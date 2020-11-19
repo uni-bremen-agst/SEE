@@ -20,7 +20,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System; 
+using System;
 
 namespace SEE.Utils
 {
@@ -39,7 +39,6 @@ namespace SEE.Utils
         public static IEnumerable<string> NumericalSort(this IEnumerable<string> list)
         {
             int maxLen = 0;
-
             try
             {
                 maxLen = list.Select(s => s.Length).Max();
@@ -47,11 +46,7 @@ namespace SEE.Utils
             catch (Exception e)
             {
                 UnityEngine.Debug.LogError("Sequence is empty ");
-                
             }
-
-            
-
             return list.Select(s => new
             {
                 OrgStr = s,

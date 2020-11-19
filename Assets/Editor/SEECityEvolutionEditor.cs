@@ -33,11 +33,6 @@ namespace SEEEditor
         private bool isGraphLoaded = false;
 
         /// <summary>
-        /// The name of the file where a node-selection will be saved
-        /// </summary>
-        public string fileName = "Backup-V1";
-
-        /// <summary>
         /// The loaded graph. It is the first one in the series of graphs.
         /// </summary>
         private Graph firstGraph = null;
@@ -47,8 +42,6 @@ namespace SEEEditor
         /// </summary>
         protected void Buttons()
         {
-            SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
-
             SEECityEvolution city = target as SEECityEvolution;
             if (firstGraph == null && GUILayout.Button("Load First Graph"))
             {
@@ -69,14 +62,12 @@ namespace SEEEditor
             fileName = EditorGUILayout.TextField("Name of File: ", fileName);
             if (GUILayout.Button("Save City") && isGraphLoaded)
             {
-                string exportPath = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select saving directory", pathPrefix.stringValue, ""));
-                city.SaveSelection(exportPath, fileName);
+                SaveCityInJSON(city);
             }
             EditorGUILayout.EndHorizontal();
             if(GUILayout.Button("Load City from json"))
             {
-                string importPath = Filenames.OnCurrentPlatform(EditorUtility.OpenFilePanel("Select loading directory", pathPrefix.stringValue, ""));
-                 city.RestoreCity(importPath,city);
+                LoadCityFromJSON(city);
             }
         }
 
