@@ -31,7 +31,7 @@ public class CityRestorer
     /// <param name="path"> The directory where the json-file will be saved </param>
     /// <param name="fileName"> The name of the json-file </param>
     /// <param name="city"> The city which will be stored in the json-file</param>
-    public static void Persist(Dictionary<string, bool> nodeTypes, string path, string fileName, AbstractSEECity city)
+    public static void Persist(string path, string fileName, AbstractSEECity city)
     {
         if(fileName == null || fileName == "")
         {
