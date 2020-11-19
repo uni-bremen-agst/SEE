@@ -105,7 +105,7 @@ namespace SEE.Game
             {
                 Graph graph = graphs.First<Graph>();                
                 graph = RelevantGraph(graph);
-                graph.FinalizeGraph();
+                graph.FinalizeNodeHierarchy();
                 return graph;
             }
         }

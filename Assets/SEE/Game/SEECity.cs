@@ -358,7 +358,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Saves the current layout of the city as GVL in a file name GVLPath.
+        /// Saves the current layout of the city as GVL in a file named <see cref="GVLPath"/>.
         /// </summary>
         public void SaveLayout()
         {

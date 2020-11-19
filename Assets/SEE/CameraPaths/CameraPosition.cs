@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using SEE.Utils;
+using System.IO;
 using UnityEngine;
 
 namespace SEE.CameraPaths
@@ -89,7 +90,7 @@ namespace SEE.CameraPaths
         private void Start()
         {
             // This gets the Main Camera from the Scene
-            mainCamera = Camera.main;
+            mainCamera = MainCamera.Camera;
             path = new CameraPath();
             if (string.IsNullOrEmpty(Directory))
             {
