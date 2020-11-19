@@ -1468,6 +1468,7 @@ GameObject:
   - component: {fileID: 1087713764}
   - component: {fileID: 1087713772}
   - component: {fileID: 1087713773}
+  - component: {fileID: 1087713774}
   m_Layer: 0
   m_Name: SEECity Evolution
   m_TagString: Code City
@@ -2217,6 +2218,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4874e0649dc8ad742a50b1d3b5845fd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1087713774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1087713763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a402756c70fc7b8428d1580ad8b0d004, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NewBeamColor: {r: 0, g: 0, b: 0, a: 0}
+  ChangedBeamColor: {r: 0.8584906, g: 0.677968, b: 0.07694017, a: 0}
+  DeletedBeamColor: {r: 0, g: 0, b: 0, a: 0}
+  PowerBeamDimensions: {x: 0.02, y: 3, z: 0.03}
 --- !u!1 &1093528283
 GameObject:
   m_ObjectHideFlags: 0

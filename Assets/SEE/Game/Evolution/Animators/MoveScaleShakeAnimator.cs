@@ -264,6 +264,8 @@ namespace SEE.Game.Evolution
             /// </summary>
             public void Update()
             {
+                List<GameObject> deletedBeams = new List<GameObject>();
+
                 if (beamHeight <= 0)
                 {
                     beamHeight = 3f;
@@ -278,8 +280,11 @@ namespace SEE.Game.Evolution
                     }
                     else
                     {
-                        powerBeams.Remove(beam);
+                        deletedBeams.Add(beam);
                     }
+                }
+                for (int i = 0; i < deletedBeams.Count; i++) {
+                    powerBeams.Remove(deletedBeams[i]);
                 }
                 // Animate deleted power beams
                 foreach (GameObject deleted in removedBeams)
