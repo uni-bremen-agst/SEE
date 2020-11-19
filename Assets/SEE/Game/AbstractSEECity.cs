@@ -755,7 +755,7 @@ namespace SEE.Game
         public void SaveSelection(string exportPath, string fileName)
         {          
             nodeTypes = SelectedNodeTypes;
-            CityRestorer.Persist(nodeTypes, exportPath, fileName, this);
+            CityRestorer.Persist(exportPath, fileName, this);
         }
 
         /// <summary>
