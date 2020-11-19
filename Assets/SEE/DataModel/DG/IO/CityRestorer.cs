@@ -39,12 +39,12 @@ public class CityRestorer
             return;
         }
         json = JsonUtility.ToJson(city,true);
-        
-        
-        string dataPath = path + "/" + fileName + ".json";
+
+        string extension = "json";
+        string dataPath = path + "/" + fileName + extension;
         System.IO.File.WriteAllText(dataPath, json);
         UnityEngine.Debug.Log("Export sucessfully\n");
->>>>>>> 7d0422c7fe0753474115329af6de07c24c919c5e
+
     }
 
 
