@@ -2028,7 +2028,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  pathPrefix: C:\Users\Leonard\Desktop\Uni\5.Semester\SEA\SEE\Data\GXL\animation-clones
+  pathPrefix: C:\Users\Leonard\Desktop\Uni\5.Semester\SEA\SEE\Data\GXL\animation-clones-log4j
   gvlPath: ..\Data\GXL\linux-clones\net.gvl
   WidthMetric: Metric.Number_of_Tokens
   HeightMetric: Metric.Clone_Rate
@@ -2230,9 +2230,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a402756c70fc7b8428d1580ad8b0d004, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NewBeamColor: {r: 0, g: 0, b: 0, a: 0}
-  ChangedBeamColor: {r: 0.8584906, g: 0.677968, b: 0.07694017, a: 0}
-  DeletedBeamColor: {r: 0, g: 0, b: 0, a: 0}
+  NewBeamColor: {r: 0.031480715, g: 0.9716981, b: 0, a: 0}
+  ChangedBeamColor: {r: 0.16197933, g: 0.7904972, b: 0.9811321, a: 0}
+  DeletedBeamColor: {r: 0.8396226, g: 0, b: 0, a: 0}
   PowerBeamDimensions: {x: 0.02, y: 3, z: 0.03}
 --- !u!1 &1093528283
 GameObject:

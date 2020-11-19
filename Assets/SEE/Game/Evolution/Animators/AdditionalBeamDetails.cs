@@ -2,6 +2,9 @@
 
 namespace SEE.Game.Evolution
 {
+    /// <summary>
+    /// Used for customizing power beams through the inspector
+    /// </summary>
     public class AdditionalBeamDetails : MonoBehaviour
     {
 
