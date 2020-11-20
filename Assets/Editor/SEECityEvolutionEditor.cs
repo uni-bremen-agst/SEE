@@ -28,11 +28,6 @@ namespace SEEEditor
         }
 
         /// <summary>
-        /// True if the underlying graph was successfully loaded.
-        /// </summary>
-        private bool isGraphLoaded = false;
-
-        /// <summary>
         /// The loaded graph. It is the first one in the series of graphs.
         /// </summary>
         private Graph firstGraph = null;
@@ -47,7 +42,6 @@ namespace SEEEditor
             {
                 firstGraph = city.LoadFirstGraph();
                 city.InspectSchema(firstGraph);
-                isGraphLoaded = true;
             }
             if (firstGraph != null && GUILayout.Button("Draw"))
             {
@@ -59,7 +53,7 @@ namespace SEEEditor
                 firstGraph = null;
             }
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Save Settings") && isGraphLoaded)
+            if (firstGraph != null && GUILayout.Button("Save Settings"))
             {
                 SaveCityInJSON(city);
             }
