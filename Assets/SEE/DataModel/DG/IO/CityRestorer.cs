@@ -34,14 +34,15 @@ public class CityRestorer
     /// <param name="city"> The city which will be stored in the json-file</param>
     public static void Persist(string path, string fileName, AbstractSEECity city)
     {
-        if(fileName == null || fileName == "")
+        
+        if (fileName == null || fileName == "")
         {
             UnityEngine.Debug.LogError("There is no filename given");
             return;
         }
         json = JsonUtility.ToJson(city,true);
 
-        string extension = "json";
+        string extension = ".json";
         string dataPath = path + "/" + fileName + extension;
         System.IO.File.WriteAllText(dataPath, json);
         UnityEngine.Debug.Log("Export sucessfully\n");
