@@ -132,8 +132,10 @@ namespace SEEEditor
                     UnityEngine.Debug.Log("Saving canceled\n");
                     return;
                 }
-                city.SaveSelection(exportPath, fileName);
+                
             }
+
+            city.SaveSelection(exportPath, fileName);
         }
     }
 }
