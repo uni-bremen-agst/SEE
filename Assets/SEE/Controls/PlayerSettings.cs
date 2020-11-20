@@ -23,6 +23,7 @@ namespace SEE.Controls
             Desktop,      // player for desktop and mouse input
             TouchGamepad, // player for touch devices or gamepads using InControl
             VR,           // player for virtual reality devices
+            None,         // no player at all
         }
 
         [Tooltip("What kind of player type should be enabled.")]
@@ -36,17 +37,41 @@ namespace SEE.Controls
         [Tooltip("Whether hints should be shown for controllers.")]
         public bool ShowControllerHints = false;
 
+        /// <summary>
+        /// The game object representing the active local player, that is, the player 
+        /// executing on this local instance of Unity.
+        /// </summary>
+        [HideInInspector]
+        public static GameObject LocalPlayer
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// The cached player input type within this local instance of Unity.
+        /// Will be updated by <see cref="GetInputType"/> upon its first call.
+        /// </summary>
+        private static PlayerInputType localPlayerInputType = PlayerInputType.None;
+
+        /// <summary>
+        /// The player input type within this local instance of Unity.
+        /// </summary>
+        /// <returns>player input type</returns>
         public static PlayerInputType GetInputType()
         {
-            PlayerInputType result = FindObjectOfType<PlayerSettings>().playerInputType;
-            return result;
+            if (localPlayerInputType == PlayerInputType.None)
+            {
+                localPlayerInputType = FindObjectOfType<PlayerSettings>().playerInputType;
+            }
+            return localPlayerInputType;
         }
 
         /// <summary>
         /// Depending on the user's selection, turns VR mode on or off and activates/deactivates
         /// the game objects representing the player in the scene.
         /// </summary>
-        private void Start()
+        private void Awake()
         {
             // We have to explicitly disable VR if the user wants us to. Otherwise the
             // mouse positions will be wrong if VR is enabled and a head-mounted display (HMD)
@@ -60,14 +85,34 @@ namespace SEE.Controls
                 Debug.LogWarningFormat("VR enabling/disabling issue: {0}", e);
             }
 
+            if (playerInputType != PlayerInputType.VR)
+            {
+                DisableSteamVRTeleporting();
+            }
+
             Debug.LogFormat("Player input type: {0}\n", playerInputType.ToString());
 
             SetActive("DesktopPlayer", playerInputType == PlayerInputType.Desktop);
             SetActive("VRPlayer", playerInputType == PlayerInputType.VR);
             SetActive("InControl", playerInputType == PlayerInputType.TouchGamepad);
+        }
 
+        private void DisableSteamVRTeleporting()
+        {
+            foreach (TeleportArea area in UnityEngine.Object.FindObjectsOfType<TeleportArea>())
+            {
+                area.gameObject.SetActive(false);
+            }
+            foreach (Teleport port in UnityEngine.Object.FindObjectsOfType<Teleport>())
+            {
+                port.gameObject.SetActive(false);
+            }
+        }
+
+        private void Start()
+        {
             // Turn off controller hints if requested in the user settings.
-            if (!ShowControllerHints)
+            if (playerInputType == PlayerInputType.VR && !ShowControllerHints)
             {
                 foreach (Hand hand in Player.instance.hands)
                 {
@@ -89,7 +134,19 @@ namespace SEE.Controls
         /// <param name="activate">whether to enable or disable the object</param>
         private void SetActive(string name, bool activate)
         {
-            GameObject.Find(name)?.SetActive(activate);
+            GameObject player = GameObject.Find(name);
+            player?.SetActive(activate);
+            if (activate)
+            {
+                if (player != null)
+                {
+                    LocalPlayer = player;
+                }
+                else
+                {
+                    Debug.LogErrorFormat("A player object named {0} to be activated could not be found.", name);
+                }
+            }
         }
 
         /// <summary>
