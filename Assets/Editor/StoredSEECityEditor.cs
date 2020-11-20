@@ -27,7 +27,7 @@ namespace SEEEditor
         /// <summary>
         /// The name of the file where a city and the node-selection will be saved
         /// </summary>
-        public string fileName = "Backup-V1";
+        public string fileName = "CitySettings";
 
         public override void OnInspectorGUI()
         {
@@ -120,7 +120,6 @@ namespace SEEEditor
                 savingDirectory = pathPrefix.stringValue;
             }
             string importPath = Filenames.OnCurrentPlatform(EditorUtility.OpenFilePanel("Select loading directory", savingDirectory, ""));
-
             if (importPath != "")
             {
             savingDirectory = importPath;
@@ -154,9 +153,7 @@ namespace SEEEditor
                 }
                 city.SaveSelection(exportPath);
             }
-        }
-
-       
+        }     
     }
 }
 

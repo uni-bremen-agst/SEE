@@ -21,7 +21,7 @@ using System;
 public class CityRestorer
 {
     /// <summary>
-    /// A city stored in a json-formatted string.
+    /// The settings of a city stored in a json-formatted string.
     /// </summary>
     private static string json = "";
 
@@ -34,12 +34,10 @@ public class CityRestorer
     public static void Persist(string path, AbstractSEECity city)
     {
         json = JsonUtility.ToJson(city,true);
-
         string extension = ".json";
         string dataPath = path + extension;
         System.IO.File.WriteAllText(dataPath, json);
         UnityEngine.Debug.Log("Export sucessfully\n");
-
     }
 
     /// <summary>
@@ -78,7 +76,7 @@ public class CityRestorer
         }
         else
         {
-            UnityEngine.Debug.Log("The types of the scene and the loaded .json-file are not matching\n");
+            UnityEngine.Debug.LogErrorFormat("The types of the scene and the loaded .json-file are not matching\n");
             return false;
         }
     }
