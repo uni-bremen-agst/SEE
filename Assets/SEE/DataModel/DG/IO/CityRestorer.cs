@@ -53,20 +53,50 @@ public class CityRestorer
     { 
         // as the user picks the directory via a directory picker/ the GUI , no specific error handling is needed at this point.
         string jsonString = File.ReadAllText(importPath);
-
+        if (city is SEECityEvolution)
+        {
+            if (!VerifySEECityEvolution(importPath))
+            {
+                return;
+            }
+        }
+        else
+        {
+            if (!VerifySEECity(importPath))
+            {
+                return;
+            }
+        }
         JsonUtility.FromJsonOverwrite(jsonString, city);
     }
 
-    public static bool VerifySEECityEvolution(String jsonFile)
+    public static bool VerifySEECityEvolution(string jsonFile)
     {
         string jsonString = File.ReadAllText(jsonFile);
-        return (jsonString.Contains("isAnSEECityEvolutionObject"));   
+        if (jsonString.Contains("isAnSEECityEvolutionObject")){
+            UnityEngine.Debug.Log("Loaded successfully\n");
+            return true;
+        }
+        else
+        {
+            UnityEngine.Debug.Log("You can´t load the settings from a SEECity in the EvolutionScene!\n");
+            return false;
+        }
     }
+    
 
-    public static bool VerifySEECity(String jsonFile)
+    public static bool VerifySEECity(string jsonFile)
     {   
         string jsonString = File.ReadAllText(jsonFile);
-        return (jsonString.Contains("isAnSEECityObject"));
+        if (jsonString.Contains("isAnSEECityObject"))
+        {
+            UnityEngine.Debug.Log("Loaded successfully\n");
+            return true;
+        }
+        else
+        {
+            UnityEngine.Debug.Log("You can´t load the settings from a SEECityEvolution in the MainScene!\n");
+            return false;
+        }
     }
-
 }

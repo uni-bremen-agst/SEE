@@ -68,13 +68,7 @@ namespace SEEEditor
             EditorGUILayout.EndHorizontal();
             if(GUILayout.Button("Load Settings"))
             {
-
-                if(VerifySEECityScene(city)) {
                 LoadCityFromJSON(city);
-                 UnityEngine.Debug.Log("Loaded successfully\n");
-                } else {
-                  UnityEngine.Debug.Log("You can´t load the settings from a SEECityEvolution in the MainScene!\n");
-                }
             }
         }
 
