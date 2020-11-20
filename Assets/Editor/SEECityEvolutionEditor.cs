@@ -59,13 +59,13 @@ namespace SEEEditor
                 firstGraph = null;
             }
             EditorGUILayout.BeginHorizontal();
-            fileName = EditorGUILayout.TextField("Name of File: ", fileName);
-            if (GUILayout.Button("Save City") && isGraphLoaded)
+            fileName = EditorGUILayout.TextField("Filename: ", fileName);
+            if (GUILayout.Button("Save Settings") && isGraphLoaded)
             {
                 SaveCityInJSON(city);
             }
             EditorGUILayout.EndHorizontal();
-            if(GUILayout.Button("Load City from json"))
+            if(GUILayout.Button("Load Settings"))
             {
                 LoadCityFromJSON(city);
             }
