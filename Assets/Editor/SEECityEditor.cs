@@ -61,7 +61,6 @@ namespace SEEEditor
             }
             EditorGUILayout.EndHorizontal();
              EditorGUILayout.BeginHorizontal();
-            fileName = EditorGUILayout.TextField("Filename: ", fileName);
             if (GUILayout.Button("Save Settings"))
             {
                SaveCityInJSON(city);

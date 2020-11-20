@@ -59,7 +59,6 @@ namespace SEEEditor
                 firstGraph = null;
             }
             EditorGUILayout.BeginHorizontal();
-            fileName = EditorGUILayout.TextField("Filename: ", fileName);
             if (GUILayout.Button("Save Settings") && isGraphLoaded)
             {
                 SaveCityInJSON(city);
