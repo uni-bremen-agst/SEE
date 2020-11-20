@@ -67,6 +67,11 @@ namespace SEE.Game.Evolution
         public GameObject RevisionSelectionCanvas; // serialized by Unity
 
         /// <summary>
+        /// The time in between two revisions in auto-play mode.
+        /// </summary>
+        private float animationTimeValue = 2;
+
+        /// <summary>
         /// The user-data model for RevisionSelectionCanvas.
         /// </summary>
         private RevisionSelectionDataModel revisionSelectionDataModel; // not serialized; will be set in Init()
@@ -103,7 +108,9 @@ namespace SEE.Game.Evolution
             animationDataModel.Slider.maxValue = evolutionRenderer.GraphCount-1;
             animationDataModel.Slider.value = evolutionRenderer.CurrentGraphIndex;
 
-            animationDataModel.PlayButton.onClick.AddListener(TaskOnClick);
+            animationDataModel.PlayButton.onClick.AddListener(TaskOnClickPlayButton);
+
+            animationDataModel.FastForwardButton.onClick.AddListener(TaskOnClickFastForwardButton);
 
             SetMode(true);
             OnShownGraphHasChanged();
@@ -113,7 +120,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Handles actions to do when the Play/Pause button has been clicked.
         /// </summary>
-        private void TaskOnClick()
+        private void TaskOnClickPlayButton()
         {
             if (!evolutionRenderer.IsAutoPlay)
             {
@@ -125,6 +132,26 @@ namespace SEE.Game.Evolution
                 evolutionRenderer.ToggleAutoPlay();
             }
             
+        }
+
+        /// <summary>
+        /// Handles actions to do when the fast forward button has been clicked.
+        /// </summary>
+        private void TaskOnClickFastForwardButton()
+        {
+            if(animationTimeValue == 2)
+            {
+                animationTimeValue = 1;
+                evolutionRenderer.AnimationLag = animationTimeValue;
+            } else if (animationTimeValue == 1)
+            {
+                animationTimeValue = 0.5f;
+                evolutionRenderer.AnimationLag = animationTimeValue;
+            } else if (animationTimeValue == 0.5f)
+            {
+                animationTimeValue = 2;
+                evolutionRenderer.AnimationLag = animationTimeValue;
+            }
         }
 
         /// <summary>
