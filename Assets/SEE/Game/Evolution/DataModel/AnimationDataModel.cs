@@ -57,7 +57,10 @@ namespace SEE.Game.Evolution
         /// </summary>
         public Button PlayButton; // serialized by Unity
 
-
+        /// <summary>
+        /// Button to fast forward the animation.
+        /// </summary>
+        public Button FastForwardButton; // serialized by Unity
 
         /// <summary>
         /// Checks if all fields are initialized.
@@ -68,6 +71,8 @@ namespace SEE.Game.Evolution
             RevisionNumberText.AssertNotNull("RevisionNumberText");
             AutoplayToggle.AssertNotNull("AutoplayToggle");
             Slider.AssertNotNull("Slider");
+            PlayButton.AssertNotNull("PlayButton");
+            FastForwardButton.AssertNotNull("FastForwardButton");
         }
     }
 }
