@@ -96,8 +96,6 @@ namespace SEE.Controls.Actions
                 Materials.New(Materials.ShaderType.TransparentLine, Color.black.ColorWithAlpha(0.9f)));
 
             Portal.SetInfinitePortal(nodeLabel);
-            // Animate text movement
-            //iTween.MoveFrom(nodeLabel, nodeTopPosition, 1f);
         }
 
         /// <summary>
