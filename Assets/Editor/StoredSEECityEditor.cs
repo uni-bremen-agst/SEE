@@ -128,12 +128,12 @@ namespace SEEEditor
             {
                 savingDirectory = pathPrefix.stringValue;
             }
-            string exportPath = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select saving directory", savingDirectory, ""));
+            string exportPath = Filenames.OnCurrentPlatform(EditorUtility.SaveFilePanel("Select saving directory", savingDirectory, fileName, ""));
             if (exportPath != "")
             {
                 savingDirectory = exportPath;
             }
-            if (File.Exists(exportPath + "/" + fileName + JsonSuffix))
+            if (File.Exists(exportPath + JsonSuffix))
             {
                 if (!EditorUtility.DisplayDialog("There is already a file with the same name in the given directory!", "Do you want to overwrite the existing file?", "Yes", "No"))
                 {
@@ -141,7 +141,7 @@ namespace SEEEditor
                     return;
                 }  
             }
-            city.SaveSelection(exportPath, fileName);
+            city.SaveSelection(exportPath);
         }
 
         protected bool VerifyEvolutionScene(AbstractSEECity city)

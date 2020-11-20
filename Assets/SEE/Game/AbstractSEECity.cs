@@ -752,10 +752,9 @@ namespace SEE.Game
         /// </summary>
         /// <param name="exportPath"> the path in which the .json File will be stored </param>
         /// <param name="fileName"> the name of the created json-file </param>
-        public void SaveSelection(string exportPath, string fileName)
+        public void SaveSelection(string exportPath)
         {          
-            nodeTypes = SelectedNodeTypes;
-            CityRestorer.Persist(exportPath, fileName, this);
+            CityRestorer.Persist(exportPath, this);
         }
 
         /// <summary>
@@ -767,12 +766,11 @@ namespace SEE.Game
         public void RestoreCity(string importPath, AbstractSEECity city )
         {
                 CityRestorer.RestoreCity(importPath, city);
-            
         }
 
         public bool VerifyEvoScene(String jsonFile)
-        {   
-            return CityRestorer.VerifySEECityEvolution(jsonFile); 
+        {
+            return CityRestorer.VerifySEECityEvolution(jsonFile);
         }
 
         public bool VerifyCityScene(String jsonFile)
