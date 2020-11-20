@@ -767,16 +767,6 @@ namespace SEE.Game
         {
                 CityRestorer.RestoreCity(importPath, city);
         }
-
-        public bool VerifyEvoScene(String jsonFile)
-        {
-            return CityRestorer.VerifySEECityEvolution(jsonFile);
-        }
-
-        public bool VerifyCityScene(String jsonFile)
-        {
-            return CityRestorer.VerifySEECity(jsonFile);
-        }
     }
 }
 

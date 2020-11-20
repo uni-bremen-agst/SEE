@@ -114,7 +114,18 @@ namespace SEEEditor
         /// <param name="city">the city to be overwritten by the json-file</param>
         protected void LoadCityFromJSON(AbstractSEECity city)
         {
-            city.RestoreCity(jsonFileName, city);
+            SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
+            if (savingDirectory == null)
+            {
+                savingDirectory = pathPrefix.stringValue;
+            }
+            string importPath = Filenames.OnCurrentPlatform(EditorUtility.OpenFilePanel("Select loading directory", savingDirectory, ""));
+
+            if (importPath != "")
+            {
+            savingDirectory = importPath;
+            city.RestoreCity(importPath, city);
+            }
         }
 
         /// <summary>
@@ -132,31 +143,20 @@ namespace SEEEditor
             if (exportPath != "")
             {
                 savingDirectory = exportPath;
-            }
-            if (File.Exists(exportPath + JsonSuffix))
-            {
-                if (!EditorUtility.DisplayDialog("There is already a file with the same name in the given directory!", "Do you want to overwrite the existing file?", "Yes", "No"))
+
+                if (File.Exists(exportPath + JsonSuffix))
                 {
-                    UnityEngine.Debug.Log("Saving canceled\n");
-                    return;
-                }  
+                    if (!EditorUtility.DisplayDialog("There is already a file with the same name in the given directory!", "Do you want to overwrite the existing file?", "Yes", "No"))
+                    {
+                        UnityEngine.Debug.Log("Saving canceled\n");
+                        return;
+                    }
+                }
+                city.SaveSelection(exportPath);
             }
-            city.SaveSelection(exportPath);
         }
 
-        protected bool VerifyEvolutionScene(AbstractSEECity city)
-        {
-            SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
-            jsonFileName = Filenames.OnCurrentPlatform(EditorUtility.OpenFilePanel("Select loading directory", pathPrefix.stringValue, ""));
-            return city.VerifyEvoScene(jsonFileName);
-        }
-
-         protected bool VerifySEECityScene(AbstractSEECity city)
-        {
-            SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
-            jsonFileName = Filenames.OnCurrentPlatform(EditorUtility.OpenFilePanel("Select loading directory", pathPrefix.stringValue, ""));
-            return city.VerifyCityScene(jsonFileName);
-        }
+       
     }
 }
 
