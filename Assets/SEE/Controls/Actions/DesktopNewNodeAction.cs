@@ -4,30 +4,61 @@ using UnityEngine;
 using SEE.DataModel.DG;
 using SEE.Game;
 using UnityEngine.TestTools;
+using SEE.Controls.Actions;
 
 namespace SEE.Controls {
+
     public class DesktopNewNodeAction : MonoBehaviour
     {
+        
+        private bool is_innerNode = false;
+
+        DesktopNewNodeAction(bool is_innerNode)
+        {
+            this.is_innerNode = is_innerNode;
+        }
         // Start is called before the first frame update
         //temp save the new node
         //maybe i need graphrenderer.draw(gameObject)
-        Node node;
-        GameObject nodeRepresentation;
-        SEECity city;
-        GraphRenderer graphRenderer;
+        private Node node;
+        private GameObject nodeRepresentation;
+        private  SEECity city;
+        private GraphRenderer graphRenderer;
+        private bool is_selected = false;
+        GameObject codeCityObject;
+        NewNodeHoverAction newNodeHoverAction ;
         //Represents which kin of node should be created
-        bool is_innerNode = false;
         void Start()
         {
-            //gameObject.AddComponent(SEECity());
-           
+            
+            //SceneQueries.GetCodeCity();
            gameObject.TryGetComponent<SEECity>(out city);
-           graphRenderer = new GraphRenderer(city, city.LoadedGraph);
+           graphRenderer = city.Renderer;
+            newNodeHoverAction = gameObject.AddComponent<NewNodeHoverAction>();
         }
 
         // Update is called once per frame
         void Update()
         {
+            if (!is_selected)
+            {
+                
+
+
+                //Code to select the city
+                //if you hover over a city with the mouse then highlight it yellow 
+                
+                if (Input.GetButtonDown("Fire1"))
+                {
+                    GameObject hovers = newNodeHoverAction.selectGameObject();
+                    codeCityObject = SceneQueries.GetCodeCity(hovers.transform)?.gameObject;
+
+                    
+                    //on click save the GameObject of it to use the graph
+                    is_selected = true;
+                }
+            }
+
             
             //Currently i can only add one new node because we need to persist the added node 
             //Eventuell hilft die Mehtode GetNode from ObjectManager
@@ -45,8 +76,19 @@ namespace SEE.Controls {
                 node = new Node();
                 node.SourceName= "NEW-NODE";
                 node.ItsGraph = city.LoadedGraph;
+               //?? Muss ich das setzten? --> node.Type
                 //graphRenderer.ToString(); //test output if graphrenderer works
-                nodeRepresentation = graphRenderer.NewLeafNode(node);
+                if (is_innerNode)
+                {
+                    nodeRepresentation = graphRenderer.NewInnerNode(node);
+
+
+                }
+                else
+                {
+                    nodeRepresentation = graphRenderer.NewLeafNode(node);
+                }
+                
                 Debug.Log("NodeEditMODE TRUE\n");
             }
 
@@ -58,32 +100,20 @@ namespace SEE.Controls {
                 mp = Camera.main.ScreenToWorldPoint(mp);
                 nodeRepresentation.transform.position = new Vector3(mp.x, 1, mp.z);
 
-                //iF b is pressed change the node kind, later this will be removed and replaced with the menu action where you can choose wich node you want to add
-                if (Input.GetKeyDown(KeyCode.B))
-
-                {
-                    if (is_innerNode)
-                    {
-                        is_innerNode = false;
-                        nodeRepresentation = graphRenderer.NewLeafNode(node);
-
-                    }
-                    else
-                    {
-                        is_innerNode = true;
-                        nodeRepresentation = graphRenderer.NewInnerNode(node);
-                    }
-                }
                 if (Input.GetButtonDown("Fire1")) //Looks for a Left Klick
                 {
+
+                    GameObject hovers = newNodeHoverAction.selectGameObject();
+                    Node tempNode;
+                    //node.Parent = hovers.TryGetComponent<Node>(out tempNode);
                     Debug.Log("NodeEditModeLeftKlick\n");
-                    //gets the mouse podsition
+                    //gets the mouse position
                     Debug.Log(Input.mousePosition);
                     //Place node and set newNode to Null
                     if (is_innerNode)
                     {
                         //todo enter name of node
-
+                        
                     }
                     else
                     {
@@ -93,7 +123,7 @@ namespace SEE.Controls {
                 }
 
             }
-            if (Input.GetKeyDown(KeyCode.Y) && node != null)
+            if (Input.GetKeyDown(KeyCode.Y) && node != null) //vlt später durch eine kill funciton ersetzten die über das menu dann aufgerufen wird
             {
                 //exit node adding
                 //remove node from cursor
