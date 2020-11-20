@@ -17,7 +17,8 @@ namespace SEE.Controls.Actions
         {
             Browse,   // the user just browses the city; this is the default
             MoveNode, // a game node is being moved within its city
-            MapNode   // a game node is mapped from one city to another city
+            MapNode,   // a game node is mapped from one city to another city
+            NewNode //a  game node is being created
         }
 
         /// <summary>
@@ -45,6 +46,10 @@ namespace SEE.Controls.Actions
                             selectedObject = null;
                         }
                     }
+                    break
+                case State.NewNode:
+                    bool is_innerNode = false; //FIXME: Change it later into the selection of the submenu 
+                    DesktopNewNodeAction.NewNode(is_innerNode);
                     break;
             }
         }
@@ -81,6 +86,16 @@ namespace SEE.Controls.Actions
         public void Map()
         {
             Enter(State.MapNode);
+        }
+
+        /// <summary>
+        /// Changes the state to NewNode. 
+        /// 
+        /// This method is called as a callback from the menu.
+        /// </summary>
+        public void NewNode()
+        {
+            Enter(State.NewNode);
         }
 
         /// <summary>
