@@ -766,7 +766,18 @@ namespace SEE.Game
         /// <param name="city"> the city which will be overwritten </param>
         public void RestoreCity(string importPath, AbstractSEECity city )
         {
-            CityRestorer.RestoreCity(importPath, city);
+                CityRestorer.RestoreCity(importPath, city);
+            
+        }
+
+        public bool VerifyEvoScene(String jsonFile)
+        {   
+            return CityRestorer.VerifySEECityEvolution(jsonFile); 
+        }
+
+        public bool VerifyCityScene(String jsonFile)
+        {
+            return CityRestorer.VerifySEECity(jsonFile);
         }
     }
 }

@@ -33,6 +33,12 @@ namespace SEE.Game
     public class SEECityEvolution : AbstractSEECity
     {
         /// <summary>
+        /// A simple string variable for verification of the .json export and determine whether
+        /// it is an SEECityEvolution object.
+        /// </summary>
+        public string isAnSEECityEvolutionObject = "isAnSEECityEvolutionObject"; 
+
+        /// <summary>
         /// Sets the maximum number of revsions to load.
         /// </summary>
         public int maxRevisionsToLoad = 500;  // serialized by Unity

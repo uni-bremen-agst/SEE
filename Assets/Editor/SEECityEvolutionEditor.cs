@@ -67,7 +67,12 @@ namespace SEEEditor
             EditorGUILayout.EndHorizontal();
             if(GUILayout.Button("Load Settings"))
             {
+                if(VerifyEvolutionScene(city)) {
                 LoadCityFromJSON(city);
+                UnityEngine.Debug.Log("Loaded successfully\n");
+                } else {
+                UnityEngine.Debug.Log("You can´t load the settings from a SEECity in the EvolutionScene!\n");
+                }
             }
         }
 
