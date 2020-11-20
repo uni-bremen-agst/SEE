@@ -109,7 +109,7 @@ namespace SEEEditor
         }
 
         /// <summary>
-        /// Loads and restores a city from a json-file in a <paramref name="city"/>
+        /// Loads and restores the settings of a city from a json-file in the existing <paramref name="city"/>
         /// </summary>
         /// <param name="city">the city to be overwritten by the json-file</param>
         protected void LoadCityFromJSON(AbstractSEECity city)
