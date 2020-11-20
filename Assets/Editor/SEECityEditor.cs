@@ -30,31 +30,31 @@ namespace SEEEditor
         {
             SEECity city = target as SEECity;
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Load Graph"))
+            if (city.LoadedGraph == null && GUILayout.Button("Load Graph"))
             {
                 Load(city);
             }
-            if (GUILayout.Button("Delete Graph"))
+            if (city.LoadedGraph != null && GUILayout.Button("Delete Graph"))
             {
                 Reset(city);
             }
-            if (GUILayout.Button("Save Graph"))
+            if (city.LoadedGraph != null && GUILayout.Button("Save Graph"))
             {
                 Save(city);
             }
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Draw"))
+            if (city.LoadedGraph != null && GUILayout.Button("Draw"))
             {
                 Draw(city);
             }
-            if (GUILayout.Button("Re-Draw"))
+            if (city.LoadedGraph != null && GUILayout.Button("Re-Draw"))
             {
                 ReDraw(city);
             }
 
-            if (GUILayout.Button("Save Layout"))
+            if (city.LoadedGraph != null && GUILayout.Button("Save Layout"))
             {
                 SaveLayout(city);
             }

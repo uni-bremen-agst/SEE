@@ -527,7 +527,7 @@ namespace SEE.Game
                     }
                     catch (Exception e)
                     {
-                        Debug.LogErrorFormat("Exception raised for {0}: {1}\n", parent.ID, e);
+                        Debug.LogErrorFormat("Exception raised while adding the game object corresponding to {0} to the parent {1}: {2}\n", node.ID, parent.ID, e);
                     }
                 }
             }
