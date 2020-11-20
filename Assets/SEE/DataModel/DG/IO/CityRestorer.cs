@@ -42,8 +42,6 @@ public class CityRestorer
 
     }
 
-
-   
     /// <summary>
     /// Loads a city from the given <paramref name="importPath"/> and overwrites the <paramref name="city"/>
     /// </summary>
@@ -53,49 +51,34 @@ public class CityRestorer
     { 
         // as the user picks the directory via a directory picker/ the GUI , no specific error handling is needed at this point.
         string jsonString = File.ReadAllText(importPath);
-        if (city is SEECityEvolution)
+        if(VerifyCityType(importPath, city))
         {
-            if (!VerifySEECityEvolution(importPath))
-            {
-                return;
-            }
+            JsonUtility.FromJsonOverwrite(jsonString, city);
         }
-        else
-        {
-            if (!VerifySEECity(importPath))
-            {
-                return;
-            }
-        }
-        JsonUtility.FromJsonOverwrite(jsonString, city);
     }
 
-    public static bool VerifySEECityEvolution(string jsonFile)
+    /// <summary>
+    /// Veryfies wether the types of the city and the json-file are matching.
+    /// </summary>
+    /// <param name="jsonFile">the .json-file with the settings for the city</param>
+    /// <param name="city">the city, which has to be overwritten</param>
+    /// <returns>true, if the types are matching, otherwise false</returns>
+    public static bool VerifyCityType(string jsonFile, AbstractSEECity city)
     {
         string jsonString = File.ReadAllText(jsonFile);
-        if (jsonString.Contains("isAnSEECityEvolutionObject")){
+        if (jsonString.Contains("isAnSEECityObject") && city is SEECity)
+        {
             UnityEngine.Debug.Log("Loaded successfully\n");
             return true;
         }
-        else
-        {
-            UnityEngine.Debug.Log("You can´t load the settings from a SEECity in the EvolutionScene!\n");
-            return false;
-        }
-    }
-    
-
-    public static bool VerifySEECity(string jsonFile)
-    {   
-        string jsonString = File.ReadAllText(jsonFile);
-        if (jsonString.Contains("isAnSEECityObject"))
+        if (jsonString.Contains("isAnSEECityEvolutionObject") && city is SEECityEvolution)
         {
             UnityEngine.Debug.Log("Loaded successfully\n");
             return true;
         }
         else
         {
-            UnityEngine.Debug.Log("You can´t load the settings from a SEECityEvolution in the MainScene!\n");
+            UnityEngine.Debug.Log("The types of the scene and the loaded .json-file are not matching\n");
             return false;
         }
     }
