@@ -25,11 +25,23 @@ namespace SEE.Controls
         /// </summary>
         public enum PlayerInputType
         {
-            Desktop,      // player for desktop and mouse input
+            Desktop = 0,      // player for desktop and mouse input
             TouchGamepad, // player for touch devices or gamepads using InControl
             VR,           // player for virtual reality devices
-            HoloLens      // player for mixed reality devices
+            HoloLens,     // player for mixed reality devices
+            None,         // no player at all
         }
+
+        /// <summary>
+        /// A mapping from PlayerInputType onto the names of the player game objects.
+        /// </summary>
+        static readonly string[] PlayerName = new[] {
+            "DesktopPlayer",
+            "VRPlayer",
+            "InControl",
+            "MRPlayer",
+            "No Player",
+            };
 
         [Tooltip("What kind of player type should be enabled.")]
         [OdinSerialize]
@@ -49,17 +61,41 @@ namespace SEE.Controls
         [Tooltip("The factor by which code cities should be scaled on startup."), OdinSerialize, Min(0.01f)]
         public float CityScalingFactor = 1f;
 
+        /// <summary>
+        /// The game object representing the active local player, that is, the player 
+        /// executing on this local instance of Unity.
+        /// </summary>
+        [HideInInspector]
+        public static GameObject LocalPlayer
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// The cached player input type within this local instance of Unity.
+        /// Will be updated by <see cref="GetInputType"/> upon its first call.
+        /// </summary>
+        private static PlayerInputType localPlayerInputType = PlayerInputType.None;
+
+        /// <summary>
+        /// The player input type within this local instance of Unity.
+        /// </summary>
+        /// <returns>player input type</returns>
         public static PlayerInputType GetInputType()
         {
-            PlayerInputType result = FindObjectOfType<PlayerSettings>().playerInputType;
-            return result;
+            if (localPlayerInputType == PlayerInputType.None)
+            {
+                localPlayerInputType = FindObjectOfType<PlayerSettings>().playerInputType;
+            }
+            return localPlayerInputType;
         }
 
         /// <summary>
         /// Depending on the user's selection, turns VR mode on or off and activates/deactivates
         /// the game objects representing the player in the scene.
         /// </summary>
-        private void Start()
+        private void Awake()
         {
             // We have to explicitly disable VR if the user wants us to. Otherwise the
             // mouse positions will be wrong if VR is enabled and a head-mounted display (HMD)
@@ -73,15 +109,36 @@ namespace SEE.Controls
                 Debug.LogWarningFormat("VR enabling/disabling issue: {0}", e);
             }
 
+            if (playerInputType != PlayerInputType.VR)
+            {
+                DisableSteamVRTeleporting();
+            }
+
             Debug.LogFormat("Player input type: {0}\n", playerInputType.ToString());
 
-            SetActive("DesktopPlayer", playerInputType == PlayerInputType.Desktop);
-            SetActive("VRPlayer", playerInputType == PlayerInputType.VR);
-            SetActive("InControl", playerInputType == PlayerInputType.TouchGamepad);
+            SetActive(PlayerName[(int)PlayerInputType.Desktop], playerInputType == PlayerInputType.Desktop);
+            SetActive(PlayerName[(int)PlayerInputType.VR], playerInputType == PlayerInputType.VR);
+            SetActive(PlayerName[(int)PlayerInputType.TouchGamepad], playerInputType == PlayerInputType.TouchGamepad);
             SetMixedReality(playerInputType == PlayerInputType.HoloLens);
+            SetLocalPlayer(PlayerName[(int)playerInputType]);
+        }
 
+        private void DisableSteamVRTeleporting()
+        {
+            foreach (TeleportArea area in UnityEngine.Object.FindObjectsOfType<TeleportArea>())
+            {
+                area.gameObject.SetActive(false);
+            }
+            foreach (Teleport port in UnityEngine.Object.FindObjectsOfType<Teleport>())
+            {
+                port.gameObject.SetActive(false);
+            }
+        }
+
+        private void Start()
+        {
             // Turn off controller hints if requested in the user settings.
-            if (!ShowControllerHints)
+            if (playerInputType == PlayerInputType.VR && !ShowControllerHints)
             {
                 foreach (Hand hand in Player.instance.hands)
                 {
@@ -102,7 +159,7 @@ namespace SEE.Controls
          */
         private void SetMixedReality(bool isActive)
         {
-            SetActive("MRPlayer", isActive);
+            SetActive(PlayerName[(int)PlayerInputType.HoloLens], isActive);
             SetActive("MixedRealityToolkit", isActive);
             SetActive("CityCollection", isActive);
             
@@ -116,8 +173,6 @@ namespace SEE.Controls
             if (!isActive)
             {
                 MixedRealityToolkit.SetInstanceInactive(MixedRealityToolkit.Instance);
-                // MRTK also changes camera attributes for a better mixed reality experience, so we revert that here
-                GameObject.FindWithTag("MainCamera").GetComponent<Camera>()?.Reset();
             }
             else
             {
@@ -141,8 +196,7 @@ namespace SEE.Controls
                     grid.CellWidth = cities.Select(x => x.transform.localScale.MaxComponent()).Max();
                     grid.UpdateCollection();
                 }
-            }
-            
+            }            
         }
 
         /// <summary>
@@ -152,7 +206,25 @@ namespace SEE.Controls
         /// <param name="activate">whether to enable or disable the object</param>
         private void SetActive(string name, bool activate)
         {
-            GameObject.Find(name)?.SetActive(activate);
+            GameObject player = GameObject.Find(name);
+            player?.SetActive(activate);           
+        }
+
+        /// <summary>
+        /// Sets <see cref="LocalPlayer"/> by retrieving the game object with the given <paramref name="name"/>.
+        /// </summary>
+        /// <param name="name">name of the player game object</param>
+        private static void SetLocalPlayer(string name)
+        {
+            GameObject player = GameObject.Find(name);
+            if (player != null)
+            {
+                LocalPlayer = player;
+            }
+            else
+            {
+                Debug.LogErrorFormat("A player object named {0} to be activated could not be found.", name);
+            }
         }
 
         /// <summary>

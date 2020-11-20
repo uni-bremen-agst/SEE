@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.Net
 {
@@ -22,7 +23,7 @@ namespace SEE.Net
         {
             if (GetComponent<ViewContainer>().IsOwner())
             {
-                cameraTransform = Camera.main.transform ?? throw new System.ArgumentNullException("Main camera must not be null!");
+                cameraTransform = MainCamera.Camera.transform ?? throw new System.ArgumentNullException("Main camera must not be null!");
                 for (int i = 0; i < transform.childCount; i++)
                 {
                     transform.GetChild(i).gameObject.SetActive(false);
