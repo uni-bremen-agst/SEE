@@ -132,5 +132,10 @@ namespace SEE.Controls {
                 //DesktopInput.NodeCreationRequested()
             }
         }
+
+        public void NewNode(bool is_innerNode)
+        {
+            //Implement method
+        }
     }
 }
