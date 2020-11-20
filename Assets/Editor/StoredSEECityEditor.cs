@@ -22,6 +22,7 @@ namespace SEEEditor
         private string path = "";
         private string JsonSuffix = ".json";
         private string savingDirectory;
+        private string jsonFileName = "";
 
         /// <summary>
         /// The name of the file where a city and the node-selection will be saved
@@ -113,9 +114,7 @@ namespace SEEEditor
         /// <param name="city">the city to be overwritten by the json-file</param>
         protected void LoadCityFromJSON(AbstractSEECity city)
         {
-        SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
-            string importPath = Filenames.OnCurrentPlatform(EditorUtility.OpenFilePanel("Select loading directory", pathPrefix.stringValue, ""));
-            city.RestoreCity(importPath, city);
+            city.RestoreCity(jsonFileName, city);
         }
 
         /// <summary>
@@ -143,6 +142,20 @@ namespace SEEEditor
                 }  
             }
             city.SaveSelection(exportPath, fileName);
+        }
+
+        protected bool VerifyEvolutionScene(AbstractSEECity city)
+        {
+            SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
+            jsonFileName = Filenames.OnCurrentPlatform(EditorUtility.OpenFilePanel("Select loading directory", pathPrefix.stringValue, ""));
+            return city.VerifyEvoScene(jsonFileName);
+        }
+
+         protected bool VerifySEECityScene(AbstractSEECity city)
+        {
+            SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
+            jsonFileName = Filenames.OnCurrentPlatform(EditorUtility.OpenFilePanel("Select loading directory", pathPrefix.stringValue, ""));
+            return city.VerifyCityScene(jsonFileName);
         }
     }
 }
