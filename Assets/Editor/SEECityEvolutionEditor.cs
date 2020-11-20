@@ -66,8 +66,12 @@ namespace SEEEditor
             }
             EditorGUILayout.EndHorizontal();
             if(GUILayout.Button("Load City from json"))
-            {
+            {   if(VerifyEvolutionScene(city)) {
                 LoadCityFromJSON(city);
+                UnityEngine.Debug.Log("Loaded successfully");
+                } else {
+                UnityEngine.Debug.Log("It is not an Evolution scene");
+                }
             }
         }
 

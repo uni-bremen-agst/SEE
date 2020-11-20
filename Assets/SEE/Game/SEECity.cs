@@ -218,6 +218,12 @@ namespace SEE.Game
         public string CSVPath => PathPrefix + csvPath;
 
         /// <summary>
+        /// A simple string variable in order to differentiate before loading data
+        /// from a stored .json file
+        /// </summary>
+        public string isASEECityObject = "isAnSEECityObject";
+        
+        /// <summary>
         /// Loads the metrics from CSVPath() and aggregates and adds them to the graph.
         /// Precondition: graph must have been loaded before.
         /// </summary>

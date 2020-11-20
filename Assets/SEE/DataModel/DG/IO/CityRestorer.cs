@@ -60,7 +60,20 @@ public class CityRestorer
     { 
         // as the user picks the directory via a directory picker/ the GUI , no specific error handling is needed at this point.
         string jsonString = File.ReadAllText(importPath);
+
         JsonUtility.FromJsonOverwrite(jsonString, city);
+    }
+
+    public static bool VerifySEECityEvolution(String jsonFile)
+    {
+        string jsonString = File.ReadAllText(jsonFile);
+        return (jsonString.Contains("isAnSEECityEvolutionObject"));   
+    }
+
+    public static bool VerifySEECity(String jsonFile)
+    {   
+        string jsonString = File.ReadAllText(jsonFile);
+        return (jsonString.Contains("isAnSEECityObject"));
     }
 
 }
