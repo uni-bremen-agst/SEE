@@ -21,6 +21,7 @@ namespace SEEEditor
         private bool pressed = false;
         private string path = "";
         private string JsonSuffix = ".json";
+        private string savingDirectory;
 
         /// <summary>
         /// The name of the file where a city and the node-selection will be saved
@@ -124,17 +125,23 @@ namespace SEEEditor
         protected void SaveCityInJSON(AbstractSEECity city)
         {
         SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
-            string exportPath = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select saving directory", pathPrefix.stringValue, ""));
+            if(savingDirectory == null)
+            {
+                savingDirectory = pathPrefix.stringValue;
+            }
+            string exportPath = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select saving directory", savingDirectory, ""));
+            if (exportPath != "")
+            {
+                savingDirectory = exportPath;
+            }
             if (File.Exists(exportPath + "/" + fileName + JsonSuffix))
             {
                 if (!EditorUtility.DisplayDialog("There is already a file with the same name in the given directory!", "Do you want to overwrite the existing file?", "Yes", "No"))
                 {
                     UnityEngine.Debug.Log("Saving canceled\n");
                     return;
-                }
-                
+                }  
             }
-
             city.SaveSelection(exportPath, fileName);
         }
     }
