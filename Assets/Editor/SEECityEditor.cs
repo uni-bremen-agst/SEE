@@ -69,7 +69,13 @@ namespace SEEEditor
             EditorGUILayout.EndHorizontal();
             if(GUILayout.Button("Load City from json"))
             {
+
+                if(VerifySEECityScene(city)) {
                 LoadCityFromJSON(city);
+                 UnityEngine.Debug.Log("Loaded successfully");
+                } else {
+                  UnityEngine.Debug.Log("It is not a SEECity scene");
+                }
             }
         }
 
