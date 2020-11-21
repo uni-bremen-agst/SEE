@@ -398,8 +398,10 @@ namespace SEE.Game
             // Add light to simulate emissive effect
             AddLight(nodeToGameObject, rootGameNode);
 
-            GO.Plane portalPlane = parent.GetComponent<GO.Plane>();
-            portalPlane.HeightOffset = rootGameNode.transform.position.y - parent.transform.position.y;
+            if (parent.TryGetComponent<GO.Plane>(out GO.Plane portalPlane))
+            {
+                portalPlane.HeightOffset = rootGameNode.transform.position.y - parent.transform.position.y;
+            }
         }
 
         /// <summary>
@@ -791,7 +793,7 @@ namespace SEE.Game
                 case NodeLayoutKind.CompoundSpringEmbedder:
                     return new CoseLayout(groundLevel, settings);
                 case NodeLayoutKind.FromFile:
-                    return new LoadedNodeLayout(groundLevel, settings.GVLPath);
+                    return new LoadedNodeLayout(groundLevel, settings.LayoutPath);
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
             }

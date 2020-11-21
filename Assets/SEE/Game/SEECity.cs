@@ -358,11 +358,23 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Saves the current layout of the city as GVL in a file named <see cref="GVLPath"/>.
+        /// Saves the current layout of the city in a file named <see cref="LayoutPath"/>.
+        /// The format of the written file depends upon the file extension. If the extension
+        /// is <see cref="Filenames.GVLExtension"/> it is saved in the GVL format; otherwise
+        /// the file is saved in the SLD format.
         /// </summary>
         public void SaveLayout()
         {
-            Layout.IO.Writer.Save(GVLPath, loadedGraph.Name, AllNodeDescendants(gameObject));
+            string path = LayoutPath;
+            Debug.LogFormat("Saving layout data to {0}.\n", path);
+            if (Filenames.HasExtension(path, Filenames.GVLExtension))
+            {
+                Layout.IO.GVLWriter.Save(LayoutPath, loadedGraph.Name, AllNodeDescendants(gameObject));
+            }
+            else
+            {
+                Layout.IO.SLDWriter.Save(LayoutPath, AllNodeDescendants(gameObject));
+            }
         }
 
         /// <summary>
