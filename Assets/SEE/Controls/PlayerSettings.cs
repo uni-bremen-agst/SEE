@@ -123,6 +123,9 @@ namespace SEE.Controls
             SetLocalPlayer(PlayerName[(int)playerInputType]);
         }
 
+        /// <summary>
+        /// Disabbles all TeleportAreas and Teleports (SteamVR).
+        /// </summary>
         private void DisableSteamVRTeleporting()
         {
             foreach (TeleportArea area in UnityEngine.Object.FindObjectsOfType<TeleportArea>())
@@ -153,10 +156,11 @@ namespace SEE.Controls
             }
         }
 
-        /**
-         * Enables or disables mixed reality capabilities, including the Mixed Reality Toolkit.
-         * <param name="isActive">If true, mixed reality capabilities are enabled, otherwise they will be disabled.</param>
-         */
+
+        /// <summary>
+        /// Enables or disables mixed reality capabilities, including the Mixed Reality Toolkit.
+        /// </summary>
+        /// param name = "isActive" > If true, mixed reality capabilities are enabled, otherwise they will be disabled.</param>
         private void SetMixedReality(bool isActive)
         {
             SetActive(PlayerName[(int)PlayerInputType.HoloLens], isActive);
