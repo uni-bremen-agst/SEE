@@ -59,6 +59,19 @@ namespace SEE.Game.Evolution
             changedBeamColor = ChangedBeamColor;
             deletedBeamColor = DeletedBeamColor;
             powerBeamDimensions = PowerBeamDimensions;
+            float beamX = 0.02f, beamY = 3f, beamZ =  0.02f;
+            if (powerBeamDimensions.x <= beamX)
+            {
+                powerBeamDimensions = new Vector3(beamX, powerBeamDimensions.y, powerBeamDimensions.z);
+            }
+            if (powerBeamDimensions.y <= 0)
+            {
+                powerBeamDimensions = new Vector3(powerBeamDimensions.x, beamY, powerBeamDimensions.z);
+            }
+            if (powerBeamDimensions.z <= beamZ)
+            {
+                powerBeamDimensions = new Vector3(powerBeamDimensions.x, powerBeamDimensions.y, beamZ);
+            }
         }
     }
 }
