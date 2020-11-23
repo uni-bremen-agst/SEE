@@ -74,8 +74,6 @@ namespace SEEEditor
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Duration");
             animator.CallDuration = EditorGUILayout.FloatField(animator.CallDuration);
-            GUILayout.Label("#Edges");
-            animator.NumberOfEdges = EditorGUILayout.IntField(animator.NumberOfEdges);
             if (GUILayout.Button("Call Graph"))
             {
                 animator.CallGraph();
