@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using SEE.DataModel.DG;
 using SEE.Game;
-using UnityEngine.TestTools;
 using SEE.Controls.Actions;
 
 namespace SEE.Controls {
@@ -139,17 +138,20 @@ namespace SEE.Controls {
         {
             GameObject gameNode;
             Node node = new Node();
-            node.ItsGraph = city.LoadedGraph;
+            node.ItsGraph = city.LoadedGraph; //Darf ich das? müsste ja spaeter beim platzieren automatisch angepasst werden
+            //Fehlt hier noch etwas was umbedingt vorher gemacht werden muss?
             GraphRenderer graphRenderer = city.Renderer;
 
             if (is_innerNode)
             {
-                gameNode = graphRenderer.NewInnerNode(node);
+                gameNode = graphRenderer.NewInnerNode(node); //Bereich auswählen? bsp Multiselect von windows
+                //laenge hat bedeutung in Implementierung aber nicht in Architektur? Kann man irgendwie einen Unterschied in den Citys finden um es zu identifiezieren?
 
             }
             else
             {
                 gameNode = graphRenderer.NewLeafNode(node);
+                //Skalierung nur bei Architektur?
             }
 
 
@@ -164,6 +166,9 @@ namespace SEE.Controls {
        public static void SetMetricsOfNode(GameObject node)
         {
             //Set the Metrics
+            //Welche metriken Brauche ich?
+            //Skalieren der knoten? wenn ja wie? z.B. wie das normale Unity tool mit zum groeßer und kleiner ziehen?
+            //bsp Name über text eingabe fenster?
             
         }
 
