@@ -3,7 +3,6 @@ using SEE.DataModel;
 using SEE.GO;
 using SEE.DataModel.DG;
 using System.Collections.Generic;
-using UnityEngine.Assertions;
 
 namespace SEE.Game
 {
