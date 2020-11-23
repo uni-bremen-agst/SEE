@@ -134,7 +134,18 @@ namespace SEE.Game
                 }
             }
 
-#if false
+#if true
+            RemoveTransparency();
+#endif
+        }
+
+        /// <summary>
+        /// All game objects representing a graph node or edge in the current scene will be made
+        /// opaque (no transparency).
+        /// </summary>
+        private static void RemoveTransparency()
+        {
+            // Remove transparency of all nodes and edges
             foreach (NodeRef nodeRef in FindObjectsOfType<NodeRef>())
             {
                 MeshRenderer meshRenderer = nodeRef.gameObject.GetComponent<MeshRenderer>();
@@ -157,7 +168,27 @@ namespace SEE.Game
                     material.SetColor("_Color", color);
                 }
             }
-#endif
+        }
+
+        /// <summary>
+        /// Sets all NodeRefs and EdgeRefs for this city to the nodes and edges, respectively,
+        /// they correspond to. This will take place for the graph elements of the
+        /// <see cref="LoadedGraph"/> only.
+        /// We assume that the game objects with a NodeRef/EdgeRef required to be
+        /// defined to be immediate children of this SEECity. Moreover, we assume a child
+        /// game object's name is the ID of the corresponding graph node/edge.
+        /// </summary>
+        public void SetNodeEdgeRefs()
+        {
+            if (loadedGraph != null)
+            {
+                SetNodeEdgeRefs(loadedGraph, gameObject);
+                Debug.Log("Node and edge references are resolved.\n");
+            }
+            else
+            {
+                Debug.LogError("No graph loaded.\n");
+            }
         }
 
         /// <summary>
