@@ -46,10 +46,20 @@ namespace SEE.Controls.Actions
                             selectedObject = null;
                         }
                     }
-                    break
+                    break;
                 case State.NewNode:
+                    SEECity DUMMY = new SEECity(); //FIXME: Change to selection Action
                     bool is_innerNode = false; //FIXME: Change it later into the selection of the submenu 
-                    DesktopNewNodeAction.NewNode(is_innerNode);
+                    GameObject node = DesktopNewNodeAction.NewNode(is_innerNode, DUMMY);
+                    if (DesktopNewNodeAction.Place())
+                    {
+                        GameNodeMover.FinalizePosition(node);
+                        DesktopNewNodeAction.SetMetricsOfNode(node);
+                    }
+                    else
+                    {
+                        GameNodeMover.MoveTo(node);
+                    }
                     break;
             }
         }
