@@ -15,45 +15,45 @@ namespace SEE.Game
         // Edge types 
         //------------------
 
-        public static readonly HashSet<string> ReflexionEdges = new HashSet<string>()
+        public static readonly HashSet<string> ReflexionEdgeTypes = new HashSet<string>()
         {
             "Absence",             
             "Convergence",
             "Divergence",
         };
 
-        public static readonly HashSet<string> ArchitectureEdges = new HashSet<string>()
+        public static readonly HashSet<string> ArchitectureEdgeTypes = new HashSet<string>()
         {
             "Source_Dependency",
         };
 
-        public static readonly HashSet<string> AllEdges = new HashSet<string>();
+        public static readonly HashSet<string> AllEdgeTypes = new HashSet<string>();
 
-        private HashSet<string> implementationEdges = new HashSet<string>();
+        private HashSet<string> implementationEdgeTypes = new HashSet<string>();
 
-        public HashSet<string> ImplementationEdges
+        public HashSet<string> ImplementationEdgeTypes
         {
             get
             {
-                if (implementationEdges.Count == 0)
+                if (implementationEdgeTypes.Count == 0)
                 {
-                    implementationEdges = ImplementationEdgeTypes();
-                    foreach (string type in implementationEdges)
+                    implementationEdgeTypes = GetImplementationEdgeTypes();
+                    foreach (string type in implementationEdgeTypes)
                     {
                         Debug.LogFormat("implementation edge type {0}\n", type);
                     }
                 }
-                return implementationEdges;
+                return implementationEdgeTypes;
             }
         }
 
-        private static HashSet<string> ImplementationEdgeTypes()
+        private static HashSet<string> GetImplementationEdgeTypes()
         {
             HashSet<string> result = new HashSet<string>();
             foreach (GameObject go in GetAllEdges())
             {
                 string type = GetGraphEdge(go).Type;
-                if (!ReflexionEdges.Contains(type) && !ArchitectureEdges.Contains(type))
+                if (!ReflexionEdgeTypes.Contains(type) && !ArchitectureEdgeTypes.Contains(type))
                 {
                     result.Add(type);
                 }
@@ -275,7 +275,7 @@ namespace SEE.Game
                 if (implementationEdgesVisible != value)
                 {
                     implementationEdgesVisible = value;
-                    SetEdgeVisiblity(ImplementationEdges, implementationEdgesVisible);
+                    SetEdgeVisiblity(ImplementationEdgeTypes, implementationEdgesVisible);
                 }                
             }
         }
@@ -289,7 +289,7 @@ namespace SEE.Game
                 if (implementationEdgesStartColor != value)
                 {
                     implementationEdgesStartColor = value;
-                    SetLine(ImplementationEdges, implementationEdgesStartColor, implementationEdgesEndColor, implementationEdgesWidth);
+                    SetLine(ImplementationEdgeTypes, implementationEdgesStartColor, implementationEdgesEndColor, implementationEdgesWidth);
                 }
             }
         }
@@ -303,7 +303,7 @@ namespace SEE.Game
                 if (implementationEdgesEndColor != value)
                 {
                     implementationEdgesEndColor = value;
-                    SetLine(ImplementationEdges, implementationEdgesStartColor, implementationEdgesEndColor, implementationEdgesWidth);
+                    SetLine(ImplementationEdgeTypes, implementationEdgesStartColor, implementationEdgesEndColor, implementationEdgesWidth);
                 }
             }
         }
@@ -317,7 +317,7 @@ namespace SEE.Game
                 if (implementationEdgesWidth != value)
                 {
                     implementationEdgesWidth = value;
-                    SetLine(ImplementationEdges, implementationEdgesStartColor, implementationEdgesEndColor, implementationEdgesWidth);
+                    SetLine(ImplementationEdgeTypes, implementationEdgesStartColor, implementationEdgesEndColor, implementationEdgesWidth);
                 }
             }
         }
@@ -335,7 +335,7 @@ namespace SEE.Game
                 if (reflexionEdgesVisible != value)
                 {
                     reflexionEdgesVisible = value;
-                    SetEdgeVisiblity(ReflexionEdges, reflexionEdgesVisible);
+                    SetEdgeVisiblity(ReflexionEdgeTypes, reflexionEdgesVisible);
                 }
             }
         }
@@ -374,7 +374,7 @@ namespace SEE.Game
                 if (architectureEdgesVisible != value)
                 {
                     architectureEdgesVisible = value;
-                    SetEdgeVisiblity(ArchitectureEdges, architectureEdgesVisible);
+                    SetEdgeVisiblity(ArchitectureEdgeTypes, architectureEdgesVisible);
                 }
             }
         }
@@ -388,7 +388,7 @@ namespace SEE.Game
                 if (architectureEdgesStartColor != value)
                 {
                     architectureEdgesStartColor = value;
-                    SetLine(ArchitectureEdges, architectureEdgesStartColor, architectureEdgesEndColor, architectureEdgesWidth);
+                    SetLine(ArchitectureEdgeTypes, architectureEdgesStartColor, architectureEdgesEndColor, architectureEdgesWidth);
                 }
             }
         }
@@ -402,7 +402,7 @@ namespace SEE.Game
                 if (architectureEdgesEndColor != value)
                 {
                     architectureEdgesEndColor = value;
-                    SetLine(ArchitectureEdges, architectureEdgesStartColor, architectureEdgesEndColor, architectureEdgesWidth);
+                    SetLine(ArchitectureEdgeTypes, architectureEdgesStartColor, architectureEdgesEndColor, architectureEdgesWidth);
                 }
             }
         }
@@ -416,7 +416,7 @@ namespace SEE.Game
                 if (architectureEdgesWidth != value)
                 {
                     architectureEdgesWidth = value;
-                    SetLine(ArchitectureEdges, architectureEdgesStartColor, architectureEdgesEndColor, architectureEdgesWidth);
+                    SetLine(ArchitectureEdgeTypes, architectureEdgesStartColor, architectureEdgesEndColor, architectureEdgesWidth);
                 }
             }
         }
@@ -431,7 +431,7 @@ namespace SEE.Game
         {
             foreach (GameObject go in GetAllEdges())
             {
-                if (types == AllEdges || types.Contains(GetGraphEdge(go).Type))
+                if (types == AllEdgeTypes || types.Contains(GetGraphEdge(go).Type))
                 {
                     SetVisibility(go, show);
                 }
@@ -442,7 +442,7 @@ namespace SEE.Game
         {
             foreach (GameObject go in GetAllEdges())
             {
-                if (types == AllEdges || types.Contains(GetGraphEdge(go).Type))
+                if (types == AllEdgeTypes || types.Contains(GetGraphEdge(go).Type))
                 {
                     LineRenderer renderer = go.GetComponent<LineRenderer>();
                     if (renderer != null)
@@ -506,7 +506,7 @@ namespace SEE.Game
             return GetGraphNode(go).Type == "Cluster";
         }
 
-        private List<GameObject> ImplementationNodes()
+        private static List<GameObject> ImplementationNodes()
         {
             List<GameObject> result = new List<GameObject>();
             foreach (GameObject go in GetAllNodes())
@@ -519,7 +519,7 @@ namespace SEE.Game
             return result;
         }
 
-        private void SetNodeVisibility(ICollection<GameObject> nodes, bool show)
+        private static void SetNodeVisibility(ICollection<GameObject> nodes, bool show)
         {
             foreach (GameObject go in nodes)
             {
@@ -630,135 +630,294 @@ namespace SEE.Game
         // Dynamic call-graph animation
         // -------------------------------------------
 
-        public int NumberOfEdges = 1000;
-
-        public float CallDuration = 2.0f;
-
-        private class ExecutedEdge
-        {
-            public readonly GameObject source;
-            public readonly GameObject target;
-            public readonly GameObject edge;
-            private readonly Color originalTargetColor;
-
-            public ExecutedEdge(GameObject source,
-                                GameObject target,
-                                GameObject edge)
-            {
-                this.source = source;
-                this.target = target;
-                this.edge = edge;
-                if (target.TryGetComponent<Renderer>(out Renderer renderer))
-                {
-                    Material material = renderer.sharedMaterial;
-                    originalTargetColor = material.GetColor("_Color");
-                }
-                else
-                {
-                    originalTargetColor = Color.white;
-                }
-            }
-
-            // For the intial call of Main out of nowhere.
-            public ExecutedEdge(GameObject target) : this(null, target, null)
-            {
-            }
-
-            public void Call()
-            {
-                if (edge != null)
-                {
-                    SetVisibility(edge, true);
-                }
-                Color color = Color.cyan;
-                SetColorOfTarget(color);
-            }
-
-            private void SetColorOfTarget(Color color)
-            {
-                if (target.TryGetComponent<Renderer>(out Renderer renderer))
-                {
-                    Material material = renderer.sharedMaterial;
-                    material.SetColor("_Color", color);
-                }
-            }
-
-            public void Return()
-            {
-                if (edge != null)
-                {
-                    SetVisibility(edge, false);
-                }
-                SetColorOfTarget(originalTargetColor);
-            }
-        }
+        public float CallDuration = 0.5f;
 
         private float executionTimer = 0.0f;
 
-        private Stack<ExecutedEdge> callStack;
+        private Dictionary<Node, GameObject> nodeToGameObject;
+
+        /// <summary>
+        /// Initial colors of all game objects representing implementation nodes.
+        /// </summary>
+        private Dictionary<GameObject, Color> initialNodeColors;
+
+        private struct EdgeColor
+        {
+            public Color startColor;
+            public Color endColor;
+
+            public EdgeColor(Color startColor, Color endColor)
+            {
+                this.startColor = startColor;
+                this.endColor = endColor;
+            }
+        }
+
+        /// <summary>
+        /// Initial colors of all game objects representing implementation edges.
+        /// </summary>
+        private Dictionary<GameObject, EdgeColor> initialEdgeColors;
+
+        private Dictionary<Edge, GameObject> edgeToGameObject;
+
+        private RandomGraphWalker graphWalker;
+
+        private Node callGraphRoot;
 
         public void CallGraph()
         {
+            elapsedExecutionTime = 0.0f;
+            Random.InitState(seed: 42);
             state = State.runningCallGraph;
             executionTimer = 0.0f;
-            callStack = CreateCallStack();
+            nodeToGameObject = CollectImplementationNodes();
+            initialNodeColors = CollectNodeColors(nodeToGameObject.Values);            
+            edgeToGameObject = CollectImplementationEdges();
+            initialEdgeColors = CollectEdgeColors(edgeToGameObject.Values);
+            callGraphRoot = CodeCity.LoadedGraph.GetNode("R global:SEE:Game:GraphRenderer@C:/Users/raine/develop/SEECity/Temp/bin/Debug/SEE.dll^:!16+67!:Draw(!0+6!UnityEngine:GameObject@C:/Program Files/Unity/Hub/Editor/2019.4.12f1/Editor/Data/Managed/UnityEngine/UnityEngine.CoreModule.dll^)_s->!0+6!System:Void@C:!130+14! (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.7.1/mscorlib.dll");           
+            graphWalker = new RandomGraphWalker(callGraphRoot);
         }
 
-        private Stack<ExecutedEdge> CreateCallStack()
+        private Dictionary<GameObject, EdgeColor> CollectEdgeColors(Dictionary<Edge, GameObject>.ValueCollection gameObjects)
         {
-            Stack <ExecutedEdge> callStack = new Stack<ExecutedEdge>();
-            GameObject n1 = GameObject.Find("SEEEditor");
-            GameObject n2 = GameObject.Find("SEE.Tools");
-            GameObject n3 = GameObject.Find("SEE.CameraPaths");
-            GameObject n4 = GameObject.Find("SEE.Utils");
-
-            GameObject e1 = GameObject.Find("Absence#SEEEditor#SEE.Tools");
-            GameObject e2 = GameObject.Find("Absence#SEEEditor#SEE.CameraPaths");
-            GameObject e3 = GameObject.Find("Absence#SEEEditor#SEE.Utils");
-
-            callStack.Push(new ExecutedEdge(n1));
-            callStack.Push(new ExecutedEdge(n1, n2, e1));
-            callStack.Push(new ExecutedEdge(n1, n3, e2));
-            callStack.Push(new ExecutedEdge(n1, n4, e3));
-
-            return callStack;
+            Dictionary<GameObject, EdgeColor> result = new Dictionary<GameObject, EdgeColor>();
+            foreach (GameObject go in gameObjects)
+            {
+                if (go.TryGetComponent<LineRenderer>(out LineRenderer renderer))
+                {
+                    result[go] = new EdgeColor(renderer.startColor, renderer.endColor);
+                }
+                else
+                {
+                    result[go] = new EdgeColor(Color.white, Color.white);
+                }
+            }
+            return result;
         }
+
+        private Dictionary<GameObject, Color> CollectNodeColors(ICollection<GameObject> gameObjects)
+        {
+            Dictionary<GameObject, Color> result = new Dictionary<GameObject, Color>();
+            foreach (GameObject go in gameObjects)
+            {
+                Color color;
+                if (go.TryGetComponent<Renderer>(out Renderer renderer))
+                {
+                    Material material = renderer.sharedMaterial;
+                    color = material.GetColor("_Color");
+                }
+                else
+                {
+                    color = Color.white;
+                }
+                result[go] = color;
+            }
+            return result;
+        }
+
+        private Dictionary<Edge, GameObject> CollectImplementationEdges()
+        {
+            Dictionary<Edge, GameObject> result = new Dictionary<Edge, GameObject>();
+            foreach (GameObject go in GetAllEdges())
+            {
+                Edge edge = GetGraphEdge(go);
+                if (ImplementationEdgeTypes.Contains(edge.Type))
+                {
+                    result[edge] = go;
+                }                
+            }
+            return result;
+        }
+
+        private Dictionary<Node, GameObject> CollectImplementationNodes()
+        {
+            Dictionary<Node, GameObject> result = new Dictionary<Node, GameObject>();
+
+            // mapping of names of game-object representing implementation nodes onto the 
+            // respective game object with that name
+            Dictionary<string, GameObject> gameObjects = new Dictionary<string, GameObject>();
+            foreach (GameObject go in ImplementationNodes())
+            {
+                gameObjects[go.name] = go;
+            }
+
+            foreach (Node node in CodeCity.LoadedGraph.Nodes())
+            {
+                if (node.Type != "Cluster")
+                {
+                    if (gameObjects.TryGetValue(node.ID, out GameObject target))
+                    {
+                        result[node] = target;
+                    }
+                    else
+                    {
+                        Debug.LogErrorFormat("graph node {0} has no corresponding game object.\n", node.ID);
+                    }
+                }
+            }
+            return result;
+        }
+
+        private static readonly Color ExecutionColor = Color.cyan;
+
+        private bool isPaused = false;
+
+        private float elapsedExecutionTime = 0.0f;
 
         private void UpdateCallGraph()
         {
-            if (callStack.Count > 0)
+            if (Input.GetKeyDown(KeyCode.Pause))
             {
+                isPaused = !isPaused;
+                Debug.LogFormat("execution pause set to {0}.\n", isPaused);
+            }
+            if (Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                CallDuration *= 0.75f;
+                Debug.LogFormat("execution duration set to {0}.\n", CallDuration);
+            }
+            if (Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                CallDuration *= 1.25f;
+                Debug.LogFormat("execution duration set to {0}.\n", CallDuration);
+            }
+            if (!isPaused)
+            {
+                elapsedExecutionTime += Time.deltaTime;
                 executionTimer -= Time.deltaTime;
                 if (executionTimer <= 0)
                 {
-                    executionTimer = CallDuration;
-                    Show(callStack);                    
-                    callStack.Pop();
+                    Hide(graphWalker.CurrentPath());
+                    graphWalker.Next();
+                    Show(graphWalker.CurrentPath());
+                    // callGraphRoot should be highlighted no matter what             
+                    SetColor(nodeToGameObject[callGraphRoot], ExecutionColor);
+                    executionTimer = CallDuration;                    
                 }
             }
-            else if (lastExecutedEdge != null)
+            else
             {
-                executionTimer -= Time.deltaTime;
-                if (executionTimer <= 0)
+                Debug.LogFormat("Elapsed execution time: {0}.\n", elapsedExecutionTime);
+            }
+        }
+
+        private void Hide(Edge[] edges)
+        {
+            foreach (Edge edge in edges)
+            {
                 {
-                    lastExecutedEdge.Return();
+                    GameObject source = nodeToGameObject[edge.Source];
+                    SetColor(source, initialNodeColors[source]);
+                }
+                {
+                    GameObject target = nodeToGameObject[edge.Source];
+                    SetColor(target, initialNodeColors[target]);
+                }
+                {
+                    GameObject edgeGO = edgeToGameObject[edge];
+                    SetVisibility(edgeGO, false);
+                    if (edgeGO.TryGetComponent<LineRenderer>(out LineRenderer renderer))
+                    {
+                        EdgeColor color = initialEdgeColors[edgeGO];
+                        renderer.startColor = color.startColor;
+                        renderer.endColor = color.endColor;
+                    }
                 }
             }
         }
 
-        private ExecutedEdge lastExecutedEdge = null;
-
-        private void Show(Stack<ExecutedEdge> callStack)
+        private void Show(Edge[] edges)
         {
-            if (lastExecutedEdge != null)
+            foreach (Edge edge in edges)
             {
-                lastExecutedEdge.Return();
+                {
+                    GameObject source = nodeToGameObject[edge.Source];
+                    SetColor(source, ExecutionColor);
+                }
+                {
+                    GameObject target = nodeToGameObject[edge.Source];
+                    SetColor(target, ExecutionColor);
+                }
+                {
+                    GameObject edgeGO = edgeToGameObject[edge];
+                    SetVisibility(edgeGO, true);
+                    if (edgeGO.TryGetComponent<LineRenderer>(out LineRenderer renderer))
+                    {
+                        renderer.startColor = ExecutionColor;
+                        renderer.endColor = Darker(ExecutionColor);
+                    }
+                }
             }
-            foreach (ExecutedEdge edge in callStack.ToArray())
+        }
+
+        // -------------------------------
+        // Random graph walker
+        // -------------------------------
+
+        private class RandomGraphWalker
+        {
+            private readonly float returnChance = 0.1f;
+
+            private readonly Node root;
+
+            private readonly Stack<Edge> currentPath = new Stack<Edge>();
+
+            public RandomGraphWalker(Node root)
             {
-                edge.Call();
+                this.root = root;
+                if (root.Outgoings.Count == 0)
+                {
+                    throw new System.Exception("Root should have at least one successor.");
+                }
             }
-            lastExecutedEdge = callStack.Peek();
+
+            public Edge[] CurrentPath()
+            {
+                return currentPath.ToArray();
+            }
+
+            public void Next()
+            {                
+                if (currentPath.Count == 0)
+                {
+                    // We are at the root.
+                    currentPath.Push(AnySuccessor(root));
+                }
+                else
+                {
+                    Node callee = currentPath.Peek().Target;
+
+                    int numberOfOutgoings = callee.Outgoings.Count;
+
+                    //if (numberOfOutgoings == 0 || returnChance > Random.Range(0.0f, 1.0f))
+                    if (numberOfOutgoings == 0 || Random.Range(0, numberOfOutgoings) == 0)
+                    {
+                        // back to caller
+                        currentPath.Pop();
+                    }
+                    else
+                    {
+                        currentPath.Push(AnySuccessor(callee));
+                    }
+                }
+            }
+
+            private Edge AnySuccessor(Node root)
+            {
+                int whichSuccessor = Random.Range(1, root.Outgoings.Count);
+                foreach (Edge outgoing in root.Outgoings)
+                {
+                    if (whichSuccessor > 1)
+                    {
+                        whichSuccessor--;
+                    }
+                    else
+                    {
+                        return outgoing;
+                    }
+                }
+                throw new System.Exception("We should never arrive here.");
+            }
         }
     }
 }
