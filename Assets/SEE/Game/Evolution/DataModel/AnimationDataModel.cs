@@ -66,7 +66,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// List of markers.
         /// </summary>
-        public List<GameObject> MarkerList;
+        public List<Button> MarkerList;
 
         /// <summary>
         /// Checks if all fields are initialized.
