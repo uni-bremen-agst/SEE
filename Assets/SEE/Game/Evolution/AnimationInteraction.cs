@@ -155,6 +155,35 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
+        /// Handles actions to do when a marker
+        /// </summary>
+        private void TaskOnClickMarker()
+        {
+           
+        }
+
+        /// <summary>
+        /// Adds a new marker at the current position
+        /// </summary>
+        private void AddMarker()
+        {
+            GameObject newMarker = Instantiate(Resources.Load("Prefabs/Marker", typeof(GameObject)) as GameObject);
+            newMarker.transform.SetParent(animationDataModel.Slider.transform, false);
+            Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
+            Vector3 markerPos = new Vector3(handlePos.x, handlePos.y+.08f, handlePos.z);
+            newMarker.transform.position = markerPos;
+            animationDataModel.MarkerList.Add(newMarker);
+        }
+
+        /// <summary>
+        /// Removes a marker at the current position
+        /// </summary>
+        private void RemoveMarker()
+        {
+
+        }
+
+        /// <summary>
         /// Handles the user input as follows:
         ///   k   => previous graph revision is shown
         ///   l   => next graph revision is shown
@@ -177,6 +206,9 @@ namespace SEE.Game.Evolution
                 else if (Input.GetKeyDown(KeyCode.Tab))
                 {
                     evolutionRenderer.ToggleAutoPlay();
+                } else if (Input.GetKeyDown("m"))
+                {
+                    AddMarker();
                 }
 
                 string[] animationTimeKeys = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
