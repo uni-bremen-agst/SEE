@@ -157,9 +157,23 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Handles actions to do when a marker
         /// </summary>
-        private void TaskOnClickMarker()
+        private void TaskOnClickMarker(Button clickedMarker)
         {
-           
+            string commentName = clickedMarker.GetHashCode().ToString() + "-comment";
+
+            if (animationDataModel.Slider.transform.Find(commentName) != null)
+            {
+                GameObject comment = animationDataModel.Slider.transform.Find(commentName).gameObject;
+                comment.SetActive(!comment.activeSelf);
+            } else
+            {
+                InputField commentField = Instantiate(Resources.Load("Prefabs/Comment", typeof(InputField)) as InputField);
+                commentField.transform.SetParent(animationDataModel.Slider.transform, false);
+                Vector3 markerPos = clickedMarker.transform.position;
+                Vector3 commentPos = new Vector3(markerPos.x + 0.15f, markerPos.y, markerPos.z);
+                commentField.transform.position = commentPos;
+                commentField.name = commentName;
+            }
         }
 
         /// <summary>
@@ -167,11 +181,12 @@ namespace SEE.Game.Evolution
         /// </summary>
         private void AddMarker()
         {
-            GameObject newMarker = Instantiate(Resources.Load("Prefabs/Marker", typeof(GameObject)) as GameObject);
+            Button newMarker = Instantiate(Resources.Load("Prefabs/Marker", typeof(Button)) as Button);
             newMarker.transform.SetParent(animationDataModel.Slider.transform, false);
             Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
             Vector3 markerPos = new Vector3(handlePos.x, handlePos.y+.08f, handlePos.z);
             newMarker.transform.position = markerPos;
+            newMarker.onClick.AddListener(() => TaskOnClickMarker(newMarker));  
             animationDataModel.MarkerList.Add(newMarker);
         }
 
