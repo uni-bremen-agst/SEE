@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.MixedReality.Toolkit;
+using Microsoft.MixedReality.Toolkit.UI.BoundsControl;
 using Microsoft.MixedReality.Toolkit.Utilities;
 using OdinSerializer;
 using SEE.DataModel;
@@ -189,18 +190,52 @@ namespace SEE.Controls
                     GameObject cityCollection = GameObject.Find("CityCollection").AssertNotNull("CityCollection");
                     UnityEngine.Assertions.Assert.IsTrue(cityCollection.TryGetComponent(out GridObjectCollection grid));
                     GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
+
                     foreach (GameObject city in cities)
                     {
-                        city.transform.localScale *= CityScalingFactor;
-                        // City needs to be parented to collection to be organized by it
-                        city.transform.parent = cityCollection.transform;
+                        SetCityScale(city, cityCollection.transform, CityScalingFactor);
+                        AddMixedRealityGameObjectInteractionComponent(city);
+                        AppBarCityConfiguration(city);
                     }
 
+                    SetGridCellWitdth(grid, cities);
+                }
+
+
+                #region Local Methods
+                //Scales the city by factor and pretend it to collection 
+                void SetCityScale(GameObject city, Transform cityCollectionTransform, float cityScaleFactor)
+                {
+                    city.transform.localScale *= cityScaleFactor;
+                    // City needs to be parented to collection to be organized by it
+                    city.transform.parent = cityCollectionTransform;
+                }
+
+                //Sets the width of the Grid containing the cities
+                void SetGridCellWitdth(GridObjectCollection grid, GameObject[] cities)
+                {
+                    var a = cities.Select(x => x.transform.localScale.MaxComponent()).Max();
+                    var b = cities.Max(x => x.transform.localScale.MaxComponent());
+
                     // To avoid overlaps, set cell width to maximum length of code cities
-                    grid.CellWidth = cities.Select(x => x.transform.localScale.MaxComponent()).Max();
+                    grid.CellWidth = cities.Max(x => x.transform.localScale.MaxComponent());
                     grid.UpdateCollection();
                 }
-            }            
+
+                void AddMixedRealityGameObjectInteractionComponent(GameObject city)
+                {
+                    city.AddComponent<MixedRealityGameObjectInteractions>();
+                }
+
+                void AppBarCityConfiguration(GameObject city)
+                {
+                    city.AddComponent<BoundsControl>();
+                    city.GetComponent<BoundsControl>().BoundsControlActivation = Microsoft.MixedReality.Toolkit.UI.BoundsControlTypes.BoundsControlActivationType.ActivateManually;
+                }
+
+                #endregion
+
+            }
         }
 
         /// <summary>
