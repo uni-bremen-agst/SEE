@@ -527,7 +527,7 @@ namespace SEE.Game
                     }
                     catch (Exception e)
                     {
-                        Debug.LogErrorFormat("Exception raised for {0}: {1}\n", parent.ID, e);
+                        Debug.LogErrorFormat("Exception raised while adding the game object corresponding to {0} to the parent {1}: {2}\n", node.ID, parent.ID, e);
                     }
                 }
             }
@@ -1135,6 +1135,11 @@ namespace SEE.Game
         public GameObject NewLeafNode(Node node)
         {
             Assert.IsTrue(node.ItsGraph.MaxDepth >= 0, "Graph of node " + node.ID + " has negative depth");
+            // The deeper the node in the node hierarchy (quantified by a node's level), the
+            // later it should be drawn, or in other words, the higher its offset in the
+            // render queue should be. We are assuming that the nodes are stacked on each
+            // other according to the node hierarchy. Leaves are on top of all other nodes.
+            // That is why we put them at the highest necessary rendering queue offset.
             GameObject block = leafNodeFactory.NewBlock(SelectStyle(node, innerNodeFactory), node.ItsGraph.MaxDepth);
             block.name = node.ID;
             block.AddComponent<NodeRef>().node = node;
@@ -1417,7 +1422,10 @@ namespace SEE.Game
             {
                 innerNodeFactory = this.innerNodeFactory;
             }
-
+            // The deeper the node in the node hierarchy (quantified by a node's level), the
+            // later it should be drawn, or in other words, the higher its offset in the
+            // render queue should be. We are assuming that the nodes are stacked on each
+            // other according to the node hierarchy. Leaves are on top of all other nodes.
             GameObject innerGameObject = innerNodeFactory.NewBlock(0, node.Level);
             innerGameObject.name = node.ID;
             innerGameObject.tag = Tags.Node;
