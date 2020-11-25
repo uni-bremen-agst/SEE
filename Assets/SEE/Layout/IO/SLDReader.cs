@@ -74,7 +74,7 @@ namespace SEE.Layout.IO
                     else
                     {
                         Debug.LogErrorFormat
-                           ("{0}:{1}: Unknown node ID {0}.\n", filename, lineNumber, ID);
+                           ("{0}:{1}: Unknown node ID {2}.\n", filename, lineNumber, ID);
                     }
                 }
             }
