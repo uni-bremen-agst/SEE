@@ -142,7 +142,7 @@ public class CityRestorer
             // First case
             if (finalResults.Count == 0)
             {
-                UnityEngine.Debug.Log("There are no new nodytpes added since you saved your profile");
+                UnityEngine.Debug.Log("There are no new nodytpes added since you saved your profile" + "\n");
                 return;
                 // Second case 
             }
