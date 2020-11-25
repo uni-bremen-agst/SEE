@@ -198,24 +198,28 @@ public class CityRestorer
                 
                 if(t.Contains("xlink:href"))
                 {
-                    listOfNodeTypes.Add(t);
+                    string[] cut = t.Split('=');
+                    string[] nodeTypes = cut[1].Split('/');
+                    StringBuilder sb = new StringBuilder(nodeTypes[0]);
+                    sb.Remove(0, 1);
+                    sb.Remove(sb.Length - 1, 1);
+                    listOfNodeTypes.Add(sb.ToString());
                     listOfNodeTypes = listOfNodeTypes.Distinct().ToList();
                 }
                 if(s.Contains("xlink:href"))
                 {
-                    listOfNodeTypes.Add(s);
+                    string[] cut = t.Split('=');
+                    string[] nodeTypes = cut[1].Split('/');
+                    StringBuilder sb = new StringBuilder(nodeTypes[0]);
+                    sb.Remove(0, 1);
+                    sb.Remove(sb.Length-1,1);
+                    listOfNodeTypes.Add(sb.ToString());
                     listOfNodeTypes = listOfNodeTypes.Distinct().ToList();
                 }    
             }
         }
 
-        // Finally cut the exact names out of the .gxl formatted strings
-        for(int i = 0; i<listOfNodeTypes.Count(); i++)
-        {
-            StringBuilder sb = new StringBuilder(listOfNodeTypes[i]);
-            listOfNodeTypes[i] = sb.Remove(0,24).ToString();
-            listOfNodeTypes[i] = sb.Remove((listOfNodeTypes[i].Length-3), 3).ToString();
-        }
+        
     
         //Regarding Testing : Debug Log to check if parser works at any .gxl
         foreach(string s in listOfNodeTypes)
