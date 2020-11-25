@@ -49,7 +49,7 @@ public class CityRestorer
     {
         // We have to store the current enumeration of the nodetypes of the current version in order to compare 
         // it afterwards with the stored one.
-        List<string> newNodeTypes = city.SelectedNodeTypes.Keys.ToList();
+        
 
         // as the user picks the directory via a directory picker/ the GUI , no specific error handling is needed at this point.
         string jsonString = File.ReadAllText(importPath);
@@ -57,8 +57,11 @@ public class CityRestorer
         {
             JsonUtility.FromJsonOverwrite(jsonString, city);
         }
-        Dictionary<string, bool> oldNodetypes = city.SelectedNodeTypes; 
-        differentNodeTypes(oldNodetypes, jsonString, newNodeTypes);
+        Dictionary<string, bool> oldNodetypes = city.SelectedNodeTypes;
+        string GXLDirectory = city.PathPrefix;
+        
+        List<string> StoredNodeTypes = parseGXLNodeTypes(GXLDirectory);
+        differentNodeTypes(oldNodetypes, jsonString, StoredNodeTypes);
     }
 
     /// <summary>
@@ -166,4 +169,60 @@ public class CityRestorer
             UnityEngine.Debug.Log("Since you saved your profile and today the following Nodetypes have changed :\n" + difference);
         }
     
+
+
+    public static List<string> parseGXLNodeTypes(string directory)
+    {
+        
+        IEnumerable<string> GXLFiles = Filenames.GXLFilenames(directory);
+        if(GXLFiles.Count() == 0)
+        {
+            UnityEngine.Debug.LogError("There seems to be no .gxl file in the directory");
+            return null; 
+        }
+        // We implicity assume that there is only one .GXL File, we further inspect for any nodetypes
+        string firstGXL = GXLFiles.First();
+        StreamReader sr = new StreamReader(firstGXL);
+        List<string> listOfNodeTypes = new List<string>();
+       
+        //unfortunately the StreamReader skips a line if you only use the ReadLine() method once, 
+        //so we have to apply StreamReader.ReadLine() twice
+        // We implicitly assume, the structure of the .gxl will not change, i.e. there are only
+        //nodes and edges and the syntax will not change either.
+            while (!(sr.ReadLine() == null))
+            {
+            string s = sr.ReadLine();
+            string t = sr.ReadLine();
+           
+             if (!(t.Contains("edge")) && (!(s.Contains("edge")))) { 
+                
+                if(t.Contains("xlink:href"))
+                {
+                    listOfNodeTypes.Add(t);
+                    listOfNodeTypes = listOfNodeTypes.Distinct().ToList();
+                }
+                if(s.Contains("xlink:href"))
+                {
+                    listOfNodeTypes.Add(s);
+                    listOfNodeTypes = listOfNodeTypes.Distinct().ToList();
+                }    
+            }
+        }
+
+        // Finally cut the exact names out of the .gxl formatted strings
+        for(int i = 0; i<listOfNodeTypes.Count(); i++)
+        {
+            StringBuilder sb = new StringBuilder(listOfNodeTypes[i]);
+            listOfNodeTypes[i] = sb.Remove(0,24).ToString();
+            listOfNodeTypes[i] = sb.Remove((listOfNodeTypes[i].Length-3), 3).ToString();
+        }
+    
+        //Regarding Testing : Debug Log to check if parser works at any .gxl
+        foreach(string s in listOfNodeTypes)
+        {
+            UnityEngine.Debug.Log(s);
+        }
+
+        return listOfNodeTypes; 
+    }
 }
