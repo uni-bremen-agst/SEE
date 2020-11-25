@@ -1,11 +1,10 @@
-﻿using SEE.Utils;
+﻿using SEE.Game.UI3D;
+using SEE.Utils;
 using System;
 using UnityEngine;
-using SEE.Game.UI3D;
 
-namespace SEE.Controls
+namespace SEE.Controls.Actions
 {
-
     /// <summary>
     /// Controls the interactions with the city in desktop mode.
     /// </summary>
@@ -146,7 +145,7 @@ namespace SEE.Controls
         {
             base.Update();
 
-            if (CityAvailable)
+            if (CityTransform != null)
             {
                 bool isMouseOverGUI = Raycasting.IsMouseOverGUI();
 
@@ -220,7 +219,7 @@ namespace SEE.Controls
                 if (mode == NavigationMode.Rotate && cursor.HasFocus())
                 {
                     rotateState.rotateGizmo.Center = cursor.GetPosition();
-                    rotateState.rotateGizmo.Radius = 0.2f * (Camera.main.transform.position - rotateState.rotateGizmo.Center).magnitude;
+                    rotateState.rotateGizmo.Radius = 0.2f * (MainCamera.Camera.transform.position - rotateState.rotateGizmo.Center).magnitude;
                 }
             }
         }
@@ -229,7 +228,7 @@ namespace SEE.Controls
         // 'independent'.
         private void FixedUpdate()
         {
-            if (!CityAvailable)
+            if (CityTransform == null)
             {
                 return;
             }
@@ -623,7 +622,7 @@ namespace SEE.Controls
         /// <param name="planeHitPoint">The point, the plane was hit by the ray.</param>
         private void RaycastClippingPlane(out bool hitPlane, out bool insideClippingArea, out Vector3 planeHitPoint)
         {
-            Ray ray = Camera.main.ScreenPointToRay(actionState.mousePosition);
+            Ray ray = MainCamera.Camera.ScreenPointToRay(actionState.mousePosition);
 
             hitPlane = raycastPlane.Raycast(ray, out float enter);
             if (hitPlane)

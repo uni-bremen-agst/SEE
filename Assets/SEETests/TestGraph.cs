@@ -225,6 +225,113 @@ namespace SEE.DataModel.DG
         }
 
         [Test]
+        public void TestReparent()
+        {
+            string t = "Routine";
+
+            Graph g = new Graph();
+            g.FinalizeNodeHierarchy();
+            Assert.AreEqual(0, g.MaxDepth);            
+
+            Node a = NewNode(g, "a", t);
+            Node b = NewNode(g, "b", t);
+            g.FinalizeNodeHierarchy();
+
+            // hierarchy:
+            //  a   b
+            Assert.AreEqual(0, a.Level);
+            Assert.AreEqual(0, b.Level);
+            Assert.AreEqual(1, a.Depth());
+            Assert.AreEqual(1, b.Depth());
+            Assert.AreEqual(1, g.MaxDepth);
+
+            a.Reparent(null);
+            // hierarchy:
+            //  a   b
+            // no change expected
+            Assert.AreEqual(0, a.Level);
+            Assert.AreEqual(0, b.Level);
+            Assert.AreEqual(1, a.Depth());
+            Assert.AreEqual(1, b.Depth());
+            Assert.AreEqual(1, g.MaxDepth);
+
+            Node bc = Child(g, b, "bc", t);
+            g.FinalizeNodeHierarchy();
+            // hierarchy:
+            //  a   b
+            //      |
+            //      bc
+            Assert.AreEqual(0, a.Level);
+            Assert.AreEqual(0, b.Level);
+            Assert.AreEqual(1, bc.Level);
+            Assert.AreEqual(1, a.Depth());
+            Assert.AreEqual(2, b.Depth());
+            Assert.AreEqual(1, bc.Depth());
+            Assert.AreEqual(2, g.MaxDepth);
+
+            bc.Reparent(null);
+            // hierarchy:
+            //  a   b  bc
+            Assert.AreEqual(0, a.Level);
+            Assert.AreEqual(1, a.Depth());
+            Assert.AreEqual(0, b.Level);
+            Assert.AreEqual(1, b.Depth());
+            Assert.AreEqual(0, bc.Level);            
+            Assert.AreEqual(1, bc.Depth());
+            Assert.AreEqual(1, g.MaxDepth);
+
+            Node ac = Child(g, a, "ac", t);
+            Node acc = Child(g, ac, "acc", t);
+            Node bcc = Child(g, bc, "bcc", t);
+            g.FinalizeNodeHierarchy();
+            bc.Reparent(b);
+            // hierarchy:
+            //  a   b
+            //  |   |
+            // ac   bc
+            //  |   |
+            // acc bcc
+            Assert.AreEqual(0, a.Level);
+            Assert.AreEqual(3, a.Depth());
+            Assert.AreEqual(1, ac.Level);
+            Assert.AreEqual(2, ac.Depth());
+            Assert.AreEqual(2, acc.Level);
+            Assert.AreEqual(1, acc.Depth());
+
+            Assert.AreEqual(0, b.Level);
+            Assert.AreEqual(3, b.Depth());
+            Assert.AreEqual(1, bc.Level);
+            Assert.AreEqual(2, bc.Depth());
+            Assert.AreEqual(2, bcc.Level);
+            Assert.AreEqual(1, bcc.Depth());
+
+            Assert.AreEqual(3, g.MaxDepth);
+            bc.Reparent(ac);
+            // hierarchy:
+            //    a     b
+            //    |   
+            //    ac   
+            //  /   \
+            //  |   |
+            // acc bc
+            //      | 
+            //     bcc
+            Assert.AreEqual(0, a.Level);
+            Assert.AreEqual(4, a.Depth());
+            Assert.AreEqual(1, ac.Level);
+            Assert.AreEqual(3, ac.Depth());
+            Assert.AreEqual(2, acc.Level);
+            Assert.AreEqual(1, acc.Depth());
+            Assert.AreEqual(3, bc.Level);
+            Assert.AreEqual(2, bc.Depth());
+            Assert.AreEqual(4, bcc.Level);
+            Assert.AreEqual(1, bcc.Depth());
+            Assert.AreEqual(0, b.Level);
+            Assert.AreEqual(3, b.Depth());
+            Assert.AreEqual(4, g.MaxDepth);
+        }
+
+        [Test]
         public void TestSubGraph()
         {
             Graph g = new Graph();
