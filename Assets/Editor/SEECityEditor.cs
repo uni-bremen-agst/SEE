@@ -61,7 +61,7 @@ namespace SEEEditor
             }
             EditorGUILayout.EndHorizontal();
              EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Save Settings"))
+            if (city.LoadedGraph != null && GUILayout.Button("Save Settings"))
             {
                SaveCityInJSON(city);
             }

@@ -26,6 +26,11 @@ public class CityRestorer
     private static string json = "";
 
     /// <summary>
+    /// The suffix of a .json-file
+    /// </summary>
+    private static string jsonExtension = ".json";
+
+    /// <summary>
     ///  Converts the <paramref name="city"/> in a json-formatted string and saves this string in a .json-file in the directory
     ///  <paramref name="path"/>.
     /// </summary>
@@ -34,51 +39,47 @@ public class CityRestorer
     public static void Persist(string path, AbstractSEECity city)
     {
         json = JsonUtility.ToJson(city,true);
-        string extension = ".json";
-        string dataPath = path + extension;
+        string dataPath = path + jsonExtension;
         System.IO.File.WriteAllText(dataPath, json);
         UnityEngine.Debug.Log("Export sucessfully\n");
     }
 
     /// <summary>
-    /// Loads a city from the given <paramref name="importPath"/> and overwrites the <paramref name="city"/>
+    /// Loads a city from the given <paramref name="importFilename"/> and overwrites the <paramref name="city"/>
     /// </summary>
-    /// <param name="importPath"> The given json-file-path </param>
+    /// <param name="importFilename"> The given json-file-path </param>
     /// <param name="city"> The city which is to be overwritten </param>
-    public static void RestoreCity(string importPath, AbstractSEECity city)
+    public static void RestoreCity(string importFilename, AbstractSEECity city)
     {
         // We have to store the current enumeration of the nodetypes of the current version in order to compare 
         // it afterwards with the stored one.
-        
-
-        // as the user picks the directory via a directory picker/ the GUI , no specific error handling is needed at this point.
-        string jsonString = File.ReadAllText(importPath);
-        if(VerifyCityType(importPath, city))
+        // As the user picks the directory via a directory picker/ the GUI , no specific error handling is needed at this point.
+        string jsonContent = File.ReadAllText(importFilename);
+        if(VerifyCityType(city, jsonContent))
         {
-            JsonUtility.FromJsonOverwrite(jsonString, city);
+            JsonUtility.FromJsonOverwrite(jsonContent, city);
         }
         Dictionary<string, bool> oldNodetypes = city.SelectedNodeTypes;
         string GXLDirectory = city.PathPrefix;
         
-        List<string> StoredNodeTypes = parseGXLNodeTypes(GXLDirectory);
-        differentNodeTypes(oldNodetypes, jsonString, StoredNodeTypes);
+        List<string> StoredNodeTypes = ParseGXLNodeTypes(GXLDirectory);
+        DifferentNodeTypes(oldNodetypes, jsonContent, StoredNodeTypes);
     }
 
     /// <summary>
     /// Veryfies wether the types of the city and the json-file are matching.
     /// </summary>
-    /// <param name="jsonFile">the .json-file with the settings for the city</param>
     /// <param name="city">the city, which has to be overwritten</param>
+    /// <param name="jsonContent">the content of the .json-file as a string</param>
     /// <returns>true, if the types are matching, otherwise false</returns>
-    public static bool VerifyCityType(string jsonFile, AbstractSEECity city)
+    public static bool VerifyCityType(AbstractSEECity city, string jsonContent)
     {
-        string jsonString = File.ReadAllText(jsonFile);
-        if (jsonString.Contains("isAnSEECityObject") && city is SEECity)
+        if (jsonContent.Contains("isAnSEECityObject") && city is SEECity)
         {
             UnityEngine.Debug.Log("Loaded successfully\n");
             return true;
         }
-        if (jsonString.Contains("isAnSEECityEvolutionObject") && city is SEECityEvolution)
+        if (jsonContent.Contains("isAnSEECityEvolutionObject") && city is SEECityEvolution)
         {
             UnityEngine.Debug.Log("Loaded successfully\n");
             return true;
@@ -97,16 +98,16 @@ public class CityRestorer
     /// <param name="oldNodeTypes>a dictionary of the stored nodeTypes</param>
     /// <param name="newNodes> the city, which has to be overwritten</param>
     /// <returns> nothing, except a DebugLog to inform the user in case of any changes regarding the nodetypes.
-    public static void differentNodeTypes(Dictionary<string, bool> oldNodeTypes, string jsonFile, List<string> newNodes)
-    { 
-        List<string> oldNodes = oldNodeTypes.Keys.ToList(); 
+    public static void DifferentNodeTypes(Dictionary<string, bool> oldNodeTypes, string jsonFile, List<string> newNodes)
+    {
+        List<string> oldNodes = oldNodeTypes.Keys.ToList();
         List<string> finalResults = new List<string>();
         string difference = "";
-  
-            // In order to build the "real" difference between the stored parameters and the current one , we have to remove the duplicates.
-            // and concatenate the result afterwards in the list finalResults.
-            // The result will show if either there are new nodetypes in the latest version of the specific city or 
-            // if there are nodetypes stored which are not in the current version of the Evolutioncity anymore.
+
+        // In order to build the "real" difference between the stored parameters and the current one , we have to remove the duplicates.
+        // and concatenate the result afterwards in the list finalResults.
+        // The result will show if either there are new nodetypes in the latest version of the specific city or 
+        // if there are nodetypes stored which are not in the current version of the Evolutioncity anymore.
         if (newNodes.Count() < oldNodes.Count())
         {
             for (int i = 0; i < oldNodeTypes.Count(); i++)
@@ -131,47 +132,53 @@ public class CityRestorer
                 }
             }
         }
-        finalResults = newNodes.Concat(oldNodes).ToList(); 
+        finalResults = newNodes.Concat(oldNodes).ToList();
 
-            // Depending on the actual amount of difference, three cases are possible:
-            // First case = There are no differenct objects, thus we can break instantly
-            // Second case = There is only one object, so it is possible to print out the result instantly and break.
-            // Third case = There are more then two objects which have changed and we have to enumerate them and consequently cut the string for the 
-            // printing-log to get a neat output for the user.
+        // Depending on the actual amount of difference, three cases are possible:
+        // First case = There are no differenct objects, thus we can break instantly
+        // Second case = There is only one object, so it is possible to print out the result instantly and break.
+        // Third case = There are more then two objects which have changed and we have to enumerate them and consequently cut the string for the 
+        // printing-log to get a neat output for the user.
 
-            // First case
-            if (finalResults.Count == 0)
-            {
-                UnityEngine.Debug.Log("There are no new nodytpes added since you saved your profile" + "\n");
-                return;
-                // Second case 
-            }
-            else if (finalResults.Count == 1)
-            {   if(oldNodes.Count==1)
+        // First case
+        if (finalResults.Count == 0)
+        {
+            UnityEngine.Debug.Log("There are no new nodytpes added since you saved your profile" + "\n");
+            return;
+        }
+        // Second case
+        else if (finalResults.Count == 1)
+        {
+            if (oldNodes.Count == 1)
             {
                 UnityEngine.Debug.Log("Since you saved your profile the following Nodetype was deleted in the meantime :\n" + finalResults.First());
                 return;
-            }   if(newNodes.Count == 1 )
+            }
+            if (newNodes.Count == 1)
             {
                 UnityEngine.Debug.Log("Since you saved your profile the following Nodetype was added in the meantime :\n" + finalResults.First());
                 return;
             }
-                
-            } // Third case
-            else
-            {
-                foreach (string str in finalResults)
-                {
-                    difference += str + ",";
-                }
-            }
-            difference = difference.Substring(0, difference.Count());
-            UnityEngine.Debug.Log("Since you saved your profile and today the following Nodetypes have changed :\n" + difference);
         }
+        // Third case
+        else
+        {
+            foreach (string str in finalResults)
+            {
+                difference += str + ",";
+            }
+        }
+        difference = difference.Substring(0, difference.Count());
+        UnityEngine.Debug.Log("Since you saved your profile and today the following Nodetypes have changed :\n" + difference);
+    }
     
 
-
-    public static List<string> parseGXLNodeTypes(string directory)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="directory"></param>
+    /// <returns></returns>
+    public static List<string> ParseGXLNodeTypes(string directory)
     {
         
         IEnumerable<string> GXLFiles = Filenames.GXLFilenames(directory);
@@ -184,19 +191,19 @@ public class CityRestorer
         string firstGXL = GXLFiles.First();
         StreamReader sr = new StreamReader(firstGXL);
         List<string> listOfNodeTypes = new List<string>();
-       
+
         //unfortunately the StreamReader skips a line if you only use the ReadLine() method once, 
         //so we have to apply StreamReader.ReadLine() twice
         // We implicitly assume, the structure of the .gxl will not change, i.e. there are only
         //nodes and edges and the syntax will not change either.
-            while (!(sr.ReadLine() == null))
-            {
+        while (!(sr.ReadLine() == null))
+        {
             string s = sr.ReadLine();
             string t = sr.ReadLine();
-           
-             if (!(t.Contains("edge")) && (!(s.Contains("edge")))) { 
-                
-                if(t.Contains("xlink:href"))
+
+            if (!(t.Contains("edge")) && (!(s.Contains("edge"))))
+            {
+                if (t.Contains("xlink:href"))
                 {
                     string[] cut = t.Split('=');
                     string[] nodeTypes = cut[1].Split('/');
@@ -206,21 +213,18 @@ public class CityRestorer
                     listOfNodeTypes.Add(sb.ToString());
                     listOfNodeTypes = listOfNodeTypes.Distinct().ToList();
                 }
-                if(s.Contains("xlink:href"))
+                if (s.Contains("xlink:href"))
                 {
                     string[] cut = t.Split('=');
                     string[] nodeTypes = cut[1].Split('/');
                     StringBuilder sb = new StringBuilder(nodeTypes[0]);
                     sb.Remove(0, 1);
-                    sb.Remove(sb.Length-1,1);
+                    sb.Remove(sb.Length - 1, 1);
                     listOfNodeTypes.Add(sb.ToString());
                     listOfNodeTypes = listOfNodeTypes.Distinct().ToList();
-                }    
+                }
             }
         }
-
-        
-    
         //Regarding Testing : Debug Log to check if parser works at any .gxl
         foreach(string s in listOfNodeTypes)
         {
@@ -229,4 +233,5 @@ public class CityRestorer
 
         return listOfNodeTypes; 
     }
+
 }
