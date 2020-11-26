@@ -138,40 +138,34 @@ namespace SEE.Controls {
         {
             GameObject gameNode;
             Node node = new Node();
-            node.ItsGraph = city.LoadedGraph; //Darf ich das? müsste ja spaeter beim platzieren automatisch angepasst werden
-            //Fehlt hier noch etwas was umbedingt vorher gemacht werden muss?
+            System.Random rnd = new System.Random();
+            node.ID = "TEST-NODE" + rnd.Next(0, 999999999);
+            //GET THE NAME (ID) FIRST
+
+            //city.LoadedGraph.FinalizeNodeHierarchy(node);
+            //node.ItsGraph = city.LoadedGraph; 
             GraphRenderer graphRenderer = city.Renderer;
 
             if (is_innerNode)
             {
-                gameNode = graphRenderer.NewInnerNode(node); //Bereich auswählen? bsp Multiselect von windows
-                //laenge hat bedeutung in Implementierung aber nicht in Architektur? Kann man irgendwie einen Unterschied in den Citys finden um es zu identifiezieren?
-
+                gameNode = graphRenderer.NewInnerNode(node); 
             }
             else
             {
                 gameNode = graphRenderer.NewLeafNode(node);
-                //Skalierung nur bei Architektur?
             }
-
-
             return gameNode;
-
-
         }
+
         /// <summary>
-        /// Sets the metrics of a given node
+        /// Scales a node
         /// </summary>
-        /// <param name="node">The node to set the metrics</param>
-       public static void SetMetricsOfNode(GameObject node)
+        /// <param name="node">The node to be scaled</param>
+       public static void ScaleNode(GameObject node)
         {
-            //Set the Metrics
-            //Welche metriken Brauche ich?
-            //Skalieren der knoten? wenn ja wie? z.B. wie das normale Unity tool mit zum groeßer und kleiner ziehen?
-            //bsp Name über text eingabe fenster?
+            //Scale it
             
         }
-
 
         /// <summary>
         /// Returns if a Place Action has taken place.
@@ -182,5 +176,6 @@ namespace SEE.Controls {
             //FIXME: Working solutions for VR missing
             return Input.GetMouseButton(0);
         }
+        
     }
 }
