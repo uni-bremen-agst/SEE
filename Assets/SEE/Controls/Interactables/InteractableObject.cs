@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Microsoft.MixedReality.Toolkit.Input;
 using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
@@ -12,7 +13,7 @@ namespace SEE.Controls
     /// </summary>
     [RequireComponent(typeof(Interactable))]
     [RequireComponent(typeof(NodeRef))]
-    public sealed class InteractableObject : MonoBehaviour
+    public sealed class InteractableObject : MonoBehaviour, IMixedRealityFocusHandler
     {
         // Tutorial on grabbing objects:
         // https://www.youtube.com/watch?v=MKOc8J877tI&t=15s
@@ -378,5 +379,9 @@ namespace SEE.Controls
         private void OnHandHoverEnd(Hand hand) => SetHover(false, true);
 
         #endregion
+
+        public void OnFocusEnter(FocusEventData eventData) => SetHover(true, true);
+
+        public void OnFocusExit(FocusEventData eventData) => SetHover(false, true);
     }
 }
