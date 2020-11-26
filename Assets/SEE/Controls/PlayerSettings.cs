@@ -1,5 +1,10 @@
-﻿using OdinSerializer;
-using System;
+﻿using System;
+using System.Linq;
+using Microsoft.MixedReality.Toolkit;
+using Microsoft.MixedReality.Toolkit.Utilities;
+using OdinSerializer;
+using SEE.DataModel;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.XR;
 using Valve.VR;
@@ -20,11 +25,23 @@ namespace SEE.Controls
         /// </summary>
         public enum PlayerInputType
         {
-            Desktop,      // player for desktop and mouse input
+            Desktop = 0,      // player for desktop and mouse input
             TouchGamepad, // player for touch devices or gamepads using InControl
             VR,           // player for virtual reality devices
+            HoloLens,     // player for mixed reality devices
             None,         // no player at all
         }
+
+        /// <summary>
+        /// A mapping from PlayerInputType onto the names of the player game objects.
+        /// </summary>
+        static readonly string[] PlayerName = new[] {
+            "DesktopPlayer",
+            "VRPlayer",
+            "InControl",
+            "MRPlayer",
+            "No Player",
+            };
 
         [Tooltip("What kind of player type should be enabled.")]
         [OdinSerialize]
@@ -36,6 +53,13 @@ namespace SEE.Controls
 
         [Tooltip("Whether hints should be shown for controllers.")]
         public bool ShowControllerHints = false;
+
+        [Header("HoloLens specific settings (relevant only for HoloLens players)")] 
+        [Tooltip("Which scale shall be used for HoloLens players.")]
+        public ExperienceScale experienceScale = ExperienceScale.Seated;
+
+        [Tooltip("The factor by which code cities should be scaled on startup."), OdinSerialize, Min(0.01f)]
+        public float CityScalingFactor = 1f;
 
         /// <summary>
         /// The game object representing the active local player, that is, the player 
@@ -78,7 +102,7 @@ namespace SEE.Controls
             // is connected. That seems to be a bug.
             try
             {
-                XRSettings.enabled = playerInputType == PlayerInputType.VR;
+                XRSettings.enabled = playerInputType == PlayerInputType.VR || playerInputType == PlayerInputType.HoloLens;
             }
             catch (Exception e)
             {
@@ -92,11 +116,16 @@ namespace SEE.Controls
 
             Debug.LogFormat("Player input type: {0}\n", playerInputType.ToString());
 
-            SetActive("DesktopPlayer", playerInputType == PlayerInputType.Desktop);
-            SetActive("VRPlayer", playerInputType == PlayerInputType.VR);
-            SetActive("InControl", playerInputType == PlayerInputType.TouchGamepad);
+            SetActive(PlayerName[(int)PlayerInputType.Desktop], playerInputType == PlayerInputType.Desktop);
+            SetActive(PlayerName[(int)PlayerInputType.VR], playerInputType == PlayerInputType.VR);
+            SetActive(PlayerName[(int)PlayerInputType.TouchGamepad], playerInputType == PlayerInputType.TouchGamepad);
+            SetMixedReality(playerInputType == PlayerInputType.HoloLens);
+            SetLocalPlayer(PlayerName[(int)playerInputType]);
         }
 
+        /// <summary>
+        /// Disabbles all TeleportAreas and Teleports (SteamVR).
+        /// </summary>
         private void DisableSteamVRTeleporting()
         {
             foreach (TeleportArea area in UnityEngine.Object.FindObjectsOfType<TeleportArea>())
@@ -127,6 +156,53 @@ namespace SEE.Controls
             }
         }
 
+
+        /// <summary>
+        /// Enables or disables mixed reality capabilities, including the Mixed Reality Toolkit.
+        /// </summary>
+        /// param name = "isActive" > If true, mixed reality capabilities are enabled, otherwise they will be disabled.</param>
+        private void SetMixedReality(bool isActive)
+        {
+            SetActive(PlayerName[(int)PlayerInputType.HoloLens], isActive);
+            SetActive("MixedRealityToolkit", isActive);
+            SetActive("CityCollection", isActive);
+            
+            // Disable Teleporting to avoid conflict with MRTK
+            SetActive("Teleporting", !isActive);
+            SetActive("TeleportArea", !isActive);
+            
+            // Hide all decoration to improve performance
+            GameObject.FindGameObjectsWithTag(Tags.Decoration).ForEach(go => go.SetActive(!isActive));
+
+            if (!isActive)
+            {
+                MixedRealityToolkit.SetInstanceInactive(MixedRealityToolkit.Instance);
+            }
+            else
+            {
+                // Set selected experience scale 
+                MixedRealityToolkit.Instance.ActiveProfile.TargetExperienceScale = experienceScale;
+                
+                if (experienceScale == ExperienceScale.Seated || experienceScale == ExperienceScale.OrientationOnly)
+                {
+                    // Position and scale planes and CodeCities accordingly using CityCollection grid
+                    GameObject cityCollection = GameObject.Find("CityCollection").AssertNotNull("CityCollection");
+                    UnityEngine.Assertions.Assert.IsTrue(cityCollection.TryGetComponent(out GridObjectCollection grid));
+                    GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
+                    foreach (GameObject city in cities)
+                    {
+                        city.transform.localScale *= CityScalingFactor;
+                        // City needs to be parented to collection to be organized by it
+                        city.transform.parent = cityCollection.transform;
+                    }
+
+                    // To avoid overlaps, set cell width to maximum length of code cities
+                    grid.CellWidth = cities.Select(x => x.transform.localScale.MaxComponent()).Max();
+                    grid.UpdateCollection();
+                }
+            }            
+        }
+
         /// <summary>
         /// Enables or disables a game object with the given <paramref name="name" />.
         /// </summary>
@@ -135,17 +211,23 @@ namespace SEE.Controls
         private void SetActive(string name, bool activate)
         {
             GameObject player = GameObject.Find(name);
-            player?.SetActive(activate);
-            if (activate)
+            player?.SetActive(activate);           
+        }
+
+        /// <summary>
+        /// Sets <see cref="LocalPlayer"/> by retrieving the game object with the given <paramref name="name"/>.
+        /// </summary>
+        /// <param name="name">name of the player game object</param>
+        private static void SetLocalPlayer(string name)
+        {
+            GameObject player = GameObject.Find(name);
+            if (player != null)
             {
-                if (player != null)
-                {
-                    LocalPlayer = player;
-                }
-                else
-                {
-                    Debug.LogErrorFormat("A player object named {0} to be activated could not be found.", name);
-                }
+                LocalPlayer = player;
+            }
+            else
+            {
+                Debug.LogErrorFormat("A player object named {0} to be activated could not be found.", name);
             }
         }
 

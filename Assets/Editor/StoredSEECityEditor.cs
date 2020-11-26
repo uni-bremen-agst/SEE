@@ -22,7 +22,6 @@ namespace SEEEditor
         private string path = "";
         private string JsonSuffix = ".json";
         private string savingDirectory;
-        private string jsonFileName = "";
 
         /// <summary>
         /// The name of the file where a city and the node-selection will be saved
