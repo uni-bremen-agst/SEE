@@ -140,9 +140,10 @@ namespace SEE.Controls {
             Node node = new Node();
             System.Random rnd = new System.Random();
             node.ID = "TEST-NODE" + rnd.Next(0, 999999999);
-            //GET THE NAME (ID) FIRST
-
-            //city.LoadedGraph.FinalizeNodeHierarchy(node);
+            node.SourceName = "TEST-NODE" + rnd.Next(0, 999999999);
+            //GET THE NAME (ID) 
+            city.LoadedGraph.AddNode(node);
+            city.LoadedGraph.FinalizeNodeHierarchy();
             //node.ItsGraph = city.LoadedGraph; 
             GraphRenderer graphRenderer = city.Renderer;
 
@@ -163,7 +164,7 @@ namespace SEE.Controls {
         /// <param name="node">The node to be scaled</param>
        public static void ScaleNode(GameObject node)
         {
-            //Scale it
+            //Scale it draw spheres on each outline that can be drag and drop to get bigger
             
         }
 
