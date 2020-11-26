@@ -2708,7 +2708,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 220558924}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.000000016556847, y: 15.500188, z: 0.0000000010348029}
+  m_LocalPosition: {x: 0, y: 15.500188, z: 0}
   m_LocalScale: {x: 0.10000002, y: 10, z: 0.05295833}
   m_Children: []
   m_Father: {fileID: 1930472487}
@@ -8346,7 +8346,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1275815092924048, guid: 83c02591e2867124181bcd3bcb65e288, type: 3}
       propertyPath: m_Name
-      value: AppBar
+      value: MainAppBar
       objectReference: {fileID: 0}
     - target: {fileID: 4773597359991020, guid: 83c02591e2867124181bcd3bcb65e288, type: 3}
       propertyPath: m_LocalPosition.x
@@ -8354,7 +8354,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4773597359991020, guid: 83c02591e2867124181bcd3bcb65e288, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 5.41
       objectReference: {fileID: 0}
     - target: {fileID: 4773597359991020, guid: 83c02591e2867124181bcd3bcb65e288, type: 3}
       propertyPath: m_LocalPosition.z
@@ -22058,6 +22058,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c678f3d95be9f4a4f8d21decd6711f82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CreateAppBar: 0
 --- !u!1 &1931992860
 GameObject:
   m_ObjectHideFlags: 0
