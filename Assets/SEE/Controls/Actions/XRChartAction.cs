@@ -22,7 +22,7 @@
 using SEE.Game.Charts;
 using Valve.VR;
 
-namespace SEE.Controls
+namespace SEE.Controls.Actions
 {
     public class XRChartAction : ChartAction
     {

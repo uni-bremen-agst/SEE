@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.Controls
 {
@@ -24,9 +25,10 @@ namespace SEE.Controls
 
         private void Start()
         {
+            Camera mainCamera = MainCamera.Camera;
             if (focusedObject != null)
-            {
-                Camera.main.transform.position = focusedObject.CenterTop;
+            {                
+                mainCamera.transform.position = focusedObject.CenterTop;
             }
             else
             {
@@ -35,12 +37,13 @@ namespace SEE.Controls
             cameraState.distance = 2.0f;
             cameraState.yaw = 0.0f;
             cameraState.pitch = 45.0f;
-            Camera.main.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
-            Camera.main.transform.position -= Camera.main.transform.forward * cameraState.distance;
+            mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
+            mainCamera.transform.position -= mainCamera.transform.forward * cameraState.distance;
         }
 
         private void Update()
         {
+            Camera mainCamera = MainCamera.Camera;
             if (Input.GetKeyDown(KeyCode.C))
             {
                 if (cameraState.freeMode)
@@ -81,28 +84,28 @@ namespace SEE.Controls
                     cameraState.yaw += x;
                     cameraState.pitch -= y;
                 }
-                Camera.main.transform.position = focusedObject.CenterTop;
-                Camera.main.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
-                Camera.main.transform.position -= Camera.main.transform.forward * cameraState.distance;
+                mainCamera.transform.position = focusedObject.CenterTop;
+                mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
+                mainCamera.transform.position -= mainCamera.transform.forward * cameraState.distance;
             }
             else // cameraState.freeMode == true
             {
                 Vector3 v = Vector3.zero;
                 if (Input.GetKey(KeyCode.W))
                 {
-                    v += Camera.main.transform.forward;
+                    v += mainCamera.transform.forward;
                 }
                 if (Input.GetKey(KeyCode.S))
                 {
-                    v -= Camera.main.transform.forward;
+                    v -= mainCamera.transform.forward;
                 }
                 if (Input.GetKey(KeyCode.D))
                 {
-                    v += Camera.main.transform.right;
+                    v += mainCamera.transform.right;
                 }
                 if (Input.GetKey(KeyCode.A))
                 {
-                    v -= Camera.main.transform.right;
+                    v -= mainCamera.transform.right;
                 }
                 if (Input.GetKey(KeyCode.Space))
                 {
@@ -114,7 +117,7 @@ namespace SEE.Controls
                 }
                 v.Normalize();
                 v *= speed;
-                Camera.main.transform.position += v;
+                mainCamera.transform.position += v;
 
                 if (Input.GetMouseButton(RightMouseButton))
                 {
@@ -123,7 +126,7 @@ namespace SEE.Controls
                     cameraState.yaw += x;
                     cameraState.pitch -= y;
                 }
-                Camera.main.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
+                mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
             }
         }
     }
