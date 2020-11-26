@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.Assertions;
 using SEE.GO;
+using SEE.Utils;
 
 namespace SEE.Game.UI3D
 {
@@ -25,6 +26,8 @@ namespace SEE.Game.UI3D
 
         private float axisHalfLength;
         private Material axisMaterial;
+
+        private bool hasRunThisFrame;
 
         private Cursor()
         {
@@ -50,6 +53,8 @@ namespace SEE.Game.UI3D
             c.axisMaterial = new Material(Shader.Find(PlainColorShaderName));
             c.axisMaterial.SetColor("_Color", Color.black);
 
+            c.hasRunThisFrame = false;
+
             c.gameObject.SetActive(false);
 
             return c;
@@ -57,32 +62,33 @@ namespace SEE.Game.UI3D
 
         private void Update()
         {
+            hasRunThisFrame = false;
+
             if (focusses.Count != 0)
             {
                 transform.position = GetPosition();
-                axisHalfLength = 0.01f * (Camera.main.transform.position - transform.position).magnitude;
+                axisHalfLength = 0.01f * (MainCamera.Camera.transform.position - transform.position).magnitude;
             }
         }
 
         private void OnRenderObject()
         {
-            if (focusses.Count != 0)
+            if (!hasRunThisFrame && HasFocus() && axisHalfLength > 0.0f)
             {
-                if (axisHalfLength > 0.0f)
+                hasRunThisFrame = true;
+
+                axisMaterial.SetPass(0);
+                GL.Begin(GL.LINES);
                 {
-                    axisMaterial.SetPass(0);
-                    GL.Begin(GL.LINES);
-                    {
-                        Vector3 c = GetPosition();
-                        GL.Vertex(new Vector3(c.x - axisHalfLength, c.y, c.z));
-                        GL.Vertex(new Vector3(c.x + axisHalfLength, c.y, c.z));
-                        GL.Vertex(new Vector3(c.x, c.y - axisHalfLength, c.z));
-                        GL.Vertex(new Vector3(c.x, c.y + axisHalfLength, c.z));
-                        GL.Vertex(new Vector3(c.x, c.y, c.z - axisHalfLength));
-                        GL.Vertex(new Vector3(c.x, c.y, c.z + axisHalfLength));
-                    }
-                    GL.End();
+                    Vector3 c = GetPosition();
+                    GL.Vertex(new Vector3(c.x - axisHalfLength, c.y, c.z));
+                    GL.Vertex(new Vector3(c.x + axisHalfLength, c.y, c.z));
+                    GL.Vertex(new Vector3(c.x, c.y - axisHalfLength, c.z));
+                    GL.Vertex(new Vector3(c.x, c.y + axisHalfLength, c.z));
+                    GL.Vertex(new Vector3(c.x, c.y, c.z - axisHalfLength));
+                    GL.Vertex(new Vector3(c.x, c.y, c.z + axisHalfLength));
                 }
+                GL.End();
             }
         }
 

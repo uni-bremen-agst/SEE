@@ -217,7 +217,7 @@ namespace SEE.DataModel.DG.IO
             // taken into account when graphs are compared by Equals().
             // Hence, we need to set them here, otherwise Equals() would
             // yield false at any rate.
-            graph.CalculateLevels();
+            graph.FinalizeNodeHierarchy();
             return graph;
         }
     }
