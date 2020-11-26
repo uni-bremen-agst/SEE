@@ -23,6 +23,7 @@ public class MixedRealityGameObjectInteractions : MonoBehaviour, IMixedRealityPo
 
     public bool CreateAppBar = false;
     private AppBar AppBarComponent;
+    private bool ShowAppBar = true;
 
     // Start is called before the first frame update
     void Start()
@@ -74,11 +75,6 @@ public class MixedRealityGameObjectInteractions : MonoBehaviour, IMixedRealityPo
         
     }
 
-    private void OnMouseOver()
-    {
-
-    }
-
 
     /// <summary>
     /// Changes the default action (showing the MixedReality AppBar) for this game object when it were pointed 
@@ -86,9 +82,10 @@ public class MixedRealityGameObjectInteractions : MonoBehaviour, IMixedRealityPo
     /// <param name="SelectionAction">
     /// A method handling the action when the GameObject was pointed where the GameObject in parameter is the pointed object
     /// </param>
-    public void ChangeStandardPointedAction(Action<GameObject> SelectionAction)
+    public void ChangeStandardPointedAction(Action<GameObject> SelectionAction, bool showAppBar = true)
     {
         MixedRealityPointedAction = SelectionAction;
+        ShowAppBar = showAppBar;
     }
 
     public void OnPointerDown(MixedRealityPointerEventData eventData)
@@ -116,6 +113,11 @@ public class MixedRealityGameObjectInteractions : MonoBehaviour, IMixedRealityPo
     {
         if (MixedRealityPointedAction != null)
         {
+            if (ShowAppBar)
+            {
+                ShowGameObjectAppBar();
+            }
+
             MixedRealityPointedAction(gameObject);
             Debug.Log($"Pointed on {gameObject.name}");
         }
