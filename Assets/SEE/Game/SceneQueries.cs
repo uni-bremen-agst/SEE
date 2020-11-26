@@ -114,7 +114,7 @@ namespace SEE.Game
         /// <param name="codeCity">object representing a code city</param>
         /// <returns>game object representing the root of the graph or null if there is none</returns>
         public static Transform GetCityRootNode(GameObject codeCity)
-        {
+        {            
             foreach (Transform child in codeCity.transform)
             {
                 if (child.CompareTag(Tags.Node))
@@ -126,28 +126,33 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns the first transform towards the root of the game-object hierarchy
-        /// that is tagged by Tags.CodeCity. If none can be found, null is returned.
+        /// Returns the root game object that represents a code city as a whole
+        /// along with the settings (layout information etc.). In other words,
+        /// we simply return the topmost transform in the game-object hierarchy.
+        /// If the given <paramref name="transform"/> is not included in any
+        /// other game object, <paramref name="transform"/> will be returned.
         /// 
-        /// Precondition: The given <paramref name="transform"/> is part of a
-        /// game-object tree and either this <paramref name="transform"/> (in which
-        /// case <paramref name="transform"/> itself is returned) or any
-        /// of its ascendants is tagged by Tags.CodeCity.
+        /// For reasons of efficiency, we are not checking wether the returned
+        /// game object is tagged by Tags.CodeCity. A call may check if this
+        /// check is necessary.
         /// </summary>
         /// <param name="transform">transform at which to start the search</param>
-        /// <returns>first ascending transform tagged by Tags.CodeCity or null</returns>
+        /// <returns>topmost transform in the game-object hierarchy (possibly
+        /// <paramref name="transform"/> itself)</returns>
         public static Transform GetCodeCity(Transform transform)
         {
-            Transform cursor = transform;
-            while (cursor != null)
-            {
-                if (cursor.CompareTag(Tags.CodeCity))
-                {
-                    return cursor;
-                }
-                cursor = cursor.parent;
-            }
-            return cursor;
+            return transform.root;
+
+            //Transform cursor = transform;
+            //while (cursor != null)
+            //{
+            //    if (cursor.CompareTag(Tags.CodeCity))
+            //    {
+            //        return cursor;
+            //    }
+            //    cursor = cursor.parent;
+            //}
+            //return cursor;
         }
 
         /// <summary>

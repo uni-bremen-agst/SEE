@@ -253,7 +253,7 @@ namespace SEE.Game
                 Layouts[graph] = CalculateLayout(graph);
             });
             objectManager.Clear();
-            p.End();
+            p.End(true);
         }
 
         /// <summary>
