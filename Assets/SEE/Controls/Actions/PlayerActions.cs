@@ -1,5 +1,6 @@
 ﻿using SEE.Game;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
@@ -21,6 +22,17 @@ namespace SEE.Controls.Actions
             NewNode //a  game node is being created
         }
 
+        //The Selected Code City
+        SEECity city = null;
+        //The New GameNode
+        GameObject node = null;
+
+        //time since last action 
+        float coolDown = 0.0f;
+
+        //Time which has to pass between two actions
+        float coolDownTime = 1.0f;
+
         /// <summary>
         /// The current state of the player.
         /// </summary>
@@ -28,12 +40,12 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
-            switch(state)
+            switch (state)
             {
                 case State.MoveNode:
                     // an object must be selected; otherwise we cannot move it
                     if (selectedObject != null)
-                    {                        
+                    {
                         if (UserWantsToMove())
                         {
                             GameNodeMover.MoveTo(selectedObject);
@@ -48,17 +60,78 @@ namespace SEE.Controls.Actions
                     }
                     break;
                 case State.NewNode:
-                    SEECity DUMMY = new SEECity(); //FIXME: Change to selection Action
-                    bool is_innerNode = false; //FIXME: Change it later into the selection of the submenu 
-                    GameObject node = DesktopNewNodeAction.NewNode(is_innerNode, DUMMY);
-                    if (DesktopNewNodeAction.Place())
+
+                    if (hoveredObject != null && node == null)
                     {
-                        GameNodeMover.FinalizePosition(node);
-                        DesktopNewNodeAction.ScaleNode(node);
+                        if (Input.GetMouseButton(0) &&  Time.time > coolDown)
+                        {
+                            GameObject codeCityObject = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
+                            Assert.IsTrue(codeCityObject != null);
+                            codeCityObject.TryGetComponent<SEECity>(out city);
+                            coolDown = Time.time + coolDownTime;
+                        }
+                        else
+                        {
+                            //FIXME: Highlight City
+                            Debug.ClearDeveloperConsole();
+                            Debug.Log("City HOVER");
+                            //Debug.Log(hoveredObject.name);
+                        }
+
                     }
                     else
                     {
-                        GameNodeMover.MoveTo(node);
+                        Debug.ClearDeveloperConsole();
+                        Debug.Log("NO OBJECT HOVERD");
+                    }
+                    if (city != null)
+                    {
+                        if (node == null)
+                        {
+                            bool is_innerNode = false; //FIXME: Change it later into the selection of the sub menu 
+                            node = DesktopNewNodeAction.NewNode(is_innerNode, city);
+                            //Vector3 mp = Input.mousePosition;
+                             //   mp= Utils.MainCamera.Camera.WorldToScreenPoint(mp);
+                            //node.transform.position = new Vector3(mp.x, 1 , mp.z);
+                        }
+
+                        if (Time.time > coolDown && DesktopNewNodeAction.Place())
+                        {
+                            
+                            coolDown = Time.time + coolDownTime;
+                            SEECity cityTmp = null;
+                            if (hoveredObject != null)
+                            {
+                                GameObject tmp = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
+                                tmp.TryGetComponent<SEECity>(out cityTmp);
+                                if (city.Equals(cityTmp))
+                                {
+                                    GameNodeMover.FinalizePosition(node);
+                                    city.LoadedGraph.FinalizeNodeHierarchy();
+                                    DesktopNewNodeAction.ScaleNode(node);
+                                }
+                                else
+                                {
+                                    Destroy(node);
+                                }
+                            }
+                            else
+                            {
+                                Destroy(node);
+                            }
+                            node = null;
+                            city = null;
+                        }
+                        else
+                        {
+                            GameNodeMover.MoveTo(node);
+                        }
+
+                    }
+                    else
+                    {
+                        Debug.ClearDeveloperConsole();
+                        Debug.Log("NO CITY SELECTED");
                     }
                     break;
             }
@@ -137,6 +210,10 @@ namespace SEE.Controls.Actions
                 case State.MapNode:
                     break;
                 case State.MoveNode:
+                    break;
+                case State.NewNode:
+                    node = null;
+                    city = null;
                     break;
                 default:
                     throw new System.NotImplementedException();
