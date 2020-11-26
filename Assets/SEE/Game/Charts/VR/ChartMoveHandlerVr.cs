@@ -19,7 +19,8 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.Controls;
+using SEE.Controls.Actions;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -40,11 +41,6 @@ namespace SEE.Game.Charts.VR
         /// objects for the canvas to sit on).
         /// </summary>
         private Transform _parent;
-
-        /// <summary>
-        /// The camera the player sees through.
-        /// </summary>
-        private Camera _mainCamera;
 
         /// <summary>
         /// Contains information about scrolling input.
@@ -99,7 +95,6 @@ namespace SEE.Game.Charts.VR
             base.Awake();
             Transform parent = transform.parent;
             _parent = parent.GetComponent<ChartContent>().parent.transform;
-            _mainCamera = Camera.main;
             _pointerCamera = GameObject.FindGameObjectWithTag("Pointer").GetComponent<Camera>();
             _chartContent = parent.GetComponent<ChartContentVr>();
             _physicalOpen = _chartContent.physicalOpen;
@@ -126,7 +121,7 @@ namespace SEE.Game.Charts.VR
         {
             base.Update();
             Vector3 parentPosition = _parent.position;
-            _parent.LookAt(parentPosition - (_mainCamera.transform.position - parentPosition));
+            _parent.LookAt(parentPosition - (MainCamera.Camera.transform.position - parentPosition));
             ScrollInOut();
         }
 
