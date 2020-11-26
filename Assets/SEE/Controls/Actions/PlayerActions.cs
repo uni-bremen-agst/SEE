@@ -54,7 +54,7 @@ namespace SEE.Controls.Actions
                     if (DesktopNewNodeAction.Place())
                     {
                         GameNodeMover.FinalizePosition(node);
-                        DesktopNewNodeAction.SetMetricsOfNode(node);
+                        DesktopNewNodeAction.ScaleNode(node);
                     }
                     else
                     {
