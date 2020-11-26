@@ -155,18 +155,6 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Changes the color of the marker to the accentuation color.
-        /// </summary>
-        public void ToggleAccentuation()
-        {
-            if (markerHighlight.TryGetComponent(out Image image))
-            {
-                image.color = _accentuated ? ChartManager.Instance.standardColor : ChartManager.Instance.accentuationColor;
-            }
-            _accentuated = !_accentuated;
-        }
-
-        /// <summary>
         /// Changes the <see cref="infoText" /> of this marker.
         /// </summary>
         /// <param name="info">The new text.</param>
@@ -184,7 +172,7 @@ namespace SEE.Game.Charts
             infoText.gameObject.SetActive(true);
             if (TimedHighlight != null)
             {
-                ChartManager.Accentuate(linkedObject);
+                //ChartManager.Accentuate(linkedObject);
             }
         }
 
@@ -197,7 +185,7 @@ namespace SEE.Game.Charts
             infoText.gameObject.SetActive(false);
             if (_accentuated)
             {
-                ChartManager.Accentuate(linkedObject);
+                //ChartManager.Accentuate(linkedObject);
             }
         }
 

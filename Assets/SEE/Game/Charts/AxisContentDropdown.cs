@@ -52,7 +52,7 @@ namespace SEE.Game.Charts
         /// <summary>
         ///     Adds all possible options to the <see cref="TMP_Dropdown" />.
         /// </summary>
-        private void Start()
+        public void Initialize()
         {
             _chartContent = transform.parent.parent.GetComponent<ChartContent>();
             _dropdown = GetComponent<TMP_Dropdown>();
@@ -138,7 +138,6 @@ namespace SEE.Game.Charts
             CurrentlySelectedMetric = GetEntry(currentValue);
             _chartContent.DrawData(true);
             _chartContent.SetInfoText();
-            //_other.OtherChanged(_dropdown.value);
         }
 
         /// <summary>

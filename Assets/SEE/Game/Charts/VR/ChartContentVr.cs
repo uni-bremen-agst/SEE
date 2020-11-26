@@ -42,7 +42,7 @@ namespace SEE.Game.Charts.VR
         /// <summary>
         /// A checkbox to toggle the <see cref="ChartManager.selectionMode" />.
         /// </summary>
-        [SerializeField] private Toggle selectionToggle;
+        [SerializeField] private Toggle selectionToggle; // TODO(torben): remove?
 
         /// <summary>
         /// Activates the <see cref="selectionToggle" />.
@@ -83,14 +83,6 @@ namespace SEE.Game.Charts.VR
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Activates or deactivates the selection mode. TODO: Not synced across charts.
-        /// </summary>
-        public void SetSelectionMode()
-        {
-            ChartManager.Instance.selectionMode = selectionToggle.isOn;
         }
     }
 }

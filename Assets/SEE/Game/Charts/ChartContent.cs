@@ -43,19 +43,6 @@ namespace SEE.Game.Charts
         private const float MarkerOverlapDistance = 22;
 
         /// <summary>
-        /// The number of nodes at which a city is considered large.
-        /// </summary>
-        private const int BigCityThreshold = 50;
-        /// <summary>
-        /// The number of seconds to be waited until drawing the charts for large cities.
-        /// </summary>
-        private const float LongDrawWaitingTime = 1.0f;
-        /// <summary>
-        /// The number of seconds to be waited until drawing the charts for small cities.
-        /// </summary>
-        private const float ShortDrawWaitingTime = 0.2f;
-
-        /// <summary>
         /// Contains one <see cref="scrollEntryPrefab" /> for each <see cref="Node" /> in the scene.
         /// </summary>
         [SerializeField] private GameObject scrollContent;
@@ -90,11 +77,6 @@ namespace SEE.Game.Charts
         /// The gap between entries in the <see cref="scrollContent" /> to not make them overlap.
         /// </summary>
         private float _yGap;
-
-        /// <summary>
-        /// If a draw is queued, this will not be null.
-        /// </summary>
-        [HideInInspector] public Coroutine drawing;
 
         /// <summary>
         /// All game-node objects to be listed in the chart. 
@@ -204,20 +186,13 @@ namespace SEE.Game.Charts
         // This entry can be selected if one wants to have a metric on one axis and then all nodes 
         // sorted by this metric on the other axis.
         private const string NodeEnumeration = "NODES";
-
-        /// <summary>
-        /// Fills the chart for the first time and invokes <see cref="CallDrawData" /> to keep the chart up to
-        /// date.
-        /// </summary>
+        
         protected virtual void Start()
         {
-            // The time in seconds to wait until CallDrawData is called.
-            // FIXME: Why is this waiting time needed?
-            float time = _dataObjects.Count > BigCityThreshold ? LongDrawWaitingTime : ShortDrawWaitingTime;
+            axisDropdownX.Initialize();
+            axisDropdownY.Initialize();
             axisDropdownX.AddNodeEnumerationEntry(NodeEnumeration);
-            // FIXME: Why is this delayed call needed and what consequences does
-            // it have? It seems as if this slows down the completion of drawing the objects.
-            Invoke(nameof(CallDrawData), time);
+            DrawData(true);
         }
 
         /// <summary>
@@ -229,7 +204,7 @@ namespace SEE.Game.Charts
             Performance p = Performance.Begin("FillScrollViewAsList()");
 
             GameObject scrollEntry = Instantiate(scrollEntryPrefab, scrollContent.transform);
-            scrollEntry.TryGetComponent<ScrollViewToggle>(out ScrollViewToggle parentToggle);
+            scrollEntry.TryGetComponent(out ScrollViewToggle parentToggle);
             scrollEntry.transform.localPosition = headerOffset;
             parentToggle.Initialize("Leaves", this);
 
@@ -418,14 +393,7 @@ namespace SEE.Game.Charts
                         Debug.LogWarningFormat("Game node {0} without node reference.\n", data.name);
                     }
                 }
-                if (AllMetricNames.Count > 0)
-                {
-                    foreach (string metric in AllMetricNames)
-                    {
-                        Debug.LogFormat("Available metric: {0}\n", metric);
-                    }
-                }
-                else
+                if (AllMetricNames.Count == 0)
                 {
                     Debug.LogWarning("No metrics available for charts.\n");
                 }
@@ -447,12 +415,11 @@ namespace SEE.Game.Charts
             p = Performance.Begin("FindDataObjects: Node highlights");
             foreach (GameObject entry in _dataObjects)
             {
-                if (entry.TryGetComponent<NodeHighlights>(out NodeHighlights highlights))
+                if (entry.TryGetComponent(out NodeHighlights highlights))
                 {
                     highlights.showInChart[this] = true;
                     numberOfDataObjectsWithNodeHightLights++;
                 }
-                //if (!highlights.showInChart.Contains(this)) highlights.showInChart.Add(this, true);
             }
             p.End(true);
             Debug.LogFormat("numberOfDataObjectsWithNodeHightLights: {0}\n", numberOfDataObjectsWithNodeHightLights);
@@ -460,36 +427,6 @@ namespace SEE.Game.Charts
             p = Performance.Begin("FindDataObjects: Fill scroll view");
             FillScrollView(_displayAsTree);
             p.End(true);
-        }
-
-        /// <summary>
-        /// Since <see cref="MonoBehaviour.Invoke" /> does not support calls with parameters, it calls this
-        /// method to do the work.
-        /// </summary>
-        private void CallDrawData()
-        {
-            Performance p = Performance.Begin("CallDrawData");
-            DrawData(true);
-            p.End(true);
-        }
-
-        /// <summary>
-        /// Starts the Draw after a set time to handle calls in quick succession and improve performance.
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerator QueueDraw()
-        {
-            if (_dataObjects.Count > BigCityThreshold)
-            {
-                yield return new WaitForSeconds(LongDrawWaitingTime);
-            }
-            else
-            {
-                yield return new WaitForSeconds(0.5f);
-            }
-
-            DrawData(false);
-            drawing = null;
         }
 
         /// <summary>
@@ -688,8 +625,7 @@ namespace SEE.Game.Charts
         /// <param name="maxX">The maximum value on the x-axis.</param>
         /// <param name="minY">The minimum value on the y-axis.</param>
         /// <param name="maxY">The maximum value on the y-axis.</param>
-        private void AddMarkers(IEnumerable<GameObject> toDraw, float minX, float maxX, float minY,
-            float maxY)
+        private void AddMarkers(IEnumerable<GameObject> toDraw, float minX, float maxX, float minY, float maxY)
         {
             Performance p = Performance.Begin("AddMarkers(IEnumerable, float, float, float)");
             List<GameObject> updatedMarkers = new List<GameObject>();
@@ -953,24 +889,6 @@ namespace SEE.Game.Charts
                 if (activeMarker && activeMarker.TryGetComponent(out ChartMarker script) && script.linkedObject.Equals(highlight))
                 {
                     script.HighlightLinkedObjectToggle();
-                    break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Finds all markers that refer to a given <see cref="GameObject" /> and if they are highlighted,
-        /// their accentuation will be toggled.
-        /// </summary>
-        /// <param name="highlight">The object the marker will refer to.</param>
-        public void AccentuateCorrespondingMarker(GameObject highlight)
-        {
-            foreach (GameObject activeMarker in ActiveMarkers)
-            {
-                ChartMarker marker = activeMarker.GetComponent<ChartMarker>();
-                if (marker.linkedObject.Equals(highlight))
-                {
-                    marker.ToggleAccentuation();
                     break;
                 }
             }

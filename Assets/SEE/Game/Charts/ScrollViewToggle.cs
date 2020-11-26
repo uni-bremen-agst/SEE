@@ -55,11 +55,6 @@ namespace SEE.Game.Charts
         private readonly List<ScrollViewToggle> _children = new List<ScrollViewToggle>();
 
         /// <summary>
-        /// The running <see cref="UpdateStatus" /> <see cref="Coroutine" />.
-        /// </summary>
-        public Coroutine StatusUpdate { private get; set; }
-
-        /// <summary>
         /// Contains the name of the <see cref="LinkedObject" /> in the UI.
         /// </summary>
         [SerializeField] private TextMeshProUGUI label;
@@ -95,26 +90,17 @@ namespace SEE.Game.Charts
         {
             if (Parent == null)
             {
-                if (StatusUpdate == null)
+                bool active = toggle.isOn;
+                foreach (ScrollViewToggle child in _children)
                 {
-                    bool active = toggle.isOn;
-                    foreach (ScrollViewToggle child in _children)
-                    {
-                        child.Toggle(active, true);
-                    }
+                    child.Toggle(active, true);
                 }
             }
             else
             {
                 LinkedObject.showInChart[_chartContent] = toggle.isOn;
-                if (Parent.StatusUpdate == null)
-                {
-                    Parent.StatusUpdate = StartCoroutine(Parent.UpdateStatus());
-                }
-                if (_chartContent.drawing == null)
-                {
-                    _chartContent.drawing = StartCoroutine(_chartContent.QueueDraw());
-                }
+                Parent.UpdateStatus();
+                _chartContent.DrawData(false);
             }
         }
 
@@ -140,9 +126,8 @@ namespace SEE.Game.Charts
         /// Updates the status on parent markers depending on the values of it's children.
         /// </summary>
         /// <returns></returns>
-        private IEnumerator UpdateStatus()
+        private void UpdateStatus()
         {
-            yield return new WaitForSeconds(0.2f);
             bool active = true;
             foreach (ScrollViewToggle child in _children)
             {
@@ -158,8 +143,6 @@ namespace SEE.Game.Charts
             {
                 Toggle(true, true);
             }
-
-            StatusUpdate = null;
         }
 
         /// <summary>
@@ -228,7 +211,6 @@ namespace SEE.Game.Charts
             {
                 ChartManager.OnSelect(LinkedObject.gameObject, true);
             }
-            StopAllCoroutines();
         }
     }
 }
