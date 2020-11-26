@@ -53,7 +53,7 @@ namespace SEEEditor
                 firstGraph = null;
             }
             EditorGUILayout.BeginHorizontal();
-            if (firstGraph != null && GUILayout.Button("Save Settings"))
+            if (GUILayout.Button("Save Settings"))
             {
                 SaveCityInJSON(city);
             }

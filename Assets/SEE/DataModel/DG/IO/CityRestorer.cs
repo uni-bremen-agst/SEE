@@ -225,11 +225,6 @@ public class CityRestorer
                 }
             }
         }
-        //Regarding Testing : Debug Log to check if parser works at any .gxl
-        foreach(string s in listOfNodeTypes)
-        {
-            UnityEngine.Debug.Log(s);
-        }
 
         return listOfNodeTypes; 
     }
