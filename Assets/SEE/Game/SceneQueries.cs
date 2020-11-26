@@ -1,7 +1,8 @@
-﻿using SEE.DataModel;
+﻿using System.Collections.Generic;
+using SEE.Controls;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.GO;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game
@@ -132,7 +133,7 @@ namespace SEE.Game
         /// If the given <paramref name="transform"/> is not included in any
         /// other game object, <paramref name="transform"/> will be returned.
         /// 
-        /// For reasons of efficiency, we are not checking wether the returned
+        /// For reasons of efficiency, we are not checking whether the returned
         /// game object is tagged by Tags.CodeCity. A call may check if this
         /// check is necessary.
         /// </summary>
@@ -141,18 +142,24 @@ namespace SEE.Game
         /// <paramref name="transform"/> itself)</returns>
         public static Transform GetCodeCity(Transform transform)
         {
+            if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.HoloLens)
+            {
+                // If the MRTK is enabled, the cities will be part of a CityCollection, so we can't simply use the root.
+                // In this case, we actually have to traverse the tree up until the Tags match.
+                
+                Transform cursor = transform;
+                while (cursor != null)
+                {
+                    if (cursor.CompareTag(Tags.CodeCity))
+                    {
+                        return cursor;
+                    }
+                    cursor = cursor.parent;
+                }
+                return cursor;
+            }
             return transform.root;
 
-            //Transform cursor = transform;
-            //while (cursor != null)
-            //{
-            //    if (cursor.CompareTag(Tags.CodeCity))
-            //    {
-            //        return cursor;
-            //    }
-            //    cursor = cursor.parent;
-            //}
-            //return cursor;
         }
 
         /// <summary>
@@ -167,18 +174,14 @@ namespace SEE.Game
             {
                 return null;
             }
-            else
+
+            NodeRef nodeRef = transform.GetComponent<NodeRef>();
+            if (nodeRef == null)
             {
-                NodeRef nodeRef = transform.GetComponent<NodeRef>();
-                if (nodeRef == null)
-                {
-                    return null;
-                }
-                else
-                {
-                    return nodeRef.node;
-                }
+                return null;
             }
+
+            return nodeRef.node;
         }
 
         /// <summary>
@@ -190,14 +193,8 @@ namespace SEE.Game
         public static Graph GetGraph(GameObject codeCity)
         {
             Node root = GetCityRootGraphNode(codeCity);
-            if (root == null)
-            {
-                return null;
-            }
-            else
-            {
-                return root.ItsGraph;
-            }
+
+            return root?.ItsGraph;
         }
     }
 }
