@@ -125,10 +125,6 @@ namespace SEE.Game
         {
             if (CodeCity != null)
             {
-                if (CodeCity.LoadedGraph == null)
-                {
-                    CodeCity.LoadData();
-                }
                 CodeCity.SetNodeEdgeRefs();
                 if (CodeCity.gameObject != null)
                 {
@@ -159,7 +155,7 @@ namespace SEE.Game
         private void ColorNodes(GameObject parent, bool architectureNode, Color color)
         {
             // Is root a node at all? It may as well be an edge, for instance.
-            if (parent.TryGetComponent<NodeRef>(out NodeRef _))
+            if (parent.TryGetComponent<NodeRef>(out NodeRef nodeRef) && nodeRef.node != null)
             {
                 bool isArchitectureNode = IsArchitectureNode(parent);
                 Color childColor = color;
@@ -182,6 +178,10 @@ namespace SEE.Game
                         ColorNodes(child.gameObject, architectureNode, childColor);
                     }
                 }
+            }
+            else
+            {
+                Debug.LogErrorFormat("Game object {0} has no valid node reference.\n", parent.name);
             }
         }
 
