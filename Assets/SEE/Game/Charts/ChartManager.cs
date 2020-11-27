@@ -266,5 +266,16 @@ namespace SEE.Game.Charts
             Transform cameraPosition = MainCamera.Camera.transform;
             Instantiate(chartPrefabVr, cameraPosition.position + 2 * cameraPosition.forward, Quaternion.identity, transform.GetChild(0));
         }
+
+        /// <summary>
+        /// Unselects all currently selected markers of all existing charts.
+        /// </summary>
+        public void UnselectAll()
+        {
+            foreach (var chart in allCharts)
+            {
+                chart.GetComponent<ChartContent>()?.UnselectAll();
+            }
+        }
     }
 }

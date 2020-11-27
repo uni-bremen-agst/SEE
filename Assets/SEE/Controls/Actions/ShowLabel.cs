@@ -86,7 +86,6 @@ namespace SEE.Controls.Actions
         /// <param name="isOwner">true if a local user initiated this call</param>
         private void SelectionOn(bool isOwner)
         {
-            Debug.LogFormat("ShowLabel.SelectionOn {0}\n", name);
             if (isOwner)
             {
                 isSelected = true;
@@ -106,7 +105,6 @@ namespace SEE.Controls.Actions
         /// <param name="isOwner">true if a local user initiated this call</param>
         private void SelectionOff(bool isOwner)
         {
-            Debug.LogFormat("ShowLabel.SelectionOff {0}\n", name);
             if (isOwner)
             {
                 isSelected = false;

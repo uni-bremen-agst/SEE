@@ -19,7 +19,7 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System.Collections;
+using SEE.Controls;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -68,7 +68,35 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Contains properties for adding objects to charts.
         /// </summary>
-        public NodeHighlights LinkedObject { private get; set; }
+        private InteractableObject linkedInteractable;
+        private NodeHighlights linkedObject;
+        public NodeHighlights LinkedObject
+        {
+            get
+            {
+                return linkedObject;
+            }
+            set
+            {
+                if (linkedInteractable)
+                {
+                    linkedInteractable.SelectIn  -= OnSelectIn;
+                    linkedInteractable.SelectOut -= OnSelectOut;
+                }
+
+                linkedObject = value;
+                if (linkedObject && linkedObject.TryGetComponent(out InteractableObject interactableObj))
+                {
+                    linkedInteractable = interactableObj;
+                    linkedInteractable.SelectIn  -= OnSelectIn;
+                    linkedInteractable.SelectOut -= OnSelectOut;
+                }
+                else
+                {
+                    linkedInteractable = null;
+                }
+            }
+        }
 
         /// <summary>
         /// Called by <see cref="ChartContent" /> after creation to pass some values and initialize attributes.
@@ -79,7 +107,16 @@ namespace SEE.Game.Charts
         {
             this.label.text = label;
             _chartContent = script;
-            toggle.isOn = !Parent || (bool)LinkedObject.showInChart[_chartContent];
+            toggle.isOn = !Parent || (bool)linkedObject.showInChart[_chartContent];
+        }
+
+        /// <summary>
+        /// If the <see cref="GameObject" /> was still pointed on, the highlight of the
+        /// <see cref="linkedObject"/> will be stopped.
+        /// </summary>
+        private void OnDestroy()
+        {
+            OnPointerExit(null);
         }
 
         /// <summary>
@@ -88,70 +125,61 @@ namespace SEE.Game.Charts
         /// </summary>
         public void Toggle()
         {
-            if (Parent == null)
+            linkedObject.showInChart[_chartContent] = toggle.isOn;
+
+            // Propagate changes through parents
+            ScrollViewToggle parent = Parent;
+            bool deactivate = !toggle.isOn;
+            while (parent)
             {
-                bool active = toggle.isOn;
-                foreach (ScrollViewToggle child in _children)
+                if (deactivate)
                 {
-                    child.Toggle(active, true);
+                    parent.toggle.isOn = false;
                 }
-            }
-            else
-            {
-                LinkedObject.showInChart[_chartContent] = toggle.isOn;
-                Parent.UpdateStatus();
-                _chartContent.DrawData(false);
-            }
-        }
-
-        /// <summary>
-        /// Activates or deactivates a marker in the linked chart.
-        /// </summary>
-        /// <param name="active">If the marker will be activated</param>
-        /// <param name="initial"></param>
-        public void Toggle(bool active, bool initial)
-        {
-            toggle.isOn = active;
-
-            if (initial && _children.Count > 0)
-            {
-                foreach (ScrollViewToggle child in _children)
+                else
                 {
-                    child.Toggle(active, true);
+                    parent.toggle.isOn = true;
+                    foreach (ScrollViewToggle child in parent._children)
+                    {
+                        if (!child.GetStatus())
+                        {
+                            parent.toggle.isOn = false;
+                            deactivate = true;
+                            break;
+                        }
+                    }
                 }
+                parent = parent.Parent;
             }
-        }
 
-        /// <summary>
-        /// Updates the status on parent markers depending on the values of it's children.
-        /// </summary>
-        /// <returns></returns>
-        private void UpdateStatus()
-        {
-            bool active = true;
+            // Propagate changes through children
+            Stack<ScrollViewToggle> childStack = new Stack<ScrollViewToggle>(_children.Count);
             foreach (ScrollViewToggle child in _children)
             {
-                if (!child.GetStatus())
+                childStack.Push(child);
+            }
+            while (childStack.Count > 0)
+            {
+                ScrollViewToggle child = childStack.Pop();
+                if (child.toggle.isOn != toggle.isOn)
                 {
-                    Toggle(false, false);
-                    active = false;
-                    break;
+                    child.toggle.isOn = toggle.isOn;
+                    foreach (ScrollViewToggle c in child._children)
+                    {
+                        childStack.Push(c);
+                    }
                 }
             }
-
-            if (active)
-            {
-                Toggle(true, true);
-            }
         }
+          
 
         /// <summary>
-        /// Used to check if a marker for the <see cref="LinkedObject" /> will be added to the linked chart.
+        /// Used to check if a marker for the <see cref="linkedObject" /> will be added to the linked chart.
         /// </summary>
-        /// <returns>The status of the <see cref="LinkedObject" />.</returns>
+        /// <returns>The status of the <see cref="linkedObject" />.</returns>
         private bool GetStatus()
         {
-            return (bool)LinkedObject.showInChart[_chartContent];
+            return (bool)linkedObject.showInChart[_chartContent];
         }
 
         /// <summary>
@@ -175,42 +203,52 @@ namespace SEE.Game.Charts
             toggle.colors = colors;
         }
 
+        #region UnityEngine Callbacks
+
         /// <summary>
-        /// Highlights the <see cref="LinkedObject" /> when the user points on this <see cref="GameObject" />.
+        /// Highlights the <see cref="linkedObject" /> when the user points on this <see cref="GameObject" />.
         /// </summary>
         /// <param name="eventData"></param>
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (LinkedObject != null && !_pointedOn)
+            if (!_pointedOn && linkedObject != null)
             {
                 _pointedOn = true;
-                ChartManager.OnSelect(LinkedObject.gameObject);
+                linkedInteractable.SetHover(true, true);
             }
         }
 
         /// <summary>
-        /// Stops highlighting the <see cref="LinkedObject" /> when the user stops pointing on it.
+        /// Stops highlighting the <see cref="linkedObject" /> when the user stops pointing on it.
         /// </summary>
         /// <param name="eventData"></param>
         public void OnPointerExit(PointerEventData eventData)
         {
-            if (_pointedOn)
+            if (_pointedOn && linkedObject != null)
             {
-                ChartManager.OnDeselect(LinkedObject.gameObject);
                 _pointedOn = false;
+                linkedInteractable.SetHover(false, true);
             }
         }
 
-        /// <summary>
-        /// If the <see cref="GameObject" /> was still pointed on, the highlight of the
-        /// <see cref="LinkedObject" /> will be stopped.
-        /// </summary>
-        private void OnDestroy()
+        #endregion
+
+        #region InteractableObject Callbacks
+
+        private void OnSelectIn(bool isOwner)
         {
-            if (_pointedOn && LinkedObject != null)
-            {
-                ChartManager.OnSelect(LinkedObject.gameObject);
-            }
+            ColorBlock colors = toggle.colors;
+            colors.normalColor = Color.yellow;
+            toggle.colors = colors;
         }
+
+        private void OnSelectOut(bool isOwner)
+        {
+            ColorBlock colors = toggle.colors;
+            colors.normalColor = Color.white;
+            toggle.colors = colors;
+        }
+
+        #endregion
     }
 }

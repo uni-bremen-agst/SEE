@@ -19,6 +19,7 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
@@ -170,7 +171,7 @@ namespace SEE.Game.Charts
         /// all current graphs represented in the scene, and not just one particular
         /// graph.
         /// </summary>
-        public int TotalNumberOfGraphNodesInTheScene { get => _dataObjects.Count; }
+        public int TotalNumberOfGraphNodesInTheScene => _dataObjects.Count;
 
         /// <summary>
         /// Calls methods to initialize a chart.
@@ -193,7 +194,7 @@ namespace SEE.Game.Charts
             axisDropdownX.Initialize();
             axisDropdownY.Initialize();
             axisDropdownX.AddNodeEnumerationEntry(NodeEnumeration);
-            DrawData(true);
+            DrawData();
         }
 
         /// <summary>
@@ -304,9 +305,7 @@ namespace SEE.Game.Charts
         /// <param name="parentToggle">The toggle that will toggle this one when clicked.</param>
         /// <param name="index">The position of the toggle in the scrollview.</param>
         /// <param name="gap">The gap between two toggles in the scrollview.</param>
-        private void CreateChildToggle(GameObject dataObject, ScrollViewToggle parentToggle,
-            int index,
-            float gap)
+        private void CreateChildToggle(GameObject dataObject, ScrollViewToggle parentToggle, int index, float gap)
         {
             GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
             tempObject.TryGetComponent<ScrollViewToggle>(out ScrollViewToggle toggle);
@@ -332,13 +331,13 @@ namespace SEE.Game.Charts
             {
                 GameObject inScene = _dataObjects.First(entry =>
                 {
-                    entry.TryGetComponent<NodeRef>(out NodeRef nodeRef);
+                    entry.TryGetComponent(out NodeRef nodeRef);
                     return nodeRef.node.ID.Equals(child.ID);
                 });
                 GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-                tempObject.TryGetComponent<ScrollViewToggle>(out ScrollViewToggle toggle);
+                tempObject.TryGetComponent(out ScrollViewToggle toggle);
                 toggle.Parent = parentToggle;
-                inScene.TryGetComponent<NodeHighlights>(out NodeHighlights highlights);
+                inScene.TryGetComponent(out NodeHighlights highlights);
                 toggle.LinkedObject = highlights;
                 highlights.scrollViewToggle = toggle;
                 tempObject.transform.localPosition = childOffset + new Vector2(_xGap, 0f) * hierarchy + new Vector2(0f, _yGap) * index++;
@@ -436,13 +435,9 @@ namespace SEE.Game.Charts
         /// Fills the chart with data depending on the values of <see cref="axisDropdownX" /> and
         /// <see cref="axisDropdownY" />.
         /// </summary>
-        public void DrawData(bool needData)
+        public void DrawData()
         {
             Performance p = Performance.Begin("DrawData");
-            if (needData)
-            {
-                FindDataObjects();
-            }
             noDataWarning.SetActive(false);
             if (axisDropdownX.CurrentlySelectedMetric.Equals(axisDropdownY.CurrentlySelectedMetric))
             {
@@ -469,7 +464,6 @@ namespace SEE.Game.Charts
         /// </summary>
         private void DrawXY()
         {
-            Performance p = Performance.Begin("DrawXY");
             // Note that we determine the minimal and maximal metric values of the two
             // axes globally, that is, over all nodes in the scene and not just those
             // shown in this particular chart. This way, the scale of all charts for the
@@ -553,7 +547,6 @@ namespace SEE.Game.Charts
 
                 noDataWarning.SetActive(true);
             }
-            p.End(true);
         }
 
         /// <summary>
@@ -640,8 +633,7 @@ namespace SEE.Game.Charts
                 GameObject marker = Instantiate(markerPrefab, entries.transform);
                 marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
                 marker.TryGetComponent<ChartMarker>(out ChartMarker chartMarker);
-                chartMarker.linkedObject = data;
-                chartMarker.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
+                chartMarker.LinkedObject = data;
                 Node node = data.GetComponent<NodeRef>().node;
                 node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX);
                 node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY);
@@ -691,8 +683,7 @@ namespace SEE.Game.Charts
                     GameObject marker = Instantiate(markerPrefab, entries.transform);
                     marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
                     marker.TryGetComponent<ChartMarker>(out ChartMarker script);
-                    script.linkedObject = data;
-                    script.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
+                    script.LinkedObject = data;
                     Node node = data.GetComponent<NodeRef>().node;
                     node.TryGetNumeric(metric, out float value);
                     script.SetInfoText(SceneQueries.SourceName(data)
@@ -731,13 +722,12 @@ namespace SEE.Game.Charts
             foreach (GameObject data in toDraw)
             {
                 GameObject marker = Instantiate(markerPrefab, entries.transform);
-                marker.TryGetComponent<SortingGroup>(out SortingGroup group);
+                marker.TryGetComponent(out SortingGroup group);
                 group.sortingOrder = positionInLayer++;
-                marker.TryGetComponent<ChartMarker>(out ChartMarker script);
-                script.linkedObject = data;
-                data.TryGetComponent<NodeHighlights>(out NodeHighlights highlights);
-                script.ScrollViewToggle = highlights.scrollViewToggle;
-                data.TryGetComponent<NodeRef>(out NodeRef nodeRef);
+                marker.TryGetComponent(out ChartMarker script);
+                script.LinkedObject = data;
+                data.TryGetComponent(out NodeHighlights highlights);
+                data.TryGetComponent(out NodeRef nodeRef);
                 Node node = nodeRef.node;
                 node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX);
                 node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY);
@@ -745,7 +735,7 @@ namespace SEE.Game.Charts
                                    + " (" + valueX.ToString("0.00")
                                    + ", " + valueY.ToString("0.00") + ")");
 
-                marker.TryGetComponent<RectTransform>(out RectTransform anchoredPos);
+                marker.TryGetComponent(out RectTransform anchoredPos);
                 anchoredPos.anchoredPosition = new Vector2(x++ * width, y++ * height);
                 CheckOverlapping(marker, updatedMarkers.ToArray());
                 updatedMarkers.Add(marker);
@@ -773,7 +763,7 @@ namespace SEE.Game.Charts
         /// <param name="updatedMarkers">The already active new markers.</param>
         private static void CheckOverlapping(GameObject marker, GameObject[] updatedMarkers)
         {
-            marker.TryGetComponent<Image>(out Image image);
+            marker.TryGetComponent(out Image image);
             if (updatedMarkers.Length > 10)
             {
                 for (int i = updatedMarkers.Length - 10; i < updatedMarkers.Length; i++)
@@ -828,10 +818,18 @@ namespace SEE.Game.Charts
             {
                 foreach (GameObject marker in ActiveMarkers)
                 {
+                    InteractableObject interactableObject = marker.GetComponent<ChartMarker>().LinkedInteractable;
                     Vector2 markerPos = marker.transform.position;
                     if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                     {
-                        ChartManager.OnSelect(marker.GetComponent<ChartMarker>().linkedObject);
+                        if (!interactableObject.IsSelected)
+                        {
+                            interactableObject.SetSelect(true, true);
+                        }
+                    }
+                    else if (interactableObject.IsSelected)
+                    {
+                        marker.GetComponent<ChartMarker>().LinkedInteractable.SetSelect(false, true);
                     }
                 }
             }
@@ -839,10 +837,18 @@ namespace SEE.Game.Charts
             {
                 foreach (GameObject marker in ActiveMarkers)
                 {
+                    InteractableObject interactableObject = marker.GetComponent<ChartMarker>().LinkedInteractable;
                     Vector2 markerPos = marker.transform.position;
                     if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y && markerPos.y > max.y)
                     {
-                        ChartManager.OnSelect(marker.GetComponent<ChartMarker>().linkedObject);
+                        if (!interactableObject.IsSelected)
+                        {
+                            interactableObject.SetSelect(true, true);
+                        }
+                    }
+                    else if (interactableObject.IsSelected)
+                    {
+                        marker.GetComponent<ChartMarker>().LinkedInteractable.SetSelect(false, true);
                     }
                 }
             }
@@ -887,10 +893,24 @@ namespace SEE.Game.Charts
         {
             foreach (GameObject activeMarker in ActiveMarkers)
             {
-                if (activeMarker && activeMarker.TryGetComponent(out ChartMarker script) && script.linkedObject.Equals(highlight))
+                if (activeMarker && activeMarker.TryGetComponent(out ChartMarker script) && script.LinkedObject.Equals(highlight))
                 {
-                    script.SetHighlightLinkedObject(isHighlighted);
+                    //script.SetHighlightLinkedObject(isHighlighted);
                     break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Unselects all currently selected markers of this chart.
+        /// </summary>
+        public void UnselectAll()
+        {
+            foreach (GameObject activeMarker in ActiveMarkers)
+            {
+                if (activeMarker && activeMarker.TryGetComponent(out ChartMarker marker))
+                {
+                    //marker.SetHighlightLinkedObject(false);
                 }
             }
         }

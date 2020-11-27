@@ -77,7 +77,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The plane, the city is located on top of.
         /// </summary>
-        private UnityEngine.Plane raycastPlane;
+        private Plane raycastPlane;
 
         /// <summary>
         /// The current mode of navigation.
@@ -196,7 +196,7 @@ namespace SEE.Controls.Actions
                 {
                     actionState.zoomToggleToObject |= Input.GetKeyDown(KeyCode.F);
 
-                    if (Input.GetMouseButtonDown(0))
+                    if (Input.GetMouseButtonDown(0) && !isMouseOverGUI)
                     {
                         Select(actionState.hoveredTransform ? actionState.hoveredTransform.gameObject : null, !actionState.selectToggle);
                     }

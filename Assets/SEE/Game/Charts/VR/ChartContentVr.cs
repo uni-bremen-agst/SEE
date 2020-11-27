@@ -69,7 +69,7 @@ namespace SEE.Game.Charts.VR
                     Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
                     if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                     {
-                        ChartManager.OnSelect(marker.GetComponent<ChartMarker>().linkedObject);
+                        ChartManager.OnSelect(marker.GetComponent<ChartMarker>().LinkedObject);
                     }
                 }
             }
@@ -80,7 +80,7 @@ namespace SEE.Game.Charts.VR
                     Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
                     if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y && markerPos.y > max.y)
                     {
-                        ChartManager.OnSelect(marker.GetComponent<ChartMarker>().linkedObject);
+                        ChartManager.OnSelect(marker.GetComponent<ChartMarker>().LinkedObject);
                     }
                 }
             }

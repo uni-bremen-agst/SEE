@@ -23,7 +23,6 @@ using SEE.Controls;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace SEE.Game.Charts
 {
@@ -32,41 +31,52 @@ namespace SEE.Game.Charts
     /// </summary>
     public class ChartMarker : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
+        private InteractableObject linkedInteractable = null;
+
         /// <summary>
         /// The <see cref="GameObject" /> in the code city that is connected with this button.
         /// </summary>
-        [HideInInspector] public GameObject linkedObject;
+        [HideInInspector] public GameObject LinkedObject
+        {
+            get
+            {
+                return linkedInteractable ? linkedInteractable.gameObject : null;
+            }
+            set
+            {
+                if (linkedInteractable)
+                {
+                    linkedInteractable.HoverIn   -= OnHoverIn;
+                    linkedInteractable.HoverOut  -= OnHoverOut;
+                    linkedInteractable.SelectIn  -= OnSelectIn;
+                    linkedInteractable.SelectOut -= OnSelectOut;
+                }
+
+                if (value && value.TryGetComponent(out InteractableObject interactableObj))
+                {
+                    linkedInteractable = interactableObj;
+                    linkedInteractable.HoverIn   += OnHoverIn;
+                    linkedInteractable.HoverOut  += OnHoverOut;
+                    linkedInteractable.SelectIn  += OnSelectIn;
+                    linkedInteractable.SelectOut += OnSelectOut;
+                }
+                else
+                {
+                    linkedInteractable = null;
+                }
+            }
+        }
+        [HideInInspector] public InteractableObject LinkedInteractable => linkedInteractable;
 
         /// <summary>
-        /// The toggle linked to this marker.
+        /// A text popup containing useful information about the marker and its <see cref="LinkedObject"/>.
         /// </summary>
-        public ScrollViewToggle ScrollViewToggle { private get; set; }
-
-        /// <summary>
-        /// The active <see cref="Camera" /> in the scene.
-        /// </summary>
-        private Camera _activeCamera;
-
-        /// <summary>
-        /// The currently running camera movement <see cref="Coroutine" />.
-        /// </summary>
-        private Coroutine _cameraMoving;
-
-        /// <summary>
-        /// The currently running <see cref="TimedHighlightRoutine" />.
-        /// </summary>
-        public Coroutine TimedHighlight { get; private set; }
-
-        /// <summary>
-        /// Counts the time <see cref="TimedHighlight" /> has been running for.
-        /// </summary>
-        public float HighlightTime { get; private set; }
+        [SerializeField] private TextMeshProUGUI infoText;
 
         /// <summary>
         /// The <see cref="GameObject" /> making the marker look highlighted when active.
         /// </summary>
-        [Header("Highlight Properties"), SerializeField]
-        private GameObject markerHighlight;
+        [SerializeField] private GameObject markerHighlight;
 
         /// <summary>
         /// True iff the marker is accentuated.
@@ -74,75 +84,7 @@ namespace SEE.Game.Charts
         private bool _accentuated;
 
         /// <summary>
-        /// A text popup containing useful information about the marker and its <see cref="linkedObject" />.
-        /// </summary>
-        [Header("Other"), SerializeField]
-        private TextMeshProUGUI infoText;
-
-        /// <summary>
-        /// Reactivates the highlight if a previous marker linked to the same <see cref="linkedObject" />
-        /// highlighted it.
-        /// </summary>
-        private void Start()
-        {
-            //for (var i = 0; i < linkedObject.transform.childCount; i++)
-            //{
-            //    var child = linkedObject.transform.GetChild(i);
-            //    if (child.name.Equals(linkedObject.name + "(Clone)"))
-            //    {
-            //        TriggerTimedHighlight(ChartManager.Instance.highlightDuration, false, false);
-            //        break;
-            //    }
-            //}
-        }
-
-        /// <summary>
-        /// Adds the time that passed since the last <see cref="Update" /> to the <see cref="HighlightTime" />.
-        /// </summary>
-        private void Update()
-        {
-            // FIXME: Can be deleted.
-            if (TimedHighlight != null)
-            {
-                HighlightTime += Time.deltaTime;
-            }
-        }
-
-        /// <summary>
-        /// Called by Unity when the button assigned to the <see cref="ChartMarker" /> is pressed.
-        /// </summary>
-        public void ButtonClicked()
-        {
-            ChartManager.OnSelect(linkedObject);
-        }
-
-        /// <summary>
-        /// Sets the highlight of the <see cref="linkedObject" /> and this marker
-        /// to <paramref name="isHighlighted"/>.
-        /// </summary>
-        /// <param name="isHighlighted">whether or not the marker should be highlighted</param>
-        public void SetHighlightLinkedObject(bool isHighlighted)
-        {
-            if (linkedObject.TryGetComponent<InteractableObject>(out InteractableObject interactableObject))
-            {
-                // We need to call SetSelect only if there is a difference.
-                if (isHighlighted != interactableObject.IsSelected)
-                {
-                    interactableObject.SetSelect(isHighlighted, true);
-                }
-                // Assert: isHighlighted = interactableObject.IsSelected.
-                _accentuated = !isHighlighted;
-
-                markerHighlight.SetActive(isHighlighted);
-                if (ScrollViewToggle)
-                {
-                    ScrollViewToggle.SetHighlighted(isHighlighted);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Changes the <see cref="infoText" /> of this marker.
+        /// Changes the <see cref="infoText"/> of this marker.
         /// </summary>
         /// <param name="info">The new text.</param>
         public void SetInfoText(string info)
@@ -150,38 +92,21 @@ namespace SEE.Game.Charts
             infoText.text = info;
         }
 
-        /// <summary>
-        /// Activates the <see cref="infoText" />.
-        /// </summary>
-        /// <param name="eventData"></param>
-        public void OnPointerEnter(PointerEventData eventData)
-        {
-            infoText.gameObject.SetActive(true);
-            if (TimedHighlight != null)
-            {
-                //ChartManager.Accentuate(linkedObject);
-            }
-        }
+        #region UnityEngine Callbacks
 
-        /// <summary>
-        /// Deactivates the <see cref="infoText" />.
-        /// </summary>
-        /// <param name="eventData"></param>
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            infoText.gameObject.SetActive(false);
-            if (_accentuated)
-            {
-                //ChartManager.Accentuate(linkedObject);
-            }
-        }
+        public void ButtonClicked() => linkedInteractable?.SetSelect(!linkedInteractable.IsSelected, true);
+        public void OnPointerEnter(PointerEventData eventData) => linkedInteractable?.SetHover(true, true);
+        public void OnPointerExit(PointerEventData eventData) => linkedInteractable?.SetHover(false, true);
 
-        /// <summary>
-        /// Stops all co-routines.
-        /// </summary>
-        private void OnDestroy()
-        {
-            StopAllCoroutines();
-        }
+        #endregion
+
+        #region InteractableObject Callbacks
+
+        public void OnHoverIn(bool isOwner) => infoText.gameObject.SetActive(true);
+        public void OnHoverOut(bool isOwner) => infoText.gameObject.SetActive(false);
+        public void OnSelectIn(bool isOwner) => markerHighlight.SetActive(true);
+        public void OnSelectOut(bool isOwner) => markerHighlight.SetActive(false);
+
+        #endregion
     }
 }
