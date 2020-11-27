@@ -3,10 +3,21 @@ using SEE.DataModel;
 using SEE.GO;
 using SEE.DataModel.DG;
 using System.Collections.Generic;
+using System;
 
 namespace SEE.Game
 {
+    /// <summary>
+    /// This scene animator is intended to create code cities for capturing 
+    /// videos to showcase SEE. One can show/hide nodes and edges in 
+    /// the architecture, animate the evolution of the system (random
+    /// graph node selection), and animate the execution (random graph
+    /// tree walks). 
+    /// 
+    /// Its only purpose was to create a video. Do not use this class.
+    /// </summary>
     [ExecuteAlways]
+    [Obsolete("Introduced only for capturing videos.")]
     public class SceneAnimator : MonoBehaviour
     {        
         public SEECity CodeCity;
