@@ -20,7 +20,6 @@ namespace SEEEditor
     {
         private bool pressed = false;
         private string path = "";
-        private string JsonSuffix = ".json";
         private string savingDirectory;
 
         /// <summary>
