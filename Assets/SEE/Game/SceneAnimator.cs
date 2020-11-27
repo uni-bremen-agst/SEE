@@ -181,7 +181,7 @@ namespace SEE.Game
                 {
                     if ((architectureNode && isArchitectureNode) || (!architectureNode && !isArchitectureNode))
                     {
-                        SetColor(parent, color);
+                        parent.SetColor(color);
                         childColor = Darker(color, 0.35f);
                     }
                     foreach (Transform child in parent.transform)
@@ -193,15 +193,6 @@ namespace SEE.Game
             else
             {
                 Debug.LogErrorFormat("Game object {0} has no valid node reference.\n", parent.name);
-            }
-        }
-
-        private static void SetColor(GameObject gameObject, Color color)
-        {
-            if (gameObject.TryGetComponent<Renderer>(out Renderer renderer))
-            {
-                Material material = renderer.sharedMaterial;
-                material.SetColor("_Color", color);
             }
         }
 
@@ -444,7 +435,7 @@ namespace SEE.Game
             {
                 if (types == AllEdgeTypes || types.Contains(GetGraphEdge(go).Type))
                 {
-                    SetVisibility(go, show);
+                    go.SetVisibility(show);
                 }
             }
         }
@@ -534,15 +525,7 @@ namespace SEE.Game
         {
             foreach (GameObject go in nodes)
             {
-                SetVisibility(go, show);
-            }
-        }
-
-        private static void SetVisibility(GameObject gameObject, bool show)
-        {
-            if (gameObject.TryGetComponent<Renderer>(out Renderer renderer))
-            {
-                renderer.enabled = show;
+                go.SetVisibility(show);
             }
         }
 
@@ -583,7 +566,7 @@ namespace SEE.Game
             foreach (GameObject gameNode in gameNodes)
             {
                 implementationGameNodes[i] = gameNode;
-                SetVisibility(gameNode, false);
+                gameNode.SetVisibility(false);
                 i++;
             }
             // now randomize the nodes
@@ -598,8 +581,8 @@ namespace SEE.Game
             howManySwaps = Mathf.Clamp(howManySwaps, 0, gameObjects.Length);
             for (int i = 1; i <= howManySwaps; i++)
             {
-                int indexA = Random.Range(0, gameObjects.Length - 1);
-                int indexB = Random.Range(0, gameObjects.Length - 1);
+                int indexA = UnityEngine.Random.Range(0, gameObjects.Length - 1);
+                int indexB = UnityEngine.Random.Range(0, gameObjects.Length - 1);
                 GameObject swap = gameObjects[indexA];
                 gameObjects[indexA] = gameObjects[indexB];
                 gameObjects[indexB] = swap;
@@ -627,10 +610,10 @@ namespace SEE.Game
                 {
                     evolutionTimer = RevisionDuration;
                     Debug.LogFormat("revision {0}/{1}\n", revision, implementationGameNodes.Length);
-                    int howManyRevisions = Random.Range(MinNodesPerRevision, MaxNodesPerRevision);
+                    int howManyRevisions = UnityEngine.Random.Range(MinNodesPerRevision, MaxNodesPerRevision);
                     for (int i = 1; i <= howManyRevisions; i++)
                     {
-                        SetVisibility(implementationGameNodes[revision], true);
+                        implementationGameNodes[revision].SetVisibility(true);
                         revision++;
                     }
                 }
@@ -678,7 +661,7 @@ namespace SEE.Game
         public void CallGraph()
         {
             elapsedExecutionTime = 0.0f;
-            Random.InitState(seed: 42);
+            UnityEngine.Random.InitState(seed: 42);
             state = State.runningCallGraph;
             executionTimer = 0.0f;
             nodeToGameObject = CollectImplementationNodes();
@@ -802,7 +785,7 @@ namespace SEE.Game
                     graphWalker.Next();
                     Show(graphWalker.CurrentPath());
                     // callGraphRoot should be highlighted no matter what             
-                    SetColor(nodeToGameObject[callGraphRoot], ExecutionColor);
+                    nodeToGameObject[callGraphRoot].SetColor(ExecutionColor);
                     executionTimer = CallDuration;                    
                 }
             }
@@ -818,21 +801,16 @@ namespace SEE.Game
             {
                 {
                     GameObject source = nodeToGameObject[edge.Source];
-                    SetColor(source, initialNodeColors[source]);
+                    source.SetColor(initialNodeColors[source]);
                 }
                 {
                     GameObject target = nodeToGameObject[edge.Source];
-                    SetColor(target, initialNodeColors[target]);
+                    target.SetColor(initialNodeColors[target]);
                 }
                 {
                     GameObject edgeGO = edgeToGameObject[edge];
-                    SetVisibility(edgeGO, false);
-                    if (edgeGO.TryGetComponent<LineRenderer>(out LineRenderer renderer))
-                    {
-                        EdgeColor color = initialEdgeColors[edgeGO];
-                        renderer.startColor = color.startColor;
-                        renderer.endColor = color.endColor;
-                    }
+                    edgeGO.SetVisibility(false);
+                    edgeGO.SetLineColor(initialEdgeColors[edgeGO].startColor, initialEdgeColors[edgeGO].endColor);
                 }
             }
         }
@@ -843,20 +821,16 @@ namespace SEE.Game
             {
                 {
                     GameObject source = nodeToGameObject[edge.Source];
-                    SetColor(source, ExecutionColor);
+                    source.SetColor(ExecutionColor);
                 }
                 {
                     GameObject target = nodeToGameObject[edge.Source];
-                    SetColor(target, ExecutionColor);
+                    target.SetColor(ExecutionColor);
                 }
                 {
                     GameObject edgeGO = edgeToGameObject[edge];
-                    SetVisibility(edgeGO, true);
-                    if (edgeGO.TryGetComponent<LineRenderer>(out LineRenderer renderer))
-                    {
-                        renderer.startColor = ExecutionColor;
-                        renderer.endColor = Darker(ExecutionColor);
-                    }
+                    edgeGO.SetVisibility(true);
+                    edgeGO.SetLineColor(ExecutionColor, Darker(ExecutionColor));
                 }
             }
         }
@@ -867,8 +841,6 @@ namespace SEE.Game
 
         private class RandomGraphWalker
         {
-            private readonly float returnChance = 0.1f;
-
             private readonly Node root;
 
             private readonly Stack<Edge> currentPath = new Stack<Edge>();
@@ -901,7 +873,7 @@ namespace SEE.Game
                     int numberOfOutgoings = callee.Outgoings.Count;
 
                     //if (numberOfOutgoings == 0 || returnChance > Random.Range(0.0f, 1.0f))
-                    if (numberOfOutgoings == 0 || Random.Range(0, numberOfOutgoings) == 0)
+                    if (numberOfOutgoings == 0 || UnityEngine.Random.Range(0, numberOfOutgoings) == 0)
                     {
                         // back to caller
                         currentPath.Pop();
@@ -915,7 +887,7 @@ namespace SEE.Game
 
             private Edge AnySuccessor(Node root)
             {
-                int whichSuccessor = Random.Range(1, root.Outgoings.Count);
+                int whichSuccessor = UnityEngine.Random.Range(1, root.Outgoings.Count);
                 foreach (Edge outgoing in root.Outgoings)
                 {
                     if (whichSuccessor > 1)
@@ -927,7 +899,7 @@ namespace SEE.Game
                         return outgoing;
                     }
                 }
-                throw new System.Exception("We should never arrive here.");
+                throw new Exception("We should never arrive here.");
             }
         }
     }
