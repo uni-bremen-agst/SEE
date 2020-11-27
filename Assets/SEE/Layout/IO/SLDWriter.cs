@@ -4,6 +4,12 @@ using UnityEngine;
 
 namespace SEE.Layout.IO
 {
+    /// <summary>
+    /// Allows to save layout information in SLD (SEE Layout Data) format.
+    /// SLD captures the complete transform of a game object.
+    /// 
+    /// <seealso cref="SLDReader"/>.
+    /// </summary>
     public class SLDWriter
     {
         /// <summary>
