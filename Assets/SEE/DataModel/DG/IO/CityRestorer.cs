@@ -20,27 +20,17 @@ using System;
 /// </summary>
 public class CityRestorer
 {
-    /// <summary>
-    /// The settings of a city stored in a json-formatted string.
-    /// </summary>
-    private static string json = "";
-
-    /// <summary>
-    /// The suffix of a .json-file
-    /// </summary>
-    private static string jsonExtension = ".json";
-
+   
     /// <summary>
     ///  Converts the <paramref name="city"/> in a json-formatted string and saves this string in a .json-file in the directory
     ///  <paramref name="path"/>.
     /// </summary>
     /// <param name="path"> The directory in which the json-file will be saved </param>
     /// <param name="city"> The city which will be stored in the json-file</param>
-    public static void Persist(string path, AbstractSEECity city)
+    public static void Persist(string dataPath, AbstractSEECity city)
     {
-        json = JsonUtility.ToJson(city,true);
-        string dataPath = path + jsonExtension;
-        System.IO.File.WriteAllText(dataPath, json);
+        string citySettingsJson = JsonUtility.ToJson(city, true);
+        System.IO.File.WriteAllText(dataPath, citySettingsJson);
         UnityEngine.Debug.Log("Export sucessfully\n");
     }
 

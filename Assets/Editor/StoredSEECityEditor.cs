@@ -137,19 +137,12 @@ namespace SEEEditor
             {
                 savingDirectory = pathPrefix.stringValue;
             }
-            string exportPath = Filenames.OnCurrentPlatform(EditorUtility.SaveFilePanel("Select saving directory", savingDirectory, fileName, ""));
+            UnityEngine.Debug.Log(fileName);
+            string exportPath = Filenames.OnCurrentPlatform(EditorUtility.SaveFilePanel("Select saving directory", savingDirectory, fileName , "json"));
+            UnityEngine.Debug.Log("Chosen exportpath = " + exportPath);
             if (exportPath != "")
             {
                 savingDirectory = exportPath;
-
-                if (File.Exists(exportPath + JsonSuffix))
-                {
-                    if (!EditorUtility.DisplayDialog("There is already a file with the same name in the given directory!", "Do you want to overwrite the existing file?", "Yes", "No"))
-                    {
-                        UnityEngine.Debug.Log("Saving canceled\n");
-                        return;
-                    }
-                }
                 city.SaveSelection(exportPath);
             }
         }     
