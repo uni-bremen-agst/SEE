@@ -56,6 +56,11 @@ namespace SEE.Game.Charts
         {
             _chartContent = transform.parent.parent.GetComponent<ChartContent>();
             _dropdown = GetComponent<TMP_Dropdown>();
+            UpdateInternal();
+        }
+
+        private void UpdateInternal()
+        {
             FillDropDown();
             if (_dropdown.options.Count > 0)
             {
@@ -101,6 +106,7 @@ namespace SEE.Game.Charts
         {
             Assert.IsTrue(string.IsNullOrEmpty(specialEntry));
             specialEntry = entry;
+            UpdateInternal();
         }
 
         /// <summary>
@@ -136,7 +142,7 @@ namespace SEE.Game.Charts
         {
             string currentValue = _dropdown.options[_dropdown.value].text;
             CurrentlySelectedMetric = GetEntry(currentValue);
-            _chartContent.DrawData(true);
+            _chartContent.DrawData();
             _chartContent.SetInfoText();
         }
 

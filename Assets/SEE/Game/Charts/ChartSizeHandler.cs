@@ -166,7 +166,7 @@ namespace SEE.Game.Charts
             contentSelection.sizeDelta = new Vector2(contentSelection.sizeDelta.x, height);
             scrollView.sizeDelta = new Vector2(scrollView.sizeDelta.x, height - 50);
             contentSelectionHeader.anchoredPosition = new Vector2(0, height / 2 - 20);
-            _chartContent.DrawData(false);
+            _chartContent.DrawData();
         }
 
         /// <summary>
