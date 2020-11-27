@@ -54,34 +54,14 @@ namespace SEE.Game.Charts.VR
             selectionToggle.gameObject.SetActive(true);
         }
 
-        /// <summary>
-        /// VR version of <see cref="ChartContent.AreaSelection" />.
-        /// </summary>
-        /// <param name="min">The starting edge of the rectangle.</param>
-        /// <param name="max">The ending edge of the rectangle.</param>
-        /// <param name="direction">If <see cref="max" /> lies above or below <see cref="min" /></param>
-        public override void AreaSelection(Vector2 min, Vector2 max, bool direction)
+        public override void AreaSelection(Vector2 min, Vector2 max)
         {
-            if (direction)
+            foreach (GameObject marker in ActiveMarkers)
             {
-                foreach (GameObject marker in ActiveMarkers)
+                Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
+                if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                 {
-                    Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
-                    if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
-                    {
-                        ChartManager.OnSelect(marker.GetComponent<ChartMarker>().LinkedObject);
-                    }
-                }
-            }
-            else
-            {
-                foreach (GameObject marker in ActiveMarkers)
-                {
-                    Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
-                    if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y && markerPos.y > max.y)
-                    {
-                        ChartManager.OnSelect(marker.GetComponent<ChartMarker>().LinkedObject);
-                    }
+                    ChartManager.OnSelect(marker.GetComponent<ChartMarker>().LinkedObject);
                 }
             }
         }

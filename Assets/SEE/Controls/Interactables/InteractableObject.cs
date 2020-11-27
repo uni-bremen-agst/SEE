@@ -8,6 +8,15 @@ using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls
 {
+    public enum HoverFlag
+    {
+        None                     = 0x0,
+        World                    = 0x1,
+        ChartMarker              = 0x2,
+        ChartMultiSelect         = 0x4,
+        ChartScrollViewToggle    = 0x8
+    }
+
     /// <summary>
     /// Super class of the behaviours of game objects the player interacts with.
     /// </summary>
@@ -61,11 +70,13 @@ namespace SEE.Controls
         /// </summary>
         public uint ID { get; private set; }
 
+        public uint HoverFlags { get; private set; } = 0;
+
         /// <summary>
         /// Whether the object is currently hovered by e.g. the mouse or the VR-
         /// controller.
         /// </summary>
-        public bool IsHovered { get; private set; }
+        public bool IsHovered => HoverFlags != 0;
 
         /// <summary>
         /// Whether the object is currently selected by e.g. the mouse or the VR-
@@ -131,23 +142,11 @@ namespace SEE.Controls
 
         #region Interaction
 
-        /// <summary>
-        /// Visually emphasizes this object for hovering. 
-        /// 
-        /// Note: This method may be called locally when a local user interacts with the
-        /// object or remotely when a remote user has interacted with the object. In the
-        /// former case, <paramref name="isOwner"/> will be true. In the
-        /// latter case, it will be called via <see cref="SEE.Net.SetHoverAction.ExecuteOnClient()"/>
-        /// where <paramref name="isOwner"/> is false.
-        /// </summary>
-        /// <param name="hover">Whether this object should be hovered.</param>
-        /// <param name="isOwner">Whether this client is initiating the hovering action.
-        /// </param>
-        public void SetHover(bool hover, bool isOwner)
+        public void SetHoverFlags(uint hoverFlags, bool isOwner)
         {
-            IsHovered = hover;
+            HoverFlags = hoverFlags;
 
-            if (hover)
+            if (IsHovered)
             {
                 HoverIn?.Invoke(isOwner);
                 HoveredObjects.Add(this);
@@ -168,9 +167,36 @@ namespace SEE.Controls
 
             if (!Net.Network.UseInOfflineMode && isOwner)
             {
-                new Net.SetHoverAction(this, hover).Execute();
+                new Net.SetHoverAction(this, hoverFlags).Execute();
             }
-        }        
+        }
+
+        /// <summary>
+        /// Visually emphasizes this object for hovering. 
+        /// 
+        /// Note: This method may be called locally when a local user interacts with the
+        /// object or remotely when a remote user has interacted with the object. In the
+        /// former case, <paramref name="isOwner"/> will be true. In the
+        /// latter case, it will be called via <see cref="SEE.Net.SetHoverAction.ExecuteOnClient()"/>
+        /// where <paramref name="isOwner"/> is false.
+        /// </summary>
+        /// <param name="hoverFlag">The flag to be set or unset.</param>
+        /// <param name="setFlag">Whether this object should be hovered.</param>
+        /// <param name="isOwner">Whether this client is initiating the hovering action.
+        /// </param>
+        public void SetHoverFlag(HoverFlag hoverFlag, bool setFlag, bool isOwner)
+        {
+            uint hoverFlags;
+            if (setFlag)
+            {
+                hoverFlags = HoverFlags | (uint)hoverFlag;
+            }
+            else
+            {
+                hoverFlags = HoverFlags & ~(uint)hoverFlag;
+            }
+            SetHoverFlags(hoverFlags, isOwner);
+        }
 
         /// <summary>
         /// Visually emphasizes this object for selection.
@@ -186,7 +212,7 @@ namespace SEE.Controls
             {
                 // Hovering is a continuous operation, that is why we call it here
                 // when the object is in the focus but neither grabbed nor selected.
-                SetHover(true, isOwner);
+                SetHoverFlag(HoverFlag.None, true, isOwner);
             }
 
             if (select)
@@ -263,7 +289,7 @@ namespace SEE.Controls
                 }
                 else if (IsHovered)
                 {
-                    SetHover(true, isOwner);
+                    SetHoverFlag(HoverFlag.None, true, isOwner);
                 }
                 GrabbedObjects.Remove(this);
             }
@@ -351,7 +377,7 @@ namespace SEE.Controls
         {
             if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop && !Raycasting.IsMouseOverGUI())
             {
-                SetHover(true, true);
+                SetHoverFlag(HoverFlag.World, true, true);
             }
         }
 
@@ -359,13 +385,14 @@ namespace SEE.Controls
         {
             if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop)
             {
-                if (IsHovered && Raycasting.IsMouseOverGUI())
+                bool isWorldBitSet = (HoverFlags & (uint)HoverFlag.World) != 0;
+                if (isWorldBitSet && Raycasting.IsMouseOverGUI())
                 {
-                    SetHover(false, true);
+                    SetHoverFlag(HoverFlag.World, false, true);
                 }
-                else if (!IsHovered && !Raycasting.IsMouseOverGUI())
+                else if (!isWorldBitSet && !Raycasting.IsMouseOverGUI())
                 {
-                    SetHover(true, true);
+                    SetHoverFlag(HoverFlag.World, true, true);
                 }
             }
         }
@@ -374,7 +401,7 @@ namespace SEE.Controls
         {
             if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop && !Raycasting.IsMouseOverGUI())
             {
-                SetHover(false, true);
+                SetHoverFlag(HoverFlag.World, false, true);
             }
         }
 
@@ -390,8 +417,8 @@ namespace SEE.Controls
             & (~Hand.AttachmentFlags.DetachOthers)
             & (~Hand.AttachmentFlags.VelocityMovement);
 
-        private void OnHandHoverBegin(Hand hand) => SetHover(true, true);
-        private void OnHandHoverEnd(Hand hand) => SetHover(false, true);
+        private void OnHandHoverBegin(Hand hand) => SetHoverFlag(HoverFlag.World, true, true);
+        private void OnHandHoverEnd(Hand hand) => SetHoverFlag(HoverFlag.World, false, true);
 
         #endregion
     }

@@ -214,7 +214,7 @@ namespace SEE.Game.Charts
             if (!_pointedOn && linkedObject != null)
             {
                 _pointedOn = true;
-                linkedInteractable.SetHover(true, true);
+                linkedInteractable.SetHoverFlag(HoverFlag.ChartScrollViewToggle, true, true);
             }
         }
 
@@ -227,7 +227,7 @@ namespace SEE.Game.Charts
             if (_pointedOn && linkedObject != null)
             {
                 _pointedOn = false;
-                linkedInteractable.SetHover(false, true);
+                linkedInteractable.SetHoverFlag(HoverFlag.ChartScrollViewToggle, false, true);
             }
         }
 

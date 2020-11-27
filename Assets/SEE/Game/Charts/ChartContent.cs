@@ -682,7 +682,7 @@ namespace SEE.Game.Charts
                 {
                     GameObject marker = Instantiate(markerPrefab, entries.transform);
                     marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
-                    marker.TryGetComponent<ChartMarker>(out ChartMarker script);
+                    marker.TryGetComponent(out ChartMarker script);
                     script.LinkedObject = data;
                     Node node = data.GetComponent<NodeRef>().node;
                     node.TryGetNumeric(metric, out float value);
@@ -806,50 +806,44 @@ namespace SEE.Game.Charts
             }
         }
 
-        /// <summary>
-        /// Calls <see cref="ChartMarker.TriggerTimedHighlight" /> for all Markers in a rectangle in the chart.
-        /// </summary>
-        /// <param name="min">The starting edge of the rectangle.</param>
-        /// <param name="max">The ending edge of the rectangle.</param>
-        /// <param name="direction">True if min lies below max, false if not.</param>
-        public virtual void AreaSelection(Vector2 min, Vector2 max, bool direction)
+        public void AreaHover(Vector2 min, Vector2 max)
         {
-            if (direction)
+            bool toggleHover = Input.GetKey(KeyCode.LeftControl);
+            foreach (GameObject marker in ActiveMarkers)
             {
-                foreach (GameObject marker in ActiveMarkers)
+                InteractableObject interactableObject = marker.GetComponent<ChartMarker>().LinkedInteractable;
+                Vector2 markerPos = marker.transform.position;
+                if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                 {
-                    InteractableObject interactableObject = marker.GetComponent<ChartMarker>().LinkedInteractable;
-                    Vector2 markerPos = marker.transform.position;
-                    if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
+                    if (!interactableObject.IsHovered)
                     {
-                        if (!interactableObject.IsSelected)
-                        {
-                            interactableObject.SetSelect(true, true);
-                        }
-                    }
-                    else if (interactableObject.IsSelected)
-                    {
-                        marker.GetComponent<ChartMarker>().LinkedInteractable.SetSelect(false, true);
+                        interactableObject.SetHoverFlag(HoverFlag.ChartMultiSelect, true, true);
                     }
                 }
-            }
-            else
-            {
-                foreach (GameObject marker in ActiveMarkers)
+                else if (!toggleHover && interactableObject.IsHovered)
                 {
-                    InteractableObject interactableObject = marker.GetComponent<ChartMarker>().LinkedInteractable;
-                    Vector2 markerPos = marker.transform.position;
-                    if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y && markerPos.y > max.y)
+                    interactableObject.SetHoverFlag(HoverFlag.ChartMultiSelect, false, true);
+                }
+            }
+        }
+
+        public virtual void AreaSelection(Vector2 min, Vector2 max)
+        {
+            bool toggleSelect = Input.GetKey(KeyCode.LeftControl);
+            foreach (GameObject marker in ActiveMarkers)
+            {
+                InteractableObject interactableObject = marker.GetComponent<ChartMarker>().LinkedInteractable;
+                Vector2 markerPos = marker.transform.position;
+                if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
+                {
+                    if (!interactableObject.IsSelected)
                     {
-                        if (!interactableObject.IsSelected)
-                        {
-                            interactableObject.SetSelect(true, true);
-                        }
+                        interactableObject.SetSelect(true, true);
                     }
-                    else if (interactableObject.IsSelected)
-                    {
-                        marker.GetComponent<ChartMarker>().LinkedInteractable.SetSelect(false, true);
-                    }
+                }
+                else if (!toggleSelect && interactableObject.IsSelected)
+                {
+                    marker.GetComponent<ChartMarker>().LinkedInteractable.SetSelect(false, true);
                 }
             }
         }
@@ -901,16 +895,24 @@ namespace SEE.Game.Charts
             }
         }
 
-        /// <summary>
-        /// Unselects all currently selected markers of this chart.
-        /// </summary>
+        public void UnhoverAll()
+        {
+            foreach (GameObject activeMarker in ActiveMarkers)
+            {
+                if (activeMarker.TryGetComponent(out InteractableObject interactableObject))
+                {
+                    interactableObject.SetHoverFlags(0, true);
+                }
+            }
+        }
+
         public void UnselectAll()
         {
             foreach (GameObject activeMarker in ActiveMarkers)
             {
-                if (activeMarker && activeMarker.TryGetComponent(out ChartMarker marker))
+                if (activeMarker.TryGetComponent(out InteractableObject interactableObject))
                 {
-                    //marker.SetHighlightLinkedObject(false);
+                    interactableObject.SetSelect(false, true);
                 }
             }
         }
