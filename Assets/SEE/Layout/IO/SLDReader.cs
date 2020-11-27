@@ -6,6 +6,9 @@ namespace SEE.Layout.IO
 {
     /// <summary>
     /// Reads layouts in SEE's layout format (SLD = SEE Layout Data).
+    /// SLD captures the complete transform of a game object.
+    /// 
+    /// <seealso cref="SLDWriter"/>.     
     /// </summary>
     public class SLDReader
     {
