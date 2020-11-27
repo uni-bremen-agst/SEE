@@ -114,7 +114,7 @@ public class CityRestorer
         // if there are nodetypes stored which are not in the current version of the Evolutioncity anymore.
 
         finalResults = finalResults.Concat(intermediateResults).ToList();
-   
+
         // Depending on the actual amount of difference, three cases are possible:
         // First case = There are no differenct objects, thus we can break instantly
         // Second case = There is only one object, so it is possible to print out the result instantly and break.
@@ -135,10 +135,15 @@ public class CityRestorer
                 UnityEngine.Debug.Log("Since you had saved your profile the following Nodetype was been deleted in the meantime :\n" + finalResults.First());
                 return;
             }
-            if (newNodes.Count > oldNodes.Count && finalResults.Count == 1 )
+            if (newNodes.Count > oldNodes.Count && finalResults.Count == 1)
             {
                 AddNodeTypes(city, null, finalResults.First());
                 UnityEngine.Debug.Log("Since you had saved your profile the following Nodetype was added in the meantime :\n" + finalResults.First());
+                return;
+            }
+            else
+            {
+                UnityEngine.Debug.Log("There have not been added any new nodytpes added since you saved your profile" + "\n");
                 return;
             }
         }
@@ -150,10 +155,13 @@ public class CityRestorer
                 AddNodeTypes(city, finalResults, null);
                 difference += str + ",";
             }
+            StringBuilder sb = new StringBuilder(difference);
+            if (sb.Length > 0)
+            {
+                sb.Remove(sb.Length - 1, 1);
+            }
+            UnityEngine.Debug.Log("Since you saved your profile and today the following Nodetypes have changed :\n" + sb.ToString());
         }
-        StringBuilder sb = new StringBuilder(difference);
-        sb.Remove(sb.Length-1,1);
-        UnityEngine.Debug.Log("Since you saved your profile and today the following Nodetypes have changed :\n" + sb.ToString());
     }
 
 
