@@ -183,7 +183,7 @@ namespace SEE.Game
             if (loadedGraph != null)
             {
                 SetNodeEdgeRefs(loadedGraph, gameObject);
-                Debug.Log("Node and edge references are resolved.\n");
+                Debug.LogFormat("Node and edge references for {0} are resolved.\n", gameObject.name);
             }
             else
             {
@@ -218,8 +218,12 @@ namespace SEE.Game
                     edgeRef.edge = graph.GetEdge(child.name);
                     if (edgeRef.edge == null)
                     {
-                        Debug.LogWarningFormat("Could not resolve edge reference {0}.\n", child.name);
+                        Debug.LogWarningFormat("Could not resolve edge reference {0}.\n", child.name);          
                     }
+                }
+                else
+                {
+                    Debug.LogWarningFormat("Game object {0} has neither node nor edge reference.\n", child.name);
                 }
                 SetNodeEdgeRefs(graph, child);
             }
