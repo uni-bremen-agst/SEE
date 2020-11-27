@@ -5,6 +5,7 @@ using SEE.DataModel.DG.IO;
 using SEE.Game;
 using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
+using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -29,21 +30,143 @@ namespace SEE.Layout
         /// </summary>
         private const string hierarchicalEdgeType = "Enclosing";
         private const float floatTolerance = 0.1f;
-
+        
+        /// <summary>
+        /// Test for reading and writing a node layout in GVL.
+        /// </summary>
         [Test]
-        public void TestWriteRead()
+        public void TestGVLWriteRead()
         {
-            string graphName = "architecture";
+            // GVL does not contain the height (y co-ordinate).
+            bool yIsStored = false;
             string filename = Application.dataPath + "/../Temp/layout.gvl";
 
             ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes(1);
 
+            CalculateLayout(gameObjects,
+                            out Dictionary<ILayoutNode, NodeTransform> savedLayout,
+                            out Dictionary<string, NodeTransform> layoutMap);
+
+            // Save the layout.
+            SEE.Layout.IO.GVLWriter.Save(filename, "architecture", gameObjects);
+            Dump(gameObjects, 10);
+
+            ClearLayout(gameObjects, yIsStored);
+
+            // Read the saved layout. 
+            Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(0, filename).Layout(gameObjects);
+            Dump(readLayout, 10);
+
+            Assert.AreEqual(savedLayout.Count, readLayout.Count); // no gameObject added or removed
+            // Now layoutMap and readLayout should be the same except for  
+            // scale.y and, thus, position.y (none of those are stored in GVL).
+            LayoutsAreEqual(readLayout, layoutMap, yIsStored);
+        }
+
+        /// <summary>
+        /// Test for reading and writing a node layout in SLD format.
+        /// </summary>
+        //[Test]
+        //public void TestSLDWriteRead()
+        //{
+        //    // SLD contains the height (y co-ordinate).
+        //    bool yIsStored = true;
+        //    string filename = Application.dataPath + "/../Temp/layout.sld";
+
+        //    ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes(1);
+
+        //    CalculateLayout(gameObjects,
+        //                    out Dictionary<ILayoutNode, NodeTransform> savedLayout,
+        //                    out Dictionary<string, NodeTransform> layoutMap);
+
+        //    // Save the layout.
+        //    SEE.Layout.IO.SLDWriter.Save(filename, gameObjects);
+        //    Dump(gameObjects, 10);
+
+        //    ClearLayout(gameObjects, yIsStored);
+
+        //    // Read the saved layout. 
+        //    Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(0, filename).Layout(gameObjects);
+        //    Dump(readLayout, 10);
+
+        //    Assert.AreEqual(savedLayout.Count, readLayout.Count); // no gameObject added or removed
+        //    // Now layoutMap and readLayout should be the same except for  
+        //    // scale.y and, thus, position.y (none of those are stored in GVL).
+        //    LayoutsAreEqual(readLayout, layoutMap, yIsStored);
+        //}
+
+        /// <summary>
+        /// Clears the scale and position of the position of all <paramref name="gameObjects"/> 
+        /// so that we can be sure that they are actually read. If <paramref name="yIsStored"/>
+        /// scale and position are reset completely; otherwise only the x and z components
+        /// of those two vectors are reset.
+        /// Note that the GVL does not contain scale.y and position.y, that is why we need 
+        /// to maintain it.
+        /// </summary>
+        /// <param name="gameObjects">game objects whose layout is to be reset</param>
+        private static void ClearLayout(ICollection<ILayoutNode> gameObjects, bool yIsStored)
+        {            
+            foreach (ILayoutNode layoutNode in gameObjects)
+            {
+                if (yIsStored)
+                {
+                    layoutNode.LocalScale = Vector3.zero;
+                    layoutNode.CenterPosition = Vector3.zero;
+                }
+                else
+                {
+                    layoutNode.LocalScale = new Vector3(0.0f, layoutNode.LocalScale.y, 0.0f);
+                    layoutNode.CenterPosition = new Vector3(0.0f, layoutNode.LocalScale.y, 0.0f);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks whether the two layouts <paramref name="layoutMap"/> and <paramref name="readLayout"/>
+        /// are the same. If <paramref name="compareY"/> is false, the y scale and y position are ignored
+        /// in the comparison.
+        /// </summary>
+        /// <param name="readLayout">the layout read from disk</param>
+        /// <param name="layoutMap">the layout calculated originally</param>
+        /// <param name="compareY">whether the y scale and y position should be compared</param>
+        private static void LayoutsAreEqual(Dictionary<ILayoutNode, NodeTransform> readLayout, 
+                                            Dictionary<string, NodeTransform> layoutMap, 
+                                            bool compareY)
+        {            
+            foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in readLayout)
+            {
+                ILayoutNode node = entry.Key;
+                NodeTransform readTransform = entry.Value;
+
+                Debug.LogFormat("Comparing {0}\n", node.ID);
+                NodeTransform savedTransform = layoutMap[node.ID];
+                Assert.That(readTransform.scale.x, Is.EqualTo(savedTransform.scale.x).Within(floatTolerance));
+                if (compareY)
+                {
+                    Assert.That(readTransform.scale.y, Is.EqualTo(savedTransform.scale.y).Within(floatTolerance));
+                }
+                Assert.That(readTransform.scale.z, Is.EqualTo(savedTransform.scale.z).Within(floatTolerance));
+                Assert.That(readTransform.position.x, Is.EqualTo(savedTransform.position.x).Within(floatTolerance));
+                if (compareY)
+                {
+                    Assert.That(readTransform.position.y, Is.EqualTo(savedTransform.position.y).Within(floatTolerance));
+                }
+                Assert.That(readTransform.position.z, Is.EqualTo(savedTransform.position.z).Within(floatTolerance));
+                Assert.AreEqual(savedTransform.rotation, readTransform.rotation);
+            }
+        }
+
+        private static void CalculateLayout
+            (ICollection<ILayoutNode> gameObjects, 
+            out Dictionary<ILayoutNode, NodeTransform> savedLayout,
+            out Dictionary<string, NodeTransform> layoutMap)
+        {
             // Layout the nodes.
             RectanglePackingNodeLayout packer = new RectanglePackingNodeLayout(0.0f, 1.0f);
-            Dictionary<ILayoutNode, NodeTransform> savedLayout = packer.Layout(gameObjects);
+            savedLayout = packer.Layout(gameObjects);
 
             // Apply the layout.
-            Dictionary<string, NodeTransform> layoutMap = new Dictionary<string, NodeTransform>(savedLayout.Count);
+            layoutMap = new Dictionary<string, NodeTransform>(savedLayout.Count);
             foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in savedLayout)
             {
                 ILayoutNode node = entry.Key;
@@ -54,40 +177,6 @@ namespace SEE.Layout
                 position.y += transform.scale.y / 2.0f;
                 node.CenterPosition = position;
                 layoutMap[node.ID] = new NodeTransform(node.CenterPosition, node.LocalScale, node.Rotation);
-            }
-            // Save the layout.
-            SEE.Layout.IO.Writer.Save(filename, graphName, gameObjects);
-            Dump(gameObjects, 10);
-
-            // Clear the scale.x, scale.z and position of all gameObjects so that we can be sure
-            // that they are actually read. Note that the GVL does not contain scale.y,
-            // that is why we need to maintain it.
-            foreach (ILayoutNode layoutNode in gameObjects)
-            {
-                layoutNode.LocalScale = new Vector3(0.0f, layoutNode.LocalScale.y, 0.0f);
-                layoutNode.CenterPosition = Vector3.zero;
-            }
-
-            // Read the saved layout. 
-            Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(0, filename).Layout(gameObjects);
-
-            Dump(readLayout, 10);
-
-            // Now savedLayout and readLayout should be the same except for  
-            // scale.y and, thus, position.y (none of those are stored in GVL).
-            Assert.AreEqual(savedLayout.Count, readLayout.Count); // no gameObject added or removed
-            foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in readLayout)
-            {
-                ILayoutNode node = entry.Key;
-                NodeTransform readTransform = entry.Value;
-
-                Debug.LogFormat("Comparing {0}\n", node.ID);
-                NodeTransform savedTransform = layoutMap[node.ID];
-                Assert.That(readTransform.scale.x, Is.EqualTo(savedTransform.scale.x).Within(floatTolerance));
-                Assert.That(readTransform.scale.z, Is.EqualTo(savedTransform.scale.z).Within(floatTolerance));
-                Assert.That(readTransform.position.x, Is.EqualTo(savedTransform.position.x).Within(floatTolerance));
-                Assert.That(readTransform.position.z, Is.EqualTo(savedTransform.position.z).Within(floatTolerance));
-                Assert.AreEqual(savedTransform.rotation, readTransform.rotation);
             }
         }
 
@@ -129,7 +218,7 @@ namespace SEE.Layout
             ICollection<ILayoutNode> gameObjects = new List<ILayoutNode>();
 
             // Save the layout.
-            SEE.Layout.IO.Writer.Save(filename, graphName, gameObjects);
+            SEE.Layout.IO.GVLWriter.Save(filename, graphName, gameObjects);
 
             // Read the saved layout. 
             LoadedNodeLayout loadedNodeLayout = new LoadedNodeLayout(0, filename);
@@ -143,11 +232,10 @@ namespace SEE.Layout
         [Test]
         public void TestRead()
         {
-            // The path to the GXL and GVL files.
-            string path = Application.dataPath + "/../Data/GXL/SEE/";
+            // The relative path to the GXL and GVL files.
 
             // Loading the underlying graph.
-            Graph graph = LoadGraph(path + "Architecture.gxl");
+            Graph graph = LoadGraph(Filenames.OnCurrentPlatform("Data/GXL/SEE/") + "Architecture.gxl");
             //graph.DumpTree();
 
             // Setting up the node layout so that it is read from the GVL file.
@@ -160,7 +248,7 @@ namespace SEE.Layout
             seeCityComponent.EdgeLayout = EdgeLayoutKind.None;
             seeCityComponent.LeafObjects = AbstractSEECity.LeafNodeKinds.Blocks;
             seeCityComponent.InnerNodeObjects = AbstractSEECity.InnerNodeKinds.Blocks;
-            seeCityComponent.gvlPath = path + "Architecture.gvl";
+            seeCityComponent.layoutPath = "../Data/GXL/SEE/Architecture.gvl";
 
             // Render the city. This will create all game objects as well as their
             // layout. As stated before, the layout does not interest us.
@@ -181,7 +269,7 @@ namespace SEE.Layout
             //                                                       0.0f);
             DumpTree(layoutNodes);
             // Save the layout.
-            SEE.Layout.IO.Writer.Save(path + "Architecture-saved.gvl", "architecture", layoutNodes);
+            SEE.Layout.IO.GVLWriter.Save(Filenames.OnCurrentPlatform("Data/GXL/SEE/") + "Architecture-saved.gvl", "architecture", layoutNodes);
         }
 
         private ICollection<GameObject> GetGameObjects(GameObject go)

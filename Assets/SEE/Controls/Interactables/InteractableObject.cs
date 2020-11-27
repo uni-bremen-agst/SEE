@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
@@ -210,6 +211,21 @@ namespace SEE.Controls
             if (!Net.Network.UseInOfflineMode && isOwner)
             {
                 new Net.SetSelectAction(this, select).Execute();
+            }
+        }
+
+        /// <summary>
+        /// Deselects all currently selected interactable objects.
+        /// </summary>
+        /// <param name="isOwner">Whether this client is initiating the selection action.
+        public static void UnselectAll(bool isOwner)
+        {
+            // We cannot iterate on SelectedObjects directly because SetSelect will
+            // remove the iterated interactable from SelectedObjects. That is why
+            // we convert SelectedObjects to an array first.
+            foreach (InteractableObject interactable in SelectedObjects.ToArray())
+            {
+                interactable.SetSelect(false, isOwner);
             }
         }
 
