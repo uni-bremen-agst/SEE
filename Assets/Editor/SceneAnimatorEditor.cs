@@ -1,11 +1,16 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using SEE.Game;
+using System;
 
 #if UNITY_EDITOR
 
 namespace SEEEditor
 {
+    /// <summary>
+    /// Editor for SceneAnimator for capturing demo videos.
+    /// </summary>
+    [Obsolete("Introduced only for capturing videos.")]
     [CustomEditor(typeof(SceneAnimator))]
     public class SceneAnimatorEditor : Editor
     {
