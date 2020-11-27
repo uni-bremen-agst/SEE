@@ -40,6 +40,7 @@ namespace SEE.Game.Charts.VR
         public GameObject physicalClosed;
 
         /// <summary>
+        /// FIXME: Obsolete. Should be removed. Is this used in the prefab?
         /// A checkbox to toggle the <see cref="ChartManager.selectionMode" />.
         /// </summary>
         [SerializeField] private Toggle selectionToggle;
@@ -68,7 +69,7 @@ namespace SEE.Game.Charts.VR
                     Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
                     if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                     {
-                        ChartManager.OnSelect(marker.GetComponent<ChartMarker>().linkedObject, false);
+                        ChartManager.OnSelect(marker.GetComponent<ChartMarker>().linkedObject);
                     }
                 }
             }
@@ -79,18 +80,10 @@ namespace SEE.Game.Charts.VR
                     Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
                     if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y && markerPos.y > max.y)
                     {
-                        ChartManager.OnSelect(marker.GetComponent<ChartMarker>().linkedObject, false);
+                        ChartManager.OnSelect(marker.GetComponent<ChartMarker>().linkedObject);
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Activates or deactivates the selection mode. TODO: Not synced across charts.
-        /// </summary>
-        public void SetSelectionMode()
-        {
-            ChartManager.Instance.selectionMode = selectionToggle.isOn;
         }
     }
 }
