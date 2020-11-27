@@ -184,7 +184,7 @@ namespace SEE.Game.Charts
             if (LinkedObject != null && !_pointedOn)
             {
                 _pointedOn = true;
-                ChartManager.OnSelect(LinkedObject.gameObject, true);
+                ChartManager.OnSelect(LinkedObject.gameObject);
             }
         }
 
@@ -196,7 +196,7 @@ namespace SEE.Game.Charts
         {
             if (_pointedOn)
             {
-                ChartManager.OnDeselect(LinkedObject.gameObject, true);
+                ChartManager.OnDeselect(LinkedObject.gameObject);
                 _pointedOn = false;
             }
         }
@@ -209,7 +209,7 @@ namespace SEE.Game.Charts
         {
             if (_pointedOn && LinkedObject != null)
             {
-                ChartManager.OnSelect(LinkedObject.gameObject, true);
+                ChartManager.OnSelect(LinkedObject.gameObject);
             }
         }
     }

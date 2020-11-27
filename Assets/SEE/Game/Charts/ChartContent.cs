@@ -22,6 +22,7 @@
 using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -160,7 +161,7 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Contains all metric names contained in any <see cref="GameObject" /> of <see cref="_dataObjects" />.
         /// </summary>
-        public HashSet<string> AllMetricNames { get; } = new HashSet<string>();
+        public SortedSet<string> AllMetricNames { get; } = new SortedSet<string>();
 
         /// <summary>
         /// The number of game objects representing a graph node in the current scene.
@@ -237,6 +238,8 @@ namespace SEE.Game.Charts
 
         private void FillScrollView(bool tree)
         {
+            return; // FIXME: Disable for the time being because it is so slow.
+
             Performance p = Performance.Begin("FillScrollView(bool)");
             foreach (Transform child in scrollContent.transform)
             {
@@ -562,7 +565,6 @@ namespace SEE.Game.Charts
         /// </summary>
         private void DrawY(bool SortByMetric)
         {
-            Performance p = Performance.Begin("DrawY");
             List<GameObject> toDraw = new List<GameObject>();
             string metric = axisDropdownY.CurrentlySelectedMetric;
 
@@ -614,7 +616,6 @@ namespace SEE.Game.Charts
 
                 noDataWarning.SetActive(true);
             }
-            p.End(true);
         }
 
         /// <summary>
@@ -644,8 +645,9 @@ namespace SEE.Game.Charts
                 Node node = data.GetComponent<NodeRef>().node;
                 node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX);
                 node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY);
-                chartMarker.SetInfoText("Linked to: " + data.name + "\nX: "
-                                        + valueX.ToString("N") + ", Y: " + valueY.ToString("N"));
+                chartMarker.SetInfoText(SceneQueries.SourceName(data) 
+                                        + " (" + valueX.ToString("0.00") 
+                                        + ", " + valueY.ToString("0.00") + ")");
                 marker.GetComponent<RectTransform>().anchoredPosition =
                     new Vector2((valueX - minX) * width, (valueY - minY) * height);
                 //CheckOverlapping(marker, updatedMarkers.ToArray());
@@ -693,10 +695,8 @@ namespace SEE.Game.Charts
                     script.ScrollViewToggle = data.GetComponent<NodeHighlights>().scrollViewToggle;
                     Node node = data.GetComponent<NodeRef>().node;
                     node.TryGetNumeric(metric, out float value);
-                    string type = node.IsLeaf() ? "Building" : "Node";
-                    script.SetInfoText("Linked to: " + data.name + " of type " + type + "\n" +
-                                       metric +
-                                       ": " + value.ToString("N"));
+                    script.SetInfoText(SceneQueries.SourceName(data)
+                                       + ": " + value.ToString("0.00"));
                     marker.GetComponent<RectTransform>().anchoredPosition =
                         new Vector2(x++ * width, (value - min) * height);
                     CheckOverlapping(marker, updatedMarkers.ToArray());
@@ -741,9 +741,10 @@ namespace SEE.Game.Charts
                 Node node = nodeRef.node;
                 node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX);
                 node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY);
-                string type = node.IsLeaf() ? "Building" : "Node";
-                script.SetInfoText("Linked to: " + data.name + " of type " + type + "\nX: " +
-                                   valueX.ToString("0.00") + ", Y: " + valueY.ToString("N"));
+                script.SetInfoText(SceneQueries.SourceName(data)
+                                   + " (" + valueX.ToString("0.00")
+                                   + ", " + valueY.ToString("0.00") + ")");
+
                 marker.TryGetComponent<RectTransform>(out RectTransform anchoredPos);
                 anchoredPos.anchoredPosition = new Vector2(x++ * width, y++ * height);
                 CheckOverlapping(marker, updatedMarkers.ToArray());
@@ -830,7 +831,7 @@ namespace SEE.Game.Charts
                     Vector2 markerPos = marker.transform.position;
                     if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                     {
-                        ChartManager.OnSelect(marker.GetComponent<ChartMarker>().linkedObject, false);
+                        ChartManager.OnSelect(marker.GetComponent<ChartMarker>().linkedObject);
                     }
                 }
             }
@@ -841,7 +842,7 @@ namespace SEE.Game.Charts
                     Vector2 markerPos = marker.transform.position;
                     if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y && markerPos.y > max.y)
                     {
-                        ChartManager.OnSelect(marker.GetComponent<ChartMarker>().linkedObject, false);
+                        ChartManager.OnSelect(marker.GetComponent<ChartMarker>().linkedObject);
                     }
                 }
             }
@@ -877,18 +878,18 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Finds all markers that refer to a given <see cref="GameObject" /> and toggles their highlight
-        /// across all charts.
+        /// Finds all markers that refer to a given <see cref="GameObject" /> and sets their highlight
+        /// across all charts to <paramref name="isHighlighted"/>.
         /// </summary>
         /// <param name="highlight">The object the marker will refer to.</param>
-        /// <param name="scrollView">If this is triggered by a <see cref="ScrollViewToggle" /> or not.</param>
-        public void HighlightCorrespondingMarker(GameObject highlight, bool scrollView)
+        /// <param name="isHighlighted">whether or not <paramref name="highlight"/> should be highlighted</param>
+        public void HighlightCorrespondingMarker(GameObject highlight, bool isHighlighted)
         {
             foreach (GameObject activeMarker in ActiveMarkers)
             {
                 if (activeMarker && activeMarker.TryGetComponent(out ChartMarker script) && script.linkedObject.Equals(highlight))
                 {
-                    script.HighlightLinkedObjectToggle();
+                    script.SetHighlightLinkedObject(isHighlighted);
                     break;
                 }
             }

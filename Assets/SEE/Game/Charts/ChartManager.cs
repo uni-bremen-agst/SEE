@@ -22,6 +22,7 @@
 using SEE.Controls;
 using SEE.DataModel;
 using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -219,19 +220,21 @@ namespace SEE.Game.Charts
             allCharts.Remove(chart);
         }
 
-        public static void OnSelect(GameObject highlight, bool scrollView)
+        public static void OnSelect(GameObject highlight)
         {
-            foreach (GameObject chart in Instance.AllCharts)
-            {
-                chart.GetComponent<ChartContent>()?.HighlightCorrespondingMarker(highlight, scrollView);
-            }
+            SetCorrespondingMarkers(highlight, true);
         }
 
-        public static void OnDeselect(GameObject highlight, bool scrollView)
+        public static void OnDeselect(GameObject highlight)
+        {
+            SetCorrespondingMarkers(highlight, false);
+        }
+
+        private static void SetCorrespondingMarkers(GameObject highlight, bool isSelected)
         {
             foreach (GameObject chart in Instance.AllCharts)
             {
-                chart.GetComponent<ChartContent>()?.HighlightCorrespondingMarker(highlight, scrollView);
+                chart.GetComponent<ChartContent>()?.HighlightCorrespondingMarker(highlight, isSelected);
             }
         }
 
