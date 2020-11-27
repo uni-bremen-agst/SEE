@@ -19,6 +19,7 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using SEE.Controls;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -36,7 +37,7 @@ namespace SEE.Game.Charts
         [SerializeField] protected RectTransform selectionRect;
 
         /// <summary>
-        /// Needed for access to <see cref="Scripts.ChartContent.AreaSelection" />.
+        /// Needed for access to <see cref="Scripts.ChartContent.AreaSelection"/>.
         /// </summary>
         protected ChartContent chartContent;
 
@@ -46,15 +47,46 @@ namespace SEE.Game.Charts
         protected Vector3 startingPos;
 
         /// <summary>
-        /// Assigns <see cref="chartContent" />.
+        /// Assigns <see cref="chartContent"/>.
         /// </summary>
         private void Awake()
         {
             chartContent = transform.parent.GetComponent<ChartContent>();
         }
 
+        public bool IsSelecting() => selectionRect.gameObject.activeSelf;
+
+        protected void SortMinMax(Vector2 fst, Vector2 snd, out Vector2 min, out Vector2 max)
+        {
+            float x0, x1, y0, y1;
+
+            if (fst.x < snd.x)
+            {
+                x0 = fst.x;
+                x1 = snd.x;
+            }
+            else
+            {
+                x0 = snd.x;
+                x1 = fst.x;
+            }
+            if (fst.y < snd.y)
+            {
+                y0 = fst.y;
+                y1 = snd.y;
+            }
+            else
+            {
+                y0 = snd.y;
+                y1 = fst.y;
+            }
+
+            min = new Vector2(x0, y0);
+            max = new Vector2(x1, y1);
+        }
+
         /// <summary>
-        /// Activates and sets starting position of <see cref="selectionRect" />.
+        /// Activates and sets starting position of <see cref="selectionRect"/>.
         /// </summary>
         /// <param name="eventData">Contains the position data.</param>
         public virtual void OnPointerDown(PointerEventData eventData)
@@ -62,12 +94,20 @@ namespace SEE.Game.Charts
             selectionRect.gameObject.SetActive(true);
             selectionRect.position = eventData.pressPosition;
             startingPos = selectionRect.position;
-            selectionRect.sizeDelta = new Vector2(0f, 0f);
+            selectionRect.sizeDelta = new Vector2(0.0f, 0.0f);
+            if (!Input.GetKey(KeyCode.LeftControl))
+            {
+                foreach (InteractableObject interactableObject in FindObjectsOfType<InteractableObject>())
+                {
+                    interactableObject.SetHoverFlags(0, true);
+                    interactableObject.SetSelect(false, true);
+                }
+            }
         }
 
         /// <summary>
-        /// Resizes the <see cref="selectionRect" /> to make it span from <see cref="startingPos" /> to
-        /// <see cref="PointerEventData.position" />.
+        /// Resizes the <see cref="selectionRect"/> to make it span from <see cref="startingPos"/> to
+        /// <see cref="PointerEventData.position"/>.
         /// </summary>
         /// <param name="eventData">Contains the position data.</param>
         public virtual void OnDrag(PointerEventData eventData)
@@ -127,23 +167,42 @@ namespace SEE.Game.Charts
                 sizeDelta = selectionRect.sizeDelta;
                 selectionRect.position = new Vector3(startingPos.x + sizeDelta.x / 2 * lossyScale.x, startingPos.y + sizeDelta.y / 2 * lossyScale.y, 0);
             }
+
+            float x0, x1, y0, y1;
+            if (startingPos.x < eventData.position.x)
+            {
+                x0 = startingPos.x;
+                x1 = eventData.position.x;
+            }
+            else
+            {
+                x0 = eventData.position.x;
+                x1 = startingPos.x;
+            }
+            if (startingPos.y < eventData.position.y)
+            {
+                y0 = startingPos.y;
+                y1 = eventData.position.y;
+            }
+            else
+            {
+                y0 = eventData.position.y;
+                y1 = startingPos.y;
+            }
+
+            SortMinMax(startingPos, eventData.position, out Vector2 min, out Vector2 max);
+            chartContent.AreaHover(min, max);
         }
 
         /// <summary>
-        /// Highlights all markers in <see cref="selectionRect" /> and deactivates it.
+        /// Highlights all markers in <see cref="selectionRect"/> and deactivates it.
         /// </summary>
         /// <param name="eventData">Contains the position data.</param>
         public virtual void OnPointerUp(PointerEventData eventData)
         {
-            if (startingPos.x < eventData.position.x)
-            {
-                chartContent.AreaSelection(startingPos, eventData.position, startingPos.y < eventData.position.y);
-            }
-            else
-            {
-                chartContent.AreaSelection(eventData.position, startingPos, startingPos.y > eventData.position.y);
-            }
-
+            chartContent.UnhoverAll();
+            SortMinMax(startingPos, eventData.position, out Vector2 min, out Vector2 max);
+            chartContent.AreaSelection(min, max);
             selectionRect.gameObject.SetActive(false);
         }
     }

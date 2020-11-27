@@ -94,9 +94,25 @@ namespace SEE.Game.Charts
 
         #region UnityEngine Callbacks
 
-        public void ButtonClicked() => linkedInteractable?.SetSelect(!linkedInteractable.IsSelected, true);
-        public void OnPointerEnter(PointerEventData eventData) => linkedInteractable?.SetHover(true, true);
-        public void OnPointerExit(PointerEventData eventData) => linkedInteractable?.SetHover(false, true);
+        public void ButtonClicked()
+        {
+            if (linkedInteractable)
+            {
+                // TODO(torben): the action state could be global for some cases. the line below exists in DesktopNavigationAction.cs and could somewhat be shared
+                //actionState.selectToggle = Input.GetKey(KeyCode.LeftControl);
+                if (!Input.GetKey(KeyCode.LeftControl))
+                {
+                    foreach (InteractableObject interactableObject in FindObjectsOfType<InteractableObject>())
+                    {
+                        interactableObject.SetHoverFlags(0, true);
+                        interactableObject.SetSelect(false, true);
+                    }
+                }
+                linkedInteractable.SetSelect(!linkedInteractable.IsSelected, true);
+            }
+        }
+        public void OnPointerEnter(PointerEventData eventData) => linkedInteractable?.SetHoverFlag(HoverFlag.ChartMarker, true, true);
+        public void OnPointerExit(PointerEventData eventData) => linkedInteractable?.SetHoverFlag(HoverFlag.ChartMarker, false, true);
 
         #endregion
 
