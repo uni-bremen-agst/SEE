@@ -12,7 +12,7 @@ namespace SEE.Game
     internal class SceneQueries
     {
         /// <summary>
-        /// Returns all game objects in the current scene tagged by Tags.Node and having 
+        /// Returns all game objects in the current scene tagged by Tags.Node and having
         /// a valid reference to a graph node.
         /// </summary>
         /// <returns>all game objects representing graph nodes in the scene</returns>
@@ -21,7 +21,7 @@ namespace SEE.Game
             List<GameObject> result = new List<GameObject>();
             foreach (GameObject go in GameObject.FindGameObjectsWithTag(Tags.Node))
             {
-                if (go.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+                if (go.TryGetComponent(out NodeRef nodeRef))
                 {
                     Node node = nodeRef.node;
                     if (node != null)
@@ -29,6 +29,39 @@ namespace SEE.Game
                         if ((includeLeaves && node.IsLeaf()) || (includeInnerNodes && !node.IsLeaf()))
                         {
                             result.Add(go);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarningFormat("Game node {0} has a null node reference.\n", go.name);
+                    }
+                }
+                else
+                {
+                    Debug.LogWarningFormat("Game node {0} without node reference.\n", go.name);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns all node refs in the current scene of objects tagged by Tags.Node and
+        /// having a valid reference to a graph node.
+        /// </summary>
+        /// <returns>all game objects representing graph nodes in the scene</returns>
+        public static ICollection<NodeRef> AllNodeRefsInScene(bool includeLeaves, bool includeInnerNodes)
+        {
+            List<NodeRef> result = new List<NodeRef>();
+            foreach (GameObject go in GameObject.FindGameObjectsWithTag(Tags.Node))
+            {
+                if (go.TryGetComponent(out NodeRef nodeRef))
+                {
+                    Node node = nodeRef.node;
+                    if (node != null)
+                    {
+                        if ((includeLeaves && node.IsLeaf()) || (includeInnerNodes && !node.IsLeaf()))
+                        {
+                            result.Add(nodeRef);
                         }
                     }
                     else
@@ -58,6 +91,26 @@ namespace SEE.Game
             foreach (Graph graph in GetGraphs(gameNodes))
             {
                 result.AddRange(graph.GetRoots());
+            }
+            return result;
+        }
+
+        public static ICollection<Node> GetRoots(ICollection<NodeRef> nodeRefs)
+        {
+            HashSet<Node> result = new HashSet<Node>();
+            foreach (NodeRef nodeRef in nodeRefs)
+            {
+                IEnumerable<Node> nodes = nodeRef?.node?.ItsGraph?.GetRoots();
+                if (nodes != null)
+                {
+                    foreach (Node node in nodes)
+                    {
+                        if (node != null)
+                        {
+                            result.Add(node);
+                        }
+                    }
+                }
             }
             return result;
         }
@@ -93,6 +146,11 @@ namespace SEE.Game
             return gameNode.GetComponent<NodeRef>()?.node?.IsLeaf() ?? false;
         }
 
+        public static bool IsLeaf(NodeRef nodeRef)
+        {
+            return nodeRef?.node?.IsLeaf() ?? false;
+        }
+
         /// <summary>
         /// True if <paramref name="gameNode"/> represents an inner node in the graph.
         /// 
@@ -123,6 +181,18 @@ namespace SEE.Game
                 }
             }
             return gameNode.name;
+        }
+
+        public static string SourceName(NodeRef nodeRef)
+        {
+            string result = string.Empty;
+
+            if (nodeRef)
+            {
+                result = nodeRef.node?.SourceName ?? nodeRef.gameObject.name;
+            }
+
+            return result;
         }
 
         /// <summary>

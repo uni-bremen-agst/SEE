@@ -23,8 +23,6 @@ using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -86,7 +84,7 @@ namespace SEE.Game.Charts
         /// Invariant: all game objects in _dataObjects are game objects tagged by Tags.Node
         /// and having a valid graph-node reference.
         /// </summary>
-        private ICollection<GameObject> _dataObjects;
+        private ICollection<NodeRef> _dataObjects;
 
         /// <summary>
         /// A list of all <see cref="ChartMarker" />s currently displayed in the chart.
@@ -162,7 +160,7 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Contains all metric names contained in any <see cref="GameObject" /> of <see cref="_dataObjects" />.
         /// </summary>
-        public SortedSet<string> AllMetricNames { get; } = new SortedSet<string>();
+        public readonly SortedSet<string> AllMetricNames = new SortedSet<string>();
 
         /// <summary>
         /// The number of game objects representing a graph node in the current scene.
@@ -211,9 +209,9 @@ namespace SEE.Game.Charts
             parentToggle.Initialize("Leaves", this);
 
             int index = 0;
-            foreach (GameObject dataObject in _dataObjects)
+            foreach (NodeRef dataObject in _dataObjects)
             {
-                if (SceneQueries.IsLeaf(dataObject))
+                if (dataObject.node.IsLeaf())
                 {
                     CreateChildToggle(dataObject, parentToggle, index++, _yGap);
                 }
@@ -224,9 +222,9 @@ namespace SEE.Game.Charts
             scrollEntry.transform.localPosition = headerOffset + new Vector2(0, _yGap) * ++index;
             parentToggle.Initialize("Inner Nodes", this);
 
-            foreach (GameObject dataObject in _dataObjects)
+            foreach (NodeRef dataObject in _dataObjects)
             {
-                if (SceneQueries.IsInnerNode(dataObject))
+                if (dataObject.node.IsInnerNode())
                 {
                     CreateChildToggle(dataObject, parentToggle, index++, _yGap);
                 }
@@ -239,8 +237,6 @@ namespace SEE.Game.Charts
 
         private void FillScrollView(bool tree)
         {
-            return; // FIXME: Disable for the time being because it is so slow.
-
             Performance p = Performance.Begin("FillScrollView(bool)");
             foreach (Transform child in scrollContent.transform)
             {
@@ -267,16 +263,14 @@ namespace SEE.Game.Charts
 
             foreach (Node root in SceneQueries.GetRoots(_dataObjects))
             {
-                GameObject inScene = _dataObjects.First(entry =>
+                NodeRef inScene = _dataObjects.First(entry =>
                 {
-                    entry.TryGetComponent<NodeRef>(out NodeRef nodeRef);
-                    return nodeRef.node.ID.Equals(root.ID);
+                    return entry.node.ID.Equals(root.ID);
                 });
                 GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-                tempObject.TryGetComponent<ScrollViewToggle>(out ScrollViewToggle rootToggle);
-                inScene.TryGetComponent<NodeHighlights>(out NodeHighlights highlights);
-                rootToggle.LinkedObject = highlights;
-                highlights.scrollViewToggle = rootToggle;
+                ScrollViewToggle rootToggle = tempObject.GetComponent<ScrollViewToggle>();
+                rootToggle.LinkedObject = inScene.highlights;
+                inScene.highlights.scrollViewToggle = rootToggle;
                 tempObject.transform.localPosition = headerOffset + new Vector2(0f, _yGap) * index;
                 rootToggle.Initialize(root.SourceName, this);
                 if (hierarchy > maxHierarchy)
@@ -293,7 +287,7 @@ namespace SEE.Game.Charts
                 maxHierarchy = hierarchy; //TODO: Use this...
             }
 
-            scrollContent.TryGetComponent<RectTransform>(out RectTransform rect);
+            RectTransform rect = scrollContent.GetComponent<RectTransform>();
             rect.sizeDelta = new Vector2(rect.sizeDelta.x, index * Mathf.Abs(_yGap) + 40);
             p.End(true);
         }
@@ -301,20 +295,19 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Creates a toggle for an object in the scene that is a node.
         /// </summary>
-        /// <param name="dataObject">The object to be toggled.</param>
+        /// <param name="nodeRef">The object to be toggled.</param>
         /// <param name="parentToggle">The toggle that will toggle this one when clicked.</param>
         /// <param name="index">The position of the toggle in the scrollview.</param>
         /// <param name="gap">The gap between two toggles in the scrollview.</param>
-        private void CreateChildToggle(GameObject dataObject, ScrollViewToggle parentToggle, int index, float gap)
+        private void CreateChildToggle(NodeRef nodeRef, ScrollViewToggle parentToggle, int index, float gap)
         {
             GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-            tempObject.TryGetComponent<ScrollViewToggle>(out ScrollViewToggle toggle);
+            tempObject.TryGetComponent(out ScrollViewToggle toggle);
             toggle.Parent = parentToggle;
-            dataObject.TryGetComponent<NodeHighlights>(out NodeHighlights highlights);
-            toggle.LinkedObject = highlights;
-            highlights.scrollViewToggle = toggle;
+            toggle.LinkedObject = nodeRef.highlights;
+            nodeRef.highlights.scrollViewToggle = toggle;
             tempObject.transform.localPosition = childOffset + new Vector2(0f, gap) * index;
-            toggle.Initialize(dataObject.name, this);
+            toggle.Initialize(nodeRef.name, this);
             parentToggle.AddChild(toggle);
         }
 
@@ -329,17 +322,15 @@ namespace SEE.Game.Charts
             hierarchy++;
             foreach (Node child in root.Children())
             {
-                GameObject inScene = _dataObjects.First(entry =>
+                NodeRef inScene = _dataObjects.First(entry =>
                 {
-                    entry.TryGetComponent(out NodeRef nodeRef);
-                    return nodeRef.node.ID.Equals(child.ID);
+                    return entry.node.ID.Equals(child.ID);
                 });
                 GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
                 tempObject.TryGetComponent(out ScrollViewToggle toggle);
                 toggle.Parent = parentToggle;
-                inScene.TryGetComponent(out NodeHighlights highlights);
-                toggle.LinkedObject = highlights;
-                highlights.scrollViewToggle = toggle;
+                toggle.LinkedObject = inScene.highlights;
+                inScene.highlights.scrollViewToggle = toggle;
                 tempObject.transform.localPosition = childOffset + new Vector2(_xGap, 0f) * hierarchy + new Vector2(0f, _yGap) * index++;
                 toggle.Initialize(child.SourceName, this);
                 parentToggle.AddChild(toggle);
@@ -357,49 +348,35 @@ namespace SEE.Game.Charts
         {
             Performance p = Performance.Begin("GetAllNumericAttributes");
             AllMetricNames.Clear();
+#if UNITY_EDITOR
             if (_dataObjects.Count == 0)
             {
                 Debug.LogWarning("There are no nodes for showing metrics.\n");
             }
-            else
+#endif
+            foreach (NodeRef nodeRef in _dataObjects)
             {
-                foreach (GameObject data in _dataObjects)
+                foreach (string key in nodeRef.node.FloatAttributes.Keys)
                 {
-                    if (data.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+                    if (key.StartsWith(ChartManager.MetricPrefix))
                     {
-                        Node node = nodeRef.node;
-                        if (node != null)
-                        {
-                            foreach (string key in node.FloatAttributes.Keys)
-                            {
-                                if (key.StartsWith(ChartManager.MetricPrefix))
-                                {
-                                    AllMetricNames.Add(key);
-                                }
-                            }
-                            foreach (string key in node.IntAttributes.Keys)
-                            {
-                                if (key.StartsWith(ChartManager.MetricPrefix))
-                                {
-                                    AllMetricNames.Add(key);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            Debug.LogWarningFormat("Game node {0} has a null node reference.\n", data.name);
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogWarningFormat("Game node {0} without node reference.\n", data.name);
+                        AllMetricNames.Add(key);
                     }
                 }
-                if (AllMetricNames.Count == 0)
+                foreach (string key in nodeRef.node.IntAttributes.Keys)
                 {
-                    Debug.LogWarning("No metrics available for charts.\n");
+                    if (key.StartsWith(ChartManager.MetricPrefix))
+                    {
+                        AllMetricNames.Add(key);
+                    }
                 }
             }
+#if UNITY_EDITOR
+            if (AllMetricNames.Count == 0)
+            {
+                Debug.LogWarning("No metrics available for charts.\n");
+            }
+#endif
             p.End(true);
         }
 
@@ -409,17 +386,16 @@ namespace SEE.Game.Charts
         private void FindDataObjects()
         {
             Performance p = Performance.Begin("FindDataObjects: Find nodes");
-            _dataObjects = SceneQueries.AllGameNodesInScene(ChartManager.Instance.ShowLeafMetrics,
-                                                            ChartManager.Instance.ShowInnerNodeMetrics);
+            _dataObjects = SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, ChartManager.Instance.ShowInnerNodeMetrics);
             p.End(true);
 
             int numberOfDataObjectsWithNodeHightLights = 0;
             p = Performance.Begin("FindDataObjects: Node highlights");
-            foreach (GameObject entry in _dataObjects)
+            foreach (NodeRef entry in _dataObjects)
             {
-                if (entry.TryGetComponent(out NodeHighlights highlights))
+                if (entry.highlights)
                 {
-                    highlights.showInChart[this] = true;
+                    entry.highlights.showInChart[this] = true;
                     numberOfDataObjectsWithNodeHightLights++;
                 }
             }
@@ -432,38 +408,17 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Fills the chart with data depending on the values of <see cref="axisDropdownX" /> and
-        /// <see cref="axisDropdownY" />.
+        /// Fills the chart with data depending on the values of <see cref="axisDropdownX"/> and
+        /// <see cref="axisDropdownY"/>.
         /// </summary>
         public void DrawData()
         {
             Performance p = Performance.Begin("DrawData");
             noDataWarning.SetActive(false);
-            if (axisDropdownX.CurrentlySelectedMetric.Equals(axisDropdownY.CurrentlySelectedMetric))
-            {
-                DrawY(true);
-            }
-            else if (axisDropdownX.CurrentlySelectedMetric.Equals(NodeEnumeration))
-            {
-                DrawY(false);
-            }
-            else
-            {
-                DrawXY();
-            }
-            if (ActiveMarkers.Count == 0)
-            {
-                noDataWarning.SetActive(true);
-            }
-            p.End(true);
-        }
 
-        /// <summary>
-        /// Adds a marker for every <see cref="Node" /> for two metrics X and Y to be
-        /// put on both axes. A marker's position depends on the values of those metrics.
-        /// </summary>
-        private void DrawXY()
-        {
+            bool xIsNodeEnum = axisDropdownX.CurrentlySelectedMetric.Equals(NodeEnumeration);
+            bool xEqY = axisDropdownX.CurrentlySelectedMetric.Equals(axisDropdownY.CurrentlySelectedMetric);
+
             // Note that we determine the minimal and maximal metric values of the two
             // axes globally, that is, over all nodes in the scene and not just those
             // shown in this particular chart. This way, the scale of all charts for the
@@ -472,39 +427,21 @@ namespace SEE.Game.Charts
             float maxX = float.NegativeInfinity; // globally maximal value on X axis
             float minY = float.PositiveInfinity; // globally minimal value on Y axis
             float maxY = float.NegativeInfinity; // globally maximal value on Y axis
-            List<GameObject> toDraw = new List<GameObject>(); // nodes to be drawn in the chart
-            foreach (GameObject data in _dataObjects)
+            List<NodeRef> toDraw = new List<NodeRef>(); // nodes to be drawn in the chart
+            foreach (NodeRef nodeRef in _dataObjects)
             {
-                data.TryGetComponent(out NodeRef nodeRef);
-                Node node = nodeRef.node;
                 bool inX = false;
-                if (node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX))
+                if (nodeRef.node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX) || xIsNodeEnum)
                 {
-                    if (valueX < minX)
-                    {
-                        minX = valueX;
-                    }
-
-                    if (valueX > maxX)
-                    {
-                        maxX = valueX;
-                    }
-
+                    minX = Mathf.Min(minX, valueX);
+                    maxX = Mathf.Max(maxX, valueX);
                     inX = true;
                 }
                 bool inY = false;
-                if (node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY))
+                if (nodeRef.node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY))
                 {
-                    if (valueY > maxY)
-                    {
-                        maxY = valueY;
-                    }
-
-                    if (valueY < minY)
-                    {
-                        minY = valueY;
-                    }
-
+                    minY = Mathf.Min(minY, valueY);
+                    maxY = Mathf.Max(maxY, valueY);
                     inY = true;
                 }
                 // Is this node shown in this chart at all?
@@ -512,18 +449,28 @@ namespace SEE.Game.Charts
                 {
                     // only nodes to be shown in this chart and having values for both
                     // currently selected metrics for the axes will be added to the chart
-                    toDraw.Add(data);
+                    toDraw.Add(nodeRef);
                 }
             }
 
             if (toDraw.Count > 0)
             {
+                if (xEqY)
+                {
+                    toDraw.Sort(delegate (NodeRef nodeRef0, NodeRef nodeRef1)
+                    {
+                        nodeRef0.node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float value1);
+                        nodeRef1.node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float value2);
+                        return value1.CompareTo(value2);
+                    });
+                }
+
                 bool xEqual = minX.Equals(maxX);
                 bool yEqual = minY.Equals(maxY);
                 if (xEqual || yEqual)
                 {
                     (float min, float max) = minX.Equals(maxX) ? (minY, maxY) : (minX, maxX);
-                    AddMarkers(toDraw, min, max);
+                    AddMarkers(toDraw, min, max, min, max);
                     minXText.text = xEqual ? "0" : minX.ToString("N0");
                     maxXText.text = xEqual ? toDraw.Count.ToString() : maxX.ToString("N0");
                     minYText.text = yEqual ? "0" : minY.ToString("N0");
@@ -547,68 +494,8 @@ namespace SEE.Game.Charts
 
                 noDataWarning.SetActive(true);
             }
-        }
 
-        /// <summary>
-        /// Adds a marker for every <see cref="Node" /> for a single metric to be put onto the
-        /// Y axis. If SortByMetric is true, the markers will be ordered in ascending order 
-        /// by that metric and the distance between markers on the x-Axis will be equistant.
-        /// If SortByMetric is false, they will be drawn in the order in which they appear
-        /// in the list of _dataObjects.
-        /// </summary>
-        private void DrawY(bool SortByMetric)
-        {
-            List<GameObject> toDraw = new List<GameObject>();
-            string metric = axisDropdownY.CurrentlySelectedMetric;
-
-            float min = float.PositiveInfinity;
-            float max = float.NegativeInfinity;
-
-            // Collect all data objects possessing the metric and whose value is to
-            // be represented in this chart.
-            foreach (GameObject dataObject in _dataObjects)
-            {
-                if (dataObject.GetComponent<NodeRef>().node.TryGetNumeric(metric, out float value) &&
-                    (bool)dataObject.GetComponent<NodeHighlights>().showInChart[this])
-                {
-                    if (value > max)
-                    {
-                        max = value;
-                    }
-                    if (value < min)
-                    {
-                        min = value;
-                    }
-                    toDraw.Add(dataObject);
-                }
-            }
-            if (toDraw.Count > 0)
-            {
-                if (SortByMetric)
-                {
-                    toDraw.Sort(delegate (GameObject go1, GameObject go2)
-                    {
-                        go1.GetComponent<NodeRef>().node.TryGetNumeric(metric, out float value1);
-                        go2.GetComponent<NodeRef>().node.TryGetNumeric(metric, out float value2);
-                        return value1.CompareTo(value2);
-                    });
-                }
-                AddMarkers(toDraw, min, max);
-
-                minXText.text = "0";
-                maxXText.text = toDraw.Count.ToString();
-                minYText.text = min.ToString("N0");
-                maxYText.text = max.ToString("N0");
-            }
-            else
-            {
-                foreach (GameObject activeMarker in ActiveMarkers)
-                {
-                    Destroy(activeMarker);
-                }
-
-                noDataWarning.SetActive(true);
-            }
+            p.End(true);
         }
 
         /// <summary>
@@ -619,30 +506,25 @@ namespace SEE.Game.Charts
         /// <param name="maxX">The maximum value on the x-axis.</param>
         /// <param name="minY">The minimum value on the y-axis.</param>
         /// <param name="maxY">The maximum value on the y-axis.</param>
-        private void AddMarkers(IEnumerable<GameObject> toDraw, float minX, float maxX, float minY, float maxY)
+        private void AddMarkers(IEnumerable<NodeRef> toDraw, float minX, float maxX, float minY, float maxY)
         {
             Performance p = Performance.Begin("AddMarkers(IEnumerable, float, float, float)");
             List<GameObject> updatedMarkers = new List<GameObject>();
             Rect dataRect = dataPanel.rect;
-            float width = dataRect.width / (maxX - minX);
-            float height = dataRect.height / (maxY - minY);
+            float width = minX < maxX ? dataRect.width / (maxX - minX) : 0.0f;
+            float height = minY < maxY ? dataRect.height / (maxY - minY) : 0.0f;
             int positionInLayer = 0;
 
-            foreach (GameObject data in toDraw)
+            foreach (NodeRef data in toDraw)
             {
                 GameObject marker = Instantiate(markerPrefab, entries.transform);
                 marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
-                marker.TryGetComponent<ChartMarker>(out ChartMarker chartMarker);
-                chartMarker.LinkedObject = data;
-                Node node = data.GetComponent<NodeRef>().node;
-                node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX);
-                node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY);
-                chartMarker.SetInfoText(SceneQueries.SourceName(data) 
-                                        + " (" + valueX.ToString("0.00") 
-                                        + ", " + valueY.ToString("0.00") + ")");
-                marker.GetComponent<RectTransform>().anchoredPosition =
-                    new Vector2((valueX - minX) * width, (valueY - minY) * height);
-                //CheckOverlapping(marker, updatedMarkers.ToArray());
+                ChartMarker chartMarker = marker.GetComponent<ChartMarker>();
+                chartMarker.LinkedObject = data.gameObject;
+                data.node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX);
+                data.node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY);
+                chartMarker.SetInfoText(data.node.SourceName + " (" + valueX.ToString("0.00") + ", " + valueY.ToString("0.00") + ")");
+                marker.GetComponent<RectTransform>().anchoredPosition = new Vector2((valueX - minX) * width, (valueY - minY) * height);
                 updatedMarkers.Add(marker);
             }
 
@@ -653,157 +535,6 @@ namespace SEE.Game.Charts
 
             ActiveMarkers = updatedMarkers;
             p.End(true);
-        }
-
-        /// <summary>
-        /// Adds new markers to the chart if the same metric is displayed on both axes.
-        /// </summary>
-        /// <param name="toDraw">The markers to add to the chart.</param>
-        /// <param name="min">The minimum value of the metric.</param>
-        /// <param name="max">The maximum value of the metric.</param>
-        private void AddMarkers(List<GameObject> toDraw, float min, float max)
-        {
-            Performance p = Performance.Begin("AddMarkers(List, float, float)");
-            if (min.Equals(max))
-            {
-                AddMarkers(toDraw);
-            }
-            else
-            {
-                List<GameObject> updatedMarkers = new List<GameObject>();
-                Rect dataRect = dataPanel.rect;
-                float width = dataRect.width / (toDraw.Count - 1);
-                float height = dataRect.height / (max - min);
-                string metric = axisDropdownY.CurrentlySelectedMetric;
-                int x = 0;
-                int positionInLayer = 0;
-
-                foreach (GameObject data in toDraw)
-                {
-                    GameObject marker = Instantiate(markerPrefab, entries.transform);
-                    marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
-                    marker.TryGetComponent(out ChartMarker script);
-                    script.LinkedObject = data;
-                    Node node = data.GetComponent<NodeRef>().node;
-                    node.TryGetNumeric(metric, out float value);
-                    script.SetInfoText(SceneQueries.SourceName(data)
-                                       + ": " + value.ToString("0.00"));
-                    marker.GetComponent<RectTransform>().anchoredPosition =
-                        new Vector2(x++ * width, (value - min) * height);
-                    CheckOverlapping(marker, updatedMarkers.ToArray());
-                    updatedMarkers.Add(marker);
-                }
-
-                foreach (GameObject marker in ActiveMarkers)
-                {
-                    Destroy(marker);
-                }
-
-                ActiveMarkers = updatedMarkers;
-            }
-            p.End(true);
-        }
-
-        /// <summary>
-        /// Adds markers to the chart where all markers have the same value.
-        /// </summary>
-        /// <param name="toDraw">The markers to add to the chart.</param>
-        private void AddMarkers(List<GameObject> toDraw)
-        {
-            Performance p = Performance.Begin("AddMarkers(List)");
-            List<GameObject> updatedMarkers = new List<GameObject>();
-            Rect dataRect = dataPanel.rect;
-            float width = dataRect.width / toDraw.Count;
-            float height = dataRect.height / toDraw.Count;
-            int x = 0;
-            int y = 0;
-            int positionInLayer = 0;
-
-            foreach (GameObject data in toDraw)
-            {
-                GameObject marker = Instantiate(markerPrefab, entries.transform);
-                marker.TryGetComponent(out SortingGroup group);
-                group.sortingOrder = positionInLayer++;
-                marker.TryGetComponent(out ChartMarker script);
-                script.LinkedObject = data;
-                data.TryGetComponent(out NodeHighlights highlights);
-                data.TryGetComponent(out NodeRef nodeRef);
-                Node node = nodeRef.node;
-                node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX);
-                node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY);
-                script.SetInfoText(SceneQueries.SourceName(data)
-                                   + " (" + valueX.ToString("0.00")
-                                   + ", " + valueY.ToString("0.00") + ")");
-
-                marker.TryGetComponent(out RectTransform anchoredPos);
-                anchoredPos.anchoredPosition = new Vector2(x++ * width, y++ * height);
-                CheckOverlapping(marker, updatedMarkers.ToArray());
-                updatedMarkers.Add(marker);
-
-                if (ActiveMarkers.Count <= 0)
-                {
-                    break;
-                }
-            }
-
-            foreach (GameObject marker in ActiveMarkers)
-            {
-                Destroy(marker);
-            }
-
-            ActiveMarkers = updatedMarkers;
-            p.End(true);
-        }
-
-        /// <summary>
-        /// Checks if a marker is overlapping with any of the already existing new markers and changes its
-        /// color for each overlapping marker.
-        /// </summary>
-        /// <param name="marker">The marker to check.</param>
-        /// <param name="updatedMarkers">The already active new markers.</param>
-        private static void CheckOverlapping(GameObject marker, GameObject[] updatedMarkers)
-        {
-            marker.TryGetComponent(out Image image);
-            if (updatedMarkers.Length > 10)
-            {
-                for (int i = updatedMarkers.Length - 10; i < updatedMarkers.Length; i++)
-                {
-                    GameObject updatedMarker = updatedMarkers[i];
-                    if (Vector3.Distance(marker.transform.position,
-                                updatedMarker.transform.position)
-                            .CompareTo(MarkerOverlapDistance * marker.transform.lossyScale.x) >=
-                        0)
-                    {
-                        return;
-                    }
-
-                    if (image.color.g - 0.1f < 0)
-                    {
-                        return;
-                    }
-
-                    Color oldColor = image.color;
-                    image.color = new Color(oldColor.r, oldColor.g - 0.1f,
-                        oldColor.b - 0.1f);
-                }
-            }
-            else
-            {
-                foreach (GameObject updatedMarker in updatedMarkers)
-                {
-                    if (Vector3.Distance(marker.transform.position,
-                            updatedMarker.transform.position)
-                        .CompareTo(MarkerOverlapDistance * marker.transform.lossyScale.x) < 0)
-                    {
-                        if (image.color.g - 0.1f >= 0)
-                        {
-                            Color oldColor = image.color;
-                            image.color = new Color(oldColor.r, oldColor.g - 0.1f,
-                                oldColor.b - 0.1f);
-                        }
-                    }
-                }
-            }
         }
 
         public void AreaHover(Vector2 min, Vector2 max)
@@ -867,17 +598,6 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Sets if the scroll view will display the original tree of the file structure or the more convenient
-        /// grouping into buildings and nodes.
-        /// </summary>
-        /// <param name="displayAsTree"></param>
-        public void SetDisplayAsTree(bool displayAsTree)
-        {
-            _displayAsTree = displayAsTree;
-            FillScrollView(_displayAsTree);
-        }
-
-        /// <summary>
         /// Finds all markers that refer to a given <see cref="GameObject" /> and sets their highlight
         /// across all charts to <paramref name="isHighlighted"/>.
         /// </summary>
@@ -932,12 +652,9 @@ namespace SEE.Game.Charts
         public void OnDestroy()
         {
             ChartManager.Instance.UnregisterChart(gameObject);
-            foreach (GameObject dataObject in _dataObjects)
+            foreach (NodeRef dataObject in _dataObjects)
             {
-                if (dataObject != null)
-                {
-                    dataObject.GetComponent<NodeHighlights>().showInChart.Remove(this);
-                }
+                dataObject.highlights.showInChart.Remove(this);
             }
         }
     }

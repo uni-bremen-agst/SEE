@@ -162,7 +162,6 @@ namespace SEE.DataModel.DG
 
         public bool TryGetNumeric(string attributeName, out float value)
         {
-
             if (intAttributes.TryGetValue(attributeName, out int intValue))
             {
                 value = intValue;
