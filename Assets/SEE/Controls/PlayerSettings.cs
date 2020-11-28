@@ -187,18 +187,23 @@ namespace SEE.Controls
                 {
                     // Position and scale planes and CodeCities accordingly using CityCollection grid
                     GameObject cityCollection = GameObject.Find("CityCollection").AssertNotNull("CityCollection");
-                    UnityEngine.Assertions.Assert.IsTrue(cityCollection.TryGetComponent(out GridObjectCollection grid));
-                    GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
-                    foreach (GameObject city in cities)
+                    if (cityCollection.TryGetComponent(out GridObjectCollection grid))
                     {
-                        city.transform.localScale *= CityScalingFactor;
-                        // City needs to be parented to collection to be organized by it
-                        city.transform.parent = cityCollection.transform;
-                    }
+                        GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
+                        foreach (GameObject city in cities)
+                        {
+                            city.transform.localScale *= CityScalingFactor;
+                            // City needs to be parented to collection to be organized by it
+                            city.transform.parent = cityCollection.transform;
+                        }
 
-                    // To avoid overlaps, set cell width to maximum length of code cities
-                    grid.CellWidth = cities.Select(x => x.transform.localScale.MaxComponent()).Max();
-                    grid.UpdateCollection();
+                        // To avoid overlaps, set cell width to maximum length of code cities
+                        grid.CellWidth = cities.Select(x => x.transform.localScale.MaxComponent()).Max();
+                        grid.UpdateCollection();
+                    } else
+                    {
+                        Debug.LogError("CityCollection doesn't have required component 'GridObjectCollection'.\n");
+                    }
                 }
             }            
         }
