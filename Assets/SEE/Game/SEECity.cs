@@ -221,10 +221,12 @@ namespace SEE.Game
                         Debug.LogWarningFormat("Could not resolve edge reference {0}.\n", child.name);          
                     }
                 }
-                else
+#if UNITY_EDITOR
+                else if (child.tag.CompareTo(DataModel.Tags.Node) == 0 || child.tag.CompareTo(DataModel.Tags.Edge) == 0)
                 {
                     Debug.LogWarningFormat("Game object {0} has neither node nor edge reference.\n", child.name);
                 }
+#endif
                 SetNodeEdgeRefs(graph, child);
             }
         }

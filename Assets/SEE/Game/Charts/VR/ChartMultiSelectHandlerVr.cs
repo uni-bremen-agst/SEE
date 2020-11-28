@@ -117,7 +117,8 @@ namespace SEE.Game.Charts.VR
         /// <param name="eventData">Contains position data of the pointer.</param>
         public override void OnPointerUp(PointerEventData eventData)
         {
-            SortMinMax(startingPos, _referencePos, out Vector2 min, out Vector2 max);
+            Vector2 min = Vector2.Min(startingPos, _referencePos);
+            Vector2 max = Vector2.Max(startingPos, _referencePos);
             chartContent.AreaSelection(min, max);
             selectionRect.gameObject.SetActive(false);
         }
