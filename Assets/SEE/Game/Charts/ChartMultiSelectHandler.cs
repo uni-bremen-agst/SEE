@@ -56,35 +56,6 @@ namespace SEE.Game.Charts
 
         public bool IsSelecting() => selectionRect.gameObject.activeSelf;
 
-        protected void SortMinMax(Vector2 fst, Vector2 snd, out Vector2 min, out Vector2 max)
-        {
-            float x0, x1, y0, y1;
-
-            if (fst.x < snd.x)
-            {
-                x0 = fst.x;
-                x1 = snd.x;
-            }
-            else
-            {
-                x0 = snd.x;
-                x1 = fst.x;
-            }
-            if (fst.y < snd.y)
-            {
-                y0 = fst.y;
-                y1 = snd.y;
-            }
-            else
-            {
-                y0 = snd.y;
-                y1 = fst.y;
-            }
-
-            min = new Vector2(x0, y0);
-            max = new Vector2(x1, y1);
-        }
-
         /// <summary>
         /// Activates and sets starting position of <see cref="selectionRect"/>.
         /// </summary>
@@ -97,11 +68,8 @@ namespace SEE.Game.Charts
             selectionRect.sizeDelta = new Vector2(0.0f, 0.0f);
             if (!Input.GetKey(KeyCode.LeftControl))
             {
-                foreach (InteractableObject interactableObject in FindObjectsOfType<InteractableObject>())
-                {
-                    interactableObject.SetHoverFlags(0, true);
-                    interactableObject.SetSelect(false, true);
-                }
+                InteractableObject.UnhoverAll(true);
+                InteractableObject.UnselectAll(true);
             }
         }
 
@@ -168,29 +136,8 @@ namespace SEE.Game.Charts
                 selectionRect.position = new Vector3(startingPos.x + sizeDelta.x / 2 * lossyScale.x, startingPos.y + sizeDelta.y / 2 * lossyScale.y, 0);
             }
 
-            float x0, x1, y0, y1;
-            if (startingPos.x < eventData.position.x)
-            {
-                x0 = startingPos.x;
-                x1 = eventData.position.x;
-            }
-            else
-            {
-                x0 = eventData.position.x;
-                x1 = startingPos.x;
-            }
-            if (startingPos.y < eventData.position.y)
-            {
-                y0 = startingPos.y;
-                y1 = eventData.position.y;
-            }
-            else
-            {
-                y0 = eventData.position.y;
-                y1 = startingPos.y;
-            }
-
-            SortMinMax(startingPos, eventData.position, out Vector2 min, out Vector2 max);
+            Vector2 min = Vector2.Min(startingPos, eventData.position);
+            Vector2 max = Vector2.Max(startingPos, eventData.position);
             chartContent.AreaHover(min, max);
         }
 
@@ -200,8 +147,9 @@ namespace SEE.Game.Charts
         /// <param name="eventData">Contains the position data.</param>
         public virtual void OnPointerUp(PointerEventData eventData)
         {
-            chartContent.UnhoverAll();
-            SortMinMax(startingPos, eventData.position, out Vector2 min, out Vector2 max);
+            InteractableObject.UnhoverAll(true);
+            Vector2 min = Vector2.Min(startingPos, eventData.position);
+            Vector2 max = Vector2.Max(startingPos, eventData.position);
             chartContent.AreaSelection(min, max);
             selectionRect.gameObject.SetActive(false);
         }

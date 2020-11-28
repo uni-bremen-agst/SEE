@@ -198,6 +198,14 @@ namespace SEE.Controls
             SetHoverFlags(hoverFlags, isOwner);
         }
 
+        public static void UnhoverAll(bool isOwner)
+        {
+            while (HoveredObjects.Count != 0)
+            {
+                HoveredObjects.ElementAt(HoveredObjects.Count - 1).SetHoverFlags(0, isOwner);
+            }
+        }
+
         /// <summary>
         /// Visually emphasizes this object for selection.
         /// </summary>
@@ -246,12 +254,9 @@ namespace SEE.Controls
         /// <param name="isOwner">Whether this client is initiating the selection action.
         public static void UnselectAll(bool isOwner)
         {
-            // We cannot iterate on SelectedObjects directly because SetSelect will
-            // remove the iterated interactable from SelectedObjects. That is why
-            // we convert SelectedObjects to an array first.
-            foreach (InteractableObject interactable in SelectedObjects.ToArray())
+            while (SelectedObjects.Count != 0)
             {
-                interactable.SetSelect(false, isOwner);
+                SelectedObjects.ElementAt(SelectedObjects.Count - 1).SetSelect(false, isOwner);
             }
         }
 
@@ -306,6 +311,14 @@ namespace SEE.Controls
                     Destroy(InteractableSynchronizer);
                     InteractableSynchronizer = null;
                 }
+            }
+        }
+
+        public static void UngrabAll(bool isOwner)
+        {
+            while (GrabbedObjects.Count != 0)
+            {
+                GrabbedObjects.ElementAt(GrabbedObjects.Count - 1).SetGrab(false, isOwner);
             }
         }
 
