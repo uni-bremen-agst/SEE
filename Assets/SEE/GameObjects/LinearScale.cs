@@ -18,8 +18,9 @@ namespace SEE.GO
         /// <param name="minimalLength">the mininmal value a node length can have</param>
         /// <param name="maximalLength">the maximal value a node length can have</param>
         /// <param name="metrics">node metrics for scaling</param>
-        public LinearScale(ICollection<Graph> graphs, float minimalLength, float maximalLength, IList<string> metrics)
-            : base(graphs, metrics, minimalLength, maximalLength)
+        /// <param name="leavesOnly">if true, only the leaf nodes are considered</param>
+        public LinearScale(ICollection<Graph> graphs, float minimalLength, float maximalLength, IList<string> metrics, bool leavesOnly)
+            : base(graphs, metrics, minimalLength, maximalLength, leavesOnly)
         {
         }
 

@@ -108,6 +108,25 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Returns the Source.Name attribute of <paramref name="gameNode"/>. 
+        /// If <paramref name="gameNode"/> has no valid node reference, the name
+        /// of <paramref name="gameNode"/> is returned instead.
+        /// </summary>
+        /// <param name="gameNode"></param>
+        /// <returns>source name of <paramref name="gameNode"/></returns>
+        public static string SourceName(GameObject gameNode)
+        {
+            if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+            {
+                if (nodeRef.node != null)
+                {
+                    return nodeRef.node.SourceName;
+                }
+            }
+            return gameNode.name;
+        }
+
+        /// <summary>
         /// Returns first child of <paramref name="codeCity"/> tagged by Tags.Node. 
         /// If <paramref name="codeCity"/> is a node representing a code city,
         /// the result is considered the root of the graph.
