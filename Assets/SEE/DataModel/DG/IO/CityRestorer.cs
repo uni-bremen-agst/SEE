@@ -42,7 +42,15 @@ public class CityRestorer
     /// <param name="city"> The city which is to be overwritten </param>
     public static void RestoreCity(string importFilename, AbstractSEECity city)
     {
+
+        //METHODE UMSCHREIBEN BOOL -- ERSTE ZEILE VerifyCityType() - sonst return - 
         string pathPref = GetPathPrefix(importFilename);
+        if (!(Directory.Exists(pathPref)))
+        {
+            //return false; 
+        }
+
+
         List<string> newNodeTypes = new List<string>(); 
         UnityEngine.Debug.Log("path ist: " + pathPref);
         if (city is SEECityEvolution)
