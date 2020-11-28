@@ -1024,15 +1024,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 429506, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.972
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 429506, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 429506, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 447954, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1077,6 +1077,30 @@ PrefabInstance:
     - target: {fileID: 447954, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 494198, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 494198, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 494198, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 494198, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.972
+      objectReference: {fileID: 0}
+    - target: {fileID: 494198, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 494198, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 2014920, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
       propertyPath: far clip plane
@@ -1481,6 +1505,7 @@ GameObject:
   - component: {fileID: 1046553561}
   - component: {fileID: 1046553560}
   - component: {fileID: 1046553559}
+  - component: {fileID: 1046553558}
   m_Layer: 0
   m_Name: MRPlayer
   m_TagString: MainCamera
@@ -1502,6 +1527,29 @@ Transform:
   m_Father: {fileID: 1519510807}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 45, y: 0, z: 0}
+--- !u!114 &1046553558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046553556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf98dd1206224111a38765365e98e207, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lockCursorWhenFocusLocked: 1
+  setCursorInvisibleWhenFocusLocked: 0
+  maxGazeCollisionDistance: 10
+  raycastLayerMasks:
+  - serializedVersion: 2
+    m_Bits: 4294967291
+  stabilizer:
+    storedStabilitySamples: 60
+  gazeTransform: {fileID: 0}
+  minHeadVelocityThreshold: 0.5
+  maxHeadVelocityThreshold: 2
 --- !u!114 &1046553559
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2143,6 +2191,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79ef9858c6f1d9d4184e7310d93dc51b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Speed: 2
+  BoostFactor: 2
   focusedObject: {fileID: 1093528284}
 --- !u!1 &1626562202
 GameObject:
@@ -3574,8 +3624,8 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  pathPrefix: C:\Users\koschke\SEE\Data\GXL\minimal
-  gvlPath: ..\Data\GXL\SEE\CodeFacts.gvl
+  pathPrefix: D:\develop\SEE\Assets
+  layoutPath: ..\Data\GXL\linux-clones\net.gvl
   WidthMetric: Metric.Number_Of_Calling_Routines
   HeightMetric: Metric.Lines.LOC
   DepthMetric: Metric.Number_Of_Called_Routines
@@ -3617,8 +3667,8 @@ MonoBehaviour:
   Tension: 0.85
   RDP: 0.0001
   calculateMeasurements: 0
-  gxlPath: CodeFacts.gxl
-  csvPath: CodeFacts.csv
+  gxlPath: ..\Data\GXL\minimal\CodeFacts.gxl
+  csvPath: ..\Data\GXL\minimal\CodeFacts.csv
 --- !u!114 &1649116646
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4040,7 +4090,6 @@ GameObject:
   - component: {fileID: 1930472488}
   - component: {fileID: 1930472490}
   - component: {fileID: 1930472483}
-  - component: {fileID: 1930472491}
   m_Layer: 0
   m_Name: Architecture
   m_TagString: Code City
@@ -4106,7 +4155,19 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Cluster
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -4576,8 +4637,8 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  pathPrefix: C:\Users\koschke\SEE\Assets
-  gvlPath: ..\Data\GXL\SEE\Architecture.gvl
+  pathPrefix: D:\develop\SEE\Assets
+  layoutPath: ..\Data\GXL\linux-clones\net.gvl
   WidthMetric: Metric.Number_of_Descendants
   HeightMetric: 0.0001
   DepthMetric: Metric.Number_of_Descendants
@@ -4722,7 +4783,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.0030500889
+  HeightOffset: 0.0030950308
 --- !u!114 &1930472490
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4737,18 +4798,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   portalPlane: {fileID: 1930472489}
   id: 1
---- !u!114 &1930472491
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1930472482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0fa6f4fb5ab89c746bdfacec2793fdb8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &2094593327
 GameObject:
   m_ObjectHideFlags: 0
