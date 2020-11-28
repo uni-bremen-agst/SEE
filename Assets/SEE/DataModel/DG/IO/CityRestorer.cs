@@ -53,6 +53,12 @@ public class CityRestorer
             evoCity.InspectSchema(graph);
             newNodeTypes = evoCity.SelectedNodeTypes.Keys.ToList();
            
+        } else if (city is SEECity)
+        {
+            SEECity seeCity = (SEECity)city;
+            city.pathPrefix = pathPref;
+            Graph graph = seeCity.LoadedGraph;
+            newNodeTypes = seeCity.SelectedNodeTypes.Keys.ToList();
         }
         // We have to store the current enumeration of the nodetypes of the current version in order to compare 
         // it afterwards with the stored one.
