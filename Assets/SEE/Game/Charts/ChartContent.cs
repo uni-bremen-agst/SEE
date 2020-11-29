@@ -201,11 +201,11 @@ namespace SEE.Game.Charts
         /// </summary>
         private void FillScrollViewAsList()
         {
-            Performance p = Performance.Begin("FillScrollViewAsList()");
+            Performance p = Performance.Begin("FillScrollViewAsList");
 
             GameObject scrollEntry = Instantiate(scrollEntryPrefab, scrollContent.transform);
-            scrollEntry.TryGetComponent(out ScrollViewToggle parentToggle);
             scrollEntry.transform.localPosition = headerOffset;
+            ScrollViewToggle parentToggle = scrollEntry.GetComponent<ScrollViewToggle>();
             parentToggle.Initialize("Leaves", this);
 
             int index = 0;
@@ -218,8 +218,8 @@ namespace SEE.Game.Charts
             }
 
             scrollEntry = Instantiate(scrollEntryPrefab, scrollContent.transform);
-            scrollEntry.TryGetComponent(out parentToggle);
             scrollEntry.transform.localPosition = headerOffset + new Vector2(0, _yGap) * ++index;
+            parentToggle = scrollEntry.GetComponent<ScrollViewToggle>();
             parentToggle.Initialize("Inner Nodes", this);
 
             foreach (NodeRef dataObject in _dataObjects)
@@ -230,14 +230,14 @@ namespace SEE.Game.Charts
                 }
             }
 
-            scrollContent.TryGetComponent<RectTransform>(out RectTransform rect);
+            RectTransform rect = scrollContent.GetComponent<RectTransform>();
             rect.sizeDelta = new Vector2(rect.sizeDelta.x, index * Mathf.Abs(_yGap) + 40);
+
             p.End(true);
         }
 
         private void FillScrollView(bool tree)
         {
-            Performance p = Performance.Begin("FillScrollView(bool)");
             foreach (Transform child in scrollContent.transform)
             {
                 Destroy(child.gameObject);
@@ -251,12 +251,12 @@ namespace SEE.Game.Charts
             {
                 FillScrollViewAsTree();
             }
-            p.End(true);
         }
 
         private void FillScrollViewAsTree()
         {
             Performance p = Performance.Begin("FillScrollViewAsTree");
+
             int index = 0;
             int hierarchy = 0;
             int maxHierarchy = 0;
@@ -289,6 +289,7 @@ namespace SEE.Game.Charts
 
             RectTransform rect = scrollContent.GetComponent<RectTransform>();
             rect.sizeDelta = new Vector2(rect.sizeDelta.x, index * Mathf.Abs(_yGap) + 40);
+
             p.End(true);
         }
 
@@ -302,7 +303,7 @@ namespace SEE.Game.Charts
         private void CreateChildToggle(NodeRef nodeRef, ScrollViewToggle parentToggle, int index, float gap)
         {
             GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-            tempObject.TryGetComponent(out ScrollViewToggle toggle);
+            ScrollViewToggle toggle = tempObject.GetComponent<ScrollViewToggle>();
             toggle.Parent = parentToggle;
             toggle.LinkedObject = nodeRef.highlights;
             nodeRef.highlights.scrollViewToggle = toggle;
@@ -311,31 +312,28 @@ namespace SEE.Game.Charts
             parentToggle.AddChild(toggle);
         }
 
-        private void CreateChildToggles(Node root, ScrollViewToggle parentToggle, ref int index,
-            ref int hierarchy)
+        private void CreateChildToggles(Node root, ScrollViewToggle parentToggle, ref int index, ref int hierarchy)
         {
-            if (root.IsLeaf())
+            if (root.IsInnerNode())
             {
-                return;
-            }
-
-            hierarchy++;
-            foreach (Node child in root.Children())
-            {
-                NodeRef inScene = _dataObjects.First(entry =>
+                hierarchy++;
+                foreach (Node child in root.Children())
                 {
-                    return entry.node.ID.Equals(child.ID);
-                });
-                GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-                tempObject.TryGetComponent(out ScrollViewToggle toggle);
-                toggle.Parent = parentToggle;
-                toggle.LinkedObject = inScene.highlights;
-                inScene.highlights.scrollViewToggle = toggle;
-                tempObject.transform.localPosition = childOffset + new Vector2(_xGap, 0f) * hierarchy + new Vector2(0f, _yGap) * index++;
-                toggle.Initialize(child.SourceName, this);
-                parentToggle.AddChild(toggle);
-                int tempHierarchy = hierarchy;
-                CreateChildToggles(child, toggle, ref index, ref tempHierarchy);
+                    NodeRef inScene = _dataObjects.First(entry =>
+                    {
+                        return entry.node.ID.Equals(child.ID);
+                    });
+                    GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
+                    ScrollViewToggle toggle = tempObject.GetComponent<ScrollViewToggle>();
+                    toggle.Parent = parentToggle;
+                    toggle.LinkedObject = inScene.highlights;
+                    inScene.highlights.scrollViewToggle = toggle;
+                    tempObject.transform.localPosition = childOffset + new Vector2(_xGap, 0f) * hierarchy + new Vector2(0f, _yGap) * index++;
+                    toggle.Initialize(child.SourceName, this);
+                    parentToggle.AddChild(toggle);
+                    int tempHierarchy = hierarchy;
+                    CreateChildToggles(child, toggle, ref index, ref tempHierarchy);
+                }
             }
         }
 
@@ -346,7 +344,6 @@ namespace SEE.Game.Charts
         /// </summary>
         private void GetAllNumericAttributes()
         {
-            Performance p = Performance.Begin("GetAllNumericAttributes");
             AllMetricNames.Clear();
 #if UNITY_EDITOR
             if (_dataObjects.Count == 0)
@@ -377,7 +374,6 @@ namespace SEE.Game.Charts
                 Debug.LogWarning("No metrics available for charts.\n");
             }
 #endif
-            p.End(true);
         }
 
         /// <summary>
@@ -385,12 +381,9 @@ namespace SEE.Game.Charts
         /// </summary>
         private void FindDataObjects()
         {
-            Performance p = Performance.Begin("FindDataObjects: Find nodes");
             _dataObjects = SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, ChartManager.Instance.ShowInnerNodeMetrics);
-            p.End(true);
 
             int numberOfDataObjectsWithNodeHightLights = 0;
-            p = Performance.Begin("FindDataObjects: Node highlights");
             foreach (NodeRef entry in _dataObjects)
             {
                 if (entry.highlights)
@@ -399,12 +392,9 @@ namespace SEE.Game.Charts
                     numberOfDataObjectsWithNodeHightLights++;
                 }
             }
-            p.End(true);
             Debug.LogFormat("numberOfDataObjectsWithNodeHightLights: {0}\n", numberOfDataObjectsWithNodeHightLights);
 
-            p = Performance.Begin("FindDataObjects: Fill scroll view");
             FillScrollView(_displayAsTree);
-            p.End(true);
         }
 
         /// <summary>
@@ -413,7 +403,6 @@ namespace SEE.Game.Charts
         /// </summary>
         public void DrawData()
         {
-            Performance p = Performance.Begin("DrawData");
             noDataWarning.SetActive(false);
 
             bool xIsNodeEnum = axisDropdownX.CurrentlySelectedMetric.Equals(NodeEnumeration);
@@ -494,8 +483,6 @@ namespace SEE.Game.Charts
 
                 noDataWarning.SetActive(true);
             }
-
-            p.End(true);
         }
 
         /// <summary>
@@ -508,24 +495,36 @@ namespace SEE.Game.Charts
         /// <param name="maxY">The maximum value on the y-axis.</param>
         private void AddMarkers(IEnumerable<NodeRef> toDraw, float minX, float maxX, float minY, float maxY)
         {
-            Performance p = Performance.Begin("AddMarkers(IEnumerable, float, float, float)");
             List<GameObject> updatedMarkers = new List<GameObject>();
             Rect dataRect = dataPanel.rect;
             float width = minX < maxX ? dataRect.width / (maxX - minX) : 0.0f;
             float height = minY < maxY ? dataRect.height / (maxY - minY) : 0.0f;
             int positionInLayer = 0;
 
+            Dictionary<Vector2, ChartMarker> dict = new Dictionary<Vector2, ChartMarker>();
+
             foreach (NodeRef data in toDraw)
             {
-                GameObject marker = Instantiate(markerPrefab, entries.transform);
-                marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
-                ChartMarker chartMarker = marker.GetComponent<ChartMarker>();
-                chartMarker.LinkedObject = data.gameObject;
                 data.node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX);
                 data.node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY);
-                chartMarker.SetInfoText(data.node.SourceName + " (" + valueX.ToString("0.00") + ", " + valueY.ToString("0.00") + ")");
-                marker.GetComponent<RectTransform>().anchoredPosition = new Vector2((valueX - minX) * width, (valueY - minY) * height);
-                updatedMarkers.Add(marker);
+                Vector2 anchoredPosition = new Vector2((valueX - minX) * width, (valueY - minY) * height);
+                string infoText = data.node.SourceName + " (" + valueX.ToString("0.00") + ", " + valueY.ToString("0.00") + ")";
+
+                if (dict.TryGetValue(anchoredPosition, out ChartMarker chartMarker))
+                {
+                    chartMarker.AddInteractableObject(data.GetComponent<InteractableObject>(), infoText);
+                }
+                else
+                {
+                    GameObject marker = Instantiate(markerPrefab, entries.transform);
+                    marker.GetComponent<RectTransform>().anchoredPosition = anchoredPosition;
+                    marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
+                    chartMarker = marker.GetComponent<ChartMarker>();
+                    chartMarker.AddInteractableObject(data.GetComponent<InteractableObject>(), infoText);
+                    updatedMarkers.Add(marker);
+
+                    dict.Add(anchoredPosition, chartMarker);
+                }
             }
 
             foreach (GameObject marker in ActiveMarkers)
@@ -534,7 +533,6 @@ namespace SEE.Game.Charts
             }
 
             ActiveMarkers = updatedMarkers;
-            p.End(true);
         }
 
         public void AreaHover(Vector2 min, Vector2 max)
@@ -542,18 +540,21 @@ namespace SEE.Game.Charts
             bool toggleHover = Input.GetKey(KeyCode.LeftControl);
             foreach (GameObject marker in ActiveMarkers)
             {
-                InteractableObject interactableObject = marker.GetComponent<ChartMarker>().LinkedInteractable;
-                Vector2 markerPos = marker.transform.position;
-                if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
+                IEnumerable<InteractableObject> interactableObjects = marker.GetComponent<ChartMarker>().LinkedInteractableObjects;
+                foreach (InteractableObject interactableObject in interactableObjects)
                 {
-                    if (!interactableObject.IsHovered)
+                    Vector2 markerPos = marker.transform.position;
+                    if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                     {
-                        interactableObject.SetHoverFlag(HoverFlag.ChartMultiSelect, true, true);
+                        if (!interactableObject.IsHovered)
+                        {
+                            interactableObject.SetHoverFlag(HoverFlag.ChartMultiSelect, true, true);
+                        }
                     }
-                }
-                else if (!toggleHover && interactableObject.IsHovered)
-                {
-                    interactableObject.SetHoverFlag(HoverFlag.ChartMultiSelect, false, true);
+                    else if (!toggleHover && interactableObject.IsHovered)
+                    {
+                        interactableObject.SetHoverFlag(HoverFlag.ChartMultiSelect, false, true);
+                    }
                 }
             }
         }
@@ -563,18 +564,21 @@ namespace SEE.Game.Charts
             bool toggleSelect = Input.GetKey(KeyCode.LeftControl);
             foreach (GameObject marker in ActiveMarkers)
             {
-                InteractableObject interactableObject = marker.GetComponent<ChartMarker>().LinkedInteractable;
-                Vector2 markerPos = marker.transform.position;
-                if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
+                IEnumerable<InteractableObject> interactableObjects = marker.GetComponent<ChartMarker>().LinkedInteractableObjects;
+                foreach (InteractableObject interactableObject in interactableObjects)
                 {
-                    if (!interactableObject.IsSelected)
+                    Vector2 markerPos = marker.transform.position;
+                    if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                     {
-                        interactableObject.SetSelect(true, true);
+                        if (!interactableObject.IsSelected)
+                        {
+                            interactableObject.SetSelect(true, true);
+                        }
                     }
-                }
-                else if (!toggleSelect && interactableObject.IsSelected)
-                {
-                    marker.GetComponent<ChartMarker>().LinkedInteractable.SetSelect(false, true);
+                    else if (!toggleSelect && interactableObject.IsSelected)
+                    {
+                        interactableObject.SetSelect(false, true);
+                    }
                 }
             }
         }
@@ -594,24 +598,6 @@ namespace SEE.Game.Charts
             {
                 moveHandler.SetInfoText("X-Axis: " + axisDropdownX.CurrentlySelectedMetric + "\n" + "Y-Axis: " +
                                         axisDropdownY.CurrentlySelectedMetric);
-            }
-        }
-
-        /// <summary>
-        /// Finds all markers that refer to a given <see cref="GameObject" /> and sets their highlight
-        /// across all charts to <paramref name="isHighlighted"/>.
-        /// </summary>
-        /// <param name="highlight">The object the marker will refer to.</param>
-        /// <param name="isHighlighted">whether or not <paramref name="highlight"/> should be highlighted</param>
-        public void HighlightCorrespondingMarker(GameObject highlight, bool isHighlighted)
-        {
-            foreach (GameObject activeMarker in ActiveMarkers)
-            {
-                if (activeMarker && activeMarker.TryGetComponent(out ChartMarker script) && script.LinkedObject.Equals(highlight))
-                {
-                    //script.SetHighlightLinkedObject(isHighlighted);
-                    break;
-                }
             }
         }
 

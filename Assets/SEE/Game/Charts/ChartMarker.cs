@@ -20,6 +20,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Controls;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -31,45 +32,11 @@ namespace SEE.Game.Charts
     /// </summary>
     public class ChartMarker : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        private InteractableObject linkedInteractable = null;
+        private readonly HashSet<InteractableObject> linkedInteractableObjects = new HashSet<InteractableObject>();
+        public IEnumerable<InteractableObject> LinkedInteractableObjects { get => linkedInteractableObjects; }
 
         /// <summary>
-        /// The <see cref="GameObject" /> in the code city that is connected with this button.
-        /// </summary>
-        [HideInInspector] public GameObject LinkedObject
-        {
-            get
-            {
-                return linkedInteractable ? linkedInteractable.gameObject : null;
-            }
-            set
-            {
-                if (linkedInteractable)
-                {
-                    linkedInteractable.HoverIn   -= OnHoverIn;
-                    linkedInteractable.HoverOut  -= OnHoverOut;
-                    linkedInteractable.SelectIn  -= OnSelectIn;
-                    linkedInteractable.SelectOut -= OnSelectOut;
-                }
-
-                if (value && value.TryGetComponent(out InteractableObject interactableObj))
-                {
-                    linkedInteractable = interactableObj;
-                    linkedInteractable.HoverIn   += OnHoverIn;
-                    linkedInteractable.HoverOut  += OnHoverOut;
-                    linkedInteractable.SelectIn  += OnSelectIn;
-                    linkedInteractable.SelectOut += OnSelectOut;
-                }
-                else
-                {
-                    linkedInteractable = null;
-                }
-            }
-        }
-        [HideInInspector] public InteractableObject LinkedInteractable => linkedInteractable;
-
-        /// <summary>
-        /// A text popup containing useful information about the marker and its <see cref="LinkedObject"/>.
+        /// A text popup containing useful information about the marker and its <see cref="LinkedInteractable"/>.
         /// </summary>
         [SerializeField] private TextMeshProUGUI infoText;
 
@@ -83,36 +50,67 @@ namespace SEE.Game.Charts
         /// </summary>
         private bool _accentuated;
 
-        /// <summary>
-        /// Changes the <see cref="infoText"/> of this marker.
-        /// </summary>
-        /// <param name="info">The new text.</param>
-        public void SetInfoText(string info)
+        private void Awake()
         {
-            infoText.text = info;
+            infoText.text = string.Empty;
+        }
+
+        public void AddInteractableObject(InteractableObject interactableObject, string infoText)
+        {
+            if (linkedInteractableObjects.Add(interactableObject))
+            {
+                interactableObject.HoverIn += OnHoverIn;
+                interactableObject.HoverOut += OnHoverOut;
+                interactableObject.SelectIn += OnSelectIn;
+                interactableObject.SelectOut += OnSelectOut;
+
+                this.infoText.text += "\n" + infoText;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            foreach (InteractableObject interactableObject in linkedInteractableObjects)
+            {
+                interactableObject.HoverIn -= OnHoverIn;
+                interactableObject.HoverOut -= OnHoverOut;
+                interactableObject.SelectIn -= OnSelectIn;
+                interactableObject.SelectOut -= OnSelectOut;
+            }
         }
 
         #region UnityEngine Callbacks
 
         public void ButtonClicked()
         {
-            if (linkedInteractable)
+            // TODO(torben): the action state could be global for some cases. the line below exists in DesktopNavigationAction.cs and could somewhat be shared
+            //actionState.selectToggle = Input.GetKey(KeyCode.LeftControl);
+            if (!Input.GetKey(KeyCode.LeftControl))
             {
-                // TODO(torben): the action state could be global for some cases. the line below exists in DesktopNavigationAction.cs and could somewhat be shared
-                //actionState.selectToggle = Input.GetKey(KeyCode.LeftControl);
-                if (!Input.GetKey(KeyCode.LeftControl))
-                {
-                    foreach (InteractableObject interactableObject in FindObjectsOfType<InteractableObject>())
-                    {
-                        interactableObject.SetHoverFlags(0, true);
-                        interactableObject.SetSelect(false, true);
-                    }
-                }
-                linkedInteractable.SetSelect(!linkedInteractable.IsSelected, true);
+                InteractableObject.UnhoverAll(true);
+                InteractableObject.UnselectAll(true);
+            }
+
+            foreach (InteractableObject interactableObject in linkedInteractableObjects)
+            {
+                interactableObject.SetSelect(!interactableObject.IsSelected, true);
             }
         }
-        public void OnPointerEnter(PointerEventData eventData) => linkedInteractable?.SetHoverFlag(HoverFlag.ChartMarker, true, true);
-        public void OnPointerExit(PointerEventData eventData) => linkedInteractable?.SetHoverFlag(HoverFlag.ChartMarker, false, true);
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            foreach (InteractableObject interactableObject in linkedInteractableObjects)
+            {
+                interactableObject.SetHoverFlag(HoverFlag.ChartMarker, true, true);
+            }
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            foreach (InteractableObject interactableObject in linkedInteractableObjects)
+            {
+                interactableObject.SetHoverFlag(HoverFlag.ChartMarker, false, true);
+            }
+        }
 
         #endregion
 
