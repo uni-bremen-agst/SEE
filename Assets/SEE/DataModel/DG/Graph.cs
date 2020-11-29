@@ -70,7 +70,7 @@ namespace SEE.DataModel.DG
             {
                 throw new Exception("node must not be null");
             }
-            else if (String.IsNullOrEmpty(node.ID))
+            else if (string.IsNullOrEmpty(node.ID))
             {
                 throw new Exception("ID of a node must neither be null nor empty");
             }
@@ -183,7 +183,7 @@ namespace SEE.DataModel.DG
             {
                 throw new Exception("node must not be null");
             }
-            else if (String.IsNullOrEmpty(node.ID))
+            else if (string.IsNullOrEmpty(node.ID))
             {
                 throw new Exception("ID of a node must neither be null nor empty");
             }
@@ -224,7 +224,7 @@ namespace SEE.DataModel.DG
         /// <returns>node with the given unique ID if it exists; otherwise null</returns>
         public Node GetNode(string ID)
         {
-            if (String.IsNullOrEmpty(ID))
+            if (string.IsNullOrEmpty(ID))
             {
                 throw new Exception("ID must neither be null nor empty");
             }
@@ -245,7 +245,7 @@ namespace SEE.DataModel.DG
         /// <returns>edge with the given unique ID if it exists; otherwise null</returns>
         public Edge GetEdge(string ID)
         {
-            if (String.IsNullOrEmpty(ID))
+            if (string.IsNullOrEmpty(ID))
             {
                 throw new Exception("ID must neither be null nor empty");
             }

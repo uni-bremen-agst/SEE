@@ -606,6 +606,18 @@ namespace SEE.Game.Charts
             }
         }
 
+        /// <summary>
+        /// Sets if the scroll view will display the original tree of the file structure
+        /// or the more convenient grouping into buildings and nodes.
+        /// </summary>
+        /// <param name="displayAsTree">Whether the content should be displayed as a tree
+        /// or a list.</param>
+        public void SetDisplayAsTree(bool displayAsTree)
+        {
+            _displayAsTree = displayAsTree;
+            FillScrollView(_displayAsTree);
+        }
+
         public void UnhoverAll()
         {
             foreach (GameObject activeMarker in ActiveMarkers)
