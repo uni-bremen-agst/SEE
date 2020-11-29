@@ -21,7 +21,6 @@
 
 using SEE.Controls;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -33,8 +32,10 @@ namespace SEE.Game.Charts
     /// </summary>
     public class ChartMarker : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        private readonly HashSet<InteractableObject> linkedInteractableObjects = new HashSet<InteractableObject>();
+        private readonly List<InteractableObject> linkedInteractableObjects = new List<InteractableObject>();
         public IEnumerable<InteractableObject> LinkedInteractableObjects { get => linkedInteractableObjects; }
+
+        private readonly List<string> infoTexts = new List<string>();
 
         /// <summary>
         /// A text popup containing useful information about the marker and its <see cref="LinkedInteractable"/>.
@@ -53,14 +54,16 @@ namespace SEE.Game.Charts
 
         public void PushInteractableObject(InteractableObject interactableObject, string infoText)
         {
-            if (linkedInteractableObjects.Add(interactableObject))
+            if (!linkedInteractableObjects.Contains(interactableObject))
             {
+                linkedInteractableObjects.Add(interactableObject);
+
                 interactableObject.HoverIn += OnHoverIn;
                 interactableObject.HoverOut += OnHoverOut;
                 interactableObject.SelectIn += OnSelectIn;
                 interactableObject.SelectOut += OnSelectOut;
 
-                this.infoText.text += "\n" + infoText;
+                infoTexts.Add(infoText);
             }
         }
 
@@ -73,6 +76,19 @@ namespace SEE.Game.Charts
                 interactableObject.SelectIn -= OnSelectIn;
                 interactableObject.SelectOut -= OnSelectOut;
             }
+        }
+
+        private void UpdateInfoText()
+        {
+            string text = string.Empty;
+            for (int i = 0; i < linkedInteractableObjects.Count; i++)
+            {
+                if (linkedInteractableObjects[i].IsHovered || linkedInteractableObjects[i].IsSelected)
+                {
+                    text += infoTexts[i] + '\n';
+                }
+            }
+            infoText.text = text;
         }
 
         #region UnityEngine Callbacks
@@ -115,28 +131,38 @@ namespace SEE.Game.Charts
 
         public void OnHoverIn(bool isOwner)
         {
+            UpdateInfoText();
             infoText.gameObject.SetActive(true);
         }
 
         public void OnHoverOut(bool isOwner)
         {
-            if (!markerHighlight.activeSelf)
+            if (!linkedInteractableObjects[0].IsSelected)
             {
                 infoText.gameObject.SetActive(false);
+            }
+            else
+            {
+                UpdateInfoText();
             }
         }
 
         public void OnSelectIn(bool isOwner)
         {
+            UpdateInfoText();
             infoText.gameObject.SetActive(true);
             markerHighlight.SetActive(true);
         }
 
         public void OnSelectOut(bool isOwner)
         {
-            if (!linkedInteractableObjects.First().IsHovered)
+            if (!linkedInteractableObjects[0].IsHovered)
             {
                 infoText.gameObject.SetActive(false);
+            }
+            else
+            {
+                UpdateInfoText();
             }
             markerHighlight.SetActive(false);
         }
