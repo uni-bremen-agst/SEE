@@ -204,6 +204,7 @@ namespace SEE.Game.Charts
             Performance p = Performance.Begin("FillScrollViewAsList");
 
             GameObject scrollEntry = Instantiate(scrollEntryPrefab, scrollContent.transform);
+            scrollEntry.name = "ScrollViewToggle: Leaves";
             scrollEntry.transform.localPosition = headerOffset;
             ScrollViewToggle parentToggle = scrollEntry.GetComponent<ScrollViewToggle>();
             parentToggle.Initialize("Leaves", this);
@@ -218,6 +219,7 @@ namespace SEE.Game.Charts
             }
 
             scrollEntry = Instantiate(scrollEntryPrefab, scrollContent.transform);
+            scrollEntry.name = "ScrollViewToggle: Inner Nodes";
             scrollEntry.transform.localPosition = headerOffset + new Vector2(0, _yGap) * ++index;
             parentToggle = scrollEntry.GetComponent<ScrollViewToggle>();
             parentToggle.Initialize("Inner Nodes", this);
@@ -268,6 +270,7 @@ namespace SEE.Game.Charts
                     return entry.node.ID.Equals(root.ID);
                 });
                 GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
+                tempObject.name = "ScrollViewToggle: " + inScene.node.SourceName;
                 ScrollViewToggle rootToggle = tempObject.GetComponent<ScrollViewToggle>();
                 rootToggle.LinkedObject = inScene.highlights;
                 inScene.highlights.scrollViewToggle = rootToggle;
@@ -303,6 +306,7 @@ namespace SEE.Game.Charts
         private void CreateChildToggle(NodeRef nodeRef, ScrollViewToggle parentToggle, int index, float gap)
         {
             GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
+            tempObject.name = "ScrollViewToggle: " + nodeRef.node.SourceName;
             ScrollViewToggle toggle = tempObject.GetComponent<ScrollViewToggle>();
             toggle.Parent = parentToggle;
             toggle.LinkedObject = nodeRef.highlights;
@@ -324,6 +328,7 @@ namespace SEE.Game.Charts
                         return entry.node.ID.Equals(child.ID);
                     });
                     GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
+                    tempObject.name = "ScrollViewToggle: " + inScene.node.SourceName;
                     ScrollViewToggle toggle = tempObject.GetComponent<ScrollViewToggle>();
                     toggle.Parent = parentToggle;
                     toggle.LinkedObject = inScene.highlights;

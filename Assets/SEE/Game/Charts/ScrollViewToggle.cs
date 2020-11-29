@@ -119,55 +119,96 @@ namespace SEE.Game.Charts
             OnPointerExit(null);
         }
 
+        private static bool toggleParents = true;
+        private static bool toggleChildren = true;
+
         /// <summary>
         /// Mainly called by Unity. Activates or deactivates a marker in the linked chart, depending on the
         /// status of <see cref="UnityEngine.UI.Toggle.isOn" />.
         /// </summary>
         public void Toggle()
         {
-            linkedObject.showInChart[_chartContent] = toggle.isOn;
+            if (linkedObject)
+            {
+                linkedObject.showInChart[_chartContent] = toggle.isOn;
+            }
 
             // Propagate changes through parents
-            ScrollViewToggle parent = Parent;
-            bool deactivate = !toggle.isOn;
-            while (parent)
+            if (toggleParents && Parent)
             {
-                if (deactivate)
+                bool resetToggleChildren = toggleChildren;
+                toggleChildren = false;
+
+                if (Parent.toggle.isOn)
                 {
-                    parent.toggle.isOn = false;
-                }
-                else
-                {
-                    parent.toggle.isOn = true;
-                    foreach (ScrollViewToggle child in parent._children)
+                    if (!toggle.isOn)
                     {
-                        if (!child.GetStatus())
+                        Parent.toggle.isOn = false;
+                    }
+                    else
+                    {
+                        foreach (ScrollViewToggle child in Parent._children)
                         {
-                            parent.toggle.isOn = false;
-                            deactivate = true;
-                            break;
+                            if (!child.GetStatus())
+                            {
+                                // Note: This automatically calls Toggle() for the
+                                // parent's ScrollViewToggle. As 'toggleChildren' is
+                                // 'false', this propagates only through the parents and
+                                // not back down the children.
+                                Parent.toggle.isOn = false;
+                                break;
+                            }
                         }
                     }
                 }
-                parent = parent.Parent;
+                else
+                {
+                    bool activate = true;
+                    foreach (ScrollViewToggle sibling in Parent._children)
+                    {
+                        if (!sibling.GetStatus())
+                        {
+                            activate = false;
+                            break;
+                        }
+                    }
+                    if (activate)
+                    {
+                        // Note: This automatically calls Toggle() for the parent's
+                        // ScrollViewToggle. As 'toggleChildren' is 'false', this
+                        // propagates only through the parents and not back down the
+                        // children.
+                        Parent.toggle.isOn = true;
+                    }
+                }
+
+                if (resetToggleChildren)
+                {
+                    toggleChildren = true;
+                }
             }
 
             // Propagate changes through children
-            Stack<ScrollViewToggle> childStack = new Stack<ScrollViewToggle>(_children.Count);
-            foreach (ScrollViewToggle child in _children)
+            if (toggleChildren)
             {
-                childStack.Push(child);
-            }
-            while (childStack.Count > 0)
-            {
-                ScrollViewToggle child = childStack.Pop();
-                if (child.toggle.isOn != toggle.isOn)
+                bool resetToggleParents = toggleParents;
+                toggleParents = false;
+
+                foreach (ScrollViewToggle child in _children)
                 {
-                    child.toggle.isOn = toggle.isOn;
-                    foreach (ScrollViewToggle c in child._children)
+                    if (child.toggle.isOn != toggle.isOn)
                     {
-                        childStack.Push(c);
+                        // Note: This automatically calls Toggle() for the child's
+                        // ScrollViewToggle. As 'toggleParents' is 'false', this
+                        // propagates only through the children and not back up the
+                        // parents.
+                        child.toggle.isOn = toggle.isOn;
                     }
+                }
+
+                if (resetToggleParents)
+                {
+                    toggleParents = true;
                 }
             }
         }
