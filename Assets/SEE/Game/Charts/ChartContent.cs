@@ -512,7 +512,7 @@ namespace SEE.Game.Charts
 
                 if (dict.TryGetValue(anchoredPosition, out ChartMarker chartMarker))
                 {
-                    chartMarker.AddInteractableObject(data.GetComponent<InteractableObject>(), infoText);
+                    chartMarker.PushInteractableObject(data.GetComponent<InteractableObject>(), infoText);
                 }
                 else
                 {
@@ -520,7 +520,7 @@ namespace SEE.Game.Charts
                     marker.GetComponent<RectTransform>().anchoredPosition = anchoredPosition;
                     marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
                     chartMarker = marker.GetComponent<ChartMarker>();
-                    chartMarker.AddInteractableObject(data.GetComponent<InteractableObject>(), infoText);
+                    chartMarker.PushInteractableObject(data.GetComponent<InteractableObject>(), infoText);
                     updatedMarkers.Add(marker);
 
                     dict.Add(anchoredPosition, chartMarker);

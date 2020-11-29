@@ -56,6 +56,8 @@ namespace SEE.Game.Charts
 
         public bool IsSelecting() => selectionRect.gameObject.activeSelf;
 
+        #region UnityEngine Callbacks
+
         /// <summary>
         /// Activates and sets starting position of <see cref="selectionRect"/>.
         /// </summary>
@@ -153,5 +155,7 @@ namespace SEE.Game.Charts
             chartContent.AreaSelection(min, max);
             selectionRect.gameObject.SetActive(false);
         }
+
+        #endregion
     }
 }
