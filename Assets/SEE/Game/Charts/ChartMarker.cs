@@ -21,6 +21,7 @@
 
 using SEE.Controls;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -45,17 +46,12 @@ namespace SEE.Game.Charts
         /// </summary>
         [SerializeField] private GameObject markerHighlight;
 
-        /// <summary>
-        /// True iff the marker is accentuated.
-        /// </summary>
-        private bool _accentuated;
-
         private void Awake()
         {
             infoText.text = string.Empty;
         }
 
-        public void AddInteractableObject(InteractableObject interactableObject, string infoText)
+        public void PushInteractableObject(InteractableObject interactableObject, string infoText)
         {
             if (linkedInteractableObjects.Add(interactableObject))
             {
@@ -96,6 +92,7 @@ namespace SEE.Game.Charts
                 interactableObject.SetSelect(!interactableObject.IsSelected, true);
             }
         }
+
         public void OnPointerEnter(PointerEventData eventData)
         {
             foreach (InteractableObject interactableObject in linkedInteractableObjects)
@@ -116,10 +113,33 @@ namespace SEE.Game.Charts
 
         #region InteractableObject Callbacks
 
-        public void OnHoverIn(bool isOwner) => infoText.gameObject.SetActive(true);
-        public void OnHoverOut(bool isOwner) => infoText.gameObject.SetActive(false);
-        public void OnSelectIn(bool isOwner) => markerHighlight.SetActive(true);
-        public void OnSelectOut(bool isOwner) => markerHighlight.SetActive(false);
+        public void OnHoverIn(bool isOwner)
+        {
+            infoText.gameObject.SetActive(true);
+        }
+
+        public void OnHoverOut(bool isOwner)
+        {
+            if (!markerHighlight.activeSelf)
+            {
+                infoText.gameObject.SetActive(false);
+            }
+        }
+
+        public void OnSelectIn(bool isOwner)
+        {
+            infoText.gameObject.SetActive(true);
+            markerHighlight.SetActive(true);
+        }
+
+        public void OnSelectOut(bool isOwner)
+        {
+            if (!linkedInteractableObjects.First().IsHovered)
+            {
+                infoText.gameObject.SetActive(false);
+            }
+            markerHighlight.SetActive(false);
+        }
 
         #endregion
     }
