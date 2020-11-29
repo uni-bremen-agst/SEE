@@ -220,24 +220,6 @@ namespace SEE.Game.Charts
             allCharts.Remove(chart);
         }
 
-        public static void OnSelect(GameObject highlight)
-        {
-            SetCorrespondingMarkers(highlight, true);
-        }
-
-        public static void OnDeselect(GameObject highlight)
-        {
-            SetCorrespondingMarkers(highlight, false);
-        }
-
-        private static void SetCorrespondingMarkers(GameObject highlight, bool isSelected)
-        {
-            foreach (GameObject chart in Instance.AllCharts)
-            {
-                chart.GetComponent<ChartContent>()?.HighlightCorrespondingMarker(highlight, isSelected);
-            }
-        }
-
         /// <summary>
         /// Toggles the chart UI.
         /// </summary>
