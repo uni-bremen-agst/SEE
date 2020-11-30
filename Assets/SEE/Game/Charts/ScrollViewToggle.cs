@@ -36,16 +36,6 @@ namespace SEE.Game.Charts
     public class ScrollViewToggle : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         /// <summary>
-        /// The linked chart. Also contains methods to refresh the chart.
-        /// </summary>
-        private ChartContent _chartContent;
-
-        /// <summary>
-        /// If the user is currently pointing on this <see cref="GameObject" />
-        /// </summary>
-        private bool _pointedOn;
-
-        /// <summary>
         /// The parent to this <see cref="ScrollViewToggle" />.
         /// </summary>
         public ScrollViewToggle Parent { private get; set; }
@@ -53,7 +43,7 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Contains all children to this <see cref="ScrollViewToggle" />.
         /// </summary>
-        private readonly List<ScrollViewToggle> _children = new List<ScrollViewToggle>();
+        private readonly List<ScrollViewToggle> children = new List<ScrollViewToggle>();
 
         /// <summary>
         /// Contains the name of the <see cref="LinkedObject"/> in the UI.
@@ -65,6 +55,14 @@ namespace SEE.Game.Charts
         /// <see cref="UnityEngine.UI.Toggle.isOn"/>.
         /// </summary>
         [SerializeField] private Toggle toggle;
+
+        /// <summary>
+        /// The linked chart. Also contains methods to refresh the chart.
+        /// </summary>
+        private ChartContent chartContent;
+
+        private static bool toggleParents = true;
+        private static bool toggleChildren = true;
 
         /// <summary>
         /// Contains properties for adding objects to charts.
@@ -111,8 +109,8 @@ namespace SEE.Game.Charts
         public void Initialize(string label, ChartContent script)
         {
             this.label.text = label;
-            _chartContent = script;
-            toggle.isOn = !Parent || (bool)linkedObject.showInChart[_chartContent];
+            chartContent = script;
+            toggle.isOn = !Parent || (bool)linkedObject.showInChart[chartContent];
         }
 
         /// <summary>
@@ -132,9 +130,6 @@ namespace SEE.Game.Charts
             }
         }
 
-        private static bool toggleParents = true;
-        private static bool toggleChildren = true;
-
         /// <summary>
         /// Mainly called by Unity. Activates or deactivates a marker in the linked chart, depending on the
         /// status of <see cref="UnityEngine.UI.Toggle.isOn" />.
@@ -143,9 +138,9 @@ namespace SEE.Game.Charts
         {
             if (linkedObject)
             {
-                linkedObject.showInChart[_chartContent] = toggle.isOn;
+                linkedObject.showInChart[chartContent] = toggle.isOn;
                 NodeRef nodeRef = linkedInteractable.GetComponent<NodeRef>();
-                if (nodeRef && _chartContent.nodeRefToChartMarkerDict.TryGetValue(nodeRef, out ChartMarker chartMarker))
+                if (nodeRef && chartContent.nodeRefToChartMarkerDict.TryGetValue(nodeRef, out ChartMarker chartMarker))
                 {
                     chartMarker.UpdateInfoText();
                 }
@@ -165,7 +160,7 @@ namespace SEE.Game.Charts
                     }
                     else
                     {
-                        foreach (ScrollViewToggle child in Parent._children)
+                        foreach (ScrollViewToggle child in Parent.children)
                         {
                             if (!child.GetStatus())
                             {
@@ -182,7 +177,7 @@ namespace SEE.Game.Charts
                 else
                 {
                     bool activate = true;
-                    foreach (ScrollViewToggle sibling in Parent._children)
+                    foreach (ScrollViewToggle sibling in Parent.children)
                     {
                         if (!sibling.GetStatus())
                         {
@@ -212,7 +207,7 @@ namespace SEE.Game.Charts
                 bool resetToggleParents = toggleParents;
                 toggleParents = false;
 
-                foreach (ScrollViewToggle child in _children)
+                foreach (ScrollViewToggle child in children)
                 {
                     if (child.toggle.isOn != toggle.isOn)
                     {
@@ -238,7 +233,7 @@ namespace SEE.Game.Charts
         /// <returns>The status of the <see cref="linkedObject" />.</returns>
         private bool GetStatus()
         {
-            return (bool)linkedObject.showInChart[_chartContent];
+            return (bool)linkedObject.showInChart[chartContent];
         }
 
         /// <summary>
@@ -247,54 +242,10 @@ namespace SEE.Game.Charts
         /// <param name="child">The new child.</param>
         public void AddChild(ScrollViewToggle child)
         {
-            _children.Add(child);
+            children.Add(child);
         }
 
-        /// <summary>
-        /// Sets the highlight state of this toggle.
-        /// </summary>
-        /// <param name="highlighted">Highlight on or off.</param>
-        public void SetHighlighted(bool highlighted)
-        {
-            Toggle toggle = GetComponent<Toggle>();
-            ColorBlock colors = toggle.colors;
-            colors.normalColor = highlighted ? Color.yellow : Color.white;
-            toggle.colors = colors;
-        }
-
-        #region UnityEngine Callbacks
-
-        /// <summary>
-        /// Highlights the <see cref="linkedObject" /> when the user points on this <see cref="GameObject" />.
-        /// </summary>
-        /// <param name="eventData"></param>
-        public void OnPointerEnter(PointerEventData eventData)
-        {
-            if (!_pointedOn && linkedObject != null)
-            {
-                _pointedOn = true;
-                linkedInteractable.SetHoverFlag(HoverFlag.ChartScrollViewToggle, true, true);
-            }
-        }
-
-        /// <summary>
-        /// Stops highlighting the <see cref="linkedObject" /> when the user stops pointing on it.
-        /// </summary>
-        /// <param name="eventData"></param>
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            if (_pointedOn && linkedObject != null)
-            {
-                _pointedOn = false;
-                linkedInteractable.SetHoverFlag(HoverFlag.ChartScrollViewToggle, false, true);
-            }
-        }
-
-        #endregion
-
-        #region InteractableObject Callbacks
-
-        private void UpdateColor(bool isOwner)
+        public void UpdateColor()
         {
             Color color = UIColorScheme.GetLight(linkedInteractable.IsSelected ? 2 : (linkedInteractable.IsHovered ? 1 : 0));
 
@@ -305,10 +256,32 @@ namespace SEE.Game.Charts
             label.color = color;
         }
 
-        private void OnHoverIn(bool isOwner) => UpdateColor(isOwner);
-        private void OnHoverOut(bool isOwner) => UpdateColor(isOwner);
-        private void OnSelectIn(bool isOwner) => UpdateColor(isOwner);
-        private void OnSelectOut(bool isOwner) => UpdateColor(isOwner);
+        #region UnityEngine Callbacks
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (linkedObject != null && !linkedInteractable.IsHovered)
+            {
+                linkedInteractable.SetHoverFlag(HoverFlag.ChartScrollViewToggle, true, true);
+            }
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            if (linkedInteractable != null && linkedInteractable.IsHovered)
+            {
+                linkedInteractable.SetHoverFlag(HoverFlag.ChartScrollViewToggle, false, true);
+            }
+        }
+
+        #endregion
+
+        #region InteractableObject Callbacks
+
+        private void OnHoverIn(bool isOwner) => UpdateColor();
+        private void OnHoverOut(bool isOwner) => UpdateColor();
+        private void OnSelectIn(bool isOwner) => UpdateColor();
+        private void OnSelectOut(bool isOwner) => UpdateColor();
 
         #endregion
     }

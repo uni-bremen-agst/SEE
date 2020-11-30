@@ -24,31 +24,30 @@ using UnityEngine;
 namespace SEE.Game.Charts
 {
     /// <summary>
-    ///     Used to create new charts.
+    /// Used to create new charts.
     /// </summary>
     public class ChartCreator : MonoBehaviour
     {
         /// <summary>
-        ///     The prefab for a new chart.
+        /// The prefab for a new chart.
         /// </summary>
         [SerializeField] private GameObject chartPrefab;
 
         /// <summary>
-        ///     The <see cref="Canvas" /> on which the chart is created.
+        /// The <see cref="Canvas" /> on which the chart is created.
         /// </summary>
         [SerializeField] private Transform chartsCanvas;
 
         /// <summary>
-        ///     Initializes the new chart as GameObject.
+        /// Initializes the new chart as GameObject.
         /// </summary>
         public void CreateChart()
         {
             GameObject chart = Instantiate(chartPrefab, chartsCanvas);
-            ChartManager.Instance.RegisterChart(chart);
         }
 
         /// <summary>
-        ///     Deactivates the chart canvas.
+        /// Deactivates the chart canvas.
         /// </summary>
         public void CloseCharts()
         {

@@ -189,37 +189,6 @@ namespace SEE.Game.Charts
             }
         }
 
-        // All created and still existing charts. Charts are game objects tagged by Tags.Chart
-        // representing a metric chart.
-        private readonly HashSet<GameObject> allCharts = new HashSet<GameObject>();
-        private ICollection<GameObject> AllCharts => allCharts;
-
-        /// <summary>
-        /// Registers the descendant of given <paramref name="gameObject"/> tagged by Tags.Chart
-        /// in allCharts. Hightlighting and accentuation works only for elements of registered
-        /// charts.
-        /// </summary>
-        /// <param name="gameObject">a game object containing a chart</param>
-        public void RegisterChart(GameObject gameObject)
-        {
-            GameObject chart = Tags.FindChildWithTag(gameObject, Tags.Chart);
-            Assert.IsNotNull(chart);
-            allCharts.Add(chart);
-        }
-
-        /// <summary>
-        /// Unregisters the descendant of given <paramref name="gameObject"/> tagged by Tags.Chart
-        /// in allCharts. Hightlighting and accentuation works only for elements of registered
-        /// charts.
-        /// </summary>
-        /// <param name="gameObject">a game object containing a chart</param>
-        public void UnregisterChart(GameObject gameObject)
-        {
-            GameObject chart = Tags.FindChildWithTag(gameObject, Tags.Chart);
-            Assert.IsNotNull(chart);
-            allCharts.Remove(chart);
-        }
-
         /// <summary>
         /// Toggles the chart UI.
         /// </summary>
@@ -243,21 +212,10 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Initializes a new chart in front of the player in VR.
         /// </summary>
-        public void CreateChartVr()
+        public void CreateChartVR()
         {
             Transform cameraPosition = MainCamera.Camera.transform;
             Instantiate(chartPrefabVr, cameraPosition.position + 2 * cameraPosition.forward, Quaternion.identity, transform.GetChild(0));
-        }
-
-        /// <summary>
-        /// Unselects all currently selected markers of all existing charts.
-        /// </summary>
-        public void UnselectAll()
-        {
-            foreach (var chart in allCharts)
-            {
-                chart.GetComponent<ChartContent>()?.UnselectAll();
-            }
         }
     }
 }

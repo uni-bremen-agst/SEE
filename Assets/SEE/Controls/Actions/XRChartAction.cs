@@ -52,7 +52,7 @@ namespace SEE.Controls.Actions
             }
             if (createAction.stateDown)
             {
-                ChartManager.Instance.CreateChartVr();
+                ChartManager.Instance.CreateChartVR();
             }
 
             clickDown = false;
