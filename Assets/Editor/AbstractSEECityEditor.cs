@@ -52,7 +52,7 @@ namespace SEEEditor
             GUILayout.Label("Nodes and node Layout", EditorStyles.boldLabel);
             city.LeafObjects = (SEECity.LeafNodeKinds)EditorGUILayout.EnumPopup("Leaf nodes", city.LeafObjects);
             city.NodeLayout = (NodeLayoutKind)EditorGUILayout.EnumPopup("Node layout", city.NodeLayout);
-            city.gvlPath = EditorGUILayout.TextField("GVL file", city.gvlPath);
+            city.layoutPath = EditorGUILayout.TextField("Layout file", city.layoutPath);
 
             GUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel("Inner nodes");
