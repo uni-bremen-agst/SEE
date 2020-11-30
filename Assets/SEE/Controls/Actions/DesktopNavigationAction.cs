@@ -1,11 +1,10 @@
-﻿using SEE.Utils;
+﻿using SEE.Game.UI3D;
+using SEE.Utils;
 using System;
 using UnityEngine;
-using SEE.Game.UI3D;
 
-namespace SEE.Controls
+namespace SEE.Controls.Actions
 {
-
     /// <summary>
     /// Controls the interactions with the city in desktop mode.
     /// </summary>
@@ -124,7 +123,7 @@ namespace SEE.Controls
 
         protected sealed override void OnCityAvailable()
         {
-            raycastPlane = new UnityEngine.Plane(Vector3.up, CityTransform.position);
+            raycastPlane = new Plane(Vector3.up, CityTransform.position);
             mode = 0;
             movingOrRotating = false;
             cursor = Game.UI3D.Cursor.Create();
@@ -146,17 +145,19 @@ namespace SEE.Controls
         {
             base.Update();
 
-            if (CityAvailable)
+            if (CityTransform != null)
             {
+                bool isMouseOverGUI = Raycasting.IsMouseOverGUI();
+
                 // Fill action state with player input. Input MUST NOT be inquired in
                 // FixedUpdate() for the input to feel responsive!
                 actionState.selectToggle = Input.GetKey(KeyCode.LeftControl);
                 actionState.drag = Input.GetMouseButton(2);
-                actionState.startDrag |= Input.GetMouseButtonDown(2);
+                actionState.startDrag |= !isMouseOverGUI && Input.GetMouseButtonDown(2);
                 actionState.dragHoveredOnly = Input.GetKey(KeyCode.LeftControl);
                 actionState.cancel |= Input.GetKeyDown(KeyCode.Escape);
                 actionState.snap = Input.GetKey(KeyCode.LeftAlt);
-                actionState.reset |= Input.GetKeyDown(KeyCode.R);
+                actionState.reset |= (actionState.drag || !isMouseOverGUI) && Input.GetKeyDown(KeyCode.R);
                 actionState.mousePosition = Input.mousePosition;
 
                 RaycastClippingPlane(out bool hitPlane, out bool insideClippingArea, out Vector3 planeHitPoint);
@@ -185,7 +186,7 @@ namespace SEE.Controls
 
                     // For simplicity, zooming is only allowed if the city is not
                     // currently dragged
-                    if (!actionState.drag)
+                    if (!isMouseOverGUI && !actionState.drag)
                     {
                         actionState.zoomStepsDelta += Input.mouseScrollDelta.y;
                     }
@@ -218,7 +219,7 @@ namespace SEE.Controls
                 if (mode == NavigationMode.Rotate && cursor.HasFocus())
                 {
                     rotateState.rotateGizmo.Center = cursor.GetPosition();
-                    rotateState.rotateGizmo.Radius = 0.2f * (Camera.main.transform.position - rotateState.rotateGizmo.Center).magnitude;
+                    rotateState.rotateGizmo.Radius = 0.2f * (MainCamera.Camera.transform.position - rotateState.rotateGizmo.Center).magnitude;
                 }
             }
         }
@@ -227,7 +228,7 @@ namespace SEE.Controls
         // 'independent'.
         private void FixedUpdate()
         {
-            if (!CityAvailable)
+            if (CityTransform == null)
             {
                 return;
             }
@@ -621,7 +622,7 @@ namespace SEE.Controls
         /// <param name="planeHitPoint">The point, the plane was hit by the ray.</param>
         private void RaycastClippingPlane(out bool hitPlane, out bool insideClippingArea, out Vector3 planeHitPoint)
         {
-            Ray ray = Camera.main.ScreenPointToRay(actionState.mousePosition);
+            Ray ray = MainCamera.Camera.ScreenPointToRay(actionState.mousePosition);
 
             hitPlane = raycastPlane.Raycast(ray, out float enter);
             if (hitPlane)

@@ -21,6 +21,7 @@
 
 using SEE.Controls;
 using SEE.DataModel;
+using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -241,7 +242,7 @@ namespace SEE.Game.Charts
         /// </summary>
         public static void ResetPosition()
         {
-            Transform cameraPosition = Camera.main.transform;
+            Transform cameraPosition = MainCamera.Camera.transform;
             GameObject[] charts = GameObject.FindGameObjectsWithTag("ChartContainer");
             float offset = 0.0f;
             foreach (GameObject chart in charts)
@@ -366,7 +367,7 @@ namespace SEE.Game.Charts
         /// </summary>
         public void CreateChartVr()
         {
-            Transform cameraPosition = Camera.main.transform;
+            Transform cameraPosition = MainCamera.Camera.transform;
             Instantiate(chartPrefabVr, cameraPosition.position + 2 * cameraPosition.forward, Quaternion.identity, transform.GetChild(0));
         }
 

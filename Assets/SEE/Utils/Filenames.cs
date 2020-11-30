@@ -14,6 +14,26 @@ namespace SEE.Utils
         public const char UnixDirectorySeparator = '/';
 
         /// <summary>
+        /// File extension of GXL filenames.
+        /// </summary>
+        public const string GXLExtension = ".gxl";
+
+        /// <summary>
+        /// File extension of CSV filenames.
+        /// </summary>
+        public const string CSVExtension = ".csv";
+
+        /// <summary>
+        /// Yields string "*" + <paramref name="extension"/>.
+        /// </summary>
+        /// <param name="extension">file extension to be appended to "*"</param>
+        /// <returns>"*" + <paramref name="extension"/></returns>
+        private static string Globbing(string extension)
+        {
+            return "*" + extension;
+        }
+
+        /// <summary>
         /// Returns path where all Unity directory separators have been replaced by
         /// the directory separator of the current operating-system platform.
         /// </summary>
@@ -54,7 +74,7 @@ namespace SEE.Utils
         /// <returns>sorted list of GXL filenames</returns>
         public static IEnumerable<string> GXLFilenames(string directory)
         {
-            return FilenamesInDirectory(directory, "*.gxl");
+            return FilenamesInDirectory(directory, Globbing(GXLExtension));
         }
 
         /// <summary>
@@ -67,7 +87,7 @@ namespace SEE.Utils
         /// <returns>sorted list of CSV filenames</returns>
         public static IEnumerable<string> CSVFilenames(string directory)
         {
-            return FilenamesInDirectory(directory, "*.csv");
+            return FilenamesInDirectory(directory, Globbing(CSVExtension));
         }
 
         /// <summary>

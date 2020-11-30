@@ -78,7 +78,7 @@ namespace SEE.Utils
         {
             if (obj == null)
             {
-                throw new System.Exception(paramName + " must not be null");
+                throw new Exception(paramName + " must not be null");
             }
             return obj;
         }
@@ -95,7 +95,7 @@ namespace SEE.Utils
             obj.AssertNotNull(paramName);
             if (obj.Length == 0)
             {
-                throw new System.Exception(paramName + " must not be empty");
+                throw new Exception(paramName + " must not be empty");
             }
             return obj;
         }
