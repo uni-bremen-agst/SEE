@@ -32,7 +32,6 @@ namespace SEE.Controls.Actions
             if (Input.GetKeyDown(KeyCode.U))
             {
                 InteractableObject.UnselectAll(true);
-                ChartManager.Instance.UnselectAll();
             }
 
             switch (state)

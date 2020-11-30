@@ -66,17 +66,17 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Determines if the entries in the <see cref="scrollContent" /> are displayed as tree.
         /// </summary>
-        private bool _displayAsTree;
+        private bool displayAsTree;
 
         /// <summary>
         /// The gap between entries in the <see cref="scrollContent" /> indicating a new hierarchy layer.
         /// </summary>
-        private float _xGap;
+        private float xGap = 15;
 
         /// <summary>
         /// The gap between entries in the <see cref="scrollContent" /> to not make them overlap.
         /// </summary>
-        private float _yGap;
+        private float yGap = -25;
 
         /// <summary>
         /// All game-node objects to be listed in the chart. 
@@ -84,7 +84,7 @@ namespace SEE.Game.Charts
         /// Invariant: all game objects in _dataObjects are game objects tagged by Tags.Node
         /// and having a valid graph-node reference.
         /// </summary>
-        private ICollection<NodeRef> _dataObjects;
+        private ICollection<NodeRef> dataObjects;
 
         /// <summary>
         /// A list of all <see cref="ChartMarker" />s currently displayed in the chart.
@@ -160,7 +160,7 @@ namespace SEE.Game.Charts
         public RectTransform labelsPanel;
 
         /// <summary>
-        /// Contains all metric names contained in any <see cref="GameObject" /> of <see cref="_dataObjects" />.
+        /// Contains all metric names contained in any <see cref="GameObject" /> of <see cref="dataObjects" />.
         /// </summary>
         public readonly SortedSet<string> AllMetricNames = new SortedSet<string>();
 
@@ -171,16 +171,15 @@ namespace SEE.Game.Charts
         /// all current graphs represented in the scene, and not just one particular
         /// graph.
         /// </summary>
-        public int TotalNumberOfGraphNodesInTheScene => _dataObjects.Count;
+        public int TotalNumberOfGraphNodesInTheScene => dataObjects.Count;
 
         /// <summary>
         /// Calls methods to initialize a chart.
         /// </summary>
         private void Awake()
         {
-            _xGap = childOffset.x - headerOffset.x;
-            _yGap = childOffset.y - headerOffset.y;
             FindDataObjects();
+            FillScrollView(displayAsTree);
             GetAllNumericAttributes();
         }
 
@@ -197,168 +196,113 @@ namespace SEE.Game.Charts
             DrawData();
         }
 
-        private void FillScrollView(bool tree)
+        private ScrollViewToggle NewScrollViewEntry(NodeRef nodeRef, ScrollViewToggle parent, ref int index, int hierarchy)
         {
+            GameObject go = Instantiate(scrollEntryPrefab, scrollContent.transform);
+            go.name = "ScrollViewToggle: " + nodeRef.node.SourceName;
+            go.transform.localPosition = headerOffset + new Vector2(xGap * (float)hierarchy, yGap * (float)index++);
+
+            ScrollViewToggle svt = go.GetComponent<ScrollViewToggle>();
+            svt.Parent = parent;
+            svt.LinkedObject = nodeRef.highlights;
+            svt.Initialize(nodeRef.name, this);
+
+            parent?.AddChild(svt);
+
+            return svt;
+        }
+
+        private ScrollViewToggle NewScrollViewEntry(string name, ScrollViewToggle parent, ref int index, int hierarchy)
+        {
+            GameObject go = Instantiate(scrollEntryPrefab, scrollContent.transform);
+            go.name = "ScrollViewToggle: " + name;
+            go.transform.localPosition = headerOffset + new Vector2(xGap * (float)hierarchy, yGap * (float)index++);
+
+            ScrollViewToggle svt = go.GetComponent<ScrollViewToggle>();
+            svt.Parent = parent;
+            svt.Initialize(name, this);
+
+            parent?.AddChild(svt);
+
+            return svt;
+        }
+
+        private ScrollViewToggle NewScrollViewEntries(NodeRef nodeRef, ScrollViewToggle parent, ref int index, int hierarchy)
+        {
+            ScrollViewToggle svt = NewScrollViewEntry(nodeRef, parent, ref index, hierarchy);
+            foreach (Node childNode in nodeRef.node.Children())
+            {
+                NodeRef childNodeRef = dataObjects.First(entry => { return entry.node.ID.Equals(childNode.ID); });
+                NewScrollViewEntries(childNodeRef, svt, ref index, hierarchy + 1);
+            }
+            return svt;
+        }
+
+        public void FillScrollView(bool displayAsTree)
+        {
+            this.displayAsTree = displayAsTree;
+
             foreach (Transform child in scrollContent.transform)
             {
                 Destroy(child.gameObject);
             }
 
-            if (!tree)
+            Performance p = Performance.Begin(displayAsTree ? "FillScrollViewAsTree" : "FillScrollViewAsList");
+
+            int index = 0;
+            if (!displayAsTree)
             {
-                FillScrollViewAsList();
+                ScrollViewToggle svt = NewScrollViewEntry("Leaves", null, ref index, 0);
+                foreach (NodeRef dataObject in dataObjects)
+                {
+                    if (dataObject.node.IsLeaf())
+                    {
+                        NewScrollViewEntry(dataObject, svt, ref index, 1);
+                    }
+                }
+
+                svt = NewScrollViewEntry("Inner Nodes", null, ref index, 0);
+                foreach (NodeRef dataObject in dataObjects)
+                {
+                    if (dataObject.node.IsInnerNode())
+                    {
+                        NewScrollViewEntry(dataObject, svt, ref index, 1);
+                    }
+                }
             }
             else
             {
-                FillScrollViewAsTree();
-            }
-        }
-
-        /// <summary>
-        /// Fills the scroll view on the right of the chart with one entry for each node in the scene including
-        /// two headers to toggle all buildings and all nodes.
-        /// </summary>
-        private void FillScrollViewAsList()
-        {
-            Performance p = Performance.Begin("FillScrollViewAsList");
-
-            GameObject scrollEntry = Instantiate(scrollEntryPrefab, scrollContent.transform);
-            scrollEntry.name = "ScrollViewToggle: Leaves";
-            scrollEntry.transform.localPosition = headerOffset;
-            ScrollViewToggle parentToggle = scrollEntry.GetComponent<ScrollViewToggle>();
-            parentToggle.Initialize("Leaves", this);
-
-            int index = 0;
-            foreach (NodeRef dataObject in _dataObjects)
-            {
-                if (dataObject.node.IsLeaf())
+                foreach (Node root in SceneQueries.GetRoots(dataObjects))
                 {
-                    CreateChildToggle(dataObject, parentToggle, index++, _yGap);
-                }
-            }
-
-            scrollEntry = Instantiate(scrollEntryPrefab, scrollContent.transform);
-            scrollEntry.name = "ScrollViewToggle: Inner Nodes";
-            scrollEntry.transform.localPosition = headerOffset + new Vector2(0, _yGap) * ++index;
-            parentToggle = scrollEntry.GetComponent<ScrollViewToggle>();
-            parentToggle.Initialize("Inner Nodes", this);
-
-            foreach (NodeRef dataObject in _dataObjects)
-            {
-                if (dataObject.node.IsInnerNode())
-                {
-                    CreateChildToggle(dataObject, parentToggle, index++, _yGap);
-                }
-            }
-
-            RectTransform rect = scrollContent.GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(rect.sizeDelta.x, index * Mathf.Abs(_yGap) + 40);
-
-            p.End(true);
-        }
-
-        private void FillScrollViewAsTree()
-        {
-            Performance p = Performance.Begin("FillScrollViewAsTree");
-
-            int index = 0;
-            int hierarchy = 0;
-            int maxHierarchy = 0;
-
-            foreach (Node root in SceneQueries.GetRoots(_dataObjects))
-            {
-                NodeRef rootNodeRef = _dataObjects.First(entry =>
-                {
-                    return entry.node.ID.Equals(root.ID);
-                });
-                GameObject scrollViewToggleGameObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-                scrollViewToggleGameObject.name = "ScrollViewToggle: " + rootNodeRef.node.SourceName;
-                ScrollViewToggle rootToggle = scrollViewToggleGameObject.GetComponent<ScrollViewToggle>();
-                rootToggle.LinkedObject = rootNodeRef.highlights;
-                rootNodeRef.highlights.scrollViewToggle = rootToggle;
-                scrollViewToggleGameObject.transform.localPosition = headerOffset + new Vector2(0f, _yGap) * index;
-                rootToggle.Initialize(root.SourceName, this);
-                if (hierarchy > maxHierarchy)
-                {
-                    maxHierarchy = hierarchy;
-                }
-
-                hierarchy = 0;
-                CreateChildToggles(root, rootToggle, ref index, ref hierarchy);
-            }
-
-            if (hierarchy > maxHierarchy)
-            {
-                maxHierarchy = hierarchy; //TODO: Use this...
-            }
-
-            RectTransform rect = scrollContent.GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(rect.sizeDelta.x, index * Mathf.Abs(_yGap) + 40);
-
-            p.End(true);
-        }
-
-        /// <summary>
-        /// Creates a toggle for an object in the scene that is a node.
-        /// </summary>
-        /// <param name="nodeRef">The object to be toggled.</param>
-        /// <param name="parentToggle">The toggle that will toggle this one when clicked.</param>
-        /// <param name="index">The position of the toggle in the scrollview.</param>
-        /// <param name="gap">The gap between two toggles in the scrollview.</param>
-        private void CreateChildToggle(NodeRef nodeRef, ScrollViewToggle parentToggle, int index, float gap)
-        {
-            GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-            tempObject.name = "ScrollViewToggle: " + nodeRef.node.SourceName;
-            ScrollViewToggle toggle = tempObject.GetComponent<ScrollViewToggle>();
-            toggle.Parent = parentToggle;
-            toggle.LinkedObject = nodeRef.highlights;
-            nodeRef.highlights.scrollViewToggle = toggle;
-            tempObject.transform.localPosition = childOffset + new Vector2(0f, gap) * index;
-            toggle.Initialize(nodeRef.name, this);
-            parentToggle.AddChild(toggle);
-        }
-
-        private void CreateChildToggles(Node root, ScrollViewToggle parentToggle, ref int index, ref int hierarchy)
-        {
-            if (root.IsInnerNode())
-            {
-                hierarchy++;
-                foreach (Node childNode in root.Children())
-                {
-                    NodeRef childNodeRef = _dataObjects.First(entry =>
+                    NodeRef rootNodeRef = dataObjects.First(entry =>
                     {
-                        return entry.node.ID.Equals(childNode.ID);
+                        return entry.node.ID.Equals(root.ID);
                     });
-                    GameObject scrollViewToggleGameObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-                    scrollViewToggleGameObject.name = "ScrollViewToggle: " + childNodeRef.node.SourceName;
-                    ScrollViewToggle scrollViewToggle = scrollViewToggleGameObject.GetComponent<ScrollViewToggle>();
-                    scrollViewToggle.Parent = parentToggle;
-                    scrollViewToggle.LinkedObject = childNodeRef.highlights;
-                    childNodeRef.highlights.scrollViewToggle = scrollViewToggle;
-                    scrollViewToggleGameObject.transform.localPosition = childOffset + new Vector2(_xGap, 0f) * hierarchy + new Vector2(0f, _yGap) * index++;
-                    scrollViewToggle.Initialize(childNode.SourceName, this);
-                    parentToggle.AddChild(scrollViewToggle);
-                    int tempHierarchy = hierarchy;
-                    CreateChildToggles(childNode, scrollViewToggle, ref index, ref tempHierarchy);
+                    NewScrollViewEntries(rootNodeRef, null, ref index, 0);
                 }
             }
+
+            RectTransform rect = scrollContent.GetComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(rect.sizeDelta.x, index * Mathf.Abs(yGap) + 40);
+
+            p.End(true);
         }
 
         /// <summary>
         /// Gets all metric names for <see cref="float" /> values contained in the <see cref="NodeRef" /> of each
-        /// <see cref="GameObject" /> in <see cref="_dataObjects" />. A metric name is the name of a
+        /// <see cref="GameObject" /> in <see cref="dataObjects" />. A metric name is the name of a
         /// numeric (either float or int) node attribute that starts with the prefix ChartManager.MetricPrefix.
         /// </summary>
         private void GetAllNumericAttributes()
         {
             AllMetricNames.Clear();
 #if UNITY_EDITOR
-            if (_dataObjects.Count == 0)
+            if (dataObjects.Count == 0)
             {
                 Debug.LogWarning("There are no nodes for showing metrics.\n");
             }
 #endif
-            foreach (NodeRef nodeRef in _dataObjects)
+            foreach (NodeRef nodeRef in dataObjects)
             {
                 foreach (string key in nodeRef.node.FloatAttributes.Keys)
                 {
@@ -388,10 +332,10 @@ namespace SEE.Game.Charts
         /// </summary>
         private void FindDataObjects()
         {
-            _dataObjects = SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, ChartManager.Instance.ShowInnerNodeMetrics);
+            dataObjects = SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, ChartManager.Instance.ShowInnerNodeMetrics);
 
             int numberOfDataObjectsWithNodeHightLights = 0;
-            foreach (NodeRef entry in _dataObjects)
+            foreach (NodeRef entry in dataObjects)
             {
                 if (entry.highlights)
                 {
@@ -400,8 +344,6 @@ namespace SEE.Game.Charts
                 }
             }
             Debug.LogFormat("numberOfDataObjectsWithNodeHightLights: {0}\n", numberOfDataObjectsWithNodeHightLights);
-
-            FillScrollView(_displayAsTree);
         }
 
         /// <summary>
@@ -424,7 +366,7 @@ namespace SEE.Game.Charts
             float minY = float.PositiveInfinity; // globally minimal value on Y axis
             float maxY = float.NegativeInfinity; // globally maximal value on Y axis
             List<NodeRef> toDraw = new List<NodeRef>(); // nodes to be drawn in the chart
-            foreach (NodeRef nodeRef in _dataObjects)
+            foreach (NodeRef nodeRef in dataObjects)
             {
                 bool inX = false;
                 if (nodeRef.node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX) || xIsNodeEnum)
@@ -607,18 +549,6 @@ namespace SEE.Game.Charts
             }
         }
 
-        /// <summary>
-        /// Sets if the scroll view will display the original tree of the file structure
-        /// or the more convenient grouping into buildings and nodes.
-        /// </summary>
-        /// <param name="displayAsTree">Whether the content should be displayed as a tree
-        /// or a list.</param>
-        public void SetDisplayAsTree(bool displayAsTree)
-        {
-            _displayAsTree = displayAsTree;
-            FillScrollView(_displayAsTree);
-        }
-
         public void UnhoverAll()
         {
             foreach (GameObject activeMarker in ActiveMarkers)
@@ -655,8 +585,7 @@ namespace SEE.Game.Charts
         /// </summary>
         public void OnDestroy()
         {
-            ChartManager.Instance.UnregisterChart(gameObject);
-            foreach (NodeRef dataObject in _dataObjects)
+            foreach (NodeRef dataObject in dataObjects)
             {
                 dataObject.highlights.showInChart.Remove(this);
             }

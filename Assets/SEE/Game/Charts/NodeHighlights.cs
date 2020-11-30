@@ -34,10 +34,5 @@ namespace SEE.Game.Charts
         /// Determines if this objects node will be displayed in charts.
         /// </summary>
         public IDictionary showInChart = new Dictionary<ChartContent, bool>();
-
-        /// <summary>
-        /// A toggle linked to this object.
-        /// </summary>
-        public ScrollViewToggle scrollViewToggle;
     }
 }
