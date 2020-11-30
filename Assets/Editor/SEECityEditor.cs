@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 
 using SEE.Game;
+using System;
 using UnityEditor;
 using UnityEngine;
 using SEE.Utils;
@@ -60,15 +61,19 @@ namespace SEEEditor
                 SaveLayout(city);
             }
             EditorGUILayout.EndHorizontal();
-             EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.BeginHorizontal();
             if (city.LoadedGraph != null && GUILayout.Button("Save Settings"))
             {
-               SaveCityInJSON(city);
+                SaveCityInJSON(city);
             }
             EditorGUILayout.EndHorizontal();
-            if(GUILayout.Button("Load Settings"))
+            if (GUILayout.Button("Load Settings"))
             {
                 LoadCityFromJSON(city);
+            }
+            if (city.LoadedGraph != null && GUILayout.Button("Add References"))
+            {
+                AddReferences(city);
             }
         }
 
@@ -135,6 +140,11 @@ namespace SEEEditor
         private void SaveLayout(SEECity city)
         {
             city.SaveLayout();
+        }
+
+        private void AddReferences(SEECity city)
+        {
+            city.SetNodeEdgeRefs();
         }
     }
 }
