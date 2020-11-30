@@ -91,6 +91,8 @@ namespace SEE.Game.Charts
         /// </summary>
         protected List<GameObject> ActiveMarkers = new List<GameObject>();
 
+        public readonly Dictionary<NodeRef, ChartMarker> nodeRefToChartMarkerDict = new Dictionary<NodeRef, ChartMarker>();
+
         /// <summary>
         /// Handles the movement of charts.
         /// </summary>
@@ -195,6 +197,23 @@ namespace SEE.Game.Charts
             DrawData();
         }
 
+        private void FillScrollView(bool tree)
+        {
+            foreach (Transform child in scrollContent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            if (!tree)
+            {
+                FillScrollViewAsList();
+            }
+            else
+            {
+                FillScrollViewAsTree();
+            }
+        }
+
         /// <summary>
         /// Fills the scroll view on the right of the chart with one entry for each node in the scene including
         /// two headers to toggle all buildings and all nodes.
@@ -238,26 +257,11 @@ namespace SEE.Game.Charts
             p.End(true);
         }
 
-        private void FillScrollView(bool tree)
-        {
-            foreach (Transform child in scrollContent.transform)
-            {
-                Destroy(child.gameObject);
-            }
-
-            if (!tree)
-            {
-                FillScrollViewAsList();
-            }
-            else
-            {
-                FillScrollViewAsTree();
-            }
-        }
-
         private void FillScrollViewAsTree()
         {
             Performance p = Performance.Begin("FillScrollViewAsTree");
+
+            nodeRefToChartMarkerDict.Clear();
 
             int index = 0;
             int hierarchy = 0;
@@ -265,15 +269,16 @@ namespace SEE.Game.Charts
 
             foreach (Node root in SceneQueries.GetRoots(_dataObjects))
             {
-                NodeRef inScene = _dataObjects.First(entry =>
+                NodeRef rootNodeRef = _dataObjects.First(entry =>
                 {
                     return entry.node.ID.Equals(root.ID);
                 });
                 GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-                tempObject.name = "ScrollViewToggle: " + inScene.node.SourceName;
+                tempObject.name = "ScrollViewToggle: " + rootNodeRef.node.SourceName;
                 ScrollViewToggle rootToggle = tempObject.GetComponent<ScrollViewToggle>();
-                rootToggle.LinkedObject = inScene.highlights;
-                inScene.highlights.scrollViewToggle = rootToggle;
+                rootToggle.LinkedObject = rootNodeRef.highlights;
+                rootNodeRef.highlights.scrollViewToggle = rootToggle;
+                nodeRefToChartMarkerDict.Add(rootNodeRef, tempObject.GetComponent<ChartMarker>());
                 tempObject.transform.localPosition = headerOffset + new Vector2(0f, _yGap) * index;
                 rootToggle.Initialize(root.SourceName, this);
                 if (hierarchy > maxHierarchy)
@@ -327,17 +332,17 @@ namespace SEE.Game.Charts
                     {
                         return entry.node.ID.Equals(child.ID);
                     });
-                    GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-                    tempObject.name = "ScrollViewToggle: " + inScene.node.SourceName;
-                    ScrollViewToggle toggle = tempObject.GetComponent<ScrollViewToggle>();
-                    toggle.Parent = parentToggle;
-                    toggle.LinkedObject = inScene.highlights;
-                    inScene.highlights.scrollViewToggle = toggle;
-                    tempObject.transform.localPosition = childOffset + new Vector2(_xGap, 0f) * hierarchy + new Vector2(0f, _yGap) * index++;
-                    toggle.Initialize(child.SourceName, this);
-                    parentToggle.AddChild(toggle);
+                    GameObject scrollViewToggleGameObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
+                    scrollViewToggleGameObject.name = "ScrollViewToggle: " + inScene.node.SourceName;
+                    ScrollViewToggle scrollViewToggle = scrollViewToggleGameObject.GetComponent<ScrollViewToggle>();
+                    scrollViewToggle.Parent = parentToggle;
+                    scrollViewToggle.LinkedObject = inScene.highlights;
+                    inScene.highlights.scrollViewToggle = scrollViewToggle;
+                    scrollViewToggleGameObject.transform.localPosition = childOffset + new Vector2(_xGap, 0f) * hierarchy + new Vector2(0f, _yGap) * index++;
+                    scrollViewToggle.Initialize(child.SourceName, this);
+                    parentToggle.AddChild(scrollViewToggle);
                     int tempHierarchy = hierarchy;
-                    CreateChildToggles(child, toggle, ref index, ref tempHierarchy);
+                    CreateChildToggles(child, scrollViewToggle, ref index, ref tempHierarchy);
                 }
             }
         }
@@ -493,48 +498,47 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Adds new markers to the chart and removes the old ones.
         /// </summary>
-        /// <param name="toDraw">The markers to add to the chart.</param>
+        /// <param name="nodeRefsToDraw">The markers to add to the chart.</param>
         /// <param name="minX">The minimum value on the x-axis.</param>
         /// <param name="maxX">The maximum value on the x-axis.</param>
         /// <param name="minY">The minimum value on the y-axis.</param>
         /// <param name="maxY">The maximum value on the y-axis.</param>
-        private void AddMarkers(IEnumerable<NodeRef> toDraw, float minX, float maxX, float minY, float maxY)
+        private void AddMarkers(IEnumerable<NodeRef> nodeRefsToDraw, float minX, float maxX, float minY, float maxY)
         {
+            foreach (GameObject marker in ActiveMarkers)
+            {
+                Destroy(marker);
+            }
+            nodeRefToChartMarkerDict.Clear();
+
             List<GameObject> updatedMarkers = new List<GameObject>();
+            Dictionary<Vector2, ChartMarker> anchoredPositionToChartMarkerDict = new Dictionary<Vector2, ChartMarker>();
+
             Rect dataRect = dataPanel.rect;
             float width = minX < maxX ? dataRect.width / (maxX - minX) : 0.0f;
             float height = minY < maxY ? dataRect.height / (maxY - minY) : 0.0f;
             int positionInLayer = 0;
 
-            Dictionary<Vector2, ChartMarker> dict = new Dictionary<Vector2, ChartMarker>();
-
-            foreach (NodeRef data in toDraw)
+            foreach (NodeRef nodeRef in nodeRefsToDraw)
             {
-                data.node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX);
-                data.node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY);
+                nodeRef.node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX);
+                nodeRef.node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY);
                 Vector2 anchoredPosition = new Vector2((valueX - minX) * width, (valueY - minY) * height);
-                string infoText = data.node.SourceName + " (" + valueX.ToString("0.00") + ", " + valueY.ToString("0.00") + ")";
 
-                if (dict.TryGetValue(anchoredPosition, out ChartMarker chartMarker))
-                {
-                    chartMarker.PushInteractableObject(data.GetComponent<InteractableObject>(), infoText);
-                }
-                else
+                if (!anchoredPositionToChartMarkerDict.TryGetValue(anchoredPosition, out ChartMarker chartMarker))
                 {
                     GameObject marker = Instantiate(markerPrefab, entries.transform);
                     marker.GetComponent<RectTransform>().anchoredPosition = anchoredPosition;
                     marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
                     chartMarker = marker.GetComponent<ChartMarker>();
-                    chartMarker.PushInteractableObject(data.GetComponent<InteractableObject>(), infoText);
+                    chartMarker.chartContent = this;
                     updatedMarkers.Add(marker);
-
-                    dict.Add(anchoredPosition, chartMarker);
+                    anchoredPositionToChartMarkerDict.Add(anchoredPosition, chartMarker);
                 }
-            }
 
-            foreach (GameObject marker in ActiveMarkers)
-            {
-                Destroy(marker);
+                string infoText = nodeRef.node.SourceName + " (" + valueX.ToString("0.00") + ", " + valueY.ToString("0.00") + ")";
+                chartMarker.PushInteractableObject(nodeRef.GetComponent<InteractableObject>(), infoText);
+                nodeRefToChartMarkerDict.Add(nodeRef, chartMarker);
             }
 
             ActiveMarkers = updatedMarkers;

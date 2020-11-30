@@ -20,6 +20,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Controls;
+using SEE.GO;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -55,13 +56,13 @@ namespace SEE.Game.Charts
         private readonly List<ScrollViewToggle> _children = new List<ScrollViewToggle>();
 
         /// <summary>
-        /// Contains the name of the <see cref="LinkedObject" /> in the UI.
+        /// Contains the name of the <see cref="LinkedObject"/> in the UI.
         /// </summary>
         [SerializeField] private TextMeshProUGUI label;
 
         /// <summary>
         /// The UI element the user can click on to change the state of
-        /// <see cref="UnityEngine.UI.Toggle.isOn" />.
+        /// <see cref="UnityEngine.UI.Toggle.isOn"/>.
         /// </summary>
         [SerializeField] private Toggle toggle;
 
@@ -80,7 +81,9 @@ namespace SEE.Game.Charts
             {
                 if (linkedInteractable)
                 {
-                    linkedInteractable.SelectIn  -= OnSelectIn;
+                    linkedInteractable.HoverIn -= OnHoverIn;
+                    linkedInteractable.HoverOut -= OnHoverOut;
+                    linkedInteractable.SelectIn -= OnSelectIn;
                     linkedInteractable.SelectOut -= OnSelectOut;
                 }
 
@@ -88,8 +91,10 @@ namespace SEE.Game.Charts
                 if (linkedObject && linkedObject.TryGetComponent(out InteractableObject interactableObj))
                 {
                     linkedInteractable = interactableObj;
-                    linkedInteractable.SelectIn  -= OnSelectIn;
-                    linkedInteractable.SelectOut -= OnSelectOut;
+                    linkedInteractable.HoverIn += OnHoverIn;
+                    linkedInteractable.HoverOut += OnHoverOut;
+                    linkedInteractable.SelectIn  += OnSelectIn;
+                    linkedInteractable.SelectOut += OnSelectOut;
                 }
                 else
                 {
@@ -131,6 +136,7 @@ namespace SEE.Game.Charts
             if (linkedObject)
             {
                 linkedObject.showInChart[_chartContent] = toggle.isOn;
+                _chartContent.nodeRefToChartMarkerDict[linkedInteractable.GetComponent<NodeRef>()].UpdateInfoText();
             }
 
             // Propagate changes through parents
@@ -276,19 +282,21 @@ namespace SEE.Game.Charts
 
         #region InteractableObject Callbacks
 
-        private void OnSelectIn(bool isOwner)
+        private void UpdateColor(bool isOwner)
         {
+            Color color = UIColorScheme.GetLight(linkedInteractable.IsSelected ? 2 : (linkedInteractable.IsHovered ? 1 : 0));
+
             ColorBlock colors = toggle.colors;
-            colors.normalColor = Color.yellow;
+            colors.normalColor = color;
             toggle.colors = colors;
+
+            label.color = color;
         }
 
-        private void OnSelectOut(bool isOwner)
-        {
-            ColorBlock colors = toggle.colors;
-            colors.normalColor = Color.white;
-            toggle.colors = colors;
-        }
+        private void OnHoverIn(bool isOwner) => UpdateColor(isOwner);
+        private void OnHoverOut(bool isOwner) => UpdateColor(isOwner);
+        private void OnSelectIn(bool isOwner) => UpdateColor(isOwner);
+        private void OnSelectOut(bool isOwner) => UpdateColor(isOwner);
 
         #endregion
     }

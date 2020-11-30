@@ -20,6 +20,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Controls;
+using SEE.GO;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -37,19 +38,34 @@ namespace SEE.Game.Charts
 
         private readonly List<string> infoTexts = new List<string>();
 
+        public ChartContent chartContent;
+
         /// <summary>
         /// A text popup containing useful information about the marker and its <see cref="LinkedInteractable"/>.
         /// </summary>
         [SerializeField] private TextMeshProUGUI infoText;
 
         /// <summary>
-        /// The <see cref="GameObject" /> making the marker look highlighted when active.
+        /// The <see cref="GameObject"/> making the marker look highlighted when active.
         /// </summary>
         [SerializeField] private GameObject markerHighlight;
 
         private void Awake()
         {
             infoText.text = string.Empty;
+            infoText.color = UIColorScheme.GetLight(0);
+            markerHighlight.GetComponent<UnityEngine.UI.Image>().color = UIColorScheme.GetLight(2);
+        }
+
+        private void OnDestroy()
+        {
+            foreach (InteractableObject interactableObject in linkedInteractableObjects)
+            {
+                interactableObject.HoverIn -= OnHoverIn;
+                interactableObject.HoverOut -= OnHoverOut;
+                interactableObject.SelectIn -= OnSelectIn;
+                interactableObject.SelectOut -= OnSelectOut;
+            }
         }
 
         public void PushInteractableObject(InteractableObject interactableObject, string infoText)
@@ -67,23 +83,14 @@ namespace SEE.Game.Charts
             }
         }
 
-        private void OnDestroy()
-        {
-            foreach (InteractableObject interactableObject in linkedInteractableObjects)
-            {
-                interactableObject.HoverIn -= OnHoverIn;
-                interactableObject.HoverOut -= OnHoverOut;
-                interactableObject.SelectIn -= OnSelectIn;
-                interactableObject.SelectOut -= OnSelectOut;
-            }
-        }
-
-        private void UpdateInfoText()
+        public void UpdateInfoText()
         {
             string text = string.Empty;
             for (int i = 0; i < linkedInteractableObjects.Count; i++)
             {
-                if (linkedInteractableObjects[i].IsHovered || linkedInteractableObjects[i].IsSelected)
+                bool showInChart = (bool)linkedInteractableObjects[i].GetComponent<NodeRef>().highlights.showInChart[chartContent];
+                bool isHighlighted = linkedInteractableObjects[i].IsHovered || linkedInteractableObjects[i].IsSelected;
+                if (showInChart && isHighlighted)
                 {
                     text += infoTexts[i] + '\n';
                 }

@@ -22,7 +22,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace SEE.Game.Charts
 {
@@ -39,7 +38,6 @@ namespace SEE.Game.Charts
         /// <summary>
         /// A toggle linked to this object.
         /// </summary>
-        [FormerlySerializedAs("ScrollViewToggle")]
         public ScrollViewToggle scrollViewToggle;
     }
 }
