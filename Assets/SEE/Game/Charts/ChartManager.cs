@@ -22,6 +22,7 @@
 using SEE.Controls;
 using SEE.DataModel;
 using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -94,11 +95,6 @@ namespace SEE.Game.Charts
         /// </summary>
         [Tooltip("Whether the metrics of inner nodes should be shown in the charts")]
         public bool ShowInnerNodeMetrics = false;
-
-        /// <summary>
-        /// If true, highlighted objects will stay highlighted until this is deactivated.
-        /// </summary>
-        [HideInInspector] public bool selectionMode;
 
         /// <summary>
         /// The minimum size a chart can have for width and height.
@@ -287,19 +283,21 @@ namespace SEE.Game.Charts
             allCharts.Remove(chart);
         }
 
-        public static void OnSelect(GameObject highlight, bool scrollView)
+        public static void OnSelect(GameObject highlight)
         {
-            foreach (GameObject chart in Instance.AllCharts())
-            {
-                chart.GetComponent<ChartContent>()?.HighlightCorrespondingMarker(highlight, scrollView);
-            }
+            SetCorrespondingMarkers(highlight, true);
         }
 
-        public static void OnDeselect(GameObject highlight, bool scrollView)
+        public static void OnDeselect(GameObject highlight)
+        {
+            SetCorrespondingMarkers(highlight, false);
+        }
+
+        private static void SetCorrespondingMarkers(GameObject highlight, bool isSelected)
         {
             foreach (GameObject chart in Instance.AllCharts())
             {
-                chart.GetComponent<ChartContent>()?.HighlightCorrespondingMarker(highlight, scrollView);
+                chart.GetComponent<ChartContent>()?.HighlightCorrespondingMarker(highlight, isSelected);
             }
         }
 
@@ -355,14 +353,6 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Toggles the selection mode (Objects stay highlighted).
-        /// </summary>
-        public void ToggleSelectionMode()
-        {
-            selectionMode = !selectionMode;
-        }
-
-        /// <summary>
         /// Initializes a new chart in front of the player in VR.
         /// </summary>
         public void CreateChartVr()
@@ -378,6 +368,17 @@ namespace SEE.Game.Charts
         {
             buildingHighlightMaterial.SetFloat("g_flOutlineWidth", highlightOutline);
             buildingHighlightMaterialAccentuated.SetFloat("g_flOutlineWidth", highlightOutline);
+        }
+
+        /// <summary>
+        /// Unselects all currently selected markers of all existing charts.
+        /// </summary>
+        public void UnselectAll()
+        {
+            foreach (var chart in AllCharts())
+            {
+                chart.GetComponent<ChartContent>()?.UnselectAll();
+            }
         }
     }
 }
