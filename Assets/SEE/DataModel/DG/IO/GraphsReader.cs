@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System.IO;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -36,8 +37,15 @@ namespace SEE.DataModel.DG.IO
         public readonly List<Graph> graphs = new List<Graph>();
 
         /// <summary>
-        /// Loads all GXL files (limited to <paramref name="maxRevisionsToLoad"/> many 
-        /// files) from <paramref name="directory"/> and and saves all loaded graph data.
+        /// Loads all GXL and their associated CSV files (limited to <paramref name="maxRevisionsToLoad"/> many 
+        /// files) from <paramref name="directory"/> and saves these in <see cref="graphs"/>. 
+        /// 
+        /// For every GXL file, F.gxl , contained in <paramref name="directory"/>, the graph
+        /// data therein will be loaded into a new graph that is then added to <see cref="graphs"/>.
+        /// If there is a file F.csv contained in <paramref name="directory"/>, this file is assumed
+        /// to carry additional metrics for the graph nodes. These metrics will be read and added to
+        /// the nodes in the loaded graph where the unique node ID is used to identify the node to
+        /// which the metrics are to be added.
         /// </summary>
         /// <param name="directory">the directory path where the GXL file are located in</param>
         /// <param name="hierarchicalEdgeTypes">the set of edge-type names for edges considered to represent nesting</param>
@@ -51,12 +59,13 @@ namespace SEE.DataModel.DG.IO
             }
             graphs.Clear();
 
-            SEE.Utils.Performance p = SEE.Utils.Performance.Begin("Loading GXL files from " + directory);
+            Performance p = Performance.Begin("Loading GXL files from " + directory);
             // for all found GXL files load and save the graph data
             foreach (string gxlPath in sortedGraphNames)
             {
-                // load graph
-                GraphReader graphCreator = new GraphReader(gxlPath, hierarchicalEdgeTypes, gxlPath, new SEELogger());
+                // load graph (we can safely assume that the file exists because we retrieved its 
+                // name just from the directory
+                GraphReader graphCreator = new GraphReader(gxlPath, hierarchicalEdgeTypes, rootName: gxlPath, logger: new SEELogger());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
 
@@ -67,6 +76,20 @@ namespace SEE.DataModel.DG.IO
                 }
                 else
                 {
+                    string csvFilename = Path.ChangeExtension(gxlPath, Filenames.CSVExtension);
+                    if (File.Exists(csvFilename))
+                    {
+                        Debug.LogFormat("Loading CSV file {0}.\n", csvFilename);
+                        int numberOfErrors = MetricImporter.Load(graph, csvFilename, ';');
+                        if (numberOfErrors > 0)
+                        {
+                            Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", csvFilename, numberOfErrors);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarningFormat("CSV file {0} does not exist.\n", csvFilename);
+                    }
                     maxRevisionsToLoad--;
                     graphs.Add(graph);
                 }
@@ -78,5 +101,7 @@ namespace SEE.DataModel.DG.IO
             p.End();
             Debug.Log("Number of graphs loaded: " + graphs.Count + "\n");
         }
+
+
     }
 }

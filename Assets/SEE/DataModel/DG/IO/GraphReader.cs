@@ -60,7 +60,7 @@ namespace SEE.DataModel.DG.IO
                                            filename, rootName);
                     Node singleRoot = new Node
                     {
-                        Type = rootName,
+                        Type = "ROOT",
                         ID = rootName,
                         SourceName = rootName
                     };
@@ -72,8 +72,7 @@ namespace SEE.DataModel.DG.IO
                 }
             }
             // After having the complete hierarchy, we can calculate the node levels.
-            graph.CalculateLevels();
-            graph.FinalizeGraph();
+            graph.FinalizeNodeHierarchy();
         }
 
         /// <summary>

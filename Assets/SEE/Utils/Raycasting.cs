@@ -24,7 +24,7 @@ namespace SEE.Utils
             bool result = false;
 
             raycastHit = new RaycastHit();
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
             if (!IsMouseOverGUI()
                 && Physics.Raycast(ray, out RaycastHit hit)
                 && hit.transform.GetComponent<NodeRef>() != null)
@@ -32,7 +32,6 @@ namespace SEE.Utils
                 raycastHit = hit;
                 result = true;
             }
-
             return result;
         }
 
@@ -42,8 +41,7 @@ namespace SEE.Utils
         /// <returns>Whether the mouse currently hovers over a GUI element.</returns>
         public static bool IsMouseOverGUI()
         {
-            bool result = UnityEngine.Object.FindObjectOfType<EventSystem>().IsPointerOverGameObject();
-            return result;
+            return UnityEngine.Object.FindObjectOfType<EventSystem>().IsPointerOverGameObject();
         }
     }
 }

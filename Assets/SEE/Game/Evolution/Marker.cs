@@ -80,6 +80,8 @@ namespace SEE.Game.Evolution
         /// <returns>the resulting post</returns>
         private GameObject MarkByPost(GameObject block, CubeFactory postFactory)
         {
+            // The marker should be drawn in front of the block, hence, its render
+            // queue offset must be greater than the one of the block.
             GameObject post = postFactory.NewBlock(0, block.GetRenderQueue() + 1);
 
             // FIXME: These kinds of posts make sense only for leaf nodes.

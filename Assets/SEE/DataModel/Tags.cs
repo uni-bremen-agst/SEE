@@ -25,6 +25,7 @@ namespace SEE.DataModel
         // for visualization of dynamic execution
         public const string Runtime = "Runtime";
         public const string FunctionCall = "Function Call";
+        public const string JLGVisualization = "JLG Visualization";
 
         // for culling
         public const string CullingPlane = "CullingPlane"; // for a plane where code cities can be put on and be moved around with culling
@@ -35,12 +36,16 @@ namespace SEE.DataModel
         public const string Chart = "Chart"; // for a metric chart
         public const string PowerBeam = "PowerBeam"; // For power beams
 
+        // for game objects representing a UI element
+        public static string UI = "UI";
+
         /// <summary>
         /// All existing tags in one.
         /// </summary>
         public static readonly string[] All = new string[]
             { Graph, Node, Edge, NodePrefab, Text, Erosion, Decoration,
-              Path, Runtime, FunctionCall, CullingPlane, ChartContainer, Chart };
+              Path, Runtime, FunctionCall, CullingPlane, ChartContainer, Chart,
+              JLGVisualization};
 
         /// <summary>
         /// Returns any descendant (transitive children of <paramref name="gameObject"/> including

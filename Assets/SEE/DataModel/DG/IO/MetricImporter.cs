@@ -6,12 +6,10 @@ using UnityEngine;
 namespace SEE.DataModel.DG.IO
 {
     /// <summary>
-    /// Imports node metrics from files into the graph.
+    /// Imports node metrics from CSV files into the graph.
     /// </summary>
-    public class MetricImporter
+    public class MetricImporter : MetricsIO
     {
-        public const string IDColumnName = "ID";
-
         /// <summary>
         /// Loads node metric values from given CSV file with given separator.
         /// The file must contain a header with the column names. The first column
@@ -35,7 +33,7 @@ namespace SEE.DataModel.DG.IO
         /// <param name="filename">CSV file from which to import node metrics</param>
         /// <param name="separator">used to separate column entries</param>
         /// <returns>the number of errors</returns>
-        public static int Load(Graph graph, string filename, char separator = ';')
+        public static int Load(Graph graph, string filename, char separator = ';', bool aggregate = true)
         {
             if (!File.Exists(filename))
             {
@@ -94,7 +92,7 @@ namespace SEE.DataModel.DG.IO
                                             if (values[i].Contains("."))
                                             {
                                                 float value = float.Parse(values[i], CultureInfo.InvariantCulture);
-                                                node.SetFloat(columnNames[i], value);
+                                                node.SetFloat(columnNames[i], value);                                               
                                             }
                                             else
                                             {
@@ -121,7 +119,7 @@ namespace SEE.DataModel.DG.IO
                                 }
                                 else
                                 {
-                                    Debug.LogErrorFormat("Unknown node {0} in file {1} at line {2}.\n", columnNames[0], filename, lineCount);
+                                    Debug.LogErrorFormat("Unknown node {0} in file {1} at line {2}.\n", values[0], filename, lineCount);
                                     numberOfErrors++;
                                 }
                                 lineCount++;
@@ -135,7 +133,7 @@ namespace SEE.DataModel.DG.IO
                     }
                 }
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 Debug.LogErrorFormat("Exception {0} while loading data from CSV file {1}.\n", e.Message, filename);
                 throw e;
