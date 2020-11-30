@@ -99,17 +99,16 @@ public class CityRestorer
     /// <param name="jsonFile">the .json-file with the settings for the city</param>
     /// <param name="oldNodeTypes>a dictionary of the stored nodeTypes</param>
     /// <param name="newNodes> the city, which has to be overwritten</param>
-    /// <returns> nothing, except a DebugLog to inform the user in case of any changes regarding the nodetypes.
     private static void DifferentNodeTypes(Dictionary<string, bool> oldNodeTypes, string jsonFile, List<string> newNodes, AbstractSEECity city)
     {
         List<string> oldNodes = oldNodeTypes.Keys.ToList();
         List<string> deletedNodeTypes = new List<string>();
         List<string> addedNodeTypes = new List<string>();
-        string differentNodeTypes = "";
 
         deletedNodeTypes = oldNodes.Except(newNodes).ToList();
         addedNodeTypes = newNodes.Except(oldNodes).ToList();
 
+        //shows deleted Node-Types
        if(deletedNodeTypes.Count > 0)
         {
             string deletedOutput = "";
@@ -121,6 +120,7 @@ public class CityRestorer
             deletedOutput = deletedOutput.Substring(0, deletedOutput.Length - 1);
             UnityEngine.Debug.Log("Deleted Nodetypes in the .gxl-file since saving your settings: " + deletedOutput + "\n");
         }
+        //shows added Node-Types
         if (addedNodeTypes.Count > 0)
         {
             string addedOutput = "";
@@ -132,66 +132,13 @@ public class CityRestorer
             addedOutput = addedOutput.Substring(0, addedOutput.Length - 1);
             UnityEngine.Debug.Log("Added Nodetypes in the .gxl-file since saving your settings: " + addedOutput + "\n");
         }
-        if(deletedNodeTypes.Count == 0 && addedNodeTypes.Count == 0)
+        //if there are no changes, this message will be shown
+        if (deletedNodeTypes.Count == 0 && addedNodeTypes.Count == 0)
         {
             UnityEngine.Debug.Log("Nothing changed in the .gxl-file since saving your settings\n");
         }
     }
 
-
-    /// <summary>
-    /// Returns the pathPrefixes  saved in the .json File
-    /// </summary>
-    /// <param name="jsonFile">the .json-file with the settings and the exact pathPrefix of the saved city</param>
-    /// <param name="newNodes> the city, which has to be overwritten</param>
-    /// <returns>  
-  /*  private static string GetPathPrefixFromJSON(string jsonFile)
-    {
-        string pathPrefix = "";
-        StreamReader sr = new StreamReader(jsonFile);
-        while (!(sr.ReadLine() == null))
-        {
-            string firstLine = sr.ReadLine();
-            string secondLine = sr.ReadLine();
-            
-
-            if ((secondLine != null) && (secondLine.Contains("pathPrefix")))
-            {
-                UnityEngine.Debug.Log("found second line");
-                pathPrefix = OutputAndFormatDirectoryString(secondLine);
-            } 
-                    
-            if ((firstLine != null) && (firstLine.Contains("pathPrefix")))
-            {
-                pathPrefix = OutputAndFormatDirectoryString(firstLine);
-                UnityEngine.Debug.Log("found second line");
-            }         
-        }
-        return pathPrefix;
-    }
-    */
-  
-    /// <summary>
-    /// Adds new Nodetypes to the current version of the city- if not already stored.
-    /// </summary>
-    /// <param name="city">the current city</param>
-    /// <param name="newNodeTypes"> A list of strings which are added to the Dictionary SelectedNodetypes - the types are per default selected, thus "true" </param>
-    /// <returns>  
-    private static void AddNodeTypes(AbstractSEECity city, List<string> newNodeTypes)
-    {
-        
-        if(newNodeTypes != null)
-        {
-            foreach (string node in newNodeTypes)
-            {
-                if (!(city.SelectedNodeTypes.Keys.Contains(node)))
-                {
-                    city.SelectedNodeTypes.Add(node, true);
-                }
-            }
-        } 
-        
-    }
 
     /// <summary>
     /// Reloads the graph - and thus the nodetypes - depending on the objecttype of the specific AbstractSEECity object.
@@ -218,21 +165,5 @@ public class CityRestorer
             }
             return false; 
         }
-    }
-
-    /// <summary>
-    /// Cuts and formats a given string into a string which contains the directory of the stored .gxl File
-    /// </summary>
-    /// <param name="line">A line from the .json file which contains a directory</param>
-    /// <returns> the name of specific directory
-    private static string OutputAndFormatDirectoryString(string line)
-    {
-        UnityEngine.Debug.Log("line ist " + line);
-        //Whether the string is null or not has already been tested before
-        StringBuilder sb = new StringBuilder(line);
-        sb.Remove(0, 19);
-        sb.Remove((sb.Length - 2), 2);
-        sb.Append("\\");
-        return sb.ToString();
     }
 }
