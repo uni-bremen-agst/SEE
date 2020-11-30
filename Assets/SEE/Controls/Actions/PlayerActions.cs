@@ -91,8 +91,8 @@ namespace SEE.Controls.Actions
                             bool is_innerNode = false; //FIXME: Change it later into the selection of the sub menu 
                             node = DesktopNewNodeAction.NewNode(is_innerNode, city);
                             //Vector3 mp = Input.mousePosition;
-                             //   mp= Utils.MainCamera.Camera.WorldToScreenPoint(mp);
-                            //node.transform.position = new Vector3(mp.x, 1 , mp.z);
+                            //mp= Utils.MainCamera.Camera.ScreenToWorldPoint(mp)
+                           // node.transform.position = new Vector3(1,1,1);
                         }
 
                         if (Time.time > coolDown && DesktopNewNodeAction.Place())
@@ -109,6 +109,8 @@ namespace SEE.Controls.Actions
                                     GameNodeMover.FinalizePosition(node);
                                     city.LoadedGraph.FinalizeNodeHierarchy();
                                     DesktopNewNodeAction.ScaleNode(node);
+                                    //city.SaveData();
+                                   // city.ReDrawGraph();
                                 }
                                 else
                                 {
