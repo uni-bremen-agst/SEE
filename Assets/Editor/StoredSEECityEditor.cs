@@ -136,9 +136,7 @@ namespace SEEEditor
             {
                 savingDirectory = pathPrefix.stringValue;
             }
-            UnityEngine.Debug.Log(fileName);
             string exportPath = Filenames.OnCurrentPlatform(EditorUtility.SaveFilePanel("Select saving directory", savingDirectory, fileName , "json"));
-            UnityEngine.Debug.Log("Chosen exportpath = " + exportPath);
             if (exportPath != "")
             {
                 savingDirectory = exportPath;
