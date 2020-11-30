@@ -42,8 +42,10 @@ public class CityRestorer
         {
             return; 
         }
-        string pathPrefixOfCity = GetPathPrefixFromJSON(importFilename);
-        UnityEngine.Debug.Log("path ist " + pathPrefixOfCity);
+        AbstractSEECity city2 = city;
+        JsonUtility.FromJsonOverwrite(jsonContent, city2);
+        string pathPrefixOfCity = city2.PathPrefix;
+        UnityEngine.Debug.Log("path aus der city2 ist " + city2.PathPrefix);
         if (!(Directory.Exists(pathPrefixOfCity)))
         {
             return;
@@ -74,10 +76,15 @@ public class CityRestorer
     /// <returns>true, if the types are matching, otherwise false</returns>
     private static bool VerifyCityType(AbstractSEECity city, string jsonContent)
     {
-        if ((jsonContent.Contains("isAnSEECityObject") && city is SEECity) || (jsonContent.Contains("isAnSEECityEvolutionObject") && city is SEECityEvolution))
+        if (jsonContent.Contains("isAnSEECityObject") && city is SEECity)
         {
           UnityEngine.Debug.Log("Loaded successfully\n");
           return true;
+        }
+        if(jsonContent.Contains("isAnSEECityEvolutionObject") && city is SEECityEvolution)
+        {
+            UnityEngine.Debug.Log("Loaded successfully\n");
+            return true;
         }
         else
         {
@@ -96,66 +103,38 @@ public class CityRestorer
     private static void DifferentNodeTypes(Dictionary<string, bool> oldNodeTypes, string jsonFile, List<string> newNodes, AbstractSEECity city)
     {
         List<string> oldNodes = oldNodeTypes.Keys.ToList();
-        List<string> intermediateResults = new List<string>();
-        List<string> finalResults = new List<string>();
+        List<string> deletedNodeTypes = new List<string>();
+        List<string> addedNodeTypes = new List<string>();
         string differentNodeTypes = "";
 
-        intermediateResults = oldNodes.Except(newNodes).ToList();
-        finalResults = newNodes.Except(oldNodes).ToList();
+        deletedNodeTypes = oldNodes.Except(newNodes).ToList();
+        addedNodeTypes = newNodes.Except(oldNodes).ToList();
 
-        // In order to build the "real" difference between the stored parameters and the current one , we have to remove the duplicates.
-        // and concatenate the result afterwards in the list finalResults.
-        // The result will show if either there are new nodetypes in the latest version of the specific city or 
-        // if there are nodetypes stored which are not in the current version of the Evolutioncity anymore.
-
-        finalResults = finalResults.Concat(intermediateResults).ToList();
-
-        // Depending on the actual amount of difference, three cases are possible:
-        // First case = There are no differenct objects, thus we can break instantly
-        // Second case = There is only one object, so it is possible to print out the result instantly and break.
-        // Third case = There are more then two objects which have changed and we have to enumerate them and consequently cut the string for the 
-        // printing-log to get a neat output for the user.
-
-        // First case
-        if (finalResults.Count == 0)
+       if(deletedNodeTypes.Count > 0)
         {
-            UnityEngine.Debug.Log("There have not been added any new nodytpes added since you saved your profile" + "\n");
-            return;
+            string deletedOutput = "";
+
+            foreach(string nodeType in deletedNodeTypes)
+            {
+                deletedOutput += nodeType + ",";
+            }
+            deletedOutput = deletedOutput.Substring(0, deletedOutput.Length - 1);
+            UnityEngine.Debug.Log("Deleted Nodetypes in the .gxl-file since saving your settings: " + deletedOutput + "\n");
         }
-        // Second case
-        else if (finalResults.Count == 1)
+        if (addedNodeTypes.Count > 0)
         {
-            if (intermediateResults.Count == 1)
+            string addedOutput = "";
+
+            foreach (string nodeType in addedNodeTypes)
             {
-                UnityEngine.Debug.Log("Since you had saved your profile the following Nodetype was been deleted in the meantime :\n" + finalResults.First());
-                return;
+                addedOutput += nodeType + ",";
             }
-            if (newNodes.Count > oldNodes.Count && finalResults.Count == 1)
-            {
-                AddNodeTypes(city,finalResults);
-                UnityEngine.Debug.Log("Since you had saved your profile the following Nodetype was added in the meantime :\n" + finalResults.First());
-                return;
-            }
-            else
-            {
-                UnityEngine.Debug.Log("There have not been added any new nodytpes added since you saved your profile" + "\n");
-                return;
-            }
+            addedOutput = addedOutput.Substring(0, addedOutput.Length - 1);
+            UnityEngine.Debug.Log("Added Nodetypes in the .gxl-file since saving your settings: " + addedOutput + "\n");
         }
-        // Third case
-        else
+        if(deletedNodeTypes.Count == 0 && addedNodeTypes.Count == 0)
         {
-            foreach (string str in finalResults)
-            {
-                AddNodeTypes(city, finalResults);
-                differentNodeTypes += str + ",";
-            }
-            StringBuilder sb = new StringBuilder(differentNodeTypes);
-            if (sb.Length > 0)
-            {
-                sb.Remove(sb.Length - 1, 1);
-            }
-            UnityEngine.Debug.Log("Since you saved your profile and today the following Nodetypes have changed :\n" + sb.ToString());
+            UnityEngine.Debug.Log("Nothing changed in the .gxl-file since saving your settings\n");
         }
     }
 
@@ -166,7 +145,7 @@ public class CityRestorer
     /// <param name="jsonFile">the .json-file with the settings and the exact pathPrefix of the saved city</param>
     /// <param name="newNodes> the city, which has to be overwritten</param>
     /// <returns>  
-    private static string GetPathPrefixFromJSON(string jsonFile)
+  /*  private static string GetPathPrefixFromJSON(string jsonFile)
     {
         string pathPrefix = "";
         StreamReader sr = new StreamReader(jsonFile);
@@ -190,7 +169,8 @@ public class CityRestorer
         }
         return pathPrefix;
     }
-
+    */
+  
     /// <summary>
     /// Adds new Nodetypes to the current version of the city- if not already stored.
     /// </summary>
