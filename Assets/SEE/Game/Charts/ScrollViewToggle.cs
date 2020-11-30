@@ -122,6 +122,14 @@ namespace SEE.Game.Charts
         private void OnDestroy()
         {
             OnPointerExit(null);
+
+            if (linkedInteractable)
+            {
+                linkedInteractable.HoverIn -= OnHoverIn;
+                linkedInteractable.HoverOut -= OnHoverOut;
+                linkedInteractable.SelectIn -= OnSelectIn;
+                linkedInteractable.SelectOut -= OnSelectOut;
+            }
         }
 
         private static bool toggleParents = true;
@@ -136,7 +144,11 @@ namespace SEE.Game.Charts
             if (linkedObject)
             {
                 linkedObject.showInChart[_chartContent] = toggle.isOn;
-                _chartContent.nodeRefToChartMarkerDict[linkedInteractable.GetComponent<NodeRef>()].UpdateInfoText();
+                NodeRef nodeRef = linkedInteractable.GetComponent<NodeRef>();
+                if (nodeRef && _chartContent.nodeRefToChartMarkerDict.TryGetValue(nodeRef, out ChartMarker chartMarker))
+                {
+                    chartMarker.UpdateInfoText();
+                }
             }
 
             // Propagate changes through parents
