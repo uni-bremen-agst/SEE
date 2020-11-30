@@ -9,40 +9,40 @@ namespace SEE.Game.Evolution
     {
 
         /// <summary>
-        /// Newly created nodes beam color
+        /// Color given to power beams of newly added nodes, inherits from inspector (default grey)
         /// </summary>
         public static Color newBeamColor;
 
         /// <summary>
-        /// Newly created nodes beam color to be shown in inspector
+        /// Color for power beams of newly added nodes, can be set in inspector
         /// </summary>
         [Tooltip("Changes the color the beam of newly created nodes")]
-        public Color NewBeamColor;
+        public Color InspectorNewBeamColor;
 
         /// <summary>
-        /// Changed nodes beam color
+        /// Changed nodes beam color, inherits from inspector variable
         /// </summary>
         public static Color changedBeamColor;
 
         /// <summary>
-        /// Changed nodes beam color to be shown in inspector
+        /// Changed nodes beam color to be pickable in inspector
         /// </summary>
         [Tooltip("Changes the color of the beam of changed nodes")]
-        public Color ChangedBeamColor;
+        public Color InspectorChangedBeamColor;
 
         /// <summary>
-        /// Deleted nodes beam color
+        /// Deleted nodes beam color, inherits from inspector variable
         /// </summary>
         public static Color deletedBeamColor;
 
         /// <summary>
-        /// Deleted nodes beam color to be shown in inspector
+        /// Deleted nodes beam color to be pickable in inspector
         /// </summary>
         [Tooltip("Sets the color the beam of deleted nodes will have")]
-        public Color DeletedBeamColor;
+        public Color InspectorDeletedBeamColor;
 
         /// <summary>
-        /// Dimensions of power beams
+        /// Dimensions of power beams, inherits from inspector variable
         /// </summary>
         public static Vector3 powerBeamDimensions;
 
@@ -50,16 +50,17 @@ namespace SEE.Game.Evolution
         /// Dimensions of power beams to be shown in inspector
         /// </summary>
         [Tooltip("Sets the width/height of power beams")]
-        public Vector3 PowerBeamDimensions;
+        public Vector3 InspectorPowerBeamDimensions;
 
         void Awake()
         {
-            Debug.Log("Called awake. New beam color: " + NewBeamColor + " changed: " + ChangedBeamColor );
-            newBeamColor = NewBeamColor;
-            changedBeamColor = ChangedBeamColor;
-            deletedBeamColor = DeletedBeamColor;
-            powerBeamDimensions = PowerBeamDimensions;
-            float beamX = 0.02f, beamY = 3f, beamZ =  0.02f;
+            newBeamColor = InspectorNewBeamColor;
+            changedBeamColor = InspectorChangedBeamColor;
+            deletedBeamColor = InspectorDeletedBeamColor;
+            powerBeamDimensions = InspectorPowerBeamDimensions;
+            float beamX = 0.02f;
+            float beamY = 3f;
+            float beamZ = 0.02f;
             if (powerBeamDimensions.x <= beamX)
             {
                 powerBeamDimensions = new Vector3(beamX, powerBeamDimensions.y, powerBeamDimensions.z);

@@ -132,12 +132,12 @@ namespace SEE.Game.Evolution
             {
                 // Changes the modified object's color to blue while animating
                 gameObject.GetComponent<Renderer>().material.color = Color.blue;
-                // Refetch values, neccessary because this gets loaded before other script
+                // Refetch values, neccessary because this gets loaded before other scripts
                 NewNodeBeamColor = AdditionalBeamDetails.newBeamColor;
                 ChangedNodeBeamColor = AdditionalBeamDetails.changedBeamColor;
                 NodeBeamDimensions = AdditionalBeamDetails.powerBeamDimensions;
                 // Create a new power beam
-                BeamAnimator.GetInstace().CreatePowerBeam(position, ChangedNodeBeamColor, NodeBeamDimensions);
+                BeamAnimator.GetInstance().CreatePowerBeam(position, ChangedNodeBeamColor, NodeBeamDimensions);
 
                 if (mustCallBack)
                 {
@@ -171,7 +171,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         public static void DeletePowerBeams()
         {
-            BeamAnimator.GetInstace().ClearPowerBeams();
+            BeamAnimator.GetInstance().ClearPowerBeams();
         }
 
         /// <summary>
@@ -181,7 +181,7 @@ namespace SEE.Game.Evolution
         {
 
             /// <summary>
-            /// Adds power beams above gameObjects that have been changed
+            /// Adds power beam above gameObject that has been changed
             /// <param name="position">Position of the parent gameObject</param>
             /// <param name="beamColor">Color of the power beam to create</param>
             /// </summary>
@@ -189,58 +189,48 @@ namespace SEE.Game.Evolution
             {
                 // Generate power beam above updated objects
                 GameObject powerBeam = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                powerBeam.tag = "PowerBeam";
+                GameObject.DestroyImmediate(powerBeam.GetComponent<Collider>());
+                powerBeam.tag = DataModel.Tags.PowerBeam;
+                Renderer powerBeamRenderer = powerBeam.GetComponent<Renderer>();
                 powerBeam.transform.localScale = new Vector3(NodeBeamDimensions.x, 0, NodeBeamDimensions.z);
-                BeamAnimator.GetInstace().BeamHeight = NodeBeamDimensions.y;
-                powerBeam.transform.position = new Vector3(position.x, position.y, position.z);
+                BeamAnimator.GetInstance().BeamHeight = NodeBeamDimensions.y;
+                powerBeam.transform.position = position;
                 // Change power beam material color
-                powerBeam.GetComponent<Renderer>().material.color = beamColor;
+                powerBeamRenderer.material.color = beamColor;
                 // Set power beam material to emissive
-                powerBeam.GetComponent<Renderer>().material.EnableKeyword("_EMISSION");
+                powerBeamRenderer.material.EnableKeyword("_EMISSION");
                 Color emissionColor = beamColor * 7f;
-                powerBeam.GetComponent<Renderer>().material.SetColor("_EmissionColor", emissionColor);
+                powerBeamRenderer.material.SetColor("_EmissionColor", emissionColor);
                 // Remove power beam shadow
-                powerBeam.GetComponent<Renderer>().receiveShadows = false;
-                powerBeam.GetComponent<Renderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-                BeamAnimator.GetInstace().AddPowerBeam(powerBeam);
+                powerBeamRenderer.receiveShadows = false;
+                powerBeamRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                BeamAnimator.GetInstance().AddPowerBeam(powerBeam);
                 powerBeam.AddComponent<BeamAnimatorExecuter>();
             }
 
             /// <summary>
             /// Singleton instance
             /// </summary>
-            private static BeamAnimator singleton = null;
+            private static BeamAnimator Instance = null;
 
             /// <summary>
             /// Get the singleton instance
             /// </summary>
-            public static BeamAnimator GetInstace()
+            public static BeamAnimator GetInstance()
             {
-                if (singleton == null)
+                if (Instance == null)
                 {
-                    singleton = new BeamAnimator();
+                    Instance = new BeamAnimator();
                 }
-                return singleton;
+                return Instance;
             }
-
-            /// <summary>
-            /// Power beam height
-            /// </summary>
-            private float beamHeight;
 
             /// <summary>
             /// Power beam height getter/setter
             /// </summary>
             public float BeamHeight
             {
-                get
-                {
-                    return this.beamHeight;
-                }
-                set
-                {
-                    this.beamHeight = value;
-                }
+                get; set;
             }
 
             /// <summary>
@@ -249,36 +239,51 @@ namespace SEE.Game.Evolution
             private List<GameObject> powerBeams = new List<GameObject>();
 
             /// <summary>
-            /// Power beams that have been removed, get aniamted while disappearing
+            /// Power beams that have been removed, get animated while disappearing
             /// </summary>
             private GameObject[] removedBeams = new GameObject[0];
+
+            /// <summary>
+            /// Deleted power beams, updated whenever Update is called
+            /// </summary>
+            private List<GameObject> deletedBeams = new List<GameObject>();
+
+            /// <summary>
+            /// Beam appearing magic constant
+            /// </summary>
+            private const float appearingMagicNumber = 0.0025f;
+
+            /// <summary>
+            /// Beam disappearing magic number
+            /// </summary>
+            private const float disappearingMagicNumber = 0.0005f;
 
             /// <summary>
             /// Animation update function
             /// </summary>
             public void Update()
             {
-                List<GameObject> deletedBeams = new List<GameObject>();
+                deletedBeams.Clear();
 
-                if (beamHeight <= 0)
+                if (BeamHeight <= 0)
                 {
-                    beamHeight = 3f;
+                    BeamHeight = 3f;
                 }
                 // Animate new power beams
                 foreach (GameObject beam in powerBeams)
                 {
-                    if (beam.transform.localScale.y < beamHeight)
+                    if (beam.transform.localScale.y < BeamHeight)
                     {
-                        beam.transform.localScale = new Vector3(beam.transform.localScale.x, beam.transform.localScale.y + 0.0025f, beam.transform.localScale.z);
-                        beam.transform.position = new Vector3(beam.transform.position.x, beam.transform.position.y + 0.0025f, beam.transform.position.z);
+                        beam.transform.localScale = new Vector3(beam.transform.localScale.x, beam.transform.localScale.y + appearingMagicNumber, beam.transform.localScale.z);
+                        beam.transform.position = new Vector3(beam.transform.position.x, beam.transform.position.y + appearingMagicNumber, beam.transform.position.z);
                     }
                     else
                     {
                         deletedBeams.Add(beam);
                     }
                 }
-                for (int i = 0; i < deletedBeams.Count; i++) {
-                    powerBeams.Remove(deletedBeams[i]);
+                foreach (GameObject beam in deletedBeams) {
+                    powerBeams.Remove(beam);
                 }
                 // Animate deleted power beams
                 foreach (GameObject deleted in removedBeams)
@@ -287,8 +292,8 @@ namespace SEE.Game.Evolution
                     {
                         if (deleted.transform.localScale.y > 0f)
                         {
-                            deleted.transform.localScale = new Vector3(deleted.transform.localScale.x, deleted.transform.localScale.y - 0.005f, deleted.transform.localScale.z);
-                            deleted.transform.position = new Vector3(deleted.transform.position.x, deleted.transform.position.y - 0.005f, deleted.transform.position.z);
+                            deleted.transform.localScale = new Vector3(deleted.transform.localScale.x, deleted.transform.localScale.y - disappearingMagicNumber, deleted.transform.localScale.z);
+                            deleted.transform.position = new Vector3(deleted.transform.position.x, deleted.transform.position.y - disappearingMagicNumber, deleted.transform.position.z);
                         }
                         else
                         {
@@ -303,7 +308,7 @@ namespace SEE.Game.Evolution
             /// </summary>
             public void ClearPowerBeams()
             {
-                removedBeams = GameObject.FindGameObjectsWithTag("PowerBeam");
+                removedBeams = GameObject.FindGameObjectsWithTag(DataModel.Tags.PowerBeam);
                 powerBeams.Clear();
             }
 
@@ -323,14 +328,9 @@ namespace SEE.Game.Evolution
         class BeamAnimatorExecuter : MonoBehaviour
         {
 
-            private void Awake()
-            {
-                BeamAnimator.GetInstace();
-            }
-
             private void Update()
             {
-                BeamAnimator.GetInstace().Update();
+                BeamAnimator.GetInstance().Update();
             }
         }
     }

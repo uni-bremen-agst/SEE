@@ -103,7 +103,8 @@ namespace SEE.Game.Evolution
             post.transform.SetParent(block.transform, true);
 
             // Render new node power beam
-            MoveScaleShakeAnimator.BeamAnimator.GetInstace().CreatePowerBeam(new Vector3(position.x,block.transform.position.y,position.z),
+            Vector3 powerBeamDimensions = new Vector3(position.x, block.transform.position.y, position.z);
+            MoveScaleShakeAnimator.BeamAnimator.GetInstance().CreatePowerBeam(powerBeamDimensions,
                 AdditionalBeamDetails.newBeamColor, AdditionalBeamDetails.powerBeamDimensions);
 
             return post;
