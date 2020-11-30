@@ -12,7 +12,7 @@ namespace SEE.GO
         /// <summary>
         /// Color of the text.
         /// </summary>
-        private static readonly Color TextColor = Color.gray; // Color.white;
+        private static readonly Color TextColorDefault = Color.black;
         private const string PortalFontName = "Fonts & Materials/LiberationSans SDF - Portal";
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace SEE.GO
         /// <param name="fontSize">the size of the font with which the text is drawn</param>
         /// <param name="lift">if true, the text will be lifted up by its extent; that is, its y position is actually
         /// the bottom line (position.y + extents.y)</param>
-        /// <param name="textColor">the color of the text (default: light gray)</param>
+        /// <param name="textColor">the color of the text (default: black)</param>
         /// <returns>the game object representing the text</returns>
         public static GameObject GetTextWithSize(string text, Vector3 position, float fontSize, bool lift = true, 
             Color? textColor = null)
@@ -55,7 +55,7 @@ namespace SEE.GO
         /// the text width); the font size will be chosen appropriately</param>
         /// <param name="lift">if true, the text will be lifted up by its extent; that is, its y position is actually
         /// the bottom line (position.y + extents.y)</param>
-        /// <param name="textColor">the color of the text (default: light gray)</param>
+        /// <param name="textColor">the color of the text (default: <see cref="TextColorDefault"/>)</param>
         /// <returns>the game object representing the text</returns>
         public static GameObject GetTextWithWidth(string text, Vector3 position, float width, bool lift = true, 
             Color? textColor = null)
@@ -105,7 +105,7 @@ namespace SEE.GO
             tm = result.AddComponent<TextMeshPro>();
             tm.font = Resources.Load<TMP_FontAsset>(PortalFontName);
             tm.text = text;
-            tm.color = textColor ?? TextColor;
+            tm.color = textColor ?? TextColorDefault;
             tm.alignment = TextAlignmentOptions.Center;
         }
 

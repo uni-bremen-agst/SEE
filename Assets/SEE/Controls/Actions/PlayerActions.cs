@@ -1,4 +1,5 @@
 ﻿using SEE.Game;
+using SEE.Game.Charts;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -40,6 +41,16 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
+<<<<<<< HEAD
+=======
+            // If the local player presses U, we deselect all currently selected interactable objects.
+            if (Input.GetKeyDown(KeyCode.U))
+            {
+                InteractableObject.UnselectAll(true);
+                ChartManager.Instance.UnselectAll();
+            }
+
+>>>>>>> origin/master
             switch (state)
             {
                 case State.MoveNode:
