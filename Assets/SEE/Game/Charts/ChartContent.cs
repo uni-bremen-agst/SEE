@@ -261,8 +261,6 @@ namespace SEE.Game.Charts
         {
             Performance p = Performance.Begin("FillScrollViewAsTree");
 
-            nodeRefToChartMarkerDict.Clear();
-
             int index = 0;
             int hierarchy = 0;
             int maxHierarchy = 0;
@@ -273,13 +271,12 @@ namespace SEE.Game.Charts
                 {
                     return entry.node.ID.Equals(root.ID);
                 });
-                GameObject tempObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-                tempObject.name = "ScrollViewToggle: " + rootNodeRef.node.SourceName;
-                ScrollViewToggle rootToggle = tempObject.GetComponent<ScrollViewToggle>();
+                GameObject scrollViewToggleGameObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
+                scrollViewToggleGameObject.name = "ScrollViewToggle: " + rootNodeRef.node.SourceName;
+                ScrollViewToggle rootToggle = scrollViewToggleGameObject.GetComponent<ScrollViewToggle>();
                 rootToggle.LinkedObject = rootNodeRef.highlights;
                 rootNodeRef.highlights.scrollViewToggle = rootToggle;
-                nodeRefToChartMarkerDict.Add(rootNodeRef, tempObject.GetComponent<ChartMarker>());
-                tempObject.transform.localPosition = headerOffset + new Vector2(0f, _yGap) * index;
+                scrollViewToggleGameObject.transform.localPosition = headerOffset + new Vector2(0f, _yGap) * index;
                 rootToggle.Initialize(root.SourceName, this);
                 if (hierarchy > maxHierarchy)
                 {
@@ -326,23 +323,23 @@ namespace SEE.Game.Charts
             if (root.IsInnerNode())
             {
                 hierarchy++;
-                foreach (Node child in root.Children())
+                foreach (Node childNode in root.Children())
                 {
-                    NodeRef inScene = _dataObjects.First(entry =>
+                    NodeRef childNodeRef = _dataObjects.First(entry =>
                     {
-                        return entry.node.ID.Equals(child.ID);
+                        return entry.node.ID.Equals(childNode.ID);
                     });
                     GameObject scrollViewToggleGameObject = Instantiate(scrollEntryPrefab, scrollContent.transform);
-                    scrollViewToggleGameObject.name = "ScrollViewToggle: " + inScene.node.SourceName;
+                    scrollViewToggleGameObject.name = "ScrollViewToggle: " + childNodeRef.node.SourceName;
                     ScrollViewToggle scrollViewToggle = scrollViewToggleGameObject.GetComponent<ScrollViewToggle>();
                     scrollViewToggle.Parent = parentToggle;
-                    scrollViewToggle.LinkedObject = inScene.highlights;
-                    inScene.highlights.scrollViewToggle = scrollViewToggle;
+                    scrollViewToggle.LinkedObject = childNodeRef.highlights;
+                    childNodeRef.highlights.scrollViewToggle = scrollViewToggle;
                     scrollViewToggleGameObject.transform.localPosition = childOffset + new Vector2(_xGap, 0f) * hierarchy + new Vector2(0f, _yGap) * index++;
-                    scrollViewToggle.Initialize(child.SourceName, this);
+                    scrollViewToggle.Initialize(childNode.SourceName, this);
                     parentToggle.AddChild(scrollViewToggle);
                     int tempHierarchy = hierarchy;
-                    CreateChildToggles(child, scrollViewToggle, ref index, ref tempHierarchy);
+                    CreateChildToggles(childNode, scrollViewToggle, ref index, ref tempHierarchy);
                 }
             }
         }
