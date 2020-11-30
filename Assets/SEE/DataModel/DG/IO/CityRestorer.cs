@@ -1,15 +1,10 @@
-﻿using System.Collections;
+﻿
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System.Text;
-using SEE.DataModel.DG.IO;
 using SEE.Game;
-using SEE.Utils;
 using System.Linq;
-using System.Diagnostics;
-using System.Dynamic;
-using Newtonsoft.Json;
 using System;
 using SEE.DataModel.DG;
 
@@ -42,42 +37,33 @@ public class CityRestorer
     /// <param name="city"> The city which is to be overwritten </param>
     public static void RestoreCity(string importFilename, AbstractSEECity city)
     {
-
-        //METHODE UMSCHREIBEN BOOL -- ERSTE ZEILE VerifyCityType() - sonst return - 
-        string pathPref = GetPathPrefix(importFilename);
-        if (!(Directory.Exists(pathPref)))
+        string jsonContent = File.ReadAllText(importFilename);
+        if (!(VerifyCityType(city, jsonContent)))
         {
-            //return false; 
+            return; 
         }
-
+        string pathPrefixOfCity = GetPathPrefixFromJSON(importFilename);
+        UnityEngine.Debug.Log("path ist " + pathPrefixOfCity);
+        if (!(Directory.Exists(pathPrefixOfCity)))
+        {
+            return;
+        }
 
         List<string> newNodeTypes = new List<string>(); 
-        UnityEngine.Debug.Log("path ist: " + pathPref);
-        if (city is SEECityEvolution)
-        {
-            SEECityEvolution evoCity = (SEECityEvolution)city;
-            city.pathPrefix = pathPref;
-            Graph graph = evoCity.LoadFirstGraph();
-            evoCity.InspectSchema(graph);
-            newNodeTypes = evoCity.SelectedNodeTypes.Keys.ToList();
-           
-        } else if (city is SEECity)
-        {
-            SEECity seeCity = (SEECity)city;
-            city.pathPrefix = pathPref;
-            Graph graph = seeCity.LoadedGraph;
-            newNodeTypes = seeCity.SelectedNodeTypes.Keys.ToList();
+        city.pathPrefix = pathPrefixOfCity;
+        if (!(ReloadGraphByCityType(city))){
+           return; 
         }
+        newNodeTypes = city.SelectedNodeTypes.Keys.ToList();
+         
+        
         // We have to store the current enumeration of the nodetypes of the current version in order to compare 
-        // it afterwards with the stored one.
+        // it afterwards with the stored one in the method DifferentNodeTypes
         // As the user picks the directory via a directory picker/ the GUI , no specific error handling is needed at this point.
-        string jsonContent = File.ReadAllText(importFilename);
-        if (VerifyCityType(city, jsonContent))
-        {
-            JsonUtility.FromJsonOverwrite(jsonContent, city);
-        }
+
+        JsonUtility.FromJsonOverwrite(jsonContent, city);
         Dictionary<string, bool> oldNodetypes = city.SelectedNodeTypes;
-         DifferentNodeTypes(oldNodetypes, jsonContent, newNodeTypes, city);
+        DifferentNodeTypes(oldNodetypes, jsonContent, newNodeTypes, city);
     }
 
     /// <summary>
@@ -86,22 +72,17 @@ public class CityRestorer
     /// <param name="city">the city, which has to be overwritten</param>
     /// <param name="jsonContent">the content of the .json-file as a string</param>
     /// <returns>true, if the types are matching, otherwise false</returns>
-    public static bool VerifyCityType(AbstractSEECity city, string jsonContent)
+    private static bool VerifyCityType(AbstractSEECity city, string jsonContent)
     {
-        if (jsonContent.Contains("isAnSEECityObject") && city is SEECity)
+        if ((jsonContent.Contains("isAnSEECityObject") && city is SEECity) || (jsonContent.Contains("isAnSEECityEvolutionObject") && city is SEECityEvolution))
         {
-            UnityEngine.Debug.Log("Loaded successfully\n");
-            return true;
-        }
-        if (jsonContent.Contains("isAnSEECityEvolutionObject") && city is SEECityEvolution)
-        {
-            UnityEngine.Debug.Log("Loaded successfully\n");
-            return true;
+          UnityEngine.Debug.Log("Loaded successfully\n");
+          return true;
         }
         else
         {
-            UnityEngine.Debug.LogErrorFormat("The types of the scene and the loaded .json-file are not matching\n");
-            return false;
+          UnityEngine.Debug.LogErrorFormat("The types of the scene and the loaded .json-file are not matching\n");
+          return false;
         }
     }
 
@@ -112,12 +93,12 @@ public class CityRestorer
     /// <param name="oldNodeTypes>a dictionary of the stored nodeTypes</param>
     /// <param name="newNodes> the city, which has to be overwritten</param>
     /// <returns> nothing, except a DebugLog to inform the user in case of any changes regarding the nodetypes.
-    public static void DifferentNodeTypes(Dictionary<string, bool> oldNodeTypes, string jsonFile, List<string> newNodes, AbstractSEECity city)
+    private static void DifferentNodeTypes(Dictionary<string, bool> oldNodeTypes, string jsonFile, List<string> newNodes, AbstractSEECity city)
     {
         List<string> oldNodes = oldNodeTypes.Keys.ToList();
         List<string> intermediateResults = new List<string>();
         List<string> finalResults = new List<string>();
-        string difference = "";
+        string differentNodeTypes = "";
 
         intermediateResults = oldNodes.Except(newNodes).ToList();
         finalResults = newNodes.Except(oldNodes).ToList();
@@ -144,14 +125,14 @@ public class CityRestorer
         // Second case
         else if (finalResults.Count == 1)
         {
-            if (oldNodes.Count == 1)
+            if (intermediateResults.Count == 1)
             {
                 UnityEngine.Debug.Log("Since you had saved your profile the following Nodetype was been deleted in the meantime :\n" + finalResults.First());
                 return;
             }
             if (newNodes.Count > oldNodes.Count && finalResults.Count == 1)
             {
-                AddNodeTypes(city, null, finalResults.First());
+                AddNodeTypes(city,finalResults);
                 UnityEngine.Debug.Log("Since you had saved your profile the following Nodetype was added in the meantime :\n" + finalResults.First());
                 return;
             }
@@ -166,10 +147,10 @@ public class CityRestorer
         {
             foreach (string str in finalResults)
             {
-                AddNodeTypes(city, finalResults, null);
-                difference += str + ",";
+                AddNodeTypes(city, finalResults);
+                differentNodeTypes += str + ",";
             }
-            StringBuilder sb = new StringBuilder(difference);
+            StringBuilder sb = new StringBuilder(differentNodeTypes);
             if (sb.Length > 0)
             {
                 sb.Remove(sb.Length - 1, 1);
@@ -185,42 +166,40 @@ public class CityRestorer
     /// <param name="jsonFile">the .json-file with the settings and the exact pathPrefix of the saved city</param>
     /// <param name="newNodes> the city, which has to be overwritten</param>
     /// <returns>  
-    public static String GetPathPrefix(string jsonFile)
+    private static string GetPathPrefixFromJSON(string jsonFile)
     {
         string pathPrefix = "";
         StreamReader sr = new StreamReader(jsonFile);
         while (!(sr.ReadLine() == null))
         {
-            string s = sr.ReadLine();
-            string t = sr.ReadLine();
+            string firstLine = sr.ReadLine();
+            string secondLine = sr.ReadLine();
+            
 
-            if ((t != null) && t.Contains("pathPrefix")) {
-                
-                StringBuilder sb = new StringBuilder(t);
-                sb.Remove(0,19);
-                sb.Remove((sb.Length - 2), 2);
-                sb.Append("\\");
-                pathPrefix = sb.ToString();
+            if ((secondLine != null) && (secondLine.Contains("pathPrefix")))
+            {
+                UnityEngine.Debug.Log("found second line");
+                pathPrefix = OutputAndFormatDirectoryString(secondLine);
             } 
                     
-              if ((s !=null) && (s.Contains("pathPrefix")))
-            {   
-                StringBuilder sb = new StringBuilder(s);
-                sb.Remove(0, 19);
-                sb.Remove((sb.Length-2),2);
-                sb.Append("\\");
-                pathPrefix = sb.ToString();
+            if ((firstLine != null) && (firstLine.Contains("pathPrefix")))
+            {
+                pathPrefix = OutputAndFormatDirectoryString(firstLine);
+                UnityEngine.Debug.Log("found second line");
             }         
         }
         return pathPrefix;
     }
-    public static void AddNodeTypes(AbstractSEECity city, List<string> newNodeTypes, string singleNodetype)
-    {
-        if(singleNodetype != null)
-        {
-            city.SelectedNodeTypes.Add(singleNodetype, true);
-        }
 
+    /// <summary>
+    /// Adds new Nodetypes to the current version of the city- if not already stored.
+    /// </summary>
+    /// <param name="city">the current city</param>
+    /// <param name="newNodeTypes"> A list of strings which are added to the Dictionary SelectedNodetypes - the types are per default selected, thus "true" </param>
+    /// <returns>  
+    private static void AddNodeTypes(AbstractSEECity city, List<string> newNodeTypes)
+    {
+        
         if(newNodeTypes != null)
         {
             foreach (string node in newNodeTypes)
@@ -232,5 +211,48 @@ public class CityRestorer
             }
         } 
         
+    }
+
+    /// <summary>
+    /// Reloads the graph - and thus the nodetypes - depending on the objecttype of the specific AbstractSEECity object.
+    /// </summary>
+    /// <param name="city">The current city object- either a SEECityEvolution or an SEECity object</param>
+    /// <returns> "true" - in case the reloaded graph is not null, else "false".
+    private static bool ReloadGraphByCityType(AbstractSEECity city)
+    {
+        if(city is SEECityEvolution)
+        {
+            SEECityEvolution evoCity = (SEECityEvolution)city;
+            Graph graph = evoCity.LoadFirstGraph();
+            if (graph != null) {
+                evoCity.InspectSchema(graph);
+                return true;
+            }
+            return false;
+        }else
+        {
+            SEECity seeCity = (SEECity)city;
+            if( (seeCity.LoadedGraph) != null)
+            {
+                return true; 
+            }
+            return false; 
+        }
+    }
+
+    /// <summary>
+    /// Cuts and formats a given string into a string which contains the directory of the stored .gxl File
+    /// </summary>
+    /// <param name="line">A line from the .json file which contains a directory</param>
+    /// <returns> the name of specific directory
+    private static string OutputAndFormatDirectoryString(string line)
+    {
+        UnityEngine.Debug.Log("line ist " + line);
+        //Whether the string is null or not has already been tested before
+        StringBuilder sb = new StringBuilder(line);
+        sb.Remove(0, 19);
+        sb.Remove((sb.Length - 2), 2);
+        sb.Append("\\");
+        return sb.ToString();
     }
 }
