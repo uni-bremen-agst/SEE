@@ -11,7 +11,7 @@ namespace SEE.Layout.IO
     /// <summary>
     /// Writes layout information to a GVL file.
     /// </summary>
-    public class Writer
+    public class GVLWriter
     {
         /// <summary>
         /// Writes the layout information of all <paramref name="graphName"/> and their descendants tagged

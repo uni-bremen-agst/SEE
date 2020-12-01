@@ -6,8 +6,10 @@ namespace SEE.Controls
 
     public class DesktopPlayerMovement : MonoBehaviour
     {
-        private const float Speed = 2.0f;
-        private const float BoostFactor = 2.0f;
+        [Tooltip("Speed of movements")]
+        public float Speed = 2.0f;
+        [Tooltip("Boost factor of speed, applied when shift is pressed.")]
+        public float BoostFactor = 2.0f;
 
         private struct CameraState
         {
