@@ -16,7 +16,6 @@ using SEE.DataModel.DG;
 /// </summary>
 public class CityRestorer
 {
-   
     /// <summary>
     ///  Converts the <paramref name="city"/> in a json-formatted string and saves this string in a .json-file in the directory
     ///  <paramref name="dataPath"/>.
@@ -42,28 +41,36 @@ public class CityRestorer
         {
             return; 
         }
-        AbstractSEECity city2 = city;
-        JsonUtility.FromJsonOverwrite(jsonContent, city2);
-        string pathPrefixOfCity = city2.PathPrefix;
+        JsonUtility.FromJsonOverwrite(jsonContent, city);
+        Dictionary<string, bool> oldNodetypes = city.SelectedNodeTypes;
+        string pathPrefixOfCity = city.PathPrefix;
         if (!(Directory.Exists(pathPrefixOfCity)))
         {
             return;
         }
-        Dictionary<string, bool> newNodeTypes = new Dictionary<string, bool>(); 
-        city.pathPrefix = pathPrefixOfCity;
-        if (!(ReloadGraphByCityType(city)))
+        Dictionary<string, bool> newNodeTypes = new Dictionary<string, bool>();
+        if (city is SEECityEvolution)
         {
-            return;
+            SEECityEvolution evoCity = new SEECityEvolution();
+            evoCity.pathPrefix = pathPrefixOfCity;
+            if (!(ReloadGraphByCityType(evoCity)))
+            {
+                return;
+            }
+            newNodeTypes = evoCity.SelectedNodeTypes;
+        } else if (city is SEECity)
+        {
+            SEECity newCity = new SEECity();
+            newCity.pathPrefix = pathPrefixOfCity;
+            if (!(ReloadGraphByCityType(newCity)))
+            {
+                return;
+            }
+            newNodeTypes = newCity.SelectedNodeTypes;
         }
-        newNodeTypes = city.SelectedNodeTypes;
-         
-        
-        // We have to store the current enumeration of the nodetypes of the current version in order to compare 
-        // it afterwards with the stored one in the method DifferentNodeTypes
-        // As the user picks the directory via a directory picker/ the GUI , no specific error handling is needed at this point.
-
-        JsonUtility.FromJsonOverwrite(jsonContent, city);
-        Dictionary<string, bool> oldNodetypes = city.SelectedNodeTypes;
+            // We have to store the current enumeration of the nodetypes of the current version in order to compare 
+            // it afterwards with the stored one in the method DifferentNodeTypes
+            // As the user picks the directory via a directory picker/ the GUI , no specific error handling is needed at this point.
         DifferentNodeTypes(oldNodetypes, jsonContent, newNodeTypes, city);
         Debug.Log("Loaded sucessfully\n");
     }
@@ -92,7 +99,7 @@ public class CityRestorer
     }
 
     /// <summary>
-    /// Analyazes if there is a difference between the stored nodetypes and the current nodetypes.
+    /// Analyzes if there is a difference between the stored nodetypes and the current nodetypes.
     /// </summary>
     /// <param name="jsonFile">the .json-file with the settings for the city</param>
     /// <param name="oldNodeTypes>a dictionary of the stored nodeTypes</param>
@@ -103,13 +110,11 @@ public class CityRestorer
         List<string> newNodes = newNodeTypes.Keys.ToList();
         List<string> deletedNodeTypes = new List<string>();
         List<string> addedNodeTypes = new List<string>();
-
-        Debug.Log(oldNodes.Count());
-        Debug.Log(newNodes.Count());
+        
         deletedNodeTypes = oldNodes.Except(newNodes).ToList();
         addedNodeTypes = newNodes.Except(oldNodes).ToList();
 
-        //shows deleted Node-Types
+        //shows deleted nodetypes
         if (deletedNodeTypes.Count > 0)
         {
             string deletedOutput = "";
@@ -121,7 +126,7 @@ public class CityRestorer
             deletedOutput = deletedOutput.Substring(0, deletedOutput.Length - 1);
             UnityEngine.Debug.Log("Deleted Nodetypes in the .gxl-file since saving your settings: " + deletedOutput + "\n");
         }
-        //shows added Node-Types
+        //shows added nodetypes
         if (addedNodeTypes.Count > 0)
         {
             string addedOutput = "";
@@ -131,6 +136,7 @@ public class CityRestorer
                 addedOutput += nodeType + ",";
             }
             addedOutput = addedOutput.Substring(0, addedOutput.Length - 1);
+            AddNodeTypes(city,addedNodeTypes);
             UnityEngine.Debug.Log("Added Nodetypes in the .gxl-file since saving your settings: " + addedOutput + "\n");
         }
         //if there are no changes, this message will be shown
@@ -139,7 +145,6 @@ public class CityRestorer
             UnityEngine.Debug.Log("Nothing changed in the .gxl-file since saving your settings\n");
         }
     }
-
 
     /// <summary>
     /// Reloads the graph - and thus the nodetypes - depending on the objecttype of the specific AbstractSEECity object.
@@ -152,7 +157,7 @@ public class CityRestorer
         {
             SEECityEvolution evoCity = (SEECityEvolution)city;
 
-            city.InspectSchema(evoCity.LoadFirstGraph());
+            evoCity.InspectSchema(evoCity.LoadFirstGraph());
                 return (evoCity.LoadFirstGraph() != null);
    
         }
@@ -167,5 +172,26 @@ public class CityRestorer
             seeCity.LoadData();
             return (seeCity.LoadedGraph != null);
         }
+    }
+
+    /// <summary>
+    /// Adds new Nodetypes to the current version of the city- if not already stored.
+    /// </summary>
+    /// <param name="city">the current city</param>
+    /// <param name="newNodeTypes"> A list of strings which are added to the dictionary "SelectedNodetypes" - the types are per default selected, thus "true" </param>
+    /// <returns>  
+    private static void AddNodeTypes(AbstractSEECity city, List<string> newNodeTypes)
+    {
+        if (newNodeTypes != null)
+        {
+            foreach (string node in newNodeTypes)
+            {
+                if (!(city.SelectedNodeTypes.Keys.Contains(node)))
+                {
+                    city.SelectedNodeTypes.Add(node, true);
+                }
+            }
+        }
+
     }
 }
