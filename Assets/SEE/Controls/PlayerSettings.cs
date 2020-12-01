@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.MixedReality.Toolkit;
+using Microsoft.MixedReality.Toolkit.UI;
+using Microsoft.MixedReality.Toolkit.UI.BoundsControl;
 using Microsoft.MixedReality.Toolkit.Utilities;
 using OdinSerializer;
 using SEE.DataModel;
@@ -189,18 +191,69 @@ namespace SEE.Controls
                     GameObject cityCollection = GameObject.Find("CityCollection").AssertNotNull("CityCollection");
                     UnityEngine.Assertions.Assert.IsTrue(cityCollection.TryGetComponent(out GridObjectCollection grid));
                     GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
+
                     foreach (GameObject city in cities)
                     {
-                        city.transform.localScale *= CityScalingFactor;
-                        // City needs to be parented to collection to be organized by it
-                        city.transform.parent = cityCollection.transform;
+                        SetCityScale(city, cityCollection.transform, CityScalingFactor);
+                        AddMixedRealityGameObjectInteractions(city);
+                        AppBarCityConfiguration(city);
                     }
 
-                    // To avoid overlaps, set cell width to maximum length of code cities
-                    grid.CellWidth = cities.Select(x => x.transform.localScale.MaxComponent()).Max();
-                    grid.UpdateCollection();
+                    SetGridCellWitdth(grid, cities);
                 }
-            }            
+            }
+
+            #region Local Methods
+            //Scales the city by factor and pretend it to collection 
+            void SetCityScale(GameObject city, Transform cityCollectionTransform, float cityScaleFactor)
+            {
+                city.transform.localScale *= cityScaleFactor;
+                // City needs to be parented to collection to be organized by it
+                city.transform.parent = cityCollectionTransform;
+            }
+
+            //Sets the width of the Grid containing the cities
+            void SetGridCellWitdth(GridObjectCollection grid, GameObject[] cities)
+            {
+                // To avoid overlaps, set cell width to maximum length of code cities
+                grid.CellWidth = cities.Max(x => x.transform.localScale.MaxComponent());
+                grid.UpdateCollection();
+            }
+
+            //Adds MixedRealityGameObjectInteraction and ObjectManipulator Script to City
+            void AddMixedRealityGameObjectInteractions(GameObject city)
+            {
+                city.AddComponent<MixedRealityGameObjectInteractions>();
+                city.AddComponent<ObjectManipulator>();
+            }
+
+            void AppBarCityConfiguration(GameObject city)
+            {
+                city.AddComponent<BoundsControl>().BoundsControlActivation = Microsoft.MixedReality.Toolkit.UI.BoundsControlTypes.BoundsControlActivationType.ActivateManually;
+            }
+
+            void PrepareBoundsControlForHololens2(BoundsControl boundsControl)
+            {
+                /**
+                BoxDisplayConfiguration boxConfiguration = boundsControl.BoxDisplayConfig;
+                boxConfiguration.BoxMaterial = [Assign BoundingBox.mat];
+                boxConfiguration.BoxGrabbedMaterial = [Assign BoundingBoxGrabbed.mat];
+                ScaleHandlesConfiguration scaleHandleConfiguration = boundsControl.ScaleHandlesConfig;
+                scaleHandleConfiguration.HandleMaterial = [Assign BoundingBoxHandleWhite.mat];
+                scaleHandleConfiguration.HandleGrabbedMaterial = [Assign BoundingBoxHandleBlueGrabbed.mat];
+                scaleHandleConfiguration.HandlePrefab = [Assign MRTK_BoundingBox_ScaleHandle.prefab];
+                scaleHandleConfiguration.HandleSlatePrefab = [Assign MRTK_BoundingBox_ScaleHandle_Slate.prefab];
+                scaleHandleConfiguration.HandleSize = 0.016f;
+                scaleHandleConfiguration.ColliderPadding = 0.016f;
+                RotationHandlesConfiguration rotationHandleConfiguration = boundsControl.RotationHandlesConfig;
+                rotationHandleConfiguration.HandleMaterial = [Assign BoundingBoxHandleWhite.mat];
+                rotationHandleConfiguration.HandleGrabbedMaterial = [Assign BoundingBoxHandleBlueGrabbed.mat];
+                rotationHandleConfiguration.HandlePrefab = [Assign MRTK_BoundingBox_RotateHandle.prefab];
+                rotationHandleConfiguration.HandleSize = 0.016f;
+                rotationHandleConfiguration.ColliderPadding = 0.016f;
+                **/
+            }
+            #endregion
         }
 
         /// <summary>
