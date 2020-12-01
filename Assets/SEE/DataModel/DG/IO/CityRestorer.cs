@@ -45,18 +45,17 @@ public class CityRestorer
         AbstractSEECity city2 = city;
         JsonUtility.FromJsonOverwrite(jsonContent, city2);
         string pathPrefixOfCity = city2.PathPrefix;
-        UnityEngine.Debug.Log("path aus der city2 ist " + city2.PathPrefix);
         if (!(Directory.Exists(pathPrefixOfCity)))
         {
             return;
         }
-
-        List<string> newNodeTypes = new List<string>(); 
+        Dictionary<string, bool> newNodeTypes = new Dictionary<string, bool>(); 
         city.pathPrefix = pathPrefixOfCity;
-        if (!(ReloadGraphByCityType(city))){
-           return; 
+        if (!(ReloadGraphByCityType(city)))
+        {
+            return;
         }
-        newNodeTypes = city.SelectedNodeTypes.Keys.ToList();
+        newNodeTypes = city.SelectedNodeTypes;
          
         
         // We have to store the current enumeration of the nodetypes of the current version in order to compare 
@@ -66,6 +65,7 @@ public class CityRestorer
         JsonUtility.FromJsonOverwrite(jsonContent, city);
         Dictionary<string, bool> oldNodetypes = city.SelectedNodeTypes;
         DifferentNodeTypes(oldNodetypes, jsonContent, newNodeTypes, city);
+        Debug.Log("Loaded sucessfully\n");
     }
 
     /// <summary>
@@ -78,12 +78,10 @@ public class CityRestorer
     {
         if (jsonContent.Contains("isAnSEECityObject") && city is SEECity)
         {
-          UnityEngine.Debug.Log("Loaded successfully\n");
           return true;
         }
         if(jsonContent.Contains("isAnSEECityEvolutionObject") && city is SEECityEvolution)
         {
-            UnityEngine.Debug.Log("Loaded successfully\n");
             return true;
         }
         else
@@ -99,17 +97,20 @@ public class CityRestorer
     /// <param name="jsonFile">the .json-file with the settings for the city</param>
     /// <param name="oldNodeTypes>a dictionary of the stored nodeTypes</param>
     /// <param name="newNodes> the city, which has to be overwritten</param>
-    private static void DifferentNodeTypes(Dictionary<string, bool> oldNodeTypes, string jsonFile, List<string> newNodes, AbstractSEECity city)
+    private static void DifferentNodeTypes(Dictionary<string, bool> oldNodeTypes, string jsonFile, Dictionary<string, bool> newNodeTypes, AbstractSEECity city)
     {
         List<string> oldNodes = oldNodeTypes.Keys.ToList();
+        List<string> newNodes = newNodeTypes.Keys.ToList();
         List<string> deletedNodeTypes = new List<string>();
         List<string> addedNodeTypes = new List<string>();
 
+        Debug.Log(oldNodes.Count());
+        Debug.Log(newNodes.Count());
         deletedNodeTypes = oldNodes.Except(newNodes).ToList();
         addedNodeTypes = newNodes.Except(oldNodes).ToList();
 
         //shows deleted Node-Types
-       if(deletedNodeTypes.Count > 0)
+        if (deletedNodeTypes.Count > 0)
         {
             string deletedOutput = "";
 
@@ -150,20 +151,21 @@ public class CityRestorer
         if(city is SEECityEvolution)
         {
             SEECityEvolution evoCity = (SEECityEvolution)city;
-            Graph graph = evoCity.LoadFirstGraph();
-            if (graph != null) {
-                evoCity.InspectSchema(graph);
-                return true;
-            }
-            return false;
-        }else
+
+            city.InspectSchema(evoCity.LoadFirstGraph());
+                return (evoCity.LoadFirstGraph() != null);
+   
+        }
+        else
         {
             SEECity seeCity = (SEECity)city;
-            if( (seeCity.LoadedGraph) != null)
+            if (!File.Exists(seeCity.GXLPath))
             {
-                return true; 
+                Debug.LogError("The .gxl-file does not exist anymore in the given directory\n");
+                return false;
             }
-            return false; 
+            seeCity.LoadData();
+            return (seeCity.LoadedGraph != null);
         }
     }
 }

@@ -118,6 +118,10 @@ namespace SEE.Game
         public Dictionary<string, bool> SelectedNodeTypes
         {
             get => nodeTypes;
+            set
+            {
+                SelectedNodeTypes = value;
+            }
         }
 
         /// <summary>
