@@ -112,6 +112,8 @@ namespace SEE.Game.Evolution
 
             animationDataModel.FastForwardButton.onClick.AddListener(TaskOnClickFastForwardButton);
 
+            animationDataModel.ReverseButton.onClick.AddListener(TaskOnClickReverseButton);
+
             SetMode(true);
             OnShownGraphHasChanged();
             evolutionRenderer.Register(OnShownGraphHasChanged);
@@ -122,16 +124,41 @@ namespace SEE.Game.Evolution
         /// </summary>
         private void TaskOnClickPlayButton()
         {
-            if (!evolutionRenderer.IsAutoPlay)
+            if (!evolutionRenderer.IsAutoPlayReverse)
             {
-                animationDataModel.PlayButton.GetComponentInChildren<Text>().text = "ll";
-                evolutionRenderer.ToggleAutoPlay();
-            } else
-            {
-                animationDataModel.PlayButton.GetComponentInChildren<Text>().text = "►";
-                evolutionRenderer.ToggleAutoPlay();
+                if (!evolutionRenderer.IsAutoPlay)
+                {
+                    animationDataModel.PlayButton.GetComponentInChildren<Text>().text = "ll";
+                    evolutionRenderer.ToggleAutoPlay();
+                }
+                else
+                {
+                    animationDataModel.PlayButton.GetComponentInChildren<Text>().text = "►";
+                    evolutionRenderer.ToggleAutoPlay();
+                }
             }
             
+        }
+
+        /// <summary>
+        /// Handles actions to do when the Reverse/Pause button has been clicked.
+        /// </summary>
+        private void TaskOnClickReverseButton()
+        {
+            if (!evolutionRenderer.IsAutoPlay)
+            {
+                if (!evolutionRenderer.IsAutoPlayReverse)
+                {
+                    animationDataModel.ReverseButton.GetComponentInChildren<Text>().text = "ll";
+                    evolutionRenderer.ToggleAutoPlayReverse();
+                }
+                else
+                {
+                    animationDataModel.ReverseButton.GetComponentInChildren<Text>().text = "◄";
+                    evolutionRenderer.ToggleAutoPlayReverse();
+                }
+            }
+
         }
 
         /// <summary>
@@ -186,7 +213,8 @@ namespace SEE.Game.Evolution
             Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
             Vector3 markerPos = new Vector3(handlePos.x, handlePos.y+.08f, handlePos.z);
             newMarker.transform.position = markerPos;
-            newMarker.onClick.AddListener(() => TaskOnClickMarker(newMarker));  
+            newMarker.onClick.AddListener(() => TaskOnClickMarker(newMarker));
+            DontDestroyOnLoad(newMarker);
             animationDataModel.MarkerList.Add(newMarker);
         }
 

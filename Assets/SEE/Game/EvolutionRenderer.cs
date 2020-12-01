@@ -693,6 +693,11 @@ namespace SEE.Game
         private bool _isAutoplay = false;  // not serialized by Unity
 
         /// <summary>
+        /// Whether the user has selected reverse auto-play mode.
+        /// </summary>
+        private bool _isAutoplayReverse = false;  // not serialized by Unity
+
+        /// <summary>
         /// Returns true if automatic animations are active.
         /// </summary>
         public bool IsAutoPlay
@@ -704,6 +709,20 @@ namespace SEE.Game
                 _isAutoplay = value;
             }
         }
+
+        /// <summary>
+        /// Returns true if automatic reverse animations are active.
+        /// </summary>
+        public bool IsAutoPlayReverse
+        {
+            get => _isAutoplayReverse;
+            private set
+            {
+                shownGraphHasChangedEvent.Invoke();
+                _isAutoplayReverse = value;
+            }
+        }
+
 
         /// <summary>
         /// Initiates the visualization of the evolving series of <paramref name="graphs"/>.
@@ -747,6 +766,11 @@ namespace SEE.Game
                 return false;
             }
             if (IsAutoPlay)
+            {
+                Debug.Log("Auto-play mode is turned on. You cannot move to the next graph manually.\n");
+                return false;
+            }
+            if (IsAutoPlayReverse)
             {
                 Debug.Log("Auto-play mode is turned on. You cannot move to the next graph manually.\n");
                 return false;
@@ -824,6 +848,11 @@ namespace SEE.Game
                 Debug.Log("Auto-play mode is turned on. You cannot move to the next graph manually.\n");
                 return;
             }
+            if (IsAutoPlayReverse)
+            {
+                Debug.Log("Auto-play mode is turned on. You cannot move to the next graph manually.\n");
+                return;
+            }
             if (!ShowNextIfPossible())
             {
                 Debug.Log("This is already the last graph revision.\n");
@@ -860,22 +889,18 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// If we are at the begin of the graph series, nothing happens.
+        /// If we are at the beginning of the graph series, false is returned and nothing else happens.
         /// Otherwise we make the transition from the currently shown graph to its 
         /// direct predecessor graph in the graph series. CurrentGraphIndex is decreased
         /// by one accordingly.
         /// </summary>
-        public void ShowPreviousGraph()
+        /// <returns>true iff we are not at the beginning of the graph series</returns>
+        private bool ShowPreviousIfPossible()
         {
-            if (IsStillAnimating || IsAutoPlay)
-            {
-                Debug.Log("The renderer is already occupied with animating, wait till animations are finished.\n");
-                return;
-            }
             if (CurrentGraphIndex == 0)
             {
                 Debug.Log("This is already the first graph revision.\n");
-                return;
+                return false;
             }
             CurrentGraphIndex--;
 
@@ -889,6 +914,27 @@ namespace SEE.Game
             {
                 Debug.LogError("Could not retrieve a graph layout.\n");
             }
+            return true;
+        }
+
+        /// <summary>
+        /// If we are at the begin of the graph series, nothing happens.
+        /// Otherwise we make the transition from the currently shown graph to its 
+        /// direct predecessor graph in the graph series. CurrentGraphIndex is decreased
+        /// by one accordingly.
+        /// </summary>
+        public void ShowPreviousGraph()
+        {
+            if (IsStillAnimating || IsAutoPlay || IsAutoPlayReverse)
+            {
+                Debug.Log("The renderer is already occupied with animating, wait till animations are finished.\n");
+                return;
+            }
+            if (!ShowPreviousIfPossible())
+            {
+                Debug.Log("This is already the first graph revision.\n");
+                return;
+            }
         }
 
         /// <summary>
@@ -899,6 +945,16 @@ namespace SEE.Game
         {
             SetAutoPlay(!IsAutoPlay);
         }
+
+        /// <summary>
+        /// Toggles the reverse auto-play mode. Equivalent to: SetAutoPlayReverse(!IsAutoPlayReverse)
+        /// where IsAutoPlayReverse denotes the current state of the reverse auto-play mode.
+        /// </summary>
+        internal void ToggleAutoPlayReverse()
+        {
+            SetAutoPlayReverse(!IsAutoPlayReverse);
+        }
+
 
         /// <summary>
         /// Sets auto-play mode to <paramref name="enabled"/>. If <paramref name="enabled"/>
@@ -927,6 +983,33 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Sets auto-play mode to <paramref name="enabled"/>. If <paramref name="enabled"/>
+        /// is true, the previous graph in the series is shown and from there all other 
+        /// previous graphs until we reach the beginning of the graph series or auto-play
+        /// mode is turned off again. If <paramref name="enabled"/> is false instead,
+        /// the currently shown graph remains visible.
+        /// </summary>
+        /// <param name="enabled"></param>
+        internal void SetAutoPlayReverse(bool enabled)
+        {
+            IsAutoPlayReverse = enabled;
+            if (IsAutoPlayReverse)
+            {
+                AnimationFinishedEvent.AddListener(OnAutoPlayReverseCanContinue);
+                if (!ShowPreviousIfPossible())
+                {
+                    Debug.Log("This is already the first graph revision.\n");
+                }
+            }
+            
+            else
+            {
+                AnimationFinishedEvent.RemoveListener(OnAutoPlayReverseCanContinue);
+            }
+            shownGraphHasChangedEvent.Invoke();
+        }
+
+        /// <summary>
         /// If we at the end of the graph series, nothing happens.
         /// Otherwise we make the transition from the currently shown graph to its next
         /// direct successor graph in the graph series. CurrentGraphIndex is increased
@@ -937,6 +1020,20 @@ namespace SEE.Game
             if (!ShowNextIfPossible())
             {
                 ToggleAutoPlay();
+            }
+        }
+
+        /// <summary>
+        /// If we at the beginning of the graph series, nothing happens.
+        /// Otherwise we make the transition from the currently shown graph to its next
+        /// direct successor graph in the graph series. CurrentGraphIndex is increased
+        /// by one accordingly and auto-play mode is toggled (switched off actually).
+        /// </summary>
+        private void OnAutoPlayReverseCanContinue()
+        {
+            if (!ShowPreviousIfPossible())
+            {
+                ToggleAutoPlayReverse();
             }
         }
 

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4405863734327421873}
   - component: {fileID: 4405863734327421872}
   - component: {fileID: 4405863734327421875}
+  - component: {fileID: -9101702087007540924}
   m_Layer: 5
   m_Name: Marker
   m_TagString: Untagged
@@ -118,3 +119,15 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &-9101702087007540924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4405863734327421869}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b4628df380d18c469039b917f0093d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -64,6 +64,11 @@ namespace SEE.Game.Evolution
         public Button FastForwardButton; // serialized by Unity
 
         /// <summary>
+        /// Button to reverse/pause the animation.
+        /// </summary>
+        public Button ReverseButton; //serialized by Unity
+
+        /// <summary>
         /// List of markers.
         /// </summary>
         public List<Button> MarkerList;
@@ -79,6 +84,7 @@ namespace SEE.Game.Evolution
             Slider.AssertNotNull("Slider");
             PlayButton.AssertNotNull("PlayButton");
             FastForwardButton.AssertNotNull("FastForwardButton");
+            ReverseButton.AssertNotNull("ReverseButton");
         }
     }
 }
