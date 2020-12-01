@@ -113,9 +113,6 @@ namespace SEE.Game.Evolution
             // Shake the object if it was modified.
             if (wasModified)
             {
-                // Changes the modified object's color to blue while animating
-                // FIXME: gameObject.SetColor(Color.blue) should be used instead.
-                gameObject.GetComponent<Renderer>().material.color = Color.blue;
                 // Create a new power beam
                 BeamAnimator.GetInstance().CreatePowerBeam(position, AdditionalBeamDetails.changedBeamColor, AdditionalBeamDetails.powerBeamDimensions);
 
@@ -307,7 +304,6 @@ namespace SEE.Game.Evolution
         /// </summary>
         class BeamAnimatorExecuter : MonoBehaviour
         {
-
             private void Update()
             {
                 BeamAnimator.GetInstance().Update();
