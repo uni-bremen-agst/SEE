@@ -70,6 +70,7 @@ namespace SEEEditor
             if (GUILayout.Button("Load Settings"))
             {
                 LoadCityFromJSON(city);
+                city.LoadedGraph = null;
             }
             if (city.LoadedGraph != null && GUILayout.Button("Add References"))
             {
