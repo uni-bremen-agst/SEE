@@ -20,7 +20,6 @@
 using SEE.Layout;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using UnityEngine;
 
 namespace SEE.Game.Evolution
@@ -31,22 +30,6 @@ namespace SEE.Game.Evolution
     /// </summary>
     public class MoveScaleShakeAnimator : AbstractAnimator
     {
-
-        /// <summary>
-        /// Color of beams for newly added nodes
-        /// </summary>
-        private Color NewNodeBeamColor = AdditionalBeamDetails.newBeamColor;
-
-        /// <summary>
-        /// Color of beams for changed nodes
-        /// </summary>
-        public Color ChangedNodeBeamColor = AdditionalBeamDetails.changedBeamColor;
-
-        /// <summary>
-        /// Dimensions of power beams
-        /// </summary>
-        private Vector3 NodeBeamDimensions = AdditionalBeamDetails.powerBeamDimensions;
-
         /// <summary>
         /// Moves, scales, and then finally shakes (if <paramref name="wasModified"/>) the animated game object.
         /// At the end of the animation, the method <paramref name="callbackName"/> will be called for the
@@ -131,13 +114,10 @@ namespace SEE.Game.Evolution
             if (wasModified)
             {
                 // Changes the modified object's color to blue while animating
+                // FIXME: gameObject.SetColor(Color.blue) should be used instead.
                 gameObject.GetComponent<Renderer>().material.color = Color.blue;
-                // Refetch values, neccessary because this gets loaded before other scripts
-                NewNodeBeamColor = AdditionalBeamDetails.newBeamColor;
-                ChangedNodeBeamColor = AdditionalBeamDetails.changedBeamColor;
-                NodeBeamDimensions = AdditionalBeamDetails.powerBeamDimensions;
                 // Create a new power beam
-                BeamAnimator.GetInstance().CreatePowerBeam(position, ChangedNodeBeamColor, NodeBeamDimensions);
+                BeamAnimator.GetInstance().CreatePowerBeam(position, AdditionalBeamDetails.changedBeamColor, AdditionalBeamDetails.powerBeamDimensions);
 
                 if (mustCallBack)
                 {
