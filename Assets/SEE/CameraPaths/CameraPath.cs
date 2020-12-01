@@ -128,9 +128,9 @@ namespace SEE.CameraPaths
         /// Converts a float value to a string with two digits and a period as a 
         /// decimal separator.
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="value">the value to be converted</param>
         /// <returns>the float as a string in the requested format</returns>
-        private string FloatToString(float value)
+        private static string FloatToString(float value)
         {
             return value.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
         }

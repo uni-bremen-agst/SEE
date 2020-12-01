@@ -35,7 +35,7 @@ namespace SEE.Game
         [SerializeField] private string pathPrefix = null;
 
         /// <summary>
-        /// The prefix of the absolute paths for the GXL, CSV, GVL data; that is,
+        /// The prefix of the absolute paths for the GXL, CSV, layout data; that is,
         /// the directory where these data files are located in.
         /// 
         /// The style of this path prefix is always the one of the current operating
@@ -51,7 +51,10 @@ namespace SEE.Game
         {
             get
             {
-                UnityEngine.Assertions.Assert.IsTrue(!string.IsNullOrEmpty(pathPrefix));
+                if (string.IsNullOrEmpty(pathPrefix))
+                {
+                    pathPrefix = Application.dataPath;
+                }
                 string result = pathPrefix;
                 if (result[result.Length - 1] != Filenames.UnixDirectorySeparator)
                 {
@@ -63,16 +66,20 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// The relative path for the GVL file containing the node layout information.
+        /// The relative path for the layout file containing the node layout information.
+        /// If the file extension is <see cref="Filenames.GVLExtension"/> is Axivion's Gravis layout 
+        /// file with 2D co-ordinates. 
+        /// If the extension is <see cref="Filenames.SLDExtension"/> is our own layout format 
+        /// saving the complete Transform data of a game object.
         /// </summary>
-        public string gvlPath = "..\\Data\\GXL\\linux-clones\\net.gvl";
+        public string layoutPath = "..\\Data\\GXL\\linux-clones\\net" + Filenames.GVLExtension;
 
         /// <summary>
-        /// Returns the concatenation of pathPrefix and gvlPath. That is the complete
-        /// absolute path to the GVL file containing the layout information.
+        /// Returns the concatenation of <see cref="PathPrefix"/> and <see cref="LayoutPath"/>. 
+        /// That is the complete absolute path to the file containing the layout information.
         /// </summary>
-        /// <returns>concatenation of pathPrefix and gvlPath</returns>
-        public string GVLPath => PathPrefix + gvlPath;
+        /// <returns>concatenation of <see cref="PathPrefix"/> and <see cref="LayoutPath"/></returns>
+        public string LayoutPath => PathPrefix + layoutPath;
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
@@ -746,5 +753,3 @@ namespace SEE.Game
         }
     }
 }
-
-
