@@ -46,6 +46,7 @@ public class CityRestorer
         string pathPrefixOfCity = city.PathPrefix;
         if (!(Directory.Exists(pathPrefixOfCity)))
         {
+            Debug.Log("The directory does not exist anymore\n");
             return;
         }
         Dictionary<string, bool> newNodeTypes = new Dictionary<string, bool>();
@@ -60,13 +61,11 @@ public class CityRestorer
             newNodeTypes = evoCity.SelectedNodeTypes;
         } else if (city is SEECity)
         {
-            SEECity newCity = new SEECity();
-            newCity.pathPrefix = pathPrefixOfCity;
-            if (!(ReloadGraphByCityType(newCity)))
+            if (!(ReloadGraphByCityType(city)))
             {
                 return;
             }
-            newNodeTypes = newCity.SelectedNodeTypes;
+            newNodeTypes = city.SelectedNodeTypes;
         }
             // We have to store the current enumeration of the nodetypes of the current version in order to compare 
             // it afterwards with the stored one in the method DifferentNodeTypes
@@ -136,7 +135,7 @@ public class CityRestorer
                 addedOutput += nodeType + ",";
             }
             addedOutput = addedOutput.Substring(0, addedOutput.Length - 1);
-            AddNodeTypes(city,addedNodeTypes);
+            AddNodeTypes(city, addedNodeTypes);
             UnityEngine.Debug.Log("Added Nodetypes in the .gxl-file since saving your settings: " + addedOutput + "\n");
         }
         //if there are no changes, this message will be shown
