@@ -52,26 +52,28 @@ namespace SEE.Game.Evolution
         [Tooltip("Sets the width/height of power beams")]
         public Vector3 InspectorPowerBeamDimensions;
 
+        /// <summary>
+        /// The minimal scale a power beam should have.
+        /// </summary>
+        private static readonly Vector3 minimalBowerBeamScale = new Vector3(0.02f, 3f, 0.02f);
+
         void Awake()
         {
             newBeamColor = InspectorNewBeamColor;
             changedBeamColor = InspectorChangedBeamColor;
             deletedBeamColor = InspectorDeletedBeamColor;
-            powerBeamDimensions = InspectorPowerBeamDimensions;
-            float beamX = 0.02f;
-            float beamY = 3f;
-            float beamZ = 0.02f;
-            if (powerBeamDimensions.x <= beamX)
+            powerBeamDimensions = InspectorPowerBeamDimensions;            
+            if (powerBeamDimensions.x <= minimalBowerBeamScale.x)
             {
-                powerBeamDimensions = new Vector3(beamX, powerBeamDimensions.y, powerBeamDimensions.z);
+                powerBeamDimensions.x = minimalBowerBeamScale.x;
             }
             if (powerBeamDimensions.y <= 0)
             {
-                powerBeamDimensions = new Vector3(powerBeamDimensions.x, beamY, powerBeamDimensions.z);
+                powerBeamDimensions.y = minimalBowerBeamScale.y;
             }
-            if (powerBeamDimensions.z <= beamZ)
+            if (powerBeamDimensions.z <= minimalBowerBeamScale.z)
             {
-                powerBeamDimensions = new Vector3(powerBeamDimensions.x, powerBeamDimensions.y, beamZ);
+                powerBeamDimensions.z = minimalBowerBeamScale.z;
             }
         }
     }
