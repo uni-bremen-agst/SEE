@@ -60,6 +60,7 @@ namespace SEEEditor
         /// <param name="city">city whose node types are to be selected</param>
         protected void ShowNodeTypes(AbstractSEECity city)
         {
+            
             GUILayout.Label("Node types:", EditorStyles.boldLabel);
             // Make a copy to loop over the dictionary while making changes.
             Dictionary<string, bool> selection = new Dictionary<string, bool>(city.SelectedNodeTypes);
@@ -67,11 +68,14 @@ namespace SEEEditor
             int countSelected = 0;
             foreach (KeyValuePair<string, bool> entry in selection)
             {
-                city.SelectedNodeTypes[entry.Key] = EditorGUILayout.Toggle("  " + entry.Key, entry.Value);
+                if (!(entry.Key.Equals("ROOT"))){
+                    city.SelectedNodeTypes[entry.Key] = EditorGUILayout.Toggle("  " + entry.Key, entry.Value);
 
-                if (city.SelectedNodeTypes[entry.Key])
-                {
-                    countSelected++;
+
+                    if (city.SelectedNodeTypes[entry.Key])
+                    {
+                        countSelected++;
+                    }
                 }
             }
 
