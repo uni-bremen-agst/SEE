@@ -1468,7 +1468,6 @@ GameObject:
   - component: {fileID: 1087713764}
   - component: {fileID: 1087713772}
   - component: {fileID: 1087713773}
-  - component: {fileID: 1087713774}
   m_Layer: 0
   m_Name: SEECity Evolution
   m_TagString: Code City
@@ -2029,7 +2028,7 @@ MonoBehaviour:
       Entry: 8
       Data: 
   pathPrefix: C:\Users\koschke\SEE\Data\GXL\animation-clones
-  gvlPath: ..\Data\GXL\linux-clones\net.gvl
+  layoutPath: ..\Data\GXL\linux-clones\net.gvl
   WidthMetric: Metric.Number_of_Tokens
   HeightMetric: Metric.Clone_Rate
   DepthMetric: Metric.LOC
@@ -2074,6 +2073,9 @@ MonoBehaviour:
   maxRevisionsToLoad: 500
   MarkerHeight: 0.2
   MarkerWidth: 0.01
+  AdditionBeamColor: {r: 0, g: 1, b: 0, a: 1}
+  ChangeBeamColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  DeletionBeamColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!114 &1087713765
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2218,22 +2220,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4874e0649dc8ad742a50b1d3b5845fd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1087713774
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1087713763}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a402756c70fc7b8428d1580ad8b0d004, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  InspectorNewBeamColor: {r: 0, g: 1, b: 0, a: 1}
-  InspectorChangedBeamColor: {r: 0.72159934, g: 0.764151, b: 0.075694196, a: 0}
-  InspectorDeletedBeamColor: {r: 0.990566, g: 0.11681201, b: 0.21773225, a: 1}
-  InspectorPowerBeamDimensions: {x: 0, y: 0, z: 0}
 --- !u!1 &1093528283
 GameObject:
   m_ObjectHideFlags: 0
@@ -2908,6 +2894,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79ef9858c6f1d9d4184e7310d93dc51b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Speed: 2
+  BoostFactor: 2
   focusedObject: {fileID: 1093528284}
 --- !u!1 &1626562202
 GameObject:
@@ -2995,7 +2983,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1636335451}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -7.4358635, y: -4, z: 0}
+  m_LocalPosition: {x: -8.026746, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -3182,7 +3170,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1776319858}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 7.4358635, y: -4, z: 0}
+  m_LocalPosition: {x: 8.026746, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
