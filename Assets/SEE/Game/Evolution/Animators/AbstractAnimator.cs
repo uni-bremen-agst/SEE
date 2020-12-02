@@ -25,6 +25,17 @@ using UnityEngine;
 namespace SEE.Game.Evolution
 {
     /// <summary>
+    /// The kind of differences for an animated object.
+    /// </summary>
+    public enum Difference
+    {
+        None,    // if there is no difference whatsoever
+        Added,   // if the element was added
+        Changed, // if the element was changed
+        Deleted, // if the element was deleted
+    }
+
+    /// <summary>
     /// An abstract animator that makes it simple to swap an existing type of animation.
     /// For example there could be a RotationAnimator and BounceAnimator for different
     /// kind of states.
@@ -76,9 +87,10 @@ namespace SEE.Game.Evolution
         /// </summary>
         /// <param name="gameObject">game object to be animated</param>
         /// <param name="nodeTransform">the node transformation to be applied</param>
-        /// <param name="wasModified">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph</param>
+        /// <param name="difference">whether the node attached to <paramref name="gameObject"/> was added, 
+        /// modified, or deleted w.r.t. to the previous graph</param>
         /// <param name="callback">an optional callback</param>
-        public void AnimateTo(GameObject gameObject, ILayoutNode nodeTransform, bool wasModified, Action<object> callback = null)
+        public void AnimateTo(GameObject gameObject, ILayoutNode nodeTransform, Difference difference, Action<object> callback = null)
         {
             gameObject.AssertNotNull("gameObject");
             nodeTransform.AssertNotNull("nodeTransform");
@@ -96,11 +108,11 @@ namespace SEE.Game.Evolution
             }
             else if (callback == null)
             {
-                AnimateToInternalWithCallback(gameObject, nodeTransform, wasModified, null, "", null);
+                AnimateToInternalWithCallback(gameObject, nodeTransform, difference, null, "", null);
             }
             else
             {
-                AnimateToInternalWithCallback(gameObject, nodeTransform, wasModified, ((MonoBehaviour)callback.Target).gameObject, callback.Method.Name, callback);
+                AnimateToInternalWithCallback(gameObject, nodeTransform, difference, ((MonoBehaviour)callback.Target).gameObject, callback.Method.Name, callback);
             }
         }
 
@@ -113,13 +125,14 @@ namespace SEE.Game.Evolution
         /// </summary>
         /// <param name="gameObject">game object to be animated</param>
         /// <param name="nodeTransform">the node transformation to be applied</param>
-        /// <param name="wasModified">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph</param>
+        /// <param name="difference">whether the node attached to <paramref name="gameObject"/> was added, 
+        /// modified, or deleted w.r.t. to the previous graph</param>
         /// <param name="callBackTarget">an optional game object that should receive the callback</param>
         /// <param name="callbackName">the method name of the callback</param>
         protected abstract void AnimateToInternalWithCallback
             (GameObject gameObject,
              ILayoutNode nodeTransform,
-             bool wasModified,
+             Difference difference,
              GameObject callBackTarget,
              string callbackName,
              Action<object> callback);
