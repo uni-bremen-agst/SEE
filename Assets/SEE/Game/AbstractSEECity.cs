@@ -116,7 +116,7 @@ namespace SEE.Game
         /// they should be visualized or not.
         /// </summary>
         public Dictionary<string, bool> SelectedNodeTypes
-        {
+        {   
             get => nodeTypes;
             set
             {
@@ -254,7 +254,7 @@ namespace SEE.Game
                         newNodeTypes[type] = true;
                     }
                 }
-                nodeTypes = newNodeTypes;
+                    nodeTypes = newNodeTypes;
             }
         }
 
