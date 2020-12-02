@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿using SEE.DataModel.DG;
+using SEE.GO;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Utils
 {
@@ -44,6 +48,56 @@ namespace SEE.Utils
             {
                 // game is not played; we are in the editor mode
                 UnityEngine.Object.DestroyImmediate(component);
+            }
+        }
+
+        public static void DestroyGameObjectWithChilds(GameObject gameObject)
+        {
+            if (gameObject.TryGetComponent(out NodeRef nodeRef))
+            {
+                for (int i = 0; i < gameObject.transform.childCount; i++) {
+                    GameObject child = gameObject.transform.GetChild(i).gameObject;
+                    DestroyGameObjectWithChilds(child);
+                }
+                DestroyEdges(gameObject);
+                DestroyGameObject(gameObject);
+            }
+        }
+
+        private static List<string> GetEdgeIds(NodeRef nodeRef)
+        {
+            List<String> edgeIDs = new List<string>();
+            foreach (Edge edge in nodeRef.node.Outgoings)
+            {
+                edgeIDs.Add(edge.ID);
+            }
+            foreach (Edge edge in nodeRef.node.Incomings)
+            {
+                edgeIDs.Add(edge.ID);
+            }
+            return edgeIDs;
+        }
+
+        private static void DestroyEdges(GameObject gameObject)
+        {
+            if (gameObject.TryGetComponent(out NodeRef nodeRef))
+            {
+                List<String> edgeIDs = GetEdgeIds(nodeRef);
+
+                GameObject[] allObjects = UnityEngine.Object.FindObjectsOfType<GameObject>();
+                foreach (GameObject go in allObjects)
+                {
+                    if (go.activeInHierarchy)
+                    {
+                        foreach (String edgeID in edgeIDs)
+                        {
+                            if (edgeID.Equals(go.name))
+                            {
+                                Destroyer.DestroyGameObject(go);
+                            }
+                        }
+                    }
+                }
             }
         }
     }
