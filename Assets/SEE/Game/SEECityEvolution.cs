@@ -53,7 +53,25 @@ namespace SEE.Game
         /// </summary>
         [Tooltip("The width (x and z lengths) of posts used as markers for new and deleted elements (>=0).")]
         public float MarkerWidth = 0.01f;
-        
+
+        /// <summary>
+        /// Color for power beams of newly added nodes, can be set in inspector
+        /// </summary>
+        [Tooltip("The color of the beam for newly created nodes.")]
+        public Color AdditionBeamColor = Color.green;
+
+        /// <summary>
+        /// Changed nodes beam color to be pickable in inspector
+        /// </summary>
+        [Tooltip("The color of the beam for changed nodes.")]
+        public Color ChangeBeamColor = Color.yellow;
+
+        /// <summary>
+        /// Deleted nodes beam color to be pickable in inspector
+        /// </summary>
+        [Tooltip("The color of the beam for deleted nodes.")]
+        public Color DeletionBeamColor = Color.black;
+
         /// <summary>
         /// Factory method to create the used EvolutionRenderer.
         /// </summary>
