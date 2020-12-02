@@ -2,6 +2,13 @@
 using SEE.Utils;
 using System;
 using UnityEngine;
+using SEE.DataModel.DG;
+using SEE.GO;
+using SEE.Layout.EdgeLayouts;
+using SEE.Game;
+using System.Collections.Generic;
+using System.Linq;
+using SEE.Layout;
 
 namespace SEE.Controls.Actions
 {
@@ -96,6 +103,11 @@ namespace SEE.Controls.Actions
         private Game.UI3D.Cursor cursor;
 
         /// <summary>
+        /// Object to be connected with the next selected object.
+        /// </summary>
+        private GameObject objectToBeConnected;
+
+        /// <summary>
         /// The current move state.
         /// </summary>
         private MoveState moveState;
@@ -123,7 +135,7 @@ namespace SEE.Controls.Actions
 
         protected sealed override void OnCityAvailable()
         {
-            raycastPlane = new Plane(Vector3.up, CityTransform.position);
+            raycastPlane = new UnityEngine.Plane(Vector3.up, CityTransform.position);
             mode = 0;
             movingOrRotating = false;
             cursor = Game.UI3D.Cursor.Create();
@@ -200,10 +212,36 @@ namespace SEE.Controls.Actions
                     {
                         Select(actionState.hoveredTransform ? actionState.hoveredTransform.gameObject : null, !actionState.selectToggle);
                     }
+
+                    if (Input.GetKeyDown(KeyCode.F1))
+                    {
+                        if (objectToBeConnected == null)
+                        {
+                            objectToBeConnected = actionState.hoveredTransform.gameObject;
+                        }
+                        else if (objectToBeConnected != actionState.hoveredTransform.gameObject)
+                        {
+                            if (objectToBeConnected.TryGetComponent(out NodeRef source) && actionState.hoveredTransform.gameObject.TryGetComponent(out NodeRef target))
+                            {
+                                Edge testEdge = new Edge(source.node, target.node, "test");
+                                Debug.Log("Hier ist deine Nachricht, alter Freund");
+
+                                // Wirres Probieren
+                                EdgeFactory test2 = new EdgeFactory(new StraightEdgeLayout(SceneQueries.GetCodeCity(source.transform).GetComponent<AbstractSEECity>().EdgesAboveBlocks, 1f) , 1f);
+                                ICollection<Node> nodeList = new List<Node>();
+                                ICollection<Edge> edgeList = new List<Edge>();
+                                nodeList.Add(source.node);
+                                nodeList.Add(target.node);
+                                edgeList.Add(testEdge);
+                                test2.DrawEdges((ICollection<ILayoutNode>)nodeList, (ICollection<LayoutEdge>)edgeList);
+                                //Wirres Probieren Ende
+                            }
+
+                        }
+                    }
                 }
 
                 // Select mode
-                //Hier muss was rein
                 if (mode != NavigationMode.Move && Input.GetKeyDown(KeyCode.Alpha1))
                 {
                     mode = NavigationMode.Move;
