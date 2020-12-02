@@ -28,6 +28,9 @@ namespace SEE.Controls.Actions
         //The New GameNode
         GameObject node = null;
 
+        //Safes the codeCity Object for highliting purposes
+        GameObject codeCityObject = null;
+
         //time since last action 
         float coolDown = 0.0f;
 
@@ -41,8 +44,6 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
-<<<<<<< HEAD
-=======
             // If the local player presses U, we deselect all currently selected interactable objects.
             if (Input.GetKeyDown(KeyCode.U))
             {
@@ -50,7 +51,6 @@ namespace SEE.Controls.Actions
                 ChartManager.Instance.UnselectAll();
             }
 
->>>>>>> origin/master
             switch (state)
             {
                 case State.MoveNode:
@@ -72,11 +72,15 @@ namespace SEE.Controls.Actions
                     break;
                 case State.NewNode:
 
+                    
                     if (hoveredObject != null && node == null)
                     {
+                        codeCityObject = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
+                        codeCityObject.GetComponent<Renderer>().material.color = new Color(0,255,0);
+                       
                         if (Input.GetMouseButton(0) &&  Time.time > coolDown)
                         {
-                            GameObject codeCityObject = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
+                            
                             Assert.IsTrue(codeCityObject != null);
                             codeCityObject.TryGetComponent<SEECity>(out city);
                             coolDown = Time.time + coolDownTime;
@@ -92,6 +96,10 @@ namespace SEE.Controls.Actions
                     }
                     else
                     {
+                        if(codeCityObject != null)
+                        {
+                            codeCityObject.GetComponent<Renderer>().material.color = new Color(255, 255, 255);
+                        }
                         Debug.ClearDeveloperConsole();
                         Debug.Log("NO OBJECT HOVERD");
                     }
