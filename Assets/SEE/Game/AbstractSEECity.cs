@@ -65,6 +65,30 @@ namespace SEE.Game
             }
         }
 
+        [SerializeField] public string jsonDirectory = null;
+
+        public string JsonDirectory
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(jsonDirectory))
+                {
+                    jsonDirectory = Application.dataPath;
+                }
+                string result = jsonDirectory;
+                if (result[result.Length - 1] != Filenames.UnixDirectorySeparator)
+                {
+                    result += Filenames.UnixDirectorySeparator;
+                }
+                result = Filenames.OnCurrentPlatform(result);
+                return result;
+            }
+            set
+            {
+                jsonDirectory = Path.GetDirectoryName(value);
+            }
+        }
+
         /// <summary>
         /// The relative path for the layout file containing the node layout information.
         /// If the file extension is <see cref="Filenames.GVLExtension"/> is Axivion's Gravis layout 
