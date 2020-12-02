@@ -1147,6 +1147,7 @@ namespace SEE.Game
             block.AddComponent<NodeRef>().node = node;
             block.AddComponent<NodeHighlights>();
             AdjustScaleOfLeaf(block);
+            //InteractionDecorator.PrepareForInteraction(block);
             return block;
         }
 

@@ -141,6 +141,7 @@ namespace SEE.Controls {
             System.Random rnd = new System.Random();
             node.ID = "TEST-NODE" + rnd.Next(0, 999999999);
             node.SourceName = "TEST-NODE" + rnd.Next(0, 999999999);
+            node.Type = "TEST NDO"; //FIXME with input
             //GET THE NAME (ID) 
             city.LoadedGraph.AddNode(node);
             city.LoadedGraph.FinalizeNodeHierarchy();
