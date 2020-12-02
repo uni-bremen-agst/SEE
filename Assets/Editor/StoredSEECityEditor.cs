@@ -20,7 +20,6 @@ namespace SEEEditor
     {
         private bool pressed = false;
         private string path = "";
-        private string savingDirectory;
 
         /// <summary>
         /// The name of the file where a city and the node-selection will be saved
@@ -116,16 +115,12 @@ namespace SEEEditor
         /// <param name="city">the city to be overwritten by the json-file</param>
         protected void LoadCityFromJSON(AbstractSEECity city)
         {
-            SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
-            if (savingDirectory == null)
+            string loadingPath = city.JsonDirectory;
+            string importPath = Filenames.OnCurrentPlatform(EditorUtility.OpenFilePanel("Select loading directory", loadingPath, ""));
+            if (!string.IsNullOrEmpty(importPath))
             {
-                savingDirectory = pathPrefix.stringValue;
-            }
-            string importPath = Filenames.OnCurrentPlatform(EditorUtility.OpenFilePanel("Select loading directory", savingDirectory, ""));
-            if (importPath != "")
-            {
-            savingDirectory = importPath;
-            city.RestoreCity(importPath, city);
+               city.JsonDirectory = importPath;
+               city.RestoreCity(importPath, city);
             }
         }
 
@@ -135,15 +130,11 @@ namespace SEEEditor
         /// <param name="city">the city whose to be saved in a json-file</param>
         protected void SaveCityInJSON(AbstractSEECity city)
         {
-        SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
-            if(savingDirectory == null)
+            string savingPath = city.JsonDirectory;
+            string exportPath = Filenames.OnCurrentPlatform(EditorUtility.SaveFilePanel("Select saving directory", savingPath, fileName , "json"));
+            if (!string.IsNullOrEmpty(exportPath))
             {
-                savingDirectory = pathPrefix.stringValue;
-            }
-            string exportPath = Filenames.OnCurrentPlatform(EditorUtility.SaveFilePanel("Select saving directory", savingDirectory, fileName , "json"));
-            if (exportPath != "")
-            {
-                savingDirectory = exportPath;
+                city.JsonDirectory = exportPath;
                 city.SaveSelection(exportPath);
             }
         }     
