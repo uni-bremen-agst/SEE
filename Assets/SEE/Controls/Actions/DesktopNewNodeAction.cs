@@ -167,16 +167,15 @@ namespace SEE.Controls {
         /// <param name="node">The node to be scaled</param>
        public static void ScaleNode(GameObject node)
         {
-            //Inspiration from https://answers.unity.com/questions/653219/how-to-create-an-object-and-resize-it-with-mouse-d.html
+            
             //Scale it draw spheres on each outline that can be drag and drop to get bigger
             Vector3 mousepos;
             Vector3 oldMousepos = Input.mousePosition;
             float sizeFactor = 0.02f;
             while (true)
             {
-                 mousepos = Input.mousePosition;
-                //do stuff
-                node.transform.localScale = (mousepos - oldMousepos) * sizeFactor;
+                mousepos = Input.mousePosition;
+                node.transform.localScale +=  new Vector3(0.4f,0.4f,0.4f);
                 oldMousepos = mousepos;
             }
         }
