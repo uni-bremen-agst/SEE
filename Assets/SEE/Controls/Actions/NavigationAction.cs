@@ -1,6 +1,6 @@
-﻿using SEE.Game;
+﻿using System.Collections.Generic;
+using SEE.Game;
 using SEE.Utils;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -106,7 +106,7 @@ namespace SEE.Controls.Actions
         /// The plane of the table
         /// </summary>
         [Tooltip("The area in which to draw the code city")]
-        [SerializeField] protected GO.Plane portalPlane;
+        [SerializeField] public GO.Plane portalPlane;
 
         /// <summary>
         /// See the tooltip.
@@ -116,14 +116,14 @@ namespace SEE.Controls.Actions
             "to the appropriate NavigationAction! If a GameObject contains both a" +
             "Desktop- and XRNavigationAction, those IDs must be identical.")]
         // TODO(torben): a better alternative would be to use the SEECity and hash the path of the graph or something...
-        // also, this will most likely be replaces by an automatic approach
+        // also, this will most likely be replaced by an automatic approach
         [SerializeField] protected int id;
         public int ID => id;
 
         /// <summary>
         /// Dictionary mapping the unique id to a navigation action object.
         /// </summary>
-        protected static readonly Dictionary<int, NavigationAction> idToActionDict = new Dictionary<int, NavigationAction>(2);
+        private static readonly Dictionary<int, NavigationAction> idToActionDict = new Dictionary<int, NavigationAction>(2);
 
         /// <summary>
         /// Returns the navigation action of given id.
