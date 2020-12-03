@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using SEE.DataModel.DG;
 using SEE.Game;
+using System;
 using SEE.Controls.Actions;
 
 namespace SEE.Controls {
@@ -161,22 +162,48 @@ namespace SEE.Controls {
 
         /// <summary>
         /// Scales a node
+        /// IMPORTANT: ONLY USE AS CORROUTINE
         /// </summary>
         /// <param name="node">The node to be scaled</param>
        public static void ScaleNode(GameObject node)
         {
+            //Inspiration from https://answers.unity.com/questions/653219/how-to-create-an-object-and-resize-it-with-mouse-d.html
             //Scale it draw spheres on each outline that can be drag and drop to get bigger
-            
+            Vector3 mousepos;
+            Vector3 oldMousepos = Input.mousePosition;
+            float sizeFactor = 0.02f;
+            while (true)
+            {
+                 mousepos = Input.mousePosition;
+                //do stuff
+                node.transform.localScale = (mousepos - oldMousepos) * sizeFactor;
+                oldMousepos = mousepos;
+            }
         }
 
         /// <summary>
-        /// Returns if a Place Action has taken place.
+        /// Places a node on call
         /// </summary>
-        /// <returns>if the place action has take place</returns>
-        public static bool Place()
+        /// <param name="node"> The node that should be placed</param>
+        /// <param name="hoveredObject"> the object the mouse hovers over</param>
+        /// <param name="city">the city in wich it was planned to place</param>
+        /// <returns> True if the Action performed well | false if the object should be destroyed </returns>
+        public static bool Place(GameObject node, GameObject hoveredObject, SEECity city)
         {
-            //FIXME: Working solutions for VR missing
-            return Input.GetMouseButton(0);
+            SEECity cityTmp = null;
+            if (hoveredObject != null)
+            {
+                GameObject tmp = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
+                tmp.TryGetComponent<SEECity>(out cityTmp);
+                if (city.Equals(cityTmp))
+                {
+                    GameNodeMover.FinalizePosition(node);
+                    city.LoadedGraph.FinalizeNodeHierarchy();
+                    return true;
+                }
+                
+            }
+            return false;
         }
         
     }
