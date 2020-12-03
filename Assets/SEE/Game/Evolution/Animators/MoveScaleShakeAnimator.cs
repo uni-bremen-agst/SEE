@@ -72,6 +72,7 @@ namespace SEE.Game.Evolution
                 if (mustCallBack)
                 {
                     Tweens.Scale(gameObject, localScale, MaxAnimationTime);
+                    callback?.Invoke(callBackTarget);
 
                     mustCallBack = false;
                 }
@@ -87,7 +88,8 @@ namespace SEE.Game.Evolution
                 if (mustCallBack)
                 {
                     Tweens.Move(gameObject, position, MaxAnimationTime);
-                   
+                    callback?.Invoke(callBackTarget);
+
                     mustCallBack = false;
                 }
                 else
@@ -102,6 +104,7 @@ namespace SEE.Game.Evolution
                 if (mustCallBack)
                 {
                     Tweens.ShakeRotate(gameObject, MaxAnimationTime / 2, new Vector3(0, 10, 0));
+                    callback?.Invoke(callBackTarget);
 
                     mustCallBack = false;
                 }

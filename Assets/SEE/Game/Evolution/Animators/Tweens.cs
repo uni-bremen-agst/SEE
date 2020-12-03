@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using DG.Tweening;
 using UnityEngine;
 
@@ -24,15 +25,29 @@ namespace SEE.Game.Evolution
         public static void Move(GameObject gameObject, Vector3 position, float MaxAnimationTime)
         {
             gameObject.transform.DOMove(position, MaxAnimationTime);
-
-            // iTween.MoveTo(gameObject, iTween.Hash(
-            //     "position", position,
-            //     "time", MaxAnimationTime,
-            //     "oncompletetarget", callBackTarget,
-            //     "oncomplete", callbackName,
-            //     "oncompleteparams", gameObject
-            // ));
         }
+
+        /// <summary>
+        /// Moves a GameObject to a specific position over a given duration.
+        /// </summary>
+        /// <param name="gameObject">
+        /// A <see cref="GameObject"/> to be the target of the animation.
+        /// </param>
+        /// <param name="position">
+        /// A <see cref="Vector3"/> for the destination Vector3.
+        /// </param>
+        /// <param name="MaxAnimationTime">
+        /// A <see cref="System.Single"/> for the time in seconds the animation will take to complete.
+        /// </param>
+
+        public static void Move(GameObject gameObject, Vector3 position, float MaxAnimationTime, GameObject callBackTarget, String callBackMethod, System.Object callBackParams)
+        {
+            gameObject.transform.DOMove(position, MaxAnimationTime);
+
+        }
+
+
+
 
         /// <summary>
         /// Randomly shakes a GameObject's rotation by a diminishing amount over time with.
@@ -49,15 +64,6 @@ namespace SEE.Game.Evolution
         public static void ShakeRotate(GameObject gameObject, float MaxAnimationTime, Vector3 vector)
         {
             gameObject.transform.DOShakeRotation(MaxAnimationTime, vector);
-
-            // iTween.ShakeRotation(gameObject, iTween.Hash(
-            //      "amount", new Vector3(0, 10, 0),
-            //      "time", MaxAnimationTime / 2,
-            //      "delay", MaxAnimationTime / 2,
-            //      "oncompletetarget", callBackTarget,
-            //      "oncomplete", callbackName,
-            //      "oncompleteparams", gameObject
-            // ));
         }
 
         /// <summary>
@@ -75,14 +81,7 @@ namespace SEE.Game.Evolution
         public static void Scale(GameObject gameObject, Vector3 localScale, float MaxAnimationTime)
         {
             gameObject.transform.DOScale(localScale, MaxAnimationTime);
-
-            //  iTween.ScaleTo(gameObject, iTween.Hash(
-            //      "scale", localScale,
-            //      "time", MaxAnimationTime,
-            //      "oncompletetarget", callBackTarget,
-            //      "oncomplete", callbackName,
-            //      "oncompleteparams", gameObject
-            //  ));
         }
     }
+
 }
