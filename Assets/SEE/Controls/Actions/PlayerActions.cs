@@ -114,7 +114,7 @@ namespace SEE.Controls.Actions
                                 }
                                 else
                                 {
-                                //StartCoroutine("DesktopNewNodeAction.ScaleNode",node);
+                                StartCoroutine("DesktopNewNodeAction.ScaleNode",node);
                                 }
 
                                 node = null;
