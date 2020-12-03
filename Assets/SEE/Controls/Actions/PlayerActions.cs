@@ -28,8 +28,9 @@ namespace SEE.Controls.Actions
         //The New GameNode
         GameObject node = null;
 
-        //Safes the codeCity Object for highliting purposes
+        //Safes the codeCity Object for highlighting purposes
         GameObject codeCityObject = null;
+
 
         //time since last action 
         float coolDown = 0.0f;
@@ -72,88 +73,60 @@ namespace SEE.Controls.Actions
                     break;
                 case State.NewNode:
 
-                    
-                    if (hoveredObject != null && node == null)
-                    {
-                        codeCityObject = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
-                        codeCityObject.GetComponent<Renderer>().material.color = new Color(0,255,0);
-                       
-                        if (Input.GetMouseButton(0) &&  Time.time > coolDown)
+                        if (hoveredObject != null && node == null)
                         {
-                            
-                            Assert.IsTrue(codeCityObject != null);
-                            codeCityObject.TryGetComponent<SEECity>(out city);
-                            coolDown = Time.time + coolDownTime;
+                            codeCityObject = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
+                            codeCityObject.GetComponent<Renderer>().material.color = new Color(0, 255, 0);
+
+                            if (Input.GetMouseButton(0) && Time.time > coolDown)
+                            {
+
+                                Assert.IsTrue(codeCityObject != null);
+                                codeCityObject.TryGetComponent<SEECity>(out city);
+                                coolDown = Time.time + coolDownTime;
+                            }
+
                         }
                         else
                         {
-                            //FIXME: Highlight City
-                            Debug.ClearDeveloperConsole();
-                            Debug.Log("City HOVER");
-                            //Debug.Log(hoveredObject.name);
-                        }
-
-                    }
-                    else
-                    {
-                        if(codeCityObject != null)
-                        {
-                            codeCityObject.GetComponent<Renderer>().material.color = new Color(255, 255, 255);
-                        }
-                        Debug.ClearDeveloperConsole();
-                        Debug.Log("NO OBJECT HOVERD");
-                    }
-                    if (city != null)
-                    {
-                        if (node == null)
-                        {
-                            bool is_innerNode = false; //FIXME: Change it later into the selection of the sub menu 
-                            node = DesktopNewNodeAction.NewNode(is_innerNode, city);
-                            //Vector3 mp = Input.mousePosition;
-                            //mp= Utils.MainCamera.Camera.ScreenToWorldPoint(mp)
-                           // node.transform.position = new Vector3(1,1,1);
-                        }
-
-                        if (Time.time > coolDown && DesktopNewNodeAction.Place())
-                        {
-                            
-                            coolDown = Time.time + coolDownTime;
-                            SEECity cityTmp = null;
-                            if (hoveredObject != null)
+                            if (codeCityObject != null)
                             {
-                                GameObject tmp = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
-                                tmp.TryGetComponent<SEECity>(out cityTmp);
-                                if (city.Equals(cityTmp))
-                                {
-                                    GameNodeMover.FinalizePosition(node);
-                                    city.LoadedGraph.FinalizeNodeHierarchy();
-                                    DesktopNewNodeAction.ScaleNode(node);
-                                    //city.SaveData();
-                                   // city.ReDrawGraph();
-                                }
-                                else
+                                codeCityObject.GetComponent<Renderer>().material.color = new Color(255, 255, 255);
+                            }
+                        }
+
+                        if (city != null)
+                        {
+
+
+                            if (node == null)
+                            {
+                                bool is_innerNode = false; //FIXME: Change it later into the selection of the sub menu 
+                                node = DesktopNewNodeAction.NewNode(is_innerNode, city);
+                            }
+
+                            if (Time.time > coolDown && Input.GetMouseButton(0))
+                            {
+                                coolDown = Time.time + coolDownTime;
+                                if (!DesktopNewNodeAction.Place(node, hoveredObject, city))
                                 {
                                     Destroy(node);
                                 }
+                                else
+                                {
+                                //StartCoroutine("DesktopNewNodeAction.ScaleNode",node);
+                                }
+
+                                node = null;
+                                city = null;
                             }
                             else
                             {
-                                Destroy(node);
+                                GameNodeMover.MoveTo(node);
                             }
-                            node = null;
-                            city = null;
-                        }
-                        else
-                        {
-                            GameNodeMover.MoveTo(node);
-                        }
 
-                    }
-                    else
-                    {
-                        Debug.ClearDeveloperConsole();
-                        Debug.Log("NO CITY SELECTED");
-                    }
+                        }
+                    
                     break;
             }
         }
