@@ -30,7 +30,7 @@ namespace SEE.Game.Evolution
     public class MoveScaleShakeAnimator : AbstractAnimator
     {
         /// <summary>
-        /// Moves, scales, and then finally shakes (if <paramref name="wasModified"/>) the animated game object.
+        /// Moves, scales, and then finally shakes (if <paramref name="difference"/>) the animated game object.
         /// At the end of the animation, the method <paramref name="callbackName"/> will be called for the
         /// game object <paramref name="callBackTarget"/> with <paramref name="gameObject"/> as 
         /// parameter if <paramref name="callBackTarget"/> is not null. If <paramref name="callBackTarget"/>
@@ -38,13 +38,13 @@ namespace SEE.Game.Evolution
         /// </summary>
         /// <param name="gameObject">game object to be animated</param>
         /// <param name="layout">the node transformation to be applied</param>
-        /// <param name="wasModified">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph</param>
+        /// <param name="difference">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph</param>
         /// <param name="callBackTarget">an optional game object that should receive the callback</param>
         /// <param name="callbackName">the method name of the callback</param>
         protected override void AnimateToInternalWithCallback
                   (GameObject gameObject,
                    ILayoutNode layout,
-                   bool wasModified,
+                   Difference difference,
                    GameObject callBackTarget,
                    string callbackName,
                    Action<object> callback)
@@ -60,11 +60,6 @@ namespace SEE.Game.Evolution
             Vector3 localScale = gameObject.transform.parent == null ?
                                      layout.LocalScale
                                    : gameObject.transform.parent.InverseTransformVector(layout.LocalScale);
-
-            //Debug.LogFormat("animating {0} from pos={1} scale={2} to pos={3} scale={4}\n",
-            //    gameObject.name,
-            //    gameObject.transform.position, gameObject.transform.localScale,
-            //    position, localScale);
 
             if (gameObject.transform.localScale != localScale)
             {
@@ -110,7 +105,7 @@ namespace SEE.Game.Evolution
             }
 
             // Shake the object if it was modified.
-            if (wasModified)
+            if (difference == Difference.Changed)
             {
                 if (mustCallBack)
                 {
@@ -140,3 +135,4 @@ namespace SEE.Game.Evolution
         }
     }
 }
+    

@@ -38,18 +38,20 @@ namespace SEE.Game.Evolution
         /// </summary>
         /// <param name="gameObject">game object to be animated</param>
         /// <param name="layout">the node transform to be applied</param>
-        /// <param name="wasModified">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph (ignored here)</param>
+        /// <param name="difference">whether the node attached to <paramref name="gameObject"/> was added, 
+        /// modified, or deleted w.r.t. to the previous graph</param>
         /// <param name="callBackTarget">an optional game object that should receive the callback</param>
         /// <param name="callbackName">the method name of the callback</param>
         protected override void AnimateToInternalWithCallback
                   (GameObject gameObject,
                    ILayoutNode layout,
-                   bool wasModified,
+                   Difference difference,
                    GameObject callBackTarget,
                    string callbackName,
                    Action<object> callback)
         {
             gameObject.transform.localScale = layout.LocalScale;
+
             if (callBackTarget != null)
             {
                 iTween.MoveTo(gameObject, iTween.Hash(
