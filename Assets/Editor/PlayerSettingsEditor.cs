@@ -2,11 +2,16 @@
 
 using System;
 using System.Linq;
+using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.DataModel;
 using SEE.Game;
+using SEE.Game.Charts.VR;
+using SEE.Utils;
 using UnityEditor;
 using UnityEngine;
+using Valve.VR;
+using Valve.VR.InteractionSystem;
 using Plane = SEE.GO.Plane;
 using PlayerSettings = SEE.Controls.PlayerSettings;
 
@@ -73,6 +78,13 @@ namespace SEEEditor
                 }
 
                 EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.Space();
+                GUILayout.Label("Setup new scene", EditorStyles.largeLabel);
+                if (GUILayout.Button("Add required objects to scene"))
+                {
+                    SetupScene();
+                }
             }
         }
 
@@ -92,6 +104,77 @@ namespace SEEEditor
             codeCity.AddComponent<DesktopNavigationAction>().portalPlane = plane;
             codeCity.AddComponent<XRNavigationAction>().portalPlane = plane;
             codeCity.AddComponent(CityTypes[selectedType]);
+        }
+
+        /// <summary>
+        /// Creates all required GameObjects for a scene to work, barring a code city.
+        /// </summary>
+        private void SetupScene()
+        {
+            //TODO: Check if objects are already there and only add as necessary
+            //TODO: Make compatible with MRTK
+            
+            // Create light
+            GameObject light = new GameObject{ name = "Light" };
+            light.AddComponent<Light>().lightmapBakeType = LightmapBakeType.Mixed;
+            
+            // Create table from table prefab
+            UnityEngine.Object tablePrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Table.prefab");
+            GameObject table = Instantiate(tablePrefab) as GameObject;
+            UnityEngine.Assertions.Assert.IsNotNull(table);
+            table.name = "Table";
+            table.tag = Tags.CullingPlane;
+            
+            // Create VRPlayer from SteamVR prefab
+            SetupVRPlayer(out GameObject vrCamera);
+
+            // Create Desktop player from prefab
+            UnityEngine.Object desktopPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Players/DesktopPlayer.prefab");
+            GameObject desktopPlayer = Instantiate(desktopPrefab) as GameObject;
+            UnityEngine.Assertions.Assert.IsNotNull(desktopPlayer);
+            desktopPlayer.name = "DesktopPlayer";
+            desktopPlayer.tag = Tags.MainCamera;
+            desktopPlayer.GetComponent<DesktopPlayerMovement>().focusedObject = table.GetComponent<Plane>();
+            
+            // Create InControl from prefab
+            UnityEngine.Object inControlPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Players/InControl.prefab");
+            GameObject inControl = Instantiate(inControlPrefab) as GameObject;
+            UnityEngine.Assertions.Assert.IsNotNull(inControl);
+            inControl.name = "InControl";
+            
+            // Create ChartManager from prefab
+            UnityEngine.Object chartManagerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Charts/ChartManager.prefab");
+            GameObject chartManager = Instantiate(chartManagerPrefab) as GameObject;
+            UnityEngine.Assertions.Assert.IsNotNull(chartManager);
+            chartManager.name = "Chart Manager";
+            chartManager.transform.GetChild(0).GetComponent<ChartPositionVr>().cameraTransform = vrCamera.transform;
+        }
+
+        /// <summary>
+        /// Sets up the VR player for use in a scene.
+        /// </summary>
+        /// <param name="vrCamera">This will be filled with the child camera object of the VRPlayer.</param>
+        private static void SetupVRPlayer(out GameObject vrCamera)
+        {
+            UnityEngine.Object steamVrPrefab =
+                AssetDatabase.LoadAssetAtPath<GameObject>("Assets/SteamVR/InteractionSystem/Core/Prefabs/Player.prefab");
+            GameObject vrPlayer = Instantiate(steamVrPrefab) as GameObject;
+            UnityEngine.Assertions.Assert.IsNotNull(vrPlayer);
+            vrPlayer.name = "VRPlayer";
+            // We need to find the right and left hand first to use them later
+            Hand rightHand = GameObjectHierarchy.Descendants(vrPlayer)
+                .First(x => x.name == "RightHand").GetComponent<Hand>();
+            Hand leftHand = GameObjectHierarchy.Descendants(vrPlayer)
+                .First(x => x.name == "LeftHand").GetComponent<Hand>();
+            // We also need the camera later for the ChartManager
+            vrCamera = GameObjectHierarchy.Descendants(vrPlayer, Tags.MainCamera).First();
+            CharacterController vrController = vrPlayer.AddComponent<CharacterController>();
+            vrPlayer.AddComponent<SteamVR_ActivateActionSetOnLoad>();
+            vrPlayer.AddComponent<XRChartAction>();
+            vrPlayer.AddComponent<XRRay>().PointingHand = rightHand;
+            XRPlayerMovement playerMovement = vrPlayer.AddComponent<XRPlayerMovement>();
+            playerMovement.characterController = vrController;
+            playerMovement.DirectingHand = leftHand;
         }
     }
 }
