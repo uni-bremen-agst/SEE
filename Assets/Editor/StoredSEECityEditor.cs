@@ -60,6 +60,8 @@ namespace SEEEditor
         /// <param name="city">city whose node types are to be selected</param>
         protected void ShowNodeTypes(AbstractSEECity city)
         {
+            city.Reset();
+            
             SEECityEvolution c = (SEECityEvolution)city;
             Node n = c.singleRoot;
             string sourcename = null ;
