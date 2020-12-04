@@ -24,6 +24,14 @@ namespace SEE.DataModel.DG
         /// empty string if the graph was not created by loading it from disk.
         private string path = "";
 
+
+        public Node singleRoot = null; 
+
+        public Node getSingleRoot()
+        {
+            return singleRoot;
+        }
+
         private int maxDepth = -1;
         /// <summary>
         /// The maximal depth of the node hierarchy. The maximal depth is the
@@ -34,6 +42,8 @@ namespace SEE.DataModel.DG
         /// Important note: This value must be computed by calling FinalizeGraph() 
         /// before accessing <see cref="MaxDepth"/>.
         /// </summary>
+        /// 
+
         public int MaxDepth 
         { 
             get
@@ -202,6 +212,7 @@ namespace SEE.DataModel.DG
         /// <param name="type">type of new root node</param>
         public void AddSingleRoot(string name, string type)
         {
+            UnityEngine.Debug.Log("Test");
             List<Node> roots = GetRoots();
             if (roots.Count > 0)
             {

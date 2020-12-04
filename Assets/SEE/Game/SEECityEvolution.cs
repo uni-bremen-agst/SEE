@@ -33,10 +33,17 @@ namespace SEE.Game
     public class SEECityEvolution : AbstractSEECity
     {
         /// <summary>
-        /// A simple string variable for verification of the .json export and determine whether
-        /// it is an SEECityEvolution object.
+        /// The loaded graph.
         /// </summary>
-        public string isAnSEECityEvolutionObject = "isAnSEECityEvolutionObject"; 
+
+        public Node singleRoot = null;
+
+        public Node GetSingleRoot(Graph graph)
+        {
+            singleRoot = graph.getSingleRoot();
+           return graph.getSingleRoot();
+        }
+       
 
         /// <summary>
         /// Sets the maximum number of revsions to load.
@@ -80,9 +87,11 @@ namespace SEE.Game
         /// </summary>
         private List<Graph> LoadData()
         {
+            
             GraphsReader graphsReader = new GraphsReader();
             // Load all GXL graphs and CSV files in directory PathPrefix but not more than maxRevisionsToLoad many.
             graphsReader.Load(PathPrefix, HierarchicalEdges, maxRevisionsToLoad);
+            singleRoot = GetSingleRoot(graphsReader.graphs.First());
             return graphsReader.graphs;
         }
 
@@ -109,9 +118,10 @@ namespace SEE.Game
             }
             else
             {
-                Graph graph = graphs.First<Graph>();                
+                Graph graph = graphs.First<Graph>();
                 graph = RelevantGraph(graph);
                 graph.FinalizeNodeHierarchy();
+                singleRoot = GetSingleRoot(graphs.First());
                 return graph;
             }
         }
