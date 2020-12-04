@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using System.IO;
+using SEE.DataModel.DG;
 
 namespace SEEEditor
 {
@@ -59,25 +60,34 @@ namespace SEEEditor
         /// <param name="city">city whose node types are to be selected</param>
         protected void ShowNodeTypes(AbstractSEECity city)
         {
-            
+            SEECityEvolution c = (SEECityEvolution)city;
+            Node n = c.singleRoot;
+            string sourcename = null ;
+            if (n != null)
+            {
+                sourcename = n.Type;
+            }
             GUILayout.Label("Node types:", EditorStyles.boldLabel);
             // Make a copy to loop over the dictionary while making changes.
-            Dictionary<string, bool> selection = new Dictionary<string, bool>(city.SelectedNodeTypes);
-
+            Dictionary<string, bool> selection =new Dictionary<string, bool>(city.SelectedNodeTypes);
             int countSelected = 0;
-            foreach (KeyValuePair<string, bool> entry in selection)
-            {
-                if (!(entry.Key.Equals("ROOT"))){
-                    city.SelectedNodeTypes[entry.Key] = EditorGUILayout.Toggle("  " + entry.Key, entry.Value);
 
-
-                    if (city.SelectedNodeTypes[entry.Key])
-                    {
-                        countSelected++;
-                    }
+              foreach (KeyValuePair<string, bool> entry in selection)
+                {   //If selection contains the artifial ROOT as directory, we like to neglect that
+                    // and do not show this to the user.
+                     if (!(entry.Key.Equals(sourcename) && sourcename != null)) 
+                    { 
+                        city.SelectedNodeTypes[entry.Key] = EditorGUILayout.Toggle("  " + entry.Key, entry.Value);
+                        if (city.SelectedNodeTypes[entry.Key])
+                        {
+                            countSelected++;
+                        }
                 }
             }
 
+            
+            
+            
             if (city.CoseGraphSettings.loadedForNodeTypes.Count == 0)
             {
                 city.CoseGraphSettings.showGraphListing = true;

@@ -65,6 +65,7 @@ namespace SEE.DataModel.DG.IO
                         SourceName = rootName
                     };
                     graph.AddNode(singleRoot);
+                    graph.singleRoot = singleRoot;
                     foreach (Node root in roots)
                     {
                         singleRoot.AddChild(root);
