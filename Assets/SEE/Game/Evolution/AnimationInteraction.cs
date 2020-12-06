@@ -109,10 +109,10 @@ namespace SEE.Game.Evolution
             animationDataModel.Slider.value = evolutionRenderer.CurrentGraphIndex;
 
             animationDataModel.PlayButton.onClick.AddListener(TaskOnClickPlayButton);
-
             animationDataModel.FastForwardButton.onClick.AddListener(TaskOnClickFastForwardButton);
-
             animationDataModel.ReverseButton.onClick.AddListener(TaskOnClickReverseButton);
+            animationDataModel.FastBackwardButton.onClick.AddListener(TaskOnClickFastBackwardButton);
+
 
             SetMode(true);
             OnShownGraphHasChanged();
@@ -126,6 +126,12 @@ namespace SEE.Game.Evolution
         {
             if (!evolutionRenderer.IsAutoPlayReverse)
             {
+                if (!animationDataModel.FastBackwardButton.GetComponentInChildren<Text>().text.Equals("◄◄"))
+                {
+                    animationTimeValue = 2;
+                    evolutionRenderer.AnimationLag = animationTimeValue;
+                    animationDataModel.FastBackwardButton.GetComponentInChildren<Text>().text = "◄◄";
+                }
                 if (!evolutionRenderer.IsAutoPlay)
                 {
                     animationDataModel.PlayButton.GetComponentInChildren<Text>().text = "ll";
@@ -147,6 +153,12 @@ namespace SEE.Game.Evolution
         {
             if (!evolutionRenderer.IsAutoPlay)
             {
+                if (!animationDataModel.FastForwardButton.GetComponentInChildren<Text>().text.Equals("►►"))
+                {
+                    animationTimeValue = 2;
+                    evolutionRenderer.AnimationLag = animationTimeValue;
+                    animationDataModel.FastForwardButton.GetComponentInChildren<Text>().text = "►►";
+                }
                 if (!evolutionRenderer.IsAutoPlayReverse)
                 {
                     animationDataModel.ReverseButton.GetComponentInChildren<Text>().text = "ll";
@@ -163,26 +175,71 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// Handles actions to do when the fast forward button has been clicked.
+        /// Also resets the fast backward button.
+        /// If the animation is playing backwards it does nothing.
         /// </summary>
         private void TaskOnClickFastForwardButton()
         {
+            if (evolutionRenderer.IsAutoPlayReverse) return;
+            if (!animationDataModel.FastBackwardButton.GetComponentInChildren<Text>().text.Equals("◄◄")) 
+            {
+                animationTimeValue = 2;
+                evolutionRenderer.AnimationLag = animationTimeValue;
+                animationDataModel.FastBackwardButton.GetComponentInChildren<Text>().text = "◄◄";
+            }
             if(animationTimeValue == 2)
             {
                 animationTimeValue = 1;
                 evolutionRenderer.AnimationLag = animationTimeValue;
+                animationDataModel.FastForwardButton.GetComponentInChildren<Text>().text = "►►2x";
             } else if (animationTimeValue == 1)
             {
                 animationTimeValue = 0.5f;
                 evolutionRenderer.AnimationLag = animationTimeValue;
+                animationDataModel.FastForwardButton.GetComponentInChildren<Text>().text = "►►4x";
             } else if (animationTimeValue == 0.5f)
             {
                 animationTimeValue = 2;
                 evolutionRenderer.AnimationLag = animationTimeValue;
+                animationDataModel.FastForwardButton.GetComponentInChildren<Text>().text = "►►";
             }
         }
 
         /// <summary>
-        /// Handles actions to do when a marker
+        /// Handles actions to do when the fast forward button has been clicked.
+        /// If the animation is playing forwards it does nothing.
+        /// </summary>
+        private void TaskOnClickFastBackwardButton()
+        {
+            if (evolutionRenderer.IsAutoPlay) return;
+            if (!animationDataModel.FastForwardButton.GetComponentInChildren<Text>().text.Equals("►►"))
+            {
+                animationTimeValue = 2;
+                evolutionRenderer.AnimationLag = animationTimeValue;
+                animationDataModel.FastForwardButton.GetComponentInChildren<Text>().text = "►►";
+            }
+            if (animationTimeValue == 2)
+            {
+                animationTimeValue = 1;
+                evolutionRenderer.AnimationLag = animationTimeValue;
+                animationDataModel.FastBackwardButton.GetComponentInChildren<Text>().text = "◄◄2x";
+            }
+            else if (animationTimeValue == 1)
+            {
+                animationTimeValue = 0.5f;
+                evolutionRenderer.AnimationLag = animationTimeValue;
+                animationDataModel.FastBackwardButton.GetComponentInChildren<Text>().text = "◄◄4x";
+            }
+            else if (animationTimeValue == 0.5f)
+            {
+                animationTimeValue = 2;
+                evolutionRenderer.AnimationLag = animationTimeValue;
+                animationDataModel.FastBackwardButton.GetComponentInChildren<Text>().text = "◄◄";
+            }
+        }
+
+        /// <summary>
+        /// Handles actions to do when a marker is clicked.
         /// </summary>
         private void TaskOnClickMarker(Button clickedMarker)
         {
