@@ -27,7 +27,8 @@ namespace SEEEditor
         /// <summary>
         /// An array of all types of code cities which the user should be able to create.
         /// </summary>
-        private static readonly Type[] CityTypes = {
+        private static readonly Type[] CityTypes = 
+        {
             // If there are SEECity types not listed in the menu, you can add them here.
             typeof(SEECity), typeof(SEECityEvolution), typeof(SEECityRandom), typeof(SEEDynCity), typeof(SEEJlgCity)
         };
@@ -36,13 +37,24 @@ namespace SEEEditor
         /// Names of the city types. This is automatically generated from <see cref="CityTypes"/> and shouldn't
         /// need to be changed.
         /// </summary>
-        private static readonly string[] CityTypeNames = CityTypes.Select(x => x.Name).ToArray();
-        
-        // A few variables which help us keep track of the UI state
+        private static readonly string[] CityTypeNames = CityTypes.Select(x => x.Name).ToArray();       
+
+        /// <summary>
+        /// Name of the new city.
+        /// </summary>
         private string cityName;
+        /// <summary>
+        /// If true, the foldout for creating a new city is shown.
+        /// </summary>
         private bool showCreation = true;
+        /// <summary>
+        /// If true, the foldout for the platform settings is shown.
+        /// </summary>
         private bool showPlatform = true;
-        private int selectedType;
+        /// <summary>
+        /// The kind of city to be created (regular code city, evolution city, dynamic city, etc.).
+        /// </summary>
+        private int selectedCityType;
         
         public override void OnInspectorGUI()
         {
@@ -53,10 +65,7 @@ namespace SEEEditor
                 base.OnInspectorGUI();
                 EditorGUILayout.Space();  // additional space for improved readability
             }
-
-            EditorGUILayout.Space();
-                
-            // Creation of new code city
+            EditorGUILayout.Space();                
             CodeCityGUI();
         }
 
@@ -71,7 +80,7 @@ namespace SEEEditor
                 cityName = EditorGUILayout.TextField("Name of new city", cityName);
                 EditorGUILayout.BeginHorizontal();
                 // Dropdown of all code city types
-                selectedType = EditorGUILayout.Popup("City type", selectedType, CityTypeNames);
+                selectedCityType = EditorGUILayout.Popup("City type", selectedCityType, CityTypeNames);
                 if (GUILayout.Button("Create City"))
                 {
                     CreateCodeCity();
@@ -103,7 +112,7 @@ namespace SEEEditor
             Plane plane = codeCity.AddComponent<Plane>();
             codeCity.AddComponent<DesktopNavigationAction>().portalPlane = plane;
             codeCity.AddComponent<XRNavigationAction>().portalPlane = plane;
-            codeCity.AddComponent(CityTypes[selectedType]);
+            codeCity.AddComponent(CityTypes[selectedCityType]);
         }
 
         /// <summary>
@@ -113,18 +122,18 @@ namespace SEEEditor
         {
             //TODO: Check if objects are already there and only add as necessary
             //TODO: Make compatible with MRTK
-            
+
             // Create light
-            GameObject light = new GameObject{ name = "Light" };
+            GameObject light = new GameObject { name = "Light" };
             light.AddComponent<Light>().lightmapBakeType = LightmapBakeType.Mixed;
-            
+
             // Create table from table prefab
             UnityEngine.Object tablePrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Table.prefab");
             GameObject table = Instantiate(tablePrefab) as GameObject;
             UnityEngine.Assertions.Assert.IsNotNull(table);
             table.name = "Table";
             table.tag = Tags.CullingPlane;
-            
+
             // Create VRPlayer from SteamVR prefab
             SetupVRPlayer(out GameObject vrCamera);
 
@@ -132,7 +141,7 @@ namespace SEEEditor
             UnityEngine.Object desktopPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Players/DesktopPlayer.prefab");
             GameObject desktopPlayer = Instantiate(desktopPrefab) as GameObject;
             UnityEngine.Assertions.Assert.IsNotNull(desktopPlayer);
-            desktopPlayer.name = "DesktopPlayer";
+            desktopPlayer.name = PlayerSettings.PlayerName[(int)PlayerSettings.PlayerInputType.Desktop];
             desktopPlayer.tag = Tags.MainCamera;
             desktopPlayer.GetComponent<DesktopPlayerMovement>().focusedObject = table.GetComponent<Plane>();
             
@@ -160,7 +169,7 @@ namespace SEEEditor
                 AssetDatabase.LoadAssetAtPath<GameObject>("Assets/SteamVR/InteractionSystem/Core/Prefabs/Player.prefab");
             GameObject vrPlayer = Instantiate(steamVrPrefab) as GameObject;
             UnityEngine.Assertions.Assert.IsNotNull(vrPlayer);
-            vrPlayer.name = "VRPlayer";
+            vrPlayer.name = PlayerSettings.PlayerName[(int)PlayerSettings.PlayerInputType.VR]; ;
             // We need to find the right and left hand first to use them later
             Hand rightHand = GameObjectHierarchy.Descendants(vrPlayer)
                 .First(x => x.name == "RightHand").GetComponent<Hand>();
