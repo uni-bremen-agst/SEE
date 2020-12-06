@@ -55,7 +55,6 @@ namespace SEE.Game.Evolution
             if (callBackTarget != null)
             {
                 Tweens.Move(gameObject, layout.CenterPosition, MaxAnimationTime);
-                //FIXME callback?.Invoke(callBackTarget);
                 callback?.Invoke(gameObject);
             }
             else
