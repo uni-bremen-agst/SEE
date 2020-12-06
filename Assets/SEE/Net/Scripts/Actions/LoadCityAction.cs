@@ -93,8 +93,8 @@ namespace SEE.Net
         // SEECity
         //-----------------------------------------------------------------------
 
-        public string gxlPath;
-        public string csvPath;
+        public DataPath gxlPath;
+        public DataPath csvPath;
 
         //-----------------------------------------------------------------------
         // SEECityEvolution
@@ -106,7 +106,13 @@ namespace SEE.Net
         // SEECityDyn
         //-----------------------------------------------------------------------
 
-        public string dynPath;
+        public DataPath dynPath;
+
+        //-----------------------------------------------------------------------
+        // SEEJlgCity
+        //-----------------------------------------------------------------------
+
+        public DataPath jlgPath;
 
         //-----------------------------------------------------------------------
         // SEECityRandom
@@ -114,8 +120,6 @@ namespace SEE.Net
 
         public Tools.Constraint leafConstraint;
         public Tools.Constraint innerNodeConstraint;
-
-
 
         /// <summary>
         /// Constructs a an action to load the given city for every client.
@@ -172,8 +176,8 @@ namespace SEE.Net
 
             if (city.GetType() == typeof(SEECity))
             {
-                gxlPath = ((SEECity)city).gxlPath;
-                csvPath = ((SEECity)city).csvPath;
+                gxlPath = ((SEECity)city).GXLPath;
+                csvPath = ((SEECity)city).CSVPath;
             }
 
             if (city.GetType() == typeof(SEECityEvolution))
@@ -183,7 +187,12 @@ namespace SEE.Net
 
             if (city.GetType() == typeof(SEEDynCity))
             {
-                dynPath = ((SEEDynCity)city).dynPath;
+                dynPath = ((SEEDynCity)city).DYNPath;
+            }
+
+            if (city.GetType() == typeof(SEEJlgCity))
+            {
+                jlgPath = ((SEEJlgCity)city).JLGPath;
             }
 
             if (city.GetType() == typeof(SEECityRandom))
@@ -217,8 +226,8 @@ namespace SEE.Net
             if (t == typeof(SEECity))
             {
                 city = gameObject.GetComponent<SEECity>();
-                ((SEECity)city).gxlPath = gxlPath;
-                ((SEECity)city).csvPath = csvPath;
+                ((SEECity)city).GXLPath = gxlPath;
+                ((SEECity)city).CSVPath = csvPath;
             }
 
             if (t == typeof(SEECityEvolution))
@@ -230,7 +239,13 @@ namespace SEE.Net
             if (t == typeof(SEEDynCity))
             {
                 city = gameObject.GetComponent<SEEDynCity>();
-                ((SEEDynCity)city).dynPath = dynPath;
+                ((SEEDynCity)city).DYNPath = dynPath;
+            }
+
+            if (t == typeof(SEEJlgCity))
+            {
+                city = gameObject.GetComponent<SEEJlgCity>();
+                ((SEEJlgCity)city).JLGPath = jlgPath;
             }
 
             if (t == typeof(SEECityRandom))
