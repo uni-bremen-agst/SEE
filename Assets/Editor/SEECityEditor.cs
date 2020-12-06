@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 
 using SEE.Game;
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -59,6 +60,10 @@ namespace SEEEditor
                 SaveLayout(city);
             }
             EditorGUILayout.EndHorizontal();
+            if (city.LoadedGraph != null && GUILayout.Button("Add References"))
+            {
+                AddReferences(city);
+            }
         }
 
         /// <summary>
@@ -124,6 +129,11 @@ namespace SEEEditor
         private void SaveLayout(SEECity city)
         {
             city.SaveLayout();
+        }
+
+        private void AddReferences(SEECity city)
+        {
+            city.SetNodeEdgeRefs();
         }
     }
 }
