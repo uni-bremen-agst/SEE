@@ -1,14 +1,15 @@
 ﻿using System;
-using System.Reflection;
 using DG.Tweening;
 using UnityEngine;
 
 
 namespace SEE.Game.Evolution
 {
+    /// <summary>
+    /// A class for animating objects (tweening).
+    /// </summary>
     internal class Tweens : MonoBehaviour
     {
-
         /// <summary>
         /// Moves a GameObject to a specific position over a given duration.
         /// </summary>
@@ -21,7 +22,6 @@ namespace SEE.Game.Evolution
         /// <param name="MaxAnimationTime">
         /// A <see cref="System.Single"/> for the time in seconds the animation will take to complete.
         /// </param>
-
         public static void Move(GameObject gameObject, Vector3 position, float MaxAnimationTime)
         {
             gameObject.transform.DOMove(position, MaxAnimationTime);
@@ -39,15 +39,11 @@ namespace SEE.Game.Evolution
         /// <param name="MaxAnimationTime">
         /// A <see cref="System.Single"/> for the time in seconds the animation will take to complete.
         /// </param>
-
-        public static void Move(GameObject gameObject, Vector3 position, float MaxAnimationTime, GameObject callBackTarget, String callBackMethod, System.Object callBackParams)
+        public static void Move(GameObject gameObject, Vector3 position, float MaxAnimationTime, 
+                                GameObject callBackTarget, String callBackMethod, System.Object callBackParams)
         {
             gameObject.transform.DOMove(position, MaxAnimationTime);
-
         }
-
-
-
 
         /// <summary>
         /// Randomly shakes a GameObject's rotation by a diminishing amount over time with.
@@ -83,5 +79,4 @@ namespace SEE.Game.Evolution
             gameObject.transform.DOScale(localScale, MaxAnimationTime);
         }
     }
-
 }
