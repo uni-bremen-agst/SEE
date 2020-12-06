@@ -66,21 +66,13 @@ namespace SEE.Game.Evolution
                 // Scale the object.
                 if (mustCallBack)
                 {
-                    iTween.ScaleTo(gameObject, iTween.Hash(
-                        "scale", localScale,
-                        "time", MaxAnimationTime,
-                        "oncompletetarget", callBackTarget,
-                        "oncomplete", callbackName,
-                        "oncompleteparams", gameObject
-                    ));
+                    Tweens.Scale(gameObject, localScale, MaxAnimationTime);
+                    callback?.Invoke(gameObject);
                     mustCallBack = false;
                 }
                 else
                 {
-                    iTween.ScaleTo(gameObject, iTween.Hash(
-                         "scale", localScale,
-                         "time", MaxAnimationTime
-                    ));
+                    Tweens.Scale(gameObject, localScale, MaxAnimationTime);
                 }
             }
 
@@ -89,18 +81,13 @@ namespace SEE.Game.Evolution
                 // Move the object.
                 if (mustCallBack)
                 {
-                    iTween.MoveTo(gameObject, iTween.Hash(
-                        "position", position,
-                        "time", MaxAnimationTime,
-                        "oncompletetarget", callBackTarget,
-                        "oncomplete", callbackName,
-                        "oncompleteparams", gameObject
-                    ));
+                    Tweens.Move(gameObject, position, MaxAnimationTime);
+                    callback?.Invoke(gameObject);
                     mustCallBack = false;
                 }
                 else
                 {
-                    iTween.MoveTo(gameObject, iTween.Hash("position", position, "time", MaxAnimationTime));
+                    Tweens.Move(gameObject, position, MaxAnimationTime);
                 }
             }
 
@@ -109,23 +96,13 @@ namespace SEE.Game.Evolution
             {
                 if (mustCallBack)
                 {
-                    iTween.ShakeRotation(gameObject, iTween.Hash(
-                         "amount", new Vector3(0, 10, 0),
-                         "time", MaxAnimationTime / 2,
-                         "delay", MaxAnimationTime / 2,
-                         "oncompletetarget", callBackTarget,
-                         "oncomplete", callbackName,
-                         "oncompleteparams", gameObject
-                    ));
+                    Tweens.ShakeRotate(gameObject, MaxAnimationTime / 2, new Vector3(0, 10, 0));
+                    callback?.Invoke(gameObject);
                     mustCallBack = false;
                 }
                 else
                 {
-                    iTween.ShakeRotation(gameObject, iTween.Hash(
-                         "amount", new Vector3(0, 10, 0),
-                         "time", MaxAnimationTime / 2,
-                         "delay", MaxAnimationTime / 2
-                    ));
+                    Tweens.ShakeRotate(gameObject, MaxAnimationTime / 2, new Vector3(0, 10, 0));
                 }
             }
             if (mustCallBack)

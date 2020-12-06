@@ -553,7 +553,7 @@ namespace SEE.Game
         /// <summary>
         /// The width of the line representing edges in world space.
         /// </summary>
-        public float EdgeWidth = 0.3f; // serialized by Unity
+        public float EdgeWidth = 0.1f; // serialized by Unity
 
         /// <summary>
         /// Whether erosions should be visible above blocks.
