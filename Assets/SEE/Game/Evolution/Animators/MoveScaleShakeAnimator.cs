@@ -67,8 +67,8 @@ namespace SEE.Game.Evolution
                 if (mustCallBack)
                 {
                     Tweens.Scale(gameObject, localScale, MaxAnimationTime);
-                    callback?.Invoke(callBackTarget);
-
+                    // FIXME callback?.Invoke(callBackTarget);
+                    callback?.Invoke(gameObject);
                     mustCallBack = false;
                 }
                 else
@@ -83,8 +83,8 @@ namespace SEE.Game.Evolution
                 if (mustCallBack)
                 {
                     Tweens.Move(gameObject, position, MaxAnimationTime);
-                    callback?.Invoke(callBackTarget);
-
+                    // FIXME callback?.Invoke(callBackTarget);
+                    callback?.Invoke(gameObject);
                     mustCallBack = false;
                 }
                 else
@@ -99,8 +99,8 @@ namespace SEE.Game.Evolution
                 if (mustCallBack)
                 {
                     Tweens.ShakeRotate(gameObject, MaxAnimationTime / 2, new Vector3(0, 10, 0));
-                    callback?.Invoke(callBackTarget);
-
+                    // FIXME callback?.Invoke(callBackTarget);
+                    callback?.Invoke(gameObject);
                     mustCallBack = false;
                 }
                 else
