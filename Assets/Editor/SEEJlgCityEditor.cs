@@ -24,6 +24,7 @@
 
 using UnityEditor;
 using SEE.Game;
+using SEE.Utils;
 
 namespace SEEEditor
 {    
@@ -41,7 +42,7 @@ namespace SEEEditor
             {
                 base.Attributes();
                 SEEJlgCity city = target as SEEJlgCity;
-                city.jlgPath = EditorGUILayout.TextField("Full JLG filepath", city.jlgPath);
+                city.JLGPath = GetDataPath("JLG file", city.JLGPath, Filenames.ExtensionWithoutPeriod(Filenames.JLGExtension));
             }
         }
     }

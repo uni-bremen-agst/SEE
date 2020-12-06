@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 
 using SEE.Game;
+using SEE.Utils;
 using UnityEditor;
 
 namespace SEEEditor
@@ -20,7 +21,7 @@ namespace SEEEditor
         {
             base.Attributes();
             SEEDynCity city = target as SEEDynCity;
-            city.dynPath = EditorGUILayout.TextField("DYN file", city.dynPath);
+            city.DYNPath = GetDataPath("DYN file", city.DYNPath, Filenames.ExtensionWithoutPeriod(Filenames.DYNExtension));
         }
     }
 }

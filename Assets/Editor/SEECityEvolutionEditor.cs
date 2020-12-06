@@ -2,6 +2,7 @@
 
 using SEE.DataModel.DG;
 using SEE.Game;
+using SEE.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -19,6 +20,7 @@ namespace SEEEditor
         {
             base.OnInspectorGUI();
             SEECityEvolution city = target as SEECityEvolution;
+            Attributes();
             city.maxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.maxRevisionsToLoad);
             city.MarkerWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width of markers", city.MarkerWidth));
             city.MarkerHeight = Mathf.Max(0, EditorGUILayout.FloatField("Height of markers", city.MarkerHeight));
@@ -67,6 +69,17 @@ namespace SEEEditor
             // We assume here that this SEECity instance was added to a game object as
             // a component. The inherited attribute gameObject identifies this game object.
             graphRenderer.Draw(city.gameObject);
+        }
+
+        /// <summary>
+        /// Shows and sets the attributes of the SEECity managed here.
+        /// This method should be overridden by subclasses if they have additional
+        /// attributes to manage.
+        /// </summary>
+        protected void Attributes()
+        {
+            SEECityEvolution city = target as SEECityEvolution;
+            city.GXLDirectory = GetDataPath("GXL directory", city.GXLDirectory, fileDialogue: false);
         }
     }
 }

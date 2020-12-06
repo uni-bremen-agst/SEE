@@ -793,7 +793,7 @@ namespace SEE.Game
                 case NodeLayoutKind.CompoundSpringEmbedder:
                     return new CoseLayout(groundLevel, settings);
                 case NodeLayoutKind.FromFile:
-                    return new LoadedNodeLayout(groundLevel, settings.LayoutPath);
+                    return new LoadedNodeLayout(groundLevel, settings.LayoutPath.Path);
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
             }
