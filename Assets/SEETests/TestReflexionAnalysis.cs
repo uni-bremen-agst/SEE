@@ -320,9 +320,15 @@ namespace SEE.Tools.Architecture
             return result;
         }
 
+        /// <summary>
+        /// Unique ID for edges.
+        /// </summary>
+        private static int edgeID = 1;
+
         protected static Edge NewEdge(Graph graph, Node from, Node to, string type)
         {
-            Edge result = new Edge();
+            edgeID++;
+            Edge result = new Edge(edgeID.ToString());
             result.Type = type;
             result.Source = from;
             result.Target = to;
