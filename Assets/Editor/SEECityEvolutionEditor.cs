@@ -34,7 +34,7 @@ namespace SEEEditor
         /// <summary>
         /// Creates the buttons for loading the first graph of the evolution series.
         /// </summary>
-        protected void Buttons()
+        private void Buttons()
         {            
             SEECityEvolution city = target as SEECityEvolution;
             if (firstGraph == null && GUILayout.Button("Load First Graph"))
