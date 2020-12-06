@@ -54,20 +54,12 @@ namespace SEE.Game.Evolution
 
             if (callBackTarget != null)
             {
-                iTween.MoveTo(gameObject, iTween.Hash(
-                    "position", layout.CenterPosition,
-                    "time", MaxAnimationTime,
-                    "oncompletetarget", callBackTarget,
-                    "oncomplete", callbackName,
-                    "oncompleteparams", gameObject
-                ));
+                Tweens.Move(gameObject, layout.CenterPosition, MaxAnimationTime);
+                callback?.Invoke(gameObject);
             }
             else
             {
-                iTween.MoveTo(gameObject, iTween.Hash(
-                                          "position", layout.CenterPosition,
-                                          "time", MaxAnimationTime
-                ));
+                Tweens.Move(gameObject, layout.CenterPosition, MaxAnimationTime);
             }
         }
     }
