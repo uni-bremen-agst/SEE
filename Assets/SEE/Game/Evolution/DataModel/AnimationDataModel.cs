@@ -69,6 +69,11 @@ namespace SEE.Game.Evolution
         public Button ReverseButton; //serialized by Unity
 
         /// <summary>
+        /// Button to fast forward the animation.
+        /// </summary>
+        public Button FastBackwardButton; // serialized by Unity
+
+        /// <summary>
         /// List of markers.
         /// </summary>
         public List<Button> MarkerList;
@@ -85,6 +90,7 @@ namespace SEE.Game.Evolution
             PlayButton.AssertNotNull("PlayButton");
             FastForwardButton.AssertNotNull("FastForwardButton");
             ReverseButton.AssertNotNull("ReverseButton");
+            FastBackwardButton.AssertNotNull("FastBackwardButton");
         }
     }
 }
