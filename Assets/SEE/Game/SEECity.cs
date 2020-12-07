@@ -36,6 +36,8 @@ namespace SEE.Game
         [NonSerialized]
         private Graph loadedGraph = null;
 
+        public String isAnSEECityObject = "isAnSEECityObject";
+
         /// <summary>
         /// The graph underlying this SEE city that was loaded from disk. May be null.
         /// If a new graph is assigned to this property, the selected node types will

@@ -20,6 +20,7 @@
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -90,6 +91,8 @@ namespace SEE.Game
         /// </summary>
         [Tooltip("The directory in which the GXL files are located.")]
         public DataPath GXLDirectory = new DataPath();
+
+        public String isAnSEECityEvolutionObject = "isAnSEECityEvolutionObject";
 
         /// <summary>
         /// Factory method to create the used EvolutionRenderer.
