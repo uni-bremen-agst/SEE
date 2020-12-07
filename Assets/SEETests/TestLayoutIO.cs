@@ -248,7 +248,8 @@ namespace SEE.Layout
             seeCityComponent.EdgeLayout = EdgeLayoutKind.None;
             seeCityComponent.LeafObjects = AbstractSEECity.LeafNodeKinds.Blocks;
             seeCityComponent.InnerNodeObjects = AbstractSEECity.InnerNodeKinds.Blocks;
-            seeCityComponent.layoutPath = "../Data/GXL/SEE/Architecture.gvl";
+            seeCityComponent.LayoutPath.Root = DataPath.RootKind.ProjectFolder;
+            seeCityComponent.LayoutPath.RelativePath = "/Data/GXL/SEE/Architecture.gvl";
 
             // Render the city. This will create all game objects as well as their
             // layout. As stated before, the layout does not interest us.

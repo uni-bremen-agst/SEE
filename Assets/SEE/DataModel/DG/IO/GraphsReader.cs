@@ -101,7 +101,5 @@ namespace SEE.DataModel.DG.IO
             p.End();
             Debug.Log("Number of graphs loaded: " + graphs.Count + "\n");
         }
-
-
     }
 }

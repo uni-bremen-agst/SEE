@@ -299,10 +299,17 @@ namespace SEE.DataModel.DG
                 }
                 else
                 {
-                    edge.ItsGraph = this;
-                    edges[edge.ID] = edge;
-                    edge.Source.AddOutgoing(edge);
-                    edge.Target.AddIncoming(edge);
+                    if (edges.ContainsKey(edge.ID))
+                    {
+                        throw new Exception("There is already an edge with the ID " + edge.ID);
+                    }
+                    else
+                    {
+                        edge.ItsGraph = this;
+                        edges[edge.ID] = edge;
+                        edge.Source.AddOutgoing(edge);
+                        edge.Target.AddIncoming(edge);
+                    }
                 }
             }
             else
@@ -342,6 +349,7 @@ namespace SEE.DataModel.DG
                 {
                     edge.Source.RemoveOutgoing(edge);
                     edge.Target.RemoveIncoming(edge);
+                    edges.Remove(edge.ID);
                     edge.ItsGraph = null;
                 }
             }
