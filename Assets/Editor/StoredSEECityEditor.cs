@@ -36,14 +36,16 @@ namespace SEEEditor
         /// <param name="city">city whose node types are to be selected</param>
         protected void ShowNodeTypes(AbstractSEECity city)
         {
-            city.Reset();
-            
-            SEECityEvolution c = (SEECityEvolution)city;
-            Node n = c.singleRoot;
-            string sourcename = null ;
-            if (n != null)
-            {
-                sourcename = n.Type;
+            string sourcename = null;    
+            if (city is SEECityEvolution) {
+                city.Reset();
+                SEECityEvolution c = (SEECityEvolution)city;
+                Node n = c.singleRoot;
+                sourcename = null;
+                if (n != null)
+                {
+                    sourcename = n.Type;
+                }
             }
             GUILayout.Label("Node types:", EditorStyles.boldLabel);
             // Make a copy to loop over the dictionary while making changes.

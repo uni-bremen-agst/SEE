@@ -16,14 +16,14 @@ namespace SEEEditor
     public class SEECityEvolutionEditor : StoredSEECityEditor
     {    
         public override void OnInspectorGUI()
-        {   
+        {
+            
             base.OnInspectorGUI();
             SEECityEvolution city = target as SEECityEvolution;
             Attributes();
             city.maxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.maxRevisionsToLoad);
             city.MarkerWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width of markers", city.MarkerWidth));
             city.MarkerHeight = Mathf.Max(0, EditorGUILayout.FloatField("Height of markers", city.MarkerHeight));
-            Graph g = city.LoadFirstGraph();
             ShowNodeTypes(city);
             Buttons();
         }

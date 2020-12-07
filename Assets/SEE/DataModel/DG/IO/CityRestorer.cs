@@ -36,24 +36,22 @@ public class CityRestorer
     /// <param name="city"> The city which is to be overwritten </param>
     public static void RestoreCity(string importFilename, AbstractSEECity city)
     {
+       
         string jsonContent = File.ReadAllText(importFilename);
         if (!(VerifyCityType(city, jsonContent)))
         {
             return; 
         }
         JsonUtility.FromJsonOverwrite(jsonContent, city);
+        string dataPath = getDataPath(city);
         Dictionary<string, bool> oldNodetypes = city.SelectedNodeTypes;
-        string pathPrefixOfCity = city.PathPrefix;
-        if (!(Directory.Exists(pathPrefixOfCity)))
-        {
-            Debug.Log("The directory does not exist anymore\n");
-            return;
-        }
+        string pathPrefixOfCity = dataPath;  
         Dictionary<string, bool> newNodeTypes = new Dictionary<string, bool>();
+
         if (city is SEECityEvolution)
         {
             SEECityEvolution evoCity = new SEECityEvolution();
-            evoCity.pathPrefix = pathPrefixOfCity;
+            evoCity.GXLDirectory.Set(dataPath);
             if (!(ReloadGraphByCityType(evoCity)))
             {
                 return;
@@ -163,7 +161,7 @@ public class CityRestorer
         else
         {
             SEECity seeCity = (SEECity)city;
-            if (!File.Exists(seeCity.GXLPath))
+            if (!File.Exists(seeCity.GXLPath.Path))
             {
                 Debug.LogError("The .gxl-file does not exist anymore in the given directory\n");
                 return false;
@@ -192,5 +190,27 @@ public class CityRestorer
             }
         }
 
+    }
+
+    /// <summary>
+    /// Returns either the GXL Directory of a SEECity or the SEECityEvolution object, depending on the specific
+    /// type of the AbstractSEECity object.
+    /// </summary>
+    /// <param name="city">the current city</param>
+    /// <returns>path = the name of the specific datapath, the .gxl file is saved into. 
+    private static string getDataPath(AbstractSEECity city)
+    { string path = null;
+        if (city is SEECity)
+        {
+            SEECity seeCity = (SEECity)city;
+            path = seeCity.GXLPath.Path;
+        }
+
+        else
+        {
+            SEECityEvolution sCityEvo = (SEECityEvolution)city;
+            path = sCityEvo.GXLDirectory.Path;
+        }
+        return path;
     }
 }
