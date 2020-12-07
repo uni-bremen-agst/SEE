@@ -17,18 +17,6 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class ShowLabel : InteractableObjectAction
     {
-        /// <summary>
-        /// Sets <see cref="isLeaf"/> and <see cref="city"/>.
-        /// </summary>
-        protected override void Awake()           
-        {   
-            base.Awake();  
-            isLeaf = SceneQueries.IsLeaf(gameObject);
-            GameObject codeCityObject = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
-            Assert.IsTrue(codeCityObject != null);
-            codeCityObject.TryGetComponent(out city);
-        }
-
         // There can be two reasons why the label needs to be shown: because it is selected
         // or because it is hovered over. Those two conditions are not mutually exclusive.
         // The label will be shown if and only if isHovered or isSelected.
@@ -86,7 +74,6 @@ namespace SEE.Controls.Actions
         /// <param name="isOwner">true if a local user initiated this call</param>
         private void SelectionOn(bool isOwner)
         {
-            Debug.LogFormat("ShowLabel.SelectionOn {0}\n", name);
             if (isOwner)
             {
                 isSelected = true;
@@ -106,7 +93,6 @@ namespace SEE.Controls.Actions
         /// <param name="isOwner">true if a local user initiated this call</param>
         private void SelectionOff(bool isOwner)
         {
-            Debug.LogFormat("ShowLabel.SelectionOff {0}\n", name);
             if (isOwner)
             {
                 isSelected = false;
@@ -155,11 +141,6 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// True if this node is a leaf. This value is cached to avoid frequent retrievals.
-        /// </summary>
-        private bool isLeaf;
-
-        /// <summary>
         /// The text label that's displayed above the object when the user hovers over it.
         /// Will be <code>null</code> when the label is not currently being displayed.
         /// This nodeLabel will contain a TextMeshPro component for the label text and a
@@ -168,15 +149,31 @@ namespace SEE.Controls.Actions
         private GameObject nodeLabel;
 
         /// <summary>
-        /// Settings for the visualization of the node.
+        /// Returns the code city holding the settings for the visualization of the node.
+        /// 
+        /// May be null.
         /// </summary>
-        private AbstractSEECity city;
+        private AbstractSEECity City()
+        {
+            GameObject codeCityObject = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
+            if (codeCityObject == null)
+            {
+                return null;
+            }
+            else
+            {
+                codeCityObject.TryGetComponent(out AbstractSEECity city);
+                return city;
+            }
+        }
 
         /// <summary>
-        /// Returns true iff labels are enabled for this node type.
+        /// Returns true iff labels are enabled for this kind of node.
         /// </summary>
-        /// <returns>true iff labels are enabled for this node type</returns>
-        private bool LabelsEnabled()
+        /// <param name="city">the code city holding the attributes for showing labels</param>
+        /// <param name="isLeaf">whether this node is a leaf</param>
+        /// <returns>true iff labels are enabled for this kind of node</returns>
+        private bool LabelsEnabled(AbstractSEECity city, bool isLeaf)
         {
             return isLeaf && city.ShowLabel || !isLeaf && city.InnerNodeShowLabel;
         }
@@ -184,15 +181,23 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Creates a text label above the object with its node's SourceName if the label doesn't exist yet.
         /// </summary>
-        /// <param name="isOwner">true if a local user initiated this call</param>
         private void On()
-        {
-            if (!LabelsEnabled())
+        {            
+            AbstractSEECity city = City();
+            if (city == null)
+            {
+                // The game node is currently not part of a city. This may happen, for instance,
+                // if a node is just created and not yet added to a city. In this case, we 
+                // are not doing anything.
+                return; 
+            }
+            bool isLeaf = SceneQueries.IsLeaf(gameObject);
+            if (!LabelsEnabled(city, isLeaf))
             {
                 return;  // If labels are disabled, we don't need to do anything
             }
 
-            // If label already exists, nothing needs to be done
+            // If label already exists or the game object has no node reference, nothing needs to be done
             if (nodeLabel != null || !gameObject.TryGetComponent(out NodeRef nodeRef))
             {
                 return;
@@ -201,9 +206,10 @@ namespace SEE.Controls.Actions
             Node node = nodeRef.node;
             if (node == null)
             {
+                Debug.LogErrorFormat("Game node {0} has no valid node reference.\n", name);
                 return;
             }
-
+            
             // Add text
             Vector3 position = gameObject.transform.position;
             position.y += isLeaf ? city.LeafLabelDistance : city.InnerNodeLabelDistance;
@@ -230,10 +236,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void Off()
         {
-            // If labels are disabled, we don't need to do anything
-            if (LabelsEnabled() && nodeLabel != null)
+            if (nodeLabel != null)
             {
                 Destroyer.DestroyGameObject(nodeLabel);
+                nodeLabel = null;
             }
         }
     }

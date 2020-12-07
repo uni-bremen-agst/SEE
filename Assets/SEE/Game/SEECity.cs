@@ -99,7 +99,7 @@ namespace SEE.Game
         /// </summary>
         protected void Awake()
         {
-            string filename = GXLPath;
+            string filename = GXLPath.Path;
             if (loadedGraph != null)
             {
                 Debug.Log("SEECity.Awake: graph is already loaded.\n");
@@ -221,36 +221,21 @@ namespace SEE.Game
                         Debug.LogWarningFormat("Could not resolve edge reference {0}.\n", child.name);          
                     }
                 }
-                else
-                {
-                    Debug.LogWarningFormat("Game object {0} has neither node nor edge reference.\n", child.name);
-                }
                 SetNodeEdgeRefs(graph, child);
             }
         }
 
         /// <summary>
-        /// The relative path for the GXL file containing the graph data.
+        /// The path to the GXL file containing the graph data.
         /// </summary>
-        public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
-        /// <summary>
-        /// The relative path for the CSV file containing the node metrics.
-        /// </summary>
-        public string csvPath = "..\\Data\\GXL\\minimal_clones.csv";
+        /// <returns>GXL data path</returns>
+        public DataPath GXLPath = new DataPath();
 
         /// <summary>
-        /// Returns the concatenation of pathPrefix and gxlPath. That is the complete
-        /// absolute path to the GXL file containing the graph data.
+        /// The path to the CSV file containing the additional metric values.
         /// </summary>
-        /// <returns>concatenation of pathPrefix and gxlPath</returns>
-        public string GXLPath => PathPrefix + gxlPath;
-
-        /// <summary>
-        /// Returns the concatenation of pathPrefix and csvPath. That is the complete
-        /// absolute path to the CSV file containing the additional metric values.
-        /// </summary>
-        /// <returns>concatenation of pathPrefix and csvPath</returns>
-        public string CSVPath => PathPrefix + csvPath;
+        /// <returns>metric data path</returns>
+        public DataPath CSVPath = new DataPath();
 
         /// <summary>
         /// A simple string variable in order to differentiate before loading data
@@ -264,7 +249,7 @@ namespace SEE.Game
         /// </summary>
         private void LoadMetrics()
         {
-            string filename = CSVPath;
+            string filename = CSVPath.Path;
             Performance p = Performance.Begin("loading metric data data from CSV file " + filename);
             int numberOfErrors = MetricImporter.Load(LoadedGraph, filename);
             if (numberOfErrors > 0)
@@ -293,7 +278,7 @@ namespace SEE.Game
         /// </summary>
         public virtual void LoadData()
         {
-            if (string.IsNullOrEmpty(GXLPath))
+            if (string.IsNullOrEmpty(GXLPath.Path))
             {
                 Debug.LogError("Empty graph path.\n");
             }
@@ -303,7 +288,7 @@ namespace SEE.Game
                 {
                     Reset();
                 }
-                LoadedGraph = LoadGraph(GXLPath);
+                LoadedGraph = LoadGraph(GXLPath.Path);
                 LoadMetrics();
             }
         }
@@ -313,7 +298,7 @@ namespace SEE.Game
         /// </summary>
         public virtual void SaveData()
         {
-            if (string.IsNullOrEmpty(GXLPath))
+            if (string.IsNullOrEmpty(GXLPath.Path))
             {
                 Debug.LogError("Empty graph path.\n");
             }
@@ -326,7 +311,7 @@ namespace SEE.Game
                     // arbitrary element from a HashSet (the type of HierarchicalEdges).
                     foreach (string hierarchicalEdge in HierarchicalEdges)
                     {
-                        GraphWriter.Save(GXLPath, LoadedGraph, hierarchicalEdge);
+                        GraphWriter.Save(GXLPath.Path, LoadedGraph, hierarchicalEdge);
                         break;
                     }
                 }
@@ -406,15 +391,15 @@ namespace SEE.Game
         /// </summary>
         public void SaveLayout()
         {
-            string path = LayoutPath;
-            Debug.LogFormat("Saving layout data to {0}.\n", path);
+            string path = LayoutPath.Path;
+            Debug.LogFormat("Saving layout data to {0}.\n", path);            
             if (Filenames.HasExtension(path, Filenames.GVLExtension))
             {
-                Layout.IO.GVLWriter.Save(LayoutPath, loadedGraph.Name, AllNodeDescendants(gameObject));
+                Layout.IO.GVLWriter.Save(path, loadedGraph.Name, AllNodeDescendants(gameObject));
             }
             else
             {
-                Layout.IO.SLDWriter.Save(LayoutPath, AllNodeDescendants(gameObject));
+                Layout.IO.SLDWriter.Save(path, AllNodeDescendants(gameObject));
             }
         }
 

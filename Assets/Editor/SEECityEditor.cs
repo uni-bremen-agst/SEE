@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 
 using SEE.Game;
-using System;
+using SEE.Utils;
 using UnityEditor;
 using UnityEngine;
 using SEE.Utils;
@@ -86,8 +86,8 @@ namespace SEEEditor
         protected virtual void Attributes()
         {
             SEECity city = target as SEECity;
-            city.gxlPath = EditorGUILayout.TextField("GXL file", city.gxlPath);
-            city.csvPath = EditorGUILayout.TextField("CSV file", city.csvPath);
+            city.GXLPath = GetDataPath("GXL file", city.GXLPath, Filenames.ExtensionWithoutPeriod(Filenames.GXLExtension));
+            city.CSVPath = GetDataPath("Metric file", city.CSVPath, Filenames.ExtensionWithoutPeriod(Filenames.CSVExtension));           
         }
 
         /// <summary>

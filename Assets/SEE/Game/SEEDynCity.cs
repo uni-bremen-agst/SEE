@@ -8,20 +8,12 @@ namespace SEE.Game
 {
     public class SEEDynCity : SEECity
     {
-        /// <summary>
-        /// The relative path for the DYN file containing the dynamic call graph.
-        /// </summary>
-        public string dynPath = "example_02.dyn";
 
         /// <summary>
-        /// Returns the concatenation of pathPrefix and dynPath. That is the complete
-        /// absolute path to the DYN file containing the additional metric values.
+        /// The path to the DYN file containing the trace data.
         /// </summary>
-        /// <returns>concatenation of pathPrefix and dynPath</returns>
-        public string DYNPath()
-        {
-            return PathPrefix + dynPath;
-        }
+        /// <returns>path of DYN file</returns>
+        public DataPath DYNPath = new DataPath();
 
         /// <summary>
         /// Loads the graph data from the GXL file with GXLPath() and the metrics
@@ -30,15 +22,8 @@ namespace SEE.Game
         /// </summary>
         public override void LoadData()
         {
-            if (string.IsNullOrEmpty(GXLPath))
-            {
-                Debug.LogError("Empty graph path.\n");
-            }
-            else
-            {
-                base.LoadData();
-                LoadDYN();
-            }
+            base.LoadData();
+            LoadDYN();
         }
 
         /// <summary>
@@ -47,7 +32,7 @@ namespace SEE.Game
         /// </summary>
         private void LoadDYN()
         {
-            string filename = DYNPath();
+            string filename = DYNPath.Path;
             if (string.IsNullOrEmpty(filename))
             {
                 Debug.LogError("Empty path for dynamic trace file.\n");
