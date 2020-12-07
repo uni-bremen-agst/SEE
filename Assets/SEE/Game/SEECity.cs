@@ -36,7 +36,6 @@ namespace SEE.Game
         [NonSerialized]
         private Graph loadedGraph = null;
 
-        public String isAnSEECityObject = "isAnSEECityObject";
 
         /// <summary>
         /// The graph underlying this SEE city that was loaded from disk. May be null.
@@ -231,7 +230,7 @@ namespace SEE.Game
         /// The path to the GXL file containing the graph data.
         /// </summary>
         /// <returns>GXL data path</returns>
-        public DataPath GXLPath = new DataPath();
+        public DataPath  GXLPath = new DataPath();
 
         /// <summary>
         /// The path to the CSV file containing the additional metric values.
