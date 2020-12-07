@@ -14,7 +14,13 @@ namespace SEEEditor
     [CustomEditor(typeof(SEECityEvolution))]
     [CanEditMultipleObjects]
     public class SEECityEvolutionEditor : StoredSEECityEditor
-    {    
+    {
+
+        /// <summary>
+        /// An attribute which is true, if the Button "Load First Graph" was activated, else false. Important for saving json-node-type-collection.
+        /// </summary>
+        private bool loaded = false;
+
         public override void OnInspectorGUI()
         {
             
@@ -43,6 +49,7 @@ namespace SEEEditor
             {
                 firstGraph = city.LoadFirstGraph();
                 city.InspectSchema(firstGraph);
+                loaded = true;
             }
             if (firstGraph != null && GUILayout.Button("Draw"))
             {
@@ -52,11 +59,15 @@ namespace SEEEditor
             {
                 city.Reset(); // will not clear the selected node types
                 firstGraph = null;
+                loaded = false;
             }
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Save Settings"))
+            if (!loaded)
             {
-                SaveCityInJSON(city);
+                if (GUILayout.Button("Save Settings"))
+                {
+                    SaveCityInJSON(city);
+                }
             }
             EditorGUILayout.EndHorizontal();
             if(GUILayout.Button("Load Settings"))
