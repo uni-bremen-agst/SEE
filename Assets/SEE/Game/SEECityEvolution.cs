@@ -41,7 +41,7 @@ namespace SEE.Game
 
         public Node GetSingleRoot(Graph graph)
         {
-            singleRoot = graph.getSingleRoot();
+           singleRoot = graph.getSingleRoot();
            return graph.getSingleRoot();
         }
        
@@ -92,7 +92,7 @@ namespace SEE.Game
         [Tooltip("The directory in which the GXL files are located.")]
         public DataPath GXLDirectory = new DataPath();
 
-        public String isAnSEECityEvolutionObject = "isAnSEECityEvolutionObject";
+        public string isAnSEECityEvolutionObject = "isAnSEECityEvolutionObject";
 
         /// <summary>
         /// Factory method to create the used EvolutionRenderer.
