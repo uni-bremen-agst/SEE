@@ -38,10 +38,13 @@ namespace SEEEditor
         {
             string sourcename = null;    
             if (city is SEECityEvolution) {
-                city.Reset();
+                
                 SEECityEvolution c = (SEECityEvolution)city;
                 Node n = c.singleRoot;
                 sourcename = null;
+                //we have to reset the nodetypes of the city to prevent glitches, i.e. 
+                //the software showing the nodetypes of the elder version, in case an elder version was loaded
+                city.Reset();
                 if (n != null)
                 {
                     sourcename = n.Type;

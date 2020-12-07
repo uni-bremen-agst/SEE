@@ -18,7 +18,6 @@ namespace SEEEditor
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
-
             SEECity city = target as SEECity;
             Attributes();
             ShowNodeTypes(city);
