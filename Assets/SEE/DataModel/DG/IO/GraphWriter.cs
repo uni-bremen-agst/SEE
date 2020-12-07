@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
+using UnityEngine;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -30,7 +32,15 @@ namespace SEE.DataModel.DG.IO
             AppendDependencyEdges(doc, graphNode, graph, nodeIDs_To_GXLids);
             int hierarchicalEdgeCount = 1;
             AppendChildren(doc, graphNode, graph, nodeIDs_To_GXLids, hierarchicalEdgeType, ref hierarchicalEdgeCount);
-            doc.Save(filename);
+            try
+            {
+                doc.Save(filename);
+            }
+            catch(Exception e)
+            {
+                Debug.LogErrorFormat("Could not save graph to GXL file '{0}' due to: {1}.\n", filename, e.Message);
+                throw e;
+            }
         }
 
         /// <summary>
