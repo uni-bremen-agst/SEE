@@ -36,7 +36,6 @@ public class CityRestorer
     /// <param name="city"> The city which is to be overwritten </param>
     public static void RestoreCity(string importFilename, AbstractSEECity city)
     {
-       
         string jsonContent = File.ReadAllText(importFilename);
         if (!(VerifyCityType(city, jsonContent)))
         {
