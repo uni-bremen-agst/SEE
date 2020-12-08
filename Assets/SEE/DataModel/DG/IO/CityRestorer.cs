@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
-using System.Text;
 using SEE.Game;
 using System.Linq;
-using System;
-using SEE.DataModel.DG;
 
 /// <summary>
 /// This class is responsible for the export and the restore of either a SEECity or a SEECityEvolution object. 
@@ -155,7 +152,6 @@ public class CityRestorer
 
             evoCity.InspectSchema(evoCity.LoadFirstGraph());
                 return (evoCity.LoadFirstGraph() != null);
-   
         }
         else
         {
@@ -188,7 +184,6 @@ public class CityRestorer
                 }
             }
         }
-
     }
 
     /// <summary>
@@ -204,7 +199,6 @@ public class CityRestorer
             SEECity seeCity = (SEECity)city;
             path = seeCity.GXLPath.Path;
         }
-
         else
         {
             SEECityEvolution sCityEvo = (SEECityEvolution)city;

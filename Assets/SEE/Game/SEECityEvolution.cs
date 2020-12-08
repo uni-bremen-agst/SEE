@@ -20,7 +20,6 @@
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -36,7 +35,6 @@ namespace SEE.Game
         /// <summary>
         /// The loaded graph.
         /// </summary>
-
         public Node singleRoot = null;
 
         public Node GetSingleRoot(Graph graph)
@@ -97,6 +95,10 @@ namespace SEE.Game
         [Tooltip("The directory in which the GXL files are located.")]
         public DataPath GXLDirectory = new DataPath();
 
+        /// <summary>
+        /// A simple string variable in order to differentiate before loading data
+        /// from a stored .json file
+        /// </summary>
         public string isAnSEECityEvolutionObject = "isAnSEECityEvolutionObject";
 
         /// <summary>
@@ -119,7 +121,6 @@ namespace SEE.Game
         /// </summary>
         private List<Graph> LoadData()
         {
-            
             GraphsReader graphsReader = new GraphsReader();
             // Load all GXL graphs and CSV files in directory PathPrefix but not more than maxRevisionsToLoad many.
             graphsReader.Load(GXLDirectory.Path, HierarchicalEdges, maxRevisionsToLoad);

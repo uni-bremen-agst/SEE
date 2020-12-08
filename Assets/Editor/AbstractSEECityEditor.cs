@@ -153,6 +153,7 @@ namespace SEEEditor
                 if(city is SEECityEvolution)
                 {
                     SEECityEvolution evo = (SEECityEvolution)city;
+                    evo.Reset();
                     Graph firstGraph = evo.LoadFirstGraph();
                     evo.InspectSchema(firstGraph);
                     evo.NodeTypesTemp = evo.SelectedNodeTypes;

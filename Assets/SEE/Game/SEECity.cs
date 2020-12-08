@@ -36,7 +36,6 @@ namespace SEE.Game
         [NonSerialized]
         private Graph loadedGraph = null;
 
-
         /// <summary>
         /// The graph underlying this SEE city that was loaded from disk. May be null.
         /// If a new graph is assigned to this property, the selected node types will
@@ -230,7 +229,7 @@ namespace SEE.Game
         /// The path to the GXL file containing the graph data.
         /// </summary>
         /// <returns>GXL data path</returns>
-        public DataPath  GXLPath = new DataPath();
+        public DataPath GXLPath = new DataPath();
 
         /// <summary>
         /// The path to the CSV file containing the additional metric values.

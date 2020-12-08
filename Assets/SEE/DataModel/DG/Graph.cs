@@ -42,8 +42,6 @@ namespace SEE.DataModel.DG
         /// Important note: This value must be computed by calling FinalizeGraph() 
         /// before accessing <see cref="MaxDepth"/>.
         /// </summary>
-        /// 
-
         public int MaxDepth 
         { 
             get
@@ -212,7 +210,6 @@ namespace SEE.DataModel.DG
         /// <param name="type">type of new root node</param>
         public void AddSingleRoot(string name, string type)
         {
-            UnityEngine.Debug.Log("Test");
             List<Node> roots = GetRoots();
             if (roots.Count > 0)
             {
