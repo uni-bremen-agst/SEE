@@ -35,33 +35,6 @@ namespace SEE.Game
         [OdinSerialize]
         public DataPath LayoutPath = new DataPath();
 
-
-
-
-        [SerializeField] public string jsonDirectory = null;
-
-        public string JsonDirectory
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(jsonDirectory))
-                {
-                    jsonDirectory = Application.dataPath;
-                }
-                string result = jsonDirectory;
-                if (result[result.Length - 1] != Filenames.UnixDirectorySeparator)
-                {
-                    result += Filenames.UnixDirectorySeparator;
-                }
-                result = Filenames.OnCurrentPlatform(result);
-                return result;
-            }
-            set
-            {
-                jsonDirectory = Path.GetDirectoryName(value);
-            }
-        }
-
         /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
@@ -735,6 +708,36 @@ namespace SEE.Game
 
                 CoseGraphSettings.loadedForNodeTypes = SelectedNodeTypes.Where(type => type.Value == true).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
                 CoseGraphSettings.rootDirs = graph.GetRoots();
+            }
+        }
+
+        /// <summary>
+        /// A string which contains the directory of the last chosen .json-loading or .json-saving-path
+        /// </summary>
+        [SerializeField] public string jsonDirectory = null;
+
+        /// <summary>
+        /// getter and setter for the last chosen json-directory-path. If its null, a relative default path will be chosen.
+        /// </summary>
+        public string JsonDirectory
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(jsonDirectory))
+                {
+                    jsonDirectory = Application.dataPath;
+                }
+                string result = jsonDirectory;
+                if (result[result.Length - 1] != Filenames.UnixDirectorySeparator)
+                {
+                    result += Filenames.UnixDirectorySeparator;
+                }
+                result = Filenames.OnCurrentPlatform(result);
+                return result;
+            }
+            set
+            {
+                jsonDirectory = Path.GetDirectoryName(value);
             }
         }
 

@@ -45,8 +45,10 @@ namespace SEEEditor
         private void Buttons()
         {
             SEECityEvolution city = target as SEECityEvolution;
+          
             if (firstGraph == null && GUILayout.Button("Load First Graph"))
             {
+                city.NodeTypesTemp = city.SelectedNodeTypes;
                 firstGraph = city.LoadFirstGraph();
                 city.InspectSchema(firstGraph);
                 loaded = true;
@@ -58,6 +60,7 @@ namespace SEEEditor
             if (firstGraph != null && GUILayout.Button("Delete Graph"))
             {
                 city.Reset(); // will not clear the selected node types
+                city.SetNodeTypesTemp(city.NodeTypesTemp);
                 firstGraph = null;
                 loaded = false;
             }
