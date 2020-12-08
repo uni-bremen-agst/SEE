@@ -42,9 +42,6 @@ namespace SEEEditor
                 SEECityEvolution c = (SEECityEvolution)city;
                 Node n = c.singleRoot;
                 sourcename = null;
-                //we have to reset the nodetypes of the city to prevent glitches, i.e. 
-                //the software showing the nodetypes of the elder version, in case an elder version was loaded
-                city.Reset();
                 if (n != null)
                 {
                     sourcename = n.Type;
@@ -52,7 +49,7 @@ namespace SEEEditor
             }
             GUILayout.Label("Node types:", EditorStyles.boldLabel);
             // Make a copy to loop over the dictionary while making changes.
-            Dictionary<string, bool> selection =new Dictionary<string, bool>(city.SelectedNodeTypes);
+            Dictionary<string, bool> selection = new Dictionary<string, bool>(city.SelectedNodeTypes);
             int countSelected = 0;
 
               foreach (KeyValuePair<string, bool> entry in selection)
@@ -61,16 +58,13 @@ namespace SEEEditor
                      if (!(entry.Key.Equals(sourcename) && sourcename != null)) 
                     { 
                         city.SelectedNodeTypes[entry.Key] = EditorGUILayout.Toggle("  " + entry.Key, entry.Value);
-                        if (city.SelectedNodeTypes[entry.Key])
-                        {
-                            countSelected++;
-                        }
+                    if (city.SelectedNodeTypes[entry.Key])
+                    {
+                        countSelected++;
+                    }
                 }
             }
 
-            
-            
-            
             if (city.CoseGraphSettings.loadedForNodeTypes.Count == 0)
             {
                 city.CoseGraphSettings.showGraphListing = true;

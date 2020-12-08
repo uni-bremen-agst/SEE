@@ -70,7 +70,7 @@ namespace SEE.Game
         /// they should be visualized or not.
         /// </summary>
         public Dictionary<string, bool> SelectedNodeTypes
-        {   
+        {
             get => nodeTypes;
             set
             {
@@ -208,7 +208,7 @@ namespace SEE.Game
                         newNodeTypes[type] = true;
                     }
                 }
-                    nodeTypes = newNodeTypes;
+                nodeTypes = newNodeTypes;
             }
         }
 
@@ -220,7 +220,6 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">graph whose subgraph is requested</param>
         /// <returns>subgraph of <paramref name="graph"/> (copy) or <paramref name="graph"/></returns>
-
         public Graph RelevantGraph(Graph graph)
         {
             if (AllNodeTypesAreRelevant)
