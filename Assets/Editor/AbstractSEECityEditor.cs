@@ -150,6 +150,13 @@ namespace SEEEditor
                 {
                     dataPath.Set(selectedPath);
                 }
+                if(city is SEECityEvolution)
+                {
+                    SEECityEvolution evo = (SEECityEvolution)city;
+                    Graph firstGraph = evo.LoadFirstGraph();
+                    evo.InspectSchema(firstGraph);
+                    evo.NodeTypesTemp = evo.SelectedNodeTypes;
+                }
             }
             EditorGUILayout.EndHorizontal();
 
