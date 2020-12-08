@@ -44,7 +44,12 @@ namespace SEE.Game
            singleRoot = graph.getSingleRoot();
            return graph.getSingleRoot();
         }
-       
+
+        /// <summary>
+        /// An additional Dictionary with all NodeTypes before loading the Graph-Data
+        /// (after it, only true NodeTypes are contained in the main-dictionary "selectedNodeTypes").
+        /// </summary>
+        public Dictionary<string, bool> NodeTypesTemp;
 
         /// <summary>
         /// Sets the maximum number of revsions to load.
@@ -209,6 +214,18 @@ namespace SEE.Game
 
             evolutionRenderer = CreateEvolutionRenderer();
             evolutionRenderer.ShowGraphEvolution(graphs);
+        }
+
+        /// <summary>
+        /// Another setter-Method for restoring the node-type´s after pushing the delete-button.
+        ///
+        /// Note: For unknown reason Unity closes using "NodeTypes" or a public attribute without any message.
+        /// Therefore, this Method is nessecary.
+        /// </summary>
+        /// <param name="tempNodeTypes"></param>
+        public void SetNodeTypesTemp(Dictionary<string, bool> tempNodeTypes)
+        {
+            nodeTypes = tempNodeTypes;
         }
     }
 }
