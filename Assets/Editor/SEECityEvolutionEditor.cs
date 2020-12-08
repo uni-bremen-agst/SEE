@@ -76,6 +76,8 @@ namespace SEEEditor
             if(GUILayout.Button("Load Settings"))
             {
                 LoadCityFromJSON(city);
+                city.Reset();
+                city.LoadFirstGraph();
             }
         }
 
