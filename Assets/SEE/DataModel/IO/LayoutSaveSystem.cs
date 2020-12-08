@@ -8,8 +8,16 @@ using UnityEngine;
 
 namespace SEE.DataModel.IO
 {
+    /// <summary>
+    /// Serialises and deserialises the current city layout using the binaryformater.
+    /// </summary>
     public static class LayoutSaveSystem
     {
+        /// <summary>
+        /// Serialises the current city layout <paramref name="annotatableObjects"/> into <paramref name="path"/>.
+        /// </summary>
+        /// <param name="annotatableObjects">the objects to be saved</param>
+        /// <param name="path">the path which the file is going to be saved in</param>
         public static void SaveAnnotatableObjects(List<AnnotatableObjectData> annotatableObjects, string path)
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
@@ -26,6 +34,10 @@ namespace SEE.DataModel.IO
             }
         }
 
+        /// <summary>
+        /// Deserialases the a city layout from <paramref name="path"/>.
+        /// </summary>
+        /// <param name="path">the path which the layout is going to be loaded from</param>
         public static List<AnnotatableObjectData> LoadAnnotatableObjects(string path)
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();

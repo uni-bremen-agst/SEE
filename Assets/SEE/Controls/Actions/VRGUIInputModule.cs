@@ -7,6 +7,9 @@ using Valve.VR;
 using Valve.VR.InteractionSystem;
 
 
+/// <summary>
+/// Controlls the intactions with the UI elements of the annoationEditor in VR.
+/// </summary>
 public class VRGUIInputModule : BaseInputModule
 {
     public Camera camera;
@@ -26,6 +29,9 @@ public class VRGUIInputModule : BaseInputModule
 
     public override void Process() { }
 
+    /// <summary>
+    /// Calls onClick() of the UI buttons from the annoationEditor in VR. 
+    /// </summary>
     public void Use()
     {
             data.Reset();

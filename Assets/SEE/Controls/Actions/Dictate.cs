@@ -7,12 +7,18 @@ using SEE.GO;
 using SEE.Game;
 using TMPro;
 
+/// <summary>
+/// Implements interactions with the dictationRecognizer.
+/// </summary>
 public class Dictate : MonoBehaviour
 {
     private DictationRecognizer m_DictationRecognizer;
 
     private string record = "";
 
+    /// <summary>
+    /// True if currently recording.
+    /// </summary>
     private bool recording = false;
 
     void Start()
@@ -67,6 +73,9 @@ public class Dictate : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Switches between recording and not recording.
+    /// </summary>
     public void Click()
     {
         if (recording == false)
@@ -81,6 +90,9 @@ public class Dictate : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Start the dictation process and switches the button text from start to stop.
+    /// </summary>
     private void Go()
     {
         m_DictationRecognizer.Start();
@@ -98,6 +110,9 @@ public class Dictate : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Stops the dictation process and adds the dictated text to the textfield.
+    /// </summary>
     private void Stop()
     {
         AnnotationEditor annotationEditor = this.gameObject.GetComponent<AnnotationEditor>();
@@ -117,6 +132,13 @@ public class Dictate : MonoBehaviour
             m_DictationRecognizer.Stop();
     }
 
+    public void Quit()
+    {
+        if (recording)
+        {
+            Stop();
+        }
+    }
     public void Close()
     {
         m_DictationRecognizer.Dispose();

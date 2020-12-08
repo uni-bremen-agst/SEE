@@ -8,12 +8,18 @@ using SEE.Controls;
 
 namespace SEE.GO
 {
+    /// <summary>
+    /// Implements interactions with an annoationEditor game object.
+    /// </summary>
     public class AnnotationEditor : MonoBehaviour
     {
         public TMP_InputField annotationToAdd;
         public TMP_InputField annotationToEdit;
         private GameObject actor;
 
+        /// <summary>
+        /// Adds an annotation with the text of annotationToAdd.
+        /// </summary>
         public void AddAnnotation()
         {
             AnnotatableObject annotatableObject = this.GetComponentInParent(typeof(AnnotatableObject)) as AnnotatableObject;
@@ -21,18 +27,27 @@ namespace SEE.GO
             annotationToAdd.text = "";
         }
 
+        /// <summary>
+        /// Initiats the process of removing an annoation.
+        /// </summary>
         public void RemoveAnnotatio()
         {
             AnnotatableObject annotatableObject = this.GetComponentInParent(typeof(AnnotatableObject)) as AnnotatableObject;
             annotatableObject.MakeAnnotationsClickable(true);
         }
 
+        /// <summary>
+        /// Initiats the process of editing an annoation.
+        /// </summary>
         public void StartEditing()
         {
             AnnotatableObject annotatableObject = this.GetComponentInParent(typeof(AnnotatableObject)) as AnnotatableObject;
             annotatableObject.MakeAnnotationsClickable(false);
         }
 
+        /// <summary>
+        /// Edits an annotation with the text of annotationToEdit.
+        /// </summary>
         public void EditAnnotation()
         {
             AnnotatableObject annotatableObject = this.GetComponentInParent(typeof(AnnotatableObject)) as AnnotatableObject;
@@ -40,12 +55,18 @@ namespace SEE.GO
             annotationToEdit.text = "";
         }
 
+        /// <summary>
+        /// Closes the annoationEditor.
+        /// </summary>
         public void QuitAnnotationEditor()
         {
             AnnotatableObject annotatableObject = this.GetComponentInParent(typeof(AnnotatableObject)) as AnnotatableObject;
             annotatableObject.CloseAnnotationEditor();
         }
 
+        /// <summary>
+        /// Deactives and actives movement via keybord in order to prefend movement while typing.
+        /// </summary>
         public void Moveable()
         {
             if (actor == null)

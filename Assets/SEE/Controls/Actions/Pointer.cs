@@ -7,6 +7,9 @@ using Valve.VR;
 using Valve.VR.InteractionSystem;
 
 
+/// <summary>
+/// Provids a visible ray to interact with the annotationEditor and the annotations in VR.
+/// </summary>
 public class Pointer : MonoBehaviour
 {
     public float default_length = 5.0f;
@@ -40,6 +43,9 @@ public class Pointer : MonoBehaviour
         UpdateLine();
     }
 
+    /// <summary>
+    /// Updates the ray and initiats intactions with the annotationEditor or an annotation on button press.
+    /// </summary>
     private void UpdateLine()
     {
         PointerEventData data = input_module.GetData();

@@ -6,9 +6,12 @@ using SEE.Controls;
 
 namespace SEE.GO
 {
+/// <summary>
+/// Controlls the click intaction between mouse and annoations.
+/// </summary>
     public class Clickable : MonoBehaviour
     {
-        // Update is called once per frame
+
         void Update()
         {
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);

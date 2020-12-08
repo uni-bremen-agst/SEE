@@ -3,6 +3,9 @@ using SEE.Controls;
 using SEE.GO;
 using System;
 
+/// <summary>
+/// Converts all relevant attributs of an annoatableObject so the are serialisable and deserialisible.
+/// </summary>
 [System.Serializable]
 public class AnnotatableObjectData
 {

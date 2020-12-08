@@ -429,6 +429,12 @@ namespace SEE.Game
             return result;
         }
 
+        /// <summary>
+        /// Finds the object with the given <paramref name="id"/> in the list of object <paramref name="gameObjects"/>.
+        /// </summary>
+        /// <param name="id">id of the gameobject to be found</param>
+        /// <param name="gameObjects">list of gameObjects</param>
+        /// <returns>the gameObject matching <paramref name="id"/></returns>
         private GameObject FindGameObject(uint id, List<GameObject> gameObjects)
         {
             foreach (GameObject gameObject in gameObjects)
@@ -441,6 +447,9 @@ namespace SEE.Game
             return null;
         }
 
+        /// <summary>
+        /// Initiats the saving of all objects of the city.
+        /// </summary>
         public void SaveLayoutAndAnnotations()
         {
             List<GameObject> gameObjects = SEECity.AllNodeDescendants(gameObject).ToList();
@@ -458,6 +467,9 @@ namespace SEE.Game
             catch (DirectoryNotFoundException e) { }
         }
 
+        /// <summary>
+        /// Initiats the loading of a previous saved layout and annoatations.
+        /// </summary>
         public void LoadLayoutAndAnnotations()
         {
             List<AnnotatableObjectData> annotatableObjects = LayoutSaveSystem.LoadAnnotatableObjects(SEELoadPath());

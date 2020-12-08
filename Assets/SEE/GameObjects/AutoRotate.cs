@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Rearanges the annoationEditor and the annoations to face the main camera.
+/// </summary>
 public class AutoRotate : MonoBehaviour
 {
 

@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace SEE.Controls
 {
+    /// <summary>
+    /// Adds a mark to an annoatableObject.
+    /// </summary>
     public class MarkScript : MonoBehaviour
     {
         private LineRenderer mark;
@@ -21,6 +24,9 @@ namespace SEE.Controls
             mark.enabled = false;
         }
 
+        /// <summary>
+        /// Activates the mark, if the object is annotated and the annoationEditor of the object is not open.
+        /// </summary>
         void Update()
         {
             AnnotatableObject annotatableObject = this.GetComponentInParent(typeof(AnnotatableObject)) as AnnotatableObject;

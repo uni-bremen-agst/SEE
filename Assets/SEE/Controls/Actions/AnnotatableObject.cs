@@ -13,22 +13,42 @@ namespace SEE.Controls
     /// </summary>
     public class AnnotatableObject : GrabbableObject
     {
+        /// <summary>
+        /// True if the object is currently annotated.
+        /// </summary>
         public bool isAnnotated = false;
 
+        /// <summary>
+        /// List of Annoations.
+        /// </summary>
         public List<GameObject> annotations;
+
 
         private GameObject annotationEditor = null;
 
         private static GameObject annotationEditorPrefab;
 
+        /// <summary>
+        /// True if the annoationEditor is currently open.
+        /// </summary>
         private bool editorOpen = false;
 
+        /// <summary>
+        /// True if the current interaction is deleting.
+        /// </summary>
         private bool delete = false;
+
 
         private GameObject annotationToEdit;
 
+        /// <summary>
+        /// Pointer objext for annoationEditor.
+        /// </summary>
         private GameObject guiPointer;
 
+        /// <summary>
+        /// True if annoations are allowed.
+        /// </summary>
         private bool isAnnotatable;
 
         protected override void Awake()
@@ -36,7 +56,7 @@ namespace SEE.Controls
             base.Awake();
             if (annotationEditorPrefab == null)
             {
-                // Filename of the prefab for the text on paper excluding its file extension .prefab
+                // Filename of the prefab for the annoation editor excluding its file extension .prefab
                 string path = "Prefabs/AnnotationEditor3D";
                 annotationEditorPrefab = Resources.Load<GameObject>(path);
                 if (annotationEditorPrefab == null)
@@ -92,6 +112,10 @@ namespace SEE.Controls
             guiPointer.GetComponent<Pointer>().SetSelectionState(Pointer.SelectionState.None, this);
         }
 
+        /// <summary>
+        /// Actives and deactives the ray for the interactions with the annoation editor in VR.
+        /// </summary>
+        /// <param name="state">the new state of the GUIPointer</param>
         private void SwitchGUIPointer(bool state)
         {
             guiPointer.GetComponent<LineRenderer>().enabled = state;
@@ -99,6 +123,9 @@ namespace SEE.Controls
             guiPointer.transform.GetChild(0).gameObject.SetActive(state);
         }
 
+        /// <summary>
+        /// Resets the annoation editor to its main menu.
+        /// </summary>
         private void ResetAnnotationEditor()
         {
             foreach (Transform child in annotationEditor.transform)
@@ -111,6 +138,10 @@ namespace SEE.Controls
             }
         }
 
+        /// <summary>
+        /// Adds the given <paramref name="annotation"/> the object.
+        /// </summary>
+        /// <param name="annotation">the text of the annotation to be added</param>
         public void Annotate(string annotation)
         {
             GameObject annotationOnPaper = Instantiate(textOnPaperPrefab, Vector3.zero, Quaternion.identity);
@@ -120,7 +151,7 @@ namespace SEE.Controls
             // Now textOnPaper has been re-sized properly; so we can derive its absolute height.
             float paperHeight = TextGUIAndPaperResizer.Height(annotationOnPaper);
 
-            // We want to put the label above the roof of the gameObject. The gameObject,
+            // We want to put the annoation above the roof of the gameObject. The gameObject,
             // however, could be composed of multiple child objects of different height
             // (e.g., an inner node which typically has a very low height because it is
             // visualized as an area, but the area contains many child objects).
@@ -153,6 +184,10 @@ namespace SEE.Controls
             isAnnotated = true;
         }
 
+        /// <summary>
+        /// Changes the annoationToEdit text to the given <paramref name="annotation"/>.
+        /// </summary>
+        /// <param name="annotation">the new annotation text</param>
         public void EditAnnotation(string annotation)
         {
             CloseAnnotationEditor();
@@ -160,6 +195,10 @@ namespace SEE.Controls
             TextGUIAndPaperResizer.Height(annotationToEdit);
         }
 
+        /// <summary>
+        /// Sets the annotaitonToEdit to the given <paramref name="annotation"/> object.
+        /// </summary>
+        /// <param name="annotation">the annotation to be edited</param>
         public void StartEditing(GameObject annotation)
         {
             HideInformation();
@@ -175,6 +214,10 @@ namespace SEE.Controls
             annotationEditor.SetActive(true);
         }
 
+        /// <summary>
+        /// Removes the given <paramref name="annotation"/> from the object.
+        /// </summary>
+        /// <param name="annotation">the annotation to be removed</param>
         public void RemoveAnnotation(GameObject annotation)
         {
             GameObject.Destroy(annotation.gameObject);
@@ -200,6 +243,9 @@ namespace SEE.Controls
             CloseAnnotationEditor();
         }
 
+        /// <summary>
+        /// Removes all annoations from the object.
+        /// </summary>
         public void RemoveAllAnnotations()
         {
             foreach (GameObject annotation in annotations)
@@ -210,6 +256,10 @@ namespace SEE.Controls
             isAnnotated = false;
         }
 
+        /// <summary>
+        /// Depending on delete the given <paramref name="annotation"/> is either deleted or edited.
+        /// </summary>
+        /// <param name="annotation">the clicked annotation</param>
         public void AnnotationClicked(GameObject annotation)
         {
             if (delete)
@@ -304,6 +354,11 @@ namespace SEE.Controls
             return isAnnotatable;
         }
 
+        /// <summary>
+        /// Resizes the text of the annotation.
+        /// </summary>
+        /// <param name="annotation">the raw text of the annotation to be added</param>
+        /// <returns>the formated text of the annotation to be added </returns>
         private string ResizeAnnotation(string annotation)
         {
             string annotationNewLine = annotation;

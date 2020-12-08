@@ -69,6 +69,10 @@
       "type": "vector2"
     },
     {
+      "name": "/actions/default/in/AnnotationEditor",
+      "type": "boolean"
+    },
+    {
       "name": "/actions/default/out/Haptic",
       "type": "vibration"
     }
@@ -76,6 +80,10 @@
   "action_sets": [
     {
       "name": "/actions/default",
+      "usage": "leftright"
+    },
+    {
+      "name": "/actions/NewSet",
       "usage": "single"
     }
   ],
@@ -135,7 +143,8 @@
       "/actions/default/in/Cancel": "Cancel",
       "/actions/default/in/Move": "Move",
       "/actions/default/in/Home": "Home",
-      "/actions/default/in/Zoom": "Zoom"
+      "/actions/default/in/Zoom": "Zoom",
+      "/actions/default/in/AnnotationEditor": "AnnotationEditor"
     }
   ]
 }
