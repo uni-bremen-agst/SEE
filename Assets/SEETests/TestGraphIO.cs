@@ -183,7 +183,7 @@ namespace SEE.DataModel.DG.IO
 
         private static Edge NewEdge(Graph graph, Node from, Node to, string type)
         {
-            Edge result = new Edge();
+            Edge result = new Edge(type + "#" + from.ID + "#" + to.ID);
             result.Type = type;
             result.Source = from;
             result.Target = to;
