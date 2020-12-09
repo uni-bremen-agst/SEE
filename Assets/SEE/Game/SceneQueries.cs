@@ -3,6 +3,7 @@ using SEE.Controls;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.GO;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game
@@ -148,25 +149,22 @@ namespace SEE.Game
         /// <summary>
         /// Returns the root game object that represents a code city as a whole
         /// along with the settings (layout information etc.). In other words,
-        /// we simply return the topmost transform in the game-object hierarchy.
-        /// If the given <paramref name="transform"/> is not included in any
-        /// other game object, <paramref name="transform"/> will be returned.
-        /// 
-        /// For reasons of efficiency, we are not checking whether the returned
-        /// game object is tagged by Tags.CodeCity. A call may check if this
-        /// check is necessary.
+        /// we simply return the top-most transform in the game-object hierarchy.
+        /// That top-most object must be tagged by Tags.CodeCity. If it is,
+        /// it will be returned. If not, null will be returned.
         /// </summary>
         /// <param name="transform">transform at which to start the search</param>
-        /// <returns>topmost transform in the game-object hierarchy (possibly
-        /// <paramref name="transform"/> itself)</returns>
+        /// <returns>top-most transform in the game-object hierarchy tagged by 
+        /// Tags.CodeCity or null</returns>
         public static Transform GetCodeCity(Transform transform)
         {
+
+            Transform result = transform;
             if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.HoloLens)
             {
                 // If the MRTK is enabled, the cities will be part of a CityCollection, so we can't simply use the root.
                 // In this case, we actually have to traverse the tree up until the Tags match.
                 
-                Transform cursor = transform;
                 while (cursor != null)
                 {
                     if (cursor.CompareTag(Tags.CodeCity))
@@ -177,8 +175,15 @@ namespace SEE.Game
                 }
                 return cursor;
             }
-            return transform.root;
-
+            result = transform.root;
+	    if (result.CompareTag(Tags.CodeCity))
+            {
+                return result;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>

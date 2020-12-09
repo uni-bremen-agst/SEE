@@ -29,19 +29,10 @@ namespace SEE.Game
     public class SEEJlgCity : SEECity
     {
         /// <summary>
-        /// The full path to the jlg source file.
+        /// Path to the JLG file containing the runtime trace data.
         /// </summary>
-        public string jlgPath;
-
-        /// <summary>
-        /// Returns the concatenation of pathPrefix and jlgPath. That is the complete
-        /// absolute path to the JLG file containing the runtime trace data.
-        /// </summary>
-        /// <returns>concatenation of pathPrefix and jlgPath</returns>
-        public string JLGPath()
-        {
-            return PathPrefix + jlgPath;
-        }
+        /// <returns>path of JLG file</returns>
+        public DataPath JLGPath = new DataPath();
 
         public override void LoadData()
         {
@@ -54,7 +45,7 @@ namespace SEE.Game
         /// </summary>
         private void LoadJLG()
         {
-            string path = JLGPath();
+            string path = JLGPath.Path;
 
             if (string.IsNullOrEmpty(path))
             {

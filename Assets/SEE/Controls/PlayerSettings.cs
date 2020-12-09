@@ -22,25 +22,27 @@ namespace SEE.Controls
     {
         /// <summary>
         /// What kind of input devices the player uses.
+        /// The order must be consistent with <see cref="PlayerName"/>.
         /// </summary>
         public enum PlayerInputType
         {
             Desktop = 0,      // player for desktop and mouse input
-            TouchGamepad, // player for touch devices or gamepads using InControl
-            VR,           // player for virtual reality devices
-            HoloLens,     // player for mixed reality devices
-            None,         // no player at all
+            TouchGamepad = 1, // player for touch devices or gamepads using InControl
+            VR = 2,           // player for virtual reality devices
+            HoloLens = 3,     // player for mixed reality devices
+            None = 4,         // no player at all
         }
 
         /// <summary>
         /// A mapping from PlayerInputType onto the names of the player game objects.
+        /// The order must be consistent with <see cref="PlayerInputType"/>.
         /// </summary>
-        static readonly string[] PlayerName = new[] {
-            "DesktopPlayer",
-            "VRPlayer",
-            "InControl",
-            "MRPlayer",
-            "No Player",
+        public static readonly string[] PlayerName = new[] {
+            "DesktopPlayer", // Desktop
+            "InControl",     // TouchGamepad
+            "VRPlayer",      // VR          
+            "MRPlayer",      // HoloLens
+            "No Player",     // None
             };
 
         [Tooltip("What kind of player type should be enabled.")]

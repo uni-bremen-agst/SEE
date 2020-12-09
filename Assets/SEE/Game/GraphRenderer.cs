@@ -53,6 +53,10 @@ namespace SEE.Game
         }
 
         public readonly Materials.ShaderType ShaderType;
+
+        /// <summary>
+        /// The distance between two stacked game objects (parent/child).
+        /// </summary>
         private const float LevelDistance = 0.001f;
 
         /// <summary>
@@ -186,6 +190,7 @@ namespace SEE.Game
             Performance p = Performance.Begin("edge layout " + layout.Name);
             EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
             ICollection<GameObject> result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), ConnectingEdges(gameNodes));
+            AddLOD(result);
             p.End();
             Debug.LogFormat("Built \"" + settings.EdgeLayout + "\" edge layout for " + gameNodes.Count + " nodes in {0} [h:m:s:ms].\n", p.GetElapsedTime());
             return result;
@@ -793,7 +798,7 @@ namespace SEE.Game
                 case NodeLayoutKind.CompoundSpringEmbedder:
                     return new CoseLayout(groundLevel, settings);
                 case NodeLayoutKind.FromFile:
-                    return new LoadedNodeLayout(groundLevel, settings.LayoutPath);
+                    return new LoadedNodeLayout(groundLevel, settings.LayoutPath.Path);
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
             }
@@ -1147,7 +1152,38 @@ namespace SEE.Game
             block.AddComponent<NodeRef>().node = node;
             block.AddComponent<NodeHighlights>();
             AdjustScaleOfLeaf(block);
+            AddLOD(block);
             return block;
+        }
+
+        /// <summary>
+        /// Adds a LOD group to <paramref name="gameObject"/> with only a single LOD.
+        /// This is used to cull the object if it gets too small. The percentage
+        /// by which to cull is retrieved from <see cref="settings.LODCulling"/>
+        /// </summary>
+        /// <param name="gameObject">object where to add the LOD group</param>
+        private void AddLOD(GameObject gameObject)
+        {
+            LODGroup lodGroup = gameObject.AddComponent<LODGroup>();
+            // Only a single LOD: we either or cull.
+            LOD[] lods = new LOD[1];
+            Renderer[] renderers = new Renderer[1];
+            renderers[0] = gameObject.GetComponent<Renderer>();
+            lods[0] = new LOD(settings.LODCulling, renderers);
+            lodGroup.SetLODs(lods);
+            lodGroup.RecalculateBounds();
+        }
+
+        /// <summary>
+        /// Applies ADDLOD to every game object in <paramref name="gameObjects"/>.
+        /// </summary>
+        /// <param name="gameObjects">the list of game objects where ADDLOD is to be applied</param>
+        private void AddLOD(ICollection<GameObject> gameObjects)
+        {
+            foreach (GameObject go in gameObjects)
+            {
+                AddLOD(go);
+            }
         }
 
         /// <summary>
@@ -1435,6 +1471,7 @@ namespace SEE.Game
             innerGameObject.AddComponent<NodeHighlights>();
             AdjustStyle(innerGameObject);
             AdjustHeightOfInnerNode(innerGameObject);
+            AddLOD(innerGameObject);
             return innerGameObject;
         }
 

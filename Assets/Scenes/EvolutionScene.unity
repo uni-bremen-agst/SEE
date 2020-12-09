@@ -1496,9 +1496,24 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
+    - Name: LayoutPath
+      Entry: 7
+      Data: 0|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: HierarchicalEdges
       Entry: 7
-      Data: 0|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
     - Name: 
       Entry: 12
       Data: 4
@@ -1522,18 +1537,42 @@ MonoBehaviour:
       Data: 
     - Name: nodeTypes
       Entry: 7
-      Data: 1|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 2|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Directory
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: File
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -1632,7 +1671,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 3|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
+      Data: 4|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -1662,11 +1701,11 @@ MonoBehaviour:
       Data: false
     - Name: ListDirToggle
       Entry: 7
-      Data: 4|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 5|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 5|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 6|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -1682,11 +1721,11 @@ MonoBehaviour:
       Data: 
     - Name: DirNodeLayout
       Entry: 7
-      Data: 6|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Layout.NodeLayouts.NodeLayoutKind,
+      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Layout.NodeLayouts.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 5
+      Data: 6
     - Name: 
       Entry: 12
       Data: 0
@@ -1698,11 +1737,11 @@ MonoBehaviour:
       Data: 
     - Name: DirShape
       Entry: 7
-      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+InnerNodeKinds,
+      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+InnerNodeKinds,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 5
+      Data: 6
     - Name: 
       Entry: 12
       Data: 0
@@ -1714,7 +1753,7 @@ MonoBehaviour:
       Data: 
     - Name: rootDirs
       Entry: 7
-      Data: 8|System.Collections.Generic.List`1[[SEE.DataModel.DG.Node, SEE]], mscorlib
+      Data: 9|System.Collections.Generic.List`1[[SEE.DataModel.DG.Node, SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -1726,11 +1765,11 @@ MonoBehaviour:
       Data: 
     - Name: show
       Entry: 7
-      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 5
+      Data: 6
     - Name: 
       Entry: 12
       Data: 0
@@ -1745,11 +1784,11 @@ MonoBehaviour:
       Data: true
     - Name: loadedForNodeTypes
       Entry: 7
-      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 5
+      Data: 6
     - Name: 
       Entry: 12
       Data: 0
@@ -1770,7 +1809,7 @@ MonoBehaviour:
       Data: 
     - Name: Measurements
       Entry: 7
-      Data: 11|System.Collections.Generic.SortedDictionary`2[[System.String, mscorlib],[System.String,
+      Data: 12|System.Collections.Generic.SortedDictionary`2[[System.String, mscorlib],[System.String,
         mscorlib]], System
     - Name: 
       Entry: 12
@@ -1783,11 +1822,11 @@ MonoBehaviour:
       Data: 
     - Name: SubLayoutsInnerNodes
       Entry: 7
-      Data: 12|System.Collections.Generic.Dictionary`2[[SEE.Layout.NodeLayouts.NodeLayoutKind,
+      Data: 13|System.Collections.Generic.Dictionary`2[[SEE.Layout.NodeLayouts.NodeLayoutKind,
         SEE],[System.String, mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 13|System.Collections.Generic.EnumEqualityComparer`1[[SEE.Layout.NodeLayouts.NodeLayoutKind,
+      Data: 14|System.Collections.Generic.EnumEqualityComparer`1[[SEE.Layout.NodeLayouts.NodeLayoutKind,
         SEE]], mscorlib
     - Name: 
       Entry: 12
@@ -1893,11 +1932,11 @@ MonoBehaviour:
       Data: 
     - Name: SubLayoutsLeafNodes
       Entry: 7
-      Data: 14|System.Collections.Generic.Dictionary`2[[SEE.Layout.NodeLayouts.NodeLayoutKind,
+      Data: 15|System.Collections.Generic.Dictionary`2[[SEE.Layout.NodeLayouts.NodeLayoutKind,
         SEE],[System.String, mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 13
+      Data: 14
     - Name: 
       Entry: 12
       Data: 8
@@ -2003,12 +2042,17 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  pathPrefix: C:\Users\koschke\SEE\Data\GXL\animation-clones
-  gvlPath: ..\Data\GXL\linux-clones\net.gvl
+  LayoutPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
   WidthMetric: Metric.Number_of_Tokens
   HeightMetric: Metric.Clone_Rate
   DepthMetric: Metric.LOC
   LeafStyleMetric: Metric.Complexity
+  ShowLabel: 1
+  LeafLabelDistance: 0.2
+  LeafLabelFontSize: 0.4
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -2026,6 +2070,9 @@ MonoBehaviour:
   InnerDonutMetric: Metric.IssuesTotal
   InnerNodeHeightMetric: 
   InnerNodeStyleMetric: Metric.IssuesTotal
+  InnerNodeShowLabel: 1
+  InnerNodeLabelDistance: 0.2
+  InnerNodeLabelFontSize: 0.4
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
   LeafObjects: 0
@@ -2043,6 +2090,13 @@ MonoBehaviour:
   maxRevisionsToLoad: 500
   MarkerHeight: 0.2
   MarkerWidth: 0.01
+  AdditionBeamColor: {r: 0, g: 1, b: 0, a: 1}
+  ChangeBeamColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  DeletionBeamColor: {r: 0, g: 0, b: 0, a: 1}
+  GXLDirectory:
+    Root: 1
+    relativePath: /Data/GXL/animation-clones
+    absolutePath: 
 --- !u!114 &1087713765
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2056,7 +2110,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.003445983
+  HeightOffset: 0.0031000376
 --- !u!114 &1087713766
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2518,6 +2572,8 @@ MonoBehaviour:
   playerInputType: 0
   HideVRControllers: 0
   ShowControllerHints: 0
+  experienceScale: 1
+  CityScalingFactor: 1
 --- !u!4 &1510433995
 Transform:
   m_ObjectHideFlags: 0
@@ -2655,13 +2711,75 @@ GameObject:
   - component: {fileID: 1566173691}
   - component: {fileID: 1566173696}
   - component: {fileID: 1566173694}
-  m_Layer: 0
+  - component: {fileID: 1566173680}
+  - component: {fileID: 1566173682}
+  m_Layer: 9
   m_Name: DesktopPlayer
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &1566173680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1566173679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 948f4100a11a5c24981795d21301da5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  volumeTrigger: {fileID: 1566173689}
+  volumeLayer:
+    serializedVersion: 2
+    m_Bits: 512
+  stopNaNPropagation: 1
+  finalBlitToCameraTarget: 0
+  antialiasingMode: 0
+  temporalAntialiasing:
+    jitterSpread: 0.75
+    sharpness: 0.25
+    stationaryBlending: 0.95
+    motionBlending: 0.85
+  subpixelMorphologicalAntialiasing:
+    quality: 2
+  fastApproximateAntialiasing:
+    fastMode: 0
+    keepAlpha: 0
+  fog:
+    enabled: 1
+    excludeSkybox: 1
+  debugLayer:
+    lightMeter:
+      width: 512
+      height: 256
+      showCurves: 1
+    histogram:
+      width: 512
+      height: 256
+      channel: 3
+    waveform:
+      exposure: 0.12
+      height: 256
+    vectorscope:
+      size: 256
+      exposure: 0.12
+    overlaySettings:
+      linearDepth: 0
+      motionColorIntensity: 4
+      motionGridSize: 64
+      colorBlindnessType: 0
+      colorBlindnessStrength: 1
+  m_Resources: {fileID: 11400000, guid: d82512f9c8e5d4a4d938b575d47f88d4, type: 2}
+  m_ShowToolkit: 0
+  m_ShowCustomSorter: 0
+  breakBeforeColorGrading: 0
+  m_BeforeTransparentBundles: []
+  m_BeforeStackBundles: []
+  m_AfterStackBundles: []
 --- !u!20 &1566173681
 Camera:
   m_ObjectHideFlags: 0
@@ -2705,6 +2823,23 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!114 &1566173682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1566173679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b9a305e18de0c04dbd257a21cd47087, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sharedProfile: {fileID: 11400000, guid: 5eaafc49f6be3a745aec4fc16aec783f, type: 2}
+  isGlobal: 1
+  blendDistance: 0
+  weight: 1
+  priority: 0
 --- !u!4 &1566173689
 Transform:
   m_ObjectHideFlags: 0
@@ -2780,6 +2915,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79ef9858c6f1d9d4184e7310d93dc51b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Speed: 2
+  BoostFactor: 2
   focusedObject: {fileID: 1093528284}
 --- !u!1 &1626562202
 GameObject:
@@ -2867,7 +3004,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1636335451}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5.6693683, y: -4, z: 0}
+  m_LocalPosition: {x: -5.15625, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -3054,7 +3191,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1776319858}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 5.6693683, y: -4, z: 0}
+  m_LocalPosition: {x: 5.15625, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -3167,6 +3304,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useInOfflineMode: 1
+  hostServer: 0
+  remoteServerIPAddress: 
+  localServerPort: 55555
+  remoteServerPort: 0
+  loadCityOnStart: 0
+  networkCommsLoggingEnabled: 0
+  internalLoggingEnabled: 1
+  minimalSeverity: 2
+  vivoxChannelName: 
 --- !u!4 &1925924586
 Transform:
   m_ObjectHideFlags: 0

@@ -17,34 +17,9 @@ namespace SEEEditor
     [CanEditMultipleObjects]
     public abstract class StoredSEECityEditor : AbstractSEECityEditor
     {
-        private bool pressed = false;
-        private string path = "";
-
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
-
-            SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
-
-            EditorGUILayout.BeginHorizontal();
-            {
-                EditorGUILayout.PropertyField(pathPrefix, new GUIContent("Data path prefix"));
-                if (GUILayout.Button("Select"))
-                {
-                    pressed = true;
-                    path = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select graph data directory", pathPrefix.stringValue, ""));
-                }
-                else if (pressed)
-                {
-                    pressed = false;
-                    if (!string.IsNullOrEmpty(path))
-                    {
-                        pathPrefix.stringValue = path;
-                    }
-                }
-            }
-            EditorGUILayout.EndHorizontal();
-            serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
 
         /// <summary>
