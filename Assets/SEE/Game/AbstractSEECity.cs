@@ -26,6 +26,12 @@ namespace SEE.Game
     public abstract class AbstractSEECity : SerializedMonoBehaviour
     {
         /// <summary>
+        /// The screen relative height to use for the culling a game node [0-1].
+        /// If the game node uses less than this percentage it will be culled.
+        /// </summary>
+        public float LODCulling = 0.01f;
+
+        /// <summary>
         /// The path for the layout file containing the node layout information.
         /// If the file extension is <see cref="Filenames.GVLExtension"/>, the layout is expected
         /// to be stored in Axivion's Gravis layout (GVL) with 2D co-ordinates. 
