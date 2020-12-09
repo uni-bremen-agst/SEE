@@ -52,6 +52,11 @@ namespace SEEEditor
         {
             city = target as AbstractSEECity;
 
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("LOD Culling");
+            city.LODCulling = EditorGUILayout.Slider(city.LODCulling, 0.0f, 1.0f);
+            //city.LODCulling = Mathf.Clamp(EditorGUILayout.FloatField("LOD Culling", city.LODCulling), 0, 1);
+            GUILayout.EndHorizontal();
 
             LeafNodeAttributes();
             
