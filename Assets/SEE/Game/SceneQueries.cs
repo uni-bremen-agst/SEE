@@ -3,7 +3,6 @@ using SEE.Controls;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.GO;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game
@@ -43,6 +42,7 @@ namespace SEE.Game
                     Debug.LogWarningFormat("Game node {0} without node reference.\n", go.name);
                 }
             }
+
             return result;
         }
 
@@ -61,6 +61,7 @@ namespace SEE.Game
             {
                 result.AddRange(graph.GetRoots());
             }
+
             return result;
         }
 
@@ -79,6 +80,7 @@ namespace SEE.Game
             {
                 result.Add(go.GetComponent<NodeRef>().node.ItsGraph);
             }
+
             return result;
         }
 
@@ -124,6 +126,7 @@ namespace SEE.Game
                     return nodeRef.node.SourceName;
                 }
             }
+
             return gameNode.name;
         }
 
@@ -135,7 +138,7 @@ namespace SEE.Game
         /// <param name="codeCity">object representing a code city</param>
         /// <returns>game object representing the root of the graph or null if there is none</returns>
         public static Transform GetCityRootNode(GameObject codeCity)
-        {            
+        {
             foreach (Transform child in codeCity.transform)
             {
                 if (child.CompareTag(Tags.Node))
@@ -143,6 +146,7 @@ namespace SEE.Game
                     return child.transform;
                 }
             }
+
             return null;
         }
 
@@ -158,25 +162,28 @@ namespace SEE.Game
         /// Tags.CodeCity or null</returns>
         public static Transform GetCodeCity(Transform transform)
         {
-
             Transform result = transform;
             if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.HoloLens)
             {
                 // If the MRTK is enabled, the cities will be part of a CityCollection, so we can't simply use the root.
                 // In this case, we actually have to traverse the tree up until the Tags match.
-                
-                while (cursor != null)
+
+                while (result != null)
                 {
-                    if (cursor.CompareTag(Tags.CodeCity))
+                    if (result.CompareTag(Tags.CodeCity))
                     {
-                        return cursor;
+                        return result;
                     }
-                    cursor = cursor.parent;
+
+                    result = result.parent;
                 }
-                return cursor;
+
+                return result;
             }
+
             result = transform.root;
-	    if (result.CompareTag(Tags.CodeCity))
+
+            if (result.CompareTag(Tags.CodeCity))
             {
                 return result;
             }
