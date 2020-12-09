@@ -1792,6 +1792,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7a135b1a2cb9c8f488d4dd00c55ab283, type: 3}
+--- !u!1 &1425718863 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 125964, guid: dc06161b6d97feb419f45f03b62e14b9,
+    type: 3}
+  m_PrefabInstance: {fileID: 844925775}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1425718864
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1425718863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_FirstSelected: {fileID: 0}
+  m_sendNavigationEvents: 1
+  m_DragThreshold: 10
 --- !u!1 &1510433993
 GameObject:
   m_ObjectHideFlags: 0
@@ -1821,7 +1842,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcc1cedcf0a20b04ca3d2bb78035f3cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerInputType: 0
+  playerInputType: 3
   HideVRControllers: 0
   ShowControllerHints: 0
   experienceScale: 1
@@ -3595,8 +3616,11 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  pathPrefix: C:\Users\koschke\SEE\Data\GXL\minimal
-  gvlPath: ..\Data\GXL\SEE\CodeFacts.gvl
+  LODCulling: 0.01
+  LayoutPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
   WidthMetric: Metric.Number_Of_Calling_Routines
   HeightMetric: Metric.Lines.LOC
   DepthMetric: Metric.Number_Of_Called_Routines
@@ -3638,8 +3662,14 @@ MonoBehaviour:
   Tension: 0.85
   RDP: 0.0001
   calculateMeasurements: 0
-  gxlPath: CodeFacts.gxl
-  csvPath: CodeFacts.csv
+  GXLPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  CSVPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
 --- !u!114 &1649116646
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4094,10 +4124,10 @@ MonoBehaviour:
       Data: 0|SEE.Game.DataPath, SEE
     - Name: Root
       Entry: 3
-      Data: 1
+      Data: 2
     - Name: relativePath
       Entry: 1
-      Data: /Data/GXL/SEE/Architecture.gvl
+      Data: 
     - Name: absolutePath
       Entry: 1
       Data: 
@@ -4623,8 +4653,11 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  pathPrefix: C:\Users\koschke\SEE\Assets
-  gvlPath: ..\Data\GXL\SEE\Architecture.gvl
+  LODCulling: 0.01
+  LayoutPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
   WidthMetric: Metric.Number_of_Descendants
   HeightMetric: 0.0001
   DepthMetric: Metric.Number_of_Descendants
@@ -4667,12 +4700,12 @@ MonoBehaviour:
   RDP: 0.0001
   calculateMeasurements: 1
   GXLPath:
-    Root: 1
-    relativePath: /Data/GXL/SEE/Architecture.gxl
+    Root: 2
+    relativePath: 
     absolutePath: 
   CSVPath:
-    Root: 1
-    relativePath: /Data/GXL/SEE/Architecture.csv
+    Root: 2
+    relativePath: 
     absolutePath: 
 --- !u!65 &1930472484
 BoxCollider:

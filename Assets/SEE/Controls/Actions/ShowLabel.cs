@@ -1,11 +1,11 @@
-﻿using SEE.DataModel.DG;
+﻿using System.Collections.Generic;
+using DG.Tweening;
+using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Assertions;
 using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls.Actions
@@ -25,6 +25,7 @@ namespace SEE.Controls.Actions
         /// True if the object is currently being hovered over.
         /// </summary>
         private bool isHovered = false;
+
         /// <summary>
         /// True if the object is currently selected.
         /// </summary>
@@ -182,19 +183,20 @@ namespace SEE.Controls.Actions
         /// Creates a text label above the object with its node's SourceName if the label doesn't exist yet.
         /// </summary>
         private void On()
-        {            
+        {
             AbstractSEECity city = City();
             if (city == null)
             {
                 // The game node is currently not part of a city. This may happen, for instance,
                 // if a node is just created and not yet added to a city. In this case, we 
                 // are not doing anything.
-                return; 
+                return;
             }
+
             bool isLeaf = SceneQueries.IsLeaf(gameObject);
             if (!LabelsEnabled(city, isLeaf))
             {
-                return;  // If labels are disabled, we don't need to do anything
+                return; // If labels are disabled, we don't need to do anything
             }
 
             // If label already exists or the game object has no node reference, nothing needs to be done
@@ -209,24 +211,55 @@ namespace SEE.Controls.Actions
                 Debug.LogErrorFormat("Game node {0} has no valid node reference.\n", name);
                 return;
             }
-            
-            // Add text
-            Vector3 position = gameObject.transform.position;
-            position.y += isLeaf ? city.LeafLabelDistance : city.InnerNodeLabelDistance;
-            nodeLabel = TextFactory.GetTextWithSize(node.SourceName, position,
-                isLeaf ? city.LeafLabelFontSize : city.InnerNodeLabelFontSize, textColor: Color.black);
-            nodeLabel.name = "Label " + node.SourceName;
-            nodeLabel.transform.SetParent(gameObject.transform);
-            
-            // Add connecting line between "roof" of object and text
-            Vector3 labelPosition = nodeLabel.transform.position;
-            Vector3 nodeTopPosition = gameObject.transform.position;
-            nodeTopPosition.y = BoundingBox.GetRoof(new List<GameObject> { gameObject });
-            labelPosition.y -= nodeLabel.GetComponent<TextMeshPro>().textBounds.extents.y;
-            LineFactory.Draw(nodeLabel, new[] { nodeTopPosition, labelPosition }, 0.01f,
-                Materials.New(Materials.ShaderType.TransparentLine, Color.black.ColorWithAlpha(0.98f)));
 
+            // Now we create the label
+            // We define starting and ending positions for the animation
+            Vector3 startLabelPosition = gameObject.transform.position;
+            Vector3 endLabelPosition = gameObject.transform.position;
+            endLabelPosition.y += isLeaf ? city.LeafLabelDistance : city.InnerNodeLabelDistance;
+            nodeLabel = TextFactory.GetTextWithSize(node.SourceName, startLabelPosition,
+                                                    isLeaf ? city.LeafLabelFontSize : city.InnerNodeLabelFontSize, textColor: Color.black.ColorWithAlpha(0f));
+            nodeLabel.name = $"Label {node.SourceName}";
+            nodeLabel.transform.SetParent(gameObject.transform);
+
+            // Add connecting line between "roof" of object and text
+            Vector3 startLinePosition = gameObject.transform.position;
+            Vector3 endLinePosition = endLabelPosition;
+            float nodeTopPosition = nodeLabel.GetComponent<TextMeshPro>().textBounds.extents.y;
+            startLinePosition.y = BoundingBox.GetRoof(new List<GameObject> {gameObject});
+            endLinePosition.y -= nodeTopPosition * 1.3f; // add slight gap to make it slightly more aesthetic
+            LineFactory.Draw(nodeLabel, new[] {startLinePosition, startLinePosition}, 0.01f,
+                             Materials.New(Materials.ShaderType.TransparentLine, Color.black));
             Portal.SetInfinitePortal(nodeLabel);
+
+            // Animated label to move to top and fade in
+            if (nodeLabel.TryGetComponent(out TextMeshPro text))
+            {
+                // TODO: Maybe the class in Tweens.cs should be used instead.
+                // However, I'm not sure why that class is a MonoBehaviour (shouldn't it be a static helper class?)
+                // and DOTween instead recommends using extension methods, so this is what's used here.
+                nodeLabel.transform.DOMove(endLabelPosition, 0.5f);
+                DOTween.ToAlpha(() => text.color, color => text.color = color, 1f, 0.5f);
+            }
+            else
+            {
+                Debug.LogError("Couldn't find text component in newly created label.\n");
+            }
+
+            // Animated line to move to top and fade in
+            if (nodeLabel.TryGetComponent(out LineRenderer line))
+            {
+                // Reset colors to clear first
+                LineFactory.SetColors(line, Color.clear, Color.clear);
+
+                DOTween.ToAlpha(() => line.startColor, c => line.startColor = c, 0.25f, 0.5f);
+                DOTween.ToAlpha(() => line.endColor, c => line.endColor = c, 1f, 0.5f);
+                DOTween.To(() => line.GetPosition(1), p => line.SetPosition(1, p), endLinePosition, 0.5f);
+            }
+            else
+            {
+                Debug.LogError("Couldn't find line component in newly created label.\n");
+            }
         }
 
         /// <summary>

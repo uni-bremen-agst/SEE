@@ -5,7 +5,7 @@ namespace SEE.GO
     /// <summary>
     /// Sets attributes of lines.
     /// </summary>
-    internal class LineFactory
+    internal static class LineFactory
     {
         private const float defaultWidth = 0.1f;
 
@@ -52,6 +52,7 @@ namespace SEE.GO
                 // edge does not yet have a renderer; we add a new one
                 line = edge.AddComponent<LineRenderer>();
             }
+
             line.useWorldSpace = true;
             if (material != null)
             {
@@ -60,6 +61,7 @@ namespace SEE.GO
                 // of the material and will not be affected by changes of the original material
                 line.sharedMaterial = material;
             }
+
             line.positionCount = linePoints.Length; // number of vertices       
             line.SetPositions(linePoints);
             SetDefaults(line);
