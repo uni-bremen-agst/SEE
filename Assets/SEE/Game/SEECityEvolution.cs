@@ -38,7 +38,7 @@ namespace SEE.Game
         public Node singleRoot = null;
 
         /// <summary>
-        /// Gets the single Root of a given graph.
+        /// Gets the single root of a given graph.
         /// </summary>
         public Node GetSingleRoot(Graph graph)
         {

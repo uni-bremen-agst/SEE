@@ -69,7 +69,7 @@ public class CityRestorer
     }
 
     /// <summary>
-    /// Veryfies wether the types of the city and the json-file are matching.
+    /// Veryfies whether the types of the city and the json-file are matching.
     /// </summary>
     /// <param name="city">the city, which has to be overwritten</param>
     /// <param name="jsonContent">the content of the .json-file as a string</param>
