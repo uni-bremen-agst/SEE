@@ -3639,6 +3639,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+  LODCulling: 0.01
   LayoutPath:
     Root: 2
     relativePath: 
@@ -4675,6 +4676,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+  LODCulling: 0.01
   LayoutPath:
     Root: 1
     relativePath: /Data/GXL/SEE/Architecture.gvl
