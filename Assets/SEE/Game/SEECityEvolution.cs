@@ -33,10 +33,13 @@ namespace SEE.Game
     public class SEECityEvolution : AbstractSEECity
     {
         /// <summary>
-        /// The loaded graph.
+        /// The single root of the graph saved as a Node.
         /// </summary>
         public Node singleRoot = null;
 
+        /// <summary>
+        /// Gets the single Root of a given graph.
+        /// </summary>
         public Node GetSingleRoot(Graph graph)
         {
            singleRoot = graph.getSingleRoot();
