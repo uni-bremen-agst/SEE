@@ -53,6 +53,10 @@ namespace SEE.Game
         }
 
         public readonly Materials.ShaderType ShaderType;
+
+        /// <summary>
+        /// The distance between two stacked game objects (parent/child).
+        /// </summary>
         private const float LevelDistance = 0.001f;
 
         /// <summary>
@@ -186,6 +190,7 @@ namespace SEE.Game
             Performance p = Performance.Begin("edge layout " + layout.Name);
             EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
             ICollection<GameObject> result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), ConnectingEdges(gameNodes));
+            AddLOD(result);
             p.End();
             Debug.LogFormat("Built \"" + settings.EdgeLayout + "\" edge layout for " + gameNodes.Count + " nodes in {0} [h:m:s:ms].\n", p.GetElapsedTime());
             return result;
@@ -1167,6 +1172,18 @@ namespace SEE.Game
             lods[0] = new LOD(settings.LODCulling, renderers);
             lodGroup.SetLODs(lods);
             lodGroup.RecalculateBounds();
+        }
+
+        /// <summary>
+        /// Applies ADDLOD to every game object in <paramref name="gameObjects"/>.
+        /// </summary>
+        /// <param name="gameObjects">the list of game objects where ADDLOD is to be applied</param>
+        private void AddLOD(ICollection<GameObject> gameObjects)
+        {
+            foreach (GameObject go in gameObjects)
+            {
+                AddLOD(go);
+            }
         }
 
         /// <summary>
