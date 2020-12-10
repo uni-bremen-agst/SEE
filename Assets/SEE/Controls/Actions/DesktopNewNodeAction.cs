@@ -167,9 +167,10 @@ namespace SEE.Controls {
         /// <param name="node">The node to be scaled</param>
        public static void ScaleNode(GameObject node)
         {
-            
+
+            node.transform.localScale = node.transform.localScale + new Vector3(1, 1000, 1);
             //Scale it draw spheres on each outline that can be drag and drop to get bigger
-            Vector3 mousepos;
+           /* Vector3 mousepos;
             Vector3 oldMousepos = Input.mousePosition;
             float sizeFactor = 0.02f;
             while (true)
@@ -177,7 +178,7 @@ namespace SEE.Controls {
                 mousepos = Input.mousePosition;
                 node.transform.localScale +=  new Vector3(0.4f,0.4f,0.4f);
                 oldMousepos = mousepos;
-            }
+            } */
         }
 
         /// <summary>

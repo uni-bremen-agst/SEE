@@ -1147,7 +1147,7 @@ namespace SEE.Game
             block.AddComponent<NodeRef>().node = node;
             block.AddComponent<NodeHighlights>();
             AdjustScaleOfLeaf(block);
-           // InteractionDecorator.PrepareForInteraction(block);
+            InteractionDecorator.PrepareForInteraction(block);
             return block;
         }
 
@@ -1436,6 +1436,7 @@ namespace SEE.Game
             innerGameObject.AddComponent<NodeHighlights>();
             AdjustStyle(innerGameObject);
             AdjustHeightOfInnerNode(innerGameObject);
+            InteractionDecorator.PrepareForInteraction(innerGameObject);
             return innerGameObject;
         }
 
