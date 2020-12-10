@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.UI;
@@ -190,13 +191,24 @@ namespace SEE.Controls
                     // Position and scale planes and CodeCities accordingly using CityCollection grid
                     GameObject cityCollection = GameObject.Find("CityCollection").AssertNotNull("CityCollection");
                     UnityEngine.Assertions.Assert.IsTrue(cityCollection.TryGetComponent(out GridObjectCollection grid));
-                    GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
 
-                    foreach (GameObject city in cities)
+                    GameObject[] citiesWithoutShell = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
+
+                    GameObject[] cities = new GameObject[citiesWithoutShell.Length];
+
+
+                    for (int i = 0; i< citiesWithoutShell.Length; i++)
                     {
-                        SetCityScale(city, cityCollection.transform, CityScalingFactor);
+                        cities[i] = AddCodeCityShell(citiesWithoutShell[i]);
+
+                        GameObject city = cities[i];
+
+                        SetCityScale(city, cityCollection.transform, CityScalingFactor);                     
+
                         AddMixedRealityGameObjectInteractions(city);
                         AppBarCityConfiguration(city);
+
+                        PrepareBoundsControlForHololens2(city.GetComponent<BoundsControl>());
                     }
 
                     SetGridCellWitdth(grid, cities);
@@ -229,11 +241,15 @@ namespace SEE.Controls
 
             void AppBarCityConfiguration(GameObject city)
             {
-                city.AddComponent<BoundsControl>().BoundsControlActivation = Microsoft.MixedReality.Toolkit.UI.BoundsControlTypes.BoundsControlActivationType.ActivateManually;
+                BoundsControl boundsControl = city.AddComponent<BoundsControl>();
+                boundsControl.BoundsControlActivation = Microsoft.MixedReality.Toolkit.UI.BoundsControlTypes.BoundsControlActivationType.ActivateManually;
             }
 
+            //Hololens2 BoundsControl
             void PrepareBoundsControlForHololens2(BoundsControl boundsControl)
             {
+                //TODO: Figure out how to get materials like "BoundingBox.mat" without inspector
+
                 /**
                 BoxDisplayConfiguration boxConfiguration = boundsControl.BoxDisplayConfig;
                 boxConfiguration.BoxMaterial = [Assign BoundingBox.mat];
@@ -253,6 +269,33 @@ namespace SEE.Controls
                 rotationHandleConfiguration.ColliderPadding = 0.016f;
                 **/
             }
+
+            //Creats a Container GameObject for Cities
+            GameObject AddCodeCityShell(GameObject city)
+            {
+                GameObject cityShell = new GameObject();
+                Bounds bounds;
+
+                cityShell.name = city.name + "Shell";
+                cityShell.transform.position = city.transform.position;
+
+                Vector3 citySize = city.Size();
+                Vector3 cityCenter = city.GetComponent<Renderer>().bounds.center;
+
+                if (citySize.y < 0.1f)
+                {
+                    bounds = new Bounds(cityCenter, new Vector3(citySize.x, 0.1f, citySize.z));
+                }
+                else
+                {
+                    bounds = new Bounds(cityCenter, citySize);
+                }
+
+                city.transform.SetParent(cityShell.transform);
+
+                return cityShell;
+            }
+
             #endregion
         }
 
