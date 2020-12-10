@@ -332,7 +332,7 @@ namespace SEE.Controls.Actions
                     tweens.Add(lastTween);
                     if (!animateIn)
                     {
-                        lastTween.OnKill(DestroyLabel);
+                        lastTween.OnComplete(DestroyLabel);
                     }
                 }
                 else
