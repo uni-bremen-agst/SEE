@@ -110,7 +110,7 @@ namespace SEE.Tools.Architecture
             Dictionary<int, Edge> s = new Dictionary<int, Edge>();
             for (int j = 1; j <= 4; j++)
             {
-                s[j] = new Edge();
+                s[j] = new Edge(j.ToString());
                 s[j].Type = call;
             }
 
@@ -150,7 +150,7 @@ namespace SEE.Tools.Architecture
             Dictionary<int, Edge> e = new Dictionary<int, Edge>();
             for (int j = 1; j <= 9; j++)
             {
-                Edge edge = new Edge();
+                Edge edge = new Edge(j.ToString());
                 edge.Type = call;
                 e[j] = edge;
             }

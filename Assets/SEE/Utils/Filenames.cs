@@ -38,6 +38,29 @@ namespace SEE.Utils
         public const string CSVExtension = ".csv";
 
         /// <summary>
+        /// File extension of LJG filenames.
+        /// </summary>
+        public const string JLGExtension = ".jlg";
+
+        /// <summary>
+        /// File extension of DYN filenames.
+        /// </summary>
+        public const string DYNExtension = ".dyn";
+
+        /// <summary>
+        /// Returns the last part of the given <paramref name="extension"/>
+        /// without the period.
+        /// 
+        /// Precondition: <paramref name="extension"/> must start with a period.
+        /// </summary>
+        /// <param name="extension"></param>
+        /// <returns><paramref name="extension"/> without leading period</returns>
+        public static string ExtensionWithoutPeriod(string extension)
+        {
+            return extension.Substring(1);
+        }
+
+        /// <summary>
         /// True if <paramref name="filename"/> has <paramref name="extension"/>.
         /// If <paramref name="filename"/> is null or if it has no extension
         /// separated by a period, false is returned.

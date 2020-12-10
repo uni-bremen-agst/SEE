@@ -25,6 +25,10 @@ namespace SEE.Controls.Actions
         [Range(0, 0.1f)]
         public float Depth = 0.01f;
 
+        /// <summary>
+        /// The player actions attached to the gameObject. The selection of 
+        /// menu entries will be forwarded to this component.
+        /// </summary>
         private PlayerActions playerActions;
 
         /// <summary>
@@ -33,7 +37,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected virtual void Start()
         {
-            GameObject menu = MenuFactory.CreateMenu(EntriesParameter, Radius, Depth);
+            MenuFactory.CreateMenu(EntriesParameter, Radius, Depth);
             if (!gameObject.TryGetComponent<PlayerActions>(out playerActions))
             {
                 Debug.LogErrorFormat("Player {0} does not have PlayerActions.\n", name);
@@ -81,11 +85,6 @@ namespace SEE.Controls.Actions
         /// Path of the prefix for the sprite to be instantiated for the menu entries.
         /// </summary>
         private const string menuEntrySprite = "Icons/Circle";
-
-        /// <summary>
-        /// The color gold.
-        /// </summary>
-        private static readonly Color gold = new Color(1.0F, 0.84F, 0.0F);
 
         /// <summary>
         /// Returns given <paramref name="color"/> lightened by 50%.
