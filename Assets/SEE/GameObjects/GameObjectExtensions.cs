@@ -93,21 +93,32 @@ namespace SEE.GO
         /// <summary>
         /// Sets the visibility of this <paramref name="gameObject"/> to <paramref name="show"/>.
         /// If <paramref name="show"/> is false, the object becomes invisible. If it is true
-        /// instead, it becomes visible. Only the renderer of <paramref name="gameObject"/> 
+        /// instead, it becomes visible. 
+        /// 
+        /// If <paramref name="includingChildren"/> is false, only the renderer of <paramref name="gameObject"/> 
         /// is turned on/off, which will not affect whether the <paramref name="gameObject"/>
         /// is active or inactive. If <paramref name="gameObject"/> has children, their
-        /// renderers will not be changed. However, if <paramref name="gameObject"/>'s
-        /// renderer is turned off, the children will neither be visible.
+        /// renderers will not be changed.
+        /// 
+        /// If <paramref name="includingChildren"/> is true, the operation applies to all descendants, too.
         /// 
         /// Precondition: <paramref name="gameObject"/> must have a Renderer.
         /// </summary>
         /// <param name="gameObject">object whose visibility is to be changed</param>
         /// <param name="show">whether or not to make the object visible</param>
-        public static void SetVisibility(this GameObject gameObject, bool show)
+        /// <param name="includingChildren">if true, the operation applies to all descendants, too</param>
+        public static void SetVisibility(this GameObject gameObject, bool show, bool includingChildren = true)
         {
             if (gameObject.TryGetComponent<Renderer>(out Renderer renderer))
             {
                 renderer.enabled = show;
+            }
+            if (includingChildren)
+            {
+                foreach (Transform child in gameObject.transform)
+                {
+                    child.gameObject.SetVisibility(show, includingChildren);
+                }
             }
         }
     }

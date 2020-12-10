@@ -32,7 +32,7 @@ namespace SEE.Game.Charts.VR
         /// <summary>
         /// Contains position data of the assigned camera.
         /// </summary>
-        [SerializeField] private Transform cameraTransform;
+        [SerializeField] public Transform cameraTransform;
 
         /// <summary>
         /// The minimum distance between the players head and the <see cref="GameObject" /> the charts are

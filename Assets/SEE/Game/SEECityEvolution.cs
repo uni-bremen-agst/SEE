@@ -73,6 +73,12 @@ namespace SEE.Game
         public Color DeletionBeamColor = Color.black;
 
         /// <summary>
+        /// The directory in which the GXL files are located.
+        /// </summary>
+        [Tooltip("The directory in which the GXL files are located.")]
+        public DataPath GXLDirectory = new DataPath();
+
+        /// <summary>
         /// Factory method to create the used EvolutionRenderer.
         /// </summary>
         /// <returns></returns>
@@ -94,7 +100,7 @@ namespace SEE.Game
         {
             GraphsReader graphsReader = new GraphsReader();
             // Load all GXL graphs and CSV files in directory PathPrefix but not more than maxRevisionsToLoad many.
-            graphsReader.Load(PathPrefix, HierarchicalEdges, maxRevisionsToLoad);
+            graphsReader.Load(GXLDirectory.Path, HierarchicalEdges, maxRevisionsToLoad);
             return graphsReader.graphs;
         }
 
@@ -113,7 +119,7 @@ namespace SEE.Game
         public Graph LoadFirstGraph()
         {
             GraphsReader reader = new GraphsReader();
-            reader.Load(PathPrefix, HierarchicalEdges, 1);
+            reader.Load(GXLDirectory.Path, HierarchicalEdges, 1);
             List<Graph> graphs = reader.graphs;
             if (graphs.Count == 0)
             {
