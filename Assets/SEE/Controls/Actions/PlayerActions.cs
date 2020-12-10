@@ -76,6 +76,7 @@ namespace SEE.Controls.Actions
                     if (nodePlaced && UserWantsToMove())
                     {
                         DesktopNewNodeAction.ScaleNode(node);
+                        nodePlaced = false;
                     }
                     else
                     {
