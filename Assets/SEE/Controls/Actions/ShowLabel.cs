@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using DG.Tweening;
+using JetBrains.Annotations;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
@@ -150,6 +151,11 @@ namespace SEE.Controls.Actions
         private GameObject nodeLabel;
 
         /// <summary>
+        /// True iff the label is currently playing an animation after which it will be destroyed.
+        /// </summary>
+        private bool currentlyDestroying;
+
+        /// <summary>
         /// Returns the code city holding the settings for the visualization of the node.
         /// 
         /// May be null.
@@ -161,11 +167,9 @@ namespace SEE.Controls.Actions
             {
                 return null;
             }
-            else
-            {
-                codeCityObject.TryGetComponent(out AbstractSEECity city);
-                return city;
-            }
+
+            codeCityObject.TryGetComponent(out AbstractSEECity city);
+            return city;
         }
 
         /// <summary>
@@ -200,10 +204,12 @@ namespace SEE.Controls.Actions
             }
 
             // If label already exists or the game object has no node reference, nothing needs to be done
-            if (nodeLabel != null || !gameObject.TryGetComponent(out NodeRef nodeRef))
+            if (nodeLabel != null && !currentlyDestroying || !gameObject.TryGetComponent(out NodeRef nodeRef))
             {
                 return;
             }
+
+            currentlyDestroying = false;
 
             Node node = nodeRef.node;
             if (node == null)
@@ -215,51 +221,87 @@ namespace SEE.Controls.Actions
             // Now we create the label
             // We define starting and ending positions for the animation
             Vector3 startLabelPosition = gameObject.transform.position;
-            Vector3 endLabelPosition = gameObject.transform.position;
-            endLabelPosition.y += isLeaf ? city.LeafLabelDistance : city.InnerNodeLabelDistance;
             nodeLabel = TextFactory.GetTextWithSize(node.SourceName, startLabelPosition,
-                                                    isLeaf ? city.LeafLabelFontSize : city.InnerNodeLabelFontSize, textColor: Color.black.ColorWithAlpha(0f));
+                                                    isLeaf ? city.LeafLabelFontSize : city.InnerNodeLabelFontSize, 
+                                                    textColor: Color.black.ColorWithAlpha(0f), outline: true);
             nodeLabel.name = $"Label {node.SourceName}";
             nodeLabel.transform.SetParent(gameObject.transform);
 
             // Add connecting line between "roof" of object and text
             Vector3 startLinePosition = gameObject.transform.position;
-            Vector3 endLinePosition = endLabelPosition;
             float nodeTopPosition = nodeLabel.GetComponent<TextMeshPro>().textBounds.extents.y;
             startLinePosition.y = BoundingBox.GetRoof(new List<GameObject> {gameObject});
-            endLinePosition.y -= nodeTopPosition * 1.3f; // add slight gap to make it slightly more aesthetic
             LineFactory.Draw(nodeLabel, new[] {startLinePosition, startLinePosition}, 0.01f,
                              Materials.New(Materials.ShaderType.TransparentLine, Color.black));
             Portal.SetInfinitePortal(nodeLabel);
 
-            // Animated label to move to top and fade in
-            if (nodeLabel.TryGetComponent(out TextMeshPro text))
+            AnimateLabel(true, city, isLeaf);
+        }
+
+        private void AnimateLabel(bool animateIn, AbstractSEECity city, bool isLeaf)
+        {
+            // TODO: Maybe the class in Tweens.cs should be used instead.
+            // However, I'm not sure why that class is a MonoBehaviour (shouldn't it be a static helper class?)
+            // and DOTween instead recommends using extension methods, so this is what's used here.
+            // Additionally, some specific functionality (e.g. callbacks), isn't available from Tweens.cs.
+            
+            Vector3 endLabelPosition, endLinePosition;
+            float endAlpha;
+            if (animateIn)
             {
-                // TODO: Maybe the class in Tweens.cs should be used instead.
-                // However, I'm not sure why that class is a MonoBehaviour (shouldn't it be a static helper class?)
-                // and DOTween instead recommends using extension methods, so this is what's used here.
-                nodeLabel.transform.DOMove(endLabelPosition, 0.5f);
-                DOTween.ToAlpha(() => text.color, color => text.color = color, 1f, 0.5f);
+                endLabelPosition = nodeLabel.transform.position;
+                endLabelPosition.y += isLeaf ? city.LeafLabelDistance : city.InnerNodeLabelDistance;
+                endLinePosition = endLabelPosition;
+                float nodeTopPosition = nodeLabel.GetComponent<TextMeshPro>().textBounds.extents.y;
+                endLinePosition.y -= nodeTopPosition * 1.3f; // add slight gap to make it slightly more aesthetic
+                endAlpha = 1f;
             }
             else
             {
-                Debug.LogError("Couldn't find text component in newly created label.\n");
+                endLabelPosition = gameObject.transform.position;
+                endLinePosition = endLabelPosition;
+                endLinePosition.y = BoundingBox.GetRoof(new List<GameObject> {gameObject});
+                endAlpha = 0f;
             }
 
-            // Animated line to move to top and fade in
-            if (nodeLabel.TryGetComponent(out LineRenderer line))
-            {
-                // Reset colors to clear first
-                LineFactory.SetColors(line, Color.clear, Color.clear);
+            float animationDuration = AnimationDuration(isLeaf, city);
+            AnimateLabelText();
+            AnimateLabelLine();
 
-                DOTween.ToAlpha(() => line.startColor, c => line.startColor = c, 0.25f, 0.5f);
-                DOTween.ToAlpha(() => line.endColor, c => line.endColor = c, 1f, 0.5f);
-                DOTween.To(() => line.GetPosition(1), p => line.SetPosition(1, p), endLinePosition, 0.5f);
-            }
-            else
+            #region Local Methods
+            void AnimateLabelText()
             {
-                Debug.LogError("Couldn't find line component in newly created label.\n");
+                // Animated label to move to top and fade in
+                if (nodeLabel.TryGetComponent(out TextMeshPro text))
+                {
+                    nodeLabel.transform.DOMove(endLabelPosition, animationDuration);
+                    DOTween.ToAlpha(() => text.color, color => text.color = color, endAlpha, animationDuration);
+                    DOTween.ToAlpha(() => text.outlineColor, color => text.outlineColor = color, endAlpha, animationDuration);
+                }
+                else
+                {
+                    Debug.LogError("Couldn't find text component in newly created label.\n");
+                }
             }
+
+            void AnimateLabelLine()
+            {
+                // Animated line to move to top and fade in
+                if (nodeLabel.TryGetComponent(out LineRenderer line))
+                {
+                    // Reset colors to clear first
+                    LineFactory.SetColors(line, Color.clear, Color.clear);
+
+                    DOTween.ToAlpha(() => line.startColor, c => line.startColor = c, endAlpha * 0.25f, animationDuration);
+                    DOTween.ToAlpha(() => line.endColor, c => line.endColor = c, endAlpha, animationDuration);
+                    DOTween.To(() => line.GetPosition(1), p => line.SetPosition(1, p), endLinePosition, animationDuration);
+                }
+                else
+                {
+                    Debug.LogError("Couldn't find line component in newly created label.\n");
+                }
+            }
+            #endregion
         }
 
         /// <summary>
@@ -269,11 +311,42 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void Off()
         {
-            if (nodeLabel != null)
+            if (nodeLabel == null)
+            {
+                return;
+            }
+
+            currentlyDestroying = true;
+            // Fade out and move label down
+            AnimateLabel(false, City(), SceneQueries.IsLeaf(gameObject));
+        }
+
+        /**
+         * Returns the animation duration using values defined in AbstractSEECity.
+         * <param name="isLeaf">Must be true iff the node attached to the game object is a leaf.</param>
+         * <param name="city">The city object from which to retrieve the duration.
+         * If <code>null</code>, the city object will be retrieved by a call to <see cref="City"/>.</param>
+         */
+        private float AnimationDuration(bool isLeaf, [CanBeNull] AbstractSEECity city = null)
+        {
+            city = city ?? City();
+            return isLeaf ? city.LeafLabelAnimationDuration : city.InnerNodeLabelAnimationDuration;
+        }
+
+        /// <summary>
+        /// Destroys the node label. Should only be called after the animations have completed.
+        /// </summary>
+        private void DestroyLabel() {
+            // Only destroy label if we are actually still destroying it.
+            // currentlyDestroying may be false if the user hovers away and quickly hovers back, in which case this
+            // method will still be called.
+            if (nodeLabel != null && currentlyDestroying)
             {
                 Destroyer.DestroyGameObject(nodeLabel);
                 nodeLabel = null;
             }
+
+            currentlyDestroying = false;
         }
     }
 }
