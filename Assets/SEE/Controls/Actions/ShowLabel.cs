@@ -156,6 +156,11 @@ namespace SEE.Controls.Actions
         private bool currentlyDestroying;
 
         /// <summary>
+        /// All currently active tweens.
+        /// </summary>
+        private List<Tween> tweens = new List<Tween>();
+
+        /// <summary>
         /// Returns the code city holding the settings for the visualization of the node.
         /// 
         /// May be null.
@@ -223,13 +228,14 @@ namespace SEE.Controls.Actions
             Vector3 startLabelPosition = gameObject.transform.position;
             nodeLabel = TextFactory.GetTextWithSize(node.SourceName, startLabelPosition,
                                                     isLeaf ? city.LeafLabelFontSize : city.InnerNodeLabelFontSize, 
-                                                    textColor: Color.black.ColorWithAlpha(0f), outline: true);
+                                                    textColor: Color.black.ColorWithAlpha(0f));
             nodeLabel.name = $"Label {node.SourceName}";
             nodeLabel.transform.SetParent(gameObject.transform);
+            
+            SetOutline();
 
             // Add connecting line between "roof" of object and text
             Vector3 startLinePosition = gameObject.transform.position;
-            float nodeTopPosition = nodeLabel.GetComponent<TextMeshPro>().textBounds.extents.y;
             startLinePosition.y = BoundingBox.GetRoof(new List<GameObject> {gameObject});
             LineFactory.Draw(nodeLabel, new[] {startLinePosition, startLinePosition}, 0.01f,
                              Materials.New(Materials.ShaderType.TransparentLine, Color.black));
@@ -238,6 +244,33 @@ namespace SEE.Controls.Actions
             AnimateLabel(true, city, isLeaf);
         }
 
+        /// <summary>
+        /// Enables or disables an outline around TextMeshPro instances based on our platform.
+        /// </summary>
+        private void SetOutline()
+        {
+            // On the HoloLens, we want to make the text a bit easier to read by making it bolder.
+            // We do this by adding a slight outline.
+            bool enableOutline = PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.HoloLens;
+            // However, when developing on a PC/Emulator, the background will be black, so we add a white outline.
+            Color outlineColor = Debug.isDebugBuild ? Color.white : Color.black;
+            if (nodeLabel.TryGetComponent(out TextMeshPro tm))
+            {
+                TextFactory.SetOutline(enableOutline, tm, outlineColor: outlineColor);
+            }
+            else
+            {
+                Debug.LogError("No TextMeshPro has been found on a newly created label.\n");
+            }
+        }
+
+        /// <summary>
+        /// Animates the given labels by fading them in/out and gradually changing their position.
+        /// </summary>
+        /// <param name="animateIn">If true, we will fade-in and move the label to the top.
+        /// If false, we will fade out and move the label to the bottom.</param>
+        /// <param name="city">The <see cref="AbstractSEECity"/> object from which to get the settings.</param>
+        /// <param name="isLeaf">Whether this node is a leaf.</param>
         private void AnimateLabel(bool animateIn, AbstractSEECity city, bool isLeaf)
         {
             // TODO: Maybe the class in Tweens.cs should be used instead.
@@ -274,9 +307,9 @@ namespace SEE.Controls.Actions
                 // Animated label to move to top and fade in
                 if (nodeLabel.TryGetComponent(out TextMeshPro text))
                 {
-                    nodeLabel.transform.DOMove(endLabelPosition, animationDuration);
-                    DOTween.ToAlpha(() => text.color, color => text.color = color, endAlpha, animationDuration);
-                    DOTween.ToAlpha(() => text.outlineColor, color => text.outlineColor = color, endAlpha, animationDuration);
+                    tweens.Add(nodeLabel.transform.DOMove(endLabelPosition, animationDuration));
+                    tweens.Add(DOTween.ToAlpha(() => text.color, color => text.color = color, endAlpha, animationDuration));
+                    tweens.Add(DOTween.ToAlpha(() => text.outlineColor, color => text.outlineColor = color, endAlpha, animationDuration));
                 }
                 else
                 {
@@ -292,9 +325,15 @@ namespace SEE.Controls.Actions
                     // Reset colors to clear first
                     LineFactory.SetColors(line, Color.clear, Color.clear);
 
-                    DOTween.ToAlpha(() => line.startColor, c => line.startColor = c, endAlpha * 0.25f, animationDuration);
-                    DOTween.ToAlpha(() => line.endColor, c => line.endColor = c, endAlpha, animationDuration);
-                    DOTween.To(() => line.GetPosition(1), p => line.SetPosition(1, p), endLinePosition, animationDuration);
+                    // Lower start of line should be visible almost immediately due to reduced alpha (smooth transition)
+                    tweens.Add(DOTween.ToAlpha(() => line.startColor, c => line.startColor = c, endAlpha * 0.5f, animationDuration*0.1f));
+                    tweens.Add(DOTween.ToAlpha(() => line.endColor, c => line.endColor = c, endAlpha, animationDuration));
+                    Tween lastTween = DOTween.To(() => line.GetPosition(1), p => line.SetPosition(1, p), endLinePosition, animationDuration);
+                    tweens.Add(lastTween);
+                    if (!animateIn)
+                    {
+                        lastTween.OnKill(DestroyLabel);
+                    }
                 }
                 else
                 {
@@ -342,6 +381,8 @@ namespace SEE.Controls.Actions
             // method will still be called.
             if (nodeLabel != null && currentlyDestroying)
             {
+                // FIXME there's what appears to be a racing condition here, where sometimes labels don't get destroyed
+                tweens.ForEach(tween => tween.Kill());
                 Destroyer.DestroyGameObject(nodeLabel);
                 nodeLabel = null;
             }
