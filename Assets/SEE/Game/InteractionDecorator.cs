@@ -1,4 +1,5 @@
 ﻿using SEE.Controls.Actions;
+using SEE.Game;
 using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
@@ -27,6 +28,7 @@ namespace SEE.Controls
             gameNode.AddComponent<ShowHovering>();
             gameNode.AddComponent<ShowSelection>();
             gameNode.AddComponent<ShowGrabbing>();
+            gameNode.AddComponent<GameNodeScaler>();
         }
 
         /// <summary>

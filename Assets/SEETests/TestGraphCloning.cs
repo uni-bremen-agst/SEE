@@ -44,9 +44,15 @@ namespace SEE.DataModel.DG
             Assert.That(clone.ItsGraph, Is.Null);
         }
 
+        /// <summary>
+        /// Unique ID for edges.
+        /// </summary>
+        private int edgeID = 1;
+
         private Edge NewEdge(Node source, Node target)
-        {
-            Edge edge = new Edge();
+        {            
+            Edge edge = new Edge(edgeID.ToString());
+            edgeID++;
             edge.Source = source;
             edge.Target = target;
             edge.Type = "Call";

@@ -1513,9 +1513,24 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
+    - Name: LayoutPath
+      Entry: 7
+      Data: 0|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: HierarchicalEdges
       Entry: 7
-      Data: 0|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
     - Name: 
       Entry: 12
       Data: 4
@@ -1539,18 +1554,90 @@ MonoBehaviour:
       Data: 
     - Name: nodeTypes
       Entry: 7
-      Data: 1|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 2|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 6
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: File
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Class
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Method
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Member
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Package
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Directory
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -1649,7 +1736,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 3|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
+      Data: 4|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -1679,11 +1766,11 @@ MonoBehaviour:
       Data: false
     - Name: ListDirToggle
       Entry: 7
-      Data: 4|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 5|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 5|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 6|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -1699,11 +1786,11 @@ MonoBehaviour:
       Data: 
     - Name: DirNodeLayout
       Entry: 7
-      Data: 6|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Layout.NodeLayouts.NodeLayoutKind,
+      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Layout.NodeLayouts.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 5
+      Data: 6
     - Name: 
       Entry: 12
       Data: 0
@@ -1715,11 +1802,11 @@ MonoBehaviour:
       Data: 
     - Name: DirShape
       Entry: 7
-      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+InnerNodeKinds,
+      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+InnerNodeKinds,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 5
+      Data: 6
     - Name: 
       Entry: 12
       Data: 0
@@ -1731,7 +1818,7 @@ MonoBehaviour:
       Data: 
     - Name: rootDirs
       Entry: 7
-      Data: 8|System.Collections.Generic.List`1[[SEE.DataModel.DG.Node, SEE]], mscorlib
+      Data: 9|System.Collections.Generic.List`1[[SEE.DataModel.DG.Node, SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -1743,11 +1830,11 @@ MonoBehaviour:
       Data: 
     - Name: show
       Entry: 7
-      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 5
+      Data: 6
     - Name: 
       Entry: 12
       Data: 0
@@ -1762,11 +1849,11 @@ MonoBehaviour:
       Data: true
     - Name: loadedForNodeTypes
       Entry: 7
-      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 5
+      Data: 6
     - Name: 
       Entry: 12
       Data: 0
@@ -1787,7 +1874,7 @@ MonoBehaviour:
       Data: 
     - Name: Measurements
       Entry: 7
-      Data: 11|System.Collections.Generic.SortedDictionary`2[[System.String, mscorlib],[System.String,
+      Data: 12|System.Collections.Generic.SortedDictionary`2[[System.String, mscorlib],[System.String,
         mscorlib]], System
     - Name: 
       Entry: 12
@@ -1800,11 +1887,11 @@ MonoBehaviour:
       Data: 
     - Name: SubLayoutsInnerNodes
       Entry: 7
-      Data: 12|System.Collections.Generic.Dictionary`2[[SEE.Layout.NodeLayouts.NodeLayoutKind,
+      Data: 13|System.Collections.Generic.Dictionary`2[[SEE.Layout.NodeLayouts.NodeLayoutKind,
         SEE],[System.String, mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 13|System.Collections.Generic.EnumEqualityComparer`1[[SEE.Layout.NodeLayouts.NodeLayoutKind,
+      Data: 14|System.Collections.Generic.EnumEqualityComparer`1[[SEE.Layout.NodeLayouts.NodeLayoutKind,
         SEE]], mscorlib
     - Name: 
       Entry: 12
@@ -1910,11 +1997,11 @@ MonoBehaviour:
       Data: 
     - Name: SubLayoutsLeafNodes
       Entry: 7
-      Data: 14|System.Collections.Generic.Dictionary`2[[SEE.Layout.NodeLayouts.NodeLayoutKind,
+      Data: 15|System.Collections.Generic.Dictionary`2[[SEE.Layout.NodeLayouts.NodeLayoutKind,
         SEE],[System.String, mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 13
+      Data: 14
     - Name: 
       Entry: 12
       Data: 8
@@ -2020,8 +2107,10 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  pathPrefix: C:\Users\koschke\SEE\Data\GXL\TestProjectToDebug
-  gvlPath: ..\Data\GXL\linux-clones\net.gvl
+  LayoutPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
   WidthMetric: Metric.LOC
   HeightMetric: Metric.LOC
   DepthMetric: Metric.LOC
@@ -2063,9 +2152,18 @@ MonoBehaviour:
   Tension: 0.85
   RDP: 0.05
   calculateMeasurements: 0
-  gxlPath: CodeFacts.gxl
-  csvPath: CodeFacts.csv
-  jlgPath: CodeFacts.jlg
+  GXLPath:
+    Root: 1
+    relativePath: /Data/GXL/TestProjectToDebug/CodeFacts.gxl
+    absolutePath: 
+  CSVPath:
+    Root: 1
+    relativePath: 
+    absolutePath: 
+  JLGPath:
+    Root: 1
+    relativePath: /Data/GXL/TestProjectToDebug/CodeFacts.jlg
+    absolutePath: 
 --- !u!114 &1312456092
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2107,7 +2205,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.0032052994
+  HeightOffset: 0.0031439066
 --- !u!65 &1312456095
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2178,7 +2276,8 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.747, y: 0.962, z: 0.011}
   m_LocalScale: {x: 1, y: 0.0001, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 1671730621}
   m_Father: {fileID: 0}
   m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2214,6 +2313,8 @@ MonoBehaviour:
   playerInputType: 0
   HideVRControllers: 0
   ShowControllerHints: 0
+  experienceScale: 1
+  CityScalingFactor: 1
 --- !u!4 &1510433995
 Transform:
   m_ObjectHideFlags: 0
@@ -2476,6 +2577,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79ef9858c6f1d9d4184e7310d93dc51b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Speed: 2
+  BoostFactor: 2
   focusedObject: {fileID: 1093528284}
 --- !u!1 &1626562202
 GameObject:
@@ -2646,6 +2749,67 @@ MonoBehaviour:
     lockAspectRatio: 1
     worldSize: {x: 0.99999994, y: 0.99999994}
   knobRange: 7.5
+--- !u!1 &1671730620
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1671730621}
+  - component: {fileID: 1671730622}
+  m_Layer: 0
+  m_Name: JLG Visualization
+  m_TagString: JLG Visualization
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1671730621
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1671730620}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.747, y: -9620, z: -0.011}
+  m_LocalScale: {x: 1, y: 10000, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1312456098}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1671730622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1671730620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9aec9929283525040bdb89e1d9cfd8ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: parsedJLG
+      Entry: 6
+      Data: 
+  jlgFilePath: C:\Users\koschke\SEE\Data\GXL\TestProjectToDebug\CodeFacts.jlg
+  BreakpointClass: classname
+  BreakpointLine: 0
+  DistanceAboveCity: 0.01
+  DistanceBehindCity: 0.3
+  LineWidth: 0.01
 --- !u!1001 &1691752130
 PrefabInstance:
   m_ObjectHideFlags: 0
