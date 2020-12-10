@@ -1,6 +1,8 @@
-﻿using SEE.DataModel;
+﻿using Microsoft.MixedReality.Toolkit.Utilities;
+using SEE.DataModel;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SEE.GO
 {
@@ -28,9 +30,16 @@ namespace SEE.GO
         /// <param name="textColor">the color of the text (default: black)</param>
         /// <returns>the game object representing the text</returns>
         public static GameObject GetTextWithSize(string text, Vector3 position, float fontSize, bool lift = true, 
-            Color? textColor = null)
+                                                 bool outline = false, Color? textColor = null)
         {
             CreateText(text, position, textColor, out TextMeshPro tm, out GameObject result);
+
+            if (outline)
+            {
+                //TODO: Use shader outline instead
+                Outline outl = result.AddComponent<Outline>();
+                outl.effectColor = textColor?.Invert() ?? Color.white;
+            }
 
             tm.fontSize = fontSize;
 

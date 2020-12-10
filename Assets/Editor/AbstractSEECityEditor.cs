@@ -294,6 +294,8 @@ namespace SEEEditor
                 city.InnerNodeShowLabel = EditorGUILayout.Toggle("Show labels", city.InnerNodeShowLabel);
                 city.InnerNodeLabelDistance = EditorGUILayout.FloatField("Label distance", city.InnerNodeLabelDistance);
                 city.InnerNodeLabelFontSize = EditorGUILayout.FloatField("Label font size", city.InnerNodeLabelFontSize);
+                city.InnerNodeLabelAnimationDuration = EditorGUILayout.FloatField("Label animation duration (in seconds)",
+                                                                                  city.InnerNodeLabelAnimationDuration);
             }
         }
 
@@ -319,6 +321,8 @@ namespace SEEEditor
                 city.ShowLabel = EditorGUILayout.Toggle("Show labels", city.ShowLabel);
                 city.LeafLabelDistance = EditorGUILayout.FloatField("Label distance", city.LeafLabelDistance);
                 city.LeafLabelFontSize = EditorGUILayout.FloatField("Label font size", city.LeafLabelFontSize);
+                city.LeafLabelAnimationDuration = EditorGUILayout.FloatField("Label animation duration (in seconds)",
+                                                                                  city.LeafLabelAnimationDuration);
             }
         }
 

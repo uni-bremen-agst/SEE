@@ -289,6 +289,11 @@ namespace SEE.Game
         public float LeafLabelFontSize = 0.4f;
 
         /// <summary>
+        /// How many seconds the label should take to (dis)appear.
+        /// </summary>
+        public float LeafLabelAnimationDuration = 0.5f;
+
+        /// <summary>
         /// All metrics used for visual attributes of a leaf node (WidthMetric, HeightMetric,
         /// DepthMetric, and LeafStyleMetric). 
         /// Note: A metric name occurs only once (i.e., duplicate names are removed).
@@ -481,6 +486,10 @@ namespace SEE.Game
         /// The font size of the inner node's label.
         /// </summary>
         public float InnerNodeLabelFontSize = 0.4f;
+        /// <summary>
+        /// How many seconds the label should take to (dis)appear.
+        /// </summary>
+        public float InnerNodeLabelAnimationDuration = 0.5f;
 
 
         /// <summary>
