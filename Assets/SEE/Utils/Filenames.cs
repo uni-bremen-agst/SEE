@@ -19,9 +19,61 @@ namespace SEE.Utils
         public const string GXLExtension = ".gxl";
 
         /// <summary>
+        /// File extension of layout files in the format of Axivion's Gravis.
+        /// These kinds of layout files contain only 2D co-ordinates.
+        /// </summary>
+        public const string GVLExtension = ".gvl";
+
+        /// <summary>
+        /// File extension of layout files in the SEE format:
+        /// SEE Layout Data (SLD).
+        /// These kinds of layout files contain the complete Transform
+        /// data of the game objects.
+        /// </summary>
+        public const string SLDExtension = ".sld";
+
+        /// <summary>
         /// File extension of CSV filenames.
         /// </summary>
         public const string CSVExtension = ".csv";
+
+        /// <summary>
+        /// File extension of LJG filenames.
+        /// </summary>
+        public const string JLGExtension = ".jlg";
+
+        /// <summary>
+        /// File extension of DYN filenames.
+        /// </summary>
+        public const string DYNExtension = ".dyn";
+
+        /// <summary>
+        /// Returns the last part of the given <paramref name="extension"/>
+        /// without the period.
+        /// 
+        /// Precondition: <paramref name="extension"/> must start with a period.
+        /// </summary>
+        /// <param name="extension"></param>
+        /// <returns><paramref name="extension"/> without leading period</returns>
+        public static string ExtensionWithoutPeriod(string extension)
+        {
+            return extension.Substring(1);
+        }
+
+        /// <summary>
+        /// True if <paramref name="filename"/> has <paramref name="extension"/>.
+        /// If <paramref name="filename"/> is null or if it has no extension
+        /// separated by a period, false is returned.
+        /// </summary>
+        /// <param name="filename">filename to be checked for the extension</param>
+        /// <param name="extension">the extension the filename should have</param>
+        /// <returns></returns>
+        public static bool HasExtension(string filename, string extension)
+        {
+            string extensionOfFilename = Path.GetExtension(filename);
+            return !string.IsNullOrEmpty(extensionOfFilename)
+                && extensionOfFilename == extension;
+        }
 
         /// <summary>
         /// Yields string "*" + <paramref name="extension"/>.

@@ -187,9 +187,10 @@ namespace SEE.Tools
                 {
                     if (constraint.EdgeDensity == 1 || random.NextDouble() < constraint.EdgeDensity)
                     {
-                        Edge edge = new Edge(source, target, constraint.EdgeType);
+                        string id = constraint.EdgeType + "#" + source.ID + "#" + target.ID;
+                        Edge edge = new Edge(id, source, target, constraint.EdgeType);
                         result.Add(edge);
-                        graph.AddEdge(edge);
+                        graph.AddEdge(edge);                        
                     }
                 }
             }

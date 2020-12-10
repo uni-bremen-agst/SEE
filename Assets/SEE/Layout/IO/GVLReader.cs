@@ -9,7 +9,7 @@ namespace SEE.Layout.IO
     /// <summary>
     /// Reads layout information from GVL files.
     /// </summary>
-    public class Reader
+    public class GVLReader
     {
         /// <summary>
         /// Reads layout information from given GVL file with given <paramref name="filename"/>.
@@ -27,7 +27,7 @@ namespace SEE.Layout.IO
         /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
         /// placed on this level</param>
         /// <param name="logger">logger used to emit errors, warnings, etc.</param>
-        public Reader(string filename, ICollection<IGameNode> gameNodes, float groundLevel, SEE.Utils.ILogger logger = null)
+        public GVLReader(string filename, ICollection<IGameNode> gameNodes, float groundLevel, SEE.Utils.ILogger logger = null)
         {
             this.filename = filename;
             this.logger = logger;
@@ -64,7 +64,7 @@ namespace SEE.Layout.IO
         /// </summary>
         /// <param name="gameNodes">game nodes that are to be mapped</param>
         /// <returns>mapping from the IDs onto <paramref name="gameNodes"/></returns>
-        private Dictionary<string, IGameNode> ToMap(ICollection<IGameNode> gameNodes)
+        private static Dictionary<string, IGameNode> ToMap(ICollection<IGameNode> gameNodes)
         {
             Dictionary<string, IGameNode> result = new Dictionary<string, IGameNode>();
             foreach (IGameNode gameNode in gameNodes)
@@ -590,13 +590,6 @@ namespace SEE.Layout.IO
 
             //Debug.LogFormat("result for node {0} center={1} left upper corner={2} scale={3}\n", 
             //                gameNode.ID, gameNode.CenterPosition, ToLeftUpperCorner(gameNode.CenterPosition, gameNode.LocalScale), gameNode.LocalScale);
-        }
-
-        private static Vector3 ToLeftUpperCorner(Vector3 position, Vector3 scale)
-        {
-            position.x -= scale.x / 2.0f;
-            position.z += scale.z / 2.0f;
-            return position;
         }
 
         /// <summary>

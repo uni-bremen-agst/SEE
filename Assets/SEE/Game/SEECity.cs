@@ -99,7 +99,7 @@ namespace SEE.Game
         /// </summary>
         protected void Awake()
         {
-            string filename = GXLPath;
+            string filename = GXLPath.Path;
             if (loadedGraph != null)
             {
                 Debug.Log("SEECity.Awake: graph is already loaded.\n");
@@ -134,7 +134,18 @@ namespace SEE.Game
                 }
             }
 
-#if false
+#if true
+            RemoveTransparency();
+#endif
+        }
+
+        /// <summary>
+        /// All game objects representing a graph node or edge in the current scene will be made
+        /// opaque (no transparency).
+        /// </summary>
+        private static void RemoveTransparency()
+        {
+            // Remove transparency of all nodes and edges
             foreach (NodeRef nodeRef in FindObjectsOfType<NodeRef>())
             {
                 MeshRenderer meshRenderer = nodeRef.gameObject.GetComponent<MeshRenderer>();
@@ -157,7 +168,27 @@ namespace SEE.Game
                     material.SetColor("_Color", color);
                 }
             }
-#endif
+        }
+
+        /// <summary>
+        /// Sets all NodeRefs and EdgeRefs for this city to the nodes and edges, respectively,
+        /// they correspond to. This will take place for the graph elements of the
+        /// <see cref="LoadedGraph"/> only.
+        /// We assume that the game objects with a NodeRef/EdgeRef required to be
+        /// defined to be immediate children of this SEECity. Moreover, we assume a child
+        /// game object's name is the ID of the corresponding graph node/edge.
+        /// </summary>
+        public void SetNodeEdgeRefs()
+        {
+            if (loadedGraph != null)
+            {
+                SetNodeEdgeRefs(loadedGraph, gameObject);
+                Debug.LogFormat("Node and edge references for {0} are resolved.\n", gameObject.name);
+            }
+            else
+            {
+                Debug.LogError("No graph loaded.\n");
+            }
         }
 
         /// <summary>
@@ -187,7 +218,7 @@ namespace SEE.Game
                     edgeRef.edge = graph.GetEdge(child.name);
                     if (edgeRef.edge == null)
                     {
-                        Debug.LogWarningFormat("Could not resolve edge reference {0}.\n", child.name);
+                        Debug.LogWarningFormat("Could not resolve edge reference {0}.\n", child.name);          
                     }
                 }
                 SetNodeEdgeRefs(graph, child);
@@ -195,27 +226,16 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// The relative path for the GXL file containing the graph data.
+        /// The path to the GXL file containing the graph data.
         /// </summary>
-        public string gxlPath = "..\\Data\\GXL\\minimal_clones.gxl";
-        /// <summary>
-        /// The relative path for the CSV file containing the node metrics.
-        /// </summary>
-        public string csvPath = "..\\Data\\GXL\\minimal_clones.csv";
+        /// <returns>GXL data path</returns>
+        public DataPath GXLPath = new DataPath();
 
         /// <summary>
-        /// Returns the concatenation of pathPrefix and gxlPath. That is the complete
-        /// absolute path to the GXL file containing the graph data.
+        /// The path to the CSV file containing the additional metric values.
         /// </summary>
-        /// <returns>concatenation of pathPrefix and gxlPath</returns>
-        public string GXLPath => PathPrefix + gxlPath;
-
-        /// <summary>
-        /// Returns the concatenation of pathPrefix and csvPath. That is the complete
-        /// absolute path to the CSV file containing the additional metric values.
-        /// </summary>
-        /// <returns>concatenation of pathPrefix and csvPath</returns>
-        public string CSVPath => PathPrefix + csvPath;
+        /// <returns>metric data path</returns>
+        public DataPath CSVPath = new DataPath();
 
         /// <summary>
         /// Loads the metrics from CSVPath() and aggregates and adds them to the graph.
@@ -223,7 +243,7 @@ namespace SEE.Game
         /// </summary>
         private void LoadMetrics()
         {
-            string filename = CSVPath;
+            string filename = CSVPath.Path;
             Performance p = Performance.Begin("loading metric data data from CSV file " + filename);
             int numberOfErrors = MetricImporter.Load(LoadedGraph, filename);
             if (numberOfErrors > 0)
@@ -252,7 +272,7 @@ namespace SEE.Game
         /// </summary>
         public virtual void LoadData()
         {
-            if (string.IsNullOrEmpty(GXLPath))
+            if (string.IsNullOrEmpty(GXLPath.Path))
             {
                 Debug.LogError("Empty graph path.\n");
             }
@@ -262,7 +282,7 @@ namespace SEE.Game
                 {
                     Reset();
                 }
-                LoadedGraph = LoadGraph(GXLPath);
+                LoadedGraph = LoadGraph(GXLPath.Path);
                 LoadMetrics();
             }
         }
@@ -272,7 +292,7 @@ namespace SEE.Game
         /// </summary>
         public virtual void SaveData()
         {
-            if (string.IsNullOrEmpty(GXLPath))
+            if (string.IsNullOrEmpty(GXLPath.Path))
             {
                 Debug.LogError("Empty graph path.\n");
             }
@@ -285,7 +305,7 @@ namespace SEE.Game
                     // arbitrary element from a HashSet (the type of HierarchicalEdges).
                     foreach (string hierarchicalEdge in HierarchicalEdges)
                     {
-                        GraphWriter.Save(GXLPath, LoadedGraph, hierarchicalEdge);
+                        GraphWriter.Save(GXLPath.Path, LoadedGraph, hierarchicalEdge);
                         break;
                     }
                 }
@@ -358,11 +378,23 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Saves the current layout of the city as GVL in a file named <see cref="GVLPath"/>.
+        /// Saves the current layout of the city in a file named <see cref="LayoutPath"/>.
+        /// The format of the written file depends upon the file extension. If the extension
+        /// is <see cref="Filenames.GVLExtension"/> it is saved in the GVL format; otherwise
+        /// the file is saved in the SLD format.
         /// </summary>
         public void SaveLayout()
         {
-            Layout.IO.Writer.Save(GVLPath, loadedGraph.Name, AllNodeDescendants(gameObject));
+            string path = LayoutPath.Path;
+            Debug.LogFormat("Saving layout data to {0}.\n", path);            
+            if (Filenames.HasExtension(path, Filenames.GVLExtension))
+            {
+                Layout.IO.GVLWriter.Save(path, loadedGraph.Name, AllNodeDescendants(gameObject));
+            }
+            else
+            {
+                Layout.IO.SLDWriter.Save(path, AllNodeDescendants(gameObject));
+            }
         }
 
         /// <summary>
