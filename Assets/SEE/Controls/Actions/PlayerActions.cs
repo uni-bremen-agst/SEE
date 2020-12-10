@@ -38,7 +38,8 @@ namespace SEE.Controls.Actions
         //Time which has to pass between two actions
         float coolDownTime = 1.0f;
 
-        /// <summary>
+        bool nodePlaced = false;
+         /// <summary>
         /// The current state of the player.
         /// </summary>
         private State state = State.Browse;
@@ -72,6 +73,13 @@ namespace SEE.Controls.Actions
                     }
                     break;
                 case State.NewNode:
+                    if (nodePlaced && UserWantsToMove())
+                    {
+                        DesktopNewNodeAction.ScaleNode(node);
+                    }
+                    else
+                    {
+
 
                         if (hoveredObject != null && node == null)
                         {
@@ -114,7 +122,7 @@ namespace SEE.Controls.Actions
                                 }
                                 else
                                 {
-                                StartCoroutine("DesktopNewNodeAction.ScaleNode",node);
+                                    nodePlaced = true;
                                 }
 
                                 node = null;
@@ -126,6 +134,7 @@ namespace SEE.Controls.Actions
                             }
 
                         }
+                    }
                     
                     break;
             }
