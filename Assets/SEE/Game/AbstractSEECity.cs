@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -81,6 +80,19 @@ namespace SEE.Game
             set
             {
                 SelectedNodeTypes = value;
+            }
+        }
+
+        /// <summary>
+        /// The path where the settings (the attributes of this class) are stored.
+        /// </summary>
+        public DataPath CityPath;
+
+        private void Awake()
+        {
+            if (CityPath == null)
+            {
+                CityPath = new DataPath(Application.dataPath + "/config" + Filenames.JSONExtension);
             }
         }
 
@@ -664,7 +676,7 @@ namespace SEE.Game
         ///  Dictionary with all Nodelayouts only for leaf nodes
         /// </summary>
         public Dictionary<NodeLayoutKind, string> SubLayoutsLeafNodes = Enum.GetValues(typeof(NodeLayoutKind)).Cast<NodeLayoutKind>().OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
-
+        
         /// <summary>
         /// Saves all data needed for the listing of the dirs in gui in cosegraphSettings
         /// </summary>
@@ -717,55 +729,40 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// A string which contains the directory of the last chosen .json-loading or .json-saving-path
+        /// Saves the settings of this code city to <see cref="CityPath"/>.
         /// </summary>
-        [SerializeField] public string jsonDirectory = null;
-
-        /// <summary>
-        /// getter and setter for the last chosen json-directory-path. If its null, a relative default path will be chosen.
-        /// </summary>
-        public string JsonDirectory
+        public void Save()
         {
-            get
-            {
-                if (string.IsNullOrEmpty(jsonDirectory))
-                {
-                    jsonDirectory = Application.dataPath;
-                }
-                string result = jsonDirectory;
-                if (result[result.Length - 1] != Filenames.UnixDirectorySeparator)
-                {
-                    result += Filenames.UnixDirectorySeparator;
-                }
-                result = Filenames.OnCurrentPlatform(result);
-                return result;
-            }
-            set
-            {
-                jsonDirectory = Path.GetDirectoryName(value);
-            }
+            Save(this, CityPath.Path);
         }
 
         /// <summary>
-        /// Saves a city in the chosen <paramref name="exportPath"/> directory with the 
-        /// chosen <paramref name="fileName"/> name.
+        /// Loads the settings of this code city from <see cref="CityPath"/>.
         /// </summary>
-        /// <param name="exportPath"> the path in which the .json File will be stored </param>
-        /// <param name="fileName"> the name of the created json-file </param>
-        public void SaveSelection(string exportPath)
+        public void Load()
+        {
+            Load(this, CityPath.Path);
+        }
+
+        /// <summary>
+        /// Saves <paramref name="city"/> in a file with given <paramref name="filename"/>.
+        /// </summary>
+        /// <param name="city">the city to be stored</param>
+        /// <param name="filename">the name of the file in which <paramref name="city"/> will be stored</param>
+        public static void Save(AbstractSEECity city, string filename)
         {          
-            CityRestorer.Persist(exportPath, this);
+            CityRestorer.Persist(filename, city);
         }
 
         /// <summary>
-        /// Loads and overwrites the <paramref name="city"/> with the city from the json-file 
-        /// found in the given <paramref name="importPath"/>.
+        /// Loads and overwrites the <paramref name="city"/> with the city read 
+        /// from the file with given <paramref name="filename"/>.
         /// </summary>
-        /// <param name="importPath"> the path of the json-file </param>
-        /// <param name="city"> the city which will be overwritten </param>
-        public void RestoreCity(string importPath, AbstractSEECity city )
+        /// <param name="city">the city to be overwritten</param>
+        /// <param name="filename">the name of the file from which to read the <paramref name="city"/></param>
+        public static void Load(AbstractSEECity city, string filename)
         {
-                CityRestorer.RestoreCity(importPath, city);
+            CityRestorer.RestoreCity(filename, city);
         }
     }
 }

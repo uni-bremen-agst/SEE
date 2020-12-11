@@ -33,20 +33,6 @@ namespace SEE.Game
     public class SEECityEvolution : AbstractSEECity
     {
         /// <summary>
-        /// The single root of the graph saved as a Node.
-        /// </summary>
-        public Node singleRoot = null;
-
-        /// <summary>
-        /// Gets the single root of a given graph.
-        /// </summary>
-        public Node GetSingleRoot(Graph graph)
-        {
-           singleRoot = graph.getSingleRoot();
-           return graph.getSingleRoot();
-        }
-
-        /// <summary>
         /// An additional Dictionary with all NodeTypes before loading the Graph-Data
         /// (after it, only true NodeTypes are contained in the main-dictionary "selectedNodeTypes").
         /// </summary>
@@ -127,7 +113,6 @@ namespace SEE.Game
             GraphsReader graphsReader = new GraphsReader();
             // Load all GXL graphs and CSV files in directory PathPrefix but not more than maxRevisionsToLoad many.
             graphsReader.Load(GXLDirectory.Path, HierarchicalEdges, maxRevisionsToLoad);
-            singleRoot = GetSingleRoot(graphsReader.graphs.First());
             return graphsReader.graphs;
         }
 
@@ -157,7 +142,6 @@ namespace SEE.Game
                 Graph graph = graphs.First<Graph>();
                 graph = RelevantGraph(graph);
                 graph.FinalizeNodeHierarchy();
-                singleRoot = GetSingleRoot(graphs.First());
                 return graph;
             }
         }

@@ -4,7 +4,6 @@ using SEE.Game;
 using SEE.Utils;
 using UnityEditor;
 using UnityEngine;
-using SEE.Utils;
 
 namespace SEEEditor
 {
@@ -60,22 +59,17 @@ namespace SEEEditor
                 SaveLayout(city);
             }
             EditorGUILayout.EndHorizontal();
-            EditorGUILayout.BeginHorizontal();
-            if (city.LoadedGraph != null && GUILayout.Button("Save Settings"))
-            {
-                SaveCityInJSON(city);
-            }
-            EditorGUILayout.EndHorizontal();
-            if (GUILayout.Button("Load Settings"))
-            {
-                LoadCityFromJSON(city);
-                city.LoadedGraph = null;
-            }
+
             if (city.LoadedGraph != null && GUILayout.Button("Add References"))
             {
                 AddReferences(city);
             }
         }
+
+        /// <summary>
+        /// Whether the foldout for the data-file attributes of the city should be expanded.
+        /// </summary>
+        private bool showDataFiles = true;
 
         /// <summary>
         /// Shows and sets the attributes of the SEECity managed here.
@@ -85,8 +79,13 @@ namespace SEEEditor
         protected virtual void Attributes()
         {
             SEECity city = target as SEECity;
-            city.GXLPath = GetDataPath("GXL file", city.GXLPath, Filenames.ExtensionWithoutPeriod(Filenames.GXLExtension));
-            city.CSVPath = GetDataPath("Metric file", city.CSVPath, Filenames.ExtensionWithoutPeriod(Filenames.CSVExtension));           
+            showDataFiles = EditorGUILayout.Foldout(showDataFiles,
+                                                    "Data Files", true, EditorStyles.foldoutHeader);
+            if (showDataFiles)
+            {
+                city.GXLPath = GetDataPath("GXL file", city.GXLPath, Filenames.ExtensionWithoutPeriod(Filenames.GXLExtension));
+                city.CSVPath = GetDataPath("Metric file", city.CSVPath, Filenames.ExtensionWithoutPeriod(Filenames.CSVExtension));
+            }
         }
 
         /// <summary>

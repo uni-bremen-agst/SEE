@@ -24,13 +24,11 @@ namespace SEE.DataModel.DG
         /// empty string if the graph was not created by loading it from disk.
         private string path = "";
 
-
-        public Node singleRoot = null; 
-
-        public Node getSingleRoot()
-        {
-            return singleRoot;
-        }
+        /// <summary>
+        /// Name of the artifical node type used for artifical root nodes added
+        /// when we do not have a real node type derived from the input graph.
+        /// </summary>
+        public const string ArtificalNodeType = "";
 
         private int maxDepth = -1;
         /// <summary>
