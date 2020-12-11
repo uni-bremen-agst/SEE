@@ -104,15 +104,25 @@ namespace SEE.GO
             return result;
         }
 
-
-        /// <summary>
-        /// Calculates the Edge Lines
-        /// </summary>
-        /// <returns>Layout Edge with Points</returns>
-        public ICollection<LayoutEdge> CalculateEdges(ICollection<ILayoutNode> nodes, ICollection<LayoutEdge> edges, bool draw = false)
+        public List<Vector3 []> CalcPoints(ICollection<ILayoutNode> nodes, ICollection<LayoutEdge> edges)
         {
+            List<Vector3 []> points = new List<Vector3 []>();
+            List<GameObject> result = new List<GameObject>(edges.Count);
+            if (edges.Count == 0)
+            {
+                return new List<Vector3 []>();
+            }
             layout.Create(nodes, edges.Cast<ILayoutEdge>().ToList());
-            return edges;
+            foreach (LayoutEdge layoutEdge in edges)
+            {
+                GameObject gameEdge = NewGameEdge(layoutEdge);
+                result.Add(gameEdge);
+                points.Add(layoutEdge.Points);
+
+            }
+            return points;
+        }
     }
-    }
+
+    
 }

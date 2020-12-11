@@ -191,17 +191,17 @@ namespace SEE.Game
             return result;
         }
 
-        public  ICollection<LayoutEdge> CalculateEdges(ICollection<GameObject> gameNodes)
+        public List<Vector3 []> CalcNewPints(ICollection<GameObject> gameNodes)
         {
-            return CalculateEdges(ToLayoutNodes(gameNodes));
+            return CalcNewPints(ToLayoutNodes(gameNodes));
         }
+
         /// <summary>
         /// Applies the edge layout according to the the user's choice (settings).
-        /// Creates Line Points without drawing
         /// </summary>
         /// <param name="gameNodes">the set of layout edges for which to create game objects</param>
-        /// <returns>Edges with Points</returns>
-        private ICollection<LayoutEdge> CalculateEdges(ICollection<GameNode> gameNodes, bool draw = true)
+        /// <returns>all game objects created to represent the edges; may be empty</returns>
+        private List<Vector3 []> CalcNewPints(ICollection<GameNode> gameNodes)
         {
             float minimalEdgeLevelDistance = 2.5f * settings.EdgeWidth;
             IEdgeLayout layout;
@@ -218,15 +218,13 @@ namespace SEE.Game
                     break;
                 case EdgeLayoutKind.None:
                     // nothing to be done
-                    return new List<LayoutEdge>();
+                    return new List<Vector3 []>();
                 default:
                     throw new Exception("Unhandled edge layout " + settings.EdgeLayout.ToString());
             }
-            Performance p = Performance.Begin("edge layout " + layout.Name);
+            
             EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
-            ICollection<LayoutEdge> result = edgeFactory.CalculateEdges(gameNodes.Cast<ILayoutNode>().ToList(), ConnectingEdges(gameNodes));
-            p.End();
-            Debug.LogFormat("Built \"" + settings.EdgeLayout + "\" edge layout for " + gameNodes.Count + " nodes in {0} [h:m:s:ms].\n", p.GetElapsedTime());
+            List<Vector3 []> result = edgeFactory.CalcPoints(gameNodes.Cast<ILayoutNode>().ToList(), ConnectingEdges(gameNodes));
             return result;
         }
 

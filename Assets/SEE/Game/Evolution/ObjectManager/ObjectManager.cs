@@ -261,72 +261,41 @@ namespace SEE.Game.Evolution
 
             edges = _graphRenderer.EdgeLayout(nodes.Values);
 
+            foreach(GameObject edge in edges){
+                LineRenderer lr;
+                edge.TryGetComponent<LineRenderer>(out lr);
+                //Destroyer.DestroyComponent(lr);
+                //for(int i = 0 ; i < lr.positionCount; i++){
+                 //   Debug.LogFormat("Pos: " + lr.GetPosition(i));
+                //}
+            }
+        }
 
-
-            if (null != edges)
-            {
-                int count = 0;
-                foreach (GameObject e in edges)
-                {
-                    LineRenderer line;
-
-                    e.TryGetComponent<LineRenderer>(out line);
-                    Vector3[] v = new Vector3[line.positionCount];
-                    for (int i = 0; i < line.positionCount; i++)
-                    {
-                        v[i] = line.GetPosition(i);
-                    }
-                    newPoints.Add((e.name, v));
-                    count++;
+        //Removes Edge
+        public void RemoveEdge(Edge edge){
+            foreach(GameObject e in edges.ToList()){
+                if(e.ID().Equals(edge.ID)){
+                    edges.Remove(e);
+                    e.TryGetComponent<LineRenderer>(out LineRenderer l);
+                    Destroyer.DestroyComponent(l);
+                    Destroyer.DestroyGameObject(e);
                 }
             }
+        }
 
 
-            List<(string, Vector3[])> sampledOldPoints = new List<(string, Vector3[])>();
-            List<(string, Vector3[])> samplednewPoints = new List<(string, Vector3[])>();
+        public ICollection<GameObject> GetEdges(){
+            return edges;
+        }
 
+        //Calculates new points for each edge
+        public List<Vector3[]> CalNewEdges(){
+            List<Vector3[]> newPoints = _graphRenderer.CalcNewPints(nodes.Values);
 
-            foreach ((string, Vector3[]) v3 in oldPoints)
-            {
-                sampledOldPoints.Add((v3.Item1, LinePoints.BSplineLinePoints(v3.Item2, 0.85f, 200)));
+            foreach(Vector3[] v4 in newPoints){
+               // Debug.LogFormat("Count: " + v4.Count());
             }
-
-            foreach ((string, Vector3[]) v3 in newPoints)
-            {
-                samplednewPoints.Add((v3.Item1, LinePoints.BSplineLinePoints(v3.Item2, 0.85f, 200)));
-            }
-
-
-
-            List<(string, Vector3[], Vector3[])> pairs = new List<(string, Vector3[], Vector3[])>();
-
-
-            foreach ((string, Vector3[]) op in sampledOldPoints)
-            {
-                foreach ((string, Vector3[]) np in samplednewPoints)
-                {
-                    if (op.Item1.Equals(np.Item1) && !op.Item2.Equals(np.Item2))
-                    {
-                        pairs.Add((op.Item1, op.Item2, np.Item2));
-                    }
-                }
-            }
-
-
-            foreach ((string, Vector3[], Vector3[]) list in pairs)
-            {
-                Debug.LogFormat("Name: " + list.Item1 + " Start: " + list.Item2.Length+ " Target: " + list.Item3.Length);
-                for (int i = 0; i < 200; i++)
-                {
-                    //Debug.LogFormat("Name: " + list.Item1 + " Start: " + list.Item2[i]+ " Target: " + list.Item3[i]);
-                }
-
-            }
-
-
-
-
-
+            return  newPoints;
         }
 
 

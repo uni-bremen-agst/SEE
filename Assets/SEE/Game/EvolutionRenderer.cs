@@ -98,12 +98,15 @@ namespace SEE.Game
                 Assert.IsNotNull(graphRenderer);
                 diff = new NumericAttributeDiff(value.AllMetricAttributes());
                 objectManager = new ObjectManager(graphRenderer, gameObject);
-                float markerHeight = 1.0f;
-                float markerWidth = 1.0f;
                 if (gameObject.TryGetComponent<SEECityEvolution>(out SEECityEvolution cityEvolution))
                 {
-                    markerHeight = cityEvolution.MarkerHeight;
-                    markerWidth = cityEvolution.MarkerWidth;
+                    marker = new Marker(graphRenderer,
+                                        markerWidth: cityEvolution.MarkerWidth,
+                                        markerHeight: cityEvolution.MarkerHeight,
+                                        additionColor: cityEvolution.AdditionBeamColor,
+                                        changeColor: cityEvolution.ChangeBeamColor,
+                                        deletionColor: cityEvolution.DeletionBeamColor,
+                                        duration: AnimationLag);
                 }
                 else
                 {
@@ -111,7 +114,6 @@ namespace SEE.Game
                                          name);
                     enabled = false;
                 }
-                marker = new Marker(graphRenderer, markerWidth, markerHeight);
             }
         }
 
@@ -233,6 +235,8 @@ namespace SEE.Game
         /// </summary>
         private readonly NodeEqualityComparer nodeEqualityComparer = new NodeEqualityComparer();
 
+        private readonly EdgeEqualityComparer edgeEqualityComparer = new EdgeEqualityComparer();
+
         /// <summary>
         /// All pre-computed layouts for the whole graph series.
         /// </summary>
@@ -253,7 +257,7 @@ namespace SEE.Game
                 Layouts[graph] = CalculateLayout(graph);
             });
             objectManager.Clear();
-            p.End();
+            p.End(true);
         }
 
         /// <summary>
@@ -314,7 +318,7 @@ namespace SEE.Game
             // these layoutNodes represent. Here, we leave the game objects untouched. The layout
             // must be later applied when we render a city. Here, we only store the layout for later use.
             nodeLayout.Apply(layoutNodes);
-            GraphRenderer.Fit(gameObject, layoutNodes);          
+            GraphRenderer.Fit(gameObject, layoutNodes);
             return ToNodeIDLayout(layoutNodes);
 
             // Note: The game objects for leaf nodes are already properly scaled by the call to 
@@ -426,6 +430,8 @@ namespace SEE.Game
             RenderGraph(current, next);
         }
 
+        List<Vector3[]> newPoints;
+
         /// <summary>
         /// Renders the animation from CurrentGraphShown to NextGraphToBeShown.
         /// </summary>
@@ -440,6 +446,8 @@ namespace SEE.Game
             AnimationStartedEvent.Invoke();
             if (current != null)
             {
+                //objectManager.RenderEdges();
+                Debug.Log("Count a: " + objectManager.GetEdges().Count());
                 // For all nodes of the current graph not in the next graph; that is, all
                 // nodes removed: remove those. Note: The comparison is based on the
                 // IDs of the nodes because nodes between two graphs must be different
@@ -451,12 +459,19 @@ namespace SEE.Game
                         RenderRemovedNode(node);
                     });
 
+
+
+
                 // For all edges of the current graph not in the next graph; that is, all
                 // edges removed: remove those. As above, edges are compared by their
                 // IDs.
-                // FOR ANIMATION: current.Graph?
-                // FOR ANIMATION:     .Edges().Except(next.Graph.Edges(), edgeEqualityComparer).ToList()
-                // FOR ANIMATION:     .ForEach(RenderRemovedOldEdge);
+                current.Graph?
+                     .Edges().Except(next.Graph.Edges(), edgeEqualityComparer).ToList()
+                     .ForEach(edge =>
+                     {
+                         RenderRemovedEdge(edge);
+                     });
+                Debug.Log("Count b: " + objectManager.GetEdges().Count());
             }
             // We need to assign _nextCity because the callback RenderPlane, RenderInnerNode, RenderLeaf, and 
             // RenderEdge will access it.
@@ -473,9 +488,16 @@ namespace SEE.Game
             }
             // FOR ANIMATION: next.Graph.Edges().ForEach(RenderEdge);
 
+
+
+
+            Debug.Log("Count c: " + objectManager.CalNewEdges().Count());
+
             // We have made the transition to the next graph.
             _currentCity = next;
+
             RenderPlane();
+            MoveEdge(objectManager.CalNewEdges());
             Invoke("OnAnimationsFinished", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
         }
 
@@ -492,6 +514,39 @@ namespace SEE.Game
 
             IsStillAnimating = false;
             AnimationFinishedEvent.Invoke();
+        }
+
+
+        void MoveEdge(List<Vector3[]> nP)
+        {
+            float counter = 0;
+            if (nP != null && objectManager.GetEdges() != null)
+            {
+                bool stop = false;
+
+                List<GameObject> oE = objectManager.GetEdges().ToList();
+
+                while (!stop)
+                {
+                    for (int i = 0; i < objectManager.GetEdges().Count(); i++)
+                    {
+                        stop = true;
+                        oE[i].TryGetComponent<LineRenderer>(out LineRenderer l);
+                        for (int k = 0; k < l.positionCount; k++)
+                        {
+                            // l.SetPosition(k, nP[i][k]);
+                            float dist = Vector3.Distance(l.GetPosition(k), nP[i][k]);
+                            float x = Mathf.Lerp(0, dist, counter);
+                            if (counter < dist)
+                            {
+                                l.SetPosition(k, (x * Vector3.Normalize(nP[i][k] - l.GetPosition(k)) + l.GetPosition(k)));
+                                stop = false;
+                            }
+                        }
+                        counter += 0.00001f;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -521,6 +576,7 @@ namespace SEE.Game
                          "time", moveAnimator.MaxAnimationTime
                     ));
                 iTween.MoveTo(plane, iTween.Hash("position", centerPosition, "time", moveAnimator.MaxAnimationTime));
+
             }
         }
 
@@ -563,9 +619,7 @@ namespace SEE.Game
             // the game node representing the graphNode if there is any; null if there is none
             Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject currentGameNode);
 
-            // will be true iff the node existed in the previous graph and any of its node
-            // attributes were changed
-            bool wasModified;
+            Difference difference;
             if (formerGraphNode == null)
             {
                 // The node is new. It has no layout applied to it yet.
@@ -580,13 +634,22 @@ namespace SEE.Game
                 position.y += layoutNode.LocalScale.y;
                 layoutNode.CenterPosition = position;
                 marker.MarkBorn(currentGameNode);
-                wasModified = false;
+                difference = Difference.Added;
             }
             else
             {
-                wasModified = diff.AreDifferent(formerGraphNode, graphNode);
+                // node existed before
+                if (diff.AreDifferent(formerGraphNode, graphNode))
+                {
+                    difference = Difference.Changed;
+                    marker.MarkChanged(currentGameNode);
+                }
+                else
+                {
+                    difference = Difference.None;
+                }
             }
-            moveScaleShakeAnimator.AnimateTo(currentGameNode, layoutNode, wasModified, OnRenderNodeFinishedAnimation);
+            moveScaleShakeAnimator.AnimateTo(currentGameNode, layoutNode, difference, OnRenderNodeFinishedAnimation);
         }
 
         /// <summary>
@@ -601,6 +664,10 @@ namespace SEE.Game
             {
                 Destroy((GameObject)gameObject);
             }
+        }
+        protected virtual void RenderRemovedEdge(Edge edge)
+        {
+            objectManager.RemoveEdge(edge);
         }
 
         /// <summary>
@@ -617,7 +684,7 @@ namespace SEE.Game
                 Vector3 newPosition = block.transform.position;
                 newPosition.y = -block.transform.localScale.y;
                 ILayoutNode nodeTransform = new AnimationNode(newPosition, block.transform.localScale);
-                moveScaleShakeAnimator.AnimateTo(block, nodeTransform, false, OnRemovedNodeFinishedAnimation);
+                moveScaleShakeAnimator.AnimateTo(block, nodeTransform, Difference.Deleted, OnRemovedNodeFinishedAnimation);
             }
         }
 
@@ -660,6 +727,7 @@ namespace SEE.Game
             set
             {
                 AnimationDuration = value;
+                marker?.SetDuration(value);
                 shownGraphHasChangedEvent.Invoke();
             }
         }
