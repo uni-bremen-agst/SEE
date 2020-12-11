@@ -2,7 +2,7 @@
 using Valve.VR;
 using Valve.VR.InteractionSystem;
 
-namespace SEE.Controls
+namespace SEE.Controls.Actions
 {
     public class XRRay : MonoBehaviour
     {

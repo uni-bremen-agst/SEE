@@ -1,4 +1,4 @@
-﻿using SEE.Controls;
+﻿using SEE.Controls.Actions;
 using UnityEngine;
 using UnityEngine.Assertions;
 

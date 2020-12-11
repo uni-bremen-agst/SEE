@@ -53,7 +53,31 @@ namespace SEE.Game
         /// </summary>
         [Tooltip("The width (x and z lengths) of posts used as markers for new and deleted elements (>=0).")]
         public float MarkerWidth = 0.01f;
-        
+
+        /// <summary>
+        /// Color for power beams of newly added nodes, can be set in inspector
+        /// </summary>
+        [Tooltip("The color of the beam for newly created nodes.")]
+        public Color AdditionBeamColor = Color.green;
+
+        /// <summary>
+        /// Changed nodes beam color to be pickable in inspector
+        /// </summary>
+        [Tooltip("The color of the beam for changed nodes.")]
+        public Color ChangeBeamColor = Color.yellow;
+
+        /// <summary>
+        /// Deleted nodes beam color to be pickable in inspector
+        /// </summary>
+        [Tooltip("The color of the beam for deleted nodes.")]
+        public Color DeletionBeamColor = Color.black;
+
+        /// <summary>
+        /// The directory in which the GXL files are located.
+        /// </summary>
+        [Tooltip("The directory in which the GXL files are located.")]
+        public DataPath GXLDirectory = new DataPath();
+
         /// <summary>
         /// Factory method to create the used EvolutionRenderer.
         /// </summary>
@@ -76,7 +100,7 @@ namespace SEE.Game
         {
             GraphsReader graphsReader = new GraphsReader();
             // Load all GXL graphs and CSV files in directory PathPrefix but not more than maxRevisionsToLoad many.
-            graphsReader.Load(PathPrefix, HierarchicalEdges, maxRevisionsToLoad);
+            graphsReader.Load(GXLDirectory.Path, HierarchicalEdges, maxRevisionsToLoad);
             return graphsReader.graphs;
         }
 
@@ -85,6 +109,8 @@ namespace SEE.Game
         /// The order is ascending and alphabetic by the GXL filenames located in that directory.
         /// If the first GXL file has a corresponding CSV with additional metrics, this CSV file
         /// will be read, too, and the node metrics added to the graph.
+        /// Furthermore the selection of the specific node types selected by the user is applied in case 
+        /// the user specified it before. By default every node type is selected.
         /// 
         /// Precondition: PathPrefix must be set and denote an existing directory in the
         /// file system containing at least one GXL file.
@@ -93,7 +119,7 @@ namespace SEE.Game
         public Graph LoadFirstGraph()
         {
             GraphsReader reader = new GraphsReader();
-            reader.Load(PathPrefix, HierarchicalEdges, 1);
+            reader.Load(GXLDirectory.Path, HierarchicalEdges, 1);
             List<Graph> graphs = reader.graphs;
             if (graphs.Count == 0)
             {
@@ -101,7 +127,10 @@ namespace SEE.Game
             }
             else
             {
-                return graphs.First<Graph>();
+                Graph graph = graphs.First<Graph>();                
+                graph = RelevantGraph(graph);
+                graph.FinalizeNodeHierarchy();
+                return graph;
             }
         }
 
@@ -139,12 +168,26 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Creates <see cref="evolutionRenderer"/> and shows the complete graph
-        /// evolution for given <paramref name="graphs"/> using it.
+        /// Creates <see cref="evolutionRenderer"/> and shows the nodes having one of the selected
+        /// node types and the edges of these specific nodes of the graph evolution 
+        /// for given <paramref name="graphs"/> using it.
         /// </summary>
         /// <param name="graphs">the series of graph to be drawn</param>
         private void DrawGraphs(List<Graph> graphs)
-        {
+        {           
+            for (int i = 0; i < graphs.Count; i++) 
+            {
+                Graph relevantGraph = RelevantGraph(graphs[i]);
+                if (relevantGraph != graphs[i])
+                {
+                    // Node types have been filtered out. Because of that
+                    // there may now be multiple roots again.
+                    relevantGraph.AddSingleRoot(name: "ROOT", type: "ROOT");
+                }
+                graphs[i] = relevantGraph;
+                LoadDataForGraphListing(graphs[i]);
+            }
+
             evolutionRenderer = CreateEvolutionRenderer();
             evolutionRenderer.ShowGraphEvolution(graphs);
         }

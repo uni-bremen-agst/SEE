@@ -571,12 +571,9 @@ namespace SEE.Game
                 // We are re-using the existing plane, hence, we animate its change
                 // (new position and new scale).
                 objectManager.GetPlaneTransform(out Vector3 centerPosition, out Vector3 scale);
-                iTween.ScaleTo(plane, iTween.Hash(
-                         "scale", scale,
-                         "time", moveAnimator.MaxAnimationTime
-                    ));
-                iTween.MoveTo(plane, iTween.Hash("position", centerPosition, "time", moveAnimator.MaxAnimationTime));
 
+                Tweens.Scale(plane, scale, moveAnimator.MaxAnimationTime);
+                Tweens.Move(plane, centerPosition, moveAnimator.MaxAnimationTime);
             }
         }
 

@@ -183,7 +183,7 @@ namespace SEE.DataModel.DG.IO
 
         private static Edge NewEdge(Graph graph, Node from, Node to, string type)
         {
-            Edge result = new Edge();
+            Edge result = new Edge(type + "#" + from.ID + "#" + to.ID);
             result.Type = type;
             result.Source = from;
             result.Target = to;
@@ -217,7 +217,7 @@ namespace SEE.DataModel.DG.IO
             // taken into account when graphs are compared by Equals().
             // Hence, we need to set them here, otherwise Equals() would
             // yield false at any rate.
-            graph.CalculateLevels();
+            graph.FinalizeNodeHierarchy();
             return graph;
         }
     }

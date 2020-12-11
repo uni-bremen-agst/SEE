@@ -156,7 +156,7 @@ namespace SEE.Layout.Utils
                  middle.x, middle.y, middle.z,
                  end.x,    end.y,    end.z
                };
-            return ListToVectors(TinySpline.BSpline.InterpolateCubic(path, dimensions).Sample());
+            return ListToVectors(TinySpline.BSpline.InterpolateCubicNatural(path, dimensions).Sample());
         }
 
         /// <summary>
