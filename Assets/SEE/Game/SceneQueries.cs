@@ -107,6 +107,25 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Returns the Source.Name attribute of <paramref name="gameNode"/>. 
+        /// If <paramref name="gameNode"/> has no valid node reference, the name
+        /// of <paramref name="gameNode"/> is returned instead.
+        /// </summary>
+        /// <param name="gameNode"></param>
+        /// <returns>source name of <paramref name="gameNode"/></returns>
+        public static string SourceName(GameObject gameNode)
+        {
+            if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+            {
+                if (nodeRef.node != null)
+                {
+                    return nodeRef.node.SourceName;
+                }
+            }
+            return gameNode.name;
+        }
+
+        /// <summary>
         /// Returns first child of <paramref name="codeCity"/> tagged by Tags.Node. 
         /// If <paramref name="codeCity"/> is a node representing a code city,
         /// the result is considered the root of the graph.
@@ -114,7 +133,7 @@ namespace SEE.Game
         /// <param name="codeCity">object representing a code city</param>
         /// <returns>game object representing the root of the graph or null if there is none</returns>
         public static Transform GetCityRootNode(GameObject codeCity)
-        {
+        {            
             foreach (Transform child in codeCity.transform)
             {
                 if (child.CompareTag(Tags.Node))
@@ -126,28 +145,26 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns the first transform towards the root of the game-object hierarchy
-        /// that is tagged by Tags.CodeCity. If none can be found, null is returned.
-        /// 
-        /// Precondition: The given <paramref name="transform"/> is part of a
-        /// game-object tree and either this <paramref name="transform"/> (in which
-        /// case <paramref name="transform"/> itself is returned) or any
-        /// of its ascendants is tagged by Tags.CodeCity.
+        /// Returns the root game object that represents a code city as a whole
+        /// along with the settings (layout information etc.). In other words,
+        /// we simply return the top-most transform in the game-object hierarchy.
+        /// That top-most object must be tagged by Tags.CodeCity. If it is,
+        /// it will be returned. If not, null will be returned.
         /// </summary>
         /// <param name="transform">transform at which to start the search</param>
-        /// <returns>first ascending transform tagged by Tags.CodeCity or null</returns>
+        /// <returns>top-most transform in the game-object hierarchy tagged by 
+        /// Tags.CodeCity or null</returns>
         public static Transform GetCodeCity(Transform transform)
         {
-            Transform cursor = transform;
-            while (cursor != null)
+            Transform result = transform.root;
+            if (result.CompareTag(Tags.CodeCity))
             {
-                if (cursor.CompareTag(Tags.CodeCity))
-                {
-                    return cursor;
-                }
-                cursor = cursor.parent;
+                return result;
             }
-            return cursor;
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>

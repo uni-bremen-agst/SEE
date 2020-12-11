@@ -92,10 +92,11 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Returns the maximal depth of the tree rooted by this node, that is,
-        /// the longest path to any of its leaves.
+        /// the number of nodes on the longest path from this node to any of its 
+        /// leaves. The minimal value returned is 1.
         /// </summary>
         /// <returns>maximal depth of the tree rooted by this node</returns>
-        internal int Depth()
+        public int Depth()
         {
             int maxDepth = 0;
 
@@ -431,8 +432,42 @@ namespace SEE.DataModel.DG
             }
             else
             {
-                throw new System.Exception("Hierarchical edges do not form a tree. Node with multiple parents: "
+                throw new Exception("Hierarchical edges do not form a tree. Node with multiple parents: "
                     + child.ID);
+            }
+        }
+
+        public void Reparent(Node newParent)
+        {
+            if (this == newParent)
+            {
+                throw new Exception("Circular dependency. A node cannot become its own parent.");
+            }
+            else if (newParent == null)
+            {
+                // Nothing do be done for newParent == null and parent == null.
+                if (parent != null)
+                {
+                    parent.children.Remove(this);
+                    parent = null;
+                    graph.FinalizeNodeHierarchy();
+                }
+            }
+            else
+            {
+                // assert: newParent != null
+                if (parent == null)
+                {
+                    newParent.AddChild(this);                    
+                }
+                else
+                {
+                    // parent != null and newParent != null
+                    parent.children.Remove(this);
+                    parent = newParent;
+                    parent.children.Add(this);
+                }
+                graph.FinalizeNodeHierarchy();
             }
         }
 

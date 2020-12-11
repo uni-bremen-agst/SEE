@@ -124,7 +124,7 @@ namespace SEE.Tools
             IList<Node> innerNodes = CreateTree(graph, innerNodeConstraint);
             AssignLeaves(graph, leaves, innerNodes);
             ICollection<Edge> innerEdges = CreateEdges(graph, innerNodes, innerNodeConstraint);
-            graph.CalculateLevels();
+            graph.FinalizeNodeHierarchy();
             PrintStatistics(graph, leaves.Count, leafEdges.Count, innerNodes.Count, innerEdges.Count);
             return graph;
         }
@@ -187,9 +187,10 @@ namespace SEE.Tools
                 {
                     if (constraint.EdgeDensity == 1 || random.NextDouble() < constraint.EdgeDensity)
                     {
-                        Edge edge = new Edge(source, target, constraint.EdgeType);
+                        string id = constraint.EdgeType + "#" + source.ID + "#" + target.ID;
+                        Edge edge = new Edge(id, source, target, constraint.EdgeType);
                         result.Add(edge);
-                        graph.AddEdge(edge);
+                        graph.AddEdge(edge);                        
                     }
                 }
             }

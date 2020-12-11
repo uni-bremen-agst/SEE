@@ -11,7 +11,7 @@ namespace SEE.Layout.IO
     /// <summary>
     /// Writes layout information to a GVL file.
     /// </summary>
-    public class Writer
+    public class GVLWriter
     {
         /// <summary>
         /// Writes the layout information of all <paramref name="graphName"/> and their descendants tagged
@@ -283,9 +283,8 @@ namespace SEE.Layout.IO
             Vector3 parentCenterPosition,
             Vector3 parentAbsoluteScale)
         {
-            Debug.LogFormat("ID={0} nodeCenterPosition={1} nodeAbsoluteScale={2} isRoot={3} parentCenterPosition={4} parentAbsoluteScale={5}\n",
-                            ID, nodeCenterPosition.ToString("F4"), nodeAbsoluteScale.ToString("F4"), isRoot, parentCenterPosition.ToString("F4"), parentAbsoluteScale.ToString("F4"));
-
+            //Debug.LogFormat("ID={0} nodeCenterPosition={1} nodeAbsoluteScale={2} isRoot={3} parentCenterPosition={4} parentAbsoluteScale={5}\n",
+            //                ID, nodeCenterPosition.ToString("F4"), nodeAbsoluteScale.ToString("F4"), isRoot, parentCenterPosition.ToString("F4"), parentAbsoluteScale.ToString("F4"));
 
             XmlElement xmlNode = doc.CreateElement(null, "Node", null);
             xmlParent.AppendChild(xmlNode);

@@ -1,9 +1,9 @@
-﻿using SEE.Game;
+﻿using System.Collections.Generic;
+using SEE.Game;
 using SEE.Utils;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Controls
+namespace SEE.Controls.Actions
 {
 
     /// <summary>
@@ -93,12 +93,6 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Whether the city is already available. This might be false in multiplayer
-        /// mode, if the city is created after connecting to the server.
-        /// </summary>
-        protected bool CityAvailable { get; private set; } = false;
-
-        /// <summary>
         /// The transform of the city.
         /// </summary>
         public Transform CityTransform { get; protected set; }
@@ -112,7 +106,7 @@ namespace SEE.Controls
         /// The plane of the table
         /// </summary>
         [Tooltip("The area in which to draw the code city")]
-        [SerializeField] protected GO.Plane portalPlane;
+        [SerializeField] public GO.Plane portalPlane;
 
         /// <summary>
         /// See the tooltip.
@@ -122,14 +116,14 @@ namespace SEE.Controls
             "to the appropriate NavigationAction! If a GameObject contains both a" +
             "Desktop- and XRNavigationAction, those IDs must be identical.")]
         // TODO(torben): a better alternative would be to use the SEECity and hash the path of the graph or something...
-        // also, this will most likely be replaces by an automatic approach
+        // also, this will most likely be replaced by an automatic approach
         [SerializeField] protected int id;
         public int ID => id;
 
         /// <summary>
         /// Dictionary mapping the unique id to a navigation action object.
         /// </summary>
-        protected static readonly Dictionary<int, NavigationAction> idToActionDict = new Dictionary<int, NavigationAction>(2);
+        private static readonly Dictionary<int, NavigationAction> idToActionDict = new Dictionary<int, NavigationAction>(2);
 
         /// <summary>
         /// Returns the navigation action of given id.
@@ -162,13 +156,23 @@ namespace SEE.Controls
 
         public virtual void Update()
         {
-            if (!CityAvailable)
+            Transform currentCityTransform = SceneQueries.GetCityRootNode(gameObject);
+            // Nothing to be done if the city root node has not changed (including
+            // the case that it was null before and is still null).
+            if (currentCityTransform != CityTransform)
             {
-                CityTransform = SceneQueries.GetCityRootNode(gameObject);
-
-                if (CityTransform)
+                // The city root node has changed. This may be caused by a new city
+                // root node during the visualization of an evolving graph series.
+                // The new node may be valid, but could also be null (for the empty
+                // graph).
+                if (currentCityTransform == null)
+                {                    
+                    CityTransform = null;
+                }
+                else
                 {
-                    CityAvailable = true;
+                    // There is a new valid root node. We must update the state.                    
+                    CityTransform = currentCityTransform;
 
                     zoomState.originalScale = CityTransform.localScale;
                     zoomState.zoomCommands = new List<ZoomCommand>((int)ZoomState.ZoomMaxSteps);

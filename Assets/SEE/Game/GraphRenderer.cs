@@ -53,6 +53,10 @@ namespace SEE.Game
         }
 
         public readonly Materials.ShaderType ShaderType;
+
+        /// <summary>
+        /// The distance between two stacked game objects (parent/child).
+        /// </summary>
         private const float LevelDistance = 0.001f;
 
         /// <summary>
@@ -127,11 +131,11 @@ namespace SEE.Game
 
             if (settings.ZScoreScale)
             {
-                scaler = new ZScoreScale(graphs, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics);
+                scaler = new ZScoreScale(graphs, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics, true);
             }
             else
             {
-                scaler = new LinearScale(graphs, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics);
+                scaler = new LinearScale(graphs, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics, true);
             }
         }
 
@@ -186,6 +190,7 @@ namespace SEE.Game
             Performance p = Performance.Begin("edge layout " + layout.Name);
             EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
             ICollection<GameObject> result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), ConnectingEdges(gameNodes));
+            AddLOD(result);
             p.End();
             Debug.LogFormat("Built \"" + settings.EdgeLayout + "\" edge layout for " + gameNodes.Count + " nodes in {0} [h:m:s:ms].\n", p.GetElapsedTime());
             return result;
@@ -435,8 +440,10 @@ namespace SEE.Game
             // Add light to simulate emissive effect
             AddLight(nodeToGameObject, rootGameNode);
 
-            GO.Plane portalPlane = parent.GetComponent<GO.Plane>();
-            portalPlane.HeightOffset = rootGameNode.transform.position.y - parent.transform.position.y;
+            if (parent.TryGetComponent<GO.Plane>(out GO.Plane portalPlane))
+            {
+                portalPlane.HeightOffset = rootGameNode.transform.position.y - parent.transform.position.y;
+            }
         }
 
         /// <summary>
@@ -564,7 +571,7 @@ namespace SEE.Game
                     }
                     catch (Exception e)
                     {
-                        Debug.LogErrorFormat("Exception raised for {0}: {1}\n", parent.ID, e);
+                        Debug.LogErrorFormat("Exception raised while adding the game object corresponding to {0} to the parent {1}: {2}\n", node.ID, parent.ID, e);
                     }
                 }
             }
@@ -828,7 +835,7 @@ namespace SEE.Game
                 case NodeLayoutKind.CompoundSpringEmbedder:
                     return new CoseLayout(groundLevel, settings);
                 case NodeLayoutKind.FromFile:
-                    return new LoadedNodeLayout(groundLevel, settings.GVLPath);
+                    return new LoadedNodeLayout(groundLevel, settings.LayoutPath.Path);
                 default:
                     throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
             }
@@ -1172,12 +1179,48 @@ namespace SEE.Game
         public GameObject NewLeafNode(Node node)
         {
             Assert.IsTrue(node.ItsGraph.MaxDepth >= 0, "Graph of node " + node.ID + " has negative depth");
+            // The deeper the node in the node hierarchy (quantified by a node's level), the
+            // later it should be drawn, or in other words, the higher its offset in the
+            // render queue should be. We are assuming that the nodes are stacked on each
+            // other according to the node hierarchy. Leaves are on top of all other nodes.
+            // That is why we put them at the highest necessary rendering queue offset.
             GameObject block = leafNodeFactory.NewBlock(SelectStyle(node, innerNodeFactory), node.ItsGraph.MaxDepth);
             block.name = node.ID;
             block.AddComponent<NodeRef>().node = node;
             block.AddComponent<NodeHighlights>();
             AdjustScaleOfLeaf(block);
+            AddLOD(block);
             return block;
+        }
+
+        /// <summary>
+        /// Adds a LOD group to <paramref name="gameObject"/> with only a single LOD.
+        /// This is used to cull the object if it gets too small. The percentage
+        /// by which to cull is retrieved from <see cref="settings.LODCulling"/>
+        /// </summary>
+        /// <param name="gameObject">object where to add the LOD group</param>
+        private void AddLOD(GameObject gameObject)
+        {
+            LODGroup lodGroup = gameObject.AddComponent<LODGroup>();
+            // Only a single LOD: we either or cull.
+            LOD[] lods = new LOD[1];
+            Renderer[] renderers = new Renderer[1];
+            renderers[0] = gameObject.GetComponent<Renderer>();
+            lods[0] = new LOD(settings.LODCulling, renderers);
+            lodGroup.SetLODs(lods);
+            lodGroup.RecalculateBounds();
+        }
+
+        /// <summary>
+        /// Applies ADDLOD to every game object in <paramref name="gameObjects"/>.
+        /// </summary>
+        /// <param name="gameObjects">the list of game objects where ADDLOD is to be applied</param>
+        private void AddLOD(ICollection<GameObject> gameObjects)
+        {
+            foreach (GameObject go in gameObjects)
+            {
+                AddLOD(go);
+            }
         }
 
         /// <summary>
@@ -1454,7 +1497,10 @@ namespace SEE.Game
             {
                 innerNodeFactory = this.innerNodeFactory;
             }
-
+            // The deeper the node in the node hierarchy (quantified by a node's level), the
+            // later it should be drawn, or in other words, the higher its offset in the
+            // render queue should be. We are assuming that the nodes are stacked on each
+            // other according to the node hierarchy. Leaves are on top of all other nodes.
             GameObject innerGameObject = innerNodeFactory.NewBlock(0, node.Level);
             innerGameObject.name = node.ID;
             innerGameObject.tag = Tags.Node;
@@ -1462,6 +1508,7 @@ namespace SEE.Game
             innerGameObject.AddComponent<NodeHighlights>();
             AdjustStyle(innerGameObject);
             AdjustHeightOfInnerNode(innerGameObject);
+            AddLOD(innerGameObject);
             return innerGameObject;
         }
 

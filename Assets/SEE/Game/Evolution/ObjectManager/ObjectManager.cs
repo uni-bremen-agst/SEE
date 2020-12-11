@@ -214,7 +214,7 @@ namespace SEE.Game.Evolution
         public bool RemoveNode(Node node, out GameObject gameObject)
         {
             node.AssertNotNull("node");
-
+            
             bool wasNodeRemoved = nodes.TryGetValue(node.ID, out gameObject);
             nodes.Remove(node.ID);
             return wasNodeRemoved;

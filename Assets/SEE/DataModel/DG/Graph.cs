@@ -26,8 +26,13 @@ namespace SEE.DataModel.DG
 
         private int maxDepth = -1;
         /// <summary>
-        /// The maximal depth of the node hierarchy. This value must be computed
-        /// by calling FinalizeGraph() before accessing <see cref="MaxDepth"/>.
+        /// The maximal depth of the node hierarchy. The maximal depth is the
+        /// maximal length of all paths from any of the roots to their leaves
+        /// where the length of a path is defined by the number of nodes on this
+        /// path. The empty graph has maximal depth 0.
+        /// 
+        /// Important note: This value must be computed by calling FinalizeGraph() 
+        /// before accessing <see cref="MaxDepth"/>.
         /// </summary>
         public int MaxDepth 
         { 
@@ -36,7 +41,7 @@ namespace SEE.DataModel.DG
                 if (maxDepth < 0)
                 {
                     Debug.LogErrorFormat("Forgotten call to FinalizeGraph() for graph {0}\n", name);
-                    FinalizeGraph();
+                    FinalizeNodeHierarchy();
                 }
                 return maxDepth;
             }
@@ -98,7 +103,7 @@ namespace SEE.DataModel.DG
         {
             if (ReferenceEquals(node, null))
             {
-                throw new System.Exception("node must not be null");
+                throw new Exception("node must not be null");
             }
             else if (node.ItsGraph != this)
             {
@@ -154,7 +159,7 @@ namespace SEE.DataModel.DG
                         // the levels. Note: We could do that incrementally if we wanted to
                         // by traversing only the children of node instead of all nodes in 
                         // the graph.
-                        CalculateLevels();
+                        FinalizeNodeHierarchy();
                     }
                     node.ItsGraph = null;
                 }
@@ -176,15 +181,39 @@ namespace SEE.DataModel.DG
         {
             if (ReferenceEquals(node, null))
             {
-                throw new System.Exception("node must not be null");
+                throw new Exception("node must not be null");
             }
             else if (String.IsNullOrEmpty(node.ID))
             {
-                throw new System.Exception("ID of a node must neither be null nor empty");
+                throw new Exception("ID of a node must neither be null nor empty");
             }
             else
             {
                 return nodes.ContainsKey(node.ID);
+            }
+        }
+
+        /// <summary>
+        /// If the graph has only a single root, nothing happens. Otherwise
+        /// all current roots become an immediate child of a newly added
+        /// root node with given <paramref name="name"/> and <paramref name="type"/>.
+        /// </summary>
+        /// <param name="name">ID of new root node</param>
+        /// <param name="type">type of new root node</param>
+        public void AddSingleRoot(string name, string type)
+        {
+            List<Node> roots = GetRoots();
+            if (roots.Count > 0)
+            {
+                Node newRoot = new Node();
+                newRoot.SourceName = name;
+                newRoot.ID = name;
+                AddNode(newRoot);
+                foreach (Node oldRoot in roots)
+                {
+                    newRoot.AddChild(oldRoot);
+                }
+                FinalizeNodeHierarchy();
             }
         }
 
@@ -197,7 +226,7 @@ namespace SEE.DataModel.DG
         {
             if (String.IsNullOrEmpty(ID))
             {
-                throw new System.Exception("ID must neither be null nor empty");
+                throw new Exception("ID must neither be null nor empty");
             }
             else if (nodes.TryGetValue(ID, out Node node))
             {
@@ -218,7 +247,7 @@ namespace SEE.DataModel.DG
         {
             if (String.IsNullOrEmpty(ID))
             {
-                throw new System.Exception("ID must neither be null nor empty");
+                throw new Exception("ID must neither be null nor empty");
             }
             else if (edges.TryGetValue(ID, out Edge edge))
             {
@@ -259,10 +288,17 @@ namespace SEE.DataModel.DG
                 }
                 else
                 {
-                    edge.ItsGraph = this;
-                    edges[edge.ID] = edge;
-                    edge.Source.AddOutgoing(edge);
-                    edge.Target.AddIncoming(edge);
+                    if (edges.ContainsKey(edge.ID))
+                    {
+                        throw new Exception("There is already an edge with the ID " + edge.ID);
+                    }
+                    else
+                    {
+                        edge.ItsGraph = this;
+                        edges[edge.ID] = edge;
+                        edge.Source.AddOutgoing(edge);
+                        edge.Target.AddIncoming(edge);
+                    }
                 }
             }
             else
@@ -302,6 +338,7 @@ namespace SEE.DataModel.DG
                 {
                     edge.Source.RemoveOutgoing(edge);
                     edge.Target.RemoveIncoming(edge);
+                    edges.Remove(edge.ID);
                     edge.ItsGraph = null;
                 }
             }
@@ -521,7 +558,7 @@ namespace SEE.DataModel.DG
         /// Sets the level of each node in the graph. The level of a root node is 0.
         /// For all other nodes, the level is the level of its parent + 1.
         /// </summary>
-        public void CalculateLevels()
+        private void CalculateLevels()
         {
             foreach (Node root in GetRoots())
             {
@@ -530,12 +567,15 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Sets the maximal depth of the graph. This method must be called
-        /// after the graph has been fully loaded and before any client is 
-        /// accessing MaxDepth.
+        /// Sets the levels of all nodes and the maximal depth of the graph. 
+        /// 
+        /// Note: This method must be called after the graph has been fully 
+        /// loaded and before any client is accessing MaxDepth or the Level
+        /// of any node in the graph.
         /// </summary>
-        public void FinalizeGraph()
+        public void FinalizeNodeHierarchy()
         {
+            CalculateLevels();
             maxDepth = CalcMaxDepth(GetRoots(), -1);
         }
 
@@ -611,7 +651,7 @@ namespace SEE.DataModel.DG
                     throw new Exception("target graph does not have a node with ID " + fromRoot.ID);
                 }
             }
-            toGraph.CalculateLevels();
+            toGraph.FinalizeNodeHierarchy();
         }
 
         /// <summary>

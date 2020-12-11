@@ -24,7 +24,7 @@ namespace SEE.Utils
             bool result = false;
 
             raycastHit = new RaycastHit();
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
             if (!IsMouseOverGUI()
                 && Physics.Raycast(ray, out RaycastHit hit)
                 && hit.transform.GetComponent<NodeRef>() != null)
@@ -32,9 +32,14 @@ namespace SEE.Utils
                 raycastHit = hit;
                 result = true;
             }
-
             return result;
         }
+
+        /// <summary>
+        /// The cached event system. It is cached because it needs to be queried in
+        /// each Update cycle.
+        /// </summary>
+        private static EventSystem eventSystem;
 
         /// <summary>
         /// Whether the mouse currently hovers over a GUI element.
@@ -42,8 +47,15 @@ namespace SEE.Utils
         /// <returns>Whether the mouse currently hovers over a GUI element.</returns>
         public static bool IsMouseOverGUI()
         {
-            bool result = UnityEngine.Object.FindObjectOfType<EventSystem>().IsPointerOverGameObject();
-            return result;
+            if (eventSystem == null)
+            {
+                eventSystem = UnityEngine.Object.FindObjectOfType<EventSystem>();
+                if (eventSystem == null)
+                {
+                    throw new System.Exception("No EventSystem found.");
+                }
+            }
+            return eventSystem.IsPointerOverGameObject();
         }
     }
 }

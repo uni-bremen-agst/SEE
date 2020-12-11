@@ -126,7 +126,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="filename">name of the file containing the sprite prefab</param>
         /// <returns>the game objects loaded as a prefab from given file</returns>
-        private static UnityEngine.Object LoadSprite(string filename)
+        public static UnityEngine.Object LoadSprite(string filename)
         {
             try
             {

@@ -25,6 +25,7 @@ namespace SEE.DataModel
         // for visualization of dynamic execution
         public const string Runtime = "Runtime";
         public const string FunctionCall = "Function Call";
+        public const string JLGVisualization = "JLG Visualization";
 
         // for culling
         public const string CullingPlane = "CullingPlane"; // for a plane where code cities can be put on and be moved around with culling
@@ -34,12 +35,19 @@ namespace SEE.DataModel
         public const string ChartContainer = "ChartContainer";
         public const string Chart = "Chart"; // for a metric chart
 
+        // for game objects representing a UI element
+        public const string UI = "UI";
+        
+        // for the main camera in the scene
+        public const string MainCamera = "MainCamera";
+
         /// <summary>
         /// All existing tags in one.
         /// </summary>
         public static readonly string[] All = new string[]
             { Graph, Node, Edge, NodePrefab, Text, Erosion, Decoration,
-              Path, Runtime, FunctionCall, CullingPlane, ChartContainer, Chart };
+              Path, Runtime, FunctionCall, CullingPlane, ChartManager, ChartContainer, Chart,
+              JLGVisualization, UI, MainCamera};
 
         /// <summary>
         /// Returns any descendant (transitive children of <paramref name="gameObject"/> including
@@ -55,22 +63,21 @@ namespace SEE.DataModel
             {
                 return null;
             }
-            else if (gameObject.tag == tag)
+
+            if (gameObject.CompareTag(tag))
             {
                 return gameObject;
             }
-            else
+
+            foreach (Transform child in gameObject.transform)
             {
-                foreach (Transform child in gameObject.transform)
+                GameObject result = FindChildWithTag(child.gameObject, tag);
+                if (result != null)
                 {
-                    GameObject result = FindChildWithTag(child.gameObject, tag);
-                    if (result != null)
-                    {
-                        return result;
-                    }
+                    return result;
                 }
-                return null;
             }
+            return null;
         }
     }
 }

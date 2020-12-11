@@ -2,6 +2,7 @@
 
 using SEE.DataModel.DG;
 using SEE.Game;
+using SEE.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -19,65 +20,66 @@ namespace SEEEditor
         {
             base.OnInspectorGUI();
             SEECityEvolution city = target as SEECityEvolution;
+            Attributes();
             city.maxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.maxRevisionsToLoad);
             city.MarkerWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width of markers", city.MarkerWidth));
             city.MarkerHeight = Mathf.Max(0, EditorGUILayout.FloatField("Height of markers", city.MarkerHeight));
-            if (isGraphLoaded)
-            {
-                ShowNodeTypes(city);
-            }
+            ShowNodeTypes(city);
             Buttons();
         }
 
         /// <summary>
-        /// True if the underlying graph was successfully loaded.
+        /// The loaded graph. It is the first one in the series of graphs.
         /// </summary>
-        private bool isGraphLoaded = false;
-
-        /// <summary>
-        /// The loaded graph. The value is different from null only if isGraphLoaded is true.
-        /// </summary>
-        private Graph graph = null;
+        private Graph firstGraph = null;
 
         /// <summary>
         /// Creates the buttons for loading the first graph of the evolution series.
         /// </summary>
-        protected void Buttons()
-        {
+        private void Buttons()
+        {            
             SEECityEvolution city = target as SEECityEvolution;
-            if (GUILayout.Button("Load First Graph"))
+            if (firstGraph == null && GUILayout.Button("Load First Graph"))
             {
-                graph = city.LoadFirstGraph();
-                city.InspectSchema(graph);
-                isGraphLoaded = true;
+                firstGraph = city.LoadFirstGraph();
+                city.InspectSchema(firstGraph);                      
             }
-            if (isGraphLoaded)
+            if (firstGraph != null && GUILayout.Button("Draw"))
             {
-                if (GUILayout.Button("Draw"))
-                {
-                    if (graph != null)
-                    {
-                        DrawGraph(city, graph);
-                    }
-                    else
-                    {
-                        Debug.LogError("No valid graph loaded.\n");
-                    }
-                }
-                if (GUILayout.Button("Delete"))
-                {
-                    isGraphLoaded = false;
-                    city.Reset();
-                }
+                DrawGraph(city, firstGraph);
+            }
+            if (firstGraph != null && GUILayout.Button("Delete Graph"))
+            {
+                city.Reset(); // will not clear the selected node types
+                firstGraph = null;
             }
         }
 
+        /// <summary>
+        /// Draws given <paramref name="graph"/> using the settings of <paramref name="city"/>.
+        /// 
+        /// Precondition: graph != null.
+        /// </summary>
+        /// <param name="city">the city settings for drawing the graph</param>
+        /// <param name="graph">the graph to be drawn</param>
         private void DrawGraph(AbstractSEECity city, Graph graph)
         {
+            graph = city.RelevantGraph(graph);
             GraphRenderer graphRenderer = new GraphRenderer(city, graph);
             // We assume here that this SEECity instance was added to a game object as
             // a component. The inherited attribute gameObject identifies this game object.
             graphRenderer.Draw(city.gameObject);
+        }
+
+        /// <summary>
+        /// Shows and sets the attributes of the SEECity managed here.
+        /// This method should be overridden by subclasses if they have additional
+        /// attributes to manage.
+        /// </summary>
+        protected void Attributes()
+        {
+            SEECityEvolution city = target as SEECityEvolution;
+            city.GXLDirectory = GetDataPath("GXL directory", city.GXLDirectory, fileDialogue: false);
         }
     }
 }

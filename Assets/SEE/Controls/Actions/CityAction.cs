@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.Controls
+namespace SEE.Controls.Actions
 {
     /// <summary>
     /// Abstract super class of all actions dealing with a code-city object.
