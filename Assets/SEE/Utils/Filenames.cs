@@ -48,6 +48,11 @@ namespace SEE.Utils
         public const string DYNExtension = ".dyn";
 
         /// <summary>
+        /// File extension of JSON filenames (e.g. config files).
+        /// </summary>
+        public const string JSONExtension = ".json";
+
+        /// <summary>
         /// Returns the last part of the given <paramref name="extension"/>
         /// without the period.
         /// 
