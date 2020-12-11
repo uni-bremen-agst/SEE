@@ -54,6 +54,21 @@ namespace SEE.Game
             TemporaryCache,
         }
 
+        public DataPath()
+        {
+            // intentionally left blank
+        }
+
+        /// <summary>
+        /// Constructor where the kind of root and relative or absolute path is
+        /// derived from given <paramref name="path"/> (analogously to <see cref="Set(string)"/>).
+        /// </summary>
+        /// <param name="path">path from which to derive the kind of root and relative/absolute path</param>
+        public DataPath(string path)
+        {
+            Set(path);
+        }
+
         /// <summary>
         /// Adjusts the root and path information of this data path based on the given <paramref name="path"/>.
         /// If none of Unity's path prefixes for standard folders match, <paramref name="path"/> is considered

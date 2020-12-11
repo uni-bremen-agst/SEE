@@ -16,8 +16,7 @@ namespace SEEEditor
     public class SEECityEvolutionEditor : StoredSEECityEditor
     {
         public override void OnInspectorGUI()
-        {
-            
+        {            
             base.OnInspectorGUI();
             SEECityEvolution city = target as SEECityEvolution;
             Attributes();
@@ -56,18 +55,6 @@ namespace SEEEditor
                 city.Reset(); // will not clear the selected node types
                 city.SetNodeTypesTemp(city.NodeTypesTemp);
                 firstGraph = null;
-            }
-            EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Save Settings"))
-            {
-                    SaveCityInJSON(city);
-            }
-            EditorGUILayout.EndHorizontal();
-            if(GUILayout.Button("Load Settings"))
-            {
-                LoadCityFromJSON(city);
-                firstGraph = city.LoadFirstGraph();
-                city.InspectSchema(firstGraph);
             }
         }
 

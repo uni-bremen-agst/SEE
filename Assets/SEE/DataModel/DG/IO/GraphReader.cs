@@ -60,12 +60,11 @@ namespace SEE.DataModel.DG.IO
                                            filename, rootName);
                     Node singleRoot = new Node
                     {
-                        Type = "ROOT",
+                        Type = Graph.ArtificalNodeType,
                         ID = rootName,
                         SourceName = rootName
                     };
                     graph.AddNode(singleRoot);
-                    graph.singleRoot = singleRoot;
                     foreach (Node root in roots)
                     {
                         singleRoot.AddChild(root);

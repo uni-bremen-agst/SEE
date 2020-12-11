@@ -6,6 +6,7 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
+using SEE.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -22,6 +23,11 @@ namespace SEEEditor
         /// the city to display
         /// </summary>
         private AbstractSEECity city;
+
+        /// <summary>
+        /// Whether the foldout for the global attributes of the city should be expanded.
+        /// </summary>
+        private bool showGlobalAttributes = true;
 
         /// <summary>
         /// Whether the leaf node attribute foldout should be expanded.
@@ -52,22 +58,20 @@ namespace SEEEditor
         {
             city = target as AbstractSEECity;
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("LOD Culling");
-            city.LODCulling = EditorGUILayout.Slider(city.LODCulling, 0.0f, 1.0f);
-            //city.LODCulling = Mathf.Clamp(EditorGUILayout.FloatField("LOD Culling", city.LODCulling), 0, 1);
-            GUILayout.EndHorizontal();
+            GlobalAttributes();
+
+            EditorGUILayout.Separator();
 
             LeafNodeAttributes();
-            
+
             EditorGUILayout.Separator();
 
             InnerNodeAttributes();
-            
+
             EditorGUILayout.Separator();
 
             NodeLayout();
-            
+
             EditorGUILayout.Separator();
 
             if (city.NodeLayout == NodeLayoutKind.CompoundSpringEmbedder)
@@ -77,7 +81,7 @@ namespace SEEEditor
             }
 
             EdgeLayout();
-            
+
             EditorGUILayout.Separator();
 
             if (city.NodeLayout == NodeLayoutKind.CompoundSpringEmbedder)
@@ -105,21 +109,33 @@ namespace SEEEditor
                     }
                 }
             }
-
-            EditorGUIUtility.labelWidth = 150;
-            GUILayout.Label("Measurements", EditorStyles.boldLabel);
-
-            city.calculateMeasurements = EditorGUILayout.Toggle("Calculate measurements", city.calculateMeasurements);
-
-            if (city.calculateMeasurements)
-            {
-                MeasurementsTable(city.Measurements);
-            }
-
-            GUILayout.Label("Data", EditorStyles.boldLabel);
-
             // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
             // TODO: We may want to allow a user to define which node attributes should be mapped onto which icons
+        }
+
+        private void GlobalAttributes()
+        {
+            showGlobalAttributes = EditorGUILayout.Foldout(showGlobalAttributes,
+                                                           "Global attributes", true, EditorStyles.foldoutHeader);
+            if (showGlobalAttributes)
+            {                
+                city.CityPath = GetDataPath("Settings file", city.CityPath, Filenames.ExtensionWithoutPeriod(Filenames.JSONExtension));
+                GUILayout.BeginHorizontal();
+                if (GUILayout.Button("Load", GUILayout.Width(50)))
+                {
+                    city.Load();
+                }
+                if (GUILayout.Button("Save", GUILayout.Width(50)))
+                {
+                    city.Save();
+                }
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("LOD Culling");
+                city.LODCulling = EditorGUILayout.Slider(city.LODCulling, 0.0f, 1.0f);
+                GUILayout.EndHorizontal();
+            }
         }
 
         /// <summary>
@@ -129,7 +145,7 @@ namespace SEEEditor
         /// <param name="dataPath">the path to be set here</param>
         /// <param name="extension">the extension the selected file should have (used as filter in file panel)</param>
         /// <param name="fileDialogue">if true, a file panel is opened; otherwise a directory panel</param>
-        /// <returns></returns>
+        /// <returns>the resulting data specified as selected  by the user</returns>
         protected DataPath GetDataPath(string label, DataPath dataPath, string extension = "", bool fileDialogue = true)
         {
             GUILayout.BeginHorizontal();
@@ -155,8 +171,9 @@ namespace SEEEditor
                 {
                     dataPath.Set(selectedPath);
                 }
-                if(city is SEECityEvolution)
-                {
+                // FIXME: Does not belong here.
+                if (city is SEECityEvolution)
+                {                   
                     SEECityEvolution evo = (SEECityEvolution)city;
                     evo.Reset();
                     Graph firstGraph = evo.LoadFirstGraph();
