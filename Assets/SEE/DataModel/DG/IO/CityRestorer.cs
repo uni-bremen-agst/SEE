@@ -22,8 +22,8 @@ public class CityRestorer
     public static void Persist(string dataPath, AbstractSEECity city)
     {
         string citySettingsJson = JsonUtility.ToJson(city, true);
-        System.IO.File.WriteAllText(dataPath, citySettingsJson);
-        UnityEngine.Debug.Log("Export sucessfully\n");
+        File.WriteAllText(dataPath, citySettingsJson);
+        Debug.LogFormat("Settings successfully exported to {0}\n", dataPath);
     }
 
     /// <summary>
@@ -44,6 +44,7 @@ public class CityRestorer
         string pathPrefixOfCity = dataPath;  
         Dictionary<string, bool> newNodeTypes = new Dictionary<string, bool>();
 
+        // FIXME: We shouldn't need to use these kinds of type checks.
         if (city is SEECityEvolution)
         {
             SEECityEvolution evoCity = new SEECityEvolution();
@@ -53,7 +54,8 @@ public class CityRestorer
                 return;
             }
             newNodeTypes = evoCity.SelectedNodeTypes;
-        } else if (city is SEECity)
+        }
+        else if (city is SEECity)
         {
             if (!(ReloadGraphByCityType(city)))
             {
@@ -65,7 +67,7 @@ public class CityRestorer
             // it afterwards with the stored one in the method DifferentNodeTypes
             // As the user picks the directory via a directory picker/ the GUI , no specific error handling is needed at this point.
         DifferentNodeTypes(oldNodetypes, jsonContent, newNodeTypes, city);
-        Debug.Log("Loaded sucessfully\n");
+        Debug.LogFormat("Settings successfully imported from {0}\n", dataPath);
     }
 
     /// <summary>
