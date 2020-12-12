@@ -41,10 +41,8 @@ namespace SEEEditor
           
             if (firstGraph == null && GUILayout.Button("Load First Graph"))
             {
-                city.NodeTypesTemp = city.SelectedNodeTypes;
                 firstGraph = city.LoadFirstGraph();
                 city.InspectSchema(firstGraph);
-                city.SetNodeTypesTemp(city.NodeTypesTemp);
             }
             if (firstGraph != null && GUILayout.Button("Draw"))
             {
@@ -53,7 +51,6 @@ namespace SEEEditor
             if (firstGraph != null && GUILayout.Button("Delete Graph"))
             {
                 city.Reset(); // will not clear the selected node types
-                city.SetNodeTypesTemp(city.NodeTypesTemp);
                 firstGraph = null;
             }
         }
