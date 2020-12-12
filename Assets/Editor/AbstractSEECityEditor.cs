@@ -113,6 +113,10 @@ namespace SEEEditor
             // TODO: We may want to allow a user to define which node attributes should be mapped onto which icons
         }
 
+        /// <summary>
+        /// Foldout for global settings (settings filename, LOD Culling) and buttons for 
+        /// loading and saving the settings.
+        /// </summary>
         private void GlobalAttributes()
         {
             showGlobalAttributes = EditorGUILayout.Foldout(showGlobalAttributes,
@@ -170,15 +174,6 @@ namespace SEEEditor
                 if (!string.IsNullOrEmpty(selectedPath))
                 {
                     dataPath.Set(selectedPath);
-                }
-                // FIXME: Does not belong here.
-                if (city is SEECityEvolution)
-                {                   
-                    SEECityEvolution evo = (SEECityEvolution)city;
-                    evo.Reset();
-                    Graph firstGraph = evo.LoadFirstGraph();
-                    evo.InspectSchema(firstGraph);
-                    evo.NodeTypesTemp = evo.SelectedNodeTypes;
                 }
             }
             EditorGUILayout.EndHorizontal();
