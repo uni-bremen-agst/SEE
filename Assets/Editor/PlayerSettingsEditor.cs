@@ -104,6 +104,7 @@ namespace SEEEditor
         {
             GameObject codeCity = new GameObject {tag = Tags.CodeCity, name = cityName};
             codeCity.transform.localScale = new Vector3(1f, 0.0001f, 1f); // choose sensible y-scale
+            codeCity.transform.position = new Vector3(0, 0.964f, 0);
 
             // Add required components
             codeCity.AddComponent<MeshRenderer>();
@@ -112,6 +113,7 @@ namespace SEEEditor
             Plane plane = codeCity.AddComponent<Plane>();
             codeCity.AddComponent<DesktopNavigationAction>().portalPlane = plane;
             codeCity.AddComponent<XRNavigationAction>().portalPlane = plane;
+
             codeCity.AddComponent(CityTypes[selectedCityType]);
         }
 
