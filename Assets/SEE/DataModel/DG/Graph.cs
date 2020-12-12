@@ -28,7 +28,7 @@ namespace SEE.DataModel.DG
         /// Name of the artifical node type used for artifical root nodes added
         /// when we do not have a real node type derived from the input graph.
         /// </summary>
-        public const string ArtificalNodeType = "";
+        public const string UnknownType = "";
 
         private int maxDepth = -1;
         /// <summary>
