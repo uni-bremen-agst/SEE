@@ -751,7 +751,7 @@ namespace SEE.Game
         /// <param name="filename">the name of the file in which <paramref name="city"/> will be stored</param>
         public static void Save(AbstractSEECity city, string filename)
         {          
-            CityRestorer.Persist(filename, city);
+            CityRestorer.Save(filename, city);
         }
 
         /// <summary>
@@ -762,7 +762,7 @@ namespace SEE.Game
         /// <param name="filename">the name of the file from which to read the <paramref name="city"/></param>
         public static void Load(AbstractSEECity city, string filename)
         {
-            CityRestorer.RestoreCity(filename, city);
+            CityRestorer.Load(filename, city);
         }
     }
 }
