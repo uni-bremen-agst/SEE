@@ -11,37 +11,44 @@ namespace SEE.Game
     /// The object stores values and selections such as specific metrics of a city or selected nodetypes as well which were chosen  
     /// by the user before saving his or her profile.
     /// </summary>
-    public class CityRestorer
+    public class AbstractSEECityIO
     {
         /// <summary>
-        ///  Converts the <paramref name="city"/> in a json-formatted string and saves this string in a .json-file in the directory
-        ///  <paramref name="dataPath"/>.
+        ///  Saves the attributes of the given <paramref name="city"/> to a file with given <paramref name="filename"/>
+        ///  in JSON format.
         /// </summary>
-        /// <param name="dataPath"> The directory in which the json-file will be saved </param>
-        /// <param name="city"> The city which will be stored in the json-file</param>
-        public static void Save(string dataPath, AbstractSEECity city)
+        /// <param name="city">The city which will be stored in the JSON file</param>
+        /// <param name="filename">Name of the output JSON file</param>
+        public static void Save(AbstractSEECity city, string filename)
         {
             string citySettingsJson = JsonUtility.ToJson(city, true);
-            File.WriteAllText(dataPath, citySettingsJson);
-            Debug.LogFormat("Settings successfully exported to {0}\n", dataPath);
+            File.WriteAllText(filename, citySettingsJson);
+            Debug.LogFormat("Settings successfully exported to {0}\n", filename);
         }
 
         /// <summary>
-        /// Loads a city from the given <paramref name="importFilename"/> and overwrites the <paramref name="city"/>
+        /// Loads the attributes for given <paramref name="city"/> from the given <paramref name="filename"/>.
         /// </summary>
-        /// <param name="importFilename"> The given json-file-path </param>
-        /// <param name="city"> The city which is to be overwritten </param>
-        public static void Load(string importFilename, AbstractSEECity city)
+        /// <param name="city">The city whose attributes are to be read and set</param>
+        /// <param name="filename">Name of ths JSON file from whicht to read the attributes</param>
+        public static void Load(AbstractSEECity city, string filename)
         {
-            string jsonContent = File.ReadAllText(importFilename);
+            string jsonContent = File.ReadAllText(filename);
             if (!(VerifyCityType(city, jsonContent)))
             {
                 return;
             }
             JsonUtility.FromJsonOverwrite(jsonContent, city);
+
+            ResolveNodeTypeSelection(city, jsonContent);
+
+            Debug.LogFormat("Settings successfully imported from {0}\n", filename);
+        }
+
+        private static void ResolveNodeTypeSelection(AbstractSEECity city, string jsonContent)
+        {
             string dataPath = getDataPath(city);
             Dictionary<string, bool> oldNodetypes = city.SelectedNodeTypes;
-            string pathPrefixOfCity = dataPath;
             Dictionary<string, bool> newNodeTypes = new Dictionary<string, bool>();
 
             // FIXME: We shouldn't need to use these kinds of type checks.
@@ -67,7 +74,6 @@ namespace SEE.Game
             // it afterwards with the stored one in the method DifferentNodeTypes
             // As the user picks the directory via a directory picker/ the GUI , no specific error handling is needed at this point.
             DifferentNodeTypes(oldNodetypes, jsonContent, newNodeTypes, city);
-            Debug.LogFormat("Settings successfully imported from {0}\n", dataPath);
         }
 
         /// <summary>
@@ -103,11 +109,8 @@ namespace SEE.Game
         {
             List<string> oldNodes = oldNodeTypes.Keys.ToList();
             List<string> newNodes = newNodeTypes.Keys.ToList();
-            List<string> deletedNodeTypes = new List<string>();
-            List<string> addedNodeTypes = new List<string>();
-
-            deletedNodeTypes = oldNodes.Except(newNodes).ToList();
-            addedNodeTypes = newNodes.Except(oldNodes).ToList();
+            List<string> deletedNodeTypes = oldNodes.Except(newNodes).ToList();
+            List<string> addedNodeTypes = newNodes.Except(oldNodes).ToList();
 
             //shows deleted nodetypes
             if (deletedNodeTypes.Count > 0)
