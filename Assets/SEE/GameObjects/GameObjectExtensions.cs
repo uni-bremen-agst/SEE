@@ -121,5 +121,16 @@ namespace SEE.GO
                 }
             }
         }
+
+        public static void SetScale(this GameObject node, Vector3 scale)
+        {
+            Debug.LogFormat("Scale Called {0} \n ", node.transform.lossyScale);
+            Transform parent = node.transform.parent;
+            node.transform.parent = null;
+            node.transform.localScale =scale;
+            Debug.LogFormat("Scale Called {0} \n ", node.transform.lossyScale);
+
+            node.transform.parent = parent;
+        }
     }
 }
