@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 
 using SEE.Game;
+using SEE.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -59,6 +60,10 @@ namespace SEEEditor
                 SaveLayout(city);
             }
             EditorGUILayout.EndHorizontal();
+            if (city.LoadedGraph != null && GUILayout.Button("Add References"))
+            {
+                AddReferences(city);
+            }
         }
 
         /// <summary>
@@ -69,8 +74,8 @@ namespace SEEEditor
         protected virtual void Attributes()
         {
             SEECity city = target as SEECity;
-            city.gxlPath = EditorGUILayout.TextField("GXL file", city.gxlPath);
-            city.csvPath = EditorGUILayout.TextField("CSV file", city.csvPath);
+            city.GXLPath = GetDataPath("GXL file", city.GXLPath, Filenames.ExtensionWithoutPeriod(Filenames.GXLExtension));
+            city.CSVPath = GetDataPath("Metric file", city.CSVPath, Filenames.ExtensionWithoutPeriod(Filenames.CSVExtension));           
         }
 
         /// <summary>
@@ -124,6 +129,11 @@ namespace SEEEditor
         private void SaveLayout(SEECity city)
         {
             city.SaveLayout();
+        }
+
+        private void AddReferences(SEECity city)
+        {
+            city.SetNodeEdgeRefs();
         }
     }
 }

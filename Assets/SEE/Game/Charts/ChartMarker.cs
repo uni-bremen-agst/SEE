@@ -80,22 +80,6 @@ namespace SEE.Game.Charts
         private TextMeshProUGUI infoText;
 
         /// <summary>
-        /// Calls methods for initialization.
-        /// </summary>
-        private void Awake()
-        {
-            GetSettingData();
-        }
-
-        /// <summary>
-        /// Links the <see cref="ChartManager" /> and gets its setting data.
-        /// </summary>
-        private void GetSettingData()
-        {
-            ChartManager chartManager = ChartManager.Instance;
-        }
-
-        /// <summary>
         /// Reactivates the highlight if a previous marker linked to the same <see cref="linkedObject" />
         /// highlighted it.
         /// </summary>
@@ -103,11 +87,11 @@ namespace SEE.Game.Charts
         {
             //for (var i = 0; i < linkedObject.transform.childCount; i++)
             //{
-            //	var child = linkedObject.transform.GetChild(i);
+            //    var child = linkedObject.transform.GetChild(i);
             //    if (child.name.Equals(linkedObject.name + "(Clone)"))
             //    {
-            //	    TriggerTimedHighlight(ChartManager.Instance.highlightDuration, false, false);
-            //	    break;
+            //        TriggerTimedHighlight(ChartManager.Instance.highlightDuration, false, false);
+            //        break;
             //    }
             //}
         }
@@ -117,6 +101,7 @@ namespace SEE.Game.Charts
         /// </summary>
         private void Update()
         {
+            // FIXME: Can be deleted.
             if (TimedHighlight != null)
             {
                 HighlightTime += Time.deltaTime;
@@ -128,28 +113,30 @@ namespace SEE.Game.Charts
         /// </summary>
         public void ButtonClicked()
         {
-            ChartManager.OnSelect(linkedObject, false);
+            ChartManager.OnSelect(linkedObject);
         }
 
         /// <summary>
-        /// Toggles the highlight of the <see cref="linkedObject" /> and this marker.
+        /// Sets the highlight of the <see cref="linkedObject" /> and this marker
+        /// to <paramref name="isHighlighted"/>.
         /// </summary>
-        public void HighlightLinkedObjectToggle()
+        /// <param name="isHighlighted">whether or not the marker should be highlighted</param>
+        public void SetHighlightLinkedObject(bool isHighlighted)
         {
-            InteractableObject interactableObject = linkedObject.GetComponent<InteractableObject>();
-            if (interactableObject)
+            if (linkedObject.TryGetComponent<InteractableObject>(out InteractableObject interactableObject))
             {
-                bool highlight = !interactableObject.IsSelected;
-                interactableObject.SetSelect(highlight, true);
-                if (!highlight)
+                // We need to call SetSelect only if there is a difference.
+                if (isHighlighted != interactableObject.IsSelected)
                 {
-                    _accentuated = false;
+                    interactableObject.SetSelect(isHighlighted, true);
                 }
+                // Assert: isHighlighted = interactableObject.IsSelected.
+                _accentuated = !isHighlighted;
 
-                markerHighlight.SetActive(highlight);
+                markerHighlight.SetActive(isHighlighted);
                 if (ScrollViewToggle)
                 {
-                    ScrollViewToggle.SetHighlighted(highlight);
+                    ScrollViewToggle.SetHighlighted(isHighlighted);
                 }
             }
         }
