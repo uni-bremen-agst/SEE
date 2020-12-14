@@ -82,6 +82,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Called from the menu as callback when the user selects the map menu entry.
+        /// Passes the map request on to <see cref="playerActions"/>.
+        /// </summary>
+        private void ScaleNodeOn()
+        {
+            playerActions.ScaleNode();
+        }
+
+        /// <summary>
         /// Path of the prefix for the sprite to be instantiated for the menu entries.
         /// </summary>
         private const string menuEntrySprite = "Icons/Circle";
@@ -137,6 +146,14 @@ namespace SEE.Controls.Actions
                                    entryOn: NewNodeOn,
                                    entryOff: null,
                                    isTransient: true),
+                 //Starts the Scaling Mode
+                 new MenuDescriptor(label: "Scale Node",
+                                   spriteFile: menuEntrySprite,
+                                   activeColor: Color.green,
+                                   inactiveColor: Lighter(Color.green),
+                                   entryOn: ScaleNodeOn,
+                                   entryOff: null,
+                                   isTransient: true)
 
             };
         }

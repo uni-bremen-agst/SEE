@@ -1153,6 +1153,7 @@ namespace SEE.Game
             block.AddComponent<NodeHighlights>();
             AdjustScaleOfLeaf(block);
             AddLOD(block);
+            Portal.SetInfinitePortal(block);
             InteractionDecorator.PrepareForInteraction(block);
             return block;
         }

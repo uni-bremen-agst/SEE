@@ -1,5 +1,6 @@
 ﻿using SEE.Game;
 using SEE.Game.Charts;
+using SEE.GO;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -20,9 +21,23 @@ namespace SEE.Controls.Actions
             Browse,   // the user just browses the city; this is the default
             MoveNode, // a game node is being moved within its city
             MapNode,   // a game node is mapped from one city to another city
-            NewNode //a  game node is being created
+            NewNode, //a  game node is being created
+            ScaleNode //a game node is scaled with mouse drag
         }
 
+
+        /// <summary>
+        /// If the State changes the PreState remembers the state before 
+        /// </summary>
+        private enum PreState
+        {
+            None,
+            MoveNode,
+            MapNode,
+            NewNode,
+            ScaleNode
+        }
+        GameObject nodeAction = null;
         //The Selected Code City
         SEECity city = null;
         //The New GameNode
@@ -38,11 +53,15 @@ namespace SEE.Controls.Actions
         //Time which has to pass between two actions
         float coolDownTime = 1.0f;
 
-        bool nodePlaced = false;
-         /// <summary>
+        /// <summary>
         /// The current state of the player.
         /// </summary>
         private State state = State.Browse;
+
+        /// <summary>
+        /// The last state of the Player
+        /// </summary>
+        private PreState preState = PreState.None;
 
         private void Update()
         {
@@ -73,70 +92,79 @@ namespace SEE.Controls.Actions
                     }
                     break;
                 case State.NewNode:
-                    if (nodePlaced && UserWantsToMove())
+                    if (hoveredObject != null && node == null)
                     {
-                        DesktopNewNodeAction.ScaleNode(node);
-                        nodePlaced = false;
+                        codeCityObject = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
+                        codeCityObject.GetComponent<Renderer>().material.color = new Color(0, 255, 0);
+
+                        if (Input.GetMouseButton(0) && Time.time > coolDown)
+                        {
+
+                            Assert.IsTrue(codeCityObject != null);
+                            codeCityObject.TryGetComponent<SEECity>(out city);
+                            coolDown = Time.time + coolDownTime;
+                        }
+
                     }
                     else
                     {
-
-
-                        if (hoveredObject != null && node == null)
+                        if (codeCityObject != null)
                         {
-                            codeCityObject = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
-                            codeCityObject.GetComponent<Renderer>().material.color = new Color(0, 255, 0);
-
-                            if (Input.GetMouseButton(0) && Time.time > coolDown)
-                            {
-
-                                Assert.IsTrue(codeCityObject != null);
-                                codeCityObject.TryGetComponent<SEECity>(out city);
-                                coolDown = Time.time + coolDownTime;
-                            }
-
+                            codeCityObject.GetComponent<Renderer>().material.color = new Color(255, 255, 255);
                         }
-                        else
+                    }
+
+                    if (city != null)
+                    {
+
+
+                        if (node == null)
                         {
-                            if (codeCityObject != null)
-                            {
-                                codeCityObject.GetComponent<Renderer>().material.color = new Color(255, 255, 255);
-                            }
+                            bool is_innerNode = false; //FIXME: Change it later into the selection of the sub menu 
+                            node = DesktopNewNodeAction.NewNode(is_innerNode, city);
                         }
 
-                        if (city != null)
+                        if (Time.time > coolDown && Input.GetMouseButton(0))
                         {
-
-
-                            if (node == null)
+                            coolDown = Time.time + coolDownTime;
+                            if (!DesktopNewNodeAction.Place(node, hoveredObject, city))
                             {
-                                bool is_innerNode = false; //FIXME: Change it later into the selection of the sub menu 
-                                node = DesktopNewNodeAction.NewNode(is_innerNode, city);
-                            }
-
-                            if (Time.time > coolDown && Input.GetMouseButton(0))
-                            {
-                                coolDown = Time.time + coolDownTime;
-                                if (!DesktopNewNodeAction.Place(node, hoveredObject, city))
-                                {
-                                    Destroy(node);
-                                }
-                                else
-                                {
-                                    nodePlaced = true;
-                                }
-
-                                node = null;
-                                city = null;
+                                Destroy(node);
                             }
                             else
                             {
-                                GameNodeMover.MoveTo(node);
+                                // GameNodeScaleAction.ScaleNode(node);
+                                node.SetScale(Vector3.one);
                             }
 
+                            node = null;
+                            city = null;
+                        }
+                        else
+                        {
+                            GameNodeMover.MoveTo(node);
                         }
                     }
-                    
+
+
+                    break;
+                case State.ScaleNode:
+                    if (selectedObject != null && nodeAction == null )
+                    {
+                        nodeAction = selectedObject;
+                        nodeAction.AddComponent<GameNodeScaleAction>();
+                        preState = PreState.ScaleNode;
+                    }
+                    break;
+
+                default:
+                    switch (preState)
+                    {
+                        case PreState.ScaleNode:
+                            nodeAction.GetComponent<GameNodeScaleAction>().removeScript();
+                            nodeAction = null;
+                            break;
+                    }
                     break;
             }
         }
@@ -185,6 +213,15 @@ namespace SEE.Controls.Actions
             Enter(State.NewNode);
         }
 
+        /// <summary>
+        /// Changes th state to ScaleNode
+        /// 
+        /// This method is called as a callback from the menu.
+        /// </summary>
+        public void ScaleNode()
+        {
+            Enter(State.ScaleNode);
+        }
         /// <summary>
         /// If <paramref name="newState"/> is different from the current state,
         /// <see cref="Cancel"/> is called and <paramref name="newState"/> is
