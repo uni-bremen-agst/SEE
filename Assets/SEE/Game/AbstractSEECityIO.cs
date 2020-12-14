@@ -24,7 +24,7 @@ namespace SEE.Game
             string citySettingsJson = JsonUtility.ToJson(city, true);
             File.WriteAllText(filename, citySettingsJson);
             Debug.LogFormat("Settings successfully exported to {0}\n", filename);
-        }
+        }      
 
         /// <summary>
         /// Loads the attributes for given <paramref name="city"/> from the given <paramref name="filename"/>.

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using OdinSerializer;
 using SEE.DataModel;
 using SEE.DataModel.DG;
@@ -22,12 +23,37 @@ namespace SEE.Game
     /// is the representation of a graph including the settings that have lead
     /// to its visualization.
     /// </summary>
+    [DataContract]
     public abstract class AbstractSEECity : SerializedMonoBehaviour
     {
+
+        public void Save(string filename)
+        {
+            using (System.IO.StreamWriter stream = new System.IO.StreamWriter(filename))
+            {
+                Save(stream);
+            }
+        }
+
+        protected virtual void Save(StreamWriter stream)
+        {
+            ConfigIO.Save(stream, "LODCulling", LODCulling);
+            Save(stream, "LayoutPath", LayoutPath);
+        }
+
+        private static void Save(StreamWriter stream, string label, DataPath path)
+        {
+            stream.Write(label + " : ");
+            path.Save(stream);
+            stream.WriteLine();
+        }
+
         /// <summary>
         /// The screen relative height to use for the culling a game node [0-1].
         /// If the game node uses less than this percentage it will be culled.
         /// </summary>
+        [ConfigAttribute("LODCulling")]
+        [DataMember()]
         public float LODCulling = 0.01f;
 
         /// <summary>
@@ -38,12 +64,16 @@ namespace SEE.Game
         /// data of a game object.
         /// </summary>
         [OdinSerialize]
+        [ConfigAttribute("LayoutPath")]
+        [DataMember()]
         public DataPath LayoutPath = new DataPath();
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
         [OdinSerialize]
+        [ConfigAttribute("HierarchicalEdges")]
+        [DataMember()]
         public HashSet<string> HierarchicalEdges = Hierarchical_Edge_Types(); // serialized by Odin
 
         /// <summary>
