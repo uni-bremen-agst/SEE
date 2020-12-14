@@ -79,6 +79,7 @@ namespace SEE.GO.Menu
                 menu.name = MouseMenuName;
                 AddInnerCircles(menu, radius, depth, entries);
                 menu.AddComponent<CircularMenu>();
+                menu.SetVisibility(false);
                 return menu;
             }
         }

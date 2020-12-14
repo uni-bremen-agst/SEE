@@ -26,53 +26,20 @@ namespace SEE.Game
     public abstract class AbstractSEECity : SerializedMonoBehaviour
     {
         /// <summary>
-        /// The internal representation of property PathPrefix.
-        /// The internal representation of this path is always in the Unix style
-        /// (or also Unity style), independent from the operating system we are currently
-        /// running on.
+        /// The screen relative height to use for the culling a game node [0-1].
+        /// If the game node uses less than this percentage it will be culled.
         /// </summary>
-        /// Must not be readonly because it will be modified in an editor of the inspector.
-        [SerializeField] private string pathPrefix = null;
+        public float LODCulling = 0.01f;
 
         /// <summary>
-        /// The prefix of the absolute paths for the GXL, CSV, GVL data; that is,
-        /// the directory where these data files are located in.
-        /// 
-        /// The style of this path prefix is always the one of the current operating
-        /// system we are running on, that is, the directory separator will be \
-        /// on Windows and / on all other platforms.
-        /// 
-        /// If the path prefix has never been set or was set to the empty string, the path 
-        /// prefix is the path to the Unity project.
-        /// 
-        /// The last character will always be the directory separator of the current platform.
+        /// The path for the layout file containing the node layout information.
+        /// If the file extension is <see cref="Filenames.GVLExtension"/>, the layout is expected
+        /// to be stored in Axivion's Gravis layout (GVL) with 2D co-ordinates. 
+        /// Otherwise is our own layout format SDL is expected, which saves the complete Transform 
+        /// data of a game object.
         /// </summary>
-        public string PathPrefix
-        {
-            get
-            {
-                UnityEngine.Assertions.Assert.IsTrue(!string.IsNullOrEmpty(pathPrefix));
-                string result = pathPrefix;
-                if (result[result.Length - 1] != Filenames.UnixDirectorySeparator)
-                {
-                    result += Filenames.UnixDirectorySeparator;
-                }
-                result = Filenames.OnCurrentPlatform(result);
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// The relative path for the GVL file containing the node layout information.
-        /// </summary>
-        public string gvlPath = "..\\Data\\GXL\\linux-clones\\net.gvl";
-
-        /// <summary>
-        /// Returns the concatenation of pathPrefix and gvlPath. That is the complete
-        /// absolute path to the GVL file containing the layout information.
-        /// </summary>
-        /// <returns>concatenation of pathPrefix and gvlPath</returns>
-        public string GVLPath => PathPrefix + gvlPath;
+        [OdinSerialize]
+        public DataPath LayoutPath = new DataPath();
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
@@ -592,7 +559,7 @@ namespace SEE.Game
         /// <summary>
         /// The width of the line representing edges in world space.
         /// </summary>
-        public float EdgeWidth = 0.3f; // serialized by Unity
+        public float EdgeWidth = 0.1f; // serialized by Unity
 
         /// <summary>
         /// Whether erosions should be visible above blocks.
@@ -746,5 +713,3 @@ namespace SEE.Game
         }
     }
 }
-
-
