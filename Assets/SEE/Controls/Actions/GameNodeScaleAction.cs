@@ -54,9 +54,10 @@ public class GameNodeScaleAction : MonoBehaviour
         {
             Vector3 position = gameObject.transform.position;
             position.y += scale.y / 2;
-             gameObject.transform.position = position;
-             gameObject.SetScale(scale + gameObject.transform.localScale);
-            gameObject.SetScale(scale + gameObject.transform.localScale);
+            Debug.LogFormat("Scale{0}",scale);
+            gameObject.transform.position = position;
+            gameObject.SetScale(/*gameObject.transform.localScale*/Vector3.one);
+            
         }
     }
 
