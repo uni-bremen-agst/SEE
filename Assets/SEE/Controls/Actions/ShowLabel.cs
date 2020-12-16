@@ -151,16 +151,11 @@ namespace SEE.Controls.Actions
         private GameObject nodeLabel;
 
         /// <summary>
-        /// True iff the label is currently playing an animation after which it will be destroyed.
+        /// All currently active tweens, collected in a sequence.
         /// </summary>
-        private bool currentlyDestroying = false;
+        private Sequence sequence;
 
-        /// <summary>
-        /// All currently active tweens.
-        /// </summary>
-        private List<Tween> tweens = new List<Tween>();
-
-        private int i = 0;
+        private bool currentlyDestroying;
 
         /// <summary>
         /// Returns the code city holding the settings for the visualization of the node.
@@ -211,12 +206,20 @@ namespace SEE.Controls.Actions
             }
 
             // If label already exists or the game object has no node reference, nothing needs to be done
-            if ((nodeLabel != null && !currentlyDestroying) || !gameObject.TryGetComponent(out NodeRef nodeRef))
+            if (nodeLabel != null && !currentlyDestroying || !gameObject.TryGetComponent(out NodeRef nodeRef))
             {
                 return;
             }
-
+            // If sequence is being destroyed, we need to stop that and play it forwards again.
+            if (nodeLabel != null && currentlyDestroying)
+            {
+                currentlyDestroying = false;
+                // Label and its tweens already exist, so we don't need to change any of that.
+                sequence.PlayForward();
+                return;
+            }
             currentlyDestroying = false;
+
 
             Node node = nodeRef.node;
             if (node == null)
@@ -231,7 +234,7 @@ namespace SEE.Controls.Actions
             nodeLabel = TextFactory.GetTextWithSize(node.SourceName, startLabelPosition,
                                                     isLeaf ? city.LeafLabelFontSize : city.InnerNodeLabelFontSize, 
                                                     textColor: Color.black.ColorWithAlpha(0f));
-            nodeLabel.name = $"Label {node.SourceName} ({i++})";
+            nodeLabel.name = $"Label {node.SourceName}";
             nodeLabel.transform.SetParent(gameObject.transform);
             
             SetOutline();
@@ -243,7 +246,7 @@ namespace SEE.Controls.Actions
                              Materials.New(Materials.ShaderType.TransparentLine, Color.black));
             Portal.SetInfinitePortal(nodeLabel);
 
-            AnimateLabel(true, city, isLeaf);
+            AnimateLabel(city, isLeaf);
         }
 
         /// <summary>
@@ -267,39 +270,39 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Animates the given labels by fading them in/out and gradually changing their position.
+        /// Animates the given labels by fading them in and gradually changing their position.
         /// </summary>
-        /// <param name="animateIn">If true, we will fade-in and move the label to the top.
-        /// If false, we will fade out and move the label to the bottom.</param>
         /// <param name="city">The <see cref="AbstractSEECity"/> object from which to get the settings.</param>
         /// <param name="isLeaf">Whether this node is a leaf.</param>
-        private void AnimateLabel(bool animateIn, AbstractSEECity city, bool isLeaf)
+        private void AnimateLabel(AbstractSEECity city, bool isLeaf)
         {
             // TODO: Maybe the class in Tweens.cs should be used instead.
             // However, I'm not sure why that class is a MonoBehaviour (shouldn't it be a static helper class?)
             // and DOTween instead recommends using extension methods, so this is what's used here.
             // Additionally, some specific functionality (e.g. callbacks), isn't available from Tweens.cs.
-            
-            Vector3 endLabelPosition, endLinePosition;
-            float endAlpha;
-            if (animateIn)
-            {
-                endLabelPosition = nodeLabel.transform.position;
-                endLabelPosition.y += isLeaf ? city.LeafLabelDistance : city.InnerNodeLabelDistance;
-                endLinePosition = endLabelPosition;
-                float nodeTopPosition = nodeLabel.GetComponent<TextMeshPro>().textBounds.extents.y;
-                endLinePosition.y -= nodeTopPosition * 1.3f; // add slight gap to make it slightly more aesthetic
-                endAlpha = 1f;
-            }
-            else
-            {
-                endLabelPosition = gameObject.transform.position;
-                endLinePosition = endLabelPosition;
-                endLinePosition.y = BoundingBox.GetRoof(new List<GameObject> {gameObject});
-                endAlpha = 0f;
-            }
+
+            const float endAlpha = 1f;  // Alpha value the text and line will have at the end of the animation.
+            const float lineStartAlpha = endAlpha * 0.5f;  // Alpha value the start of the line should have.
+            Vector3 endLabelPosition = nodeLabel.transform.position;
+            endLabelPosition.y += isLeaf ? city.LeafLabelDistance : city.InnerNodeLabelDistance;
+            Vector3 endLinePosition = endLabelPosition;
+            float nodeTopPosition = nodeLabel.GetComponent<TextMeshPro>().textBounds.extents.y;
+            endLinePosition.y -= nodeTopPosition * 1.3f; // add slight gap to make it slightly more aesthetic
 
             float animationDuration = AnimationDuration(isLeaf, city);
+            if (animationDuration <= 0)
+            {
+                // If animation duration is set to 0, all otherwise animated attributes should be set immediately
+                SetAttributesImmediately();
+
+                return;
+            }
+            
+            // We will play the animation backwards when going away, so we'll kill the tweens ourself.
+            sequence = DOTween.Sequence();
+            sequence.SetAutoKill(false);
+            sequence.SetLink(nodeLabel, LinkBehaviour.KillOnDestroy);
+            // By inserting all tweens in the same position, they will play simultaneously.
             AnimateLabelText();
             AnimateLabelLine();
 
@@ -309,9 +312,9 @@ namespace SEE.Controls.Actions
                 // Animated label to move to top and fade in
                 if (nodeLabel.TryGetComponent(out TextMeshPro text))
                 {
-                    tweens.Add(nodeLabel.transform.DOMove(endLabelPosition, animationDuration));
-                    tweens.Add(DOTween.ToAlpha(() => text.color, color => text.color = color, endAlpha, animationDuration));
-                    tweens.Add(DOTween.ToAlpha(() => text.outlineColor, color => text.outlineColor = color, endAlpha, animationDuration));
+                    sequence.Insert(0, nodeLabel.transform.DOMove(endLabelPosition, animationDuration));
+                    sequence.Insert(0, DOTween.ToAlpha(() => text.color, color => text.color = color, endAlpha, animationDuration));
+                    sequence.Insert(0, DOTween.ToAlpha(() => text.outlineColor, color => text.outlineColor = color, endAlpha, animationDuration));
                 }
                 else
                 {
@@ -328,16 +331,9 @@ namespace SEE.Controls.Actions
                     LineFactory.SetColors(line, Color.clear, Color.clear);
 
                     // Lower start of line should be visible almost immediately due to reduced alpha (smooth transition)
-                    tweens.Add(DOTween.ToAlpha(() => line.startColor, c => line.startColor = c, endAlpha * 0.5f, animationDuration*0.1f));
-                    tweens.Add(DOTween.ToAlpha(() => line.endColor, c => line.endColor = c, endAlpha, animationDuration));
-                    Tween lastTween = DOTween.To(() => line.GetPosition(1), p => line.SetPosition(1, p), endLinePosition, animationDuration);
-                    tweens.Add(lastTween);
-                    if (!animateIn)
-                    {
-                        // FIXME For an unknown reason, DOTween sometimes doesn't execute the callback when the mouse
-                        // moves back and forth over the same object in quick succession.
-                        lastTween.OnKill(() => DestroyLabel(nodeLabel));
-                    }
+                    sequence.Insert(0, DOTween.ToAlpha(() => line.startColor, c => line.startColor = c, lineStartAlpha, animationDuration*0.1f));
+                    sequence.Insert(0, DOTween.ToAlpha(() => line.endColor, c => line.endColor = c, endAlpha, animationDuration));
+                    sequence.Insert(0, DOTween.To(() => line.GetPosition(1), p => line.SetPosition(1, p), endLinePosition, animationDuration));
                 }
                 else
                 {
@@ -345,6 +341,23 @@ namespace SEE.Controls.Actions
                 }
             }
             #endregion
+
+            void SetAttributesImmediately()
+            {
+                // If we have an animation duration of 0, we can set the positions immediately and return.
+                if (nodeLabel.TryGetComponent(out TextMeshPro text) && nodeLabel.TryGetComponent(out LineRenderer line))
+                {
+                    nodeLabel.transform.position = endLabelPosition;
+                    text.alpha = endAlpha;
+                    line.startColor = line.startColor.ColorWithAlpha(lineStartAlpha);
+                    line.endColor = line.endColor.ColorWithAlpha(endAlpha);
+                    line.SetPosition(1, endLinePosition);
+                }
+                else
+                {
+                    Debug.LogError("Couldn't find required component in newly created label.\n");
+                }
+            }
         }
 
         /// <summary>
@@ -361,8 +374,8 @@ namespace SEE.Controls.Actions
 
             currentlyDestroying = true;
             // Fade out and move label down
-            AnimateLabel(false, City(), SceneQueries.IsLeaf(gameObject));
-            //DestroyLabel(nodeLabel);
+            sequence?.PlayBackwards();
+            sequence?.OnPause(() => DestroyLabel(nodeLabel));
         }
 
         /**
@@ -381,17 +394,11 @@ namespace SEE.Controls.Actions
         /// Destroys the node label. Should only be called after the animations have completed.
         /// </summary>
         private void DestroyLabel(GameObject animatedLabel) {
-            // Only destroy label if we are actually still destroying it.
-            // currentlyDestroying may be false if the user hovers away and quickly hovers back, in which case this
-            // method will still be called.
-            Debug.Log($"Label: {animatedLabel.name}\n");
+            // Only destroy label if it still exists and if no animation is playing.
             if (animatedLabel != null && currentlyDestroying)
             {
-                tweens.ForEach(tween => tween.Kill());
                 Destroyer.DestroyGameObject(animatedLabel);
             }
-
-            currentlyDestroying = false;
         }
     }
 }
