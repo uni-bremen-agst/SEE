@@ -79,6 +79,9 @@ namespace SEE.GO.Menu
         /// </summary>
         private bool menuIsOn = false;
 
+        public bool MenuIsOn { get => menuIsOn; set => menuIsOn = value; }
+
+
         /// <summary>
         /// Shows the menu.
         /// </summary>
@@ -91,7 +94,7 @@ namespace SEE.GO.Menu
         /// <summary>
         /// Hides the menu.
         /// </summary>
-        protected virtual void Off()
+        public virtual void Off()
         {
             SetVisible(gameObject, false);
         }
@@ -136,15 +139,15 @@ namespace SEE.GO.Menu
         /// </summary>
         private void Update()
         {
-            bool oldState = menuIsOn;
+            bool oldState = MenuIsOn;
             // space bar toggles menu            
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                menuIsOn = !menuIsOn;
+                MenuIsOn = !MenuIsOn;
             }
-            if (menuIsOn)
+            if (MenuIsOn)
             {
-                if (oldState != menuIsOn)
+                if (oldState != MenuIsOn)
                 {
                     On();
                 }
@@ -182,7 +185,7 @@ namespace SEE.GO.Menu
                     }
                 }
             }
-            else if (oldState != menuIsOn)
+            else if (oldState != MenuIsOn)
             {
                 Off();
             }

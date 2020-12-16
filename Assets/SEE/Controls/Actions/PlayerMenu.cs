@@ -1,5 +1,6 @@
 ﻿using SEE.GO;
 using SEE.GO.Menu;
+using System;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -144,7 +145,7 @@ namespace SEE.Controls.Actions
                                    activeColor: Color.green,
                                    inactiveColor: Lighter(Color.green),
                                    entryOn: NewNodeOn,
-                                   entryOff: null,
+                                   entryOff: Hide,
                                    isTransient: true),
                  //Starts the Scaling Mode
                  new MenuDescriptor(label: "Scale Node",
@@ -156,6 +157,20 @@ namespace SEE.Controls.Actions
                                    isTransient: true)
 
             };
+        }
+
+        protected void Hide()
+        {
+            try
+            {
+                CircularMenu circularMenu = (CircularMenu)GameObject.Find("0").GetComponent("CircularMenu");
+                circularMenu.Off();
+                circularMenu.MenuIsOn = false;
+            }
+            catch (Exception)
+            {
+                Debug.Log("AH");
+            }
         }
     }
 }

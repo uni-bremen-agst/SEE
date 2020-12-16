@@ -134,7 +134,7 @@ namespace SEE.Controls.Actions
                             else
                             {
                                 // GameNodeScaleAction.ScaleNode(node);
-                                node.SetScale(Vector3.one);
+                                // node.SetScale(Vector3.one);
                             }
 
                             node = null;
