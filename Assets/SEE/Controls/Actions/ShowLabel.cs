@@ -334,6 +334,8 @@ namespace SEE.Controls.Actions
                     tweens.Add(lastTween);
                     if (!animateIn)
                     {
+                        // FIXME For an unknown reason, DOTween sometimes doesn't execute the callback when the mouse
+                        // moves back and forth over the same object in quick succession.
                         lastTween.OnKill(() => DestroyLabel(nodeLabel));
                     }
                 }
@@ -385,7 +387,6 @@ namespace SEE.Controls.Actions
             Debug.Log($"Label: {animatedLabel.name}\n");
             if (animatedLabel != null && currentlyDestroying)
             {
-                // FIXME there's what appears to be a racing condition here, where sometimes labels don't get destroyed
                 tweens.ForEach(tween => tween.Kill());
                 Destroyer.DestroyGameObject(animatedLabel);
             }
