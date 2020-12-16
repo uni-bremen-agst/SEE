@@ -373,9 +373,17 @@ namespace SEE.Controls.Actions
             }
 
             currentlyDestroying = true;
-            // Fade out and move label down
-            sequence?.PlayBackwards();
-            sequence?.OnPause(() => DestroyLabel(nodeLabel));
+            if (sequence == null)
+            {
+                // If no sequence exists, animation duration is 0, so we immediately destroy the label.
+                DestroyLabel(nodeLabel);
+            }
+            else
+            {
+                // Fade out and move label down
+                sequence?.PlayBackwards();
+                sequence?.OnPause(() => DestroyLabel(nodeLabel));
+            }
         }
 
         /**
@@ -399,6 +407,8 @@ namespace SEE.Controls.Actions
             {
                 Destroyer.DestroyGameObject(animatedLabel);
             }
+
+            currentlyDestroying = false;
         }
     }
 }
