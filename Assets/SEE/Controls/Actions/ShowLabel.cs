@@ -153,12 +153,14 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// True iff the label is currently playing an animation after which it will be destroyed.
         /// </summary>
-        private bool currentlyDestroying;
+        private bool currentlyDestroying = false;
 
         /// <summary>
         /// All currently active tweens.
         /// </summary>
         private List<Tween> tweens = new List<Tween>();
+
+        private int i = 0;
 
         /// <summary>
         /// Returns the code city holding the settings for the visualization of the node.
@@ -209,7 +211,7 @@ namespace SEE.Controls.Actions
             }
 
             // If label already exists or the game object has no node reference, nothing needs to be done
-            if (nodeLabel != null && !currentlyDestroying || !gameObject.TryGetComponent(out NodeRef nodeRef))
+            if ((nodeLabel != null && !currentlyDestroying) || !gameObject.TryGetComponent(out NodeRef nodeRef))
             {
                 return;
             }
@@ -229,7 +231,7 @@ namespace SEE.Controls.Actions
             nodeLabel = TextFactory.GetTextWithSize(node.SourceName, startLabelPosition,
                                                     isLeaf ? city.LeafLabelFontSize : city.InnerNodeLabelFontSize, 
                                                     textColor: Color.black.ColorWithAlpha(0f));
-            nodeLabel.name = $"Label {node.SourceName}";
+            nodeLabel.name = $"Label {node.SourceName} ({i++})";
             nodeLabel.transform.SetParent(gameObject.transform);
             
             SetOutline();
@@ -332,7 +334,7 @@ namespace SEE.Controls.Actions
                     tweens.Add(lastTween);
                     if (!animateIn)
                     {
-                        lastTween.OnComplete(DestroyLabel);
+                        lastTween.OnKill(() => DestroyLabel(nodeLabel));
                     }
                 }
                 else
@@ -358,6 +360,7 @@ namespace SEE.Controls.Actions
             currentlyDestroying = true;
             // Fade out and move label down
             AnimateLabel(false, City(), SceneQueries.IsLeaf(gameObject));
+            //DestroyLabel(nodeLabel);
         }
 
         /**
@@ -375,16 +378,16 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Destroys the node label. Should only be called after the animations have completed.
         /// </summary>
-        private void DestroyLabel() {
+        private void DestroyLabel(GameObject animatedLabel) {
             // Only destroy label if we are actually still destroying it.
             // currentlyDestroying may be false if the user hovers away and quickly hovers back, in which case this
             // method will still be called.
-            if (nodeLabel != null && currentlyDestroying)
+            Debug.Log($"Label: {animatedLabel.name}\n");
+            if (animatedLabel != null && currentlyDestroying)
             {
                 // FIXME there's what appears to be a racing condition here, where sometimes labels don't get destroyed
                 tweens.ForEach(tween => tween.Kill());
-                Destroyer.DestroyGameObject(nodeLabel);
-                nodeLabel = null;
+                Destroyer.DestroyGameObject(animatedLabel);
             }
 
             currentlyDestroying = false;
