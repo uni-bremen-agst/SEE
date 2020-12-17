@@ -40,6 +40,8 @@ namespace SEE.Game.Charts
 
         public ChartContent chartContent;
 
+        private UnityEngine.UI.Image image;
+
         /// <summary>
         /// A text popup containing useful information about the marker and its <see cref="LinkedInteractable"/>.
         /// </summary>
@@ -54,6 +56,7 @@ namespace SEE.Game.Charts
         {
             infoText.text = string.Empty;
             infoText.color = UIColorScheme.GetLight(0);
+            image = GetComponent<UnityEngine.UI.Image>();
             markerHighlight.GetComponent<UnityEngine.UI.Image>().color = UIColorScheme.GetLight(2);
         }
 
@@ -98,21 +101,39 @@ namespace SEE.Game.Charts
             infoText.text = text;
         }
 
+        public void UpdateVisibility()
+        {
+            bool isVisible = false;
+            foreach (InteractableObject interactableObject in linkedInteractableObjects)
+            {
+                bool showInChart = (bool)interactableObject.GetComponent<NodeRef>().highlights.showInChart[chartContent];
+                if (showInChart)
+                {
+                    isVisible = true;
+                    break;
+                }
+            }
+            image.enabled = isVisible;
+        }
+
         #region UnityEngine Callbacks
 
         public void ButtonClicked()
         {
-            // TODO(torben): the action state could be global for some cases. the line below exists in DesktopNavigationAction.cs and could somewhat be shared
-            //actionState.selectToggle = Input.GetKey(KeyCode.LeftControl);
-            if (!Input.GetKey(KeyCode.LeftControl))
+            if (image.enabled)
             {
-                InteractableObject.UnhoverAll(true);
-                InteractableObject.UnselectAll(true);
-            }
+                // TODO(torben): the action state could be global for some cases. the line below exists in DesktopNavigationAction.cs and could somewhat be shared
+                //actionState.selectToggle = Input.GetKey(KeyCode.LeftControl);
+                if (!Input.GetKey(KeyCode.LeftControl))
+                {
+                    InteractableObject.UnhoverAll(true);
+                    InteractableObject.UnselectAll(true);
+                }
 
-            foreach (InteractableObject interactableObject in linkedInteractableObjects)
-            {
-                interactableObject.SetSelect(!interactableObject.IsSelected, true);
+                foreach (InteractableObject interactableObject in linkedInteractableObjects)
+                {
+                    interactableObject.SetSelect(!interactableObject.IsSelected, true);
+                }
             }
         }
 

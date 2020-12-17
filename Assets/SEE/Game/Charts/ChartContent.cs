@@ -28,7 +28,6 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.UI;
 
 namespace SEE.Game.Charts
 {
@@ -37,36 +36,28 @@ namespace SEE.Game.Charts
     /// </summary>
     public class ChartContent : MonoBehaviour
     {
+        // TODO(torben): this may need to be reintroduced
         /// <summary>
         /// The distance to another marker to recognize it as overlapping.
         /// </summary>
         private const float MarkerOverlapDistance = 22;
 
         /// <summary>
-        /// Contains one <see cref="scrollEntryPrefab" /> for each <see cref="Node" /> in the scene.
+        /// Contains one <see cref="scrollEntryPrefab"/> for each <see cref="Node"/> in
+        /// the scene.
         /// </summary>
         [SerializeField] private GameObject scrollContent;
 
         /// <summary>
-        /// A checkbox associated to a <see cref="Node" /> in the scene to activate it in the chart.
-        /// A checkbox associated to a <see cref="Node" /> in the scene to activate it in the chart.
+        /// A checkbox associated to a <see cref="Node"/> in the scene to activate it in
+        /// the chart.
         /// </summary>
         [SerializeField] private GameObject scrollEntryPrefab;
 
         /// <summary>
-        /// The starting coordinates of the headers in the <see cref="scrollContent" />.
+        /// The starting coordinates of the entries of the <see cref="scrollContent"/>.
         /// </summary>
-        [SerializeField] private Vector2 headerOffset;
-
-        /// <summary>
-        /// The starting coordinates of the children in the <see cref="scrollContent" />.
-        /// </summary>
-        [SerializeField] private Vector2 childOffset;
-
-        /// <summary>
-        /// Determines if the entries in the <see cref="scrollContent" /> are displayed as tree.
-        /// </summary>
-        private bool displayAsTree;
+        [SerializeField] private Vector2 scrollEntryOffset;
 
         /// <summary>
         /// The gap between entries in the <see cref="scrollContent" /> indicating a new hierarchy layer.
@@ -179,7 +170,7 @@ namespace SEE.Game.Charts
         private void Awake()
         {
             FindDataObjects();
-            FillScrollView(displayAsTree);
+            FillScrollView(false);
             GetAllNumericAttributes();
         }
 
@@ -200,7 +191,7 @@ namespace SEE.Game.Charts
         {
             GameObject go = Instantiate(scrollEntryPrefab, scrollContent.transform);
             go.name = "ScrollViewToggle: " + nodeRef.node.SourceName;
-            go.transform.localPosition = headerOffset + new Vector2(xGap * (float)hierarchy, yGap * (float)index++);
+            go.transform.localPosition = scrollEntryOffset + new Vector2(xGap * (float)hierarchy, yGap * (float)index++);
 
             ScrollViewToggle svt = go.GetComponent<ScrollViewToggle>();
             svt.Parent = parent;
@@ -216,7 +207,7 @@ namespace SEE.Game.Charts
         {
             GameObject go = Instantiate(scrollEntryPrefab, scrollContent.transform);
             go.name = "ScrollViewToggle: " + name;
-            go.transform.localPosition = headerOffset + new Vector2(xGap * (float)hierarchy, yGap * (float)index++);
+            go.transform.localPosition = scrollEntryOffset + new Vector2(xGap * (float)hierarchy, yGap * (float)index++);
 
             ScrollViewToggle svt = go.GetComponent<ScrollViewToggle>();
             svt.Parent = parent;
@@ -240,8 +231,6 @@ namespace SEE.Game.Charts
 
         public void FillScrollView(bool displayAsTree)
         {
-            this.displayAsTree = displayAsTree;
-
             foreach (Transform child in scrollContent.transform)
             {
                 Destroy(child.gameObject);
