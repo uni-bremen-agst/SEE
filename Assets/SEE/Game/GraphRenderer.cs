@@ -154,12 +154,15 @@ namespace SEE.Game
         /// Creates and returns a new edge between <paramref name="from"/> and <paramref name="to"/>
         /// based on the current settings. A new edge will be added to the underlying graph, too.
         /// 
+        /// Note: null may be returned if no edge layout was chosen. The graph edge will be
+        /// created and added to the underlying graph anyway.
+        /// 
         /// Precondition: <paramref name="from"/> and <paramref name="to"/> must have a valid
         /// node reference. The corresponding graph nodes must be in the same graph.
         /// </summary>
         /// <param name="from">source of the new edge</param>
         /// <param name="to">target of the new edge</param>
-        /// <returns>the new edge</returns>
+        /// <returns>the new edge or null</returns>
         public GameObject DrawEdge(GameObject from, GameObject to)
         {
             Node fromNode = from.GetNode();
@@ -178,52 +181,67 @@ namespace SEE.Game
             }
             else
             {
-                Debug.Log($"Added edge from {from.name} to {to.name}\n");
                 // Creating the edge in the underlying graph
-                Edge edge = new Edge();
-                edge.Source = fromNode;
-                edge.Target = toNode;
-                // FIXME: We need to set the type of the edge.
-                Debug.LogError($"An edge {edge.ID} from {fromNode.ID} to {toNode.ID} without type is added.");
+                Edge edge = new Edge
+                {
+                    Source = fromNode,
+                    Target = toNode,
+                    Type = Graph.UnknownType // FIXME: We need to set the type of the edge.
+                };
+                
                 Graph graph = fromNode.ItsGraph;
                 graph.AddEdge(edge);
 
-                // Creating the game object representing the edge.
-                // The edge layout will be calculated for the following gameNodes. This list will
-                // contain the source and target of the edge but also all their ascendants. The
-                // ascendants are needed for hierarchical layouts.
-                HashSet<GameObject> gameNodes = new HashSet<GameObject>();
-                // We add the descendants of the source and target nodes in case the edge layout is hierarchical.
-                AddAscendants(from, gameNodes);
-                AddAscendants(to, gameNodes); 
-                foreach (GameObject item in gameNodes)
+                if (settings.EdgeLayout == EdgeLayoutKind.None)
                 {
-                    Debug.Log($"Ascendant: {item.name}\n");
+                    Debug.LogWarning($"An edge {edge.ID} from {fromNode.ID} to {toNode.ID} was added to the graph, but no edge layout was chosen.\n");
+                    return null;
                 }
-                // The layout nodes corresponding to those game nodes.
-                ICollection<GameNode> layoutNodes = ToLayoutNodes(gameNodes);
-                
-                GameNode fromLayoutNode = null; // layout node in layoutNodes corresponding to source node
-                GameNode toLayoutNode = null;   // layout node in layoutNodes corresponding to target node
-                // We need fromLayoutNode and toLayoutNode to create a single layout edge to be passed
-                // to the edge layouter.
-                foreach (GameNode layoutNode in layoutNodes)
+                else
                 {
-                    if (layoutNode.ItsNode == fromNode)
+                    // Creating the game object representing the edge.
+                    // The edge layout will be calculated for the following gameNodes. This list will
+                    // contain the source and target of the edge but also all their ascendants. The
+                    // ascendants are needed for hierarchical layouts.
+                    HashSet<GameObject> gameNodes = new HashSet<GameObject>();
+                    // We add the descendants of the source and target nodes in case the edge layout is hierarchical.
+                    AddAscendants(from, gameNodes);
+                    AddAscendants(to, gameNodes);
+                    Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
+                    // The layout nodes corresponding to those game nodes.
+                    ICollection<GameNode> layoutNodes = ToLayoutNodes(gameNodes, leafNodeFactory, innerNodeFactory, to_layout_node);
+
+                    GameNode fromLayoutNode = null; // layout node in layoutNodes corresponding to source node
+                    GameNode toLayoutNode = null;   // layout node in layoutNodes corresponding to target node
+                                                    // We need fromLayoutNode and toLayoutNode to create a single layout edge to be passed
+                                                    // to the edge layouter.
+                    foreach (GameNode layoutNode in layoutNodes)
                     {
-                        fromLayoutNode = layoutNode;
-                    } 
-                    else if (layoutNode.ItsNode == toNode)
-                    {
-                        toLayoutNode = layoutNode;
+                        if (layoutNode.ItsNode == fromNode)
+                        {
+                            fromLayoutNode = layoutNode;
+                        }
+                        // note: fromNode = toNode is possible, hence, there is no 'else' here.
+                        if (layoutNode.ItsNode == toNode)
+                        {
+                            toLayoutNode = layoutNode;
+                        }
                     }
+                    UnityEngine.Assertions.Assert.IsNotNull(fromLayoutNode, $"source node {fromNode.ID} does not have a layout node.\n");
+                    UnityEngine.Assertions.Assert.IsNotNull(toLayoutNode, $"target node {toNode.ID} does not have a layout node.\n");
+                    // The single layout edge between source and target. We want the layout only for this edge.
+                    ICollection<LayoutEdge> layoutEdges = new List<LayoutEdge> { new LayoutEdge(fromLayoutNode, toLayoutNode, edge) };
+                    // Calculate the edge layout (for the single edge only).
+                    ICollection<GameObject> edges = EdgeLayout(layoutNodes, layoutEdges);
+                    GameObject result = edges.FirstOrDefault<GameObject>();
+                    // The edge becomes a child of the root node of the game-node hierarchy
+                    GameObject codeCity = SceneQueries.GetCodeCity(from.transform).gameObject;
+                    GameObject rootNode = SceneQueries.GetCityRootNode(codeCity).gameObject;                                        
+                    result.transform.SetParent(rootNode.transform);
+                    // The portal of the new edge is inherited from the codeCity.
+                    Portal.SetPortal(root: codeCity, gameObject: result);
+                    return result;
                 }
-                // The single layout edge between source and target. We want the layout only for this edge.
-                ICollection<LayoutEdge> layoutEdges = new List<LayoutEdge> { new LayoutEdge(fromLayoutNode, toLayoutNode, edge) };
-                // Calculate the edge layout (for the single edge only).
-                ICollection<GameObject> edges = EdgeLayout(layoutNodes, layoutEdges);
-                // FIXME: Edge must be added to parent.
-                return edges.FirstOrDefault<GameObject>();
             }
         }
 
@@ -254,6 +272,12 @@ namespace SEE.Game
             return EdgeLayout(ToLayoutNodes(gameNodes));
         }
 
+        /// <summary>
+        /// Applies the edge layout according to the the user's choice (settings) for
+        /// all edges in between nodes in <paramref name="gameNodes"/>.
+        /// </summary>
+        /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
+        /// <returns>all game objects created to represent the edges; may be empty</returns>
         private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes)
         {
             return EdgeLayout(gameNodes, ConnectingEdges(gameNodes));
@@ -263,6 +287,7 @@ namespace SEE.Game
         /// Applies the edge layout according to the the user's choice (settings).
         /// </summary>
         /// <param name="gameNodes">the set of layout nodes for which to create game edges</param>
+        /// <param name="layoutEdges">the edges to be laid out</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
         private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes, ICollection<LayoutEdge> layoutEdges)
         {
@@ -757,7 +782,6 @@ namespace SEE.Game
             List<SublayoutLayoutNode> sublayoutLayoutNodes = new List<SublayoutLayoutNode>();
             sublayouts.ForEach(sublayoutNode =>
             {
-
                 SublayoutLayoutNode sublayout = new SublayoutLayoutNode(to_layout_node[sublayoutNode.Node], sublayoutNode.InnerNodeKind, sublayoutNode.NodeLayout);
                 sublayoutNode.Nodes.ForEach(n => sublayout.Nodes.Add(to_layout_node[n]));
                 sublayoutNode.RemovedChildren.ForEach(n => sublayout.RemovedChildren.Add(to_layout_node[n]));
@@ -1071,7 +1095,7 @@ namespace SEE.Game
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
         public ICollection<GameNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
         {
-            return ToLayoutNodes(gameObjects, leafNodeFactory, innerNodeFactory);
+            return ToLayoutNodes(gameObjects, leafNodeFactory, innerNodeFactory, to_layout_node);
         }
 
         /// <summary>
@@ -1089,11 +1113,11 @@ namespace SEE.Game
             {
                 ICollection<GameObject> gameObjects = new List<GameObject>();
                 sublayoutNode.Nodes.ForEach(node => gameObjects.Add(nodeMap[node]));
-                layoutNodes.AddRange(ToLayoutNodes(gameObjects, leafNodeFactory, GetInnerNodeFactory(sublayoutNode.InnerNodeKind)));
+                layoutNodes.AddRange(ToLayoutNodes(gameObjects, leafNodeFactory, GetInnerNodeFactory(sublayoutNode.InnerNodeKind), to_layout_node));
                 remainingGameobjects.RemoveAll(gameObject => gameObjects.Contains(gameObject));
             }
 
-            layoutNodes.AddRange(ToLayoutNodes(remainingGameobjects, leafNodeFactory, innerNodeFactory));
+            layoutNodes.AddRange(ToLayoutNodes(remainingGameobjects, leafNodeFactory, innerNodeFactory, to_layout_node));
 
             return layoutNodes;
         }
@@ -1105,11 +1129,13 @@ namespace SEE.Game
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
         /// <param name="leafNodeFactory">the leaf node factory that created the leaf nodes in <paramref name="gameNodes"/></param>
         /// <param name="innerNodeFactory">the inner node factory that created the inner nodes in <paramref name="gameNodes"/></param>
+        /// <param name="to_layout_node">a mapping from graph nodes onto their corresponding layout node</param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
-        private ICollection<GameNode> ToLayoutNodes
+        private static ICollection<GameNode> ToLayoutNodes
             (ICollection<GameObject> gameNodes,
             NodeFactory leafNodeFactory,
-            NodeFactory innerNodeFactory)
+            NodeFactory innerNodeFactory,
+            Dictionary<Node, ILayoutNode> to_layout_node)
         {
             IList<GameNode> result = new List<GameNode>(gameNodes.Count);
 
