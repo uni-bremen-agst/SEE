@@ -181,9 +181,9 @@ public class GameNodeScaleAction : MonoBehaviour
 
         //fstcorner
         Vector3 pos = gameObject.transform.position;
-        pos.y = BoundingBox.GetRoof(new List<GameObject> { gameObject });
+        pos.y = gameObject.GetRoof();
         pos.x -= trns.lossyScale.x / 2 + 0.02f;
-        pos.z -= trns.lossyScale.y / 2 + 0.02f;
+        pos.z -= trns.lossyScale.z / 2 + 0.02f;
         fstCornerSphere.transform.position = pos;
         fstCornerOldSpherPos = pos;
 
@@ -191,7 +191,7 @@ public class GameNodeScaleAction : MonoBehaviour
         pos = gameObject.transform.position;
         pos.y = BoundingBox.GetRoof(new List<GameObject> { gameObject });
         pos.x += trns.lossyScale.x / 2 + 0.02f;
-        pos.z -= trns.lossyScale.y / 2 + 0.02f;
+        pos.z -= trns.lossyScale.z / 2 + 0.02f;
         sndCornerSphere.transform.position = pos;
         sndCornerOldSpherPos = pos;
 
@@ -199,7 +199,7 @@ public class GameNodeScaleAction : MonoBehaviour
         pos = gameObject.transform.position;
         pos.y = BoundingBox.GetRoof(new List<GameObject> { gameObject });
         pos.x += trns.lossyScale.x / 2 + 0.02f;
-        pos.z += trns.lossyScale.y / 2 + 0.02f;
+        pos.z += trns.lossyScale.z / 2 + 0.02f;
         thrdCornerSphere.transform.position = pos;
         thrdCornerOldSpherPos = pos;
 
@@ -207,7 +207,7 @@ public class GameNodeScaleAction : MonoBehaviour
         pos = gameObject.transform.position;
         pos.y = BoundingBox.GetRoof(new List<GameObject> { gameObject });
         pos.x -= trns.lossyScale.x / 2 + 0.02f;
-        pos.z += trns.lossyScale.y / 2 + 0.02f;
+        pos.z += trns.lossyScale.z / 2 + 0.02f;
         forthCornerSphere.transform.position = pos;
         forthCornerOldSpherPos = pos;
 
