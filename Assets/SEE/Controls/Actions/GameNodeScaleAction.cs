@@ -106,11 +106,12 @@ public class GameNodeScaleAction : MonoBehaviour
             }
 
             scaleNode();
+            setOnRoof();
+            setOnSide();
         }
         else
         {
-            setOnRoof();
-            setOnSide();
+           
             //sphereRadius(topSphere);
         }
 
