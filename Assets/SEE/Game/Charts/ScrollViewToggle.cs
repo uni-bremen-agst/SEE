@@ -143,6 +143,7 @@ namespace SEE.Game.Charts
                 if (nodeRef && chartContent.nodeRefToChartMarkerDict.TryGetValue(nodeRef, out ChartMarker chartMarker))
                 {
                     chartMarker.UpdateInfoText();
+                    chartMarker.UpdateVisibility();
                 }
             }
 
