@@ -579,6 +579,11 @@ namespace SEE.Game
         /// The maximal absolute width of a sprite representing an erosion in world-space Unity units.
         /// </summary>
         public float MaxErosionWidth = 1.0f; // serialized by Unity
+        
+        /// <summary>
+        /// The time in seconds after which staring at a node triggers its label to appear.
+        /// </summary>
+        public float EyeStareDelay = 2f;
 
         /// <summary>
         /// Orientation of the edges; 

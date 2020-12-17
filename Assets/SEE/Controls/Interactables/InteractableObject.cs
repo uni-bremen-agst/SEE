@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using Microsoft.MixedReality.Toolkit.Input;
 using System.Linq;
+using Microsoft.MixedReality.Toolkit.Input;
 using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
@@ -103,11 +103,7 @@ namespace SEE.Controls
             ID = nextID++;
             interactableObjects.Add(ID, this);
 
-            interactable = GetComponent<Interactable>();
-            if (interactable == null)
-            {
-                Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
-            }
+            gameObject.TryGetComponentOrLog(out interactable);
         }
 
         private void Start()
@@ -396,7 +392,17 @@ namespace SEE.Controls
 
         #endregion
 
-        public void OnFocusEnter(FocusEventData eventData) => SetHover(true, true);
+        public void OnFocusEnter(FocusEventData eventData)
+        {
+            // In case of eye gaze, we discard the input.
+            // We handle eye gaze using the BaseEyeFocusHandler in order to only activate hovering mechanisms
+            // when the user dwells on the object, otherwise the sudden changes would be too jarring.
+            if (eventData.Pointer.InputSourceParent.SourceType != InputSourceType.Eyes)
+            {
+                SetHover(true, true);
+            }
+            
+        }
 
         public void OnFocusExit(FocusEventData eventData) => SetHover(false, true);
     }

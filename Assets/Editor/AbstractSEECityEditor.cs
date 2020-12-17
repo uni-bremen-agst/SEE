@@ -273,6 +273,10 @@ namespace SEEEditor
                 city.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", city.ZScoreScale);
                 city.ShowErosions = EditorGUILayout.Toggle("Show erosions", city.ShowErosions);
                 city.MaxErosionWidth = EditorGUILayout.FloatField("Max. width of erosion icon", city.MaxErosionWidth);
+                city.EyeStareDelay = EditorGUILayout.Slider(
+                    new GUIContent("Eye Stare Delay", 
+                                   "The time in seconds after which staring at a node triggers its label to appear."), 
+                    city.EyeStareDelay, 0, 20);
             }
         }
 

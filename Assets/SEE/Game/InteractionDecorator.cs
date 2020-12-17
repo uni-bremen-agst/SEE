@@ -1,6 +1,6 @@
-﻿using SEE.Controls.Actions;
+﻿using System.Collections.Generic;
+using SEE.Controls.Actions;
 using SEE.Game;
-using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
 
@@ -9,7 +9,7 @@ namespace SEE.Controls
     /// <summary>
     /// Adds components required for interacting with a game object.
     /// </summary>
-    public class InteractionDecorator
+    public static class InteractionDecorator
     {
         /// <summary>
         /// Adds the following components to given <paramref name="gameNode"/>:
@@ -24,6 +24,7 @@ namespace SEE.Controls
             gameNode.AddComponent<InteractableObject>();
             // The following additions of components must come after the addition of InteractableObject
             // because they require the presence of an InteractableObject.
+            gameNode.AddComponent<EyeGazeHandler>();
             gameNode.AddComponent<ShowLabel>();
             gameNode.AddComponent<ShowHovering>();
             gameNode.AddComponent<ShowSelection>();
