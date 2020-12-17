@@ -130,7 +130,7 @@ namespace SEE.Game
         /// If <paramref name="codeCity"/> is a node representing a code city,
         /// the result is considered the root of the graph.
         /// </summary>
-        /// <param name="codeCity">object representing a code city</param>
+        /// <param name="codeCity">object representing a code city (generally tagged by Tags.CodeCity)</param>
         /// <returns>game object representing the root of the graph or null if there is none</returns>
         public static Transform GetCityRootNode(GameObject codeCity)
         {            
