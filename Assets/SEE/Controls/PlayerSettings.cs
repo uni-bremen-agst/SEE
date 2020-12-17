@@ -4,6 +4,7 @@ using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.Utilities;
 using OdinSerializer;
 using SEE.DataModel;
+using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.XR;
@@ -37,7 +38,7 @@ namespace SEE.Controls
         /// A mapping from PlayerInputType onto the names of the player game objects.
         /// The order must be consistent with <see cref="PlayerInputType"/>.
         /// </summary>
-        public static readonly string[] PlayerName = new[] {
+        public static readonly string[] PlayerName = {
             "DesktopPlayer", // Desktop
             "InControl",     // TouchGamepad
             "VRPlayer",      // VR          
@@ -62,6 +63,7 @@ namespace SEE.Controls
 
         [Tooltip("The factor by which code cities should be scaled on startup."), OdinSerialize, Min(0.01f)]
         public float CityScalingFactor = 1f;
+
 
         /// <summary>
         /// The game object representing the active local player, that is, the player 
@@ -189,7 +191,7 @@ namespace SEE.Controls
                 {
                     // Position and scale planes and CodeCities accordingly using CityCollection grid
                     GameObject cityCollection = GameObject.Find("CityCollection").AssertNotNull("CityCollection");
-                    if (cityCollection.TryGetComponent(out GridObjectCollection grid))
+                    if (cityCollection.TryGetComponentOrLog(out GridObjectCollection grid))
                     {
                         GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
                         foreach (GameObject city in cities)
@@ -202,10 +204,7 @@ namespace SEE.Controls
                         // To avoid overlaps, set cell width to maximum length of code cities
                         grid.CellWidth = cities.Select(x => x.transform.localScale.MaxComponent()).Max();
                         grid.UpdateCollection();
-                    } else
-                    {
-                        Debug.LogError("CityCollection doesn't have required component 'GridObjectCollection'.\n");
-                    }
+                    } 
                 }
             }            
         }
