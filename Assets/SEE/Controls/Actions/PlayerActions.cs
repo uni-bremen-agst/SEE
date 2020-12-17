@@ -40,25 +40,6 @@ namespace SEE.Controls.Actions
         GameObject nodeAction = null;
 
 
-
-        /*
-        //The Selected Code City
-        SEECity city = null;
-        //The New GameNode
-        GameObject node = null;
-
-        //Safes the codeCity Object for highlighting purposes
-        GameObject codeCityObject = null;
-
-
-        //time since last action 
-        float coolDown = 0.0f;
-
-        //Time which has to pass between two actions
-        float coolDownTime = 1.0f;
-        */
-
-        private bool isCitySelected = false;
         /// <summary>
         /// The current state of the player.
         /// </summary>
