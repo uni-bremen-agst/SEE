@@ -65,13 +65,8 @@ namespace SEE.Controls {
                     {
                         if (Input.GetMouseButtonDown(0))
                         {
-                            if (!Place())
-                            {
-                                Destroy(GONode);
-                            }
-                            GONode = null;
-                            city = null;
-                            nodeMetrics = null;
+                            Place();
+    
                         }
                         else
                         {
@@ -153,8 +148,8 @@ namespace SEE.Controls {
         /// <summary>
         /// Places a node on call and checks if the city is the preselected one
         /// </summary>
-        /// <returns> True if the Action performed well | false if the object should be destroyed </returns>
-        private bool Place()
+        
+        private void Place()
         {
             SEECity cityTmp = null;
             if (hoveredObject != null)
@@ -166,12 +161,16 @@ namespace SEE.Controls {
                 if (city.Equals(cityTmp))
                 {
                     GameNodeMover.FinalizePosition(GONode);
-                    city.LoadedGraph.FinalizeNodeHierarchy();
-                    return true;
                 }
                 
             }
-            return false;
+            else
+            {
+                Destroy(GONode);
+            }
+            GONode = null;
+            city = null;
+            nodeMetrics = null;
         }
         
     }
