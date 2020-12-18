@@ -38,14 +38,7 @@ namespace SEE.Game
         protected virtual void Save(StreamWriter stream)
         {
             ConfigIO.Save(stream, "LODCulling", LODCulling);
-            Save(stream, "LayoutPath", LayoutPath);
-        }
-
-        private static void Save(StreamWriter stream, string label, DataPath path)
-        {
-            stream.Write(label + " : ");
-            path.Save(stream);
-            stream.WriteLine();
+            ConfigIO.Save(stream, "LayoutPath", LayoutPath);
         }
 
         /// <summary>
