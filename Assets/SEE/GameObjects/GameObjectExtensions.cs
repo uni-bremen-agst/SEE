@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.GO
 {
@@ -121,7 +122,11 @@ namespace SEE.GO
                 }
             }
         }
-
+        /// <summary>
+        /// Sets the Scale of this <paramref name="node"/> independed of the Loal Scale from the Parent
+        /// </summary>
+        /// <param name="node">object whose scale should be scaled</param>
+        /// <param name="scale">the new scale</param>
         public static void SetScale(this GameObject node, Vector3 scale)
         {
             //Debug.LogFormat("Scale Called {0} \n ", node.transform.lossyScale);
@@ -131,6 +136,16 @@ namespace SEE.GO
            // Debug.LogFormat("Scale Called {0} \n ", node.transform.lossyScale);
 
             node.transform.parent = parent;
+        }
+
+        /// <summary>
+        /// Gets the Height (Roof) of this <paramref name="node"/>
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns>The height of the Roof from thos <paramref name="node"/></returns>
+        public static float GetRoof(this GameObject node)
+        {
+            return node.transform.position.y + node.Size().y / 2.0f;
         }
     }
 }

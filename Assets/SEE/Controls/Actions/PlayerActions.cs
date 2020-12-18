@@ -38,20 +38,7 @@ namespace SEE.Controls.Actions
             ScaleNode
         }
         GameObject nodeAction = null;
-        //The Selected Code City
-        SEECity city = null;
-        //The New GameNode
-        GameObject node = null;
 
-        //Safes the codeCity Object for highlighting purposes
-        GameObject codeCityObject = null;
-
-
-        //time since last action 
-        float coolDown = 0.0f;
-
-        //Time which has to pass between two actions
-        float coolDownTime = 1.0f;
 
         /// <summary>
         /// The current state of the player.
@@ -92,61 +79,16 @@ namespace SEE.Controls.Actions
                     }
                     break;
                 case State.NewNode:
-                    if (hoveredObject != null && node == null)
+
+                    //Ads the newComponent if not already done
+                    if (!gameObject.GetComponent<DesktopNewNodeAction>())
                     {
-                        codeCityObject = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
-                        codeCityObject.GetComponent<Renderer>().material.color = new Color(0, 255, 0);
-
-                        if (Input.GetMouseButton(0) && Time.time > coolDown)
-                        {
-
-                            Assert.IsTrue(codeCityObject != null);
-                            codeCityObject.TryGetComponent<SEECity>(out city);
-                            coolDown = Time.time + coolDownTime;
-                        }
-
+                        gameObject.AddComponent<DesktopNewNodeAction>();
                     }
-                    else
-                    {
-                        if (codeCityObject != null)
-                        {
-                            codeCityObject.GetComponent<Renderer>().material.color = new Color(255, 255, 255);
-                        }
+                    else //Sets the Hovered Object
+                    { 
+                        gameObject.GetComponent<DesktopNewNodeAction>().hoveredObject = hoveredObject;
                     }
-
-                    if (city != null)
-                    {
-
-
-                        if (node == null)
-                        {
-                            bool is_innerNode = false; //FIXME: Change it later into the selection of the sub menu 
-                            node = DesktopNewNodeAction.NewNode(is_innerNode, city);
-                        }
-
-                        if (Time.time > coolDown && Input.GetMouseButton(0))
-                        {
-                            coolDown = Time.time + coolDownTime;
-                            if (!DesktopNewNodeAction.Place(node, hoveredObject, city))
-                            {
-                                Destroy(node);
-                            }
-                            else
-                            {
-                                // GameNodeScaleAction.ScaleNode(node);
-                                // node.SetScale(Vector3.one);
-                            }
-
-                            node = null;
-                            city = null;
-                        }
-                        else
-                        {
-                            GameNodeMover.MoveTo(node);
-                        }
-                    }
-
-
                     break;
                 case State.ScaleNode:
                     if (selectedObject != null && nodeAction == null )
@@ -253,8 +195,7 @@ namespace SEE.Controls.Actions
                 case State.MoveNode:
                     break;
                 case State.NewNode:
-                    node = null;
-                    city = null;
+                 
                     break;
                 default:
                     throw new System.NotImplementedException();
