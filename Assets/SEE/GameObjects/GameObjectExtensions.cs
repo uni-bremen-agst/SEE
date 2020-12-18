@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.GO
 {
@@ -144,7 +145,7 @@ namespace SEE.GO
         /// <returns>The height of the Roof from thos <paramref name="node"/></returns>
         public static float GetRoof(this GameObject node)
         {
-            return node.transform.position.y + gameObject.Size().y / 2.0f;
+            return node.transform.position.y + node.Size().y / 2.0f;
         }
     }
 }
