@@ -1,5 +1,6 @@
 ﻿using SEE.Game;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -43,6 +44,20 @@ namespace SEE.Utils
         }
 
         /// <summary>
+        /// The number style acceptable when parsing float numbers.
+        /// Implied by System.Globalization.NumberStyles.Float are AllowLeadingWhite, AllowTrailingWhite, 
+        /// AllowLeadingSign, AllowDecimalPoint, AllowExponent. We also allow AllowThousands.
+        /// </summary>
+        private const System.Globalization.NumberStyles FloatStyle = System.Globalization.NumberStyles.Float
+                    | System.Globalization.NumberStyles.AllowThousands;
+
+        private static bool TryParseFloat(string s, out float value)
+        {
+            return Single.TryParse(s: s, style: FloatStyle,
+                                   System.Globalization.CultureInfo.InvariantCulture, out value);
+        }
+
+        /// <summary>
         /// A scanner that transforms input text into tokens.
         /// </summary>
         private class Scanner
@@ -58,14 +73,6 @@ namespace SEE.Utils
                 index = 0;
                 Forward();
             }
-
-            /// <summary>
-            /// The number style acceptable when parsing float numbers.
-            /// Implied by System.Globalization.NumberStyles.Float are AllowLeadingWhite, AllowTrailingWhite, 
-            /// AllowLeadingSign, AllowDecimalPoint, AllowExponent. We also allow AllowThousands.
-            /// </summary>
-            private const System.Globalization.NumberStyles FloatStyle = System.Globalization.NumberStyles.Float
-                        | System.Globalization.NumberStyles.AllowThousands;
 
             /// <summary>
             /// The input to be scanned.
@@ -256,8 +263,7 @@ namespace SEE.Utils
                         index = endIndex;
                         currentToken = TokenType.Integer;
                     }
-                    else if (Single.TryParse(s: value, style: FloatStyle, 
-                                             System.Globalization.CultureInfo.InvariantCulture, out float _))
+                    else if (TryParseFloat(value, out float _))
                     {
                         tokenValue = value;
                         index = endIndex;
@@ -321,42 +327,40 @@ namespace SEE.Utils
                 return "";
             }
         }
-        
+
+        /// <summary>
+        /// Parses <paramref name="input"/> according to the following 
+        /// grammar in EBNF:
+        ///  Config ::= AttributeSeq EndToken .
+        ///  AttributeSeq ::= { Attribute } .
+        ///  Attribute ::= Label ':' Value ';' .
+        ///  Value ::= Bool | Integer | Float | String | Composite .
+        ///  Bool ::= True | False .
+        ///  Composite ::= '{' AttributeSeq '}' .
+        ///  
+        /// Throws an exception if input does not conform to this grammar.
+        /// </summary>
+        /// <param name="input">input to be parsed</param>
+        /// <returns>the collected attribute values as (nested) dictionary</returns>
+        public static Dictionary<string, object> Parse(string input)
+        {
+            Parser parser = new Parser(input);
+            return parser.Parse();
+        }
+
         /// <summary>
         /// Parses the input configuration.
         /// </summary>
-        public class Parser
+        private class Parser
         {
             /// <summary>
             /// Scanner used to transform the input text into tokens.
             /// </summary>
             private readonly Scanner scanner;
 
-            /// <summary>
-            /// Parses <paramref name="input"/> according to the following 
-            /// grammar in EBNF:
-            ///  Config ::= AttributeSeq EndToken .
-            ///  AttributeSeq ::= { Attribute } .
-            ///  Attribute ::= Label ':' Value ';' .
-            ///  Value ::= Bool | Integer | Float | String | Composite .
-            ///  Bool ::= True | False .
-            ///  Composite ::= '{' AttributeSeq '}' .
-            ///  
-            /// Throws an exception if input does not conform to this grammar.
-            /// </summary>
-            /// <param name="input">input to be parsed</param>
-            public static void Parse(string input)
+            public Dictionary<string, object> Parse()
             {
-                new Parser(input);
-            }
-
-            /// <summary>
-            /// Config ::= AttributeSeq EndToken .
-            /// </summary>
-            /// <param name="input"></param>
-            private Parser(string input)
-            {
-                scanner = new Scanner(input);
+                Dictionary<string, object> attributes = new Dictionary<string, object>();
                 scanner.NextToken();
                 if (scanner.CurrentToken() == TokenType.EndToken)
                 {
@@ -364,81 +368,103 @@ namespace SEE.Utils
                 }
                 else
                 {
-                    ParseAttributeSeq();
+                    ParseAttributeSeq(attributes);
                     ExpectToken(TokenType.EndToken);
                 }
+                return attributes;
+            }
+
+            /// <summary>
+            /// Config ::= AttributeSeq EndToken .
+            /// </summary>
+            /// <param name="input"></param>
+            public Parser(string input)
+            {
+                scanner = new Scanner(input);
             }
 
             /// <summary>
             /// AttributeSeq ::= { Attribute } .
             /// </summary>
-            private void ParseAttributeSeq()
+            private void ParseAttributeSeq(Dictionary<string, object> attributes)
             {
                 while (scanner.CurrentToken() == TokenType.Label)
                 {
-                    ParseAttribute();
+                    ParseAttribute(attributes);
                 }
             }
 
             /// <summary>
             /// Attribute ::= Label ':' Value ';' .
             /// </summary>
-            private void ParseAttribute()
+            private void ParseAttribute(Dictionary<string, object> attributes)
             {
-                ParseLabel();
+                string label = ParseLabel();
                 ExpectToken(TokenType.LabelSeparator);
-                ParseValue();
+                object value = ParseValue();
                 ExpectToken(TokenType.AttributeSeparator);
+                attributes[label] = value;
             }
 
             /// <summary>
-            /// Label .
+            /// Parses and returns an attribute label.
             /// </summary>
-            private void ParseLabel()
+            private string ParseLabel()
             {
+                string result = scanner.TokenValue();
                 ExpectToken(TokenType.Label);
+                return result;
             }
 
             /// <summary>
             /// Value ::= Bool | Integer | Float | String | Composite .
             //  Bool ::= True | False .
             /// </summary>
-            private void ParseValue()
+            private object ParseValue()
             {
                 switch (scanner.CurrentToken())
                 {
                     case TokenType.True:
                         scanner.NextToken();
-                        break;
+                        return true;
                     case TokenType.False:
                         scanner.NextToken();
-                        break;
+                        return false;
                     case TokenType.Float:
-                        scanner.NextToken();
-                        break;
+                        {
+                            TryParseFloat(scanner.TokenValue(), out float result);
+                            scanner.NextToken();
+                            return result;
+                        }
                     case TokenType.Integer:
-                        scanner.NextToken();
-                        break;
+                        {
+                            Int64.TryParse(scanner.TokenValue(), out long result);
+                            scanner.NextToken();
+                            return result;
+                        }
                     case TokenType.String:
-                        scanner.NextToken();
-                        break;
+                        {
+                            string result = scanner.TokenValue();
+                            scanner.NextToken();
+                            return result;
+                        }
                     case TokenType.Open:
-                        ParseComposite();
-                        break;
+                        return ParseComposite();
                     default:
-                        Debug.LogError($"true, false, integer, float or {{ expected. Current token is {scanner.CurrentToken()}.\n");
-                        break;
+                        throw new Exception($"true, false, integer, float or {{ expected. Current token is {scanner.CurrentToken()}.\n");
                 }
             }
 
             /// <summary>
             /// Composite ::= '{' AttributeSeq '}' .
             /// </summary>
-            private void ParseComposite()
+            private Dictionary<string, object> ParseComposite()
             {
+                Dictionary<string, object> result = new Dictionary<string, object>();
                 ExpectToken(TokenType.Open);
-                ParseAttributeSeq();
+                ParseAttributeSeq(result);
                 ExpectToken(TokenType.Close);
+                return result;
             }
 
             /// <summary>
@@ -493,12 +519,6 @@ namespace SEE.Utils
         {
             InternalSave(stream, label, value.ToString("F8", System.Globalization.CultureInfo.InvariantCulture), newLine);
         }
-
-        //internal static float Get(string stream, string label)
-        //{
-        //    string value = InternalRead(stream, label);
-        //    return float.Parse(value);
-        //}
 
         internal static void Save(StreamWriter stream, string label, string value, bool newLine = true)
         {
