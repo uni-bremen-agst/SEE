@@ -55,17 +55,6 @@ namespace SEE.Game
             TemporaryCache,
         }
 
-        internal void Save(StreamWriter stream)
-        {
-            ConfigIO.BeginGroup(stream);
-            ConfigIO.Save(stream, "Root", Root.ToString(), newLine: false);
-            ConfigIO.Space(stream);
-            ConfigIO.Save(stream, "RelativePath", RelativePath, newLine: false);
-            ConfigIO.Space(stream);
-            ConfigIO.Save(stream, "AbsolutePath", AbsolutePath, newLine: false);
-            ConfigIO.EndGroup(stream);
-        }
-
         public DataPath()
         {
             // intentionally left blank
