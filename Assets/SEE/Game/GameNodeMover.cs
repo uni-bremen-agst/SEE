@@ -33,6 +33,42 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Moves the given <paramref name="movingObject"/> on a sphere around the
+        /// camera. The radius sphere of this sphere is the original distance
+        /// from the <paramref name="movingObject"/> to the camera. The point
+        /// on that sphere is determined by a ray driven by the user hitting
+        /// this sphere. The speed of travel is defind by <see cref="MovingSpeed"/>.
+        /// 
+        /// This method is expected to be called at every Update().
+        /// 
+        /// You can Lock one to three axes 
+        /// </summary>
+        /// <param name="movingObject">the object to be moved</param>
+        /// <param name="x">True if it should be moved on this axes</param>
+        /// <param name="y">True if it should be moved on this axes</param>
+        /// <param name="z">True if it should be moved on this axes</param>
+        public static void MoveToLockAxes(GameObject movingObject, bool x, bool y, bool z)
+        {
+            float step = MovingSpeed * Time.deltaTime;
+            Vector3 target = TipOfRayPosition(movingObject);
+            Vector3 movingObjectPos = movingObject.transform.position;
+
+            if(!x)
+            {
+                target.x = movingObjectPos.x;
+            }
+            if (!y)
+            {
+                target.y = movingObjectPos.y;
+            }
+            if (!z)
+            {
+                target.z = movingObjectPos.z;
+            }
+            movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, target, step);
+        }
+
+        /// <summary>
         /// Finalizes the final position of the <paramref name="movingObject"/>.
         /// </summary>
         /// <param name="movingObject"></param>
