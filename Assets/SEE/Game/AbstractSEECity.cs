@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
 using OdinSerializer;
 using SEE.DataModel;
 using SEE.DataModel.DG;
@@ -23,14 +22,13 @@ namespace SEE.Game
     /// is the representation of a graph including the settings that have lead
     /// to its visualization.
     /// </summary>
-    [DataContract]
     public abstract partial class AbstractSEECity : SerializedMonoBehaviour
     {
         public void Save(string filename)
         {
-            using (System.IO.StreamWriter stream = new System.IO.StreamWriter(filename))
+            using (ConfigWriter writer = new ConfigWriter(filename))
             {
-                Save(stream);
+                Save(writer);
             }
         }
 
@@ -57,23 +55,23 @@ namespace SEE.Game
         private const string LeafLabelFontSizeLabel = "LeafLabelFontSize";
 
 
-        protected virtual void Save(StreamWriter stream)
+        protected virtual void Save(ConfigWriter writer)
         {
-            ConfigIO.Save(stream, LODCullingLabel, LODCulling);
-            ConfigIO.Save(stream, LayoutPathLabel, LayoutPath);
+            writer.Save(LODCullingLabel, LODCulling);
+            writer.Save(LayoutPathLabel, LayoutPath);
             // FIXME HierarchicalEdges
             // FIXME nodeTypes
-            ConfigIO.Save(stream, CityPathLabel, CityPath);
+            writer.Save(CityPathLabel, CityPath);
             // LeafNodeColorRange
             // InnerNodeColorRange
-            ConfigIO.Save(stream, WidthMetricLabel, WidthMetric);
-            ConfigIO.Save(stream, HeightMetricLabel, HeightMetric);
-            ConfigIO.Save(stream, DepthMetricLabel, DepthMetric);
-            ConfigIO.Save(stream, LeafStyleMetricLabel, LeafStyleMetric);
+            writer.Save(WidthMetricLabel, WidthMetric);
+            writer.Save(HeightMetricLabel, HeightMetric);
+            writer.Save(DepthMetricLabel, DepthMetric);
+            writer.Save(LeafStyleMetricLabel, LeafStyleMetric);
 
-            ConfigIO.Save(stream, ShowLabelLabel, LeafLabelSettings.Show);
-            ConfigIO.Save(stream, LeafLabelDistanceLabel, LeafLabelSettings.Distance);
-            ConfigIO.Save(stream, LeafLabelFontSizeLabel, LeafLabelSettings.FontSize);
+            writer.Save(ShowLabelLabel, LeafLabelSettings.Show);
+            writer.Save(LeafLabelDistanceLabel, LeafLabelSettings.Distance);
+            writer.Save(LeafLabelFontSizeLabel, LeafLabelSettings.FontSize);
             
         }
 
