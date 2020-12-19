@@ -24,29 +24,90 @@ namespace SEE.Game
     /// to its visualization.
     /// </summary>
     [DataContract]
-    public abstract class AbstractSEECity : SerializedMonoBehaviour
+    public abstract partial class AbstractSEECity : SerializedMonoBehaviour
     {
-
         public void Save(string filename)
         {
+            using (ConfigIOWriter configWriter = new ConfigIOWriter(filename))
+            {
+
+            }
             using (System.IO.StreamWriter stream = new System.IO.StreamWriter(filename))
             {
                 Save(stream);
             }
         }
 
+        /// <summary>
+        /// The attribute label for LODCulling in the stored configuration file.
+        /// </summary>
+        private const string LODCullingLabel = "LODCulling";
+        /// <summary>
+        /// The attribute label for LayoutPath in the stored configuration file.
+        /// </summary>
+        private const string LayoutPathLabel = "LayoutPath";
+        /// <summary>
+        /// The attribute label for CityPath in the stored configuration file.
+        /// </summary>
+        private const string CityPathLabel = "CityPath";
+
+        private const string WidthMetricLabel = "WidthMetric";
+        private const string HeightMetricLabel = "HeightMetric";
+        private const string DepthMetricLabel = "DepthMetric";
+        private const string LeafStyleMetricLabel = "LeafStyleMetric";
+
+        private const string ShowLabelLabel = "ShowLabel";
+        private const string LeafLabelDistanceLabel = "LeafLabelDistance";
+        private const string LeafLabelFontSizeLabel = "LeafLabelFontSize";
+
+
         protected virtual void Save(StreamWriter stream)
         {
-            ConfigIO.Save(stream, "LODCulling", LODCulling);
-            ConfigIO.Save(stream, "LayoutPath", LayoutPath);
+            ConfigIO.Save(stream, LODCullingLabel, LODCulling);
+            ConfigIO.Save(stream, LayoutPathLabel, LayoutPath);
+            // FIXME HierarchicalEdges
+            // FIXME nodeTypes
+            ConfigIO.Save(stream, CityPathLabel, CityPath);
+            // LeafNodeColorRange
+            // InnerNodeColorRange
+            ConfigIO.Save(stream, WidthMetricLabel, WidthMetric);
+            ConfigIO.Save(stream, HeightMetricLabel, HeightMetric);
+            ConfigIO.Save(stream, DepthMetricLabel, DepthMetric);
+            ConfigIO.Save(stream, LeafStyleMetricLabel, LeafStyleMetric);
+
+            ConfigIO.Save(stream, ShowLabelLabel, LeafLabelSettings.Show);
+            ConfigIO.Save(stream, LeafLabelDistanceLabel, LeafLabelSettings.Distance);
+            ConfigIO.Save(stream, LeafLabelFontSizeLabel, LeafLabelSettings.FontSize);
+            
+        }
+
+        public void Load(string filename)
+        {
+            using (StreamReader stream = new StreamReader(filename))
+            {
+                Restore(ConfigIO.Parse(stream.ReadToEnd()));
+            }
+        }
+
+        protected virtual void Restore(Dictionary<string, object> attributes)
+        {
+            ConfigIO.Restore<float>(attributes, LODCullingLabel, ref LODCulling);
+            ConfigIO.RestorePath(attributes, LayoutPathLabel, ref LayoutPath);
+            // FIXME HierarchicalEdges
+            // FIXME nodeTypes
+            ConfigIO.RestorePath(attributes, CityPathLabel, ref CityPath);
+
+            ConfigIO.Restore(attributes, WidthMetricLabel, ref WidthMetric);
+            ConfigIO.Restore(attributes, HeightMetricLabel, ref HeightMetric);
+            ConfigIO.Restore(attributes, DepthMetricLabel, ref DepthMetric);
+            ConfigIO.Restore(attributes, LeafStyleMetricLabel, ref LeafStyleMetric);
+
         }
 
         /// <summary>
         /// The screen relative height to use for the culling a game node [0-1].
         /// If the game node uses less than this percentage it will be culled.
         /// </summary>
-        [ConfigAttribute("LODCulling")]
-        [DataMember()]
         public float LODCulling = 0.01f;
 
         /// <summary>
@@ -57,16 +118,12 @@ namespace SEE.Game
         /// data of a game object.
         /// </summary>
         [OdinSerialize]
-        [ConfigAttribute("LayoutPath")]
-        [DataMember()]
         public DataPath LayoutPath = new DataPath();
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
         [OdinSerialize]
-        [ConfigAttribute("HierarchicalEdges")]
-        [DataMember()]
         public HashSet<string> HierarchicalEdges = Hierarchical_Edge_Types(); // serialized by Odin
 
         /// <summary>
@@ -314,18 +371,8 @@ namespace SEE.Game
         //----------------------------------
         // Attributes of a leaf node's label
         //----------------------------------
-        /// <summary>
-        /// If true, label's with the node's SourceName will be displayed above each leaf node.
-        /// </summary>
-        public bool ShowLabel = true;
-        /// <summary>
-        /// The distance between the top of the leaf node and its label.
-        /// </summary>
-        public float LeafLabelDistance = 0.2f;
-        /// <summary>
-        /// The font size of the leaf node's label.
-        /// </summary>
-        public float LeafLabelFontSize = 0.4f;
+        [OdinSerialize]
+        public LabelSettings LeafLabelSettings = new LabelSettings();
 
         /// <summary>
         /// All metrics used for visual attributes of a leaf node (WidthMetric, HeightMetric,
@@ -507,20 +554,8 @@ namespace SEE.Game
         //-----------------------------------
         // Visual attributes of an inner node
         //-----------------------------------
-
-        /// <summary>
-        /// If true, label's with the node's SourceName will be displayed above each inner node.
-        /// </summary>
-        public bool InnerNodeShowLabel = true;
-        /// <summary>
-        /// The distance between the top of the inner node and its label.
-        /// </summary>
-        public float InnerNodeLabelDistance = 0.2f;
-        /// <summary>
-        /// The font size of the inner node's label.
-        /// </summary>
-        public float InnerNodeLabelFontSize = 0.4f;
-
+        [OdinSerialize]
+        public LabelSettings InnerNodeLabelSettings = new LabelSettings();
 
         /// <summary>
         /// All metrics used for visual attributes of inner nodes (InnerNodeStyleMetric
