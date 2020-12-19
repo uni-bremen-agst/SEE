@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using SEE.Game;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ namespace SEE.Utils
     /// Test cases for ConfigIO.
     /// </summary>
     class TestConfigIO
-    {
+    {        
         [Test]
         public void TestConfigParseInteger1()
         {
@@ -189,6 +190,26 @@ namespace SEE.Utils
                 { "attr", new Dictionary<string, object>() { { "a", 1 }, { "b", 2 }, { "x", new Dictionary<string, object>() { { "y", true }, { "z", false } } } } }
             };
             CollectionAssert.AreEquivalent(expected, ConfigIO.Parse("attr : { a: 1; b: 2; x: {y : true; z : false;}; };"));
+        }
+
+        private const string filename = "seecity.cfg";
+
+        [Test]
+        public void TestSEECity()
+        {
+            SEECity savedCity = NewSEECity();
+            savedCity.Save(filename);
+            SEECity loadedCity = NewVanillaSEECity();
+            loadedCity.Load(filename);
+            Assert.AreEqual(savedCity.LODCulling, loadedCity.LODCulling);
+            AreEqual(savedCity.LayoutPath, loadedCity.LayoutPath);
+        }
+
+        private void AreEqual(DataPath expected, DataPath actual)
+        {
+            Assert.AreEqual(expected.Root, actual.Root);
+            Assert.AreEqual(expected.RelativePath, expected.RelativePath);
+            Assert.AreEqual(expected.AbsolutePath, expected.AbsolutePath);
         }
 
         private static SEECity NewSEECity()
