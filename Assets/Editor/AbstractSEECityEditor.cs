@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
@@ -311,9 +312,7 @@ namespace SEEEditor
                 city.InnerNodeColorRange.upper = EditorGUILayout.ColorField("Upper color", city.InnerNodeColorRange.upper);
                 city.InnerNodeColorRange.NumberOfColors =
                     (uint) EditorGUILayout.IntSlider("# Colors", (int) city.InnerNodeColorRange.NumberOfColors, 1, 15);
-                city.InnerNodeShowLabel = EditorGUILayout.Toggle("Show labels", city.InnerNodeShowLabel);
-                city.InnerNodeLabelDistance = EditorGUILayout.FloatField("Label distance", city.InnerNodeLabelDistance);
-                city.InnerNodeLabelFontSize = EditorGUILayout.FloatField("Label font size", city.InnerNodeLabelFontSize);
+                LabelSettings(ref city.InnerNodeLabelSettings);
             }
         }
 
@@ -336,60 +335,16 @@ namespace SEEEditor
                     EditorGUILayout.ColorField("Upper color", city.LeafNodeColorRange.upper);
                 city.LeafNodeColorRange.NumberOfColors = (uint) EditorGUILayout.IntSlider("# Colors",
                     (int) city.LeafNodeColorRange.NumberOfColors, 1, 15);
-                city.ShowLabel = EditorGUILayout.Toggle("Show labels", city.ShowLabel);
-                city.LeafLabelDistance = EditorGUILayout.FloatField("Label distance", city.LeafLabelDistance);
-                city.LeafLabelFontSize = EditorGUILayout.FloatField("Label font size", city.LeafLabelFontSize);
+                LabelSettings(ref city.LeafLabelSettings);
             }
         }
 
-        /// <summary>
-        /// Does the GUI layout for the measurements table
-        /// </summary>
-        /// <param name="measurements"></param>
-        private void MeasurementsTable(SortedDictionary<string, string> measurements)
+        private void LabelSettings(ref LabelSettings labelSettings)
         {
-            int i = 0;
-            foreach (KeyValuePair<string, string> measure in measurements)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(measure.Key, GUILayout.Width(200));
-                GUILayout.Label(measure.Value);
-                GUILayout.EndHorizontal();
-
-                if (i != measurements.Count - 1)
-                {
-                    HorizontalLine(Color.grey);
-                }
-                i++;
-            }
+            labelSettings.Show = EditorGUILayout.Toggle("Show labels", labelSettings.Show);
+            labelSettings.Distance = EditorGUILayout.FloatField("Label distance", labelSettings.Distance);
+            labelSettings.FontSize = EditorGUILayout.FloatField("Label font size", labelSettings.FontSize);
         }
-
-        /// <summary>
-        /// Displays a horizontal line.
-        /// </summary>
-        /// <param name="color">the color for the line</param>
-        private static void HorizontalLine(Color color)
-        {
-            Color c = GUI.color;
-            GUI.color = color;
-            GUILayout.Box(GUIContent.none, SetupHorizontalLine());
-            GUI.color = c;
-        }
-
-        /// <summary>
-        /// Returns a horizontal line.
-        /// </summary>
-        /// <returns>a horizontal line</returns>
-        private static GUIStyle SetupHorizontalLine()
-        {
-            GUIStyle horizontalLine;
-            horizontalLine = new GUIStyle();
-            horizontalLine.normal.background = EditorGUIUtility.whiteTexture;
-            horizontalLine.margin = new RectOffset(0, 0, 4, 4);
-            horizontalLine.fixedHeight = 1;
-            return horizontalLine;
-        }
-
 
         /// <summary>
         /// Traverses through the nodes and displays the sublayout hierarchy graph
