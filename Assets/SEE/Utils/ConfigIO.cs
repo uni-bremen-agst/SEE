@@ -1,11 +1,10 @@
 ﻿using SEE.Game;
 using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace SEE.Utils
 {
-    public class ConfigIO
+    public abstract class ConfigIO
     {        
         /// <summary>
         /// The attribute label for the relative path of a DataPath in the stored configuration file.
@@ -90,85 +89,6 @@ namespace SEE.Utils
             {
                 value = enumValue;
             }
-        }
-
-        // ---------------------------------------------------------
-        // Output
-        // ---------------------------------------------------------
-
-        private static void SaveLabel(StreamWriter stream, string label)
-        {
-            stream.Write(label + NiceLabelValueSeparator());
-        }
-
-        private static string NiceLabelValueSeparator()
-        {
-            return " " + LabelSeparator + " ";
-        }
-
-        private static void InternalSave(StreamWriter stream, string label, string value, bool newLine)
-        {
-            SaveLabel(stream, label);
-            stream.Write(value + AttributeSeparator);
-            if (newLine)
-            {
-                stream.WriteLine();
-            }
-        }
-
-        internal static void Save(StreamWriter stream, string label, float value, bool newLine = true)
-        {
-            InternalSave(stream, label, value.ToString("F8", System.Globalization.CultureInfo.InvariantCulture), newLine);
-        }
-
-        internal static void Save(StreamWriter stream, string label, string value, bool newLine = true)
-        {
-            InternalSave(stream, label, "\"" + Escape(value) + "\"", newLine);
-        }
-
-        internal static void Save(StreamWriter stream, string label, bool value, bool newLine = true)
-        {
-            InternalSave(stream, label, value.ToString(), newLine);
-        }
-
-        internal static void Save(StreamWriter stream, string label, DataPath path)
-        {
-            SaveLabel(stream, label);
-            NiceLabelValueSeparator();
-
-            BeginGroup(stream);
-            Save(stream, RootLabel, path.Root.ToString(), newLine: false);
-            Space(stream);
-            Save(stream, RelativePathLabel, path.RelativePath, newLine: false);
-            Space(stream);
-            Save(stream, AbsolutePathLabel, path.AbsolutePath, newLine: false);
-            EndGroup(stream);
-            stream.WriteLine(AttributeSeparator);
-        }
-
-        /// <summary>
-        /// Returns <paramref name="value"/> where every quote " has been replaced by a double quote "".
-        /// </summary>
-        /// <param name="value">the string where " is to be escaped</param>
-        /// <returns>replacement of " by ""</returns>
-        private static string Escape(string value)
-        {
-            return value.Replace("\"", "\"\"");
-        }
-
-        private static void BeginGroup(StreamWriter stream)
-        {
-            stream.Write(Open);
-        }
-
-        private static void EndGroup(StreamWriter stream)
-        {
-            stream.Write(Close);
-        }
-
-        private static void Space(StreamWriter stream)
-        {
-            stream.Write(" ");
         }
     }
 }
