@@ -18,7 +18,7 @@ namespace SEE.Utils
             {
                 { "label", 0 }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigIO.Parse("label : 0;\n"));
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label : 0;\n"));
         }
 
         [Test]
@@ -28,7 +28,7 @@ namespace SEE.Utils
             {
                 { "l", -1 }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigIO.Parse("l : -1;"));
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("l : -1;"));
         }
 
         [Test]
@@ -38,7 +38,7 @@ namespace SEE.Utils
             {
                 { "label", 123 }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigIO.Parse("label : +123;"));
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label : +123;"));
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace SEE.Utils
             {
                 { "label", 123.0f }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigIO.Parse("label: +123.0;"));
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label: +123.0;"));
         }
 
         [Test]
@@ -58,7 +58,7 @@ namespace SEE.Utils
             {
                 { "label", -1234.0f }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigIO.Parse("label : -1,234.00;"));
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label : -1,234.00;"));
         }
 
         [Test]
@@ -68,7 +68,7 @@ namespace SEE.Utils
             {
                 { "label", 1.234567E-06f }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigIO.Parse("label : 1.234567E-06 ;"));
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label : 1.234567E-06 ;"));
         }
 
         [Test]
@@ -78,7 +78,7 @@ namespace SEE.Utils
             {
                 { "label", -1.234567e-1f }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigIO.Parse("label\t: -1.234567e-1;\r"));
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label\t: -1.234567e-1;\r"));
         }
 
         [Test]
@@ -88,7 +88,7 @@ namespace SEE.Utils
             {
                 { "label", "hello" }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigIO.Parse("label : \"hello\";"));
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label : \"hello\";"));
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace SEE.Utils
             {
                 { "label", "" }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigIO.Parse("label : \"\";"));
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label : \"\";"));
         }
 
         [Test]
@@ -108,7 +108,7 @@ namespace SEE.Utils
             {
                 { "label", "\"" }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigIO.Parse("label : \"\"\"\";"));
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label : \"\"\"\";"));
         }
 
         [Test]
@@ -118,7 +118,7 @@ namespace SEE.Utils
             {
                 { "label", "\"hello, world\"" }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigIO.Parse("label : \"\"\"hello, world\"\"\";"));
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label : \"\"\"hello, world\"\"\";"));
         }
 
         [Test]
@@ -128,7 +128,7 @@ namespace SEE.Utils
             {
                 { "label", true }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigIO.Parse("label : true;"));
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label : true;"));
         }
 
         [Test]
@@ -138,7 +138,7 @@ namespace SEE.Utils
             {
                 { "label", false }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigIO.Parse("label : false;"));
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("label : false;"));
         }
 
         [Test]
@@ -148,7 +148,7 @@ namespace SEE.Utils
             {
                 { "attr", new Dictionary<string, object>() { { "int", 1 } } }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigIO.Parse("attr : { int: 1; };"));
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("attr : { int: 1; };"));
         }
 
         [Test]
@@ -158,7 +158,7 @@ namespace SEE.Utils
             {
                 { "attr", new Dictionary<string, object>() }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigIO.Parse("attr : { };"));
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("attr : { };"));
         }
 
         [Test]
@@ -168,7 +168,7 @@ namespace SEE.Utils
             {
                 { "attr", new Dictionary<string, object>() { { "int", 1 }, { "x", "hello" } } }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigIO.Parse("attr : { int: 1; x : \"hello\"; };"));
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("attr : { int: 1; x : \"hello\"; };"));
         }
 
 
@@ -179,7 +179,7 @@ namespace SEE.Utils
             {
                 { "attr", new Dictionary<string, object>() { { "x", new Dictionary<string, object>() } } }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigIO.Parse("attr : { x: {}; };"));
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("attr : { x: {}; };"));
         }
 
         [Test]
@@ -189,7 +189,7 @@ namespace SEE.Utils
             {
                 { "attr", new Dictionary<string, object>() { { "a", 1 }, { "b", 2 }, { "x", new Dictionary<string, object>() { { "y", true }, { "z", false } } } } }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigIO.Parse("attr : { a: 1; b: 2; x: {y : true; z : false;}; };"));
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("attr : { a: 1; b: 2; x: {y : true; z : false;}; };"));
         }
 
         private const string filename = "seecity.cfg";

@@ -28,10 +28,6 @@ namespace SEE.Game
     {
         public void Save(string filename)
         {
-            using (ConfigIOWriter configWriter = new ConfigIOWriter(filename))
-            {
-
-            }
             using (System.IO.StreamWriter stream = new System.IO.StreamWriter(filename))
             {
                 Save(stream);
@@ -83,9 +79,9 @@ namespace SEE.Game
 
         public void Load(string filename)
         {
-            using (StreamReader stream = new StreamReader(filename))
+            using (ConfigReader stream = new ConfigReader(filename))
             {
-                Restore(ConfigIO.Parse(stream.ReadToEnd()));
+                Restore(stream.Read());
             }
         }
 
