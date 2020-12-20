@@ -115,6 +115,8 @@ namespace SEE.Utils
                         }
                     case TokenType.Open:
                         return ParseComposite();
+                    case TokenType.OpenList:
+                        return ParseList();
                     default:
                         Error($"true, false, integer, float or {{ expected. Current token is {scanner.CurrentToken()}.\n");
                         return null;
@@ -124,6 +126,7 @@ namespace SEE.Utils
             /// <summary>
             /// Composite ::= '{' AttributeSeq '}' .
             /// </summary>
+            /// <returns>the collected attributes (labels and values)</returns>
             private Dictionary<string, object> ParseComposite()
             {
                 Dictionary<string, object> result = new Dictionary<string, object>();
@@ -133,11 +136,49 @@ namespace SEE.Utils
                 return result;
             }
 
+
+            /// <summary>
+            /// List ::= '[' ValueSeq? '] .
+            /// </summary>
+            /// <returns>the collected values as a list</returns>
+            private List<object> ParseList()
+            {
+                List<object> result;
+                ExpectToken(TokenType.OpenList);
+                if (scanner.CurrentToken() != TokenType.CloseList)
+                {
+                    result = ParseValueSeq();
+                }
+                else
+                {
+                    result = new List<object>();
+                }
+                ExpectToken(TokenType.CloseList);
+                return result;
+            }
+
+            /// <summary>
+            /// ValueSeq ::= { Value ';' } .
+            /// </summary>
+            /// <returns>the collected values as a list</returns>
+            private List<object> ParseValueSeq()
+            {
+                List<object> result = new List<object>() { ParseValue() };
+                ExpectToken(TokenType.AttributeSeparator);
+                // the list is ended by ']'
+                while (scanner.CurrentToken() != TokenType.CloseList)
+                {                    
+                    result.Add(ParseValue());
+                    ExpectToken(TokenType.AttributeSeparator);
+                }
+                return result;
+            }
+
             /// <summary>
             /// Checks whether the current token is <paramref name="expected"/>. If not,
             /// an exception will be thrown. Moves to the next token.
             /// </summary>
-            /// <param name="expected"></param>
+            /// <param name="expected">the expected token</param>
             private void ExpectToken(TokenType expected)
             {
                 if (scanner.CurrentToken() != expected)

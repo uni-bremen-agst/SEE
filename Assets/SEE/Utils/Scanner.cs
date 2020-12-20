@@ -133,6 +133,20 @@ namespace SEE.Utils
                     Forward();
                     currentToken = TokenType.Close;
                 }
+                else if (input[index] == OpenList)
+                {
+                    tokenValue = OpenList.ToString();
+                    index++;
+                    Forward();
+                    currentToken = TokenType.OpenList;
+                }
+                else if (input[index] == CloseList)
+                {
+                    tokenValue = CloseList.ToString();
+                    index++;
+                    Forward();
+                    currentToken = TokenType.CloseList;
+                }
                 else if (input[index] == '"')  // scanning a string literal
                 {
                     // scanned initial "

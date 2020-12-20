@@ -52,20 +52,24 @@ namespace SEE.Game
 
         private const string LeafLabelSettingsLabel = "LeafLabelSettings";
         private const string InnerNodeLabelSettingsLabel = "InnerNodeLabelSettings";
+        private const string LeafNodeColorRangeLabel = "LeafNodeColorRange";
+        private const string InnerNodeColorRangeLabel = "InnerNodeColorRange";
+        private const string HierarchicalEdgesLabel = "HierarchicalEdges";
+        private const string NodeTypesLabel = "NodeTypes";
 
         protected virtual void Save(ConfigWriter writer)
         {
-            writer.Save(LODCullingLabel, LODCulling);
+            writer.Save(LODCulling, LODCullingLabel);
             LayoutPath.Save(writer, LayoutPathLabel);
-            // FIXME HierarchicalEdges
-            // FIXME nodeTypes
+            writer.Save(HierarchicalEdges.ToList<string>(), HierarchicalEdgesLabel);
+            writer.Save(nodeTypes, NodeTypesLabel);
             CityPath.Save(writer, CityPathLabel);
-            // LeafNodeColorRange
-            // InnerNodeColorRange
-            writer.Save(WidthMetricLabel, WidthMetric);
-            writer.Save(HeightMetricLabel, HeightMetric);
-            writer.Save(DepthMetricLabel, DepthMetric);
-            writer.Save(LeafStyleMetricLabel, LeafStyleMetric);
+            LeafNodeColorRange.Save(writer, LeafNodeColorRangeLabel);
+            InnerNodeColorRange.Save(writer, InnerNodeColorRangeLabel);
+            writer.Save(WidthMetric, WidthMetricLabel);
+            writer.Save(HeightMetric, HeightMetricLabel);
+            writer.Save(DepthMetric, DepthMetricLabel);
+            writer.Save(LeafStyleMetric, LeafStyleMetricLabel);
 
             LeafLabelSettings.Save(writer, LeafLabelSettingsLabel);
             InnerNodeLabelSettings.Save(writer, InnerNodeLabelSettingsLabel);
@@ -83,11 +87,11 @@ namespace SEE.Game
         {
             ConfigIO.Restore<float>(attributes, LODCullingLabel, ref LODCulling);
             LayoutPath.Restore(attributes, LayoutPathLabel);
-            // FIXME HierarchicalEdges
-            // FIXME nodeTypes
+            ConfigIO.Restore(attributes, HierarchicalEdgesLabel, ref HierarchicalEdges);
+            ConfigIO.Restore(attributes, NodeTypesLabel, ref nodeTypes);
             CityPath.Restore(attributes, CityPathLabel);
-            // LeafNodeColorRange
-            // InnerNodeColorRange
+            LeafNodeColorRange.Restore(attributes, LeafNodeColorRangeLabel);
+            InnerNodeColorRange.Restore(attributes, InnerNodeColorRangeLabel);
             ConfigIO.Restore(attributes, WidthMetricLabel, ref WidthMetric);
             ConfigIO.Restore(attributes, HeightMetricLabel, ref HeightMetric);
             ConfigIO.Restore(attributes, DepthMetricLabel, ref DepthMetric);
@@ -152,7 +156,7 @@ namespace SEE.Game
             get => nodeTypes;
             set
             {
-                SelectedNodeTypes = value;
+                nodeTypes = value;
             }
         }
 

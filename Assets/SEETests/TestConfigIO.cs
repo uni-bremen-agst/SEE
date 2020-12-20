@@ -192,6 +192,46 @@ namespace SEE.Utils
             CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("attr : { a: 1; b: 2; x: {y : true; z : false;}; };"));
         }
 
+        [Test]
+        public void TestConfigParseList1()
+        {
+            Dictionary<string, object> expected = new Dictionary<string, object>()
+            {
+                { "list", new List<object>() { } }
+            };
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("list : [];"));
+        }
+
+        [Test]
+        public void TestConfigParseList2()
+        {
+            Dictionary<string, object> expected = new Dictionary<string, object>()
+            {
+                { "list", new List<object>() { 1, 2, 3 } }
+            };
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("list : [ 1; 2; 3;];"));
+        }
+
+        [Test]
+        public void TestConfigParseList3()
+        {
+            Dictionary<string, object> expected = new Dictionary<string, object>()
+            {
+                { "list", new List<object>() { true} }
+            };
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("list : [ true; ];"));
+        }
+
+        [Test]
+        public void TestConfigParseList4()
+        {
+            Dictionary<string, object> expected = new Dictionary<string, object>()
+            {
+                { "list", new List<object>() { new List<object>(), new List<object>() { 1 }, new List<object>() { 1, 2 } } }
+            };
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("list : [ []; [1;]; [1; 2;];];"));
+        }
+
         private const string filename = "seecity.cfg";
 
         [Test]
@@ -199,17 +239,55 @@ namespace SEE.Utils
         {
             SEECity savedCity = NewSEECity();
             savedCity.Save(filename);
+
             SEECity loadedCity = NewVanillaSEECity();
             loadedCity.Load(filename);
+
             Assert.AreEqual(savedCity.LODCulling, loadedCity.LODCulling);
             AreEqual(savedCity.LayoutPath, loadedCity.LayoutPath);
+            CollectionAssert.AreEquivalent(savedCity.HierarchicalEdges, loadedCity.HierarchicalEdges);
+            CollectionAssert.AreEquivalent(savedCity.SelectedNodeTypes, loadedCity.SelectedNodeTypes);
+            AreEqual(savedCity.CityPath, loadedCity.CityPath);
+            AreEqual(savedCity.LeafNodeColorRange, loadedCity.LeafNodeColorRange);
+            AreEqual(savedCity.InnerNodeColorRange, loadedCity.InnerNodeColorRange);
+            Assert.AreEqual(savedCity.WidthMetric, loadedCity.WidthMetric);
+            Assert.AreEqual(savedCity.HeightMetric, loadedCity.HeightMetric);
+            Assert.AreEqual(savedCity.DepthMetric, loadedCity.DepthMetric);
+            Assert.AreEqual(savedCity.LeafStyleMetric, loadedCity.LeafStyleMetric);
+            AreEqual(savedCity.LeafLabelSettings, loadedCity.LeafLabelSettings);
+            AreEqual(savedCity.InnerNodeLabelSettings, loadedCity.InnerNodeLabelSettings);
+            
+            // Assert.AreEqual(savedCity., loadedCity.);
+            //Assert.AreEqual(savedCity, loadedCity);
+        }
+
+        private void AreEqual(LabelSettings expected, LabelSettings actual)
+        {
+            Assert.AreEqual(expected.Show, actual.Show);
+            Assert.AreEqual(expected.FontSize, actual.FontSize, 0.001f);
+            Assert.AreEqual(expected.Distance, actual.Distance, 0.001f);
+        }
+
+        private void AreEqual(ColorRange expected, ColorRange actual)
+        {
+            AreEqual(expected.lower, actual.lower);
+            AreEqual(expected.upper, actual.upper);
+            Assert.AreEqual(expected.NumberOfColors, actual.NumberOfColors);
+        }
+
+        private void AreEqual(Color expected, Color actual)
+        {
+            Assert.AreEqual(expected.r, actual.r, 0.001f);
+            Assert.AreEqual(expected.g, actual.g, 0.001f);
+            Assert.AreEqual(expected.b, actual.b, 0.001f);
+            Assert.AreEqual(expected.a, actual.a, 0.001f);
         }
 
         private void AreEqual(DataPath expected, DataPath actual)
         {
             Assert.AreEqual(expected.Root, actual.Root);
-            Assert.AreEqual(expected.RelativePath, expected.RelativePath);
-            Assert.AreEqual(expected.AbsolutePath, expected.AbsolutePath);
+            Assert.AreEqual(expected.RelativePath, actual.RelativePath);
+            Assert.AreEqual(expected.AbsolutePath, actual.AbsolutePath);            
         }
 
         private static SEECity NewSEECity()
@@ -217,6 +295,7 @@ namespace SEE.Utils
             SEECity city = NewVanillaSEECity();
             city.LayoutPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gvl");
             city.LODCulling = 1.0f;
+            city.SelectedNodeTypes = new Dictionary<string, bool>() { { "Routine", true }, { "Class", false } };
             return city;
         }
 

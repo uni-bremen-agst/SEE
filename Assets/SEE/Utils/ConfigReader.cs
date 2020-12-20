@@ -21,9 +21,11 @@ namespace SEE.Utils
     ///  Config ::= AttributeSeq EndToken .
     ///  AttributeSeq ::= { Attribute } .
     ///  Attribute ::= Label ':' Value ';' .
-    ///  Value ::= Bool | Integer | Float | String | Composite .
+    ///  Value ::= Bool | Integer | Float | String | Composite | List.
     ///  Bool ::= True | False .
     ///  Composite ::= '{' AttributeSeq '}' .
+    ///  List ::= '[' (ValueSeq)? '] .
+    ///  ValueSeq ::= { Value ';' } .
     /// </summary>
     public partial class ConfigReader : ConfigIO, IDisposable
     {

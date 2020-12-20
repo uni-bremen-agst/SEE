@@ -294,9 +294,9 @@ namespace SEE.Game
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(RootLabel, Root.ToString());
-            writer.Save(RelativePathLabel, RelativePath);
-            writer.Save(AbsolutePathLabel, AbsolutePath);
+            writer.Save(Root.ToString(), RootLabel);
+            writer.Save(RelativePath, RelativePathLabel);
+            writer.Save(AbsolutePath, AbsolutePathLabel);
             writer.EndGroup();            
         }
 
