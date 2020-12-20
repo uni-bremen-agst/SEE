@@ -7,19 +7,6 @@ namespace SEE.Utils
     public abstract class ConfigIO
     {        
         /// <summary>
-        /// The attribute label for the relative path of a DataPath in the stored configuration file.
-        /// </summary>
-        protected const string RelativePathLabel = "RelativePath";
-        /// <summary>
-        /// The attribute label for the absolute path of a DataPath in the stored configuration file.
-        /// </summary>
-        protected const string AbsolutePathLabel = "AbsolutePath";
-        /// <summary>
-        /// The attribute label for the root kind of a DataPath in the stored configuration file.
-        /// </summary>
-        protected const string RootLabel = "Root";
-
-        /// <summary>
         /// The separator between a label and its value.
         /// </summary>
         protected const char LabelSeparator = ':';
@@ -53,26 +40,7 @@ namespace SEE.Utils
             }
         }
 
-        public static void RestorePath(Dictionary<string, object> attributes, string label, ref DataPath dataPath)
-        {
-            if (attributes.TryGetValue(label, out object dictionary))
-            {
-                Dictionary<string, object> path = dictionary as Dictionary<string, object>;
-                {
-                    string value = "";
-                    Restore<string>(path, RelativePathLabel, ref value);
-                    dataPath.RelativePath = value;
-                }
-                {
-                    string value = "";
-                    Restore<string>(path, AbsolutePathLabel, ref value);
-                    dataPath.AbsolutePath = value;
-                }
-                RestoreEnum<DataPath.RootKind>(path, RootLabel, ref dataPath.Root);
-            }
-        }
-
-        private static void RestoreEnum<E>(Dictionary<string, object> dict, string label, ref E value) where E : struct, IConvertible
+        public static void RestoreEnum<E>(Dictionary<string, object> dict, string label, ref E value) where E : struct, IConvertible
         {
             if (!typeof(E).IsEnum)
             {
@@ -80,7 +48,7 @@ namespace SEE.Utils
             }
             // enum values are stored as string
             string stringValue = "";
-            Restore<string>(dict, RootLabel, ref stringValue);
+            Restore<string>(dict, label, ref stringValue);
             if (string.IsNullOrEmpty(stringValue))
             {
                 throw new Exception("Enum value must neither be null nor the empty string.");

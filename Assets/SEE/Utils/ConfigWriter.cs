@@ -1,9 +1,11 @@
-﻿using SEE.Game;
-using System;
+﻿using System;
 using System.IO;
 
 namespace SEE.Utils
 {
+    /// <summary>
+    /// A writer for configuration settings.
+    /// </summary>
     public class ConfigWriter : ConfigIO, IDisposable
     {
         /// <summary>
@@ -26,60 +28,73 @@ namespace SEE.Utils
         public void Dispose()
         {
             stream.Close();
+            if (groupNesting != 0)
+            {
+                 throw new InvalidOperationException("The number of calls to BeginGroup() and Endgroup() do not match.");
+            }
         }
 
-        // ---------------------------------------------------------
-        // Output
-        // ---------------------------------------------------------
-
+        /// <summary>
+        /// Emits given <paramref name="label"/> followed by <see cref="NiceLabelValueSeparator"/> 
+        /// to <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="stream">where to emit</param>
+        /// <param name="label">label to emit</param>
         private static void SaveLabel(StreamWriter stream, string label)
         {
             stream.Write(label + NiceLabelValueSeparator());
         }
 
+        /// <summary>
+        /// Returns <see cref="LabelSeparator"/> by preceeding and trailing single blank.
+        /// </summary>
+        /// <returns>" " + <see cref="LabelSeparator"/> + " "</returns>
         private static string NiceLabelValueSeparator()
         {
             return " " + LabelSeparator + " ";
         }
 
-        private static void InternalSave(StreamWriter stream, string label, string value, bool newLine)
+        /// <summary>
+        /// Writes <paramref name="label"/> and its <paramref name="value"/> to <see cref="stream"/>.
+        /// </summary>
+        /// <param name="label">label to be emitted</param>
+        /// <param name="value">value to be emitted</param>
+        private void InternalSave(string label, string value)
         {
+            Indent(stream, groupNesting * 3);
             SaveLabel(stream, label);
             stream.Write(value + AttributeSeparator);
-            if (newLine)
-            {
-                stream.WriteLine();
-            }
+            stream.WriteLine();
         }
 
-        internal void Save(string label, float value, bool newLine = true)
+        /// <summary>
+        /// Writes <paramref name="label"/> and its <paramref name="value"/> to <see cref="stream"/>.
+        /// </summary>
+        /// <param name="label">label to be emitted</param>
+        /// <param name="value">value to be emitted</param>
+        internal void Save(string label, float value)
         {
-            InternalSave(stream, label, value.ToString("F8", System.Globalization.CultureInfo.InvariantCulture), newLine);
+            InternalSave(label, value.ToString("F8", System.Globalization.CultureInfo.InvariantCulture));
         }
 
-        internal void Save(string label, string value, bool newLine = true)
+        /// <summary>
+        /// Writes <paramref name="label"/> and its <paramref name="value"/> to <see cref="stream"/>.
+        /// </summary>
+        /// <param name="label">label to be emitted</param>
+        /// <param name="value">value to be emitted</param>
+        internal void Save(string label, string value)
         {
-            InternalSave(stream, label, "\"" + Escape(value) + "\"", newLine);
+            InternalSave(label, "\"" + Escape(value) + "\"");
         }
 
-        internal void Save(string label, bool value, bool newLine = true)
+        /// <summary>
+        /// Writes <paramref name="label"/> and its <paramref name="value"/> to <see cref="stream"/>.
+        /// </summary>
+        /// <param name="label">label to be emitted</param>
+        /// <param name="value">value to be emitted</param>
+        internal void Save(string label, bool value)
         {
-            InternalSave(stream, label, value.ToString(), newLine);
-        }
-
-        internal void Save(string label, DataPath path)
-        {
-            SaveLabel(stream, label);
-            NiceLabelValueSeparator();
-
-            BeginGroup(stream);
-            Save(RootLabel, path.Root.ToString(), newLine: false);
-            Space(stream);
-            Save(RelativePathLabel, path.RelativePath, newLine: false);
-            Space(stream);
-            Save(AbsolutePathLabel, path.AbsolutePath, newLine: false);
-            EndGroup(stream);
-            stream.WriteLine(AttributeSeparator);
+            InternalSave(label, value.ToString());
         }
 
         /// <summary>
@@ -92,19 +107,59 @@ namespace SEE.Utils
             return value.Replace("\"", "\"\"");
         }
 
-        private static void BeginGroup(StreamWriter stream)
+        /// <summary>
+        /// The nesting of composite data. Whenever <see cref="BeginGroup(string)"/> is called,
+        /// the nesting is increased by one. Whenever <see cref="EndGroup"/> is called, it is
+        /// decreased by one. Its value will be used in <see cref="Indent"/> to determine the
+        /// indentation of an emitted line.
+        /// </summary>
+        private int groupNesting = 0;
+
+        /// <summary>
+        /// Signals the begin of a composite data structure, which will be emitted as nested
+        /// composite value. Every other call to any of the <see cref="Save"/> methods after that
+        /// is assumed to deliver a value belonging to this group -- until <see cref="EndGroup"/>
+        /// is called eventually.
+        /// </summary>
+        /// <param name="label">the label of the composite value</param>
+        public void BeginGroup(string label)
         {
+            SaveLabel(stream, label);
             stream.Write(Open);
+            stream.WriteLine();
+            groupNesting++;
         }
 
-        private static void EndGroup(StreamWriter stream)
+        /// <summary>
+        /// Signals the end of a composite data structure.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">thrown if the number of calls <see cref="BeginGroup(string)"/>
+        /// is lower than the number of calls to <see cref="EndGroup"/></exception>
+        public void EndGroup()
         {
-            stream.Write(Close);
+            if (groupNesting <= 0)
+            {
+                throw new InvalidOperationException("Call to Endgroup() where nesting level is zero.");
+            }
+            else
+            {
+                stream.Write(Close);
+                stream.WriteLine(AttributeSeparator);
+                groupNesting--;
+            }
         }
 
-        private static void Space(StreamWriter stream)
+        /// <summary>
+        /// Emits <paramref name="howMany"/> blanks to <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="stream">where to emit the blanks</param>
+        /// <param name="howMany">how many blanks to emit</param>
+        private static void Indent(StreamWriter stream, int howMany)
         {
-            stream.Write(" ");
+            for (int i = 1; i <= howMany; i++)
+            {
+                stream.Write(" ");
+            }
         }
     }
 }

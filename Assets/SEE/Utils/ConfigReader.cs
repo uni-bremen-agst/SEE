@@ -4,6 +4,17 @@ using System.Collections.Generic;
 namespace SEE.Utils
 {
     /// <summary>
+    /// Thrown in case of syntax errors.
+    /// </summary>
+    public class SyntaxError : Exception
+    {
+        public SyntaxError(string message) : base(message)
+        {
+            // intentionally left blank
+        }
+    }
+
+    /// <summary>
     /// Parser for configuration settings according to the following 
     /// grammar in EBNF:
     /// 

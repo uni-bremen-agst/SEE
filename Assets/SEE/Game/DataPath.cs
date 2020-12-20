@@ -1,6 +1,6 @@
 ﻿using SEE.Utils;
 using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -269,6 +269,62 @@ namespace SEE.Game
                         return Filenames.OnCurrentPlatform(RootPath + relativePath);
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// The attribute label for the relative path of a DataPath in the stored configuration file.
+        /// </summary>
+        private const string RelativePathLabel = "RelativePath";
+        /// <summary>
+        /// The attribute label for the absolute path of a DataPath in the stored configuration file.
+        /// </summary>
+        private const string AbsolutePathLabel = "AbsolutePath";
+        /// <summary>
+        /// The attribute label for the root kind of a DataPath in the stored configuration file.
+        /// </summary>
+        private const string RootLabel = "Root";
+
+        /// <summary>
+        /// Saves the attributes of this <see cref="DataPath"/> using given <paramref name="writer"/>
+        /// under the given <paramref name="label"/>.
+        /// </summary>
+        /// <param name="writer">used to save the attributes</param>
+        /// <param name="label">the label for saved attributes</param>
+        public void Save(ConfigWriter writer, string label)
+        {
+            writer.BeginGroup(label);
+            writer.Save(RootLabel, Root.ToString());
+            writer.Save(RelativePathLabel, RelativePath);
+            writer.Save(AbsolutePathLabel, AbsolutePath);
+            writer.EndGroup();            
+        }
+
+        /// <summary>
+        /// Restores the state of ths <see cref="DataPath"/> according to <paramref name="attributes"/>.
+        /// 
+        /// Looks up the attributes of the data path in <paramref name="attributes"/> using
+        /// the key <paramref name="label"/> and sets the internal attributes of this
+        /// instance of <see cref="DataPath"/> according the looked up values.
+        /// </summary>
+        /// <param name="attributes">where to look up the values</param>
+        /// <param name="label">the key for the lookup</param>
+        public void Restore(Dictionary<string, object> attributes, string label)
+        {
+            if (attributes.TryGetValue(label, out object dictionary))
+            {
+                Dictionary<string, object> path = dictionary as Dictionary<string, object>;
+                {
+                    string value = "";
+                    ConfigIO.Restore<string>(path, RelativePathLabel, ref value);
+                    RelativePath = value;
+                }
+                {
+                    string value = "";
+                    ConfigIO.Restore<string>(path, AbsolutePathLabel, ref value);
+                    AbsolutePath = value;
+                }
+                ConfigIO.RestoreEnum<DataPath.RootKind>(path, RootLabel, ref Root);
             }
         }
     }
