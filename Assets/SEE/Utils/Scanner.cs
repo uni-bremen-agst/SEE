@@ -180,11 +180,11 @@ namespace SEE.Utils
                         index++;
                     }
                     Forward();
-                    if (tokenValue == "true")
+                    if (tokenValue.ToLower() == "true")
                     {
                         currentToken = TokenType.True;
                     }
-                    else if (tokenValue == "false")
+                    else if (tokenValue.ToLower() == "false")
                     {
                         currentToken = TokenType.False;
                     }

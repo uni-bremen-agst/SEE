@@ -58,10 +58,10 @@ namespace SEE.Game
         protected virtual void Save(ConfigWriter writer)
         {
             writer.Save(LODCullingLabel, LODCulling);
-            writer.Save(LayoutPathLabel, LayoutPath);
+            LayoutPath.Save(writer, LayoutPathLabel);
             // FIXME HierarchicalEdges
             // FIXME nodeTypes
-            writer.Save(CityPathLabel, CityPath);
+            CityPath.Save(writer, CityPathLabel);
             // LeafNodeColorRange
             // InnerNodeColorRange
             writer.Save(WidthMetricLabel, WidthMetric);
@@ -86,10 +86,10 @@ namespace SEE.Game
         protected virtual void Restore(Dictionary<string, object> attributes)
         {
             ConfigIO.Restore<float>(attributes, LODCullingLabel, ref LODCulling);
-            ConfigIO.RestorePath(attributes, LayoutPathLabel, ref LayoutPath);
+            LayoutPath.Restore(attributes, LayoutPathLabel);
             // FIXME HierarchicalEdges
             // FIXME nodeTypes
-            ConfigIO.RestorePath(attributes, CityPathLabel, ref CityPath);
+            CityPath.Restore(attributes, CityPathLabel);
 
             ConfigIO.Restore(attributes, WidthMetricLabel, ref WidthMetric);
             ConfigIO.Restore(attributes, HeightMetricLabel, ref HeightMetric);
@@ -160,15 +160,8 @@ namespace SEE.Game
         /// <summary>
         /// The path where the settings (the attributes of this class) are stored.
         /// </summary>
-        public DataPath CityPath;
-
-        private void Awake()
-        {
-            if (CityPath == null)
-            {
-                CityPath = new DataPath(Application.dataPath + "/config" + Filenames.JSONExtension);
-            }
-        }
+        [OdinSerialize]
+        public DataPath CityPath = new DataPath();
 
         /// <summary>
         /// Resets everything that is specific to a given graph. Here: 

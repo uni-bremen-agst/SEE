@@ -15,6 +15,14 @@ namespace SEE.Utils
             /// </summary>
             private readonly Scanner scanner;
 
+            /// <summary>
+            /// Parses the input (passed to the constructor) and returns all collected attributes
+            /// to the resulting dictionary. The key of a dictionary entry is the label retrieved
+            /// from the input and the value of the dictionary entry is the value of that label.
+            /// In case of a composite attribute, the value is a nested dictionary.
+            /// </summary>
+            /// <returns>a (nested) dictionary with all attributes collected from the input</returns>
+            /// <exception cref="SyntaxError">will be thrown in case of a syntax error</exception>
             public Dictionary<string, object> Parse()
             {
                 Dictionary<string, object> attributes = new Dictionary<string, object>();
@@ -108,7 +116,8 @@ namespace SEE.Utils
                     case TokenType.Open:
                         return ParseComposite();
                     default:
-                        throw new Exception($"true, false, integer, float or {{ expected. Current token is {scanner.CurrentToken()}.\n");
+                        Error($"true, false, integer, float or {{ expected. Current token is {scanner.CurrentToken()}.\n");
+                        return null;
                 }
             }
 
@@ -133,18 +142,19 @@ namespace SEE.Utils
             {
                 if (scanner.CurrentToken() != expected)
                 {
-                    Error($"Line {scanner.CurrentLineNumber()}: '{scanner.CurrentLine()}'. Expected token: {expected}. Current token: {scanner.CurrentToken()}");
+                    Error($"Expected token: {expected}. Current token: {scanner.CurrentToken()}");
                 }
                 scanner.NextToken();
             }
 
             /// <summary>
-            /// Throws exception with given <paramref name="message"/>.
+            /// Throws <see cref="SyntaxError"/> with given <paramref name="message"/>.
             /// </summary>
-            /// <param name="message"></param>
+            /// <param name="message">message to be added to thrown exception</param>
+            /// <exception cref="SyntaxError">will be thrown</exception>
             private void Error(string message)
             {
-                throw new Exception(message);
+                throw new SyntaxError($"Line {scanner.CurrentLineNumber()}: '{scanner.CurrentLine()}'. " + message);
             }
         }
     }
