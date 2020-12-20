@@ -15,6 +15,8 @@
             String,             // '"' <any character> '"' where a double quote " within the string must be escaped by a preceeding double quote "
             Open,               // Open = '{'
             Close,              // Close = '}'
+            OpenList,           // '['
+            CloseList,          // ']'
             AttributeSeparator, // AttributeSeparator = ';'
             LabelSeparator,     // LabelSeparator = ':'
             EndToken,           // end of input
