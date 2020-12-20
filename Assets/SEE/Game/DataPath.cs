@@ -316,14 +316,18 @@ namespace SEE.Game
                 Dictionary<string, object> path = dictionary as Dictionary<string, object>;
                 {
                     string value = "";
-                    ConfigIO.Restore<string>(path, RelativePathLabel, ref value);
-                    RelativePath = value;
+                    if (ConfigIO.Restore<string>(path, RelativePathLabel, ref value))
+                    {
+                        RelativePath = value;
+                    }
                 }
                 {
                     string value = "";
-                    ConfigIO.Restore<string>(path, AbsolutePathLabel, ref value);
-                    AbsolutePath = value;
-                }
+                    if (ConfigIO.Restore<string>(path, AbsolutePathLabel, ref value))
+                    {
+                        AbsolutePath = value;
+                    }
+                }                
                 ConfigIO.RestoreEnum<DataPath.RootKind>(path, RootLabel, ref Root);
             }
         }
