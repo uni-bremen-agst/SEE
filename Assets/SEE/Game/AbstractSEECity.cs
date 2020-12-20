@@ -50,10 +50,8 @@ namespace SEE.Game
         private const string DepthMetricLabel = "DepthMetric";
         private const string LeafStyleMetricLabel = "LeafStyleMetric";
 
-        private const string ShowLabelLabel = "ShowLabel";
-        private const string LeafLabelDistanceLabel = "LeafLabelDistance";
-        private const string LeafLabelFontSizeLabel = "LeafLabelFontSize";
-
+        private const string LeafLabelSettingsLabel = "LeafLabelSettings";
+        private const string InnerNodeLabelSettingsLabel = "InnerNodeLabelSettings";
 
         protected virtual void Save(ConfigWriter writer)
         {
@@ -69,10 +67,8 @@ namespace SEE.Game
             writer.Save(DepthMetricLabel, DepthMetric);
             writer.Save(LeafStyleMetricLabel, LeafStyleMetric);
 
-            writer.Save(ShowLabelLabel, LeafLabelSettings.Show);
-            writer.Save(LeafLabelDistanceLabel, LeafLabelSettings.Distance);
-            writer.Save(LeafLabelFontSizeLabel, LeafLabelSettings.FontSize);
-            
+            LeafLabelSettings.Save(writer, LeafLabelSettingsLabel);
+            InnerNodeLabelSettings.Save(writer, InnerNodeLabelSettingsLabel);
         }
 
         public void Load(string filename)
@@ -90,12 +86,15 @@ namespace SEE.Game
             // FIXME HierarchicalEdges
             // FIXME nodeTypes
             CityPath.Restore(attributes, CityPathLabel);
-
+            // LeafNodeColorRange
+            // InnerNodeColorRange
             ConfigIO.Restore(attributes, WidthMetricLabel, ref WidthMetric);
             ConfigIO.Restore(attributes, HeightMetricLabel, ref HeightMetric);
             ConfigIO.Restore(attributes, DepthMetricLabel, ref DepthMetric);
             ConfigIO.Restore(attributes, LeafStyleMetricLabel, ref LeafStyleMetric);
 
+            LeafLabelSettings.Restore(attributes, LeafLabelSettingsLabel);
+            InnerNodeLabelSettings.Restore(attributes, InnerNodeLabelSettingsLabel);
         }
 
         /// <summary>
