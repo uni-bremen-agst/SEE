@@ -148,7 +148,7 @@ namespace SEE.Controls
 
             if (IsHovered)
             {
-                HoverIn?.Invoke(isOwner);
+                HoverIn?.Invoke(this, isOwner);
                 HoveredObjects.Add(this);
                 if (isOwner)
                 {
@@ -157,7 +157,7 @@ namespace SEE.Controls
             }
             else
             {
-                HoverOut?.Invoke(isOwner);
+                HoverOut?.Invoke(this, isOwner);
                 HoveredObjects.Remove(this);
                 if (isOwner)
                 {
@@ -225,7 +225,7 @@ namespace SEE.Controls
 
             if (select)
             {
-                SelectIn?.Invoke(isOwner);
+                SelectIn?.Invoke(this, isOwner);
                 SelectedObjects.Add(this);
                 if (isOwner)
                 {
@@ -234,7 +234,7 @@ namespace SEE.Controls
             }
             else
             {
-                SelectOut?.Invoke(isOwner);
+                SelectOut?.Invoke(this, isOwner);
                 SelectedObjects.Remove(this);
                 if (isOwner)
                 {
@@ -272,7 +272,7 @@ namespace SEE.Controls
 
             if (grab)
             {
-                GrabIn?.Invoke(isOwner);
+                GrabIn?.Invoke(this, isOwner);
                 GrabbedObjects.Add(this);
                 if (isOwner)
                 {
@@ -281,7 +281,7 @@ namespace SEE.Controls
             }
             else
             {
-                GrabOut?.Invoke(isOwner);
+                GrabOut?.Invoke(this, isOwner);
                 if (isOwner)
                 {
                     localPlayerActions?.GrabOff(gameObject);
@@ -338,7 +338,7 @@ namespace SEE.Controls
         /// A delegate to be called when a hovering event has happened (hover over
         /// or hover off the game object).
         /// </summary>
-        public delegate void HoverAction(bool isOwner);
+        public delegate void HoverAction(InteractableObject interactableObject, bool isOwner);
         /// <summary>
         /// Event to be triggered when this game object is being hovered over.
         /// </summary>
@@ -355,7 +355,7 @@ namespace SEE.Controls
         /// A delegate to be called when a selection event has happened (selecting
         /// or deselecting the game object).
         /// </summary>
-        public delegate void SelectAction(bool isOwner);
+        public delegate void SelectAction(InteractableObject interactableObject, bool isOwner);
         /// <summary>
         /// Event to be triggered when this game object is being selected.
         /// </summary>
@@ -372,7 +372,7 @@ namespace SEE.Controls
         /// A delegate to be called when a grab event has happened (grabbing
         /// or releasing the game object).
         /// </summary>
-        public delegate void GrabAction(bool isOwner);
+        public delegate void GrabAction(InteractableObject interactableObject, bool isOwner);
         /// <summary>
         /// Event to be triggered when this game object is being grabbed.
         /// </summary>

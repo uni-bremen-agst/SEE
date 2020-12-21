@@ -83,22 +83,47 @@ namespace SEE.Game.Charts
                 interactableObject.SelectOut += OnSelectOut;
 
                 infoTexts.Add(infoText);
+
+                if (interactableObject.IsHovered)
+                {
+                    // TODO(torben): the owner should be cached inside InteractableObject, create functions like e.g. IsHoveredByThisClient()...
+                    OnHoverIn(interactableObject, true);
+                }
+                if (interactableObject.IsSelected)
+                {
+                    // TODO(torben): the owner should be cached inside InteractableObject, create functions like e.g. IsHoveredByThisClient()...
+                    OnSelectIn(interactableObject, true);
+                }
             }
         }
 
         public void UpdateInfoText()
         {
-            string text = string.Empty;
-            for (int i = 0; i < linkedInteractableObjects.Count; i++)
+            bool showInfoText = false;
+            foreach (InteractableObject interactableObject in linkedInteractableObjects)
             {
-                bool showInChart = (bool)linkedInteractableObjects[i].GetComponent<NodeRef>().highlights.showInChart[chartContent];
-                bool isHighlighted = linkedInteractableObjects[i].IsHovered || linkedInteractableObjects[i].IsSelected;
-                if (showInChart && isHighlighted)
+                if (interactableObject.IsHovered || interactableObject.IsSelected)
                 {
-                    text += infoTexts[i] + '\n';
+                    showInfoText = true;
+                    break;
                 }
             }
-            infoText.text = text;
+
+            infoText.gameObject.SetActive(showInfoText);
+            if (showInfoText)
+            {
+                string text = string.Empty;
+                for (int i = 0; i < linkedInteractableObjects.Count; i++)
+                {
+                    bool showInChart = (bool)linkedInteractableObjects[i].GetComponent<NodeRef>().highlights.showInChart[chartContent];
+                    bool isHighlighted = linkedInteractableObjects[i].IsHovered || linkedInteractableObjects[i].IsSelected;
+                    if (showInChart && isHighlighted)
+                    {
+                        text += infoTexts[i] + '\n';
+                    }
+                }
+                infoText.text = text;
+            }
         }
 
         public void UpdateVisibility()
@@ -157,42 +182,35 @@ namespace SEE.Game.Charts
 
         #region InteractableObject Callbacks
 
-        public void OnHoverIn(bool isOwner)
+        public void OnHoverIn(InteractableObject interactableObject, bool isOwner)
         {
             UpdateInfoText();
-            infoText.gameObject.SetActive(true);
         }
 
-        public void OnHoverOut(bool isOwner)
-        {
-            if (!linkedInteractableObjects[0].IsSelected)
-            {
-                infoText.gameObject.SetActive(false);
-            }
-            else
-            {
-                UpdateInfoText();
-            }
-        }
-
-        public void OnSelectIn(bool isOwner)
+        public void OnHoverOut(InteractableObject interactableObject, bool isOwner)
         {
             UpdateInfoText();
-            infoText.gameObject.SetActive(true);
+        }
+
+        public void OnSelectIn(InteractableObject interactableObject, bool isOwner)
+        {
+            UpdateInfoText();
             markerHighlight.SetActive(true);
         }
 
-        public void OnSelectOut(bool isOwner)
+        public void OnSelectOut(InteractableObject interactableObject, bool isOwner)
         {
-            if (!linkedInteractableObjects[0].IsHovered)
+            UpdateInfoText();
+            bool showMarker = false;
+            foreach (InteractableObject io in linkedInteractableObjects)
             {
-                infoText.gameObject.SetActive(false);
+                if (io.IsSelected)
+                {
+                    showMarker = true;
+                    break;
+                }
             }
-            else
-            {
-                UpdateInfoText();
-            }
-            markerHighlight.SetActive(false);
+            markerHighlight.SetActive(showMarker);
         }
 
         #endregion
