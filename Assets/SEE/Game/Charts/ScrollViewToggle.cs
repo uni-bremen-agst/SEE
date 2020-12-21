@@ -279,10 +279,10 @@ namespace SEE.Game.Charts
 
         #region InteractableObject Callbacks
 
-        private void OnHoverIn(bool isOwner) => UpdateColor();
-        private void OnHoverOut(bool isOwner) => UpdateColor();
-        private void OnSelectIn(bool isOwner) => UpdateColor();
-        private void OnSelectOut(bool isOwner) => UpdateColor();
+        private void OnHoverIn(InteractableObject interactableObject, bool isOwner) => UpdateColor();
+        private void OnHoverOut(InteractableObject interactableObject, bool isOwner) => UpdateColor();
+        private void OnSelectIn(InteractableObject interactableObject, bool isOwner) => UpdateColor();
+        private void OnSelectOut(InteractableObject interactableObject, bool isOwner) => UpdateColor();
 
         #endregion
     }
