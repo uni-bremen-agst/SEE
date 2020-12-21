@@ -111,6 +111,18 @@ namespace SEE.Game.Charts
             this.label.text = label;
             chartContent = script;
             toggle.isOn = !Parent || (bool)linkedObject.showInChart[chartContent];
+
+            if (linkedInteractable)
+            {
+                if (linkedInteractable.IsHovered)
+                {
+                    OnHoverIn(linkedInteractable, true); // TODO(torben): cache address of owner in InteractableObject
+                }
+                if (linkedInteractable.IsSelected)
+                {
+                    OnSelectIn(linkedInteractable, true); // TODO(torben): cache address of owner in InteractableObject
+                }
+            }
         }
 
         /// <summary>
