@@ -135,6 +135,12 @@ namespace SEE.Game.Charts
         [SerializeField] private TextMeshProUGUI maxYText;
 
         /// <summary>
+        /// The pool of scroll view toggles, such that they can be reused, if
+        /// <see cref="FillScrollView(bool)"/> is called.
+        /// </summary>
+        private Stack<ScrollViewToggle> scrollViewTogglePool = new Stack<ScrollViewToggle>();
+
+        /// <summary>
         /// A parent of this object. Used in VR to destroy the whole construct of a moveable chart.
         /// </summary>
         public GameObject parent;
@@ -191,6 +197,14 @@ namespace SEE.Game.Charts
             DrawData();
         }
 
+        /// <summary>
+        /// Either creates or retrieves a pooled <see cref="ScrollViewToggle"/>. Pooled
+        /// toggles are cleared, before they're returned.
+        /// </summary>
+        /// <param name="popPool">The pool, of which the toggles can be retrieved.
+        /// </param>
+        /// <param name="svt">The new scroll view toggle.</param>
+        /// <param name="go">The game object containing the scroll view toggle.</param>
         private void GetScrollViewToggle(Stack<ScrollViewToggle> popPool, ref ScrollViewToggle svt, ref GameObject go)
         {
             if (popPool.Count > 0)
@@ -207,6 +221,19 @@ namespace SEE.Game.Charts
             }
         }
 
+        /// <summary>
+        /// Creates a new scroll view toggle entry to display given node ref.
+        /// </summary>
+        /// <param name="nodeRef">The node to be displayed.</param>
+        /// <param name="parent">The parent of the entry.</param>
+        /// <param name="index">The index of the toggle to determine the y-offset of the
+        /// entry.</param>
+        /// <param name="hierarchy">The hierarchy to determine the x-offset of the entry.
+        /// </param>
+        /// <param name="pushPool">The pool, in which the new entries are pushed.</param>
+        /// <param name="popPool">The pool, out of which pooled toggled can be retrieved.
+        /// </param>
+        /// <returns>The created scroll view toggle.</returns>
         private ScrollViewToggle NewScrollViewEntry(
             NodeRef nodeRef,
             ScrollViewToggle parent,
@@ -233,8 +260,21 @@ namespace SEE.Game.Charts
             return svt;
         }
 
+        /// <summary>
+        /// Creates a new scroll view toggle entry with given label.
+        /// </summary>
+        /// <param name="label">The label.</param>
+        /// <param name="parent">The parent of the entry.</param>
+        /// <param name="index">The index of the toggle to determine the y-offset of the
+        /// entry.</param>
+        /// <param name="hierarchy">The hierarchy to determine the x-offset of the entry.
+        /// </param>
+        /// <param name="pushPool">The pool, in which the new entries are pushed.</param>
+        /// <param name="popPool">The pool, out of which pooled toggled can be retrieved.
+        /// </param>
+        /// <returns>The created scroll view toggle.</returns>
         private ScrollViewToggle NewScrollViewEntry(
-            string name,
+            string label,
             ScrollViewToggle parent,
             ref int index,
             int hierarchy,
@@ -246,11 +286,11 @@ namespace SEE.Game.Charts
             GameObject go = null;
             GetScrollViewToggle(popPool, ref svt, ref go);
 
-            go.name = "ScrollViewToggle: " + name;
+            go.name = "ScrollViewToggle: " + label;
             go.transform.localPosition = scrollEntryOffset + new Vector2(xGap * (float)hierarchy, yGap * (float)index++);
 
             svt.Parent = parent;
-            svt.Initialize(name, this);
+            svt.Initialize(label, this);
 
             parent?.AddChild(svt);
             pushPool.Push(svt);
@@ -258,6 +298,10 @@ namespace SEE.Game.Charts
             return svt;
         }
 
+        /// <summary>
+        /// Recursive version of
+        /// <see cref="NewScrollViewEntry(NodeRef, ScrollViewToggle, ref int, int, Stack{ScrollViewToggle}, Stack{ScrollViewToggle})"/>
+        /// </summary>
         private ScrollViewToggle NewScrollViewEntries(
             NodeRef nodeRef,
             ScrollViewToggle parent,
@@ -276,14 +320,12 @@ namespace SEE.Game.Charts
             return svt;
         }
 
-        private Stack<ScrollViewToggle> scrollViewTogglePool = new Stack<ScrollViewToggle>();
-
         /// <summary>
-        /// Called by Unity
-        /// 
-        /// TODO: doc
+        /// Fills the scroll with as a list or a tree. Is called on start-up and
+        /// thereupon only by Unity on button-press-events.
         /// </summary>
-        /// <param name="displayAsTree"></param>
+        /// <param name="displayAsTree">Whether the scroll view is to be filled as a
+        /// tree.</param>
         public void FillScrollView(bool displayAsTree)
         {
             Performance p = Performance.Begin(displayAsTree ? "FillScrollViewAsTree" : "FillScrollViewAsList");
@@ -291,7 +333,7 @@ namespace SEE.Game.Charts
             Stack<ScrollViewToggle> pushPool = new Stack<ScrollViewToggle>(scrollViewTogglePool.Count);
 
             int index = 0;
-            if (!displayAsTree)
+            if (!displayAsTree) // display as list
             {
                 int leafCount = 0;
                 int innerNodeCount = 0;
@@ -327,7 +369,7 @@ namespace SEE.Game.Charts
                     }
                 }
             }
-            else
+            else // display as tree
             {
                 foreach (Node root in SceneQueries.GetRoots(dataObjects))
                 {
@@ -339,6 +381,7 @@ namespace SEE.Game.Charts
                 }
             }
 
+            // resize scroll-view area
             float maxWidth = 0.0f;
             foreach (ScrollViewToggle svt in pushPool)
             {
@@ -348,10 +391,10 @@ namespace SEE.Game.Charts
                     maxWidth = w;
                 }
             }
-
             RectTransform rect = scrollContent.GetComponent<RectTransform>();
             rect.sizeDelta = new Vector2(maxWidth, index * Mathf.Abs(yGap) + 40);
 
+            // update pooling system
             while (scrollViewTogglePool.Count > 0)
             {
                 ScrollViewToggle svt = scrollViewTogglePool.Pop();
@@ -364,10 +407,11 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Gets all metric names for <see cref="float" /> values contained in the <see cref="NodeRef" /> of each
-        /// <see cref="GameObject" /> in <see cref="dataObjects" />. A metric name is the name of a
-        /// numeric (either float or int) node attribute that starts with the prefix ChartManager.MetricPrefix.
-        /// </summary>
+        /// Gets all metric names for <see cref="float"/> values contained in the
+        /// <see cref="NodeRef"/> of each <see cref="GameObject"/> in
+        /// <see cref="dataObjects"/>. A metric name is the name of a numeric (either
+        /// float or int) node attribute that starts with the prefix
+        /// ChartManager.MetricPrefix.</summary>
         private void GetAllNumericAttributes()
         {
             AllMetricNames.Clear();
@@ -403,7 +447,7 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Fills a List with all <see cref="Node" />s that will be in the chart.
+        /// Fills a List with all <see cref="Node"/>s that will be in the chart.
         /// </summary>
         private void FindDataObjects()
         {
@@ -422,8 +466,8 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Fills the chart with data depending on the values of <see cref="axisDropdownX"/> and
-        /// <see cref="axisDropdownY"/>.
+        /// Fills the chart with data depending on the values of
+        /// <see cref="axisDropdownX"/> and <see cref="axisDropdownY"/>.
         /// </summary>
         public void DrawData()
         {
@@ -558,7 +602,13 @@ namespace SEE.Game.Charts
             ActiveMarkers = updatedMarkers;
         }
 
-        public void AreaHover(Vector2 min, Vector2 max)
+        /// <summary>
+        /// Hoveres every interactable object of every marker, that is inside given
+        /// bounds.
+        /// </summary>
+        /// <param name="min">The min value of the bounds.</param>
+        /// <param name="max">The max value of the bounds.</param>
+        public virtual void AreaHover(Vector2 min, Vector2 max)
         {
             bool toggleHover = Input.GetKey(KeyCode.LeftControl);
             foreach (GameObject marker in ActiveMarkers)
@@ -582,6 +632,12 @@ namespace SEE.Game.Charts
             }
         }
 
+        /// <summary>
+        /// Selects every interactable object of every marker, that is inside given
+        /// bounds.
+        /// </summary>
+        /// <param name="min">The min value of the bounds.</param>
+        /// <param name="max">The max value of the bounds.</param>
         public virtual void AreaSelection(Vector2 min, Vector2 max)
         {
             bool toggleSelect = Input.GetKey(KeyCode.LeftControl);
@@ -619,30 +675,9 @@ namespace SEE.Game.Charts
             }
             else
             {
-                moveHandler.SetInfoText("X-Axis: " + axisDropdownX.CurrentlySelectedMetric + "\n" + "Y-Axis: " +
-                                        axisDropdownY.CurrentlySelectedMetric);
-            }
-        }
-
-        public void UnhoverAll()
-        {
-            foreach (GameObject activeMarker in ActiveMarkers)
-            {
-                if (activeMarker.TryGetComponent(out InteractableObject interactableObject))
-                {
-                    interactableObject.SetHoverFlags(0, true);
-                }
-            }
-        }
-
-        public void UnselectAll()
-        {
-            foreach (GameObject activeMarker in ActiveMarkers)
-            {
-                if (activeMarker.TryGetComponent(out InteractableObject interactableObject))
-                {
-                    interactableObject.SetSelect(false, true);
-                }
+                moveHandler.SetInfoText(
+                    "X-Axis: " + axisDropdownX.CurrentlySelectedMetric + "\n" + "Y-Axis: " + axisDropdownY.CurrentlySelectedMetric
+                );
             }
         }
 
@@ -656,7 +691,8 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Removes this chart from all <see cref="NodeHighlights.showInChart" /> dictionaries.
+        /// Removes this chart from all <see cref="NodeHighlights.showInChart"/>
+        /// dictionaries.
         /// </summary>
         public void OnDestroy()
         {
