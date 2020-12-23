@@ -143,6 +143,17 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
+        /// Returns the width of the label of the scroll view toggle.
+        /// </summary>
+        /// <returns>The width of the label.</returns>
+        public float GetLabelWidth()
+        {
+            // TODO(torben): this is too large!
+            float result = label.preferredWidth;
+            return result;
+        }
+
+        /// <summary>
         /// Mainly called by Unity. Activates or deactivates a marker in the linked chart, depending on the
         /// status of <see cref="UnityEngine.UI.Toggle.isOn" />.
         /// </summary>
@@ -238,7 +249,6 @@ namespace SEE.Game.Charts
                 }
             }
         }
-          
 
         /// <summary>
         /// Used to check if a marker for the <see cref="linkedObject" /> will be added to the linked chart.
@@ -249,6 +259,14 @@ namespace SEE.Game.Charts
             return (bool)linkedObject.showInChart[chartContent];
         }
 
+        public void SetChildrenCapacity(int capacity)
+        {
+            if (capacity > children.Capacity)
+            {
+                children.Capacity = capacity;
+            }
+        }
+
         /// <summary>
         /// Adds a <see cref="ScrollViewToggle" /> as a child of this <see cref="ScrollViewToggle" />.
         /// </summary>
@@ -256,6 +274,11 @@ namespace SEE.Game.Charts
         public void AddChild(ScrollViewToggle child)
         {
             children.Add(child);
+        }
+
+        public void ClearChildren()
+        {
+            children.Clear();
         }
 
         public void UpdateColor()
