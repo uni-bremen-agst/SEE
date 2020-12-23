@@ -169,6 +169,10 @@ namespace SEE.Game.Charts
         /// </summary>
         private void Awake()
         {
+            foreach (Transform child in scrollContent.transform)
+            {
+                Destroy(child.gameObject);
+            }
             FindDataObjects();
             FillScrollView(false);
             GetAllNumericAttributes();
@@ -187,75 +191,139 @@ namespace SEE.Game.Charts
             DrawData();
         }
 
-        private ScrollViewToggle NewScrollViewEntry(NodeRef nodeRef, ScrollViewToggle parent, ref int index, int hierarchy)
+        private void GetScrollViewToggle(Stack<ScrollViewToggle> popPool, ref ScrollViewToggle svt, ref GameObject go)
         {
-            GameObject go = Instantiate(scrollEntryPrefab, scrollContent.transform);
+            if (popPool.Count > 0)
+            {
+                svt = popPool.Pop();
+                svt.ClearChildren();
+                go = svt.gameObject;
+                go.SetActive(true);
+            }
+            else
+            {
+                go = Instantiate(scrollEntryPrefab, scrollContent.transform);
+                svt = go.GetComponent<ScrollViewToggle>();
+            }
+        }
+
+        private ScrollViewToggle NewScrollViewEntry(
+            NodeRef nodeRef,
+            ScrollViewToggle parent,
+            ref int index,
+            int hierarchy,
+            Stack<ScrollViewToggle> pushPool,
+            Stack<ScrollViewToggle> popPool
+        )
+        {
+            ScrollViewToggle svt = null;
+            GameObject go = null;
+            GetScrollViewToggle(popPool, ref svt, ref go);
+
             go.name = "ScrollViewToggle: " + nodeRef.node.SourceName;
             go.transform.localPosition = scrollEntryOffset + new Vector2(xGap * (float)hierarchy, yGap * (float)index++);
 
-            ScrollViewToggle svt = go.GetComponent<ScrollViewToggle>();
             svt.Parent = parent;
             svt.LinkedObject = nodeRef.highlights;
             svt.Initialize(nodeRef.name, this);
 
             parent?.AddChild(svt);
+            pushPool.Push(svt);
 
             return svt;
         }
 
-        private ScrollViewToggle NewScrollViewEntry(string name, ScrollViewToggle parent, ref int index, int hierarchy)
+        private ScrollViewToggle NewScrollViewEntry(
+            string name,
+            ScrollViewToggle parent,
+            ref int index,
+            int hierarchy,
+            Stack<ScrollViewToggle> pushPool,
+            Stack<ScrollViewToggle> popPool
+        )
         {
-            GameObject go = Instantiate(scrollEntryPrefab, scrollContent.transform);
+            ScrollViewToggle svt = null;
+            GameObject go = null;
+            GetScrollViewToggle(popPool, ref svt, ref go);
+
             go.name = "ScrollViewToggle: " + name;
             go.transform.localPosition = scrollEntryOffset + new Vector2(xGap * (float)hierarchy, yGap * (float)index++);
 
-            ScrollViewToggle svt = go.GetComponent<ScrollViewToggle>();
             svt.Parent = parent;
             svt.Initialize(name, this);
 
             parent?.AddChild(svt);
+            pushPool.Push(svt);
 
             return svt;
         }
 
-        private ScrollViewToggle NewScrollViewEntries(NodeRef nodeRef, ScrollViewToggle parent, ref int index, int hierarchy)
+        private ScrollViewToggle NewScrollViewEntries(
+            NodeRef nodeRef,
+            ScrollViewToggle parent,
+            ref int index,
+            int hierarchy,
+            Stack<ScrollViewToggle> pushPool,
+            Stack<ScrollViewToggle> popPool
+        )
         {
-            ScrollViewToggle svt = NewScrollViewEntry(nodeRef, parent, ref index, hierarchy);
+            ScrollViewToggle svt = NewScrollViewEntry(nodeRef, parent, ref index, hierarchy, pushPool, scrollViewTogglePool);
             foreach (Node childNode in nodeRef.node.Children())
             {
                 NodeRef childNodeRef = dataObjects.First(entry => { return entry.node.ID.Equals(childNode.ID); });
-                NewScrollViewEntries(childNodeRef, svt, ref index, hierarchy + 1);
+                NewScrollViewEntries(childNodeRef, svt, ref index, hierarchy + 1, pushPool, scrollViewTogglePool);
             }
             return svt;
         }
 
+        private Stack<ScrollViewToggle> scrollViewTogglePool = new Stack<ScrollViewToggle>();
+
+        /// <summary>
+        /// Called by Unity
+        /// 
+        /// TODO: doc
+        /// </summary>
+        /// <param name="displayAsTree"></param>
         public void FillScrollView(bool displayAsTree)
         {
-            foreach (Transform child in scrollContent.transform)
-            {
-                Destroy(child.gameObject);
-            }
-
             Performance p = Performance.Begin(displayAsTree ? "FillScrollViewAsTree" : "FillScrollViewAsList");
+
+            Stack<ScrollViewToggle> pushPool = new Stack<ScrollViewToggle>(scrollViewTogglePool.Count);
 
             int index = 0;
             if (!displayAsTree)
             {
-                ScrollViewToggle svt = NewScrollViewEntry("Leaves", null, ref index, 0);
+                int leafCount = 0;
+                int innerNodeCount = 0;
                 foreach (NodeRef dataObject in dataObjects)
                 {
                     if (dataObject.node.IsLeaf())
                     {
-                        NewScrollViewEntry(dataObject, svt, ref index, 1);
+                        leafCount++;
+                    }
+                    else
+                    {
+                        innerNodeCount++;
                     }
                 }
 
-                svt = NewScrollViewEntry("Inner Nodes", null, ref index, 0);
+                ScrollViewToggle svt = NewScrollViewEntry("Leaves", null, ref index, 0, pushPool, scrollViewTogglePool);
+                svt.SetChildrenCapacity(leafCount);
+                foreach (NodeRef dataObject in dataObjects)
+                {
+                    if (dataObject.node.IsLeaf())
+                    {
+                        NewScrollViewEntry(dataObject, svt, ref index, 1, pushPool, scrollViewTogglePool);
+                    }
+                }
+
+                svt = NewScrollViewEntry("Inner Nodes", null, ref index, 0, pushPool, scrollViewTogglePool);
+                svt.SetChildrenCapacity(innerNodeCount);
                 foreach (NodeRef dataObject in dataObjects)
                 {
                     if (dataObject.node.IsInnerNode())
                     {
-                        NewScrollViewEntry(dataObject, svt, ref index, 1);
+                        NewScrollViewEntry(dataObject, svt, ref index, 1, pushPool, scrollViewTogglePool);
                     }
                 }
             }
@@ -267,12 +335,30 @@ namespace SEE.Game.Charts
                     {
                         return entry.node.ID.Equals(root.ID);
                     });
-                    NewScrollViewEntries(rootNodeRef, null, ref index, 0);
+                    NewScrollViewEntries(rootNodeRef, null, ref index, 0, pushPool, scrollViewTogglePool);
+                }
+            }
+
+            float maxWidth = 0.0f;
+            foreach (ScrollViewToggle svt in pushPool)
+            {
+                float w = svt.GetComponent<RectTransform>().anchoredPosition.x + svt.GetLabelWidth();
+                if (w > maxWidth)
+                {
+                    maxWidth = w;
                 }
             }
 
             RectTransform rect = scrollContent.GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(rect.sizeDelta.x, index * Mathf.Abs(yGap) + 40);
+            rect.sizeDelta = new Vector2(maxWidth, index * Mathf.Abs(yGap) + 40);
+
+            while (scrollViewTogglePool.Count > 0)
+            {
+                ScrollViewToggle svt = scrollViewTogglePool.Pop();
+                svt.gameObject.SetActive(false);
+                pushPool.Push(svt);
+            }
+            scrollViewTogglePool = pushPool;
 
             p.End(true);
         }
