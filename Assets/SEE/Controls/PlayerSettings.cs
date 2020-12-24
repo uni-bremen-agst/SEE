@@ -188,7 +188,9 @@ namespace SEE.Controls
                 {
                     // Position and scale planes and CodeCities accordingly using CityCollection grid
                     GameObject cityCollection = GameObject.Find("CityCollection").AssertNotNull("CityCollection");
-                    UnityEngine.Assertions.Assert.IsTrue(cityCollection.TryGetComponent(out GridObjectCollection grid));
+                    // Note: For unknown reasons, 'grid' mustn't be inlined so that it is possible to build the game...
+                    GridObjectCollection grid = null;
+                    UnityEngine.Assertions.Assert.IsTrue(cityCollection.TryGetComponent(out grid));
                     GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
                     foreach (GameObject city in cities)
                     {
