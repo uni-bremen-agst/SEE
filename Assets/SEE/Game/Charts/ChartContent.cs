@@ -1,4 +1,6 @@
-﻿// Copyright 2020 Robert Bohnsack
+﻿#define SEE_RECT_WIDTH
+
+// Copyright 2020 Robert Bohnsack
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -241,6 +243,9 @@ namespace SEE.Game.Charts
             int hierarchy,
             Stack<ScrollViewToggle> pushPool,
             Stack<ScrollViewToggle> popPool
+#if SEE_RECT_WIDTH
+            ,ref float maxWidth
+#endif
         )
         {
             ScrollViewToggle svt = null;
@@ -248,7 +253,8 @@ namespace SEE.Game.Charts
             GetScrollViewToggle(popPool, ref svt, ref go);
 
             go.name = "ScrollViewToggle: " + nodeRef.node.SourceName;
-            go.transform.localPosition = scrollEntryOffset + new Vector2(xGap * (float)hierarchy, yGap * (float)index++);
+            float w = xGap * (float)hierarchy;
+            go.transform.localPosition = scrollEntryOffset + new Vector2(w, yGap * (float)index++);
 
             svt.Parent = parent;
             svt.LinkedObject = nodeRef.highlights;
@@ -256,6 +262,13 @@ namespace SEE.Game.Charts
 
             parent?.AddChild(svt);
             pushPool.Push(svt);
+#if SEE_RECT_WIDTH
+            w += svt.GetLabelWidth();
+            if (w > maxWidth)
+            {
+                maxWidth = w;
+            }
+#endif
 
             return svt;
         }
@@ -280,6 +293,9 @@ namespace SEE.Game.Charts
             int hierarchy,
             Stack<ScrollViewToggle> pushPool,
             Stack<ScrollViewToggle> popPool
+#if SEE_RECT_WIDTH
+            , ref float maxWidth
+#endif
         )
         {
             ScrollViewToggle svt = null;
@@ -287,13 +303,21 @@ namespace SEE.Game.Charts
             GetScrollViewToggle(popPool, ref svt, ref go);
 
             go.name = "ScrollViewToggle: " + label;
-            go.transform.localPosition = scrollEntryOffset + new Vector2(xGap * (float)hierarchy, yGap * (float)index++);
+            float w = xGap * (float)hierarchy;
+            go.transform.localPosition = scrollEntryOffset + new Vector2(w, yGap * (float)index++);
 
             svt.Parent = parent;
             svt.Initialize(label, this);
 
             parent?.AddChild(svt);
             pushPool.Push(svt);
+#if SEE_RECT_WIDTH
+            w += svt.GetLabelWidth();
+            if (w > maxWidth)
+            {
+                maxWidth = w;
+            }
+#endif
 
             return svt;
         }
@@ -309,13 +333,26 @@ namespace SEE.Game.Charts
             int hierarchy,
             Stack<ScrollViewToggle> pushPool,
             Stack<ScrollViewToggle> popPool
+#if SEE_RECT_WIDTH
+            , ref float maxWidth
+#endif
         )
         {
-            ScrollViewToggle svt = NewScrollViewEntry(nodeRef, parent, ref index, hierarchy, pushPool, scrollViewTogglePool);
+            ScrollViewToggle svt = NewScrollViewEntry(
+                nodeRef, parent, ref index, hierarchy, pushPool, scrollViewTogglePool
+#if SEE_RECT_WIDTH
+                ,ref maxWidth
+#endif
+            );
             foreach (Node childNode in nodeRef.node.Children())
             {
                 NodeRef childNodeRef = dataObjects.First(entry => { return entry.node.ID.Equals(childNode.ID); });
-                NewScrollViewEntries(childNodeRef, svt, ref index, hierarchy + 1, pushPool, scrollViewTogglePool);
+                NewScrollViewEntries(
+                    childNodeRef, svt, ref index, hierarchy + 1, pushPool, scrollViewTogglePool
+#if SEE_RECT_WIDTH
+                , ref maxWidth
+#endif
+                );
             }
             return svt;
         }
@@ -331,6 +368,9 @@ namespace SEE.Game.Charts
             Performance p = Performance.Begin(displayAsTree ? "FillScrollViewAsTree" : "FillScrollViewAsList");
 
             Stack<ScrollViewToggle> pushPool = new Stack<ScrollViewToggle>(scrollViewTogglePool.Count);
+#if SEE_RECT_WIDTH
+            float maxWidth = 0.0f;
+#endif
 
             int index = 0;
             if (!displayAsTree) // display as list
@@ -349,23 +389,43 @@ namespace SEE.Game.Charts
                     }
                 }
 
-                ScrollViewToggle svt = NewScrollViewEntry("Leaves", null, ref index, 0, pushPool, scrollViewTogglePool);
+                ScrollViewToggle svt = NewScrollViewEntry(
+                    "Leaves", null, ref index, 0, pushPool, scrollViewTogglePool
+#if SEE_RECT_WIDTH
+                    , ref maxWidth
+#endif
+                );
                 svt.SetChildrenCapacity(leafCount);
                 foreach (NodeRef dataObject in dataObjects)
                 {
                     if (dataObject.node.IsLeaf())
                     {
-                        NewScrollViewEntry(dataObject, svt, ref index, 1, pushPool, scrollViewTogglePool);
+                        NewScrollViewEntry(
+                            dataObject, svt, ref index, 1, pushPool, scrollViewTogglePool
+#if SEE_RECT_WIDTH
+                            , ref maxWidth
+#endif
+                        );
                     }
                 }
 
-                svt = NewScrollViewEntry("Inner Nodes", null, ref index, 0, pushPool, scrollViewTogglePool);
+                svt = NewScrollViewEntry(
+                    "Inner Nodes", null, ref index, 0, pushPool, scrollViewTogglePool
+#if SEE_RECT_WIDTH
+                    , ref maxWidth
+#endif
+                );
                 svt.SetChildrenCapacity(innerNodeCount);
                 foreach (NodeRef dataObject in dataObjects)
                 {
                     if (dataObject.node.IsInnerNode())
                     {
-                        NewScrollViewEntry(dataObject, svt, ref index, 1, pushPool, scrollViewTogglePool);
+                        NewScrollViewEntry(
+                            dataObject, svt, ref index, 1, pushPool, scrollViewTogglePool
+#if SEE_RECT_WIDTH
+                            , ref maxWidth
+#endif
+                        );
                     }
                 }
             }
@@ -377,11 +437,17 @@ namespace SEE.Game.Charts
                     {
                         return entry.node.ID.Equals(root.ID);
                     });
-                    NewScrollViewEntries(rootNodeRef, null, ref index, 0, pushPool, scrollViewTogglePool);
+                    NewScrollViewEntries(
+                        rootNodeRef, null, ref index, 0, pushPool, scrollViewTogglePool
+#if SEE_RECT_WIDTH
+                        , ref maxWidth
+#endif
+                    );
                 }
             }
 
             // resize scroll-view area
+#if !SEE_RECT_WIDTH
             float maxWidth = 0.0f;
             foreach (ScrollViewToggle svt in pushPool)
             {
@@ -391,6 +457,7 @@ namespace SEE.Game.Charts
                     maxWidth = w;
                 }
             }
+#endif
             RectTransform rect = scrollContent.GetComponent<RectTransform>();
             rect.sizeDelta = new Vector2(maxWidth, index * Mathf.Abs(yGap) + 40);
 
@@ -421,21 +488,11 @@ namespace SEE.Game.Charts
                 Debug.LogWarning("There are no nodes for showing metrics.\n");
             }
 #endif
-            foreach (NodeRef nodeRef in dataObjects)
+            foreach (string name in Attributable.NumericAttributeNames)
             {
-                foreach (string key in nodeRef.node.FloatAttributes.Keys)
+                if (name.StartsWith(ChartManager.MetricPrefix))
                 {
-                    if (key.StartsWith(ChartManager.MetricPrefix))
-                    {
-                        AllMetricNames.Add(key);
-                    }
-                }
-                foreach (string key in nodeRef.node.IntAttributes.Keys)
-                {
-                    if (key.StartsWith(ChartManager.MetricPrefix))
-                    {
-                        AllMetricNames.Add(key);
-                    }
+                    AllMetricNames.Add(name);
                 }
             }
 #if UNITY_EDITOR
