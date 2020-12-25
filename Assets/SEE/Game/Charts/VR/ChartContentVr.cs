@@ -43,12 +43,12 @@ namespace SEE.Game.Charts.VR
 
         /// <summary>
         /// FIXME: Obsolete. Should be removed. Is this used in the prefab?
-        /// A checkbox to toggle the <see cref="ChartManager.selectionMode" />.
+        /// A checkbox to toggle the <see cref="ChartManager.selectionMode"/>.
         /// </summary>
         [SerializeField] private Toggle selectionToggle; // TODO(torben): remove?
 
         /// <summary>
-        /// Activates the <see cref="selectionToggle" />.
+        /// Activates the <see cref="selectionToggle"/>.
         /// </summary>
         protected override void Start()
         {
@@ -56,11 +56,17 @@ namespace SEE.Game.Charts.VR
             selectionToggle.gameObject.SetActive(true);
         }
 
+        /// <summary>
+        /// Selects every linked <see cref="InteractableObject"/> of every
+        /// <see cref="ChartMarker"/> within given bounds.
+        /// </summary>
+        /// <param name="min">The min value of the bounds.</param>
+        /// <param name="max">The max value of the bounds.</param>
         public override void AreaSelection(Vector2 min, Vector2 max)
         {
             foreach (GameObject marker in ActiveMarkers)
             {
-                Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
+                Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition; // TODO(torben): could i just use marker.transform.[...]?
                 if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                 {
                     IEnumerable<InteractableObject> interactableObjects = marker.GetComponent<ChartMarker>().LinkedInteractableObjects;
