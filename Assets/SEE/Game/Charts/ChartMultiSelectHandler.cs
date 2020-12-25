@@ -28,8 +28,7 @@ namespace SEE.Game.Charts
     /// <summary>
     /// Handles selection of multiple markers in selection mode.
     /// </summary>
-    public class ChartMultiSelectHandler : MonoBehaviour, IPointerDownHandler, IDragHandler,
-        IPointerUpHandler
+    public class ChartMultiSelectHandler : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
     {
         /// <summary>
         /// The rectangle used to visualize the selection process for the user.
@@ -53,8 +52,6 @@ namespace SEE.Game.Charts
         {
             chartContent = transform.parent.GetComponent<ChartContent>();
         }
-
-        public bool IsSelecting() => selectionRect.gameObject.activeSelf;
 
         #region UnityEngine Callbacks
 
@@ -133,9 +130,16 @@ namespace SEE.Game.Charts
 
             if (!negative)
             {
-                selectionRect.sizeDelta = new Vector2((eventData.position.x - startingPos.x) / lossyScale.x, (eventData.position.y - startingPos.y) / lossyScale.y);
+                selectionRect.sizeDelta = new Vector2(
+                    (eventData.position.x - startingPos.x) / lossyScale.x,
+                    (eventData.position.y - startingPos.y) / lossyScale.y
+                );
                 sizeDelta = selectionRect.sizeDelta;
-                selectionRect.position = new Vector3(startingPos.x + sizeDelta.x / 2 * lossyScale.x, startingPos.y + sizeDelta.y / 2 * lossyScale.y, 0);
+                selectionRect.position = new Vector3(
+                    startingPos.x + sizeDelta.x / 2 * lossyScale.x,
+                    startingPos.y + sizeDelta.y / 2 * lossyScale.y,
+                    0
+                );
             }
 
             Vector2 min = Vector2.Min(startingPos, eventData.position);

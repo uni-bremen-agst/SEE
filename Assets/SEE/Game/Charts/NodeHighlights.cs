@@ -33,6 +33,6 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Determines if this objects node will be displayed in charts.
         /// </summary>
-        public IDictionary showInChart = new Dictionary<ChartContent, bool>();
+        public IDictionary showInChart = new Dictionary<ChartContent, bool>(); // TODO(torben): This whole script could probably be removed.
     }
 }

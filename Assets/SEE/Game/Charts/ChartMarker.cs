@@ -33,17 +33,30 @@ namespace SEE.Game.Charts
     /// </summary>
     public class ChartMarker : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        private readonly List<InteractableObject> linkedInteractableObjects = new List<InteractableObject>();
-        public IEnumerable<InteractableObject> LinkedInteractableObjects { get => linkedInteractableObjects; }
+        /// <summary>
+        /// The interactable objects, that are displayed by this marker.
+        /// </summary>
+        public readonly List<InteractableObject> LinkedInteractableObjects = new List<InteractableObject>();
 
-        private readonly List<string> infoTexts = new List<string>();
-
+        /// <summary>
+        /// The chart content, on which this marker is displayed.
+        /// </summary>
         public ChartContent chartContent;
 
+        /// <summary>
+        /// The information to be displayed for each linked interactable object,
+        /// respectively.
+        /// </summary>
+        private readonly List<string> infoTexts = new List<string>();
+
+        /// <summary>
+        /// The icon of the marker.
+        /// </summary>
         private UnityEngine.UI.Image image;
 
         /// <summary>
-        /// A text popup containing useful information about the marker and its <see cref="LinkedInteractable"/>.
+        /// A text popup containing useful information about the marker and its linked
+        /// interactable objects.
         /// </summary>
         [SerializeField] private TextMeshProUGUI infoText;
 
@@ -62,7 +75,7 @@ namespace SEE.Game.Charts
 
         private void OnDestroy()
         {
-            foreach (InteractableObject interactableObject in linkedInteractableObjects)
+            foreach (InteractableObject interactableObject in LinkedInteractableObjects)
             {
                 interactableObject.HoverIn -= OnHoverIn;
                 interactableObject.HoverOut -= OnHoverOut;
@@ -71,11 +84,16 @@ namespace SEE.Game.Charts
             }
         }
 
+        /// <summary>
+        /// Adds an interactable object with given info text to this marker.
+        /// </summary>
+        /// <param name="interactableObject">The object to be added.</param>
+        /// <param name="infoText">The text to be displayed for the given object.</param>
         public void PushInteractableObject(InteractableObject interactableObject, string infoText)
         {
-            if (!linkedInteractableObjects.Contains(interactableObject))
+            if (!LinkedInteractableObjects.Contains(interactableObject))
             {
-                linkedInteractableObjects.Add(interactableObject);
+                LinkedInteractableObjects.Add(interactableObject);
 
                 interactableObject.HoverIn += OnHoverIn;
                 interactableObject.HoverOut += OnHoverOut;
@@ -97,10 +115,15 @@ namespace SEE.Game.Charts
             }
         }
 
+        /// <summary>
+        /// Updates the info text to be displayed for this marker. The info texts for
+        /// every hovered and/or selected object is displayed. If no such object exists,
+        /// the info text is disabled.
+        /// </summary>
         public void UpdateInfoText()
         {
             bool showInfoText = false;
-            foreach (InteractableObject interactableObject in linkedInteractableObjects)
+            foreach (InteractableObject interactableObject in LinkedInteractableObjects)
             {
                 if (interactableObject.IsHovered || interactableObject.IsSelected)
                 {
@@ -113,10 +136,10 @@ namespace SEE.Game.Charts
             if (showInfoText)
             {
                 string text = string.Empty;
-                for (int i = 0; i < linkedInteractableObjects.Count; i++)
+                for (int i = 0; i < LinkedInteractableObjects.Count; i++)
                 {
-                    bool showInChart = (bool)linkedInteractableObjects[i].GetComponent<NodeRef>().highlights.showInChart[chartContent];
-                    bool isHighlighted = linkedInteractableObjects[i].IsHovered || linkedInteractableObjects[i].IsSelected;
+                    bool showInChart = (bool)LinkedInteractableObjects[i].GetComponent<NodeRef>().highlights.showInChart[chartContent];
+                    bool isHighlighted = LinkedInteractableObjects[i].IsHovered || LinkedInteractableObjects[i].IsSelected;
                     if (showInChart && isHighlighted)
                     {
                         text += infoTexts[i] + '\n';
@@ -126,10 +149,15 @@ namespace SEE.Game.Charts
             }
         }
 
+        /// <summary>
+        /// Updates the visibility of the marker. If none of this marker's linked
+        /// interactable objects should be shown in the chart, this marker is made
+        /// invisible.
+        /// </summary>
         public void UpdateVisibility()
         {
             bool isVisible = false;
-            foreach (InteractableObject interactableObject in linkedInteractableObjects)
+            foreach (InteractableObject interactableObject in LinkedInteractableObjects)
             {
                 bool showInChart = (bool)interactableObject.GetComponent<NodeRef>().highlights.showInChart[chartContent];
                 if (showInChart)
@@ -143,6 +171,11 @@ namespace SEE.Game.Charts
 
         #region UnityEngine Callbacks
 
+        /// <summary>
+        /// Called by Unity, if this marker is clicked.
+        /// 
+        /// Selects/Toggles the linked interactable objects of this marker.
+        /// </summary>
         public void ButtonClicked()
         {
             if (image.enabled)
@@ -155,24 +188,36 @@ namespace SEE.Game.Charts
                     InteractableObject.UnselectAll(true);
                 }
 
-                foreach (InteractableObject interactableObject in linkedInteractableObjects)
+                foreach (InteractableObject interactableObject in LinkedInteractableObjects)
                 {
                     interactableObject.SetSelect(!interactableObject.IsSelected, true);
                 }
             }
         }
 
+        /// <summary>
+        /// Called by Unity, if the mouse hovers over this marker.
+        /// 
+        /// Hoveres every linked interactable object of this marker.
+        /// </summary>
+        /// <param name="eventData">Ignored.</param>
         public void OnPointerEnter(PointerEventData eventData)
         {
-            foreach (InteractableObject interactableObject in linkedInteractableObjects)
+            foreach (InteractableObject interactableObject in LinkedInteractableObjects)
             {
                 interactableObject.SetHoverFlag(HoverFlag.ChartMarker, true, true);
             }
         }
 
+        /// <summary>
+        /// Called by Unity, if the mouse stops hovering over this marker.
+        /// 
+        /// Unhoveres every linked interactable object of this marker.
+        /// </summary>
+        /// <param name="eventData">Ignored.</param>
         public void OnPointerExit(PointerEventData eventData)
         {
-            foreach (InteractableObject interactableObject in linkedInteractableObjects)
+            foreach (InteractableObject interactableObject in LinkedInteractableObjects)
             {
                 interactableObject.SetHoverFlag(HoverFlag.ChartMarker, false, true);
             }
@@ -182,27 +227,56 @@ namespace SEE.Game.Charts
 
         #region InteractableObject Callbacks
 
+        /// <summary>
+        /// Called through event <see cref="InteractableObject.HoverIn"/>.
+        /// 
+        /// Updates the info text.
+        /// </summary>
+        /// <param name="interactableObject">Ignored.</param>
+        /// <param name="isOwner">Ignored.</param>
         public void OnHoverIn(InteractableObject interactableObject, bool isOwner)
         {
             UpdateInfoText();
         }
 
+        /// <summary>
+        /// Called through event <see cref="InteractableObject.HoverOut"/>.
+        /// 
+        /// Updates the info text.
+        /// </summary>
+        /// <param name="interactableObject">Ignored.</param>
+        /// <param name="isOwner">Ignored.</param>
         public void OnHoverOut(InteractableObject interactableObject, bool isOwner)
         {
             UpdateInfoText();
         }
 
+        /// <summary>
+        /// Called through event <see cref="InteractableObject.SelectIn"/>.
+        /// 
+        /// Updates the info text and highlights this marker.
+        /// </summary>
+        /// <param name="interactableObject">Ignored.</param>
+        /// <param name="isOwner">Ignored.</param>
         public void OnSelectIn(InteractableObject interactableObject, bool isOwner)
         {
             UpdateInfoText();
             markerHighlight.SetActive(true);
         }
 
+        /// <summary>
+        /// Called through event <see cref="InteractableObject.SelectOut"/>.
+        /// 
+        /// Updates the info text and stops highlighting this marker, if no other linked
+        /// interactable object is still selected.
+        /// </summary>
+        /// <param name="interactableObject">Ignored.</param>
+        /// <param name="isOwner">Ignored.</param>
         public void OnSelectOut(InteractableObject interactableObject, bool isOwner)
         {
             UpdateInfoText();
             bool showMarker = false;
-            foreach (InteractableObject io in linkedInteractableObjects)
+            foreach (InteractableObject io in LinkedInteractableObjects)
             {
                 if (io.IsSelected)
                 {

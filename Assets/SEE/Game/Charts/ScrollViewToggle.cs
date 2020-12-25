@@ -36,12 +36,12 @@ namespace SEE.Game.Charts
     public class ScrollViewToggle : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         /// <summary>
-        /// The parent to this <see cref="ScrollViewToggle" />.
+        /// The parent to this <see cref="ScrollViewToggle"/>.
         /// </summary>
         public ScrollViewToggle Parent { private get; set; }
 
         /// <summary>
-        /// Contains all children to this <see cref="ScrollViewToggle" />.
+        /// Contains all children to this <see cref="ScrollViewToggle"/>.
         /// </summary>
         private readonly List<ScrollViewToggle> children = new List<ScrollViewToggle>();
 
@@ -52,23 +52,39 @@ namespace SEE.Game.Charts
 
         /// <summary>
         /// The UI element the user can click on to change the state of
-        /// <see cref="UnityEngine.UI.Toggle.isOn"/>.
+        /// <see cref="UnityEngine.UI.Toggle.isOn"/> and toggle some
+        /// <see cref="ChartMarker"/>s.
         /// </summary>
         [SerializeField] private Toggle toggle;
 
         /// <summary>
-        /// The linked chart. Also contains methods to refresh the chart.
+        /// The chart content of the chart, this scroll view toggle is attached to.
         /// </summary>
         private ChartContent chartContent;
 
+        /// <summary>
+        /// Used for propagating the activeness of scroll view toggles through the
+        /// parents and children. If a toggle is enabled/disabled, parents/children may
+        /// also need to be enabled/disabled.
+        /// </summary>
         private static bool toggleParents = true;
+
+        /// <summary>
+        /// <see cref="toggleParents"/>
+        /// </summary>
         private static bool toggleChildren = true;
+
+        private InteractableObject linkedInteractable;
 
         /// <summary>
         /// Contains properties for adding objects to charts.
         /// </summary>
-        private InteractableObject linkedInteractable;
         private NodeHighlights linkedObject;
+
+        /// <summary>
+        /// Sets the <see cref="linkedObject"/> and the <see cref="linkedInteractable"/>
+        /// of this toggle. Also updates event callbacks.
+        /// </summary>
         public NodeHighlights LinkedObject
         {
             get
@@ -79,20 +95,20 @@ namespace SEE.Game.Charts
             {
                 if (linkedInteractable)
                 {
-                    linkedInteractable.HoverIn -= OnHoverIn;
-                    linkedInteractable.HoverOut -= OnHoverOut;
-                    linkedInteractable.SelectIn -= OnSelectIn;
-                    linkedInteractable.SelectOut -= OnSelectOut;
+                    linkedInteractable.HoverIn -= OnHoverOrSelect;
+                    linkedInteractable.HoverOut -= OnHoverOrSelect;
+                    linkedInteractable.SelectIn -= OnHoverOrSelect;
+                    linkedInteractable.SelectOut -= OnHoverOrSelect;
                 }
 
                 linkedObject = value;
                 if (linkedObject && linkedObject.TryGetComponent(out InteractableObject interactableObj))
                 {
                     linkedInteractable = interactableObj;
-                    linkedInteractable.HoverIn += OnHoverIn;
-                    linkedInteractable.HoverOut += OnHoverOut;
-                    linkedInteractable.SelectIn  += OnSelectIn;
-                    linkedInteractable.SelectOut += OnSelectOut;
+                    linkedInteractable.HoverIn += OnHoverOrSelect;
+                    linkedInteractable.HoverOut += OnHoverOrSelect;
+                    linkedInteractable.SelectIn  += OnHoverOrSelect;
+                    linkedInteractable.SelectOut += OnHoverOrSelect;
                 }
                 else
                 {
@@ -102,7 +118,8 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Called by <see cref="ChartContent" /> after creation to pass some values and initialize attributes.
+        /// Called by <see cref="ChartContent"/> after creation to pass some values and
+        /// initialize attributes.
         /// </summary>
         /// <param name="label">The label.</param>
         /// <param name="script">The script to link.</param>
@@ -116,29 +133,33 @@ namespace SEE.Game.Charts
             {
                 if (linkedInteractable.IsHovered)
                 {
-                    OnHoverIn(linkedInteractable, true); // TODO(torben): cache address of owner in InteractableObject
+                    OnHoverOrSelect(linkedInteractable, true); // TODO(torben): cache address of owner in InteractableObject
                 }
                 if (linkedInteractable.IsSelected)
                 {
-                    OnSelectIn(linkedInteractable, true); // TODO(torben): cache address of owner in InteractableObject
+                    OnHoverOrSelect(linkedInteractable, true); // TODO(torben): cache address of owner in InteractableObject
                 }
             }
         }
 
         /// <summary>
-        /// If the <see cref="GameObject" /> was still pointed on, the highlight of the
+        /// If the <see cref="GameObject"/> was still pointed on, the highlight of the
         /// <see cref="linkedObject"/> will be stopped.
         /// </summary>
         private void OnDestroy()
         {
+            // TODO(torben): this needs to check somehow, if THIS toggle is actually
+            // pointing and not some other chart or the mouse in the 3D-world. Otherwise,
+            // this call will simply overwrite the hover-state of the linked
+            // interactable.
             OnPointerExit(null);
 
             if (linkedInteractable)
             {
-                linkedInteractable.HoverIn -= OnHoverIn;
-                linkedInteractable.HoverOut -= OnHoverOut;
-                linkedInteractable.SelectIn -= OnSelectIn;
-                linkedInteractable.SelectOut -= OnSelectOut;
+                linkedInteractable.HoverIn -= OnHoverOrSelect;
+                linkedInteractable.HoverOut -= OnHoverOrSelect;
+                linkedInteractable.SelectIn -= OnHoverOrSelect;
+                linkedInteractable.SelectOut -= OnHoverOrSelect;
             }
         }
 
@@ -154,8 +175,8 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Mainly called by Unity. Activates or deactivates a marker in the linked chart, depending on the
-        /// status of <see cref="UnityEngine.UI.Toggle.isOn" />.
+        /// Mainly called by Unity. Activates or deactivates a marker in the linked
+        /// chart, depending on the status of <see cref="UnityEngine.UI.Toggle.isOn"/>.
         /// </summary>
         public void Toggle()
         {
@@ -186,7 +207,7 @@ namespace SEE.Game.Charts
                     {
                         foreach (ScrollViewToggle child in Parent.children)
                         {
-                            if (!child.GetStatus())
+                            if (!child.IsLinkedObjectVisible())
                             {
                                 // Note: This automatically calls Toggle() for the
                                 // parent's ScrollViewToggle. As 'toggleChildren' is
@@ -203,7 +224,7 @@ namespace SEE.Game.Charts
                     bool activate = true;
                     foreach (ScrollViewToggle sibling in Parent.children)
                     {
-                        if (!sibling.GetStatus())
+                        if (!sibling.IsLinkedObjectVisible())
                         {
                             activate = false;
                             break;
@@ -251,14 +272,20 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Used to check if a marker for the <see cref="linkedObject" /> will be added to the linked chart.
+        /// Whether the linked interactable object is currently visible in the chart.
         /// </summary>
-        /// <returns>The status of the <see cref="linkedObject" />.</returns>
-        private bool GetStatus()
+        /// <returns><code>true</code> if the linked interactable object is currently
+        /// visible in the chart, <code>false</code> otherwise.</returns>
+        private bool IsLinkedObjectVisible()
         {
             return (bool)linkedObject.showInChart[chartContent];
         }
 
+        /// <summary>
+        /// Sets the capacity of the number of children of this scroll view toggle. If
+        /// the new capacity is not greater than the old capacity, nothing happens.
+        /// </summary>
+        /// <param name="capacity">The new capacity.</param>
         public void SetChildrenCapacity(int capacity)
         {
             if (capacity > children.Capacity)
@@ -268,7 +295,7 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Adds a <see cref="ScrollViewToggle" /> as a child of this <see cref="ScrollViewToggle" />.
+        /// Adds a <see cref="ScrollViewToggle"/> as a child of this toggle.
         /// </summary>
         /// <param name="child">The new child.</param>
         public void AddChild(ScrollViewToggle child)
@@ -276,11 +303,18 @@ namespace SEE.Game.Charts
             children.Add(child);
         }
 
+        /// <summary>
+        /// Removes all children of this toggle.
+        /// </summary>
         public void ClearChildren()
         {
             children.Clear();
         }
 
+        /// <summary>
+        /// Updates the color of the toggle, depending on whether the linked interactable
+        /// object is hovered or selected.
+        /// </summary>
         public void UpdateColor()
         {
             Color color = UIColorScheme.GetLight(linkedInteractable.IsSelected ? 2 : (linkedInteractable.IsHovered ? 1 : 0));
@@ -294,6 +328,12 @@ namespace SEE.Game.Charts
 
         #region UnityEngine Callbacks
 
+        /// <summary>
+        /// Called by Unity, if the mouse hovers over this toggle.
+        /// 
+        /// Hovers the linked interactable object.
+        /// </summary>
+        /// <param name="eventData">Ignored.</param>
         public void OnPointerEnter(PointerEventData eventData)
         {
             if (linkedObject != null && !linkedInteractable.IsHovered)
@@ -302,6 +342,12 @@ namespace SEE.Game.Charts
             }
         }
 
+        /// <summary>
+        /// Called by Unity, if the mouse stops hovering over this toggle.
+        /// 
+        /// Unhovers the linked interactable object.
+        /// </summary>
+        /// <param name="eventData">Ignored.</param>
         public void OnPointerExit(PointerEventData eventData)
         {
             if (linkedInteractable != null && linkedInteractable.IsHovered)
@@ -314,10 +360,18 @@ namespace SEE.Game.Charts
 
         #region InteractableObject Callbacks
 
-        private void OnHoverIn(InteractableObject interactableObject, bool isOwner) => UpdateColor();
-        private void OnHoverOut(InteractableObject interactableObject, bool isOwner) => UpdateColor();
-        private void OnSelectIn(InteractableObject interactableObject, bool isOwner) => UpdateColor();
-        private void OnSelectOut(InteractableObject interactableObject, bool isOwner) => UpdateColor();
+        /// <summary>
+        /// Called through events <see cref="InteractableObject.HoverIn"/>,
+        /// <see cref="InteractableObject.Hoverout"/>,
+        /// <see cref="InteractableObject.SelectIn"/> and
+        /// <see cref="InteractableObject.SelectOut"/>.
+        /// 
+        /// Updates the color of the toggle, depending on whether the linked interactable
+        /// object is hovered or selected.
+        /// </summary>
+        /// <param name="interactableObject">Ignored.</param>
+        /// <param name="isOwner">Ignored.</param>
+        private void OnHoverOrSelect(InteractableObject interactableObject, bool isOwner) => UpdateColor();
 
         #endregion
     }
