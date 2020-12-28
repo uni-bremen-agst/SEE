@@ -1,4 +1,4 @@
-﻿using SEE.Utils;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.GO
@@ -122,6 +122,7 @@ namespace SEE.GO
                 }
             }
         }
+<<<<<<< HEAD
         /// <summary>
         /// Sets the Scale of this <paramref name="node"/> independed of the Loal Scale from the Parent
         /// </summary>
@@ -146,6 +147,34 @@ namespace SEE.GO
         public static float GetRoof(this GameObject node)
         {
             return node.transform.position.y + node.Size().y / 2.0f;
+=======
+
+        /// <summary>
+        /// Returns the graph node represented by this <paramref name="gameObject"/>.
+        /// 
+        /// Precondition: <paramref name="gameObject"/> must have a <see cref="NodeRef"/>
+        /// attached to it referring to a valid node; if not, an exception is raised.
+        /// </summary>
+        /// <param name="gameObject">the game object whose Node is requested</param>
+        /// <returns>the correponding graph node</returns>
+        public static Node GetNode(this GameObject gameObject)
+        {
+            if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+            {
+                if (nodeRef != null)
+                {
+                    return nodeRef.node;
+                }
+                else
+                {
+                    throw new Exception($"Node reference of game object {gameObject.name} is null");
+                }
+            }
+            else
+            {
+                throw new Exception($"Game object {gameObject.name} has no NodeRef");
+            }
+>>>>>>> origin/master
         }
     }
 }
