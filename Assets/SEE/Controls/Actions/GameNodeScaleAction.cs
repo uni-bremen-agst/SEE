@@ -158,7 +158,7 @@ public class GameNodeScaleAction : MonoBehaviour
         else
         {
 
-            //sphereRadius(topSphere);
+            sphereRadius(topSphere);
         }
 
     }
@@ -223,6 +223,7 @@ public class GameNodeScaleAction : MonoBehaviour
         topSphere.transform.position = pos;
 
         topOldSpherPos = topSphere.transform.position;
+        pos.y += 0.2f;
         pos.x += 0.1f;
         endWithSave.transform.position = pos;
         pos.x -= 0.2f;
@@ -309,7 +310,7 @@ public class GameNodeScaleAction : MonoBehaviour
     private void sphereRadius(GameObject sphere)
     {
         Vector3 goScale = gameObject.transform.lossyScale;
-        float scale = (goScale.x + goScale.z) / 3;
+        float scale = (goScale.x + goScale.z) / 10;
         sphere.transform.localScale = new Vector3(scale, scale, scale);
     }
 
