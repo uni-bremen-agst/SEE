@@ -49,7 +49,7 @@ namespace SEE.Game
         /// having a valid reference to a graph node.
         /// </summary>
         /// <returns>all game objects representing graph nodes in the scene</returns>
-        public static ICollection<NodeRef> AllNodeRefsInScene(bool includeLeaves, bool includeInnerNodes)
+        public static List<NodeRef> AllNodeRefsInScene(bool includeLeaves, bool includeInnerNodes)
         {
             List<NodeRef> result = new List<NodeRef>();
             foreach (GameObject go in GameObject.FindGameObjectsWithTag(Tags.Node))
