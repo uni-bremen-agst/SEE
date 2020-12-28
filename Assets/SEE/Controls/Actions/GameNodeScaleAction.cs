@@ -76,7 +76,7 @@ public class GameNodeScaleAction : MonoBehaviour
         sphereRadius(endWithSave);
         endWithSave.GetComponent<Renderer>().material.color = Color.green;
 
-        endWithOutSave = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        endWithOutSave = GameObject.CreatePrimitive(PrimitiveType.Capsule);
         sphereRadius(endWithOutSave);
         endWithOutSave.GetComponent<Renderer>().material.color = Color.red;
 
@@ -159,6 +159,17 @@ public class GameNodeScaleAction : MonoBehaviour
         {
 
             sphereRadius(topSphere);
+            sphereRadius(fstSideSphere);
+            sphereRadius(sndSideSphere);
+            sphereRadius(thrdSideSphere);
+            sphereRadius(forthSideSphere);
+            sphereRadius(fstCornerSphere);
+            sphereRadius(sndCornerSphere);
+            sphereRadius(thrdCornerSphere);
+            sphereRadius(forthCornerSphere);
+
+            sphereRadius(endWithOutSave);
+            sphereRadius(endWithSave);
         }
 
     }
@@ -310,8 +321,16 @@ public class GameNodeScaleAction : MonoBehaviour
     private void sphereRadius(GameObject sphere)
     {
         Vector3 goScale = gameObject.transform.lossyScale;
-        float scale = (goScale.x + goScale.z) / 10;
-        sphere.transform.localScale = new Vector3(scale, scale, scale);
+        if(goScale.x > goScale.z)
+        {
+            sphere.transform.localScale = new Vector3(goScale.z, goScale.z, goScale.z) * 0.3f; ;
+        }
+        else
+        {
+            sphere.transform.localScale = new Vector3(goScale.x, goScale.x, goScale.x)*0.3f;
+        }
+        //float scale = (goScale.x + goScale.z) / 4;
+        
     }
 
     /// <summary>
