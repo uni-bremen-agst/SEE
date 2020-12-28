@@ -257,6 +257,7 @@ namespace SEE.Game.Charts
                 Assert.IsNull(pool[poolEntryCount], "The pool slot is not null!");
 
                 pool[poolEntryCount++] = scrollViewToggles[i];
+                scrollViewToggles[i].OnDestroy();
                 scrollViewToggles[i] = null;
             }
             for (int i = Mathf.Max(onePastLast, previousFirst); i < previousOnePastLast; i++) // after
@@ -266,21 +267,22 @@ namespace SEE.Game.Charts
                 Assert.IsNull(pool[poolEntryCount], "The pool slot is not null!");
 
                 pool[poolEntryCount++] = scrollViewToggles[i];
+                scrollViewToggles[i].OnDestroy();
                 scrollViewToggles[i] = null;
             }
 
-            void NewSVE(int i)
+            void _NewScrollViewEntry(int i)
             {
                 int temp = i;
                 if (i == 0) // 'Leaves' node
                 {
                     scrollViewToggles[i] = NewScrollViewEntry("Leaves", null, ref temp, 0);
                 }
-                else if (i == leafCount) // 'Inner Nodes' node
+                else if (i == leafCount + 1) // 'Inner Nodes' node
                 {
                     scrollViewToggles[i] = NewScrollViewEntry("Inner Nodes", null, ref temp, 0);
                 }
-                else if (i < leafCount) // leaf node
+                else if (i < leafCount + 1) // leaf node
                 {
                     scrollViewToggles[i] = NewScrollViewEntry(dataObjects[i - 1], scrollViewToggles[0], ref temp, 1);
                 }
@@ -293,11 +295,11 @@ namespace SEE.Game.Charts
             // prepend and append new entries
             for (int i = first; i < Mathf.Min(previousFirst, onePastLast); i++) // prepend
             {
-                NewSVE(i);
+                _NewScrollViewEntry(i);
             }
             for (int i = Mathf.Max(previousOnePastLast, first); i < onePastLast; i++) // append
             {
-                NewSVE(i);
+                _NewScrollViewEntry(i);
             }
 
             previousFirst = first;
@@ -319,10 +321,7 @@ namespace SEE.Game.Charts
                 poolEntryCount--;
                 svt = pool[poolEntryCount];
                 pool[poolEntryCount] = null;
-
-                svt.ClearChildren();
                 go = svt.gameObject;
-                go.SetActive(true);
             }
             else
             {
