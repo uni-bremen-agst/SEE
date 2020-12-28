@@ -157,7 +157,7 @@ public class GameNodeScaleAction : MonoBehaviour
         }
         else
         {
-
+            //Adjust the size of the scaling elements
             sphereRadius(topSphere);
             sphereRadius(fstSideSphere);
             sphereRadius(sndSideSphere);
@@ -175,7 +175,7 @@ public class GameNodeScaleAction : MonoBehaviour
     }
 
     /// <summary>
-    /// Scales a node
+    /// Sets the new Scale of a Node based on the sphere elements
     /// 
     /// </summary>
     private void scaleNode()
@@ -225,7 +225,7 @@ public class GameNodeScaleAction : MonoBehaviour
     }
 
     /// <summary>
-    /// Sets the top Sphere on the Top of a GameObject
+    /// Sets the top Sphere on the Top of a GameObject and the Save and Discard objects
     /// </summary>
     private void setOnRoof()
     {
@@ -321,14 +321,20 @@ public class GameNodeScaleAction : MonoBehaviour
     private void sphereRadius(GameObject sphere)
     {
         Vector3 goScale = gameObject.transform.lossyScale;
-        if(goScale.x > goScale.z)
+        if(goScale.x > goScale.z && goScale.z > 0.1f )
         {
-            sphere.transform.localScale = new Vector3(goScale.z, goScale.z, goScale.z) * 0.3f; ;
+            sphere.transform.localScale = new Vector3(goScale.z, goScale.z, goScale.z) * 0.1f; ;
+        }
+        else if(goScale.x > 0.1f)
+        {
+            sphere.transform.localScale = new Vector3(goScale.x, goScale.x, goScale.x)*0.1f;
         }
         else
         {
-            sphere.transform.localScale = new Vector3(goScale.x, goScale.x, goScale.x)*0.3f;
+            Debug.Log( sphere.transform.lossyScale.x);
+            sphere.transform.localScale = new Vector3(0.01f,0.01f,0.01f);
         }
+
         //float scale = (goScale.x + goScale.z) / 4;
         
     }
