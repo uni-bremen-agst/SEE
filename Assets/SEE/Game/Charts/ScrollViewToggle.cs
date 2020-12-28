@@ -36,16 +36,6 @@ namespace SEE.Game.Charts
     public class ScrollViewToggle : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         /// <summary>
-        /// The parent to this <see cref="ScrollViewToggle"/>.
-        /// </summary>
-        public ScrollViewToggle Parent { private get; set; }
-
-        /// <summary>
-        /// Contains all children to this <see cref="ScrollViewToggle"/>.
-        /// </summary>
-        private readonly List<ScrollViewToggle> children = new List<ScrollViewToggle>();
-
-        /// <summary>
         /// Contains the name of the <see cref="LinkedObject"/> in the UI.
         /// </summary>
         [SerializeField] private TextMeshProUGUI label;
@@ -56,6 +46,16 @@ namespace SEE.Game.Charts
         /// <see cref="ChartMarker"/>s.
         /// </summary>
         [SerializeField] private Toggle toggle;
+
+        /// <summary>
+        /// The parent to this <see cref="ScrollViewToggle"/>.
+        /// </summary>
+        public ScrollViewToggle Parent { private get; set; }
+
+        /// <summary>
+        /// Contains all children to this <see cref="ScrollViewToggle"/>.
+        /// </summary>
+        private readonly List<ScrollViewToggle> children = new List<ScrollViewToggle>();
 
         /// <summary>
         /// The chart content of the chart, this scroll view toggle is attached to.
@@ -122,12 +122,12 @@ namespace SEE.Game.Charts
         /// initialize attributes.
         /// </summary>
         /// <param name="label">The label.</param>
-        /// <param name="script">The script to link.</param>
-        public void Initialize(string label, ChartContent script)
+        /// <param name="chartContent">The script to link.</param>
+        public void Initialize(string label, ChartContent chartContent)
         {
             this.label.text = label;
-            chartContent = script;
-            toggle.isOn = !Parent || (bool)linkedObject.showInChart[chartContent];
+            this.chartContent = chartContent;
+            toggle.isOn = !Parent || (bool)linkedObject.showInChart[this.chartContent];
 
             if (linkedInteractable)
             {
@@ -146,21 +146,28 @@ namespace SEE.Game.Charts
         /// If the <see cref="GameObject"/> was still pointed on, the highlight of the
         /// <see cref="linkedObject"/> will be stopped.
         /// </summary>
-        private void OnDestroy()
+        public void OnDestroy()
         {
-            // TODO(torben): this needs to check somehow, if THIS toggle is actually
-            // pointing and not some other chart or the mouse in the 3D-world. Otherwise,
-            // this call will simply overwrite the hover-state of the linked
-            // interactable.
             OnPointerExit(null);
 
+            Parent = null;
+            children.Clear();
+            chartContent = null;
+            toggleParents = true;
+            toggleChildren = true;
             if (linkedInteractable)
             {
                 linkedInteractable.HoverIn -= OnHoverOrSelect;
                 linkedInteractable.HoverOut -= OnHoverOrSelect;
                 linkedInteractable.SelectIn -= OnHoverOrSelect;
                 linkedInteractable.SelectOut -= OnHoverOrSelect;
+
+                linkedInteractable = null;
             }
+            linkedObject = null;
+
+            label.text = string.Empty;
+            OnHoverOrSelect(null, true); // TODO(torben): is owner should not simply be 'true'
         }
 
         /// <summary>
@@ -304,20 +311,24 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Removes all children of this toggle.
-        /// </summary>
-        public void ClearChildren()
-        {
-            children.Clear();
-        }
-
-        /// <summary>
         /// Updates the color of the toggle, depending on whether the linked interactable
         /// object is hovered or selected.
         /// </summary>
         public void UpdateColor()
         {
-            Color color = UIColorScheme.GetLight(linkedInteractable.IsSelected ? 2 : (linkedInteractable.IsHovered ? 1 : 0));
+            int colorIndex = 0;
+            if (linkedInteractable != null)
+            {
+                if (linkedInteractable.IsSelected)
+                {
+                    colorIndex = 2;
+                }
+                else if (linkedInteractable.IsHovered)
+                {
+                    colorIndex = 1;
+                }
+            }
+            Color color = UIColorScheme.GetLight(colorIndex);
 
             ColorBlock colors = toggle.colors;
             colors.normalColor = color;
