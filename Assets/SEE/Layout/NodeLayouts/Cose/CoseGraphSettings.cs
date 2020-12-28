@@ -16,6 +16,8 @@
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.DataModel.DG;
+using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using static SEE.Game.AbstractSEECity;
 
@@ -69,52 +71,68 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <summary>
         /// if true the feature: multilevel scaling is used
         /// </summary>
-        public bool multiLevelScaling = CoseLayoutSettings.Multilevel_Scaling;
+        public bool MultiLevelScaling = CoseLayoutSettings.Multilevel_Scaling;
 
         /// <summary>
-        /// key: dir ids, value: bool, if true the dir is a layouted by a sublayout
+        /// key: inner-node ids, value: bool, if true the inner node is layouted by a sublayout
         /// </summary>
-        public Dictionary<string, bool> ListDirToggle = new Dictionary<string, bool>();
+        public Dictionary<string, bool> ListInnerNodeToggle = new Dictionary<string, bool>();
 
         /// <summary>
-        ///  key: dir ids, value: the nodelayout
+        ///  key: inner-node ids, value: the nodelayout
         /// </summary>
-        public Dictionary<string, NodeLayoutKind> DirNodeLayout = new Dictionary<string, NodeLayoutKind>();
+        public Dictionary<string, NodeLayoutKind> InnerNodeLayout = new Dictionary<string, NodeLayoutKind>();
 
         /// <summary>
-        /// key: dir ids, value: the inner node kind
+        /// key: inner-node ids, value: the inner node kind
         /// </summary>
-        public Dictionary<string, InnerNodeKinds> DirShape = new Dictionary<string, InnerNodeKinds>();
-
-        /// <summary>
-        /// a list of root dirs from the current graph
-        /// </summary>
-        public List<Node> rootDirs = new List<Node>();
-
-        /// <summary>
-        /// key: dir ids, value: bool, if true the dir is shown in the foldout, if false the sectioon feldout is collapsed 
-        /// </summary>
-        public Dictionary<string, bool> show = new Dictionary<string, bool>();
-
-        /// <summary>
-        /// if true is listing of dirs with posiible nodelayouts and inner node kinds is shown
-        /// </summary>
-        public bool showGraphListing = true;
+        public Dictionary<string, InnerNodeKinds> InnerNodeShape = new Dictionary<string, InnerNodeKinds>();
 
         /// <summary>
         /// the nodetypes
         /// </summary>
-        public Dictionary<string, bool> loadedForNodeTypes = new Dictionary<string, bool>();
+        public Dictionary<string, bool> LoadedForNodeTypes = new Dictionary<string, bool>();
 
         /// <summary>
         /// is true the parameter edgeLength and repulsion strength are calculated automatically
         /// </summary>
-        public bool useCalculationParameter = true;
+        public bool UseCalculationParameter = true;
 
         /// <summary>
         /// is true the parameter edgeLength and repulsion strength are calculated automatically and are iteratily changed till a goog layout is found
         /// </summary>
-        public bool useIterativeCalculation = false;
+        public bool UseIterativeCalculation = false;
+
+        private const string EdgeLengthLabel = "EdgeLength";
+
+        internal void Save(ConfigWriter writer, string label)
+        {
+            writer.BeginGroup(label);
+            writer.Save(EdgeLength, EdgeLengthLabel);
+            throw new NotImplementedException();
+            /*
+             UseSmartMultilevelScaling
+PerLevelIdealEdgeLengthFactor
+UseSmartRepulsionRangeCalculation
+GravityStrength
+CompoundGravityStrength
+RepulsionStrength
+MultiLevelScaling
+ListInnerNodeToggle
+InnerNodeLayout
+InnerNodeShape
+LoadedForNodeTypes
+UseCalculationParameter
+UseIterativeCalculation
+
+             */
+            writer.EndGroup();
+        }
+
+        internal void Restore(Dictionary<string, object> attributes, string coseGraphSettingsLabel)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

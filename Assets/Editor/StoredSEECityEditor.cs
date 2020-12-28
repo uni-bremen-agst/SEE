@@ -3,7 +3,6 @@
 using SEE.Game;
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEngine;
 using SEE.DataModel.DG;
 
 namespace SEEEditor
@@ -49,14 +48,14 @@ namespace SEEEditor
                     }
                 }
 
-                if (city.CoseGraphSettings.loadedForNodeTypes.Count == 0)
+                if (city.CoseGraphSettings.LoadedForNodeTypes.Count == 0)
                 {
-                    city.CoseGraphSettings.showGraphListing = true;
+                    ShowGraphListing = true;
                     return;
                 }
 
                 bool allTypes = true;
-                foreach (KeyValuePair<string, bool> kvp in city.CoseGraphSettings.loadedForNodeTypes)
+                foreach (KeyValuePair<string, bool> kvp in city.CoseGraphSettings.LoadedForNodeTypes)
                 {
                     if (city.SelectedNodeTypes.ContainsKey(kvp.Key))
                     {
@@ -71,13 +70,13 @@ namespace SEEEditor
 
                 if (allTypes)
                 {
-                    if (countSelected != city.CoseGraphSettings.loadedForNodeTypes.Count)
+                    if (countSelected != city.CoseGraphSettings.LoadedForNodeTypes.Count)
                     {
                         allTypes = false;
                     }
                 }
 
-                city.CoseGraphSettings.showGraphListing = allTypes;
+                ShowGraphListing = allTypes;
             }
         }   
     }
