@@ -256,7 +256,44 @@ namespace SEE.Utils
             Assert.AreEqual(savedCity.LeafStyleMetric, loadedCity.LeafStyleMetric);
             AreEqual(savedCity.LeafLabelSettings, loadedCity.LeafLabelSettings);
             AreEqual(savedCity.InnerNodeLabelSettings, loadedCity.InnerNodeLabelSettings);
-            
+
+            Assert.AreEqual(savedCity.StyleIssue, loadedCity.StyleIssue);
+            Assert.AreEqual(savedCity.UniversalIssue, loadedCity.UniversalIssue);
+            Assert.AreEqual(savedCity.MetricIssue, loadedCity.MetricIssue);
+            Assert.AreEqual(savedCity.Dead_CodeIssue, loadedCity.Dead_CodeIssue);
+            Assert.AreEqual(savedCity.CycleIssue, loadedCity.CycleIssue);
+            Assert.AreEqual(savedCity.CloneIssue, loadedCity.CloneIssue);
+            Assert.AreEqual(savedCity.ArchitectureIssue, loadedCity.ArchitectureIssue);
+
+            Assert.AreEqual(savedCity.StyleIssue_SUM, loadedCity.StyleIssue_SUM);
+            Assert.AreEqual(savedCity.UniversalIssue_SUM, loadedCity.UniversalIssue_SUM);
+            Assert.AreEqual(savedCity.MetricIssue_SUM, loadedCity.MetricIssue_SUM);
+            Assert.AreEqual(savedCity.Dead_CodeIssue_SUM, loadedCity.Dead_CodeIssue_SUM);
+            Assert.AreEqual(savedCity.CycleIssue_SUM, loadedCity.CycleIssue_SUM);
+            Assert.AreEqual(savedCity.CloneIssue_SUM, loadedCity.CloneIssue_SUM);
+            Assert.AreEqual(savedCity.ArchitectureIssue_SUM, loadedCity.ArchitectureIssue_SUM);
+
+            Assert.AreEqual(savedCity.InnerDonutMetric, loadedCity.InnerDonutMetric);
+            Assert.AreEqual(savedCity.InnerNodeHeightMetric, loadedCity.InnerNodeHeightMetric);
+
+            Assert.AreEqual(savedCity.MinimalBlockLength, loadedCity.MinimalBlockLength);
+            Assert.AreEqual(savedCity.MaximalBlockLength, loadedCity.MaximalBlockLength);
+
+            Assert.AreEqual(savedCity.LeafObjects, loadedCity.LeafObjects);
+            Assert.AreEqual(savedCity.InnerNodeObjects, loadedCity.InnerNodeObjects);
+
+            Assert.AreEqual(savedCity.NodeLayout, loadedCity.NodeLayout);
+            Assert.AreEqual(savedCity.EdgeLayout, loadedCity.EdgeLayout);
+
+            Assert.AreEqual(savedCity.ZScoreScale, loadedCity.ZScoreScale);
+            Assert.AreEqual(savedCity.EdgeWidth, loadedCity.EdgeWidth);
+            Assert.AreEqual(savedCity.ShowErosions, loadedCity.ShowErosions);
+            Assert.AreEqual(savedCity.MaxErosionWidth, loadedCity.MaxErosionWidth);
+            Assert.AreEqual(savedCity.EdgesAboveBlocks, loadedCity.EdgesAboveBlocks);
+            Assert.AreEqual(savedCity.Tension, loadedCity.Tension);
+            Assert.AreEqual(savedCity.RDP, loadedCity.RDP);
+            /*
+             * */
             // Assert.AreEqual(savedCity., loadedCity.);
             //Assert.AreEqual(savedCity, loadedCity);
         }

@@ -416,7 +416,6 @@ namespace SEE.Game
                 loadedGraph.Destroy();
             }
             LoadedGraph = null;
-            Measurements.Clear();
         }
     }
 }
