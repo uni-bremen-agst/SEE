@@ -18,6 +18,7 @@ public class GameNodeScaleAction : MonoBehaviour
     Vector3 thrdSideOldSpherPos;
     Vector3 forthSideOldSpherPos;
     Vector3 originalScale;
+    Vector3 originalPosition;
     GameObject topSphere;
     GameObject fstCornerSphere; //x0 y0
     GameObject sndCornerSphere; //x1 y0
@@ -27,9 +28,14 @@ public class GameNodeScaleAction : MonoBehaviour
     GameObject sndSideSphere; //x1 y0
     GameObject thrdSideSphere; //x1 y1
     GameObject forthSideSphere; //x0 y1
+
+    //FIXMEE REPLACE WITH GUI
+    GameObject endWithSave;
+    GameObject endWithOutSave;
     public void Start()
     {
         originalScale = gameObject.transform.lossyScale;
+        originalPosition = gameObject.transform.position;
         Renderer render = gameObject.GetComponent<Renderer>();
 
         //TOP SPHERE
@@ -65,6 +71,16 @@ public class GameNodeScaleAction : MonoBehaviour
         sphereRadius(forthSideSphere);
 
 
+        //End Operations
+        endWithSave = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        sphereRadius(endWithSave);
+        endWithSave.SetColor(new Color(0, 255, 0));
+
+        endWithOutSave = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        sphereRadius(endWithOutSave);
+        //endWithOutSave.SetColor(new Color(255, 0, 0));
+
+
         //Positioning
         setOnRoof();
         setOnSide();
@@ -81,6 +97,9 @@ public class GameNodeScaleAction : MonoBehaviour
             RaycastHit hit;
             // Casts the ray and get the first game object hit
             Physics.Raycast(ray, out hit);
+            
+            
+            //Moves the Sphere which was hit
             //top
             if (hit.collider == topSphere.GetComponent<Collider>())
             {
@@ -97,7 +116,7 @@ public class GameNodeScaleAction : MonoBehaviour
             }
             else if (hit.collider == thrdCornerSphere.GetComponent<Collider>())
             {
-                GameNodeMover.MoveToLockAxes(thrdCornerSphere, true, false, true);
+                GameNodeMover.MoveToLockAxes(thrdCornerSphere, true, false, true); 
             }
             else if (hit.collider == forthCornerSphere.GetComponent<Collider>())
             {
@@ -120,6 +139,17 @@ public class GameNodeScaleAction : MonoBehaviour
             {
                 GameNodeMover.MoveToLockAxes(forthSideSphere, false, false, true);
             }
+
+            //End Scalling
+            else if (hit.collider == endWithSave.GetComponent<Collider>())
+            {
+                endScale(true);
+            }
+            else if (hit.collider == endWithOutSave.GetComponent<Collider>())
+            {
+                endScale(false);
+            }
+
 
             scaleNode();
             setOnRoof();
@@ -145,7 +175,7 @@ public class GameNodeScaleAction : MonoBehaviour
         scale.x -= fstSideSphere.transform.position.x - fstSideOldSpherPos.x;
         scale.x += sndSideSphere.transform.position.x - sndSideOldSpherPos.x;
         scale.z -= thrdSideSphere.transform.position.z - thrdSideOldSpherPos.z;
-        scale.z += forthSideSphere.transform.position.z - forthSideOldSpherPos.
+        scale.z += forthSideSphere.transform.position.z - forthSideOldSpherPos.z;
 
         //Corner Scaling
         float scaleCorner = 0;
@@ -189,10 +219,14 @@ public class GameNodeScaleAction : MonoBehaviour
     private void setOnRoof()
     {
         Vector3 pos = gameObject.transform.position;
-        pos.y = BoundingBox.GetRoof(new List<GameObject> { gameObject }) + 0.01f;
+        pos.y = gameObject.GetRoof() + 0.01f;
         topSphere.transform.position = pos;
 
         topOldSpherPos = topSphere.transform.position;
+        pos.x += 0.1f;
+        endWithSave.transform.position = pos;
+        pos.x -= 0.2f;
+        endWithOutSave.transform.position = pos;
     }
 
     /// <summary>
@@ -282,9 +316,10 @@ public class GameNodeScaleAction : MonoBehaviour
     /// <summary>
     /// This will end the Scalling Action the user Can Choose between Safe and Discard
     /// </summary>
-    public void endScale()
+    /// <param name="save">Should the changes be saved</param>
+    public void endScale(bool save)
     {
-        if (true)//FIXME WITH USER INPUT
+        if (save)//FIXME WITH USER INPUT
         {
             //SAFE THE CHANGES
             removeScript();
@@ -292,6 +327,7 @@ public class GameNodeScaleAction : MonoBehaviour
         else
         {
             gameObject.SetScale(originalScale);
+            gameObject.transform.position = originalPosition;
             removeScript();
         }
     }
@@ -301,6 +337,16 @@ public class GameNodeScaleAction : MonoBehaviour
     public void removeScript()
     {
         Destroy(topSphere);
+        Destroy(fstCornerSphere);
+        Destroy(sndCornerSphere);
+        Destroy(thrdCornerSphere);
+        Destroy(forthCornerSphere);
+        Destroy(fstSideSphere);
+        Destroy(sndSideSphere);
+        Destroy(thrdSideSphere);
+        Destroy(forthSideSphere);
+        Destroy(endWithSave);
+        Destroy(endWithOutSave);
         Destroy(this);
     }
 }
