@@ -166,11 +166,26 @@ namespace SEE.Controls {
             }
             else
             {
+                //FIXME: DO WE NEED TO DESTROY THE NODE TO?
                 Destroy(GONode);
             }
             GONode = null;
             city = null;
             nodeMetrics = null;
+        }
+
+        /// <summary>
+        /// Removes The Script
+        /// Places the new Node if not placed
+        /// </summary>
+        public void removeScript()
+        {
+            if(GONode != null)
+            {
+                Place();
+            }
+
+            Destroy(this);
         }
         
     }
