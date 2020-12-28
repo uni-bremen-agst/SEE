@@ -86,6 +86,22 @@ public class GameNodeScaleAction : MonoBehaviour
             {
                 GameNodeMover.MoveToLockAxes(topSphere, false, true, false);
 
+            } //Corners
+            else if (hit.collider == fstCornerSphere.GetComponent<Collider>())
+            {
+                GameNodeMover.MoveToLockAxes(fstCornerSphere, true, false, true);
+            }
+            else if (hit.collider == sndCornerSphere.GetComponent<Collider>())
+            {
+                GameNodeMover.MoveToLockAxes(sndCornerSphere, true, false, true);
+            }
+            else if (hit.collider == thrdCornerSphere.GetComponent<Collider>())
+            {
+                GameNodeMover.MoveToLockAxes(thrdCornerSphere, true, false, true);
+            }
+            else if (hit.collider == forthCornerSphere.GetComponent<Collider>())
+            {
+                GameNodeMover.MoveToLockAxes(forthCornerSphere, true, false, true);
             }
             //Sides
             else if (hit.collider == fstSideSphere.GetComponent<Collider>())
@@ -111,10 +127,9 @@ public class GameNodeScaleAction : MonoBehaviour
         }
         else
         {
-           
+
             //sphereRadius(topSphere);
         }
-
 
     }
 
@@ -124,36 +139,44 @@ public class GameNodeScaleAction : MonoBehaviour
     /// </summary>
     private void scaleNode()
     {
+
         Vector3 scale = Vector3.zero;
         scale.y += topSphere.transform.position.y - topOldSpherPos.y;
         scale.x -= fstSideSphere.transform.position.x - fstSideOldSpherPos.x;
         scale.x += sndSideSphere.transform.position.x - sndSideOldSpherPos.x;
         scale.z -= thrdSideSphere.transform.position.z - thrdSideOldSpherPos.z;
-        scale.z += forthSideSphere.transform.position.z - forthSideOldSpherPos.z;
+        scale.z += forthSideSphere.transform.position.z - forthSideOldSpherPos.
+
+        //Corner Scaling
+        float scaleCorner = 0;
+        scaleCorner += (fstCornerSphere.transform.position.x - fstCornerOldSpherPos.x) + (fstCornerSphere.transform.position.z - fstCornerOldSpherPos.z) * 0.5f;
+        scaleCorner += (sndCornerSphere.transform.position.x - sndCornerOldSpherPos.x) + (sndCornerSphere.transform.position.z - sndCornerOldSpherPos.z) * 0.5f;
+        scaleCorner += (thrdCornerSphere.transform.position.x - thrdCornerOldSpherPos.x) + (thrdCornerSphere.transform.position.z - thrdCornerOldSpherPos.z) * 0.5f;
+        scaleCorner += (forthCornerSphere.transform.position.x - forthCornerOldSpherPos.x) + (forthCornerSphere.transform.position.z - forthCornerOldSpherPos.z) * 0.5f;
+        scale.x += scaleCorner;
+        scale.z += scaleCorner;
 
         //Move the gameObject so the user thinks he scaled only in one direction
         Vector3 position = gameObject.transform.position;
-        position.y += scale.y / 2;
-        
-        if (fstSideSphere.transform.position.x - fstSideOldSpherPos.x != 0 || sndSideSphere.transform.position.x - sndSideOldSpherPos.x != 0)
-        {
-            position.x += (fstSideSphere.transform.position.x - fstSideOldSpherPos.x) /2;
-            position.x += (sndSideSphere.transform.position.x - sndSideOldSpherPos.x) / 2;
-        } 
-        else if(thrdSideSphere.transform.position.z - thrdSideOldSpherPos.z != 0 || forthSideSphere.transform.position.z - forthSideOldSpherPos.z != 0)
-        {
-            position.z += (thrdSideSphere.transform.position.z - thrdSideOldSpherPos.z )/ 2;
-            position.z += (forthSideSphere.transform.position.z - forthSideOldSpherPos.z) / 2;
-        }
+        position.y += scale.y * 0.5f;
+        position.x += (fstSideSphere.transform.position.x - fstSideOldSpherPos.x) * 0.5f;
+        position.x += (sndSideSphere.transform.position.x - sndSideOldSpherPos.x) * 0.5f;
+        position.z += (thrdSideSphere.transform.position.z - thrdSideOldSpherPos.z) * 0.5f;
+        position.z += (forthSideSphere.transform.position.z - forthSideOldSpherPos.z) * 0.5f;
 
-        
+        //Setting the old positions
         topOldSpherPos = topSphere.transform.position;
+        fstCornerOldSpherPos = fstCornerSphere.transform.position;
+        sndCornerOldSpherPos = sndCornerSphere.transform.position;
+        thrdCornerOldSpherPos = thrdCornerSphere.transform.position;
+        forthCornerOldSpherPos = forthCornerSphere.transform.position;
         fstSideOldSpherPos = fstSideSphere.transform.position;
         sndSideOldSpherPos = sndSideSphere.transform.position;
         thrdSideOldSpherPos = thrdSideSphere.transform.position;
         forthSideOldSpherPos = forthSideSphere.transform.position;
-        
 
+
+        //transform the new pos and scale
         gameObject.transform.position = position;
         gameObject.SetScale(gameObject.transform.lossyScale + scale);
 
@@ -189,7 +212,7 @@ public class GameNodeScaleAction : MonoBehaviour
 
         //sndcorner
         pos = gameObject.transform.position;
-        pos.y = BoundingBox.GetRoof(new List<GameObject> { gameObject });
+        pos.y = gameObject.GetRoof();
         pos.x += trns.lossyScale.x / 2 + 0.02f;
         pos.z -= trns.lossyScale.z / 2 + 0.02f;
         sndCornerSphere.transform.position = pos;
@@ -197,7 +220,7 @@ public class GameNodeScaleAction : MonoBehaviour
 
         //thrd corner
         pos = gameObject.transform.position;
-        pos.y = BoundingBox.GetRoof(new List<GameObject> { gameObject });
+        pos.y = gameObject.GetRoof();
         pos.x += trns.lossyScale.x / 2 + 0.02f;
         pos.z += trns.lossyScale.z / 2 + 0.02f;
         thrdCornerSphere.transform.position = pos;
@@ -205,7 +228,7 @@ public class GameNodeScaleAction : MonoBehaviour
 
         //forth corner
         pos = gameObject.transform.position;
-        pos.y = BoundingBox.GetRoof(new List<GameObject> { gameObject });
+        pos.y = gameObject.GetRoof();
         pos.x -= trns.lossyScale.x / 2 + 0.02f;
         pos.z += trns.lossyScale.z / 2 + 0.02f;
         forthCornerSphere.transform.position = pos;
@@ -213,32 +236,32 @@ public class GameNodeScaleAction : MonoBehaviour
 
         //fst side
         pos = gameObject.transform.position;
-        pos.y = BoundingBox.GetRoof(new List<GameObject> { gameObject });
+        pos.y = gameObject.GetRoof();
         pos.x -= trns.lossyScale.x / 2 + 0.01f;
-   
+
         fstSideSphere.transform.position = pos;
         fstSideOldSpherPos = pos;
 
         //snd side
         pos = gameObject.transform.position;
-        pos.y = BoundingBox.GetRoof(new List<GameObject> { gameObject });
+        pos.y = gameObject.GetRoof();
         pos.x += trns.lossyScale.x / 2 + 0.01f;
-   
+
         sndSideSphere.transform.position = pos;
         sndSideOldSpherPos = pos;
 
         //thrd side
         pos = gameObject.transform.position;
-        pos.y = BoundingBox.GetRoof(new List<GameObject> { gameObject });
-     
+        pos.y = gameObject.GetRoof();
+
         pos.z -= trns.lossyScale.z / 2 + 0.01f;
         thrdSideSphere.transform.position = pos;
         thrdSideOldSpherPos = pos;
 
         //forth side
         pos = gameObject.transform.position;
-        pos.y = BoundingBox.GetRoof(new List<GameObject> { gameObject });
-      
+        pos.y = gameObject.GetRoof();
+
         pos.z += trns.lossyScale.z / 2 + 0.01f;
         forthSideSphere.transform.position = pos;
         forthSideOldSpherPos = pos;
