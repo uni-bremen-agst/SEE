@@ -62,7 +62,7 @@ namespace SEE.Controls.Actions
                     }
                     break;
                 case State.NewNode:
-
+                    //places new nodes as long as the user doesnt switch the modes
                     //Ads the newComponent if not already done
                     if (!gameObject.GetComponent<DesktopNewNodeAction>())
                     {
@@ -172,7 +172,7 @@ namespace SEE.Controls.Actions
                 case State.MoveNode:
                     break;
                 case State.NewNode:
-                 
+                    gameObject.GetComponent<DesktopNewNodeAction>().removeScript();
                     break;
                 case State.ScaleNode:
                     break;
