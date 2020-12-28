@@ -27,28 +27,11 @@ namespace SEE.Controls.Actions
 
 
         /// <summary>
-        /// If the State changes the PreState remembers the state before 
-        /// </summary>
-        private enum PreState
-        {
-            None,
-            MoveNode,
-            MapNode,
-            NewNode,
-            ScaleNode
-        }
-        GameObject nodeAction = null;
-
-
-        /// <summary>
         /// The current state of the player.
         /// </summary>
         private State state = State.Browse;
 
-        /// <summary>
-        /// The last state of the Player
-        /// </summary>
-        private PreState preState = PreState.None;
+      
 
         private void Update()
         {
@@ -91,22 +74,16 @@ namespace SEE.Controls.Actions
                     }
                     break;
                 case State.ScaleNode:
-                    if (selectedObject != null && nodeAction == null )
+                    if (selectedObject != null )
                     {
-                        nodeAction = selectedObject;
-                        nodeAction.AddComponent<GameNodeScaleAction>();
-                        preState = PreState.ScaleNode;
+                       
+                        selectedObject.AddComponent<GameNodeScaleAction>();
+                        Browse();
                     }
                     break;
 
                 default:
-                    switch (preState)
-                    {
-                        case PreState.ScaleNode:
-                            nodeAction.GetComponent<GameNodeScaleAction>().removeScript();
-                            nodeAction = null;
-                            break;
-                    }
+                   
                     break;
             }
         }
@@ -196,6 +173,8 @@ namespace SEE.Controls.Actions
                     break;
                 case State.NewNode:
                  
+                    break;
+                case State.ScaleNode:
                     break;
                 default:
                     throw new System.NotImplementedException();
