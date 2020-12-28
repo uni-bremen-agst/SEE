@@ -74,11 +74,11 @@ public class GameNodeScaleAction : MonoBehaviour
         //End Operations
         endWithSave = GameObject.CreatePrimitive(PrimitiveType.Capsule);
         sphereRadius(endWithSave);
-        endWithSave.SetColor(new Color(0, 255, 0));
+        endWithSave.GetComponent<Renderer>().material.color = Color.green;
 
         endWithOutSave = GameObject.CreatePrimitive(PrimitiveType.Cube);
         sphereRadius(endWithOutSave);
-        //endWithOutSave.SetColor(new Color(255, 0, 0));
+        endWithOutSave.GetComponent<Renderer>().material.color = Color.red;
 
 
         //Positioning
