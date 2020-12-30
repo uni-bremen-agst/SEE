@@ -32,6 +32,8 @@ public class GameNodeScaleAction : MonoBehaviour
     //FIXMEE REPLACE WITH GUI
     GameObject endWithSave;
     GameObject endWithOutSave;
+
+    GameObject tmpSphere = null;
     public void Start()
     {
         originalScale = gameObject.transform.lossyScale;
@@ -92,71 +94,106 @@ public class GameNodeScaleAction : MonoBehaviour
         //ScaleNode(gameObject);
         if (Input.GetMouseButton(0))
         {
-            Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
+            if (tmpSphere == null)
+            {
 
-            RaycastHit hit;
-            // Casts the ray and get the first game object hit
-            Physics.Raycast(ray, out hit);
+
+                Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
+
+                RaycastHit hit;
+                // Casts the ray and get the first game object hit
+                Physics.Raycast(ray, out hit);
+
+
+                //Moves the Sphere which was hit
+                //top
+                if (hit.collider == topSphere.GetComponent<Collider>())
+                {
+                    //GameNodeMover.MoveToLockAxes(topSphere, false, true, false);
+                    tmpSphere = topSphere;
+
+                } //Corners
+                else if (hit.collider == fstCornerSphere.GetComponent<Collider>())
+                {
+                    tmpSphere = fstCornerSphere;
+                    //GameNodeMover.MoveToLockAxes(fstCornerSphere, true, false, true);
+                }
+                else if (hit.collider == sndCornerSphere.GetComponent<Collider>())
+                {
+                    tmpSphere = sndCornerSphere;
+                    //GameNodeMover.MoveToLockAxes(sndCornerSphere, true, false, true);
+                }
+                else if (hit.collider == thrdCornerSphere.GetComponent<Collider>())
+                {
+                    tmpSphere = thrdCornerSphere;
+                   // GameNodeMover.MoveToLockAxes(thrdCornerSphere, true, false, true);
+                }
+                else if (hit.collider == forthCornerSphere.GetComponent<Collider>())
+                {
+                    tmpSphere = forthCornerSphere;
+                    //GameNodeMover.MoveToLockAxes(forthCornerSphere, true, false, true);
+                }
+                //Sides
+                else if (hit.collider == fstSideSphere.GetComponent<Collider>())
+                {
+                    tmpSphere = fstSideSphere;
+                    //GameNodeMover.MoveToLockAxes(fstSideSphere, true, false, false);
+                }
+                else if (hit.collider == sndSideSphere.GetComponent<Collider>())
+                {
+                    tmpSphere = sndSideSphere;
+                    //GameNodeMover.MoveToLockAxes(sndSideSphere, true, false, false);
+                }
+                else if (hit.collider == thrdSideSphere.GetComponent<Collider>())
+                {
+                    tmpSphere = thrdSideSphere;
+                    //GameNodeMover.MoveToLockAxes(thrdSideSphere, false, false, true);
+                }
+                else if (hit.collider == forthSideSphere.GetComponent<Collider>())
+                {
+                    tmpSphere = forthSideSphere;
+                    //GameNodeMover.MoveToLockAxes(forthSideSphere, false, false, true);
+                }
+
+                //End Scalling
+                else if (hit.collider == endWithSave.GetComponent<Collider>())
+                {
+                    endScale(true);
+                }
+                else if (hit.collider == endWithOutSave.GetComponent<Collider>())
+                {
+                    endScale(false);
+                }
+            }
+
+            if (tmpSphere == topSphere)
+            {
+                GameNodeMover.MoveToLockAxes(tmpSphere, false, true, false);
+            }
+            else if (tmpSphere == fstCornerSphere || tmpSphere == sndCornerSphere || tmpSphere == thrdCornerSphere || tmpSphere == forthCornerSphere)
+            {
+                GameNodeMover.MoveToLockAxes(tmpSphere, true, false, true);
+            }
+            else if(tmpSphere == fstSideSphere ||tmpSphere == sndSideSphere)
+            {
+                GameNodeMover.MoveToLockAxes(tmpSphere, true, false, false);
+            }
+            else if(tmpSphere == thrdSideSphere ||tmpSphere == forthSideSphere)
+            {
+                GameNodeMover.MoveToLockAxes(tmpSphere, false, false, true);
+            }
+            else
+            {
+                tmpSphere = null;
+            }
             
-            
-            //Moves the Sphere which was hit
-            //top
-            if (hit.collider == topSphere.GetComponent<Collider>())
-            {
-                GameNodeMover.MoveToLockAxes(topSphere, false, true, false);
-
-            } //Corners
-            else if (hit.collider == fstCornerSphere.GetComponent<Collider>())
-            {
-                GameNodeMover.MoveToLockAxes(fstCornerSphere, true, false, true);
-            }
-            else if (hit.collider == sndCornerSphere.GetComponent<Collider>())
-            {
-                GameNodeMover.MoveToLockAxes(sndCornerSphere, true, false, true);
-            }
-            else if (hit.collider == thrdCornerSphere.GetComponent<Collider>())
-            {
-                GameNodeMover.MoveToLockAxes(thrdCornerSphere, true, false, true); 
-            }
-            else if (hit.collider == forthCornerSphere.GetComponent<Collider>())
-            {
-                GameNodeMover.MoveToLockAxes(forthCornerSphere, true, false, true);
-            }
-            //Sides
-            else if (hit.collider == fstSideSphere.GetComponent<Collider>())
-            {
-                GameNodeMover.MoveToLockAxes(fstSideSphere, true, false, false);
-            }
-            else if (hit.collider == sndSideSphere.GetComponent<Collider>())
-            {
-                GameNodeMover.MoveToLockAxes(sndSideSphere, true, false, false);
-            }
-            else if (hit.collider == thrdSideSphere.GetComponent<Collider>())
-            {
-                GameNodeMover.MoveToLockAxes(thrdSideSphere, false, false, true);
-            }
-            else if (hit.collider == forthSideSphere.GetComponent<Collider>())
-            {
-                GameNodeMover.MoveToLockAxes(forthSideSphere, false, false, true);
-            }
-
-            //End Scalling
-            else if (hit.collider == endWithSave.GetComponent<Collider>())
-            {
-                endScale(true);
-            }
-            else if (hit.collider == endWithOutSave.GetComponent<Collider>())
-            {
-                endScale(false);
-            }
-
-
             scaleNode();
             setOnRoof();
             setOnSide();
         }
         else
         {
+            tmpSphere = null;
             //Adjust the size of the scaling elements
             sphereRadius(topSphere);
             sphereRadius(fstSideSphere);
@@ -357,6 +394,7 @@ public class GameNodeScaleAction : MonoBehaviour
             removeScript();
         }
     }
+
     /// <summary>
     /// Removes this Script from the GameObject
     /// </summary>
