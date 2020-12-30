@@ -38,11 +38,29 @@ namespace SEE.Game.Charts
     /// </summary>
     public class ChartContent : MonoBehaviour
     {
+        /// <summary>
+        /// The offset The gap between entries in the <see cref="scrollContent" /> indicating a new hierarchy layer.
+        /// </summary>
+        private const float ScrollViewEntryIndentation = 15;
+
+        /// <summary>
+        /// The height of an entry in the <see cref="scrollContent"/>.
+        /// </summary>
+        private const float ScrollViewEntryHeight = 25;
+
         // TODO(torben): this may need to be reintroduced
         /// <summary>
         /// The distance to another marker to recognize it as overlapping.
         /// </summary>
         private const float MarkerOverlapDistance = 22;
+
+        /// <summary>
+        /// This entry of the dropdown box represents not a metric but just the
+        /// enumeration of nodes. This entry can be selected if one wants to have a
+        /// metric on one axis and then all nodes sorted by this metric on the other
+        /// axis.
+        /// </summary>
+        private const string NodeEnumeration = "NODES";
 
         /// <summary>
         /// Contains one <see cref="scrollEntryPrefab"/> for each <see cref="Node"/> in
@@ -60,31 +78,6 @@ namespace SEE.Game.Charts
         /// The starting coordinates of the entries of the <see cref="scrollContent"/>.
         /// </summary>
         [SerializeField] private Vector2 scrollEntryOffset;
-
-        /// <summary>
-        /// The gap between entries in the <see cref="scrollContent" /> indicating a new hierarchy layer.
-        /// </summary>
-        private float xGap = 15;
-
-        /// <summary>
-        /// The gap between entries in the <see cref="scrollContent" /> to not make them overlap.
-        /// </summary>
-        private float yGap = -25;
-
-        /// <summary>
-        /// All game-node objects to be listed in the chart. 
-        /// 
-        /// Invariant: all game objects in _dataObjects are game objects tagged by Tags.Node
-        /// and having a valid graph-node reference.
-        /// </summary>
-        private List<NodeRef> dataObjects;
-
-        /// <summary>
-        /// A list of all <see cref="ChartMarker" />s currently displayed in the chart.
-        /// </summary>
-        protected List<GameObject> ActiveMarkers = new List<GameObject>();
-
-        public readonly Dictionary<NodeRef, ChartMarker> nodeRefToChartMarkerDict = new Dictionary<NodeRef, ChartMarker>();
 
         /// <summary>
         /// Handles the movement of charts.
@@ -137,20 +130,8 @@ namespace SEE.Game.Charts
         [SerializeField] private TextMeshProUGUI maxYText;
 
         /// <summary>
-        /// The pool of scroll view toggles, such that they can be reused, if
-        /// <see cref="FillScrollView(bool)"/> is called.
-        /// </summary>
-        //private Stack<ScrollViewToggle> scrollViewTogglePool = new Stack<ScrollViewToggle>();
-
-        /// <summary>
-        /// A parent of this object. Used in VR to destroy the whole construct of a moveable chart.
-        /// </summary>
-        public GameObject parent;
-
-        /// <summary>
         /// The panel on which the <see cref="ChartMarker" />s are instantiated.
         /// </summary>
-        [Header("For resizing and minimizing")]
         public RectTransform dataPanel;
 
         /// <summary>
@@ -159,18 +140,24 @@ namespace SEE.Game.Charts
         public RectTransform labelsPanel;
 
         /// <summary>
+        /// All game-node objects to be listed in the chart. 
+        /// 
+        /// Invariant: all game objects in dataObjects are game objects tagged by Tags.Node
+        /// and having a valid graph-node reference.
+        /// </summary>
+        private List<NodeRef> dataObjects;
+
+        /// <summary>
+        /// A list of all <see cref="ChartMarker" />s currently displayed in the chart.
+        /// </summary>
+        protected List<GameObject> ActiveMarkers = new List<GameObject>();
+
+        public readonly Dictionary<NodeRef, ChartMarker> nodeRefToChartMarkerDict = new Dictionary<NodeRef, ChartMarker>();
+
+        /// <summary>
         /// Contains all metric names contained in any <see cref="GameObject" /> of <see cref="dataObjects" />.
         /// </summary>
         public readonly SortedSet<string> AllMetricNames = new SortedSet<string>();
-
-        /// <summary>
-        /// The number of game objects representing a graph node in the current scene.
-        /// A game object representing a graph node is one that is tagged by Tags.Node
-        /// having a valid NodeRef to a graph node. Note that this number is across
-        /// all current graphs represented in the scene, and not just one particular
-        /// graph.
-        /// </summary>
-        public int TotalNumberOfGraphNodesInTheScene => dataObjects.Count;
 
         /// <summary>
         /// Calls methods to initialize a chart.
@@ -181,7 +168,7 @@ namespace SEE.Game.Charts
 
             FindDataObjects();
 
-            float stride = Mathf.Abs(yGap);
+            float stride = ScrollViewEntryHeight;
 
             // Note(torben): The list view contains every node + two additional parent
             // header entries for 'Inner Nodes' and 'Leaves'. The tree view tree only the
@@ -202,9 +189,35 @@ namespace SEE.Game.Charts
             // does have a height of zero... that's why i have to calculate the current
             // height of the scrollrect in Update() every frame
             float maxPanelHeight = scrollViewRectTransform.sizeDelta.y;
+            maxPanelEntryCount = Mathf.FloorToInt(maxPanelHeight / stride) + 1;
 
-            scrollViewToggles = new ScrollViewToggle[totalEntryCount];
-            pool = new ScrollViewToggle[Mathf.FloorToInt(maxPanelHeight / stride) + 1];
+            scrollViewEntries = new ScrollViewEntry[totalEntryCount];
+            scrollViewEntryDatas = new ScrollViewEntryData[totalEntryCount];
+
+            int idx = 0;
+            scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, null, ScrollViewEntryData.InvalidIndex, leafCount, true);
+            idx++;
+
+            for (int i = 0; i < leafCount; i++)
+            {
+                scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, dataObjects[i].GetComponent<InteractableObject>(), 0, 0, true);
+                scrollViewEntryDatas[0].childIndices[i] = idx;
+                idx++;
+            }
+
+            int innerCount = dataObjects.Count - leafCount;
+            int innerNodeIdx = idx;
+            scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, null, ScrollViewEntryData.InvalidIndex, innerCount, true);
+            idx++;
+
+            for (int i = 0; i < innerCount; i++)
+            {
+                scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, dataObjects[i].GetComponent<InteractableObject>(), innerNodeIdx, 0, true);
+                scrollViewEntryDatas[innerNodeIdx].childIndices[i] = idx;
+                idx++;
+            }
+
+            pool = new Stack<ScrollViewEntry>(maxPanelEntryCount);
 
             RectTransform scrollContentRect = scrollContent.GetComponent<RectTransform>();
             scrollContentRect.sizeDelta = new Vector2(scrollContentRect.sizeDelta.x, totalHeight + 40);
@@ -212,11 +225,6 @@ namespace SEE.Game.Charts
             FillScrollView(false);
             GetAllNumericAttributes();
         }
-
-        // This entry of the dropdown box represents not a metric but just the enumeration of nodes.
-        // This entry can be selected if one wants to have a metric on one axis and then all nodes 
-        // sorted by this metric on the other axis.
-        private const string NodeEnumeration = "NODES";
         
         protected virtual void Start()
         {
@@ -234,62 +242,63 @@ namespace SEE.Game.Charts
         [SerializeField] private RectTransform scrollViewRectTransform;
 
         private float totalHeight = 0;
+        private int maxPanelEntryCount = 0;
         private int leafCount = 0;
 
-        private ScrollViewToggle[] scrollViewToggles = null;
-        private ScrollViewToggle[] pool = null;
-        private int poolEntryCount = 0;
+        private ScrollViewEntry[] scrollViewEntries = null;
+        private ScrollViewEntryData[] scrollViewEntryDatas = null;
+        private Stack<ScrollViewEntry> pool = null;
 
         private int previousFirst = 0;
         private int previousOnePastLast = 0;
 
         private void Update()
         {
-            float panelEntryCount = totalHeight * (1.0f - verticalScrollBar.size) / Mathf.Abs(yGap);
+            float panelEntryCount = totalHeight * (1.0f - verticalScrollBar.size) / ScrollViewEntryHeight;
             int first = Mathf.Max(0, Mathf.FloorToInt((1.0f - verticalScrollBar.value) * panelEntryCount));
-            int onePastLast = Mathf.Min(scrollViewToggles.Length, first + pool.Length);
+            int onePastLast = Mathf.Min(scrollViewEntries.Length, first + maxPanelEntryCount);
 
-            // delete out of view entries
-            for (int i = previousFirst; i < Mathf.Min(previousOnePastLast, first); i++) // before
+            void _PushToPool(int i)
             {
-                Assert.IsTrue(poolEntryCount < pool.Length, "The pool is full!");
-                Assert.IsNotNull(scrollViewToggles[i], "The toggle to be pooled is null!");
-                Assert.IsNull(pool[poolEntryCount], "The pool slot is not null!");
+                Assert.IsNotNull(scrollViewEntries[i], "The toggle to be pooled is null!");
 
-                pool[poolEntryCount++] = scrollViewToggles[i];
-                scrollViewToggles[i].OnDestroy();
-                scrollViewToggles[i] = null;
-            }
-            for (int i = Mathf.Max(onePastLast, previousFirst); i < previousOnePastLast; i++) // after
-            {
-                Assert.IsTrue(poolEntryCount < pool.Length, "The pool is full!");
-                Assert.IsNotNull(scrollViewToggles[i], "The toggle to be pooled is null!");
-                Assert.IsNull(pool[poolEntryCount], "The pool slot is not null!");
-
-                pool[poolEntryCount++] = scrollViewToggles[i];
-                scrollViewToggles[i].OnDestroy();
-                scrollViewToggles[i] = null;
+                scrollViewEntries[i].OnDestroy();
+                pool.Push(scrollViewEntries[i]);
+                scrollViewEntries[i] = null;
             }
 
             void _NewScrollViewEntry(int i)
             {
+                Assert.IsNull(scrollViewEntries[i]);
+                int leavesIndex = 0;
+                int innerNodeIndex = leafCount + 1;
                 int temp = i;
-                if (i == 0) // 'Leaves' node
+                if (i == leavesIndex) // 'Leaves' node
                 {
-                    scrollViewToggles[i] = NewScrollViewEntry("Leaves", null, ref temp, 0);
+                    scrollViewEntries[leavesIndex] = NewScrollViewEntry("Leaves", null, ref temp, 0);
                 }
-                else if (i == leafCount + 1) // 'Inner Nodes' node
+                else if (i == innerNodeIndex) // 'Inner Nodes' node
                 {
-                    scrollViewToggles[i] = NewScrollViewEntry("Inner Nodes", null, ref temp, 0);
+                    scrollViewEntries[innerNodeIndex] = NewScrollViewEntry("Inner Nodes", null, ref temp, 0);
                 }
                 else if (i < leafCount + 1) // leaf node
                 {
-                    scrollViewToggles[i] = NewScrollViewEntry(dataObjects[i - 1], scrollViewToggles[0], ref temp, 1);
+                    scrollViewEntries[i] = NewScrollViewEntry(dataObjects[i - 1], scrollViewEntries[leavesIndex], ref temp, 1);
                 }
                 else // inner node
                 {
-                    scrollViewToggles[i] = NewScrollViewEntry(dataObjects[i - 2], scrollViewToggles[leafCount], ref temp, 1);
+                    scrollViewEntries[i] = NewScrollViewEntry(dataObjects[i - 2], scrollViewEntries[innerNodeIndex], ref temp, 1);
                 }
+            }
+
+            // delete out of view entries
+            for (int i = previousFirst; i < Mathf.Min(previousOnePastLast, first); i++) // before
+            {
+                _PushToPool(i);
+            }
+            for (int i = Mathf.Max(onePastLast, previousFirst); i < previousOnePastLast; i++) // after
+            {
+                _PushToPool(i);
             }
 
             // prepend and append new entries
@@ -306,27 +315,37 @@ namespace SEE.Game.Charts
             previousOnePastLast = onePastLast;
         }
 
+        public ScrollViewEntry GetScrollViewEntry(int index)
+        {
+            ScrollViewEntry result = scrollViewEntries[index];
+            return result;
+        }
+
+        public ref ScrollViewEntryData GetScrollViewEntryData(int index)
+        {
+            ref ScrollViewEntryData result = ref scrollViewEntryDatas[index];
+            return ref result;
+        }
+
         /// <summary>
-        /// Either creates or retrieves a pooled <see cref="ScrollViewToggle"/>. Pooled
+        /// Either creates or retrieves a pooled <see cref="ScrollViewEntry"/>. Pooled
         /// toggles are cleared, before they're returned.
         /// </summary>
         /// <param name="popPool">The pool, of which the toggles can be retrieved.
         /// </param>
         /// <param name="svt">The new scroll view toggle.</param>
         /// <param name="go">The game object containing the scroll view toggle.</param>
-        private void GetScrollViewToggle(ref ScrollViewToggle svt, ref GameObject go)
+        private void NewScrollViewEntry(ref ScrollViewEntry svt, ref GameObject go)
         {
-            if (poolEntryCount > 0)
+            if (pool.Count > 0)
             {
-                poolEntryCount--;
-                svt = pool[poolEntryCount];
-                pool[poolEntryCount] = null;
+                svt = pool.Pop();
                 go = svt.gameObject;
             }
             else
             {
                 go = Instantiate(scrollEntryPrefab, scrollContent.transform);
-                svt = go.GetComponent<ScrollViewToggle>();
+                svt = go.GetComponent<ScrollViewEntry>();
             }
         }
 
@@ -343,28 +362,21 @@ namespace SEE.Game.Charts
         /// <param name="popPool">The pool, out of which pooled toggled can be retrieved.
         /// </param>
         /// <returns>The created scroll view toggle.</returns>
-        private ScrollViewToggle NewScrollViewEntry(
-            NodeRef nodeRef,
-            ScrollViewToggle parent,
-            ref int index,
-            int hierarchy
-        )
+        private ScrollViewEntry NewScrollViewEntry(NodeRef nodeRef, ScrollViewEntry parent, ref int index, int hierarchy)
         {
-            ScrollViewToggle svt = null;
+            ScrollViewEntry entry = null;
             GameObject go = null;
-            GetScrollViewToggle(ref svt, ref go);
+            NewScrollViewEntry(ref entry, ref go);
 
-            go.name = "ScrollViewToggle: " + nodeRef.node.SourceName;
-            float w = xGap * (float)hierarchy;
-            go.transform.localPosition = scrollEntryOffset + new Vector2(w, yGap * (float)index++);
+            go.name = "ScrollViewEntry: " + nodeRef.node.SourceName;
+            go.transform.localPosition = scrollEntryOffset
+                + new Vector2(ScrollViewEntryIndentation * (float)hierarchy, -ScrollViewEntryHeight * (float)index);
 
-            svt.Parent = parent;
-            svt.LinkedObject = nodeRef.highlights;
-            svt.Initialize(nodeRef.name, this);
+            entry.Init(this, ref scrollViewEntryDatas[index], nodeRef.name);
 
-            parent?.AddChild(svt);
+            index++;
 
-            return svt;
+            return entry;
         }
 
         /// <summary>
@@ -380,65 +392,37 @@ namespace SEE.Game.Charts
         /// <param name="popPool">The pool, out of which pooled toggled can be retrieved.
         /// </param>
         /// <returns>The created scroll view toggle.</returns>
-        private ScrollViewToggle NewScrollViewEntry(
-            string label,
-            ScrollViewToggle parent,
-            ref int index,
-            int hierarchy
-        )
+        private ScrollViewEntry NewScrollViewEntry(string label, ScrollViewEntry parent, ref int index, int hierarchy)
         {
-            ScrollViewToggle svt = null;
+            ScrollViewEntry entry = null;
             GameObject go = null;
-            GetScrollViewToggle(ref svt, ref go);
+            NewScrollViewEntry(ref entry, ref go);
 
-            go.name = "ScrollViewToggle: " + label;
-            float w = xGap * (float)hierarchy;
-            go.transform.localPosition = scrollEntryOffset + new Vector2(w, yGap * (float)index++);
+            go.name = "ScrollViewEntry: " + label;
+            go.transform.localPosition = scrollEntryOffset
+                + new Vector2(ScrollViewEntryIndentation * (float)hierarchy, -ScrollViewEntryHeight * (float)index);
 
-            svt.Parent = parent;
-            svt.Initialize(label, this);
+            entry.Init(this, ref scrollViewEntryDatas[index], label);
 
-            parent?.AddChild(svt);
+            index++;
 
-            return svt;
+            return entry;
         }
 
-#if false
         /// <summary>
         /// Recursive version of
-        /// <see cref="NewScrollViewEntry(NodeRef, ScrollViewToggle, ref int, int, Stack{ScrollViewToggle}, Stack{ScrollViewToggle})"/>
+        /// <see cref="NewScrollViewEntry(NodeRef, ScrollViewEntry, ref int, int, Stack{ScrollViewEntry}, Stack{ScrollViewEntry})"/>
         /// </summary>
-        private ScrollViewToggle NewScrollViewEntries(
-            NodeRef nodeRef,
-            ScrollViewToggle parent,
-            ref int index,
-            int hierarchy,
-            Stack<ScrollViewToggle> pushPool,
-            Stack<ScrollViewToggle> popPool
-#if SEE_RECT_WIDTH
-            , ref float maxWidth
-#endif
-        )
+        private ScrollViewEntry NewScrollViewEntries(NodeRef nodeRef, ScrollViewEntry parent, ref int index, int hierarchy)
         {
-            ScrollViewToggle svt = NewScrollViewEntry(
-                nodeRef, parent, ref index, hierarchy, pushPool, scrollViewTogglePool
-#if SEE_RECT_WIDTH
-                ,ref maxWidth
-#endif
-            );
+            ScrollViewEntry svt = NewScrollViewEntry(nodeRef, parent, ref index, hierarchy);
             foreach (Node childNode in nodeRef.node.Children())
             {
                 NodeRef childNodeRef = dataObjects.First(entry => { return entry.node.ID.Equals(childNode.ID); });
-                NewScrollViewEntries(
-                    childNodeRef, svt, ref index, hierarchy + 1, pushPool, scrollViewTogglePool
-#if SEE_RECT_WIDTH
-                , ref maxWidth
-#endif
-                );
+                NewScrollViewEntries(childNodeRef, svt, ref index, hierarchy + 1);
             }
             return svt;
         }
-#endif
 
         /// <summary>
         /// Fills the scroll with as a list or a tree. Is called on start-up and
@@ -449,44 +433,11 @@ namespace SEE.Game.Charts
         public void FillScrollView(bool displayAsTree)
         {
             Performance p = Performance.Begin(displayAsTree ? "FillScrollViewAsTree" : "FillScrollViewAsList");
-
-            int index = 0;
+            
 #if false
             if (!displayAsTree) // display as list
             {
-                int leafCount = 0;
-                int innerNodeCount = 0;
-                foreach (NodeRef dataObject in dataObjects)
-                {
-                    if (dataObject.node.IsLeaf())
-                    {
-                        leafCount++;
-                    }
-                    else
-                    {
-                        innerNodeCount++;
-                    }
-                }
-
-                ScrollViewToggle svt = NewScrollViewEntry("Leaves", null, ref index, 0, pushPool, scrollViewTogglePool);
-                svt.SetChildrenCapacity(leafCount);
-                foreach (NodeRef dataObject in dataObjects)
-                {
-                    if (dataObject.node.IsLeaf())
-                    {
-                        NewScrollViewEntry(dataObject, svt, ref index, 1, pushPool, scrollViewTogglePool);
-                    }
-                }
-
-                svt = NewScrollViewEntry("Inner Nodes", null, ref index, 0, pushPool, scrollViewTogglePool);
-                svt.SetChildrenCapacity(innerNodeCount);
-                foreach (NodeRef dataObject in dataObjects)
-                {
-                    if (dataObject.node.IsInnerNode())
-                    {
-                        NewScrollViewEntry(dataObject, svt, ref index, 1, pushPool, scrollViewTogglePool);
-                    }
-                }
+                [...]
             }
             else // display as tree
             {
@@ -505,10 +456,6 @@ namespace SEE.Game.Charts
                 }
         }
 #endif
-
-            index = 5000;
-            //RectTransform rect = scrollContent.GetComponent<RectTransform>();
-            //rect.sizeDelta = new Vector2(rect.sizeDelta.x, index * Mathf.Abs(yGap) + 40);
 
             p.End(true);
         }
@@ -553,11 +500,8 @@ namespace SEE.Game.Charts
             int numberOfDataObjectsWithNodeHightLights = 0;
             foreach (NodeRef entry in dataObjects)
             {
-                if (entry.highlights)
-                {
-                    entry.highlights.showInChart[this] = true;
-                    numberOfDataObjectsWithNodeHightLights++;
-                }
+                entry.showInChart[this] = true;
+                numberOfDataObjectsWithNodeHightLights++;
             }
             dataObjects.Sort(delegate (NodeRef n0, NodeRef n1)
             {
@@ -613,7 +557,7 @@ namespace SEE.Game.Charts
                     inY = true;
                 }
                 // Is this node shown in this chart at all?
-                if (inX && inY && (bool)nodeRef.highlights.showInChart[this])
+                if (inX && inY && (bool)nodeRef.showInChart[this])
                 {
                     // only nodes to be shown in this chart and having values for both
                     // currently selected metrics for the axes will be added to the chart
@@ -798,7 +742,7 @@ namespace SEE.Game.Charts
         /// </summary>
         public void Destroy()
         {
-            Destroy(parent);
+            Destroy(gameObject);
         }
 
         /// <summary>
@@ -809,7 +753,7 @@ namespace SEE.Game.Charts
         {
             foreach (NodeRef dataObject in dataObjects)
             {
-                dataObject.highlights.showInChart.Remove(this);
+                dataObject.showInChart.Remove(this);
             }
         }
     }

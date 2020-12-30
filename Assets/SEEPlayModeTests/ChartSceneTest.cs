@@ -157,7 +157,7 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        ///     Checks if markers can be activated and deactivated via the <see cref="ScrollViewToggle" />s.
+        ///     Checks if markers can be activated and deactivated via the <see cref="ScrollViewEntry" />s.
         /// </summary>
         /// <returns></returns>
         [UnityTest]
