@@ -227,10 +227,10 @@ public class GameNodeScaleAction : MonoBehaviour
 
         //Corner Scaling
         float scaleCorner = 0;
-        scaleCorner += (fstCornerSphere.transform.position.x - fstCornerOldSpherPos.x) + (fstCornerSphere.transform.position.z - fstCornerOldSpherPos.z) * 0.5f;
-        scaleCorner += (sndCornerSphere.transform.position.x - sndCornerOldSpherPos.x) + (sndCornerSphere.transform.position.z - sndCornerOldSpherPos.z) * 0.5f;
-        scaleCorner += (thrdCornerSphere.transform.position.x - thrdCornerOldSpherPos.x) + (thrdCornerSphere.transform.position.z - thrdCornerOldSpherPos.z) * 0.5f;
-        scaleCorner += (forthCornerSphere.transform.position.x - forthCornerOldSpherPos.x) + (forthCornerSphere.transform.position.z - forthCornerOldSpherPos.z) * 0.5f;
+        scaleCorner -= (fstCornerSphere.transform.position.x - fstCornerOldSpherPos.x) + (fstCornerSphere.transform.position.z - fstCornerOldSpherPos.z); //* 0.5f;
+        scaleCorner += (sndCornerSphere.transform.position.x - sndCornerOldSpherPos.x) + (sndCornerSphere.transform.position.z - sndCornerOldSpherPos.z); //* 0.5f;
+        scaleCorner -= (thrdCornerSphere.transform.position.x - thrdCornerOldSpherPos.x) + (thrdCornerSphere.transform.position.z - thrdCornerOldSpherPos.z);// * 0.5f;
+        scaleCorner += (forthCornerSphere.transform.position.x - forthCornerOldSpherPos.x) + (forthCornerSphere.transform.position.z - forthCornerOldSpherPos.z);// * 0.5f;
         scale.x += scaleCorner;
         scale.z += scaleCorner;
 
