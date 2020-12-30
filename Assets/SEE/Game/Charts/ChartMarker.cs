@@ -138,7 +138,7 @@ namespace SEE.Game.Charts
                 string text = string.Empty;
                 for (int i = 0; i < LinkedInteractableObjects.Count; i++)
                 {
-                    bool showInChart = (bool)LinkedInteractableObjects[i].GetComponent<NodeRef>().highlights.showInChart[chartContent];
+                    bool showInChart = (bool)LinkedInteractableObjects[i].GetComponent<NodeRef>().showInChart[chartContent];
                     bool isHighlighted = LinkedInteractableObjects[i].IsHovered || LinkedInteractableObjects[i].IsSelected;
                     if (showInChart && isHighlighted)
                     {
@@ -159,7 +159,7 @@ namespace SEE.Game.Charts
             bool isVisible = false;
             foreach (InteractableObject interactableObject in LinkedInteractableObjects)
             {
-                bool showInChart = (bool)interactableObject.GetComponent<NodeRef>().highlights.showInChart[chartContent];
+                bool showInChart = (bool)interactableObject.GetComponent<NodeRef>().showInChart[chartContent];
                 if (showInChart)
                 {
                     isVisible = true;

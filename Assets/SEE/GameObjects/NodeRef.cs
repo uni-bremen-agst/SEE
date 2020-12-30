@@ -1,6 +1,7 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Game.Charts;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.GO
@@ -19,15 +20,6 @@ namespace SEE.GO
         /// </summary>
         [NonSerialized] public Node node;
 
-        /// <summary>
-        /// The NodeHighlights component of this NodeRef (needed for nodes represented 
-        /// in metric charts).
-        /// </summary>
-        [HideInInspector] public NodeHighlights highlights;
-
-        public void Awake()
-        {
-            highlights = GetComponent<NodeHighlights>();
-        }
+        [HideInInspector] public readonly Dictionary<ChartContent, bool> showInChart = new Dictionary<ChartContent, bool>();
     }
 }
