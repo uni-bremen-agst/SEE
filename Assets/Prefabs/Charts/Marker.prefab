@@ -388,6 +388,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chartContent: {fileID: 0}
+  image: {fileID: 7900548257253700397}
   infoText: {fileID: 2199698873300044687}
   markerHighlight: {fileID: 4103084839615680333}
 --- !u!210 &6095600582505346959

@@ -1145,7 +1145,6 @@ namespace SEE.Game
             GameObject block = leafNodeFactory.NewBlock(SelectStyle(node, innerNodeFactory), node.ItsGraph.MaxDepth);
             block.name = node.ID;
             block.AddComponent<NodeRef>().node = node;
-            block.AddComponent<NodeHighlights>();
             AdjustScaleOfLeaf(block);
             return block;
         }
@@ -1432,7 +1431,6 @@ namespace SEE.Game
             innerGameObject.name = node.ID;
             innerGameObject.tag = Tags.Node;
             innerGameObject.AddComponent<NodeRef>().node = node;
-            innerGameObject.AddComponent<NodeHighlights>();
             AdjustStyle(innerGameObject);
             AdjustHeightOfInnerNode(innerGameObject);
             return innerGameObject;

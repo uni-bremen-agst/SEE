@@ -1,8 +1,5 @@
 ﻿using SEE.DataModel.DG;
-using SEE.Game.Charts;
 using System;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace SEE.GO
 {
@@ -19,7 +16,5 @@ namespace SEE.GO
         /// by both Unity and Odin.
         /// </summary>
         [NonSerialized] public Node node;
-
-        [HideInInspector] public readonly Dictionary<ChartContent, bool> showInChart = new Dictionary<ChartContent, bool>();
     }
 }
