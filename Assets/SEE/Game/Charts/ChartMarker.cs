@@ -20,7 +20,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Controls;
-using SEE.GO;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
@@ -57,11 +56,13 @@ namespace SEE.Game.Charts
         /// </summary>
         [SerializeField] private GameObject markerHighlight;
         
-        public readonly HashSet<uint> ids = new HashSet<uint>();
-        private readonly HashSet<uint> hoveredOrSelectedIds = new HashSet<uint>();
+        public readonly List<uint> ids = new List<uint>();
+        public readonly HashSet<uint> hoveredOrSelectedIds = new HashSet<uint>();
         private readonly Dictionary<uint, string> id2TextDict = new Dictionary<uint, string>();
-        private uint selectedIdCount = 0;
+        private uint selectedCount = 0;
         private uint showInChartCount = 0;
+
+        private readonly static StringBuilder sharedStringBuilder = new StringBuilder();
 
         private void Awake()
         {
@@ -81,8 +82,8 @@ namespace SEE.Game.Charts
                 o.SelectIn -= OnSelectIn;
                 o.SelectOut -= OnSelectOut;
             }
+            selectedCount = 0;
             showInChartCount = 0;
-            selectedIdCount = 0;
             id2TextDict.Clear();
             hoveredOrSelectedIds.Clear();
             ids.Clear();
@@ -95,14 +96,12 @@ namespace SEE.Game.Charts
         /// <param name="infoText">The text to be displayed for the given object.</param>
         public void PushInteractableObject(InteractableObject o, string infoText)
         {
+            Assert.IsTrue(!ids.Contains(o.ID));
+
             ids.Add(o.ID);
             if (o.IsHovered || o.IsSelected)
             {
                 hoveredOrSelectedIds.Add(o.ID);
-                if (o.IsSelected)
-                {
-                    selectedIdCount++;
-                }
             }
             id2TextDict.Add(o.ID, infoText);
             if (chartContent.ShowInChart(o))
@@ -144,18 +143,25 @@ namespace SEE.Game.Charts
             infoText.gameObject.SetActive(showInfoText);
             if (showInfoText)
             {
-                StringBuilder sb = new StringBuilder(infoText.text.Length);
+                sharedStringBuilder.Clear();
+                int count = 0;
+                const int maxLines = 3;
                 foreach (uint id in hoveredOrSelectedIds)
                 {
+                    if (hoveredOrSelectedIds.Count > maxLines && ++count == maxLines)
+                    {
+                        sharedStringBuilder.Append("...");
+                        break;
+                    }
+
                     InteractableObject o = InteractableObject.Get(id);
                     bool showInChart = chartContent.ShowInChart(o);
                     if (showInChart)
                     {
-                        string text = id2TextDict[id];
-                        sb.AppendFormat("{0}\n", text);
+                        sharedStringBuilder.AppendFormat("{0}\n", id2TextDict[id]);
                     }
                 }
-                infoText.text = sb.ToString();
+                infoText.text = sharedStringBuilder.ToString();
             }
         }
 
@@ -238,11 +244,14 @@ namespace SEE.Game.Charts
         /// 
         /// Updates the info text.
         /// </summary>
-        /// <param name="interactableObject">Ignored.</param>
+        /// <param name="o">Ignored.</param>
         /// <param name="isOwner">Ignored.</param>
-        public void OnHoverIn(InteractableObject interactableObject, bool isOwner)
+        public void OnHoverIn(InteractableObject o, bool isOwner)
         {
-            hoveredOrSelectedIds.Add(interactableObject.ID);
+            if (!o.IsSelected)
+            {
+                hoveredOrSelectedIds.Add(o.ID);
+            }
 
             UpdateInfoText();
         }
@@ -252,11 +261,14 @@ namespace SEE.Game.Charts
         /// 
         /// Updates the info text.
         /// </summary>
-        /// <param name="interactableObject">Ignored.</param>
+        /// <param name="o">Ignored.</param>
         /// <param name="isOwner">Ignored.</param>
-        public void OnHoverOut(InteractableObject interactableObject, bool isOwner)
+        public void OnHoverOut(InteractableObject o, bool isOwner)
         {
-            hoveredOrSelectedIds.Remove(interactableObject.ID);
+            if (!o.IsSelected)
+            {
+                hoveredOrSelectedIds.Remove(o.ID);
+            }
 
             UpdateInfoText();
         }
@@ -266,12 +278,15 @@ namespace SEE.Game.Charts
         /// 
         /// Updates the info text and highlights this marker.
         /// </summary>
-        /// <param name="interactableObject">Ignored.</param>
+        /// <param name="o">Ignored.</param>
         /// <param name="isOwner">Ignored.</param>
-        public void OnSelectIn(InteractableObject interactableObject, bool isOwner)
+        public void OnSelectIn(InteractableObject o, bool isOwner)
         {
-            hoveredOrSelectedIds.Add(interactableObject.ID);
-            selectedIdCount++;
+            selectedCount++;
+            if (!o.IsHovered)
+            {
+                hoveredOrSelectedIds.Add(o.ID);
+            }
 
             UpdateInfoText();
             markerHighlight.SetActive(true);
@@ -283,15 +298,18 @@ namespace SEE.Game.Charts
         /// Updates the info text and stops highlighting this marker, if no other linked
         /// interactable object is still selected.
         /// </summary>
-        /// <param name="interactableObject">Ignored.</param>
+        /// <param name="o">Ignored.</param>
         /// <param name="isOwner">Ignored.</param>
-        public void OnSelectOut(InteractableObject interactableObject, bool isOwner)
+        public void OnSelectOut(InteractableObject o, bool isOwner)
         {
-            hoveredOrSelectedIds.Remove(interactableObject.ID);
-            selectedIdCount--;
+            selectedCount--;
+            if (!o.IsHovered)
+            {
+                hoveredOrSelectedIds.Remove(o.ID);
+            }
 
             UpdateInfoText();
-            markerHighlight.SetActive(selectedIdCount > 0);
+            markerHighlight.SetActive(selectedCount > 0);
         }
 
         private void OnShowInChartEvent(bool value)
