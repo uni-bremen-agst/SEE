@@ -150,14 +150,62 @@ namespace SEE.Game.Charts
         /// <summary>
         /// A list of all <see cref="ChartMarker" />s currently displayed in the chart.
         /// </summary>
-        protected List<GameObject> ActiveMarkers = new List<GameObject>();
+        protected List<GameObject> activeMarkers = new List<GameObject>();
 
-        public readonly Dictionary<NodeRef, ChartMarker> nodeRefToChartMarkerDict = new Dictionary<NodeRef, ChartMarker>();
+        public readonly Dictionary<NodeRef, ChartMarker> nodeRefToChartMarkerDict = new Dictionary<NodeRef, ChartMarker>(); // TODO(torben): can this be io not nodeRef?
 
         /// <summary>
         /// Contains all metric names contained in any <see cref="GameObject" /> of <see cref="dataObjects" />.
         /// </summary>
-        public readonly SortedSet<string> AllMetricNames = new SortedSet<string>();
+        public readonly SortedSet<string> allMetricNames = new SortedSet<string>();
+
+
+
+        private readonly Dictionary<uint, bool> showInChartDict = new Dictionary<uint, bool>();
+
+        public delegate void ShowInChartCallbackFn(bool value);
+        private readonly Dictionary<uint, List<ShowInChartCallbackFn>> callbackFnDict = new Dictionary<uint, List<ShowInChartCallbackFn>>();
+
+        public void AttachShowInChartCallbackFn(InteractableObject interactableObject, ShowInChartCallbackFn callbackFn)
+        {
+            if (!callbackFnDict.TryGetValue(interactableObject.ID, out List<ShowInChartCallbackFn> callbackFns))
+            {
+                callbackFns = new List<ShowInChartCallbackFn>();
+                callbackFnDict.Add(interactableObject.ID, callbackFns);
+            }
+            callbackFns.Add(callbackFn);
+        }
+
+        public bool DetachShowInChartCallbackFn(InteractableObject interactableObject, ShowInChartCallbackFn callbackFn)
+        {
+            bool result = false;
+            if (callbackFnDict.TryGetValue(interactableObject.ID, out List<ShowInChartCallbackFn> callbackFns))
+            {
+                result = callbackFns.Remove(callbackFn);
+            }
+            return result;
+        }
+
+        public bool ShowInChart(InteractableObject interactableObject)
+        {
+            bool result = showInChartDict[interactableObject.ID];
+            return result;
+        }
+
+        public void SetShowInChart(InteractableObject interactableObject, bool value)
+        {
+            bool invoke = showInChartDict.TryGetValue(interactableObject.ID, out bool oldValue) && oldValue != value;
+            showInChartDict[interactableObject.ID] = value;
+            if (callbackFnDict.TryGetValue(interactableObject.ID, out List<ShowInChartCallbackFn> callbackFns))
+            {
+                foreach (ShowInChartCallbackFn fn in callbackFns)
+                {
+                    fn(value);
+                }
+            }
+        }
+
+
 
         /// <summary>
         /// Calls methods to initialize a chart.
@@ -468,7 +516,7 @@ namespace SEE.Game.Charts
         /// ChartManager.MetricPrefix.</summary>
         private void GetAllNumericAttributes()
         {
-            AllMetricNames.Clear();
+            allMetricNames.Clear();
 #if UNITY_EDITOR
             if (dataObjects.Count == 0)
             {
@@ -479,11 +527,11 @@ namespace SEE.Game.Charts
             {
                 if (name.StartsWith(ChartManager.MetricPrefix))
                 {
-                    AllMetricNames.Add(name);
+                    allMetricNames.Add(name);
                 }
             }
 #if UNITY_EDITOR
-            if (AllMetricNames.Count == 0)
+            if (allMetricNames.Count == 0)
             {
                 Debug.LogWarning("No metrics available for charts.\n");
             }
@@ -500,7 +548,7 @@ namespace SEE.Game.Charts
             int numberOfDataObjectsWithNodeHightLights = 0;
             foreach (NodeRef entry in dataObjects)
             {
-                entry.showInChart[this] = true;
+                SetShowInChart(entry.GetComponent<InteractableObject>(), true); // TODO(torben): don't get it? performance
                 numberOfDataObjectsWithNodeHightLights++;
             }
             dataObjects.Sort(delegate (NodeRef n0, NodeRef n1)
@@ -557,7 +605,7 @@ namespace SEE.Game.Charts
                     inY = true;
                 }
                 // Is this node shown in this chart at all?
-                if (inX && inY && (bool)nodeRef.showInChart[this])
+                if (inX && inY)
                 {
                     // only nodes to be shown in this chart and having values for both
                     // currently selected metrics for the axes will be added to the chart
@@ -599,7 +647,7 @@ namespace SEE.Game.Charts
             }
             else
             {
-                foreach (GameObject activeMarker in ActiveMarkers)
+                foreach (GameObject activeMarker in activeMarkers)
                 {
                     Destroy(activeMarker);
                 }
@@ -618,7 +666,7 @@ namespace SEE.Game.Charts
         /// <param name="maxY">The maximum value on the y-axis.</param>
         private void AddMarkers(IEnumerable<NodeRef> nodeRefsToDraw, float minX, float maxX, float minY, float maxY)
         {
-            foreach (GameObject marker in ActiveMarkers)
+            foreach (GameObject marker in activeMarkers)
             {
                 Destroy(marker);
             }
@@ -641,6 +689,7 @@ namespace SEE.Game.Charts
                 if (!anchoredPositionToChartMarkerDict.TryGetValue(anchoredPosition, out ChartMarker chartMarker))
                 {
                     GameObject marker = Instantiate(markerPrefab, entries.transform);
+                    marker.name = "ChartMarker: " + nodeRef.node.SourceName;
                     marker.GetComponent<RectTransform>().anchoredPosition = anchoredPosition;
                     marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
                     chartMarker = marker.GetComponent<ChartMarker>();
@@ -648,13 +697,17 @@ namespace SEE.Game.Charts
                     updatedMarkers.Add(marker);
                     anchoredPositionToChartMarkerDict.Add(anchoredPosition, chartMarker);
                 }
+                else if (!chartMarker.gameObject.name.EndsWith(", [...]"))
+                {
+                    chartMarker.gameObject.name += ", [...]";
+                }
 
                 string infoText = nodeRef.node.SourceName + " (" + valueX.ToString("0.00") + ", " + valueY.ToString("0.00") + ")";
                 chartMarker.PushInteractableObject(nodeRef.GetComponent<InteractableObject>(), infoText);
                 nodeRefToChartMarkerDict.Add(nodeRef, chartMarker);
             }
 
-            ActiveMarkers = updatedMarkers;
+            activeMarkers = updatedMarkers;
         }
 
         /// <summary>
@@ -666,22 +719,23 @@ namespace SEE.Game.Charts
         public virtual void AreaHover(Vector2 min, Vector2 max)
         {
             bool toggleHover = Input.GetKey(KeyCode.LeftControl);
-            foreach (GameObject marker in ActiveMarkers)
+            foreach (GameObject marker in activeMarkers)
             {
-                IEnumerable<InteractableObject> interactableObjects = marker.GetComponent<ChartMarker>().LinkedInteractableObjects;
-                foreach (InteractableObject interactableObject in interactableObjects)
+                HashSet<uint> ids = marker.GetComponent<ChartMarker>().ids;
+                foreach (uint id in ids)
                 {
+                    InteractableObject o = InteractableObject.Get(id);
                     Vector2 markerPos = marker.transform.position;
                     if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                     {
-                        if (!interactableObject.IsHovered)
+                        if (!o.IsHovered)
                         {
-                            interactableObject.SetHoverFlag(HoverFlag.ChartMultiSelect, true, true);
+                            o.SetHoverFlag(HoverFlag.ChartMultiSelect, true, true);
                         }
                     }
-                    else if (!toggleHover && interactableObject.IsHovered)
+                    else if (!toggleHover && o.IsHovered)
                     {
-                        interactableObject.SetHoverFlag(HoverFlag.ChartMultiSelect, false, true);
+                        o.SetHoverFlag(HoverFlag.ChartMultiSelect, false, true);
                     }
                 }
             }
@@ -696,22 +750,23 @@ namespace SEE.Game.Charts
         public virtual void AreaSelection(Vector2 min, Vector2 max)
         {
             bool toggleSelect = Input.GetKey(KeyCode.LeftControl);
-            foreach (GameObject marker in ActiveMarkers)
+            foreach (GameObject marker in activeMarkers)
             {
-                IEnumerable<InteractableObject> interactableObjects = marker.GetComponent<ChartMarker>().LinkedInteractableObjects;
-                foreach (InteractableObject interactableObject in interactableObjects)
+                HashSet<uint> ids = marker.GetComponent<ChartMarker>().ids;
+                foreach (uint id in ids)
                 {
+                    InteractableObject o = InteractableObject.Get(id);
                     Vector2 markerPos = marker.transform.position;
                     if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                     {
-                        if (!interactableObject.IsSelected)
+                        if (!o.IsSelected)
                         {
-                            interactableObject.SetSelect(true, true);
+                            o.SetSelect(true, true);
                         }
                     }
-                    else if (!toggleSelect && interactableObject.IsSelected)
+                    else if (!toggleSelect && o.IsSelected)
                     {
-                        interactableObject.SetSelect(false, true);
+                        o.SetSelect(false, true);
                     }
                 }
             }
@@ -743,18 +798,6 @@ namespace SEE.Game.Charts
         public void Destroy()
         {
             Destroy(gameObject);
-        }
-
-        /// <summary>
-        /// Removes this chart from all <see cref="NodeHighlights.showInChart"/>
-        /// dictionaries.
-        /// </summary>
-        public void OnDestroy()
-        {
-            foreach (NodeRef dataObject in dataObjects)
-            {
-                dataObject.showInChart.Remove(this);
-            }
         }
     }
 }

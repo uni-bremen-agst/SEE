@@ -64,15 +64,16 @@ namespace SEE.Game.Charts.VR
         /// <param name="max">The max value of the bounds.</param>
         public override void AreaSelection(Vector2 min, Vector2 max)
         {
-            foreach (GameObject marker in ActiveMarkers)
+            foreach (GameObject marker in activeMarkers)
             {
                 Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition; // TODO(torben): could i just use marker.transform.[...]?
                 if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                 {
-                    IEnumerable<InteractableObject> interactableObjects = marker.GetComponent<ChartMarker>().LinkedInteractableObjects;
-                    foreach (InteractableObject interactableObject in interactableObjects)
+                    HashSet<uint> ids = marker.GetComponent<ChartMarker>().ids;
+                    foreach (uint id in ids)
                     {
-                        interactableObject.SetSelect(true, true);
+                        InteractableObject o = InteractableObject.Get(id);
+                        o.SetSelect(true, true);
                     }
                 }
             }

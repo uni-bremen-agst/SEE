@@ -125,7 +125,7 @@ namespace SEE.Game.Charts
             }
             {
                 // Add all node metrics without their prefix
-                string[] options = _chartContent.AllMetricNames.ToArray();
+                string[] options = _chartContent.allMetricNames.ToArray();
                 int MetricPrefixLength = ChartManager.MetricPrefix.Length;
                 for (int i = 0; i < options.Length; i++)
                 {

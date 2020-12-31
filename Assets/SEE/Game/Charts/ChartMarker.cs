@@ -22,8 +22,10 @@
 using SEE.Controls;
 using SEE.GO;
 using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 
 namespace SEE.Game.Charts
@@ -31,28 +33,18 @@ namespace SEE.Game.Charts
     /// <summary>
     /// Contains the logic for the markers representing entries linked to objects in the chart.
     /// </summary>
+    [RequireComponent(typeof(UnityEngine.UI.Image))]
     public class ChartMarker : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         /// <summary>
-        /// The interactable objects, that are displayed by this marker.
-        /// </summary>
-        public readonly List<InteractableObject> LinkedInteractableObjects = new List<InteractableObject>();
-
-        /// <summary>
         /// The chart content, on which this marker is displayed.
         /// </summary>
-        public ChartContent chartContent;
-
-        /// <summary>
-        /// The information to be displayed for each linked interactable object,
-        /// respectively.
-        /// </summary>
-        private readonly List<string> infoTexts = new List<string>();
+        [HideInInspector] public ChartContent chartContent;
 
         /// <summary>
         /// The icon of the marker.
         /// </summary>
-        private UnityEngine.UI.Image image;
+        [SerializeField] private UnityEngine.UI.Image image;
 
         /// <summary>
         /// A text popup containing useful information about the marker and its linked
@@ -64,55 +56,81 @@ namespace SEE.Game.Charts
         /// The <see cref="GameObject"/> making the marker look highlighted when active.
         /// </summary>
         [SerializeField] private GameObject markerHighlight;
+        
+        public readonly HashSet<uint> ids = new HashSet<uint>();
+        private readonly HashSet<uint> hoveredOrSelectedIds = new HashSet<uint>();
+        private readonly Dictionary<uint, string> id2TextDict = new Dictionary<uint, string>();
+        private uint selectedIdCount = 0;
+        private uint showInChartCount = 0;
 
         private void Awake()
         {
             infoText.text = string.Empty;
             infoText.color = UIColorScheme.GetLight(0);
-            image = GetComponent<UnityEngine.UI.Image>();
             markerHighlight.GetComponent<UnityEngine.UI.Image>().color = UIColorScheme.GetLight(2);
         }
 
         private void OnDestroy()
         {
-            foreach (InteractableObject interactableObject in LinkedInteractableObjects)
+            foreach (uint id in ids)
             {
-                interactableObject.HoverIn -= OnHoverIn;
-                interactableObject.HoverOut -= OnHoverOut;
-                interactableObject.SelectIn -= OnSelectIn;
-                interactableObject.SelectOut -= OnSelectOut;
+                InteractableObject o = InteractableObject.Get(id);
+                chartContent.DetachShowInChartCallbackFn(o, OnShowInChartEvent);
+                o.HoverIn -= OnHoverIn;
+                o.HoverOut -= OnHoverOut;
+                o.SelectIn -= OnSelectIn;
+                o.SelectOut -= OnSelectOut;
             }
+            showInChartCount = 0;
+            selectedIdCount = 0;
+            id2TextDict.Clear();
+            hoveredOrSelectedIds.Clear();
+            ids.Clear();
         }
 
         /// <summary>
         /// Adds an interactable object with given info text to this marker.
         /// </summary>
-        /// <param name="interactableObject">The object to be added.</param>
+        /// <param name="o">The interactable object to be added.</param>
         /// <param name="infoText">The text to be displayed for the given object.</param>
-        public void PushInteractableObject(InteractableObject interactableObject, string infoText)
+        public void PushInteractableObject(InteractableObject o, string infoText)
         {
-            if (!LinkedInteractableObjects.Contains(interactableObject))
+            ids.Add(o.ID);
+            if (o.IsHovered || o.IsSelected)
             {
-                LinkedInteractableObjects.Add(interactableObject);
-
-                interactableObject.HoverIn += OnHoverIn;
-                interactableObject.HoverOut += OnHoverOut;
-                interactableObject.SelectIn += OnSelectIn;
-                interactableObject.SelectOut += OnSelectOut;
-
-                infoTexts.Add(infoText);
-
-                if (interactableObject.IsHovered)
+                hoveredOrSelectedIds.Add(o.ID);
+                if (o.IsSelected)
                 {
-                    // TODO(torben): the owner should be cached inside InteractableObject, create functions like e.g. IsHoveredByThisClient()...
-                    OnHoverIn(interactableObject, true);
-                }
-                if (interactableObject.IsSelected)
-                {
-                    // TODO(torben): the owner should be cached inside InteractableObject, create functions like e.g. IsHoveredByThisClient()...
-                    OnSelectIn(interactableObject, true);
+                    selectedIdCount++;
                 }
             }
+            id2TextDict.Add(o.ID, infoText);
+            if (chartContent.ShowInChart(o))
+            {
+                showInChartCount++;
+            }
+
+            o.HoverIn += OnHoverIn;
+            o.HoverOut += OnHoverOut;
+            o.SelectIn += OnSelectIn;
+            o.SelectOut += OnSelectOut;
+
+            chartContent.AttachShowInChartCallbackFn(o, OnShowInChartEvent);
+
+            // Note(torben): This if-else-statepent only works, because 'OnSelectIn'
+            // does everything 'OnHoverIn' does, but more.
+            if (o.IsSelected)
+            {
+                // TODO(torben): the owner should be cached inside InteractableObject, create functions like e.g. IsHoveredByThisClient()...
+                OnSelectIn(o, true);
+            }
+            else if (o.IsHovered)
+            {
+                // TODO(torben): the owner should be cached inside InteractableObject, create functions like e.g. IsHoveredByThisClient()...
+                OnHoverIn(o, true);
+            }
+
+            UpdateVisibility();
         }
 
         /// <summary>
@@ -122,30 +140,22 @@ namespace SEE.Game.Charts
         /// </summary>
         public void UpdateInfoText()
         {
-            bool showInfoText = false;
-            foreach (InteractableObject interactableObject in LinkedInteractableObjects)
-            {
-                if (interactableObject.IsHovered || interactableObject.IsSelected)
-                {
-                    showInfoText = true;
-                    break;
-                }
-            }
-
+            bool showInfoText = hoveredOrSelectedIds.Count > 0;
             infoText.gameObject.SetActive(showInfoText);
             if (showInfoText)
             {
-                string text = string.Empty;
-                for (int i = 0; i < LinkedInteractableObjects.Count; i++)
+                StringBuilder sb = new StringBuilder(infoText.text.Length);
+                foreach (uint id in hoveredOrSelectedIds)
                 {
-                    bool showInChart = (bool)LinkedInteractableObjects[i].GetComponent<NodeRef>().showInChart[chartContent];
-                    bool isHighlighted = LinkedInteractableObjects[i].IsHovered || LinkedInteractableObjects[i].IsSelected;
-                    if (showInChart && isHighlighted)
+                    InteractableObject o = InteractableObject.Get(id);
+                    bool showInChart = chartContent.ShowInChart(o);
+                    if (showInChart)
                     {
-                        text += infoTexts[i] + '\n';
+                        string text = id2TextDict[id];
+                        sb.AppendFormat("{0}\n", text);
                     }
                 }
-                infoText.text = text;
+                infoText.text = sb.ToString();
             }
         }
 
@@ -156,17 +166,7 @@ namespace SEE.Game.Charts
         /// </summary>
         public void UpdateVisibility()
         {
-            bool isVisible = false;
-            foreach (InteractableObject interactableObject in LinkedInteractableObjects)
-            {
-                bool showInChart = (bool)interactableObject.GetComponent<NodeRef>().showInChart[chartContent];
-                if (showInChart)
-                {
-                    isVisible = true;
-                    break;
-                }
-            }
-            image.enabled = isVisible;
+            image.enabled = showInChartCount > 0;
         }
 
         #region UnityEngine Callbacks
@@ -188,9 +188,13 @@ namespace SEE.Game.Charts
                     InteractableObject.UnselectAll(true);
                 }
 
-                foreach (InteractableObject interactableObject in LinkedInteractableObjects)
+                foreach (uint id in ids)
                 {
-                    interactableObject.SetSelect(!interactableObject.IsSelected, true);
+                    InteractableObject o = InteractableObject.Get(id);
+                    if (chartContent.ShowInChart(o))
+                    {
+                        o.SetSelect(!o.IsSelected, true);
+                    }
                 }
             }
         }
@@ -203,9 +207,10 @@ namespace SEE.Game.Charts
         /// <param name="eventData">Ignored.</param>
         public void OnPointerEnter(PointerEventData eventData)
         {
-            foreach (InteractableObject interactableObject in LinkedInteractableObjects)
+            foreach (uint id in ids)
             {
-                interactableObject.SetHoverFlag(HoverFlag.ChartMarker, true, true);
+                InteractableObject o = InteractableObject.Get(id);
+                o.SetHoverFlag(HoverFlag.ChartMarker, true, true);
             }
         }
 
@@ -217,15 +222,16 @@ namespace SEE.Game.Charts
         /// <param name="eventData">Ignored.</param>
         public void OnPointerExit(PointerEventData eventData)
         {
-            foreach (InteractableObject interactableObject in LinkedInteractableObjects)
+            foreach (uint id in ids)
             {
-                interactableObject.SetHoverFlag(HoverFlag.ChartMarker, false, true);
+                InteractableObject o = InteractableObject.Get(id);
+                o.SetHoverFlag(HoverFlag.ChartMarker, false, true);
             }
         }
 
         #endregion
 
-        #region InteractableObject Callbacks
+        #region Internal Callbacks
 
         /// <summary>
         /// Called through event <see cref="InteractableObject.HoverIn"/>.
@@ -236,6 +242,8 @@ namespace SEE.Game.Charts
         /// <param name="isOwner">Ignored.</param>
         public void OnHoverIn(InteractableObject interactableObject, bool isOwner)
         {
+            hoveredOrSelectedIds.Add(interactableObject.ID);
+
             UpdateInfoText();
         }
 
@@ -248,6 +256,8 @@ namespace SEE.Game.Charts
         /// <param name="isOwner">Ignored.</param>
         public void OnHoverOut(InteractableObject interactableObject, bool isOwner)
         {
+            hoveredOrSelectedIds.Remove(interactableObject.ID);
+
             UpdateInfoText();
         }
 
@@ -260,6 +270,9 @@ namespace SEE.Game.Charts
         /// <param name="isOwner">Ignored.</param>
         public void OnSelectIn(InteractableObject interactableObject, bool isOwner)
         {
+            hoveredOrSelectedIds.Add(interactableObject.ID);
+            selectedIdCount++;
+
             UpdateInfoText();
             markerHighlight.SetActive(true);
         }
@@ -274,17 +287,23 @@ namespace SEE.Game.Charts
         /// <param name="isOwner">Ignored.</param>
         public void OnSelectOut(InteractableObject interactableObject, bool isOwner)
         {
+            hoveredOrSelectedIds.Remove(interactableObject.ID);
+            selectedIdCount--;
+
             UpdateInfoText();
-            bool showMarker = false;
-            foreach (InteractableObject io in LinkedInteractableObjects)
+            markerHighlight.SetActive(selectedIdCount > 0);
+        }
+
+        private void OnShowInChartEvent(bool value)
+        {
+            if (value)
             {
-                if (io.IsSelected)
-                {
-                    showMarker = true;
-                    break;
-                }
+                showInChartCount++;
             }
-            markerHighlight.SetActive(showMarker);
+            else
+            {
+                showInChartCount--;
+            }
         }
 
         #endregion
