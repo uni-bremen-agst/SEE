@@ -79,6 +79,14 @@ namespace SEE.Controls
         public bool IsHovered => HoverFlags != 0;
 
         /// <summary>
+        /// Whether the given hover flag is set.
+        /// </summary>
+        /// <param name="flag">The flag to check.</param>
+        /// <returns><code>true</code> if the given flag is set, <code>false</code>
+        /// otherwise.</returns>
+        public bool IsHoverFlagSet(HoverFlag flag) => (HoverFlags & (uint)flag) != 0;
+
+        /// <summary>
         /// Whether the object is currently selected by e.g. the mouse or the VR-
         /// controller.
         /// </summary>

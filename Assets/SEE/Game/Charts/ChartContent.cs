@@ -142,15 +142,15 @@ namespace SEE.Game.Charts
         /// <summary>
         /// All game-node objects to be listed in the chart. 
         /// 
-        /// Invariant: all game objects in dataObjects are game objects tagged by Tags.Node
-        /// and having a valid graph-node reference.
+        /// Invariant: all game objects in dataObjects are game objects tagged by
+        /// Tags.Node and having a valid graph-node reference.
         /// </summary>
         private List<NodeRef> dataObjects;
 
         /// <summary>
-        /// A list of all <see cref="ChartMarker" />s currently displayed in the chart.
+        /// A list of all <see cref="ChartMarker"/>s currently displayed in the chart.
         /// </summary>
-        protected List<GameObject> activeMarkers = new List<GameObject>();
+        protected List<ChartMarker> activeMarkers = new List<ChartMarker>();
 
         public readonly Dictionary<NodeRef, ChartMarker> nodeRefToChartMarkerDict = new Dictionary<NodeRef, ChartMarker>(); // TODO(torben): can this be io not nodeRef?
 
@@ -653,9 +653,9 @@ namespace SEE.Game.Charts
             }
             else
             {
-                foreach (GameObject activeMarker in activeMarkers)
+                foreach (ChartMarker marker in activeMarkers)
                 {
-                    Destroy(activeMarker);
+                    Destroy(marker.gameObject);
                 }
 
                 noDataWarning.SetActive(true);
@@ -672,13 +672,13 @@ namespace SEE.Game.Charts
         /// <param name="maxY">The maximum value on the y-axis.</param>
         private void AddMarkers(IEnumerable<NodeRef> nodeRefsToDraw, float minX, float maxX, float minY, float maxY)
         {
-            foreach (GameObject marker in activeMarkers)
+            foreach (ChartMarker marker in activeMarkers)
             {
-                Destroy(marker);
+                Destroy(marker.gameObject); // TODO(torben): pooling for performance
             }
             nodeRefToChartMarkerDict.Clear();
 
-            List<GameObject> updatedMarkers = new List<GameObject>();
+            List<ChartMarker> updatedMarkers = new List<ChartMarker>();
             Dictionary<Vector2, ChartMarker> anchoredPositionToChartMarkerDict = new Dictionary<Vector2, ChartMarker>();
 
             Rect dataRect = dataPanel.rect;
@@ -695,18 +695,22 @@ namespace SEE.Game.Charts
                 if (!anchoredPositionToChartMarkerDict.TryGetValue(anchoredPosition, out ChartMarker chartMarker))
                 {
                     GameObject marker = Instantiate(markerPrefab, entries.transform);
+#if UNITY_EDITOR
                     marker.name = "ChartMarker: " + nodeRef.node.SourceName;
+#endif
                     marker.GetComponent<RectTransform>().anchoredPosition = anchoredPosition;
                     marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
                     chartMarker = marker.GetComponent<ChartMarker>();
                     chartMarker.chartContent = this;
-                    updatedMarkers.Add(marker);
+                    updatedMarkers.Add(chartMarker);
                     anchoredPositionToChartMarkerDict.Add(anchoredPosition, chartMarker);
                 }
+#if UNITY_EDITOR
                 else if (!chartMarker.gameObject.name.EndsWith(", [...]"))
                 {
                     chartMarker.gameObject.name += ", [...]";
                 }
+#endif
 
                 string infoText = nodeRef.node.SourceName + " (" + valueX.ToString("0.00") + ", " + valueY.ToString("0.00") + ")";
                 chartMarker.PushInteractableObject(nodeRef.GetComponent<InteractableObject>(), infoText);
@@ -725,23 +729,31 @@ namespace SEE.Game.Charts
         public virtual void AreaHover(Vector2 min, Vector2 max)
         {
             bool toggleHover = Input.GetKey(KeyCode.LeftControl);
-            foreach (GameObject marker in activeMarkers)
+            foreach (ChartMarker marker in activeMarkers)
             {
-                HashSet<uint> ids = marker.GetComponent<ChartMarker>().ids;
-                foreach (uint id in ids)
+                Vector2 markerPos = marker.transform.position;
+                if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                 {
-                    InteractableObject o = InteractableObject.Get(id);
-                    Vector2 markerPos = marker.transform.position;
-                    if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
+                    List<uint> ids = marker.ids;
+                    for (int i = 0; i < ids.Count; i++)
                     {
-                        if (!o.IsHovered)
+                        InteractableObject o = InteractableObject.Get(ids[i]);
+                        if (!o.IsHoverFlagSet(HoverFlag.ChartMultiSelect))
                         {
                             o.SetHoverFlag(HoverFlag.ChartMultiSelect, true, true);
                         }
                     }
-                    else if (!toggleHover && o.IsHovered)
+                }
+                else if (!toggleHover)
+                {
+                    List<uint> ids = marker.ids;
+                    for (int i = 0; i < ids.Count; i++)
                     {
-                        o.SetHoverFlag(HoverFlag.ChartMultiSelect, false, true);
+                        InteractableObject o = InteractableObject.Get(ids[i]);
+                        if (o.IsHoverFlagSet(HoverFlag.ChartMultiSelect))
+                        {
+                            o.SetHoverFlag(HoverFlag.ChartMultiSelect, false, true);
+                        }
                     }
                 }
             }
@@ -756,23 +768,31 @@ namespace SEE.Game.Charts
         public virtual void AreaSelection(Vector2 min, Vector2 max)
         {
             bool toggleSelect = Input.GetKey(KeyCode.LeftControl);
-            foreach (GameObject marker in activeMarkers)
+            foreach (ChartMarker marker in activeMarkers)
             {
-                HashSet<uint> ids = marker.GetComponent<ChartMarker>().ids;
-                foreach (uint id in ids)
+                Vector2 markerPos = marker.transform.position;
+                if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                 {
-                    InteractableObject o = InteractableObject.Get(id);
-                    Vector2 markerPos = marker.transform.position;
-                    if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
+                    List<uint> ids = marker.ids;
+                    foreach (uint id in ids)
                     {
+                        InteractableObject o = InteractableObject.Get(id);
                         if (!o.IsSelected)
                         {
                             o.SetSelect(true, true);
                         }
                     }
-                    else if (!toggleSelect && o.IsSelected)
+                }
+                else if (!toggleSelect)
+                {
+                    List<uint> ids = marker.ids;
+                    foreach (uint id in ids)
                     {
-                        o.SetSelect(false, true);
+                        InteractableObject o = InteractableObject.Get(id);
+                        if (o.IsSelected)
+                        {
+                            o.SetSelect(false, true);
+                        }
                     }
                 }
             }
