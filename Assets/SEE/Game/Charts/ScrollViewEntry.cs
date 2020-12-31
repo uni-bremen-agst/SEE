@@ -97,11 +97,6 @@ namespace SEE.Game.Charts
             if (interactableObject != null)
             {
                 chartContent.SetShowInChart(interactableObject, isOn);
-                if (chartContent.nodeRefToChartMarkerDict.TryGetValue(interactableObject.GetComponent<NodeRef>(), out ChartMarker chartMarker))
-                {
-                    chartMarker.UpdateInfoText();
-                    chartMarker.UpdateVisibility();
-                }
             }
 
             // Propagate changes through parents
