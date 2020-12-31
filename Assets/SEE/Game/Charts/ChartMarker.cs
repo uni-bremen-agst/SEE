@@ -138,7 +138,7 @@ namespace SEE.Game.Charts
         /// every hovered and/or selected object is displayed. If no such object exists,
         /// the info text is disabled.
         /// </summary>
-        public void UpdateInfoText()
+        private void UpdateInfoText()
         {
             bool showInfoText = hoveredOrSelectedIds.Count > 0;
             infoText.gameObject.SetActive(showInfoText);
@@ -164,7 +164,7 @@ namespace SEE.Game.Charts
         /// interactable objects should be shown in the chart, this marker is made
         /// invisible.
         /// </summary>
-        public void UpdateVisibility()
+        private void UpdateVisibility()
         {
             image.enabled = showInChartCount > 0;
         }
@@ -304,6 +304,8 @@ namespace SEE.Game.Charts
             {
                 showInChartCount--;
             }
+            UpdateInfoText();
+            UpdateVisibility();
         }
 
         #endregion

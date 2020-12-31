@@ -194,9 +194,12 @@ namespace SEE.Game.Charts
 
         public void SetShowInChart(InteractableObject interactableObject, bool value)
         {
-            bool invoke = showInChartDict.TryGetValue(interactableObject.ID, out bool oldValue) && oldValue != value;
+            if (!showInChartDict.TryGetValue(interactableObject.ID, out bool oldValue))
+            {
+                oldValue = true;
+            }
             showInChartDict[interactableObject.ID] = value;
-            if (callbackFnDict.TryGetValue(interactableObject.ID, out List<ShowInChartCallbackFn> callbackFns))
+            if (oldValue != value && callbackFnDict.TryGetValue(interactableObject.ID, out List<ShowInChartCallbackFn> callbackFns))
             {
                 foreach (ShowInChartCallbackFn fn in callbackFns)
                 {
@@ -243,12 +246,14 @@ namespace SEE.Game.Charts
             scrollViewEntryDatas = new ScrollViewEntryData[totalEntryCount];
 
             int idx = 0;
+            int dataObjectIdx = 0;
             scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, null, ScrollViewEntryData.InvalidIndex, leafCount, true);
             idx++;
 
             for (int i = 0; i < leafCount; i++)
             {
-                scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, dataObjects[i].GetComponent<InteractableObject>(), 0, 0, true);
+                scrollViewEntryDatas[idx]
+                    = new ScrollViewEntryData(idx, this, dataObjects[dataObjectIdx++].GetComponent<InteractableObject>(), 0, 0, true);
                 scrollViewEntryDatas[0].childIndices[i] = idx;
                 idx++;
             }
@@ -260,7 +265,8 @@ namespace SEE.Game.Charts
 
             for (int i = 0; i < innerCount; i++)
             {
-                scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, dataObjects[i].GetComponent<InteractableObject>(), innerNodeIdx, 0, true);
+                scrollViewEntryDatas[idx]
+                    = new ScrollViewEntryData(idx, this, dataObjects[dataObjectIdx++].GetComponent<InteractableObject>(), innerNodeIdx, 0, true);
                 scrollViewEntryDatas[innerNodeIdx].childIndices[i] = idx;
                 idx++;
             }
