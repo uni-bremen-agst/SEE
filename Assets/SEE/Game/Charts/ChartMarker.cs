@@ -56,10 +56,30 @@ namespace SEE.Game.Charts
         /// </summary>
         [SerializeField] private GameObject markerHighlight;
         
+        /// <summary>
+        /// The ids of the handled <see cref="InteractableObject"/>.
+        /// </summary>
         public readonly List<uint> ids = new List<uint>();
+
+        /// <summary>
+        /// The ids of the hovered or selected handled <see cref="InteractableObject"/>.
+        /// </summary>
         public readonly HashSet<uint> hoveredOrSelectedIds = new HashSet<uint>();
+
+        /// <summary>
+        /// Dictionary converts between <see cref="InteractableObject.ID"/> and the
+        /// corresponding info-texts.
+        /// </summary>
         private readonly Dictionary<uint, string> id2TextDict = new Dictionary<uint, string>();
+
+        /// <summary>
+        /// The number of handled selected objects.
+        /// </summary>
         private uint selectedCount = 0;
+
+        /// <summary>
+        /// The number of handled objects, that should be visible in the chart.
+        /// </summary>
         private uint showInChartCount = 0;
 
         /// <summary>
@@ -249,8 +269,6 @@ namespace SEE.Game.Charts
         /// 
         /// Updates the info text.
         /// </summary>
-        /// <param name="o">Ignored.</param>
-        /// <param name="isOwner">Ignored.</param>
         public void OnHoverIn(InteractableObject o, bool isOwner)
         {
             if (!o.IsSelected)
@@ -266,8 +284,6 @@ namespace SEE.Game.Charts
         /// 
         /// Updates the info text.
         /// </summary>
-        /// <param name="o">Ignored.</param>
-        /// <param name="isOwner">Ignored.</param>
         public void OnHoverOut(InteractableObject o, bool isOwner)
         {
             if (!o.IsSelected)
@@ -283,8 +299,6 @@ namespace SEE.Game.Charts
         /// 
         /// Updates the info text and highlights this marker.
         /// </summary>
-        /// <param name="o">Ignored.</param>
-        /// <param name="isOwner">Ignored.</param>
         public void OnSelectIn(InteractableObject o, bool isOwner)
         {
             selectedCount++;
@@ -303,8 +317,6 @@ namespace SEE.Game.Charts
         /// Updates the info text and stops highlighting this marker, if no other linked
         /// interactable object is still selected.
         /// </summary>
-        /// <param name="o">Ignored.</param>
-        /// <param name="isOwner">Ignored.</param>
         public void OnSelectOut(InteractableObject o, bool isOwner)
         {
             selectedCount--;
@@ -317,6 +329,11 @@ namespace SEE.Game.Charts
             markerHighlight.SetActive(selectedCount > 0);
         }
 
+        /// <summary>
+        /// Called by <see cref="ChartContent.ShowInChartCallbackFn"/>, if one of the
+        /// <see cref="InteractableObject"/>s with the <see cref="ids"/> should be shown
+        /// or should no longer be shown within the chart.
+        /// </summary>
         private void OnShowInChartEvent(bool value)
         {
             if (value)
