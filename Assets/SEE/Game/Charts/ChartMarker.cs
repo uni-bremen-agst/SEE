@@ -75,7 +75,7 @@ namespace SEE.Game.Charts
             markerHighlight.GetComponent<UnityEngine.UI.Image>().color = UIColorScheme.GetLight(2);
         }
 
-        private void OnDestroy()
+        internal void OnDestroy()
         {
             foreach (uint id in ids)
             {

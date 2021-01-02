@@ -196,13 +196,11 @@ namespace SEE.Game.Charts
 
             FindDataObjects();
 
-            float stride = ScrollViewEntryHeight;
-
             // Note(torben): The list view contains every node + two additional parent
             // header entries for 'Inner Nodes' and 'Leaves'. The tree view tree only the
             // nodes, so this here is the capacity.
             int totalEntryCount = 2 + listDataObjects.Count;
-            totalHeight = (float)totalEntryCount * stride;
+            totalHeight = (float)totalEntryCount * ScrollViewEntryHeight;
 
             leafCount = 0;
             foreach (NodeRef nodeRef in listDataObjects)
@@ -212,12 +210,6 @@ namespace SEE.Game.Charts
                     leafCount++;
                 }
             }
-
-            // TODO(torben): 'maxPanelHeight' is slightly too large, but the viewport
-            // does have a height of zero... that's why i have to calculate the current
-            // height of the scrollrect in Update() every frame
-            float maxPanelHeight = scrollViewRectTransform.sizeDelta.y;
-            maxPanelEntryCount = Mathf.FloorToInt(maxPanelHeight / stride) + 1;
 
             scrollViewEntries = new ScrollViewEntry[totalEntryCount];
             scrollViewEntryDatas = new ScrollViewEntryData[totalEntryCount];
@@ -527,6 +519,15 @@ namespace SEE.Game.Charts
             p.End(true);
         }
 
+        private void UpdateMaxPanelEntryCount()
+        {
+            // TODO(torben): 'maxPanelHeight' is slightly too large, but the viewport
+            // does have a height of zero... that's why i have to calculate the current
+            // height of the scrollrect in Update() every frame
+            float maxPanelHeight = scrollViewRectTransform.sizeDelta.y;
+            maxPanelEntryCount = Mathf.FloorToInt(maxPanelHeight / ScrollViewEntryHeight) + 1;
+        }
+
         /// <summary>
         /// Gets all metric names for <see cref="float"/> values contained in the
         /// <see cref="NodeRef"/> of each <see cref="GameObject"/> in
@@ -610,6 +611,8 @@ namespace SEE.Game.Charts
         /// </summary>
         public void DrawData()
         {
+            UpdateMaxPanelEntryCount();
+
             noDataWarning.SetActive(false);
 
             bool xIsNodeEnum = axisDropdownX.CurrentlySelectedMetric.Equals(NodeEnumeration);
@@ -623,7 +626,7 @@ namespace SEE.Game.Charts
             float maxX = float.NegativeInfinity; // globally maximal value on X axis
             float minY = float.PositiveInfinity; // globally minimal value on Y axis
             float maxY = float.NegativeInfinity; // globally maximal value on Y axis
-            List<NodeRef> toDraw = new List<NodeRef>(); // nodes to be drawn in the chart
+            List<NodeRef> toDraw = new List<NodeRef>(activeMarkers.Count); // nodes to be drawn in the chart
             foreach (NodeRef nodeRef in listDataObjects)
             {
                 bool inX = false;
@@ -702,19 +705,17 @@ namespace SEE.Game.Charts
         /// <param name="maxY">The maximum value on the y-axis.</param>
         private void AddMarkers(IEnumerable<NodeRef> nodeRefsToDraw, float minX, float maxX, float minY, float maxY)
         {
-            foreach (ChartMarker marker in activeMarkers)
-            {
-                Destroy(marker.gameObject); // TODO(torben): pooling for performance
-            }
             nodeRefToChartMarkerDict.Clear();
+            callbackFnDict.Clear();
 
-            List<ChartMarker> updatedMarkers = new List<ChartMarker>();
-            Dictionary<Vector2, ChartMarker> anchoredPositionToChartMarkerDict = new Dictionary<Vector2, ChartMarker>();
+            List<ChartMarker> updatedMarkers = new List<ChartMarker>(activeMarkers.Count);
+            Dictionary<Vector2, ChartMarker> anchoredPositionToChartMarkerDict = new Dictionary<Vector2, ChartMarker>(activeMarkers.Count);
 
             Rect dataRect = dataPanel.rect;
             float width = minX < maxX ? dataRect.width / (maxX - minX) : 0.0f;
             float height = minY < maxY ? dataRect.height / (maxY - minY) : 0.0f;
             int positionInLayer = 0;
+            int currentReusedActiveMarkerIndex = 0;
 
             foreach (NodeRef nodeRef in nodeRefsToDraw)
             {
@@ -724,13 +725,23 @@ namespace SEE.Game.Charts
 
                 if (!anchoredPositionToChartMarkerDict.TryGetValue(anchoredPosition, out ChartMarker chartMarker))
                 {
-                    GameObject marker = Instantiate(markerPrefab, entries.transform);
+                    GameObject marker;
+                    if (currentReusedActiveMarkerIndex < activeMarkers.Count)
+                    {
+                        chartMarker = activeMarkers[currentReusedActiveMarkerIndex++];
+                        chartMarker.OnDestroy();
+                        marker = chartMarker.gameObject;
+                    }
+                    else
+                    {
+                        marker = Instantiate(markerPrefab, entries.transform);
+                        chartMarker = marker.GetComponent<ChartMarker>();
+                    }
 #if UNITY_EDITOR
                     marker.name = "ChartMarker: " + nodeRef.Value.SourceName;
 #endif
                     marker.GetComponent<RectTransform>().anchoredPosition = anchoredPosition;
                     marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
-                    chartMarker = marker.GetComponent<ChartMarker>();
                     chartMarker.chartContent = this;
                     updatedMarkers.Add(chartMarker);
                     anchoredPositionToChartMarkerDict.Add(anchoredPosition, chartMarker);
@@ -747,6 +758,10 @@ namespace SEE.Game.Charts
                 nodeRefToChartMarkerDict.Add(nodeRef, chartMarker);
             }
 
+            for (int i = currentReusedActiveMarkerIndex; i < activeMarkers.Count; i++)
+            {
+                Destroy(activeMarkers[i].gameObject); // TODO(torben): these could potentially still be pooled for future rebuilds
+            }
             activeMarkers = updatedMarkers;
         }
 
