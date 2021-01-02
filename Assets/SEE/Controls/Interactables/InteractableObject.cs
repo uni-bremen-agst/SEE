@@ -298,11 +298,11 @@ namespace SEE.Controls
                 // when the object is in the focus but not grabbed any longer.
                 if (IsSelected)
                 {
-                    SetSelect(true, isOwner); // see: @DoubleHoverEventPerformance
+                    SetSelect(true, isOwner); // See: @DoubleHoverEventPerformance
                 }
                 else if (IsHovered)
                 {
-                    SetHoverFlag(HoverFlag.None, true, isOwner); // see: @DoubleHoverEventPerformance
+                    SetHoverFlag(HoverFlag.None, true, isOwner); // See: @DoubleHoverEventPerformance
                 }
                 GrabbedObjects.Remove(this);
             }

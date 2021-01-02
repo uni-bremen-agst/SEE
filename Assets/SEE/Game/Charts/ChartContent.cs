@@ -139,21 +139,41 @@ namespace SEE.Game.Charts
         /// </summary>
         public RectTransform labelsPanel;
 
+        /// <summary>
+        /// The current data of the vertical scroll bar is used to determine the range of
+        /// visible entries.
+        /// </summary>
         [SerializeField] private Scrollbar verticalScrollBar;
 
         // TODO(torben): i'd rather have the Viewport sizes, as this is slightly too
         // large. as a result, i have to calculate 'first' in Update() every frame with
         // 'verticalScrollBar.value'
+        /// <summary>
+        /// The transform if the scroll view rect is used to determine the max size and
+        /// thus the upper limit of entries of the panel.
+        /// </summary>
         [SerializeField] private RectTransform scrollViewRectTransform;
 
         /// <summary>
-        /// All game-node objects to be listed in the chart. 
+        /// All game-node objects to be listed in the chart for the list-view.
         /// 
         /// Invariant: all game objects in dataObjects are game objects tagged by
         /// Tags.Node and having a valid graph-node reference.
         /// </summary>
         private List<NodeRef> listDataObjects;
+
+        /// <summary>
+        /// All game-node objects to be listed in the chart for the tree-view.
+        /// 
+        /// Invariant: all game objects in dataObjects are game objects tagged by
+        /// Tags.Node and having a valid graph-node reference.
+        /// </summary>
         private List<NodeRef> treeDataObjects;
+
+        /// <summary>
+        /// The hierarchy-indices of every <see cref="treeDataObjects"/>-element. Both
+        /// always have same number of elements.
+        /// </summary>
         private List<int> treeHierarchies;
 
         /// <summary>
@@ -416,7 +436,7 @@ namespace SEE.Game.Charts
                     // Note(torben): This only unsubscribes from events from the
                     // interactable object and thus can be inside of this if-statement
                     // for better performance
-                    scrollViewEntryDatas[i].Destroy();
+                    scrollViewEntryDatas[i].OnDestroy();
                 }
             }
 
@@ -433,7 +453,7 @@ namespace SEE.Game.Charts
             if (scrollViewIsTree)
             {
                 Stack<int> parentIndexStack = new Stack<int>();
-                parentIndexStack.Push(ScrollViewEntryData.InvalidIndex);
+                parentIndexStack.Push(ScrollViewEntryData.NoParentIndex);
 
                 for (int i = 0; i < treeDataObjects.Count; i++)
                 {
@@ -487,7 +507,7 @@ namespace SEE.Game.Charts
                 int idx = 0;
                 int dataObjectIdx = 0;
 
-                scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, null, ScrollViewEntryData.InvalidIndex, leafCount);
+                scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, null, ScrollViewEntryData.NoParentIndex, leafCount);
                 idx++;
 
                 for (int i = 0; i < leafCount; i++)
@@ -500,7 +520,7 @@ namespace SEE.Game.Charts
 
                 int innerCount = listDataObjects.Count - leafCount;
                 int innerNodeIdx = idx;
-                scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, null, ScrollViewEntryData.InvalidIndex, innerCount);
+                scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, null, ScrollViewEntryData.NoParentIndex, innerCount);
                 idx++;
 
                 for (int i = 0; i < innerCount; i++)
