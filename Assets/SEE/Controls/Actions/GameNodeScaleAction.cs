@@ -96,65 +96,55 @@ public class GameNodeScaleAction : MonoBehaviour
         {
             if (tmpSphere == null)
             {
-
-
                 Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
 
                 RaycastHit hit;
                 // Casts the ray and get the first game object hit
                 Physics.Raycast(ray, out hit);
 
-
                 //Moves the Sphere which was hit
                 //top
                 if (hit.collider == topSphere.GetComponent<Collider>())
                 {
-                    //GameNodeMover.MoveToLockAxes(topSphere, false, true, false);
                     tmpSphere = topSphere;
-
                 } //Corners
                 else if (hit.collider == fstCornerSphere.GetComponent<Collider>())
                 {
                     tmpSphere = fstCornerSphere;
-                    //GameNodeMover.MoveToLockAxes(fstCornerSphere, true, false, true);
+                    Debug.Log("FST CORNER");
                 }
                 else if (hit.collider == sndCornerSphere.GetComponent<Collider>())
                 {
                     tmpSphere = sndCornerSphere;
-                    //GameNodeMover.MoveToLockAxes(sndCornerSphere, true, false, true);
+                    Debug.Log("SND CORNER");
                 }
                 else if (hit.collider == thrdCornerSphere.GetComponent<Collider>())
                 {
                     tmpSphere = thrdCornerSphere;
-                   // GameNodeMover.MoveToLockAxes(thrdCornerSphere, true, false, true);
+                    Debug.Log("THRD Corner");
                 }
                 else if (hit.collider == forthCornerSphere.GetComponent<Collider>())
                 {
                     tmpSphere = forthCornerSphere;
-                    //GameNodeMover.MoveToLockAxes(forthCornerSphere, true, false, true);
+                    Debug.Log("Forth Corener");
                 }
                 //Sides
                 else if (hit.collider == fstSideSphere.GetComponent<Collider>())
                 {
                     tmpSphere = fstSideSphere;
-                    //GameNodeMover.MoveToLockAxes(fstSideSphere, true, false, false);
                 }
                 else if (hit.collider == sndSideSphere.GetComponent<Collider>())
                 {
                     tmpSphere = sndSideSphere;
-                    //GameNodeMover.MoveToLockAxes(sndSideSphere, true, false, false);
                 }
                 else if (hit.collider == thrdSideSphere.GetComponent<Collider>())
                 {
                     tmpSphere = thrdSideSphere;
-                    //GameNodeMover.MoveToLockAxes(thrdSideSphere, false, false, true);
                 }
                 else if (hit.collider == forthSideSphere.GetComponent<Collider>())
                 {
                     tmpSphere = forthSideSphere;
-                    //GameNodeMover.MoveToLockAxes(forthSideSphere, false, false, true);
                 }
-
                 //End Scalling
                 else if (hit.collider == endWithSave.GetComponent<Collider>())
                 {
@@ -228,9 +218,10 @@ public class GameNodeScaleAction : MonoBehaviour
         //Corner Scaling
         float scaleCorner = 0;
         scaleCorner -= (fstCornerSphere.transform.position.x - fstCornerOldSpherPos.x) + (fstCornerSphere.transform.position.z - fstCornerOldSpherPos.z); //* 0.5f;
-        scaleCorner += (sndCornerSphere.transform.position.x - sndCornerOldSpherPos.x) + (sndCornerSphere.transform.position.z - sndCornerOldSpherPos.z); //* 0.5f;
-        scaleCorner -= (thrdCornerSphere.transform.position.x - thrdCornerOldSpherPos.x) + (thrdCornerSphere.transform.position.z - thrdCornerOldSpherPos.z);// * 0.5f;
-        scaleCorner += (forthCornerSphere.transform.position.x - forthCornerOldSpherPos.x) + (forthCornerSphere.transform.position.z - forthCornerOldSpherPos.z);// * 0.5f;
+        scaleCorner += (sndCornerSphere.transform.position.x - sndCornerOldSpherPos.x) - (sndCornerSphere.transform.position.z - sndCornerOldSpherPos.z); //* 0.5f;
+        scaleCorner += (thrdCornerSphere.transform.position.x - thrdCornerOldSpherPos.x) + (thrdCornerSphere.transform.position.z - thrdCornerOldSpherPos.z);// * 0.5f;
+        scaleCorner -= (forthCornerSphere.transform.position.x - forthCornerOldSpherPos.x) - (forthCornerSphere.transform.position.z - forthCornerOldSpherPos.z);// * 0.5f;
+
         scale.x += scaleCorner;
         scale.z += scaleCorner;
 
@@ -368,7 +359,6 @@ public class GameNodeScaleAction : MonoBehaviour
         }
         else
         {
-            Debug.Log( sphere.transform.lossyScale.x);
             sphere.transform.localScale = new Vector3(0.01f,0.01f,0.01f);
         }
 
