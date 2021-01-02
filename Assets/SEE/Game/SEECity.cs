@@ -207,8 +207,8 @@ namespace SEE.Game
                 GameObject child = childTransform.gameObject;
                 if (child.TryGetComponent(out NodeRef nodeRef))
                 {
-                    nodeRef.node = graph.GetNode(child.name);
-                    if (nodeRef.node == null)
+                    nodeRef.Value = graph.GetNode(child.name);
+                    if (nodeRef.Value == null)
                     {
                         Debug.LogWarningFormat("Could not resolve node reference {0}.\n", child.name);
                     }

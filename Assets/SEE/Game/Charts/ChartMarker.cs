@@ -62,6 +62,10 @@ namespace SEE.Game.Charts
         private uint selectedCount = 0;
         private uint showInChartCount = 0;
 
+        /// <summary>
+        /// This is shared across all <see cref="ChartMarker"/>s to reduce memory
+        /// consumption and the number of memory allocations.
+        /// </summary>
         private readonly static StringBuilder sharedStringBuilder = new StringBuilder();
 
         private void Awake()
@@ -150,7 +154,9 @@ namespace SEE.Game.Charts
                 {
                     if (hoveredOrSelectedIds.Count > maxLines && ++count == maxLines)
                     {
-                        sharedStringBuilder.Append("...");
+                        sharedStringBuilder.Append("and ");
+                        sharedStringBuilder.Append((hoveredOrSelectedIds.Count - maxLines + 1).ToString());
+                        sharedStringBuilder.Append(" more...");
                         break;
                     }
 

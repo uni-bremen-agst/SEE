@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using SEE.Controls.Actions;
+using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -48,7 +49,7 @@ namespace SEE.Controls
         /// <summary>
         /// The interactable objects.
         /// </summary>
-        private static readonly Dictionary<uint, InteractableObject> interactableObjects = new Dictionary<uint, InteractableObject>(); // TODO(torben): is a simple list sufficient?
+        private static readonly Dictionary<uint, InteractableObject> idToInteractableObjectDict = new Dictionary<uint, InteractableObject>(); // TODO(torben): is a simple list sufficient?
 
         /// <summary>
         /// The hovered objects.
@@ -119,7 +120,7 @@ namespace SEE.Controls
         private void Awake()
         {
             ID = nextID++;
-            interactableObjects.Add(ID, this);
+            idToInteractableObjectDict.Add(ID, this);
 
             interactable = GetComponent<Interactable>();
             if (interactable == null)
@@ -141,7 +142,7 @@ namespace SEE.Controls
         /// <returns></returns>
         public static InteractableObject Get(uint id)
         {
-            if (!interactableObjects.TryGetValue(id, out InteractableObject result))
+            if (!idToInteractableObjectDict.TryGetValue(id, out InteractableObject result))
             {
                 result = null;
             }

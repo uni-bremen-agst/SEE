@@ -23,7 +23,7 @@ namespace SEE.Game
             {
                 if (go.TryGetComponent(out NodeRef nodeRef))
                 {
-                    Node node = nodeRef.node;
+                    Node node = nodeRef.Value;
                     if (node != null)
                     {
                         if ((includeLeaves && node.IsLeaf()) || (includeInnerNodes && !node.IsLeaf()))
@@ -56,7 +56,7 @@ namespace SEE.Game
             {
                 if (go.TryGetComponent(out NodeRef nodeRef))
                 {
-                    Node node = nodeRef.node;
+                    Node node = nodeRef.Value;
                     if (node != null)
                     {
                         if ((includeLeaves && node.IsLeaf()) || (includeInnerNodes && !node.IsLeaf()))
@@ -85,7 +85,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">game nodes whose roots are to be returned</param>
         /// <returns>all root nodes in the scene</returns>
-        public static ICollection<Node> GetRoots(ICollection<GameObject> gameNodes)
+        public static List<Node> GetRoots(ICollection<GameObject> gameNodes)
         {
             List<Node> result = new List<Node>();
             foreach (Graph graph in GetGraphs(gameNodes))
@@ -95,12 +95,12 @@ namespace SEE.Game
             return result;
         }
 
-        public static ICollection<Node> GetRoots(ICollection<NodeRef> nodeRefs)
+        public static HashSet<Node> GetRoots(ICollection<NodeRef> nodeRefs)
         {
             HashSet<Node> result = new HashSet<Node>();
             foreach (NodeRef nodeRef in nodeRefs)
             {
-                IEnumerable<Node> nodes = nodeRef?.node?.ItsGraph?.GetRoots();
+                IEnumerable<Node> nodes = nodeRef?.Value?.ItsGraph?.GetRoots();
                 if (nodes != null)
                 {
                     foreach (Node node in nodes)
@@ -128,7 +128,7 @@ namespace SEE.Game
             HashSet<Graph> result = new HashSet<Graph>();
             foreach (GameObject go in gameNodes)
             {
-                result.Add(go.GetComponent<NodeRef>().node.ItsGraph);
+                result.Add(go.GetComponent<NodeRef>().Value.ItsGraph);
             }
             return result;
         }
@@ -143,12 +143,12 @@ namespace SEE.Game
         /// <returns>true if <paramref name="gameNode"/> represents a leaf in the graph</returns>
         public static bool IsLeaf(GameObject gameNode)
         {
-            return gameNode.GetComponent<NodeRef>()?.node?.IsLeaf() ?? false;
+            return gameNode.GetComponent<NodeRef>()?.Value?.IsLeaf() ?? false;
         }
 
         public static bool IsLeaf(NodeRef nodeRef)
         {
-            return nodeRef?.node?.IsLeaf() ?? false;
+            return nodeRef?.Value?.IsLeaf() ?? false;
         }
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace SEE.Game
         /// <returns>true if <paramref name="gameNode"/> represents an inner node in the graph</returns>
         public static bool IsInnerNode(GameObject gameNode)
         {
-            return gameNode.GetComponent<NodeRef>()?.node?.IsInnerNode() ?? false;
+            return gameNode.GetComponent<NodeRef>()?.Value?.IsInnerNode() ?? false;
         }
 
         /// <summary>
@@ -175,9 +175,9 @@ namespace SEE.Game
         {
             if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
-                if (nodeRef.node != null)
+                if (nodeRef.Value != null)
                 {
-                    return nodeRef.node.SourceName;
+                    return nodeRef.Value.SourceName;
                 }
             }
             return gameNode.name;
@@ -189,7 +189,7 @@ namespace SEE.Game
 
             if (nodeRef)
             {
-                result = nodeRef.node?.SourceName ?? nodeRef.gameObject.name;
+                result = nodeRef.Value?.SourceName ?? nodeRef.gameObject.name;
             }
 
             return result;
@@ -265,7 +265,7 @@ namespace SEE.Game
                 }
                 else
                 {
-                    return nodeRef.node;
+                    return nodeRef.Value;
                 }
             }
         }

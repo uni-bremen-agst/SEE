@@ -196,7 +196,7 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            Node node = nodeRef.node;
+            Node node = nodeRef.Value;
             if (node == null)
             {
                 return;
