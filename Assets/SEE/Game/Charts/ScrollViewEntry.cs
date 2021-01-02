@@ -20,7 +20,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Controls;
-using SEE.GO;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
@@ -29,6 +28,83 @@ namespace SEE.Game.Charts
 {
     public struct ScrollViewEntryData
     {
+        private class EventHandler
+        {
+            private readonly ChartContent chartContent;
+            private readonly int index;
+            private readonly InteractableObject interactableObject;
+
+            /// <summary>
+            /// Sadly, since you can not properly unsubscribe from an event with a
+            /// member-function of a struct, this class is necessary to handle the event
+            /// subscriptions.
+            /// </summary>
+            /// <param name="chartContent">The chart content.</param>
+            /// <param name="index">The index of the <see cref="ScrollViewEntryData"/>.
+            /// </param>
+            /// <param name="interactableObject">The interactable object.</param>
+            internal EventHandler(ChartContent chartContent, int index, InteractableObject interactableObject)
+            {
+                this.chartContent = chartContent;
+                this.index = index;
+                this.interactableObject = interactableObject;
+
+                if (this.interactableObject)
+                {
+                    this.interactableObject.HoverIn += OnHoverOrSelect;
+                    this.interactableObject.HoverOut += OnHoverOrSelect;
+                    this.interactableObject.SelectIn += OnHoverOrSelect;
+                    this.interactableObject.SelectOut += OnHoverOrSelect;
+
+                    if (this.interactableObject.IsHovered)
+                    {
+                        OnHoverOrSelect(this.interactableObject, true); // TODO(torben): cache address of owner in InteractableObject
+                    }
+                    if (this.interactableObject.IsSelected)
+                    {
+                        OnHoverOrSelect(this.interactableObject, true); // TODO(torben): cache address of owner in InteractableObject
+                    }
+                }
+            }
+
+            internal void OnHoverOrSelect(InteractableObject o, bool isOwner)
+            {
+                ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);
+                if (entry != null)
+                {
+                    int colorIndex = 0;
+                    if (o != null)
+                    {
+                        if (o.IsSelected)
+                        {
+                            colorIndex = 2;
+                        }
+                        else if (o.IsHovered)
+                        {
+                            colorIndex = 1;
+                        }
+                    }
+
+                    Color color = UIColorScheme.GetLight(colorIndex);
+                    UnityEngine.UI.ColorBlock colors = entry.toggle.colors;
+                    colors.normalColor = color;
+                    entry.toggle.colors = colors;
+                    entry.label.color = color;
+                }
+            }
+
+            internal void Destroy()
+            {
+                if (interactableObject)
+                {
+                    interactableObject.HoverIn -= OnHoverOrSelect;
+                    interactableObject.HoverOut -= OnHoverOrSelect;
+                    interactableObject.SelectIn -= OnHoverOrSelect;
+                    interactableObject.SelectOut -= OnHoverOrSelect;
+                }
+            }
+        }
+
         public const int InvalidIndex = -1;
 
         public readonly int index; // equals the index of corresponding ScrollViewEntry
@@ -38,6 +114,7 @@ namespace SEE.Game.Charts
         public readonly int[] childIndices;
         public bool isOn;
 
+        private EventHandler eventHandler;
         private static bool toggleParents = true;
         private static bool toggleChildren = true;
 
@@ -61,32 +138,14 @@ namespace SEE.Game.Charts
             childIndices = childIndexCount == 0 ? null : new int[childIndexCount];
             this.isOn = isOn;
 
-            if (this.interactableObject)
-            {
-                this.interactableObject.HoverIn += OnHoverOrSelect;
-                this.interactableObject.HoverOut += OnHoverOrSelect;
-                this.interactableObject.SelectIn += OnHoverOrSelect;
-                this.interactableObject.SelectOut += OnHoverOrSelect;
-
-                if (this.interactableObject.IsHovered)
-                {
-                    OnHoverOrSelect(this.interactableObject, true); // TODO(torben): cache address of owner in InteractableObject
-                }
-                if (this.interactableObject.IsSelected)
-                {
-                    OnHoverOrSelect(this.interactableObject, true); // TODO(torben): cache address of owner in InteractableObject
-                }
-            }
+            eventHandler = new EventHandler(this.chartContent, this.index, this.interactableObject);
         }
 
         internal void Destroy()
         {
-            if (interactableObject)
+            if (eventHandler != null)
             {
-                interactableObject.HoverIn -= OnHoverOrSelect;
-                interactableObject.HoverOut -= OnHoverOrSelect;
-                interactableObject.SelectIn -= OnHoverOrSelect;
-                interactableObject.SelectOut -= OnHoverOrSelect;
+                eventHandler.Destroy();
             }
         }
 
@@ -223,32 +282,6 @@ namespace SEE.Game.Charts
                 interactableObject.SetHoverFlag(HoverFlag.ChartScrollViewToggle, enter, true);
             }
         }
-
-        private void OnHoverOrSelect(InteractableObject interactableObject, bool isOwner)
-        {
-            ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);
-            if (entry != null)
-            {
-                int colorIndex = 0;
-                if (interactableObject != null)
-                {
-                    if (interactableObject.IsSelected)
-                    {
-                        colorIndex = 2;
-                    }
-                    else if (interactableObject.IsHovered)
-                    {
-                        colorIndex = 1;
-                    }
-                }
-
-                Color color = UIColorScheme.GetLight(colorIndex);
-                UnityEngine.UI.ColorBlock colors = entry.toggle.colors;
-                colors.normalColor = color;
-                entry.toggle.colors = colors;
-                entry.label.color = color;
-            }
-        }
     }
 
     [RequireComponent(typeof(UnityEngine.UI.Toggle))]
@@ -273,7 +306,7 @@ namespace SEE.Game.Charts
             OnPointerExit(null);
 #if UNITY_EDITOR
             toggle.SetIsOnWithoutNotify(true);
-            label.text = "Pooled ScrollViewEntry";
+            label.text = "Pooled ScrollViewEntry, previously: " + label.text;
             index = ScrollViewEntryData.InvalidIndex;
             chartContent = null;
 #endif
