@@ -1,6 +1,10 @@
-﻿using SEE.Game;
+﻿using SEE.DataModel.DG;
+using SEE.Game;
 using SEE.Game.Charts;
+using SEE.GO;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
@@ -21,10 +25,23 @@ namespace SEE.Controls.Actions
             MapNode   // a game node is mapped from one city to another city
         }
 
+        [SerializeField] private MappingAction mappingAction;
+
         /// <summary>
         /// The current state of the player.
         /// </summary>
         private State state = State.Browse;
+
+        private bool firstMove = true;
+        private Vector3 startPosition = Vector3.zero;
+        private readonly List<Node> otherNodes = new List<Node>();
+
+#if UNITY_EDITOR
+        private void Awake()
+        {
+            UnityEngine.Assertions.Assert.IsNotNull(mappingAction, "The mapping action must not be null!");
+        }
+#endif
 
         private void Update()
         {
@@ -38,22 +55,60 @@ namespace SEE.Controls.Actions
             switch (state)
             {
                 case State.MoveNode:
-                    // an object must be selected; otherwise we cannot move it
-                    if (selectedObject != null)
-                    {                        
-                        if (UserWantsToMove())
-                        {
-                            GameNodeMover.MoveTo(selectedObject);
+                    {
+                        // an object must be selected; otherwise we cannot move it
+                        if (selectedObject != null)
+                        {                        
+                            if (UserWantsToMove())
+                            {
+                                GameNodeMover.MoveTo(selectedObject);
+                            }
+                            else
+                            {
+                                // The selected object has reached its final destination.
+                                // It needs to be placed there.
+                                GameNodeMover.FinalizePosition(selectedObject);
+                                selectedObject = null;
+                            }
                         }
-                        else
+                    } break;
+                case State.MapNode:
+                    {
+                        if (selectedObject != null)
                         {
-                            // The selected object has reached its final destination.
-                            // It needs to be placed there.
-                            GameNodeMover.FinalizePosition(selectedObject);
-                            selectedObject = null;
+                            if (UserWantsToMove())
+                            {
+                                if (firstMove)
+                                {
+                                    firstMove = false;
+                                    startPosition = selectedObject.transform.position;
+                                    Rigidbody r = selectedObject.AddComponent<Rigidbody>();
+                                    r.freezeRotation = true;
+                                    r.isKinematic = true;
+                                    selectedObject.GetComponent<InteractableObject>().CollisionIn += CollisionIn;
+                                    selectedObject.GetComponent<InteractableObject>().CollisionOut += CollisionOut;
+                                }
+                                GameNodeMover.MoveTo(selectedObject);
+                            }
+                            else
+                            {
+                                firstMove = true;
+                                selectedObject.transform.position = startPosition;
+                                selectedObject.GetComponent<InteractableObject>().CollisionIn -= CollisionIn;
+                                selectedObject.GetComponent<InteractableObject>().CollisionOut -= CollisionOut;
+                                Destroy(selectedObject.GetComponent<Rigidbody>());
+
+                                Node n = selectedObject.GetComponent<NodeRef>().node;
+                                if (otherNodes.Count > 0)
+                                {
+                                    Assert.IsTrue(!mappingAction.Reflexion.Is_Mapper(n));
+                                    mappingAction.Reflexion.Add_To_Mapping(n, otherNodes[otherNodes.Count - 1]);
+                                }
+
+                                selectedObject = null;
+                            }
                         }
-                    }
-                    break;
+                    } break;
             }
         }
 
@@ -215,6 +270,24 @@ namespace SEE.Controls.Actions
         public void GrabOff(GameObject grabbed)
         {
             // currently empty
+        }
+
+        private void CollisionIn(InteractableObject interactableObject, Collision collision)
+        {
+            NodeRef nodeRef = collision.transform.GetComponent<NodeRef>();
+            if (nodeRef)
+            {
+                otherNodes.Add(nodeRef.node);
+            }
+        }
+
+        private void CollisionOut(InteractableObject interactableObject, Collision collision)
+        {
+            NodeRef nodeRef = collision.transform.GetComponent<NodeRef>();
+            if (nodeRef)
+            {
+                otherNodes.Remove(nodeRef.node);
+            }
         }
 
         // -------------------------------------------------------------
