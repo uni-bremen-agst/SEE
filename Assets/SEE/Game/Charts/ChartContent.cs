@@ -145,7 +145,9 @@ namespace SEE.Game.Charts
         /// Invariant: all game objects in dataObjects are game objects tagged by
         /// Tags.Node and having a valid graph-node reference.
         /// </summary>
-        private List<NodeRef> dataObjects;
+        private List<NodeRef> listDataObjects;
+        private List<NodeRef> treeDataObjects;
+        private List<int> treeHierarchies;
 
         /// <summary>
         /// A list of all <see cref="ChartMarker"/>s currently displayed in the chart.
@@ -155,16 +157,18 @@ namespace SEE.Game.Charts
         public readonly Dictionary<NodeRef, ChartMarker> nodeRefToChartMarkerDict = new Dictionary<NodeRef, ChartMarker>(); // TODO(torben): can this be io not nodeRef?
 
         /// <summary>
-        /// Contains all metric names contained in any <see cref="GameObject" /> of <see cref="dataObjects" />.
+        /// Contains all metric names contained in any <see cref="GameObject" /> of <see cref="listDataObjects" />.
         /// </summary>
         public readonly SortedSet<string> allMetricNames = new SortedSet<string>();
-
-
 
         private readonly Dictionary<uint, bool> showInChartDict = new Dictionary<uint, bool>();
 
         public delegate void ShowInChartCallbackFn(bool value);
         private readonly Dictionary<uint, List<ShowInChartCallbackFn>> callbackFnDict = new Dictionary<uint, List<ShowInChartCallbackFn>>();
+
+        private bool scrollViewIsTree = true;
+
+
 
         public void AttachShowInChartCallbackFn(InteractableObject interactableObject, ShowInChartCallbackFn callbackFn)
         {
@@ -208,8 +212,6 @@ namespace SEE.Game.Charts
             }
         }
 
-
-
         /// <summary>
         /// Calls methods to initialize a chart.
         /// </summary>
@@ -224,13 +226,13 @@ namespace SEE.Game.Charts
             // Note(torben): The list view contains every node + two additional parent
             // header entries for 'Inner Nodes' and 'Leaves'. The tree view tree only the
             // nodes, so this here is the capacity.
-            int totalEntryCount = 2 + dataObjects.Count;
+            int totalEntryCount = 2 + listDataObjects.Count;
             totalHeight = (float)totalEntryCount * stride;
 
             leafCount = 0;
-            foreach (NodeRef nodeRef in dataObjects)
+            foreach (NodeRef nodeRef in listDataObjects)
             {
-                if (nodeRef.node.IsLeaf())
+                if (nodeRef.Value.IsLeaf())
                 {
                     leafCount++;
                 }
@@ -245,39 +247,98 @@ namespace SEE.Game.Charts
             scrollViewEntries = new ScrollViewEntry[totalEntryCount];
             scrollViewEntryDatas = new ScrollViewEntryData[totalEntryCount];
 
-            int idx = 0;
-            int dataObjectIdx = 0;
-            scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, null, ScrollViewEntryData.InvalidIndex, leafCount, true);
-            idx++;
-
-            for (int i = 0; i < leafCount; i++)
-            {
-                scrollViewEntryDatas[idx]
-                    = new ScrollViewEntryData(idx, this, dataObjects[dataObjectIdx++].GetComponent<InteractableObject>(), 0, 0, true);
-                scrollViewEntryDatas[0].childIndices[i] = idx;
-                idx++;
-            }
-
-            int innerCount = dataObjects.Count - leafCount;
-            int innerNodeIdx = idx;
-            scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, null, ScrollViewEntryData.InvalidIndex, innerCount, true);
-            idx++;
-
-            for (int i = 0; i < innerCount; i++)
-            {
-                scrollViewEntryDatas[idx]
-                    = new ScrollViewEntryData(idx, this, dataObjects[dataObjectIdx++].GetComponent<InteractableObject>(), innerNodeIdx, 0, true);
-                scrollViewEntryDatas[innerNodeIdx].childIndices[i] = idx;
-                idx++;
-            }
-
             pool = new Stack<ScrollViewEntry>(maxPanelEntryCount);
 
             RectTransform scrollContentRect = scrollContent.GetComponent<RectTransform>();
             scrollContentRect.sizeDelta = new Vector2(scrollContentRect.sizeDelta.x, totalHeight + 40);
 
-            FillScrollView(false);
+            FillScrollViewData(scrollViewIsTree);
             GetAllNumericAttributes();
+        }
+
+        private void FillScrollViewData(bool fillAsTree)
+        {
+            if (fillAsTree)
+            {
+                Stack<int> parentIndexStack = new Stack<int>();
+                parentIndexStack.Push(ScrollViewEntryData.InvalidIndex);
+
+                for (int i = 0; i < treeDataObjects.Count; i++)
+                {
+                    int hierarchy = treeHierarchies[i];
+
+                    // remove non-relevant parent-indices
+                    while (hierarchy < parentIndexStack.Count - 1)
+                    {
+                        parentIndexStack.Pop();
+                    }
+
+                    // count children
+                    int childCount = 0;
+                    for (int j = i + 1; j < treeDataObjects.Count; j++)
+                    {
+                        int h = treeHierarchies[j];
+                        if (h <= hierarchy)
+                        {
+                            break;
+                        }
+                        if (h == hierarchy + 1)
+                        {
+                            childCount++;
+                        }
+                    }
+
+                    InteractableObject o = treeDataObjects[i].GetComponent<InteractableObject>();
+                    scrollViewEntryDatas[i] = new ScrollViewEntryData(i, this, o, parentIndexStack.Peek(), childCount);
+
+                    // fill child indices
+                    childCount = 0;
+                    for (int j = i + 1; j < treeDataObjects.Count; j++)
+                    {
+                        int h = treeHierarchies[j];
+                        if (h <= hierarchy)
+                        {
+                            break;
+                        }
+                        if (h == hierarchy + 1)
+                        {
+                            scrollViewEntryDatas[i].childIndices[childCount] = j;
+                            childCount++;
+                        }
+                    }
+
+                    parentIndexStack.Push(i);
+                }
+            }
+            else
+            {
+                int idx = 0;
+                int dataObjectIdx = 0;
+
+                scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, null, ScrollViewEntryData.InvalidIndex, leafCount);
+                idx++;
+
+                for (int i = 0; i < leafCount; i++)
+                {
+                    InteractableObject o = listDataObjects[dataObjectIdx++].GetComponent<InteractableObject>();
+                    scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, o, 0, 0);
+                    scrollViewEntryDatas[0].childIndices[i] = idx;
+                    idx++;
+                }
+
+                int innerCount = listDataObjects.Count - leafCount;
+                int innerNodeIdx = idx;
+                scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, null, ScrollViewEntryData.InvalidIndex, innerCount);
+                idx++;
+
+                for (int i = 0; i < innerCount; i++)
+                {
+                    InteractableObject o = listDataObjects[dataObjectIdx++].GetComponent<InteractableObject>();
+                    scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, o, innerNodeIdx, 0);
+                    scrollViewEntryDatas[innerNodeIdx].childIndices[i] = idx;
+                    idx++;
+                }
+            }
         }
         
         protected virtual void Start()
@@ -309,8 +370,9 @@ namespace SEE.Game.Charts
         private void Update()
         {
             float panelEntryCount = totalHeight * (1.0f - verticalScrollBar.size) / ScrollViewEntryHeight;
+            int totalEntryCount = scrollViewEntries.Length - (scrollViewIsTree ? 2 : 0);
             int first = Mathf.Max(0, Mathf.FloorToInt((1.0f - verticalScrollBar.value) * panelEntryCount));
-            int onePastLast = Mathf.Min(scrollViewEntries.Length, first + maxPanelEntryCount);
+            int onePastLast = Mathf.Min(totalEntryCount, first + maxPanelEntryCount);
 
             void _PushToPool(int i)
             {
@@ -323,25 +385,32 @@ namespace SEE.Game.Charts
 
             void _NewScrollViewEntry(int i)
             {
-                Assert.IsNull(scrollViewEntries[i]);
-                int leavesIndex = 0;
-                int innerNodeIndex = leafCount + 1;
-                int temp = i;
-                if (i == leavesIndex) // 'Leaves' node
+                if (scrollViewIsTree)
                 {
-                    scrollViewEntries[leavesIndex] = NewScrollViewEntry("Leaves", null, ref temp, 0);
+                    scrollViewEntries[i] = NewScrollViewEntry(treeDataObjects[i].name, i, treeHierarchies[i]);
                 }
-                else if (i == innerNodeIndex) // 'Inner Nodes' node
+                else
                 {
-                    scrollViewEntries[innerNodeIndex] = NewScrollViewEntry("Inner Nodes", null, ref temp, 0);
-                }
-                else if (i < leafCount + 1) // leaf node
-                {
-                    scrollViewEntries[i] = NewScrollViewEntry(dataObjects[i - 1], scrollViewEntries[leavesIndex], ref temp, 1);
-                }
-                else // inner node
-                {
-                    scrollViewEntries[i] = NewScrollViewEntry(dataObjects[i - 2], scrollViewEntries[innerNodeIndex], ref temp, 1);
+                    Assert.IsNull(scrollViewEntries[i]);
+
+                    int leavesIndex = 0;
+                    int innerNodeIndex = leafCount + 1;
+                    if (i == leavesIndex) // 'Leaves' node
+                    {
+                        scrollViewEntries[leavesIndex] = NewScrollViewEntry("Leaves", i, 0);
+                    }
+                    else if (i == innerNodeIndex) // 'Inner Nodes' node
+                    {
+                        scrollViewEntries[innerNodeIndex] = NewScrollViewEntry("Inner Nodes", i, 0);
+                    }
+                    else if (i < leafCount + 1) // leaf node
+                    {
+                        scrollViewEntries[i] = NewScrollViewEntry(listDataObjects[i - 1].name, i, 1);
+                    }
+                    else // inner node
+                    {
+                        scrollViewEntries[i] = NewScrollViewEntry(listDataObjects[i - 2].name, i, 1);
+                    }
                 }
             }
 
@@ -389,7 +458,7 @@ namespace SEE.Game.Charts
         /// </param>
         /// <param name="svt">The new scroll view toggle.</param>
         /// <param name="go">The game object containing the scroll view toggle.</param>
-        private void NewScrollViewEntry(ref ScrollViewEntry svt, ref GameObject go)
+        private void RetrieveScrollViewEntry(ref ScrollViewEntry svt, ref GameObject go)
         {
             if (pool.Count > 0)
             {
@@ -404,40 +473,9 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Creates a new scroll view toggle entry to display given node ref.
-        /// </summary>
-        /// <param name="nodeRef">The node to be displayed.</param>
-        /// <param name="parent">The parent of the entry.</param>
-        /// <param name="index">The index of the toggle to determine the y-offset of the
-        /// entry.</param>
-        /// <param name="hierarchy">The hierarchy to determine the x-offset of the entry.
-        /// </param>
-        /// <param name="pushPool">The pool, in which the new entries are pushed.</param>
-        /// <param name="popPool">The pool, out of which pooled toggled can be retrieved.
-        /// </param>
-        /// <returns>The created scroll view toggle.</returns>
-        private ScrollViewEntry NewScrollViewEntry(NodeRef nodeRef, ScrollViewEntry parent, ref int index, int hierarchy)
-        {
-            ScrollViewEntry entry = null;
-            GameObject go = null;
-            NewScrollViewEntry(ref entry, ref go);
-
-            go.name = "ScrollViewEntry: " + nodeRef.node.SourceName;
-            go.transform.localPosition = scrollEntryOffset
-                + new Vector2(ScrollViewEntryIndentation * (float)hierarchy, -ScrollViewEntryHeight * (float)index);
-
-            entry.Init(this, ref scrollViewEntryDatas[index], nodeRef.name);
-
-            index++;
-
-            return entry;
-        }
-
-        /// <summary>
         /// Creates a new scroll view toggle entry with given label.
         /// </summary>
         /// <param name="label">The label.</param>
-        /// <param name="parent">The parent of the entry.</param>
         /// <param name="index">The index of the toggle to determine the y-offset of the
         /// entry.</param>
         /// <param name="hierarchy">The hierarchy to determine the x-offset of the entry.
@@ -446,19 +484,17 @@ namespace SEE.Game.Charts
         /// <param name="popPool">The pool, out of which pooled toggled can be retrieved.
         /// </param>
         /// <returns>The created scroll view toggle.</returns>
-        private ScrollViewEntry NewScrollViewEntry(string label, ScrollViewEntry parent, ref int index, int hierarchy)
+        private ScrollViewEntry NewScrollViewEntry(string label, int index, int hierarchy)
         {
             ScrollViewEntry entry = null;
             GameObject go = null;
-            NewScrollViewEntry(ref entry, ref go);
+            RetrieveScrollViewEntry(ref entry, ref go);
 
             go.name = "ScrollViewEntry: " + label;
             go.transform.localPosition = scrollEntryOffset
                 + new Vector2(ScrollViewEntryIndentation * (float)hierarchy, -ScrollViewEntryHeight * (float)index);
 
             entry.Init(this, ref scrollViewEntryDatas[index], label);
-
-            index++;
 
             return entry;
         }
@@ -467,13 +503,14 @@ namespace SEE.Game.Charts
         /// Recursive version of
         /// <see cref="NewScrollViewEntry(NodeRef, ScrollViewEntry, ref int, int, Stack{ScrollViewEntry}, Stack{ScrollViewEntry})"/>
         /// </summary>
-        private ScrollViewEntry NewScrollViewEntries(NodeRef nodeRef, ScrollViewEntry parent, ref int index, int hierarchy)
+        private ScrollViewEntry NewScrollViewEntries(NodeRef nodeRef, ref int index, int hierarchy)
         {
-            ScrollViewEntry svt = NewScrollViewEntry(nodeRef, parent, ref index, hierarchy);
-            foreach (Node childNode in nodeRef.node.Children())
+            ScrollViewEntry svt = NewScrollViewEntry(nodeRef.name, index, hierarchy);
+            index++;
+            foreach (Node childNode in nodeRef.Value.Children())
             {
-                NodeRef childNodeRef = dataObjects.First(entry => { return entry.node.ID.Equals(childNode.ID); });
-                NewScrollViewEntries(childNodeRef, svt, ref index, hierarchy + 1);
+                NodeRef childNodeRef = listDataObjects.First(entry => { return entry.Value.ID.Equals(childNode.ID); });
+                NewScrollViewEntries(childNodeRef, ref index, hierarchy + 1);
             }
             return svt;
         }
@@ -517,14 +554,14 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Gets all metric names for <see cref="float"/> values contained in the
         /// <see cref="NodeRef"/> of each <see cref="GameObject"/> in
-        /// <see cref="dataObjects"/>. A metric name is the name of a numeric (either
+        /// <see cref="listDataObjects"/>. A metric name is the name of a numeric (either
         /// float or int) node attribute that starts with the prefix
         /// ChartManager.MetricPrefix.</summary>
         private void GetAllNumericAttributes()
         {
             allMetricNames.Clear();
 #if UNITY_EDITOR
-            if (dataObjects.Count == 0)
+            if (listDataObjects.Count == 0)
             {
                 Debug.LogWarning("There are no nodes for showing metrics.\n");
             }
@@ -549,22 +586,23 @@ namespace SEE.Game.Charts
         /// </summary>
         private void FindDataObjects()
         {
-            dataObjects = SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, ChartManager.Instance.ShowInnerNodeMetrics);
+            // list
+            listDataObjects = SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, ChartManager.Instance.ShowInnerNodeMetrics);
 
             int numberOfDataObjectsWithNodeHightLights = 0;
-            foreach (NodeRef entry in dataObjects)
+            foreach (NodeRef entry in listDataObjects)
             {
-                SetShowInChart(entry.GetComponent<InteractableObject>(), true); // TODO(torben): don't get it? performance
+                SetShowInChart(entry.GetComponent<InteractableObject>(), true); // TODO(torben): don't get the component for performance?
                 numberOfDataObjectsWithNodeHightLights++;
             }
-            dataObjects.Sort(delegate (NodeRef n0, NodeRef n1)
+            listDataObjects.Sort(delegate (NodeRef n0, NodeRef n1)
             {
                 int result = 0;
-                if (n0.node.IsLeaf() && n1.node.IsInnerNode())
+                if (n0.Value.IsLeaf() && n1.Value.IsInnerNode())
                 {
                     result = -1;
                 }
-                else if (n0.node.IsInnerNode() && n1.node.IsLeaf())
+                else if (n0.Value.IsInnerNode() && n1.Value.IsLeaf())
                 {
                     result = 1;
                 }
@@ -572,6 +610,28 @@ namespace SEE.Game.Charts
             });
 
             Debug.LogFormat("numberOfDataObjectsWithNodeHightLights: {0}\n", numberOfDataObjectsWithNodeHightLights);
+
+            // tree
+            treeDataObjects = new List<NodeRef>(listDataObjects.Count);
+            treeHierarchies = new List<int>(listDataObjects.Count);
+            int hierarchy = 0;
+            void _FindForTree(Node root)
+            {
+                treeDataObjects.Add(NodeRef.Get(root));
+                treeHierarchies.Add(hierarchy);
+
+                hierarchy++;
+                foreach (Node child in root.Children())
+                {
+                    _FindForTree(child);
+                }
+                hierarchy--;
+            }
+            HashSet<Node> roots = SceneQueries.GetRoots(listDataObjects);
+            foreach (Node root in roots)
+            {
+                _FindForTree(root);
+            }
         }
 
         /// <summary>
@@ -594,17 +654,17 @@ namespace SEE.Game.Charts
             float minY = float.PositiveInfinity; // globally minimal value on Y axis
             float maxY = float.NegativeInfinity; // globally maximal value on Y axis
             List<NodeRef> toDraw = new List<NodeRef>(); // nodes to be drawn in the chart
-            foreach (NodeRef nodeRef in dataObjects)
+            foreach (NodeRef nodeRef in listDataObjects)
             {
                 bool inX = false;
-                if (nodeRef.node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX) || xIsNodeEnum)
+                if (nodeRef.Value.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX) || xIsNodeEnum)
                 {
                     minX = Mathf.Min(minX, valueX);
                     maxX = Mathf.Max(maxX, valueX);
                     inX = true;
                 }
                 bool inY = false;
-                if (nodeRef.node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY))
+                if (nodeRef.Value.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY))
                 {
                     minY = Mathf.Min(minY, valueY);
                     maxY = Mathf.Max(maxY, valueY);
@@ -625,8 +685,8 @@ namespace SEE.Game.Charts
                 {
                     toDraw.Sort(delegate (NodeRef nodeRef0, NodeRef nodeRef1)
                     {
-                        nodeRef0.node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float value1);
-                        nodeRef1.node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float value2);
+                        nodeRef0.Value.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float value1);
+                        nodeRef1.Value.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float value2);
                         return value1.CompareTo(value2);
                     });
                 }
@@ -688,15 +748,15 @@ namespace SEE.Game.Charts
 
             foreach (NodeRef nodeRef in nodeRefsToDraw)
             {
-                nodeRef.node.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX);
-                nodeRef.node.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY);
+                nodeRef.Value.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX);
+                nodeRef.Value.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY);
                 Vector2 anchoredPosition = new Vector2((valueX - minX) * width, (valueY - minY) * height);
 
                 if (!anchoredPositionToChartMarkerDict.TryGetValue(anchoredPosition, out ChartMarker chartMarker))
                 {
                     GameObject marker = Instantiate(markerPrefab, entries.transform);
 #if UNITY_EDITOR
-                    marker.name = "ChartMarker: " + nodeRef.node.SourceName;
+                    marker.name = "ChartMarker: " + nodeRef.Value.SourceName;
 #endif
                     marker.GetComponent<RectTransform>().anchoredPosition = anchoredPosition;
                     marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
@@ -712,7 +772,7 @@ namespace SEE.Game.Charts
                 }
 #endif
 
-                string infoText = nodeRef.node.SourceName + " (" + valueX.ToString("0.00") + ", " + valueY.ToString("0.00") + ")";
+                string infoText = "(" + valueX.ToString("0.00") + ", " + valueY.ToString("0.00") + ") " + nodeRef.Value.SourceName;
                 chartMarker.PushInteractableObject(nodeRef.GetComponent<InteractableObject>(), infoText);
                 nodeRefToChartMarkerDict.Add(nodeRef, chartMarker);
             }

@@ -32,7 +32,7 @@ namespace SEE.GO
             }
             else
             {
-                return nodeRef.node.ID;
+                return nodeRef.Value.ID;
             }
         }
 

@@ -47,7 +47,7 @@ namespace SEE.Game.Charts
             InteractableObject interactableObject,
             int parentIndex,
             int childIndexCount,
-            bool isOn
+            bool isOn = true
         )
         {
             Assert.IsTrue(index >= 0);
@@ -183,31 +183,28 @@ namespace SEE.Game.Charts
             }
 
             // Propagate changes through children
-            if (toggleChildren)
+            if (toggleChildren && childIndices != null)
             {
                 bool resetToggleParents = toggleParents;
                 toggleParents = false;
 
-                if (childIndices != null)
+                foreach (int childIdx in childIndices)
                 {
-                    foreach (int childIdx in childIndices)
+                    ref ScrollViewEntryData childData = ref chartContent.GetScrollViewEntryData(childIdx);
+                    if (childData.isOn != isOn)
                     {
-                        ref ScrollViewEntryData childData = ref chartContent.GetScrollViewEntryData(childIdx);
-                        if (childData.isOn != isOn)
+                        // Note: This automatically calls Toggle() for the child's
+                        // ScrollViewToggle. As 'toggleParents' is 'false', this
+                        // propagates only through the children and not back up the
+                        // parents.
+                        ScrollViewEntry child = chartContent.GetScrollViewEntry(childIdx);
+                        if (child)
                         {
-                            // Note: This automatically calls Toggle() for the child's
-                            // ScrollViewToggle. As 'toggleParents' is 'false', this
-                            // propagates only through the children and not back up the
-                            // parents.
-                            ScrollViewEntry child = chartContent.GetScrollViewEntry(childIdx);
-                            if (child)
-                            {
-                                child.toggle.isOn = isOn;
-                            }
-                            else
-                            {
-                                childData.Toggle(isOn);
-                            }
+                            child.toggle.isOn = isOn;
+                        }
+                        else
+                        {
+                            childData.Toggle(isOn);
                         }
                     }
                 }

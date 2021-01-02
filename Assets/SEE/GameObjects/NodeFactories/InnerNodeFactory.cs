@@ -49,8 +49,8 @@ namespace SEE.GO
             if (renderer != null)
             {
                 UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>());
-                UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>().node);
-                int level = block.GetComponent<NodeRef>().node.Level;
+                UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>().Value);
+                int level = block.GetComponent<NodeRef>().Value.Level;
                 renderer.sharedMaterial = Materials.Get(level, Mathf.Clamp(style, 0, (int)NumberOfStyles() - 1));
             }
         }

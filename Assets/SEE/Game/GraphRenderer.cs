@@ -417,7 +417,7 @@ namespace SEE.Game
         /// <param name="layout">layout to be applied to the game node</param>
         public void Apply(GameObject gameNode, GameObject itsParent, ILayoutNode layout)
         {
-            Node node = gameNode.GetComponent<NodeRef>().node;
+            Node node = gameNode.GetComponent<NodeRef>().Value;
 
             if (node.IsLeaf())
             {
@@ -1012,7 +1012,7 @@ namespace SEE.Game
 
             foreach (GameObject gameObject in gameNodes)
             {
-                Node node = gameObject.GetComponent<NodeRef>().node;
+                Node node = gameObject.GetComponent<NodeRef>().Value;
                 if (node.IsLeaf())
                 {
                     result.Add(new GameNode(to_layout_node, gameObject, leafNodeFactory));
@@ -1039,7 +1039,7 @@ namespace SEE.Game
                 Vector3 size = innerNodeFactory.GetSize(node);
                 float length = Mathf.Min(size.x, size.z);
                 // The text may occupy up to 30% of the length.
-                GameObject text = TextFactory.GetTextWithWidth(node.GetComponent<NodeRef>().node.SourceName,
+                GameObject text = TextFactory.GetTextWithWidth(node.GetComponent<NodeRef>().Value.SourceName,
                                                       node.transform.position, length * 0.3f);
                 text.transform.SetParent(node.transform);
             }
@@ -1072,7 +1072,7 @@ namespace SEE.Game
         /// <returns>true iff gameNode is a leaf in the graph</returns>
         private static bool IsLeaf(GameObject gameNode)
         {
-            return gameNode.GetComponent<NodeRef>().node.IsLeaf();
+            return gameNode.GetComponent<NodeRef>().Value.IsLeaf();
         }
 
         /// <summary>
@@ -1082,7 +1082,7 @@ namespace SEE.Game
         /// <param name="degree">degree of rotation</param>
         private void Rotate(GameObject gameNode, float degree)
         {
-            Node node = gameNode.GetComponent<NodeRef>().node;
+            Node node = gameNode.GetComponent<NodeRef>().Value;
             if (node.IsLeaf())
             {
                 leafNodeFactory.Rotate(gameNode, degree);
@@ -1144,7 +1144,7 @@ namespace SEE.Game
             // That is why we put them at the highest necessary rendering queue offset.
             GameObject block = leafNodeFactory.NewBlock(SelectStyle(node, innerNodeFactory), node.ItsGraph.MaxDepth);
             block.name = node.ID;
-            block.AddComponent<NodeRef>().node = node;
+            block.AddComponent<NodeRef>().Value = node;
             AdjustScaleOfLeaf(block);
             return block;
         }
@@ -1227,7 +1227,7 @@ namespace SEE.Game
             }
             else
             {
-                Node node = noderef.node;
+                Node node = noderef.Value;
                 if (node.IsLeaf())
                 {
                     return leafNodeFactory.Roof(gameNode);
@@ -1255,7 +1255,7 @@ namespace SEE.Game
             }
             else
             {
-                Node node = noderef.node;
+                Node node = noderef.Value;
                 if (node.IsLeaf())
                 {
                     return leafNodeFactory.GetSize(gameNode);
@@ -1284,7 +1284,7 @@ namespace SEE.Game
             }
             else
             {
-                float value = GetMetricValue(noderef.node, settings.InnerNodeHeightMetric);
+                float value = GetMetricValue(noderef.Value, settings.InnerNodeHeightMetric);
                 innerNodeFactory.SetHeight(gameNode, value);
             }
         }
@@ -1309,7 +1309,7 @@ namespace SEE.Game
             }
             else
             {
-                Node node = noderef.node;
+                Node node = noderef.Value;
                 int style = SelectStyle(node, innerNodeFactory);
                 if (node.IsLeaf())
                 {
@@ -1341,7 +1341,7 @@ namespace SEE.Game
             }
             else
             {
-                Node node = nodeRef.node;
+                Node node = nodeRef.Value;
                 if (node.IsLeaf())
                 {
                     // Scaled metric values for the three dimensions.
@@ -1430,7 +1430,7 @@ namespace SEE.Game
             GameObject innerGameObject = innerNodeFactory.NewBlock(0, node.Level);
             innerGameObject.name = node.ID;
             innerGameObject.tag = Tags.Node;
-            innerGameObject.AddComponent<NodeRef>().node = node;
+            innerGameObject.AddComponent<NodeRef>().Value = node;
             AdjustStyle(innerGameObject);
             AdjustHeightOfInnerNode(innerGameObject);
             return innerGameObject;
@@ -1476,7 +1476,7 @@ namespace SEE.Game
 
                 foreach (GameObject go in gameNodes)
                 {
-                    Node node = go.GetComponent<NodeRef>().node;
+                    Node node = go.GetComponent<NodeRef>().Value;
 
                     Vector3 extent = node.IsLeaf() ? leafNodeFactory.GetSize(go) / 2.0f : innerNodeFactory.GetSize(go) / 2.0f;
                     // Note: position denotes the center of the object
