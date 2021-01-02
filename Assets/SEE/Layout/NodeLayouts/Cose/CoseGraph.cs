@@ -70,7 +70,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// the esitmated size of this graph
+        /// the estimated size of this graph
         /// </summary>
         private double estimatedSize = Mathf.NegativeInfinity;
 
