@@ -56,7 +56,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// For the reflexion analysis.
         /// </summary>
-        private Reflexion reflexion;
+        public Reflexion Reflexion { get; private set; }
 
         /// <summary>
         /// Materials for the decoration of reflexion edges.
@@ -452,10 +452,10 @@ namespace SEE.Controls.Actions
         {
             foreach (Selection implementation in objectsInClipboard)
             {
-                if (!reflexion.Is_Mapper(implementation.graphNode))
+                if (!Reflexion.Is_Mapper(implementation.graphNode))
                 {
                     Debug.LogFormat("Mapping {0} -> {1}.\n", implementation.gameNode.name, target.gameNode.name);
-                    reflexion.Add_To_Mapping(from: implementation.graphNode, to: target.graphNode);
+                    Reflexion.Add_To_Mapping(from: implementation.graphNode, to: target.graphNode);
                 }
                 else
                 {
@@ -490,10 +490,10 @@ namespace SEE.Controls.Actions
 
         private void SetupReflexion()
         {
-            reflexion = new Reflexion(implementation, architecture, mapping);
-            reflexion.Register(this);
+            Reflexion = new Reflexion(implementation, architecture, mapping);
+            Reflexion.Register(this);
             // An initial run is necessary to set up the necessary data structures.
-            reflexion.Run();
+            Reflexion.Run();
         }
 
         /// <summary>

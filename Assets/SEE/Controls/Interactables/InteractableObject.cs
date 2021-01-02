@@ -343,6 +343,13 @@ namespace SEE.Controls
         /// </summary>
         public event GrabAction GrabOut;
 
+        public delegate void CollisionAction(InteractableObject interactableObject, Collision collision);
+        public event CollisionAction CollisionIn;
+        public event CollisionAction CollisionOut;
+
+        private void OnCollisionEnter(Collision collision) => CollisionIn?.Invoke(this, collision);
+        private void OnCollisionExit(Collision collision) => CollisionIn?.Invoke(this, collision);
+
         //----------------------------------------------------------------
         // Mouse actions
         //----------------------------------------------------------------
