@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using SEE.Controls.Actions;
-using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -229,7 +228,7 @@ namespace SEE.Controls
             {
                 // Hovering is a continuous operation, that is why we call it here
                 // when the object is in the focus but neither grabbed nor selected.
-                SetHoverFlag(HoverFlag.None, true, isOwner);
+                SetHoverFlag(HoverFlag.None, true, isOwner); // TODO(torben): is this really necessary? a hover event is invoked, even though nothing changes. these events also create unnecessary performance overhead. also: @DoubleHoverEventPerformance
             }
 
             if (select)
@@ -299,11 +298,11 @@ namespace SEE.Controls
                 // when the object is in the focus but not grabbed any longer.
                 if (IsSelected)
                 {
-                    SetSelect(true, isOwner);
+                    SetSelect(true, isOwner); // see: @DoubleHoverEventPerformance
                 }
                 else if (IsHovered)
                 {
-                    SetHoverFlag(HoverFlag.None, true, isOwner);
+                    SetHoverFlag(HoverFlag.None, true, isOwner); // see: @DoubleHoverEventPerformance
                 }
                 GrabbedObjects.Remove(this);
             }
