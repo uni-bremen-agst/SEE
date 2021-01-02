@@ -139,6 +139,13 @@ namespace SEE.Game.Charts
         /// </summary>
         public RectTransform labelsPanel;
 
+        [SerializeField] private Scrollbar verticalScrollBar;
+
+        // TODO(torben): i'd rather have the Viewport sizes, as this is slightly too
+        // large. as a result, i have to calculate 'first' in Update() every frame with
+        // 'verticalScrollBar.value'
+        [SerializeField] private RectTransform scrollViewRectTransform;
+
         /// <summary>
         /// All game-node objects to be listed in the chart. 
         /// 
@@ -164,58 +171,21 @@ namespace SEE.Game.Charts
         private readonly Dictionary<uint, bool> showInChartDict = new Dictionary<uint, bool>();
 
         public delegate void ShowInChartCallbackFn(bool value);
-        private readonly Dictionary<uint, List<ShowInChartCallbackFn>> callbackFnDict = new Dictionary<uint, List<ShowInChartCallbackFn>>();
+        private readonly Dictionary<uint, ShowInChartCallbackFn> callbackFnDict = new Dictionary<uint, ShowInChartCallbackFn>();
 
         private bool scrollViewIsTree = false;
 
+        private float totalHeight = 0;
+        private int maxPanelEntryCount = 0;
+        private int leafCount = 0;
 
+        private ScrollViewEntry[] scrollViewEntries = null;
+        private ScrollViewEntryData[] scrollViewEntryDatas = null;
+        private Stack<ScrollViewEntry> pool = null;
 
-        public void AttachShowInChartCallbackFn(InteractableObject interactableObject, ShowInChartCallbackFn callbackFn)
-        {
-            if (!callbackFnDict.TryGetValue(interactableObject.ID, out List<ShowInChartCallbackFn> callbackFns))
-            {
-                callbackFns = new List<ShowInChartCallbackFn>();
-                callbackFnDict.Add(interactableObject.ID, callbackFns);
-            }
-            callbackFns.Add(callbackFn);
-        }
+        private int previousFirst = 0;
+        private int previousOnePastLast = 0;
 
-        public bool DetachShowInChartCallbackFn(InteractableObject interactableObject, ShowInChartCallbackFn callbackFn)
-        {
-            bool result = false;
-            if (callbackFnDict.TryGetValue(interactableObject.ID, out List<ShowInChartCallbackFn> callbackFns))
-            {
-                result = callbackFns.Remove(callbackFn);
-            }
-            return result;
-        }
-
-        public bool ShowInChart(InteractableObject interactableObject)
-        {
-            bool result = showInChartDict[interactableObject.ID];
-            return result;
-        }
-
-        public void SetShowInChart(InteractableObject interactableObject, bool value)
-        {
-            if (!showInChartDict.TryGetValue(interactableObject.ID, out bool oldValue))
-            {
-                oldValue = true;
-            }
-            showInChartDict[interactableObject.ID] = value;
-            if (oldValue != value && callbackFnDict.TryGetValue(interactableObject.ID, out List<ShowInChartCallbackFn> callbackFns))
-            {
-                foreach (ShowInChartCallbackFn fn in callbackFns)
-                {
-                    fn(value);
-                }
-            }
-        }
-
-        private void SetShowInChartNoNotify(InteractableObject interactableObject, bool value)
-        {
-            showInChartDict[interactableObject.ID] = value;
-        }
 
         /// <summary>
         /// Calls methods to initialize a chart.
@@ -267,48 +237,6 @@ namespace SEE.Game.Charts
             axisDropdownY.Initialize();
             axisDropdownX.AddNodeEnumerationEntry(NodeEnumeration);
             DrawData();
-        }
-
-        [SerializeField] private Scrollbar verticalScrollBar;
-
-        // TODO(torben): i'd rather have the Viewport sizes, as this is slightly too
-        // large. as a result, i have to calculate 'first' in Update() every frame with
-        // 'verticalScrollBar.value'
-        [SerializeField] private RectTransform scrollViewRectTransform;
-
-        private float totalHeight = 0;
-        private int maxPanelEntryCount = 0;
-        private int leafCount = 0;
-
-        private ScrollViewEntry[] scrollViewEntries = null;
-        private ScrollViewEntryData[] scrollViewEntryDatas = null;
-        private Stack<ScrollViewEntry> pool = null;
-
-        private int previousFirst = 0;
-        private int previousOnePastLast = 0;
-
-        public ScrollViewEntry GetScrollViewEntry(int index)
-        {
-            ScrollViewEntry result = scrollViewEntries[index];
-            return result;
-        }
-
-        public ref ScrollViewEntryData GetScrollViewEntryData(int index)
-        {
-            ref ScrollViewEntryData result = ref scrollViewEntryDatas[index];
-            return ref result;
-        }
-
-        private void PushScrollViewEntriesToPool(int first, int onePastLast)
-        {
-            for (int i = first; i < onePastLast; i++)
-            {
-                Assert.IsNotNull(scrollViewEntries[i], "The toggle to be pooled is null!");
-
-                scrollViewEntries[i].OnDestroy();
-                pool.Push(scrollViewEntries[i]);
-                scrollViewEntries[i] = null;
-            }
         }
 
         private void Update()
@@ -367,6 +295,63 @@ namespace SEE.Game.Charts
             previousOnePastLast = onePastLast;
         }
 
+
+
+        public void AttachShowInChartCallbackFn(InteractableObject interactableObject, ShowInChartCallbackFn callbackFn)
+        {
+            Assert.IsTrue(!callbackFnDict.ContainsKey(interactableObject.ID));
+            callbackFnDict[interactableObject.ID] = callbackFn;
+        }
+
+        public bool DetachShowInChartCallbackFn(InteractableObject interactableObject, ShowInChartCallbackFn callbackFn)
+        {
+            bool result = callbackFnDict.Remove(interactableObject.ID);
+            return result;
+        }
+
+        public bool ShowInChart(InteractableObject interactableObject)
+        {
+            bool result = showInChartDict[interactableObject.ID];
+            return result;
+        }
+
+        public void SetShowInChart(InteractableObject interactableObject, bool value)
+        {
+            if (!showInChartDict.TryGetValue(interactableObject.ID, out bool oldValue))
+            {
+                oldValue = true;
+            }
+            showInChartDict[interactableObject.ID] = value;
+            if (oldValue != value && callbackFnDict.TryGetValue(interactableObject.ID, out ShowInChartCallbackFn fn))
+            {
+                fn(value);
+            }
+        }
+
+        public ScrollViewEntry GetScrollViewEntry(int index)
+        {
+            ScrollViewEntry result = scrollViewEntries[index];
+            return result;
+        }
+
+        public ref ScrollViewEntryData GetScrollViewEntryData(int index)
+        {
+            ref ScrollViewEntryData result = ref scrollViewEntryDatas[index];
+            return ref result;
+        }
+
+        private void PushScrollViewEntriesToPool(int first, int onePastLast)
+        {
+            for (int i = first; i < onePastLast; i++)
+            {
+                Assert.IsNotNull(scrollViewEntries[i], "The toggle to be pooled is null!");
+
+                scrollViewEntries[i].OnDestroy();
+                pool.Push(scrollViewEntries[i]);
+                scrollViewEntries[i] = null;
+            }
+        }
+
         /// <summary>
         /// Either creates or retrieves a pooled <see cref="ScrollViewEntry"/>. Pooled
         /// toggles are cleared, before they're returned.
@@ -408,8 +393,9 @@ namespace SEE.Game.Charts
             RetrieveScrollViewEntry(ref entry, ref go);
 
             go.name = "ScrollViewEntry: " + label;
-            go.transform.localPosition = scrollEntryOffset
-                + new Vector2(ScrollViewEntryIndentation * (float)hierarchy, -ScrollViewEntryHeight * (float)index);
+            float x = ScrollViewEntryIndentation * (float)hierarchy;
+            float y = -ScrollViewEntryHeight * (float)index;
+            go.transform.localPosition = scrollEntryOffset + new Vector2(x, y);
 
             entry.Init(this, ref scrollViewEntryDatas[index], label);
 
@@ -417,27 +403,42 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Recursive version of
-        /// <see cref="NewScrollViewEntry(NodeRef, ScrollViewEntry, ref int, int, Stack{ScrollViewEntry}, Stack{ScrollViewEntry})"/>
+        /// Fills the scroll with as a list or a tree. Is called on start-up and
+        /// thereupon only by Unity on button-press-events.
         /// </summary>
-        private ScrollViewEntry NewScrollViewEntries(NodeRef nodeRef, ref int index, int hierarchy)
+        /// <param name="asTree">Whether the scroll view is to be filled as a
+        /// tree.</param>
+        public void FillScrollView(bool asTree)
         {
-            ScrollViewEntry svt = NewScrollViewEntry(nodeRef.name, index, hierarchy);
-            index++;
-            foreach (Node childNode in nodeRef.Value.Children())
-            {
-                NodeRef childNodeRef = listDataObjects.First(entry => { return entry.Value.ID.Equals(childNode.ID); });
-                NewScrollViewEntries(childNodeRef, ref index, hierarchy + 1);
-            }
-            return svt;
-        }
+            Performance p = Performance.Begin(asTree ? "FillScrollViewAsTree" : "FillScrollViewAsList");
 
-        private void FillScrollViewData()
-        {
+            #region Reset
+
+            for (int i = 0; i < listDataObjects.Count; i++)
+            {
+                SetShowInChart(listDataObjects[i].GetComponent<InteractableObject>(), true);
+            }
+
             for (int i = 0; i < scrollViewEntryDatas.Length; i++)
             {
-                scrollViewEntryDatas[i].Destroy();
+                if (scrollViewEntryDatas[i].interactableObject)
+                {
+                    // Note(torben): This only unsubscribes from events from the
+                    // interactable object and thus can be inside of this if-statement
+                    // for better performance
+                    scrollViewEntryDatas[i].Destroy();
+                }
             }
+
+            PushScrollViewEntriesToPool(previousFirst, previousOnePastLast);
+            previousFirst = 0;
+            previousOnePastLast = 0;
+
+            #endregion
+
+            scrollViewIsTree = asTree;
+
+            #region Fill ScrollViewEntryData
 
             if (scrollViewIsTree)
             {
@@ -520,30 +521,8 @@ namespace SEE.Game.Charts
                     idx++;
                 }
             }
-        }
 
-        /// <summary>
-        /// Fills the scroll with as a list or a tree. Is called on start-up and
-        /// thereupon only by Unity on button-press-events.
-        /// </summary>
-        /// <param name="asTree">Whether the scroll view is to be filled as a
-        /// tree.</param>
-        public void FillScrollView(bool asTree)
-        {
-            Performance p = Performance.Begin(asTree ? "FillScrollViewAsTree" : "FillScrollViewAsList");
-
-            showInChartDict.Clear();
-            PushScrollViewEntriesToPool(previousFirst, previousOnePastLast);
-            previousFirst = 0;
-            previousOnePastLast = 0;
-
-            scrollViewIsTree = asTree;
-            List<NodeRef> nodeRefs = scrollViewIsTree ? treeDataObjects : listDataObjects;
-            foreach (NodeRef entry in nodeRefs)
-            {
-                SetShowInChart(entry.GetComponent<InteractableObject>(), true); // TODO(torben): don't get the component? performance
-            }
-            FillScrollViewData();
+            #endregion
 
             p.End(true);
         }

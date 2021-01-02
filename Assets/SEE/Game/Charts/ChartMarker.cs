@@ -152,18 +152,17 @@ namespace SEE.Game.Charts
                 const int maxLines = 3;
                 foreach (uint id in hoveredOrSelectedIds)
                 {
-                    if (hoveredOrSelectedIds.Count > maxLines && ++count == maxLines)
-                    {
-                        sharedStringBuilder.Append("and ");
-                        sharedStringBuilder.Append((hoveredOrSelectedIds.Count - maxLines + 1).ToString());
-                        sharedStringBuilder.Append(" more...");
-                        break;
-                    }
-
                     InteractableObject o = InteractableObject.Get(id);
                     bool showInChart = chartContent.ShowInChart(o);
                     if (showInChart)
                     {
+                        if (hoveredOrSelectedIds.Count > maxLines && ++count == maxLines)
+                        {
+                            sharedStringBuilder.Append("and ");
+                            sharedStringBuilder.Append((hoveredOrSelectedIds.Count - maxLines + 1).ToString());
+                            sharedStringBuilder.Append(" more...");
+                            break;
+                        }
                         sharedStringBuilder.AppendFormat("{0}\n", id2TextDict[id]);
                     }
                 }
