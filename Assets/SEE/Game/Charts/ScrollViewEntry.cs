@@ -51,39 +51,79 @@ namespace SEE.Game.Charts
 
                 if (this.interactableObject)
                 {
-                    this.interactableObject.HoverIn += OnHoverOrSelect;
-                    this.interactableObject.HoverOut += OnHoverOrSelect;
-                    this.interactableObject.SelectIn += OnHoverOrSelect;
-                    this.interactableObject.SelectOut += OnHoverOrSelect;
+                    this.interactableObject.HoverIn += OnHover;
+                    this.interactableObject.HoverOut += OnUnhover;
+                    this.interactableObject.SelectIn += OnSelect;
+                    this.interactableObject.SelectOut += OnUnselect;
 
-                    if (this.interactableObject.IsHovered)
-                    {
-                        OnHoverOrSelect(this.interactableObject, true); // TODO(torben): cache address of owner in InteractableObject
-                    }
                     if (this.interactableObject.IsSelected)
                     {
-                        OnHoverOrSelect(this.interactableObject, true); // TODO(torben): cache address of owner in InteractableObject
+                        OnSelect(this.interactableObject, true); // TODO(torben): cache address of owner in InteractableObject
+                    }
+                    else if (this.interactableObject.IsHovered)
+                    {
+                        OnHover(this.interactableObject, true); // TODO(torben): cache address of owner in InteractableObject
                     }
                 }
             }
 
-            internal void OnHoverOrSelect(InteractableObject o, bool isOwner)
+            internal void OnHover(InteractableObject _, bool isOwner)
+            {
+                if (interactableObject == null || !interactableObject.IsSelected)
+                {
+                    ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);
+                    if (entry != null)
+                    {
+                        const int colorIndex = 1;
+
+                        Color color = UIColorScheme.GetLight(colorIndex);
+                        UnityEngine.UI.ColorBlock colors = entry.toggle.colors;
+                        colors.normalColor = color;
+                        entry.toggle.colors = colors;
+                        entry.label.color = color;
+                    }
+                }
+            }
+
+            internal void OnUnhover(InteractableObject _, bool isOwner)
+            {
+                if (interactableObject == null || !interactableObject.IsSelected)
+                {
+                    ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);
+                    if (entry != null)
+                    {
+                        const int colorIndex = 0;
+
+                        Color color = UIColorScheme.GetLight(colorIndex);
+                        UnityEngine.UI.ColorBlock colors = entry.toggle.colors;
+                        colors.normalColor = color;
+                        entry.toggle.colors = colors;
+                        entry.label.color = color;
+                    }
+                }
+            }
+
+            private void OnSelect(InteractableObject o, bool isOwner)
             {
                 ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);
                 if (entry != null)
                 {
-                    int colorIndex = 0;
-                    if (o != null)
-                    {
-                        if (o.IsSelected)
-                        {
-                            colorIndex = 2;
-                        }
-                        else if (o.IsHovered)
-                        {
-                            colorIndex = 1;
-                        }
-                    }
+                    const int colorIndex = 2;
+
+                    Color color = UIColorScheme.GetLight(colorIndex);
+                    UnityEngine.UI.ColorBlock colors = entry.toggle.colors;
+                    colors.normalColor = color;
+                    entry.toggle.colors = colors;
+                    entry.label.color = color;
+                }
+            }
+
+            private void OnUnselect(InteractableObject o, bool isOwner)
+            {
+                ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);
+                if (entry != null)
+                {
+                    int colorIndex = o.IsHovered ? 1 : 0;
 
                     Color color = UIColorScheme.GetLight(colorIndex);
                     UnityEngine.UI.ColorBlock colors = entry.toggle.colors;
@@ -97,10 +137,10 @@ namespace SEE.Game.Charts
             {
                 if (interactableObject)
                 {
-                    interactableObject.HoverIn -= OnHoverOrSelect;
-                    interactableObject.HoverOut -= OnHoverOrSelect;
-                    interactableObject.SelectIn -= OnHoverOrSelect;
-                    interactableObject.SelectOut -= OnHoverOrSelect;
+                    interactableObject.HoverIn -= OnHover;
+                    interactableObject.HoverOut -= OnUnhover;
+                    interactableObject.SelectIn -= OnSelect;
+                    interactableObject.SelectOut -= OnUnselect;
                 }
             }
         }
@@ -277,9 +317,23 @@ namespace SEE.Game.Charts
 
         internal void OnPointerEvent(bool enter)
         {
-            if (interactableObject != null && interactableObject.IsHovered != enter)
+            if (interactableObject != null)
             {
-                interactableObject.SetHoverFlag(HoverFlag.ChartScrollViewToggle, enter, true);
+                if (interactableObject.IsHovered != enter)
+                {
+                    interactableObject.SetHoverFlag(HoverFlag.ChartScrollViewToggle, enter, true);
+                }
+            }
+            else if (eventHandler != null)
+            {
+                if (enter)
+                {
+                    eventHandler.OnHover(null, true);
+                }
+                else
+                {
+                    eventHandler.OnUnhover(null, true);
+                }
             }
         }
     }
