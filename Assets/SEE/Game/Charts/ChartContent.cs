@@ -161,8 +161,6 @@ namespace SEE.Game.Charts
         /// </summary>
         protected List<ChartMarker> activeMarkers = new List<ChartMarker>();
 
-        public readonly Dictionary<NodeRef, ChartMarker> nodeRefToChartMarkerDict = new Dictionary<NodeRef, ChartMarker>(); // TODO(torben): can this be io not nodeRef?
-
         /// <summary>
         /// Contains all metric names contained in any <see cref="GameObject" /> of <see cref="listDataObjects" />.
         /// </summary>
@@ -705,7 +703,6 @@ namespace SEE.Game.Charts
         /// <param name="maxY">The maximum value on the y-axis.</param>
         private void AddMarkers(IEnumerable<NodeRef> nodeRefsToDraw, float minX, float maxX, float minY, float maxY)
         {
-            nodeRefToChartMarkerDict.Clear();
             callbackFnDict.Clear();
 
             List<ChartMarker> updatedMarkers = new List<ChartMarker>(activeMarkers.Count);
@@ -755,7 +752,6 @@ namespace SEE.Game.Charts
 
                 string infoText = "(" + valueX.ToString("0.00") + ", " + valueY.ToString("0.00") + ") " + nodeRef.Value.SourceName;
                 chartMarker.PushInteractableObject(nodeRef.GetComponent<InteractableObject>(), infoText);
-                nodeRefToChartMarkerDict.Add(nodeRef, chartMarker);
             }
 
             for (int i = currentReusedActiveMarkerIndex; i < activeMarkers.Count; i++)
