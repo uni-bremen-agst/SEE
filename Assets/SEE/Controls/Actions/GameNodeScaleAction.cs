@@ -111,22 +111,18 @@ public class GameNodeScaleAction : MonoBehaviour
                 else if (hit.collider == fstCornerSphere.GetComponent<Collider>())
                 {
                     tmpSphere = fstCornerSphere;
-                    Debug.Log("FST CORNER");
                 }
                 else if (hit.collider == sndCornerSphere.GetComponent<Collider>())
                 {
                     tmpSphere = sndCornerSphere;
-                    Debug.Log("SND CORNER");
                 }
                 else if (hit.collider == thrdCornerSphere.GetComponent<Collider>())
                 {
                     tmpSphere = thrdCornerSphere;
-                    Debug.Log("THRD Corner");
                 }
                 else if (hit.collider == forthCornerSphere.GetComponent<Collider>())
                 {
                     tmpSphere = forthCornerSphere;
-                    Debug.Log("Forth Corener");
                 }
                 //Sides
                 else if (hit.collider == fstSideSphere.GetComponent<Collider>())
