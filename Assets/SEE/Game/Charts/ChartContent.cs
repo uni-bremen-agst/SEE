@@ -166,7 +166,7 @@ namespace SEE.Game.Charts
         public delegate void ShowInChartCallbackFn(bool value);
         private readonly Dictionary<uint, List<ShowInChartCallbackFn>> callbackFnDict = new Dictionary<uint, List<ShowInChartCallbackFn>>();
 
-        private bool scrollViewIsTree = true;
+        private bool scrollViewIsTree = false;
 
 
 
@@ -212,6 +212,11 @@ namespace SEE.Game.Charts
             }
         }
 
+        private void SetShowInChartNoNotify(InteractableObject interactableObject, bool value)
+        {
+            showInChartDict[interactableObject.ID] = value;
+        }
+
         /// <summary>
         /// Calls methods to initialize a chart.
         /// </summary>
@@ -252,13 +257,189 @@ namespace SEE.Game.Charts
             RectTransform scrollContentRect = scrollContent.GetComponent<RectTransform>();
             scrollContentRect.sizeDelta = new Vector2(scrollContentRect.sizeDelta.x, totalHeight + 40);
 
-            FillScrollViewData(scrollViewIsTree);
+            FillScrollView(scrollViewIsTree);
             GetAllNumericAttributes();
         }
-
-        private void FillScrollViewData(bool fillAsTree)
+        
+        protected virtual void Start()
         {
-            if (fillAsTree)
+            axisDropdownX.Initialize();
+            axisDropdownY.Initialize();
+            axisDropdownX.AddNodeEnumerationEntry(NodeEnumeration);
+            DrawData();
+        }
+
+        [SerializeField] private Scrollbar verticalScrollBar;
+
+        // TODO(torben): i'd rather have the Viewport sizes, as this is slightly too
+        // large. as a result, i have to calculate 'first' in Update() every frame with
+        // 'verticalScrollBar.value'
+        [SerializeField] private RectTransform scrollViewRectTransform;
+
+        private float totalHeight = 0;
+        private int maxPanelEntryCount = 0;
+        private int leafCount = 0;
+
+        private ScrollViewEntry[] scrollViewEntries = null;
+        private ScrollViewEntryData[] scrollViewEntryDatas = null;
+        private Stack<ScrollViewEntry> pool = null;
+
+        private int previousFirst = 0;
+        private int previousOnePastLast = 0;
+
+        public ScrollViewEntry GetScrollViewEntry(int index)
+        {
+            ScrollViewEntry result = scrollViewEntries[index];
+            return result;
+        }
+
+        public ref ScrollViewEntryData GetScrollViewEntryData(int index)
+        {
+            ref ScrollViewEntryData result = ref scrollViewEntryDatas[index];
+            return ref result;
+        }
+
+        private void PushScrollViewEntriesToPool(int first, int onePastLast)
+        {
+            for (int i = first; i < onePastLast; i++)
+            {
+                Assert.IsNotNull(scrollViewEntries[i], "The toggle to be pooled is null!");
+
+                scrollViewEntries[i].OnDestroy();
+                pool.Push(scrollViewEntries[i]);
+                scrollViewEntries[i] = null;
+            }
+        }
+
+        private void Update()
+        {
+            float panelEntryCount = totalHeight * (1.0f - verticalScrollBar.size) / ScrollViewEntryHeight;
+            int totalEntryCount = scrollViewEntries.Length - (scrollViewIsTree ? 2 : 0);
+            int first = Mathf.Max(0, Mathf.FloorToInt((1.0f - verticalScrollBar.value) * panelEntryCount));
+            int onePastLast = Mathf.Min(totalEntryCount, first + maxPanelEntryCount);
+
+            void _NewScrollViewEntries(int fst, int opl)
+            {
+                if (scrollViewIsTree)
+                {
+                    for (int i = fst; i < opl; i++)
+                    {
+                        scrollViewEntries[i] = NewScrollViewEntry(treeDataObjects[i].name, i, treeHierarchies[i]);
+                    }
+                }
+                else
+                {
+                    for (int i = fst; i < opl; i++)
+                    {
+                        Assert.IsNull(scrollViewEntries[i]);
+
+                        int leavesIndex = 0;
+                        int innerNodeIndex = leafCount + 1;
+                        if (i == leavesIndex) // 'Leaves' node
+                        {
+                            scrollViewEntries[leavesIndex] = NewScrollViewEntry("Leaves", i, 0);
+                        }
+                        else if (i == innerNodeIndex) // 'Inner Nodes' node
+                        {
+                            scrollViewEntries[innerNodeIndex] = NewScrollViewEntry("Inner Nodes", i, 0);
+                        }
+                        else if (i < leafCount + 1) // leaf node
+                        {
+                            scrollViewEntries[i] = NewScrollViewEntry(listDataObjects[i - 1].name, i, 1);
+                        }
+                        else // inner node
+                        {
+                            scrollViewEntries[i] = NewScrollViewEntry(listDataObjects[i - 2].name, i, 1);
+                        }
+                    }
+                }
+            }
+
+            // delete out of view entries
+            PushScrollViewEntriesToPool(previousFirst, Mathf.Min(previousOnePastLast, first)); // before
+            PushScrollViewEntriesToPool(Mathf.Max(onePastLast, previousFirst), previousOnePastLast); // after
+
+            // prepend and append new entries
+            _NewScrollViewEntries(first, Mathf.Min(previousFirst, onePastLast)); // prepend
+            _NewScrollViewEntries(Mathf.Max(previousOnePastLast, first), onePastLast); // append
+
+            previousFirst = first;
+            previousOnePastLast = onePastLast;
+        }
+
+        /// <summary>
+        /// Either creates or retrieves a pooled <see cref="ScrollViewEntry"/>. Pooled
+        /// toggles are cleared, before they're returned.
+        /// </summary>
+        /// <param name="popPool">The pool, of which the toggles can be retrieved.
+        /// </param>
+        /// <param name="svt">The new scroll view toggle.</param>
+        /// <param name="go">The game object containing the scroll view toggle.</param>
+        private void RetrieveScrollViewEntry(ref ScrollViewEntry svt, ref GameObject go)
+        {
+            if (pool.Count > 0)
+            {
+                svt = pool.Pop();
+                go = svt.gameObject;
+            }
+            else
+            {
+                go = Instantiate(scrollEntryPrefab, scrollContent.transform);
+                svt = go.GetComponent<ScrollViewEntry>();
+            }
+        }
+
+        /// <summary>
+        /// Creates a new scroll view toggle entry with given label.
+        /// </summary>
+        /// <param name="label">The label.</param>
+        /// <param name="index">The index of the toggle to determine the y-offset of the
+        /// entry.</param>
+        /// <param name="hierarchy">The hierarchy to determine the x-offset of the entry.
+        /// </param>
+        /// <param name="pushPool">The pool, in which the new entries are pushed.</param>
+        /// <param name="popPool">The pool, out of which pooled toggled can be retrieved.
+        /// </param>
+        /// <returns>The created scroll view toggle.</returns>
+        private ScrollViewEntry NewScrollViewEntry(string label, int index, int hierarchy)
+        {
+            ScrollViewEntry entry = null;
+            GameObject go = null;
+            RetrieveScrollViewEntry(ref entry, ref go);
+
+            go.name = "ScrollViewEntry: " + label;
+            go.transform.localPosition = scrollEntryOffset
+                + new Vector2(ScrollViewEntryIndentation * (float)hierarchy, -ScrollViewEntryHeight * (float)index);
+
+            entry.Init(this, ref scrollViewEntryDatas[index], label);
+
+            return entry;
+        }
+
+        /// <summary>
+        /// Recursive version of
+        /// <see cref="NewScrollViewEntry(NodeRef, ScrollViewEntry, ref int, int, Stack{ScrollViewEntry}, Stack{ScrollViewEntry})"/>
+        /// </summary>
+        private ScrollViewEntry NewScrollViewEntries(NodeRef nodeRef, ref int index, int hierarchy)
+        {
+            ScrollViewEntry svt = NewScrollViewEntry(nodeRef.name, index, hierarchy);
+            index++;
+            foreach (Node childNode in nodeRef.Value.Children())
+            {
+                NodeRef childNodeRef = listDataObjects.First(entry => { return entry.Value.ID.Equals(childNode.ID); });
+                NewScrollViewEntries(childNodeRef, ref index, hierarchy + 1);
+            }
+            return svt;
+        }
+
+        private void FillScrollViewData()
+        {
+            for (int i = 0; i < scrollViewEntryDatas.Length; i++)
+            {
+                scrollViewEntryDatas[i].Destroy();
+            }
+
+            if (scrollViewIsTree)
             {
                 Stack<int> parentIndexStack = new Stack<int>();
                 parentIndexStack.Push(ScrollViewEntryData.InvalidIndex);
@@ -340,213 +521,29 @@ namespace SEE.Game.Charts
                 }
             }
         }
-        
-        protected virtual void Start()
-        {
-            axisDropdownX.Initialize();
-            axisDropdownY.Initialize();
-            axisDropdownX.AddNodeEnumerationEntry(NodeEnumeration);
-            DrawData();
-        }
-
-        [SerializeField] private Scrollbar verticalScrollBar;
-
-        // TODO(torben): i'd rather have the Viewport sizes, as this is slightly too
-        // large. as a result, i have to calculate 'first' in Update() every frame with
-        // 'verticalScrollBar.value'
-        [SerializeField] private RectTransform scrollViewRectTransform;
-
-        private float totalHeight = 0;
-        private int maxPanelEntryCount = 0;
-        private int leafCount = 0;
-
-        private ScrollViewEntry[] scrollViewEntries = null;
-        private ScrollViewEntryData[] scrollViewEntryDatas = null;
-        private Stack<ScrollViewEntry> pool = null;
-
-        private int previousFirst = 0;
-        private int previousOnePastLast = 0;
-
-        private void Update()
-        {
-            float panelEntryCount = totalHeight * (1.0f - verticalScrollBar.size) / ScrollViewEntryHeight;
-            int totalEntryCount = scrollViewEntries.Length - (scrollViewIsTree ? 2 : 0);
-            int first = Mathf.Max(0, Mathf.FloorToInt((1.0f - verticalScrollBar.value) * panelEntryCount));
-            int onePastLast = Mathf.Min(totalEntryCount, first + maxPanelEntryCount);
-
-            void _PushToPool(int i)
-            {
-                Assert.IsNotNull(scrollViewEntries[i], "The toggle to be pooled is null!");
-
-                scrollViewEntries[i].OnDestroy();
-                pool.Push(scrollViewEntries[i]);
-                scrollViewEntries[i] = null;
-            }
-
-            void _NewScrollViewEntry(int i)
-            {
-                if (scrollViewIsTree)
-                {
-                    scrollViewEntries[i] = NewScrollViewEntry(treeDataObjects[i].name, i, treeHierarchies[i]);
-                }
-                else
-                {
-                    Assert.IsNull(scrollViewEntries[i]);
-
-                    int leavesIndex = 0;
-                    int innerNodeIndex = leafCount + 1;
-                    if (i == leavesIndex) // 'Leaves' node
-                    {
-                        scrollViewEntries[leavesIndex] = NewScrollViewEntry("Leaves", i, 0);
-                    }
-                    else if (i == innerNodeIndex) // 'Inner Nodes' node
-                    {
-                        scrollViewEntries[innerNodeIndex] = NewScrollViewEntry("Inner Nodes", i, 0);
-                    }
-                    else if (i < leafCount + 1) // leaf node
-                    {
-                        scrollViewEntries[i] = NewScrollViewEntry(listDataObjects[i - 1].name, i, 1);
-                    }
-                    else // inner node
-                    {
-                        scrollViewEntries[i] = NewScrollViewEntry(listDataObjects[i - 2].name, i, 1);
-                    }
-                }
-            }
-
-            // delete out of view entries
-            for (int i = previousFirst; i < Mathf.Min(previousOnePastLast, first); i++) // before
-            {
-                _PushToPool(i);
-            }
-            for (int i = Mathf.Max(onePastLast, previousFirst); i < previousOnePastLast; i++) // after
-            {
-                _PushToPool(i);
-            }
-
-            // prepend and append new entries
-            for (int i = first; i < Mathf.Min(previousFirst, onePastLast); i++) // prepend
-            {
-                _NewScrollViewEntry(i);
-            }
-            for (int i = Mathf.Max(previousOnePastLast, first); i < onePastLast; i++) // append
-            {
-                _NewScrollViewEntry(i);
-            }
-
-            previousFirst = first;
-            previousOnePastLast = onePastLast;
-        }
-
-        public ScrollViewEntry GetScrollViewEntry(int index)
-        {
-            ScrollViewEntry result = scrollViewEntries[index];
-            return result;
-        }
-
-        public ref ScrollViewEntryData GetScrollViewEntryData(int index)
-        {
-            ref ScrollViewEntryData result = ref scrollViewEntryDatas[index];
-            return ref result;
-        }
-
-        /// <summary>
-        /// Either creates or retrieves a pooled <see cref="ScrollViewEntry"/>. Pooled
-        /// toggles are cleared, before they're returned.
-        /// </summary>
-        /// <param name="popPool">The pool, of which the toggles can be retrieved.
-        /// </param>
-        /// <param name="svt">The new scroll view toggle.</param>
-        /// <param name="go">The game object containing the scroll view toggle.</param>
-        private void RetrieveScrollViewEntry(ref ScrollViewEntry svt, ref GameObject go)
-        {
-            if (pool.Count > 0)
-            {
-                svt = pool.Pop();
-                go = svt.gameObject;
-            }
-            else
-            {
-                go = Instantiate(scrollEntryPrefab, scrollContent.transform);
-                svt = go.GetComponent<ScrollViewEntry>();
-            }
-        }
-
-        /// <summary>
-        /// Creates a new scroll view toggle entry with given label.
-        /// </summary>
-        /// <param name="label">The label.</param>
-        /// <param name="index">The index of the toggle to determine the y-offset of the
-        /// entry.</param>
-        /// <param name="hierarchy">The hierarchy to determine the x-offset of the entry.
-        /// </param>
-        /// <param name="pushPool">The pool, in which the new entries are pushed.</param>
-        /// <param name="popPool">The pool, out of which pooled toggled can be retrieved.
-        /// </param>
-        /// <returns>The created scroll view toggle.</returns>
-        private ScrollViewEntry NewScrollViewEntry(string label, int index, int hierarchy)
-        {
-            ScrollViewEntry entry = null;
-            GameObject go = null;
-            RetrieveScrollViewEntry(ref entry, ref go);
-
-            go.name = "ScrollViewEntry: " + label;
-            go.transform.localPosition = scrollEntryOffset
-                + new Vector2(ScrollViewEntryIndentation * (float)hierarchy, -ScrollViewEntryHeight * (float)index);
-
-            entry.Init(this, ref scrollViewEntryDatas[index], label);
-
-            return entry;
-        }
-
-        /// <summary>
-        /// Recursive version of
-        /// <see cref="NewScrollViewEntry(NodeRef, ScrollViewEntry, ref int, int, Stack{ScrollViewEntry}, Stack{ScrollViewEntry})"/>
-        /// </summary>
-        private ScrollViewEntry NewScrollViewEntries(NodeRef nodeRef, ref int index, int hierarchy)
-        {
-            ScrollViewEntry svt = NewScrollViewEntry(nodeRef.name, index, hierarchy);
-            index++;
-            foreach (Node childNode in nodeRef.Value.Children())
-            {
-                NodeRef childNodeRef = listDataObjects.First(entry => { return entry.Value.ID.Equals(childNode.ID); });
-                NewScrollViewEntries(childNodeRef, ref index, hierarchy + 1);
-            }
-            return svt;
-        }
 
         /// <summary>
         /// Fills the scroll with as a list or a tree. Is called on start-up and
         /// thereupon only by Unity on button-press-events.
         /// </summary>
-        /// <param name="displayAsTree">Whether the scroll view is to be filled as a
+        /// <param name="asTree">Whether the scroll view is to be filled as a
         /// tree.</param>
-        public void FillScrollView(bool displayAsTree)
+        public void FillScrollView(bool asTree)
         {
-            Performance p = Performance.Begin(displayAsTree ? "FillScrollViewAsTree" : "FillScrollViewAsList");
-            
-#if false
-            if (!displayAsTree) // display as list
+            Performance p = Performance.Begin(asTree ? "FillScrollViewAsTree" : "FillScrollViewAsList");
+
+            showInChartDict.Clear();
+            PushScrollViewEntriesToPool(previousFirst, previousOnePastLast);
+            previousFirst = 0;
+            previousOnePastLast = 0;
+
+            scrollViewIsTree = asTree;
+            List<NodeRef> nodeRefs = scrollViewIsTree ? treeDataObjects : listDataObjects;
+            foreach (NodeRef entry in nodeRefs)
             {
-                [...]
+                SetShowInChart(entry.GetComponent<InteractableObject>(), true); // TODO(torben): don't get the component? performance
             }
-            else // display as tree
-            {
-                foreach (Node root in SceneQueries.GetRoots(dataObjects))
-                {
-                    NodeRef rootNodeRef = dataObjects.First(entry =>
-                    {
-                        return entry.node.ID.Equals(root.ID);
-                    });
-                    NewScrollViewEntries(
-                        rootNodeRef, null, ref index, 0, pushPool, scrollViewTogglePool
-#if SEE_RECT_WIDTH
-                        , ref maxWidth
-#endif
-                    );
-                }
-        }
-#endif
+            FillScrollViewData();
 
             p.End(true);
         }
@@ -589,12 +586,6 @@ namespace SEE.Game.Charts
             // list
             listDataObjects = SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, ChartManager.Instance.ShowInnerNodeMetrics);
 
-            int numberOfDataObjectsWithNodeHightLights = 0;
-            foreach (NodeRef entry in listDataObjects)
-            {
-                SetShowInChart(entry.GetComponent<InteractableObject>(), true); // TODO(torben): don't get the component for performance?
-                numberOfDataObjectsWithNodeHightLights++;
-            }
             listDataObjects.Sort(delegate (NodeRef n0, NodeRef n1)
             {
                 int result = 0;
@@ -609,7 +600,7 @@ namespace SEE.Game.Charts
                 return result;
             });
 
-            Debug.LogFormat("numberOfDataObjectsWithNodeHightLights: {0}\n", numberOfDataObjectsWithNodeHightLights);
+            Debug.LogFormat("numberOfDataObjectsWithNodeHightLights: {0}\n", listDataObjects.Count);
 
             // tree
             treeDataObjects = new List<NodeRef>(listDataObjects.Count);
