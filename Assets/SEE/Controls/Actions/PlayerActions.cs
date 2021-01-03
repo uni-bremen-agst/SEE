@@ -2,7 +2,8 @@
 using SEE.Game;
 using SEE.Game.Charts;
 using SEE.GO;
-using System.Collections.Generic;
+using SEE.Tools;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -14,34 +15,20 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class PlayerActions : MonoBehaviour
     {
-        /// <summary>
-        /// The possible states a player can be in. The state determines how the player
-        /// reacts to events.
-        /// </summary>
-        private enum State
-        {
-            Browse,   // the user just browses the city; this is the default
-            MoveNode, // a game node is being moved within its city
-            MapNode   // a game node is mapped from one city to another city
-        }
-
         [SerializeField] private MappingAction mappingAction;
 
-        /// <summary>
-        /// The current state of the player.
-        /// </summary>
-        private State state = State.Browse;
+        private ActionState.Type state = ActionState.Value;
 
-        private bool firstMove = true;
-        private Vector3 startPosition = Vector3.zero;
-        private readonly List<Node> otherNodes = new List<Node>();
-
-#if UNITY_EDITOR
-        private void Awake()
+        private void Start()
         {
-            UnityEngine.Assertions.Assert.IsNotNull(mappingAction, "The mapping action must not be null!");
+            Assert.IsNotNull(mappingAction, "The mapping action must not be null!");
+            ActionState.OnStateChanged += OnStateChanged;
         }
-#endif
+
+        private void OnDestroy()
+        {
+            ActionState.OnStateChanged -= OnStateChanged;
+        }
 
         private void Update()
         {
@@ -49,66 +36,57 @@ namespace SEE.Controls.Actions
             if (Input.GetKeyDown(KeyCode.U))
             {
                 InteractableObject.UnselectAll(true);
-                ChartManager.Instance.UnselectAll();
+                ChartManager.Instance.UnselectAll(); // TODO(torben): this should happen via callbacks through InteractableObject. i believe, that should already work in the charts branch...
             }
 
             switch (state)
             {
-                case State.MoveNode:
+                case ActionState.Type.Move:
                     {
                         // an object must be selected; otherwise we cannot move it
-                        if (selectedObject != null)
-                        {                        
+                        if (selectedNodeRef != null)
+                        {
                             if (UserWantsToMove())
                             {
-                                GameNodeMover.MoveTo(selectedObject);
+                                GameNodeMover.MoveTo(selectedNodeRef.gameObject);
                             }
                             else
                             {
                                 // The selected object has reached its final destination.
                                 // It needs to be placed there.
-                                GameNodeMover.FinalizePosition(selectedObject);
-                                selectedObject = null;
+                                GameNodeMover.FinalizePosition(selectedNodeRef.gameObject);
+                                selectedNodeRef = null;
                             }
                         }
-                    } break;
-                case State.MapNode:
+                    }
+                    break;
+                case ActionState.Type.Rotate:
                     {
-                        if (selectedObject != null)
+                    }
+                    break;
+                case ActionState.Type.Map:
+                    {
+                        if (selectedNodeRef != null && Input.GetMouseButtonDown(0) && Raycasting.RaycastNodes(out RaycastHit raycastHit, out NodeRef nodeRef))
                         {
-                            if (UserWantsToMove())
-                            {
-                                if (firstMove)
-                                {
-                                    firstMove = false;
-                                    startPosition = selectedObject.transform.position;
-                                    Rigidbody r = selectedObject.AddComponent<Rigidbody>();
-                                    r.freezeRotation = true;
-                                    r.isKinematic = true;
-                                    selectedObject.GetComponent<InteractableObject>().CollisionIn += CollisionIn;
-                                    selectedObject.GetComponent<InteractableObject>().CollisionOut += CollisionOut;
-                                }
-                                GameNodeMover.MoveTo(selectedObject);
-                            }
-                            else
-                            {
-                                firstMove = true;
-                                selectedObject.transform.position = startPosition;
-                                selectedObject.GetComponent<InteractableObject>().CollisionIn -= CollisionIn;
-                                selectedObject.GetComponent<InteractableObject>().CollisionOut -= CollisionOut;
-                                Destroy(selectedObject.GetComponent<Rigidbody>());
+                            Node from = selectedNodeRef.node;
+                            Node to = nodeRef.node;
 
-                                Node n = selectedObject.GetComponent<NodeRef>().node;
-                                if (otherNodes.Count > 0)
+                            if (from.ItsGraph.Name != to.ItsGraph.Name)
+                            {
+                                Reflexion reflexion = mappingAction.Reflexion;
+                                if (reflexion.Is_Mapper(from))
                                 {
-                                    Assert.IsTrue(!mappingAction.Reflexion.Is_Mapper(n));
-                                    mappingAction.Reflexion.Add_To_Mapping(n, otherNodes[otherNodes.Count - 1]);
+                                    Assert.IsTrue(from.Outgoings.Count == 1);
+                                    reflexion.Delete_From_Mapping(from.Outgoings[0]);
                                 }
+                                reflexion.Add_To_Mapping(from, to);
 
-                                selectedObject = null;
+                                SetAlpha(1.0f);
+                                selectedNodeRef = null;
                             }
                         }
-                    } break;
+                    }
+                    break;
             }
         }
 
@@ -116,34 +94,9 @@ namespace SEE.Controls.Actions
         // The callbacks from the circular menu to trigger state changes
         // -------------------------------------------------------------
 
-        /// <summary>
-        /// Changes the state to Browse. 
-        /// 
-        /// This method is called as a callback from the menu.
-        /// </summary>
-        public void Browse()
+        private void OnStateChanged(ActionState.Type value)
         {
-            Enter(State.Browse);
-        }
-
-        /// <summary>
-        /// Changes the state to MoveNode. 
-        /// 
-        /// This method is called as a callback from the menu.
-        /// </summary>
-        public void Move()
-        {
-            Enter(State.MoveNode);
-        }
-
-        /// <summary>
-        /// Changes the state to MapNode. 
-        /// 
-        /// This method is called as a callback from the menu.
-        /// </summary>
-        public void Map()
-        {
-            Enter(State.MapNode);
+            Enter(value);
         }
 
         /// <summary>
@@ -152,7 +105,7 @@ namespace SEE.Controls.Actions
         /// entered.
         /// </summary>
         /// <param name="newState">new state to be entered</param>
-        private void Enter(State newState)
+        private void Enter(ActionState.Type newState)
         {
             if (state != newState)
             {
@@ -169,16 +122,32 @@ namespace SEE.Controls.Actions
         {
             switch (state)
             {
-                case State.Browse:
-                    // nothing to be done
+                case ActionState.Type.Move:
+                    {
+                    }
                     break;
-                case State.MapNode:
+                case ActionState.Type.Rotate:
+                    {
+                    }
                     break;
-                case State.MoveNode:
+                case ActionState.Type.Map:
+                    {
+                        if (selectedNodeRef)
+                        {
+                            SetAlpha(1.0f);
+                        }
+                    }
                     break;
-                default:
-                    throw new System.NotImplementedException();
+                default: throw new System.NotImplementedException();
             }
+        }
+
+        private void SetAlpha(float alpha)
+        {
+            MeshRenderer meshRenderer = selectedNodeRef.GetComponent<MeshRenderer>();
+            Color color = meshRenderer.material.color;
+            color.a = alpha;
+            meshRenderer.material.color = color;
         }
 
         // ------------------------------------------------------------
@@ -190,7 +159,7 @@ namespace SEE.Controls.Actions
         /// Do not use this attribute directly. Use <see cref="SelectedObject"/>
         /// instead.
         /// </summary>
-        private GameObject selectedObject;
+        private NodeRef selectedNodeRef;
 
         // ------------------------------------------------------------------------------
         // Events triggered by interactable objects when they are selected, hovered over,
@@ -207,7 +176,12 @@ namespace SEE.Controls.Actions
         /// <param name="selection">the selected interactable object</param>
         public void SelectOn(GameObject selection)
         {
-            selectedObject = selection;
+            // TODO(torben): if mapping, only select if node is from 'implementation' and not from 'architecture'
+            selectedNodeRef = selection.GetComponent<NodeRef>();
+            if (state == ActionState.Type.Map)
+            {
+                SetAlpha(0.8f);
+            }
         }
 
         /// <summary>
@@ -219,7 +193,11 @@ namespace SEE.Controls.Actions
         /// <param name="selection">the interactable object no longer selected</param>
         public void SelectOff(GameObject selection)
         {
-            selectedObject = null;
+            if (state == ActionState.Type.Map && selectedNodeRef)
+            {
+                SetAlpha(1.0f);
+            }
+            selectedNodeRef = null;
         }
 
         /// <summary>
@@ -270,24 +248,6 @@ namespace SEE.Controls.Actions
         public void GrabOff(GameObject grabbed)
         {
             // currently empty
-        }
-
-        private void CollisionIn(InteractableObject interactableObject, Collision collision)
-        {
-            NodeRef nodeRef = collision.transform.GetComponent<NodeRef>();
-            if (nodeRef)
-            {
-                otherNodes.Add(nodeRef.node);
-            }
-        }
-
-        private void CollisionOut(InteractableObject interactableObject, Collision collision)
-        {
-            NodeRef nodeRef = collision.transform.GetComponent<NodeRef>();
-            if (nodeRef)
-            {
-                otherNodes.Remove(nodeRef.node);
-            }
         }
 
         // -------------------------------------------------------------

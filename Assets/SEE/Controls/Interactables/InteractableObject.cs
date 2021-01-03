@@ -343,12 +343,14 @@ namespace SEE.Controls
         /// </summary>
         public event GrabAction GrabOut;
 
+#if false // TODO(torben): will we ever need this?
         public delegate void CollisionAction(InteractableObject interactableObject, Collision collision);
         public event CollisionAction CollisionIn;
         public event CollisionAction CollisionOut;
 
         private void OnCollisionEnter(Collision collision) => CollisionIn?.Invoke(this, collision);
         private void OnCollisionExit(Collision collision) => CollisionIn?.Invoke(this, collision);
+#endif
 
         //----------------------------------------------------------------
         // Mouse actions
@@ -400,6 +402,6 @@ namespace SEE.Controls
         private void OnHandHoverBegin(Hand hand) => SetHover(true, true);
         private void OnHandHoverEnd(Hand hand) => SetHover(false, true);
 
-        #endregion
+#endregion
     }
 }
