@@ -200,9 +200,9 @@ namespace SEE.Controls.Actions
             if (enabled)
             {
                 Usage();
+                SetupReflexionDecorator();
                 SetupGameObjectMappings();
                 SetupReflexion();
-                SetupReflexionDecorator();
             }
         }
 
@@ -369,7 +369,7 @@ namespace SEE.Controls.Actions
             //------------------------------------------------------------------------
 
             // We check whether we are focusing on the code city this NavigationAction is attached to.
-            if (Raycasting.RaycastNodes(out RaycastHit hit))
+            if (Raycasting.RaycastNodes(out RaycastHit hit, out NodeRef nodeRef))
             {
                 Transform firstHit = hit.transform;
                 if (firstHit.gameObject == Architecture)
@@ -393,7 +393,7 @@ namespace SEE.Controls.Actions
             // Selection of an object
             if (Input.GetMouseButtonDown(0)) // left mouse button
             {
-                if (hit.transform.gameObject.TryGetComponent(out NodeRef nodeRef))
+                if (nodeRef?.node != null)
                 {
                     selection.gameNode = hit.transform.gameObject;
                     selection.graphNode = nodeRef.node;
@@ -507,7 +507,6 @@ namespace SEE.Controls.Actions
             if (changeEvent is EdgeChange)
             {
                 HandleEdgeChange(changeEvent as EdgeChange);
-
             }
             else if (changeEvent is PropagatedEdgeAdded)
             {
@@ -563,29 +562,29 @@ namespace SEE.Controls.Actions
                         //--------------------------------------
                         // Changes for architecture dependencies
                         //--------------------------------------
-                        case State.specified:
+                        case Tools.State.specified:
                             // nothing to be done
                             break;
-                        case State.absent:
+                        case Tools.State.absent:
                             decorator.UndecorateAbsence(gameEdge);
                             break;
-                        case State.allowed_absent:
+                        case Tools.State.allowed_absent:
                             decorator.UndecorateAllowedAbsence(gameEdge);
                             break;
-                        case State.convergent:
+                        case Tools.State.convergent:
                             decorator.UndecorateConvergence(gameEdge);
                             break;
 
                         //-----------------------------------------------------------------------
                         // changes for implementation dependencies propagated to the architecture
                         //-----------------------------------------------------------------------
-                        case State.divergent:
+                        case Tools.State.divergent:
                             decorator.UndecorateDivergence(gameEdge);
                             break;
-                        case State.allowed:
+                        case Tools.State.allowed:
                             decorator.UndecorateAllowed(gameEdge);
                             break;
-                        case State.implicitly_allowed:
+                        case Tools.State.implicitly_allowed:
                             decorator.UndecorateImplicitlyAllowed(gameEdge);
                             break;
                         default:
@@ -593,34 +592,34 @@ namespace SEE.Controls.Actions
                             break;
                     }
 
-                    switch (edgeChange.oldState)
+                    switch (edgeChange.newState)
                     {
                         //--------------------------------------
                         // Changes for architecture dependencies
                         //--------------------------------------
-                        case State.specified:
+                        case Tools.State.specified:
                             // nothing to be done
                             break;
-                        case State.absent:
+                        case Tools.State.absent:
                             decorator.DecorateAbsence(gameEdge);
                             break;
-                        case State.allowed_absent:
+                        case Tools.State.allowed_absent:
                             decorator.DecorateAllowedAbsence(gameEdge);
                             break;
-                        case State.convergent:
+                        case Tools.State.convergent:
                             decorator.DecorateConvergence(gameEdge);
                             break;
 
                         //-----------------------------------------------------------------------
                         // changes for implementation dependencies propagated to the architecture
                         //-----------------------------------------------------------------------
-                        case State.divergent:
+                        case Tools.State.divergent:
                             decorator.DecorateDivergence(gameEdge);
                             break;
-                        case State.allowed:
+                        case Tools.State.allowed:
                             decorator.DecorateAllowed(gameEdge);
                             break;
-                        case State.implicitly_allowed:
+                        case Tools.State.implicitly_allowed:
                             decorator.DecorateImplicitlyAllowed(gameEdge);
                             break;
                         default:
