@@ -4,6 +4,7 @@ using UnityEngine;
 using SEE.Utils;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using SEE.GO;
 
 namespace SEE.Game.Evolution
 {
@@ -23,6 +24,10 @@ namespace SEE.Game.Evolution
 
         private bool wasAutoPlayReverse = false;
 
+        private bool isDragging = false;
+
+        private List<GameObject> hoverText;
+
         public EvolutionRenderer EvolutionRenderer
         {
             set
@@ -35,11 +40,39 @@ namespace SEE.Game.Evolution
         private void Init()
         {
             animationDataModel = AnimationCanvas.GetComponent<AnimationDataModel>();
+
+            animationDataModel.Slider.onValueChanged.AddListener(delegate { TaskOnValueChanged(); });
+
+            hoverText = new List<GameObject>();
+        }
+
+        private void Update()
+        {
+            if(hoverText.Count > 1)
+            {
+                for (int i = 0; i < hoverText.Count - 1; i++)
+                {
+                    GameObject g = hoverText[i];
+                    Object.Destroy(g);
+                }
+            }
+        }
+
+        private void TaskOnValueChanged()
+        {
+            if (isDragging)
+            {
+                Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
+                Vector3 textPos = new Vector3(handlePos.x , handlePos.y + 0.05f, handlePos.z );
+                GameObject text = TextFactory.GetTextWithWidth((animationDataModel.Slider.value+1).ToString() + "/" + (animationDataModel.Slider.maxValue+1f),
+                                                      textPos, 0.1f);
+                text.transform.SetParent(animationDataModel.Slider.transform);
+                hoverText.Add(text);
+            }
         }
 
         public void OnPointerDown(PointerEventData eventData)
         {
-
             if (evolutionRenderer.IsAutoPlay)
             {
                 wasAutoPlay = true;
@@ -50,6 +83,7 @@ namespace SEE.Game.Evolution
                 wasAutoPlayReverse = true;
                 evolutionRenderer.ToggleAutoPlayReverse();
             }
+            isDragging = true;
         }
 
         public void OnPointerUp(PointerEventData eventData)
@@ -70,6 +104,12 @@ namespace SEE.Game.Evolution
                 evolutionRenderer.ToggleAutoPlayReverse();
                 wasAutoPlayReverse = false;
             }
+            for (int i = 0; i < hoverText.Count; i++)
+            {
+                GameObject g = hoverText[i];
+                Object.Destroy(g);
+            }
+            isDragging = false;
         }
     }
 }
