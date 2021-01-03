@@ -16,22 +16,34 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Constructor.
         /// </summary>
+        /// <param name="ID">unique ID of edge</param>
         /// <param name="source">source of the edge</param>
         /// <param name="target">target of the edge</param>
         /// <param name="type">type of the edge</param>
-        public Edge(Node source, Node target, string type)
+        public Edge(string ID, Node source, Node target, string type)
         {
             this.source = source;
             this.target = target;
             Type = type;
+            id = ID;
         }
 
         /// <summary>
         /// Constructor. Source, target, and type of the edge remain undefined.
         /// </summary>
+        /// <param name="ID">unique ID of edge</param>
+        public Edge(string ID)
+        {
+            id = ID;
+        }
+
+        /// <summary>
+        /// Constructor. Source, target, and type of the edge remain undefined.
+        /// A random ID will be used for this edge.
+        /// </summary>
         public Edge()
         {
-            // intentionally left blank
+            id = Utils.RandomStrings.Get();
         }
 
         /// <summary>
@@ -46,8 +58,7 @@ namespace SEE.DataModel.DG
             get => base.Type;
             set
             {
-                base.Type = !string.IsNullOrEmpty(value) ? value : "Unknown";
-                SetID();
+                base.Type = !string.IsNullOrEmpty(value) ? value : "Unknown";               
             }
         }
 
@@ -65,7 +76,6 @@ namespace SEE.DataModel.DG
             set
             {
                 source = value;
-                SetID();
             }
         }
 
@@ -83,7 +93,6 @@ namespace SEE.DataModel.DG
             set
             {
                 target = value;
-                SetID();
             }
         }
 
@@ -165,24 +174,8 @@ namespace SEE.DataModel.DG
         private string id;
 
         /// <summary>
-        /// Sets the ID of this edge. Must be called whenever the target, source,
-        /// or type of this edge changes.
+        /// Unique ID.
         /// </summary>
-        private void SetID()
-        {
-            if (!string.IsNullOrEmpty(Type) && Source != null && Target != null)
-            {
-                id = Type + "#" + Source.ID + "#" + Target.ID;
-            }
-        }
-
-        /// <summary>
-        /// Creates a unique string representing the edge as the concatentation of its edge
-        /// type and the two ID of the edge's source and target node.
-        /// IMPORTANT NOTE: This ID is unique only if there is only a single edge
-        /// between those nodes with the edge's type.
-        /// </summary>
-        /// <returns>a string from both nodes' ID as follows: Type + "#" + Source.ID + '#' + Target.ID</returns>
         public override string ID
         {
             get => id;

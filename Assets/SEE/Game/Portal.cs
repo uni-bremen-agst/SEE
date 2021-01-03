@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Game
 {
@@ -21,8 +20,7 @@ namespace SEE.Game
         /// the area of the <paramref name="parent"/></param>
         public static void SetPortal(GameObject parent)
         {
-            Vector2 leftFront, rightBack;
-            GetDimensions(parent, out leftFront, out rightBack);
+            GetDimensions(parent, out Vector2 leftFront, out Vector2 rightBack);
             foreach (Transform child in parent.transform)
             {
                 SetPortal(child, leftFront, rightBack);
@@ -75,31 +73,39 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Sets the culling area (portal) of <paramref name="go"/> to the rectangle in
+        /// Sets the culling area (portal) of <paramref name="gameObject"/> to the rectangle in
         /// the x/z plane defined by the extents of <paramref name="root"/>.
         /// </summary>
-        /// <param name="root">object defining the extends of the culling area</param>
-        /// <param name="go">object whose culling area is to be set</param>
-        public static void SetPortal(GameObject root, GameObject go)
+        /// <param name="root">object defining the extent of the culling area</param>
+        /// <param name="gameObject">object whose culling area is to be set</param>
+        public static void SetPortal(GameObject root, GameObject gameObject)
         {
             GetDimensions(root, out Vector2 leftFront, out Vector2 rightBack);
-            SetPortalOfMaterials(go, leftFront, rightBack);
+            SetPortalOfMaterials(gameObject, leftFront, rightBack);
         }
 
         /// <summary>
-        /// Sets the culling area (portal) of <paramref name="go"/> to an infititely large rectangle.
+        /// Sets the culling area (portal) of <paramref name="go"/> and all its descendants
+        /// to an infititely large rectangle.
         /// </summary>
         /// <param name="go">object whose culling area is to be set</param>
         public static void SetInfinitePortal(GameObject go)
         {
             SetPortalOfMaterials(go, Vector2.negativeInfinity, Vector2.positiveInfinity);
+            foreach (Transform child in go.transform)
+            {
+                SetInfinitePortal(child.gameObject);
+            }
         }
 
         private static void SetPortalOfMaterials(GameObject go, Vector2 leftFront, Vector2 rightBack)
         {
-            foreach (Material material in go.GetComponent<MeshRenderer>().sharedMaterials)
+            if (go.TryGetComponent<Renderer>(out Renderer renderer))
             {
-                SetPortal(leftFront, rightBack, material);
+                foreach (Material material in renderer.sharedMaterials)
+                {
+                    SetPortal(leftFront, rightBack, material);
+                }
             }
         }
 

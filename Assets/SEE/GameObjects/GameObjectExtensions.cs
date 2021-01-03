@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using SEE.DataModel.DG;
+using System;
+using UnityEngine;
 
 namespace SEE.GO
 {
@@ -54,6 +56,98 @@ namespace SEE.GO
             {
                 Debug.LogWarningFormat("GetRenderQueue: Game object {0} has no renderer.\n", gameObject.name);
                 return 0;
+            }
+        }
+
+        /// <summary>
+        /// Sets the color for this <paramref name="gameObject"/> to given <paramref name="color"/>.
+        /// 
+        /// Precondition: <paramref name="gameObject"/> has a renderer whose material has attribute _Color.
+        /// </summary>
+        /// <param name="gameObject">objects whose color is to be set</param>
+        /// <param name="color">the new color to be set</param>
+        public static void SetColor(this GameObject gameObject, Color color)
+        {
+            if (gameObject.TryGetComponent<Renderer>(out Renderer renderer))
+            {
+                Material material = renderer.sharedMaterial;
+                material.SetColor("_Color", color);
+            }
+        }
+
+        /// <summary>
+        /// Sets the start and end line color of <paramref name="gameObject"/>.
+        /// 
+        /// Precondition: <paramref name="gameObject"/> must have a line renderer.
+        /// </summary>
+        /// <param name="gameObject">object holding a line renderer whose start and end color is to be set</param>
+        /// <param name="startColor">start color of the line</param>
+        /// <param name="endColor">end color of the line</param>
+        public static void SetLineColor(this GameObject gameObject, Color startColor, Color endColor)
+        {
+            if (gameObject.TryGetComponent<LineRenderer>(out LineRenderer renderer))
+            {
+                renderer.startColor = startColor;
+                renderer.endColor = endColor;
+            }
+        }
+
+        /// <summary>
+        /// Sets the visibility of this <paramref name="gameObject"/> to <paramref name="show"/>.
+        /// If <paramref name="show"/> is false, the object becomes invisible. If it is true
+        /// instead, it becomes visible. 
+        /// 
+        /// If <paramref name="includingChildren"/> is false, only the renderer of <paramref name="gameObject"/> 
+        /// is turned on/off, which will not affect whether the <paramref name="gameObject"/>
+        /// is active or inactive. If <paramref name="gameObject"/> has children, their
+        /// renderers will not be changed.
+        /// 
+        /// If <paramref name="includingChildren"/> is true, the operation applies to all descendants, too.
+        /// 
+        /// Precondition: <paramref name="gameObject"/> must have a Renderer.
+        /// </summary>
+        /// <param name="gameObject">object whose visibility is to be changed</param>
+        /// <param name="show">whether or not to make the object visible</param>
+        /// <param name="includingChildren">if true, the operation applies to all descendants, too</param>
+        public static void SetVisibility(this GameObject gameObject, bool show, bool includingChildren = true)
+        {
+            if (gameObject.TryGetComponent<Renderer>(out Renderer renderer))
+            {
+                renderer.enabled = show;
+            }
+            if (includingChildren)
+            {
+                foreach (Transform child in gameObject.transform)
+                {
+                    child.gameObject.SetVisibility(show, includingChildren);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the graph node represented by this <paramref name="gameObject"/>.
+        /// 
+        /// Precondition: <paramref name="gameObject"/> must have a <see cref="NodeRef"/>
+        /// attached to it referring to a valid node; if not, an exception is raised.
+        /// </summary>
+        /// <param name="gameObject">the game object whose Node is requested</param>
+        /// <returns>the correponding graph node</returns>
+        public static Node GetNode(this GameObject gameObject)
+        {
+            if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+            {
+                if (nodeRef != null)
+                {
+                    return nodeRef.node;
+                }
+                else
+                {
+                    throw new Exception($"Node reference of game object {gameObject.name} is null");
+                }
+            }
+            else
+            {
+                throw new Exception($"Game object {gameObject.name} has no NodeRef");
             }
         }
     }

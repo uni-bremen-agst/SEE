@@ -65,7 +65,7 @@ namespace SEE.DataModel.DG.IO
             {
                 // load graph (we can safely assume that the file exists because we retrieved its 
                 // name just from the directory
-                GraphReader graphCreator = new GraphReader(gxlPath, hierarchicalEdgeTypes, gxlPath, new SEELogger());
+                GraphReader graphCreator = new GraphReader(gxlPath, hierarchicalEdgeTypes, rootName: gxlPath, logger: new SEELogger());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
 
@@ -101,7 +101,5 @@ namespace SEE.DataModel.DG.IO
             p.End();
             Debug.Log("Number of graphs loaded: " + graphs.Count + "\n");
         }
-
-
     }
 }

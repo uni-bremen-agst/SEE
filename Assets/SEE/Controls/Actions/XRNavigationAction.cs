@@ -2,7 +2,7 @@
 using Valve.VR;
 using Valve.VR.InteractionSystem;
 
-namespace SEE.Controls
+namespace SEE.Controls.Actions
 {
 
     /// <summary>
@@ -133,7 +133,7 @@ namespace SEE.Controls
         {
             base.Update();
 
-            if (CityAvailable)
+            if (CityTransform != null)
             {
                 // Grab, release parts of city
                 if (grabAction.lastAxis < 0.9f && grabAction.axis >= 0.9f)

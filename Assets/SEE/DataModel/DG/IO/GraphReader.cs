@@ -60,7 +60,7 @@ namespace SEE.DataModel.DG.IO
                                            filename, rootName);
                     Node singleRoot = new Node
                     {
-                        Type = rootName,
+                        Type = "ROOT",
                         ID = rootName,
                         SourceName = rootName
                     };
@@ -72,8 +72,7 @@ namespace SEE.DataModel.DG.IO
                 }
             }
             // After having the complete hierarchy, we can calculate the node levels.
-            graph.CalculateLevels();
-            graph.FinalizeGraph();
+            graph.FinalizeNodeHierarchy();
         }
 
         /// <summary>
@@ -253,21 +252,16 @@ namespace SEE.DataModel.DG.IO
             {
                 LogError("There is still a pending graph element when new edge declaration has begun.");
             }
-            // the game object we create for this edge in the game; we do not
-            // know whether this edge is a hierarchical or non-hierarchical 
-            // edge until we see the edge type; hierarchical edges will not be 
-            // represented as GameObjects; if we create a game object for a 
-            // a hierarchical edge, we may need to destroy it later again
-            current = new Edge();
-
+            
             if (reader.HasAttributes)
-            {
-                Edge thisEdge = (Edge)current;
-
+            {                
+                // We will first collect those attributes and then create the edge
+                // because the constructor of Edge requires an ID.
                 string fromNode = "";
                 string toNode = "";
+                string id = "";
 
-                // determine fromNode and toNode
+                // determine id, fromNode and toNode
                 while (reader.MoveToNextAttribute())
                 {
                     if (reader.Name == "from")
@@ -279,15 +273,6 @@ namespace SEE.DataModel.DG.IO
                         else
                         {
                             fromNode = reader.Value;
-                            // set source of the edge
-                            if (nodes.TryGetValue(fromNode, out Node node))
-                            {
-                                thisEdge.Source = node;
-                            }
-                            else
-                            {
-                                LogError("Unkown source node ID " + fromNode + ".");
-                            }
                         }
                     }
                     else if (reader.Name == "to")
@@ -299,20 +284,11 @@ namespace SEE.DataModel.DG.IO
                         else
                         {
                             toNode = reader.Value;
-                            // set target of the edge
-                            if (nodes.TryGetValue(toNode, out Node node))
-                            {
-                                thisEdge.Target = node;
-                            }
-                            else
-                            {
-                                LogError("Unkown target node ID " + toNode + ".");
-                            }
                         }
                     }
                     else if (reader.Name == "id")
                     {
-                        // Nothing to be done
+                        id = reader.Value;
                     }
                 } // while
                 if (fromNode == "")
@@ -325,6 +301,34 @@ namespace SEE.DataModel.DG.IO
                     LogError("Edge has no target node.");
                     throw new SyntaxError("Edge has no target node.");
                 }
+                else if (id == "")
+                {
+                    LogError("Edge has no id.");
+                    throw new SyntaxError("Edge has no id.");
+                }
+
+                // Note that we do not know yet whether this edge is a hierarchical 
+                // or non-hierarchical edge until we see the edge type.
+                Edge thisEdge = new Edge(id);
+                // set source of the edge
+                if (nodes.TryGetValue(fromNode, out Node sourceNode))
+                {
+                    thisEdge.Source = sourceNode;
+                }
+                else
+                {
+                    LogError("Unkown source node ID " + fromNode + ".");
+                }
+                // set target of the edge
+                if (nodes.TryGetValue(toNode, out Node targetNode))
+                {
+                    thisEdge.Target = targetNode;
+                }
+                else
+                {
+                    LogError("Unkown target node ID " + toNode + ".");
+                }
+                current = thisEdge;
             }
             else
             {
