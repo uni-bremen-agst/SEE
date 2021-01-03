@@ -32,21 +32,12 @@ namespace SEE.Game.Evolution
     /// </summary>
     public class AnimationDataModel : MonoBehaviour
     {
-        /// <summary>
-        /// TextField for the animation time in seconds, that is, the time in 
-        /// seconds for showing a single graph revision during auto-play animation.
-        /// </summary>
-        public Text AnimationLagText; // serialized by Unity
 
         /// <summary>
         /// TextField for the shown revision in game.
         /// </summary>
         public Text RevisionNumberText; // serialized by Unity
 
-        /// <summary>
-        /// Toggle that shows whether auto-play mode is active.
-        /// </summary>
-        public Toggle AutoplayToggle; // serialized by Unity
 
         /// <summary>
         /// Slider to show the progress of the animation.
@@ -83,9 +74,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         private void Start()
         {
-            AnimationLagText.AssertNotNull("AnimationLagText");
             RevisionNumberText.AssertNotNull("RevisionNumberText");
-            AutoplayToggle.AssertNotNull("AutoplayToggle");
             Slider.AssertNotNull("Slider");
             PlayButton.AssertNotNull("PlayButton");
             FastForwardButton.AssertNotNull("FastForwardButton");

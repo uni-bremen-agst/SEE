@@ -25,7 +25,7 @@ using UnityEngine.UI;
 namespace SEE.Game.Evolution
 {
     /// <summary>
-    /// The AnimationInteraction manages user inputs and interfaces.
+    /// The AnimationInteraction manages user inputs and interfaces
     /// </summary>
     public class AnimationInteraction : MonoBehaviour
     {
@@ -113,11 +113,15 @@ namespace SEE.Game.Evolution
             animationDataModel.ReverseButton.onClick.AddListener(TaskOnClickReverseButton);
             animationDataModel.FastBackwardButton.onClick.AddListener(TaskOnClickFastBackwardButton);
 
+            SliderDrag sliderDrag = animationDataModel.Slider.GetComponent<SliderDrag>();
+            sliderDrag.EvolutionRenderer = evolutionRenderer;
 
             SetMode(true);
             OnShownGraphHasChanged();
             evolutionRenderer.Register(OnShownGraphHasChanged);
         }
+
+
 
         /// <summary>
         /// Handles actions to do when the Play/Pause button has been clicked.
@@ -321,10 +325,6 @@ namespace SEE.Game.Evolution
                     }
                 }
 
-                if(animationDataModel.Slider.value != evolutionRenderer.CurrentGraphIndex)
-                {
-                    evolutionRenderer.TryShowSpecificGraph((int)animationDataModel.Slider.value);
-                }
             }
             if (Input.GetKeyDown(KeyCode.Escape))
             {
@@ -394,8 +394,6 @@ namespace SEE.Game.Evolution
         private void OnShownGraphHasChanged()
         {
             animationDataModel.RevisionNumberText.text = (evolutionRenderer.CurrentGraphIndex + 1) + " / " + evolutionRenderer.GraphCount;
-            animationDataModel.AutoplayToggle.isOn = evolutionRenderer.IsAutoPlay;
-            animationDataModel.AnimationLagText.text = "Revision animation lag: " + evolutionRenderer.AnimationLag + "s";
             animationDataModel.Slider.value = evolutionRenderer.CurrentGraphIndex;
         }
 
