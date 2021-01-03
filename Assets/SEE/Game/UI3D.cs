@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.Assertions;
 using SEE.GO;
+using SEE.Utils;
 
 namespace SEE.Game.UI3D
 {
@@ -66,7 +67,7 @@ namespace SEE.Game.UI3D
             if (focusses.Count != 0)
             {
                 transform.position = GetPosition();
-                axisHalfLength = 0.01f * (Camera.main.transform.position - transform.position).magnitude;
+                axisHalfLength = 0.01f * (MainCamera.Camera.transform.position - transform.position).magnitude;
             }
         }
 

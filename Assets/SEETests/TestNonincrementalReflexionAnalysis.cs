@@ -233,7 +233,7 @@ namespace SEE.Tools.Architecture
 
             // Note: The levels must be calculated when the hierarchy has been
             // established. This is not done automatically.
-            graph.CalculateLevels();
+            graph.FinalizeNodeHierarchy();
 
             return graph;
         }

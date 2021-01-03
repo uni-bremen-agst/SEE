@@ -1,7 +1,8 @@
-﻿using SEE.Game;
-using SEE.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using SEE.Controls;
+using SEE.Game;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -22,10 +23,17 @@ namespace SEE.GO
             Invisible
         }
 
+        // Normal materials
         public const string OpaqueMaterialName = "Materials/OpaquePortalMaterial";
         public const string TransparentMaterialName = "Materials/TransparentPortalMaterial";
         public const string TransparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
         public const string InvisibleMaterialName = "Materials/InvisibleMaterial";
+        
+        // MRTK variants
+        public const string MRTKOpaqueMaterialName = "Materials/OpaqueMRTKMaterial";
+        public const string MRTKTransparentMaterialName = "Materials/TransparentMRTKMaterial";
+        public const string MRTKTransparentLineMaterialName = "Materials/TransparentLineMRTKMaterial";
+        public const string MRTKInvisibleMaterialName = "Materials/InvisibleMRTKMaterial";
 
         /// <summary>
         /// The type of the shaders of this material instance.
@@ -84,7 +92,7 @@ namespace SEE.GO
             }
             else
             {
-                // Assumption: numberOfColors > 1; if numberOfColors == 0, we would devide by zero.
+                // Assumption: numberOfColors > 1; if numberOfColors == 0, we would divide by zero.
                 for (int i = 0; i < result.Length; i++)
                 {
                     result[i] = New(shaderType, Color.Lerp(lower, higher, i / (float)(numberOfColors - 1)), renderQueueOffset);
@@ -97,11 +105,12 @@ namespace SEE.GO
         /// Returns the default material for the given <paramref name="degree"/> (always the identical 
         /// material, no matter how often this method is called). That means, if 
         /// the caller modifies this material, other objects using it will be affected, too.
-        /// 
+        /// <paramref name="renderQueueOffset"/> specifies the offset of the render queue for rendering.
+        /// The larger the offset, the later the object will be rendered. An object drawn later
+        /// will cover objects drawn earlier.
         /// Precondition: 0 <= degree <= numberOfColors-1 and renderQueueOffset >= 0; otherwise an exception is thrown
         /// </summary>
-        /// <param name="renderQueueOffset">The offset of the render queue for rendering.
-        /// The larger the offset, the later the object will be rendered.</param>
+        /// <param name="renderQueueOffset">offset for the render queue</param>
         /// <param name="degree">index of the material (color) in the range [0, numberOfColors-1]</param>
         /// <returns>default material</returns>
         public Material Get(int renderQueueOffset, int degree)
@@ -138,13 +147,28 @@ namespace SEE.GO
         {
             string materialName = null;
 
-            switch (shaderType)
+            // When the user is on a HoloLens, the special MRTK shader variants should be used
+            if (PlayerSettings.GetInputType() != PlayerSettings.PlayerInputType.HoloLens)
             {
-                case ShaderType.Opaque: materialName = OpaqueMaterialName; break;
-                case ShaderType.Transparent: materialName = TransparentMaterialName; break;
-                case ShaderType.TransparentLine: materialName = TransparentLineMaterialName; break;
-                case ShaderType.Invisible: materialName = InvisibleMaterialName; break;
-                default: Assertions.InvalidCodePath(); break;
+                switch (shaderType)
+                {
+                    case ShaderType.Opaque: materialName = OpaqueMaterialName; break;
+                    case ShaderType.Transparent: materialName = TransparentMaterialName; break;
+                    case ShaderType.TransparentLine: materialName = TransparentLineMaterialName; break;
+                    case ShaderType.Invisible: materialName = InvisibleMaterialName; break;
+                    default: Assertions.InvalidCodePath(); break;
+                }
+            }
+            else
+            {
+                switch (shaderType)
+                {
+                    case ShaderType.Opaque: materialName = MRTKOpaqueMaterialName; break;
+                    case ShaderType.Transparent: materialName = MRTKTransparentMaterialName; break;
+                    case ShaderType.TransparentLine: materialName = MRTKTransparentLineMaterialName; break;
+                    case ShaderType.Invisible: materialName = MRTKInvisibleMaterialName; break;
+                    default: Assertions.InvalidCodePath(); break;
+                }
             }
 
             Material materialPrefab = Resources.Load<Material>(materialName);

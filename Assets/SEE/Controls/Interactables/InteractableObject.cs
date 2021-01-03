@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
-using SEE.DataModel.DG;
-using SEE.Game;
+using System.Linq;
+using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
-using TMPro;
 using UnityEngine;
-using UnityEngine.Assertions;
 using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls
@@ -88,56 +86,16 @@ namespace SEE.Controls
         private Interactable interactable;
 
         /// <summary>
-        /// The text label that's displayed above the object when the user hovers over it.
-        /// Will be <code>null</code> when the label is not currently being displayed.
-        /// </summary>
-        private GameObject nodeLabel;
-
-        /// <summary>
-        /// Settings for the visualization of the node.
-        /// </summary>
-        private AbstractSEECity city;
-
-        /// <summary>
-        /// True if this node is a leaf. This value is cached to avoid frequent retrievals.
-        /// </summary>
-        private bool isLeaf;
-
-        /// <summary>
         /// The synchronizer is attached to <code>this.gameObject</code>, iff it is
         /// grabbed.
         /// </summary>
         public Net.Synchronizer InteractableSynchronizer { get; private set; }
 
         /// <summary>
-        /// The local hovering color of the outline.
+        /// The local player to be informed about his/her own hovered, selected,
+        /// or grabbed objects.
         /// </summary>
-        private readonly Color LocalHoverColor = Utils.ColorPalette.Viridis(0.0f);
-
-        /// <summary>
-        /// The remote hovering color of the outline.
-        /// </summary>
-        private readonly Color RemoteHoverColor = Utils.ColorPalette.Viridis(0.2f);
-
-        /// <summary>
-        /// The local selection color of the outline.
-        /// </summary>
-        private readonly Color LocalSelectColor = Utils.ColorPalette.Viridis(0.4f);
-
-        /// <summary>
-        /// The remote selection color of the outline.
-        /// </summary>
-        private readonly Color RemoteSelectColor = Utils.ColorPalette.Viridis(0.6f);
-
-        /// <summary>
-        /// The local grabbing color of the outline.
-        /// </summary>
-        private readonly Color LocalGrabColor = Utils.ColorPalette.Viridis(0.8f);
-
-        /// <summary>
-        /// The remote grabbing color of the outline.
-        /// </summary>
-        private readonly Color RemoteGrabColor = Utils.ColorPalette.Viridis(0.0f);
+        private PlayerActions localPlayerActions;
 
         private void Awake()
         {
@@ -149,11 +107,11 @@ namespace SEE.Controls
             {
                 Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
             }
+        }
 
-            GameObject cityGo = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
-            Assert.IsTrue(cityGo != null);
-            cityGo.TryGetComponent(out city);
-            isLeaf = SceneQueries.IsLeaf(gameObject);
+        private void Start()
+        {
+            localPlayerActions = PlayerSettings.LocalPlayer?.GetComponent<PlayerActions>();
         }
 
         /// <summary>
@@ -174,7 +132,13 @@ namespace SEE.Controls
         #region Interaction
 
         /// <summary>
-        /// Visually emphasizes this object for hovering.
+        /// Visually emphasizes this object for hovering. 
+        /// 
+        /// Note: This method may be called locally when a local user interacts with the
+        /// object or remotely when a remote user has interacted with the object. In the
+        /// former case, <paramref name="isOwner"/> will be true. In the
+        /// latter case, it will be called via <see cref="SEE.Net.SetHoverAction.ExecuteOnClient()"/>
+        /// where <paramref name="isOwner"/> is false.
         /// </summary>
         /// <param name="hover">Whether this object should be hovered.</param>
         /// <param name="isOwner">Whether this client is initiating the hovering action.
@@ -183,110 +147,30 @@ namespace SEE.Controls
         {
             IsHovered = hover;
 
-            if (!IsSelected && !IsGrabbed)
-            {
-                bool hasOutline = TryGetComponent(out Outline outline);
-
-                if (hover)
-                {
-                    if (hasOutline)
-                    {
-                        outline.SetColor(isOwner ? LocalHoverColor : RemoteHoverColor);
-                    }
-                    else
-                    {
-                        Outline.Create(gameObject, isOwner ? LocalHoverColor : RemoteHoverColor);
-                    }
-                }
-                else
-                {
-                    if (hasOutline)
-                    {
-                        DestroyImmediate(outline);
-                    }
-                }
-            }
-
             if (hover)
             {
-                CreateObjectLabel();
+                HoverIn?.Invoke(isOwner);
                 HoveredObjects.Add(this);
+                if (isOwner)
+                {
+                    localPlayerActions?.HoverOn(gameObject);
+                }
             }
             else
             {
-                DestroyObjectLabel();
+                HoverOut?.Invoke(isOwner);
                 HoveredObjects.Remove(this);
+                if (isOwner)
+                {
+                    localPlayerActions?.HoverOff(gameObject);
+                }
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
             {
                 new Net.SetHoverAction(this, hover).Execute();
             }
-        }
-
-        /// <summary>
-        /// Returns true iff labels are enabled for this node type.
-        /// </summary>
-        /// <returns>true iff labels are enabled for this node type</returns>
-        private bool LabelsEnabled()
-        {
-            return isLeaf && city.ShowLabel || !isLeaf && city.InnerNodeShowLabel;
-        }
-
-        /// <summary>
-        /// Creates a text label above the object with its node's SourceName if the label doesn't exist yet.
-        /// </summary>
-        private void CreateObjectLabel()
-        {
-            if (!LabelsEnabled())
-            {
-                return;  // If labels are disabled, we don't need to do anything
-            }
-
-            // If label already exists, nothing needs to be done
-            if (nodeLabel != null || !gameObject.TryGetComponent(out NodeRef nodeRef))
-            {
-                return;
-            }
-
-            Node node = nodeRef.node;
-            if (node == null)
-            {
-                return;
-            }
-
-            // Add text
-            Vector3 position = gameObject.transform.position;
-            position.y += isLeaf ? city.LeafLabelDistance : city.InnerNodeLabelDistance;
-            nodeLabel = TextFactory.GetTextWithSize(node.SourceName, position,
-                isLeaf ? city.LeafLabelFontSize : city.InnerNodeLabelFontSize, textColor: Color.black);
-            nodeLabel.transform.SetParent(gameObject.transform);
-
-            // Add connecting line between "roof" of object and text
-            Vector3 labelPosition = nodeLabel.transform.position;
-            Vector3 nodeTopPosition = gameObject.transform.position;
-            nodeTopPosition.y = BoundingBox.GetRoof(new List<GameObject> { gameObject });
-            labelPosition.y -= nodeLabel.GetComponent<TextMeshPro>().textBounds.extents.y;
-            LineFactory.Draw(nodeLabel, new[] { nodeTopPosition, labelPosition }, 0.01f,
-                Materials.New(Materials.ShaderType.TransparentLine, Color.black.ColorWithAlpha(0.9f)));
-
-            Portal.SetInfinitePortal(nodeLabel);
-            // Animate text movement
-            //iTween.MoveFrom(nodeLabel, nodeTopPosition, 1f);
-        }
-
-        /// <summary>
-        /// Destroys the text label above the object if it exists.
-        /// </summary>
-        /// <seealso cref="CreateObjectLabel"/>
-        private void DestroyObjectLabel()
-        {
-            // If labels are disabled, we don't need to do anything
-            if (LabelsEnabled() && nodeLabel != null)
-            {
-                Destroyer.DestroyGameObject(nodeLabel);
-            }
-        }
+        }        
 
         /// <summary>
         /// Visually emphasizes this object for selection.
@@ -298,41 +182,30 @@ namespace SEE.Controls
         {
             IsSelected = select;
 
-            if (!IsGrabbed)
+            if (!IsGrabbed && !IsSelected && IsHovered)
             {
-                bool hasOutline = TryGetComponent(out Outline outline);
-
-                if (select)
-                {
-                    if (hasOutline)
-                    {
-                        outline.SetColor(isOwner ? LocalSelectColor : RemoteSelectColor);
-                    }
-                    else
-                    {
-                        Outline.Create(gameObject, isOwner ? LocalSelectColor : RemoteSelectColor);
-                    }
-                }
-                else
-                {
-                    if (IsHovered)
-                    {
-                        SetHover(true, isOwner);
-                    }
-                    else if (hasOutline)
-                    {
-                        DestroyImmediate(outline);
-                    }
-                }
+                // Hovering is a continuous operation, that is why we call it here
+                // when the object is in the focus but neither grabbed nor selected.
+                SetHover(true, isOwner);
             }
 
             if (select)
             {
+                SelectIn?.Invoke(isOwner);
                 SelectedObjects.Add(this);
+                if (isOwner)
+                {
+                    localPlayerActions?.SelectOn(gameObject);
+                }
             }
             else
             {
+                SelectOut?.Invoke(isOwner);
                 SelectedObjects.Remove(this);
+                if (isOwner)
+                {
+                    localPlayerActions?.SelectOff(gameObject);
+                }
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
@@ -342,32 +215,48 @@ namespace SEE.Controls
         }
 
         /// <summary>
+        /// Deselects all currently selected interactable objects.
+        /// </summary>
+        /// <param name="isOwner">Whether this client is initiating the selection action.
+        public static void UnselectAll(bool isOwner)
+        {
+            // We cannot iterate on SelectedObjects directly because SetSelect will
+            // remove the iterated interactable from SelectedObjects. That is why
+            // we convert SelectedObjects to an array first.
+            foreach (InteractableObject interactable in SelectedObjects.ToArray())
+            {
+                interactable.SetSelect(false, isOwner);
+            }
+        }
+
+        /// <summary>
         /// Visually emphasizes this object for grabbing.
         /// </summary>
-        /// <param name="hover">Whether this object should be grabbed.</param>
+        /// <param name="grab">Whether this object should be grabbed.</param>
         /// <param name="isOwner">Whether this client is initiating the grabbing action.
         /// </param>
         public void SetGrab(bool grab, bool isOwner)
         {
             IsGrabbed = grab;
 
-            bool hasOutline = TryGetComponent(out Outline outline);
-
             if (grab)
             {
-                if (hasOutline)
-                {
-                    outline.SetColor(isOwner ? LocalGrabColor : RemoteGrabColor);
-                }
-                else
-                {
-                    Outline.Create(gameObject, isOwner ? LocalGrabColor : RemoteGrabColor);
-                }
-
+                GrabIn?.Invoke(isOwner);
                 GrabbedObjects.Add(this);
+                if (isOwner)
+                {
+                    localPlayerActions?.GrabOn(gameObject);
+                }
             }
             else
             {
+                GrabOut?.Invoke(isOwner);
+                if (isOwner)
+                {
+                    localPlayerActions?.GrabOff(gameObject);
+                }
+                // Hovering and selection are continuous operations, that is why we call them here
+                // when the object is in the focus but not grabbed any longer.
                 if (IsSelected)
                 {
                     SetSelect(true, isOwner);
@@ -376,11 +265,6 @@ namespace SEE.Controls
                 {
                     SetHover(true, isOwner);
                 }
-                else if (hasOutline)
-                {
-                    DestroyImmediate(outline);
-                }
-
                 GrabbedObjects.Remove(this);
             }
 
@@ -402,6 +286,62 @@ namespace SEE.Controls
         #endregion
 
         #region Events
+
+        ///------------------------------------------------------------------
+        /// Actions can register on selection, hovering, and grabbing events.
+        /// Then they will be invoked if those events occur.
+        ///------------------------------------------------------------------
+        ///
+        /// ----------------------------
+        /// Hovering event system
+        /// ----------------------------
+        /// <summary>
+        /// A delegate to be called when a hovering event has happened (hover over
+        /// or hover off the game object).
+        /// </summary>
+        public delegate void HoverAction(bool isOwner);
+        /// <summary>
+        /// Event to be triggered when this game object is being hovered over.
+        /// </summary>
+        public event HoverAction HoverIn;
+        /// <summary>
+        /// Event to be triggered when this game object is no longer hovered over.
+        /// </summary>
+        public event HoverAction HoverOut;
+
+        /// ----------------------------
+        /// Selection event system
+        /// ----------------------------
+        /// <summary>
+        /// A delegate to be called when a selection event has happened (selecting
+        /// or deselecting the game object).
+        /// </summary>
+        public delegate void SelectAction(bool isOwner);
+        /// <summary>
+        /// Event to be triggered when this game object is being selected.
+        /// </summary>
+        public event SelectAction SelectIn;
+        /// <summary>
+        /// Event to be triggered when this game object is no longer selected.
+        /// </summary>
+        public event SelectAction SelectOut;
+
+        /// ----------------------------
+        /// Grabbing event system
+        /// ----------------------------
+        /// <summary>
+        /// A delegate to be called when a grab event has happened (grabbing
+        /// or releasing the game object).
+        /// </summary>
+        public delegate void GrabAction(bool isOwner);
+        /// <summary>
+        /// Event to be triggered when this game object is being grabbed.
+        /// </summary>
+        public event GrabAction GrabIn;
+        /// <summary>
+        /// Event to be triggered when this game object is no longer grabbed.
+        /// </summary>
+        public event GrabAction GrabOut;
 
         //----------------------------------------------------------------
         // Mouse actions

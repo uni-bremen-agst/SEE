@@ -98,12 +98,15 @@ namespace SEE.Game
                 Assert.IsNotNull(graphRenderer);
                 diff = new NumericAttributeDiff(value.AllMetricAttributes());
                 objectManager = new ObjectManager(graphRenderer, gameObject);
-                float markerHeight = 1.0f;
-                float markerWidth = 1.0f;
                 if (gameObject.TryGetComponent<SEECityEvolution>(out SEECityEvolution cityEvolution))
                 {
-                    markerHeight = cityEvolution.MarkerHeight;
-                    markerWidth = cityEvolution.MarkerWidth;
+                    marker = new Marker(graphRenderer,
+                                        markerWidth: cityEvolution.MarkerWidth,
+                                        markerHeight: cityEvolution.MarkerHeight,
+                                        additionColor: cityEvolution.AdditionBeamColor,
+                                        changeColor: cityEvolution.ChangeBeamColor,
+                                        deletionColor: cityEvolution.DeletionBeamColor,
+                                        duration: AnimationLag);
                 }
                 else
                 {
@@ -111,7 +114,6 @@ namespace SEE.Game
                                          name);
                     enabled = false;
                 }
-                marker = new Marker(graphRenderer, markerWidth, markerHeight);
             }
         }
 
@@ -253,7 +255,7 @@ namespace SEE.Game
                 Layouts[graph] = CalculateLayout(graph);
             });
             objectManager.Clear();
-            p.End();
+            p.End(true);
         }
 
         /// <summary>
@@ -516,11 +518,9 @@ namespace SEE.Game
                 // We are re-using the existing plane, hence, we animate its change
                 // (new position and new scale).
                 objectManager.GetPlaneTransform(out Vector3 centerPosition, out Vector3 scale);
-                iTween.ScaleTo(plane, iTween.Hash(
-                         "scale", scale,
-                         "time", moveAnimator.MaxAnimationTime
-                    ));
-                iTween.MoveTo(plane, iTween.Hash("position", centerPosition, "time", moveAnimator.MaxAnimationTime));
+
+                Tweens.Scale(plane, scale, moveAnimator.MaxAnimationTime);
+                Tweens.Move(plane, centerPosition, moveAnimator.MaxAnimationTime);
             }
         }
 
@@ -563,9 +563,7 @@ namespace SEE.Game
             // the game node representing the graphNode if there is any; null if there is none
             Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject currentGameNode);
 
-            // will be true iff the node existed in the previous graph and any of its node
-            // attributes were changed
-            bool wasModified;
+            Difference difference;
             if (formerGraphNode == null)
             {
                 // The node is new. It has no layout applied to it yet.
@@ -580,13 +578,22 @@ namespace SEE.Game
                 position.y += layoutNode.LocalScale.y;
                 layoutNode.CenterPosition = position;
                 marker.MarkBorn(currentGameNode);
-                wasModified = false;
+                difference = Difference.Added;
             }
             else
             {
-                wasModified = diff.AreDifferent(formerGraphNode, graphNode);
+                // node existed before
+                if (diff.AreDifferent(formerGraphNode, graphNode))
+                {
+                    difference = Difference.Changed;
+                    marker.MarkChanged(currentGameNode);
+                }
+                else
+                {
+                    difference = Difference.None;
+                }
             }
-            moveScaleShakeAnimator.AnimateTo(currentGameNode, layoutNode, wasModified, OnRenderNodeFinishedAnimation);
+            moveScaleShakeAnimator.AnimateTo(currentGameNode, layoutNode, difference, OnRenderNodeFinishedAnimation);
         }
 
         /// <summary>
@@ -617,7 +624,7 @@ namespace SEE.Game
                 Vector3 newPosition = block.transform.position;
                 newPosition.y = -block.transform.localScale.y;
                 ILayoutNode nodeTransform = new AnimationNode(newPosition, block.transform.localScale);
-                moveScaleShakeAnimator.AnimateTo(block, nodeTransform, false, OnRemovedNodeFinishedAnimation);
+                moveScaleShakeAnimator.AnimateTo(block, nodeTransform, Difference.Deleted, OnRemovedNodeFinishedAnimation);
             }
         }
 
@@ -660,6 +667,7 @@ namespace SEE.Game
             set
             {
                 AnimationDuration = value;
+                marker?.SetDuration(value);
                 shownGraphHasChangedEvent.Invoke();
             }
         }

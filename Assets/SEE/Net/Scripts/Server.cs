@@ -195,7 +195,7 @@ namespace SEE.Net
                                 new LoadCityAction(city).Execute(recipient);
                             }
                         }
-                        foreach (Controls.NavigationAction navigationAction in UnityEngine.Object.FindObjectsOfType<Controls.NavigationAction>())
+                        foreach (Controls.Actions.NavigationAction navigationAction in UnityEngine.Object.FindObjectsOfType<Controls.Actions.NavigationAction>())
                         {
                             new SyncCitiesAction(navigationAction).Execute(recipient);
                         }
