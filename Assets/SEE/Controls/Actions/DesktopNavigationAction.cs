@@ -3,6 +3,7 @@ using SEE.GO;
 using SEE.Utils;
 using System;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
@@ -158,7 +159,11 @@ namespace SEE.Controls.Actions
                 actionState.hoveredTransform = null;
                 if (insideClippingArea)
                 {
-                    if (Raycasting.RaycastNodes(out RaycastHit raycastHit, out NodeRef nodeRef))
+                    if (Input.GetKeyDown(KeyCode.U))
+                    {
+                        InteractableObject.UnselectAll(true);
+                    }
+                    else if (Raycasting.RaycastNodes(out RaycastHit raycastHit, out NodeRef nodeRef))
                     {
                         Transform hoveredTransform = raycastHit.transform;
                         Transform parentTransform = hoveredTransform;
@@ -194,14 +199,17 @@ namespace SEE.Controls.Actions
                     }
                 }
 
-                // Select mode
-                if (ActionState.Value != ActionState.Type.Move && Input.GetKeyDown(KeyCode.Alpha1))
+                // Select action state
+                ActionState.Type[] actionStateTypes = (ActionState.Type[])Enum.GetValues(typeof(ActionState.Type));
+                Assert.IsTrue(actionStateTypes.Length <= 9);
+                for (int i = 0; i < actionStateTypes.Length; i++)
                 {
-                    ActionState.Value = ActionState.Type.Move;
-                }
-                else if (ActionState.Value != ActionState.Type.Rotate && Input.GetKeyDown(KeyCode.Alpha2))
-                {
-                    ActionState.Value = ActionState.Type.Rotate;
+                    ActionState.Type type = actionStateTypes[i];
+                    if (ActionState.Value != type && Input.GetKeyDown(KeyCode.Alpha1 + i))
+                    {
+                        ActionState.Value = type;
+                        break;
+                    }
                 }
 
                 if (ActionState.Value == ActionState.Type.Rotate && cursor.HasFocus())
@@ -346,7 +354,7 @@ namespace SEE.Controls.Actions
 
             #region Rotate
 
-            else // mode == NavigationMode.Rotate
+            else if (ActionState.Value == ActionState.Type.Rotate)
             {
                 if (actionState.reset) // reset rotation to identity();
                 {

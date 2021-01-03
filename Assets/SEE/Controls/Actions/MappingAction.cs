@@ -7,6 +7,7 @@ using SEE.Tools;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
@@ -204,6 +205,8 @@ namespace SEE.Controls.Actions
                 SetupGameObjectMappings();
                 SetupReflexion();
             }
+
+            InteractableObject.AnySelectIn += AnySelectIn;
         }
 
         /// <summary>
@@ -452,7 +455,7 @@ namespace SEE.Controls.Actions
         {
             foreach (Selection implementation in objectsInClipboard)
             {
-                if (!Reflexion.Is_Mapper(implementation.graphNode))
+                if (!Reflexion.Is_Mapped(implementation.graphNode))
                 {
                     Debug.LogFormat("Mapping {0} -> {1}.\n", implementation.gameNode.name, target.gameNode.name);
                     Reflexion.Add_To_Mapping(from: implementation.graphNode, to: target.graphNode);
@@ -494,6 +497,48 @@ namespace SEE.Controls.Actions
             Reflexion.Register(this);
             // An initial run is necessary to set up the necessary data structures.
             Reflexion.Run();
+        }
+
+        private NodeRef selectedNodeRef;
+
+        private void AnySelectIn(InteractableObject interactableObject, bool isOwner)
+        {
+            NodeRef nr1 = interactableObject.GetComponent<NodeRef>();
+            Node n1 = nr1.node;
+
+            if (selectedNodeRef == null || selectedNodeRef.node.ItsGraph == n1.ItsGraph)
+            {
+                if (selectedNodeRef)
+                {
+                    SetAlpha(selectedNodeRef, 1.0f);
+                }
+                selectedNodeRef = nr1;
+                SetAlpha(selectedNodeRef, 0.5f);
+            }
+            else
+            {
+                Graph mapping = Reflexion.Get_Mapping();
+                Node n0 = selectedNodeRef.node;
+                if (Reflexion.Is_Mapped(selectedNodeRef.node))
+                {
+                    Node mapped = Reflexion.Get_Mapping().GetNode(n0.ID);
+                    Assert.IsTrue(mapped.Outgoings.Count == 1);
+                    Reflexion.Delete_From_Mapping(mapped.Outgoings[0]);
+                }
+                Reflexion.Add_To_Mapping(n0, n1);
+                SetAlpha(selectedNodeRef, 1.0f);
+                selectedNodeRef = null;
+                SetAlpha(nr1, 1.0f);
+                interactableObject.SetSelect(false, true);
+            }
+        }
+
+        private void SetAlpha(NodeRef nodeRef, float alpha)
+        {
+            MeshRenderer meshRenderer = nodeRef.GetComponent<MeshRenderer>();
+            Color color = meshRenderer.material.color;
+            color.a = alpha;
+            meshRenderer.material.color = color;
         }
 
         /// <summary>
