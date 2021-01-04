@@ -18,6 +18,8 @@ namespace SEE.Game.Evolution
 
         public GameObject AnimationCanvas;
 
+        public Text hoverText;
+
         private EvolutionRenderer evolutionRenderer;
 
         private bool wasAutoPlay = false;
@@ -25,8 +27,6 @@ namespace SEE.Game.Evolution
         private bool wasAutoPlayReverse = false;
 
         private bool isDragging = false;
-
-        private List<GameObject> hoverText;
 
         public EvolutionRenderer EvolutionRenderer
         {
@@ -41,38 +41,24 @@ namespace SEE.Game.Evolution
         {
             animationDataModel = AnimationCanvas.GetComponent<AnimationDataModel>();
 
-            animationDataModel.Slider.onValueChanged.AddListener(delegate { TaskOnValueChanged(); });
+            hoverText.enabled = false;
 
-            hoverText = new List<GameObject>();
         }
 
         private void Update()
         {
-            if(hoverText.Count > 1)
-            {
-                for (int i = 0; i < hoverText.Count - 1; i++)
-                {
-                    GameObject g = hoverText[i];
-                    Object.Destroy(g);
-                }
-            }
-        }
-
-        private void TaskOnValueChanged()
-        {
             if (isDragging)
             {
                 Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
-                Vector3 textPos = new Vector3(handlePos.x , handlePos.y + 0.05f, handlePos.z );
-                GameObject text = TextFactory.GetTextWithWidth((animationDataModel.Slider.value+1).ToString() + "/" + (animationDataModel.Slider.maxValue+1f),
-                                                      textPos, 0.1f);
-                text.transform.SetParent(animationDataModel.Slider.transform);
-                hoverText.Add(text);
+                Vector3 textPos = new Vector3(handlePos.x, handlePos.y + 0.05f, handlePos.z);
+                hoverText.text = (animationDataModel.Slider.value + 1f).ToString() + "/" + (animationDataModel.Slider.maxValue + 1f);
+                hoverText.rectTransform.position = textPos;
             }
         }
 
         public void OnPointerDown(PointerEventData eventData)
         {
+            hoverText.enabled = true;
             if (evolutionRenderer.IsAutoPlay)
             {
                 wasAutoPlay = true;
@@ -88,6 +74,7 @@ namespace SEE.Game.Evolution
 
         public void OnPointerUp(PointerEventData eventData)
         {
+            hoverText.enabled = false;
             if (animationDataModel.Slider.value != evolutionRenderer.CurrentGraphIndex)
             {
                 evolutionRenderer.TryShowSpecificGraph((int)animationDataModel.Slider.value);
@@ -103,11 +90,6 @@ namespace SEE.Game.Evolution
             {
                 evolutionRenderer.ToggleAutoPlayReverse();
                 wasAutoPlayReverse = false;
-            }
-            for (int i = 0; i < hoverText.Count; i++)
-            {
-                GameObject g = hoverText[i];
-                Object.Destroy(g);
             }
             isDragging = false;
         }
