@@ -75,10 +75,11 @@ namespace SEE.Game
             if (newGraphParent != null)
             {
                 movingObject.transform.position = newPosition;
+                PutOn(movingObject, newGameParent);
                 if (movingNode.Parent != newGraphParent)
                 {
                     movingNode.Reparent(newGraphParent);
-                    PutOn(movingObject, newGameParent);
+                    movingObject.transform.SetParent(newGameParent.transform);                    
                 }
             }
             else
@@ -88,9 +89,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Puts <paramref name="child"/> on top of <paramref name="parent"/>
-        /// and makes <paramref name="child"/> a child of <paramref name="parent"/>
-        /// in the game-object hierarchy.
+        /// Puts <paramref name="child"/> on top of <paramref name="parent"/>.
         /// </summary>
         /// <param name="child">child</param>
         /// <param name="parent">parent</param>
@@ -101,8 +100,7 @@ namespace SEE.Game
             Vector3 childCenter = child.transform.position;
             float parentRoof = parent.transform.position.y + parent.transform.lossyScale.y / 2;
             childCenter.y = parentRoof + child.transform.lossyScale.y / 2;
-            child.transform.position = childCenter;
-            child.transform.SetParent(parent.transform);
+            child.transform.position = childCenter;            
         }
 
         // -------------------------------------------------------------
