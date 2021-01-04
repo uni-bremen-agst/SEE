@@ -71,18 +71,8 @@ namespace SEE.Controls.Actions
 
         private struct Selection
         {
-            /// <summary>
-            /// The currently selected game object. May be null if none has been selected
-            /// or in case of deselection.
-            /// </summary>
-            internal GameObject gameNode;
-
-            /// <summary>
-            /// The graph node currently selected as retrieved from gameNode.
-            /// If gameNode is null, graphNode is null, too. If gameNode
-            /// is not null but has no attached node reference, graphNode is null, too.
-            /// </summary>
-            internal Node graphNode;
+            internal NodeRef nodeRef;
+            internal InteractableObject interactableObject; // TODO(torben): it is time to combine NodeRefs and InteractableObjects or at least have some dictionary for them...
         }
 
         /// <summary>
@@ -100,7 +90,7 @@ namespace SEE.Controls.Actions
             Implementation
         }
 
-        private struct ActionState
+        private struct _ActionState
         {
             internal bool copy;              // copy selected object (i.e., start mapping)
             internal bool paste;             // paste (map) copied object
@@ -109,7 +99,7 @@ namespace SEE.Controls.Actions
             internal HitCity hitCity;        // which city we are currently focusing on
         }
 
-        private ActionState actionState;
+        private _ActionState actionState;
 
         /// <summary>
         /// The game objects that have been copied to the clipboard via Ctrl-C.
@@ -206,7 +196,32 @@ namespace SEE.Controls.Actions
                 SetupReflexion();
             }
 
-            InteractableObject.AnySelectIn += AnySelectIn;
+            ActionState.OnStateChanged += OnStateChanged;
+            if (ActionState.Value == ActionState.Type.Map)
+            {
+                InteractableObject.AnySelectIn += AnySelectIn;
+                InteractableObject.AnySelectOut += AnySelectOut;
+            }
+            else
+            {
+                enabled = false;
+            }
+        }
+
+        private void OnStateChanged(ActionState.Type value)
+        {
+            if (value == ActionState.Type.Map)
+            {
+                InteractableObject.AnySelectIn += AnySelectIn;
+                InteractableObject.AnySelectOut += AnySelectOut;
+                enabled = true;
+            }
+            else
+            {
+                InteractableObject.AnySelectIn -= AnySelectIn;
+                InteractableObject.AnySelectOut -= AnySelectOut;
+                enabled = false; // We don't want to waste CPU time, if Update() doesn't do anything
+            }
         }
 
         /// <summary>
@@ -367,47 +382,46 @@ namespace SEE.Controls.Actions
         // Update is called once per frame
         private void Update()
         {
+            // This script should be disabled, if the action state is not 'Map'
+            Assert.IsTrue(ActionState.Value == ActionState.Type.Map);
+
             //------------------------------------------------------------------------
             // ARCHITECTURAL MAPPING
             //------------------------------------------------------------------------
 
-            // We check whether we are focusing on the code city this NavigationAction is attached to.
-            if (Raycasting.RaycastNodes(out RaycastHit hit, out NodeRef nodeRef))
+            if (Input.GetMouseButtonDown(0)) // Left mouse button
             {
-                Transform firstHit = hit.transform;
-                if (firstHit.gameObject == Architecture)
+                if (Raycasting.RaycastNodes(out _, out NodeRef nodeRef)) // Select, replace or map
                 {
-                    actionState.hitCity = HitCity.Architecture;
-                }
-                else if (firstHit.gameObject == Implementation)
-                {
-                    actionState.hitCity = HitCity.Implementation;
-                }
-                else
-                {
-                    return;
-                }
-            }
-            else
-            {
-                return;
-            }
+                    Assert.IsNotNull(nodeRef);
+                    Assert.IsNotNull(nodeRef.node);
 
-            // Selection of an object
-            if (Input.GetMouseButtonDown(0)) // left mouse button
-            {
-                if (nodeRef?.node != null)
-                {
-                    selection.gameNode = hit.transform.gameObject;
-                    selection.graphNode = nodeRef.node;
+                    if (nodeRef.node.ItsGraph == implementation) // Set or replace implementation node
+                    {
+                        selection.interactableObject?.SetSelect(false, true);
+                        nodeRef.GetComponent<InteractableObject>().SetSelect(true, true);
+                    }
+                    else if (selection.nodeRef != null) // Create mapping
+                    {
+                        Node n0 = selection.nodeRef.node;
+                        Node n1 = nodeRef.node;
+                        if (Reflexion.Is_Mapped(n0))
+                        {
+                            Node mapped = Reflexion.Get_Mapping().GetNode(n0.ID);
+                            Assert.IsTrue(mapped.Outgoings.Count == 1);
+                            Reflexion.Delete_From_Mapping(mapped.Outgoings[0]);
+                        }
+                        Reflexion.Add_To_Mapping(n0, n1);
+                        selection.interactableObject.SetSelect(false, true);
+                    }
                 }
-                else
+                else // Deselect
                 {
-                    selection.gameNode = null;
-                    selection.graphNode = null;
+                    selection.interactableObject?.SetSelect(false, true);
                 }
             }
 
+#if false
             bool leftControl = LeftControlPressed();
 
             actionState.save = leftControl && Input.GetKeyDown(SaveKey);
@@ -416,16 +430,16 @@ namespace SEE.Controls.Actions
             actionState.clearClipboard = leftControl && Input.GetKeyDown(ClearKey);
 
             // We can copy only from the implementation city and if there is a selected object.
-            if (actionState.copy && actionState.hitCity == HitCity.Implementation && selection.gameNode != null)
+            if (actionState.copy && actionState.hitCity == HitCity.Implementation && selection.go != null)
             {
                 if (objectsInClipboard.Contains(selection))
                 {
-                    Debug.LogFormat("Removing node {0} from clipboard\n", selection.gameNode.name);
+                    Debug.LogFormat("Removing node {0} from clipboard\n", selection.go.name);
                     objectsInClipboard.Remove(selection);
                 }
                 else
                 {
-                    Debug.LogFormat("Copying node {0} to clipboard\n", selection.gameNode.name);
+                    Debug.LogFormat("Copying node {0} to clipboard\n", selection.go.name);
                     objectsInClipboard.Add(selection);
                 }
             }
@@ -435,7 +449,7 @@ namespace SEE.Controls.Actions
                 objectsInClipboard.Clear();
             }
             // We can paste only into the architecture city and if we have a selected object as a target
-            if (actionState.paste && actionState.hitCity == HitCity.Architecture && selection.gameNode != null)
+            if (actionState.paste && actionState.hitCity == HitCity.Architecture && selection.go != null)
             {
                 MapClipboardContent(selection);
             }
@@ -444,6 +458,7 @@ namespace SEE.Controls.Actions
             {
                 SaveMapping(mapping, MappingFile);
             }
+#endif
         }
 
         /// <summary>
@@ -455,14 +470,14 @@ namespace SEE.Controls.Actions
         {
             foreach (Selection implementation in objectsInClipboard)
             {
-                if (!Reflexion.Is_Mapped(implementation.graphNode))
+                if (!Reflexion.Is_Mapped(implementation.nodeRef.node))
                 {
-                    Debug.LogFormat("Mapping {0} -> {1}.\n", implementation.gameNode.name, target.gameNode.name);
-                    Reflexion.Add_To_Mapping(from: implementation.graphNode, to: target.graphNode);
+                    Debug.LogFormat("Mapping {0} -> {1}.\n", implementation.nodeRef.name, target.nodeRef.name);
+                    Reflexion.Add_To_Mapping(from: implementation.nodeRef.node, to: target.nodeRef.node);
                 }
                 else
                 {
-                    Debug.LogWarningFormat("Node {0} is already explicitly mapped..\n", implementation.gameNode.name);
+                    Debug.LogWarningFormat("Node {0} is already explicitly mapped..\n", implementation.nodeRef.name);
                 }
             }
             objectsInClipboard.Clear();
@@ -499,38 +514,24 @@ namespace SEE.Controls.Actions
             Reflexion.Run();
         }
 
-        private NodeRef selectedNodeRef;
-
         private void AnySelectIn(InteractableObject interactableObject, bool isOwner)
         {
-            NodeRef nr1 = interactableObject.GetComponent<NodeRef>();
-            Node n1 = nr1.node;
+            Assert.IsNull(selection.nodeRef);
+            Assert.IsNull(selection.interactableObject);
 
-            if (selectedNodeRef == null || selectedNodeRef.node.ItsGraph == n1.ItsGraph)
-            {
-                if (selectedNodeRef)
-                {
-                    SetAlpha(selectedNodeRef, 1.0f);
-                }
-                selectedNodeRef = nr1;
-                SetAlpha(selectedNodeRef, 0.5f);
-            }
-            else
-            {
-                Graph mapping = Reflexion.Get_Mapping();
-                Node n0 = selectedNodeRef.node;
-                if (Reflexion.Is_Mapped(selectedNodeRef.node))
-                {
-                    Node mapped = Reflexion.Get_Mapping().GetNode(n0.ID);
-                    Assert.IsTrue(mapped.Outgoings.Count == 1);
-                    Reflexion.Delete_From_Mapping(mapped.Outgoings[0]);
-                }
-                Reflexion.Add_To_Mapping(n0, n1);
-                SetAlpha(selectedNodeRef, 1.0f);
-                selectedNodeRef = null;
-                SetAlpha(nr1, 1.0f);
-                interactableObject.SetSelect(false, true);
-            }
+            selection.nodeRef = interactableObject.GetComponent<NodeRef>();
+            selection.interactableObject = interactableObject;
+            SetAlpha(selection.nodeRef, 0.5f);
+        }
+
+        private void AnySelectOut(InteractableObject interactableObject, bool isOwner)
+        {
+            Assert.IsNotNull(selection.nodeRef);
+            Assert.IsNotNull(selection.interactableObject);
+
+            SetAlpha(selection.nodeRef, 1.0f);
+            selection.interactableObject = null;
+            selection.nodeRef = null;
         }
 
         private void SetAlpha(NodeRef nodeRef, float alpha)
