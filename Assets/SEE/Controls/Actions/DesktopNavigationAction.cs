@@ -189,7 +189,7 @@ namespace SEE.Controls.Actions
                     }
                 }
 
-                if (!actionState.drag)
+                if (!actionState.drag && ActionState.Value != ActionState.Type.Map)
                 {
                     actionState.zoomToggleToObject |= Input.GetKeyDown(KeyCode.F);
 
@@ -591,7 +591,7 @@ namespace SEE.Controls.Actions
                     InteractableObject interactable = oldFocus.GetComponent<InteractableObject>();
                     if (interactable)
                     {
-                        interactable.SetSelect(false, true);
+                        interactable.SetSelect(false, true); // TODO(torben): callback and have cursor always focus on every 'InteractableObject.SelectedObjects'-element
                         cursor.RemoveFocus(oldFocus);
                     }
                 }
