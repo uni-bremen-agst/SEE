@@ -2,7 +2,7 @@
 using DG.Tweening;
 using UnityEngine;
 
-namespace SEE.Game.Evolution
+namespace SEE.Utils
 {
     /// <summary>
     /// A class for animating objects (tweening).
