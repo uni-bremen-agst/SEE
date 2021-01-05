@@ -46,18 +46,18 @@ namespace SEE.Controls.Actions
             {
                 case State.MoveNode:
                     // an object must be selected; otherwise we cannot move it
-                    if (selectedObject != null)
-                    {
+                    if (selectedObject.gameObect != null)
+                    {                        
                         if (UserWantsToMove())
                         {
-                            GameNodeMover.MoveTo(selectedObject);
+                            GameNodeMover.MoveTo(selectedObject.gameObect);
                         }
                         else
                         {
                             // The selected object has reached its final destination.
                             // It needs to be placed there.
-                            GameNodeMover.FinalizePosition(selectedObject);
-                            selectedObject = null;
+                            GameNodeMover.FinalizePosition(selectedObject.gameObect, selectedObject.originalPosition);
+                            selectedObject.gameObect = null;
                         }
                     }
                     break;
@@ -185,12 +185,18 @@ namespace SEE.Controls.Actions
         // The management of the currently selected interactable object
         // ------------------------------------------------------------
 
+        private struct ObjectInfo
+        {
+            public GameObject gameObect;
+            public Vector3 originalPosition;
+        }
+
         /// <summary>
         /// The currently selected object. May be null if none is selected.
         /// Do not use this attribute directly. Use <see cref="SelectedObject"/>
         /// instead.
         /// </summary>
-        private GameObject selectedObject;
+        private ObjectInfo selectedObject = new ObjectInfo();
 
         // ------------------------------------------------------------------------------
         // Events triggered by interactable objects when they are selected, hovered over,
@@ -207,7 +213,8 @@ namespace SEE.Controls.Actions
         /// <param name="selection">the selected interactable object</param>
         public void SelectOn(GameObject selection)
         {
-            selectedObject = selection;
+            selectedObject.gameObect = selection;
+            selectedObject.originalPosition = selection.transform.position;
         }
 
         /// <summary>
@@ -219,7 +226,7 @@ namespace SEE.Controls.Actions
         /// <param name="selection">the interactable object no longer selected</param>
         public void SelectOff(GameObject selection)
         {
-            selectedObject = null;
+            selectedObject.gameObect = null;
         }
 
         /// <summary>
