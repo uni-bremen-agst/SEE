@@ -69,7 +69,21 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Finalizes the final position of the <paramref name="movingObject"/>.
+        /// Finalizes the position of the <paramref name="movingObject"/>. If the current
+        /// pointer of the user is pointing at a game object with a NodeRef the final
+        /// position of <paramref name="movingObject"/> will be the game object with a NodeRef
+        /// that is at the deepest level of the node hierarchy (the pointer may actually 
+        /// hit multiple nested nodes), in the following called target parent. The 
+        /// <paramref name="movingObject"/> will then be placed onto the roof of the target
+        /// parent and its associated graph node will be become a child of the graph node
+        /// associated with the target parent and <paramref name="movingObject"/> becomes
+        /// a child of the target node (the game-node hierarchy and the graph-node hierarchy
+        /// must be in sync). 
+        /// 
+        /// If no such target node can be identified, the <paramref name="movingObject"/> will 
+        /// return to its <paramref name="originalPosition"/> and neither the graph-node hierarchy 
+        /// nor the game-node hierarchy will be changed.
+        ///
         /// </summary>
         /// <param name="movingObject">the object being moved</param>
         /// <param name="originalPosition">the original world-space position of <paramref name="movingObject"/>
