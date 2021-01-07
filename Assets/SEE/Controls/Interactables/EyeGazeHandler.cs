@@ -13,6 +13,14 @@ namespace SEE.Controls
     public class EyeGazeHandler : BaseEyeFocusHandler
     {
 
+        /// <summary>
+        /// Seconds to wait before triggering the SetHover event on eye focus.
+        /// </summary>
+        private float eyeStareDelay;
+
+        /// <summary>
+        /// Interactable object which receives SetHover events.
+        /// </summary>
         private InteractableObject interactable;
         
         private void Awake()
@@ -26,7 +34,8 @@ namespace SEE.Controls
             {
                 if (SceneQueries.GetCodeCity(gameObject.transform).gameObject.TryGetComponentOrLog(out AbstractSEECity city))
                 {
-                    dwellField.SetValue(this, city.EyeStareDelay);
+                    eyeStareDelay = city.EyeStareDelay;
+                    dwellField.SetValue(this, eyeStareDelay);
                 }
             }
             else
