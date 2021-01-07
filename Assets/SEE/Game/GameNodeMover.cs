@@ -13,7 +13,7 @@ namespace SEE.Game
         /// <summary>
         /// The speed by which to move a selected object.
         /// </summary>
-        public static float MovingSpeed = 1.0f;
+        public static float MovingSpeed = 4.2f;
 
         /// <summary>
         /// Moves the given <paramref name="movingObject"/> on a sphere around the
@@ -53,7 +53,7 @@ namespace SEE.Game
             Vector3 target = TipOfRayPosition(movingObject);
             Vector3 movingObjectPos = movingObject.transform.position;
 
-            if(!x)
+            if (!x)
             {
                 target.x = movingObjectPos.x;
             }
@@ -131,7 +131,7 @@ namespace SEE.Game
                 if (movingNode.Parent != newGraphParent)
                 {
                     movingNode.Reparent(newGraphParent);
-                    movingObject.transform.SetParent(newGameParent.transform);                    
+                    movingObject.transform.SetParent(newGameParent.transform);
                 }
             }
             else
@@ -154,7 +154,7 @@ namespace SEE.Game
             Vector3 childCenter = child.transform.position;
             float parentRoof = parent.transform.position.y + parent.transform.lossyScale.y / 2;
             childCenter.y = parentRoof + child.transform.lossyScale.y / 2;
-            child.transform.position = childCenter;            
+            child.transform.position = childCenter;
         }
 
         // -------------------------------------------------------------

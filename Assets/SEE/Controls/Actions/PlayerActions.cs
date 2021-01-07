@@ -46,18 +46,18 @@ namespace SEE.Controls.Actions
             {
                 case State.MoveNode:
                     // an object must be selected; otherwise we cannot move it
-                    if (selectedObject.gameObect != null)
+                    if (selectedObject.gameObject != null)
                     {                        
                         if (UserWantsToMove())
                         {
-                            GameNodeMover.MoveTo(selectedObject.gameObect);
+                            GameNodeMover.MoveTo(selectedObject.gameObject);
                         }
                         else
                         {
                             // The selected object has reached its final destination.
                             // It needs to be placed there.
-                            GameNodeMover.FinalizePosition(selectedObject.gameObect, selectedObject.originalPosition);
-                            selectedObject.gameObect = null;
+                            GameNodeMover.FinalizePosition(selectedObject.gameObject, selectedObject.originalPosition);
+                            selectedObject.gameObject = null;
                         }
                     }
                     break;
@@ -74,10 +74,10 @@ namespace SEE.Controls.Actions
                     }
                     break;
                 case State.ScaleNode:
-                    if (selectedObject != null )
+                    if (selectedObject.gameObject != null )
                     {
                        
-                        selectedObject.AddComponent<GameNodeScaleAction>();
+                        selectedObject.gameObject.AddComponent<GameNodeScaleAction>();
                         Browse();
                     }
                     break;
@@ -187,7 +187,7 @@ namespace SEE.Controls.Actions
 
         private struct ObjectInfo
         {
-            public GameObject gameObect;
+            public GameObject gameObject;
             public Vector3 originalPosition;
         }
 
@@ -213,7 +213,7 @@ namespace SEE.Controls.Actions
         /// <param name="selection">the selected interactable object</param>
         public void SelectOn(GameObject selection)
         {
-            selectedObject.gameObect = selection;
+            selectedObject.gameObject = selection;
             selectedObject.originalPosition = selection.transform.position;
         }
 
@@ -226,7 +226,7 @@ namespace SEE.Controls.Actions
         /// <param name="selection">the interactable object no longer selected</param>
         public void SelectOff(GameObject selection)
         {
-            selectedObject.gameObect = null;
+            selectedObject.gameObject = null;
         }
 
         /// <summary>
