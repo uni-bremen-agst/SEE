@@ -16,11 +16,11 @@ public class DrawLine : MonoBehaviour
 	//Use this for initialization
 	void Start()
     {
-		lineRenderer = GetComponent<lineRenderer>();
-		lineRenderer.SetPosition(0, origin.postition);
+		lineRenderer = GetComponent<LineRenderer>();
+		lineRenderer.SetPosition(0, origin.position);
 		lineRenderer.SetWidth(.45f, .45f);
 
-		dist = Vector3.Distance(origin.postion, destination.position);
+		dist = Vector3.Distance(origin.position, destination.position);
     }
 
 	//Update is called once per frame
@@ -30,7 +30,7 @@ public class DrawLine : MonoBehaviour
         {
 			counter += .1f / lineDrawSpeed;
 
-			float x = Math.Lerp(0, dist, counter);
+			float x = Mathf.Lerp(0, dist, counter);
 
 			Vector3 pointA = origin.position;
 			Vector3 pointB = destination.position;
