@@ -14,7 +14,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private readonly static Color RemoteGrabColor = Utils.ColorPalette.Viridis(0.0f);
 
-        protected override void On(bool isOwner)
+        protected override void On(InteractableObject interactableObject, bool isOwner)
         {
             if (TryGetComponent(out Outline outline))
             {
@@ -26,7 +26,7 @@ namespace SEE.Controls.Actions
             }
         }
 
-        protected override void Off(bool isOwner)
+        protected override void Off(InteractableObject interactableObject, bool isOwner)
         {
             if (!interactable.IsSelected && !interactable.IsHovered && TryGetComponent(out Outline outline))
             {

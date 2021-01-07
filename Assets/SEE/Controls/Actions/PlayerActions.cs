@@ -1,4 +1,5 @@
 ﻿using SEE.Game;
+using SEE.Game.Charts;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -27,7 +28,13 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
-            switch(state)
+            // If the local player presses U, we deselect all currently selected interactable objects.
+            if (Input.GetKeyDown(KeyCode.U))
+            {
+                InteractableObject.UnselectAll(true);
+            }
+
+            switch (state)
             {
                 case State.MoveNode:
                     // an object must be selected; otherwise we cannot move it

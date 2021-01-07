@@ -270,7 +270,7 @@ namespace SEE.Controls.Actions
             {
                 if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
                 {
-                    Node node = nodeRef.node;
+                    Node node = nodeRef.Value;
                     if (node != null)
                     {
                         nodes[node.ID] = gameObject;
@@ -396,7 +396,7 @@ namespace SEE.Controls.Actions
                 if (hit.transform.gameObject.TryGetComponent(out NodeRef nodeRef))
                 {
                     selection.gameNode = hit.transform.gameObject;
-                    selection.graphNode = nodeRef.node;
+                    selection.graphNode = nodeRef.Value;
                 }
                 else
                 {

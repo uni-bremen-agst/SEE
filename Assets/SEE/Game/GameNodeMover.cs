@@ -39,7 +39,7 @@ namespace SEE.Game
         public static void FinalizePosition(GameObject movingObject)
         {
             // The underlying graph node of the moving object.
-            Node movingNode = movingObject.GetComponent<NodeRef>().node;
+            Node movingNode = movingObject.GetComponent<NodeRef>().Value;
             // The new parent of the movingNode in the underlying graph.
             Node newGraphParent = null;
             // The new parent of the movingNode in the game-object hierarchy.
@@ -59,12 +59,12 @@ namespace SEE.Game
                 {
                     NodeRef nodeRef = hit.transform.GetComponent<NodeRef>();
                     // Is it a node at all and if so, are they in the same graph?
-                    if (nodeRef != null && nodeRef.node.ItsGraph == movingNode.ItsGraph)
+                    if (nodeRef != null && nodeRef.Value.ItsGraph == movingNode.ItsGraph)
                     {
                         // update newParent when we found a node deeper into the tree
-                        if (newGraphParent == null || nodeRef.node.Level > newGraphParent.Level)
+                        if (newGraphParent == null || nodeRef.Value.Level > newGraphParent.Level)
                         {
-                            newGraphParent = nodeRef.node;
+                            newGraphParent = nodeRef.Value;
                             newGameParent = hit.collider.gameObject;
                             newPosition = hit.point;
                         }

@@ -17,12 +17,14 @@ namespace SEE.GO
         /// <param name="metrics">node metrics for scaling</param>
         /// <param name="minimalLength">the minimal value that can be returned by this scaling</param>
         /// <param name="minimalLength">the maximal value that can be returned by this scaling</param>
-        public IScale(ICollection<Graph> graphs, IList<string> metrics, float minimalLength, float maximalLength)
+        /// <param name="leavesOnly">if true, only the leaf nodes are considered</param>
+        public IScale(ICollection<Graph> graphs, IList<string> metrics, float minimalLength, float maximalLength, bool leavesOnly)
         {
             this.metrics = metrics;
             this.minimalLength = minimalLength;
             this.maximalLength = maximalLength;
-            metricMaxima = DetermineMetricMaxima(graphs, metrics);
+            this.leavesOnly = leavesOnly;
+            metricMaxima = DetermineMetricMaxima(graphs, metrics, leavesOnly);
         }
 
         /// <summary>
@@ -43,6 +45,10 @@ namespace SEE.GO
         /// the maximal value that can be returned by this scaling
         /// </summary>
         protected readonly float maximalLength;
+        /// <summary>
+        /// If true, the normalization is done only for leaf nodes.
+        /// </summary>
+        protected readonly bool leavesOnly;
 
         /// <summary>
         /// Yields a normalized value of the given node metric. The type of normalization
@@ -87,8 +93,9 @@ namespace SEE.GO
         /// </summary>
         /// <param name="graphs">the set of graphs for which to determine the node metric maxima</param>
         /// <param name="metrics">the metrics for which the maxima are to be gathered</param>
+        /// <param name="leavesOnly">if true, only the leaf nodes are considered</param>
         /// <returns>metric maxima</returns>
-        protected Dictionary<string, float> DetermineMetricMaxima(ICollection<Graph> graphs, IList<string> metrics)
+        protected Dictionary<string, float> DetermineMetricMaxima(ICollection<Graph> graphs, IList<string> metrics, bool leavesOnly)
         {
             Dictionary<string, float> result = new Dictionary<string, float>();
             foreach (string metric in metrics)
@@ -100,13 +107,16 @@ namespace SEE.GO
             {
                 foreach (Node node in graph.Nodes())
                 {
-                    foreach (string metric in metrics)
+                    if (!leavesOnly || node.IsLeaf())
                     {
-                        if (node.TryGetNumeric(metric, out float value))
+                        foreach (string metric in metrics)
                         {
-                            if (value > result[metric])
+                            if (node.TryGetNumeric(metric, out float value))
                             {
-                                result[metric] = value;
+                                if (value > result[metric])
+                                {
+                                    result[metric] = value;
+                                }
                             }
                         }
                     }

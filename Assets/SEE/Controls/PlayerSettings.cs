@@ -25,29 +25,31 @@ namespace SEE.Controls
         /// </summary>
         public enum PlayerInputType
         {
-            Desktop = 0,      // player for desktop and mouse input
-            TouchGamepad, // player for touch devices or gamepads using InControl
-            VR,           // player for virtual reality devices
-            HoloLens,     // player for mixed reality devices
-            None,         // no player at all
+            None         = 0, // no player at all
+            Desktop,          // player for desktop and mouse input
+            HoloLens,         // player for mixed reality devices
+            TouchGamepad,     // player for touch devices or gamepads using InControl
+            VR                // player for virtual reality devices
         }
-
-        /// <summary>
-        /// A mapping from PlayerInputType onto the names of the player game objects.
-        /// </summary>
-        static readonly string[] PlayerName = new[] {
-            "DesktopPlayer",
-            "VRPlayer",
-            "InControl",
-            "MRPlayer",
-            "No Player",
-            };
 
         [Tooltip("What kind of player type should be enabled.")]
         [OdinSerialize]
         public PlayerInputType playerInputType = PlayerInputType.Desktop;
 
+        [Tooltip("The GameObject containing the desktop player.")]
+        [SerializeField] private GameObject playerDesktop;
+
+        [Tooltip("The GameObject containing the HoloLens player.")]
+        [SerializeField] private GameObject playerHoloLens;
+
+        [Tooltip("The GameObject containing the touch gamepad player.")]
+        [SerializeField] private GameObject playerTouchGamepad;
+
+        [Tooltip("The GameObject containing the VR player.")]
+        [SerializeField] private GameObject playerVR;
+
         [Header("VR specific settings (relevant only for VR players)")]
+
         [Tooltip("Whether the VR controllers should be hidden.")]
         public bool HideVRControllers = false;
 
@@ -116,11 +118,10 @@ namespace SEE.Controls
 
             Debug.LogFormat("Player input type: {0}\n", playerInputType.ToString());
 
-            SetActive(PlayerName[(int)PlayerInputType.Desktop], playerInputType == PlayerInputType.Desktop);
-            SetActive(PlayerName[(int)PlayerInputType.VR], playerInputType == PlayerInputType.VR);
-            SetActive(PlayerName[(int)PlayerInputType.TouchGamepad], playerInputType == PlayerInputType.TouchGamepad);
+            playerDesktop?.SetActive(playerInputType == PlayerInputType.Desktop);
             SetMixedReality(playerInputType == PlayerInputType.HoloLens);
-            SetLocalPlayer(PlayerName[(int)playerInputType]);
+            playerTouchGamepad?.SetActive(playerInputType == PlayerInputType.TouchGamepad);
+            playerVR?.SetActive(playerInputType == PlayerInputType.VR);
         }
 
         /// <summary>
@@ -128,11 +129,11 @@ namespace SEE.Controls
         /// </summary>
         private void DisableSteamVRTeleporting()
         {
-            foreach (TeleportArea area in UnityEngine.Object.FindObjectsOfType<TeleportArea>())
+            foreach (TeleportArea area in FindObjectsOfType<TeleportArea>())
             {
                 area.gameObject.SetActive(false);
             }
-            foreach (Teleport port in UnityEngine.Object.FindObjectsOfType<Teleport>())
+            foreach (Teleport port in FindObjectsOfType<Teleport>())
             {
                 port.gameObject.SetActive(false);
             }
@@ -163,7 +164,7 @@ namespace SEE.Controls
         /// param name = "isActive" > If true, mixed reality capabilities are enabled, otherwise they will be disabled.</param>
         private void SetMixedReality(bool isActive)
         {
-            SetActive(PlayerName[(int)PlayerInputType.HoloLens], isActive);
+            playerHoloLens?.SetActive(playerInputType == PlayerInputType.HoloLens);
             SetActive("MixedRealityToolkit", isActive);
             SetActive("CityCollection", isActive);
             
@@ -187,7 +188,9 @@ namespace SEE.Controls
                 {
                     // Position and scale planes and CodeCities accordingly using CityCollection grid
                     GameObject cityCollection = GameObject.Find("CityCollection").AssertNotNull("CityCollection");
-                    UnityEngine.Assertions.Assert.IsTrue(cityCollection.TryGetComponent(out GridObjectCollection grid));
+                    // Note: For unknown reasons, 'grid' mustn't be inlined so that it is possible to build the game...
+                    GridObjectCollection grid = null;
+                    UnityEngine.Assertions.Assert.IsTrue(cityCollection.TryGetComponent(out grid));
                     GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
                     foreach (GameObject city in cities)
                     {
