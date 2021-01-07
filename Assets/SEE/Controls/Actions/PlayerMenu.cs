@@ -169,7 +169,6 @@ namespace SEE.Controls.Actions
             }
             catch (Exception)
             {
-                Debug.Log("AH");
             }
         }
     }

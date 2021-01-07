@@ -5,10 +5,12 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using System;
 using SEE.Controls.Actions;
+using SEE.Utils;
 
-namespace SEE.Controls {
+namespace SEE.Controls
+{
 
-    public  class DesktopNewNodeAction : MonoBehaviour
+    public class DesktopNewNodeAction : MonoBehaviour
     {
         /// <summary>
         /// The Code City in wich the Node should be Placed
@@ -38,7 +40,7 @@ namespace SEE.Controls {
 
         public void Start()
         {
-            
+
         }
 
         public void Update()
@@ -49,24 +51,26 @@ namespace SEE.Controls {
                 selectCity();
             }
             else
-            { 
+            {
                 //Gets the Metrics for the new Node if no
-                if(nodeMetrics == null)
+                if (nodeMetrics == null)
                 {
                     getMetrics();
-                } else
+                }
+                else
                 {
                     //Creates the new node, important check if the metrics have been set before!
                     if (GONode == null)
                     {
                         NewNode();
+                        GameNodeMover.MoveTo(GONode);
                     }
                     else
                     {
                         if (Input.GetMouseButtonDown(0))
                         {
+
                             Place();
-    
                         }
                         else
                         {
@@ -75,8 +79,8 @@ namespace SEE.Controls {
                     }
                 }
 
-                
-                
+
+
             }
         }
 
@@ -85,15 +89,15 @@ namespace SEE.Controls {
         /// </summary>
         private void selectCity()
         {
-          if(hoveredObject != null &&Input.GetMouseButtonDown(0))
+
+            if (hoveredObject != null && Input.GetMouseButtonDown(0))
             {
                 //Gets the SEECity from the hoverdObject
                 SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject.TryGetComponent<SEECity>(out city);
 
-                
             }
         }
-        
+
         /// <summary>
         /// Sets the Metrics from the GUI
         /// </summary>
@@ -102,7 +106,7 @@ namespace SEE.Controls {
             //FIXME WITH GUI THE NODE ID MUST BE UNIQUE SO MAYBE YOU NEED TO CHECK THE GUI ENTRY AND THE ALREDY EXISTING NODES
             System.Random rnd = new System.Random();
             //YOU CANT MODIFY THE VALUES OF A TUPLE, SO YOU NEED TO CREATE A NEW ONE IF YOU WANT TO MODIFY
-            nodeMetrics =new Tuple<string, string, string>( "TEST-NODE" + rnd.Next(0, 999999999), "TEST-NODE" + rnd.Next(0, 999999999),"TEST NODE");
+            nodeMetrics = new Tuple<string, string, string>("TEST-NODE" + rnd.Next(0, 999999999), "TEST-NODE" + rnd.Next(0, 999999999), "TEST NODE");
 
         }
 
@@ -111,8 +115,8 @@ namespace SEE.Controls {
         /// Creates a New Node
         /// </summary>
         /// <returns>New Node as GameObject</returns>
-        private  void NewNode()
-        { 
+        private void NewNode()
+        {
             GameObject gameNode;
             Node node = new Node();
 
@@ -120,19 +124,20 @@ namespace SEE.Controls {
             node.ID = nodeMetrics.Item1;
             node.SourceName = nodeMetrics.Item2;
             node.Type = nodeMetrics.Item3;
-            
+
             //Ads the new Node to the City Graph
             city.LoadedGraph.AddNode(node);
 
             //Redraw the node Graph
             city.LoadedGraph.FinalizeNodeHierarchy();
-            
+
             //gets the renderer
             GraphRenderer graphRenderer = city.Renderer;
 
             if (is_innerNode)
             {
-                gameNode = graphRenderer.NewInnerNode(node); 
+                gameNode = graphRenderer.NewInnerNode(node);
+
             }
             else
             {
@@ -140,15 +145,16 @@ namespace SEE.Controls {
             }
 
             //Sets the The GONode so the main work can continue;
-            GONode =  gameNode;
+            GONode = gameNode;
+            GameNodeMover.MoveTo(GONode);
         }
 
-       
+
 
         /// <summary>
         /// Places a node on call and checks if the city is the preselected one
         /// </summary>
-        
+
         private void Place()
         {
             SEECity cityTmp = null;
@@ -157,12 +163,20 @@ namespace SEE.Controls {
 
                 //checks if the currently hovered object is part of the preselected city
                 GameObject tmp = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
-                tmp.TryGetComponent<SEECity>(out cityTmp);
+                try
+                {
+                    tmp.TryGetComponent<SEECity>(out cityTmp);
+                }
+                catch (Exception np)
+                {
+                    Debug.Log("city not selected"); // FIXME
+                    return;
+                }
                 if (city.Equals(cityTmp))
                 {
-                    GameNodeMover.FinalizePosition(GONode);
+                    GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
                 }
-                
+
             }
             else
             {
@@ -180,13 +194,13 @@ namespace SEE.Controls {
         /// </summary>
         public void removeScript()
         {
-            if(GONode != null)
+            if (GONode != null)
             {
                 Place();
             }
 
             Destroy(this);
         }
-        
+
     }
 }
