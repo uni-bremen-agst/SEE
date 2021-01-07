@@ -134,11 +134,11 @@ namespace SEE.Controls
         /// </summary>
         private void DisableSteamVRTeleporting()
         {
-            foreach (TeleportArea area in UnityEngine.Object.FindObjectsOfType<TeleportArea>())
+            foreach (TeleportArea area in FindObjectsOfType<TeleportArea>())
             {
                 area.gameObject.SetActive(false);
             }
-            foreach (Teleport port in UnityEngine.Object.FindObjectsOfType<Teleport>())
+            foreach (Teleport port in FindObjectsOfType<Teleport>())
             {
                 port.gameObject.SetActive(false);
             }
@@ -166,7 +166,7 @@ namespace SEE.Controls
         /// <summary>
         /// Enables or disables mixed reality capabilities, including the Mixed Reality Toolkit.
         /// </summary>
-        /// param name = "isActive" > If true, mixed reality capabilities are enabled, otherwise they will be disabled.</param>
+        /// <param name = "isActive"> If true, mixed reality capabilities are enabled, otherwise they will be disabled.</param>
         private void SetMixedReality(bool isActive)
         {
             SetActive(PlayerName[(int)PlayerInputType.HoloLens], isActive);
@@ -202,7 +202,7 @@ namespace SEE.Controls
                             AddMixedRealityGameObjectInteractions(city);
                             AppBarCityConfiguration(city);
                         }
-                        SetGridCellWitdth(grid, cities);
+                        SetGridCellWidth(grid, cities);
                     } 
                 }
 
@@ -218,11 +218,8 @@ namespace SEE.Controls
             }
 
             //Sets the width of the Grid containing the cities
-            void SetGridCellWitdth(GridObjectCollection grid, GameObject[] cities)
+            void SetGridCellWidth(GridObjectCollection grid, GameObject[] cities)
             {
-                var a = cities.Select(x => x.transform.localScale.MaxComponent()).Max();
-                var b = cities.Max(x => x.transform.localScale.MaxComponent());
-
                 // To avoid overlaps, set cell width to maximum length of code cities
                 grid.CellWidth = cities.Max(x => x.transform.localScale.MaxComponent());
                 grid.UpdateCollection();
@@ -246,13 +243,13 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Enables or disables a game object with the given <paramref name="name" />.
+        /// Enables or disables a game object with the given <paramref name="gameObjectName" />.
         /// </summary>
-        /// <param name="name">name of the object to be enabled/disabled</param>
+        /// <param name="gameObjectName">name of the object to be enabled/disabled</param>
         /// <param name="activate">whether to enable or disable the object</param>
-        private void SetActive(string name, bool activate)
+        private void SetActive(string gameObjectName, bool activate)
         {
-            GameObject player = GameObject.Find(name);
+            GameObject player = GameObject.Find(gameObjectName);
             player?.SetActive(activate);           
         }
 
