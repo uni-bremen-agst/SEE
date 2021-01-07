@@ -117,17 +117,9 @@ namespace SEE.Game.Charts.VR
         /// <param name="eventData">Contains position data of the pointer.</param>
         public override void OnPointerUp(PointerEventData eventData)
         {
-            if (startingPos.x < _referencePos.x)
-            {
-                chartContent.AreaSelection(startingPos, _referencePos,
-                    startingPos.y < _referencePos.y);
-            }
-            else
-            {
-                chartContent.AreaSelection(_referencePos, startingPos,
-                    startingPos.y > _referencePos.y);
-            }
-
+            Vector2 min = Vector2.Min(startingPos, _referencePos);
+            Vector2 max = Vector2.Max(startingPos, _referencePos);
+            chartContent.AreaSelection(min, max);
             selectionRect.gameObject.SetActive(false);
         }
     }

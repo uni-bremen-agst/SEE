@@ -29,6 +29,8 @@ namespace SEE.DataModel.DG
     /// </summary>
     public abstract class Attributable : ICloneable
     {
+        public static readonly HashSet<string> NumericAttributeNames = new HashSet<string>();
+
         //----------------------------------
         // Toggle attributes
         //----------------------------------
@@ -64,25 +66,21 @@ namespace SEE.DataModel.DG
         // Unity does not serializes Dictionaries. That is why we need to use StringStringDictionary
         // instead here. Note that we need to declare the attribute here as a SerializeField 
         // nevertheless.
-        private Dictionary<string, string> stringAttributes = new Dictionary<string, string>();
-        public Dictionary<string, string> StringAttributes
-        {
-            get => stringAttributes;
-        }
+        public Dictionary<string, string> StringAttributes { get; private set; } = new Dictionary<string, string>();
 
         public void SetString(string attributeName, string value)
         {
-            stringAttributes[attributeName] = value;
+            StringAttributes[attributeName] = value;
         }
 
         public bool TryGetString(string attributeName, out string value)
         {
-            return stringAttributes.TryGetValue(attributeName, out value);
+            return StringAttributes.TryGetValue(attributeName, out value);
         }
 
         public string GetString(string attributeName)
         {
-            if (stringAttributes.TryGetValue(attributeName, out string value))
+            if (StringAttributes.TryGetValue(attributeName, out string value))
             {
                 return value;
             }
@@ -96,20 +94,17 @@ namespace SEE.DataModel.DG
         // Float attributes
         //----------------------------------
 
-        public Dictionary<string, float> floatAttributes = new Dictionary<string, float>();
-        public Dictionary<string, float> FloatAttributes
-        {
-            get => floatAttributes;
-        }
+        public Dictionary<string, float> FloatAttributes { get; private set; } = new Dictionary<string, float>();
 
         public void SetFloat(string attributeName, float value)
         {
-            floatAttributes[attributeName] = value;
+            FloatAttributes[attributeName] = value;
+            NumericAttributeNames.Add(attributeName);
         }
 
         public float GetFloat(string attributeName)
         {
-            if (floatAttributes.TryGetValue(attributeName, out float value))
+            if (FloatAttributes.TryGetValue(attributeName, out float value))
             {
                 return value;
             }
@@ -121,27 +116,24 @@ namespace SEE.DataModel.DG
 
         public bool TryGetFloat(string attributeName, out float value)
         {
-            return floatAttributes.TryGetValue(attributeName, out value);
+            return FloatAttributes.TryGetValue(attributeName, out value);
         }
 
         //----------------------------------
         // Integer attributes
         //----------------------------------
 
-        public Dictionary<string, int> intAttributes = new Dictionary<string, int>();
-        public Dictionary<string, int> IntAttributes
-        {
-            get => intAttributes;
-        }
+        public Dictionary<string, int> IntAttributes { get; private set; } = new Dictionary<string, int>();
 
         public void SetInt(string attributeName, int value)
         {
-            intAttributes[attributeName] = value;
+            IntAttributes[attributeName] = value;
+            NumericAttributeNames.Add(attributeName);
         }
 
         public int GetInt(string attributeName)
         {
-            if (intAttributes.TryGetValue(attributeName, out int value))
+            if (IntAttributes.TryGetValue(attributeName, out int value))
             {
                 return value;
             }
@@ -153,7 +145,7 @@ namespace SEE.DataModel.DG
 
         public bool TryGetInt(string attributeName, out int value)
         {
-            return intAttributes.TryGetValue(attributeName, out value);
+            return IntAttributes.TryGetValue(attributeName, out value);
         }
 
         //----------------------------------
@@ -162,8 +154,7 @@ namespace SEE.DataModel.DG
 
         public bool TryGetNumeric(string attributeName, out float value)
         {
-
-            if (intAttributes.TryGetValue(attributeName, out int intValue))
+            if (IntAttributes.TryGetValue(attributeName, out int intValue))
             {
                 value = intValue;
                 return true;
@@ -171,7 +162,7 @@ namespace SEE.DataModel.DG
             else
             {
                 // second try if we cannot find attributeName as an integer attribute
-                return floatAttributes.TryGetValue(attributeName, out value);
+                return FloatAttributes.TryGetValue(attributeName, out value);
             }
         }
 
@@ -213,17 +204,17 @@ namespace SEE.DataModel.DG
                     Report("The toggle attributes are different");
                     return false;
                 }
-                else if (!AreEqual<string>(stringAttributes, otherAttributable.stringAttributes))
+                else if (!AreEqual<string>(StringAttributes, otherAttributable.StringAttributes))
                 {
                     Report("The string attributes are different");
                     return false;
                 }
-                else if (!AreEqual<int>(intAttributes, otherAttributable.intAttributes))
+                else if (!AreEqual<int>(IntAttributes, otherAttributable.IntAttributes))
                 {
                     Report("The int attributes are different");
                     return false;
                 }
-                else if (!AreEqual<float>(floatAttributes, otherAttributable.floatAttributes))
+                else if (!AreEqual<float>(FloatAttributes, otherAttributable.FloatAttributes))
                 {
                     Report("The float attributes are different");
                     return false;
@@ -258,7 +249,7 @@ namespace SEE.DataModel.DG
             // we are using only those two attribute kinds to avoid unnecessary 
             // computation in the hope that they suffice; nodes and edges should
             // have some attributes of this kind sufficiently different to others
-            return intAttributes.GetHashCode() ^ stringAttributes.GetHashCode();
+            return IntAttributes.GetHashCode() ^ StringAttributes.GetHashCode();
         }
 
         /// <summary>
@@ -275,17 +266,17 @@ namespace SEE.DataModel.DG
                 result += " \"" + attr + "\": true,\n";
             }
 
-            foreach (KeyValuePair<string, string> attr in stringAttributes)
+            foreach (KeyValuePair<string, string> attr in StringAttributes)
             {
                 result += " \"" + attr.Key + "\": \"" + attr.Value + "\",\n";
             }
 
-            foreach (KeyValuePair<string, int> attr in intAttributes)
+            foreach (KeyValuePair<string, int> attr in IntAttributes)
             {
                 result += " \"" + attr.Key + "\": " + attr.Value + ",\n";
             }
 
-            foreach (KeyValuePair<string, float> attr in floatAttributes)
+            foreach (KeyValuePair<string, float> attr in FloatAttributes)
             {
                 result += " \"" + attr.Key + "\": " + attr.Value + ",\n";
             }
@@ -319,9 +310,9 @@ namespace SEE.DataModel.DG
             // Because the keys and values are primitive types, the following are deep copies of the 
             // attributes.
             target.toggleAttributes = new HashSet<string>(toggleAttributes);
-            target.stringAttributes = new Dictionary<string, string>(stringAttributes);
-            target.floatAttributes = new Dictionary<string, float>(floatAttributes);
-            target.intAttributes = new Dictionary<string, int>(intAttributes);
+            target.StringAttributes = new Dictionary<string, string>(StringAttributes);
+            target.FloatAttributes = new Dictionary<string, float>(FloatAttributes);
+            target.IntAttributes = new Dictionary<string, int>(IntAttributes);
         }
     }
 }

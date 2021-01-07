@@ -70,7 +70,7 @@ namespace SEE.DataModel.DG
             {
                 throw new Exception("node must not be null");
             }
-            else if (String.IsNullOrEmpty(node.ID))
+            else if (string.IsNullOrEmpty(node.ID))
             {
                 throw new Exception("ID of a node must neither be null nor empty");
             }
@@ -183,7 +183,7 @@ namespace SEE.DataModel.DG
             {
                 throw new Exception("node must not be null");
             }
-            else if (String.IsNullOrEmpty(node.ID))
+            else if (string.IsNullOrEmpty(node.ID))
             {
                 throw new Exception("ID of a node must neither be null nor empty");
             }
@@ -224,7 +224,7 @@ namespace SEE.DataModel.DG
         /// <returns>node with the given unique ID if it exists; otherwise null</returns>
         public Node GetNode(string ID)
         {
-            if (String.IsNullOrEmpty(ID))
+            if (string.IsNullOrEmpty(ID))
             {
                 throw new Exception("ID must neither be null nor empty");
             }
@@ -245,7 +245,7 @@ namespace SEE.DataModel.DG
         /// <returns>edge with the given unique ID if it exists; otherwise null</returns>
         public Edge GetEdge(string ID)
         {
-            if (String.IsNullOrEmpty(ID))
+            if (string.IsNullOrEmpty(ID))
             {
                 throw new Exception("ID must neither be null nor empty");
             }
@@ -400,7 +400,7 @@ namespace SEE.DataModel.DG
         /// Returns the list of nodes without parent.
         /// </summary>
         /// <returns>root nodes of the hierarchy</returns>
-        public List<Node> GetRoots()
+        public List<Node> GetRoots() // TODO(torben): this query could be cached to improve performance
         {
             List<Node> result = new List<Node>();
             foreach (Node node in nodes.Values)

@@ -134,7 +134,18 @@ namespace SEE.Game
                 }
             }
 
-#if false
+#if true
+            RemoveTransparency();
+#endif
+        }
+
+        /// <summary>
+        /// All game objects representing a graph node or edge in the current scene will be made
+        /// opaque (no transparency).
+        /// </summary>
+        private static void RemoveTransparency()
+        {
+            // Remove transparency of all nodes and edges
             foreach (NodeRef nodeRef in FindObjectsOfType<NodeRef>())
             {
                 MeshRenderer meshRenderer = nodeRef.gameObject.GetComponent<MeshRenderer>();
@@ -157,7 +168,27 @@ namespace SEE.Game
                     material.SetColor("_Color", color);
                 }
             }
-#endif
+        }
+
+        /// <summary>
+        /// Sets all NodeRefs and EdgeRefs for this city to the nodes and edges, respectively,
+        /// they correspond to. This will take place for the graph elements of the
+        /// <see cref="LoadedGraph"/> only.
+        /// We assume that the game objects with a NodeRef/EdgeRef required to be
+        /// defined to be immediate children of this SEECity. Moreover, we assume a child
+        /// game object's name is the ID of the corresponding graph node/edge.
+        /// </summary>
+        public void SetNodeEdgeRefs()
+        {
+            if (loadedGraph != null)
+            {
+                SetNodeEdgeRefs(loadedGraph, gameObject);
+                Debug.LogFormat("Node and edge references for {0} are resolved.\n", gameObject.name);
+            }
+            else
+            {
+                Debug.LogError("No graph loaded.\n");
+            }
         }
 
         /// <summary>
@@ -174,22 +205,28 @@ namespace SEE.Game
             foreach (Transform childTransform in parent.transform)
             {
                 GameObject child = childTransform.gameObject;
-                if (child.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+                if (child.TryGetComponent(out NodeRef nodeRef))
                 {
-                    nodeRef.node = graph.GetNode(child.name);
-                    if (nodeRef.node == null)
+                    nodeRef.Value = graph.GetNode(child.name);
+                    if (nodeRef.Value == null)
                     {
                         Debug.LogWarningFormat("Could not resolve node reference {0}.\n", child.name);
                     }
                 }
-                else if (child.TryGetComponent<EdgeRef>(out EdgeRef edgeRef))
+                else if (child.TryGetComponent(out EdgeRef edgeRef))
                 {
                     edgeRef.edge = graph.GetEdge(child.name);
                     if (edgeRef.edge == null)
                     {
-                        Debug.LogWarningFormat("Could not resolve edge reference {0}.\n", child.name);
+                        Debug.LogWarningFormat("Could not resolve edge reference {0}.\n", child.name);          
                     }
                 }
+#if UNITY_EDITOR
+                else if (child.tag.CompareTo(DataModel.Tags.Node) == 0 || child.tag.CompareTo(DataModel.Tags.Edge) == 0)
+                {
+                    Debug.LogWarningFormat("Game object {0} has neither node nor edge reference.\n", child.name);
+                }
+#endif
                 SetNodeEdgeRefs(graph, child);
             }
         }
@@ -358,11 +395,23 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Saves the current layout of the city as GVL in a file named <see cref="GVLPath"/>.
+        /// Saves the current layout of the city in a file named <see cref="LayoutPath"/>.
+        /// The format of the written file depends upon the file extension. If the extension
+        /// is <see cref="Filenames.GVLExtension"/> it is saved in the GVL format; otherwise
+        /// the file is saved in the SLD format.
         /// </summary>
         public void SaveLayout()
         {
-            Layout.IO.Writer.Save(GVLPath, loadedGraph.Name, AllNodeDescendants(gameObject));
+            string path = LayoutPath;
+            Debug.LogFormat("Saving layout data to {0}.\n", path);
+            if (Filenames.HasExtension(path, Filenames.GVLExtension))
+            {
+                Layout.IO.GVLWriter.Save(LayoutPath, loadedGraph.Name, AllNodeDescendants(gameObject));
+            }
+            else
+            {
+                Layout.IO.SLDWriter.Save(LayoutPath, AllNodeDescendants(gameObject));
+            }
         }
 
         /// <summary>

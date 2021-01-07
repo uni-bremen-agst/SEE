@@ -23,10 +23,11 @@ namespace SEE.GO
         /// <param name="minimalLength">the mininmal value a node length can have</param>
         /// <param name="maximalLength">the maximal value a node length can have</param>
         /// <param name="metrics">node metrics for scaling</param>
-        public ZScoreScale(ICollection<Graph> graphs, float minimalLength, float maximalLength, IList<string> metrics)
-        : base(graphs, metrics, minimalLength, maximalLength)
+        /// <param name="leavesOnly">if true, only the leaf nodes are considered</param>
+        public ZScoreScale(ICollection<Graph> graphs, float minimalLength, float maximalLength, IList<string> metrics, bool leavesOnly)
+        : base(graphs, metrics, minimalLength, maximalLength, leavesOnly)
         {
-            Determine_Statistics(graphs);
+            Determine_Statistics(graphs, leavesOnly);
         }
 
         // The statistics gathered for the node metrics.
@@ -51,7 +52,8 @@ namespace SEE.GO
         /// Determines mean and standard deviation for each metric.
         /// </summary>
         /// <param name="graphs">set of graphs whose nodes are to be considered</param>
-        private void Determine_Statistics(ICollection<Graph> graphs)
+        /// <param name="leavesOnly">if true, only the leaf nodes are considered</param>
+        private void Determine_Statistics(ICollection<Graph> graphs, bool leavesOnly)
         {
             Dictionary<string, float> sum = Initial(metrics);
             Dictionary<string, float> count = Initial(metrics);
@@ -61,12 +63,15 @@ namespace SEE.GO
             {
                 foreach (Node node in graph.Nodes())
                 {
-                    foreach (string metric in metrics)
+                    if (!leavesOnly || node.IsLeaf())
                     {
-                        if (node.TryGetNumeric(metric, out float value))
+                        foreach (string metric in metrics)
                         {
-                            count[metric]++;
-                            sum[metric] += value;
+                            if (node.TryGetNumeric(metric, out float value))
+                            {
+                                count[metric]++;
+                                sum[metric] += value;
+                            }
                         }
                     }
                 }
@@ -90,12 +95,15 @@ namespace SEE.GO
             {
                 foreach (Node node in graph.Nodes())
                 {
-                    foreach (string metric in metrics)
+                    if (!leavesOnly || node.IsLeaf())
                     {
-                        if (node.TryGetNumeric(metric, out float value))
+                        foreach (string metric in metrics)
                         {
-                            float diff = value - statistics[metric].mean;
-                            statistics[metric].standard_deviation += diff * diff;
+                            if (node.TryGetNumeric(metric, out float value))
+                            {
+                                float diff = value - statistics[metric].mean;
+                                statistics[metric].standard_deviation += diff * diff;
+                            }
                         }
                     }
                 }

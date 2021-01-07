@@ -35,13 +35,19 @@ namespace SEE.Utils
             return result;
         }
 
+        private static EventSystem eventSystem = null;
+
         /// <summary>
         /// Whether the mouse currently hovers over a GUI element.
         /// </summary>
         /// <returns>Whether the mouse currently hovers over a GUI element.</returns>
         public static bool IsMouseOverGUI()
         {
-            return UnityEngine.Object.FindObjectOfType<EventSystem>().IsPointerOverGameObject();
+            if (eventSystem == null)
+            {
+                eventSystem = Object.FindObjectOfType<EventSystem>();
+            }
+            return eventSystem.IsPointerOverGameObject();
         }
     }
 }
