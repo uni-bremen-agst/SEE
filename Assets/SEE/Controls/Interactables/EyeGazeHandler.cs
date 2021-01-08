@@ -25,7 +25,7 @@ namespace SEE.Controls
         
         private void Awake()
         {
-            // TODO The only way to change the delay until OnEyeFocusDwell triggers is by reflection, which is
+            // The only way to change the delay until OnEyeFocusDwell triggers is by reflection, which is
             // pretty ugly and error-prone. The only way to really fix this, however, would be to submit
             // a pull request to the MRTK upstream which adds a protected (instead of private) setter for this field.
             FieldInfo dwellField = typeof(BaseEyeFocusHandler)
