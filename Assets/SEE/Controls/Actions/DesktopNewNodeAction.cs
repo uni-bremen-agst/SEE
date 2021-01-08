@@ -13,7 +13,7 @@ namespace SEE.Controls
     public class DesktopNewNodeAction : MonoBehaviour
     {
         /// <summary>
-        /// The Code City in wich the Node should be Placed
+        /// The Code City in wich the node should be placed
         /// </summary>
         SEECity city = null;
 
@@ -23,12 +23,12 @@ namespace SEE.Controls
         GameObject GONode = null;
 
         /// <summary>
-        /// Set by the GUI if a Inner Node should be Created
+        /// Set by the GUI if a Inner Node should be created
         /// </summary>
         bool is_innerNode = false;
 
         /// <summary>
-        /// The Meta infos from the new Node, seted by the GUI
+        /// The Meta infos from the new node, set by the GUI
         /// 1. ID, 2. SourceName, 3. Type
         /// </summary>
         Tuple<String, String, String> nodeMetrics = null;
@@ -103,16 +103,37 @@ namespace SEE.Controls
         /// </summary>
         private void getMetrics()
         {
-            //FIXME WITH GUI THE NODE ID MUST BE UNIQUE SO MAYBE YOU NEED TO CHECK THE GUI ENTRY AND THE ALREDY EXISTING NODES
+
+            string randomID = randomizeString();
             System.Random rnd = new System.Random();
             //YOU CANT MODIFY THE VALUES OF A TUPLE, SO YOU NEED TO CREATE A NEW ONE IF YOU WANT TO MODIFY
-            nodeMetrics = new Tuple<string, string, string>("TEST-NODE" + rnd.Next(0, 999999999), "TEST-NODE" + rnd.Next(0, 999999999), "TEST NODE");
+            nodeMetrics = new Tuple<string, string, string>(randomID, "TEST-NODE" + rnd.Next(0, 999999999), "TEST NODE");
+        }
+
+        private static string randomizeString()
+        {
+            return SEE.Utils.RandomStrings.Get();
 
         }
 
-
         /// <summary>
-        /// Creates a New Node
+        /// Adds a node to the loadedGraph and repeats the process in case the generated ID is not unique.
+        /// </summary>
+        private void addNode(Node node)
+        {
+            try 
+            {
+                city.LoadedGraph.AddNode(node);
+            }
+            catch(Exception e)
+            {
+                node.ID = randomizeString();
+                addNode(node);
+                return; 
+            }
+        }
+        /// <summary>
+        /// Creates a new node
         /// </summary>
         /// <returns>New Node as GameObject</returns>
         private void NewNode()
@@ -125,9 +146,9 @@ namespace SEE.Controls
             node.SourceName = nodeMetrics.Item2;
             node.Type = nodeMetrics.Item3;
 
-            //Ads the new Node to the City Graph
-            city.LoadedGraph.AddNode(node);
+            //Adds the new Node to the City Graph
 
+            addNode(node);
             //Redraw the node Graph
             city.LoadedGraph.FinalizeNodeHierarchy();
 
