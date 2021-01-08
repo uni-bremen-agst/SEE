@@ -104,34 +104,69 @@ namespace SEE.Layout.NodeLayouts.Cose
         public bool UseIterativeCalculation = false;
 
         private const string EdgeLengthLabel = "EdgeLength";
+        private const string UseSmartMultilevelScalingLabel = "UseSmartMultilevelScaling";
+        private const string PerLevelIdealEdgeLengthFactorLabel = "PerLevelIdealEdgeLengthFactor";
+        private const string UseSmartRepulsionRangeCalculationLabel = "UseSmartRepulsionRangeCalculation";
+        private const string GravityStrengthLabel = "GravityStrength";
+        private const string CompoundGravityStrengthLabel = "CompoundGravityStrength";
+        private const string RepulsionStrengthLabel = "RepulsionStrength";
+        private const string MultiLevelScalingLabel = "MultiLevelScaling";
+        private const string ListInnerNodeToggleLabel = "ListInnerNodeToggle";
+        private const string InnerNodeLayoutLabel = "InnerNodeLayout"; 
+        private const string InnerNodeShapeLabel = "InnerNodeShape";
+        private const string LoadedForNodeTypesLabel = "LoadedForNodeTypes";
+        private const string UseCalculationParameterLabel = "UseCalculationParameter";
+        private const string UseIterativeCalculationLabel = "UseIterativeCalculation";
 
         internal void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
             writer.Save(EdgeLength, EdgeLengthLabel);
-            throw new NotImplementedException();
-            /*
-             UseSmartMultilevelScaling
-PerLevelIdealEdgeLengthFactor
-UseSmartRepulsionRangeCalculation
-GravityStrength
-CompoundGravityStrength
-RepulsionStrength
-MultiLevelScaling
-ListInnerNodeToggle
-InnerNodeLayout
-InnerNodeShape
-LoadedForNodeTypes
-UseCalculationParameter
-UseIterativeCalculation
-
-             */
+            writer.Save(UseSmartMultilevelScaling, UseSmartMultilevelScalingLabel);
+            writer.Save(PerLevelIdealEdgeLengthFactor, PerLevelIdealEdgeLengthFactorLabel);
+            writer.Save(UseSmartRepulsionRangeCalculation, UseSmartRepulsionRangeCalculationLabel);
+            writer.Save(GravityStrength, GravityStrengthLabel);
+            writer.Save(CompoundGravityStrength, CompoundGravityStrengthLabel);
+            writer.Save(RepulsionStrength, RepulsionStrengthLabel);
+            writer.Save(MultiLevelScaling, MultiLevelScalingLabel);
+            writer.Save(ListInnerNodeToggle, ListInnerNodeToggleLabel);
+            writer.Save(InnerNodeLayout, InnerNodeLayoutLabel); // saves enums as strings
+            writer.Save(InnerNodeShape, InnerNodeShapeLabel);   // saves enums as strings
+            writer.Save(LoadedForNodeTypes, LoadedForNodeTypesLabel);
+            writer.Save(UseCalculationParameter, UseCalculationParameterLabel);
+            writer.Save(UseIterativeCalculation, UseIterativeCalculationLabel);
             writer.EndGroup();
         }
 
-        internal void Restore(Dictionary<string, object> attributes, string coseGraphSettingsLabel)
+        internal void Restore(Dictionary<string, object> attributes, string label)
         {
-            throw new NotImplementedException();
+            if (attributes.TryGetValue(label, out object dictionary))
+            {
+                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+                {
+                    {
+                        long value = EdgeLength;
+                        ConfigIO.Restore(values, EdgeLengthLabel, ref value);
+                        EdgeLength = (int)value;
+                    }
+                    ConfigIO.Restore(values, UseSmartMultilevelScalingLabel, ref UseSmartMultilevelScaling);
+
+                    ConfigIO.Restore(values, PerLevelIdealEdgeLengthFactorLabel, ref PerLevelIdealEdgeLengthFactor);
+                    ConfigIO.Restore(values, UseSmartRepulsionRangeCalculationLabel, ref UseSmartRepulsionRangeCalculation);
+                    ConfigIO.Restore(values, GravityStrengthLabel, ref GravityStrength);
+                    ConfigIO.Restore(values, CompoundGravityStrengthLabel, ref CompoundGravityStrength);
+                    ConfigIO.Restore(values, RepulsionStrengthLabel, ref RepulsionStrength);
+                    ConfigIO.Restore(values, MultiLevelScalingLabel, ref MultiLevelScaling);
+                    ConfigIO.Restore(values, ListInnerNodeToggleLabel, ref ListInnerNodeToggle);
+
+                    ConfigIO.Restore(values, InnerNodeLayoutLabel, ref InnerNodeLayout); // TODO: read list of enums
+                    ConfigIO.Restore(values, InnerNodeShapeLabel, ref InnerNodeShape);   // TODO: read list of enums
+
+                    ConfigIO.Restore(values, LoadedForNodeTypesLabel, ref LoadedForNodeTypes);
+                    ConfigIO.Restore(values, UseCalculationParameterLabel, ref UseCalculationParameter);
+                    ConfigIO.Restore(values, UseIterativeCalculationLabel, ref UseIterativeCalculation);
+                }
+            }            
         }
     }
 }
