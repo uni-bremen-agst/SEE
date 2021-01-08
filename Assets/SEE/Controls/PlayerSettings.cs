@@ -1,4 +1,6 @@
-﻿using System;
+﻿
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.UI;
@@ -8,6 +10,7 @@ using OdinSerializer;
 using SEE.DataModel;
 using SEE.GO;
 using SEE.Utils;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.XR;
 using Valve.VR;
@@ -193,32 +196,45 @@ namespace SEE.Controls
                 {
                     // Position and scale planes and CodeCities accordingly using CityCollection grid
                     GameObject cityCollection = GameObject.Find("CityCollection").AssertNotNull("CityCollection");
-                    if (cityCollection.TryGetComponentOrLog(out GridObjectCollection grid))
-                    {
-                        GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
-                        foreach (GameObject city in cities)
-                        {
-                            SetCityScale(city, cityCollection.transform, CityScalingFactor);
-                            AddMixedRealityGameObjectInteractions(city);
-                            AppBarCityConfiguration(city);
-                        }
-                        SetGridCellWidth(grid, cities);
-                    } 
-                }
 
+                    GridObjectCollection grid = new GridObjectCollection();
+
+                    UnityEngine.Assertions.Assert.IsTrue(cityCollection.TryGetComponent(out grid));
+
+                    GameObject[] citiesWithoutContainer = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
+
+                    GameObject[] citiesWithContainer = new GameObject[citiesWithoutContainer.Length];
+
+
+                    for (int i = 0; i< citiesWithoutContainer.Length; i++)
+                    {
+                        citiesWithContainer[i] = AddCodeCityContainer(citiesWithoutContainer[i]);
+
+                        GameObject cityWithContainer = citiesWithContainer[i];
+
+                        SetCityScale(cityWithContainer, cityCollection.transform, CityScalingFactor);                     
+
+                        AddMixedRealityGameObjectInteractions(cityWithContainer);
+                        AppBarCityConfiguration(cityWithContainer);
+
+                        PrepareBoundsControlForHololens2(cityWithContainer.GetComponent<BoundsControl>());
+                    }
+
+                    SetGridCellWitdth(grid, citiesWithContainer);
+                }
             }
 
             #region Local Methods
             //Scales the city by factor and pretend it to collection 
-            void SetCityScale(GameObject city, Transform cityCollectionTransform, float cityScaleFactor)
+            void SetCityScale(GameObject cityWitchContainer, Transform cityCollectionTransform, float cityScaleFactor)
             {
-                city.transform.localScale *= cityScaleFactor;
+                cityWitchContainer.transform.localScale *= cityScaleFactor;
                 // City needs to be parented to collection to be organized by it
-                city.transform.parent = cityCollectionTransform;
+                cityWitchContainer.transform.parent = cityCollectionTransform;
             }
 
             //Sets the width of the Grid containing the cities
-            void SetGridCellWidth(GridObjectCollection grid, GameObject[] cities)
+            void SetGridCellWitdth(GridObjectCollection grid, GameObject[] cities)
             {
                 // To avoid overlaps, set cell width to maximum length of code cities
                 grid.CellWidth = cities.Max(x => x.transform.localScale.MaxComponent());
@@ -226,17 +242,70 @@ namespace SEE.Controls
             }
 
             //Adds MixedRealityGameObjectInteraction and ObjectManipulator Script to City
-            void AddMixedRealityGameObjectInteractions(GameObject city)
+            void AddMixedRealityGameObjectInteractions(GameObject cityWithContainer)
             {
-                city.AddComponent<MixedRealityGameObjectInteractions>();
-                city.AddComponent<ObjectManipulator>();
+                cityWithContainer.AddComponent<MixedRealityGameObjectInteractions>();
+                cityWithContainer.AddComponent<ObjectManipulator>();
             }
 
-            void AppBarCityConfiguration(GameObject city)
+            void AppBarCityConfiguration(GameObject cityWithContainer)
             {
-                city.AddComponent<BoundsControl>();
-                city.GetComponent<BoundsControl>().BoundsControlActivation = Microsoft.MixedReality.Toolkit.UI.BoundsControlTypes.BoundsControlActivationType.ActivateManually;
-                city.GetComponent<ObjectManipulator>();
+                BoundsControl boundsControl = cityWithContainer.AddComponent<BoundsControl>();
+                boundsControl.BoundsControlActivation = Microsoft.MixedReality.Toolkit.UI.BoundsControlTypes.BoundsControlActivationType.ActivateManually;
+            }
+
+            //Hololens2 BoundsControl
+            void PrepareBoundsControlForHololens2(BoundsControl boundsControl)
+            {
+                //TODO: Figure out how to get materials like "BoundingBox.mat" without inspector
+
+                /**
+                BoxDisplayConfiguration boxConfiguration = boundsControl.BoxDisplayConfig;
+                boxConfiguration.BoxMaterial = [Assign BoundingBox.mat];
+                boxConfiguration.BoxGrabbedMaterial = [Assign BoundingBoxGrabbed.mat];
+                ScaleHandlesConfiguration scaleHandleConfiguration = boundsControl.ScaleHandlesConfig;
+                scaleHandleConfiguration.HandleMaterial = [Assign BoundingBoxHandleWhite.mat];
+                scaleHandleConfiguration.HandleGrabbedMaterial = [Assign BoundingBoxHandleBlueGrabbed.mat];
+                scaleHandleConfiguration.HandlePrefab = [Assign MRTK_BoundingBox_ScaleHandle.prefab];
+                scaleHandleConfiguration.HandleSlatePrefab = [Assign MRTK_BoundingBox_ScaleHandle_Slate.prefab];
+                scaleHandleConfiguration.HandleSize = 0.016f;
+                scaleHandleConfiguration.ColliderPadding = 0.016f;
+                RotationHandlesConfiguration rotationHandleConfiguration = boundsControl.RotationHandlesConfig;
+                rotationHandleConfiguration.HandleMaterial = [Assign BoundingBoxHandleWhite.mat];
+                rotationHandleConfiguration.HandleGrabbedMaterial = [Assign BoundingBoxHandleBlueGrabbed.mat];
+                rotationHandleConfiguration.HandlePrefab = [Assign MRTK_BoundingBox_RotateHandle.prefab];
+                rotationHandleConfiguration.HandleSize = 0.016f;
+                rotationHandleConfiguration.ColliderPadding = 0.016f;
+                **/
+            }
+
+            //Creats a Container GameObject for Cities 
+            GameObject AddCodeCityContainer(GameObject city)
+            {
+                //TODO: A prefab does no work because it is not possible todd materials/Scripts 
+                //GameObject cityContainer = Instantiate(Resources.Load("Prefabs/CityContainer", typeof(GameObject))) as GameObject;
+
+                GameObject cityContainer = new GameObject();
+                Bounds bounds;
+
+                cityContainer.name = city.name + "Container";
+                cityContainer.transform.position = city.transform.position;
+
+                Vector3 citySize = city.Size();
+                Vector3 cityCenter = city.GetComponent<Renderer>().bounds.center;
+
+                if (citySize.y < 0.1f)
+                {
+                    bounds = new Bounds(cityCenter, new Vector3(citySize.x, 0.1f, citySize.z));
+                }
+                else
+                {
+                    bounds = new Bounds(cityCenter, citySize);
+                }
+
+                city.transform.SetParent(cityContainer.transform);
+
+                return cityContainer;
             }
 
             #endregion
