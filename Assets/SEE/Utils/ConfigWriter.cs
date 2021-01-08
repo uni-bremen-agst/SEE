@@ -157,6 +157,16 @@ namespace SEE.Utils
             EndList();
         }
 
+        /// <summary>
+        /// Saves the given <paramref name="dictionary"/> as a list of pairs where
+        /// a pair is a list with two elements: one for the key and one for the value.
+        /// The key is saved as a string and the value is saved as a plain literal:
+        /// either True or False.
+        /// 
+        /// Note: This method is more specific than <see cref="Save{K, V}(Dictionary{K, V}, string)"/>
+        /// in that the key is not saved as a string but as a boolean literal (no quotes around it).
+        /// <param name="dictionary">the dictionary to be saved</param>
+        /// <param name="label">the label to be added in front of the value</param>
         internal void Save(Dictionary<string, bool> dictionary, string label = "")
         {
             BeginList(label);
@@ -165,6 +175,31 @@ namespace SEE.Utils
                 BeginList();
                 Save(item.Key);
                 Save(item.Value);
+                EndList();
+            }
+            EndList();
+        }
+
+        /// <summary>
+        /// Saves the given <paramref name="dictionary"/> as a list of pairs where
+        /// a pair is a list with two elements: one for the key and one for the value.
+        /// Both are stored as strings.
+        /// 
+        /// Note: If either key or value should better not be saved as a string, you must use
+        /// a more specific save operation instead.
+        /// </summary>
+        /// <typeparam name="K">type of the key of <paramref name="dictionary"/></typeparam>
+        /// <typeparam name="V">type of the value of <paramref name="dictionary"/></typeparam>
+        /// <param name="dictionary">the dictionary to be saved</param>
+        /// <param name="label">the label to be added in front of the value</param>
+        internal void Save<K,V>(Dictionary<K,V> dictionary, string label = "")
+        {
+            BeginList(label);
+            foreach (var item in dictionary)
+            {
+                BeginList();
+                Save(item.Key.ToString());
+                Save(item.Value.ToString());
                 EndList();
             }
             EndList();
