@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.MixedReality.Toolkit;
@@ -8,6 +9,7 @@ using Microsoft.MixedReality.Toolkit.Utilities;
 using OdinSerializer;
 using SEE.DataModel;
 using SEE.Utils;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.XR;
 using Valve.VR;
@@ -190,38 +192,41 @@ namespace SEE.Controls
                 {
                     // Position and scale planes and CodeCities accordingly using CityCollection grid
                     GameObject cityCollection = GameObject.Find("CityCollection").AssertNotNull("CityCollection");
-                    UnityEngine.Assertions.Assert.IsTrue(cityCollection.TryGetComponent(out GridObjectCollection grid));
 
-                    GameObject[] citiesWithoutShell = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
+                    GridObjectCollection grid = new GridObjectCollection();
 
-                    GameObject[] cities = new GameObject[citiesWithoutShell.Length];
+                    UnityEngine.Assertions.Assert.IsTrue(cityCollection.TryGetComponent(out grid));
+
+                    GameObject[] citiesWithoutContainer = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
+
+                    GameObject[] citiesWithContainer = new GameObject[citiesWithoutContainer.Length];
 
 
-                    for (int i = 0; i< citiesWithoutShell.Length; i++)
+                    for (int i = 0; i< citiesWithoutContainer.Length; i++)
                     {
-                        cities[i] = AddCodeCityShell(citiesWithoutShell[i]);
+                        citiesWithContainer[i] = AddCodeCityContainer(citiesWithoutContainer[i]);
 
-                        GameObject city = cities[i];
+                        GameObject cityWithContainer = citiesWithContainer[i];
 
-                        SetCityScale(city, cityCollection.transform, CityScalingFactor);                     
+                        SetCityScale(cityWithContainer, cityCollection.transform, CityScalingFactor);                     
 
-                        AddMixedRealityGameObjectInteractions(city);
-                        AppBarCityConfiguration(city);
+                        AddMixedRealityGameObjectInteractions(cityWithContainer);
+                        AppBarCityConfiguration(cityWithContainer);
 
-                        PrepareBoundsControlForHololens2(city.GetComponent<BoundsControl>());
+                        PrepareBoundsControlForHololens2(cityWithContainer.GetComponent<BoundsControl>());
                     }
 
-                    SetGridCellWitdth(grid, cities);
+                    SetGridCellWitdth(grid, citiesWithContainer);
                 }
             }
 
             #region Local Methods
             //Scales the city by factor and pretend it to collection 
-            void SetCityScale(GameObject city, Transform cityCollectionTransform, float cityScaleFactor)
+            void SetCityScale(GameObject cityWitchContainer, Transform cityCollectionTransform, float cityScaleFactor)
             {
-                city.transform.localScale *= cityScaleFactor;
+                cityWitchContainer.transform.localScale *= cityScaleFactor;
                 // City needs to be parented to collection to be organized by it
-                city.transform.parent = cityCollectionTransform;
+                cityWitchContainer.transform.parent = cityCollectionTransform;
             }
 
             //Sets the width of the Grid containing the cities
@@ -233,15 +238,15 @@ namespace SEE.Controls
             }
 
             //Adds MixedRealityGameObjectInteraction and ObjectManipulator Script to City
-            void AddMixedRealityGameObjectInteractions(GameObject city)
+            void AddMixedRealityGameObjectInteractions(GameObject cityWithContainer)
             {
-                city.AddComponent<MixedRealityGameObjectInteractions>();
-                city.AddComponent<ObjectManipulator>();
+                cityWithContainer.AddComponent<MixedRealityGameObjectInteractions>();
+                cityWithContainer.AddComponent<ObjectManipulator>();
             }
 
-            void AppBarCityConfiguration(GameObject city)
+            void AppBarCityConfiguration(GameObject cityWithContainer)
             {
-                BoundsControl boundsControl = city.AddComponent<BoundsControl>();
+                BoundsControl boundsControl = cityWithContainer.AddComponent<BoundsControl>();
                 boundsControl.BoundsControlActivation = Microsoft.MixedReality.Toolkit.UI.BoundsControlTypes.BoundsControlActivationType.ActivateManually;
             }
 
@@ -270,14 +275,17 @@ namespace SEE.Controls
                 **/
             }
 
-            //Creats a Container GameObject for Cities
-            GameObject AddCodeCityShell(GameObject city)
+            //Creats a Container GameObject for Cities 
+            GameObject AddCodeCityContainer(GameObject city)
             {
-                GameObject cityShell = new GameObject();
+                //TODO: A prefab does no work because it is not possible todd materials/Scripts 
+                //GameObject cityContainer = Instantiate(Resources.Load("Prefabs/CityContainer", typeof(GameObject))) as GameObject;
+
+                GameObject cityContainer = new GameObject();
                 Bounds bounds;
 
-                cityShell.name = city.name + "Shell";
-                cityShell.transform.position = city.transform.position;
+                cityContainer.name = city.name + "Container";
+                cityContainer.transform.position = city.transform.position;
 
                 Vector3 citySize = city.Size();
                 Vector3 cityCenter = city.GetComponent<Renderer>().bounds.center;
@@ -291,9 +299,9 @@ namespace SEE.Controls
                     bounds = new Bounds(cityCenter, citySize);
                 }
 
-                city.transform.SetParent(cityShell.transform);
+                city.transform.SetParent(cityContainer.transform);
 
-                return cityShell;
+                return cityContainer;
             }
 
             #endregion
