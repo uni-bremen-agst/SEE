@@ -179,7 +179,15 @@ namespace SEE.Utils
                         List<object> pair = item as List<object>;
                         if (pair.Count == 2)
                         {
-                            value[(string)pair[0]] = (bool)pair[1];
+                            try
+                            {
+                                value[(string)pair[0]] = (bool)pair[1];
+                            }
+                            catch(InvalidCastException e)
+                            {
+                                object val = pair[1];
+                                throw new InvalidCastException($"Value to be cast {val} is expected to be a boolean. Actual type is {val.GetType().Name}.");
+                            }
                         }
                         else
                         {
