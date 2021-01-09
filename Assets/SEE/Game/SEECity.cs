@@ -14,6 +14,12 @@ namespace SEE.Game
     /// </summary>
     public class SEECity : AbstractSEECity
     {
+        /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
+        /// configuration file, make sure you save and restore it in 
+        /// <see cref="SEECity.Save(ConfigWriter)"/> and 
+        /// <see cref="SEECity.Restore(Dictionary{string, object})"/>, 
+        /// respectively. You should also extend the test cases in TestConfigIO.
+        
         /// <summary>
         /// The graph that is visualized in the scene and whose visualization settings are 
         /// managed here.

@@ -24,6 +24,13 @@ namespace SEE.Game
     /// </summary>
     public abstract partial class AbstractSEECity : SerializedMonoBehaviour
     {
+        /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
+        /// configuration file, make sure you save and restore it in 
+        /// <see cref="AbstractSEECity.Save(ConfigWriter)"/> and 
+        /// <see cref="AbstractSEECity.Restore(Dictionary{string, object})"/>, 
+        /// respectively (both declared in AbstractSEECityIO). You should also
+        /// extend the test cases in TestConfigIO.
+
         /// <summary>
         /// Saves the settings of this code city to <see cref="CityPath"/>.
         /// </summary>
