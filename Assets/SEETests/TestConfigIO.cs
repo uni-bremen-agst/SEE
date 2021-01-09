@@ -243,17 +243,29 @@ namespace SEE.Utils
 
             SEECity loadedCity = NewVanillaSEECity();
             loadedCity.Load(filename);
-
-            AbstractSEECityAttributesAreEqual(savedCity, loadedCity);            
+            SEECityAttributesAreEqual(savedCity, loadedCity);                     
         }
 
         /// <summary>
         /// Checks whether the configuration attributes of <paramref name="expected"/> and 
         /// <paramref name="actual"/> are equal.
         /// </summary>
-        /// <param name="expected">expected AbstractSEECity</param>
-        /// <param name="actual">actual AbstractSEECity</param>
-        private void AbstractSEECityAttributesAreEqual(SEECity expected, SEECity actual)
+        /// <param name="expected">expected settings</param>
+        /// <param name="actual">actual settings</param>
+        private void SEECityAttributesAreEqual(SEECity expected, SEECity actual)
+        {
+            AbstractSEECityAttributesAreEqual(expected, actual);
+            AreEqual(expected.GXLPath, actual.GXLPath);
+            AreEqual(expected.CSVPath, actual.CSVPath);
+        }
+
+        /// <summary>
+        /// Checks whether the configuration attributes of <paramref name="expected"/> and 
+        /// <paramref name="actual"/> are equal.
+        /// </summary>
+        /// <param name="expected">expected settings</param>
+        /// <param name="actual">actual settings</param>
+        private void AbstractSEECityAttributesAreEqual(AbstractSEECity expected, AbstractSEECity actual)
         {
             Assert.AreEqual(expected.LODCulling, actual.LODCulling);
             AreEqual(expected.LayoutPath, actual.LayoutPath);
@@ -353,22 +365,41 @@ namespace SEE.Utils
             Assert.AreEqual(expected.AbsolutePath, actual.AbsolutePath);            
         }
 
+        /// <summary>
+        /// Returns a new city where all attributes of given <paramref name="city"/> 
+        /// are assigned to arbitrary values different from their default values.
+        /// </summary>
         private static SEECity NewSEECity()
         {
-            SEECity city = NewVanillaSEECity();
-
-            WhipeOutAbstractSEECityAttributes(city);
-
+            SEECity city = NewVanillaSEECity();            
+            WhipeOutSEECityAttributes(city);
             return city;
         }
 
-        private static void WhipeOutAbstractSEECityAttributes(SEECity city)
+        /// <summary>
+        /// Assigns all attributes of given <paramref name="city"/> to arbitrary values
+        /// different from their default values.
+        /// </summary>
+        /// <param name="city">the city whose attributes are to re-assigned</param>
+        private static void WhipeOutSEECityAttributes(SEECity city)
+        {
+            WhipeOutAbstractSEECityAttributes(city);
+            city.GXLPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
+            city.CSVPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.csv");
+        }
+
+        /// <summary>
+        /// Assigns all attributes of given <paramref name="city"/> to arbitrary values
+        /// different from their default values.
+        /// </summary>
+        /// <param name="city">the city whose attributes are to re-assigned</param>
+        private static void WhipeOutAbstractSEECityAttributes(AbstractSEECity city)
         {
             city.LODCulling++;
             city.LayoutPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gvl");
             city.HierarchicalEdges = new HashSet<string>() { "Nonsense", "Whatever" };
             city.SelectedNodeTypes = new Dictionary<string, bool>() { { "Routine", true }, { "Class", false } };
-            city.CityPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
+            city.CityPath.Set("C:/MyAbsoluteDirectory/config.cfg");
             city.LeafNodeColorRange = new ColorRange(Color.magenta, Color.magenta, 2);
             city.InnerNodeColorRange = new ColorRange(Color.blue, Color.blue, 10);
             city.WidthMetric = "M1";
@@ -430,6 +461,10 @@ namespace SEE.Utils
             city.CoseGraphSettings.UseIterativeCalculation = !city.CoseGraphSettings.UseIterativeCalculation;
         }
 
+        /// <summary>
+        /// Returns a new game object with a SEECity component with all its default values.
+        /// </summary>
+        /// <returns>new game object with a SEECity component</returns>
         private static SEECity NewVanillaSEECity()
         {
             GameObject go = new GameObject();
