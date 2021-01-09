@@ -2412,7 +2412,7 @@ MonoBehaviour:
       Data: 0|SEE.Game.DataPath, SEE
     - Name: Root
       Entry: 3
-      Data: 2
+      Data: 1
     - Name: relativePath
       Entry: 1
       Data: 
@@ -2446,7 +2446,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: nodeTypes
+    - Name: SelectedNodeTypes
       Entry: 7
       Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
@@ -2459,33 +2459,24 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 2
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Directory
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: File
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
+      Data: 0
     - Name: 
       Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CityPath
+      Entry: 7
+      Data: 4|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 1
+    - Name: relativePath
+      Entry: 1
+      Data: /Data/GXL/minimal/config.cfg
+    - Name: absolutePath
+      Entry: 1
       Data: 
     - Name: 
       Entry: 8
@@ -2498,10 +2489,10 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 4
-      Data: 0.6621218
+      Data: 1
     - Name: 
       Entry: 4
       Data: 1
@@ -2543,10 +2534,10 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.9716792
+      Data: 1
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 4
       Data: 1
@@ -2580,12 +2571,42 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: LeafLabelSettings
+      Entry: 7
+      Data: 5|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: false
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeLabelSettings
+      Entry: 7
+      Data: 6|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 4|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
+      Data: 7|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
     - Name: EdgeLength
       Entry: 3
-      Data: 7
+      Data: 4
     - Name: UseSmartIdealEdgeCalculation
       Entry: 5
       Data: false
@@ -2606,17 +2627,17 @@ MonoBehaviour:
       Data: 1.5
     - Name: RepulsionStrength
       Entry: 4
-      Data: 7
-    - Name: multiLevelScaling
+      Data: 3
+    - Name: MultiLevelScaling
       Entry: 5
       Data: false
-    - Name: ListDirToggle
+    - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 5|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 6|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 9|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -2632,7 +2653,7 @@ MonoBehaviour:
       Data: dir_A
     - Name: $v
       Entry: 5
-      Data: false
+      Data: true
     - Name: 
       Entry: 8
       Data: 
@@ -2644,7 +2665,7 @@ MonoBehaviour:
       Data: dir_B
     - Name: $v
       Entry: 5
-      Data: false
+      Data: true
     - Name: 
       Entry: 8
       Data: 
@@ -2656,7 +2677,7 @@ MonoBehaviour:
       Data: dir_C
     - Name: $v
       Entry: 5
-      Data: false
+      Data: true
     - Name: 
       Entry: 8
       Data: 
@@ -2762,13 +2783,13 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: DirNodeLayout
+    - Name: InnerNodeLayout
       Entry: 7
-      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Layout.NodeLayouts.NodeLayoutKind,
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Layout.NodeLayouts.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 9
     - Name: 
       Entry: 12
       Data: 11
@@ -2780,335 +2801,154 @@ MonoBehaviour:
       Data: dir_A
     - Name: $v
       Entry: 3
-      Data: 6
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_B
-    - Name: $v
-      Entry: 3
-      Data: 6
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_C
-    - Name: $v
-      Entry: 3
-      Data: 6
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_A_1
-    - Name: $v
-      Entry: 3
-      Data: 6
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_A_2
-    - Name: $v
-      Entry: 3
-      Data: 6
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_B_1
-    - Name: $v
-      Entry: 3
-      Data: 6
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_B_2
-    - Name: $v
-      Entry: 3
-      Data: 6
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_C_1
-    - Name: $v
-      Entry: 3
-      Data: 6
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_C_2
-    - Name: $v
-      Entry: 3
-      Data: 6
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_root
-    - Name: $v
-      Entry: 3
-      Data: 6
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_D
-    - Name: $v
-      Entry: 3
-      Data: 6
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: DirShape
-      Entry: 7
-      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+InnerNodeKinds,
-        SEE]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 6
-    - Name: 
-      Entry: 12
-      Data: 11
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_A
-    - Name: $v
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_B
-    - Name: $v
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_C
-    - Name: $v
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_A_1
-    - Name: $v
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_A_2
-    - Name: $v
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_B_1
-    - Name: $v
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_B_2
-    - Name: $v
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_C_1
-    - Name: $v
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_C_2
-    - Name: $v
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_root
-    - Name: $v
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_D
-    - Name: $v
-      Entry: 3
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: rootDirs
-      Entry: 7
-      Data: 9|System.Collections.Generic.List`1[[SEE.DataModel.DG.Node, SEE]], mscorlib
-    - Name: 
-      Entry: 12
       Data: 1
     - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
       Entry: 7
-      Data: 10|SEE.DataModel.DG.Node, SEE
-    - Name: floatAttributes
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: dir_B
+    - Name: $v
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
       Entry: 7
-      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Single,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 9
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: dir_C
+    - Name: $v
+      Entry: 3
       Data: 6
     - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: dir_A_1
+    - Name: $v
+      Entry: 3
+      Data: 6
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: dir_A_2
+    - Name: $v
+      Entry: 3
+      Data: 6
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: dir_B_1
+    - Name: $v
+      Entry: 3
+      Data: 6
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: dir_B_2
+    - Name: $v
+      Entry: 3
+      Data: 6
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: dir_C_1
+    - Name: $v
+      Entry: 3
+      Data: 6
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: dir_C_2
+    - Name: $v
+      Entry: 3
+      Data: 6
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: dir_root
+    - Name: $v
+      Entry: 3
+      Data: 6
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: dir_D
+    - Name: $v
+      Entry: 3
+      Data: 6
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeShape
+      Entry: 7
+      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+InnerNodeKinds,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 9
+    - Name: 
       Entry: 12
-      Data: 8
+      Data: 11
     - Name: 
       Entry: 7
       Data: 
     - Name: $k
       Entry: 1
-      Data: Metric.Architecture_Violations_SUM
+      Data: dir_A
     - Name: $v
-      Entry: 4
-      Data: 60
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Metric.Clone_SUM
-    - Name: $v
-      Entry: 4
-      Data: 209
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Metric.Cycle_SUM
-    - Name: $v
-      Entry: 4
+      Entry: 3
       Data: 2
     - Name: 
       Entry: 8
@@ -3118,183 +2958,10 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Metric.Dead_Code_SUM
-    - Name: $v
-      Entry: 4
-      Data: 12
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Metric.Metric_SUM
-    - Name: $v
-      Entry: 4
-      Data: 313
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Metric.Style_SUM
-    - Name: $v
-      Entry: 4
-      Data: 298825
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Metric.Universal_SUM
-    - Name: $v
-      Entry: 4
-      Data: 1.4
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Metric.IssuesTotal
-    - Name: $v
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: intAttributes
-      Entry: 7
-      Data: 12|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Int32,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 6
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: show
-      Entry: 7
-      Data: 13|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 6
-    - Name: 
-      Entry: 12
-      Data: 11
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_root
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_A
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_A_1
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_A_2
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
       Data: dir_B
     - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_B_1
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: dir_B_2
-    - Name: $v
-      Entry: 5
-      Data: true
+      Entry: 3
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -3305,8 +2972,56 @@ MonoBehaviour:
       Entry: 1
       Data: dir_C
     - Name: $v
-      Entry: 5
-      Data: true
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: dir_A_1
+    - Name: $v
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: dir_A_2
+    - Name: $v
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: dir_B_1
+    - Name: $v
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: dir_B_2
+    - Name: $v
+      Entry: 3
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -3317,8 +3032,8 @@ MonoBehaviour:
       Entry: 1
       Data: dir_C_1
     - Name: $v
-      Entry: 5
-      Data: true
+      Entry: 3
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -3329,8 +3044,20 @@ MonoBehaviour:
       Entry: 1
       Data: dir_C_2
     - Name: $v
-      Entry: 5
-      Data: true
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: dir_root
+    - Name: $v
+      Entry: 3
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -3341,8 +3068,8 @@ MonoBehaviour:
       Entry: 1
       Data: dir_D
     - Name: $v
-      Entry: 5
-      Data: true
+      Entry: 3
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -3352,16 +3079,17 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: showGraphListing
-      Entry: 5
-      Data: true
-    - Name: loadedForNodeTypes
+    - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 14|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 12|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
-      Entry: 9
-      Data: 6
+      Entry: 7
+      Data: 13|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
       Data: 2
@@ -3395,266 +3123,28 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: useCalculationParameter
+    - Name: UseCalculationParameter
       Entry: 5
       Data: true
-    - Name: useIterativeCalculation
+    - Name: UseIterativeCalculation
       Entry: 5
       Data: false
     - Name: 
       Entry: 8
       Data: 
-    - Name: Measurements
-      Entry: 7
-      Data: 15|System.Collections.Generic.SortedDictionary`2[[System.String, mscorlib],[System.String,
-        mscorlib]], System
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: SubLayoutsInnerNodes
-      Entry: 7
-      Data: 16|System.Collections.Generic.Dictionary`2[[SEE.Layout.NodeLayouts.NodeLayoutKind,
-        SEE],[System.String, mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 17|System.Collections.Generic.EnumEqualityComparer`1[[SEE.Layout.NodeLayouts.NodeLayoutKind,
-        SEE]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 7
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 1
-    - Name: $v
-      Entry: 1
-      Data: Balloon
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 4
-    - Name: $v
-      Entry: 1
-      Data: CirclePacking
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 6
-    - Name: $v
-      Entry: 1
-      Data: CompoundSpringEmbedder
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 0
-    - Name: $v
-      Entry: 1
-      Data: EvoStreets
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 7
-    - Name: $v
-      Entry: 1
-      Data: FromFile
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 2
-    - Name: $v
-      Entry: 1
-      Data: RectanglePacking
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 3
-    - Name: $v
-      Entry: 1
-      Data: Treemap
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: SubLayoutsLeafNodes
-      Entry: 7
-      Data: 18|System.Collections.Generic.Dictionary`2[[SEE.Layout.NodeLayouts.NodeLayoutKind,
-        SEE],[System.String, mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 17
-    - Name: 
-      Entry: 12
-      Data: 8
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 1
-    - Name: $v
-      Entry: 1
-      Data: Balloon
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 4
-    - Name: $v
-      Entry: 1
-      Data: CirclePacking
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 6
-    - Name: $v
-      Entry: 1
-      Data: CompoundSpringEmbedder
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 0
-    - Name: $v
-      Entry: 1
-      Data: EvoStreets
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 7
-    - Name: $v
-      Entry: 1
-      Data: FromFile
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 5
-    - Name: $v
-      Entry: 1
-      Data: Manhattan
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 2
-    - Name: $v
-      Entry: 1
-      Data: RectanglePacking
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 3
-    - Name: $v
-      Entry: 1
-      Data: Treemap
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
   LODCulling: 0.01
   LayoutPath:
-    Root: 2
+    Root: 1
     relativePath: 
     absolutePath: 
   CityPath:
-    Root: 2
-    relativePath: 
+    Root: 1
+    relativePath: /Data/GXL/minimal/config.cfg
     absolutePath: 
   WidthMetric: Metric.Number_of_Tokens
-  HeightMetric: Metric.Style
+  HeightMetric: Metric.Clone_Rate
   DepthMetric: Metric.LOC
   LeafStyleMetric: Metric.Complexity
-  ShowLabel: 1
-  LeafLabelDistance: 0.2
-  LeafLabelFontSize: 0.4
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -3670,25 +3160,21 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
-  InnerNodeHeightMetric: 0.001
-  InnerNodeStyleMetric: 1
-  InnerNodeShowLabel: 1
-  InnerNodeLabelDistance: 0.2
-  InnerNodeLabelFontSize: 0.4
+  InnerNodeHeightMetric: 0.01
+  InnerNodeStyleMetric: Metric.IssuesTotal
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
   LeafObjects: 0
-  InnerNodeObjects: 0
-  NodeLayout: 2
-  EdgeLayout: 0
+  InnerNodeObjects: 3
+  NodeLayout: 4
+  EdgeLayout: 3
   ZScoreScale: 0
-  EdgeWidth: 0.001
+  EdgeWidth: 0.01
   ShowErosions: 0
   MaxErosionWidth: 1
   EdgesAboveBlocks: 1
   Tension: 0.85
   RDP: 0.0001
-  calculateMeasurements: 0
   GXLPath:
     Root: 1
     relativePath: /Data/GXL/minimal/CodeFacts.gxl
@@ -3697,7 +3183,6 @@ MonoBehaviour:
     Root: 1
     relativePath: /Data/GXL/minimal/CodeFacts.csv
     absolutePath: 
-  isASEECityObject: isAnSEECityObject
 --- !u!114 &1649116646
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3725,7 +3210,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.003054738
+  HeightOffset: 0.0030533075
 --- !u!65 &1649116648
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4186,7 +3671,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: nodeTypes
+    - Name: SelectedNodeTypes
       Entry: 7
       Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
@@ -4199,21 +3684,24 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 1
+      Data: 0
     - Name: 
-      Entry: 7
+      Entry: 13
       Data: 
-    - Name: $k
-      Entry: 1
-      Data: Cluster
-    - Name: $v
-      Entry: 5
-      Data: true
     - Name: 
       Entry: 8
       Data: 
-    - Name: 
-      Entry: 13
+    - Name: CityPath
+      Entry: 7
+      Data: 4|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
       Data: 
     - Name: 
       Entry: 8
@@ -4308,9 +3796,39 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: LeafLabelSettings
+      Entry: 7
+      Data: 5|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeLabelSettings
+      Entry: 7
+      Data: 6|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 4|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
+      Data: 7|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -4335,349 +3853,27 @@ MonoBehaviour:
     - Name: RepulsionStrength
       Entry: 4
       Data: 50
-    - Name: multiLevelScaling
+    - Name: MultiLevelScaling
       Entry: 5
       Data: false
-    - Name: ListDirToggle
-      Entry: 7
-      Data: 5|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 6|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
+    - Name: ListInnerNodeToggle
+      Entry: 6
       Data: 
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
+    - Name: InnerNodeLayout
+      Entry: 6
       Data: 
-    - Name: 
-      Entry: 8
+    - Name: InnerNodeShape
+      Entry: 6
       Data: 
-    - Name: DirNodeLayout
-      Entry: 7
-      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Layout.NodeLayouts.NodeLayoutKind,
-        SEE]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 6
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
+    - Name: LoadedForNodeTypes
+      Entry: 6
       Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: DirShape
-      Entry: 7
-      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+InnerNodeKinds,
-        SEE]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 6
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: rootDirs
-      Entry: 7
-      Data: 9|System.Collections.Generic.List`1[[SEE.DataModel.DG.Node, SEE]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: show
-      Entry: 7
-      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 6
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: showGraphListing
-      Entry: 5
-      Data: true
-    - Name: loadedForNodeTypes
-      Entry: 7
-      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 6
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: useCalculationParameter
-      Entry: 5
-      Data: true
-    - Name: useIterativeCalculation
+    - Name: UseCalculationParameter
       Entry: 5
       Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: Measurements
-      Entry: 7
-      Data: 12|System.Collections.Generic.SortedDictionary`2[[System.String, mscorlib],[System.String,
-        mscorlib]], System
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: SubLayoutsInnerNodes
-      Entry: 7
-      Data: 13|System.Collections.Generic.Dictionary`2[[SEE.Layout.NodeLayouts.NodeLayoutKind,
-        SEE],[System.String, mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 14|System.Collections.Generic.EnumEqualityComparer`1[[SEE.Layout.NodeLayouts.NodeLayoutKind,
-        SEE]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 7
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 1
-    - Name: $v
-      Entry: 1
-      Data: Balloon
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 4
-    - Name: $v
-      Entry: 1
-      Data: CirclePacking
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 6
-    - Name: $v
-      Entry: 1
-      Data: CompoundSpringEmbedder
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 0
-    - Name: $v
-      Entry: 1
-      Data: EvoStreets
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 7
-    - Name: $v
-      Entry: 1
-      Data: FromFile
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 2
-    - Name: $v
-      Entry: 1
-      Data: RectanglePacking
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 3
-    - Name: $v
-      Entry: 1
-      Data: Treemap
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: SubLayoutsLeafNodes
-      Entry: 7
-      Data: 15|System.Collections.Generic.Dictionary`2[[SEE.Layout.NodeLayouts.NodeLayoutKind,
-        SEE],[System.String, mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 14
-    - Name: 
-      Entry: 12
-      Data: 8
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 1
-    - Name: $v
-      Entry: 1
-      Data: Balloon
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 4
-    - Name: $v
-      Entry: 1
-      Data: CirclePacking
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 6
-    - Name: $v
-      Entry: 1
-      Data: CompoundSpringEmbedder
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 0
-    - Name: $v
-      Entry: 1
-      Data: EvoStreets
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 7
-    - Name: $v
-      Entry: 1
-      Data: FromFile
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 5
-    - Name: $v
-      Entry: 1
-      Data: Manhattan
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 2
-    - Name: $v
-      Entry: 1
-      Data: RectanglePacking
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 3
-    - Name: $v
-      Entry: 1
-      Data: Treemap
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
+    - Name: UseIterativeCalculation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -4694,9 +3890,6 @@ MonoBehaviour:
   HeightMetric: 0.0001
   DepthMetric: Metric.Number_of_Descendants
   LeafStyleMetric: Metric.Number_of_Clusters
-  ShowLabel: 1
-  LeafLabelDistance: 0.2
-  LeafLabelFontSize: 0.4
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -4714,9 +3907,6 @@ MonoBehaviour:
   InnerDonutMetric: Metric.IssuesTotal
   InnerNodeHeightMetric: 0.0001
   InnerNodeStyleMetric: Metric.Number_of_Descendants
-  InnerNodeShowLabel: 1
-  InnerNodeLabelDistance: 0.25
-  InnerNodeLabelFontSize: 0.4
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
   LeafObjects: 0
@@ -4730,7 +3920,6 @@ MonoBehaviour:
   EdgesAboveBlocks: 1
   Tension: 0.85
   RDP: 0.0001
-  calculateMeasurements: 1
   GXLPath:
     Root: 1
     relativePath: /Data/GXL/SEE/Architecture.gxl
@@ -4739,7 +3928,6 @@ MonoBehaviour:
     Root: 1
     relativePath: /Data/GXL/SEE/Architecture.csv
     absolutePath: 
-  isASEECityObject: isAnSEECityObject
 --- !u!65 &1930472484
 BoxCollider:
   m_ObjectHideFlags: 0
