@@ -207,7 +207,7 @@ namespace SEE.Controls
             Debug.Log(canvasIsClosed + "JDFKJHJK");
             if (anotherBool)
             {
-                anotherBool = false;
+                
                 SEECity cityTmp = null;
                 if (hoveredObject != null)
                 {
@@ -226,6 +226,7 @@ namespace SEE.Controls
                     if (city.Equals(cityTmp))
                     {
                         GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
+                        anotherBool = false;
                     }
 
                 }
