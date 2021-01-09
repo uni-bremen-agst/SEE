@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using SEE.Game;
+using SEE.Layout.NodeLayouts;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -243,59 +244,84 @@ namespace SEE.Utils
             SEECity loadedCity = NewVanillaSEECity();
             loadedCity.Load(filename);
 
-            Assert.AreEqual(savedCity.LODCulling, loadedCity.LODCulling);
-            AreEqual(savedCity.LayoutPath, loadedCity.LayoutPath);
-            CollectionAssert.AreEquivalent(savedCity.HierarchicalEdges, loadedCity.HierarchicalEdges);
-            CollectionAssert.AreEquivalent(savedCity.SelectedNodeTypes, loadedCity.SelectedNodeTypes);
-            AreEqual(savedCity.CityPath, loadedCity.CityPath);
-            AreEqual(savedCity.LeafNodeColorRange, loadedCity.LeafNodeColorRange);
-            AreEqual(savedCity.InnerNodeColorRange, loadedCity.InnerNodeColorRange);
-            Assert.AreEqual(savedCity.WidthMetric, loadedCity.WidthMetric);
-            Assert.AreEqual(savedCity.HeightMetric, loadedCity.HeightMetric);
-            Assert.AreEqual(savedCity.DepthMetric, loadedCity.DepthMetric);
-            Assert.AreEqual(savedCity.LeafStyleMetric, loadedCity.LeafStyleMetric);
-            AreEqual(savedCity.LeafLabelSettings, loadedCity.LeafLabelSettings);
-            AreEqual(savedCity.InnerNodeLabelSettings, loadedCity.InnerNodeLabelSettings);
+            AbstractSEECityAttributesAreEqual(savedCity, loadedCity);            
+        }
 
-            Assert.AreEqual(savedCity.StyleIssue, loadedCity.StyleIssue);
-            Assert.AreEqual(savedCity.UniversalIssue, loadedCity.UniversalIssue);
-            Assert.AreEqual(savedCity.MetricIssue, loadedCity.MetricIssue);
-            Assert.AreEqual(savedCity.Dead_CodeIssue, loadedCity.Dead_CodeIssue);
-            Assert.AreEqual(savedCity.CycleIssue, loadedCity.CycleIssue);
-            Assert.AreEqual(savedCity.CloneIssue, loadedCity.CloneIssue);
-            Assert.AreEqual(savedCity.ArchitectureIssue, loadedCity.ArchitectureIssue);
+        /// <summary>
+        /// Checks whether the configuration attributes of <paramref name="expected"/> and 
+        /// <paramref name="actual"/> are equal.
+        /// </summary>
+        /// <param name="expected">expected AbstractSEECity</param>
+        /// <param name="actual">actual AbstractSEECity</param>
+        private void AbstractSEECityAttributesAreEqual(SEECity expected, SEECity actual)
+        {
+            Assert.AreEqual(expected.LODCulling, actual.LODCulling);
+            AreEqual(expected.LayoutPath, actual.LayoutPath);
+            CollectionAssert.AreEquivalent(expected.HierarchicalEdges, actual.HierarchicalEdges);
+            CollectionAssert.AreEquivalent(expected.SelectedNodeTypes, actual.SelectedNodeTypes);
+            AreEqual(expected.CityPath, actual.CityPath);
+            AreEqual(expected.LeafNodeColorRange, actual.LeafNodeColorRange);
+            AreEqual(expected.InnerNodeColorRange, actual.InnerNodeColorRange);
+            Assert.AreEqual(expected.WidthMetric, actual.WidthMetric);
+            Assert.AreEqual(expected.HeightMetric, actual.HeightMetric);
+            Assert.AreEqual(expected.DepthMetric, actual.DepthMetric);
+            Assert.AreEqual(expected.LeafStyleMetric, actual.LeafStyleMetric);
+            AreEqual(expected.LeafLabelSettings, actual.LeafLabelSettings);
+            AreEqual(expected.InnerNodeLabelSettings, actual.InnerNodeLabelSettings);
 
-            Assert.AreEqual(savedCity.StyleIssue_SUM, loadedCity.StyleIssue_SUM);
-            Assert.AreEqual(savedCity.UniversalIssue_SUM, loadedCity.UniversalIssue_SUM);
-            Assert.AreEqual(savedCity.MetricIssue_SUM, loadedCity.MetricIssue_SUM);
-            Assert.AreEqual(savedCity.Dead_CodeIssue_SUM, loadedCity.Dead_CodeIssue_SUM);
-            Assert.AreEqual(savedCity.CycleIssue_SUM, loadedCity.CycleIssue_SUM);
-            Assert.AreEqual(savedCity.CloneIssue_SUM, loadedCity.CloneIssue_SUM);
-            Assert.AreEqual(savedCity.ArchitectureIssue_SUM, loadedCity.ArchitectureIssue_SUM);
+            Assert.AreEqual(expected.StyleIssue, actual.StyleIssue);
+            Assert.AreEqual(expected.UniversalIssue, actual.UniversalIssue);
+            Assert.AreEqual(expected.MetricIssue, actual.MetricIssue);
+            Assert.AreEqual(expected.Dead_CodeIssue, actual.Dead_CodeIssue);
+            Assert.AreEqual(expected.CycleIssue, actual.CycleIssue);
+            Assert.AreEqual(expected.CloneIssue, actual.CloneIssue);
+            Assert.AreEqual(expected.ArchitectureIssue, actual.ArchitectureIssue);
 
-            Assert.AreEqual(savedCity.InnerDonutMetric, loadedCity.InnerDonutMetric);
-            Assert.AreEqual(savedCity.InnerNodeHeightMetric, loadedCity.InnerNodeHeightMetric);
+            Assert.AreEqual(expected.StyleIssue_SUM, actual.StyleIssue_SUM);
+            Assert.AreEqual(expected.UniversalIssue_SUM, actual.UniversalIssue_SUM);
+            Assert.AreEqual(expected.MetricIssue_SUM, actual.MetricIssue_SUM);
+            Assert.AreEqual(expected.Dead_CodeIssue_SUM, actual.Dead_CodeIssue_SUM);
+            Assert.AreEqual(expected.CycleIssue_SUM, actual.CycleIssue_SUM);
+            Assert.AreEqual(expected.CloneIssue_SUM, actual.CloneIssue_SUM);
+            Assert.AreEqual(expected.ArchitectureIssue_SUM, actual.ArchitectureIssue_SUM);
 
-            Assert.AreEqual(savedCity.MinimalBlockLength, loadedCity.MinimalBlockLength);
-            Assert.AreEqual(savedCity.MaximalBlockLength, loadedCity.MaximalBlockLength);
+            Assert.AreEqual(expected.InnerDonutMetric, actual.InnerDonutMetric);
+            Assert.AreEqual(expected.InnerNodeHeightMetric, actual.InnerNodeHeightMetric);
 
-            Assert.AreEqual(savedCity.LeafObjects, loadedCity.LeafObjects);
-            Assert.AreEqual(savedCity.InnerNodeObjects, loadedCity.InnerNodeObjects);
+            Assert.AreEqual(expected.MinimalBlockLength, actual.MinimalBlockLength);
+            Assert.AreEqual(expected.MaximalBlockLength, actual.MaximalBlockLength);
 
-            Assert.AreEqual(savedCity.NodeLayout, loadedCity.NodeLayout);
-            Assert.AreEqual(savedCity.EdgeLayout, loadedCity.EdgeLayout);
+            Assert.AreEqual(expected.LeafObjects, actual.LeafObjects);
+            Assert.AreEqual(expected.InnerNodeObjects, actual.InnerNodeObjects);
 
-            Assert.AreEqual(savedCity.ZScoreScale, loadedCity.ZScoreScale);
-            Assert.AreEqual(savedCity.EdgeWidth, loadedCity.EdgeWidth);
-            Assert.AreEqual(savedCity.ShowErosions, loadedCity.ShowErosions);
-            Assert.AreEqual(savedCity.MaxErosionWidth, loadedCity.MaxErosionWidth);
-            Assert.AreEqual(savedCity.EdgesAboveBlocks, loadedCity.EdgesAboveBlocks);
-            Assert.AreEqual(savedCity.Tension, loadedCity.Tension);
-            Assert.AreEqual(savedCity.RDP, loadedCity.RDP);
-            /*
-             * */
-            // Assert.AreEqual(savedCity., loadedCity.);
-            //Assert.AreEqual(savedCity, loadedCity);
+            Assert.AreEqual(expected.NodeLayout, actual.NodeLayout);
+            Assert.AreEqual(expected.EdgeLayout, actual.EdgeLayout);
+
+            Assert.AreEqual(expected.ZScoreScale, actual.ZScoreScale);
+            Assert.AreEqual(expected.EdgeWidth, actual.EdgeWidth);
+            Assert.AreEqual(expected.ShowErosions, actual.ShowErosions);
+            Assert.AreEqual(expected.MaxErosionWidth, actual.MaxErosionWidth);
+            Assert.AreEqual(expected.EdgesAboveBlocks, actual.EdgesAboveBlocks);
+            Assert.AreEqual(expected.Tension, actual.Tension);
+            Assert.AreEqual(expected.RDP, actual.RDP);
+
+            // CoseGraphSettings
+            Assert.AreEqual(expected.CoseGraphSettings.EdgeLength, actual.CoseGraphSettings.EdgeLength);
+            Assert.AreEqual(expected.CoseGraphSettings.UseSmartIdealEdgeCalculation, actual.CoseGraphSettings.UseSmartIdealEdgeCalculation);
+            Assert.AreEqual(expected.CoseGraphSettings.UseSmartMultilevelScaling, actual.CoseGraphSettings.UseSmartMultilevelScaling);
+            Assert.AreEqual(expected.CoseGraphSettings.PerLevelIdealEdgeLengthFactor, actual.CoseGraphSettings.PerLevelIdealEdgeLengthFactor);
+            Assert.AreEqual(expected.CoseGraphSettings.UseSmartRepulsionRangeCalculation, actual.CoseGraphSettings.UseSmartRepulsionRangeCalculation);
+            Assert.AreEqual(expected.CoseGraphSettings.GravityStrength, actual.CoseGraphSettings.GravityStrength);
+            Assert.AreEqual(expected.CoseGraphSettings.CompoundGravityStrength, actual.CoseGraphSettings.CompoundGravityStrength);
+            Assert.AreEqual(expected.CoseGraphSettings.RepulsionStrength, actual.CoseGraphSettings.RepulsionStrength);
+            Assert.AreEqual(expected.CoseGraphSettings.MultiLevelScaling, actual.CoseGraphSettings.MultiLevelScaling);
+            Assert.AreEqual(expected.CoseGraphSettings.MultiLevelScaling, actual.CoseGraphSettings.MultiLevelScaling);
+            CollectionAssert.AreEquivalent(expected.CoseGraphSettings.ListInnerNodeToggle, actual.CoseGraphSettings.ListInnerNodeToggle);
+            CollectionAssert.AreEquivalent(expected.CoseGraphSettings.InnerNodeLayout, actual.CoseGraphSettings.InnerNodeLayout);
+            CollectionAssert.AreEquivalent(expected.CoseGraphSettings.InnerNodeShape, actual.CoseGraphSettings.InnerNodeShape);
+            CollectionAssert.AreEquivalent(expected.CoseGraphSettings.LoadedForNodeTypes, actual.CoseGraphSettings.LoadedForNodeTypes);
+            Assert.AreEqual(expected.CoseGraphSettings.UseCalculationParameter, actual.CoseGraphSettings.UseCalculationParameter);
+            Assert.AreEqual(expected.CoseGraphSettings.UseIterativeCalculation, actual.CoseGraphSettings.UseIterativeCalculation);
         }
 
         private void AreEqual(LabelSettings expected, LabelSettings actual)
@@ -330,10 +356,78 @@ namespace SEE.Utils
         private static SEECity NewSEECity()
         {
             SEECity city = NewVanillaSEECity();
-            city.LayoutPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gvl");
-            city.LODCulling = 1.0f;
-            city.SelectedNodeTypes = new Dictionary<string, bool>() { { "Routine", true }, { "Class", false } };
+
+            WhipeOutAbstractSEECityAttributes(city);
+
             return city;
+        }
+
+        private static void WhipeOutAbstractSEECityAttributes(SEECity city)
+        {
+            city.LODCulling++;
+            city.LayoutPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gvl");
+            city.HierarchicalEdges = new HashSet<string>() { "Nonsense", "Whatever" };
+            city.SelectedNodeTypes = new Dictionary<string, bool>() { { "Routine", true }, { "Class", false } };
+            city.CityPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
+            city.LeafNodeColorRange = new ColorRange(Color.magenta, Color.magenta, 2);
+            city.InnerNodeColorRange = new ColorRange(Color.blue, Color.blue, 10);
+            city.WidthMetric = "M1";
+            city.HeightMetric = "M2";
+            city.DepthMetric = "M3";
+            city.LeafStyleMetric = "M4";
+
+            city.StyleIssue = "X";
+            city.UniversalIssue = "X";
+            city.MetricIssue = "X";
+            city.Dead_CodeIssue = "X";
+            city.CycleIssue = "X";
+            city.CloneIssue = "X";
+            city.ArchitectureIssue = "X";
+
+            city.StyleIssue_SUM = "X";
+            city.UniversalIssue_SUM = "X";
+            city.MetricIssue_SUM = "X";
+            city.Dead_CodeIssue_SUM = "X";
+            city.CycleIssue_SUM = "X";
+            city.CloneIssue_SUM = "X";
+            city.ArchitectureIssue_SUM = "X";
+
+            city.InnerDonutMetric = "X";
+            city.InnerNodeHeightMetric = "X";
+            city.InnerNodeStyleMetric = "X";
+
+            city.MinimalBlockLength++;
+            city.MaximalBlockLength++;
+            city.LeafObjects = AbstractSEECity.LeafNodeKinds.Blocks;
+            city.InnerNodeObjects = AbstractSEECity.InnerNodeKinds.Empty;
+
+            city.NodeLayout = NodeLayoutKind.CompoundSpringEmbedder;
+            city.EdgeLayout = Layout.EdgeLayouts.EdgeLayoutKind.Straight;
+
+            city.ZScoreScale = !city.ZScoreScale;
+            city.EdgeWidth++;
+            city.ShowErosions = !city.ShowErosions;
+            city.MaxErosionWidth++;
+            city.EdgesAboveBlocks = !city.EdgesAboveBlocks;
+            city.Tension = 0.0f;
+            city.RDP = 10;
+
+            // CoseGraphSettings
+            city.CoseGraphSettings.EdgeLength++;
+            city.CoseGraphSettings.UseSmartIdealEdgeCalculation = !city.CoseGraphSettings.UseSmartIdealEdgeCalculation;
+            city.CoseGraphSettings.UseSmartMultilevelScaling = !city.CoseGraphSettings.UseSmartMultilevelScaling;
+            city.CoseGraphSettings.PerLevelIdealEdgeLengthFactor++;
+            city.CoseGraphSettings.UseSmartRepulsionRangeCalculation = !city.CoseGraphSettings.UseSmartRepulsionRangeCalculation;
+            city.CoseGraphSettings.GravityStrength++;
+            city.CoseGraphSettings.CompoundGravityStrength++;
+            city.CoseGraphSettings.RepulsionStrength++;
+            city.CoseGraphSettings.MultiLevelScaling = !city.CoseGraphSettings.MultiLevelScaling;
+            city.CoseGraphSettings.ListInnerNodeToggle = new Dictionary<string, bool>() { { "ID1", true }, { "ID2", false } };
+            city.CoseGraphSettings.InnerNodeLayout = new Dictionary<string, NodeLayoutKind>() { { "ID1", NodeLayoutKind.Manhattan }, { "ID2", NodeLayoutKind.Balloon } };
+            city.CoseGraphSettings.InnerNodeShape = new Dictionary<string, AbstractSEECity.InnerNodeKinds>() { { "ID1", AbstractSEECity.InnerNodeKinds.Blocks }, { "ID2", AbstractSEECity.InnerNodeKinds.Circles } };
+            city.CoseGraphSettings.LoadedForNodeTypes = new Dictionary<string, bool>() { { "ID1", false }, { "ID2", true } };
+            city.CoseGraphSettings.UseCalculationParameter = !city.CoseGraphSettings.UseCalculationParameter;
+            city.CoseGraphSettings.UseIterativeCalculation = !city.CoseGraphSettings.UseIterativeCalculation;
         }
 
         private static SEECity NewVanillaSEECity()
