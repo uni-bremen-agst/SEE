@@ -172,6 +172,7 @@ namespace SEE.Controls.Actions
                 case State.MoveNode:
                     break;
                 case State.NewNode:
+                    gameObject.GetComponent<DesktopNewNodeAction>().hoveredObject = null;
                     gameObject.GetComponent<DesktopNewNodeAction>().removeScript();
                     break;
                 case State.ScaleNode:
