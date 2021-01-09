@@ -32,6 +32,8 @@ namespace SEE.Game
         /// from the GXL file, i.e., the GXL file is our persistent serialization we 
         /// use to re-create the graph. We need, however, to set the NodeRefs at runtime.
         /// All that is being done in Start() below.
+        /// 
+        /// Neither serialized nor saved to the config file.
         /// </summary>
         [NonSerialized]
         private Graph loadedGraph = null;
@@ -40,6 +42,8 @@ namespace SEE.Game
         /// The graph underlying this SEE city that was loaded from disk. May be null.
         /// If a new graph is assigned to this property, the selected node types will
         /// be updated, too.
+        /// 
+        /// Neither serialized nor saved to the config file.
         /// </summary>
         public Graph LoadedGraph
         {
@@ -236,7 +240,7 @@ namespace SEE.Game
         /// </summary>
         /// <returns>metric data path</returns>
         public DataPath CSVPath = new DataPath();
-        
+
         /// <summary>
         /// Loads the metrics from CSVPath() and aggregates and adds them to the graph.
         /// Precondition: graph must have been loaded before.
@@ -331,11 +335,6 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// The graph renderer used to draw the city.
-        /// </summary>
-        private GraphRenderer graphRenderer;
-
-        /// <summary>
         /// Draws the graph.
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
@@ -361,6 +360,13 @@ namespace SEE.Game
                 }
             }
         }
+
+        /// <summary>
+        /// The graph renderer used to draw the city.
+        /// 
+        /// Neither serialized nor saved to the config file.
+        /// </summary>
+        private GraphRenderer graphRenderer;
 
         /// <summary>
         /// Yields a graph renderer that can draw this city.
@@ -410,6 +416,33 @@ namespace SEE.Game
                 loadedGraph.Destroy();
             }
             LoadedGraph = null;
+        }
+
+        //--------------------------------
+        // Configuration file input/output
+        //--------------------------------
+
+        /// <summary>
+        /// Label of attribute <see cref="GXLPath"/> in the configuration file.
+        /// </summary>
+        private const string GXLPathLabel = "GXLPath";
+        /// <summary>
+        /// Label of attribute <see cref="CSVPath"/> in the configuration file.
+        /// </summary>
+        private const string CSVPathLabel = "CSVPath";
+
+        protected override void Save(ConfigWriter writer)
+        {
+            base.Save(writer);
+            GXLPath.Save(writer, GXLPathLabel);
+            CSVPath.Save(writer, CSVPathLabel);
+        }
+
+        protected override void Restore(Dictionary<string, object> attributes)
+        {
+            base.Restore(attributes);
+            GXLPath.Restore(attributes, GXLPathLabel);
+            CSVPath.Restore(attributes, CSVPathLabel);
         }
     }
 }
