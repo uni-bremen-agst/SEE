@@ -241,7 +241,7 @@ namespace SEEEditor
             else
             {
                 // Dictionary with all Nodelayouts for leaf and inner nodes
-                subLayoutNodeLayouts = Enum.GetValues(typeof(NodeLayoutKind)).Cast<NodeLayoutKind>().Where(nodeLayout => !nodeLayout.GetModel().OnlyLeaves).OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString()); ;
+                subLayoutNodeLayouts = Enum.GetValues(typeof(NodeLayoutKind)).Cast<NodeLayoutKind>().Where(nl => !nl.GetModel().OnlyLeaves).OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString()); ;
             }
 
             foreach (NodeLayoutKind layout in parentNodeLayouts)
