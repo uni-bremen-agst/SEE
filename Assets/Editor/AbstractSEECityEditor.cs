@@ -54,7 +54,7 @@ namespace SEEEditor
         private bool showCompoundSpringEmbedder = true;
 
         /// <summary>
-        /// if true listing of inner nodes with possiible nodelayouts and inner node kinds is shown
+        /// if true, listing of inner nodes with possible nodelayouts and inner node kinds is shown
         /// </summary>
         protected bool ShowGraphListing = true;
 
