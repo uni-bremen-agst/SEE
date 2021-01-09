@@ -224,10 +224,11 @@ public class GameNodeScaleAction : MonoBehaviour
         //Move the gameObject so the user thinks he scaled only in one direction
         Vector3 position = gameObject.transform.position;
         position.y += scale.y * 0.5f;
-        position.x += (fstSideSphere.transform.position.x - fstSideOldSpherPos.x) * 0.5f;
-        position.x += (sndSideSphere.transform.position.x - sndSideOldSpherPos.x) * 0.5f;
-        position.z += (thrdSideSphere.transform.position.z - thrdSideOldSpherPos.z) * 0.5f;
-        position.z += (forthSideSphere.transform.position.z - forthSideOldSpherPos.z) * 0.5f;
+        // position.x += (fstSideSphere.transform.position.x - fstSideOldSpherPos.x) * 0.5f;
+        // position.x += (sndSideSphere.transform.position.x - sndSideOldSpherPos.x) * 0.5f;
+        // position.z += (thrdSideSphere.transform.position.z - thrdSideOldSpherPos.z) * 0.5f;
+        // position.z += (forthSideSphere.transform.position.z - forthSideOldSpherPos.z) * 0.5f;
+
 
         //Setting the old positions
         topOldSpherPos = topSphere.transform.position;
@@ -241,10 +242,30 @@ public class GameNodeScaleAction : MonoBehaviour
         forthSideOldSpherPos = forthSideSphere.transform.position;
 
 
+        
+        scale = gameObject.transform.lossyScale + scale;
+
+        //Fixes negative dimension
+        if (scale.x <= 0 )
+        {
+            scale.x = gameObject.transform.lossyScale.x;
+        }
+        if(scale.y <= 0)
+        {
+            scale.y = gameObject.transform.lossyScale.y;
+            position.y = gameObject.transform.position.y;
+        }
+
+        if(scale.z <= 0)
+        {
+            scale.z = gameObject.transform.lossyScale.z;
+
+        }
+
+        
         //transform the new pos and scale
         gameObject.transform.position = position;
-        gameObject.SetScale(gameObject.transform.lossyScale + scale);
-
+        gameObject.SetScale(scale);
 
     }
 
