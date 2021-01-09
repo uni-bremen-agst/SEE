@@ -119,10 +119,7 @@ namespace SEE.Controls
         /// <returns></returns>
         public static InteractableObject Get(uint id)
         {
-            if (!interactableObjects.TryGetValue(id, out InteractableObject result))
-            {
-                result = null;
-            }
+            interactableObjects.TryGetValue(id, out InteractableObject result);
             return result;
         }
 
@@ -374,24 +371,11 @@ namespace SEE.Controls
                 SetHover(false, true);
             }
         }
-
-        //----------------------------------------------------------------
-        // Private actions called by the hand when the object is hovered.
-        // These methods are called by SteamVR by way of the interactable.
-        // <see cref="Hand.Update"/>
-        //----------------------------------------------------------------
-
-        private const Hand.AttachmentFlags AttachmentFlags
-            = Hand.defaultAttachmentFlags
-            & (~Hand.AttachmentFlags.SnapOnAttach)
-            & (~Hand.AttachmentFlags.DetachOthers)
-            & (~Hand.AttachmentFlags.VelocityMovement);
-
-        private void OnHandHoverBegin(Hand hand) => SetHover(true, true);
-        private void OnHandHoverEnd(Hand hand) => SetHover(false, true);
-
-        #endregion
-
+        
+        //----------------------------------------
+        // Actions called by the MRTK on HoloLens.
+        //----------------------------------------
+        
         public void OnFocusEnter(FocusEventData eventData)
         {
             // In case of eye gaze, we discard the input.
@@ -404,6 +388,31 @@ namespace SEE.Controls
             
         }
 
-        public void OnFocusExit(FocusEventData eventData) => SetHover(false, true);
+        public void OnFocusExit(FocusEventData eventData)
+        {
+            // Similarly to OnFocusEnter(), we discard the input in case of eye gaze to avoid jarring changes.
+            if (eventData.Pointer.InputSourceParent.SourceType != InputSourceType.Eyes)
+            {
+                SetHover(false, true);
+            }
+        }
+
+        //----------------------------------------------------------------
+        // Private actions called by the hand when the object is hovered.
+        // These methods are called by SteamVR by way of the interactable.
+        // <see cref="Hand.Update"/>
+        //----------------------------------------------------------------
+
+        private const Hand.AttachmentFlags AttachmentFlags
+            = Hand.defaultAttachmentFlags
+            & ~Hand.AttachmentFlags.SnapOnAttach
+            & ~Hand.AttachmentFlags.DetachOthers
+            & ~Hand.AttachmentFlags.VelocityMovement;
+
+        private void OnHandHoverBegin(Hand hand) => SetHover(true, true);
+        private void OnHandHoverEnd(Hand hand) => SetHover(false, true);
+
+        #endregion
+
     }
 }

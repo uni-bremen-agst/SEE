@@ -1,9 +1,0 @@
-ID;Metric.Complexity;Metric.FanIn;Metric.FanOut
-src\test\java\javax\util\streamex;0;0;0
-src\main\java\javax\util\streamex;0;0;0
-streamex-root;0;0;0
-src\main\java\javax\util\streamex\LongStreamEx.java;1661;324;0
-src\test\java\javax\util\streamex\StreamExTest.java;687;70;0
-src\main\java\javax\util\streamex\IntStreamEx.java;1756;348;0
-src\main\java\javax\util\streamex\DoubleStreamEx.java;1575;309;0
-src\main\java\javax\util\streamex\StreamEx.java;3069;445;0

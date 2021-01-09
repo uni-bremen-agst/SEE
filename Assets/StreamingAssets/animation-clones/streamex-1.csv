@@ -1,9 +1,0 @@
-ID;Metric.Complexity
-src\test\java\javax\util\streamex;1
-src\main\java\javax\util\streamex;2
-streamex-root;1
-src\main\java\javax\util\streamex\LongStreamEx.java;5
-src\test\java\javax\util\streamex\StreamExTest.java;4
-src\main\java\javax\util\streamex\IntStreamEx.java;2
-src\main\java\javax\util\streamex\DoubleStreamEx.java;3
-src\main\java\javax\util\streamex\StreamEx.java;8
