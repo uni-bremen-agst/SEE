@@ -2,16 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class scri2 : MonoBehaviour
+public class AddingNodeCanvasScript : MonoBehaviour
 {
     // Start is called before the first frame update
 
-    public GameObject testgameObject2;
+    public GameObject canvas;
     void Start()
     {
-        testgameObject2 = Instantiate(Resources.Load("TestPrefab", typeof(GameObject))) as GameObject;
-        Debug.Log("Start-Methode ist gerunnt");
-        Debug.Log(testgameObject2);
+        canvas = Instantiate(Resources.Load("NodeCanvas", typeof(GameObject))) as GameObject;
     }
 
     // Update is called once per frame
@@ -20,18 +18,14 @@ public class scri2 : MonoBehaviour
         
     }
 
-    public void InstantiateGameObject()
+    public void InstantiateCanvas()
     {
-        Instantiate(testgameObject2);
-        Debug.Log("testgameObject2 existiert noch nicht");
-
-
-
+        Instantiate(canvas);
     }
 
     public void DestroyAllChilds()
     {
-        foreach (Transform child in testgameObject2.transform)
+        foreach (Transform child in canvas.transform)
         {
             GameObject.Destroy(child.gameObject);
         }
