@@ -4,6 +4,7 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -230,7 +231,18 @@ namespace SEEEditor
             GUILayoutOption[] guiOptions = { GUILayout.ExpandWidth(false), GUILayout.Width(200) };
             EditorGUIUtility.labelWidth = 80;
             EditorGUILayout.PrefixLabel("Sublayouts");
-            Dictionary<NodeLayoutKind, string> subLayoutNodeLayouts = childrenAreLeaves ? city.SubLayoutsLeafNodes : city.SubLayoutsInnerNodes;
+            Dictionary<NodeLayoutKind, string> subLayoutNodeLayouts;
+            
+            if (childrenAreLeaves)
+            {
+                //  Dictionary with all Nodelayouts only for leaf nodes
+                subLayoutNodeLayouts = Enum.GetValues(typeof(NodeLayoutKind)).Cast<NodeLayoutKind>().OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
+            }
+            else
+            {
+                // Dictionary with all Nodelayouts for leaf and inner nodes
+                subLayoutNodeLayouts = Enum.GetValues(typeof(NodeLayoutKind)).Cast<NodeLayoutKind>().Where(nodeLayout => !nodeLayout.GetModel().OnlyLeaves).OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString()); ;
+            }
 
             foreach (NodeLayoutKind layout in parentNodeLayouts)
             {
