@@ -15,9 +15,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.DataModel.DG;
 using SEE.Utils;
-using System;
 using System.Collections.Generic;
 using static SEE.Game.AbstractSEECity;
 
@@ -104,6 +102,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         public bool UseIterativeCalculation = false;
 
         private const string EdgeLengthLabel = "EdgeLength";
+        private const string UseSmartIdealEdgeCalculationLabel = "UseSmartIdealEdgeCalculation";
         private const string UseSmartMultilevelScalingLabel = "UseSmartMultilevelScaling";
         private const string PerLevelIdealEdgeLengthFactorLabel = "PerLevelIdealEdgeLengthFactor";
         private const string UseSmartRepulsionRangeCalculationLabel = "UseSmartRepulsionRangeCalculation";
@@ -122,6 +121,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         {
             writer.BeginGroup(label);
             writer.Save(EdgeLength, EdgeLengthLabel);
+            writer.Save(UseSmartIdealEdgeCalculation, UseSmartIdealEdgeCalculationLabel);            
             writer.Save(UseSmartMultilevelScaling, UseSmartMultilevelScalingLabel);
             writer.Save(PerLevelIdealEdgeLengthFactor, PerLevelIdealEdgeLengthFactorLabel);
             writer.Save(UseSmartRepulsionRangeCalculation, UseSmartRepulsionRangeCalculationLabel);
@@ -150,7 +150,7 @@ namespace SEE.Layout.NodeLayouts.Cose
                         EdgeLength = (int)value;
                     }
                     ConfigIO.Restore(values, UseSmartMultilevelScalingLabel, ref UseSmartMultilevelScaling);
-
+                    ConfigIO.Restore(values, UseSmartIdealEdgeCalculationLabel, ref UseSmartIdealEdgeCalculation);
                     ConfigIO.Restore(values, PerLevelIdealEdgeLengthFactorLabel, ref PerLevelIdealEdgeLengthFactor);
                     ConfigIO.Restore(values, UseSmartRepulsionRangeCalculationLabel, ref UseSmartRepulsionRangeCalculation);
                     ConfigIO.Restore(values, GravityStrengthLabel, ref GravityStrength);
@@ -158,10 +158,8 @@ namespace SEE.Layout.NodeLayouts.Cose
                     ConfigIO.Restore(values, RepulsionStrengthLabel, ref RepulsionStrength);
                     ConfigIO.Restore(values, MultiLevelScalingLabel, ref MultiLevelScaling);
                     ConfigIO.Restore(values, ListInnerNodeToggleLabel, ref ListInnerNodeToggle);
-
-                    ConfigIO.Restore(values, InnerNodeLayoutLabel, ref InnerNodeLayout); // TODO: read list of enums
-                    ConfigIO.Restore(values, InnerNodeShapeLabel, ref InnerNodeShape);   // TODO: read list of enums
-
+                    ConfigIO.RestoreEnumDict(values, InnerNodeLayoutLabel, ref InnerNodeLayout);
+                    ConfigIO.RestoreEnumDict(values, InnerNodeShapeLabel, ref InnerNodeShape);
                     ConfigIO.Restore(values, LoadedForNodeTypesLabel, ref LoadedForNodeTypes);
                     ConfigIO.Restore(values, UseCalculationParameterLabel, ref UseCalculationParameter);
                     ConfigIO.Restore(values, UseIterativeCalculationLabel, ref UseIterativeCalculation);
