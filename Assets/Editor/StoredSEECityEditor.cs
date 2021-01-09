@@ -36,7 +36,8 @@ namespace SEEEditor
 
                 int countSelected = 0;
                 foreach (KeyValuePair<string, bool> entry in selection)
-                {   // If selection contains the artifial node type, we like to neglect that
+                {   
+                    // If selection contains the artifial node type, we like to neglect that
                     // and do not show this to the user.
                     if (!(entry.Key.Equals(Graph.UnknownType)))
                     {
@@ -51,32 +52,33 @@ namespace SEEEditor
                 if (city.CoseGraphSettings.LoadedForNodeTypes.Count == 0)
                 {
                     ShowGraphListing = true;
-                    return;
                 }
-
-                bool allTypes = true;
-                foreach (KeyValuePair<string, bool> kvp in city.CoseGraphSettings.LoadedForNodeTypes)
+                else
                 {
-                    if (city.SelectedNodeTypes.ContainsKey(kvp.Key))
+                    bool allTypes = true;
+                    foreach (KeyValuePair<string, bool> kvp in city.CoseGraphSettings.LoadedForNodeTypes)
                     {
-                        allTypes = allTypes && city.SelectedNodeTypes[kvp.Key];
-                    }
-                    else
-                    {
-                        allTypes = false;
+                        if (city.SelectedNodeTypes.ContainsKey(kvp.Key))
+                        {
+                            allTypes = allTypes && city.SelectedNodeTypes[kvp.Key];
+                        }
+                        else
+                        {
+                            allTypes = false;
+                        }
+
                     }
 
+                    if (allTypes)
+                    {
+                        if (countSelected != city.CoseGraphSettings.LoadedForNodeTypes.Count)
+                        {
+                            allTypes = false;
+                        }
+                    }
+
+                    ShowGraphListing = allTypes;
                 }
-
-                if (allTypes)
-                {
-                    if (countSelected != city.CoseGraphSettings.LoadedForNodeTypes.Count)
-                    {
-                        allTypes = false;
-                    }
-                }
-
-                ShowGraphListing = allTypes;
             }
         }   
     }
