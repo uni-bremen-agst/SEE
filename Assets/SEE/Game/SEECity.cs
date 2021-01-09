@@ -236,12 +236,6 @@ namespace SEE.Game
         /// </summary>
         /// <returns>metric data path</returns>
         public DataPath CSVPath = new DataPath();
-
-        /// <summary>
-        /// A simple string variable in order to differentiate before loading data
-        /// from a stored .json file
-        /// </summary>
-        public string isASEECityObject = "isAnSEECityObject";
         
         /// <summary>
         /// Loads the metrics from CSVPath() and aggregates and adds them to the graph.
