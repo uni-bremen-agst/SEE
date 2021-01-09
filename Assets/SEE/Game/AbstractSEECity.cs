@@ -95,12 +95,6 @@ namespace SEE.Game
 
         private const string CoseGraphSettingsLabel = "CoseGraphSettings";
 
-        /*
-
-SubLayoutsInnerNodes
-SubLayoutsLeafNodes
-*/
-
         protected virtual void Save(ConfigWriter writer)
         {
             writer.Save(LODCulling, LODCullingLabel);
@@ -154,8 +148,7 @@ SubLayoutsLeafNodes
             writer.Save(RDP, RDPLabel);
 
             CoseGraphSettings.Save(writer, CoseGraphSettingsLabel);
-
-    }
+        }
 
         protected virtual void Restore(Dictionary<string, object> attributes)
         {
@@ -210,7 +203,6 @@ SubLayoutsLeafNodes
             ConfigIO.Restore(attributes, RDPLabel, ref RDP);
 
             CoseGraphSettings.Restore(attributes, CoseGraphSettingsLabel);
-
         }
 
         public void Load(string filename)
@@ -825,16 +817,6 @@ SubLayoutsLeafNodes
         /// </summary>
         public CoseGraphSettings CoseGraphSettings = new CoseGraphSettings();
 
-        /// <summary>
-        /// Dictionary with all Nodelayouts for leaf and inner nodes
-        /// </summary>
-        public Dictionary<NodeLayoutKind, string> SubLayoutsInnerNodes = Enum.GetValues(typeof(NodeLayoutKind)).Cast<NodeLayoutKind>().Where(nodeLayout => !nodeLayout.GetModel().OnlyLeaves).OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
-
-        /// <summary>
-        ///  Dictionary with all Nodelayouts only for leaf nodes
-        /// </summary>
-        public Dictionary<NodeLayoutKind, string> SubLayoutsLeafNodes = Enum.GetValues(typeof(NodeLayoutKind)).Cast<NodeLayoutKind>().OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
-        
         /// <summary>
         /// Saves all data needed for the listing of the dirs in gui in cosegraphSettings
         /// </summary>
