@@ -38,7 +38,11 @@ namespace SEE.Controls
         /// </summary>
         public GameObject hoveredObject = null;
 
-        public scri scri;
+        public CanvasGenerator canvasGenerator;
+
+        public static bool canvasIsClosed = true;
+
+        public static bool anotherBool = false; 
 
         public void Start()
         {
@@ -47,6 +51,8 @@ namespace SEE.Controls
 
         public void Update()
         {
+            if (canvasIsClosed)
+            { }
             if (city == null)
             {
                 //City Selection
@@ -83,17 +89,25 @@ namespace SEE.Controls
                 }
 
 
-
             }
+        
+            
+                if(!canvasIsClosed)
+                {
+                    GameObject canvasObject = GameObject.Find("AddingNodeCanvas");
+                    CanvasGenerator c = (CanvasGenerator)canvasObject.GetComponent("CanvasGenerator");
+                    c.DestroyGameObject();
+                anotherBool = true;
+                canvasIsClosed = true;
+                }
+
         }
 
         public void OpenDialog()
         {
-            GameObject canvasObject = GameObject.Find("TEST");
-            scri c = (scri)canvasObject.GetComponent("scri");
+            GameObject canvasObject = GameObject.Find("AddingNodeCanvas");
+            CanvasGenerator c = (CanvasGenerator)canvasObject.GetComponent("CanvasGenerator");
             c.InstantiateGameObject();
-            Debug.Log("GEKLAPPT?");
-
         }
 
         /// <summary>
@@ -190,38 +204,40 @@ namespace SEE.Controls
 
         private void Place()
         {
-            GameObject canvasObject = GameObject.Find("TEST");
-            scri c = (scri)canvasObject.GetComponent("scri");
-            c.DestroyGameObject();
-            SEECity cityTmp = null;
-            if (hoveredObject != null)
+            Debug.Log(canvasIsClosed + "JDFKJHJK");
+            if (anotherBool)
             {
+                anotherBool = false;
+                SEECity cityTmp = null;
+                if (hoveredObject != null)
+                {
 
-                //checks if the currently hovered object is part of the preselected city
-                GameObject tmp = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
-                try
-                {
-                    tmp.TryGetComponent<SEECity>(out cityTmp);
-                }
-                catch (Exception np)
-                {
-                    Debug.Log("city not selected"); // FIXME
-                    return;
-                }
-                if (city.Equals(cityTmp))
-                {
-                    GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
-                }
+                    //checks if the currently hovered object is part of the preselected city
+                    GameObject tmp = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
+                    try
+                    {
+                        tmp.TryGetComponent<SEECity>(out cityTmp);
+                    }
+                    catch (Exception np)
+                    {
+                        Debug.Log("city not selected"); // FIXME
+                        return;
+                    }
+                    if (city.Equals(cityTmp))
+                    {
+                        GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
+                    }
 
+                }
+                else
+                {
+                    //FIXME: DO WE NEED TO DESTROY THE NODE TO?
+                    Destroy(GONode);
+                }
+                GONode = null;
+                city = null;
+                nodeMetrics = null;
             }
-            else
-            {
-                //FIXME: DO WE NEED TO DESTROY THE NODE TO?
-                Destroy(GONode);
-            }
-            GONode = null;
-            city = null;
-            nodeMetrics = null;
         }
 
         /// <summary>
@@ -236,6 +252,11 @@ namespace SEE.Controls
             }
 
             Destroy(this);
+        }
+
+        public static void  setBool(bool isactive)
+        {
+            canvasIsClosed = isactive;
         }
 
     }
