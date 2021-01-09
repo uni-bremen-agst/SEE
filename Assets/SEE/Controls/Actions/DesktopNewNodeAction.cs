@@ -38,6 +38,8 @@ namespace SEE.Controls
         /// </summary>
         public GameObject hoveredObject = null;
 
+        public scri scri;
+
         public void Start()
         {
 
@@ -55,6 +57,7 @@ namespace SEE.Controls
                 //Gets the Metrics for the new Node if no
                 if (nodeMetrics == null)
                 {
+                    OpenDialog();
                     getMetrics();
                 }
                 else
@@ -82,6 +85,15 @@ namespace SEE.Controls
 
 
             }
+        }
+
+        public void OpenDialog()
+        {
+            GameObject canvasObject = GameObject.Find("TEST");
+            scri c = (scri)canvasObject.GetComponent("scri");
+            c.InstantiateGameObject();
+            Debug.Log("GEKLAPPT?");
+
         }
 
         /// <summary>
@@ -178,6 +190,9 @@ namespace SEE.Controls
 
         private void Place()
         {
+            GameObject canvasObject = GameObject.Find("TEST");
+            scri c = (scri)canvasObject.GetComponent("scri");
+            c.DestroyGameObject();
             SEECity cityTmp = null;
             if (hoveredObject != null)
             {
