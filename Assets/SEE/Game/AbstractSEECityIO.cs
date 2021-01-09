@@ -1,216 +1,193 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
-using System.IO;
 using System.Linq;
+using SEE.Utils;
+using SEE.Layout.NodeLayouts;
+using SEE.Layout.EdgeLayouts;
 
 namespace SEE.Game
 {
     /// <summary>
-    /// This class is responsible for the export and the import of instances of AbstractSEECity.
-    /// The required data is stored in a JSON file.
-    /// The object stores values and selections such as specific metrics of a city or selected nodetypes as well which were chosen  
-    /// by the user before saving his or her profile.
+    /// Configuration attribute input/output for AbstractSEECity.
     /// </summary>
-    public class AbstractSEECityIO
+    public partial class AbstractSEECity
     {
         /// <summary>
-        ///  Saves the attributes of the given <paramref name="city"/> to a file with given <paramref name="filename"/>
-        ///  in JSON format.
+        /// The attribute labels for all attributes in the stored configuration file.
         /// </summary>
-        /// <param name="city">The city which will be stored in the JSON file</param>
-        /// <param name="filename">Name of the output JSON file</param>
-        public static void Save(AbstractSEECity city, string filename)
-        {
-            string citySettingsJson = JsonUtility.ToJson(city, true);
-            File.WriteAllText(filename, citySettingsJson);
-            Debug.LogFormat("Settings successfully exported to {0}\n", filename);
-        }      
+        private const string LODCullingLabel = "LODCulling";
+        private const string LayoutPathLabel = "LayoutPath";
+        private const string CityPathLabel = "CityPath";
+
+        private const string WidthMetricLabel = "WidthMetric";
+        private const string HeightMetricLabel = "HeightMetric";
+        private const string DepthMetricLabel = "DepthMetric";
+        private const string LeafStyleMetricLabel = "LeafStyleMetric";
+
+        private const string LeafLabelSettingsLabel = "LeafLabelSettings";
+        private const string InnerNodeLabelSettingsLabel = "InnerNodeLabelSettings";
+        private const string LeafNodeColorRangeLabel = "LeafNodeColorRange";
+        private const string InnerNodeColorRangeLabel = "InnerNodeColorRange";
+        private const string HierarchicalEdgesLabel = "HierarchicalEdges";
+        private const string NodeTypesLabel = "NodeTypes";
+
+        private const string StyleIssueLabel = "StyleIssue";
+        private const string UniversalIssueLabel = "UniversalIssue";
+        private const string MetricIssueLabel = "MetricIssue";
+        private const string Dead_CodeIssueLabel = "Dead_CodeIssue";
+        private const string CycleIssueLabel = "CycleIssue";
+        private const string CloneIssueLabel = "CloneIssue";
+        private const string ArchitectureIssueLabel = "ArchitectureIssue";
+
+        private const string StyleIssue_SUMLabel = "StyleIssue_SUM";
+        private const string UniversalIssue_SUMLabel = "UniversalIssue_SUM";
+        private const string MetricIssue_SUMLabel = "MetricIssue_SUM";
+        private const string Dead_CodeIssue_SUMLabel = "Dead_CodeIssue_SUM";
+        private const string CycleIssue_SUMLabel = "CycleIssue_SUM";
+        private const string CloneIssue_SUMLabel = "CloneIssue_SUM";
+        private const string ArchitectureIssue_SUMLabel = "ArchitectureIssue_SUM";
+
+        private const string InnerDonutMetricLabel = "InnerDonutMetric";
+        private const string InnerNodeHeightMetricLabel = "InnerNodeHeightMetric";
+        private const string InnerNodeStyleMetricLabel = "InnerNodeStyleMetric";
+
+        private const string MinimalBlockLengthLabel = "MinimalBlockLength";
+        private const string MaximalBlockLengthLabel = "MaximalBlockLength";
+
+        private const string LeafObjectsLabel = "LeafObjects";
+        private const string InnerNodeObjectsLabel = "InnerNodeObjects";
+
+        private const string NodeLayoutLabel = "NodeLayout";
+        private const string EdgeLayoutLabel = "EdgeLayout";
+
+        private const string ZScoreScaleLabel = "ZScoreScale";
+        private const string EdgeWidthLabel = "EdgeWidth";
+        private const string ShowErosionsLabel = "ShowErosions";
+        private const string MaxErosionWidthLabel = "MaxErosionWidth";
+        private const string EdgesAboveBlocksLabel = "EdgesAboveBlocks";
+        private const string TensionLabel = "Tension";
+        private const string RDPLabel = "RDP";        
+
+        private const string CoseGraphSettingsLabel = "CoseGraphSettings";
 
         /// <summary>
-        /// Loads the attributes for given <paramref name="city"/> from the given <paramref name="filename"/>.
+        /// Saves all attributes of this AbstractSEECity instance in the configuration file 
+        /// using the given <paramref name="writer"/>.
         /// </summary>
-        /// <param name="city">The city whose attributes are to be read and set</param>
-        /// <param name="filename">Name of ths JSON file from whicht to read the attributes</param>
-        public static void Load(AbstractSEECity city, string filename)
+        /// <param name="writer">writer for the configuration file</param>
+        protected virtual void Save(ConfigWriter writer)
         {
-            string jsonContent = File.ReadAllText(filename);
-            if (!(VerifyCityType(city, jsonContent)))
-            {
-                return;
-            }
-            JsonUtility.FromJsonOverwrite(jsonContent, city);
+            writer.Save(LODCulling, LODCullingLabel);
+            LayoutPath.Save(writer, LayoutPathLabel);
+            writer.Save(HierarchicalEdges.ToList<string>(), HierarchicalEdgesLabel);
+            writer.Save(SelectedNodeTypes, NodeTypesLabel);
+            CityPath.Save(writer, CityPathLabel);
+            LeafNodeColorRange.Save(writer, LeafNodeColorRangeLabel);
+            InnerNodeColorRange.Save(writer, InnerNodeColorRangeLabel);
+            writer.Save(WidthMetric, WidthMetricLabel);
+            writer.Save(HeightMetric, HeightMetricLabel);
+            writer.Save(DepthMetric, DepthMetricLabel);
+            writer.Save(LeafStyleMetric, LeafStyleMetricLabel);
+            LeafLabelSettings.Save(writer, LeafLabelSettingsLabel);
+            InnerNodeLabelSettings.Save(writer, InnerNodeLabelSettingsLabel);
 
-            ResolveNodeTypeSelection(city, jsonContent);
+            writer.Save(StyleIssue, StyleIssueLabel);
+            writer.Save(UniversalIssue, UniversalIssueLabel);
+            writer.Save(MetricIssue, MetricIssueLabel);
+            writer.Save(Dead_CodeIssue, Dead_CodeIssueLabel);
+            writer.Save(CycleIssue, CycleIssueLabel);
+            writer.Save(CloneIssue, CloneIssueLabel);
+            writer.Save(ArchitectureIssue, ArchitectureIssueLabel);
 
-            Debug.LogFormat("Settings successfully imported from {0}\n", filename);
-        }
+            writer.Save(StyleIssue_SUM, StyleIssue_SUMLabel);
+            writer.Save(UniversalIssue_SUM, UniversalIssue_SUMLabel);
+            writer.Save(MetricIssue_SUM, MetricIssue_SUMLabel);
+            writer.Save(Dead_CodeIssue_SUM, Dead_CodeIssue_SUMLabel);
+            writer.Save(CycleIssue_SUM, CycleIssue_SUMLabel);
+            writer.Save(CloneIssue_SUM, CloneIssue_SUMLabel);
+            writer.Save(ArchitectureIssue_SUM, ArchitectureIssue_SUMLabel);
 
-        private static void ResolveNodeTypeSelection(AbstractSEECity city, string jsonContent)
-        {
-            string dataPath = getDataPath(city);
-            Dictionary<string, bool> oldNodetypes = city.SelectedNodeTypes;
-            Dictionary<string, bool> newNodeTypes = new Dictionary<string, bool>();
+            writer.Save(InnerDonutMetric, InnerDonutMetricLabel);
+            writer.Save(InnerNodeHeightMetric, InnerNodeHeightMetricLabel);
+            writer.Save(InnerNodeStyleMetric, InnerNodeStyleMetricLabel);
 
-            // FIXME: We shouldn't need to use these kinds of type checks.
-            if (city is SEECityEvolution)
-            {
-                SEECityEvolution evoCity = new SEECityEvolution();
-                evoCity.GXLDirectory.Set(dataPath);
-                if (!(ReloadGraphByCityType(evoCity)))
-                {
-                    return;
-                }
-                newNodeTypes = evoCity.SelectedNodeTypes;
-            }
-            else if (city is SEECity)
-            {
-                if (!(ReloadGraphByCityType(city)))
-                {
-                    return;
-                }
-                newNodeTypes = city.SelectedNodeTypes;
-            }
-            // We have to store the current enumeration of the nodetypes of the current version in order to compare 
-            // it afterwards with the stored one in the method DifferentNodeTypes
-            // As the user picks the directory via a directory picker/ the GUI , no specific error handling is needed at this point.
-            DifferentNodeTypes(oldNodetypes, jsonContent, newNodeTypes, city);
-        }
+            writer.Save(MinimalBlockLength, MinimalBlockLengthLabel);
+            writer.Save(MaximalBlockLength, MaximalBlockLengthLabel);
 
-        /// <summary>
-        /// Veryfies whether the types of the city and the json-file are matching.
-        /// </summary>
-        /// <param name="city">the city, which has to be overwritten</param>
-        /// <param name="jsonContent">the content of the .json-file as a string</param>
-        /// <returns>true, if the types are matching, otherwise false</returns>
-        private static bool VerifyCityType(AbstractSEECity city, string jsonContent)
-        {
-            if (jsonContent.Contains("isAnSEECityObject") && city is SEECity)
-            {
-                return true;
-            }
-            if (jsonContent.Contains("isAnSEECityEvolutionObject") && city is SEECityEvolution)
-            {
-                return true;
-            }
-            else
-            {
-                UnityEngine.Debug.LogErrorFormat("The types of the scene and the loaded .json-file are not matching\n");
-                return false;
-            }
-        }
+            writer.Save(LeafObjects.ToString(), LeafObjectsLabel);
+            writer.Save(InnerNodeObjects.ToString(), InnerNodeObjectsLabel);
 
-        /// <summary>
-        /// Analyzes if there is a difference between the stored nodetypes and the current nodetypes.
-        /// </summary>
-        /// <param name="jsonFile">the .json-file with the settings for the city</param>
-        /// <param name="oldNodeTypes>a dictionary of the stored nodeTypes</param>
-        /// <param name="newNodes> the city, which has to be overwritten</param>
-        private static void DifferentNodeTypes(Dictionary<string, bool> oldNodeTypes, string jsonFile, Dictionary<string, bool> newNodeTypes, AbstractSEECity city)
-        {
-            List<string> oldNodes = oldNodeTypes.Keys.ToList();
-            List<string> newNodes = newNodeTypes.Keys.ToList();
-            List<string> deletedNodeTypes = oldNodes.Except(newNodes).ToList();
-            List<string> addedNodeTypes = newNodes.Except(oldNodes).ToList();
+            writer.Save(NodeLayout.ToString(), NodeLayoutLabel);
+            writer.Save(EdgeLayout.ToString(), EdgeLayoutLabel);
 
-            //shows deleted nodetypes
-            if (deletedNodeTypes.Count > 0)
-            {
-                string deletedOutput = "";
+            writer.Save(ZScoreScale, ZScoreScaleLabel);
+            writer.Save(EdgeWidth, EdgeWidthLabel);
+            writer.Save(ShowErosions, ShowErosionsLabel);
+            writer.Save(MaxErosionWidth, MaxErosionWidthLabel);
+            writer.Save(EdgesAboveBlocks, EdgesAboveBlocksLabel);
+            writer.Save(Tension, TensionLabel);
+            writer.Save(RDP, RDPLabel);
 
-                foreach (string nodeType in deletedNodeTypes)
-                {
-                    deletedOutput += nodeType + ",";
-                }
-                deletedOutput = deletedOutput.Substring(0, deletedOutput.Length - 1);
-                UnityEngine.Debug.Log("Deleted Nodetypes in the .gxl-file since saving your settings: " + deletedOutput + "\n");
-            }
-            //shows added nodetypes
-            if (addedNodeTypes.Count > 0)
-            {
-                string addedOutput = "";
-
-                foreach (string nodeType in addedNodeTypes)
-                {
-                    addedOutput += nodeType + ",";
-                }
-                addedOutput = addedOutput.Substring(0, addedOutput.Length - 1);
-                AddNodeTypes(city, addedNodeTypes);
-                UnityEngine.Debug.Log("Added Nodetypes in the .gxl-file since saving your settings: " + addedOutput + "\n");
-            }
-            //if there are no changes, this message will be shown
-            if (deletedNodeTypes.Count == 0 && addedNodeTypes.Count == 0)
-            {
-                UnityEngine.Debug.Log("Nothing changed in the .gxl-file since saving your settings\n");
-            }
+            CoseGraphSettings.Save(writer, CoseGraphSettingsLabel);
         }
 
         /// <summary>
-        /// Reloads the graph - and thus the nodetypes - depending on the objecttype of the specific AbstractSEECity object.
+        /// Restores all attributes of this AbstractSEECity instance from the given <paramref name="attributes"/>.
         /// </summary>
-        /// <param name="city">The current city object- either a SEECityEvolution or an SEECity object</param>
-        /// <returns> "true" - in case the reloaded graph is not null, else "false".
-        private static bool ReloadGraphByCityType(AbstractSEECity city)
+        /// <param name="attributes">dictionary containing the attributes (key = attribute label, value = attribute value)</param>
+        protected virtual void Restore(Dictionary<string, object> attributes)
         {
-            if (city is SEECityEvolution)
-            {
-                SEECityEvolution evoCity = (SEECityEvolution)city;
+            ConfigIO.Restore<float>(attributes, LODCullingLabel, ref LODCulling);
+            LayoutPath.Restore(attributes, LayoutPathLabel);
+            ConfigIO.Restore(attributes, HierarchicalEdgesLabel, ref HierarchicalEdges);
+            ConfigIO.Restore(attributes, NodeTypesLabel, ref SelectedNodeTypes);
+            CityPath.Restore(attributes, CityPathLabel);
+            LeafNodeColorRange.Restore(attributes, LeafNodeColorRangeLabel);
+            InnerNodeColorRange.Restore(attributes, InnerNodeColorRangeLabel);
+            ConfigIO.Restore(attributes, WidthMetricLabel, ref WidthMetric);
+            ConfigIO.Restore(attributes, HeightMetricLabel, ref HeightMetric);
+            ConfigIO.Restore(attributes, DepthMetricLabel, ref DepthMetric);
+            ConfigIO.Restore(attributes, LeafStyleMetricLabel, ref LeafStyleMetric);
+            LeafLabelSettings.Restore(attributes, LeafLabelSettingsLabel);
+            InnerNodeLabelSettings.Restore(attributes, InnerNodeLabelSettingsLabel);
 
-                evoCity.InspectSchema(evoCity.LoadFirstGraph());
-                return (evoCity.LoadFirstGraph() != null);
-            }
-            else
-            {
-                SEECity seeCity = (SEECity)city;
-                if (!File.Exists(seeCity.GXLPath.Path))
-                {
-                    Debug.LogError("The .gxl-file does not exist anymore in the given directory\n");
-                    return false;
-                }
-                seeCity.LoadData();
-                return (seeCity.LoadedGraph != null);
-            }
-        }
+            ConfigIO.Restore(attributes, StyleIssueLabel, ref StyleIssue);
+            ConfigIO.Restore(attributes, UniversalIssueLabel, ref UniversalIssue);
+            ConfigIO.Restore(attributes, MetricIssueLabel, ref MetricIssue);
+            ConfigIO.Restore(attributes, Dead_CodeIssueLabel, ref Dead_CodeIssue);
+            ConfigIO.Restore(attributes, CycleIssueLabel, ref CycleIssue);
+            ConfigIO.Restore(attributes, CloneIssueLabel, ref CloneIssue);
+            ConfigIO.Restore(attributes, ArchitectureIssueLabel, ref ArchitectureIssue);
 
-        /// <summary>
-        /// Adds new Nodetypes to the current version of the city- if not already stored.
-        /// </summary>
-        /// <param name="city">the current city</param>
-        /// <param name="newNodeTypes"> A list of strings which are added to the dictionary "SelectedNodetypes" - the types are per default selected, thus "true" </param>
-        /// <returns>  
-        private static void AddNodeTypes(AbstractSEECity city, List<string> newNodeTypes)
-        {
-            if (newNodeTypes != null)
-            {
-                foreach (string node in newNodeTypes)
-                {
-                    if (!(city.SelectedNodeTypes.Keys.Contains(node)))
-                    {
-                        city.SelectedNodeTypes.Add(node, true);
-                    }
-                }
-            }
-        }
+            ConfigIO.Restore(attributes, StyleIssue_SUMLabel, ref StyleIssue_SUM);
+            ConfigIO.Restore(attributes, UniversalIssue_SUMLabel, ref UniversalIssue_SUM);
+            ConfigIO.Restore(attributes, MetricIssue_SUMLabel, ref MetricIssue_SUM);
+            ConfigIO.Restore(attributes, Dead_CodeIssue_SUMLabel, ref Dead_CodeIssue_SUM);
+            ConfigIO.Restore(attributes, CycleIssue_SUMLabel, ref CycleIssue_SUM);
+            ConfigIO.Restore(attributes, CloneIssue_SUMLabel, ref CloneIssue_SUM);
+            ConfigIO.Restore(attributes, ArchitectureIssue_SUMLabel, ref ArchitectureIssue_SUM);
 
-        /// <summary>
-        /// Returns either the GXL Directory of a SEECity or the SEECityEvolution object, depending on the specific
-        /// type of the AbstractSEECity object.
-        /// </summary>
-        /// <param name="city">the current city</param>
-        /// <returns>path = the name of the specific datapath, the .gxl file is saved into. 
-        private static string getDataPath(AbstractSEECity city)
-        {
-            string path = null;
-            if (city is SEECity)
-            {
-                SEECity seeCity = (SEECity)city;
-                path = seeCity.GXLPath.Path;
-            }
-            else
-            {
-                SEECityEvolution sCityEvo = (SEECityEvolution)city;
-                path = sCityEvo.GXLDirectory.Path;
-            }
-            return path;
+            ConfigIO.Restore(attributes, InnerDonutMetricLabel, ref InnerDonutMetric);
+            ConfigIO.Restore(attributes, InnerNodeHeightMetricLabel, ref InnerNodeHeightMetric);
+            ConfigIO.Restore(attributes, InnerNodeStyleMetricLabel, ref InnerNodeStyleMetric);
+
+            ConfigIO.Restore(attributes, MinimalBlockLengthLabel, ref MinimalBlockLength);
+            ConfigIO.Restore(attributes, MaximalBlockLengthLabel, ref MaximalBlockLength);
+
+            ConfigIO.RestoreEnum<LeafNodeKinds>(attributes, LeafObjectsLabel, ref LeafObjects);
+            ConfigIO.RestoreEnum<InnerNodeKinds>(attributes, InnerNodeObjectsLabel, ref InnerNodeObjects);
+
+            ConfigIO.RestoreEnum<NodeLayoutKind>(attributes, NodeLayoutLabel, ref NodeLayout);
+            ConfigIO.RestoreEnum<EdgeLayoutKind>(attributes, EdgeLayoutLabel, ref EdgeLayout);
+
+            ConfigIO.Restore(attributes, ZScoreScaleLabel, ref ZScoreScale);
+            ConfigIO.Restore(attributes, EdgeWidthLabel, ref EdgeWidth);
+            ConfigIO.Restore(attributes, ShowErosionsLabel, ref ShowErosions);
+            ConfigIO.Restore(attributes, MaxErosionWidthLabel, ref MaxErosionWidth);
+            ConfigIO.Restore(attributes, EdgesAboveBlocksLabel, ref EdgesAboveBlocks);
+            ConfigIO.Restore(attributes, TensionLabel, ref Tension);
+            ConfigIO.Restore(attributes, RDPLabel, ref RDP);
+
+            CoseGraphSettings.Restore(attributes, CoseGraphSettingsLabel);
         }
     }
 }
