@@ -144,11 +144,7 @@ namespace SEE.Layout.NodeLayouts.Cose
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
                 {
-                    {
-                        long value = EdgeLength;
-                        ConfigIO.Restore(values, EdgeLengthLabel, ref value);
-                        EdgeLength = (int)value;
-                    }
+                    ConfigIO.Restore(values, EdgeLengthLabel, ref EdgeLength);
                     ConfigIO.Restore(values, UseSmartMultilevelScalingLabel, ref UseSmartMultilevelScaling);
                     ConfigIO.Restore(values, UseSmartIdealEdgeCalculationLabel, ref UseSmartIdealEdgeCalculation);
                     ConfigIO.Restore(values, PerLevelIdealEdgeLengthFactorLabel, ref PerLevelIdealEdgeLengthFactor);

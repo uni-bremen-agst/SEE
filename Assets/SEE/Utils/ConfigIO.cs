@@ -57,7 +57,8 @@ namespace SEE.Utils
         /// receives the looked up value.
         /// 
         /// Note: For types <typeparamref name="T"/> that are enums, use <see cref="RestoreEnum()"/>
-        /// instead. For Color, use <see cref="RestoreColor()"/>.
+        /// instead. For Color, use <see cref="Restore(Dictionary{string, object}, string, ref Color)"/>. For int, use 
+        /// <see cref="Restore(Dictionary{string, object}, string, ref int)"/>.
         /// </summary>
         /// <typeparam name="T">the type of <paramref name="value"/></typeparam>
         /// <param name="attributes">where to look up the <paramref name="label"/></param>
@@ -89,6 +90,29 @@ namespace SEE.Utils
         /// Looks up the <paramref name="value"/> in <paramref name="attributes"/> using the 
         /// key <paramref name="label"/>. If no such <paramref name="label"/> exists, false
         /// is returned and <paramref name="value"/> remains unchanged. Otherwise <paramref name="value"/>
+        /// receives the looked up value.
+        /// 
+        /// Note: This method is intended for int values. If you would use the generic method
+        /// <see cref="Restore{T}(Dictionary{string, object}, string, ref T)"/> instead, you
+        /// would run into a conversion error from int64 (long) to int32 (int).
+        /// </summary>
+        /// <param name="attributes">where to look up the <paramref name="label"/></param>
+        /// <param name="label">the label to look up</param>
+        /// <param name="value">the value of the looked up <paramref name="label"/> if the <paramref name="label"/>
+        /// exists</param>
+        /// <returns>true if the <paramref name="label"/> was found</returns>
+        internal static bool Restore(Dictionary<string, object> values, string label, ref int value)
+        {
+            long v = value;
+            bool result = ConfigIO.Restore(values, label, ref v);
+            value = (int)v;
+            return result;
+        }
+
+        /// <summary>
+        /// Looks up the <paramref name="value"/> in <paramref name="attributes"/> using the 
+        /// key <paramref name="label"/>. If no such <paramref name="label"/> exists, false
+        /// is returned and <paramref name="value"/> remains unchanged. Otherwise <paramref name="value"/>
         /// receives the looked up value. Note that only those parts of the color (red, green, blue,
         /// alpha) will be updated in <paramref name="value"/> that are actually found in <paramref name="attributes"/>;
         /// all others remain unchanged.
@@ -101,7 +125,7 @@ namespace SEE.Utils
         /// <param name="value">the value of the looked up <paramref name="label"/> if the <paramref name="label"/>
         /// exists</param>
         /// <returns>true if the <paramref name="label"/> was found</returns>
-        internal static bool RestoreColor(Dictionary<string, object> attributes, string label, ref Color value)
+        internal static bool Restore(Dictionary<string, object> attributes, string label, ref Color value)
         {
             if (attributes.TryGetValue(label, out object dictionary))
             {
