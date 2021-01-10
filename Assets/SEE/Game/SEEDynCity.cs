@@ -6,8 +6,17 @@ using UnityEngine;
 
 namespace SEE.Game
 {
+    /// <summary>
+    /// Configuration of a code city for the visualization of dynamic data in
+    /// traced at the level of method calls.
+    /// </summary>
     public class SEEDynCity : SEECity
     {
+        /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
+        /// configuration file, make sure you save and restore it in 
+        /// <see cref="SEEDynCity.Save(ConfigWriter)"/> and 
+        /// <see cref="SEEDynCity.Restore(Dictionary{string, object})"/>, 
+        /// respectively. You should also extend the test cases in TestConfigIO.
 
         /// <summary>
         /// The path to the DYN file containing the trace data.
