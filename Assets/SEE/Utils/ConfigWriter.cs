@@ -147,12 +147,37 @@ namespace SEE.Utils
             InternalSave(label, value.ToString());
         }
 
-        internal void Save(ICollection<string> list, string label = "")
+        /// <summary>
+        /// Saves the given <paramref name="collection"/> as a list of strings.
+        /// </summary>
+        /// <param name="collection">items to be saved</param>
+        /// <param name="label">label to be emitted</param>
+        internal void Save(ICollection<string> collection, string label = "")
         {
             BeginList(label);
-            foreach (string item in list)
+            foreach (string item in collection)
             {
                 Save(item);
+            }
+            EndList();
+        }
+
+        /// <summary>
+        /// Saves the given <paramref name="collection"/> as a list.
+        /// 
+        /// Note: If either key or value should better not be saved as a string, you must use
+        /// a more specific save operation instead.
+        /// </summary>
+        /// <typeparam name="K">type of the key of <paramref name="collection"/></typeparam>
+        /// <typeparam name="V">type of the value of <paramref name="collection"/></typeparam>
+        /// <param name="collection">the dictionary to be saved</param>
+        /// <param name="label">the label to be added in front of the value</param>
+        internal void Save<T>(ICollection<T> collection, string label = "") where T : PersistentConfigItem
+        {
+            BeginList(label);
+            foreach (var item in collection)
+            {
+                item.Save(this);
             }
             EndList();
         }

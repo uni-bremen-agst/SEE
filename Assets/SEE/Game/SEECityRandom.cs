@@ -1,5 +1,6 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Tools;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace SEE.Game
         /// <summary>
         /// The leaf node attributes and their constraints for the random generation of their values.
         /// </summary>
-        public List<RandomAttributeDescriptor> LeafAttributes = Defaults();
+        public IList<RandomAttributeDescriptor> LeafAttributes = Defaults();
 
         public static int DefaultAttributeMean = 10;
 
@@ -70,6 +71,27 @@ namespace SEE.Game
             // generate graph randomly
             RandomGraphs randomGraphs = new RandomGraphs();
             LoadedGraph = randomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes);
+        }
+
+        private const string LeafConstraintLabel = "LeafConstraint";
+        private const string InnerNodeConstraintLabel = "InnerNodeConstraint";
+        private const string LeafAttributesLabel = "LeafAttributes";
+
+        protected override void Save(ConfigWriter writer)
+        {
+            base.Save(writer);
+            LeafConstraint.Save(writer, LeafConstraintLabel);
+            InnerNodeConstraint.Save(writer, InnerNodeConstraintLabel);
+            writer.Save(LeafAttributes, LeafAttributesLabel); // LeafAttributes are stored as a list       
+        }
+
+        protected override void Restore(Dictionary<string, object> attributes)
+        {
+            base.Restore(attributes);
+            LeafConstraint.Restore(attributes, LeafConstraintLabel);
+            InnerNodeConstraint.Restore(attributes, InnerNodeConstraintLabel);
+            // LeafAttributes are stored as a list
+            ConfigIO.RestoreList<RandomAttributeDescriptor>(attributes, LeafAttributesLabel, ref LeafAttributes);
         }
     }
 }
