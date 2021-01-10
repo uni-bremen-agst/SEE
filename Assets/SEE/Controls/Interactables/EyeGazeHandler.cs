@@ -3,6 +3,7 @@ using System.Reflection;
 using Microsoft.MixedReality.Toolkit.Input;
 using SEE.Game;
 using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -32,6 +33,13 @@ namespace SEE.Controls
         
         private void Awake()
         {
+
+            if (PlayerSettings.GetInputType() != PlayerSettings.PlayerInputType.HoloLens)
+            {
+                Destroyer.DestroyComponent(this);
+                return;
+            }
+            
             // The only way to change the delay until OnEyeFocusDwell triggers is by reflection, which is
             // pretty ugly and error-prone. The only way to really fix this, however, would be to submit
             // a pull request to the MRTK upstream which adds a protected (instead of private) setter for this field.
@@ -42,6 +50,11 @@ namespace SEE.Controls
             {
                 if (SceneQueries.GetCodeCity(gameObject.transform).gameObject.TryGetComponentOrLog(out AbstractSEECity city))
                 {
+                    if (!city.ShowLabelOnEyeGaze)
+                    {
+                        Destroyer.DestroyComponent(this);
+                        return;
+                    }
                     eyeStareDelay = city.EyeStareDelay;
                     dwellField.SetValue(this, eyeStareDelay);
                 }
