@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections;
+using System.Reflection;
 using Microsoft.MixedReality.Toolkit.Input;
 using SEE.Game;
 using SEE.GO;
@@ -22,12 +23,19 @@ namespace SEE.Controls
         /// Interactable object which receives SetHover events.
         /// </summary>
         private InteractableObject interactable;
+
+        /// <summary>
+        /// If true, the "dehover" action should actually be called after the <see cref="eyeStareDelay"/> has passed.
+        /// Used to avoid concurrency shenanigans.
+        /// </summary>
+        private bool shouldDehover = true;
         
         private void Awake()
         {
             // The only way to change the delay until OnEyeFocusDwell triggers is by reflection, which is
             // pretty ugly and error-prone. The only way to really fix this, however, would be to submit
             // a pull request to the MRTK upstream which adds a protected (instead of private) setter for this field.
+            // Actually, a second way would be to use the same method as in OnEyeFocusStop().
             FieldInfo dwellField = typeof(BaseEyeFocusHandler)
                 .GetField("timeToTriggerDwellInSec", BindingFlags.NonPublic | BindingFlags.Instance);
             if (dwellField != null)
@@ -40,6 +48,8 @@ namespace SEE.Controls
             }
             else
             {
+                // If this error is triggered, an alternative approach as mentioned in the beginning of this
+                // method should be implemented instead.
                 Debug.LogError("Reflection failed: timeToTriggerDwellInSec attribute wasn't found "
                                + "(has probably been renamed).\n");
             }
@@ -49,13 +59,24 @@ namespace SEE.Controls
 
         protected override void OnEyeFocusDwell()
         {
+            shouldDehover = false;
             interactable.SetHover(true, true);
+            base.OnEyeFocusDwell();
         }
 
         protected override void OnEyeFocusStop()
         {
-            //TODO: Don't stop when gazing on label
-            interactable.SetHover(false, true);
+            shouldDehover = true;
+            StartCoroutine(StopFocusAfterDelay());
+        }
+
+        private IEnumerator StopFocusAfterDelay()
+        {
+            yield return new WaitForSecondsRealtime(eyeStareDelay*1.5f);
+            if (shouldDehover)
+            {
+                interactable.SetHover(false, true);
+            }
         }
     }
 }

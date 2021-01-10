@@ -582,8 +582,9 @@ namespace SEE.Game
         
         /// <summary>
         /// The time in seconds after which staring at a node triggers its label to appear.
+        /// The label of the node will disappear after 150% as much time.
         /// </summary>
-        public float EyeStareDelay = 2f;
+        public float EyeStareDelay = 1f;
 
         /// <summary>
         /// Orientation of the edges; 
