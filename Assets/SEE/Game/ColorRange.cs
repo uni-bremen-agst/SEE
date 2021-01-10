@@ -60,8 +60,8 @@ namespace SEE.Game
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
                 {
-                    ConfigIO.RestoreColor(values, LowerLabel, ref lower);
-                    ConfigIO.RestoreColor(values, UpperLabel, ref upper);
+                    ConfigIO.Restore(values, LowerLabel, ref lower);
+                    ConfigIO.Restore(values, UpperLabel, ref upper);
                     long storedNumberOfColors = 0;
                     if (ConfigIO.Restore(values, NumberOfColorsLabel, ref storedNumberOfColors))
                     {
