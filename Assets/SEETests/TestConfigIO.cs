@@ -1,6 +1,8 @@
 ﻿using NUnit.Framework;
 using SEE.Game;
 using SEE.Layout.NodeLayouts;
+using SEE.Tools;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -270,6 +272,24 @@ namespace SEE.Utils
             SEECityEvolutionAttributesAreEqual(savedCity, loadedCity);
         }
 
+        [Test]
+        public void TestSEECityRandom()
+        {
+            // First save a new city with all its default values.
+            SEECityRandom savedCity = NewVanillaSEECity<SEECityRandom>();
+            savedCity.Save(filename);
+
+            // Create a new city with all its default values and then 
+            // wipe out all its attributes to see whether they are correctly
+            // restored from the saved configuration file.
+            SEECityRandom loadedCity = NewVanillaSEECity<SEECityRandom>();
+            WipeOutSEECityRandomAttributes(loadedCity);
+            // Load the saved attributes from the configuration file.
+            loadedCity.Load(filename);
+
+            SEECityRandomAttributesAreEqual(savedCity, loadedCity);
+        }
+
         /// <summary>
         /// Checks whether the configuration attributes of <paramref name="expected"/> and 
         /// <paramref name="actual"/> are equal.
@@ -281,6 +301,51 @@ namespace SEE.Utils
             AbstractSEECityAttributesAreEqual(expected, actual);
             AreEqual(expected.GXLPath, actual.GXLPath);
             AreEqual(expected.CSVPath, actual.CSVPath);
+        }
+
+        /// <summary>
+        /// Checks whether the configuration attributes of <paramref name="expected"/> and 
+        /// <paramref name="actual"/> are equal.
+        /// </summary>
+        /// <param name="expected">expected settings</param>
+        /// <param name="actual">actual settings</param>
+        private void SEECityRandomAttributesAreEqual(SEECityRandom expected, SEECityRandom actual)
+        {
+            SEECityAttributesAreEqual(expected, actual);            
+            AreEqual(expected.LeafConstraint, actual.LeafConstraint);
+            AreEqual(expected.InnerNodeConstraint, actual.InnerNodeConstraint);
+            AreEqual(expected.LeafAttributes, actual.LeafAttributes);
+        }
+
+        private void AreEqual(IList<RandomAttributeDescriptor> expected, IList<RandomAttributeDescriptor> actual)
+        {
+            Assert.AreEqual(expected.Count, actual.Count);
+            foreach (RandomAttributeDescriptor outer in expected)
+            {
+                bool found = false;
+                foreach (RandomAttributeDescriptor inner in actual)
+                {
+                    if (outer.Name == inner.Name)
+                    {
+                        Assert.AreEqual(outer.Mean, inner.Mean);
+                        Assert.AreEqual(outer.StandardDeviation, inner.StandardDeviation);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    Assert.Fail($"Expected RandomAttributeDescriptor {outer.Name} not found.");
+                }
+            }
+        }
+
+        private void AreEqual(Constraint expected, Constraint actual)
+        {
+            Assert.AreEqual(expected.NodeType, actual.NodeType);
+            Assert.AreEqual(expected.EdgeType, actual.EdgeType);
+            Assert.AreEqual(expected.NodeNumber, actual.NodeNumber);
+            Assert.AreEqual(expected.EdgeDensity, actual.EdgeDensity);
         }
 
         /// <summary>
@@ -411,7 +476,7 @@ namespace SEE.Utils
         /// Assigns all attributes of given <paramref name="city"/> to arbitrary values
         /// different from their default values.
         /// </summary>
-        /// <param name="city">the city whose attributes are to re-assigned</param>
+        /// <param name="city">the city whose attributes are to be re-assigned</param>
         private static void WipeOutSEECityAttributes(SEECity city)
         {
             WipeOutAbstractSEECityAttributes(city);
@@ -423,7 +488,20 @@ namespace SEE.Utils
         /// Assigns all attributes of given <paramref name="city"/> to arbitrary values
         /// different from their default values.
         /// </summary>
-        /// <param name="city">the city whose attributes are to re-assigned</param>
+        /// <param name="city">the city whose attributes are to be re-assigned</param>
+        private void WipeOutSEECityRandomAttributes(SEECityRandom city)
+        {
+            WipeOutSEECityAttributes(city);
+            city.LeafConstraint = new Tools.Constraint(nodeType: "X", edgeType: "Y", nodeNumber: 5, edgeDensity: 0);
+            city.InnerNodeConstraint = new Tools.Constraint(nodeType: "N", edgeType: "T", nodeNumber: 1, edgeDensity: 1);
+            city.LeafAttributes = new List<Tools.RandomAttributeDescriptor>();
+        }
+
+        /// <summary>
+        /// Assigns all attributes of given <paramref name="city"/> to arbitrary values
+        /// different from their default values.
+        /// </summary>
+        /// <param name="city">the city whose attributes are to be re-assigned</param>
         private static void WipeOutSEECityEvolutionAttributes(SEECityEvolution city)
         {
             WipeOutAbstractSEECityAttributes(city);
@@ -440,7 +518,7 @@ namespace SEE.Utils
         /// Assigns all attributes of given <paramref name="city"/> to arbitrary values
         /// different from their default values.
         /// </summary>
-        /// <param name="city">the city whose attributes are to re-assigned</param>
+        /// <param name="city">the city whose attributes are to be re-assigned</param>
         private static void WipeOutAbstractSEECityAttributes(AbstractSEECity city)
         {
             city.LODCulling++;

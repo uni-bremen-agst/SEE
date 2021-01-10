@@ -1,11 +1,44 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Utils
 {
+    /// <summary>
+    /// Abstract super class of input/output of configuration attributes.
+    /// </summary>
     public abstract class ConfigIO
-    {        
+    {
+        public interface PersistentConfigItem
+        {
+            /// <summary>
+            /// Saves the configuration attributes by way of the given <paramref name="writer"/>
+            /// with the given <paramref name="label"/>.
+            /// </summary>
+            /// <param name="writer">the configuration writer to be used for the output</param>
+            /// <param name="label">the label to be emitted in front of the configuration attributes</param>
+            void Save(ConfigWriter writer, string label = "");
+            /// <summary>
+            /// Restores the attributes of this instance from <paramref name="attributes"/> as follows:
+            /// If label is neither empty nor null, <paramref name="attributes"/>[<paramref name="label"/>]
+            /// is looked up. If it does not exist, nothing else happens and false is returned. If it
+            /// exists, the data available in <paramref name="attributes"/>[<paramref name="label"/>] will
+            /// be used to restore the attributes of this instance. If at least one such attribute was 
+            /// restored, true is returned; otherwise false is returned.
+            /// If the label is empty or null, <paramref name="attributes"/> direclty is assumed to hold the
+            /// data to restore the attributes of this instance.
+            /// </summary>
+            /// <param name="attributes">if <paramref name="label"/> is null or empty,  holds the data
+            /// for restoring the attributes; otherwise <paramref name="attributes"/>[<paramref name="label"/>]
+            /// is assumed to hold the necessary data</param>
+            /// <param name="label">the label for the lookup of the data to restore the attributes,
+            /// or null or empty</param>
+            /// <returns>true if at least one attribute was successfully restored</returns>
+            bool Restore(Dictionary<string, object> attributes, string label = "");
+        }
+
         /// <summary>
         /// The separator between a label and its value.
         /// </summary>
@@ -75,9 +108,55 @@ namespace SEE.Utils
                     value = (T)v;
                     return true;
                 }
-                catch (InvalidCastException e)
+                catch (InvalidCastException)
                 {
                     throw new InvalidCastException($"Types are not assignment compatible for attribute {label}. Expected type: {typeof(T)}. Actual type: {v.GetType()}");
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Looks up the list <paramref name="value"/> in <paramref name="attributes"/> using the 
+        /// key <paramref name="label"/>. If no such <paramref name="label"/> exists, false
+        /// is returned and <paramref name="value"/> remains unchanged. Otherwise <paramref name="value"/>
+        /// will be cleared and all its elements will be restored from the looked up values.
+        /// To restore a single element e, e.Restore(item, "") will be called where 'item' is a single
+        /// data element of the list looked up by <paramref name="label"/>.
+        /// 
+        /// Note: For types <typeparamref name="T"/> that are enums, use <see cref="RestoreEnum()"/>
+        /// instead. For Color, use <see cref="Restore(Dictionary{string, object}, string, ref Color)"/>. For int, use 
+        /// <see cref="Restore(Dictionary{string, object}, string, ref int)"/>.
+        /// </summary>
+        /// <typeparam name="T">the type of elements of the list <paramref name="value"/></typeparam>
+        /// <param name="attributes">where to look up the <paramref name="label"/></param>
+        /// <param name="label">the label to look up</param>
+        /// <param name="value">the value of the looked up <paramref name="label"/> if the <paramref name="label"/>
+        /// exists</param>
+        /// <returns>true if the <paramref name="label"/> was found</returns>
+        public static bool RestoreList<T>(Dictionary<string, object> attributes, string label, ref IList<T> value) where T : PersistentConfigItem, new()
+        {
+            if (attributes.TryGetValue(label, out object v))
+            {
+                value.Clear();
+                try
+                {
+                    IList items = (IList)v;                    
+                    foreach (object item in items)
+                    {
+                        Dictionary<string, object> dict = (Dictionary<string, object>)item;
+                        T t = new T();
+                        t.Restore(dict, "");
+                        value.Add(t);
+                    }
+                    return true;
+                }
+                catch (InvalidCastException e)
+                {
+                    throw new InvalidCastException($"Types are not assignment compatible for attribute {label}. Expected type: IList<{typeof(T)}>. Actual type: {v.GetType()}. Original exception: {e.Message} {e.StackTrace}");
                 }
             }
             else
