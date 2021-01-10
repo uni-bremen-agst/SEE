@@ -579,12 +579,18 @@ namespace SEE.Game
         /// The maximal absolute width of a sprite representing an erosion in world-space Unity units.
         /// </summary>
         public float MaxErosionWidth = 1.0f; // serialized by Unity
+
+        /// <summary>
+        /// Whether to have the nodes display their labels when the user looks upon them.
+        /// Only available on HoloLens.
+        /// </summary>
+        public bool ShowLabelOnEyeGaze = true;
         
         /// <summary>
         /// The time in seconds after which staring at a node triggers its label to appear.
         /// The label of the node will disappear after 150% as much time.
         /// </summary>
-        public float EyeStareDelay = 1f;
+        public float EyeStareDelay = 1f; // serialized by Unity
 
         /// <summary>
         /// Orientation of the edges; 
