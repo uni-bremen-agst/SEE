@@ -20,7 +20,7 @@ namespace SEEEditor
             base.OnInspectorGUI();
             SEECityEvolution city = target as SEECityEvolution;
             Attributes();
-            city.maxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.maxRevisionsToLoad);
+            city.MaxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.MaxRevisionsToLoad);
             city.MarkerWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width of markers", city.MarkerWidth));
             city.MarkerHeight = Mathf.Max(0, EditorGUILayout.FloatField("Height of markers", city.MarkerHeight));
             ShowNodeTypes(city);
