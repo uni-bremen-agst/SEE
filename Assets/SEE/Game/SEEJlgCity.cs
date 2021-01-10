@@ -26,8 +26,18 @@ using UnityEngine;
 
 namespace SEE.Game
 {
+    /// <summary>
+    /// Configuration of a code city for the visualization of dynamic data in
+    /// traced at the level of statements.
+    /// </summary>
     public class SEEJlgCity : SEECity
     {
+        /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
+        /// configuration file, make sure you save and restore it in 
+        /// <see cref="SEEJlgCity.Save(ConfigWriter)"/> and 
+        /// <see cref="SEEJlgCity.Restore(Dictionary{string, object})"/>, 
+        /// respectively. You should also extend the test cases in TestConfigIO.
+
         /// <summary>
         /// Path to the JLG file containing the runtime trace data.
         /// </summary>
