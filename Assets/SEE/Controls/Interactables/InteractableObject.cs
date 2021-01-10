@@ -391,8 +391,14 @@ namespace SEE.Controls
         public void OnFocusExit(FocusEventData eventData)
         {
             // Similarly to OnFocusEnter(), we discard the input in case of eye gaze to avoid jarring changes.
-            if (eventData.Pointer.InputSourceParent.SourceType != InputSourceType.Eyes)
+            if (eventData.Pointer.InputSourceParent.SourceType != InputSourceType.Eyes 
+                && !eventData.Pointer.PointerName.StartsWith("None"))
             {
+                // Unfortunately, there seems to be a bug in the MRTK:
+                // The SourceType is falsely reported by the MRTK as "Hands" here
+                // (in contrast to OnFocusEnter(), where Eyes are correctly reported.)
+                // The only recognizable difference seems to be that the pointer isn't attached to any hand
+                // so it's just called "None Hand" instead of "Right Hand", we use this to detect it.
                 SetHover(false, true);
             }
         }
