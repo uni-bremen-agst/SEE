@@ -1,5 +1,6 @@
-﻿using OdinSerializer.Utilities;
-using UnityEngine;
+﻿using System;
+using OdinSerializer.Utilities;
+using SEE.DataModel.DG;
 
 namespace SEE.GO
 {
@@ -137,6 +138,34 @@ namespace SEE.GO
             }
 
             return true;
+        }
+
+
+	/// <summary>
+        /// Returns the graph node represented by this <paramref name="gameObject"/>.
+        /// 
+        /// Precondition: <paramref name="gameObject"/> must have a <see cref="NodeRef"/>
+        /// attached to it referring to a valid node; if not, an exception is raised.
+        /// </summary>
+        /// <param name="gameObject">the game object whose Node is requested</param>
+        /// <returns>the correponding graph node</returns>
+        public static Node GetNode(this GameObject gameObject)
+        {
+            if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+            {
+                if (nodeRef != null)
+                {
+                    return nodeRef.node;
+                }
+                else
+                {
+                    throw new Exception($"Node reference of game object {gameObject.name} is null");
+                }
+            }
+            else
+            {
+                throw new Exception($"Game object {gameObject.name} has no NodeRef");
+            }
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace SEE.Game
+﻿namespace SEE.Game
 {
     /// <summary>
     /// Manages the portal information of shaders. A portal is a plane in X/Z
@@ -73,15 +71,15 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Sets the culling area (portal) of <paramref name="go"/> to the rectangle in
+        /// Sets the culling area (portal) of <paramref name="gameObject"/> to the rectangle in
         /// the x/z plane defined by the extents of <paramref name="root"/>.
         /// </summary>
-        /// <param name="root">object defining the extends of the culling area</param>
-        /// <param name="go">object whose culling area is to be set</param>
-        public static void SetPortal(GameObject root, GameObject go)
+        /// <param name="root">object defining the extent of the culling area</param>
+        /// <param name="gameObject">object whose culling area is to be set</param>
+        public static void SetPortal(GameObject root, GameObject gameObject)
         {
             GetDimensions(root, out Vector2 leftFront, out Vector2 rightBack);
-            SetPortalOfMaterials(go, leftFront, rightBack);
+            SetPortalOfMaterials(gameObject, leftFront, rightBack);
         }
 
         /// <summary>

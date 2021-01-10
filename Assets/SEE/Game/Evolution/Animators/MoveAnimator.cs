@@ -17,9 +17,8 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.Layout;
 using System;
-using UnityEngine;
+using SEE.Layout;
 
 namespace SEE.Game.Evolution
 {

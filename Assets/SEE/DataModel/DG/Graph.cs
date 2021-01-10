@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace SEE.DataModel.DG
 {
@@ -23,6 +22,12 @@ namespace SEE.DataModel.DG
         // The path of the file from which this graph was loaded. Could be the
         /// empty string if the graph was not created by loading it from disk.
         private string path = "";
+
+        /// <summary>
+        /// Name of the artifical node type used for artifical root nodes added
+        /// when we do not have a real node type derived from the input graph.
+        /// </summary>
+        public const string UnknownType = "";
 
         private int maxDepth = -1;
         /// <summary>

@@ -1,13 +1,10 @@
 ﻿using System.Collections.Generic;
 using DG.Tweening;
-using JetBrains.Annotations;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
 using TMPro;
-using UnityEngine;
-using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls.Actions
 {
@@ -242,8 +239,10 @@ namespace SEE.Controls.Actions
             // Add connecting line between "roof" of object and text
             Vector3 startLinePosition = gameObject.transform.position;
             startLinePosition.y = BoundingBox.GetRoof(new List<GameObject> {gameObject});
-            LineFactory.Draw(nodeLabel, new[] {startLinePosition, startLinePosition}, 0.01f,
+            GameObject edge = new GameObject();
+            LineFactory.Draw(edge, new[] {startLinePosition, startLinePosition}, 0.01f,
                              Materials.New(Materials.ShaderType.TransparentLine, Color.black));
+            edge.transform.SetParent(nodeLabel.transform);
             Portal.SetInfinitePortal(nodeLabel);
 
             AnimateLabel(city, isLeaf);
