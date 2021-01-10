@@ -1,7 +1,6 @@
-﻿using SEE.DataModel.DG;
+﻿using System.Collections.Generic;
+using SEE.DataModel.DG;
 using SEE.Layout;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace SEE.Game
 {
@@ -108,7 +107,11 @@ namespace SEE.Game
 
         /// <summary>
         /// The set of children of this node. Note: For nodes for which IsLeaf
-        /// returns true, the empty list will be returned. 
+        /// is true, the empty list will be returned.
+        /// 
+        /// Note: If a child of the node in the underlying graph, has no
+        /// corresponding layout node (<see cref="to_layout_node"/>), it will be ignored silently. 
+        /// This is useful in situation where only a subset of nodes is to be considered for a layout.
         /// </summary>
         /// <returns>children of this node</returns>
         public ICollection<ILayoutNode> Children()
@@ -120,7 +123,14 @@ namespace SEE.Game
                 result = new List<ILayoutNode>(children.Count);
                 foreach (Node node in children)
                 {
-                    result.Add(to_layout_node[node]);
+                    if (to_layout_node.TryGetValue(node, out ILayoutNode layoutNode))
+                    {
+                        result.Add(layoutNode);
+                    }
+                    //else
+                    //{
+                    //    Debug.LogError($"Child {node.ID} of {ID} has no corresponding layout node.\n");
+                    //}
                 }
             }
             else
