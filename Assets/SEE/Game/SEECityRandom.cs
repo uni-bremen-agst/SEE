@@ -73,10 +73,18 @@ namespace SEE.Game
             LoadedGraph = randomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes);
         }
 
+        //----------------------------------------------------------------------------
+        // Input/output of configuration attributes
+        //----------------------------------------------------------------------------
+
+        // The labels for the configuration attributes in the configuration file.
         private const string LeafConstraintLabel = "LeafConstraint";
         private const string InnerNodeConstraintLabel = "InnerNodeConstraint";
         private const string LeafAttributesLabel = "LeafAttributes";
 
+        /// <summary>
+        /// <see cref="AbstractSEECity.Save(ConfigWriter)"/>
+        /// </summary>
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
@@ -85,6 +93,9 @@ namespace SEE.Game
             writer.Save(LeafAttributes, LeafAttributesLabel); // LeafAttributes are stored as a list       
         }
 
+        /// <summary>
+        /// <see cref="AbstractSEECity.Restore(Dictionary{string, object})"/>.
+        /// </summary>
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
