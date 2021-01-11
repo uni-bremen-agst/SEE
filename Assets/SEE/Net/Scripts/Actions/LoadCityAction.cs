@@ -182,7 +182,7 @@ namespace SEE.Net
 
             if (city.GetType() == typeof(SEECityEvolution))
             {
-                maxRevisionsToLoad = ((SEECityEvolution)city).maxRevisionsToLoad;
+                maxRevisionsToLoad = ((SEECityEvolution)city).MaxRevisionsToLoad;
             }
 
             if (city.GetType() == typeof(SEEDynCity))
@@ -233,7 +233,7 @@ namespace SEE.Net
             if (t == typeof(SEECityEvolution))
             {
                 city = gameObject.GetComponent<SEECityEvolution>();
-                ((SEECityEvolution)city).maxRevisionsToLoad = maxRevisionsToLoad;
+                ((SEECityEvolution)city).MaxRevisionsToLoad = maxRevisionsToLoad;
             }
 
             if (t == typeof(SEEDynCity))
