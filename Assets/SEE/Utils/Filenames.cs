@@ -48,9 +48,10 @@ namespace SEE.Utils
         public const string DYNExtension = ".dyn";
 
         /// <summary>
-        /// File extension of JSON filenames (e.g. config files).
+        /// File extension of filenames for configuration files in which attributes
+        /// of AbstractSEECity instances are persisted.
         /// </summary>
-        public const string JSONExtension = ".json";
+        public const string ConfigExtension = ".cfg";
 
         /// <summary>
         /// Returns the last part of the given <paramref name="extension"/>
