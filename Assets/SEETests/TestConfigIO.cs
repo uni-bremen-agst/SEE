@@ -232,13 +232,15 @@ namespace SEE.Utils
                 { "list", new List<object>() { new List<object>(), new List<object>() { 1 }, new List<object>() { 1, 2 } } }
             };
             CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("list : [ []; [1;]; [1; 2;];];"));
-        }
+        }        
 
-        private const string filename = "seecity.cfg";
-
+        /// <summary>
+        /// Test for SEECity.
+        /// </summary>
         [Test]
         public void TestSEECity()
         {
+            string filename = "seecity.cfg";
             // First save a new city with all its default values.
             SEECity savedCity = NewVanillaSEECity<SEECity>();
             savedCity.Save(filename);
@@ -254,9 +256,13 @@ namespace SEE.Utils
             SEECityAttributesAreEqual(savedCity, loadedCity);                     
         }
 
+        /// <summary>
+        /// Test for SEEEvolutionCity.
+        /// </summary>
         [Test]
-        public void TestSEECityEvolution()
+        public void TestSEEEvolutionCity()
         {
+            string filename = "seerandomcity.cfg";
             // First save a new city with all its default values.
             SEECityEvolution savedCity = NewVanillaSEECity<SEECityEvolution>();
             savedCity.Save(filename);
@@ -265,16 +271,20 @@ namespace SEE.Utils
             // wipe out all its attributes to see whether they are correctly
             // restored from the saved configuration file.
             SEECityEvolution loadedCity = NewVanillaSEECity<SEECityEvolution>();
-            WipeOutSEECityEvolutionAttributes(loadedCity);
+            WipeOutSEEEvolutionCityAttributes(loadedCity);
             // Load the saved attributes from the configuration file.
             loadedCity.Load(filename);
 
-            SEECityEvolutionAttributesAreEqual(savedCity, loadedCity);
+            SEEEvolutionCityAttributesAreEqual(savedCity, loadedCity);
         }
 
+        /// <summary>
+        /// Test for SEERandomCity.
+        /// </summary>
         [Test]
-        public void TestSEECityRandom()
+        public void TestSEERandomCity()
         {
+            string filename = "seerandomcity.cfg";
             // First save a new city with all its default values.
             SEECityRandom savedCity = NewVanillaSEECity<SEECityRandom>();
             savedCity.Save(filename);
@@ -283,16 +293,20 @@ namespace SEE.Utils
             // wipe out all its attributes to see whether they are correctly
             // restored from the saved configuration file.
             SEECityRandom loadedCity = NewVanillaSEECity<SEECityRandom>();
-            WipeOutSEECityRandomAttributes(loadedCity);
+            WipeOutSEERandomCityAttributes(loadedCity);
             // Load the saved attributes from the configuration file.
             loadedCity.Load(filename);
 
-            SEECityRandomAttributesAreEqual(savedCity, loadedCity);
+            SEERandomCityAttributesAreEqual(savedCity, loadedCity);
         }
 
+        /// <summary>
+        /// Test for SEEDynCity.
+        /// </summary>
         [Test]
         public void TestSEEDynCity()
         {
+            string filename = "seedyncity.cfg";
             // First save a new city with all its default values.
             SEEDynCity savedCity = NewVanillaSEECity<SEEDynCity>();
             savedCity.Save(filename);
@@ -301,12 +315,38 @@ namespace SEE.Utils
             // wipe out all its attributes to see whether they are correctly
             // restored from the saved configuration file.
             SEEDynCity loadedCity = NewVanillaSEECity<SEEDynCity>();
-            WipeOutSEECityRandomAttributes(loadedCity);
+            WipeOutSEEDynCityAttributes(loadedCity);
             // Load the saved attributes from the configuration file.
             loadedCity.Load(filename);
 
             SEEDynCityAttributesAreEqual(savedCity, loadedCity);
         }
+
+        /// <summary>
+        /// Test for SEEJlgCity.
+        /// </summary>
+        [Test]
+        public void TestSEEJlgCity()
+        {
+            string filename = "seejlgcity.cfg";
+            // First save a new city with all its default values.
+            SEEJlgCity savedCity = NewVanillaSEECity<SEEJlgCity>();
+            savedCity.Save(filename);
+
+            // Create a new city with all its default values and then 
+            // wipe out all its attributes to see whether they are correctly
+            // restored from the saved configuration file.
+            SEEJlgCity loadedCity = NewVanillaSEECity<SEEJlgCity>();
+            WipeOutSEEJlgCityAttributes(loadedCity);
+            // Load the saved attributes from the configuration file.
+            loadedCity.Load(filename);
+
+            SEEJlgCityAttributesAreEqual(savedCity, loadedCity);
+        }
+
+        //--------------------------------------------------------
+        // AreEqual comparisons
+        //--------------------------------------------------------
 
         /// <summary>
         /// Checks whether the configuration attributes of <paramref name="expected"/> and 
@@ -327,7 +367,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="expected">expected settings</param>
         /// <param name="actual">actual settings</param>
-        private void SEECityRandomAttributesAreEqual(SEECityRandom expected, SEECityRandom actual)
+        private void SEERandomCityAttributesAreEqual(SEECityRandom expected, SEECityRandom actual)
         {
             SEECityAttributesAreEqual(expected, actual);            
             AreEqual(expected.LeafConstraint, actual.LeafConstraint);
@@ -347,6 +387,24 @@ namespace SEE.Utils
             AreEqual(expected.DYNPath, actual.DYNPath);
         }
 
+        /// <summary>
+        /// Checks whether the configuration attributes of <paramref name="expected"/> and 
+        /// <paramref name="actual"/> are equal.
+        /// </summary>
+        /// <param name="expected">expected settings</param>
+        /// <param name="actual">actual settings</param>
+        private void SEEJlgCityAttributesAreEqual(SEEJlgCity expected, SEEJlgCity actual)
+        {
+            SEECityAttributesAreEqual(expected, actual);
+            AreEqual(expected.JLGPath, actual.JLGPath);
+        }
+
+        /// <summary>
+        /// Checks whether the two lists <paramref name="expected"/> and <paramref name="actual"/>
+        /// are equal (by value).
+        /// </summary>
+        /// <param name="expected">expected list</param>
+        /// <param name="actual">actual list</param>
         private void AreEqual(IList<RandomAttributeDescriptor> expected, IList<RandomAttributeDescriptor> actual)
         {
             Assert.AreEqual(expected.Count, actual.Count);
@@ -370,6 +428,12 @@ namespace SEE.Utils
             }
         }
 
+        /// <summary>
+        /// Checks whether the two constraints <paramref name="expected"/> and <paramref name="actual"/>
+        /// are equal (by value).
+        /// </summary>
+        /// <param name="expected">expected constraint</param>
+        /// <param name="actual">actual constraint</param>
         private void AreEqual(Constraint expected, Constraint actual)
         {
             Assert.AreEqual(expected.NodeType, actual.NodeType);
@@ -384,7 +448,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="expected">expected settings</param>
         /// <param name="actual">actual settings</param>
-        private void SEECityEvolutionAttributesAreEqual(SEECityEvolution expected, SEECityEvolution actual)
+        private void SEEEvolutionCityAttributesAreEqual(SEECityEvolution expected, SEECityEvolution actual)
         {
             AbstractSEECityAttributesAreEqual(expected, actual);
             AreEqual(expected.GXLDirectory, actual.GXLDirectory);
@@ -473,6 +537,12 @@ namespace SEE.Utils
             Assert.AreEqual(expected.CoseGraphSettings.UseIterativeCalculation, actual.CoseGraphSettings.UseIterativeCalculation);
         }
 
+        /// <summary>
+        /// Checks whether the two label settings <paramref name="expected"/> and <paramref name="actual"/>
+        /// are equal (by value).
+        /// </summary>
+        /// <param name="expected">expected label setting</param>
+        /// <param name="actual">actual label setting</param>
         private void AreEqual(LabelSettings expected, LabelSettings actual)
         {
             Assert.AreEqual(expected.Show, actual.Show);
@@ -480,6 +550,12 @@ namespace SEE.Utils
             Assert.AreEqual(expected.Distance, actual.Distance, 0.001f);
         }
 
+        /// <summary>
+        /// Checks whether the two color ranges <paramref name="expected"/> and <paramref name="actual"/>
+        /// are equal (by value).
+        /// </summary>
+        /// <param name="expected">expected color range</param>
+        /// <param name="actual">actual color range</param>
         private void AreEqual(ColorRange expected, ColorRange actual)
         {
             AreEqual(expected.lower, actual.lower);
@@ -487,6 +563,12 @@ namespace SEE.Utils
             Assert.AreEqual(expected.NumberOfColors, actual.NumberOfColors);
         }
 
+        /// <summary>
+        /// Checks whether the two colors <paramref name="expected"/> and <paramref name="actual"/>
+        /// are equal (by value).
+        /// </summary>
+        /// <param name="expected">expected color</param>
+        /// <param name="actual">actual color</param>
         private void AreEqual(Color expected, Color actual)
         {
             Assert.AreEqual(expected.r, actual.r, 0.001f);
@@ -495,12 +577,22 @@ namespace SEE.Utils
             Assert.AreEqual(expected.a, actual.a, 0.001f);
         }
 
+        /// <summary>
+        /// Checks whether the two data paths <paramref name="expected"/> and <paramref name="actual"/>
+        /// are equal (by value).
+        /// </summary>
+        /// <param name="expected">expected data path</param>
+        /// <param name="actual">actual data path</param>
         private void AreEqual(DataPath expected, DataPath actual)
         {
             Assert.AreEqual(expected.Root, actual.Root);
             Assert.AreEqual(expected.RelativePath, actual.RelativePath);
             Assert.AreEqual(expected.AbsolutePath, actual.AbsolutePath);            
         }
+
+        //--------------------------------------------------------
+        // attribute modifiers
+        //--------------------------------------------------------
 
         /// <summary>
         /// Assigns all attributes of given <paramref name="city"/> to arbitrary values
@@ -519,7 +611,7 @@ namespace SEE.Utils
         /// different from their default values.
         /// </summary>
         /// <param name="city">the city whose attributes are to be re-assigned</param>
-        private void WipeOutSEECityRandomAttributes(SEECityRandom city)
+        private void WipeOutSEERandomCityAttributes(SEECityRandom city)
         {
             WipeOutSEECityAttributes(city);
             city.LeafConstraint = new Tools.Constraint(nodeType: "X", edgeType: "Y", nodeNumber: 5, edgeDensity: 0);
@@ -532,7 +624,7 @@ namespace SEE.Utils
         /// different from their default values.
         /// </summary>
         /// <param name="city">the city whose attributes are to be re-assigned</param>
-        private void WipeOutSEECityRandomAttributes(SEEDynCity city)
+        private void WipeOutSEEDynCityAttributes(SEEDynCity city)
         {
             WipeOutSEECityAttributes(city);
             city.DYNPath = new DataPath("C:/MyAbsoluteDirectory/MyAbsoluteFile.dyn");
@@ -543,7 +635,18 @@ namespace SEE.Utils
         /// different from their default values.
         /// </summary>
         /// <param name="city">the city whose attributes are to be re-assigned</param>
-        private static void WipeOutSEECityEvolutionAttributes(SEECityEvolution city)
+        private void WipeOutSEEJlgCityAttributes(SEEJlgCity city)
+        {
+            WipeOutSEECityAttributes(city);
+            city.JLGPath = new DataPath("C:/MyAbsoluteDirectory/MyAbsoluteFile.jlg");
+        }
+
+        /// <summary>
+        /// Assigns all attributes of given <paramref name="city"/> to arbitrary values
+        /// different from their default values.
+        /// </summary>
+        /// <param name="city">the city whose attributes are to be re-assigned</param>
+        private static void WipeOutSEEEvolutionCityAttributes(SEECityEvolution city)
         {
             WipeOutAbstractSEECityAttributes(city);
             city.GXLDirectory.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
@@ -627,6 +730,10 @@ namespace SEE.Utils
             city.CoseGraphSettings.UseCalculationParameter = !city.CoseGraphSettings.UseCalculationParameter;
             city.CoseGraphSettings.UseIterativeCalculation = !city.CoseGraphSettings.UseIterativeCalculation;
         }
+
+        //--------------------------------------------------------
+        // new instances
+        //--------------------------------------------------------
 
         /// <summary>
         /// Returns a new game object with a SEECity component T with all its default values.

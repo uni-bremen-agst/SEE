@@ -21,6 +21,8 @@
 // SOFTWARE.
 
 using SEE.DataModel;
+using SEE.Utils;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -94,6 +96,31 @@ namespace SEE.Game
             jlgVisualisationGameObject.tag = Tags.JLGVisualization;
 
             jlgVisualisationGameObject.AddComponent<Runtime.JLGVisualizer>().jlgFilePath = path;
+        }
+
+        //----------------------------------------------------------------------------
+        // Input/output of configuration attributes
+        //----------------------------------------------------------------------------
+
+        // The labels for the configuration attributes in the configuration file.
+        private const string JLGPathLabel = "JLGPath";
+
+        /// <summary>
+        /// <see cref="AbstractSEECity.Save(ConfigWriter)"/>
+        /// </summary>
+        protected override void Save(ConfigWriter writer)
+        {
+            base.Save(writer);
+            JLGPath.Save(writer, JLGPathLabel);
+        }
+
+        /// <summary>
+        /// <see cref="AbstractSEECity.Restore(Dictionary{string, object})"/>.
+        /// </summary>
+        protected override void Restore(Dictionary<string, object> attributes)
+        {
+            base.Restore(attributes);
+            JLGPath.Restore(attributes, JLGPathLabel);
         }
     }
 }
