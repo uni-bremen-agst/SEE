@@ -27,7 +27,7 @@ namespace SEE.Controls
         /// <summary>
         /// Set by the GUI if a Inner Node should be created
         /// </summary>
-        bool is_innerNode = false;
+        public static bool is_innerNode;
 
         /// <summary>
         /// The Meta infos from the new node, set by the GUI
@@ -46,8 +46,14 @@ namespace SEE.Controls
 
         public static bool anotherBool = false;
 
+        /// <summary>
+        /// The name of a node given in the input-Field.
+        /// </summary>
         public static string nodename;
 
+        /// <summary>
+        /// The type of a node given in the input-Field.
+        /// </summary>
         public static string nodetype;
 
         public void Start()
@@ -57,8 +63,7 @@ namespace SEE.Controls
 
         public void Update()
         {
-            if (canvasIsClosed)
-            { }
+
             if (city == null)
             {
                 //City Selection
@@ -75,28 +80,28 @@ namespace SEE.Controls
                 else
                 {
                     //Creates the new node, important check if the metrics have been set before!
-                    if (GONode == null)
+                    if (anotherBool)
                     {
-                        NewNode();
-                        GameNodeMover.MoveTo(GONode);
-                    }
-                    else
-                    {
-                        if (Input.GetMouseButtonDown(0))
+                        if (GONode == null)
                         {
-
-                            Place();
+                            NewNode();
+                            GameNodeMover.MoveTo(GONode);
                         }
                         else
                         {
-                            GameNodeMover.MoveTo(GONode);
+                            if (Input.GetMouseButtonDown(0))
+                            {
+
+                                Place();
+                            }
+                            else
+                            {
+                                GameNodeMover.MoveTo(GONode);
+                            }
                         }
                     }
                 }
-
-
             }
-        
             
                 if(!canvasIsClosed)
                 {
@@ -278,7 +283,7 @@ namespace SEE.Controls
             Destroy(this);
         }
 
-        public static void  setBool(bool isactive)
+        public static void  SetBool(bool isactive)
         {
             canvasIsClosed = isactive;
         }
