@@ -33,7 +33,6 @@ namespace SEE.Controls
         
         private void Awake()
         {
-
             if (PlayerSettings.GetInputType() != PlayerSettings.PlayerInputType.HoloLens)
             {
                 Destroyer.DestroyComponent(this);

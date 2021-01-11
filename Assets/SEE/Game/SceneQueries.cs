@@ -173,13 +173,10 @@ namespace SEE.Game
                     {
                         return result;
                     }
-
                     result = result.parent;
                 }
-
                 return result;
             }
-
             result = transform.root;
 
             if (result.CompareTag(Tags.CodeCity))
