@@ -31,8 +31,6 @@ public class AddingNodeCanvasScript : MonoBehaviour
 
     public void DestroyAllChilds()
     {
-        int anzahl = canvas.transform.GetChildCount();
-      
         foreach (Transform child in canvas.transform)
         {
             GameObject.Destroy(child.gameObject);

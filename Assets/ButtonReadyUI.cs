@@ -8,6 +8,9 @@ public class ButtonReadyUI : MonoBehaviour
 {
     // Start is called before the first frame update
 
+    /// <summary>
+    /// The button on the adding-node-canvas, which is closing the canvas
+    /// </summary>
     public Button button;
     void Start()
     {
@@ -22,6 +25,6 @@ public class ButtonReadyUI : MonoBehaviour
 
     public void setBool()
     {
-        DesktopNewNodeAction.setBool(false);
+        DesktopNewNodeAction.SetBool(false);
     }
 }
