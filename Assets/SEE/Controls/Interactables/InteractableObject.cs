@@ -385,7 +385,6 @@ namespace SEE.Controls
             {
                 SetHover(true, true);
             }
-            
         }
 
         public void OnFocusExit(FocusEventData eventData)

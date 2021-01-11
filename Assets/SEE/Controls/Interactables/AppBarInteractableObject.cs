@@ -98,15 +98,17 @@ namespace SEE.Controls
 
         public void OnPointerDragged(MixedRealityPointerEventData eventData)
         {
+            // Intentionally left blank.
         }
 
         public void OnPointerUp(MixedRealityPointerEventData eventData)
         {
+            // Intentionally left blank.
         }
 
         public void OnPointerClicked(MixedRealityPointerEventData eventData)
         {
-
+            // Intentionally left blank.
         }
 
         /// <summary>
