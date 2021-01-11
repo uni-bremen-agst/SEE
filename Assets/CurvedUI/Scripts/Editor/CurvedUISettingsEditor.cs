@@ -27,6 +27,7 @@ namespace CurvedUI {
         static bool ShowAdvaced = false;
 		bool loadingCustomDefine = false;
         static bool CUIeventSystemPresent = false;
+        private bool inPrefabMode = false;
 
         [SerializeField][HideInInspector]
         Dictionary<CurvedUIInputModule.CUIControlMethod, string> m_controlMethodDefineDict;
@@ -55,7 +56,7 @@ namespace CurvedUI {
             CUIeventSystemPresent = (FindObjectsOfType(typeof(CurvedUIEventSystem)).Length > 0);
             
             //hacky way to make sure event is connected only once, but it works!
-#if UNITY_2018 || UNITY_2019
+#if UNITY_2018_1_OR_NEWER
             EditorApplication.hierarchyChanged -= AddCurvedUIComponents;
             EditorApplication.hierarchyChanged -= AddCurvedUIComponents;
             EditorApplication.hierarchyChanged += AddCurvedUIComponents;
@@ -118,11 +119,10 @@ namespace CurvedUI {
 
 
 
-
+            
         public override void OnInspectorGUI()
         {
-
-            //setup custom define dictionary---------------------//
+     
        
 
 
@@ -131,6 +131,9 @@ namespace CurvedUI {
             if (target == null) return;
             GUI.changed = false;
             EditorGUIUtility.labelWidth = 150;
+            #if UNITY_2018_3_OR_NEWER
+            inPrefabMode = (UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage() != null);
+            #endif
 
 
             //Version----------------------------------------------//
@@ -195,7 +198,7 @@ namespace CurvedUI {
                 {
                     GUILayout.BeginHorizontal();
                     GUILayout.Space(150);
-                    EditorGUILayout.HelpBox("Sphere shape is more expensive than a Cyllinder shape. Keep this in mind when working on mobile VR.", MessageType.Info);
+                    EditorGUILayout.HelpBox("Sphere shape is more expensive than a Cylinder shape. Keep this in mind when working on mobile VR.", MessageType.Info);
                     GUILayout.EndHorizontal();
                     GUILayout.Space(10);
 
@@ -238,15 +241,25 @@ namespace CurvedUI {
                 if (GUILayout.Button("Hide Advanced Settings")) ShowAdvaced = false;
                 GUILayout.Space(20);
                 
-               
-                //common options
-                CurvedUIInputModule.Instance.RaycastLayerMask = LayerMaskField("Raycast Layer Mask",
-                    CurvedUIInputModule.Instance.RaycastLayerMask);
-                myTarget.Interactable = EditorGUILayout.Toggle("Interactable", myTarget.Interactable);
-                myTarget.BlocksRaycasts = EditorGUILayout.Toggle("Blocks Raycasts", myTarget.BlocksRaycasts);
-                if (myTarget.Shape != CurvedUISettings.CurvedUIShape.SPHERE) myTarget.ForceUseBoxCollider = 
-                    EditorGUILayout.Toggle("Force Box Colliders Use", myTarget.ForceUseBoxCollider);
-
+                //InputModule Options - only if we're not in prefab mode.
+                if (!inPrefabMode)
+                {
+                    CurvedUIInputModule.Instance.RaycastLayerMask = LayerMaskField("Raycast Layer Mask",
+                        CurvedUIInputModule.Instance.RaycastLayerMask);
+                
+                    //pointer override
+                    GUILayout.Space(20);
+                    CurvedUIInputModule.Instance.PointerTransformOverride = (Transform)EditorGUILayout.ObjectField("Pointer Override", CurvedUIInputModule.Instance.PointerTransformOverride, typeof(Transform), true);
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(150);
+                    GUILayout.Label("(Optional) If set, its position and forward (blue) direction will be used to point at canvas.", EditorStyles.helpBox);
+                    GUILayout.EndHorizontal();
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox("Some settings are hidden in Prefab Mode", MessageType.Warning);
+                }
+                
                 //quality
                 GUILayout.Space(20);
                 myTarget.Quality = EditorGUILayout.Slider("Quality", myTarget.Quality, 0.1f, 3.0f);
@@ -254,15 +267,13 @@ namespace CurvedUI {
                 GUILayout.Space(150);
                 GUILayout.Label("Smoothness of the curve. Bigger values mean more subdivisions. Decrease for better performance. Default 1", EditorStyles.helpBox);
                 GUILayout.EndHorizontal();
-
-                //pointer override
-                GUILayout.Space(20);
-                CurvedUIInputModule.Instance.PointerTransformOverride = (Transform)EditorGUILayout.ObjectField("Pointer Override", CurvedUIInputModule.Instance.PointerTransformOverride, typeof(Transform), true);
-                GUILayout.BeginHorizontal();
-                GUILayout.Space(150);
-                GUILayout.Label("(Optional) If set, its position and forward (blue) direction will be used to point at canvas.", EditorStyles.helpBox);
-                GUILayout.EndHorizontal();
-
+                
+                //common options
+                myTarget.Interactable = EditorGUILayout.Toggle("Interactable", myTarget.Interactable);
+                myTarget.BlocksRaycasts = EditorGUILayout.Toggle("Blocks Raycasts", myTarget.BlocksRaycasts);
+                if (myTarget.Shape != CurvedUISettings.CurvedUIShape.SPHERE) myTarget.ForceUseBoxCollider = 
+                    EditorGUILayout.Toggle("Force Box Colliders Use", myTarget.ForceUseBoxCollider);
+                
                 //add components button
                 GUILayout.Space(20);
                 GUILayout.BeginHorizontal();
@@ -306,6 +317,16 @@ namespace CurvedUI {
         void DrawControlMethods()
         {
             GUILayout.Label("Global Settings", EditorStyles.boldLabel);
+
+            //Do not allow to change Global Settings in Prefab Mode
+            //These are stored in CurvedUInputModule
+            if (inPrefabMode)
+            {
+                EditorGUILayout.HelpBox(
+                    "Some global settings (including Control Method) are hidden in Prefab Mode. These are stored on CurvedUIInputModule component which cannot be accessed now.",
+                    MessageType.Warning);
+                return;
+            }
 
             //Control Method dropdown--------------------------------//
             CurvedUIInputModule.ControlMethod = (CurvedUIInputModule.CUIControlMethod)EditorGUILayout.EnumPopup("Control Method", CurvedUIInputModule.ControlMethod);

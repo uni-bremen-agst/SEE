@@ -65,7 +65,11 @@ namespace CurvedUI
         [SerializeField] [HideInInspector] Vector3 savedUp;
         [SerializeField] [HideInInspector] Vector2 savedRectSize;
         [SerializeField] [HideInInspector] Color savedColor;
+        #if UNITY_2020_2_OR_NEWER
+        [SerializeField] [HideInInspector] Vector4 savedTextUV0;
+        #else
         [SerializeField] [HideInInspector] Vector2 savedTextUV0;
+        #endif
         [SerializeField] [HideInInspector] float savedFill;
         #endregion
 
@@ -621,8 +625,13 @@ namespace CurvedUI
         /// <param name="quad">Quad.</param>
         /// <param name="x">The x coordinate.</param>
         /// <param name="y">The y coordinate.</param>
+        #if UNITY_2020_2_OR_NEWER
+        private Vector4 _uv0;
+        private Vector4 _uv1;
+        #else
         private Vector2 _uv0;
         private Vector2 _uv1;
+        #endif
         private Vector3 _pos;
         UIVertex TesselateQuad(float x, float y)
         {

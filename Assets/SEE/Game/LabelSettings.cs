@@ -1,49 +1,42 @@
 ﻿using SEE.Utils;
+using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace SEE.Game
 {
     /// <summary>
-    ///  A discrete range of numberOfColors colors from lower to upper.
+    /// Setting for labels to be shown above game nodes.
     /// </summary>
-    public struct ColorRange
+    public class LabelSettings
     {
         /// <summary>
-        /// First color in the range.
+        /// If true, a label with the node's SourceName will be displayed above each node.
         /// </summary>
-        public Color lower;
+        public bool Show = true;
         /// <summary>
-        /// Last color in the range.
+        /// The distance between the top of the node and its label.
         /// </summary>
-        public Color upper;
+        public float Distance = 0.2f;
         /// <summary>
-        /// The number of colors in the range.
+        /// The font size of the node's label.
         /// </summary>
-        public uint NumberOfColors;
+        public float FontSize = 0.4f;
 
-        public ColorRange(Color lower, Color upper, uint numberOfColors)
-        {
-            this.lower = lower;
-            this.upper = upper;
-            NumberOfColors = numberOfColors;
-        }
-
-        private const string LowerLabel = "Lower";
-        private const string UpperLabel = "Upper";
-        private const string NumberOfColorsLabel = "NumberOfColors";
+        private const string ShowLabel = "Show";
+        private const string DistanceLabel = "Distance";
+        private const string FontSizeLabel = "FontSize";
 
         /// <summary>
-        /// Saves this <see cref="ColorRange"/> using <paramref name="writer"/> under the given <paramref name="label"/>.
+        /// Saves these LabelSettings using <paramref name="writer"/> under the given <paramref name="label"/>.
         /// </summary>
         /// <param name="writer">used to emit the settings</param>
         /// <param name="label">the label under which to emit the settings</param>
         internal void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(lower, LowerLabel);
-            writer.Save(upper, UpperLabel);
-            writer.Save((int)NumberOfColors, NumberOfColorsLabel);
+            writer.Save(Show, ShowLabel);
+            writer.Save(Distance, DistanceLabel);
+            writer.Save(FontSize, FontSizeLabel);
             writer.EndGroup();
         }
 
@@ -60,13 +53,9 @@ namespace SEE.Game
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
                 {
-                    ConfigIO.Restore(values, LowerLabel, ref lower);
-                    ConfigIO.Restore(values, UpperLabel, ref upper);
-                    long storedNumberOfColors = 0;
-                    if (ConfigIO.Restore(values, NumberOfColorsLabel, ref storedNumberOfColors))
-                    {
-                        NumberOfColors = (uint)storedNumberOfColors;
-                    }
+                    ConfigIO.Restore(values, ShowLabel, ref Show);
+                    ConfigIO.Restore(values, DistanceLabel, ref Distance);
+                    ConfigIO.Restore(values, FontSizeLabel, ref FontSize);
                 }
             }
         }
