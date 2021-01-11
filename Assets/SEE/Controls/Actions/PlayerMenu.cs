@@ -1,5 +1,6 @@
 ﻿using SEE.GO;
 using SEE.GO.Menu;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -78,16 +79,6 @@ namespace SEE.Controls.Actions
         private const string menuEntrySprite = "Icons/Circle";
 
         /// <summary>
-        /// Returns given <paramref name="color"/> lightened by 50%.
-        /// </summary>
-        /// <param name="color">base color to be lightened</param>
-        /// <returns>given <paramref name="color"/> lightened by 50%</returns>
-        private static Color Lighter(Color color)
-        {
-            return Color.Lerp(color, Color.white, 0.5f); // To lighten by 50 %
-        }
-
-        /// <summary>
         /// The entries of the menu.
         /// </summary>
         private MenuDescriptor[] EntriesParameter;
@@ -100,7 +91,7 @@ namespace SEE.Controls.Actions
                 new MenuDescriptor(label: "Browse",
                                    spriteFile: menuEntrySprite,
                                    activeColor: Color.blue,
-                                   inactiveColor: Lighter(Color.blue),
+                                   inactiveColor: Color.blue.Lighter(),
                                    entryOn: BrowseOn,
                                    entryOff: null,
                                    isTransient: true),
@@ -108,7 +99,7 @@ namespace SEE.Controls.Actions
                 new MenuDescriptor(label: "Move",
                                    spriteFile: menuEntrySprite,
                                    activeColor: Color.red,
-                                   inactiveColor: Lighter(Color.red),
+                                   inactiveColor: Color.red.Lighter(),
                                    entryOn: MoveOn,
                                    entryOff: null,
                                    isTransient: true),
@@ -116,7 +107,7 @@ namespace SEE.Controls.Actions
                 new MenuDescriptor(label: "Map",
                                    spriteFile: menuEntrySprite,
                                    activeColor: Color.green,
-                                   inactiveColor: Lighter(Color.green),
+                                   inactiveColor: Color.green.Lighter(),
                                    entryOn: MapOn,
                                    entryOff: null,
                                    isTransient: true),

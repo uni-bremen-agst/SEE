@@ -7,10 +7,10 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-using Leap.Unity.Query;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Leap.Unity.Query;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -839,7 +839,7 @@ namespace Leap.Unity
 
         #endregion
 
-        #region Component Utils
+        #region RenderableComponent Utils
 
         /// <summary>
         /// Recursively searches the hierarchy of the argument Transform to find all of the

@@ -1,5 +1,5 @@
-﻿using SEE.DataModel.DG;
-using System;
+﻿using System;
+using SEE.DataModel.DG;
 using UnityEngine;
 
 namespace SEE.GO
@@ -23,19 +23,10 @@ namespace SEE.GO
             if (nodeRef == null)
             {
                 EdgeRef edgeRef = gameObject.GetComponent<EdgeRef>();
-                if (edgeRef == null)
-                {
-                    return gameObject.name;
-                }
-                else
-                {
-                    return edgeRef.edge.ID;
-                }
+                return edgeRef == null ? gameObject.name : edgeRef.edge.ID;
             }
-            else
-            {
-                return nodeRef.node.ID;
-            }
+
+            return nodeRef.node.ID;
         }
 
         /// <summary>
@@ -48,15 +39,13 @@ namespace SEE.GO
         /// <returns>render-queue offset</returns>
         public static int GetRenderQueue(this GameObject gameObject)
         {
-            if (gameObject.TryGetComponent<Renderer>(out Renderer renderer))
+            if (gameObject.TryGetComponent(out Renderer renderer))
             {
                 return renderer.sharedMaterial.renderQueue;
             }
-            else
-            {
-                Debug.LogWarningFormat("GetRenderQueue: Game object {0} has no renderer.\n", gameObject.name);
-                return 0;
-            }
+
+            Debug.LogWarningFormat("GetRenderQueue: Game object {0} has no renderer.\n", gameObject.name);
+            return 0;
         }
 
         /// <summary>
@@ -68,7 +57,7 @@ namespace SEE.GO
         /// <param name="color">the new color to be set</param>
         public static void SetColor(this GameObject gameObject, Color color)
         {
-            if (gameObject.TryGetComponent<Renderer>(out Renderer renderer))
+            if (gameObject.TryGetComponent(out Renderer renderer))
             {
                 Material material = renderer.sharedMaterial;
                 material.SetColor("_Color", color);
@@ -85,7 +74,7 @@ namespace SEE.GO
         /// <param name="endColor">end color of the line</param>
         public static void SetLineColor(this GameObject gameObject, Color startColor, Color endColor)
         {
-            if (gameObject.TryGetComponent<LineRenderer>(out LineRenderer renderer))
+            if (gameObject.TryGetComponent(out LineRenderer renderer))
             {
                 renderer.startColor = startColor;
                 renderer.endColor = endColor;
@@ -111,7 +100,7 @@ namespace SEE.GO
         /// <param name="includingChildren">if true, the operation applies to all descendants, too</param>
         public static void SetVisibility(this GameObject gameObject, bool show, bool includingChildren = true)
         {
-            if (gameObject.TryGetComponent<Renderer>(out Renderer renderer))
+            if (gameObject.TryGetComponent(out Renderer renderer))
             {
                 renderer.enabled = show;
             }
@@ -131,24 +120,20 @@ namespace SEE.GO
         /// attached to it referring to a valid node; if not, an exception is raised.
         /// </summary>
         /// <param name="gameObject">the game object whose Node is requested</param>
-        /// <returns>the correponding graph node</returns>
+        /// <returns>the corresponding graph node</returns>
         public static Node GetNode(this GameObject gameObject)
         {
-            if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+            if (gameObject.TryGetComponent(out NodeRef nodeRef))
             {
                 if (nodeRef != null)
                 {
                     return nodeRef.node;
                 }
-                else
-                {
-                    throw new Exception($"Node reference of game object {gameObject.name} is null");
-                }
+
+                throw new Exception($"Node reference of game object {gameObject.name} is null");
             }
-            else
-            {
-                throw new Exception($"Game object {gameObject.name} has no NodeRef");
-            }
+
+            throw new Exception($"Game object {gameObject.name} has no NodeRef");
         }
     }
 }
