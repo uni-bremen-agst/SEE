@@ -23,6 +23,5 @@ public class ButtonReadyUI : MonoBehaviour
     public void setBool()
     {
         DesktopNewNodeAction.setBool(false);
-        Debug.Log("Button pressed");
     }
 }

@@ -6,6 +6,8 @@ using SEE.Game;
 using System;
 using SEE.Controls.Actions;
 using SEE.Utils;
+using UnityEngine.UI;
+using SEE.GO;
 
 namespace SEE.Controls
 {
@@ -42,7 +44,11 @@ namespace SEE.Controls
 
         public static bool canvasIsClosed = true;
 
-        public static bool anotherBool = false; 
+        public static bool anotherBool = false;
+
+        public static string nodename;
+
+        public static string nodetype;
 
         public void Start()
         {
@@ -107,7 +113,9 @@ namespace SEE.Controls
         {
             GameObject canvasObject = GameObject.Find("AddingNodeCanvas");
             CanvasGenerator c = (CanvasGenerator)canvasObject.GetComponent("CanvasGenerator");
-            c.InstantiateGameObject();
+            GameObject canvas = c.InstantiateGameObject();
+            Debug.Log(canvas);
+            
         }
 
         /// <summary>
@@ -128,8 +136,7 @@ namespace SEE.Controls
         /// Sets the Metrics from the GUI
         /// </summary>
         private void getMetrics()
-        {
-
+        { 
             string randomID = randomizeString();
             System.Random rnd = new System.Random();
             //YOU CANT MODIFY THE VALUES OF A TUPLE, SO YOU NEED TO CREATE A NEW ONE IF YOU WANT TO MODIFY
@@ -172,6 +179,7 @@ namespace SEE.Controls
             node.SourceName = nodeMetrics.Item2;
             node.Type = nodeMetrics.Item3;
 
+
             //Adds the new Node to the City Graph
 
             addNode(node);
@@ -194,6 +202,8 @@ namespace SEE.Controls
             //Sets the The GONode so the main work can continue;
             GONode = gameNode;
             GameNodeMover.MoveTo(GONode);
+            Debug.Log("Endgültiger Nodename: " + node.SourceName);
+            Debug.Log("Endgültiger Nodetype: " + node.Type);
         }
 
 
@@ -204,10 +214,23 @@ namespace SEE.Controls
 
         private void Place()
         {
-            Debug.Log(canvasIsClosed + "JDFKJHJK");
             if (anotherBool)
             {
-                
+                Node node = GONode.GetComponent<NodeRef>().node;
+
+                if (nodename != null || !nodename.Equals(" ")) ;
+                {
+                    node.SourceName = nodename;
+                }
+
+                if (nodetype != null || !nodetype.Equals(" "))
+                {
+                    node.Type = nodetype;
+                }
+
+                Debug.Log(node.SourceName);
+                Debug.Log(node.Type);
+
                 SEECity cityTmp = null;
                 if (hoveredObject != null)
                 {
