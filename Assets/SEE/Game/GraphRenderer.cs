@@ -437,17 +437,6 @@ namespace SEE.Game
                     {
                         AddDecorationsForSublayouts(layoutNodes, sublayoutLayoutNodes, parent);
                     }
-
-                    // Gather the layout quality measurements.
-                    if (settings.calculateMeasurements)
-                    {
-                        Measurements measurements = new Measurements(layoutNodes, graph, leftFrontCorner, rightBackCorner, p);
-                        settings.Measurements = measurements.ToStringDictionary(true);
-                    }
-                    else
-                    {
-                        settings.Measurements = new SortedDictionary<string, string>();
-                    }
                 }
                 finally
                 {
@@ -730,17 +719,17 @@ namespace SEE.Game
         private List<SublayoutNode> CreateSublayoutNodes(List<Node> nodes)
         {
             List<SublayoutNode> coseSublayoutNodes = new List<SublayoutNode>();
-            foreach (KeyValuePair<string, bool> dir in settings.CoseGraphSettings.ListDirToggle)
+            foreach (KeyValuePair<string, bool> dir in settings.CoseGraphSettings.ListInnerNodeToggle)
             {
                 if (dir.Value)
                 {
                     string name = dir.Key;
-                    if (settings.CoseGraphSettings.DirNodeLayout.ContainsKey(name) && settings.CoseGraphSettings.DirShape.ContainsKey(name))
+                    if (settings.CoseGraphSettings.InnerNodeLayout.ContainsKey(name) && settings.CoseGraphSettings.InnerNodeShape.ContainsKey(name))
                     {
                         IEnumerable<Node> matches = nodes.Where(i => i.ID.Equals(name));
                         if (matches.Count() > 0)
                         {
-                            coseSublayoutNodes.Add(new SublayoutNode(matches.First(), settings.CoseGraphSettings.DirShape[name], settings.CoseGraphSettings.DirNodeLayout[name]));
+                            coseSublayoutNodes.Add(new SublayoutNode(matches.First(), settings.CoseGraphSettings.InnerNodeShape[name], settings.CoseGraphSettings.InnerNodeLayout[name]));
                         }
                     }
                 }

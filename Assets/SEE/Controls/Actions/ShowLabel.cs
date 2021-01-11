@@ -4,7 +4,10 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
+using System.Collections.Generic;
 using TMPro;
+using UnityEngine;
+using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls.Actions
 {
@@ -179,7 +182,7 @@ namespace SEE.Controls.Actions
         /// <returns>true iff labels are enabled for this kind of node</returns>
         private bool LabelsEnabled(AbstractSEECity city, bool isLeaf)
         {
-            return isLeaf && city.ShowLabel || !isLeaf && city.InnerNodeShowLabel;
+            return isLeaf && city.LeafLabelSettings.Show || !isLeaf && city.InnerNodeLabelSettings.Show;
         }
 
         /// <summary>
@@ -229,7 +232,7 @@ namespace SEE.Controls.Actions
             // We define starting and ending positions for the animation
             Vector3 startLabelPosition = gameObject.transform.position;
             nodeLabel = TextFactory.GetTextWithSize(node.SourceName, startLabelPosition,
-                                                    isLeaf ? city.LeafLabelFontSize : city.InnerNodeLabelFontSize, 
+                                                    isLeaf ? city.LeafLabeSettings.lFontSize : city.InnerNodeLabelSettings.FontSize, 
                                                     textColor: Color.black.ColorWithAlpha(0f));
             nodeLabel.name = $"Label {node.SourceName}";
             nodeLabel.transform.SetParent(gameObject.transform);

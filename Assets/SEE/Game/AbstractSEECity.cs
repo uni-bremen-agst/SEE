@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,8 +22,55 @@ namespace SEE.Game
     /// is the representation of a graph including the settings that have lead
     /// to its visualization.
     /// </summary>
-    public abstract class AbstractSEECity : SerializedMonoBehaviour
+    public abstract partial class AbstractSEECity : SerializedMonoBehaviour
     {
+        /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
+        /// configuration file, make sure you save and restore it in 
+        /// <see cref="AbstractSEECity.Save(ConfigWriter)"/> and 
+        /// <see cref="AbstractSEECity.Restore(Dictionary{string, object})"/>, 
+        /// respectively (both declared in AbstractSEECityIO). You should also
+        /// extend the test cases in TestConfigIO.
+
+        /// <summary>
+        /// Saves the settings of this code city to <see cref="CityPath"/>.
+        /// </summary>
+        public void Save()
+        {
+            Save(CityPath.Path);
+        }
+
+        /// <summary>
+        /// Loads the settings of this code city from <see cref="CityPath"/>.
+        /// </summary>
+        public void Load()
+        {
+            Load(CityPath.Path);
+        }
+
+        /// <summary>
+        /// Saves the settings of this code city to <paramref name="filename"/>
+        /// </summary>
+        /// <param name="filename"></param>
+        public void Save(string filename)
+        {
+            using (ConfigWriter writer = new ConfigWriter(filename))
+            {
+                Save(writer);
+            }
+        }
+
+        /// <summary>
+        /// Reads the settings of this city from <paramref name="filename"/>.
+        /// </summary>
+        /// <param name="filename"></param>
+        public void Load(string filename)
+        {
+            using (ConfigReader stream = new ConfigReader(filename))
+            {
+                Restore(stream.Read());
+            }
+        }
+
         /// <summary>
         /// The screen relative height to use for the culling a game node [0-1].
         /// If the game node uses less than this percentage it will be culled.
@@ -70,15 +116,13 @@ namespace SEE.Game
         /// they should be visualized or not.
         /// </summary>
         [NonSerialized, OdinSerialize]
-        protected Dictionary<string, bool> nodeTypes = new Dictionary<string, bool>();
+        public Dictionary<string, bool> SelectedNodeTypes = new Dictionary<string, bool>();
+
         /// <summary>
-        /// A mapping of all node types of the nodes in the graph onto whether
-        /// they should be visualized or not.
+        /// The path where the settings (the attributes of this class) are stored.
         /// </summary>
-        public Dictionary<string, bool> SelectedNodeTypes
-        {
-            get => nodeTypes;
-        }
+        [OdinSerialize]
+        public DataPath CityPath = new DataPath();
 
         /// <summary>
         /// Resets everything that is specific to a given graph. Here: 
@@ -94,7 +138,7 @@ namespace SEE.Game
         /// </summary>
         public void ResetSelectedNodeTypes()
         {
-            nodeTypes.Clear();
+            SelectedNodeTypes.Clear();
         }
 
         /// <summary>
@@ -160,7 +204,7 @@ namespace SEE.Game
         {
             get
             {
-                foreach (bool relevant in nodeTypes.Values)
+                foreach (bool relevant in SelectedNodeTypes.Values)
                 {
                     if (!relevant)
                     {
@@ -199,10 +243,10 @@ namespace SEE.Game
                 Dictionary<string, bool> newNodeTypes = new Dictionary<string, bool>();
                 foreach (string type in newTypes)
                 {
-                    if (nodeTypes.ContainsKey(type))
+                    if (SelectedNodeTypes.ContainsKey(type))
                     {
                         // preserve existing node types
-                        newNodeTypes[type] = nodeTypes[type];
+                        newNodeTypes[type] = SelectedNodeTypes[type];
                     }
                     else
                     {
@@ -210,7 +254,7 @@ namespace SEE.Game
                         newNodeTypes[type] = true;
                     }
                 }
-                nodeTypes = newNodeTypes;
+                SelectedNodeTypes = newNodeTypes;
             }
         }
 
@@ -223,7 +267,7 @@ namespace SEE.Game
         /// <param name="graph">graph whose subgraph is requested</param>
         /// <returns>subgraph of <paramref name="graph"/> (copy) or <paramref name="graph"/></returns>
         public Graph RelevantGraph(Graph graph)
-        {            
+        {
             if (AllNodeTypesAreRelevant)
             {
                 Debug.Log("All node types are relevant.\n");
@@ -231,7 +275,7 @@ namespace SEE.Game
             }
             else
             {
-                ICollection<string> matches = nodeTypes.Where(pair => pair.Value == true)
+                ICollection<string> matches = SelectedNodeTypes.Where(pair => pair.Value == true)
                   .Select(pair => pair.Key).ToList();
                 Debug.Log("The following node types are relevant:\n");
                 foreach (string nodeType in matches)
@@ -271,26 +315,17 @@ namespace SEE.Game
         /// The attribute name of the metric to be used for determining the style of leaf nodes.
         /// </summary>
         public string LeafStyleMetric = NumericAttributeNames.Complexity.Name(); // serialized by Unity
-        
+
         //----------------------------------
         // Attributes of a leaf node's label
         //----------------------------------
-        /// <summary>
-        /// If true, label's with the node's SourceName will be displayed above each leaf node.
-        /// </summary>
-        public bool ShowLabel = true;
-        /// <summary>
-        /// The distance between the top of the leaf node and its label.
-        /// </summary>
-        public float LeafLabelDistance = 0.2f;
-        /// <summary>
-        /// The font size of the leaf node's label.
-        /// </summary>
-        public float LeafLabelFontSize = 0.4f;
+        [OdinSerialize]
+        public LabelSettings LeafLabelSettings = new LabelSettings();
 
         /// <summary>
         /// How many seconds the label should take to (dis)appear.
         /// </summary>
+	//TODO: Move to LabelSettings
         public float LeafLabelAnimationDuration = 0.5f;
 
         /// <summary>
@@ -469,28 +504,17 @@ namespace SEE.Game
         /// The attribute name of the metric to be used for determining the style of inner nodes.
         /// </summary>
         public string InnerNodeStyleMetric = NumericAttributeNames.IssuesTotal.Name(); // serialized by Unity
-        
+
         //-----------------------------------
         // Visual attributes of an inner node
         //-----------------------------------
-        
-        /// <summary>
-        /// If true, label's with the node's SourceName will be displayed above each inner node.
-        /// </summary>
-        public bool InnerNodeShowLabel = true;
-        /// <summary>
-        /// The distance between the top of the inner node and its label.
-        /// </summary>
-        public float InnerNodeLabelDistance = 0.2f;
-        /// <summary>
-        /// The font size of the inner node's label.
-        /// </summary>
-        public float InnerNodeLabelFontSize = 0.4f;
-        /// <summary>
+        [OdinSerialize]
+        public LabelSettings InnerNodeLabelSettings = new LabelSettings();
+	/// <summary>
         /// How many seconds the label should take to (dis)appear.
         /// </summary>
         public float InnerNodeLabelAnimationDuration = 0.5f;
-
+	//TODO: Move to LabelSettings
 
         /// <summary>
         /// All metrics used for visual attributes of inner nodes (InnerNodeStyleMetric
@@ -585,6 +609,7 @@ namespace SEE.Game
         /// Only available on HoloLens.
         /// </summary>
         public bool ShowLabelOnEyeGaze = true;
+	//TODO: Move to LabelSettings
         
         /// <summary>
         /// The time in seconds after which staring at a node triggers its label to appear.
@@ -663,26 +688,6 @@ namespace SEE.Game
         public CoseGraphSettings CoseGraphSettings = new CoseGraphSettings();
 
         /// <summary>
-        /// measurements of the layout
-        /// </summary>
-        public SortedDictionary<string, string> Measurements = new SortedDictionary<string, string>();
-
-        /// <summary>
-        /// Indicates whether the measurements should be calculated or not
-        /// </summary>
-        public bool calculateMeasurements = false;
-
-        /// <summary>
-        /// Dictionary with all Nodelayouts for leaf and inner nodes
-        /// </summary>
-        public Dictionary<NodeLayoutKind, string> SubLayoutsInnerNodes = Enum.GetValues(typeof(NodeLayoutKind)).Cast<NodeLayoutKind>().Where(nodeLayout => !nodeLayout.GetModel().OnlyLeaves).OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
-
-        /// <summary>
-        ///  Dictionary with all Nodelayouts only for leaf nodes
-        /// </summary>
-        public Dictionary<NodeLayoutKind, string> SubLayoutsLeafNodes = Enum.GetValues(typeof(NodeLayoutKind)).Cast<NodeLayoutKind>().OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
-
-        /// <summary>
         /// Saves all data needed for the listing of the dirs in gui in cosegraphSettings
         /// </summary>
         /// <param name="graph"></param>
@@ -690,7 +695,7 @@ namespace SEE.Game
         {
             if (NodeLayout == NodeLayoutKind.CompoundSpringEmbedder)
             {
-                Dictionary<string, bool> dirs = CoseGraphSettings.ListDirToggle;
+                Dictionary<string, bool> dirs = CoseGraphSettings.ListInnerNodeToggle;
                 // die neuen dirs 
                 Dictionary<string, bool> dirsLocal = new Dictionary<string, bool>();
 
@@ -710,8 +715,6 @@ namespace SEE.Game
                 // falls der key nicht in den alten dictonary ist
                 //dirsLocal = dirsLocal.Where(i => !dirs.ContainsKey(i.Key)).ToDictionary(i => i.Key, i => i.Value);
 
-                CoseGraphSettings.show = new Dictionary<string, bool>();
-
                 bool diff1 = dirs.Keys.Except(dirsLocal.Keys).Any();
                 bool diff2 = dirsLocal.Keys.Except(dirs.Keys).Any();
 
@@ -721,15 +724,12 @@ namespace SEE.Game
                 }
                 else
                 {
-                    CoseGraphSettings.DirShape = dirsShape;
-                    CoseGraphSettings.DirNodeLayout = dirsLayout;
-                    CoseGraphSettings.ListDirToggle = dirsLocal;
-                    // get roots
-                    CoseGraphSettings.rootDirs = graph.GetRoots();
+                    CoseGraphSettings.InnerNodeShape = dirsShape;
+                    CoseGraphSettings.InnerNodeLayout = dirsLayout;
+                    CoseGraphSettings.ListInnerNodeToggle = dirsLocal;
                 }
 
-                CoseGraphSettings.loadedForNodeTypes = SelectedNodeTypes.Where(type => type.Value == true).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-                CoseGraphSettings.rootDirs = graph.GetRoots();
+                CoseGraphSettings.LoadedForNodeTypes = SelectedNodeTypes.Where(type => type.Value == true).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             }
         }
     }
