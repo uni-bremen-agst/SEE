@@ -1,6 +1,7 @@
 ﻿using SEE.DataModel;
 using SEE.DataModel.Runtime.IO;
 using SEE.Utils;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -61,6 +62,31 @@ namespace SEE.Game
                 runtimeGO.tag = Tags.Runtime;
                 runtimeGO.AddComponent<Runtime.Runtime>().callTree = callTreeReader.CallTree;
             }
+        }
+
+        //----------------------------------------------------------------------------
+        // Input/output of configuration attributes
+        //----------------------------------------------------------------------------
+
+        // The labels for the configuration attributes in the configuration file.
+        private const string DYNPathLabel = "DYNPath";
+
+        /// <summary>
+        /// <see cref="AbstractSEECity.Save(ConfigWriter)"/>
+        /// </summary>
+        protected override void Save(ConfigWriter writer)
+        {
+            base.Save(writer);
+            DYNPath.Save(writer, DYNPathLabel);  
+        }
+
+        /// <summary>
+        /// <see cref="AbstractSEECity.Restore(Dictionary{string, object})"/>.
+        /// </summary>
+        protected override void Restore(Dictionary<string, object> attributes)
+        {
+            base.Restore(attributes);
+            DYNPath.Restore(attributes, DYNPathLabel);
         }
     }
 }
