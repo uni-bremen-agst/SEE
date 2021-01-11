@@ -1,10 +1,10 @@
-﻿using SEE.Game;
-using System;
+﻿using System;
+using SEE.Game;
 using UnityEngine;
 
 namespace SEE.GO.Menu
 {
-    public class MenuFactory
+    public static class MenuFactory
     {
         /// <summary>
         /// The name we use for the game object representing the menu.
