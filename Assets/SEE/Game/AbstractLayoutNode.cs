@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using SEE.DataModel.DG;
 using SEE.Layout;
+using UnityEngine;
 
 namespace SEE.Game
 {
@@ -18,10 +19,7 @@ namespace SEE.Game
         /// <summary>
         /// The underlying graph node represented by this laid out node.
         /// </summary>
-        public Node ItsNode
-        {
-            get => node;
-        }
+        public Node ItsNode => node;
 
         /// <summary>
         /// Constructor setting the graph <paramref name="node"/> corresponding to this layout node
@@ -72,7 +70,7 @@ namespace SEE.Game
         /// A unique ID for a node: the ID of the graph node underlying this layout node.
         /// </summary>
         /// <returns>unique ID for this node</returns>
-        public string ID { get => node.ID; }
+        public string ID => node.ID;
 
         /// <summary>
         /// The parent of this node. May be null if it has none.

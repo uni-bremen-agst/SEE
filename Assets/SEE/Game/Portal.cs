@@ -1,4 +1,6 @@
-﻿namespace SEE.Game
+﻿using UnityEngine;
+
+namespace SEE.Game
 {
     /// <summary>
     /// Manages the portal information of shaders. A portal is a plane in X/Z

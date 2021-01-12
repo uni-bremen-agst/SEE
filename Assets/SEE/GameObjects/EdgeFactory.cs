@@ -4,6 +4,7 @@ using SEE.DataModel;
 using SEE.Game;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
+using UnityEngine;
 
 namespace SEE.GO
 {

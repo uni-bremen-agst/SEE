@@ -144,11 +144,17 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// The text label that's displayed above the object when the user hovers over it.
-        /// Will be <code>null</code> when the label is not currently being displayed.
-        /// This nodeLabel will contain a TextMeshPro component for the label text and a
-        /// LineRenderer that connects the labeled object and the label text visually.
+        /// Will be <c>null</c> when the label is not currently being displayed.
+        /// This nodeLabel will contain a TextMeshPro component for the label text.
         /// </summary>
         private GameObject nodeLabel;
+
+        /// <summary>
+        /// The edge connecting a <see cref="nodeLabel"/> to its node.
+        /// Is a child of <see cref="nodeLabel"/> and contains a
+        /// LineRenderer that connects the labeled object and the label text visually.
+        /// </summary>
+        private GameObject edge;
 
         /// <summary>
         /// All currently active tweens, collected in a sequence.
@@ -232,7 +238,7 @@ namespace SEE.Controls.Actions
             // We define starting and ending positions for the animation
             Vector3 startLabelPosition = gameObject.transform.position;
             nodeLabel = TextFactory.GetTextWithSize(node.SourceName, startLabelPosition,
-                                                    isLeaf ? city.LeafLabeSettings.lFontSize : city.InnerNodeLabelSettings.FontSize, 
+                                                    (isLeaf ? city.LeafLabelSettings : city.InnerNodeLabelSettings).FontSize, 
                                                     textColor: Color.black.ColorWithAlpha(0f));
             nodeLabel.name = $"Label {node.SourceName}";
             nodeLabel.transform.SetParent(gameObject.transform);
@@ -242,7 +248,7 @@ namespace SEE.Controls.Actions
             // Add connecting line between "roof" of object and text
             Vector3 startLinePosition = gameObject.transform.position;
             startLinePosition.y = BoundingBox.GetRoof(new List<GameObject> {gameObject});
-            GameObject edge = new GameObject();
+            edge = new GameObject();
             LineFactory.Draw(edge, new[] {startLinePosition, startLinePosition}, 0.01f,
                              Materials.New(Materials.ShaderType.TransparentLine, Color.black));
             edge.transform.SetParent(nodeLabel.transform);
@@ -286,8 +292,9 @@ namespace SEE.Controls.Actions
             const float endAlpha = 1f;  // Alpha value the text and line will have at the end of the animation.
             const float lineStartAlpha = endAlpha * 0.5f;  // Alpha value the start of the line should have.
             Vector3 endLabelPosition = nodeLabel.transform.position;
-            endLabelPosition.y += isLeaf ? city.LeafLabelDistance : city.InnerNodeLabelDistance;
-            Vector3 endLinePosition = endLabelPosition;
+            endLabelPosition.y += (isLeaf ? city.LeafLabelSettings : city.InnerNodeLabelSettings).Distance;
+            // Due to the line not using world space, we need to transform its position accordingly
+            Vector3 endLinePosition = edge.transform.InverseTransformPoint(endLabelPosition);
             float nodeTopPosition = nodeLabel.GetComponent<TextMeshPro>().textBounds.extents.y;
             endLinePosition.y -= nodeTopPosition * 1.3f; // add slight gap to make it slightly more aesthetic
 
@@ -327,7 +334,7 @@ namespace SEE.Controls.Actions
             void AnimateLabelLine()
             {
                 // Animated line to move to top and fade in
-                if (nodeLabel.TryGetComponent(out LineRenderer line))
+                if (edge.TryGetComponent(out LineRenderer line))
                 {
                     // Reset colors to clear first
                     LineFactory.SetColors(line, Color.clear, Color.clear);
@@ -347,7 +354,7 @@ namespace SEE.Controls.Actions
             void SetAttributesImmediately()
             {
                 // If we have an animation duration of 0, we can set the positions immediately and return.
-                if (nodeLabel.TryGetComponent(out TextMeshPro text) && nodeLabel.TryGetComponent(out LineRenderer line))
+                if (nodeLabel.TryGetComponent(out TextMeshPro text) && edge.TryGetComponent(out LineRenderer line))
                 {
                     nodeLabel.transform.position = endLabelPosition;
                     text.alpha = endAlpha;
@@ -394,10 +401,10 @@ namespace SEE.Controls.Actions
          * <param name="city">The city object from which to retrieve the duration.
          * If <code>null</code>, the city object will be retrieved by a call to <see cref="City"/>.</param>
          */
-        private float AnimationDuration(bool isLeaf, [CanBeNull] AbstractSEECity city = null)
+        private float AnimationDuration(bool isLeaf, AbstractSEECity city = null)
         {
             city = city ?? City();
-            return isLeaf ? city.LeafLabelAnimationDuration : city.InnerNodeLabelAnimationDuration;
+            return (isLeaf ? city.LeafLabelSettings : city.InnerNodeLabelSettings).AnimationDuration;
         }
 
         /// <summary>

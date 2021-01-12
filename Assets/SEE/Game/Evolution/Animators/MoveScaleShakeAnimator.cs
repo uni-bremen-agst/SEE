@@ -19,6 +19,8 @@
 
 using System;
 using SEE.Layout;
+using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.Game.Evolution
 {

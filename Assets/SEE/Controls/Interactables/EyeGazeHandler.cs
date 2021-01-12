@@ -33,7 +33,8 @@ namespace SEE.Controls
         
         private void Awake()
         {
-            if (PlayerSettings.GetInputType() != PlayerSettings.PlayerInputType.HoloLens)
+            PlayerSettings settings = PlayerSettings.GetPlayerSettings();
+            if (settings.playerInputType != PlayerSettings.PlayerInputType.HoloLens || !settings.EyeGazeHover)
             {
                 Destroyer.DestroyComponent(this);
                 return;
@@ -47,16 +48,8 @@ namespace SEE.Controls
                 .GetField("timeToTriggerDwellInSec", BindingFlags.NonPublic | BindingFlags.Instance);
             if (dwellField != null)
             {
-                if (SceneQueries.GetCodeCity(gameObject.transform).gameObject.TryGetComponentOrLog(out AbstractSEECity city))
-                {
-                    if (!city.ShowLabelOnEyeGaze)
-                    {
-                        Destroyer.DestroyComponent(this);
-                        return;
-                    }
-                    eyeStareDelay = city.EyeStareDelay;
-                    dwellField.SetValue(this, eyeStareDelay);
-                }
+                eyeStareDelay = settings.EyeStareDelay;
+                dwellField.SetValue(this, eyeStareDelay);
             }
             else
             {
