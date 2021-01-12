@@ -91,6 +91,11 @@ namespace SEE.Controls.Actions
             playerActions.ScaleNode();
         }
 
+        private void EditNodeOn()
+        {
+            playerActions.EditNode();
+        }
+
         /// <summary>
         /// Path of the prefix for the sprite to be instantiated for the menu entries.
         /// </summary>
@@ -154,6 +159,14 @@ namespace SEE.Controls.Actions
                                    inactiveColor: Lighter(Color.green),
                                    entryOn: ScaleNodeOn,
                                    entryOff: null,
+                                   isTransient: true),
+                 //Starts the Edit-Node-Mode
+                    new MenuDescriptor(label: "Edit Node",
+                                   spriteFile: menuEntrySprite,
+                                   activeColor: Color.yellow,
+                                   inactiveColor: Lighter(Color.yellow),
+                                   entryOn: EditNodeOn,
+                                   entryOff: Hide,
                                    isTransient: true)
 
             };
