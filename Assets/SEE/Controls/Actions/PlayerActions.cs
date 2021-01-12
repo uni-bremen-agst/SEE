@@ -22,7 +22,8 @@ namespace SEE.Controls.Actions
             MoveNode, // a game node is being moved within its city
             MapNode,   // a game node is mapped from one city to another city
             NewNode, //a  game node is being created
-            ScaleNode //a game node is scaled with mouse drag
+            ScaleNode, //a game node is scaled with mouse drag
+            EditNode // a game node is being edited
         }
 
 
@@ -82,6 +83,19 @@ namespace SEE.Controls.Actions
                     }
                     break;
                 case State.Browse:
+                    break;
+                case State.EditNode:
+                    //NOTE: JUST COPIED AND PASTED FROM NEWNODE
+                    //places new nodes as long as the user doesnt switch the modes
+                    //Ads the newComponent if not already done
+                    if (!gameObject.GetComponent<DesktopEditNodeAction>())
+                    {
+                        gameObject.AddComponent<DesktopEditNodeAction>();
+                    }
+                    else //Sets the Hovered Object
+                    {
+                        gameObject.GetComponent<DesktopEditNodeAction>().hoveredObject = hoveredObject;
+                    }
                     break;
                 default:
                    
@@ -157,6 +171,11 @@ namespace SEE.Controls.Actions
             }
         }
 
+        public void EditNode()
+        {
+            Enter(State.EditNode);
+        }
+
         /// <summary>
         /// Cancels the current action before the next new state is entered.
         /// This method can implement the "last wishes" of a running action.
@@ -180,6 +199,9 @@ namespace SEE.Controls.Actions
                     break;
                 case State.ScaleNode:
                     break;
+                case State.EditNode:
+                    break;
+
                 default:
                     throw new System.NotImplementedException();
             }

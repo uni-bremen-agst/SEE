@@ -242,7 +242,6 @@ namespace SEE.Controls
                 Debug.Log(node.Type);
 
                 SEECity cityTmp = null;
-                Debug.Log(hoveredObject);
                 if (hoveredObject != null)
                 {
                     //checks if the currently hovered object is part of the preselected city
