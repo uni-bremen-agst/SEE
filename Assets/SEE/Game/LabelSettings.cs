@@ -21,10 +21,15 @@ namespace SEE.Game
         /// The font size of the node's label.
         /// </summary>
         public float FontSize = 0.4f;
+        /// <summary>
+        /// How many seconds the label should take to (dis)appear.
+        /// </summary>
+        public float AnimationDuration = 0.5f;
 
         private const string ShowLabel = "Show";
         private const string DistanceLabel = "Distance";
         private const string FontSizeLabel = "FontSize";
+        private const string AnimationDurationLabel = "AnimationDuration";
 
         /// <summary>
         /// Saves these LabelSettings using <paramref name="writer"/> under the given <paramref name="label"/>.
@@ -37,6 +42,7 @@ namespace SEE.Game
             writer.Save(Show, ShowLabel);
             writer.Save(Distance, DistanceLabel);
             writer.Save(FontSize, FontSizeLabel);
+            writer.Save(AnimationDuration, AnimationDurationLabel);
             writer.EndGroup();
         }
 
@@ -56,6 +62,7 @@ namespace SEE.Game
                     ConfigIO.Restore(values, ShowLabel, ref Show);
                     ConfigIO.Restore(values, DistanceLabel, ref Distance);
                     ConfigIO.Restore(values, FontSizeLabel, ref FontSize);
+                    ConfigIO.Restore(values, AnimationDurationLabel, ref AnimationDuration);
                 }
             }
         }

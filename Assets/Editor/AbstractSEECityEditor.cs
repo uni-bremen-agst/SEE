@@ -276,13 +276,6 @@ namespace SEEEditor
                 city.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", city.ZScoreScale);
                 city.ShowErosions = EditorGUILayout.Toggle("Show erosions", city.ShowErosions);
                 city.MaxErosionWidth = EditorGUILayout.FloatField("Max. width of erosion icon", city.MaxErosionWidth);
-                city.ShowLabelOnEyeGaze = EditorGUILayout.Toggle("Eye Gaze Labels (HoloLens)", city.ShowLabelOnEyeGaze);
-                GUI.enabled = city.ShowLabelOnEyeGaze;
-                city.EyeStareDelay = EditorGUILayout.Slider(
-                    new GUIContent("Eye Stare Delay", 
-                                   "The time in seconds after which staring at a node triggers its label to appear."), 
-                    city.EyeStareDelay, 0, 20);
-                GUI.enabled = true;
             }
         }
 
@@ -302,9 +295,6 @@ namespace SEEEditor
                 city.InnerNodeColorRange.NumberOfColors =
                     (uint) EditorGUILayout.IntSlider("# Colors", (int) city.InnerNodeColorRange.NumberOfColors, 1, 15);
                 LabelSettings(ref city.InnerNodeLabelSettings);
-		//TODO: Move to LabelSettings
-		city.InnerNodeLabelAnimationDuration = EditorGUILayout.FloatField("Label animation duration (in seconds)",
-                                                                                  city.InnerNodeLabelAnimationDuration);
             }
         }
 
@@ -328,9 +318,6 @@ namespace SEEEditor
                 city.LeafNodeColorRange.NumberOfColors = (uint) EditorGUILayout.IntSlider("# Colors",
                     (int) city.LeafNodeColorRange.NumberOfColors, 1, 15);
                 LabelSettings(ref city.LeafLabelSettings);
-		//TODO: Move to LabelSettings
-		city.LeafLabelAnimationDuration = EditorGUILayout.FloatField("Label animation duration (in seconds)",
-                                                                                  city.LeafLabelAnimationDuration);
             }
         }
 
@@ -339,6 +326,8 @@ namespace SEEEditor
             labelSettings.Show = EditorGUILayout.Toggle("Show labels", labelSettings.Show);
             labelSettings.Distance = EditorGUILayout.FloatField("Label distance", labelSettings.Distance);
             labelSettings.FontSize = EditorGUILayout.FloatField("Label font size", labelSettings.FontSize);
+            labelSettings.AnimationDuration = EditorGUILayout.FloatField("Label animation duration (in seconds)", 
+                                                                               city.InnerNodeLabelSettings.AnimationDuration);
         }
     }
 }

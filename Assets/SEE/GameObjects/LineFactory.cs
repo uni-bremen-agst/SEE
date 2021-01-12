@@ -1,4 +1,6 @@
-﻿namespace SEE.GO
+﻿using UnityEngine;
+
+namespace SEE.GO
 {
     /// <summary>
     /// Sets attributes of lines.
@@ -50,7 +52,8 @@
                 // edge does not yet have a renderer; we add a new one
                 line = edge.AddComponent<LineRenderer>();
             }
-            line.useWorldSpace = false;
+
+            line.useWorldSpace = true;
             if (material != null)
             {
                 // use sharedMaterial if changes to the original material should affect all

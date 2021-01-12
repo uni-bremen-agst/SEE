@@ -10,10 +10,16 @@ using UnityEngine;
 namespace SEE.Controls
 {
     /// <summary>
-    /// GameObjects with this component will display an AppBar when clicked at by a mixed reality hand pointer.
+    /// GameObjects with this component will display an AppBar when clicked on by a mixed reality hand pointer.
     /// </summary>
     public class AppBarInteractableObject : MonoBehaviour, IMixedRealityPointerHandler
     {
+
+        /// <summary>
+        /// Name of the app bar.
+        /// </summary>
+        private const string AppBarName = "HoloLensAppBar";
+        
         /// <summary>
         /// Custom MixedReality pointed action for current game object
         /// </summary>
@@ -33,11 +39,6 @@ namespace SEE.Controls
         /// Whether an app bar should be shown at all.
         /// </summary>
         private bool ShowAppBar = true;
-
-        /// <summary>
-        /// Whether an app bar should be created if it doesn't exist yet.
-        /// </summary>
-        public bool CreateAppBar = false;
         
         /// <summary>
         /// The app bar containing actions.
@@ -53,23 +54,23 @@ namespace SEE.Controls
                 return;
             }
 
-            AppBar = GameObject.Find("MainAppBar");
+            AppBar = GameObject.Find(AppBarName);
 
-            if (AppBar == null && CreateAppBar)
+            if (AppBar == null)
             {
-                GameObject appBar = new GameObject("MainAppBar", typeof(AppBar));
+                GameObject appBar = new GameObject(AppBarName, typeof(AppBar));
                 appBar.transform.parent = null;
                 AppBar = appBar;
 
                 Debug.Log($"A new AppBar '{AppBar.name}' was created and added to root into the current scene");
             }
-            else if (!AppBar.TryGetComponentOrLog(out AppBarComponent))
+            if (!AppBar.TryGetComponent(out AppBarComponent))
             {
                 AppBar.AddComponent<AppBar>();
                 AppBarComponent = AppBar.GetComponent<AppBar>();
             }
 
-            if (!gameObject.TryGetComponentOrLog(out BoundsControl))
+            if (!gameObject.TryGetComponent(out BoundsControl))
             {
                 gameObject.AddComponent<BoundsControl>();
                 BoundsControl = gameObject.GetComponent<BoundsControl>();

@@ -68,6 +68,13 @@ namespace SEE.Controls
         [Tooltip("The factor by which code cities should be scaled on startup."), OdinSerialize, Min(0.01f)]
         public float CityScalingFactor = 1f;
 
+        [Tooltip("Whether eye gaze should trigger hovering actions, such as node labels.")]
+        public bool EyeGazeHover = true;
+
+        [Range(0, 20)]
+        [Tooltip("The time in seconds after which staring at an object triggers its hovering action.")]
+        public float EyeStareDelay = 1;
+
 
         /// <summary>
         /// The game object representing the active local player, that is, the player 
@@ -78,6 +85,12 @@ namespace SEE.Controls
             get;
             private set;
         }
+        
+        /// <summary>
+        /// The cached player settings within this local instance of Unity.
+        /// Will be updated by <see cref="GetPlayerSettings"/> on its first call.
+        /// </summary>
+        private static PlayerSettings localPlayerSettings;
 
         /// <summary>
         /// The cached player input type within this local instance of Unity.
@@ -93,9 +106,23 @@ namespace SEE.Controls
         {
             if (localPlayerInputType == PlayerInputType.None)
             {
-                localPlayerInputType = FindObjectOfType<PlayerSettings>().playerInputType;
+                localPlayerInputType = GetPlayerSettings().playerInputType;
             }
             return localPlayerInputType;
+        }
+
+        /// <summary>
+        /// The player settings within this local instance of Unity.
+        /// </summary>
+        /// <returns>player settings</returns>
+        public static PlayerSettings GetPlayerSettings()
+        {
+            if (localPlayerSettings == null)
+            {
+                localPlayerSettings = FindObjectOfType<PlayerSettings>();
+            }
+
+            return localPlayerSettings;
         }
 
         /// <summary>

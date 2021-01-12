@@ -1,6 +1,7 @@
 ﻿using System;
 using OdinSerializer.Utilities;
 using SEE.DataModel.DG;
+using UnityEngine;
 
 namespace SEE.GO
 {
@@ -124,7 +125,7 @@ namespace SEE.GO
         /// If it wasn't found, <paramref name="component"/> will be <code>null</code>, false will be returned,
         /// and an error message will be logged indicating that the component type wasn't present on the GameObject.
         /// </summary>
-        /// <param name="gameObject">The game object the component should be gotten from.</param>
+        /// <param name="gameObject">The game object the component should be gotten from. Must not be null.</param>
         /// <param name="component">The variable in which to save the component.</param>
         /// <typeparam name="T">The type of the component.</typeparam>
         /// <returns>True if the component was present on the <paramref name="gameObject"/>, false otherwise.</returns>
