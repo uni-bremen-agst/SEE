@@ -81,7 +81,8 @@ namespace SEE.Controls.Actions
                         Browse();
                     }
                     break;
-
+                case State.Browse:
+                    break;
                 default:
                    
                     break;
@@ -172,6 +173,8 @@ namespace SEE.Controls.Actions
                 case State.MoveNode:
                     break;
                 case State.NewNode:
+                    CanvasGenerator generator = (CanvasGenerator)GameObject.Find("AddingNodeCanvas").GetComponent("CanvasGenerator");
+                    generator.DestroyGameObject();
                     gameObject.GetComponent<DesktopNewNodeAction>().hoveredObject = null;
                     gameObject.GetComponent<DesktopNewNodeAction>().removeScript();
                     break;
