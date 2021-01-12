@@ -14,7 +14,8 @@ public class AddingNodeCanvasScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        canvas = Instantiate(Resources.Load("NodeCanvas", typeof(GameObject))) as GameObject;
+        // Note: Its important that the Prefab lays inside of the Resources-Folder to use the Resources.Load-Method.
+        canvas = Instantiate(Resources.Load("Prefabs/NodeCanvas", typeof(GameObject))) as GameObject;
         canvas.transform.SetParent(gameObject.transform);
     }
 
