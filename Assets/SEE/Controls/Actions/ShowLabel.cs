@@ -174,7 +174,7 @@ namespace SEE.Controls.Actions
         /// <returns>true iff labels are enabled for this kind of node</returns>
         private bool LabelsEnabled(AbstractSEECity city, bool isLeaf)
         {
-            return isLeaf && city.ShowLabel || !isLeaf && city.InnerNodeShowLabel;
+            return isLeaf && city.LeafLabelSettings.Show || !isLeaf && city.InnerNodeLabelSettings.Show;
         }
 
         /// <summary>
@@ -211,9 +211,9 @@ namespace SEE.Controls.Actions
             
             // Add text
             Vector3 position = gameObject.transform.position;
-            position.y += isLeaf ? city.LeafLabelDistance : city.InnerNodeLabelDistance;
+            position.y += isLeaf ? city.LeafLabelSettings.Distance : city.InnerNodeLabelSettings.Distance;
             nodeLabel = TextFactory.GetTextWithSize(node.SourceName, position,
-                isLeaf ? city.LeafLabelFontSize : city.InnerNodeLabelFontSize, textColor: Color.black);
+                isLeaf ? city.LeafLabelSettings.FontSize : city.InnerNodeLabelSettings.FontSize, textColor: Color.black);
             nodeLabel.name = "Label " + node.SourceName;
             nodeLabel.transform.SetParent(gameObject.transform);
             

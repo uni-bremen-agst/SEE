@@ -15,7 +15,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.DataModel.DG;
+using SEE.Utils;
 using System.Collections.Generic;
 using static SEE.Game.AbstractSEECity;
 
@@ -69,52 +69,99 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <summary>
         /// if true the feature: multilevel scaling is used
         /// </summary>
-        public bool multiLevelScaling = CoseLayoutSettings.Multilevel_Scaling;
+        public bool MultiLevelScaling = CoseLayoutSettings.Multilevel_Scaling;
 
         /// <summary>
-        /// key: dir ids, value: bool, if true the dir is a layouted by a sublayout
+        /// key: inner-node ids, value: bool, if true the inner node is layouted by a sublayout
         /// </summary>
-        public Dictionary<string, bool> ListDirToggle = new Dictionary<string, bool>();
+        public Dictionary<string, bool> ListInnerNodeToggle = new Dictionary<string, bool>();
 
         /// <summary>
-        ///  key: dir ids, value: the nodelayout
+        ///  key: inner-node ids, value: the nodelayout
         /// </summary>
-        public Dictionary<string, NodeLayoutKind> DirNodeLayout = new Dictionary<string, NodeLayoutKind>();
+        public Dictionary<string, NodeLayoutKind> InnerNodeLayout = new Dictionary<string, NodeLayoutKind>();
 
         /// <summary>
-        /// key: dir ids, value: the inner node kind
+        /// key: inner-node ids, value: the inner node kind
         /// </summary>
-        public Dictionary<string, InnerNodeKinds> DirShape = new Dictionary<string, InnerNodeKinds>();
-
-        /// <summary>
-        /// a list of root dirs from the current graph
-        /// </summary>
-        public List<Node> rootDirs = new List<Node>();
-
-        /// <summary>
-        /// key: dir ids, value: bool, if true the dir is shown in the foldout, if false the sectioon feldout is collapsed 
-        /// </summary>
-        public Dictionary<string, bool> show = new Dictionary<string, bool>();
-
-        /// <summary>
-        /// if true is listing of dirs with posiible nodelayouts and inner node kinds is shown
-        /// </summary>
-        public bool showGraphListing = true;
+        public Dictionary<string, InnerNodeKinds> InnerNodeShape = new Dictionary<string, InnerNodeKinds>();
 
         /// <summary>
         /// the nodetypes
         /// </summary>
-        public Dictionary<string, bool> loadedForNodeTypes = new Dictionary<string, bool>();
+        public Dictionary<string, bool> LoadedForNodeTypes = new Dictionary<string, bool>();
 
         /// <summary>
         /// is true the parameter edgeLength and repulsion strength are calculated automatically
         /// </summary>
-        public bool useCalculationParameter = true;
+        public bool UseCalculationParameter = true;
 
         /// <summary>
         /// is true the parameter edgeLength and repulsion strength are calculated automatically and are iteratily changed till a goog layout is found
         /// </summary>
-        public bool useIterativeCalculation = false;
+        public bool UseIterativeCalculation = false;
+
+        private const string EdgeLengthLabel = "EdgeLength";
+        private const string UseSmartIdealEdgeCalculationLabel = "UseSmartIdealEdgeCalculation";
+        private const string UseSmartMultilevelScalingLabel = "UseSmartMultilevelScaling";
+        private const string PerLevelIdealEdgeLengthFactorLabel = "PerLevelIdealEdgeLengthFactor";
+        private const string UseSmartRepulsionRangeCalculationLabel = "UseSmartRepulsionRangeCalculation";
+        private const string GravityStrengthLabel = "GravityStrength";
+        private const string CompoundGravityStrengthLabel = "CompoundGravityStrength";
+        private const string RepulsionStrengthLabel = "RepulsionStrength";
+        private const string MultiLevelScalingLabel = "MultiLevelScaling";
+        private const string ListInnerNodeToggleLabel = "ListInnerNodeToggle";
+        private const string InnerNodeLayoutLabel = "InnerNodeLayout"; 
+        private const string InnerNodeShapeLabel = "InnerNodeShape";
+        private const string LoadedForNodeTypesLabel = "LoadedForNodeTypes";
+        private const string UseCalculationParameterLabel = "UseCalculationParameter";
+        private const string UseIterativeCalculationLabel = "UseIterativeCalculation";
+
+        internal void Save(ConfigWriter writer, string label)
+        {
+            writer.BeginGroup(label);
+            writer.Save(EdgeLength, EdgeLengthLabel);
+            writer.Save(UseSmartIdealEdgeCalculation, UseSmartIdealEdgeCalculationLabel);            
+            writer.Save(UseSmartMultilevelScaling, UseSmartMultilevelScalingLabel);
+            writer.Save(PerLevelIdealEdgeLengthFactor, PerLevelIdealEdgeLengthFactorLabel);
+            writer.Save(UseSmartRepulsionRangeCalculation, UseSmartRepulsionRangeCalculationLabel);
+            writer.Save(GravityStrength, GravityStrengthLabel);
+            writer.Save(CompoundGravityStrength, CompoundGravityStrengthLabel);
+            writer.Save(RepulsionStrength, RepulsionStrengthLabel);
+            writer.Save(MultiLevelScaling, MultiLevelScalingLabel);
+            writer.Save(ListInnerNodeToggle, ListInnerNodeToggleLabel);
+            writer.Save(InnerNodeLayout, InnerNodeLayoutLabel); // saves enums as strings
+            writer.Save(InnerNodeShape, InnerNodeShapeLabel);   // saves enums as strings
+            writer.Save(LoadedForNodeTypes, LoadedForNodeTypesLabel);
+            writer.Save(UseCalculationParameter, UseCalculationParameterLabel);
+            writer.Save(UseIterativeCalculation, UseIterativeCalculationLabel);
+            writer.EndGroup();
+        }
+
+        internal void Restore(Dictionary<string, object> attributes, string label)
+        {
+            if (attributes.TryGetValue(label, out object dictionary))
+            {
+                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+                {
+                    ConfigIO.Restore(values, EdgeLengthLabel, ref EdgeLength);
+                    ConfigIO.Restore(values, UseSmartMultilevelScalingLabel, ref UseSmartMultilevelScaling);
+                    ConfigIO.Restore(values, UseSmartIdealEdgeCalculationLabel, ref UseSmartIdealEdgeCalculation);
+                    ConfigIO.Restore(values, PerLevelIdealEdgeLengthFactorLabel, ref PerLevelIdealEdgeLengthFactor);
+                    ConfigIO.Restore(values, UseSmartRepulsionRangeCalculationLabel, ref UseSmartRepulsionRangeCalculation);
+                    ConfigIO.Restore(values, GravityStrengthLabel, ref GravityStrength);
+                    ConfigIO.Restore(values, CompoundGravityStrengthLabel, ref CompoundGravityStrength);
+                    ConfigIO.Restore(values, RepulsionStrengthLabel, ref RepulsionStrength);
+                    ConfigIO.Restore(values, MultiLevelScalingLabel, ref MultiLevelScaling);
+                    ConfigIO.Restore(values, ListInnerNodeToggleLabel, ref ListInnerNodeToggle);
+                    ConfigIO.RestoreEnumDict(values, InnerNodeLayoutLabel, ref InnerNodeLayout);
+                    ConfigIO.RestoreEnumDict(values, InnerNodeShapeLabel, ref InnerNodeShape);
+                    ConfigIO.Restore(values, LoadedForNodeTypesLabel, ref LoadedForNodeTypes);
+                    ConfigIO.Restore(values, UseCalculationParameterLabel, ref UseCalculationParameter);
+                    ConfigIO.Restore(values, UseIterativeCalculationLabel, ref UseIterativeCalculation);
+                }
+            }            
+        }
     }
 }
 
