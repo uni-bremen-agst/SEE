@@ -159,6 +159,12 @@ namespace SEEEditor
             UnityEngine.Assertions.Assert.IsNotNull(chartManager);
             chartManager.name = "Chart Manager";
             chartManager.transform.GetChild(0).GetComponent<ChartPositionVr>().cameraTransform = vrCamera.transform;
+            
+            // Create HoloLensAppBar from prefab
+            UnityEngine.Object appBarPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Resources/Prefabs/HoloLensAppBar.prefab");
+            GameObject appBar = Instantiate(appBarPrefab) as GameObject;
+            UnityEngine.Assertions.Assert.IsNotNull(appBar);
+            chartManager.name = AppBarInteractableObject.AppBarName;
         }
 
         /// <summary>
