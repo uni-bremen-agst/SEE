@@ -3,7 +3,6 @@ using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.UI;
 using Microsoft.MixedReality.Toolkit.UI.BoundsControl;
 using Microsoft.MixedReality.Toolkit.UI.BoundsControlTypes;
-using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 
@@ -18,7 +17,7 @@ namespace SEE.Controls
         /// <summary>
         /// Name of the app bar.
         /// </summary>
-        private const string AppBarName = "HoloLensAppBar";
+        public const string AppBarName = "HoloLensAppBar";
         
         /// <summary>
         /// Custom MixedReality pointed action for current game object
@@ -58,11 +57,10 @@ namespace SEE.Controls
 
             if (AppBar == null)
             {
-                GameObject appBar = new GameObject(AppBarName, typeof(AppBar));
-                appBar.transform.parent = null;
-                AppBar = appBar;
-
-                Debug.Log($"A new AppBar '{AppBar.name}' was created and added to root into the current scene");
+                Debug.LogError($"Game object with the name '{AppBarName}' is missing from scene. "
+                               + "Please add it by using the prefab under 'Assets/Resources/Prefabs'.");
+                Destroyer.DestroyComponent(this);
+                return;
             }
             if (!AppBar.TryGetComponent(out AppBarComponent))
             {
