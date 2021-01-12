@@ -1,12 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using SEE.DataModel.DG;
 using SEE.Game;
 using System;
-using SEE.Controls.Actions;
-using SEE.Utils;
-using UnityEngine.UI;
 using SEE.GO;
 
 namespace SEE.Controls
@@ -107,6 +102,7 @@ namespace SEE.Controls
                 {
                     GameObject canvasObject = GameObject.Find("AddingNodeCanvas");
                     CanvasGenerator c = (CanvasGenerator)canvasObject.GetComponent("CanvasGenerator");
+                    c.GetNodeMetrics();
                     c.DestroyGameObject();
                 anotherBool = true;
                 canvasIsClosed = true;
@@ -207,23 +203,18 @@ namespace SEE.Controls
             //Sets the The GONode so the main work can continue;
             GONode = gameNode;
             GameNodeMover.MoveTo(GONode);
-            Debug.Log("Endgültiger Nodename: " + node.SourceName);
-            Debug.Log("Endgültiger Nodetype: " + node.Type);
         }
-
-
 
         /// <summary>
         /// Places a node on call and checks if the city is the preselected one
         /// </summary>
-
         private void Place()
         {
             if (anotherBool)
             {
                 Node node = GONode.GetComponent<NodeRef>().node;
 
-                if (nodename != null || !nodename.Equals(" ")) ;
+                if (nodename != null || !nodename.Equals(" "))
                 {
                     node.SourceName = nodename;
                 }
@@ -283,7 +274,11 @@ namespace SEE.Controls
             Destroy(this);
         }
 
-        public static void  SetBool(bool isactive)
+        /// <summary>
+        /// A setter-method for the canvasIsClosed-Attribute.
+        /// </summary>
+        /// <param name="isactive">the value for the canvasIsClosed-attribute. </param>
+        public static void  SetCanvasIsClosed(bool isactive)
         {
             canvasIsClosed = isactive;
         }

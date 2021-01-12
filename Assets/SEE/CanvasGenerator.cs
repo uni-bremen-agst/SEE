@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// This class is a component of the AddingNodeCanvas and instantiates and destroys the adding-node-canvas script, which contains the addinNodeCanvas-prefab.
+/// </summary>
 public class CanvasGenerator : MonoBehaviour
 {
     // Start is called before the first frame update
@@ -18,6 +21,10 @@ public class CanvasGenerator : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Instantiates the AddingNodeCanvasScript and adds it to the AddingNodeCanvas gameObject.
+    /// </summary>
+    /// <returns>the gameObject of the AddingNodeCanvas-script, which contains the canvas-prefab</returns>
     public GameObject InstantiateGameObject()
     {
         gameObject.AddComponent<AddingNodeCanvasScript>();
@@ -26,35 +33,45 @@ public class CanvasGenerator : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// Destroys the AddingNodeCanvasScript and all childs of it.
+    /// </summary>
     public void DestroyGameObject()
     {
         AddingNodeCanvasScript script = (AddingNodeCanvasScript)gameObject.GetComponent("AddingNodeCanvasScript");
+        if (script != null)
+        {
+            script.DestroyGOAndAllChilds();
+            Destroy(gameObject.GetComponent("AddingNodeCanvasScript"));
+        }
+    }
 
+    /// <summary>
+    /// Extracts the given Nodename, the nodetype and wether it is a inner node or a leaf from the canvas.
+    /// </summary>
+    public void GetNodeMetrics()
+    {
+        AddingNodeCanvasScript script = (AddingNodeCanvasScript)gameObject.GetComponent("AddingNodeCanvasScript");
+
+        //Gets the texts from the InputFields. The sequence in the array is given by the sequence of the components in the prefab.
         Component[] c = script.canvas.GetComponentsInChildren<InputField>();
         InputField inputname = (InputField)c[0];
         InputField inputtype = (InputField)c[1];
 
+        //Gets the selection of the toggleGroup. The sequence in the toggleComponent-Array is given by the sequence of the components in the prefab.
         Component toggleGroup = script.canvas.GetComponentInChildren<ToggleGroup>();
-
         Toggle[] toggles = toggleGroup.GetComponentsInChildren<Toggle>();
-     
-        if(toggles[0].isOn)
+        if (toggles[0].isOn)
         {
-            Debug.Log("InnerNode");
             DesktopNewNodeAction.is_innerNode = true;
         }
         if (toggles[1].isOn)
         {
-            Debug.Log("Leaf");
             DesktopNewNodeAction.is_innerNode = false;
         }
 
-
         DesktopNewNodeAction.nodename = inputname.text;
         DesktopNewNodeAction.nodetype = inputtype.text;
-        
-        script.DestroyAllChilds();
-        Destroy(gameObject.GetComponent("AddingNodeCanvasScript"));
 
     }
 
