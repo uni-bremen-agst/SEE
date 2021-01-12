@@ -35,11 +35,20 @@ namespace SEE.Controls
         /// </summary>
         public GameObject hoveredObject = null;
 
+        /// <summary>
+        /// The script which instantiates the adding-node-canvas
+        /// </summary>
         public CanvasGenerator canvasGenerator;
 
+        /// <summary>
+        /// true, if the addingnode-canvas is closed, else false.
+        /// </summary>
         public static bool canvasIsClosed = true;
 
-        public static bool anotherBool = false;
+        /// <summary>
+        /// True, if the adding-node-canvas was opened, node-values was given and saved and the canvas was closed again, else false.
+        /// </summary>
+        public static bool nodeValuesGiven = false;
 
         /// <summary>
         /// The name of a node given in the input-Field.
@@ -75,7 +84,7 @@ namespace SEE.Controls
                 else
                 {
                     //Creates the new node, important check if the metrics have been set before!
-                    if (anotherBool)
+                    if (nodeValuesGiven)
                     {
                         if (GONode == null)
                         {
@@ -97,26 +106,28 @@ namespace SEE.Controls
                     }
                 }
             }
-            
-                if(!canvasIsClosed)
-                {
-                    GameObject canvasObject = GameObject.Find("AddingNodeCanvas");
-                    CanvasGenerator c = (CanvasGenerator)canvasObject.GetComponent("CanvasGenerator");
-                    c.GetNodeMetrics();
-                    c.DestroyGameObject();
-                anotherBool = true;
+
+            if (!canvasIsClosed)
+            {
+                GameObject canvasObject = GameObject.Find("AddingNodeCanvas");
+                CanvasGenerator c = (CanvasGenerator)canvasObject.GetComponent("CanvasGenerator");
+                c.GetNodeMetrics();
+                c.DestroyGameObject();
+                nodeValuesGiven = true;
                 canvasIsClosed = true;
-                }
+            }
 
         }
 
+        /// <summary>
+        /// opens a dialog-canvas where the user can insert some node-metrics. Therefore,a CanvasGenerator-script-component 
+        /// will be added to this gameObject which contains the canvas.
+        /// </summary>
         public void OpenDialog()
         {
             GameObject canvasObject = GameObject.Find("AddingNodeCanvas");
             CanvasGenerator c = (CanvasGenerator)canvasObject.GetComponent("CanvasGenerator");
             GameObject canvas = c.InstantiateGameObject();
-            Debug.Log(canvas);
-            
         }
 
         /// <summary>
@@ -141,9 +152,12 @@ namespace SEE.Controls
             string randomID = randomizeString();
             System.Random rnd = new System.Random();
             //YOU CANT MODIFY THE VALUES OF A TUPLE, SO YOU NEED TO CREATE A NEW ONE IF YOU WANT TO MODIFY
-            nodeMetrics = new Tuple<string, string, string>(randomID, "TEST-NODE" + rnd.Next(0, 999999999), "TEST NODE");
+            nodeMetrics = new Tuple<string, string, string>(randomID, "NODE" + rnd.Next(0, 999999999), "FILE");
         }
 
+        /// <summary>
+        /// creates a randomized string for the id for the created node
+        /// </summary>
         private static string randomizeString()
         {
             return SEE.Utils.RandomStrings.Get();
@@ -159,7 +173,7 @@ namespace SEE.Controls
             {
                 city.LoadedGraph.AddNode(node);
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 node.ID = randomizeString();
                 addNode(node);
@@ -179,7 +193,6 @@ namespace SEE.Controls
             node.ID = nodeMetrics.Item1;
             node.SourceName = nodeMetrics.Item2;
             node.Type = nodeMetrics.Item3;
-
 
             //Adds the new Node to the City Graph
 
@@ -210,16 +223,17 @@ namespace SEE.Controls
         /// </summary>
         private void Place()
         {
-            if (anotherBool)
+            if (nodeValuesGiven)
             {
                 Node node = GONode.GetComponent<NodeRef>().node;
 
-                if (nodename != null || !nodename.Equals(" "))
+                //this will reached only if the nodename is not set in the inputField
+                if (nodename != null && !nodename.Equals(""))
                 {
                     node.SourceName = nodename;
                 }
 
-                if (nodetype != null || !nodetype.Equals(" "))
+                if (nodetype != null && !nodetype.Equals(""))
                 {
                     node.Type = nodetype;
                 }
@@ -228,16 +242,16 @@ namespace SEE.Controls
                 Debug.Log(node.Type);
 
                 SEECity cityTmp = null;
+                Debug.Log(hoveredObject);
                 if (hoveredObject != null)
                 {
-
                     //checks if the currently hovered object is part of the preselected city
                     GameObject tmp = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
                     try
                     {
                         tmp.TryGetComponent<SEECity>(out cityTmp);
                     }
-                    catch (Exception np)
+                    catch (Exception)
                     {
                         Debug.Log("city not selected"); // FIXME
                         return;
@@ -245,14 +259,15 @@ namespace SEE.Controls
                     if (city.Equals(cityTmp))
                     {
                         GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
-                        anotherBool = false;
+                        nodeValuesGiven = false;
                     }
-
                 }
                 else
                 {
-                    //FIXME: DO WE NEED TO DESTROY THE NODE TO?
+                    //FIXME: DO WE NEED TO DESTROY THE NODE TOO?
                     Destroy(GONode);
+                    nodeValuesGiven = false;
+
                 }
                 GONode = null;
                 city = null;
