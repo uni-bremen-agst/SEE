@@ -75,7 +75,6 @@ namespace SEE.Controls
         [Tooltip("The time in seconds after which staring at an object triggers its hovering action.")]
         public float EyeStareDelay = 1;
 
-
         /// <summary>
         /// The game object representing the active local player, that is, the player 
         /// executing on this local instance of Unity.
@@ -121,7 +120,6 @@ namespace SEE.Controls
             {
                 localPlayerSettings = FindObjectOfType<PlayerSettings>();
             }
-
             return localPlayerSettings;
         }
 

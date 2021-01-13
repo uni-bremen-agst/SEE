@@ -14,7 +14,6 @@ namespace SEE.Controls
     /// </summary>
     public class EyeGazeHandler : BaseEyeFocusHandler
     {
-
         /// <summary>
         /// Seconds to wait before triggering the SetHover event on eye focus.
         /// </summary>
