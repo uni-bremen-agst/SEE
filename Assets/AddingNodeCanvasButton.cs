@@ -12,14 +12,25 @@ public class AddingNodeCanvasButton : MonoBehaviour
     /// <summary>
     /// The button on the adding-node-canvas, which is closing the canvas
     /// </summary>
-    public Button button;
+    public Button addingButton;
+
+    public Button editNodeCancel;
+
+    public Button editNodeButton;
 
     /// <summary>
     /// Adds a listener to the button which calls a method when the button is pushed.
     /// </summary>
     void Start()
     {
-        button.onClick.AddListener(SetCanvasIsClosed);
+        if (addingButton != null)
+        {
+            addingButton.onClick.AddListener(SetCanvasIsClosed);
+        }
+        if (editNodeCancel != null)
+        {
+            editNodeCancel.onClick.AddListener(EditIsCanceled);
+        }
     }
 
     // Update is called once per frame
@@ -34,5 +45,10 @@ public class AddingNodeCanvasButton : MonoBehaviour
     public void SetCanvasIsClosed()
     {
         DesktopNewNodeAction.SetCanvasIsClosed(false);
+    }
+
+    public void EditIsCanceled()
+    {
+        DesktopEditNodeAction.editIsCanceled = true;
     }
 }

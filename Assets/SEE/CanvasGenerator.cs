@@ -25,24 +25,43 @@ public class CanvasGenerator : MonoBehaviour
     /// Instantiates the AddingNodeCanvasScript and adds it to the AddingNodeCanvas gameObject.
     /// </summary>
     /// <returns>the gameObject of the AddingNodeCanvas-script, which contains the canvas-prefab</returns>
-    public GameObject InstantiateGameObject()
+    public GameObject InstantiateAddingNodeCanvas()
     {
         gameObject.AddComponent<AddingNodeCanvasScript>();
-        AddingNodeCanvasScript script = (AddingNodeCanvasScript)gameObject.GetComponent("AddingNodeCanvasScript");
+        AddingNodeCanvasScript script = gameObject.GetComponent<AddingNodeCanvasScript>();
         return script.canvas;
         
     }
 
+    public GameObject InstantiateEditNodeCanvasScript()
+    {
+        gameObject.AddComponent<EditNodeCanvasScript>();
+        AddingNodeCanvasScript script = gameObject.GetComponent<AddingNodeCanvasScript>();
+        return script.canvas;
+
+    }
+
+
     /// <summary>
     /// Destroys the AddingNodeCanvasScript and all childs of it.
     /// </summary>
-    public void DestroyGameObject()
+    public void DestroyAddCanvas()
     {
-        AddingNodeCanvasScript script = (AddingNodeCanvasScript)gameObject.GetComponent("AddingNodeCanvasScript");
+        AddingNodeCanvasScript script = gameObject.GetComponent<AddingNodeCanvasScript>();
         if (script != null)
         {
             script.DestroyGOAndAllChilds();
-            Destroy(gameObject.GetComponent("AddingNodeCanvasScript"));
+            Destroy(gameObject.GetComponent<AddingNodeCanvasScript>());
+        }
+    }
+
+    public void DestroyEditCanvas()
+    {
+        EditNodeCanvasScript script = gameObject.GetComponent<EditNodeCanvasScript>();
+        if (script != null)
+        {
+            script.DestroyGOAndAllChilds();
+            Destroy(gameObject.GetComponent<EditNodeCanvasScript>());
         }
     }
 
@@ -51,7 +70,7 @@ public class CanvasGenerator : MonoBehaviour
     /// </summary>
     public void GetNodeMetrics()
     {
-        AddingNodeCanvasScript script = (AddingNodeCanvasScript)gameObject.GetComponent("AddingNodeCanvasScript");
+        AddingNodeCanvasScript script = (AddingNodeCanvasScript)gameObject.GetComponent<AddingNodeCanvasScript>();
 
         //Gets the texts from the InputFields. The sequence in the array is given by the sequence of the components in the prefab.
         Component[] c = script.canvas.GetComponentsInChildren<InputField>();

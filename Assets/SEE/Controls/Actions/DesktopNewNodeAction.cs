@@ -82,11 +82,16 @@ namespace SEE.Controls
         /// </summary>
         private List<Color> listOfColors = null;
 
+        /// <summary>
+        /// The GameObject Node
+        /// </summary>
+        private GameObject canvasObject;
 
         public void Start()
         {
             hoveredObjectList = new List<GameObject>();
             listOfColors =  new List<Color>();
+            canvasObject = GameObject.Find("CanvasObject");
         }
 
         public void Update()
@@ -133,10 +138,10 @@ namespace SEE.Controls
 
             if (!canvasIsClosed)
             {
-                GameObject canvasObject = GameObject.Find("AddingNodeCanvas");
-                CanvasGenerator c = (CanvasGenerator)canvasObject.GetComponent("CanvasGenerator");
+               
+                CanvasGenerator c = canvasObject.GetComponent<CanvasGenerator>();
                 c.GetNodeMetrics();
-                c.DestroyGameObject();
+                c.DestroyAddCanvas();
                 nodeValuesGiven = true;
                 canvasIsClosed = true;
             }
@@ -149,9 +154,8 @@ namespace SEE.Controls
         /// </summary>
         public void OpenDialog()
         {
-            GameObject canvasObject = GameObject.Find("AddingNodeCanvas");
-            CanvasGenerator c = (CanvasGenerator)canvasObject.GetComponent("CanvasGenerator");
-            GameObject canvas = c.InstantiateGameObject();
+            CanvasGenerator c = canvasObject.GetComponent<CanvasGenerator>();
+            GameObject canvas = c.InstantiateAddingNodeCanvas();
         }
 
         /// <summary>

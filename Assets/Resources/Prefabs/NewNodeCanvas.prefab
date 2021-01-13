@@ -1661,7 +1661,7 @@ GameObject:
   - component: {fileID: 6341249730995801168}
   - component: {fileID: 4276423812148580088}
   m_Layer: 5
-  m_Name: NodeCanvas
+  m_Name: NewNodeCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1765,7 +1765,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 907e5a4f306d4124f98d747b8a17e920, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  button: {fileID: 3702588669730741672}
+  addingButton: {fileID: 3702588669730741672}
+  editNodeCancel: {fileID: 0}
+  editNodeButton: {fileID: 0}
 --- !u!1 &8157448604666641370
 GameObject:
   m_ObjectHideFlags: 0
