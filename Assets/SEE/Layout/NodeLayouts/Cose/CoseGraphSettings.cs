@@ -15,6 +15,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using SEE.DataModel.DG;
 using SEE.Utils;
 using System.Collections.Generic;
 using static SEE.Game.AbstractSEECity;
@@ -27,17 +28,17 @@ namespace SEE.Layout.NodeLayouts.Cose
     public class CoseGraphSettings
     {
         /// <summary>
-        /// The ideal Length of the edge
+        /// The ideal length of the edge
         /// </summary>
         public int EdgeLength = CoseLayoutSettings.Edge_Length;
 
         /// <summary>
-        /// If true the edge length is calcualte with the feature: use smart ideal edge calculation
+        /// If true the edge length is calculated with the feature "use smart ideal edge calculation"
         /// </summary>
         public bool UseSmartIdealEdgeCalculation = CoseLayoutSettings.Use_Smart_Ideal_Edge_Calculation;
 
         /// <summary>
-        /// If true the feature: use smart multilevel calculation is used, the edge length ajusts for each level
+        /// If true the feature "use smart multilevel calculation" is used, the edge length adjusts for each level
         /// </summary>
         public bool UseSmartMultilevelScaling = CoseLayoutSettings.Use_Smart_Multilevel_Calculation;
 
@@ -47,7 +48,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         public float PerLevelIdealEdgeLengthFactor = CoseLayoutSettings.Per_Level_Ideal_Edge_Length_Factor;
 
         /// <summary>
-        /// if true the feature: smart repulsion range calculation is used (Grid variant)
+        /// if true the feature "smart repulsion range calculation" is used (Grid variant)
         /// </summary>
         public bool UseSmartRepulsionRangeCalculation = CoseLayoutSettings.Use_Smart_Repulsion_Range_Calculation;
 

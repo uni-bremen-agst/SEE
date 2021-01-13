@@ -123,7 +123,7 @@ namespace SEE.Game.Charts
         /// <param name="isHighlighted">whether or not the marker should be highlighted</param>
         public void SetHighlightLinkedObject(bool isHighlighted)
         {
-            if (linkedObject.TryGetComponent<InteractableObject>(out InteractableObject interactableObject))
+            if (linkedObject.TryGetComponent(out InteractableObject interactableObject))
             {
                 // We need to call SetSelect only if there is a difference.
                 if (isHighlighted != interactableObject.IsSelected)

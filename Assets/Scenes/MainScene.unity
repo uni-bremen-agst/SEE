@@ -1735,6 +1735,125 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1193892386
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1452257075271347235, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1452257075533063092, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1452257076534230368, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1452257076814911099, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3837134357043826764, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3837134357266201431, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3837134357647747604, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3837134358412584323, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5019665777652161805, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_Name
+      value: HoloLensAppBar
+      objectReference: {fileID: 0}
+    - target: {fileID: 5025193351834278769, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 21
+      objectReference: {fileID: 0}
+    - target: {fileID: 5025193351834278769, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5025193351834278769, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5025193351834278769, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5025193351834278769, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5025193351834278769, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5025193351834278769, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5025193351834278769, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5025193351834278769, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5025193351834278769, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5025193351834278769, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5328971991646898937, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7535373787085950158, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 2b712e916e329da46823a23b42d9899a, type: 3}
 --- !u!1001 &1245159332
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1870,6 +1989,8 @@ MonoBehaviour:
   ShowControllerHints: 0
   experienceScale: 1
   CityScalingFactor: 1
+  EyeGazeHover: 0
+  EyeStareDelay: 0
 --- !u!4 &1510433995
 Transform:
   m_ObjectHideFlags: 0
@@ -2459,7 +2580,31 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Directory
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: File
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -2576,13 +2721,16 @@ MonoBehaviour:
       Data: 5|SEE.Game.LabelSettings, SEE
     - Name: Show
       Entry: 5
-      Data: false
+      Data: true
     - Name: Distance
       Entry: 4
       Data: 0.2
     - Name: FontSize
       Entry: 4
       Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -2598,6 +2746,9 @@ MonoBehaviour:
     - Name: FontSize
       Entry: 4
       Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -3165,7 +3316,7 @@ MonoBehaviour:
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
   LeafObjects: 0
-  InnerNodeObjects: 3
+  InnerNodeObjects: 5
   NodeLayout: 4
   EdgeLayout: 3
   ZScoreScale: 0
@@ -3727,7 +3878,19 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Cluster
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -3851,6 +4014,9 @@ MonoBehaviour:
     - Name: FontSize
       Entry: 4
       Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
     - Name: 
       Entry: 8
       Data: 
@@ -3866,6 +4032,9 @@ MonoBehaviour:
     - Name: FontSize
       Entry: 4
       Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
     - Name: 
       Entry: 8
       Data: 
@@ -3900,20 +4069,76 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: ListInnerNodeToggle
-      Entry: 6
+      Entry: 7
+      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 9|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
       Data: 
     - Name: InnerNodeLayout
-      Entry: 6
+      Entry: 7
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Layout.NodeLayouts.NodeLayoutKind,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 9
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
       Data: 
     - Name: InnerNodeShape
-      Entry: 6
+      Entry: 7
+      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+InnerNodeKinds,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 9
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
       Data: 
     - Name: LoadedForNodeTypes
-      Entry: 6
+      Entry: 7
+      Data: 12|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 9
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
       Data: 
     - Name: UseCalculationParameter
       Entry: 5
-      Data: false
+      Data: true
     - Name: UseIterativeCalculation
       Entry: 5
       Data: false
