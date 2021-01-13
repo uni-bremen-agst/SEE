@@ -2721,7 +2721,7 @@ MonoBehaviour:
       Data: 5|SEE.Game.LabelSettings, SEE
     - Name: Show
       Entry: 5
-      Data: false
+      Data: true
     - Name: Distance
       Entry: 4
       Data: 0.2
@@ -2730,7 +2730,7 @@ MonoBehaviour:
       Data: 0.4
     - Name: AnimationDuration
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -2748,7 +2748,7 @@ MonoBehaviour:
       Data: 0.4
     - Name: AnimationDuration
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -3316,7 +3316,7 @@ MonoBehaviour:
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
   LeafObjects: 0
-  InnerNodeObjects: 3
+  InnerNodeObjects: 5
   NodeLayout: 4
   EdgeLayout: 3
   ZScoreScale: 0
