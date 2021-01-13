@@ -31,6 +31,10 @@ public class AddingNodeCanvasButton : MonoBehaviour
         {
             editNodeCancel.onClick.AddListener(EditIsCanceled);
         }
+        if (editNodeButton != null)
+        {
+            editNodeButton.onClick.AddListener(EditNode);
+        }
     }
 
     // Update is called once per frame
@@ -50,5 +54,10 @@ public class AddingNodeCanvasButton : MonoBehaviour
     public void EditIsCanceled()
     {
         DesktopEditNodeAction.editIsCanceled = true;
+    }
+
+    public void EditNode()
+    {
+        EditNodeCanvasScript.editNode = true;
     }
 }

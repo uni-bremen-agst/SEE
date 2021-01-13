@@ -12,26 +12,48 @@ public class EditNodeCanvasScript : MonoBehaviour
     /// </summary>
     public GameObject canvas;
 
-    public Node nodeToEdit; 
+    public Node nodeToEdit;
 
-    // Start is called before the first frame update
-    void Start()
+    public static bool editNode = false;
+
+    InputField inputname;
+    InputField inputtype;
+
+    public GameObject canvasObject;
+
+// Start is called before the first frame update
+void Start()
     {
         // Note: Its important that the Prefab lays inside of the Resources-Folder to use the Resources.Load-Method.
         canvas = Instantiate(Resources.Load("Prefabs/EditNodeCanvas", typeof(GameObject))) as GameObject;
         canvas.transform.SetParent(gameObject.transform);
 
         Component[] c = canvas.GetComponentsInChildren<InputField>();
-        InputField inputname = (InputField)c[0];
-        InputField inputtype = (InputField)c[1];
+        inputname = (InputField)c[0];
+        inputtype = (InputField)c[1];
         inputname.text = nodeToEdit.SourceName;
         inputtype.text = nodeToEdit.Type;
+        canvasObject = GameObject.Find("CanvasObject");
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        if(editNode)
+        {
+            Debug.Log("ButtonPressed");
+            if (!inputname.text.Equals(nodeToEdit.SourceName))
+            {
+                nodeToEdit.SourceName = inputname.text;
+            }
+            if (!inputtype.text.Equals(nodeToEdit.Type))
+            {
+                nodeToEdit.Type = inputtype.text;
+            }
+            CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
+            generator.DestroyEditCanvas();
+            editNode = false;
+        }
     }
 
     /// <summary>
@@ -41,9 +63,9 @@ public class EditNodeCanvasScript : MonoBehaviour
     {
         foreach (Transform child in canvas.transform)
         {
-            GameObject.Destroy(child.gameObject);
+            Destroy(child.gameObject);
         }
-        GameObject.Destroy(canvas);
+        Destroy(canvas);
     }
 
 }
