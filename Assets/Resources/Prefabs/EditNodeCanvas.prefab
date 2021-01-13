@@ -1372,6 +1372,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   addingButton: {fileID: 2912748952741219896}
   editNodeCancel: {fileID: 826077016185094173}
+  editNodeButton: {fileID: 2912748952741219896}
 --- !u!1 &9140197740766457383
 GameObject:
   m_ObjectHideFlags: 0
