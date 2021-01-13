@@ -548,6 +548,7 @@ namespace SEE.Utils
             Assert.AreEqual(expected.Show, actual.Show);
             Assert.AreEqual(expected.FontSize, actual.FontSize, 0.001f);
             Assert.AreEqual(expected.Distance, actual.Distance, 0.001f);
+            Assert.AreEqual(expected.AnimationDuration, actual.AnimationDuration, 0.001f);
         }
 
         /// <summary>
@@ -713,6 +714,9 @@ namespace SEE.Utils
             city.Tension = 0.0f;
             city.RDP = 10;
 
+            WipeOutLabelSettings(ref city.LeafLabelSettings);
+            WipeOutLabelSettings(ref city.InnerNodeLabelSettings);
+
             // CoseGraphSettings
             city.CoseGraphSettings.EdgeLength++;
             city.CoseGraphSettings.UseSmartIdealEdgeCalculation = !city.CoseGraphSettings.UseSmartIdealEdgeCalculation;
@@ -729,6 +733,18 @@ namespace SEE.Utils
             city.CoseGraphSettings.LoadedForNodeTypes = new Dictionary<string, bool>() { { "ID1", false }, { "ID2", true } };
             city.CoseGraphSettings.UseCalculationParameter = !city.CoseGraphSettings.UseCalculationParameter;
             city.CoseGraphSettings.UseIterativeCalculation = !city.CoseGraphSettings.UseIterativeCalculation;
+        }
+
+        /// <summary>
+        /// Modifies all attributes of <paramref name="settings"/>.
+        /// </summary>
+        /// <param name="settings">settings whose attributes are to be modified</param>
+        private static void WipeOutLabelSettings(ref LabelSettings settings)
+        {
+            settings.AnimationDuration++;
+            settings.Show = !settings.Show;
+            settings.FontSize++;
+            settings.Distance++;
         }
 
         //--------------------------------------------------------
