@@ -176,7 +176,7 @@ namespace SEE.Controls.Actions
         {
             try
             {
-                CircularMenu circularMenu = (CircularMenu)GameObject.Find("0").GetComponent("CircularMenu");
+                CircularMenu circularMenu = GameObject.Find("0").GetComponent<CircularMenu>();
                 circularMenu.Off();
                 circularMenu.MenuIsOn = false;
             }

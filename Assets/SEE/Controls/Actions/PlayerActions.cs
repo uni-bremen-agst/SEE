@@ -182,6 +182,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void Cancel()
         {
+            GameObject addingNodeCanvas = GameObject.Find("CanvasObject");
+            CanvasGenerator generator = (CanvasGenerator)addingNodeCanvas.GetComponent<CanvasGenerator>();
             switch (state)
             {
                 case State.Browse:
@@ -192,14 +194,16 @@ namespace SEE.Controls.Actions
                 case State.MoveNode:
                     break;
                 case State.NewNode:
-                    CanvasGenerator generator = (CanvasGenerator)GameObject.Find("AddingNodeCanvas").GetComponent("CanvasGenerator");
-                    generator.DestroyGameObject();
+                    generator.DestroyAddCanvas();
                     gameObject.GetComponent<DesktopNewNodeAction>().hoveredObject = null;
                     gameObject.GetComponent<DesktopNewNodeAction>().removeScript();
                     break;
                 case State.ScaleNode:
                     break;
                 case State.EditNode:
+                    generator.DestroyEditCanvas();
+                    gameObject.GetComponent<DesktopEditNodeAction>().hoveredObject = null;
+                    gameObject.GetComponent<DesktopEditNodeAction>().removeScript();
                     break;
 
                 default:
