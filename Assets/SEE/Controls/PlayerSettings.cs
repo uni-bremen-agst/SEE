@@ -1,9 +1,14 @@
-﻿using System;
+﻿
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.MixedReality.Toolkit;
+using Microsoft.MixedReality.Toolkit.UI;
+using Microsoft.MixedReality.Toolkit.UI.BoundsControl;
 using Microsoft.MixedReality.Toolkit.Utilities;
 using OdinSerializer;
 using SEE.DataModel;
+using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.XR;
@@ -37,7 +42,7 @@ namespace SEE.Controls
         /// A mapping from PlayerInputType onto the names of the player game objects.
         /// The order must be consistent with <see cref="PlayerInputType"/>.
         /// </summary>
-        public static readonly string[] PlayerName = new[] {
+        public static readonly string[] PlayerName = {
             "DesktopPlayer", // Desktop
             "InControl",     // TouchGamepad
             "VRPlayer",      // VR          
@@ -63,16 +68,28 @@ namespace SEE.Controls
         [Tooltip("The factor by which code cities should be scaled on startup."), OdinSerialize, Min(0.01f)]
         public float CityScalingFactor = 1f;
 
+        [Tooltip("Whether eye gaze should trigger hovering actions, such as node labels.")]
+        public bool EyeGazeHover = true;
+
+        [Range(0, 20)]
+        [Tooltip("The time in seconds after which staring at an object triggers its hovering action.")]
+        public float EyeStareDelay = 1;
+
         /// <summary>
         /// The game object representing the active local player, that is, the player 
         /// executing on this local instance of Unity.
         /// </summary>
-        [HideInInspector]
         public static GameObject LocalPlayer
         {
             get;
             private set;
         }
+        
+        /// <summary>
+        /// The cached player settings within this local instance of Unity.
+        /// Will be updated by <see cref="GetPlayerSettings"/> on its first call.
+        /// </summary>
+        private static PlayerSettings localPlayerSettings;
 
         /// <summary>
         /// The cached player input type within this local instance of Unity.
@@ -88,9 +105,22 @@ namespace SEE.Controls
         {
             if (localPlayerInputType == PlayerInputType.None)
             {
-                localPlayerInputType = FindObjectOfType<PlayerSettings>().playerInputType;
+                localPlayerInputType = GetPlayerSettings().playerInputType;
             }
             return localPlayerInputType;
+        }
+
+        /// <summary>
+        /// The player settings within this local instance of Unity.
+        /// </summary>
+        /// <returns>player settings</returns>
+        public static PlayerSettings GetPlayerSettings()
+        {
+            if (localPlayerSettings == null)
+            {
+                localPlayerSettings = FindObjectOfType<PlayerSettings>();
+            }
+            return localPlayerSettings;
         }
 
         /// <summary>
@@ -126,15 +156,15 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Disabbles all TeleportAreas and Teleports (SteamVR).
+        /// Disables all TeleportAreas and Teleports (SteamVR).
         /// </summary>
-        private void DisableSteamVRTeleporting()
+        private static void DisableSteamVRTeleporting()
         {
-            foreach (TeleportArea area in UnityEngine.Object.FindObjectsOfType<TeleportArea>())
+            foreach (TeleportArea area in FindObjectsOfType<TeleportArea>())
             {
                 area.gameObject.SetActive(false);
             }
-            foreach (Teleport port in UnityEngine.Object.FindObjectsOfType<Teleport>())
+            foreach (Teleport port in FindObjectsOfType<Teleport>())
             {
                 port.gameObject.SetActive(false);
             }
@@ -162,7 +192,7 @@ namespace SEE.Controls
         /// <summary>
         /// Enables or disables mixed reality capabilities, including the Mixed Reality Toolkit.
         /// </summary>
-        /// param name = "isActive" > If true, mixed reality capabilities are enabled, otherwise they will be disabled.</param>
+        /// <param name = "isActive"> If true, mixed reality capabilities are enabled, otherwise they will be disabled.</param>
         private void SetMixedReality(bool isActive)
         {
             SetActive(PlayerName[(int)PlayerInputType.HoloLens], isActive);
@@ -185,34 +215,68 @@ namespace SEE.Controls
                 // Set selected experience scale 
                 MixedRealityToolkit.Instance.ActiveProfile.TargetExperienceScale = experienceScale;
                 
+                Debug.Log($"Current HoloLens scale: {experienceScale.ToString()}\n");
                 if (experienceScale == ExperienceScale.Seated || experienceScale == ExperienceScale.OrientationOnly)
                 {
                     // Position and scale planes and CodeCities accordingly using CityCollection grid
                     GameObject cityCollection = GameObject.Find("CityCollection").AssertNotNull("CityCollection");
-                    UnityEngine.Assertions.Assert.IsTrue(cityCollection.TryGetComponent(out GridObjectCollection grid));
-                    GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
-                    foreach (GameObject city in cities)
-                    {
-                        city.transform.localScale *= CityScalingFactor;
-                        // City needs to be parented to collection to be organized by it
-                        city.transform.parent = cityCollection.transform;
-                    }
 
-                    // To avoid overlaps, set cell width to maximum length of code cities
-                    grid.CellWidth = cities.Select(x => x.transform.localScale.MaxComponent()).Max();
-                    grid.UpdateCollection();
+                    if (cityCollection.TryGetComponentOrLog(out GridObjectCollection grid))
+                    {
+
+                        GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
+
+                        foreach (GameObject city in cities)
+                        {
+                            // Scale city by given factor, and reset position to origin
+                            city.transform.localScale *= CityScalingFactor;
+                            // City needs to be parented to collection to be organized by it
+                            city.transform.parent = cityCollection.transform;
+                            
+                            AddInteractions(city);
+                            AppBarCityConfiguration(city);
+                        }
+
+                        SetGridCellWidth(grid, cities);
+                    }
                 }
-            }            
+            }
+
+            #region Local Methods
+
+            //Sets the width of the Grid containing the cities
+            void SetGridCellWidth(GridObjectCollection grid, IEnumerable<GameObject> cities)
+            {
+                // To avoid overlaps, set cell width to maximum length of code cities
+                grid.CellWidth = cities.Max(x => x.transform.localScale.MaxComponent());
+                grid.UpdateCollection();
+            }
+
+            // Adds AppBar and ObjectManipulator components to City
+            void AddInteractions(GameObject city)
+            {
+                city.AddComponent<AppBarInteractableObject>();
+                city.AddComponent<ObjectManipulator>();
+            }
+
+            void AppBarCityConfiguration(GameObject city)
+            {
+                BoundsControl boundsControl = city.AddComponent<BoundsControl>();
+                boundsControl.BoundsControlActivation = Microsoft.MixedReality.Toolkit.UI.BoundsControlTypes
+                                                                 .BoundsControlActivationType.ActivateManually;
+            }
+
+            #endregion
         }
 
         /// <summary>
-        /// Enables or disables a game object with the given <paramref name="name" />.
+        /// Enables or disables a game object with the given <paramref name="gameObjectName" />.
         /// </summary>
-        /// <param name="name">name of the object to be enabled/disabled</param>
+        /// <param name="gameObjectName">name of the object to be enabled/disabled</param>
         /// <param name="activate">whether to enable or disable the object</param>
-        private void SetActive(string name, bool activate)
+        private void SetActive(string gameObjectName, bool activate)
         {
-            GameObject player = GameObject.Find(name);
+            GameObject player = GameObject.Find(gameObjectName);
             player?.SetActive(activate);           
         }
 

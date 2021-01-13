@@ -101,7 +101,7 @@ namespace SEE.Utils
 
         protected Stack<State> context = new Stack<State>();
         protected string filename;
-        protected XmlTextReader reader;
+        protected XmlReader reader;
         protected SEE.Utils.ILogger logger = null;
 
         [Serializable]
@@ -134,7 +134,7 @@ namespace SEE.Utils
         {
             if (logger != null)
             {
-                IXmlLineInfo xmlInfo = reader;
+                IXmlLineInfo xmlInfo = (IXmlLineInfo) reader;
                 int lineNumber = xmlInfo.LineNumber - 1;
                 logger.LogError(filename + ":" + lineNumber + ": " + message + "\n");
             }
