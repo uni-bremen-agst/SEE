@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
@@ -117,6 +118,11 @@ namespace SEEEditor
                 city.LODCulling = EditorGUILayout.Slider(city.LODCulling, 0.0f, 1.0f);
                 GUILayout.EndHorizontal();
             }
+
+            GUILayout.Label("Data", EditorStyles.boldLabel);
+
+            // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
+            // TODO: We may want to allow a user to define which node attributes should be mapped onto which icons
         }
 
         /// <summary>
@@ -315,11 +321,17 @@ namespace SEEEditor
             }
         }
 
+        /// <summary>
+        /// Allows the user to set the attributes of <paramref name="labelSettings"/>.
+        /// </summary>
+        /// <param name="labelSettings">settings to be retrieved from the user</param>
         private void LabelSettings(ref LabelSettings labelSettings)
         {
             labelSettings.Show = EditorGUILayout.Toggle("Show labels", labelSettings.Show);
             labelSettings.Distance = EditorGUILayout.FloatField("Label distance", labelSettings.Distance);
             labelSettings.FontSize = EditorGUILayout.FloatField("Label font size", labelSettings.FontSize);
+            labelSettings.AnimationDuration = EditorGUILayout.FloatField("Label animation duration (in seconds)",
+                                                                         labelSettings.AnimationDuration);
         }
     }
 }

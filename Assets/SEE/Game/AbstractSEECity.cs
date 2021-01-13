@@ -322,6 +322,7 @@ namespace SEE.Game
         [OdinSerialize]
         public LabelSettings LeafLabelSettings = new LabelSettings();
 
+
         /// <summary>
         /// All metrics used for visual attributes of a leaf node (WidthMetric, HeightMetric,
         /// DepthMetric, and LeafStyleMetric). 
@@ -593,6 +594,7 @@ namespace SEE.Game
         /// </summary>
         public float MaxErosionWidth = 1.0f; // serialized by Unity
 
+
         /// <summary>
         /// Orientation of the edges; 
         /// if false, the edges are drawn below the houses;
@@ -632,30 +634,26 @@ namespace SEE.Game
                 Debug.LogError("Empty graph path.\n");
                 return new Graph();
             }
-            else
-            {
-                if (File.Exists(filename))
-                {
-                    Performance p = Performance.Begin("loading graph data from " + filename);
-                    GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, logger: new SEELogger());
-                    graphCreator.Load();
-                    Graph graph = graphCreator.GetGraph();
-                    p.End();
-                    Debug.Log("Loaded graph data successfully:"
-                        + "\nFilename: " + filename
-                        + "\nNumber of nodes: " + graph.NodeCount
-                        + "\nNumber of edges: " + graph.EdgeCount
-                        + "\nElapsed time: " + p.GetElapsedTime() + "[h:m:s:ms]\n");
 
-                    LoadDataForGraphListing(graph);
-                    return graph;
-                }
-                else
-                {
-                    Debug.LogErrorFormat("GXL file {0} does not exist.\n", filename);
-                    return new Graph();
-                }
+            if (File.Exists(filename))
+            {
+                Performance p = Performance.Begin("loading graph data from " + filename);
+                GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, logger: new SEELogger());
+                graphCreator.Load();
+                Graph graph = graphCreator.GetGraph();
+                p.End();
+                Debug.Log("Loaded graph data successfully:"
+                          + "\nFilename: " + filename
+                          + "\nNumber of nodes: " + graph.NodeCount
+                          + "\nNumber of edges: " + graph.EdgeCount
+                          + "\nElapsed time: " + p.GetElapsedTime() + "[h:m:s:ms]\n");
+
+                LoadDataForGraphListing(graph);
+                return graph;
             }
+
+            Debug.LogErrorFormat("GXL file {0} does not exist.\n", filename);
+            return new Graph();
         }
 
         /// <summary>
@@ -705,7 +703,8 @@ namespace SEE.Game
                     CoseGraphSettings.ListInnerNodeToggle = dirsLocal;
                 }
 
-                CoseGraphSettings.LoadedForNodeTypes = SelectedNodeTypes.Where(type => type.Value == true).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                CoseGraphSettings.LoadedForNodeTypes = SelectedNodeTypes.Where(type => type.Value)
+                                                                        .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             }
         }
     }

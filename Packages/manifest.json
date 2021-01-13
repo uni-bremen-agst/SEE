@@ -10,12 +10,9 @@
     }
   ],
   "dependencies": {
-    "com.microsoft.mixedreality.toolkit.foundation": "2.5.1",
-    "com.microsoft.mixedreality.toolkit.tools": "2.5.1",
-    "com.unity.2d.sprite": "1.0.0",
-    "com.unity.2d.tilemap": "1.0.0",
-    "com.unity.ads": "3.5.2",
-    "com.unity.analytics": "3.3.5",
+    "com.microsoft.mixedreality.toolkit.examples": "2.5.3",
+    "com.microsoft.mixedreality.toolkit.foundation": "2.5.3",
+    "com.microsoft.mixedreality.toolkit.tools": "2.5.3",
     "com.unity.collab-proxy": "1.2.16",
     "com.unity.ext.nunit": "1.0.5",
     "com.unity.ide.rider": "1.1.4",
