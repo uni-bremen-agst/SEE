@@ -3,6 +3,8 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using System;
 using SEE.GO;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SEE.Controls
 {
@@ -60,9 +62,31 @@ namespace SEE.Controls
         /// </summary>
         public static string nodetype;
 
+        /// <summary>
+        /// Colour the hovered city is changed to when hovered or selected. 
+        /// </summary>
+        private Color BLACK = Color.black;
+
+        /// <summary>
+        /// Colour the hovered city is changed to when hovered or selected. 
+        /// </summary>
+        private Color GREEN = Color.green;
+
+        /// <summary>
+        /// A list the hovered GameObjects are stored in.
+        /// </summary>
+        private List<GameObject> hoveredObjectList = null;
+
+        /// <summary>
+        /// A list the colors of the hovered GameObjects are stored in.
+        /// </summary>
+        private List<Color> listOfColors = null;
+
+
         public void Start()
         {
-
+            hoveredObjectList = new List<GameObject>();
+            listOfColors =  new List<Color>();
         }
 
         public void Update()
@@ -135,8 +159,31 @@ namespace SEE.Controls
         /// </summary>
         private void selectCity()
         {
+            
+            // The case the user hovers an object and has hovered objects before. The former colors of the specific objects are set again.
+            if(hoveredObject != null && hoveredObjectList.Count >0 && hoveredObject.gameObject.GetComponent<Renderer>().material.color != GREEN || hoveredObject == null && hoveredObjectList.Count > 0)
+            {
+                int ct = 0; 
+                foreach(GameObject GO in hoveredObjectList)
+                {
+                    GO.gameObject.GetComponent<Renderer>().material.color = listOfColors.ElementAt(ct);
+                    ct++;
+                }
+                listOfColors.Clear();
+                hoveredObjectList.Clear();
+            }
 
-            if (hoveredObject != null && Input.GetMouseButtonDown(0))
+            if (hoveredObject != null)
+            {
+                // The case the user hovers over an object which is not stored yet in the datastructure.
+                // The object is either dyed green in case it is not already green, else black.
+                if (!(hoveredObjectList.Contains(hoveredObject)))
+                {
+                    changeColor(hoveredObject, hoveredObject.gameObject.GetComponent<Renderer>().material.color);
+                }
+            }
+
+                if (hoveredObject != null && Input.GetMouseButtonDown(0))
             {
                 //Gets the SEECity from the hoverdObject
                 SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject.TryGetComponent<SEECity>(out city);
@@ -155,6 +202,23 @@ namespace SEE.Controls
             nodeMetrics = new Tuple<string, string, string>(randomID, "NODE" + rnd.Next(0, 999999999), "FILE");
         }
 
+        /// <summary>
+        /// Dyes the hoveredObject either green in case it is not already green, else black.
+        /// </summary>
+        private void changeColor(GameObject hoveredbject, Color colorOfCity)
+        {
+            Color newCityColor = new Color();
+            if (colorOfCity == GREEN)
+            { newCityColor = BLACK;
+            }
+            else 
+            {
+                newCityColor = GREEN;
+            }
+            hoveredObjectList.Add(hoveredObject);
+            listOfColors.Add(hoveredObject.gameObject.GetComponent<Renderer>().material.color);
+            hoveredObject.gameObject.GetComponent<Renderer>().material.color = newCityColor;
+        }
         /// <summary>
         /// creates a randomized string for the id for the created node
         /// </summary>
