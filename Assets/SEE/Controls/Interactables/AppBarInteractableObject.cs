@@ -13,7 +13,6 @@ namespace SEE.Controls
     /// </summary>
     public class AppBarInteractableObject : MonoBehaviour, IMixedRealityPointerHandler
     {
-
         /// <summary>
         /// Name of the app bar.
         /// </summary>
@@ -46,7 +45,6 @@ namespace SEE.Controls
 
         private void Start()
         {
-
             if (PlayerSettings.GetInputType() != PlayerSettings.PlayerInputType.HoloLens)
             {
                 Destroyer.DestroyComponent(this);
@@ -60,21 +58,22 @@ namespace SEE.Controls
                 Debug.LogError($"Game object with the name '{AppBarName}' is missing from scene. "
                                + "Please add it by using the prefab under 'Assets/Resources/Prefabs'.");
                 Destroyer.DestroyComponent(this);
-                return;
             }
-            if (!AppBar.TryGetComponent(out AppBarComponent))
+            else
             {
-                AppBar.AddComponent<AppBar>();
-                AppBarComponent = AppBar.GetComponent<AppBar>();
-            }
+                if (!AppBar.TryGetComponent(out AppBarComponent))
+                {
+                    AppBar.AddComponent<AppBar>();
+                    AppBarComponent = AppBar.GetComponent<AppBar>();
+                }
 
-            if (!gameObject.TryGetComponent(out BoundsControl))
-            {
-                gameObject.AddComponent<BoundsControl>();
-                BoundsControl = gameObject.GetComponent<BoundsControl>();
-                Debug.Log($"A BoundsControl was added to the GameObject {gameObject.name}!");
-                BoundsControl.BoundsControlActivation = BoundsControlActivationType.ActivateByPointer;
-
+                if (!gameObject.TryGetComponent(out BoundsControl))
+                {
+                    gameObject.AddComponent<BoundsControl>();
+                    BoundsControl = gameObject.GetComponent<BoundsControl>();
+                    Debug.Log($"A BoundsControl was added to the GameObject {gameObject.name}!");
+                    BoundsControl.BoundsControlActivation = BoundsControlActivationType.ActivateByPointer;
+                }
             }
         }
 
