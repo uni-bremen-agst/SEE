@@ -73,6 +73,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Called from the menu as a callback when the user selects the map menu entry.
+        /// Passes the map request on to <see cref="playerActions"/>.
+        /// </summary>
+        private void DrawOn()
+        {
+            playerActions.Draw();
+        }
+
+        /// <summary>
         /// Path of the prefix for the sprite to be instantiated for the menu entries.
         /// </summary>
         private const string menuEntrySprite = "Icons/Circle";
@@ -118,6 +127,14 @@ namespace SEE.Controls.Actions
                                    activeColor: Color.green,
                                    inactiveColor: Lighter(Color.green),
                                    entryOn: MapOn,
+                                   entryOff: null,
+                                   isTransient: true),
+                // Drawing a new edge between to gameobjects
+                new MenuDescriptor(label: "DrawEdge",
+                                   spriteFile: menuEntrySprite,
+                                   activeColor: Color.green,
+                                   inactiveColor: Lighter(Color.green),
+                                   entryOn: DrawOn,
                                    entryOff: null,
                                    isTransient: true),
             };

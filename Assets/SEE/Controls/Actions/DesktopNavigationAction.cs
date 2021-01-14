@@ -213,32 +213,33 @@ namespace SEE.Controls.Actions
                         Select(actionState.hoveredTransform ? actionState.hoveredTransform.gameObject : null, !actionState.selectToggle);
                     }
 
-                    if (Input.GetKeyDown(KeyCode.F1))
-                    {
-                        if (objectToBeConnected == null)
-                        {
-                            objectToBeConnected = actionState.hoveredTransform.gameObject;
-                        }
-                        else if (objectToBeConnected != actionState.hoveredTransform.gameObject)
-                        {
-                            if (objectToBeConnected.TryGetComponent(out NodeRef source) && actionState.hoveredTransform.gameObject.TryGetComponent(out NodeRef target))
-                            {
-                                Edge testEdge = new Edge(source.node, target.node, "test");
-                                Debug.Log("Hier ist deine Nachricht, alter Freund");
-
-                                // Wirres Probieren
-                                EdgeFactory test2 = new EdgeFactory(new StraightEdgeLayout(SceneQueries.GetCodeCity(source.transform).GetComponent<AbstractSEECity>().EdgesAboveBlocks, 1f) , 1f);
-                                ICollection<Node> nodeList = new List<Node>();
-                                ICollection<Edge> edgeList = new List<Edge>();
-                                nodeList.Add(source.node);
-                                nodeList.Add(target.node);
-                                edgeList.Add(testEdge);
-                                test2.DrawEdges((ICollection<ILayoutNode>)nodeList, (ICollection<LayoutEdge>)edgeList);
-                                //Wirres Probieren Ende
-                            }
-
-                        }
-                    }
+                    //if (Input.GetKeyDown(KeyCode.F1))
+                    //{
+                    //    if (objectToBeConnected == null)
+                    //    {
+                    //        objectToBeConnected = actionState.hoveredTransform.gameObject;
+                    //    }
+                    //    else if (objectToBeConnected != actionState.hoveredTransform.gameObject)
+                    //    {
+                    //        if (objectToBeConnected.TryGetComponent(out NodeRef source) && actionState.hoveredTransform.gameObject.TryGetComponent(out NodeRef target))
+                    //        {
+                    //            
+                    //            //Edge testEdge = new Edge(source.node, target.node, "test");
+                    //            //Debug.Log("Hier ist deine Nachricht, alter Freund");
+                    //            //
+                    //            //// Wirres Probieren
+                    //            //EdgeFactory test2 = new EdgeFactory(new StraightEdgeLayout(SceneQueries.GetCodeCity(source.transform).GetComponent<AbstractSEECity>().EdgesAboveBlocks, 1f) , 1f);
+                    //            //ICollection<Node> nodeList = new List<Node>();
+                    //            //ICollection<Edge> edgeList = new List<Edge>();
+                    //            //nodeList.Add(source.node);
+                    //            //nodeList.Add(target.node);
+                    //            //edgeList.Add(testEdge);
+                    //            //test2.DrawEdges((ICollection<ILayoutNode>)nodeList, (ICollection<LayoutEdge>)edgeList);
+                    //            ////Wirres Probieren Ende
+                    //        }
+                    //
+                    //    }
+                    //}
                 }
 
                 // Select mode
