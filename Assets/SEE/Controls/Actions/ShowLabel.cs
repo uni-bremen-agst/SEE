@@ -5,7 +5,6 @@ using SEE.Utils;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Assertions;
 using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls.Actions
@@ -223,9 +222,16 @@ namespace SEE.Controls.Actions
             Vector3 nodeTopPosition = gameObject.transform.position;
             nodeTopPosition.y = BoundingBox.GetRoof(new List<GameObject> { gameObject });
             labelPosition.y -= nodeLabel.GetComponent<TextMeshPro>().textBounds.extents.y;
-            LineFactory.Draw(nodeLabel, new[] { nodeTopPosition, labelPosition }, 0.01f,
-                Materials.New(Materials.ShaderType.TransparentLine, Color.black.ColorWithAlpha(0.98f)));
 
+            {
+                // We make the line an own game object so that we can set the line renderers
+                // co-ordinate system to useWorldSpace = false. As a consequence, the parent object
+                // can be moved and the line wil move along with it.
+                GameObject edge = new GameObject();
+                LineFactory.Draw(edge, new[] { nodeTopPosition, labelPosition }, 0.01f,
+                    Materials.New(Materials.ShaderType.TransparentLine, Color.black.ColorWithAlpha(0.98f)));
+                edge.transform.SetParent(nodeLabel.transform);
+            }
             Portal.SetInfinitePortal(nodeLabel);
         }
 
