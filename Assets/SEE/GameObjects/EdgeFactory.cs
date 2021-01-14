@@ -120,7 +120,10 @@ namespace SEE.GO
                    // vertex.y *= ;
                 //});
                 meshCollider.sharedMesh = mesh;
-                meshCollider.convex = false;
+
+                //FIXME
+                // Convex ist eher ungeil, da zu groß. Funktioniert aber vorerst.
+                meshCollider.convex =true;
 
 
                 // FIXME
