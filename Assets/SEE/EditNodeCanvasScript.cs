@@ -7,9 +7,6 @@ using UnityEngine.UI;
 
 public class EditNodeCanvasScript : MonoBehaviour
 {
-    /// <summary>
-    /// The canvas-prefab for the new-node-process.
-    /// </summary>
     public GameObject canvas;
 
     public Node nodeToEdit;
@@ -51,7 +48,7 @@ void Start()
                 nodeToEdit.Type = inputtype.text;
             }
             CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
-            generator.DestroyEditCanvas();
+            generator.DestroyEditNodeCanvas();
             editNode = false;
         }
     }

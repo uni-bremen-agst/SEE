@@ -5,10 +5,8 @@ using UnityEngine.UI;
 
 
 public class AddingNodeCanvasScript : MonoBehaviour
-{ 
-    /// <summary>
-    /// The canvas-prefab for the new-node-process.
-    /// </summary>
+{
+
     public GameObject canvas;
 
     // Start is called before the first frame update
