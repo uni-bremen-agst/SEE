@@ -194,18 +194,17 @@ namespace SEE.Controls.Actions
                 case State.MoveNode:
                     break;
                 case State.NewNode:
-                    generator.DestroyAddCanvas();
+                    generator.DestroyAddNodeCanvas();
                     gameObject.GetComponent<DesktopNewNodeAction>().hoveredObject = null;
-                    gameObject.GetComponent<DesktopNewNodeAction>().removeScript();
+                    gameObject.GetComponent<DesktopNewNodeAction>().RemoveScript();
                     break;
                 case State.ScaleNode:
                     break;
                 case State.EditNode:
-                    generator.DestroyEditCanvas();
+                    generator.DestroyEditNodeCanvas();
                     gameObject.GetComponent<DesktopEditNodeAction>().hoveredObject = null;
-                    gameObject.GetComponent<DesktopEditNodeAction>().removeScript();
+                    gameObject.GetComponent<DesktopEditNodeAction>().RemoveScript();
                     break;
-
                 default:
                     throw new System.NotImplementedException();
             }
