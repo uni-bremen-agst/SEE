@@ -38,7 +38,6 @@ void Start()
     {
         if(editNode)
         {
-            Debug.Log("ButtonPressed");
             if (!inputname.text.Equals(nodeToEdit.SourceName))
             {
                 nodeToEdit.SourceName = inputname.text;
