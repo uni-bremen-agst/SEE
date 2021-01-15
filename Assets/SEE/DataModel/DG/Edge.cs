@@ -38,20 +38,20 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// Constructor. Source, target, and type of the edge remain undefined.
+        /// A random ID will be used for this edge.
+        /// </summary>
+        public Edge()
+        {
+            id = Utils.RandomStrings.Get();
+        }
+
+        /// <summary>
         /// The name of the toggle attribute that marks edges that where lifted from
         /// lower level nodes to higher level nodes rather than being part of the 
         /// original graph loaded. Such edges are introduced artifically.
         /// </summary>
         public const string IsLiftedToggle = "IsLifted";
-
-        public override string Type
-        {
-            get => base.Type;
-            set
-            {
-                base.Type = !string.IsNullOrEmpty(value) ? value : "Unknown";               
-            }
-        }
 
         /// <summary>
         /// The source of the edge.
