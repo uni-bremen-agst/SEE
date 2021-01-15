@@ -22,9 +22,7 @@ using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.Layout;
 using UnityEngine;
-using SEE.Layout.Utils;
 
 namespace SEE.Game.Evolution
 {
@@ -223,9 +221,11 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// The list of edges rendered for this graph.
         /// </summary>
-        private ICollection<GameObject> edges = new List<GameObject>();
+        private ICollection<GameObject> edges;
 
-        private List<(string, Vector3[])> newPoints;
+        private ICollection<GameObject> newEdges;
+
+        private ICollection<GameObject> newEdges2;
 
         /// <summary>
         /// Renders all edges for the nodes in the node cache according to the settings.
@@ -233,71 +233,64 @@ namespace SEE.Game.Evolution
         /// </summary>
         public void RenderEdges()
         {
-            //ClearEdges();
+            ClearEdges();
             // FIXME: Provide meaningful values for scaleFactor.
 
-            List<(string, Vector3[])> oldPoints = new List<(string, Vector3[])>();
-            List<(string, Vector3[])> newPoints = new List<(string, Vector3[])>();
 
-            if (null != edges)
-            {
-                int count = 0;
-                foreach (GameObject e in edges)
-                {
-                    LineRenderer line;
-
-                    e.TryGetComponent<LineRenderer>(out line);
-                    Vector3[] v = new Vector3[line.positionCount];
-                    for (int i = 0; i < line.positionCount; i++)
-                    {
-                        v[i] = line.GetPosition(i);
-                    }
-                    oldPoints.Add((e.name, v));
-                    count++;
-                }
-            }
-
-            ClearEdges();
 
             edges = _graphRenderer.EdgeLayout(nodes.Values);
 
-            foreach(GameObject edge in edges){
-                LineRenderer lr;
-                edge.TryGetComponent<LineRenderer>(out lr);
-                //Destroyer.DestroyComponent(lr);
-                //for(int i = 0 ; i < lr.positionCount; i++){
-                 //   Debug.LogFormat("Pos: " + lr.GetPosition(i));
-                //}
-            }
+
+           
         }
 
-        //Removes Edge
+        public void RenderEdges2()
+        {
+            ClearEdges2();
+            // FIXME: Provide meaningful values for scaleFactor.
+
+
+
+            newEdges2 = _graphRenderer.EdgeLayout(nodes.Values);
+
+
+           
+        }
+
+
+        public ICollection<GameObject> GetEdges2(){return newEdges2;}
+
+        public ICollection<GameObject> GetEdges(){return edges;}
+
+        public ICollection<GameObject> CalculateNewEdgeControlPoints(){
+            ClearNewEdges();
+            newEdges = _graphRenderer.CalculateNewEdgeLayout(nodes.Values);
+            return newEdges;
+
+        }
+
         public void RemoveEdge(Edge edge){
-            foreach(GameObject e in edges.ToList()){
-                if(e.ID().Equals(edge.ID)){
-                    edges.Remove(e);
-                    e.TryGetComponent<LineRenderer>(out LineRenderer l);
-                    Destroyer.DestroyComponent(l);
-                    Destroyer.DestroyGameObject(e);
+            foreach(GameObject go in edges.ToList<GameObject>()){
+                if(edge.ID.Equals(go.ID())){
+                    edges.Remove(go);
+                    Destroyer.DestroyGameObject(go);
                 }
             }
         }
 
-
-        public ICollection<GameObject> GetEdges(){
-            return edges;
-        }
-
-        //Calculates new points for each edge
-        public List<Vector3[]> CalNewEdges(){
-            List<Vector3[]> newPoints = _graphRenderer.CalcNewPints(nodes.Values);
-
-            foreach(Vector3[] v4 in newPoints){
-               // Debug.LogFormat("Count: " + v4.Count());
+        private void ClearNewEdges()
+        {
+            if (newEdges != null)
+            {
+                foreach (GameObject gameObject in newEdges)
+                {
+                    Destroyer.DestroyGameObject(gameObject);
+                }
+                // edges will be overridden in RenderEdges() each time, that is why we
+                // do not Clear() it but reset it to null
+                newEdges = null;
             }
-            return  newPoints;
         }
-
 
         /// <summary>
         /// Clears the internal cache containing all game objects created by GetInnerNode(),
@@ -308,6 +301,7 @@ namespace SEE.Game.Evolution
             ClearPlane();
             ClearNodes();
             ClearEdges();
+            ClearNewEdges();
         }
 
         /// <summary>
@@ -335,6 +329,20 @@ namespace SEE.Game.Evolution
             nodes.Clear();
         }
 
+        private void ClearEdges2()
+        {
+            if (newEdges2 != null)
+            {
+                foreach (GameObject gameObject in newEdges2)
+                {
+                    Destroyer.DestroyGameObject(gameObject);
+                }
+                // edges will be overridden in RenderEdges() each time, that is why we
+                // do not Clear() it but reset it to null
+                edges = null;
+            }
+        }
+
         /// <summary>
         /// Destroys all game objects created for edges.
         /// Postcondition: 
@@ -350,7 +358,6 @@ namespace SEE.Game.Evolution
                 // edges will be overridden in RenderEdges() each time, that is why we
                 // do not Clear() it but reset it to null
                 edges = null;
-                edges = new List<GameObject>();
             }
         }
     }

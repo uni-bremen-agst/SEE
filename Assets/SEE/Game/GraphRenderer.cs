@@ -262,6 +262,79 @@ namespace SEE.Game
             }
         }
 
+
+
+
+
+
+
+
+
+    /// <summary>
+        /// Applies the edge layout according to the the user's choice (settings) for
+        /// all edges in between nodes in <paramref name="gameNodes"/>.
+        /// </summary>
+        /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
+        /// <returns>all game objects created to represent the edges; may be empty</returns>
+        public ICollection<GameObject> CalculateNewEdgeLayout(ICollection<GameObject> gameNodes)
+        {
+            return CalculateNewEdgeLayout(ToLayoutNodes(gameNodes));
+        }
+
+        /// <summary>
+        /// Applies the edge layout according to the the user's choice (settings) for
+        /// all edges in between nodes in <paramref name="gameNodes"/>.
+        /// </summary>
+        /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
+        /// <returns>all game objects created to represent the edges; may be empty</returns>
+        private ICollection<GameObject> CalculateNewEdgeLayout(ICollection<GameNode> gameNodes)
+        {
+            return CalculateNewEdgeLayout(gameNodes, ConnectingEdges(gameNodes));
+        }
+
+        /// <summary>
+        /// Applies the edge layout according to the the user's choice (settings).
+        /// </summary>
+        /// <param name="gameNodes">the set of layout nodes for which to create game edges</param>
+        /// <param name="layoutEdges">the edges to be laid out</param>
+        /// <returns>all game objects created to represent the edges; may be empty</returns>
+        private ICollection<GameObject> CalculateNewEdgeLayout(ICollection<GameNode> gameNodes, ICollection<LayoutEdge> layoutEdges)
+        {
+            float minimalEdgeLevelDistance = 2.5f * settings.EdgeWidth;
+            IEdgeLayout layout;
+            switch (settings.EdgeLayout)
+            {
+                case EdgeLayoutKind.Straight:
+                    layout = new StraightEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance);
+                    break;
+                case EdgeLayoutKind.Spline:
+                    layout = new SplineEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance, settings.RDP);
+                    break;
+                case EdgeLayoutKind.Bundling:
+                    layout = new BundledEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance, settings.Tension, settings.RDP);
+                    break;
+                case EdgeLayoutKind.None:
+                    // nothing to be done
+                    return new List<GameObject>();
+                default:
+                    throw new Exception("Unhandled edge layout " + settings.EdgeLayout);
+            }
+            EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
+            ICollection<GameObject> result = edgeFactory.CalculateNewEdges(gameNodes.Cast<ILayoutNode>().ToList(), layoutEdges);
+            AddLOD(result);
+            return result;
+        }
+
+
+
+
+
+
+
+
+
+
+
         /// <summary>
         /// Applies the edge layout according to the the user's choice (settings) for
         /// all edges in between nodes in <paramref name="gameNodes"/>.
@@ -279,7 +352,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes, bool draw = true)
+        private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes)
         {
             return EdgeLayout(gameNodes, ConnectingEdges(gameNodes));
         }
@@ -317,43 +390,6 @@ namespace SEE.Game
             AddLOD(result);
             p.End();
             Debug.LogFormat("Built \"" + settings.EdgeLayout + "\" edge layout for " + gameNodes.Count + " nodes in {0} [h:m:s:ms].\n", p.GetElapsedTime());
-            return result;
-        }
-
-        public List<Vector3 []> CalcNewPints(ICollection<GameObject> gameNodes)
-        {
-            return CalcNewPints(ToLayoutNodes(gameNodes));
-        }
-
-        /// <summary>
-        /// Applies the edge layout according to the the user's choice (settings).
-        /// </summary>
-        /// <param name="gameNodes">the set of layout edges for which to create game objects</param>
-        /// <returns>all game objects created to represent the edges; may be empty</returns>
-        private List<Vector3 []> CalcNewPints(ICollection<GameNode> gameNodes)
-        {
-            float minimalEdgeLevelDistance = 2.5f * settings.EdgeWidth;
-            IEdgeLayout layout;
-            switch (settings.EdgeLayout)
-            {
-                case EdgeLayoutKind.Straight:
-                    layout = new StraightEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance);
-                    break;
-                case EdgeLayoutKind.Spline:
-                    layout = new SplineEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance, settings.RDP);
-                    break;
-                case EdgeLayoutKind.Bundling:
-                    layout = new BundledEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance, settings.Tension, settings.RDP);
-                    break;
-                case EdgeLayoutKind.None:
-                    // nothing to be done
-                    return new List<Vector3 []>();
-                default:
-                    throw new Exception("Unhandled edge layout " + settings.EdgeLayout.ToString());
-            }
-            
-            EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
-            List<Vector3 []> result = edgeFactory.CalcPoints(gameNodes.Cast<ILayoutNode>().ToList(), ConnectingEdges(gameNodes));
             return result;
         }
 
