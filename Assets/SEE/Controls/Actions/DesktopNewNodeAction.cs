@@ -101,6 +101,7 @@ namespace SEE.Controls
             {
                 //City Selection
                 selectCity();
+                //Debug.Log("AUSWAHL!!!!!!!!!!");
             }
             else
             {
@@ -189,6 +190,7 @@ namespace SEE.Controls
 
                 if (hoveredObject != null && Input.GetMouseButtonDown(0))
             {
+               
                 //Gets the SEECity from the hoverdObject
                 SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject.TryGetComponent<SEECity>(out city);
 
@@ -310,8 +312,8 @@ namespace SEE.Controls
                 Debug.Log(node.Type);
 
                 SEECity cityTmp = null;
-                if (hoveredObject != null)
-                {
+              //  if (hoveredObject != null)
+             //   {
                     //checks if the currently hovered object is part of the preselected city
                     GameObject tmp = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
                     try
@@ -321,16 +323,18 @@ namespace SEE.Controls
                     catch (Exception)
                     {
                         Debug.Log("city not selected"); // FIXME
-                        return;
+                        //return;
                     }
-                    if (city.Equals(cityTmp))
+                    if (cityTmp != null && city.Equals(cityTmp))
                     {
+                        Debug.Log("OLACED");
                         GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
                         nodeValuesGiven = false;
                     }
-                }
+                //}
                 else
                 {
+                    Debug.Log("DESTROY");
                     //FIXME: DO WE NEED TO DESTROY THE NODE TOO?
                     Destroy(GONode);
                     nodeValuesGiven = false;
@@ -339,6 +343,7 @@ namespace SEE.Controls
                 GONode = null;
                 city = null;
                 nodeMetrics = null;
+                
             }
         }
 
