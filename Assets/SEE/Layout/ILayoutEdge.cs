@@ -20,6 +20,8 @@ namespace SEE.Layout
         /// </summary>
         public Vector3[] Points;
 
+        public Vector3[] ControlPoints;
+
         /// <summary>
         /// Constructor.
         /// </summary>

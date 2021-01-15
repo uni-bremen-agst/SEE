@@ -63,9 +63,6 @@ namespace SEE.GO
             return gameEdge;
         }
 
-<<<<<<< HEAD
-        public ICollection<GameObject> DrawEdges(ICollection<ILayoutNode> nodes, ICollection<LayoutEdge> edges, bool draw = false)
-=======
         /// <summary>
         /// Creates and returns game objects for the given <paramref name="edges"/> among the given 
         /// <paramref name="nodes"/>. An edge is drawn as a line using a LineRenderer (attached to 
@@ -76,7 +73,6 @@ namespace SEE.GO
         /// <param name="edges">the layout edges for which to create game objects</param>
         /// <returns>game objects representing the <paramref name="edges"/></returns>
         public ICollection<GameObject> DrawEdges(ICollection<ILayoutNode> nodes, ICollection<LayoutEdge> edges)
->>>>>>> master
         {
             List<GameObject> result = new List<GameObject>(edges.Count);
             if (edges.Count == 0)
@@ -89,8 +85,10 @@ namespace SEE.GO
                 GameObject gameEdge = NewGameEdge(layoutEdge);
                 result.Add(gameEdge);
 
-               // Debug.Log(gameEdge.tag);
 
+                Points p  = gameEdge.AddComponent<Points>();
+                p.controlPoints = layoutEdge.ControlPoints;
+                p.linePoints = layoutEdge.Points;
                 // gameEdge does not yet have a renderer; we add a new one
                 LineRenderer line = gameEdge.AddComponent<LineRenderer>();
                 // use sharedMaterial if changes to the original material should affect all
@@ -126,29 +124,43 @@ namespace SEE.GO
                 //capsule.transform.LookAt(points[1]);
                 //capsule.height = (points[2] - points[1]).magnitude;
             }
-            
             return result;
         }
 
-        public List<Vector3 []> CalcPoints(ICollection<ILayoutNode> nodes, ICollection<LayoutEdge> edges)
+         public ICollection<GameObject> CalculateNewEdges(ICollection<ILayoutNode> nodes, ICollection<LayoutEdge> edges)
         {
-            List<Vector3 []> points = new List<Vector3 []>();
             List<GameObject> result = new List<GameObject>(edges.Count);
             if (edges.Count == 0)
             {
-                return new List<Vector3 []>();
+                return result;
             }
             layout.Create(nodes, edges.Cast<ILayoutEdge>().ToList());
             foreach (LayoutEdge layoutEdge in edges)
             {
                 GameObject gameEdge = NewGameEdge(layoutEdge);
                 result.Add(gameEdge);
-                points.Add(layoutEdge.Points);
 
+
+                Points p  = gameEdge.AddComponent<Points>();
+                p.controlPoints = layoutEdge.ControlPoints;
+                p.linePoints = layoutEdge.Points;
+                // FIXME
+                // put a capsule collider around the straight main line
+                // (the one from points[1] to points[2]
+                // FIXME: The following works only for straight lines with at least
+                // three points, but a layoutEdge can have fewer lines and generally
+                // is not a line in the first place. We need a better approach to
+                // make edges selectable. For the time being, this code will be
+                // disabled.
+                //CapsuleCollider capsule = gameEdge.AddComponent<CapsuleCollider>();
+                //capsule.radius = Math.Max(line.startWidth, line.endWidth) / 2.0f;
+                //capsule.center = Vector3.zero;
+                //capsule.direction = 2; // Z-axis for easier "LookAt" orientation
+                //capsule.transform.position = points[1] + (points[2] - points[1]) / 2;
+                //capsule.transform.LookAt(points[1]);
+                //capsule.height = (points[2] - points[1]).magnitude;
             }
-            return points;
+            return result;
         }
     }
-
-    
 }

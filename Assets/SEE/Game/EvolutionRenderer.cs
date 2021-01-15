@@ -318,7 +318,7 @@ namespace SEE.Game
             // these layoutNodes represent. Here, we leave the game objects untouched. The layout
             // must be later applied when we render a city. Here, we only store the layout for later use.
             nodeLayout.Apply(layoutNodes);
-            GraphRenderer.Fit(gameObject, layoutNodes);
+            GraphRenderer.Fit(gameObject, layoutNodes);          
             return ToNodeIDLayout(layoutNodes);
 
             // Note: The game objects for leaf nodes are already properly scaled by the call to 
@@ -430,8 +430,6 @@ namespace SEE.Game
             RenderGraph(current, next);
         }
 
-        List<Vector3[]> newPoints;
-
         /// <summary>
         /// Renders the animation from CurrentGraphShown to NextGraphToBeShown.
         /// </summary>
@@ -446,8 +444,6 @@ namespace SEE.Game
             AnimationStartedEvent.Invoke();
             if (current != null)
             {
-                //objectManager.RenderEdges();
-                Debug.Log("Count a: " + objectManager.GetEdges().Count());
                 // For all nodes of the current graph not in the next graph; that is, all
                 // nodes removed: remove those. Note: The comparison is based on the
                 // IDs of the nodes because nodes between two graphs must be different
@@ -459,19 +455,12 @@ namespace SEE.Game
                         RenderRemovedNode(node);
                     });
 
-
-
-
                 // For all edges of the current graph not in the next graph; that is, all
                 // edges removed: remove those. As above, edges are compared by their
                 // IDs.
-                current.Graph?
+                 current.Graph?
                      .Edges().Except(next.Graph.Edges(), edgeEqualityComparer).ToList()
-                     .ForEach(edge =>
-                     {
-                         RenderRemovedEdge(edge);
-                     });
-                Debug.Log("Count b: " + objectManager.GetEdges().Count());
+                     .ForEach(RenderRemovedOldEdge);
             }
             // We need to assign _nextCity because the callback RenderPlane, RenderInnerNode, RenderLeaf, and 
             // RenderEdge will access it.
@@ -488,16 +477,10 @@ namespace SEE.Game
             }
             // FOR ANIMATION: next.Graph.Edges().ForEach(RenderEdge);
 
-
-
-
-            Debug.Log("Count c: " + objectManager.CalNewEdges().Count());
-
             // We have made the transition to the next graph.
             _currentCity = next;
-
             RenderPlane();
-            MoveEdge(objectManager.CalNewEdges());
+            objectManager.RenderEdges2();
             Invoke("OnAnimationsFinished", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
         }
 
@@ -512,41 +495,9 @@ namespace SEE.Game
             // of the animation cycle.
             objectManager.RenderEdges();
 
+            moveEdges = false;
             IsStillAnimating = false;
             AnimationFinishedEvent.Invoke();
-        }
-
-
-        void MoveEdge(List<Vector3[]> nP)
-        {
-            float counter = 0;
-            if (nP != null && objectManager.GetEdges() != null)
-            {
-                bool stop = false;
-
-                List<GameObject> oE = objectManager.GetEdges().ToList();
-
-                while (!stop)
-                {
-                    for (int i = 0; i < objectManager.GetEdges().Count(); i++)
-                    {
-                        stop = true;
-                        oE[i].TryGetComponent<LineRenderer>(out LineRenderer l);
-                        for (int k = 0; k < l.positionCount; k++)
-                        {
-                            // l.SetPosition(k, nP[i][k]);
-                            float dist = Vector3.Distance(l.GetPosition(k), nP[i][k]);
-                            float x = Mathf.Lerp(0, dist, counter);
-                            if (counter < dist)
-                            {
-                                l.SetPosition(k, (x * Vector3.Normalize(nP[i][k] - l.GetPosition(k)) + l.GetPosition(k)));
-                                stop = false;
-                            }
-                        }
-                        counter += 0.00001f;
-                    }
-                }
-            }
         }
 
         /// <summary>
@@ -575,7 +526,72 @@ namespace SEE.Game
                 Tweens.Scale(plane, scale, moveAnimator.MaxAnimationTime);
                 Tweens.Move(plane, centerPosition, moveAnimator.MaxAnimationTime);
             }
+            MoveEdges();
+            
         }
+
+
+        protected virtual IList<(GameObject, GameObject)> EdgeMatcher(IList<GameObject> oldEdges, IList<GameObject> newEdges){
+            IList<(GameObject, GameObject)> result = new List<(GameObject, GameObject)>();
+            foreach(GameObject oGO in oldEdges){
+                foreach(GameObject nGO in newEdges){
+                    if(oGO.ID().Equals(nGO.ID())){
+                        result.Add((oGO,nGO));
+                    }
+                }
+            }
+            return result;
+        }
+
+        bool moveEdges = false;
+
+        IList<(GameObject, GameObject)> matchedEdges;
+
+        protected virtual void MoveEdges(){
+           try{
+            IList<GameObject> newEdges = objectManager.CalculateNewEdgeControlPoints().ToList();
+            IList<GameObject> oldEdges = objectManager.GetEdges().ToList();
+
+            matchedEdges =  EdgeMatcher(oldEdges,newEdges);
+
+
+            foreach((GameObject oldEdge, GameObject newEdge) in matchedEdges){
+                oldEdge.TryGetComponent<Points>(out Points oP);
+                newEdge.TryGetComponent<Points>(out Points nP);
+
+                oP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePoints200(oP.controlPoints);
+                nP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePoints200(nP.controlPoints);
+
+                oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
+                lineRenderer.positionCount = oP.linePoints.Count();
+                lineRenderer.SetPositions(oP.linePoints);
+
+            }
+            
+
+                moveEdges = true;
+
+            }catch{
+                moveEdges = false;
+            }
+        }
+
+        float timer;
+
+        void Update(){
+
+            timer += Time.deltaTime;
+            if(moveEdges == true){
+                 foreach((GameObject oldEdge, GameObject newEdge) in matchedEdges){
+                    oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
+                    newEdge.TryGetComponent<Points>(out Points newLinePoints);
+                    for(int i = 0; i < lineRenderer.positionCount; i++){
+                        lineRenderer.SetPosition(i, Vector3.Lerp(lineRenderer.GetPosition(i), newLinePoints.linePoints[i],timer/AnimationDuration));
+                    }
+                }
+            }
+        }
+
 
         /// <summary>
         /// Event function that adjusts the given <paramref name="gameNode"/>
@@ -646,7 +662,9 @@ namespace SEE.Game
                     difference = Difference.None;
                 }
             }
+            //
             moveScaleShakeAnimator.AnimateTo(currentGameNode, layoutNode, difference, OnRenderNodeFinishedAnimation);
+            //objectManager.RenderEdges();
         }
 
         /// <summary>
@@ -661,10 +679,6 @@ namespace SEE.Game
             {
                 Destroy((GameObject)gameObject);
             }
-        }
-        protected virtual void RenderRemovedEdge(Edge edge)
-        {
-            objectManager.RemoveEdge(edge);
         }
 
         /// <summary>
@@ -698,10 +712,10 @@ namespace SEE.Game
         /// Removes the given edge. The edge is not destroyed, however.
         /// </summary>
         /// <param name="edge"></param>
-        /// FOR ANIMATION: protected virtual void RenderRemovedOldEdge(Edge edge)
-        /// FOR ANIMATION: {
-        /// FOR ANIMATION: // FIXME.
-        /// FOR ANIMATION: }
+        protected virtual void RenderRemovedOldEdge(Edge edge)
+        {
+            objectManager.RemoveEdge(edge);
+        }
 
         // **********************************************************************
 

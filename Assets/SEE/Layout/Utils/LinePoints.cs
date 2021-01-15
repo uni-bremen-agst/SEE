@@ -26,7 +26,7 @@ namespace SEE.Layout.Utils
         /// <param name="tension">tension of the control points onto the spline points; must be in
         /// the range [0, 1]</param>
         /// <returns>points of the line along the B-spline</returns>
-        public static Vector3[] BSplineLinePoints(Vector3[] controlPoints, float tension = tensionDefault, uint samplerate = 0)
+        public static Vector3[] BSplineLinePoints(Vector3[] controlPoints, float tension = tensionDefault)
         {
             Debug.Assert(controlPoints.Length > 3);
             Debug.Assert(0.0f <= tension && tension <= 1.0f);
@@ -37,15 +37,28 @@ namespace SEE.Layout.Utils
                 // Setup control points.
                 ControlPoints = VectorsToList(controlPoints)
             };
-            if(samplerate == 0){
-                IList<double> list = spline.Tension(tension).Sample();
-                return ListToVectors(list);
-            }else{
-                IList<double> list = spline.Tension(tension).Sample(samplerate);
-                return ListToVectors(list);
-            }
-            
+
+            IList<double> list = spline.Tension(tension).Sample();
+            return ListToVectors(list);
         }
+
+
+        public static Vector3[] BSplineLinePoints200(Vector3[] controlPoints, float tension = tensionDefault)
+        {
+            Debug.Assert(controlPoints.Length > 3);
+            Debug.Assert(0.0f <= tension && tension <= 1.0f);
+
+            // Create a cubic spline with control points in 3D using a clamped knot vector.
+            TinySpline.BSpline spline = new TinySpline.BSpline((uint)controlPoints.Length, dimensions)
+            {
+                // Setup control points.
+                ControlPoints = VectorsToList(controlPoints)
+            };
+
+            IList<double> list = spline.Tension(tension).Sample(200);
+            return ListToVectors(list);
+        }
+
 
         /// <summary>
         /// Serializes the co-ordinates of all given vectors as a list.
