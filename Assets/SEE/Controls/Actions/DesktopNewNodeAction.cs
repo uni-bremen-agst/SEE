@@ -99,8 +99,9 @@ namespace SEE.Controls
 
             if (city == null)
             {
-                //City Selection
+               //City Selection
                 SelectCity();
+
             }
             else
             {
@@ -138,7 +139,6 @@ namespace SEE.Controls
 
             if (!canvasIsActive)
             {
-                Debug.Log("HALLLO?");
                 CanvasGenerator c = canvasObject.GetComponent<CanvasGenerator>();
                 c.GetNodeMetrics();
                 c.DestroyAddNodeCanvas();
@@ -189,6 +189,7 @@ namespace SEE.Controls
 
                 if (hoveredObject != null && Input.GetMouseButtonDown(0))
             {
+               
                 //Gets the SEECity from the hoverdObject
                 SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject.TryGetComponent<SEECity>(out city);
 
@@ -306,8 +307,7 @@ namespace SEE.Controls
                 }
 
                 SEECity cityTmp;
-                if (hoveredObject != null)
-                {
+  
                     //checks if the currently hovered object is part of the preselected city
                     GameObject tmp = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
                     try
@@ -319,12 +319,11 @@ namespace SEE.Controls
                         Debug.Log("city not selected"); // FIXME
                         return;
                     }
-                    if (city.Equals(cityTmp))
+                    if (cityTmp != null && city.Equals(cityTmp))
                     {
                         GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
                         valuesAreGiven = false;
                     }
-                }
                 else
                 {
                     //FIXME: DO WE NEED TO DESTROY THE NODE TOO?
@@ -335,6 +334,7 @@ namespace SEE.Controls
                 GONode = null;
                 city = null;
                 nodeMetrics = null;
+                
             }
         }
 
