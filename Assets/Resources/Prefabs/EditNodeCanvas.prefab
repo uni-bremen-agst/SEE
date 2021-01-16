@@ -373,7 +373,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Placeholder for EditNode
+  m_Text: Edit
 --- !u!1 &4105438836302769263
 GameObject:
   m_ObjectHideFlags: 0
