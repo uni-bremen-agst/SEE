@@ -24,7 +24,7 @@ namespace SEE.Controls
         /// <summary>
         /// Set by the GUI if a Inner Node should be created
         /// </summary>
-        public static bool is_innerNode;
+        private static bool isInnerNode;
 
         /// <summary>
         /// The Meta infos from the new node, set by the GUI
@@ -45,22 +45,22 @@ namespace SEE.Controls
         /// <summary>
         /// true, if the addingnode-canvas is closed, else false.
         /// </summary>
-        public static bool canvasIsClosed = true;
+        private static bool canvasIsActive = true;
 
         /// <summary>
         /// True, if the adding-node-canvas was opened, node-values was given and saved and the canvas was closed again, else false.
         /// </summary>
-        public static bool nodeValuesGiven = false;
+        private static bool valuesAreGiven = false;
 
         /// <summary>
         /// The name of a node given in the input-Field.
         /// </summary>
-        public static string nodename;
+        private static string nodename;
 
         /// <summary>
         /// The type of a node given in the input-Field.
         /// </summary>
-        public static string nodetype;
+        private static string nodetype;
 
         /// <summary>
         /// Colour the hovered city is changed to when hovered or selected. 
@@ -99,8 +99,9 @@ namespace SEE.Controls
 
             if (city == null)
             {
-                //City Selection
-                selectCity();
+               //City Selection
+                SelectCity();
+
             }
             else
             {
@@ -108,12 +109,12 @@ namespace SEE.Controls
                 if (nodeMetrics == null)
                 {
                     OpenDialog();
-                    getMetrics();
+                    GetMetrics();
                 }
                 else
                 {
                     //Creates the new node, important check if the metrics have been set before!
-                    if (nodeValuesGiven)
+                    if (valuesAreGiven)
                     {
                         if (GONode == null)
                         {
@@ -136,14 +137,13 @@ namespace SEE.Controls
                 }
             }
 
-            if (!canvasIsClosed)
+            if (!canvasIsActive)
             {
-               
                 CanvasGenerator c = canvasObject.GetComponent<CanvasGenerator>();
                 c.GetNodeMetrics();
-                c.DestroyAddCanvas();
-                nodeValuesGiven = true;
-                canvasIsClosed = true;
+                c.DestroyAddNodeCanvas();
+                canvasIsActive = true;
+                valuesAreGiven = true;
             }
 
         }
@@ -155,13 +155,13 @@ namespace SEE.Controls
         public void OpenDialog()
         {
             CanvasGenerator c = canvasObject.GetComponent<CanvasGenerator>();
-            GameObject canvas = c.InstantiateAddingNodeCanvas();
+            c.InstantiateAddingNodeCanvas();
         }
 
         /// <summary>
         /// Selects the City with hovering. Sets the City Object on Click on a GameObject
         /// </summary>
-        private void selectCity()
+        private void SelectCity()
         {
             
             // The case the user hovers an object and has hovered objects before. The former colors of the specific objects are set again.
@@ -183,12 +183,13 @@ namespace SEE.Controls
                 // The object is either dyed green in case it is not already green, else black.
                 if (!(hoveredObjectList.Contains(hoveredObject)))
                 {
-                    changeColor(hoveredObject, hoveredObject.gameObject.GetComponent<Renderer>().material.color);
+                    ChangeColor(hoveredObject, hoveredObject.gameObject.GetComponent<Renderer>().material.color);
                 }
             }
 
                 if (hoveredObject != null && Input.GetMouseButtonDown(0))
             {
+               
                 //Gets the SEECity from the hoverdObject
                 SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject.TryGetComponent<SEECity>(out city);
 
@@ -198,9 +199,9 @@ namespace SEE.Controls
         /// <summary>
         /// Sets the Metrics from the GUI
         /// </summary>
-        private void getMetrics()
+        private void GetMetrics()
         { 
-            string randomID = randomizeString();
+            string randomID = RandomizeString();
             System.Random rnd = new System.Random();
             //YOU CANT MODIFY THE VALUES OF A TUPLE, SO YOU NEED TO CREATE A NEW ONE IF YOU WANT TO MODIFY
             nodeMetrics = new Tuple<string, string, string>(randomID, "NODE" + rnd.Next(0, 999999999), "FILE");
@@ -209,7 +210,7 @@ namespace SEE.Controls
         /// <summary>
         /// Dyes the hoveredObject either green in case it is not already green, else black.
         /// </summary>
-        private void changeColor(GameObject hoveredbject, Color colorOfCity)
+        private void ChangeColor(GameObject hoveredbject, Color colorOfCity)
         {
             Color newCityColor = new Color();
             if (colorOfCity == GREEN)
@@ -226,16 +227,16 @@ namespace SEE.Controls
         /// <summary>
         /// creates a randomized string for the id for the created node
         /// </summary>
-        private static string randomizeString()
+        private static string RandomizeString()
         {
-            return SEE.Utils.RandomStrings.Get();
+            return Utils.RandomStrings.Get();
 
         }
 
         /// <summary>
         /// Adds a node to the loadedGraph and repeats the process in case the generated ID is not unique.
         /// </summary>
-        private void addNode(Node node)
+        private void AddNode(Node node)
         {
             try 
             {
@@ -243,8 +244,8 @@ namespace SEE.Controls
             }
             catch(Exception)
             {
-                node.ID = randomizeString();
-                addNode(node);
+                node.ID = RandomizeString();
+                AddNode(node);
                 return; 
             }
         }
@@ -264,14 +265,14 @@ namespace SEE.Controls
 
             //Adds the new Node to the City Graph
 
-            addNode(node);
+            AddNode(node);
             //Redraw the node Graph
             city.LoadedGraph.FinalizeNodeHierarchy();
 
             //gets the renderer
             GraphRenderer graphRenderer = city.Renderer;
 
-            if (is_innerNode)
+            if (isInnerNode)
             {
                 gameNode = graphRenderer.NewInnerNode(node);
 
@@ -291,10 +292,9 @@ namespace SEE.Controls
         /// </summary>
         private void Place()
         {
-            if (nodeValuesGiven)
+            if (valuesAreGiven)
             {
                 Node node = GONode.GetComponent<NodeRef>().node;
-
                 //this will reached only if the nodename is not set in the inputField
                 if (nodename != null && !nodename.Equals(""))
                 {
@@ -306,12 +306,8 @@ namespace SEE.Controls
                     node.Type = nodetype;
                 }
 
-                Debug.Log(node.SourceName);
-                Debug.Log(node.Type);
-
-                SEECity cityTmp = null;
-                if (hoveredObject != null)
-                {
+                SEECity cityTmp;
+  
                     //checks if the currently hovered object is part of the preselected city
                     GameObject tmp = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
                     try
@@ -323,22 +319,22 @@ namespace SEE.Controls
                         Debug.Log("city not selected"); // FIXME
                         return;
                     }
-                    if (city.Equals(cityTmp))
+                    if (cityTmp != null && city.Equals(cityTmp))
                     {
                         GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
-                        nodeValuesGiven = false;
+                        valuesAreGiven = false;
                     }
-                }
                 else
                 {
                     //FIXME: DO WE NEED TO DESTROY THE NODE TOO?
                     Destroy(GONode);
-                    nodeValuesGiven = false;
+                    valuesAreGiven = false;
 
                 }
                 GONode = null;
                 city = null;
                 nodeMetrics = null;
+                
             }
         }
 
@@ -346,7 +342,7 @@ namespace SEE.Controls
         /// Removes The Script
         /// Places the new Node if not placed
         /// </summary>
-        public void removeScript()
+        public void RemoveScript()
         {
             if (GONode != null)
             {
@@ -360,10 +356,38 @@ namespace SEE.Controls
         /// A setter-method for the canvasIsClosed-Attribute.
         /// </summary>
         /// <param name="isactive">the value for the canvasIsClosed-attribute. </param>
-        public static void  SetCanvasIsClosed(bool isactive)
+        public static void  SetValuesAreGiven(bool isactive)
         {
-            canvasIsClosed = isactive;
+            valuesAreGiven = isactive;
         }
 
+        /// <summary>
+        /// Setter-method for the nodeName-attribute
+        /// </summary>
+        /// <param name="newNodename">new value for the nodeName-attribute</param>
+        public static void SetNodeName(string newNodename)
+        {
+            nodename = newNodename;
+        }
+
+        /// <summary>
+        /// Setter-method fpr the nodetype-attribute
+        /// </summary>
+        /// <param name="newNodeType">new value for the nodeType-attribute</param>
+        public static void SetNodeType(string newNodeType)
+        {
+            nodetype = newNodeType;
+        }
+
+        public static void SetCanvasIsActive(bool newCanvasIsActive)
+        {
+            canvasIsActive = newCanvasIsActive;
+        }
+            
+        public static void SetIsInnerNode(bool newIsInnerNode)
+        {
+            isInnerNode = newIsInnerNode;
+        }
     }
+
 }

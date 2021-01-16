@@ -1,6 +1,4 @@
 ﻿using SEE.Controls;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,30 +20,33 @@ public class CanvasGenerator : MonoBehaviour
     }
 
     /// <summary>
-    /// Instantiates the AddingNodeCanvasScript and adds it to the AddingNodeCanvas gameObject.
+    /// Instantiates the AddingNodeCanvasScript and adds it to the CanvasObject gameObject.
     /// </summary>
-    /// <returns>the gameObject of the AddingNodeCanvas-script, which contains the canvas-prefab</returns>
+    /// <returns>the added AddingNodeCanvasScript</returns>
+
     public GameObject InstantiateAddingNodeCanvas()
     {
         gameObject.AddComponent<AddingNodeCanvasScript>();
         AddingNodeCanvasScript script = gameObject.GetComponent<AddingNodeCanvasScript>();
         return script.canvas;
-        
     }
 
-    public GameObject InstantiateEditNodeCanvasScript()
+    /// <summary>
+    /// Instantiates the EditNodeCanvasScript and adds it to the CanvasObject gameObject.
+    /// </summary>
+    /// <returns>the added EditNodeCanvasScript</returns>
+    public EditNodeCanvasScript InstantiateEditNodeCanvas()
     {
         gameObject.AddComponent<EditNodeCanvasScript>();
-        AddingNodeCanvasScript script = gameObject.GetComponent<AddingNodeCanvasScript>();
-        return script.canvas;
+        EditNodeCanvasScript script = gameObject.GetComponent<EditNodeCanvasScript>();
+        return script;
 
     }
-
 
     /// <summary>
     /// Destroys the AddingNodeCanvasScript and all childs of it.
     /// </summary>
-    public void DestroyAddCanvas()
+    public void DestroyAddNodeCanvas()
     {
         AddingNodeCanvasScript script = gameObject.GetComponent<AddingNodeCanvasScript>();
         if (script != null)
@@ -55,7 +56,10 @@ public class CanvasGenerator : MonoBehaviour
         }
     }
 
-    public void DestroyEditCanvas()
+    /// <summary>
+    /// Destroys the EditNodeCanvasScript and all childs of it.
+    /// </summary>
+    public void DestroyEditNodeCanvas()
     {
         EditNodeCanvasScript script = gameObject.GetComponent<EditNodeCanvasScript>();
         if (script != null)
@@ -70,6 +74,11 @@ public class CanvasGenerator : MonoBehaviour
     /// </summary>
     public void GetNodeMetrics()
     {
+        string inputNodename;
+        string inputNodetype;
+
+
+        //this part has to be removed by the new UI-Team
         AddingNodeCanvasScript script = (AddingNodeCanvasScript)gameObject.GetComponent<AddingNodeCanvasScript>();
 
         //Gets the texts from the InputFields. The sequence in the array is given by the sequence of the components in the prefab.
@@ -82,15 +91,19 @@ public class CanvasGenerator : MonoBehaviour
         Toggle[] toggles = toggleGroup.GetComponentsInChildren<Toggle>();
         if (toggles[0].isOn)
         {
-            DesktopNewNodeAction.is_innerNode = true;
+            DesktopNewNodeAction.SetIsInnerNode(true);
         }
         if (toggles[1].isOn)
         {
-            DesktopNewNodeAction.is_innerNode = false;
+            DesktopNewNodeAction.SetIsInnerNode(false);
         }
+        inputNodename = inputname.text;
+        inputNodetype = inputtype.text;
+        //until here 
 
-        DesktopNewNodeAction.nodename = inputname.text;
-        DesktopNewNodeAction.nodetype = inputtype.text;
+
+        DesktopNewNodeAction.SetNodeName(inputNodename);
+        DesktopNewNodeAction.SetNodeType(inputNodetype);
 
     }
 

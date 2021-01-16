@@ -10,12 +10,18 @@ public class AddingNodeCanvasButton : MonoBehaviour
     // Start is called before the first frame update
 
     /// <summary>
-    /// The button on the adding-node-canvas, which is closing the canvas
+    /// The button on the adding-node-canvas, which is finishing the addNode-process.
     /// </summary>
     public Button addingButton;
 
+    /// <summary>
+    /// The button on the editNode-canvas, which is canceling the editNode-process.
+    /// </summary>
     public Button editNodeCancel;
 
+    /// <summary>
+    /// The button on the editNode-canvas, which is finishing the editNode-process.
+    /// </summary>
     public Button editNodeButton;
 
     /// <summary>
@@ -25,7 +31,7 @@ public class AddingNodeCanvasButton : MonoBehaviour
     {
         if (addingButton != null)
         {
-            addingButton.onClick.AddListener(SetCanvasIsClosed);
+            addingButton.onClick.AddListener(SetCanvasIsActive);
         }
         if (editNodeCancel != null)
         {
@@ -44,16 +50,19 @@ public class AddingNodeCanvasButton : MonoBehaviour
     }
 
     /// <summary>
-    /// Sets a bool in the DesktopNewNodeAction-script which closes the adding-node-canvas.
+    /// Sets a bool in the DesktopNewNodeAction-script which is finishing the .
     /// </summary>
-    public void SetCanvasIsClosed()
+    public void SetCanvasIsActive()
     {
-        DesktopNewNodeAction.SetCanvasIsClosed(false);
+        DesktopNewNodeAction.SetCanvasIsActive(false);
     }
 
+    /// <summary>
+    /// Sets a bool in the DesktopEditNodeAction-script which closes the adding-node-canvas.
+    /// </summary>
     public void EditIsCanceled()
     {
-        DesktopEditNodeAction.editIsCanceled = true;
+        DesktopEditNodeAction.SetEditIsCanceled(true);
     }
 
     public void EditNode()

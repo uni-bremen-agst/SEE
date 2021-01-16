@@ -11,7 +11,7 @@ public class DesktopEditNodeAction : MonoBehaviour
     /// </summary>
     public GameObject hoveredObject = null;
 
-    public static bool editIsCanceled = false;
+    private static bool editIsCanceled = false;
 
     public GameObject canvasObject;
 
@@ -28,17 +28,17 @@ public class DesktopEditNodeAction : MonoBehaviour
         {
             if (canvasObject.GetComponent<EditNodeCanvasScript>() == null)
             {
-                canvasObject.AddComponent<EditNodeCanvasScript>();
-                EditNodeCanvasScript script = canvasObject.GetComponent<EditNodeCanvasScript>();
+                CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
+                EditNodeCanvasScript script = generator.InstantiateEditNodeCanvas();
                 script.nodeToEdit = hoveredObject.GetComponent<NodeRef>().node;
             }
         }
         if(editIsCanceled)
         {
             CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
-            generator.DestroyEditCanvas();
+            generator.DestroyEditNodeCanvas();
             hoveredObject = null;
-            removeScript();
+            RemoveScript();
             editIsCanceled = false;
         }
     }
@@ -47,9 +47,14 @@ public class DesktopEditNodeAction : MonoBehaviour
     /// Removes The Script
     /// Places the new Node if not placed
     /// </summary>
-    public void removeScript()
+    public void RemoveScript()
     {
         Destroy(this);
+    }
+
+    public static void SetEditIsCanceled(bool newEditIsCaneled)
+    {
+        editIsCanceled = newEditIsCaneled;
     }
 
 }
