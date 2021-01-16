@@ -87,16 +87,34 @@ namespace SEE.Controls
         /// </summary>
         private GameObject canvasObject;
 
+        /// <summary>
+        /// A list the gamenodes are stored in.
+        /// </summary>
         public ICollection<GameNode> gameNodes = null;
 
+        /// <summary>
+        /// The median of the lossyscale of the graphs leafs  
+        /// </summary>
         private Vector3 medianOfLeaf = new Vector3();
 
+        /// <summary>
+        /// The median of the lossyscale of the graphs inner nodes.
+        /// </summary>
         private Vector3 medianOfInnerNode = new Vector3();
 
+        /// <summary>
+        /// A gamobject which stores the graphs root. 
+        /// </summary>
         private GameObject dir_Root = null;
 
+        /// <summary>
+        /// The colour the graphs leafs graphical representation is dyed . 
+        /// </summary>
         private Color leafColor = Color.red;
 
+        /// <summary>
+        /// The colour the graphs inner nodes graphical representation is dyed . 
+        /// </summary>
         private Color innerNodeColor = Color.white;
 
         Vector3 zeroVector = new Vector3(0, 0, 0);
@@ -179,7 +197,7 @@ namespace SEE.Controls
         private void SelectCity()
         {
 
-            // The case the user hovers an object and has hovered objects before. The former colors of the specific objects are set again.
+            // The case the user hovers an object and has hovered objects before. The former colours of the specific objects are set again.
             if (hoveredObject != null && hoveredObjectList.Count > 0 && hoveredObject.gameObject.GetComponent<Renderer>().material.color != GREEN || hoveredObject == null && hoveredObjectList.Count > 0)
             {
                 Undye();
@@ -235,7 +253,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Dyes the hoveredObject either green in case it is not already green, else black.
+        /// Dyes the hoveredObject either green in case it is not already green, else black by default.
         /// </summary>
         private void ChangeColor(GameObject hoveredbject, Color colorOfCity)
         {
@@ -261,8 +279,9 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Adds a node to the loadedGraph and repeats the process in case the generated ID is not unique.
+        /// Adds a node to the loadedGraph and creats its ID. Repeats the process in case the generated ID is not unique.
         /// </summary>
+        /// /// <param name="newNodeType">The node to add to the graph</param>
         private void AddNode(Node node)
         {
             try 
@@ -290,8 +309,8 @@ namespace SEE.Controls
             node.SourceName = nodeMetrics.Item2;
             node.Type = nodeMetrics.Item3;
 
-            //Adds the new Node to the City Graph
 
+            //Adds the new Node to the City Graph
             AddNode(node);
             //Redraw the node Graph
             city.LoadedGraph.FinalizeNodeHierarchy();
@@ -412,7 +431,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Setter-method fpr the nodetype-attribute
+        /// Setter-method for the nodetype-attribute
         /// </summary>
         /// <param name="newNodeType">new value for the nodeType-attribute</param>
         public static void SetNodeType(string newNodeType)
@@ -430,6 +449,7 @@ namespace SEE.Controls
             isInnerNode = newIsInnerNode;
         }
 
+
         public void GetNodesOfScene()
         {
 
@@ -442,6 +462,9 @@ namespace SEE.Controls
 
             }
 
+
+            // In the special case the graph only consists of one leaf, we have to check in the list of all leafs, which has the count of one in that case
+            // if there is the root node.
             ICollection<GameObject> allInnerNodesInScene = SceneQueries.AllGameNodesInScene(false, true);
             if (allLeafsInScene.Count == 1 && allInnerNodesInScene.Count == 0)
             {
@@ -456,6 +479,7 @@ namespace SEE.Controls
             }
 
 
+            // Search for the graphs roor in the set of all inner nodes.
             foreach (GameObject rootSearch in allInnerNodesInScene)
             {
                 Node root = rootSearch.GetComponent<NodeRef>().node;
@@ -465,6 +489,7 @@ namespace SEE.Controls
                 }
             }
 
+            //Prepares a list of all innernodes lossyscale which is stored in the list InnerNodeSize.
             List<Vector3> InnerNodeSize = new List<Vector3>();
             foreach (GameObject gObject in allInnerNodesInScene)
             {
@@ -474,13 +499,24 @@ namespace SEE.Controls
 
             medianOfLeaf = CalcMedianOfaVector(leafSize);
             medianOfInnerNode = CalcMedianOfaVector(InnerNodeSize);
+            
+            // In the special case there are no inner nodes, the median of the graphs only leaf is set 
+            // as a default value for any inner node that might be created.
+            if (InnerNodeSize.Count == 0)
+            {
+                medianOfInnerNode = medianOfLeaf;
+            }
         }
 
+        /// <summary>
+        /// Calculates the median of a list of vectors.
+        /// </summary>
+        /// /// <param name="vectors">List of vectors-attribute</param>
         private Vector3 CalcMedianOfaVector(List<Vector3> vectors)
         {
             if (vectors.Count == 0 || vectors == null)
             {
-                return new Vector3(0.4f, 0.4f, 0.4f);
+                return new Vector3(0,0,0);
             }
 
             Vector3 result = new Vector3();
@@ -498,11 +534,13 @@ namespace SEE.Controls
             xAxis.Sort();
             yAxis.Sort();
             zAxis.Sort();
-            Debug.Log(vectors.Count);
+   
             result.x = CalcMedianElementFromFloats(xAxis);
             result.y = CalcMedianElementFromFloats(yAxis);
             result.z = CalcMedianElementFromFloats(zAxis);
 
+
+            
             if(!(vectors.Count %2 == 0))
             {
                 return result; 
@@ -520,6 +558,10 @@ namespace SEE.Controls
             return result;
         }
 
+        /// <summary>
+        /// Calculates the median of a list of floats.
+        /// </summary>
+        /// /// <param name="newNodeType">List of floats of which the median is calculated</param>
         private static float CalcMedianElementFromFloats(List<float> floatList)
         {
            float median = 0;
@@ -531,10 +573,15 @@ namespace SEE.Controls
             indexOfMid = indexOfMid/2; 
             median = floatList.ElementAt(indexOfMid);
 
+            // If the amount of the list is impair, we will return the element which is located at the middle of the list,
+            // e.g. the amount = 13 , i.e the element at the index 6.
             if (!(floatList.Count % 2 == 0))
             {
                 return median;
             }
+
+            // If the amount is impair, we have to interpolate linearly between the value at the index at the half of the lists size,
+            // and the value of the following index. E.g. size = 13 -> index 6 and 7 .
             int indexSecondMedianValue  = indexOfMid+1;
             float SecondCoordinate = floatList.ElementAt(indexSecondMedianValue);
             median += SecondCoordinate;
