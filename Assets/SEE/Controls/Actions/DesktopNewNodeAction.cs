@@ -87,6 +87,21 @@ namespace SEE.Controls
         /// </summary>
         private GameObject canvasObject;
 
+        public ICollection<GameNode> gameNodes = null;
+
+        private Vector3 medianOfLeaf = new Vector3();
+
+        private Vector3 medianOfInnerNode = new Vector3();
+
+        private GameObject dir_Root = null;
+
+        private Color leafColor = Color.red;
+
+        private Color innerNodeColor = Color.white;
+
+        Vector3 zeroVector = new Vector3(0, 0, 0);
+
+
         public void Start()
         {
             hoveredObjectList = new List<GameObject>();
@@ -163,18 +178,11 @@ namespace SEE.Controls
         /// </summary>
         private void SelectCity()
         {
-            
+
             // The case the user hovers an object and has hovered objects before. The former colors of the specific objects are set again.
-            if(hoveredObject != null && hoveredObjectList.Count >0 && hoveredObject.gameObject.GetComponent<Renderer>().material.color != GREEN || hoveredObject == null && hoveredObjectList.Count > 0)
+            if (hoveredObject != null && hoveredObjectList.Count > 0 && hoveredObject.gameObject.GetComponent<Renderer>().material.color != GREEN || hoveredObject == null && hoveredObjectList.Count > 0)
             {
-                int ct = 0; 
-                foreach(GameObject GO in hoveredObjectList)
-                {
-                    GO.gameObject.GetComponent<Renderer>().material.color = listOfColors.ElementAt(ct);
-                    ct++;
-                }
-                listOfColors.Clear();
-                hoveredObjectList.Clear();
+                Undye();
             }
 
             if (hoveredObject != null)
@@ -189,13 +197,32 @@ namespace SEE.Controls
 
                 if (hoveredObject != null && Input.GetMouseButtonDown(0))
             {
-               
+                Undye();
+                GetNodesOfScene();
                 //Gets the SEECity from the hoverdObject
                 SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject.TryGetComponent<SEECity>(out city);
-
+                if (dir_Root != null)
+                {
+                    dir_Root.GetComponent<Renderer>().material.color = Color.white;
+                }
             }
         }
 
+
+        // <summary>
+        /// Undyes the the current colour of the object, i.e. changes the color to its original color.
+        /// </summary>
+        public void Undye()
+        {
+            int count = 0;
+            foreach (GameObject GO in hoveredObjectList)
+            {
+                GO.gameObject.GetComponent<Renderer>().material.color = listOfColors.ElementAt(count);
+                count++;
+            }
+            listOfColors.Clear();
+            hoveredObjectList.Clear();
+        }
         /// <summary>
         /// Sets the Metrics from the GUI
         /// </summary>
@@ -284,6 +311,20 @@ namespace SEE.Controls
 
             //Sets the The GONode so the main work can continue;
             GONode = gameNode;
+            if (isInnerNode)
+            {
+
+                GONode.transform.localScale = medianOfInnerNode;
+                GONode.gameObject.GetComponent<Renderer>().material.color = innerNodeColor;
+
+            }
+            else
+            {
+
+                GONode.transform.localScale = medianOfLeaf;
+                GONode.gameObject.GetComponent<Renderer>().material.color = leafColor;
+
+            }
             GameNodeMover.MoveTo(GONode);
         }
 
@@ -387,6 +428,118 @@ namespace SEE.Controls
         public static void SetIsInnerNode(bool newIsInnerNode)
         {
             isInnerNode = newIsInnerNode;
+        }
+
+        public void GetNodesOfScene()
+        {
+
+            ICollection<GameObject> allLeafsInScene = SceneQueries.AllGameNodesInScene(true, false);
+            List<Vector3> leafSize = new List<Vector3>();
+
+            foreach (GameObject go in allLeafsInScene)
+            {
+                leafSize.Add(go.transform.lossyScale);
+
+            }
+
+            ICollection<GameObject> allInnerNodesInScene = SceneQueries.AllGameNodesInScene(false, true);
+            if (allLeafsInScene.Count == 1 && allInnerNodesInScene.Count == 0)
+            {
+                foreach (GameObject rootSearch in allInnerNodesInScene)
+                {
+                    Node root = rootSearch.GetComponent<NodeRef>().node;
+                    if (root.IsRoot())
+                    {
+                        dir_Root = rootSearch;
+                    }
+                }
+            }
+
+
+            foreach (GameObject rootSearch in allInnerNodesInScene)
+            {
+                Node root = rootSearch.GetComponent<NodeRef>().node;
+                if (root.IsRoot())
+                {
+                    dir_Root = rootSearch;
+                }
+            }
+
+            List<Vector3> InnerNodeSize = new List<Vector3>();
+            foreach (GameObject gObject in allInnerNodesInScene)
+            {
+
+                InnerNodeSize.Add(gObject.transform.lossyScale);
+            }
+
+            medianOfLeaf = CalcMedianOfaVector(leafSize);
+            medianOfInnerNode = CalcMedianOfaVector(InnerNodeSize);
+        }
+
+        private Vector3 CalcMedianOfaVector(List<Vector3> vectors)
+        {
+            if (vectors.Count == 0 || vectors == null)
+            {
+                return new Vector3(0.4f, 0.4f, 0.4f);
+            }
+
+            Vector3 result = new Vector3();
+            List<float> xAxis = new List<float>();
+            List<float> yAxis = new List<float>();
+            List<float> zAxis = new List<float>();
+
+            foreach (Vector3 vect in vectors)
+            {
+                xAxis.Add(vect.x);
+                yAxis.Add(vect.y);
+                zAxis.Add(vect.z);
+            }
+
+            xAxis.Sort();
+            yAxis.Sort();
+            zAxis.Sort();
+            Debug.Log(vectors.Count);
+            result.x = CalcMedianElementFromFloats(xAxis);
+            result.y = CalcMedianElementFromFloats(yAxis);
+            result.z = CalcMedianElementFromFloats(zAxis);
+
+            if(!(vectors.Count %2 == 0))
+            {
+                return result; 
+            }
+
+            int indexSecondMedian = (xAxis.Count +1) /2;
+            float SecondXCoordinate = CalcMedianElementFromFloats(xAxis);
+            float SecondYCoordinate = CalcMedianElementFromFloats(yAxis);
+            float SecondZCoordinate = CalcMedianElementFromFloats(zAxis);
+
+            result.x = (result.x + SecondXCoordinate) / 2;
+            result.y = (result.y + SecondYCoordinate) / 2;
+            result.z = (result.z + SecondZCoordinate) / 2;
+
+            return result;
+        }
+
+        private static float CalcMedianElementFromFloats(List<float> floatList)
+        {
+           float median = 0;
+            if(floatList.Count == 0 | floatList == null)
+            {
+                return median; 
+            }
+            int indexOfMid = floatList.Count;
+            indexOfMid = indexOfMid/2; 
+            median = floatList.ElementAt(indexOfMid);
+
+            if (!(floatList.Count % 2 == 0))
+            {
+                return median;
+            }
+            int indexSecondMedianValue  = indexOfMid+1;
+            float SecondCoordinate = floatList.ElementAt(indexSecondMedianValue);
+            median += SecondCoordinate;
+            median = median/2; 
+            return median ; 
         }
     }
 
