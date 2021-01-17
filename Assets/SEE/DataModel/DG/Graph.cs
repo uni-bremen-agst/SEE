@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Object = System.Object;
 
 namespace SEE.DataModel.DG
 {
@@ -25,7 +26,7 @@ namespace SEE.DataModel.DG
         private string path = "";
 
         /// <summary>
-        /// Name of the artifical node type used for artifical root nodes added
+        /// Name of the artificial node type used for artificial root nodes added
         /// when we do not have a real node type derived from the input graph.
         /// </summary>
         public const string UnknownType = "";
@@ -57,7 +58,7 @@ namespace SEE.DataModel.DG
         /// Constructor.
         /// </summary>
         /// <param name="name">name of the graph</param>
-        public Graph(string name = "") : base()
+        public Graph(string name = "")
         {
             this.name = name;
         }
@@ -76,26 +77,24 @@ namespace SEE.DataModel.DG
             {
                 throw new Exception("node must not be null");
             }
-            else if (String.IsNullOrEmpty(node.ID))
+            if (string.IsNullOrEmpty(node.ID))
             {
                 throw new Exception("ID of a node must neither be null nor empty");
             }
-            else if (nodes.ContainsKey(node.ID))
+            if (nodes.ContainsKey(node.ID))
             {
                 throw new Exception("ID '" + node.ID + "' is not unique:\n"
-                                    + node.ToString()
+                                    + node
                                     + ".\nDuplicate already in graph: "
-                                    + nodes[node.ID].ToString());
+                                    + nodes[node.ID]);
             }
-            else if (!ReferenceEquals(node.ItsGraph, null))
+            if (!ReferenceEquals(node.ItsGraph, null))
             {
-                throw new Exception("node " + node.ToString() + " is already in a graph " + node.ItsGraph.Name);
+                throw new Exception("node " + node + " is already in a graph " + node.ItsGraph.Name);
             }
-            else
-            {
-                nodes[node.ID] = node;
-                node.ItsGraph = this;
-            }
+
+            nodes[node.ID] = node;
+            node.ItsGraph = this;
         }
 
         /// <summary>
@@ -111,68 +110,65 @@ namespace SEE.DataModel.DG
             {
                 throw new Exception("node must not be null");
             }
-            else if (node.ItsGraph != this)
+
+            if (node.ItsGraph != this)
             {
                 if (ReferenceEquals(node.ItsGraph, null))
                 {
-                    throw new Exception("node " + node.ToString() + " is not contained in any graph");
+                    throw new Exception("node " + node + " is not contained in any graph");
                 }
-                else
+
+                throw new Exception("node " + node + " is contained in a different graph " + node.ItsGraph.Name);
+            }
+
+            if (nodes.Remove(node.ID))
+            {
+                // The edges of node are stored in the node's data structure as well as
+                // in the node's neighbor's data structure.
+                foreach (Edge outgoing in node.Outgoings)
                 {
-                    throw new Exception("node " + node.ToString() + " is contained in a different graph " + node.ItsGraph.Name);
+                    Node successor = outgoing.Target;
+                    successor.RemoveIncoming(outgoing);
+                    edges.Remove(outgoing.ID);
                 }
+                foreach (Edge incoming in node.Incomings)
+                {
+                    Node predecessor = incoming.Source;
+                    predecessor.RemoveOutgoing(incoming);
+                    edges.Remove(incoming.ID);
+                }
+                node.RemoveAllEdges();
+                // Adjust the node hierarchy.
+                if (node.NumberOfChildren() > 0)
+                {
+                    if (node.Parent == null)
+                    {
+                        // All children of node become roots now.
+                        foreach (Node child in node.Children())
+                        {
+                            child.Parent = null;
+                        }
+                    }
+                    else
+                    {
+                        // The father of node now becomes the father of all children of node.
+                        foreach (Node child in node.Children())
+                        {
+                            child.Parent = null;
+                            node.Parent.AddChild(child);
+                        }
+                    }
+                    // Because the node hierarchy has changed, we need to re-calcuate
+                    // the levels. Note: We could do that incrementally if we wanted to
+                    // by traversing only the children of node instead of all nodes in 
+                    // the graph.
+                    FinalizeNodeHierarchy();
+                }
+                node.ItsGraph = null;
             }
             else
             {
-                if (nodes.Remove(node.ID))
-                {
-                    // The edges of node are stored in the node's data structure as well as
-                    // in the node's neighbor's data structure.
-                    foreach (Edge outgoing in node.Outgoings)
-                    {
-                        Node successor = outgoing.Target;
-                        successor.RemoveIncoming(outgoing);
-                        edges.Remove(outgoing.ID);
-                    }
-                    foreach (Edge incoming in node.Incomings)
-                    {
-                        Node predecessor = incoming.Source;
-                        predecessor.RemoveOutgoing(incoming);
-                        edges.Remove(incoming.ID);
-                    }
-                    node.RemoveAllEdges();
-                    // Adjust the node hierarchy.
-                    if (node.NumberOfChildren() > 0)
-                    {
-                        if (node.Parent == null)
-                        {
-                            // All children of node become roots now.
-                            foreach (Node child in node.Children())
-                            {
-                                child.Parent = null;
-                            }
-                        }
-                        else
-                        {
-                            // The father of node now becomes the father of all children of node.
-                            foreach (Node child in node.Children())
-                            {
-                                child.Parent = null;
-                                node.Parent.AddChild(child);
-                            }
-                        }
-                        // Because the node hierarchy has changed, we need to re-calcuate
-                        // the levels. Note: We could do that incrementally if we wanted to
-                        // by traversing only the children of node instead of all nodes in 
-                        // the graph.
-                        FinalizeNodeHierarchy();
-                    }
-                    node.ItsGraph = null;
-                }
-                else
-                {
-                    throw new Exception("node " + node.ToString() + " is not contained in this graph " + Name);
-                }
+                throw new Exception("node " + node + " is not contained in this graph " + Name);
             }
         }
 
@@ -189,14 +185,13 @@ namespace SEE.DataModel.DG
             {
                 throw new Exception("node must not be null");
             }
-            else if (String.IsNullOrEmpty(node.ID))
+
+            if (String.IsNullOrEmpty(node.ID))
             {
                 throw new Exception("ID of a node must neither be null nor empty");
             }
-            else
-            {
-                return nodes.ContainsKey(node.ID);
-            }
+
+            return nodes.ContainsKey(node.ID);
         }
 
         /// <summary>
@@ -234,14 +229,13 @@ namespace SEE.DataModel.DG
             {
                 throw new Exception("ID must neither be null nor empty");
             }
-            else if (nodes.TryGetValue(ID, out Node node))
+
+            if (nodes.TryGetValue(ID, out Node node))
             {
                 return node;
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         /// <summary>
@@ -251,18 +245,17 @@ namespace SEE.DataModel.DG
         /// <returns>edge with the given unique ID if it exists; otherwise null</returns>
         public Edge GetEdge(string ID)
         {
-            if (String.IsNullOrEmpty(ID))
+            if (string.IsNullOrEmpty(ID))
             {
                 throw new Exception("ID must neither be null nor empty");
             }
-            else if (edges.TryGetValue(ID, out Edge edge))
+
+            if (edges.TryGetValue(ID, out Edge edge))
             {
                 return edge;
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         /// <summary>
@@ -278,38 +271,37 @@ namespace SEE.DataModel.DG
             {
                 throw new Exception("edge must not be null");
             }
-            else if (ReferenceEquals(edge.Source, null) || ReferenceEquals(edge.Target, null))
+
+            if (ReferenceEquals(edge.Source, null) || ReferenceEquals(edge.Target, null))
             {
                 throw new Exception("source/target of this node is null");
             }
-            else if (ReferenceEquals(edge.ItsGraph, null))
+
+            if (ReferenceEquals(edge.ItsGraph, null))
             {
                 if (edge.Source.ItsGraph != this)
                 {
-                    throw new Exception("source node " + edge.Source.ToString() + " is not in the graph");
+                    throw new Exception("source node " + edge.Source + " is not in the graph");
                 }
-                else if (edge.Target.ItsGraph != this)
+
+                if (edge.Target.ItsGraph != this)
                 {
-                    throw new Exception("target node " + edge.Target.ToString() + " is not in the graph");
+                    throw new Exception("target node " + edge.Target + " is not in the graph");
                 }
-                else
+
+                if (edges.ContainsKey(edge.ID))
                 {
-                    if (edges.ContainsKey(edge.ID))
-                    {
-                        throw new Exception("There is already an edge with the ID " + edge.ID);
-                    }
-                    else
-                    {
-                        edge.ItsGraph = this;
-                        edges[edge.ID] = edge;
-                        edge.Source.AddOutgoing(edge);
-                        edge.Target.AddIncoming(edge);
-                    }
+                    throw new Exception("There is already an edge with the ID " + edge.ID);
                 }
+
+                edge.ItsGraph = this;
+                edges[edge.ID] = edge;
+                edge.Source.AddOutgoing(edge);
+                edge.Target.AddIncoming(edge);
             }
             else
             {
-                throw new Exception("edge " + edge.ToString() + " is already in a graph " + edge.ItsGraph.Name);
+                throw new Exception("edge " + edge + " is already in a graph " + edge.ItsGraph.Name);
             }
         }
 
@@ -323,31 +315,26 @@ namespace SEE.DataModel.DG
             {
                 throw new Exception("edge must not be null");
             }
-            else if (edge.ItsGraph != this)
+
+            if (edge.ItsGraph != this)
             {
                 if (ReferenceEquals(edge.ItsGraph, null))
                 {
-                    throw new Exception("edge " + edge.ToString() + " is not contained in any graph");
+                    throw new Exception("edge " + edge + " is not contained in any graph");
                 }
-                else
-                {
-                    throw new Exception("edge " + edge.ToString() + " is contained in a different graph " + edge.ItsGraph.Name);
-                }
+
+                throw new Exception("edge " + edge + " is contained in a different graph " + edge.ItsGraph.Name);
             }
-            else
+
+            if (!edges.ContainsKey(edge.ID))
             {
-                if (!edges.ContainsKey(edge.ID))
-                {
-                    throw new Exception("edge " + edge.ToString() + " is not contained in graph " + Name);
-                }
-                else
-                {
-                    edge.Source.RemoveOutgoing(edge);
-                    edge.Target.RemoveIncoming(edge);
-                    edges.Remove(edge.ID);
-                    edge.ItsGraph = null;
-                }
+                throw new Exception("edge " + edge + " is not contained in graph " + Name);
             }
+
+            edge.Source.RemoveOutgoing(edge);
+            edge.Target.RemoveIncoming(edge);
+            edges.Remove(edge.ID);
+            edge.ItsGraph = null;
         }
 
         /// <summary>
@@ -550,11 +537,11 @@ namespace SEE.DataModel.DG
             // its nodes
             foreach (Node node in nodes.Values)
             {
-                result += node.ToString() + ",\n";
+                result += node + ",\n";
             }
             foreach (Edge edge in edges.Values)
             {
-                result += edge.ToString() + ",\n";
+                result += edge + ",\n";
             }
             result += "}\n";
             return result;
@@ -922,7 +909,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="other">to be compared to</param>
         /// <returns>true if equal</returns>
-        public override bool Equals(System.Object other)
+        public override bool Equals(Object other)
         {
             if (!base.Equals(other))
             {
@@ -933,47 +920,47 @@ namespace SEE.DataModel.DG
                 }
                 return false;
             }
-            else
+
+            Graph otherGraph = other as Graph;
+            if (path != otherGraph.path)
             {
-                Graph otherGraph = other as Graph;
-                if (path != otherGraph.path)
-                {
-                    Report("Graph paths are different");
-                    return false;
-                }
-                else if (name != otherGraph.name)
-                {
-                    Report("Graph names are different");
-                    return false;
-                }
-                else if (NodeCount != otherGraph.NodeCount)
-                {
-                    Report("Number of nodes are different");
-                    return false;
-                }
-                else if (!AreEqual(nodes, otherGraph.nodes))
-                {
-                    // Note: because the Equals operation for nodes checks also the ID
-                    // of the node's parents and children, we will also implicitly check the
-                    // node hierarchy.
-                    Report("Graph nodes are different");
-                    return false;
-                }
-                else if (edges.Count != otherGraph.edges.Count)
-                {
-                    Report("Number of edges are different");
-                    return false;
-                }
-                else
-                {
-                    bool equal = AreEqual(edges, otherGraph.edges);
-                    if (!equal)
-                    {
-                        Report("Graph edges are different");
-                    }
-                    return true;
-                }
+                Report("Graph paths are different");
+                return false;
             }
+
+            if (name != otherGraph.name)
+            {
+                Report("Graph names are different");
+                return false;
+            }
+
+            if (NodeCount != otherGraph.NodeCount)
+            {
+                Report("Number of nodes are different");
+                return false;
+            }
+
+            if (!AreEqual(nodes, otherGraph.nodes))
+            {
+                // Note: because the Equals operation for nodes checks also the ID
+                // of the node's parents and children, we will also implicitly check the
+                // node hierarchy.
+                Report("Graph nodes are different");
+                return false;
+            }
+
+            if (edges.Count != otherGraph.edges.Count)
+            {
+                Report("Number of edges are different");
+                return false;
+            }
+
+            bool equal = AreEqual(edges, otherGraph.edges);
+            if (!equal)
+            {
+                Report("Graph edges are different");
+            }
+            return true;
         }
 
         /// <summary>
@@ -1085,7 +1072,7 @@ namespace SEE.DataModel.DG
                     result.Add(name);
                 }
             }
-            return result.ToList<string>();
+            return result.ToList();
         }
     }
 }

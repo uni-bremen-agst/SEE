@@ -1,5 +1,6 @@
-﻿using System;
-using SEE.DataModel.DG;
+﻿using SEE.DataModel.DG;
+using System;
+using OdinSerializer.Utilities;
 using UnityEngine;
 
 namespace SEE.GO
@@ -23,7 +24,14 @@ namespace SEE.GO
             if (nodeRef == null)
             {
                 EdgeRef edgeRef = gameObject.GetComponent<EdgeRef>();
-                return edgeRef == null ? gameObject.name : edgeRef.edge.ID;
+                if (edgeRef == null)
+                {
+                    return gameObject.name;
+                }
+                else
+                {
+                    return edgeRef.edge.ID;
+                }
             }
 
             return nodeRef.node.ID;
@@ -114,26 +122,53 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Tries to get the component of the given type <typeparamref name="T"/> of this <paramref name="gameObject"/>.
+        /// If the component was found, it will be stored in <paramref name="component"/> and true will be returned.
+        /// If it wasn't found, <paramref name="component"/> will be <code>null</code>, false will be returned,
+        /// and an error message will be logged indicating that the component type wasn't present on the GameObject.
+        /// </summary>
+        /// <param name="gameObject">The game object the component should be gotten from. Must not be null.</param>
+        /// <param name="component">The variable in which to save the component.</param>
+        /// <typeparam name="T">The type of the component.</typeparam>
+        /// <returns>True if the component was present on the <paramref name="gameObject"/>, false otherwise.</returns>
+        public static bool TryGetComponentOrLog<T>(this GameObject gameObject, out T component)
+        {
+            if (!gameObject.TryGetComponent(out component))
+            {
+                Debug.LogError($"Couldn't find component '{typeof(T).GetNiceName()}' "
+                               + $"on game object '{gameObject.name}'.\n");
+                return false;
+            }
+
+            return true;
+        }
+
+
+	/// <summary>
         /// Returns the graph node represented by this <paramref name="gameObject"/>.
         /// 
         /// Precondition: <paramref name="gameObject"/> must have a <see cref="NodeRef"/>
         /// attached to it referring to a valid node; if not, an exception is raised.
         /// </summary>
         /// <param name="gameObject">the game object whose Node is requested</param>
-        /// <returns>the corresponding graph node</returns>
+        /// <returns>the correponding graph node</returns>
         public static Node GetNode(this GameObject gameObject)
         {
-            if (gameObject.TryGetComponent(out NodeRef nodeRef))
+            if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
                 if (nodeRef != null)
                 {
                     return nodeRef.node;
                 }
-
-                throw new Exception($"Node reference of game object {gameObject.name} is null");
+                else
+                {
+                    throw new Exception($"Node reference of game object {gameObject.name} is null");
+                }
             }
-
-            throw new Exception($"Game object {gameObject.name} has no NodeRef");
+            else
+            {
+                throw new Exception($"Game object {gameObject.name} has no NodeRef");
+            }
         }
     }
 }

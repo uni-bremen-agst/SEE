@@ -1,6 +1,13 @@
 ﻿
 
 CurvedUI changelog--------------------------------//
+3.2
+Bugfixes
+- Fixed an issue where TMP Text would not clear properly. 
+- Fixed a compile error in Unity 2020.1 and above.
+- Removed Shaders that could show errors on URP and HDRP in Unity 2020.
+- Fixed errors showing in Prefab Mode and added more descriptive messages.
+
 3.1
 New
 - Added support for Oculus Integration v19.1 and above. 

@@ -55,22 +55,22 @@ namespace SEE.Layout.NodeLayouts.Cose
         public static int Simple_Node_Size = 1;
 
         /// <summary>
-        /// the factor by which the edge length increases with every level of the edges source/ target node
+        /// the factor by which the edge length increases with every level of the edges source/target node
         /// </summary>
         public static float Per_Level_Ideal_Edge_Length_Factor = 0.1f;
 
         /// <summary>
-        /// Indicates whether the layout process in incrementally calculated
+        /// Indicates whether the layout process is incrementally calculated
         /// </summary>
         public static bool Incremental = true;
 
         /// <summary>
-        /// the maximum value of the displacement of a node when the layout prozess is incrementally calculated
+        /// the maximum value of the displacement of a node when the layout process is incrementally calculated
         /// </summary>
         public static float Max_Node_Displacement_Incremental = 50.0f;
 
         /// <summary>
-        ///  the maximum value of the displacement of a node when the layout prozess is not incrementally calculated
+        ///  the maximum value of the displacement of a node when the layout process is not incrementally calculated
         /// </summary>
         public static double Max_Node_Displacement = 100.0 * 3;
 
@@ -90,7 +90,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         public static float Spring_Strength = 0.45f;
 
         /// <summary>
-        /// Indicates whether is smart repulsion range calculation is used
+        /// Indicates whether smart repulsion range calculation is used
         /// </summary>
         public static bool Use_Smart_Repulsion_Range_Calculation = false;
 
@@ -140,7 +140,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         public static int Cooling_Adjuster = 1;
 
         /// <summary>
-        /// true if the parameter edgeLength/ repulsionStrength should be calculated automatically 
+        /// true if the parameter edgeLength/repulsionStrength should be calculated automatically 
         /// </summary>
         public static bool Automatic_Parameter_Calculation = true;
 
@@ -155,7 +155,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         private float coolingFactor;
 
         /// <summary>
-        /// the inital cooling factor
+        /// the initial cooling factor
         /// </summary>
         private float initialCoolingFactor;
 

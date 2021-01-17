@@ -43,7 +43,7 @@ namespace SEE.DataModel.DG
         public virtual string Type
         {
             get => type;
-            set => type = !string.IsNullOrEmpty(value) ? value : "Unknown";
+            set => type = !string.IsNullOrEmpty(value) ? value : Graph.UnknownType;
         }
 
         /// <summary>
