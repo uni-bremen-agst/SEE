@@ -83,6 +83,7 @@ namespace SEE.Controls.Actions
                     }
                     break;
                 case State.Browse:
+
                     break;
                 case State.EditNode:
                     //NOTE: JUST COPIED AND PASTED FROM NEWNODE
