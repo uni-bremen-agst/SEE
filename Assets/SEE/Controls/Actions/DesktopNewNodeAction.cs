@@ -182,7 +182,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// opens a dialog-canvas where the user can insert some node-metrics. Therefore,a CanvasGenerator-script-component 
+        /// opens a dialog-canvas where the user can insert some node-metrics. Therefore, a CanvasGenerator-script-component 
         /// will be added to this gameObject which contains the canvas.
         /// </summary>
         public void OpenDialog()
@@ -450,63 +450,94 @@ namespace SEE.Controls
         }
 
 
+
+        /// <summary>
+        /// 
+        /// </summary>
         public void GetNodesOfScene()
         {
 
-            ICollection<GameObject> allLeafsInScene = SceneQueries.AllGameNodesInScene(true, false);
+            //Prepares a list of all leafs lossyscale which is stored in the list innerNodeSize.
             List<Vector3> leafSize = new List<Vector3>();
 
-            foreach (GameObject go in allLeafsInScene)
-            {
-                leafSize.Add(go.transform.lossyScale);
+            //Prepares a list of all innernodes lossyscale which is stored in the list innerNodeSize.
+            List<Vector3> innerNodeSize = new List<Vector3>();
 
-            }
+            // Query to obtain all the leafnodes of the specific scene.
+            ICollection<GameObject> allLeafsInScene = SceneQueries.AllGameNodesInScene(true, false);
 
 
-            // In the special case the graph only consists of one leaf, we have to check in the list of all leafs, which has the count of one in that case
-            // if there is the root node.
+            //Query to obtain all the inner nodes of the specific scene.
             ICollection<GameObject> allInnerNodesInScene = SceneQueries.AllGameNodesInScene(false, true);
+
+
+            // In the special case the graph only consists of one leaf, we will have to check in the list of all leafs, which has the count of one in that case,
+            // if there is the root node.
             if (allLeafsInScene.Count == 1 && allInnerNodesInScene.Count == 0)
             {
-                foreach (GameObject rootSearch in allInnerNodesInScene)
-                {
-                    Node root = rootSearch.GetComponent<NodeRef>().node;
-                    if (root.IsRoot())
-                    {
-                        dir_Root = rootSearch;
-                    }
-                }
+                dir_Root = rootSearch(allLeafsInScene);
+
             }
 
 
-            // Search for the graphs roor in the set of all inner nodes.
-            foreach (GameObject rootSearch in allInnerNodesInScene)
-            {
-                Node root = rootSearch.GetComponent<NodeRef>().node;
-                if (root.IsRoot())
-                {
-                    dir_Root = rootSearch;
-                }
-            }
+            // Search for the graphs root in the set of all inner nodes.
+            dir_Root = rootSearch(allInnerNodesInScene);
 
-            //Prepares a list of all innernodes lossyscale which is stored in the list InnerNodeSize.
-            List<Vector3> InnerNodeSize = new List<Vector3>();
-            foreach (GameObject gObject in allInnerNodesInScene)
-            {
 
-                InnerNodeSize.Add(gObject.transform.lossyScale);
-            }
-
+            // Fill the lists with the specific lossyscales of all the nodes, either leafs or innernodes.
+            leafSize = listOfLossyscale(allLeafsInScene);
+            innerNodeSize = listOfLossyscale(allInnerNodesInScene);
+            
+            // Calculate the median of the specific sets, either leafs or innernodes. 
             medianOfLeaf = CalcMedianOfaVector(leafSize);
-            medianOfInnerNode = CalcMedianOfaVector(InnerNodeSize);
+            medianOfInnerNode = CalcMedianOfaVector(innerNodeSize);
             
             // In the special case there are no inner nodes, the median of the graphs only leaf is set 
             // as a default value for any inner node that might be created.
-            if (InnerNodeSize.Count == 0)
+            if (innerNodeSize.Count == 0)
             {
                 medianOfInnerNode = medianOfLeaf;
             }
         }
+
+        /// <summary>
+        /// Returns a vector list filled with the lossyscale of the param pListOfGameObject. 
+        /// </summary>
+        /// <param name="pListOfGameObjects">A List of GameObjects</param>
+        /// <returns></returns>
+        private List<Vector3> listOfLossyscale(ICollection<GameObject> pListOfGameObjects)
+        {
+            if (pListOfGameObjects == null | pListOfGameObjects.Count == 0)
+            {
+                return null;
+            }
+            List<Vector3> lossyScaleList = new List<Vector3>();
+            foreach (GameObject go in pListOfGameObjects)
+            {
+                    lossyScaleList.Add(go.transform.lossyScale);
+            }
+
+            return lossyScaleList;
+
+
+        }
+
+        private GameObject rootSearch(ICollection<GameObject> pListOfGameNodes)
+        {
+            GameObject root = new GameObject();
+            Node rootTmp = new Node();
+            foreach (GameObject rootSearchItem in pListOfGameNodes)
+            {
+                rootTmp = rootSearchItem.GetComponent<NodeRef>().node;
+                if (rootTmp.IsRoot())
+                {
+                    root = rootSearchItem;
+                    return root;
+                }
+            }
+            return null; 
+        }
+
 
         /// <summary>
         /// Calculates the median of a list of vectors.
