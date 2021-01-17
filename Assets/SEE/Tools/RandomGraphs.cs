@@ -15,7 +15,7 @@ namespace SEE.Tools
     /// SeeCityRandomEditor.
     /// </summary>
     [Serializable]
-    public class RandomAttributeDescriptor
+    public class RandomAttributeDescriptor : ConfigWriter.PersistentConfigItem
     {
         public RandomAttributeDescriptor()
         { }
@@ -32,6 +32,53 @@ namespace SEE.Tools
         public float Mean;
         [SerializeField]
         public float StandardDeviation;
+
+        private const string NameLabel = "Name";
+        private const string MeanLabel = "Mean";
+        private const string StandardDeviationLabel = "StandardDeviation";
+
+        /// <summary>
+        /// <see cref="ConfigIO.PersistentConfigItem.Save()"/>
+        /// </summary>
+        public void Save(ConfigWriter writer, string label)
+        {
+            writer.BeginGroup(label);
+            writer.Save(Name, NameLabel);
+            writer.Save(Mean, MeanLabel);
+            writer.Save(StandardDeviation, StandardDeviationLabel);
+            writer.EndGroup();
+        }
+
+        /// <summary>
+        /// <see cref="ConfigIO.PersistentConfigItem.Restore()"/>
+        /// </summary>
+        public bool Restore(Dictionary<string, object> attributes, string label = "")
+        {
+            Dictionary<string, object> values;
+            if (string.IsNullOrEmpty(label))
+            {
+                // no label given => attributes contains already the data to be restored
+                values = attributes;
+            }
+            else if (attributes.TryGetValue(label, out object dictionary))
+            {
+                // label was given => attributes is a dictionary where we need to look up the data 
+                // using the label
+                values = dictionary as Dictionary<string, object>;
+            }
+            else
+            {
+                // label was given, but attributes does not know it
+                // => no data; we cannot restore the object
+                return false;
+            }
+
+            bool result = false;
+            result = ConfigIO.Restore(values, NameLabel, ref Name) || result;
+            result = ConfigIO.Restore(values, MeanLabel, ref Mean) || result;
+            result = ConfigIO.Restore(values, StandardDeviationLabel, ref StandardDeviation) || result;
+            return result;
+        }
     }
 
     /// <summary>
@@ -88,6 +135,35 @@ namespace SEE.Tools
             else if (EdgeDensity > 1)
             {
                 throw new Exception("Edge density must not be greater than 1.");
+            }
+        }
+
+        private const string NodeTypeLabel = "NodeType";
+        private const string EdgeTypeLabel = "EdgeType";
+        private const string NodeNumberLabel = "NodeNumber";
+        private const string EdgeDensityLabel = "EdgeDensity";
+
+        internal void Save(ConfigWriter writer, string label)
+        {
+            writer.BeginGroup(label);
+            writer.Save(NodeType, NodeTypeLabel);
+            writer.Save(EdgeType, EdgeTypeLabel);
+            writer.Save(NodeNumber, NodeNumberLabel);
+            writer.Save(EdgeDensity, EdgeDensityLabel);
+            writer.EndGroup();
+        }
+
+        internal void Restore(Dictionary<string, object> attributes, string label)
+        {
+            if (attributes.TryGetValue(label, out object dictionary))
+            {
+                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+                {
+                    ConfigIO.Restore(values, NodeTypeLabel, ref NodeType);
+                    ConfigIO.Restore(values, EdgeTypeLabel, ref EdgeType);
+                    ConfigIO.Restore(values, NodeNumberLabel, ref NodeNumber);
+                    ConfigIO.Restore(values, EdgeDensityLabel, ref EdgeDensity);
+                }
             }
         }
     }
