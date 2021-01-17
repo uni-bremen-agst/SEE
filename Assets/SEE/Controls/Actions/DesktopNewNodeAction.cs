@@ -63,24 +63,24 @@ namespace SEE.Controls
         private static string nodetype;
 
         /// <summary>
-        /// Colour the hovered city is changed to when hovered or selected. 
+        /// Colour the hovered city is dyed when hovered or selected , set green by default 
         /// </summary>
-        private Color BLACK = Color.black;
+        private Color defaultHoverCityColor = Color.green;
 
         /// <summary>
-        /// Colour the hovered city is changed to when hovered or selected. 
+        /// Colour the hovered city is dyed to when hovered or selected in case the default colour is occupied , set black by default
         /// </summary>
-        private Color GREEN = Color.green;
+        private Color alternativeHoverCityColor = Color.black;
 
         /// <summary>
         /// A list the hovered GameObjects are stored in.
         /// </summary>
-        private List<GameObject> hoveredObjectList = null;
+        private List<GameObject> hoveredObjectList = new List<GameObject>();
 
         /// <summary>
         /// A list the colors of the hovered GameObjects are stored in.
         /// </summary>
-        private List<Color> listOfColors = null;
+        private List<Color> listOfColors = new List<Color>();
 
         /// <summary>
         /// The GameObject Node
@@ -108,12 +108,12 @@ namespace SEE.Controls
         private GameObject dir_Root = null;
 
         /// <summary>
-        /// The colour the graphs leafs graphical representation is dyed . 
+        /// The colour the graphs leafs graphical representation is dyed, set red by default . // To be changed when the metrics are considered
         /// </summary>
         private Color leafColor = Color.red;
 
         /// <summary>
-        /// The colour the graphs inner nodes graphical representation is dyed . 
+        /// The colour the graphs inner nodes graphical representation is dyed, set white by default . // To be changed when the metrics are considered
         /// </summary>
         private Color innerNodeColor = Color.white;
 
@@ -122,8 +122,7 @@ namespace SEE.Controls
 
         public void Start()
         {
-            hoveredObjectList = new List<GameObject>();
-            listOfColors =  new List<Color>();
+           
             canvasObject = GameObject.Find("CanvasObject");
         }
 
@@ -198,7 +197,7 @@ namespace SEE.Controls
         {
 
             // The case the user hovers an object and has hovered objects before. The former colours of the specific objects are set again.
-            if (hoveredObject != null && hoveredObjectList.Count > 0 && hoveredObject.gameObject.GetComponent<Renderer>().material.color != GREEN || hoveredObject == null && hoveredObjectList.Count > 0)
+            if (hoveredObject != null && hoveredObjectList.Count > 0 && hoveredObject.gameObject.GetComponent<Renderer>().material.color != defaultHoverCityColor || hoveredObject == null && hoveredObjectList.Count > 0)
             {
                 Undye();
             }
@@ -221,7 +220,7 @@ namespace SEE.Controls
                 SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject.TryGetComponent<SEECity>(out city);
                 if (dir_Root != null)
                 {
-                    dir_Root.GetComponent<Renderer>().material.color = Color.white;
+                    ChangeColor(dir_Root, Color.white);
                 }
             }
         }
@@ -232,6 +231,7 @@ namespace SEE.Controls
         /// </summary>
         public void Undye()
         {
+            Debug.Log(listOfColors.Count);
             int count = 0;
             foreach (GameObject GO in hoveredObjectList)
             {
@@ -255,19 +255,19 @@ namespace SEE.Controls
         /// <summary>
         /// Dyes the hoveredObject either green in case it is not already green, else black by default.
         /// </summary>
-        private void ChangeColor(GameObject hoveredbject, Color colorOfCity)
+        private void ChangeColor(GameObject objectToDye, Color colorOfCity)
         {
             Color newCityColor = new Color();
-            if (colorOfCity == GREEN)
-            { newCityColor = BLACK;
+            if (colorOfCity == defaultHoverCityColor)
+            { newCityColor = alternativeHoverCityColor;
             }
             else 
             {
-                newCityColor = GREEN;
+                newCityColor = defaultHoverCityColor;
             }
-            hoveredObjectList.Add(hoveredObject);
-            listOfColors.Add(hoveredObject.gameObject.GetComponent<Renderer>().material.color);
-            hoveredObject.gameObject.GetComponent<Renderer>().material.color = newCityColor;
+            hoveredObjectList.Add(objectToDye);
+            listOfColors.Add(objectToDye.gameObject.GetComponent<Renderer>().material.color);
+            objectToDye.gameObject.GetComponent<Renderer>().material.color = newCityColor;
         }
         /// <summary>
         /// creates a randomized string for the id for the created node
@@ -489,8 +489,8 @@ namespace SEE.Controls
             innerNodeSize = listOfLossyscale(allInnerNodesInScene);
             
             // Calculate the median of the specific sets, either leafs or innernodes. 
-            medianOfLeaf = CalcMedianOfaVector(leafSize);
-            medianOfInnerNode = CalcMedianOfaVector(innerNodeSize);
+            medianOfLeaf = CalcMedian(leafSize);
+            medianOfInnerNode = CalcMedian(innerNodeSize);
             
             // In the special case there are no inner nodes, the median of the graphs only leaf is set 
             // as a default value for any inner node that might be created.
@@ -501,10 +501,10 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Returns a vector list filled with the lossyscale of the param pListOfGameObject. 
+        /// Iterates the list of gameobjects and adds the lossyscale of the given objects to a list. 
         /// </summary>
         /// <param name="pListOfGameObjects">A List of GameObjects</param>
-        /// <returns></returns>
+        /// <returns> Returns a  vector list filled with the lossyscale of the param pListOfGameObject. </returns>
         private List<Vector3> listOfLossyscale(ICollection<GameObject> pListOfGameObjects)
         {
             if (pListOfGameObjects == null | pListOfGameObjects.Count == 0)
@@ -522,6 +522,11 @@ namespace SEE.Controls
 
         }
 
+        /// <summary>
+        /// Search for a rootNode in a given list of Gameobjects. 
+        /// </summary>
+        /// <param name="pListOfGameNodes"></param>
+        /// <returns>Returns the rootnode as gameObject in case the root is found, else null.</returns>
         private GameObject rootSearch(ICollection<GameObject> pListOfGameNodes)
         {
             GameObject root = new GameObject();
@@ -539,11 +544,12 @@ namespace SEE.Controls
         }
 
 
-        /// <summary>
-        /// Calculates the median of a list of vectors.
-        /// </summary>
-        /// /// <param name="vectors">List of vectors-attribute</param>
-        private Vector3 CalcMedianOfaVector(List<Vector3> vectors)
+       /// <summary>
+       /// Calculates the median of a vector list.
+       /// </summary>
+       /// <param name="vectors"></param>
+       /// <returns A vector 3 with the median></returns>
+        private Vector3 CalcMedian(List<Vector3> vectors)
         {
             if (vectors.Count == 0 || vectors == null)
             {
@@ -566,9 +572,9 @@ namespace SEE.Controls
             yAxis.Sort();
             zAxis.Sort();
    
-            result.x = CalcMedianElementFromFloats(xAxis);
-            result.y = CalcMedianElementFromFloats(yAxis);
-            result.z = CalcMedianElementFromFloats(zAxis);
+            result.x = CalcMedian(xAxis);
+            result.y = CalcMedian(yAxis);
+            result.z = CalcMedian(zAxis);
 
 
             
@@ -578,9 +584,9 @@ namespace SEE.Controls
             }
 
             int indexSecondMedian = (xAxis.Count +1) /2;
-            float SecondXCoordinate = CalcMedianElementFromFloats(xAxis);
-            float SecondYCoordinate = CalcMedianElementFromFloats(yAxis);
-            float SecondZCoordinate = CalcMedianElementFromFloats(zAxis);
+            float SecondXCoordinate = CalcMedian(xAxis);
+            float SecondYCoordinate = CalcMedian(yAxis);
+            float SecondZCoordinate = CalcMedian(zAxis);
 
             result.x = (result.x + SecondXCoordinate) / 2;
             result.y = (result.y + SecondYCoordinate) / 2;
@@ -592,8 +598,9 @@ namespace SEE.Controls
         /// <summary>
         /// Calculates the median of a list of floats.
         /// </summary>
-        /// /// <param name="newNodeType">List of floats of which the median is calculated</param>
-        private static float CalcMedianElementFromFloats(List<float> floatList)
+        /// <param name="floatList"></param>
+        /// <returns>the single median of the list as a float</returns>
+        private static float CalcMedian(List<float> floatList)
         {
            float median = 0;
             if(floatList.Count == 0 | floatList == null)
