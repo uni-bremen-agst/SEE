@@ -11,19 +11,20 @@ public class ScaleNodeNetAction : AbstractAction
         str = "Hello World!";
     }
 
-   // protected override void ExecuteOnServer;
+    protected override void ExecuteOnServer()
+    {
+
+    }
 
     protected override void ExecuteOnClient()
     {
         if (!IsRequester())
         {
             Debug.Log(str);
+          GameObject thrdCornerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         }
         
     }
 
-    protected override void ExecuteOnServer()
-    {
-       
-    }
+   
 }
