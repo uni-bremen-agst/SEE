@@ -1,4 +1,4 @@
-﻿//Copyright 2020 Florian Garbade
+//Copyright 2020 Florian Garbade
 
 //Permission is hereby granted, free of charge, to any person obtaining a
 //copy of this software and associated documentation files (the "Software"),
@@ -481,6 +481,12 @@ namespace SEE.Game
             _currentCity = next;
             RenderPlane();
             
+            Invoke("AnimateEdges", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
+        }
+
+        private void AnimateEdges()
+        {
+            MoveEdges();
             Invoke("OnAnimationsFinished", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
         }
 
@@ -493,7 +499,7 @@ namespace SEE.Game
             // Destroy all previous edges and draw all edges of next graph. This can only
             // be done when nodes have reached their final position, that is, at the end
             // of the animation cycle.
-            MoveEdges();
+            
             objectManager.RenderEdges();
 
             moveEdges = false;
@@ -527,7 +533,7 @@ namespace SEE.Game
                 Tweens.Scale(plane, scale, moveAnimator.MaxAnimationTime);
                 Tweens.Move(plane, centerPosition, moveAnimator.MaxAnimationTime);
             }
-            
+            MoveEdges();
             
         }
 
@@ -563,17 +569,21 @@ namespace SEE.Game
                 oP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePoints200(oP.controlPoints);
                 nP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePoints200(nP.controlPoints);
 
-                TinySpline.BSpline spline = SEE.Layout.Utils.LinePoints.BSpline(oP.controlPoints);
-                Debug.LogFormat("Lenght Controlpoints before insertion: " + spline.NumControlPoints);
-                spline = spline.InsertKnot(0,1);
-                Debug.LogFormat("Lenght Controlpoints after insertion: " + spline.NumControlPoints);
+
+                //----Begin Test----//
+                //TinySpline.BSpline spline = SEE.Layout.Utils.LinePoints.BSpline(oP.controlPoints);
+                //Debug.LogFormat("Lenght Controlpoints before insertion: " + spline.NumControlPoints);
+                //spline = spline.InsertKnot(0,1);
+                //Debug.LogFormat("Lenght Controlpoints after insertion: " + spline.NumControlPoints);
+                //----End Test----//
+
 
                 oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
                 lineRenderer.positionCount = oP.linePoints.Count();
                 lineRenderer.SetPositions(oP.linePoints);
 
             }
-            
+                timer = 0f;
 
                 moveEdges = true;
 
