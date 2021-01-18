@@ -542,7 +542,9 @@ namespace SEE.Game
             IList<(GameObject, GameObject)> result = new List<(GameObject, GameObject)>();
             foreach(GameObject oGO in oldEdges){
                 foreach(GameObject nGO in newEdges){
-                    if(oGO.ID().Equals(nGO.ID())){
+                    oGO.TryGetComponent<EdgeRef>(out EdgeRef oER);
+                    nGO.TryGetComponent<EdgeRef>(out EdgeRef nER);
+                    if(oER.edge.Equals(nER.edge)){
                         result.Add((oGO,nGO));
                     }
                 }
