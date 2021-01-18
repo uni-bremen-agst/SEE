@@ -342,7 +342,10 @@ namespace SEE.Game.Evolution
         {
             SliderMarker sliderMarker = sliderMarkerContainer.getSliderMarkerForLocation(marker.transform.position);
             sliderMarkerContainer.SliderMarkers.Remove(sliderMarker);
-            GameObject.Destroy(marker);
+            InputField comment = markerDictionary[marker];
+            markerDictionary.Remove(marker);
+            GameObject.Destroy(comment.gameObject);
+            GameObject.Destroy(marker.gameObject);
         }
 
         /// <summary>
