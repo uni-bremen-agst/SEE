@@ -207,7 +207,7 @@ public class GameNodeScaleAction : MonoBehaviour
     /// </summary>
     private void scaleNode()
     {
-
+       
         Vector3 scale = Vector3.zero;
         scale.y += topSphere.transform.position.y - topOldSpherPos.y;
         scale.x -= fstSideSphere.transform.position.x - fstSideOldSpherPos.x;
@@ -270,7 +270,7 @@ public class GameNodeScaleAction : MonoBehaviour
         //transform the new pos and scale
         gameObject.transform.position = position;
         gameObject.SetScale(scale);
-        new ScaleNodeNetAction().Execute(null);
+        new ScaleNodeNetAction(gameObject.name, scale, position).Execute(null);
 
     }
 
@@ -403,6 +403,7 @@ public class GameNodeScaleAction : MonoBehaviour
         {
             gameObject.SetScale(originalScale);
             gameObject.transform.position = originalPosition;
+            new ScaleNodeNetAction(gameObject.name, originalScale,originalPosition).Execute(null);
             removeScript();
         }
     }
