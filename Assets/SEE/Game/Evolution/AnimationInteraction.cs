@@ -21,6 +21,9 @@ using SEE.Utils;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
+using UnityEngine.EventSystems;
+using System.IO;
 
 namespace SEE.Game.Evolution
 {
@@ -81,6 +84,12 @@ namespace SEE.Game.Evolution
         /// </summary>
         private EvolutionRenderer evolutionRenderer; // not serialized; will be set in property EvolutionRenderer
 
+        private SliderMarkerContainer sliderMarkerContainer;
+
+        private Button selectedMarker;
+
+        private Dictionary<Button, InputField> markerDictionary = new Dictionary<Button, InputField>();
+
         /// <summary>
         /// The evolution renderer doing the rendering and animations of the graphs.
         /// </summary>
@@ -116,11 +125,37 @@ namespace SEE.Game.Evolution
             SliderDrag sliderDrag = animationDataModel.Slider.GetComponent<SliderDrag>();
             sliderDrag.EvolutionRenderer = evolutionRenderer;
 
+            try
+            {
+                sliderMarkerContainer = SliderMarkerContainer.Load(Path.Combine(Application.persistentDataPath, "sliderMarkers.xml"));
+                
+            } catch(FileNotFoundException e)
+            {
+                sliderMarkerContainer = new SliderMarkerContainer();
+            }
+
+            foreach (SliderMarker sliderMarker in sliderMarkerContainer.SliderMarkers)
+            {
+                Vector3 markerPos = new Vector3(sliderMarker.MarkerX, sliderMarker.MarkerY, sliderMarker.MarkerZ);
+                string comment = sliderMarker.Comment;
+                AddMarker(markerPos, comment);
+            }
+
             SetMode(true);
             OnShownGraphHasChanged();
             evolutionRenderer.Register(OnShownGraphHasChanged);
         }
 
+        void OnApplicationQuit()
+        {
+            foreach (KeyValuePair<Button, InputField> p in markerDictionary)
+            {
+                SliderMarker sliderMarker = sliderMarkerContainer.getSliderMarkerForLocation(p.Key.transform.position);
+                sliderMarker.setComment(p.Value.text);
+            }
+          
+            sliderMarkerContainer.Save(Path.Combine(Application.persistentDataPath, "sliderMarkers.xml"));
+        }
 
 
         /// <summary>
@@ -247,44 +282,67 @@ namespace SEE.Game.Evolution
         /// </summary>
         private void TaskOnClickMarker(Button clickedMarker)
         {
+            selectedMarker = clickedMarker;
+
             string commentName = clickedMarker.GetHashCode().ToString() + "-comment";
 
             if (animationDataModel.Slider.transform.Find(commentName) != null)
             {
                 GameObject comment = animationDataModel.Slider.transform.Find(commentName).gameObject;
                 comment.SetActive(!comment.activeSelf);
-            } else
-            {
-                InputField commentField = Instantiate(Resources.Load("Prefabs/Comment", typeof(InputField)) as InputField);
-                commentField.transform.SetParent(animationDataModel.Slider.transform, false);
-                Vector3 markerPos = clickedMarker.transform.position;
-                Vector3 commentPos = new Vector3(markerPos.x + 0.15f, markerPos.y, markerPos.z);
-                commentField.transform.position = commentPos;
-                commentField.name = commentName;
+
             }
+
         }
+        
+        private InputField AddCommentToMarker(Button marker, string comment)
+        {
+
+            string commentName = marker.GetHashCode().ToString() + "-comment";
+
+            InputField commentField = Instantiate(Resources.Load("Prefabs/Comment", typeof(InputField)) as InputField);
+
+            commentField.transform.SetParent(animationDataModel.Slider.transform, false);
+            Vector3 markerPos = marker.transform.position;
+            Vector3 commentPos = new Vector3(markerPos.x + 0.15f, markerPos.y, markerPos.z);
+            commentField.transform.position = commentPos;
+            commentField.name = commentName;
+            if (comment != null) commentField.text = comment;
+            markerDictionary.Add(marker, commentField);
+            return commentField;
+          
+        }
+
 
         /// <summary>
         /// Adds a new marker at the current position
         /// </summary>
-        private void AddMarker()
+        private void AddMarker(Vector3 markerPos, string comment)
         {
             Button newMarker = Instantiate(Resources.Load("Prefabs/Marker", typeof(Button)) as Button);
             newMarker.transform.SetParent(animationDataModel.Slider.transform, false);
-            Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
-            Vector3 markerPos = new Vector3(handlePos.x, handlePos.y+.08f, handlePos.z);
             newMarker.transform.position = markerPos;
             newMarker.onClick.AddListener(() => TaskOnClickMarker(newMarker));
-            DontDestroyOnLoad(newMarker);
-            animationDataModel.MarkerList.Add(newMarker);
+            if (sliderMarkerContainer.getSliderMarkerForLocation(markerPos) == null)
+            {
+                SliderMarker newSliderMarker = new SliderMarker();
+                newSliderMarker.MarkerX = markerPos.x;
+                newSliderMarker.MarkerY = markerPos.y;
+                newSliderMarker.MarkerZ = markerPos.z;
+                sliderMarkerContainer.SliderMarkers.Add(newSliderMarker);
+            }
+            InputField commentField = AddCommentToMarker(newMarker, comment);
+            commentField.gameObject.SetActive(false);      
         }
 
         /// <summary>
-        /// Removes a marker at the current position
+        /// Removes the selected marker
         /// </summary>
-        private void RemoveMarker()
+        private void RemoveMarker(Button marker)
         {
-
+            SliderMarker sliderMarker = sliderMarkerContainer.getSliderMarkerForLocation(marker.transform.position);
+            sliderMarkerContainer.SliderMarkers.Remove(sliderMarker);
+            GameObject.Destroy(marker);
         }
 
         /// <summary>
@@ -312,7 +370,13 @@ namespace SEE.Game.Evolution
                     evolutionRenderer.ToggleAutoPlay();
                 } else if (Input.GetKeyDown("m"))
                 {
-                    AddMarker();
+                    Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
+                    Vector3 markerPos = new Vector3(handlePos.x, handlePos.y + .08f, handlePos.z);
+                    if (sliderMarkerContainer.getSliderMarkerForLocation(markerPos) != null) return;
+                    AddMarker(markerPos, null);
+                } else if (Input.GetKeyDown(KeyCode.Delete))
+                {
+                    RemoveMarker(selectedMarker);
                 }
 
                 string[] animationTimeKeys = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };

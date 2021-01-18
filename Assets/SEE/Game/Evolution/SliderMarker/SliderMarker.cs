@@ -12,14 +12,18 @@ namespace SEE.Game.Evolution
 {
     public class SliderMarker
     {
+        [XmlAttribute("MarkerX")]
+        public float MarkerX;
+        [XmlAttribute("MarkerY")]
+        public float MarkerY;
+        [XmlAttribute("MarkerZ")]
+        public float MarkerZ;
+        [XmlAttribute("Comment")]
+        public string Comment;
 
-
-        public float MarkerX { get => MarkerX; set => MarkerX = value; }
-        public float MarkerY { get => MarkerY; set => MarkerY = value; }
-        public float MarkerZ { get => MarkerZ; set => MarkerZ = value; }
-        public float CommentX { get => CommentX; set => CommentX = value; }
-        public float CommentY { get => CommentY; set => CommentY = value; }
-        public float CommentZ { get => CommentZ; set => CommentZ = value; }
-        public string Comment { get => Comment; set => Comment = value; }
+        public void setComment(string comment)
+        {
+            this.Comment = comment;
+        }
     }
 }
