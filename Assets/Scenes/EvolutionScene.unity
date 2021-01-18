@@ -1371,6 +1371,12 @@ PrefabInstance:
       propertyPath: m_Name
       value: AnimationCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 6721087702604884392, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8,
+        type: 3}
+      propertyPath: markerPrefab
+      value: 
+      objectReference: {fileID: 4405863734327421875, guid: bf551eb3b2791384793b19746ba863b3,
+        type: 3}
     - target: {fileID: 8411774010446772676, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8,
         type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -3019,7 +3025,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1636335451}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -11.990099, y: -4, z: 0}
+  m_LocalPosition: {x: -12.255814, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -3206,7 +3212,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1776319858}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 11.990099, y: -4, z: 0}
+  m_LocalPosition: {x: 12.255814, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
