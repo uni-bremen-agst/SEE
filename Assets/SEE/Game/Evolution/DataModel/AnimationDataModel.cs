@@ -20,7 +20,6 @@
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 namespace SEE.Game.Evolution
 {
@@ -63,11 +62,6 @@ namespace SEE.Game.Evolution
         /// Button to fast forward the animation.
         /// </summary>
         public Button FastBackwardButton; // serialized by Unity
-
-        /// <summary>
-        /// List of markers.
-        /// </summary>
-        public List<Button> MarkerList;
 
         /// <summary>
         /// Checks if all fields are initialized.

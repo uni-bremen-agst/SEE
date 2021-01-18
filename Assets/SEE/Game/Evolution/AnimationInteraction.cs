@@ -22,7 +22,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using UnityEngine.EventSystems;
 using System.IO;
 
 namespace SEE.Game.Evolution
@@ -84,10 +83,19 @@ namespace SEE.Game.Evolution
         /// </summary>
         private EvolutionRenderer evolutionRenderer; // not serialized; will be set in property EvolutionRenderer
 
-        private SliderMarkerContainer sliderMarkerContainer;
+        /// <summary>
+        /// The container for the markers, needed for serialization 
+        /// </summary>
+        private SliderMarkerContainer sliderMarkerContainer; // not serialized; will be set in Init()
 
+        /// <summary>
+        /// The currently selected marker
+        /// </summary>
         private Button selectedMarker;
 
+        /// <summary>
+        /// A dictionary linking markers and comments, needed for saving the comments on application quit
+        /// </summary>
         private Dictionary<Button, InputField> markerDictionary = new Dictionary<Button, InputField>();
 
         /// <summary>
@@ -146,6 +154,9 @@ namespace SEE.Game.Evolution
             evolutionRenderer.Register(OnShownGraphHasChanged);
         }
 
+        /// <summary>
+        /// Saves the marker data on application quit
+        /// </summary>
         void OnApplicationQuit()
         {
             foreach (KeyValuePair<Button, InputField> p in markerDictionary)
@@ -283,34 +294,30 @@ namespace SEE.Game.Evolution
         private void TaskOnClickMarker(Button clickedMarker)
         {
             selectedMarker = clickedMarker;
-
             string commentName = clickedMarker.GetHashCode().ToString() + "-comment";
-
             if (animationDataModel.Slider.transform.Find(commentName) != null)
             {
                 GameObject comment = animationDataModel.Slider.transform.Find(commentName).gameObject;
                 comment.SetActive(!comment.activeSelf);
 
             }
-
         }
-        
+
+        /// <summary>
+        /// Adds an Inputfield to enter comments to the specified marker and returns the created Inputfield
+        /// </summary>
         private InputField AddCommentToMarker(Button marker, string comment)
         {
-
             string commentName = marker.GetHashCode().ToString() + "-comment";
-
             InputField commentField = Instantiate(Resources.Load("Prefabs/Comment", typeof(InputField)) as InputField);
-
-            commentField.transform.SetParent(animationDataModel.Slider.transform, false);
             Vector3 markerPos = marker.transform.position;
             Vector3 commentPos = new Vector3(markerPos.x + 0.15f, markerPos.y, markerPos.z);
+            commentField.transform.SetParent(animationDataModel.Slider.transform, false);
             commentField.transform.position = commentPos;
             commentField.name = commentName;
             if (comment != null) commentField.text = comment;
             markerDictionary.Add(marker, commentField);
             return commentField;
-          
         }
 
 
@@ -352,7 +359,9 @@ namespace SEE.Game.Evolution
         /// Handles the user input as follows:
         ///   k   => previous graph revision is shown
         ///   l   => next graph revision is shown
+        ///   m   => create new marker
         ///   tab => auto-play mode is toggled
+        ///   del => delete selected marker
         ///   0-9 => the time in between two revisions in auto-play mode is adjusted
         ///   ESC => toggle between the two canvases AnimationCanvas and RevisionSelectionCanvas
         /// </summary>
