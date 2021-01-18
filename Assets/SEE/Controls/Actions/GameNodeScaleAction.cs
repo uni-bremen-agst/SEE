@@ -1,9 +1,11 @@
 ﻿using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
+using SEE.Net;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 
 public class GameNodeScaleAction : MonoBehaviour
 {
@@ -86,6 +88,8 @@ public class GameNodeScaleAction : MonoBehaviour
         //Positioning
         setOnRoof();
         setOnSide();
+
+        
     }
 
     private void Update()
@@ -266,6 +270,7 @@ public class GameNodeScaleAction : MonoBehaviour
         //transform the new pos and scale
         gameObject.transform.position = position;
         gameObject.SetScale(scale);
+        new ScaleNodeNetAction().Execute(null);
 
     }
 
