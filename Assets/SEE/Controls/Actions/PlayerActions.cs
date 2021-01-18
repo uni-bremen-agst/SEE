@@ -115,6 +115,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public void Browse()
         {
+
             Enter(State.Browse);
         }
 
@@ -197,7 +198,9 @@ namespace SEE.Controls.Actions
                 case State.NewNode:
                     generator.DestroyAddNodeCanvas();
                     gameObject.GetComponent<DesktopNewNodeAction>().hoveredObject = null;
+                    GetComponent<DesktopNewNodeAction>().Undye();
                     gameObject.GetComponent<DesktopNewNodeAction>().RemoveScript();
+                    
                     break;
                 case State.ScaleNode:
                     break;
