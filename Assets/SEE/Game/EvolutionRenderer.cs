@@ -480,7 +480,7 @@ namespace SEE.Game
             // We have made the transition to the next graph.
             _currentCity = next;
             RenderPlane();
-            objectManager.RenderEdges2();
+            
             Invoke("OnAnimationsFinished", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
         }
 
@@ -493,6 +493,7 @@ namespace SEE.Game
             // Destroy all previous edges and draw all edges of next graph. This can only
             // be done when nodes have reached their final position, that is, at the end
             // of the animation cycle.
+            MoveEdges();
             objectManager.RenderEdges();
 
             moveEdges = false;
@@ -526,7 +527,7 @@ namespace SEE.Game
                 Tweens.Scale(plane, scale, moveAnimator.MaxAnimationTime);
                 Tweens.Move(plane, centerPosition, moveAnimator.MaxAnimationTime);
             }
-            MoveEdges();
+            
             
         }
 
@@ -562,6 +563,11 @@ namespace SEE.Game
                 oP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePoints200(oP.controlPoints);
                 nP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePoints200(nP.controlPoints);
 
+                TinySpline.BSpline spline = SEE.Layout.Utils.LinePoints.BSpline(oP.controlPoints);
+                Debug.LogFormat("Lenght Controlpoints before insertion: " + spline.NumControlPoints);
+                spline = spline.InsertKnot(0,1);
+                Debug.LogFormat("Lenght Controlpoints after insertion: " + spline.NumControlPoints);
+
                 oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
                 lineRenderer.positionCount = oP.linePoints.Count();
                 lineRenderer.SetPositions(oP.linePoints);
@@ -580,8 +586,9 @@ namespace SEE.Game
 
         void Update(){
 
-            timer += Time.deltaTime;
+            
             if(moveEdges == true){
+                timer += Time.deltaTime;
                  foreach((GameObject oldEdge, GameObject newEdge) in matchedEdges){
                     oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
                     newEdge.TryGetComponent<Points>(out Points newLinePoints);

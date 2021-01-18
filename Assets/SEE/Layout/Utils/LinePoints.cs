@@ -42,6 +42,21 @@ namespace SEE.Layout.Utils
             return ListToVectors(list);
         }
 
+        public static TinySpline.BSpline BSpline(Vector3[] controlPoints, float tension = tensionDefault)
+        {
+            Debug.Assert(controlPoints.Length > 3);
+            Debug.Assert(0.0f <= tension && tension <= 1.0f);
+
+            // Create a cubic spline with control points in 3D using a clamped knot vector.
+            TinySpline.BSpline spline = new TinySpline.BSpline((uint)controlPoints.Length, dimensions)
+            {
+                // Setup control points.
+                ControlPoints = VectorsToList(controlPoints)
+            };
+
+            return spline;
+        }
+
 
         public static Vector3[] BSplineLinePoints200(Vector3[] controlPoints, float tension = tensionDefault)
         {
