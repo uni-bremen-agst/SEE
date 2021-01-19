@@ -20,6 +20,7 @@
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
+using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -30,15 +31,25 @@ namespace SEE.Game
     /// A SEECityEvolution combines all necessary components for the animations
     /// of an evolving SEECity.
     /// </summary>
+    [RequireComponent(typeof(EvolutionRenderer), typeof(AnimationInteraction))]    
     public class SEECityEvolution : AbstractSEECity
     {
+        /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
+        /// configuration file, make sure you save and restore it in 
+        /// <see cref="SEECityEvolution.Save(ConfigWriter)"/> and 
+        /// <see cref="SEECityEvolution.Restore(Dictionary{string, object})"/>, 
+        /// respectively. You should also extend the test cases in TestConfigIO.
+        
+
         /// <summary>
         /// Sets the maximum number of revsions to load.
         /// </summary>
-        public int maxRevisionsToLoad = 500;  // serialized by Unity
+        public int MaxRevisionsToLoad = 500;  // serialized by Unity
 
         /// <summary>
         /// The renderer for rendering the evolution of the graph series.
+        /// 
+        /// Neither serialized nor saved in the configuration file.
         /// </summary>
         private EvolutionRenderer evolutionRenderer;  // not serialized by Unity; will be set in Start()
 
@@ -100,7 +111,7 @@ namespace SEE.Game
         {
             GraphsReader graphsReader = new GraphsReader();
             // Load all GXL graphs and CSV files in directory PathPrefix but not more than maxRevisionsToLoad many.
-            graphsReader.Load(GXLDirectory.Path, HierarchicalEdges, maxRevisionsToLoad);
+            graphsReader.Load(GXLDirectory.Path, HierarchicalEdges, MaxRevisionsToLoad);
             return graphsReader.graphs;
         }
 
@@ -127,7 +138,7 @@ namespace SEE.Game
             }
             else
             {
-                Graph graph = graphs.First<Graph>();                
+                Graph graph = graphs.First<Graph>();
                 graph = RelevantGraph(graph);
                 graph.FinalizeNodeHierarchy();
                 return graph;
@@ -190,6 +201,63 @@ namespace SEE.Game
 
             evolutionRenderer = CreateEvolutionRenderer();
             evolutionRenderer.ShowGraphEvolution(graphs);
+        }
+
+        //--------------------------------
+        // Configuration file input/output
+        //--------------------------------
+
+        /// <summary>
+        /// Label of attribute <see cref="GXLDirectory"/> in the configuration file.
+        /// </summary>
+        private const string GXLDirectoryLabel = "GXLDirectory";
+        /// <summary>
+        /// Label of attribute <see cref="MaxRevisionsToLoad"/> in the configuration file.
+        /// </summary>
+        private const string MaxRevisionsToLoadLabel = "MaxRevisionsToLoad";
+        /// <summary>
+        /// Label of attribute <see cref="MarkerHeight"/> in the configuration file.
+        /// </summary>
+        private const string MarkerHeightLabel = "MarkerHeight";
+        /// <summary>
+        /// Label of attribute <see cref="MarkerWidth"/> in the configuration file.
+        /// </summary>
+        private const string MarkerWidthLabel = "MarkerWidth";
+        /// <summary>
+        /// Label of attribute <see cref="AdditionBeamColor"/> in the configuration file.
+        /// </summary>
+        private const string AdditionBeamColorLabel = "AdditionBeamColor";
+        /// <summary>
+        /// Label of attribute <see cref="ChangeBeamColor"/> in the configuration file.
+        /// </summary>
+        private const string ChangeBeamColorLabel = "ChangeBeamColor";
+        /// <summary>
+        /// Label of attribute <see cref="DeletionBeamColor"/> in the configuration file.
+        /// </summary>
+        private const string DeletionBeamColorLabel = "DeletionBeamColor";
+
+        protected override void Save(ConfigWriter writer)
+        {
+            base.Save(writer);
+            GXLDirectory.Save(writer, GXLDirectoryLabel);
+            writer.Save(MaxRevisionsToLoad, MaxRevisionsToLoadLabel);
+            writer.Save(MarkerHeight, MarkerHeightLabel);
+            writer.Save(MarkerWidth, MarkerWidthLabel);
+            writer.Save(AdditionBeamColor, AdditionBeamColorLabel);
+            writer.Save(ChangeBeamColor, ChangeBeamColorLabel);
+            writer.Save(DeletionBeamColor, DeletionBeamColorLabel);
+        }
+
+        protected override void Restore(Dictionary<string, object> attributes)
+        {
+            base.Restore(attributes);
+            GXLDirectory.Restore(attributes, GXLDirectoryLabel);
+            ConfigIO.Restore(attributes, MaxRevisionsToLoadLabel, ref MaxRevisionsToLoad);
+            ConfigIO.Restore(attributes, MarkerHeightLabel, ref MarkerHeight);
+            ConfigIO.Restore(attributes, MarkerWidthLabel, ref MarkerWidth);
+            ConfigIO.Restore(attributes, AdditionBeamColorLabel, ref AdditionBeamColor);
+            ConfigIO.Restore(attributes, ChangeBeamColorLabel, ref ChangeBeamColor);
+            ConfigIO.Restore(attributes, DeletionBeamColorLabel, ref DeletionBeamColor);
         }
     }
 }
