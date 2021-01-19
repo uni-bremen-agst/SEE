@@ -37,7 +37,6 @@ namespace SEE.Game.Evolution
         /// </summary>
         public Text RevisionNumberText; // serialized by Unity
 
-
         /// <summary>
         /// Slider to show the progress of the animation.
         /// </summary>

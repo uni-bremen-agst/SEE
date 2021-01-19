@@ -91,7 +91,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// The currently selected marker
         /// </summary>
-        private Button selectedMarker;
+        private Button selectedMarker; 
 
         /// <summary>
         /// A dictionary linking markers and comments, needed for saving the comments on application quit
@@ -137,7 +137,7 @@ namespace SEE.Game.Evolution
             {
                 sliderMarkerContainer = SliderMarkerContainer.Load(Path.Combine(Application.persistentDataPath, "sliderMarkers.xml"));
                 
-            } catch(FileNotFoundException e)
+            } catch(FileNotFoundException)
             {
                 sliderMarkerContainer = new SliderMarkerContainer();
             }
