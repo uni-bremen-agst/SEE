@@ -1377,6 +1377,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4405863734327421875, guid: bf551eb3b2791384793b19746ba863b3,
         type: 3}
+    - target: {fileID: 6721087702604884392, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8,
+        type: 3}
+      propertyPath: commentPrefab
+      value: 
+      objectReference: {fileID: 6727790572673153326, guid: 6220b04a43686284189211911d44599e,
+        type: 3}
     - target: {fileID: 8411774010446772676, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8,
         type: 3}
       propertyPath: m_AnchoredPosition.y

@@ -64,6 +64,16 @@ namespace SEE.Game.Evolution
         public Button FastBackwardButton; // serialized by Unity
 
         /// <summary>
+        /// Prefab for creating markers
+        /// </summary>
+        public Button markerPrefab; // serialized by Unity
+
+        /// <summary>
+        /// Prefab for creating comments
+        /// </summary>
+        public InputField commentPrefab; // serialized by Unity
+
+        /// <summary>
         /// Checks if all fields are initialized.
         /// </summary>
         private void Start()
@@ -74,6 +84,8 @@ namespace SEE.Game.Evolution
             FastForwardButton.AssertNotNull("FastForwardButton");
             ReverseButton.AssertNotNull("ReverseButton");
             FastBackwardButton.AssertNotNull("FastBackwardButton");
+            markerPrefab.AssertNotNull("Marker");
+            commentPrefab.AssertNotNull("Comment");
         }
     }
 }
