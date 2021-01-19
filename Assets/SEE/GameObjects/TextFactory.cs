@@ -1,4 +1,5 @@
-﻿using SEE.DataModel;
+﻿using System.Linq;
+using SEE.DataModel;
 using TMPro;
 using UnityEngine;
 
@@ -16,6 +17,35 @@ namespace SEE.GO
         private const string PortalFontName = "Fonts & Materials/LiberationSans SDF - Portal";
 
         /// <summary>
+        /// This will apply an outline effect across <em>all</em> TextMeshPro instances with the same
+        /// shared material as the given one.
+        /// </summary>
+        /// <param name="outline">Whether the outline should be enabled or disabled.
+        /// If this is false, all other parameters besides <paramref name="tm"/> will be ignored.</param>
+        /// <param name="tm">The <see cref="TextMeshPro"/> instance whose material we should apply the effect on.
+        /// Note that this will affect every TextMeshPro instance with the same material.</param>
+        /// <param name="thickness">The thickness of the outline. Default: 0.1</param>
+        /// <param name="outlineColor">The color of the outline. Default: white</param>
+        public static void SetOutline(bool outline, TextMeshPro tm, float thickness = 0.1f, Color? outlineColor = null)
+        {
+            string[] keywords = tm.fontSharedMaterial.shaderKeywords ?? new string[]{};
+            if (outline)
+            {
+                tm.fontSharedMaterial.SetColor(ShaderUtilities.ID_OutlineColor, outlineColor ?? Color.black);
+                tm.fontSharedMaterial.SetFloat(ShaderUtilities.ID_OutlineWidth, thickness);
+                tm.fontSharedMaterial.shaderKeywords = keywords.Append(ShaderUtilities.Keyword_Outline).ToArray();
+            }
+            else
+            {
+                // Remove outline activation keyword
+                tm.fontSharedMaterial.shaderKeywords = keywords 
+                                                       .Where(x => !x.Equals(ShaderUtilities.Keyword_Outline))
+                                                       .ToArray();
+            }
+            tm.UpdateMeshPadding();
+        }
+
+        /// <summary>
         /// Returns a game object showing the given <paramref name="text"/> at given <paramref name="position"/>
         /// with given <paramref name="fontSize"/>. 
         /// The text rotates towards the main camera.
@@ -28,7 +58,7 @@ namespace SEE.GO
         /// <param name="textColor">the color of the text (default: black)</param>
         /// <returns>the game object representing the text</returns>
         public static GameObject GetTextWithSize(string text, Vector3 position, float fontSize, bool lift = true, 
-            Color? textColor = null)
+                                                 Color? textColor = null)
         {
             CreateText(text, position, textColor, out TextMeshPro tm, out GameObject result);
 

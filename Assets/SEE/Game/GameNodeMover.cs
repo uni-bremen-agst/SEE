@@ -33,10 +33,26 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Finalizes the final position of the <paramref name="movingObject"/>.
+        /// Finalizes the position of the <paramref name="movingObject"/>. If the current
+        /// pointer of the user is pointing at a game object with a NodeRef the final
+        /// position of <paramref name="movingObject"/> will be the game object with a NodeRef
+        /// that is at the deepest level of the node hierarchy (the pointer may actually 
+        /// hit multiple nested nodes), in the following called target parent. The 
+        /// <paramref name="movingObject"/> will then be placed onto the roof of the target
+        /// parent and its associated graph node will be become a child of the graph node
+        /// associated with the target parent and <paramref name="movingObject"/> becomes
+        /// a child of the target node (the game-node hierarchy and the graph-node hierarchy
+        /// must be in sync). 
+        /// 
+        /// If no such target node can be identified, the <paramref name="movingObject"/> will 
+        /// return to its <paramref name="originalPosition"/> and neither the graph-node hierarchy 
+        /// nor the game-node hierarchy will be changed.
+        ///
         /// </summary>
-        /// <param name="movingObject"></param>
-        public static void FinalizePosition(GameObject movingObject)
+        /// <param name="movingObject">the object being moved</param>
+        /// <param name="originalPosition">the original world-space position of <paramref name="movingObject"/>
+        /// to be used if the movement cannot be finalized</param>
+        public static void FinalizePosition(GameObject movingObject, Vector3 originalPosition)
         {
             // The underlying graph node of the moving object.
             Node movingNode = movingObject.GetComponent<NodeRef>().node;
@@ -75,22 +91,23 @@ namespace SEE.Game
             if (newGraphParent != null)
             {
                 movingObject.transform.position = newPosition;
+                PutOn(movingObject, newGameParent);
                 if (movingNode.Parent != newGraphParent)
                 {
                     movingNode.Reparent(newGraphParent);
-                    PutOn(movingObject, newGameParent);
+                    movingObject.transform.SetParent(newGameParent.transform);                    
                 }
             }
             else
             {
-                Debug.Log("Final destination canceled.\n");
+                // Attempt to move the node outside of any node in the node hierarchy.
+                // => Reset its original transform.
+                Tweens.Move(movingObject, originalPosition, 1.0f);
             }
         }
 
         /// <summary>
-        /// Puts <paramref name="child"/> on top of <paramref name="parent"/>
-        /// and makes <paramref name="child"/> a child of <paramref name="parent"/>
-        /// in the game-object hierarchy.
+        /// Puts <paramref name="child"/> on top of <paramref name="parent"/>.
         /// </summary>
         /// <param name="child">child</param>
         /// <param name="parent">parent</param>
@@ -101,8 +118,7 @@ namespace SEE.Game
             Vector3 childCenter = child.transform.position;
             float parentRoof = parent.transform.position.y + parent.transform.lossyScale.y / 2;
             childCenter.y = parentRoof + child.transform.lossyScale.y / 2;
-            child.transform.position = childCenter;
-            child.transform.SetParent(parent.transform);
+            child.transform.position = childCenter;            
         }
 
         // -------------------------------------------------------------
