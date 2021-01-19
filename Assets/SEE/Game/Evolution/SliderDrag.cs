@@ -47,6 +47,12 @@ namespace SEE.Game.Evolution
         private bool isDragging = false;
 
         /// <summary>
+        /// True if drag is finished but evolutionRenderer is still animating 
+        /// </summary>
+        private bool awaitFinish;
+
+
+        /// <summary>
         /// The evolution renderer doing the rendering and animations of the graphs.
         /// </summary>
         public EvolutionRenderer EvolutionRenderer
@@ -72,6 +78,14 @@ namespace SEE.Game.Evolution
         {
             if (isDragging)
             {
+                if (awaitFinish)
+                {
+                    if (!evolutionRenderer.IsStillAnimating)
+                    {
+                        awaitFinish = false;
+                        FinishDrag();
+                    }
+                }
                 Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
                 Vector3 textPos = new Vector3(handlePos.x, handlePos.y + 0.05f, handlePos.z);
                 hoverText.text = (animationDataModel.Slider.value + 1f).ToString() + "/" + (animationDataModel.Slider.maxValue + 1f);
@@ -90,7 +104,7 @@ namespace SEE.Game.Evolution
                 wasAutoPlay = true;
                 evolutionRenderer.ToggleAutoPlay();
             }
-            if(evolutionRenderer.IsAutoPlayReverse)
+            if (evolutionRenderer.IsAutoPlayReverse)
             {
                 wasAutoPlayReverse = true;
                 evolutionRenderer.ToggleAutoPlayReverse();
@@ -102,6 +116,20 @@ namespace SEE.Game.Evolution
         /// Actions to do when cursor is let go after dragging
         /// </summary>
         public void OnPointerUp(PointerEventData eventData)
+        {
+            if (evolutionRenderer.IsStillAnimating)
+            {
+                awaitFinish = true;
+            } else
+            {
+                FinishDrag();
+            }
+        }
+
+        /// <summary>
+        /// Finalize drag
+        /// </summary>
+        private void FinishDrag()
         {
             hoverText.enabled = false;
             if (animationDataModel.Slider.value != evolutionRenderer.CurrentGraphIndex)
@@ -115,7 +143,7 @@ namespace SEE.Game.Evolution
                 wasAutoPlay = false;
             }
 
-            if(wasAutoPlayReverse)
+            if (wasAutoPlayReverse)
             {
                 evolutionRenderer.ToggleAutoPlayReverse();
                 wasAutoPlayReverse = false;
