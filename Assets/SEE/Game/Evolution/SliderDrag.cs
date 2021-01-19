@@ -16,18 +16,39 @@ namespace SEE.Game.Evolution
         /// </summary>
         private AnimationDataModel animationDataModel; // not serialized; will be set in Init()
 
+        /// <summary>
+        /// The AnimationCanvas.
+        /// </summary>
         public GameObject AnimationCanvas;
 
+        /// <summary>
+        /// The hover text showing the iteration currently hovered over
+        /// </summary>
         public Text hoverText;
 
-        private EvolutionRenderer evolutionRenderer;
+        /// <summary>
+        /// The evolution renderer doing the rendering and animations of the graphs.
+        /// </summary>
+        private EvolutionRenderer evolutionRenderer; // not serialized; will be set in property EvolutionRenderer
 
+        /// <summary>
+        /// True if autoplay was on when drag started
+        /// </summary>
         private bool wasAutoPlay = false;
 
+        /// <summary>
+        /// True if reverse autoplay was on when drag started
+        /// </summary>
         private bool wasAutoPlayReverse = false;
 
+        /// <summary>
+        /// True if currently dragging
+        /// </summary>
         private bool isDragging = false;
 
+        /// <summary>
+        /// The evolution renderer doing the rendering and animations of the graphs.
+        /// </summary>
         public EvolutionRenderer EvolutionRenderer
         {
             set
@@ -42,9 +63,11 @@ namespace SEE.Game.Evolution
             animationDataModel = AnimationCanvas.GetComponent<AnimationDataModel>();
 
             hoverText.enabled = false;
-
         }
 
+        /// <summary>
+        /// Move hover text while dragging
+        /// </summary>
         private void Update()
         {
             if (isDragging)
@@ -56,6 +79,9 @@ namespace SEE.Game.Evolution
             }
         }
 
+        /// <summary>
+        /// Actions to do when slider is clicked.
+        /// </summary>
         public void OnPointerDown(PointerEventData eventData)
         {
             hoverText.enabled = true;
@@ -72,6 +98,9 @@ namespace SEE.Game.Evolution
             isDragging = true;
         }
 
+        /// <summary>
+        /// Actions to do when cursor is let go after dragging
+        /// </summary>
         public void OnPointerUp(PointerEventData eventData)
         {
             hoverText.enabled = false;
