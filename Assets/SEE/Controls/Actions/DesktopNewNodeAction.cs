@@ -117,6 +117,8 @@ namespace SEE.Controls
         /// </summary>
         private Color innerNodeColor = Color.white;
 
+        private List<GameObject> listOfRoots = null;
+
         Vector3 zeroVector = new Vector3(0, 0, 0);
 
 
@@ -124,6 +126,7 @@ namespace SEE.Controls
         {
            
             canvasObject = GameObject.Find("CanvasObject");
+            listOfRoots = new List<GameObject>(); 
         }
 
         public void Update()
@@ -215,12 +218,19 @@ namespace SEE.Controls
                 if (hoveredObject != null && Input.GetMouseButtonDown(0))
             {
                 Undye();
-                GetNodesOfScene();
+                
                 //Gets the SEECity from the hoverdObject
                 SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject.TryGetComponent<SEECity>(out city);
+                GetNodesOfScene();
                 if (dir_Root != null)
                 {
-                    ChangeColor(dir_Root, Color.white);
+                    foreach (GameObject root in listOfRoots)
+                    {
+                        if (checkNodeAndGraph(root,city.LoadedGraph))
+                        {
+                            ChangeColor(root, Color.white);
+                        }
+                    }
                 }
             }
         }
@@ -231,7 +241,7 @@ namespace SEE.Controls
         /// </summary>
         public void Undye()
         {
-            Debug.Log(listOfColors.Count);
+            
             int count = 0;
             foreach (GameObject GO in hoveredObjectList)
             {
@@ -470,18 +480,19 @@ namespace SEE.Controls
             //Query to obtain all the inner nodes of the specific scene.
             ICollection<GameObject> allInnerNodesInScene = SceneQueries.AllGameNodesInScene(false, true);
 
-
+            //List with the graphs roots or most likely only a single root of the specific city.
+            List<Node> rootList = city.LoadedGraph.GetRoots();
+            
             // In the special case the graph only consists of one leaf, we will have to check in the list of all leafs, which has the count of one in that case,
             // if there is the root node.
             if (allLeafsInScene.Count == 1 && allInnerNodesInScene.Count == 0)
             {
-                dir_Root = rootSearch(allLeafsInScene);
+                dir_Root = rootSearch(allLeafsInScene, rootList);
 
             }
 
-
             // Search for the graphs root in the set of all inner nodes.
-            dir_Root = rootSearch(allInnerNodesInScene);
+            dir_Root = rootSearch(allInnerNodesInScene, rootList);
 
 
             // Fill the lists with the specific lossyscales of all the nodes, either leafs or innernodes.
@@ -514,12 +525,29 @@ namespace SEE.Controls
             List<Vector3> lossyScaleList = new List<Vector3>();
             foreach (GameObject go in pListOfGameObjects)
             {
+                //to specify if the specific node belongt to the specific graph.
+                if (checkNodeAndGraph(go,city.LoadedGraph))
+                {
                     lossyScaleList.Add(go.transform.lossyScale);
+                }
+            }
+            return lossyScaleList;
+        }
+
+        /// <summary>
+        /// Specifies whether the node representation of a given gameObject belongs to the certain graph.
+        /// </summary>
+        /// <param name="pGameObject"></param>
+        /// <param name="g"></param>
+        /// <returns>true, if graph belongs to the gameObject represented as a node, else false </returns>
+        public static bool checkNodeAndGraph(GameObject pGameObject, Graph g)
+        {
+            if (pGameObject == null || g == null)
+            {
+                return false;
             }
 
-            return lossyScaleList;
-
-
+            return pGameObject.GetComponent<NodeRef>().node.ItsGraph == g;
         }
 
         /// <summary>
@@ -527,20 +555,27 @@ namespace SEE.Controls
         /// </summary>
         /// <param name="pListOfGameNodes"></param>
         /// <returns>Returns the rootnode as gameObject in case the root is found, else null.</returns>
-        private GameObject rootSearch(ICollection<GameObject> pListOfGameNodes)
-        {
-            GameObject root = new GameObject();
+        private GameObject rootSearch(ICollection<GameObject> pListOfGameNodes, List<Node> pListofRoots)
+        {          
             Node rootTmp = new Node();
-            foreach (GameObject rootSearchItem in pListOfGameNodes)
+
+                ///In the special case a graph has not only a single root, we would have to iterate the list of Roots in order to 
+                ///compare the GameObject and search. 
+            foreach (Node root in pListofRoots)
             {
-                rootTmp = rootSearchItem.GetComponent<NodeRef>().node;
-                if (rootTmp.IsRoot())
+                Node rootOfCity = root;
+                foreach (GameObject rootSearchItem in pListOfGameNodes)
                 {
-                    root = rootSearchItem;
-                    return root;
+                    rootTmp = rootSearchItem.GetComponent<NodeRef>().node;
+                    if (rootTmp.IsRoot() && rootTmp == rootOfCity && !(rootTmp == null))
+                    {
+                        listOfRoots.Add(rootSearchItem);
+                        dir_Root = rootSearchItem;                    
+                    }
                 }
             }
-            return null; 
+
+            return dir_Root; 
         }
 
 
