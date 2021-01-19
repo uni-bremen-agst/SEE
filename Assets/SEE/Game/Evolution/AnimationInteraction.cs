@@ -309,7 +309,7 @@ namespace SEE.Game.Evolution
         private InputField AddCommentToMarker(Button marker, string comment)
         {
             string commentName = marker.GetHashCode().ToString() + "-comment";
-            InputField commentField = Instantiate(Resources.Load("Prefabs/Comment", typeof(InputField)) as InputField);
+            InputField commentField = Instantiate(animationDataModel.commentPrefab);
             Vector3 markerPos = marker.transform.position;
             Vector3 commentPos = new Vector3(markerPos.x + 0.15f, markerPos.y, markerPos.z);
             commentField.transform.SetParent(animationDataModel.Slider.transform, false);
@@ -326,7 +326,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         private void AddMarker(Vector3 markerPos, string comment)
         {
-            Button newMarker = Instantiate(Resources.Load("Prefabs/Marker", typeof(Button)) as Button);
+            Button newMarker = Instantiate(animationDataModel.markerPrefab);
             newMarker.transform.SetParent(animationDataModel.Slider.transform, false);
             newMarker.transform.position = markerPos;
             newMarker.onClick.AddListener(() => TaskOnClickMarker(newMarker));

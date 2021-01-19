@@ -1389,7 +1389,10 @@ MonoBehaviour:
   FastForwardButton: {fileID: 438968762}
   ReverseButton: {fileID: 212908315}
   FastBackwardButton: {fileID: 87988460}
-  MarkerList: []
+  markerPrefab: {fileID: 4405863734327421875, guid: bf551eb3b2791384793b19746ba863b3,
+    type: 3}
+  commentPrefab: {fileID: 6727790572673153326, guid: 6220b04a43686284189211911d44599e,
+    type: 3}
 --- !u!1 &4741337296903842283
 GameObject:
   m_ObjectHideFlags: 0
