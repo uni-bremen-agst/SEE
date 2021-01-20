@@ -23,7 +23,6 @@ public class CanvasGenerator : MonoBehaviour
     /// Instantiates the AddingNodeCanvasScript and adds it to the CanvasObject gameObject.
     /// </summary>
     /// <returns>the added AddingNodeCanvasScript</returns>
-
     public GameObject InstantiateAddingNodeCanvas()
     {
         gameObject.AddComponent<AddingNodeCanvasScript>();
@@ -91,19 +90,19 @@ public class CanvasGenerator : MonoBehaviour
         Toggle[] toggles = toggleGroup.GetComponentsInChildren<Toggle>();
         if (toggles[0].isOn)
         {
-            DesktopNewNodeAction.SetIsInnerNode(true);
+            DesktopNewNodeAction.IsInnerNode = true;
         }
         if (toggles[1].isOn)
         {
-            DesktopNewNodeAction.SetIsInnerNode(false);
+            DesktopNewNodeAction.IsInnerNode = false;
         }
         inputNodename = inputname.text;
         inputNodetype = inputtype.text;
         //until here 
 
 
-        DesktopNewNodeAction.SetNodeName(inputNodename);
-        DesktopNewNodeAction.SetNodeType(inputNodetype);
+        DesktopNewNodeAction.Nodename = inputNodename;
+        DesktopNewNodeAction.Nodetype = inputNodetype;
 
     }
 
