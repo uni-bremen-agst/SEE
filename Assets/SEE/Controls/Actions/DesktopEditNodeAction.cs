@@ -13,6 +13,8 @@ public class DesktopEditNodeAction : MonoBehaviour
 
     private static bool editIsCanceled = false;
 
+    public static bool EditIsCanceled { get => editIsCanceled; set => editIsCanceled = value; }
+
     public GameObject canvasObject;
 
     // Start is called before the first frame update
@@ -50,11 +52,6 @@ public class DesktopEditNodeAction : MonoBehaviour
     public void RemoveScript()
     {
         Destroy(this);
-    }
-
-    public static void SetEditIsCanceled(bool newEditIsCaneled)
-    {
-        editIsCanceled = newEditIsCaneled;
     }
 
 }

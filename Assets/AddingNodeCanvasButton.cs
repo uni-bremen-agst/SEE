@@ -54,7 +54,7 @@ public class AddingNodeCanvasButton : MonoBehaviour
     /// </summary>
     public void SetCanvasIsActive()
     {
-        DesktopNewNodeAction.SetCanvasIsActive(false);
+        DesktopNewNodeAction.CanvasIsActive = false;
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ public class AddingNodeCanvasButton : MonoBehaviour
     /// </summary>
     public void EditIsCanceled()
     {
-        DesktopEditNodeAction.SetEditIsCanceled(true);
+        DesktopEditNodeAction.EditIsCanceled = true;
     }
 
     public void EditNode()

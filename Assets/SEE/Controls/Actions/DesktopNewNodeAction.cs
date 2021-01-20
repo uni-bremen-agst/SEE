@@ -22,11 +22,6 @@ namespace SEE.Controls
         GameObject GONode = null;
 
         /// <summary>
-        /// Set by the GUI if a Inner Node should be created
-        /// </summary>
-        private static bool isInnerNode;
-
-        /// <summary>
         /// The Meta infos from the new node, set by the GUI
         /// 1. ID, 2. SourceName, 3. Type
         /// </summary>
@@ -47,30 +42,49 @@ namespace SEE.Controls
         /// </summary>
         private static bool canvasIsActive = true;
 
+        public static bool CanvasIsActive { get => canvasIsActive; set => canvasIsActive = value; }
+
         /// <summary>
         /// True, if the adding-node-canvas was opened, node-values was given and saved and the canvas was closed again, else false.
         /// </summary>
         private static bool valuesAreGiven = false;
+
+        public static bool ValuesAreGiven { get => valuesAreGiven; set => valuesAreGiven = value; }
+
+        /// <summary>
+        /// True, if the node which will be created is an innerNode, else false
+        /// </summary>
+        private static bool isInnerNode = false;
+
+        public static bool IsInnerNode { get => isInnerNode; set => isInnerNode = value; }
 
         /// <summary>
         /// The name of a node given in the input-Field.
         /// </summary>
         private static string nodename;
 
+        public static string Nodename { get => nodename; set => nodename = value; }
+
         /// <summary>
         /// The type of a node given in the input-Field.
         /// </summary>
         private static string nodetype;
+
+        public static string Nodetype { get => nodetype; set => nodetype = value; }
 
         /// <summary>
         /// Colour the hovered city is dyed when hovered or selected , set green by default 
         /// </summary>
         private Color defaultHoverCityColor = Color.green;
 
+        public Color DefaultHoverCityColor { get => defaultHoverCityColor; set => defaultHoverCityColor = value; }
+
         /// <summary>
         /// Colour the hovered city is dyed to when hovered or selected in case the default colour is occupied , set black by default
         /// </summary>
         private Color alternativeHoverCityColor = Color.black;
+
+        public Color AlternativeHoverCityColor { get => alternativeHoverCityColor; set => alternativeHoverCityColor = value; }
 
         /// <summary>
         /// A list the hovered GameObjects are stored in.
@@ -83,7 +97,7 @@ namespace SEE.Controls
         private List<Color> listOfColors = new List<Color>();
 
         /// <summary>
-        /// The GameObject Node
+        /// The gameObject which contains the CanvasGenerator-Scripts and the actual CanvasObject-Script
         /// </summary>
         private GameObject canvasObject;
 
@@ -122,12 +136,10 @@ namespace SEE.Controls
         /// </summary>
         private List<GameObject> listOfRoots = null;
 
-        public Color DefaultHoverCityColor { get => defaultHoverCityColor; set => defaultHoverCityColor = value; }
-        public Color AlternativeHoverCityColor { get => alternativeHoverCityColor; set => alternativeHoverCityColor = value; }
+       
 
         public void Start()
         {
-           
             canvasObject = GameObject.Find("CanvasObject");
             listOfRoots = new List<GameObject>(); 
         }
@@ -139,7 +151,6 @@ namespace SEE.Controls
             {
                //City Selection
                 SelectCity();
-
             }
             else
             {
@@ -217,9 +228,9 @@ namespace SEE.Controls
                     ChangeColor(hoveredObject, hoveredObject.gameObject.GetComponent<Renderer>().material.color);
                 }
             }
-
-                if (hoveredObject != null && Input.GetMouseButtonDown(0))
-            {
+            
+            if (hoveredObject != null && Input.GetMouseButtonDown(0))
+            { 
                 Undye();
                 
                 //Gets the SEECity from the hoverdObject
@@ -229,7 +240,7 @@ namespace SEE.Controls
                 {
                     foreach (GameObject root in listOfRoots)
                     {
-                        if (checkNodeAndGraph(root,city.LoadedGraph))
+                        if (CheckNodeAndGraph(root, city.LoadedGraph))
                         {
                             ChangeColor(root, Color.white);
                         }
@@ -238,13 +249,11 @@ namespace SEE.Controls
             }
         }
 
-
         // <summary>
         /// Undyes the the current colour of the object, i.e. changes the color of to its original color.
         /// </summary>
         public void Undye()
         {
-
             int count = 0;
             foreach (GameObject GO in hoveredObjectList)
             {
@@ -254,6 +263,7 @@ namespace SEE.Controls
             listOfColors.Clear();
             hoveredObjectList.Clear();
         }
+
         /// <summary>
         /// Sets the Metrics from the GUI
         /// </summary>
@@ -288,13 +298,13 @@ namespace SEE.Controls
             listOfColors.Add(objectToDye.gameObject.GetComponent<Renderer>().material.color);
             objectToDye.gameObject.GetComponent<Renderer>().material.color = newCityColor;
         }
+
         /// <summary>
         /// Creates a randomized string, i.e. the id for the created node
         /// </summary>
         private static string RandomizeString()
         {
             return Utils.RandomStrings.Get();
-
         }
 
         /// <summary>
@@ -319,6 +329,7 @@ namespace SEE.Controls
                 return;
             }
         }
+
         /// <summary>
         /// Creates a new node
         /// </summary>
@@ -326,13 +337,13 @@ namespace SEE.Controls
         private void NewNode()
         {
             GameObject gameNode;
-            Node node = new Node();
-
-            //Set the metrics of the new node
-            node.ID = nodeMetrics.Item1;
-            node.SourceName = nodeMetrics.Item2;
-            node.Type = nodeMetrics.Item3;
-
+            Node node = new Node
+            {
+                //Set the metrics of the new node
+                ID = nodeMetrics.Item1,
+                SourceName = nodeMetrics.Item2,
+                Type = nodeMetrics.Item3
+            };
 
             //Adds the new Node to the City Graph
             AddNode(node);
@@ -354,20 +365,18 @@ namespace SEE.Controls
 
             //Sets the The GONode so the main work can continue;
             GONode = gameNode;
+
             if (isInnerNode)
             {
-
                 GONode.transform.localScale = medianOfInnerNode;
                 GONode.gameObject.GetComponent<Renderer>().material.color = innerNodeColor;
-
             }
             else
             {
-
                 GONode.transform.localScale = medianOfLeaf;
                 GONode.gameObject.GetComponent<Renderer>().material.color = leafColor;
-
             }
+
             GameNodeMover.MoveTo(GONode);
         }
 
@@ -437,45 +446,6 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// A setter-method for the canvasIsClosed-Attribute.
-        /// </summary>
-        /// <param name="isactive">the value for the canvasIsClosed-attribute. </param>
-        public static void  SetValuesAreGiven(bool isactive)
-        {
-            valuesAreGiven = isactive;
-        }
-
-        /// <summary>
-        /// Setter-method for the nodeName-attribute
-        /// </summary>
-        /// <param name="newNodename">new value for the nodeName-attribute</param>
-        public static void SetNodeName(string newNodename)
-        {
-            nodename = newNodename;
-        }
-
-        /// <summary>
-        /// Setter-method for the nodetype-attribute
-        /// </summary>
-        /// <param name="newNodeType">new value for the nodeType-attribute</param>
-        public static void SetNodeType(string newNodeType)
-        {
-            nodetype = newNodeType;
-        }
-
-        public static void SetCanvasIsActive(bool newCanvasIsActive)
-        {
-            canvasIsActive = newCanvasIsActive;
-        }
-            
-        public static void SetIsInnerNode(bool newIsInnerNode)
-        {
-            isInnerNode = newIsInnerNode;
-        }
-
-
-
-        /// <summary>
         /// 
         /// </summary>
         public void GetNodesOfScene()
@@ -490,7 +460,6 @@ namespace SEE.Controls
             // Query to obtain all the leafnodes of the specific scene.
             ICollection<GameObject> allLeafsInScene = SceneQueries.AllGameNodesInScene(true, false);
 
-
             //Query to obtain all the inner nodes of the specific scene.
             ICollection<GameObject> allInnerNodesInScene = SceneQueries.AllGameNodesInScene(false, true);
 
@@ -501,17 +470,17 @@ namespace SEE.Controls
             // if there is the root node.
             if (allLeafsInScene.Count == 1 && allInnerNodesInScene.Count == 0)
             {
-                dir_Root = rootSearch(allLeafsInScene, rootList);
+                dir_Root = RootSearch(allLeafsInScene, rootList);
 
             }
 
             // Search for the graphs root in the set of all inner nodes.
-            dir_Root = rootSearch(allInnerNodesInScene, rootList);
+            dir_Root = RootSearch(allInnerNodesInScene, rootList);
 
 
             // Fill the lists with the specific lossyscales of all the nodes, either leafs or innernodes.
-            leafSize = listOfLossyscale(allLeafsInScene);
-            innerNodeSize = listOfLossyscale(allInnerNodesInScene);
+            leafSize = ListOfLossyscale(allLeafsInScene);
+            innerNodeSize = ListOfLossyscale(allInnerNodesInScene);
 
             // Calculate the median of the specific sets, either leafs or innernodes. 
             medianOfLeaf = CalcMedian(leafSize);
@@ -531,7 +500,7 @@ namespace SEE.Controls
         /// <param name="pListOfGameObjects">A List of GameObjects</param>
         /// <returns> Returns a  vector list filled with the lossyscale of the param pListOfGameObject or null in case the list is empty or
         ///  the given object is null</returns>
-        private List<Vector3> listOfLossyscale(ICollection<GameObject> pListOfGameObjects)
+        private List<Vector3> ListOfLossyscale(ICollection<GameObject> pListOfGameObjects)
         {
             if (pListOfGameObjects == null | pListOfGameObjects.Count == 0)
             {
@@ -541,7 +510,7 @@ namespace SEE.Controls
             foreach (GameObject go in pListOfGameObjects)
             {
                 //to specify if the specific node belongt to the specific graph.
-                if (checkNodeAndGraph(go, city.LoadedGraph))
+                if (CheckNodeAndGraph(go, city.LoadedGraph))
                 {
                     lossyScaleList.Add(go.transform.lossyScale);
                 }
@@ -555,7 +524,7 @@ namespace SEE.Controls
         /// <param name="pGameObject"></param>
         /// <param name="g"></param>
         /// <returns true, if graph belongs to the gameObject represented as a node, else false </returns>
-        public static bool checkNodeAndGraph(GameObject pGameObject, Graph g)
+        public static bool CheckNodeAndGraph(GameObject pGameObject, Graph g)
         {
             if (pGameObject == null || g == null)
             {
@@ -569,8 +538,8 @@ namespace SEE.Controls
         /// Search for a rootNode in a given list of Gameobjects. 
         /// </summary>
         /// <param name="pListOfGameNodes"></param>
-        /// <returns The rootnode as gameObject in case the root is found, else dir_root (which can be null).</returns>
-        private GameObject rootSearch(ICollection<GameObject> pListOfGameNodes, List<Node> pListofRoots)
+        /// <returns> The rootnode as gameObject in case the root is found, else dir_root (which can be null).</returns>
+        private GameObject RootSearch(ICollection<GameObject> pListOfGameNodes, List<Node> pListofRoots)
         {          
             Node rootTmp = new Node();
 
@@ -598,8 +567,8 @@ namespace SEE.Controls
        /// Calculates the median of a vector list. PreCondition: The list of vectors does not have to be sorted.
        /// </summary>
        /// <param name="vectors"></param>
-       /// <returns A vector3 with the calculated median of the vector list or null in 
-       /// case the given vector list is empty or null itself></returns>
+       /// <returns> A vector3 with the calculated median of the vector list or null in 
+       /// case the given vector list is empty or null itself</returns>
         private Vector3 CalcMedian(List<Vector3> vectors)
         {
             if (vectors.Count == 0 || vectors == null)
@@ -627,8 +596,6 @@ namespace SEE.Controls
             result.y = CalcMedian(yAxis);
             result.z = CalcMedian(zAxis);
 
-
-
             if (!(vectors.Count % 2 == 0))
             {
                 return result;
@@ -651,7 +618,7 @@ namespace SEE.Controls
         /// </summary>
         /// <param name="floatList"></param>
         /// <returns> The single median of the list as a float or null in 
-        /// case the given vector list is empty or null itself></returns>
+        /// case the given vector list is empty or null itself</returns>
         private static float CalcMedian(List<float> floatList)
         {
             float median = 0;
@@ -660,7 +627,7 @@ namespace SEE.Controls
                 return median;
             }
             int indexOfMid = floatList.Count;
-            indexOfMid = indexOfMid / 2;
+            indexOfMid /= 2;
             median = floatList.ElementAt(indexOfMid);
 
             // If the amount of the list is impair, we will return the element which is located at the middle of the list,
@@ -675,7 +642,7 @@ namespace SEE.Controls
             int indexSecondMedianValue = indexOfMid + 1;
             float SecondCoordinate = floatList.ElementAt(indexSecondMedianValue);
             median += SecondCoordinate;
-            median = median / 2;
+            median /= 2;
             return median;
         }
     }
