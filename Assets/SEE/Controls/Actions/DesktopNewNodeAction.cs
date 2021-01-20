@@ -117,9 +117,10 @@ namespace SEE.Controls
         /// </summary>
         private Color innerNodeColor = Color.white;
 
+        /// <summary>
+        /// A list of roots stores at least the single root of a graph, more in the special case the graph has more than one root.
+        /// </summary>
         private List<GameObject> listOfRoots = null;
-
-        Vector3 zeroVector = new Vector3(0, 0, 0);
 
 
         public void Start()
@@ -517,7 +518,8 @@ namespace SEE.Controls
         /// Iterates the list of gameobjects and adds the lossyscale of the given objects to a list. 
         /// </summary>
         /// <param name="pListOfGameObjects">A List of GameObjects</param>
-        /// <returns> Returns a  vector list filled with the lossyscale of the param pListOfGameObject. </returns>
+        /// <returns> Returns a  vector list filled with the lossyscale of the param pListOfGameObject or null in case the list is empty or
+        ///  the given object is null</returns>
         private List<Vector3> listOfLossyscale(ICollection<GameObject> pListOfGameObjects)
         {
             if (pListOfGameObjects == null | pListOfGameObjects.Count == 0)
@@ -541,7 +543,7 @@ namespace SEE.Controls
         /// </summary>
         /// <param name="pGameObject"></param>
         /// <param name="g"></param>
-        /// <returns>true, if graph belongs to the gameObject represented as a node, else false </returns>
+        /// <returns true, if graph belongs to the gameObject represented as a node, else false </returns>
         public static bool checkNodeAndGraph(GameObject pGameObject, Graph g)
         {
             if (pGameObject == null || g == null)
@@ -556,7 +558,7 @@ namespace SEE.Controls
         /// Search for a rootNode in a given list of Gameobjects. 
         /// </summary>
         /// <param name="pListOfGameNodes"></param>
-        /// <returns>Returns the rootnode as gameObject in case the root is found, else null.</returns>
+        /// <returns The rootnode as gameObject in case the root is found, else null.</returns>
         private GameObject rootSearch(ICollection<GameObject> pListOfGameNodes, List<Node> pListofRoots)
         {          
             Node rootTmp = new Node();
@@ -582,10 +584,11 @@ namespace SEE.Controls
 
 
        /// <summary>
-       /// Calculates the median of a vector list.
+       /// Calculates the median of a vector list. PreCondition: The list of vectors does not have to be sorted.
        /// </summary>
        /// <param name="vectors"></param>
-       /// <returns A vector 3 with the median></returns>
+       /// <returns A vector3 with the calculated median of the vector list or null in 
+       /// case the given vector list is empty or null itself></returns>
         private Vector3 CalcMedian(List<Vector3> vectors)
         {
             if (vectors.Count == 0 || vectors == null)
@@ -633,10 +636,11 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Calculates the median of a list of floats.
+        /// Calculates the median of a list of floats. Precondition: The list of vectors does not have to be sorted.
         /// </summary>
         /// <param name="floatList"></param>
-        /// <returns>the single median of the list as a float</returns>
+        /// <returns> The single median of the list as a float or null in 
+        /// case the given vector list is empty or null itself></returns>
         private static float CalcMedian(List<float> floatList)
         {
            float median = 0;
