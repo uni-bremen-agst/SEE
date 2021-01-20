@@ -122,6 +122,8 @@ namespace SEE.Controls
         /// </summary>
         private List<GameObject> listOfRoots = null;
 
+        public Color DefaultHoverCityColor { get => defaultHoverCityColor; set => defaultHoverCityColor = value; }
+        public Color AlternativeHoverCityColor { get => alternativeHoverCityColor; set => alternativeHoverCityColor = value; }
 
         public void Start()
         {
@@ -242,7 +244,7 @@ namespace SEE.Controls
         /// </summary>
         public void Undye()
         {
-            
+
             int count = 0;
             foreach (GameObject GO in hoveredObjectList)
             {
@@ -272,13 +274,15 @@ namespace SEE.Controls
         {
             Color newCityColor = new Color();
             if (colorOfCity == defaultHoverCityColor)
-            { newCityColor = alternativeHoverCityColor;
+            {
+                newCityColor = alternativeHoverCityColor;
             }
-            else 
+            else
             {
                 newCityColor = defaultHoverCityColor;
             }
-            if (!(hoveredObjectList.Contains(objectToDye))){
+            if (!(hoveredObjectList.Contains(objectToDye)))
+            {
                 hoveredObjectList.Add(objectToDye);
             }
             listOfColors.Add(objectToDye.gameObject.GetComponent<Renderer>().material.color);
@@ -300,19 +304,19 @@ namespace SEE.Controls
         /// /// <param name="newNodeType">The node to add to the graph</param>
         private void AddNode(Node node)
         {
-            if(node == null)
+            if (node == null)
             {
-                return; 
+                return;
             }
-            try 
+            try
             {
                 city.LoadedGraph.AddNode(node);
             }
-            catch(Exception)
+            catch (Exception)
             {
                 node.ID = RandomizeString();
                 AddNode(node);
-                return; 
+                return;
             }
         }
         /// <summary>
@@ -492,7 +496,7 @@ namespace SEE.Controls
 
             //List with the graphs roots or most likely only a single root of the specific city.
             List<Node> rootList = city.LoadedGraph.GetRoots();
-            
+
             // In the special case the graph only consists of one leaf, we will have to check in the list of all leafs, which has the count of one in that case,
             // if there is the root node.
             if (allLeafsInScene.Count == 1 && allInnerNodesInScene.Count == 0)
@@ -508,11 +512,11 @@ namespace SEE.Controls
             // Fill the lists with the specific lossyscales of all the nodes, either leafs or innernodes.
             leafSize = listOfLossyscale(allLeafsInScene);
             innerNodeSize = listOfLossyscale(allInnerNodesInScene);
-            
+
             // Calculate the median of the specific sets, either leafs or innernodes. 
             medianOfLeaf = CalcMedian(leafSize);
             medianOfInnerNode = CalcMedian(innerNodeSize);
-            
+
             // In the special case there are no inner nodes, the median of the graphs only leaf is set 
             // as a default value for any inner node that might be created.
             if (innerNodeSize.Count == 0)
@@ -537,7 +541,7 @@ namespace SEE.Controls
             foreach (GameObject go in pListOfGameObjects)
             {
                 //to specify if the specific node belongt to the specific graph.
-                if (checkNodeAndGraph(go,city.LoadedGraph))
+                if (checkNodeAndGraph(go, city.LoadedGraph))
                 {
                     lossyScaleList.Add(go.transform.lossyScale);
                 }
@@ -565,13 +569,13 @@ namespace SEE.Controls
         /// Search for a rootNode in a given list of Gameobjects. 
         /// </summary>
         /// <param name="pListOfGameNodes"></param>
-        /// <returns The rootnode as gameObject in case the root is found, else null.</returns>
+        /// <returns The rootnode as gameObject in case the root is found, else dir_root (which can be null).</returns>
         private GameObject rootSearch(ICollection<GameObject> pListOfGameNodes, List<Node> pListofRoots)
         {          
             Node rootTmp = new Node();
 
-                ///In the special case a graph has not only a single root, we would have to iterate the list of Roots in order to 
-                ///compare the GameObject and search. 
+            ///In the special case a graph has not only a single root, we would have to iterate the list of Roots in order to 
+            ///compare the GameObject and search. 
             foreach (Node root in pListofRoots)
             {
                 Node rootOfCity = root;
@@ -581,12 +585,12 @@ namespace SEE.Controls
                     if (rootTmp.IsRoot() && rootTmp == rootOfCity && !(rootTmp == null))
                     {
                         listOfRoots.Add(rootSearchItem);
-                        dir_Root = rootSearchItem;                    
+                        dir_Root = rootSearchItem;
                     }
                 }
             }
 
-            return dir_Root; 
+            return dir_Root;
         }
 
 
@@ -600,7 +604,7 @@ namespace SEE.Controls
         {
             if (vectors.Count == 0 || vectors == null)
             {
-                return new Vector3(0,0,0);
+                return new Vector3(0, 0, 0);
             }
 
             Vector3 result = new Vector3();
@@ -618,19 +622,19 @@ namespace SEE.Controls
             xAxis.Sort();
             yAxis.Sort();
             zAxis.Sort();
-   
+
             result.x = CalcMedian(xAxis);
             result.y = CalcMedian(yAxis);
             result.z = CalcMedian(zAxis);
 
 
-            
-            if(!(vectors.Count %2 == 0))
+
+            if (!(vectors.Count % 2 == 0))
             {
-                return result; 
+                return result;
             }
 
-            int indexSecondMedian = (xAxis.Count +1) /2;
+            int indexSecondMedian = (xAxis.Count + 1) / 2;
             float SecondXCoordinate = CalcMedian(xAxis);
             float SecondYCoordinate = CalcMedian(yAxis);
             float SecondZCoordinate = CalcMedian(zAxis);
@@ -650,13 +654,13 @@ namespace SEE.Controls
         /// case the given vector list is empty or null itself></returns>
         private static float CalcMedian(List<float> floatList)
         {
-           float median = 0;
-            if(floatList.Count == 0 | floatList == null)
+            float median = 0;
+            if (floatList.Count == 0 | floatList == null)
             {
-                return median; 
+                return median;
             }
             int indexOfMid = floatList.Count;
-            indexOfMid = indexOfMid/2; 
+            indexOfMid = indexOfMid / 2;
             median = floatList.ElementAt(indexOfMid);
 
             // If the amount of the list is impair, we will return the element which is located at the middle of the list,
@@ -668,11 +672,11 @@ namespace SEE.Controls
 
             // If the amount is impair, we have to interpolate linearly between the value at the index at the half of the lists size,
             // and the value of the following index. E.g. size = 13 -> index 6 and 7 .
-            int indexSecondMedianValue  = indexOfMid+1;
+            int indexSecondMedianValue = indexOfMid + 1;
             float SecondCoordinate = floatList.ElementAt(indexSecondMedianValue);
             median += SecondCoordinate;
-            median = median/2; 
-            return median ; 
+            median = median / 2;
+            return median;
         }
     }
 
