@@ -238,7 +238,7 @@ namespace SEE.Controls
 
 
         // <summary>
-        /// Undyes the the current colour of the object, i.e. changes the color to its original color.
+        /// Undyes the the current colour of the object, i.e. changes the color of to its original color.
         /// </summary>
         public void Undye()
         {
@@ -264,7 +264,9 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Dyes the hoveredObject either green in case it is not already green, else black by default.
+        /// Dyes the hoveredObject either in the defaulthoverCitycolor or in the alternativeHoverCityColor in case
+        /// the object is already dyed in that color.
+        /// The colors are about to be set by the user itself in the inspector or via GUI.
         /// </summary>
         private void ChangeColor(GameObject objectToDye, Color colorOfCity)
         {
@@ -283,7 +285,7 @@ namespace SEE.Controls
             objectToDye.gameObject.GetComponent<Renderer>().material.color = newCityColor;
         }
         /// <summary>
-        /// creates a randomized string for the id for the created node
+        /// Creates a randomized string, i.e. the id for the created node
         /// </summary>
         private static string RandomizeString()
         {
@@ -293,10 +295,15 @@ namespace SEE.Controls
 
         /// <summary>
         /// Adds a node to the loadedGraph and creats its ID. Repeats the process in case the generated ID is not unique.
+        /// Precondition: The parameter may be null, it is checked again before beeing added to the loadedGraph.
         /// </summary>
         /// /// <param name="newNodeType">The node to add to the graph</param>
         private void AddNode(Node node)
         {
+            if(node == null)
+            {
+                return; 
+            }
             try 
             {
                 city.LoadedGraph.AddNode(node);
