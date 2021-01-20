@@ -275,7 +275,9 @@ namespace SEE.Controls
             {
                 newCityColor = defaultHoverCityColor;
             }
-            hoveredObjectList.Add(objectToDye);
+            if (!(hoveredObjectList.Contains(objectToDye))){
+                hoveredObjectList.Add(objectToDye);
+            }
             listOfColors.Add(objectToDye.gameObject.GetComponent<Renderer>().material.color);
             objectToDye.gameObject.GetComponent<Renderer>().material.color = newCityColor;
         }
