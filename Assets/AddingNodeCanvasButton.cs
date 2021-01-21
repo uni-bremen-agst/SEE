@@ -43,12 +43,6 @@ public class AddingNodeCanvasButton : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     /// <summary>
     /// Sets a bool in the DesktopNewNodeAction-script which is finishing the .
     /// </summary>
@@ -67,6 +61,6 @@ public class AddingNodeCanvasButton : MonoBehaviour
 
     public void EditNode()
     {
-        EditNodeCanvasScript.editNode = true;
+        EditNodeCanvasScript.EditNode = true;
     }
 }
