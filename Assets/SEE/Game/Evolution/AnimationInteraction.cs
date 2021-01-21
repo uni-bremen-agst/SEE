@@ -94,7 +94,7 @@ namespace SEE.Game.Evolution
         private Button selectedMarker; 
 
         /// <summary>
-        /// A dictionary linking markers and comments, needed for saving the comments on application quit
+        /// A dictionary linking markers and comments, needed for saving the comments on application quit and deleting the comments
         /// </summary>
         private Dictionary<Button, InputField> markerDictionary = new Dictionary<Button, InputField>();
 
