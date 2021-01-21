@@ -13,17 +13,17 @@ namespace SEE.Game.UI
         /// <summary>
         /// The title of this entry.
         /// </summary>
-        private readonly string title;
+        private readonly string Title;
         
         /// <summary>
         /// A description of this entry.
         /// </summary>
-        private readonly string description;
+        private readonly string Description;
         
         /// <summary>
         /// The color of this entry.
         /// </summary>
-        protected readonly Color color;
+        protected readonly Color EntryColor;
         
         /// <summary>
         /// The action to be taken when the entry is selected.
@@ -33,12 +33,12 @@ namespace SEE.Game.UI
         /// <summary>
         /// Whether this entry is currently enabled (i.e. whether it can be selected.)
         /// </summary>
-        protected bool enabled;
+        protected bool Enabled;
 
         /// <summary>
         /// The color of this entry when disabled.
         /// </summary>
-        private Color disabled => color.ColorWithAlpha(0.2f);
+        private Color DisabledColor => EntryColor.ColorWithAlpha(0.2f);
 
         /// <summary>
         /// Instantiates and returns a new MenuEntry.
@@ -46,15 +46,15 @@ namespace SEE.Game.UI
         /// <param name="action">What action to take when the entry is selected.</param>
         /// <param name="title">The title of the entry.</param>
         /// <param name="description">A description of the entry.</param>
-        /// <param name="color">The color with which this entry shall be displayed.</param>
+        /// <param name="entryColor">The color with which this entry shall be displayed.</param>
         /// <param name="enabled">Whether this entry should be enabled on creation.</param>
-        public MenuEntry(Action action, string title, string description = null, Color color = default, bool enabled = default)
+        public MenuEntry(Action action, string title, string description = null, Color entryColor = default, bool enabled = default)
         {
             DoAction = action;
-            this.title = title ?? throw new ArgumentNullException(nameof(title));
-            this.description = description;
-            this.color = color;
-            this.enabled = enabled;
+            Title = title ?? throw new ArgumentNullException(nameof(title));
+            Description = description;
+            EntryColor = entryColor;
+            Enabled = enabled;
         }
     }
 }

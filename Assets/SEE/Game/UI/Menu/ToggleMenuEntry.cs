@@ -20,7 +20,7 @@ namespace SEE.Game.UI
         /// </summary>
         private readonly Action DoExitAction;
 
-        private Color inactiveColor => color.Lighter();
+        private Color inactiveColor => EntryColor.Lighter();
 
         /// <summary>
         /// Whether this entry is currently active (i.e. toggled).
@@ -39,6 +39,7 @@ namespace SEE.Game.UI
                 active = value;
                 
             }
+            get => active;
         }
 
 
@@ -47,17 +48,17 @@ namespace SEE.Game.UI
         /// </summary>
         /// <param name="active">Whether the entry should be active on creation.</param>
         /// <param name="entryAction">What action to take when the entry is selected.</param>
-        /// <param name="exitAction">What action to take when the entry is deselected.</param>
+        /// <param name="exitAction">What action to take when the entry is deselected. May be <c>null</c>.</param>
         /// <param name="title">The title of the entry.</param>
         /// <param name="description">A description of the entry.</param>
-        /// <param name="color">The color with which this entry shall be displayed.</param>
+        /// <param name="entryColor">The color with which this entry shall be displayed.</param>
         /// <param name="enabled">Whether this entry should be enabled on creation.</param>
         public ToggleMenuEntry(bool active, Action entryAction, Action exitAction, string title, 
-                               string description = null, Color color = default, bool enabled = default) 
-            : base(entryAction, title, description, color, enabled)
+                               string description = null, Color entryColor = default, bool enabled = default) 
+            : base(entryAction, title, description, entryColor, enabled)
         {
             this.active = active;
-            DoExitAction = exitAction;
+            DoExitAction = exitAction ?? (() => {});
         }
         
     }

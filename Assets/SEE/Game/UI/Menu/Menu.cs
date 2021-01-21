@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using SEE.Controls;
 
 namespace SEE.Game.UI
 {
@@ -10,45 +9,57 @@ namespace SEE.Game.UI
     /// </summary>
     /// <typeparam name="T">the type of entries used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
     /// <seealso cref="MenuEntry"/>
-    public class Menu<T>: RenderableComponent where T : MenuEntry
+    public partial class Menu<T>: PlatformDependentComponent where T : MenuEntry
     {
+
+        /// <summary>
+        /// Whether the menu is currently being shown.
+        /// </summary>
+        protected bool MenuShown;
+
+        /// <summary>
+        /// Displays or hides the menu, depending on <paramref name="show"/>.
+        /// </summary>
+        /// <param name="show">Whether the menu should be shown.</param>
+        public void ShowMenu(bool show)
+        {
+            MenuShown = show;
+        }
+        
         /// <summary>
         /// A list of menu entries for this menu.
         /// </summary>
         /// <seealso cref="MenuEntry"/>
-        protected readonly IList<T> entries = new List<T>();
+        protected readonly IList<T> Entries = new List<T>();
 
         /// <summary>
-        /// Adds an <paramref name="entry"/> to this menu's <see cref="entries"/>.
-        /// This method must be called <i>before</i> this component's Awake() method has been called.
+        /// Adds an <paramref name="entry"/> to this menu's <see cref="Entries"/>.
+        /// This method must be called <i>before</i> this component's Start() method has been called.
         /// </summary>
         /// <param name="entry">The entry to add to this menu.</param>
         public void AddEntry(T entry)
         {
-            entries.Add(entry);
-        }
-        
-        protected override bool RenderComponent(PlayerSettings.PlayerInputType inputType)
-        {
-            switch (inputType)
-            {
-                //TODO: Implement these
-                case PlayerSettings.PlayerInputType.Desktop: return false;
-                case PlayerSettings.PlayerInputType.TouchGamepad: return false;
-                case PlayerSettings.PlayerInputType.VR: return false;
-                case PlayerSettings.PlayerInputType.HoloLens: return false;
-                case PlayerSettings.PlayerInputType.None: return true;  // no UI has to be rendered
-                default: return false;
-            }
+            Entries.Add(entry);
         }
 
         /// <summary>
         /// Called when an entry in the menu is selected.
         /// </summary>
         /// <param name="entry">The entry which was selected.</param>
-        public virtual void OnEntrySelected(T entry)
+        protected virtual void OnEntrySelected(T entry)
         {
             entry.DoAction();
         }
+
+        // TODO: Implement TouchGamepad UI (same as Desktop?)
+        protected override void StartTouchGamepad() => StartDesktop();
+
+        // TODO: Implement VR UI (same as Desktop, but Curved?)
+        protected override void StartVR() => StartDesktop();
+
+
+        protected override void UpdateTouchGamepad() => UpdateDesktop();
+
+        protected override void UpdateVR() => UpdateDesktop();
     }
 }

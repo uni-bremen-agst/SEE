@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using SEE.Controls.Actions;
 using UnityEngine;
 
 namespace SEE.Game.UI
@@ -10,48 +10,52 @@ namespace SEE.Game.UI
     {
         /// <summary>
         /// This creates and returns the mode menu, with which you can select the active game mode.
+        /// 
         /// Available modes are:
         /// - Browsing
         /// - Moving
         /// - Mapping
         /// </summary>
-        /// <returns>the newly created mode menu game object.</returns>
-        public static GameObject CreateModeMenu()
+        /// <param name="attachTo">The game object the menu should be attached to. If <c>null</c>, a
+        /// new game object will be created.</param>
+        /// <returns>the newly created mode menu game object, or if it wasn't null
+        /// <paramref name="attachTo"/> with the mode menu attached.</returns>
+        public static GameObject CreateModeMenu(PlayerActions actions, GameObject attachTo = null)
         {
-            //TODO Set entry/exit actions to methods specified in comment.
-            // For this, refer to file "PlayerMenu.cs", as this menu is supposed to be the replacement for the
-            // menu constructed in there. The referenced methods are also present in that class.
-            
             ToggleMenuEntry[] entries = {
                 new ToggleMenuEntry(
                     active: true,
-                    entryAction: () => Debug.Log("TODO"), // Should be BrowseOn
+                    entryAction: actions.Browse,
                     exitAction: null,
                     title: "Browse",
                     description: "Normal browsing mode",
-                    color: Color.blue
+                    entryColor: Color.blue
                     ),
                 new ToggleMenuEntry(
                     active: false,
-                    entryAction: () => Debug.Log("TODO"), // Should be MoveOn
+                    entryAction: actions.Move,
                     exitAction: null,
                     title: "Move",
                     description: "Move a node within a graph",
-                    color: Color.red
+                    entryColor: Color.red
                     ),
                 new ToggleMenuEntry(
                     active: false,
-                    entryAction: () => Debug.Log("TODO"), // Should be MapOn
+                    entryAction: actions.Map,
                     exitAction: null,
                     title: "Map",
                     description: "Map a node from one graph to another graph",
-                    color: Color.green
+                    entryColor: Color.green
                     ),
             };
             
-            GameObject modeMenuGO = new GameObject();
+            GameObject modeMenuGO = attachTo ?? new GameObject { name = "Mode Menu" };
             SelectionMenu modeMenu = modeMenuGO.AddComponent<SelectionMenu>();
-            entries.ToList().ForEach(x => modeMenu.AddEntry(x));
+            foreach (ToggleMenuEntry entry in entries)
+            {
+                modeMenu.AddEntry(entry);
+            }
+
             return modeMenuGO;
         }
     }

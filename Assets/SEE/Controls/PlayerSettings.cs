@@ -198,6 +198,7 @@ namespace SEE.Controls
             SetActive(PlayerName[(int)PlayerInputType.HoloLens], isActive);
             SetActive("MixedRealityToolkit", isActive);
             SetActive("CityCollection", isActive);
+            SetActive(AppBarInteractableObject.AppBarName, isActive);
             
             // Disable Teleporting to avoid conflict with MRTK
             SetActive("Teleporting", !isActive);
