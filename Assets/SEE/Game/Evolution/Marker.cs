@@ -107,7 +107,7 @@ namespace SEE.Game.Evolution
             // Render new node power beam
             Vector3 powerBeamDimensions = new Vector3(position.x, block.transform.position.y, position.z);
             MoveScaleShakeAnimator.BeamAnimator.GetInstance().CreatePowerBeam(powerBeamDimensions,
-                AdditionalBeamDetails.newBeamColor, AdditionalBeamDetails.powerBeamDimensions, "new", block.name);
+                AdditionalBeamDetails.newBeamColor, AdditionalBeamDetails.powerBeamDimensions);
 
             return post;
         }

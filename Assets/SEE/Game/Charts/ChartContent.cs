@@ -173,22 +173,22 @@ namespace SEE.Game.Charts
         /// <summary>
         /// All game-node objects from previous graph revision
         /// </summary>
-        private List<NodeRef> previousNodes = new List<NodeRef>();
+        private List<Node> previousNodes = NodeChangesBuffer.GetSingleton().previousRevisionNodes;
 
         /// <summary>
         /// Nodes removed in current revision
         /// </summary>
-        private List<NodeRef> removedNodes = new List<NodeRef>();
+        private List<Node> removedNodes = new List<Node>();
 
         /// <summary>
         /// Nodes added in current revision
         /// </summary>
-        private List<NodeRef> addedNodes = new List<NodeRef>();
+        private List<Node> addedNodes = new List<Node>();
 
         /// <summary>
         /// Nodes (itnernally-)changed in the current revision
         /// </summary>
-        private List<NodeRef> changedNodes = new List<NodeRef>();
+        private List<Node> changedNodes = new List<Node>();
 
         /// <summary>
         /// Color of added node labels
@@ -250,9 +250,6 @@ namespace SEE.Game.Charts
         /// </summary>
         private void Awake()
         {
-            // Load color profile for chart entries
-            fetchLableColorProfile();
-
             Assert.IsTrue(scrollContent.transform.childCount == 0);
 
             FindDataObjects();
@@ -306,8 +303,11 @@ namespace SEE.Game.Charts
                     for (int i = fst; i < opl; i++)
                     {
                         scrollViewEntries[i] = NewScrollViewEntry(treeDataObjects[i].name, i, treeHierarchies[i]);
+
+                        // Load color profile for chart entries
+                        FetchLableColorProfile();
                         // Change color for changed nodes
-                        changedScrollViewEntryColor(scrollViewEntries[i].transform.gameObject.transform.Find("Label").gameObject, scrollViewEntries[i].transform.gameObject);
+                        ChangedScrollViewEntryColor(scrollViewEntries[i].transform.gameObject.transform.Find("Label").gameObject, scrollViewEntries[i].transform.gameObject);
                     }
                 }
                 else
@@ -334,8 +334,11 @@ namespace SEE.Game.Charts
                         {
                             scrollViewEntries[i] = NewScrollViewEntry(listDataObjects[i - 2].name, i, 1);
                         }
+
+                        // Load color profile for chart entries
+                        FetchLableColorProfile();
                         // Change color for changed nodes
-                        changedScrollViewEntryColor(scrollViewEntries[i].transform.gameObject.transform.Find("Label").gameObject, scrollViewEntries[i].transform.gameObject);
+                        ChangedScrollViewEntryColor(scrollViewEntries[i].transform.gameObject.transform.Find("Label").gameObject, scrollViewEntries[i].transform.gameObject);
                     }
                 }
             }
@@ -628,27 +631,19 @@ namespace SEE.Game.Charts
         /// </summary>
         private void FindDataObjects()
         {
-            // Store previous revision nodes in list
-            if (listDataObjects != null)
-            {
-                // Remove the previous revision removed nodes from listDataObjects
-                foreach (NodeRef removedNode in removedNodes)
-                {
-                    listDataObjects.Remove(removedNode);
-                }
-                previousNodes = listDataObjects;
-            }
             // list
             listDataObjects = SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, ChartManager.Instance.ShowInnerNodeMetrics);
             // Get newly added nodes and removed nodes from previous revision
+            previousNodes = NodeChangesBuffer.GetSingleton().previousRevisionNodes;
             removedNodes = GetRemovedNodes(previousNodes, listDataObjects);
             addedNodes = GetNewNodes(previousNodes, listDataObjects);
             changedNodes = GetChangedNodes(previousNodes, listDataObjects);
-            // Add removed nodes to graph
-            foreach (NodeRef nodeRef in removedNodes)
+            previousNodes.Clear();
+            foreach (NodeRef n in listDataObjects)
             {
-                listDataObjects.Add(nodeRef);
+                previousNodes.Add(n.Value);
             }
+            
 
             listDataObjects.Sort(delegate (NodeRef n0, NodeRef n1)
             {
@@ -958,11 +953,11 @@ namespace SEE.Game.Charts
         /// </summary>
         /// <param name="previousRevisionNodes">A list containing the previous graph revision nodes</param>
         /// <param name="currentRevisionNodes">A list containing the current graph revision nodes</param>
-        private List<NodeRef> GetNewNodes(List<NodeRef> previousRevisionNodes, List<NodeRef> currentRevisionNodes)
+        private List<Node> GetNewNodes(List<Node> previousRevisionNodes, List<NodeRef> currentRevisionNodes)
         {
-            List<NodeRef> newNodes = new List<NodeRef>();
+            List<Node> newNodes = new List<Node>();
             
-            if (previousRevisionNodes == null)
+            if (previousRevisionNodes == null || previousRevisionNodes.Count <= 0)
             {
                 // Both revisions null, must be an error, so return an empty list
                 if (currentRevisionNodes == null)
@@ -972,7 +967,11 @@ namespace SEE.Game.Charts
                 // There was no previous revision, so all nodes are new
                 else
                 {
-                    return currentRevisionNodes;
+                    foreach (NodeRef nref in currentRevisionNodes)
+                    {
+                        newNodes.Add(nref.Value);
+                    }
+                    return newNodes;
                 }
             }
 
@@ -981,9 +980,9 @@ namespace SEE.Game.Charts
                 bool containsEntry = false;
                 // Check if the node existed in the previous revision,
                 // if not, it must've been added
-                foreach (NodeRef oldNodeRef in previousRevisionNodes)
+                foreach (Node oldNodeRef in previousRevisionNodes)
                 {
-                    if (oldNodeRef.Value.ID.Equals(newNodeRef.Value.ID))
+                    if (oldNodeRef.ID.Equals(newNodeRef.Value.ID))
                     {
                         containsEntry = true;
                         break;
@@ -991,7 +990,7 @@ namespace SEE.Game.Charts
                 }
                 if (!containsEntry)
                 {
-                    newNodes.Add(newNodeRef);
+                    newNodes.Add(newNodeRef.Value);
                 }
             }
             return newNodes;
@@ -1002,20 +1001,20 @@ namespace SEE.Game.Charts
         /// </summary>
         /// <param name="previousRevisionNodes">A list containing the previous graph revision nodes</param>
         /// <param name="currentRevisionNodes">A list containing the current graph revision nodes</param>
-        private List<NodeRef> GetChangedNodes(List<NodeRef> previousRevisionNodes, List<NodeRef> currentRevisionNodes)
+        private List<Node> GetChangedNodes(List<Node> previousRevisionNodes, List<NodeRef> currentRevisionNodes)
         {
-            List<NodeRef> changedNodes = new List<NodeRef>();
-            if (previousRevisionNodes == null)
+            List<Node> changedNodes = new List<Node>();
+            if (previousRevisionNodes == null || previousRevisionNodes.Count <= 0)
             {
                 return changedNodes;
             }
-            foreach (NodeRef oldNodeRef in previousRevisionNodes)
+            foreach (Node oldNodeRef in previousRevisionNodes)
             {
                 foreach (NodeRef newNodeRef in currentRevisionNodes)
                 {
-                    if (newNodeRef.Value.ID.Equals(oldNodeRef.Value.ID) && !newNodeRef.Equals(oldNodeRef))
+                    if (newNodeRef.Value.ID.Equals(oldNodeRef.ID) && !newNodeRef.Equals(oldNodeRef))
                     {
-                        changedNodes.Add(newNodeRef);
+                        changedNodes.Add(newNodeRef.Value);
                         break;
                     }
                 }
@@ -1028,24 +1027,24 @@ namespace SEE.Game.Charts
         /// </summary>
         /// <param name="previousRevisionNodes">A list containing the previous graph revision nodes</param>
         /// <param name="currentRevisionNodes">A list containing the current graph revision nodes</param>
-        private List<NodeRef> GetRemovedNodes(List<NodeRef> previousRevisionNodes, List<NodeRef> currentRevisionNodes)
+        private List<Node> GetRemovedNodes(List<Node> previousRevisionNodes, List<NodeRef> currentRevisionNodes)
         {
-            List<NodeRef> removedNodes = new List<NodeRef>();
+            List<Node> removedNodes = new List<Node>();
 
             // If the previous revision is null, all nodes are new, therefor return the empty list
-            if (previousRevisionNodes == null)
+            if (previousRevisionNodes == null || previousRevisionNodes.Count <= 0)
             {
                 return removedNodes;
             }
 
-            foreach (NodeRef oldNodeRef in previousRevisionNodes)
+            foreach (Node oldNodeRef in previousRevisionNodes)
             {
                 bool containsEntry = false;
                 // Check if the old node exists in the current revision, 
                 // if not, then it must've been removed
                 foreach (NodeRef newNodeRef in currentRevisionNodes)
                 {
-                    if (newNodeRef.Value.ID.Equals(oldNodeRef.Value.ID))
+                    if (newNodeRef.Value.ID.Equals(oldNodeRef.ID))
                     {
                         containsEntry = true;
                         break;
@@ -1063,7 +1062,7 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Fetches the color profile selected in the ChartManager for added, edited and removed node labels
         /// </summary>
-        private void fetchLableColorProfile()
+        private void FetchLableColorProfile()
         {
             // Attempt to load user defined settings from chartManager Color Profile
             try
@@ -1088,17 +1087,17 @@ namespace SEE.Game.Charts
         /// Changes the text colors according to node changes that happened in the current revision
         /// </summary>
         /// <param name="scrollViewEntry">The scrollview entry, the color of which should be changed</param>
-        /// <param name="parentObject">The parent gameObject of the scrollview entry gameObject</param>
-        private void changedScrollViewEntryColor(GameObject scrollViewEntry, GameObject parent)
+        /// <param name="parent">The parent gameObject of the scrollview entry gameObject</param>
+        private void ChangedScrollViewEntryColor(GameObject scrollViewEntry, GameObject parent)
         {
             TextMeshProUGUI textMesh = scrollViewEntry.GetComponent<TextMeshProUGUI>();
             ColorBlock colors = parent.transform.GetComponent<Toggle>().colors;
             bool removed = false;
             bool changed = false;
             bool added = false;
-            foreach (NodeRef n in removedNodes)
+            foreach (Node n in removedNodes)
             {
-                if (n.Value.ID.Equals(textMesh.text))
+                if (n.ID.Equals(textMesh.text))
                 {
                     textMesh.color = removedNodeLabelColor;
                     colors.normalColor = removedNodeLabelColor;
@@ -1108,9 +1107,9 @@ namespace SEE.Game.Charts
             }
             if (!removed)
             {
-                foreach (NodeRef n in changedNodes)
+                foreach (Node n in changedNodes)
                 {
-                    if (n.Value.ID.Equals(textMesh.text))
+                    if (n.ID.Equals(textMesh.text))
                     {
                         textMesh.color = changedNodesLabelColor;
                         colors.normalColor = changedNodesLabelColor;
@@ -1121,9 +1120,9 @@ namespace SEE.Game.Charts
             }
             if (!changed)
             {
-                foreach (NodeRef n in addedNodes)
+                foreach (Node n in addedNodes)
                 {
-                    if (n.Value.ID.Equals(textMesh.text))
+                    if (n.ID.Equals(textMesh.text))
                     {
                         textMesh.color = addedNodesLabelColor;
                         colors.normalColor = addedNodesLabelColor;
@@ -1141,5 +1140,30 @@ namespace SEE.Game.Charts
             colors.highlightedColor = hoveringOverLabelTextColor;
             parent.transform.GetComponent<Toggle>().colors = colors;
         }
+    }
+
+    class NodeChangesBuffer
+    {
+        /// <summary>
+        /// Singleton
+        /// </summary>
+        private static NodeChangesBuffer singleton = null;
+
+        /// <summary>
+        /// Get singleton instance
+        /// </summary>
+        public static NodeChangesBuffer GetSingleton()
+        {
+            if (singleton == null)
+            {
+                singleton = new NodeChangesBuffer();
+            }
+            return singleton;
+        }
+
+        /// <summary>
+        /// Stores the previous revision nodes
+        /// </summary>
+        public List<Node> previousRevisionNodes = new List<Node>();
     }
 }
