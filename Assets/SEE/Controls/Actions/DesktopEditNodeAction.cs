@@ -1,26 +1,20 @@
 ﻿using SEE.GO;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class DesktopEditNodeAction : MonoBehaviour
+public class DesktopEditNodeAction : DesktopNodeAction
 {
 
     /// <summary>
-    /// The Object that the Cursor hovers over
+    /// True, if the Close-Button on the editCanvas is pushed, else false.
     /// </summary>
-    public GameObject hoveredObject = null;
-
     private static bool editIsCanceled = false;
 
     public static bool EditIsCanceled { get => editIsCanceled; set => editIsCanceled = value; }
 
-    public GameObject canvasObject;
-
     // Start is called before the first frame update
     void Start()
     {
-        canvasObject = GameObject.Find("CanvasObject");
+        InitialiseCanvasObject();
     }
 
     // Update is called once per frame
@@ -43,15 +37,6 @@ public class DesktopEditNodeAction : MonoBehaviour
             RemoveScript();
             editIsCanceled = false;
         }
-    }
-
-    /// <summary>
-    /// Removes The Script
-    /// Places the new Node if not placed
-    /// </summary>
-    public void RemoveScript()
-    {
-        Destroy(this);
     }
 
 }
