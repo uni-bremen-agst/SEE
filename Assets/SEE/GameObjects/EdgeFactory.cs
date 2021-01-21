@@ -8,6 +8,7 @@ using System.Linq;
 using UnityEngine;
 using SEE.Controls;
 using SEE.Controls.Actions;
+using UnityMeshSimplifier;
 
 namespace SEE.GO
 {
@@ -107,23 +108,26 @@ namespace SEE.GO
                 line.positionCount = points.Length; // number of vertices
                 line.SetPositions(points);
 
+                    
+
                 LineRenderer lineRenderer = gameEdge.GetComponent<LineRenderer>();
                 MeshCollider meshCollider = gameEdge.AddComponent<MeshCollider>();
 
                 Mesh mesh = new Mesh();
-                lineRenderer.BakeMesh(mesh, false);
+                lineRenderer.BakeMesh(mesh, Camera.main, false);
 
-                //Das Mesh scheint zu klein, Convex ist zu groß. Scaling?
-                //mesh.vertices.ForEach(vertex =>
-                //{
-                   // vertex.x *= ;
-                   // vertex.y *= ;
-                //});
-                meshCollider.sharedMesh = mesh;
+                // Qualität zwischen 0 und 1;
+                float quality = 0.5f;
+                var meshSimplifier = new MeshSimplifier();
+                meshSimplifier.Initialize(mesh);
+                meshSimplifier.SimplifyMesh(quality);
+                var destMesh = meshSimplifier.ToMesh();
+
+                meshCollider.sharedMesh = destMesh;
 
                 //FIXME
                 // Convex ist eher ungeil, da zu groß. Funktioniert aber vorerst.
-                meshCollider.convex =true;
+                meshCollider.convex = false;
 
 
                 // FIXME
