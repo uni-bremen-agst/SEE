@@ -186,6 +186,11 @@ namespace SEE.Game.Charts
         private List<NodeRef> addedNodes = new List<NodeRef>();
 
         /// <summary>
+        /// Nodes (itnernally-)changed in the current revision
+        /// </summary>
+        private List<NodeRef> changedNodes = new List<NodeRef>();
+
+        /// <summary>
         /// Color of added node labels
         /// </summary> 
         private Color addedNodesLabelColor;
@@ -952,8 +957,6 @@ namespace SEE.Game.Charts
         {
             Destroy(gameObject);
         }
-
-        // ===================== TODO CHECK CHANGED NODES
         
         /// <summary>
         /// Computes the newly created nodes in the current graph revision
@@ -1000,6 +1003,32 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
+        /// Computes the nodes that have been changed inbetween the last and the current revision
+        /// </summary>
+        /// <param name="previousRevisionNodes">A list containing the previous graph revision nodes</param>
+        /// <param name="currentRevisionNodes">A list containing the current graph revision nodes</param>
+        private List<NodeRef> GetChangedNodes(List<NodeRef> previousRevisionNodes, List<NodeRef> currentRevisionNodes)
+        {
+            List<NodeRef> changedNodes = new List<NodeRef>();
+            if (previousRevisionNodes == null)
+            {
+                return changedNodes;
+            }
+            foreach (NodeRef oldNodeRef in previousRevisionNodes)
+            {
+                foreach (NodeRef newNodeRef in currentRevisionNodes)
+                {
+                    if (newNodeRef.Value.ID.Equals(oldNodeRef.Value.ID) && !newNodeRef.Equals(oldNodeRef))
+                    {
+                        changedNodes.Add(newNodeRef);
+                        break;
+                    }
+                }
+            }
+            return changedNodes;
+        }
+
+        /// <summary>
         /// Computes the deleted nodes from the previous graph revision
         /// </summary>
         /// <param name="previousRevisionNodes">A list containing the previous graph revision nodes</param>
@@ -1014,7 +1043,7 @@ namespace SEE.Game.Charts
                 return removedNodes;
             }
 
-            foreach (NodeRef oldNodeRef in previousNodes)
+            foreach (NodeRef oldNodeRef in previousRevisionNodes)
             {
                 bool containsEntry = false;
                 // Check if the old node exists in the current revision, 
