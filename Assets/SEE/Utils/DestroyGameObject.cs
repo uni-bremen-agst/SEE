@@ -5,7 +5,7 @@ namespace SEE.Utils
     /// <summary>
     /// Functions to destroy GameObjects.
     /// </summary>
-    public class Destroyer
+    public static class Destroyer
     {
         /// <summary>
         /// Destroys given game object using UnityEngine.Object when in
@@ -18,12 +18,12 @@ namespace SEE.Utils
             if (Application.isPlaying)
             {
                 // playing either in a built player or in the player of the editor
-                UnityEngine.Object.Destroy(gameObject);
+                Object.Destroy(gameObject);
             }
             else
             {
                 // game is not played; we are in the editor mode
-                UnityEngine.Object.DestroyImmediate(gameObject);
+                Object.DestroyImmediate(gameObject);
             }
         }
 
@@ -38,12 +38,12 @@ namespace SEE.Utils
             if (Application.isPlaying)
             {
                 // playing either in a built player or in the player of the editor
-                UnityEngine.Object.Destroy(component);
+                Object.Destroy(component);
             }
             else
             {
                 // game is not played; we are in the editor mode
-                UnityEngine.Object.DestroyImmediate(component);
+                Object.DestroyImmediate(component);
             }
         }
     }

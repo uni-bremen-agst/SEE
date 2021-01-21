@@ -60,6 +60,7 @@ SubShader {
 		"Queue"="Transparent+999"
 		"IgnoreProjector"="True"
 		"RenderType"="Transparent"
+		"DisableBatching"="True"  // Necessary so that billboarding works on Hololens
 	}
 
 
