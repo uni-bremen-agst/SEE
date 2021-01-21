@@ -34,10 +34,6 @@ public class ScaleNodeNetAction : AbstractAction
     {
         if (!IsRequester())
         {
-            //Just Test Purpose START
-           Debug.Log(gameObjectID);
-          GameObject thrdCornerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            //JUST TEST PURPOSE END (REMOVE IF IT WORKS!)
             GameObject scaleObj = GameObject.Find(gameObjectID);
             if(scaleObj != null)
             {
@@ -46,6 +42,7 @@ public class ScaleNodeNetAction : AbstractAction
             }
             else
             {
+               //FIXME: Controll if a Debug Log is the right thing
                 Debug.LogWarning("Kein GameObject gefunden: " + gameObjectID);
             }
         }
