@@ -29,6 +29,7 @@ namespace SEE.Controls.Actions
         private void Update()
         {
             // If the local player presses U, we deselect all currently selected interactable objects.
+            // TODO (UI): Generalize this across platforms.
             if (Input.GetKeyDown(KeyCode.U))
             {
                 InteractableObject.UnselectAll(true);
