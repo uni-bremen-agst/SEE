@@ -107,6 +107,10 @@ namespace SEE.Game.Evolution
                 }
             }
 
+            BeamAnimator.GetInstance().newNodeIds.Clear();
+            BeamAnimator.GetInstance().changedNodeIds.Clear();
+            BeamAnimator.GetInstance().removedNodeIds.Clear();
+
             if (gameObject.transform.position != position)
             {
                 // Move the object.
@@ -137,7 +141,7 @@ namespace SEE.Game.Evolution
                 ChangedNodeBeamColor = AdditionalBeamDetails.changedBeamColor;
                 NodeBeamDimensions = AdditionalBeamDetails.powerBeamDimensions;
                 // Create a new power beam
-                BeamAnimator.GetInstance().CreatePowerBeam(position, ChangedNodeBeamColor, NodeBeamDimensions);
+                BeamAnimator.GetInstance().CreatePowerBeam(position, ChangedNodeBeamColor, NodeBeamDimensions, "new", gameObject.name);
 
                 if (mustCallBack)
                 {
@@ -182,10 +186,12 @@ namespace SEE.Game.Evolution
 
             /// <summary>
             /// Adds power beam above gameObject that has been changed
+            /// </summary>
             /// <param name="position">Position of the parent gameObject</param>
             /// <param name="beamColor">Color of the power beam to create</param>
-            /// </summary>
-            public void CreatePowerBeam(Vector3 position, Color beamColor, Vector3 NodeBeamDimensions)
+            /// <param name="beamType">Type of the beam (new/changed/deleted)</param>
+            /// <param name="nodeID">ID of the node upon which to place the beam</param>
+            public void CreatePowerBeam(Vector3 position, Color beamColor, Vector3 NodeBeamDimensions, String beamType, String nodeID)
             {
                 // Generate power beam above updated objects
                 GameObject powerBeam = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
@@ -206,6 +212,18 @@ namespace SEE.Game.Evolution
                 powerBeamRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
                 BeamAnimator.GetInstance().AddPowerBeam(powerBeam);
                 powerBeam.AddComponent<BeamAnimatorExecuter>();
+                if (beamType.Equals("new"))
+                {
+                    newNodeIds.Add(nodeID);
+                }
+                else if (beamType.Equals("changed"))
+                {
+                    changedNodeIds.Add(nodeID);
+                }
+                else
+                {
+                    removedNodeIds.Add(nodeID);
+                }
             }
 
             /// <summary>
@@ -247,6 +265,21 @@ namespace SEE.Game.Evolution
             /// Deleted power beams, updated whenever Update is called
             /// </summary>
             private List<GameObject> deletedBeams = new List<GameObject>();
+
+            /// <summary>
+            /// New node ids
+            /// </summary>
+            public List<string> newNodeIds = new List<string>();
+
+            /// <summary>
+            /// Changed node ids
+            /// </summary>
+            public List<string> changedNodeIds = new List<string>();
+
+            /// <summary>
+            /// Removed node ids
+            /// </summary>
+            public List<string> removedNodeIds = new List<string>();
 
             /// <summary>
             /// Beam appearing magic constant
