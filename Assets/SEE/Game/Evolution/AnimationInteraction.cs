@@ -130,8 +130,15 @@ namespace SEE.Game.Evolution
             animationDataModel.ReverseButton.onClick.AddListener(TaskOnClickReverseButton);
             animationDataModel.FastBackwardButton.onClick.AddListener(TaskOnClickFastBackwardButton);
 
-            SliderDrag sliderDrag = animationDataModel.Slider.GetComponent<SliderDrag>();
-            sliderDrag.EvolutionRenderer = evolutionRenderer;
+            SliderDrag sliderDrag;
+            if (animationDataModel.Slider.TryGetComponent<SliderDrag>(out sliderDrag))
+            {
+                sliderDrag.EvolutionRenderer = evolutionRenderer;
+            }
+            else
+            {
+                Debug.LogError("SliderDrag script could not be loaded.\n");
+            }
 
             try
             {
@@ -297,6 +304,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Handles actions for when a marker is clicked.
         /// </summary>
+        /// <param name="clickedMarker"> Marker that has baeen clicked. </param>
         private void TaskOnClickMarker(Button clickedMarker)
         {
             selectedMarker = clickedMarker;
@@ -309,9 +317,12 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Adds an InputField to enter comments to the specified marker and returns the created InputField.
+        /// Adds an InputField to enter comments to the specified marker.
         /// </summary>
-        private InputField AddCommentToMarker(Button marker, string comment)
+        /// <param name="marker"> Marker </param>
+        /// <param name="comment"> comment to be added to the InputField, optional </param>
+        /// <returns> Created InputField </returns>
+        private InputField AddCommentToMarker(Button marker, string comment = null)
         {
             string commentName = marker.GetHashCode().ToString() + "-comment";
             InputField commentField = Instantiate(animationDataModel.commentPrefab);
@@ -330,9 +341,11 @@ namespace SEE.Game.Evolution
 
 
         /// <summary>
-        /// Adds a new marker at the current position
+        /// Adds a new marker at the specified position
         /// </summary>
-        private void AddMarker(Vector3 markerPos, string comment)
+        /// <param name="markerPos"> Position to add the marker at </param>
+        /// <param name="comment"> Comment to be added to the marker, optional </param>
+        private void AddMarker(Vector3 markerPos, string comment = null)
         {
             Button newMarker = Instantiate(animationDataModel.markerPrefab);
             newMarker.transform.SetParent(animationDataModel.Slider.transform, false);
@@ -351,8 +364,9 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Removes the selected marker
+        /// Removes the specified marker
         /// </summary>
+        /// <param name="marker"> Marker to remove </param>
         private void RemoveMarker(Button marker)
         {
             SliderMarker sliderMarker = sliderMarkerContainer.getSliderMarkerForLocation(marker.transform.position);
