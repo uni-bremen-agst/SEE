@@ -48,6 +48,7 @@ public class EditNodeCanvasScript : NodeCanvasScript
             }
             CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
             generator.DestroyEditNodeCanvas();
+            new EditNodeNetAction(nodeToEdit,gameObject.name).Execute(null);
             editNode = false;
         }
     }
