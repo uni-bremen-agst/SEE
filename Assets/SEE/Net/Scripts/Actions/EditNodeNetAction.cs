@@ -21,6 +21,7 @@ public class EditNodeNetAction : AbstractAction
         scname = SourceName;
         type = Type;
         gameObjectID = GameObjectID;
+        Debug.Log(scname);
     }
     /// <summary>
     /// Things to Execute on the Server (None for this Class)
@@ -42,6 +43,8 @@ public class EditNodeNetAction : AbstractAction
             {
                 node.SourceName = scname;
                 node.Type = type;
+                Debug.Log(scname);
+                Debug.Log(node.SourceName);
             }
             else
             {
