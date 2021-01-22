@@ -926,7 +926,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// If we are at the begin of the graph series, nothing happens.
+        /// If we are at the beginning of the graph series, nothing happens.
         /// Otherwise we make the transition from the currently shown graph to its 
         /// direct predecessor graph in the graph series. CurrentGraphIndex is decreased
         /// by one accordingly.
@@ -1032,7 +1032,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// If we at the beginning of the graph series, nothing happens.
+        /// If we are at the beginning of the graph series, nothing happens.
         /// Otherwise we make the transition from the currently shown graph to its next
         /// direct successor graph in the graph series. CurrentGraphIndex is increased
         /// by one accordingly and auto-play mode is toggled (switched off actually).
