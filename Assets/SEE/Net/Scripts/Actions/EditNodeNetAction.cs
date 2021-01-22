@@ -6,16 +6,20 @@ using UnityEngine;
 
 public class EditNodeNetAction : AbstractAction
 {
-    public Node nodeToEdit = null;
+    public string scname;
+    public string type;
     public string gameObjectID;
+   // private Node nodeToEdit;
     /// <summary>
     /// Constructs a EditNodeNetAction
     /// </summary>
     /// <param name="GameObjectID">The id from the GameObject which should be edited through the Network</param>
     /// <param name="Node">The Node with the changes</param>
-    public EditNodeNetAction(Node node, string GameObjectID) : base()
+    public EditNodeNetAction(string SourceName, string Type, string GameObjectID) : base()
     {
-        nodeToEdit = node;
+       // nodeToEdit = node;
+        scname = SourceName;
+        type = Type;
         gameObjectID = GameObjectID;
     }
     /// <summary>
@@ -36,8 +40,8 @@ public class EditNodeNetAction : AbstractAction
             Node node = goTMP.GetComponent<NodeRef>().node;
             if (node != null)
             {
-                node.SourceName = nodeToEdit.SourceName;
-                node.Type = nodeToEdit.Type;
+                node.SourceName = scname;
+                node.Type = type;
             }
             else
             {
