@@ -1389,14 +1389,14 @@ MonoBehaviour:
   FastForwardButton: {fileID: 438968762}
   ReverseButton: {fileID: 212908315}
   FastBackwardButton: {fileID: 87988460}
-  markerPrefab: {fileID: 4405863734327421875, guid: bf551eb3b2791384793b19746ba863b3,
+  MarkerPrefab: {fileID: 4405863734327421875, guid: bf551eb3b2791384793b19746ba863b3,
     type: 3}
-  commentPrefab: {fileID: 6727790572673153326, guid: 6220b04a43686284189211911d44599e,
+  CommentPrefab: {fileID: 6727790572673153326, guid: 6220b04a43686284189211911d44599e,
     type: 3}
-  playButtonText: {fileID: 859836497}
-  reverseButtonText: {fileID: 292507466}
-  fastFowardButtonText: {fileID: 414280885}
-  fastBackwardButtonText: {fileID: 251682753}
+  PlayButtonText: {fileID: 859836497}
+  ReverseButtonText: {fileID: 292507466}
+  FastFowardButtonText: {fileID: 414280885}
+  FastBackwardButtonText: {fileID: 251682753}
 --- !u!1 &4741337296903842283
 GameObject:
   m_ObjectHideFlags: 0
