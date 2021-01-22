@@ -99,6 +99,16 @@ namespace SEE.Game.Evolution
         private Dictionary<Button, InputField> markerDictionary = new Dictionary<Button, InputField>();
 
         /// <summary>
+        /// Specifies whether the animation is currently being fast-forwarded
+        /// </summary>
+        private bool isFastForward;
+
+        /// <summary>
+        /// Specifies whether the animation is currently being fast-backwarded
+        /// </summary>
+        private bool isFastBackward;
+
+        /// <summary>
         /// The evolution renderer doing the rendering and animations of the graphs.
         /// </summary>
         public EvolutionRenderer EvolutionRenderer
@@ -183,20 +193,21 @@ namespace SEE.Game.Evolution
         {
             if (!evolutionRenderer.IsAutoPlayReverse)
             {
-                if (!animationDataModel.FastBackwardButton.GetComponentInChildren<Text>().text.Equals("◄◄"))
+                if (isFastBackward)
                 {
                     animationTimeValue = 2;
                     evolutionRenderer.AnimationLag = animationTimeValue;
-                    animationDataModel.FastBackwardButton.GetComponentInChildren<Text>().text = "◄◄";
+                    isFastBackward = false;
+                    animationDataModel.fastBackwardButtonText.text = "◄◄";
                 }
                 if (!evolutionRenderer.IsAutoPlay)
                 {
-                    animationDataModel.PlayButton.GetComponentInChildren<Text>().text = "ll";
+                    animationDataModel.playButtonText.text = "ll";
                     evolutionRenderer.ToggleAutoPlay();
                 }
                 else
                 {
-                    animationDataModel.PlayButton.GetComponentInChildren<Text>().text = "►";
+                    animationDataModel.playButtonText.text = "►";
                     evolutionRenderer.ToggleAutoPlay();
                 }
             }
@@ -210,20 +221,21 @@ namespace SEE.Game.Evolution
         {
             if (!evolutionRenderer.IsAutoPlay)
             {
-                if (!animationDataModel.FastForwardButton.GetComponentInChildren<Text>().text.Equals("►►"))
+                if (isFastForward)
                 {
                     animationTimeValue = 2;
                     evolutionRenderer.AnimationLag = animationTimeValue;
-                    animationDataModel.FastForwardButton.GetComponentInChildren<Text>().text = "►►";
+                    isFastForward = false;
+                    animationDataModel.fastFowardButtonText.text = "►►";
                 }
                 if (!evolutionRenderer.IsAutoPlayReverse)
                 {
-                    animationDataModel.ReverseButton.GetComponentInChildren<Text>().text = "ll";
+                    animationDataModel.reverseButtonText.text = "ll";
                     evolutionRenderer.ToggleAutoPlayReverse();
                 }
                 else
                 {
-                    animationDataModel.ReverseButton.GetComponentInChildren<Text>().text = "◄";
+                    animationDataModel.reverseButtonText.text = "◄";
                     evolutionRenderer.ToggleAutoPlayReverse();
                 }
             }
@@ -241,27 +253,31 @@ namespace SEE.Game.Evolution
             {
                 return;
             }
-            if (!animationDataModel.FastBackwardButton.GetComponentInChildren<Text>().text.Equals("◄◄")) 
+            if (isFastBackward) 
             {
                 animationTimeValue = 2;
                 evolutionRenderer.AnimationLag = animationTimeValue;
-                animationDataModel.FastBackwardButton.GetComponentInChildren<Text>().text = "◄◄";
+                isFastBackward = false;
+                animationDataModel.fastBackwardButtonText.text = "◄◄";
             }
             if (animationTimeValue == 2)
             {
+                isFastForward = true;
                 animationTimeValue = 1;
                 evolutionRenderer.AnimationLag = animationTimeValue;
-                animationDataModel.FastForwardButton.GetComponentInChildren<Text>().text = "►►2x";
+                animationDataModel.fastFowardButtonText.text = "►►2x";
             } else if (animationTimeValue == 1)
             {
+                isFastForward = true;
                 animationTimeValue = 0.5f;
                 evolutionRenderer.AnimationLag = animationTimeValue;
-                animationDataModel.FastForwardButton.GetComponentInChildren<Text>().text = "►►4x";
+                animationDataModel.fastFowardButtonText.text = "►►4x";
             } else if (animationTimeValue == 0.5f)
             {
+                isFastForward = false;
                 animationTimeValue = 2;
                 evolutionRenderer.AnimationLag = animationTimeValue;
-                animationDataModel.FastForwardButton.GetComponentInChildren<Text>().text = "►►";
+                animationDataModel.fastFowardButtonText.text = "►►";
             }
         }
 
@@ -275,29 +291,33 @@ namespace SEE.Game.Evolution
             {
                 return;
             }
-            if (!animationDataModel.FastForwardButton.GetComponentInChildren<Text>().text.Equals("►►"))
+            if (isFastForward)
             {
                 animationTimeValue = 2;
                 evolutionRenderer.AnimationLag = animationTimeValue;
-                animationDataModel.FastForwardButton.GetComponentInChildren<Text>().text = "►►";
+                isFastForward = false;
+                animationDataModel.fastFowardButtonText.text = "►►";
             }
             if (animationTimeValue == 2)
             {
+                isFastBackward = true;
                 animationTimeValue = 1;
                 evolutionRenderer.AnimationLag = animationTimeValue;
-                animationDataModel.FastBackwardButton.GetComponentInChildren<Text>().text = "◄◄2x";
+                animationDataModel.fastBackwardButtonText.text = "◄◄2x";
             }
             else if (animationTimeValue == 1)
             {
+                isFastBackward = true;
                 animationTimeValue = 0.5f;
                 evolutionRenderer.AnimationLag = animationTimeValue;
-                animationDataModel.FastBackwardButton.GetComponentInChildren<Text>().text = "◄◄4x";
+                animationDataModel.fastBackwardButtonText.text = "◄◄4x";
             }
             else if (animationTimeValue == 0.5f)
             {
+                isFastBackward = false;
                 animationTimeValue = 2;
                 evolutionRenderer.AnimationLag = animationTimeValue;
-                animationDataModel.FastBackwardButton.GetComponentInChildren<Text>().text = "◄◄";
+                animationDataModel.fastBackwardButtonText.text = "◄◄";
             }
         }
 
