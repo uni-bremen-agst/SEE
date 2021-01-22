@@ -23,6 +23,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using SEE.Game.Charts;
 
 namespace SEE.Game.Evolution
 {
@@ -218,6 +219,9 @@ namespace SEE.Game.Evolution
             Vector3 powerBeamDimensions = gameObject.transform.position;
             MoveScaleShakeAnimator.BeamAnimator.GetInstance().CreatePowerBeam(powerBeamDimensions, 
                 AdditionalBeamDetails.deletedBeamColor, AdditionalBeamDetails.powerBeamDimensions);
+            // Add the removed node id to the revision changes list
+            NodeChangesBuffer.GetSingleton().removedNodeIDs.Add(node.ID);
+
             nodes.Remove(node.ID);
             return wasNodeRemoved;
         }

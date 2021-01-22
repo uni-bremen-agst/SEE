@@ -171,24 +171,19 @@ namespace SEE.Game.Charts
         private List<NodeRef> treeDataObjects;
 
         /// <summary>
-        /// All game-node objects from previous graph revision
+        /// Ids of the nodes that have been added in this revision
         /// </summary>
-        private List<Node> previousNodes = NodeChangesBuffer.GetSingleton().previousRevisionNodes;
+        List<string> newNodeIDs = new List<string>();
 
         /// <summary>
-        /// Nodes removed in current revision
+        /// Ids of the nodes that have changed in this revision
         /// </summary>
-        private List<Node> removedNodes = new List<Node>();
+        List<string> changedNodeIDs = new List<string>();
 
         /// <summary>
-        /// Nodes added in current revision
+        /// Ids of the nodes that have been removed in this revision
         /// </summary>
-        private List<Node> addedNodes = new List<Node>();
-
-        /// <summary>
-        /// Nodes (itnernally-)changed in the current revision
-        /// </summary>
-        private List<Node> changedNodes = new List<Node>();
+        List<string> removedNodeIDs = new List<string>();
 
         /// <summary>
         /// Color of added node labels
@@ -633,17 +628,8 @@ namespace SEE.Game.Charts
         {
             // list
             listDataObjects = SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, ChartManager.Instance.ShowInnerNodeMetrics);
-            // Get newly added nodes and removed nodes from previous revision
-            previousNodes = NodeChangesBuffer.GetSingleton().previousRevisionNodes;
-            removedNodes = GetRemovedNodes(previousNodes, listDataObjects);
-            addedNodes = GetNewNodes(previousNodes, listDataObjects);
-            changedNodes = GetChangedNodes(previousNodes, listDataObjects);
-            previousNodes.Clear();
-            foreach (NodeRef n in listDataObjects)
-            {
-                previousNodes.Add(n.Value);
-            }
-            
+            // Detect node changes and decorate the scrollview
+            FillListsWithChanges(listDataObjects);
 
             listDataObjects.Sort(delegate (NodeRef n0, NodeRef n1)
             {
@@ -948,116 +934,7 @@ namespace SEE.Game.Charts
             Destroy(gameObject);
         }
         
-        /// <summary>
-        /// Computes the newly created nodes in the current graph revision
-        /// </summary>
-        /// <param name="previousRevisionNodes">A list containing the previous graph revision nodes</param>
-        /// <param name="currentRevisionNodes">A list containing the current graph revision nodes</param>
-        private List<Node> GetNewNodes(List<Node> previousRevisionNodes, List<NodeRef> currentRevisionNodes)
-        {
-            List<Node> newNodes = new List<Node>();
-            
-            if (previousRevisionNodes == null || previousRevisionNodes.Count <= 0)
-            {
-                // Both revisions null, must be an error, so return an empty list
-                if (currentRevisionNodes == null)
-                {
-                    return newNodes;
-                }
-                // There was no previous revision, so all nodes are new
-                else
-                {
-                    foreach (NodeRef nref in currentRevisionNodes)
-                    {
-                        newNodes.Add(nref.Value);
-                    }
-                    return newNodes;
-                }
-            }
-
-            foreach (NodeRef newNodeRef in currentRevisionNodes)
-            {
-                bool containsEntry = false;
-                // Check if the node existed in the previous revision,
-                // if not, it must've been added
-                foreach (Node oldNodeRef in previousRevisionNodes)
-                {
-                    if (oldNodeRef.ID.Equals(newNodeRef.Value.ID))
-                    {
-                        containsEntry = true;
-                        break;
-                    }
-                }
-                if (!containsEntry)
-                {
-                    newNodes.Add(newNodeRef.Value);
-                }
-            }
-            return newNodes;
-        }
-
-        /// <summary>
-        /// Computes the nodes that have been changed inbetween the last and the current revision
-        /// </summary>
-        /// <param name="previousRevisionNodes">A list containing the previous graph revision nodes</param>
-        /// <param name="currentRevisionNodes">A list containing the current graph revision nodes</param>
-        private List<Node> GetChangedNodes(List<Node> previousRevisionNodes, List<NodeRef> currentRevisionNodes)
-        {
-            List<Node> changedNodes = new List<Node>();
-            if (previousRevisionNodes == null || previousRevisionNodes.Count <= 0)
-            {
-                return changedNodes;
-            }
-            foreach (Node oldNodeRef in previousRevisionNodes)
-            {
-                foreach (NodeRef newNodeRef in currentRevisionNodes)
-                {
-                    if (newNodeRef.Value.ID.Equals(oldNodeRef.ID) && !newNodeRef.Equals(oldNodeRef))
-                    {
-                        changedNodes.Add(newNodeRef.Value);
-                        break;
-                    }
-                }
-            }
-            return changedNodes;
-        }
-
-        /// <summary>
-        /// Computes the deleted nodes from the previous graph revision
-        /// </summary>
-        /// <param name="previousRevisionNodes">A list containing the previous graph revision nodes</param>
-        /// <param name="currentRevisionNodes">A list containing the current graph revision nodes</param>
-        private List<Node> GetRemovedNodes(List<Node> previousRevisionNodes, List<NodeRef> currentRevisionNodes)
-        {
-            List<Node> removedNodes = new List<Node>();
-
-            // If the previous revision is null, all nodes are new, therefor return the empty list
-            if (previousRevisionNodes == null || previousRevisionNodes.Count <= 0)
-            {
-                return removedNodes;
-            }
-
-            foreach (Node oldNodeRef in previousRevisionNodes)
-            {
-                bool containsEntry = false;
-                // Check if the old node exists in the current revision, 
-                // if not, then it must've been removed
-                foreach (NodeRef newNodeRef in currentRevisionNodes)
-                {
-                    if (newNodeRef.Value.ID.Equals(oldNodeRef.ID))
-                    {
-                        containsEntry = true;
-                        break;
-                    }
-                }
-                if (!containsEntry)
-                {
-                    removedNodes.Add(oldNodeRef);
-                }
-                 
-            }
-            return removedNodes;
-        }
+        
 
         /// <summary>
         /// Fetches the color profile selected in the ChartManager for added, edited and removed node labels
@@ -1077,9 +954,54 @@ namespace SEE.Game.Charts
             {
                 // Set default colors: red for removed, green for added, cyan for changed and yellow for hover text
                 this.addedNodesLabelColor = Color.green;
-                this.changedNodesLabelColor = Color.cyan;
+                this.changedNodesLabelColor = Color.blue;
                 this.removedNodeLabelColor = Color.red;
                 this.hoveringOverLabelTextColor = Color.yellow;
+            }
+        }
+
+        /// <summary>
+        /// Fills the newNodes, changedNodes and removedNodes lists respectively
+        /// </summary>
+        private void FillListsWithChanges(List<NodeRef> nodeRefs)
+        {
+            List<string> newNodes = NodeChangesBuffer.GetSingleton().addedNodeIDs;
+            List<string> changedNodes = NodeChangesBuffer.GetSingleton().changedNodeIDs;
+            List<string> removedNodes = NodeChangesBuffer.GetSingleton().removedNodeIDs;
+
+            // Lists have been cleared, use cache of lists to load the data instead
+            if (newNodes.Count <= 0 && changedNodes.Count <= 0 && removedNodes.Count <= 0)
+            {
+                newNodeIDs = NodeChangesBuffer.GetSingleton().addedNodeIDsCache;
+                changedNodeIDs = NodeChangesBuffer.GetSingleton().changedNodeIDsCache;
+                removedNodeIDs = NodeChangesBuffer.GetSingleton().removedNodeIDsCache;
+            }
+            // Read the lists data and copy it to both the cache and store it locally
+            else
+            {
+                NodeChangesBuffer.GetSingleton().addedNodeIDsCache.Clear();
+                NodeChangesBuffer.GetSingleton().changedNodeIDsCache.Clear();
+                NodeChangesBuffer.GetSingleton().removedNodeIDsCache.Clear();
+
+                foreach (string s in newNodes)
+                {
+                    newNodeIDs.Add(s);
+                    NodeChangesBuffer.GetSingleton().addedNodeIDsCache.Add(s);
+                }
+                foreach (string s in changedNodes)
+                {
+                    changedNodeIDs.Add(s);
+                    NodeChangesBuffer.GetSingleton().changedNodeIDsCache.Add(s);
+                }
+                foreach (string s in removedNodes)
+                {
+                    removedNodeIDs.Add(s);
+                    NodeChangesBuffer.GetSingleton().removedNodeIDsCache.Add(s);
+                }
+
+                NodeChangesBuffer.GetSingleton().addedNodeIDs.Clear();
+                NodeChangesBuffer.GetSingleton().changedNodeIDs.Clear();
+                NodeChangesBuffer.GetSingleton().removedNodeIDs.Clear();
             }
         }
 
@@ -1092,57 +1014,33 @@ namespace SEE.Game.Charts
         {
             TextMeshProUGUI textMesh = scrollViewEntry.GetComponent<TextMeshProUGUI>();
             ColorBlock colors = parent.transform.GetComponent<Toggle>().colors;
-            bool removed = false;
-            bool changed = false;
-            bool added = false;
-            foreach (Node n in removedNodes)
+            
+            if (newNodeIDs.Contains(textMesh.text))
             {
-                if (n.ID.Equals(textMesh.text))
-                {
-                    textMesh.color = removedNodeLabelColor;
-                    colors.normalColor = removedNodeLabelColor;
-                    removed = true;
-                    break;
-                }
+                textMesh.color = addedNodesLabelColor;
+                colors.normalColor = addedNodesLabelColor;
             }
-            if (!removed)
+            else if (changedNodeIDs.Contains(textMesh.text))
             {
-                foreach (Node n in changedNodes)
-                {
-                    if (n.ID.Equals(textMesh.text))
-                    {
-                        textMesh.color = changedNodesLabelColor;
-                        colors.normalColor = changedNodesLabelColor;
-                        changed = true;
-                        break;
-                    }
-                }
+                textMesh.color = changedNodesLabelColor;
+                colors.normalColor = changedNodesLabelColor;
             }
-            if (!changed)
+            else if (removedNodeIDs.Contains(textMesh.text))
             {
-                foreach (Node n in addedNodes)
-                {
-                    if (n.ID.Equals(textMesh.text))
-                    {
-                        textMesh.color = addedNodesLabelColor;
-                        colors.normalColor = addedNodesLabelColor;
-                        added = true;
-                        break;
-                    }
-                }
+                textMesh.color = removedNodeLabelColor;
+                colors.normalColor = removedNodeLabelColor;
             }
-            if (!added)
+            else
             {
                 textMesh.color = Color.white;
                 colors.normalColor = Color.white;
             }
-            // colors.normalColor = Color.red;
             colors.highlightedColor = hoveringOverLabelTextColor;
             parent.transform.GetComponent<Toggle>().colors = colors;
         }
     }
 
-    class NodeChangesBuffer
+    public class NodeChangesBuffer
     {
         /// <summary>
         /// Singleton
@@ -1162,8 +1060,33 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Stores the previous revision nodes
+        /// Stores the IDs of nodes that have been added in the current revision
         /// </summary>
-        public List<Node> previousRevisionNodes = new List<Node>();
+        public List<string> addedNodeIDs = new List<string>();
+
+        /// <summary>
+        /// Stores the IDs of nodes that have been changed in the current revision
+        /// </summary>
+        public List<string> changedNodeIDs = new List<string>();
+
+        /// <summary>
+        /// Stores the IDs of nodes that have been removed in the current revision
+        /// </summary>
+        public List<string> removedNodeIDs = new List<string>();
+
+        /// <summary>
+        /// Old ids of newly added nodes, needed when closing and re-opening the chart
+        /// </summary>
+        public List<string> addedNodeIDsCache = new List<string>();
+
+        /// <summary>
+        /// Old ids of changed nodes, needed when closing and re-opening the chart
+        /// </summary>
+        public List<string> changedNodeIDsCache = new List<string>();
+
+        /// <summary>
+        /// Old ids of removed nodes, needed when closing and re-opening the chart
+        /// </summary>
+        public List<string> removedNodeIDsCache = new List<string>();
     }
 }
