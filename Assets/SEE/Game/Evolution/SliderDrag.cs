@@ -8,6 +8,9 @@ using SEE.GO;
 
 namespace SEE.Game.Evolution
 {
+    /// <summary>
+    /// Script for handling the dragging of the slider in the Evolution UI.
+    /// </summary>
     public class SliderDrag : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
     {
 
@@ -24,7 +27,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// The hover text showing the iteration currently hovered over
         /// </summary>
-        public Text hoverText;
+        public Text HoverText;
 
         /// <summary>
         /// The evolution renderer doing the rendering and animations of the graphs.
@@ -68,7 +71,7 @@ namespace SEE.Game.Evolution
         {
             animationDataModel = AnimationCanvas.GetComponent<AnimationDataModel>();
 
-            hoverText.enabled = false;
+            HoverText.enabled = false;
         }
 
         /// <summary>
@@ -85,17 +88,18 @@ namespace SEE.Game.Evolution
                 }
                 Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
                 Vector3 textPos = new Vector3(handlePos.x, handlePos.y + 0.05f, handlePos.z);
-                hoverText.text = (animationDataModel.Slider.value + 1f).ToString() + "/" + (animationDataModel.Slider.maxValue + 1f);
-                hoverText.rectTransform.position = textPos;
+                HoverText.text = (animationDataModel.Slider.value + 1f).ToString() + "/" + (animationDataModel.Slider.maxValue + 1f);
+                HoverText.rectTransform.position = textPos;
             }
         }
 
         /// <summary>
         /// Actions to do when slider is clicked.
         /// </summary>
+        /// <param name="eventData"> Data from the event </param>
         public void OnPointerDown(PointerEventData eventData)
         {
-            hoverText.enabled = true;
+            HoverText.enabled = true;
             if (evolutionRenderer.IsAutoPlay)
             {
                 wasAutoPlay = true;
@@ -112,6 +116,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Actions to do when cursor is let go after dragging
         /// </summary>
+        /// <param name="eventData"> Data from the event </param>
         public void OnPointerUp(PointerEventData eventData)
         {
             if (evolutionRenderer.IsStillAnimating)
@@ -128,7 +133,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         private void FinishDrag()
         {
-            hoverText.enabled = false;
+            HoverText.enabled = false;
             if (animationDataModel.Slider.value != evolutionRenderer.CurrentGraphIndex)
             {
                 evolutionRenderer.TryShowSpecificGraph((int)animationDataModel.Slider.value);
