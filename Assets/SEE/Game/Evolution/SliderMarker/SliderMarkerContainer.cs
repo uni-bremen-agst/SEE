@@ -5,6 +5,9 @@ using System.IO;
 
 namespace SEE.Game.Evolution
 {
+    /// <summary>
+    /// Container for SliderMarker
+    /// </summary>
     [XmlRoot("SliderMarkerCollection")]
     public class SliderMarkerContainer
     {
@@ -17,8 +20,10 @@ namespace SEE.Game.Evolution
         public List<SliderMarker> SliderMarkers = new List<SliderMarker>();
 
         /// <summary>
-        /// Returns the slider marker that is (approximately) at a given location or null if there is none
+        /// Returns the SliderMarker that is (approximately) at the given location or null if there is none
         /// </summary>
+        /// <param name="location"> Location to search for SliderMarker at </param>
+        /// <returns> SliderMarker that is (approximately) at the given location or null if there is none </returns>
         public SliderMarker getSliderMarkerForLocation(Vector3 location)
         {
             foreach (SliderMarker sliderMarker in SliderMarkers)
@@ -34,6 +39,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Saves the slider markers
         /// </summary>
+        /// <param name="path"> Path to save at. </param>
         public void Save(string path)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(SliderMarkerContainer));
@@ -46,6 +52,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Loads a SliderMarkerContainer from a path
         /// </summary>
+        /// <param name="path"> Path to load from. </param>
         public static SliderMarkerContainer Load(string path)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(SliderMarkerContainer));
@@ -58,6 +65,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Loads a SliderMarkerContainer from text
         /// </summary>
+        /// <param name="text"> Text to load from. </param>
         public static SliderMarkerContainer LoadFromText(string text)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(SliderMarkerContainer));
