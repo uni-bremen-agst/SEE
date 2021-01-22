@@ -961,7 +961,7 @@ namespace SEE.Game
         /// mode is turned off again. If <paramref name="enabled"/> is false instead,
         /// the currently shown graph remains visible.
         /// </summary>
-        /// <param name="enabled"> Specifies whether auto-play mode should be enabled. </param>
+        /// <param name="enabled"> Specifies whether reverse auto-play mode should be enabled. </param>
         internal void SetAutoPlay(bool enabled)
         {
             IsAutoPlay = enabled;

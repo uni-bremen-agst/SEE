@@ -73,6 +73,26 @@ namespace SEE.Game.Evolution
         public InputField commentPrefab; // serialized by Unity
 
         /// <summary>
+        /// Text of the play button.
+        /// </summary>
+        public Text playButtonText; // serialized by Unity
+
+        /// <summary>
+        /// Text of the reverse button.
+        /// </summary>
+        public Text reverseButtonText; // serialized by Unity
+
+        /// <summary>
+        /// Text of the fast-forward button.
+        /// </summary>
+        public Text fastFowardButtonText; // serialized by Unity
+
+        /// <summary>
+        /// Text of the fast-backward button.
+        /// </summary>
+        public Text fastBackwardButtonText; // serialized by Unity
+
+        /// <summary>
         /// Checks if all fields are initialized.
         /// </summary>
         private void Start()
@@ -85,6 +105,10 @@ namespace SEE.Game.Evolution
             FastBackwardButton.AssertNotNull("FastBackwardButton");
             markerPrefab.AssertNotNull("Marker");
             commentPrefab.AssertNotNull("Comment");
+            playButtonText.AssertNotNull("Text");
+            reverseButtonText.AssertNotNull("Text");
+            fastFowardButtonText.AssertNotNull("Text");
+            fastBackwardButtonText.AssertNotNull("Text");
         }
     }
 }

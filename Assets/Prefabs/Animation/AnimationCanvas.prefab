@@ -1076,7 +1076,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AnimationCanvas: {fileID: 4461994104216227615}
-  hoverText: {fileID: 8963412478501909177}
+  HoverText: {fileID: 8963412478501909177}
 --- !u!1 &2011858142
 GameObject:
   m_ObjectHideFlags: 0
@@ -1393,6 +1393,10 @@ MonoBehaviour:
     type: 3}
   commentPrefab: {fileID: 6727790572673153326, guid: 6220b04a43686284189211911d44599e,
     type: 3}
+  playButtonText: {fileID: 859836497}
+  reverseButtonText: {fileID: 292507466}
+  fastFowardButtonText: {fileID: 414280885}
+  fastBackwardButtonText: {fileID: 251682753}
 --- !u!1 &4741337296903842283
 GameObject:
   m_ObjectHideFlags: 0
