@@ -30,6 +30,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
+using SEE.Game.Evolution;
 
 namespace SEE.Game.Charts
 {
@@ -941,22 +942,20 @@ namespace SEE.Game.Charts
         /// </summary>
         private void FetchLableColorProfile()
         {
-            // Attempt to load user defined settings from chartManager Color Profile
+            this.hoveringOverLabelTextColor = Color.yellow;
+            // Load colors used for power beams, to match the text with the visible objects
             try
             {
-                GameObject chartManager = GameObject.Find("ChartManager");
-                this.addedNodesLabelColor = chartManager.GetComponent<ChartColors>().newNodesScrollviewLabelColor;
-                this.changedNodesLabelColor = chartManager.GetComponent<ChartColors>().changedNodesScrollviewLabelColor;
-                this.removedNodeLabelColor = chartManager.GetComponent<ChartColors>().removedNodesScrollviewLabelColor;
-                this.hoveringOverLabelTextColor = chartManager.GetComponent<ChartColors>().hoveringScrollviewLabelColor;
+                this.addedNodesLabelColor = new Color(AdditionalBeamDetails.newBeamColor.r, AdditionalBeamDetails.newBeamColor.g, AdditionalBeamDetails.newBeamColor.b);
+                this.changedNodesLabelColor = new Color(AdditionalBeamDetails.changedBeamColor.r, AdditionalBeamDetails.changedBeamColor.g, AdditionalBeamDetails.changedBeamColor.b);
+                this.removedNodeLabelColor = new Color(AdditionalBeamDetails.deletedBeamColor.r, AdditionalBeamDetails.deletedBeamColor.g, AdditionalBeamDetails.deletedBeamColor.b);
             }
             catch
             {
-                // Set default colors: red for removed, green for added, cyan for changed and yellow for hover text
+                // Set default colors: red for removed, green for added, cyan for changed
                 this.addedNodesLabelColor = Color.green;
-                this.changedNodesLabelColor = Color.blue;
+                this.changedNodesLabelColor = Color.cyan;
                 this.removedNodeLabelColor = Color.red;
-                this.hoveringOverLabelTextColor = Color.yellow;
             }
         }
 
@@ -972,9 +971,9 @@ namespace SEE.Game.Charts
             // Lists have been cleared, use cache of lists to load the data instead
             if (newNodes.Count <= 0 && changedNodes.Count <= 0 && removedNodes.Count <= 0)
             {
-                newNodeIDs = NodeChangesBuffer.GetSingleton().addedNodeIDsCache;
-                changedNodeIDs = NodeChangesBuffer.GetSingleton().changedNodeIDsCache;
-                removedNodeIDs = NodeChangesBuffer.GetSingleton().removedNodeIDsCache;
+                this.newNodeIDs = NodeChangesBuffer.GetSingleton().addedNodeIDsCache;
+                this.changedNodeIDs = NodeChangesBuffer.GetSingleton().changedNodeIDsCache;
+                this.removedNodeIDs = NodeChangesBuffer.GetSingleton().removedNodeIDsCache;
             }
             // Read the lists data and copy it to both the cache and store it locally
             else
@@ -985,17 +984,17 @@ namespace SEE.Game.Charts
 
                 foreach (string s in newNodes)
                 {
-                    newNodeIDs.Add(s);
+                    this.newNodeIDs.Add(s);
                     NodeChangesBuffer.GetSingleton().addedNodeIDsCache.Add(s);
                 }
                 foreach (string s in changedNodes)
                 {
-                    changedNodeIDs.Add(s);
+                    this.changedNodeIDs.Add(s);
                     NodeChangesBuffer.GetSingleton().changedNodeIDsCache.Add(s);
                 }
                 foreach (string s in removedNodes)
                 {
-                    removedNodeIDs.Add(s);
+                    this.removedNodeIDs.Add(s);
                     NodeChangesBuffer.GetSingleton().removedNodeIDsCache.Add(s);
                 }
 
@@ -1015,17 +1014,17 @@ namespace SEE.Game.Charts
             TextMeshProUGUI textMesh = scrollViewEntry.GetComponent<TextMeshProUGUI>();
             ColorBlock colors = parent.transform.GetComponent<Toggle>().colors;
             
-            if (newNodeIDs.Contains(textMesh.text))
+            if (this.newNodeIDs.Contains(textMesh.text))
             {
                 textMesh.color = addedNodesLabelColor;
                 colors.normalColor = addedNodesLabelColor;
             }
-            else if (changedNodeIDs.Contains(textMesh.text))
+            else if (this.changedNodeIDs.Contains(textMesh.text))
             {
                 textMesh.color = changedNodesLabelColor;
                 colors.normalColor = changedNodesLabelColor;
             }
-            else if (removedNodeIDs.Contains(textMesh.text))
+            else if (this.removedNodeIDs.Contains(textMesh.text))
             {
                 textMesh.color = removedNodeLabelColor;
                 colors.normalColor = removedNodeLabelColor;
