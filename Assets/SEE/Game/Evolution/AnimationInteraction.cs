@@ -198,16 +198,16 @@ namespace SEE.Game.Evolution
                     animationTimeValue = 2;
                     evolutionRenderer.AnimationLag = animationTimeValue;
                     isFastBackward = false;
-                    animationDataModel.fastBackwardButtonText.text = "◄◄";
+                    animationDataModel.FastBackwardButtonText.text = "◄◄";
                 }
                 if (!evolutionRenderer.IsAutoPlay)
                 {
-                    animationDataModel.playButtonText.text = "ll";
+                    animationDataModel.PlayButtonText.text = "ll";
                     evolutionRenderer.ToggleAutoPlay();
                 }
                 else
                 {
-                    animationDataModel.playButtonText.text = "►";
+                    animationDataModel.PlayButtonText.text = "►";
                     evolutionRenderer.ToggleAutoPlay();
                 }
             }
@@ -226,16 +226,16 @@ namespace SEE.Game.Evolution
                     animationTimeValue = 2;
                     evolutionRenderer.AnimationLag = animationTimeValue;
                     isFastForward = false;
-                    animationDataModel.fastFowardButtonText.text = "►►";
+                    animationDataModel.FastFowardButtonText.text = "►►";
                 }
                 if (!evolutionRenderer.IsAutoPlayReverse)
                 {
-                    animationDataModel.reverseButtonText.text = "ll";
+                    animationDataModel.ReverseButtonText.text = "ll";
                     evolutionRenderer.ToggleAutoPlayReverse();
                 }
                 else
                 {
-                    animationDataModel.reverseButtonText.text = "◄";
+                    animationDataModel.ReverseButtonText.text = "◄";
                     evolutionRenderer.ToggleAutoPlayReverse();
                 }
             }
@@ -258,26 +258,26 @@ namespace SEE.Game.Evolution
                 animationTimeValue = 2;
                 evolutionRenderer.AnimationLag = animationTimeValue;
                 isFastBackward = false;
-                animationDataModel.fastBackwardButtonText.text = "◄◄";
+                animationDataModel.FastBackwardButtonText.text = "◄◄";
             }
             if (animationTimeValue == 2)
             {
                 isFastForward = true;
                 animationTimeValue = 1;
                 evolutionRenderer.AnimationLag = animationTimeValue;
-                animationDataModel.fastFowardButtonText.text = "►►2x";
+                animationDataModel.FastFowardButtonText.text = "►►2x";
             } else if (animationTimeValue == 1)
             {
                 isFastForward = true;
                 animationTimeValue = 0.5f;
                 evolutionRenderer.AnimationLag = animationTimeValue;
-                animationDataModel.fastFowardButtonText.text = "►►4x";
+                animationDataModel.FastFowardButtonText.text = "►►4x";
             } else if (animationTimeValue == 0.5f)
             {
                 isFastForward = false;
                 animationTimeValue = 2;
                 evolutionRenderer.AnimationLag = animationTimeValue;
-                animationDataModel.fastFowardButtonText.text = "►►";
+                animationDataModel.FastFowardButtonText.text = "►►";
             }
         }
 
@@ -296,35 +296,35 @@ namespace SEE.Game.Evolution
                 animationTimeValue = 2;
                 evolutionRenderer.AnimationLag = animationTimeValue;
                 isFastForward = false;
-                animationDataModel.fastFowardButtonText.text = "►►";
+                animationDataModel.FastFowardButtonText.text = "►►";
             }
             if (animationTimeValue == 2)
             {
                 isFastBackward = true;
                 animationTimeValue = 1;
                 evolutionRenderer.AnimationLag = animationTimeValue;
-                animationDataModel.fastBackwardButtonText.text = "◄◄2x";
+                animationDataModel.FastBackwardButtonText.text = "◄◄2x";
             }
             else if (animationTimeValue == 1)
             {
                 isFastBackward = true;
                 animationTimeValue = 0.5f;
                 evolutionRenderer.AnimationLag = animationTimeValue;
-                animationDataModel.fastBackwardButtonText.text = "◄◄4x";
+                animationDataModel.FastBackwardButtonText.text = "◄◄4x";
             }
             else if (animationTimeValue == 0.5f)
             {
                 isFastBackward = false;
                 animationTimeValue = 2;
                 evolutionRenderer.AnimationLag = animationTimeValue;
-                animationDataModel.fastBackwardButtonText.text = "◄◄";
+                animationDataModel.FastBackwardButtonText.text = "◄◄";
             }
         }
 
         /// <summary>
         /// Handles actions for when a marker is clicked.
         /// </summary>
-        /// <param name="clickedMarker"> Marker that has baeen clicked. </param>
+        /// <param name="clickedMarker"> Marker that has been clicked. </param>
         private void TaskOnClickMarker(Button clickedMarker)
         {
             selectedMarker = clickedMarker;
@@ -345,7 +345,7 @@ namespace SEE.Game.Evolution
         private InputField AddCommentToMarker(Button marker, string comment = null)
         {
             string commentName = marker.GetHashCode().ToString() + "-comment";
-            InputField commentField = Instantiate(animationDataModel.commentPrefab);
+            InputField commentField = Instantiate(animationDataModel.CommentPrefab);
             Vector3 markerPos = marker.transform.position;
             Vector3 commentPos = new Vector3(markerPos.x + 0.15f, markerPos.y, markerPos.z);
             commentField.transform.SetParent(animationDataModel.Slider.transform, false);
@@ -367,7 +367,7 @@ namespace SEE.Game.Evolution
         /// <param name="comment"> Comment to be added to the marker, optional </param>
         private void AddMarker(Vector3 markerPos, string comment = null)
         {
-            Button newMarker = Instantiate(animationDataModel.markerPrefab);
+            Button newMarker = Instantiate(animationDataModel.MarkerPrefab);
             newMarker.transform.SetParent(animationDataModel.Slider.transform, false);
             newMarker.transform.position = markerPos;
             newMarker.onClick.AddListener(() => TaskOnClickMarker(newMarker));

@@ -65,32 +65,32 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Prefab for creating markers
         /// </summary>
-        public Button markerPrefab; // serialized by Unity
+        public Button MarkerPrefab; // serialized by Unity
 
         /// <summary>
         /// Prefab for creating comments
         /// </summary>
-        public InputField commentPrefab; // serialized by Unity
+        public InputField CommentPrefab; // serialized by Unity
 
         /// <summary>
         /// Text of the play button.
         /// </summary>
-        public Text playButtonText; // serialized by Unity
+        public Text PlayButtonText; // serialized by Unity
 
         /// <summary>
         /// Text of the reverse button.
         /// </summary>
-        public Text reverseButtonText; // serialized by Unity
+        public Text ReverseButtonText; // serialized by Unity
 
         /// <summary>
         /// Text of the fast-forward button.
         /// </summary>
-        public Text fastFowardButtonText; // serialized by Unity
+        public Text FastFowardButtonText; // serialized by Unity
 
         /// <summary>
         /// Text of the fast-backward button.
         /// </summary>
-        public Text fastBackwardButtonText; // serialized by Unity
+        public Text FastBackwardButtonText; // serialized by Unity
 
         /// <summary>
         /// Checks if all fields are initialized.
@@ -103,12 +103,12 @@ namespace SEE.Game.Evolution
             FastForwardButton.AssertNotNull("FastForwardButton");
             ReverseButton.AssertNotNull("ReverseButton");
             FastBackwardButton.AssertNotNull("FastBackwardButton");
-            markerPrefab.AssertNotNull("Marker");
-            commentPrefab.AssertNotNull("Comment");
-            playButtonText.AssertNotNull("Text");
-            reverseButtonText.AssertNotNull("Text");
-            fastFowardButtonText.AssertNotNull("Text");
-            fastBackwardButtonText.AssertNotNull("Text");
+            MarkerPrefab.AssertNotNull("Marker");
+            CommentPrefab.AssertNotNull("Comment");
+            PlayButtonText.AssertNotNull("Text");
+            ReverseButtonText.AssertNotNull("Text");
+            FastFowardButtonText.AssertNotNull("Text");
+            FastBackwardButtonText.AssertNotNull("Text");
         }
     }
 }
