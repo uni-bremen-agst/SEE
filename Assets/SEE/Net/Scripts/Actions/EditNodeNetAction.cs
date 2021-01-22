@@ -32,7 +32,8 @@ public class EditNodeNetAction : AbstractAction
     {
         if (!IsRequester())
         {
-            Node node = GameObject.Find(gameObjectID).GetNode();
+            GameObject goTMP = GameObject.Find(gameObjectID);
+            Node node = goTMP.GetComponent<NodeRef>().node;
             if (node != null)
             {
                 node.SourceName = nodeToEdit.SourceName;
