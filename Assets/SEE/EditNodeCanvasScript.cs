@@ -7,6 +7,8 @@ public class EditNodeCanvasScript : NodeCanvasScript
 {
     public Node nodeToEdit;
 
+    public string gameObjectID;
+
     private static bool editNode = false;
 
     public static bool EditNode { get => editNode; set => editNode = value; }
@@ -48,7 +50,7 @@ public class EditNodeCanvasScript : NodeCanvasScript
             }
             CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
             generator.DestroyEditNodeCanvas();
-            new EditNodeNetAction(nodeToEdit,gameObject.name).Execute(null);
+            new EditNodeNetAction(nodeToEdit,gameObjectID).Execute(null);
             editNode = false;
         }
     }
