@@ -21,7 +21,7 @@ public class EditNodeNetAction : AbstractAction
         scname = SourceName;
         type = Type;
         gameObjectID = GameObjectID;
-        Debug.Log(scname);
+  
     }
     /// <summary>
     /// Things to Execute on the Server (None for this Class)
@@ -37,14 +37,14 @@ public class EditNodeNetAction : AbstractAction
     {
         if (!IsRequester())
         {
-            GameObject goTMP = GameObject.Find(gameObjectID);
-            Node node = goTMP.GetComponent<NodeRef>().node;
+            //GameObject goTMP = GameObject.Find(gameObjectID);
+            //Node node = goTMP.GetComponent<NodeRef>().node;
+            Node node = GameObject.Find(gameObjectID).GetNode();
             if (node != null)
             {
                 node.SourceName = scname;
                 node.Type = type;
-                Debug.Log(scname);
-                Debug.Log(node.SourceName);
+
             }
             else
             {
