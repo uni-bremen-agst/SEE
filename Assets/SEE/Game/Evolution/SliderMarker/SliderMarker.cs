@@ -3,6 +3,9 @@ using System.Xml.Serialization;
 
 namespace SEE.Game.Evolution
 {
+    /// <summary>
+    /// Class for storing the location and comments of markers.
+    /// </summary>
     public class SliderMarker
     {
         /// <summary>
@@ -32,7 +35,8 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Set the comment of the slider marker
         /// </summary>
-        public void setComment(string comment)
+        /// <param name="comment"> Comment to set </param>
+        public void SetComment(string comment)
         {
             this.Comment = comment;
         }

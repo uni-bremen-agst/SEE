@@ -169,7 +169,7 @@ namespace SEE.Game.Evolution
             foreach (KeyValuePair<Button, InputField> p in markerDictionary)
             {
                 SliderMarker sliderMarker = sliderMarkerContainer.getSliderMarkerForLocation(p.Key.transform.position);
-                sliderMarker.setComment(p.Value.text);
+                sliderMarker.SetComment(p.Value.text);
             }
           
             sliderMarkerContainer.Save(Path.Combine(Application.persistentDataPath, "sliderMarkers.xml"));
