@@ -773,12 +773,7 @@ namespace SEE.Game
                 Debug.Log("The renderer is already occupied with animating, wait till animations are finished.\n");
                 return false;
             }
-            if (IsAutoPlay)
-            {
-                Debug.Log("Auto-play mode is turned on. You cannot move to the next graph manually.\n");
-                return false;
-            }
-            if (IsAutoPlayReverse)
+            if (IsAutoPlay || IsAutoPlayReverse)
             {
                 Debug.Log("Auto-play mode is turned on. You cannot move to the next graph manually.\n");
                 return false;
@@ -851,12 +846,7 @@ namespace SEE.Game
                 Debug.Log("The renderer is already occupied with animating, wait till animations are finished.\n");
                 return;
             }
-            if (IsAutoPlay)
-            {
-                Debug.Log("Auto-play mode is turned on. You cannot move to the next graph manually.\n");
-                return;
-            }
-            if (IsAutoPlayReverse)
+            if (IsAutoPlay || IsAutoPlayReverse)
             {
                 Debug.Log("Auto-play mode is turned on. You cannot move to the next graph manually.\n");
                 return;
@@ -971,7 +961,7 @@ namespace SEE.Game
         /// mode is turned off again. If <paramref name="enabled"/> is false instead,
         /// the currently shown graph remains visible.
         /// </summary>
-        /// <param name="enabled"></param>
+        /// <param name="enabled"> Specifies whether auto-play mode should be enabled. </param>
         internal void SetAutoPlay(bool enabled)
         {
             IsAutoPlay = enabled;
@@ -991,13 +981,13 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Sets auto-play mode to <paramref name="enabled"/>. If <paramref name="enabled"/>
+        /// Sets reverse auto-play mode to <paramref name="enabled"/>. If <paramref name="enabled"/>
         /// is true, the previous graph in the series is shown and from there all other 
-        /// previous graphs until we reach the beginning of the graph series or auto-play
+        /// previous graphs until we reach the beginning of the graph series or reverse auto-play
         /// mode is turned off again. If <paramref name="enabled"/> is false instead,
         /// the currently shown graph remains visible.
         /// </summary>
-        /// <param name="enabled"></param>
+        /// <param name="enabled"> Specifies whether reverse auto-play mode should be enabled. </param>
         internal void SetAutoPlayReverse(bool enabled)
         {
             IsAutoPlayReverse = enabled;
