@@ -2,6 +2,7 @@
 using SEE.GO;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.Game.Charts;
 
 namespace SEE.Game.Evolution
 {
@@ -108,6 +109,8 @@ namespace SEE.Game.Evolution
             Vector3 powerBeamDimensions = new Vector3(position.x, block.transform.position.y, position.z);
             MoveScaleShakeAnimator.BeamAnimator.GetInstance().CreatePowerBeam(powerBeamDimensions,
                 AdditionalBeamDetails.newBeamColor, AdditionalBeamDetails.powerBeamDimensions);
+            // Add the added node id to the revision changes list
+            NodeChangesBuffer.GetSingleton().addedNodeIDs.Add(block.name);
 
             return post;
         }

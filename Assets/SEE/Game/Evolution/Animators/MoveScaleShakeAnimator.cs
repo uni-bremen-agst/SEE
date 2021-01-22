@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UnityEngine;
+using SEE.Game.Charts;
 
 namespace SEE.Game.Evolution
 {
@@ -130,6 +131,7 @@ namespace SEE.Game.Evolution
             // Shake the object if it was modified.
             if (wasModified)
             {
+                NodeChangesBuffer.GetSingleton().changedNodeIDs.Add(gameObject.name);
                 // Changes the modified object's color to blue while animating
                 gameObject.GetComponent<Renderer>().material.color = Color.blue;
                 // Refetch values, neccessary because this gets loaded before other scripts
