@@ -78,13 +78,10 @@ namespace SEE.Game.Evolution
         {
             if (isDragging)
             {
-                if (awaitFinish)
+                if (awaitFinish && !evolutionRenderer.IsStillAnimating)
                 {
-                    if (!evolutionRenderer.IsStillAnimating)
-                    {
-                        awaitFinish = false;
-                        FinishDrag();
-                    }
+                    awaitFinish = false;
+                    FinishDrag();
                 }
                 Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
                 Vector3 textPos = new Vector3(handlePos.x, handlePos.y + 0.05f, handlePos.z);
@@ -152,4 +149,3 @@ namespace SEE.Game.Evolution
         }
     }
 }
-

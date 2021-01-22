@@ -170,7 +170,7 @@ namespace SEE.Game.Evolution
 
 
         /// <summary>
-        /// Handles actions to do when the Play/Pause button has been clicked.
+        /// Handles actions for when the Play/Pause button has been clicked.
         /// </summary>
         private void TaskOnClickPlayButton()
         {
@@ -197,7 +197,7 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Handles actions to do when the Reverse/Pause button has been clicked.
+        /// Handles actions for when the Reverse/Pause button has been clicked.
         /// </summary>
         private void TaskOnClickReverseButton()
         {
@@ -224,20 +224,23 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Handles actions to do when the fast forward button has been clicked.
+        /// Handles actions for when the fast forward button has been clicked.
         /// Also resets the fast backward button.
         /// If the animation is playing backwards it does nothing.
         /// </summary>
         private void TaskOnClickFastForwardButton()
         {
-            if (evolutionRenderer.IsAutoPlayReverse) return;
+            if (evolutionRenderer.IsAutoPlayReverse) 
+            {
+                return;
+            }
             if (!animationDataModel.FastBackwardButton.GetComponentInChildren<Text>().text.Equals("◄◄")) 
             {
                 animationTimeValue = 2;
                 evolutionRenderer.AnimationLag = animationTimeValue;
                 animationDataModel.FastBackwardButton.GetComponentInChildren<Text>().text = "◄◄";
             }
-            if(animationTimeValue == 2)
+            if (animationTimeValue == 2)
             {
                 animationTimeValue = 1;
                 evolutionRenderer.AnimationLag = animationTimeValue;
@@ -256,12 +259,15 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Handles actions to do when the fast forward button has been clicked.
+        /// Handles actions for when the fast forward button has been clicked.
         /// If the animation is playing forwards it does nothing.
         /// </summary>
         private void TaskOnClickFastBackwardButton()
         {
-            if (evolutionRenderer.IsAutoPlay) return;
+            if (evolutionRenderer.IsAutoPlay) 
+            {
+                return;
+            }
             if (!animationDataModel.FastForwardButton.GetComponentInChildren<Text>().text.Equals("►►"))
             {
                 animationTimeValue = 2;
@@ -289,7 +295,7 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Handles actions to do when a marker is clicked.
+        /// Handles actions for when a marker is clicked.
         /// </summary>
         private void TaskOnClickMarker(Button clickedMarker)
         {
@@ -299,12 +305,11 @@ namespace SEE.Game.Evolution
             {
                 GameObject comment = animationDataModel.Slider.transform.Find(commentName).gameObject;
                 comment.SetActive(!comment.activeSelf);
-
             }
         }
 
         /// <summary>
-        /// Adds an Inputfield to enter comments to the specified marker and returns the created Inputfield
+        /// Adds an InputField to enter comments to the specified marker and returns the created InputField.
         /// </summary>
         private InputField AddCommentToMarker(Button marker, string comment)
         {
@@ -315,7 +320,10 @@ namespace SEE.Game.Evolution
             commentField.transform.SetParent(animationDataModel.Slider.transform, false);
             commentField.transform.position = commentPos;
             commentField.name = commentName;
-            if (comment != null) commentField.text = comment;
+            if (comment != null) 
+            {
+                commentField.text = comment;
+            }
             markerDictionary.Add(marker, commentField);
             return commentField;
         }
@@ -384,7 +392,10 @@ namespace SEE.Game.Evolution
                 {
                     Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
                     Vector3 markerPos = new Vector3(handlePos.x, handlePos.y + .08f, handlePos.z);
-                    if (sliderMarkerContainer.getSliderMarkerForLocation(markerPos) != null) return;
+                    if (sliderMarkerContainer.getSliderMarkerForLocation(markerPos) != null) 
+                    { 
+                        return;
+                    }
                     AddMarker(markerPos, null);
                 } else if (Input.GetKeyDown(KeyCode.Delete))
                 {

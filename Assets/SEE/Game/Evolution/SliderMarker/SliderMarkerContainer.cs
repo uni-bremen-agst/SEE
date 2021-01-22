@@ -36,8 +36,8 @@ namespace SEE.Game.Evolution
         /// </summary>
         public void Save(string path)
         {
-            var serializer = new XmlSerializer(typeof(SliderMarkerContainer));
-            using (var stream = new FileStream(path, FileMode.Create))
+            XmlSerializer serializer = new XmlSerializer(typeof(SliderMarkerContainer));
+            using (FileStream stream = new FileStream(path, FileMode.Create))
             {
                 serializer.Serialize(stream, this);
             }
@@ -48,8 +48,8 @@ namespace SEE.Game.Evolution
         /// </summary>
         public static SliderMarkerContainer Load(string path)
         {
-            var serializer = new XmlSerializer(typeof(SliderMarkerContainer));
-            using (var stream = new FileStream(path, FileMode.Open))
+            XmlSerializer serializer = new XmlSerializer(typeof(SliderMarkerContainer));
+            using (FileStream stream = new FileStream(path, FileMode.Open))
             {
                 return serializer.Deserialize(stream) as SliderMarkerContainer;
             }
@@ -60,9 +60,8 @@ namespace SEE.Game.Evolution
         /// </summary>
         public static SliderMarkerContainer LoadFromText(string text)
         {
-            var serializer = new XmlSerializer(typeof(SliderMarkerContainer));
+            XmlSerializer serializer = new XmlSerializer(typeof(SliderMarkerContainer));
             return serializer.Deserialize(new StringReader(text)) as SliderMarkerContainer;
         }
     }
 }
-
