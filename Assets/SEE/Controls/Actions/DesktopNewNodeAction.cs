@@ -588,7 +588,7 @@ namespace SEE.Controls
         {
             valuesAreGiven = true;
             NewNode();
-            GameNodeMover.FinalizePosition(GONode, position);
+           // GameNodeMover.FinalizePosition(GONode, position);
            // GONode = null;
            // RemoveScript();
         }
