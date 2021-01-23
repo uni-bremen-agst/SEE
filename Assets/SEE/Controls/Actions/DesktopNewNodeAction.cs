@@ -404,7 +404,7 @@ namespace SEE.Controls
                 {
                     GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
                     valuesAreGiven = false;
-                    new NewNodeNetAction(city, isInnerNode,nodeMetrics, GONode.transform.position).Execute(null);
+                    new NewNodeNetAction(city, isInnerNode,nodeMetrics.Item1, nodeMetrics.Item2, nodeMetrics.Item3, GONode.transform.position).Execute(null);
                 }
                 else
                 {
@@ -575,9 +575,9 @@ namespace SEE.Controls
         /// Sets the Node Metrics for NEtwork Use
         /// </summary>
         /// <param name="NodeMetrics">the node metrics</param>
-        public void SetNodeMetrics(Tuple<string, string, string> NodeMetrics)
+        public void SetNodeMetrics(string NodeMetrics1, string NodeMetrics2, string NodeMetrics3)
         {
-            nodeMetrics = NodeMetrics;
+            nodeMetrics = new Tuple<string, string, string> ( NodeMetrics1,NodeMetrics2,NodeMetrics3);
         }
 
         /// <summary>
