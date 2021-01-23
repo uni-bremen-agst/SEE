@@ -10,7 +10,7 @@ public class NewNodeNetAction : AbstractAction
 {
     public SEECity city = null;
     public string gameObjectID;
-    public string parentID
+    public string parentID;
     public bool isInnerNode;
     public  string nodeMetrics1;
     public  string nodeMetrics2;
