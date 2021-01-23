@@ -12,6 +12,8 @@ public class DesktopNodeAction : MonoBehaviour
     /// </summary>
     public GameObject hoveredObject = null;
 
+    private readonly string nameOfCanvasObject = "CanvasObject";
+
     /// <summary>
     /// Removes The Script
     /// Places the new Node if not placed
@@ -23,7 +25,7 @@ public class DesktopNodeAction : MonoBehaviour
 
     public void InitialiseCanvasObject()
     {
-        canvasObject = GameObject.Find("CanvasObject");
+        canvasObject = GameObject.Find(nameOfCanvasObject);
     }
 
 }
