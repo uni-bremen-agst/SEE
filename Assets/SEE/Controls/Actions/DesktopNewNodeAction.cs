@@ -586,10 +586,11 @@ namespace SEE.Controls
         /// <param name="position">The position of the new node</param>
         public void NetworkNewNode(Vector3 position)
         {
+            valuesAreGiven = true;
             NewNode();
             GameNodeMover.FinalizePosition(GONode, position);
-            GONode = null;
-            RemoveScript();
+           // GONode = null;
+           // RemoveScript();
         }
     }
 
