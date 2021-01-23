@@ -54,7 +54,7 @@ public class NewNodeNetAction : AbstractAction
         if (!IsRequester())
         {
             SceneQueries.GetCodeCity(GameObject.Find(gameObjectID).transform)?.gameObject.TryGetComponent<SEECity>(out city);
-            if(city != null)
+            if (city != null)
             {
                 GameObject dummy = new GameObject();
                 dummy.AddComponent<DesktopNewNodeAction>();
@@ -62,6 +62,7 @@ public class NewNodeNetAction : AbstractAction
                 dummy.GetComponent<DesktopNewNodeAction>().SetIsInnerNode(isInnerNode);
                 dummy.GetComponent<DesktopNewNodeAction>().SetNodeMetrics(nodeMetrics1, nodeMetrics2, nodeMetrics3);
                 dummy.GetComponent<DesktopNewNodeAction>().NetworkNewNode(position, scale, parentID);
+            }
         }
     }
 
