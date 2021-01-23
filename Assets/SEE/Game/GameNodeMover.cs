@@ -151,9 +151,7 @@ namespace SEE.Game
         /// <param name="position">new position</param>
         public static void NetworkFinalizeNodePosition(GameObject child ,string parentID, Vector3 position)
         {
-            Debug.Log("Parent WIRD GEUSHCT");
             GameObject parent = GameObject.Find(parentID);
-            Debug.Log("parent gefunden");
             child.transform.position = position;
             PutOn(child, parent);
             child.GetComponent<NodeRef>().node.Reparent(parent.GetComponent<NodeRef>().node);

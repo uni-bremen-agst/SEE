@@ -405,8 +405,7 @@ namespace SEE.Controls
                     GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
                     valuesAreGiven = false;
                     
-                    new NewNodeNetAction(hoveredObject.name, isInnerNode,nodeMetrics.Item1, nodeMetrics.Item2, nodeMetrics.Item3, GONode.transform.position, GONode.transform.parent.gameObject.name).Execute(null);
-                    Debug.Log("NETWORK FINISHC");
+                    new NewNodeNetAction(hoveredObject.name, isInnerNode,nodeMetrics.Item1, nodeMetrics.Item2, nodeMetrics.Item3, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name).Execute(null);
                 }
                 else
                 {
@@ -586,16 +585,13 @@ namespace SEE.Controls
         /// For Network Use Only, creates the new node on the Clients
         /// </summary>
         /// <param name="position">The position of the new node</param>
-        public void NetworkNewNode(Vector3 position, string parentID)
+        public void NetworkNewNode(Vector3 position,Vector3 scale ,string parentID)
         {
             
             valuesAreGiven = true;
             NewNode();
-            Debug.Log("NEUER KNOTEN ERZEUGT");
+            GONode.SetScale(scale);
             GameNodeMover.NetworkFinalizeNodePosition(GONode,parentID,position);
-            Debug.Log("Node Reparented");
-
-
             GONode = null;
             RemoveScript();
         }

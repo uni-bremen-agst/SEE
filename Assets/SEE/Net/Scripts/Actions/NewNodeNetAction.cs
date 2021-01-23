@@ -16,6 +16,7 @@ public class NewNodeNetAction : AbstractAction
     public  string nodeMetrics2;
     public  string nodeMetrics3;
     public Vector3 position;
+    public Vector3 scale;
 
     /// <summary>
     /// Creates a new NewNodeNetActio
@@ -26,7 +27,7 @@ public class NewNodeNetAction : AbstractAction
     /// <param name="NodeMetrics2">metrics2 for the new node</param>
     /// <param name="NodeMetrics3">metrics3 for the new node</param>
     /// <param name="Position">the postition for the new node</param>
-    public NewNodeNetAction(string GameObjectID, bool IsInnerNode, string NodeMetrics1, string NodeMetrics2, string NodeMetrics3, Vector3 Position, string ParentID) : base()
+    public NewNodeNetAction(string GameObjectID, bool IsInnerNode, string NodeMetrics1, string NodeMetrics2, string NodeMetrics3, Vector3 Position, Vector3 Scale,string ParentID) : base()
     {
         //city = City;
         gameObjectID = GameObjectID;
@@ -36,6 +37,7 @@ public class NewNodeNetAction : AbstractAction
         nodeMetrics2 = NodeMetrics2;
         nodeMetrics3 = NodeMetrics3;
         position = Position;
+        scale = Scale;
     }
     /// <summary>
     /// Things to Execute on the Server (None for this Class)
@@ -59,18 +61,7 @@ public class NewNodeNetAction : AbstractAction
                 dummy.GetComponent<DesktopNewNodeAction>().SetCity(city);
                 dummy.GetComponent<DesktopNewNodeAction>().SetIsInnerNode(isInnerNode);
                 dummy.GetComponent<DesktopNewNodeAction>().SetNodeMetrics(nodeMetrics1, nodeMetrics2, nodeMetrics3);
-                dummy.GetComponent<DesktopNewNodeAction>().NetworkNewNode(position, parentID);
-            }
-            
-
-
-
-           // DesktopNewNodeAction desktopNewNodeAction = new DesktopNewNodeAction();
-           // desktopNewNodeAction.SetIsInnerNode(isInnerNode);
-           // desktopNewNodeAction.SetCity(city);
-           // desktopNewNodeAction.SetNodeMetrics(nodeMetrics);
-          //  desktopNewNodeAction.NetworkNewNode(position);
-                
+                dummy.GetComponent<DesktopNewNodeAction>().NetworkNewNode(position, scale, parentID);
         }
     }
 
