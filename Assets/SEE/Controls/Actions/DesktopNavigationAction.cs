@@ -1,4 +1,5 @@
-﻿using SEE.Game.UI3D;
+﻿using SEE.DataModel.DG;
+using SEE.Game.UI3D;
 using SEE.GO;
 using SEE.Utils;
 using System;
@@ -337,6 +338,72 @@ namespace SEE.Controls.Actions
                 }
                 else if (movingOrRotating) // finalize movement
                 {
+                    if (moveState.draggedTransform != CityTransform) // only reparent non-root nodes
+                    {
+                        synchronize = true;
+
+                        #region FinalizePosition
+
+                        // The underlying graph node of the moving object.
+                        Node movingNode = moveState.draggedTransform.GetComponent<NodeRef>().node;
+                        // The new parent of the movingNode in the underlying graph.
+                        Node newGraphParent = null;
+                        // The new parent of the movingNode in the game-object hierarchy.
+                        GameObject newGameParent = null;
+                        // The new position of the movingNode in world space.
+                        Vector3 newPosition = Vector3.negativeInfinity;
+
+                        // Note that the order of the results of RaycastAll() is undefined.
+                        // Hence, we need to identify the node in the node hierarchy that
+                        // is at the lowest level in the tree (more precisely, the one with
+                        // the greatest value of the node attribute Level; Level counting
+                        // starts at the root and increases downward into the tree).            
+                        foreach (RaycastHit hit in Physics.RaycastAll(MainCamera.Camera.ScreenPointToRay(actionState.mousePosition)))
+                        {
+                            // Must be different from the movingObject itself
+                            if (hit.collider.transform != moveState.draggedTransform)
+                            {
+                                NodeRef nodeRef = hit.transform.GetComponent<NodeRef>();
+                                // Is it a node at all and if so, are they in the same graph?
+                                if (nodeRef != null && nodeRef.node.ItsGraph == movingNode.ItsGraph)
+                                {
+                                    // update newParent when we found a node deeper into the tree
+                                    if (newGraphParent == null || nodeRef.node.Level > newGraphParent.Level)
+                                    {
+                                        newGraphParent = nodeRef.node;
+                                        newGameParent = hit.collider.gameObject;
+                                        newPosition = hit.point;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (newGraphParent != null)
+                        {
+                            moveState.draggedTransform.position = newPosition;
+                            if (movingNode.Parent != newGraphParent)
+                            {
+                                movingNode.Reparent(newGraphParent);
+                                #region PutOn
+                                // FIXME: child may not actually fit into parent, in which we should 
+                                // downscale it until it fits
+                                Vector3 childCenter = moveState.draggedTransform.position;
+                                float parentRoof = newGameParent.transform.position.y + newGameParent.transform.lossyScale.y / 2;
+                                childCenter.y = parentRoof + moveState.draggedTransform.lossyScale.y / 2;
+                                moveState.draggedTransform.position = childCenter;
+                                moveState.draggedTransform.SetParent(newGameParent.transform);
+                                #endregion
+                            }
+                        }
+                        else
+                        {
+                            moveState.draggedTransform.position =
+                                moveState.dragStartTransformPosition + moveState.dragStartOffset
+                                - Vector3.Scale(moveState.dragCanonicalOffset, moveState.draggedTransform.localScale);
+                        }
+                        #endregion
+                    }
+
                     actionState.startDrag = false;
                     movingOrRotating = false;
 
