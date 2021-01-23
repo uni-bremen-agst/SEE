@@ -406,6 +406,7 @@ namespace SEE.Controls
                     valuesAreGiven = false;
                     
                     new NewNodeNetAction(hoveredObject.name, isInnerNode,nodeMetrics.Item1, nodeMetrics.Item2, nodeMetrics.Item3, GONode.transform.position, gameObject.transform.parent.gameObject.name).Execute(null);
+                    Debug.Log("NETWORK FINISHC");
                 }
                 else
                 {
@@ -588,10 +589,11 @@ namespace SEE.Controls
         public void NetworkNewNode(Vector3 position, string parentID)
         {
             
-                valuesAreGiven = true;
-                NewNode();
+            valuesAreGiven = true;
+            NewNode();
+            Debug.Log("NEUER KNOTEN ERZEUGT");
             GameNodeMover.NetworkFinalizeNodePosition(GONode,parentID,position);
-
+            Debug.Log("Node Reparented");
 
 
             GONode = null;
