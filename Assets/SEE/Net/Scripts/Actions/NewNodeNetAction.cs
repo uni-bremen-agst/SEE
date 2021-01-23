@@ -10,6 +10,7 @@ public class NewNodeNetAction : AbstractAction
 {
     public SEECity city = null;
     public string gameObjectID;
+    public string parentID
     public bool isInnerNode;
     public  string nodeMetrics1;
     public  string nodeMetrics2;
@@ -25,10 +26,11 @@ public class NewNodeNetAction : AbstractAction
     /// <param name="NodeMetrics2">metrics2 for the new node</param>
     /// <param name="NodeMetrics3">metrics3 for the new node</param>
     /// <param name="Position">the postition for the new node</param>
-    public NewNodeNetAction(string GameObjectID, bool IsInnerNode, string NodeMetrics1, string NodeMetrics2, string NodeMetrics3, Vector3 Position) : base()
+    public NewNodeNetAction(string GameObjectID, bool IsInnerNode, string NodeMetrics1, string NodeMetrics2, string NodeMetrics3, Vector3 Position, string ParentID) : base()
     {
         //city = City;
         gameObjectID = GameObjectID;
+        parentID = ParentID;
         isInnerNode = IsInnerNode;
         nodeMetrics1 = NodeMetrics1;
         nodeMetrics2 = NodeMetrics2;
@@ -57,7 +59,7 @@ public class NewNodeNetAction : AbstractAction
                 dummy.GetComponent<DesktopNewNodeAction>().SetCity(city);
                 dummy.GetComponent<DesktopNewNodeAction>().SetIsInnerNode(isInnerNode);
                 dummy.GetComponent<DesktopNewNodeAction>().SetNodeMetrics(nodeMetrics1, nodeMetrics2, nodeMetrics3);
-                dummy.GetComponent<DesktopNewNodeAction>().NetworkNewNode(position);
+                dummy.GetComponent<DesktopNewNodeAction>().NetworkNewNode(position, parentID);
             }
             
 
