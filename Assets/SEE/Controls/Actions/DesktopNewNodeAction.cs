@@ -587,8 +587,7 @@ namespace SEE.Controls
         /// <param name="position">The position of the new node</param>
         public void NetworkNewNode(Vector3 position,Vector3 scale ,string parentID)
         {
-            
-            valuesAreGiven = true;
+
             NewNode();
             GONode.SetScale(scale);
             GameNodeMover.NetworkFinalizeNodePosition(GONode,parentID,position);
