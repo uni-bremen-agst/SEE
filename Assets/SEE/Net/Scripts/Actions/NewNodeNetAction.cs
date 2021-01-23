@@ -52,7 +52,7 @@ public class NewNodeNetAction : AbstractAction
             dummy.GetComponent<DesktopNewNodeAction>().SetCity(city);
             dummy.GetComponent<DesktopNewNodeAction>().SetIsInnerNode(isInnerNode);
             dummy.GetComponent<DesktopNewNodeAction>().SetNodeMetrics(nodeMetrics1, nodeMetrics2, nodeMetrics3);
-            dummy.GetComponent<DesktopNewNodeAction>().NetworkNewNode(position);
+            //dummy.GetComponent<DesktopNewNodeAction>().NetworkNewNode(position);
 
 
 
