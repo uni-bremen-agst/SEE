@@ -404,6 +404,7 @@ namespace SEE.Controls
                 {
                     GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
                     valuesAreGiven = false;
+                    new NewNodeNetAction(city, isInnerNode,nodeMetrics, GONode.transform.position).Execute(null);
                 }
                 else
                 {
