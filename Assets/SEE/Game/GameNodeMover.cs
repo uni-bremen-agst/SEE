@@ -142,6 +142,22 @@ namespace SEE.Game
             }
         }
 
+
+        /// <summary>
+        /// Sets the new Parent for a GameObject via Network
+        /// </summary>
+        /// <param name="child">child Gamobject</param>
+        /// <param name="parentID">Parent GameObject ID</param>
+        /// <param name="position">new position</param>
+        public static void NetworkFinalizeNodePosition(GameObject child ,string parentID, Vector3 position)
+        {
+            GameObject parent = GameObject.Find(parentID);
+            child.transform.position = position;
+            PutOn(child, parent);
+            child.GetComponent<NodeRef>().node.Reparent(parent.GetComponent<NodeRef>().node);
+            child.transform.SetParent(parent.transform);
+        }
+
         /// <summary>
         /// Puts <paramref name="child"/> on top of <paramref name="parent"/>.
         /// </summary>
