@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using SEE.Controls;
+using SEE.Controls.Actions;
 
 /// <summary>
 /// This script is been added to the Button of the adding-node-canvas.
@@ -48,7 +49,10 @@ public class AddingNodeCanvasButton : MonoBehaviour
     /// </summary>
     public void SetCanvasIsActive()
     {
-        DesktopNewNodeAction.CanvasIsActive = false;
+        GameObject g = GameObject.Find("DesktopPlayer");
+        Component c = g.GetComponent<PlayerActions>();
+        DesktopNewNodeAction current = c.GetComponent<DesktopNewNodeAction>();
+        current.SetState(DesktopNewNodeAction.Progress.CanvasIsClosed);
     }
 
     /// <summary>

@@ -33,20 +33,6 @@ namespace SEE.Controls
         public CanvasGenerator canvasGenerator;
 
         /// <summary>
-        /// true, if the addingnode-canvas is closed, else false.
-        /// </summary>
-        private static bool canvasIsActive = true;
-
-        public static bool CanvasIsActive { get => canvasIsActive; set => canvasIsActive = value; }
-
-        /// <summary>
-        /// True, if the adding-node-canvas was opened, node-values was given and saved and the canvas was closed again, else false.
-        /// </summary>
-        private static bool valuesAreGiven = false;
-
-        public static bool ValuesAreGiven { get => valuesAreGiven; set => valuesAreGiven = value; }
-
-        /// <summary>
         /// True, if the node which will be created is an innerNode, else false
         /// </summary>
         private static bool isInnerNode = false;
@@ -99,12 +85,12 @@ namespace SEE.Controls
         /// <summary>
         /// The median of the lossyscale of the graphs leafs  
         /// </summary>
-        private Vector3 medianOfLeaf = new Vector3();
+        private Vector3 medianOfLeaf;
 
         /// <summary>
         /// The median of the lossyscale of the graphs inner nodes.
         /// </summary>
-        private Vector3 medianOfInnerNode = new Vector3();
+        private Vector3 medianOfInnerNode;
 
         /// <summary>
         /// A gamobject which stores the graphs root. 
@@ -126,74 +112,70 @@ namespace SEE.Controls
         /// </summary>
         private List<GameObject> listOfRoots = null;
 
-       
+        public enum Progress
+        {
+            NoCitySelected,
+            CityIsSelected,
+            WaitingForValues,
+            ValuesAreGiven,
+            CanvasIsClosed
+        }
+
+        private Progress progress = Progress.NoCitySelected;
+
+
         public void Start()
         {
             listOfRoots = new List<GameObject>();
-            InitialiseCanvasObject();   
+            InitialiseCanvasObject();
         }
 
         public void Update()
         {
-
-            if (city == null)
+            if (progress.Equals(Progress.NoCitySelected))
             {
-               //City Selection
                 SelectCity();
-            }
-            else
-            {
-                //Gets the Metrics for the new Node if no
-                if (nodeMetrics == null)
-                {
-                    OpenDialog();
-                    GetMetrics();
-                }
-                else
-                {
-                    //Creates the new node, important check if the metrics have been set before!
-                    if (valuesAreGiven)
-                    {
-                        if (GONode == null)
-                        {
-                            NewNode();
-                            GameNodeMover.MoveTo(GONode);
-                        }
-                        else
-                        {
-                            if (Input.GetMouseButtonDown(0))
-                            {
-                                Place();
-                            }
-                            else
-                            {
-                                GameNodeMover.MoveTo(GONode);
-                            }
-                        }
-                    }
-                }
+                progress = Progress.CityIsSelected;
             }
 
-            if (!canvasIsActive)
+            if (progress.Equals(Progress.CityIsSelected))
+            {
+                OpenDialog();
+                progress = Progress.WaitingForValues;
+            }
+
+            if (progress.Equals(Progress.CanvasIsClosed))
             {
                 CanvasGenerator c = canvasObject.GetComponent<CanvasGenerator>();
                 AddingNodeCanvasScript script = canvasObject.GetComponent<AddingNodeCanvasScript>();
                 script.GetNodeMetrics();
                 c.DestroyAddNodeCanvas();
-                canvasIsActive = true;
-                valuesAreGiven = true;
+                progress = Progress.ValuesAreGiven;
             }
 
-        }
+            if (progress.Equals(Progress.ValuesAreGiven))
+            {
 
-        /// <summary>
-        /// opens a dialog-canvas where the user can insert some node-metrics. Therefore, a CanvasGenerator-script-component 
-        /// will be added to this gameObject which contains the canvas.
-        /// </summary>
-        public void OpenDialog()
-        {
-            CanvasGenerator c = canvasObject.GetComponent<CanvasGenerator>();
-            c.InstantiateAddingNodeCanvas();
+                if (GONode == null)
+                {
+                    NewNode();
+                    GameNodeMover.MoveTo(GONode);
+                }
+                else
+                {
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        Place();
+                        progress = Progress.NoCitySelected;
+                    }
+                    else
+                    {
+                        GameNodeMover.MoveTo(GONode);
+                    }
+                }
+
+            }
+
         }
 
         /// <summary>
@@ -202,7 +184,7 @@ namespace SEE.Controls
         private void SelectCity()
         {
 
-            // The case the user hovers an object and has hovered objects before. The former colours of the specific objects are set again.
+            /// The case the user hovers an object and has hovered objects before. The former colours of the specific objects are set again.
             if (hoveredObject != null && hoveredObjectList.Count > 0 && hoveredObject.gameObject.GetComponent<Renderer>().material.color != defaultHoverCityColor || hoveredObject == null && hoveredObjectList.Count > 0)
             {
                 Undye();
@@ -217,11 +199,11 @@ namespace SEE.Controls
                     ChangeColor(hoveredObject, hoveredObject.gameObject.GetComponent<Renderer>().material.color);
                 }
             }
-            
+
             if (hoveredObject != null && Input.GetMouseButtonDown(0))
-            { 
+            {
                 Undye();
-                
+
                 //Gets the SEECity from the hoverdObject
                 SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject.TryGetComponent<SEECity>(out city);
                 GetNodesOfScene();
@@ -229,13 +211,23 @@ namespace SEE.Controls
                 {
                     foreach (GameObject root in listOfRoots)
                     {
-                        if (CheckNodeAndGraph(root, city.LoadedGraph))
+                        if (root.GetComponent<NodeRef>().node.ItsGraph == city.LoadedGraph)
                         {
                             ChangeColor(root, Color.white);
                         }
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Opens a dialog-canvas where the user can insert some node-metrics. Therefore, a CanvasGenerator-script-component 
+        /// will be added to this gameObject which contains the canvas.
+        /// </summary>
+        public void OpenDialog()
+        {
+            CanvasGenerator c = canvasObject.GetComponent<CanvasGenerator>();
+            c.InstantiateAddingNodeCanvas();
         }
 
         // <summary>
@@ -254,24 +246,16 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Sets the Metrics from the GUI
-        /// </summary>
-        private void GetMetrics()
-        { 
-            string randomID = RandomizeString();
-            System.Random rnd = new System.Random();
-            //YOU CANT MODIFY THE VALUES OF A TUPLE, SO YOU NEED TO CREATE A NEW ONE IF YOU WANT TO MODIFY
-            nodeMetrics = new Tuple<string, string, string>(randomID, "NODE" + rnd.Next(0, 999999999), "FILE");
-        }
-
-        /// <summary>
         /// Dyes the hoveredObject either in the defaulthoverCitycolor or in the alternativeHoverCityColor in case
         /// the object is already dyed in that color.
         /// The colors are about to be set by the user itself in the inspector or via GUI.
         /// </summary>
+        /// <param name="colorOfCity"></param>
+        /// <param name="objectToDye"></param>
         private void ChangeColor(GameObject objectToDye, Color colorOfCity)
         {
-            Color newCityColor = new Color();
+            Color newCityColor;
+
             if (colorOfCity == defaultHoverCityColor)
             {
                 newCityColor = alternativeHoverCityColor;
@@ -289,18 +273,10 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Creates a randomized string, i.e. the id for the created node
-        /// </summary>
-        private static string RandomizeString()
-        {
-            return Utils.RandomStrings.Get();
-        }
-
-        /// <summary>
         /// Adds a node to the loadedGraph and creats its ID. Repeats the process in case the generated ID is not unique.
         /// Precondition: The parameter may be null, it is checked again before beeing added to the loadedGraph.
         /// </summary>
-        /// /// <param name="newNodeType">The node to add to the graph</param>
+        /// <param name="node">The node to add to the graph</param>
         private void AddNode(Node node)
         {
             if (node == null)
@@ -313,7 +289,7 @@ namespace SEE.Controls
             }
             catch (Exception)
             {
-                node.ID = RandomizeString();
+                node.ID = Utils.RandomStrings.Get();
                 AddNode(node);
                 return;
             }
@@ -326,6 +302,8 @@ namespace SEE.Controls
         private void NewNode()
         {
             GameObject gameNode;
+            System.Random rnd = new System.Random();
+            nodeMetrics = new Tuple<string, string, string>(Utils.RandomStrings.Get(), "NODE" + rnd.Next(0, 999999999), "Type" + rnd.Next(0, 999999999));
             Node node = new Node
             {
                 //Set the metrics of the new node
@@ -345,7 +323,6 @@ namespace SEE.Controls
             if (isInnerNode)
             {
                 gameNode = graphRenderer.NewInnerNode(node);
-
             }
             else
             {
@@ -374,50 +351,47 @@ namespace SEE.Controls
         /// </summary>
         private void Place()
         {
-            if (valuesAreGiven)
+            Node node = GONode.GetComponent<NodeRef>().node;
+
+            //this will reached only if the nodename is not set in the inputField
+            //FIXME: nodename und nodetype sind nur null oder leerer String, andere Abfrage unnütz aber muss nochmal gecheckt werden.
+            if (nodename != null && !nodename.Equals(""))
             {
-                Node node = GONode.GetComponent<NodeRef>().node;
-                //this will reached only if the nodename is not set in the inputField
-                if (nodename != null && !nodename.Equals(""))
-                {
-                    node.SourceName = nodename;
-                }
-
-                if (nodetype != null && !nodetype.Equals(""))
-                {
-                    node.Type = nodetype;
-                }
-
-                SEECity cityTmp;
-  
-                    //checks if the currently hovered object is part of the preselected city
-                    GameObject tmp = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
-                    try
-                    {
-                        tmp.TryGetComponent<SEECity>(out cityTmp);
-                    }
-                    catch (Exception)
-                    {
-                        Debug.Log("city not selected"); // FIXME
-                        return;
-                    }
-                    if (cityTmp != null && city.Equals(cityTmp))
-                    {
-                        GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
-                        valuesAreGiven = false;
-                    }
-                else
-                {
-                    //FIXME: DO WE NEED TO DESTROY THE NODE TOO?
-                    Destroy(GONode);
-                    valuesAreGiven = false;
-
-                }
-                GONode = null;
-                city = null;
-                nodeMetrics = null;
-                
+                node.SourceName = nodename;
             }
+
+            if (nodetype != null && !nodetype.Equals(""))
+            {
+                node.Type = nodetype;
+            }
+
+            SEECity cityTmp;
+
+            //checks if the currently hovered object is part of the preselected city
+            GameObject tmp = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
+            try
+            {
+                tmp.TryGetComponent<SEECity>(out cityTmp);
+            }
+            catch (Exception)
+            {
+                Debug.Log("city not selected"); // FIXME
+                return;
+            }
+            if (cityTmp != null && city.Equals(cityTmp))
+            {
+                GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
+            }
+            else
+            {
+                //FIXME: DO WE NEED TO DESTROY THE NODE TOO?
+                Destroy(GONode);
+
+            }
+            GONode = null;
+            city = null;
+            nodeMetrics = null;
+
         }
 
         /// <summary>
@@ -440,38 +414,33 @@ namespace SEE.Controls
         public void GetNodesOfScene()
         {
 
-            //Prepares a list of all leafs lossyscale which is stored in the list innerNodeSize.
-            List<Vector3> leafSize = new List<Vector3>();
+            List<Vector3> leafSize;
+            List<Vector3> innerNodeSize;
 
-            //Prepares a list of all innernodes lossyscale which is stored in the list innerNodeSize.
-            List<Vector3> innerNodeSize = new List<Vector3>();
-
-            // Query to obtain all the leafnodes of the specific scene.
             ICollection<GameObject> allLeafsInScene = SceneQueries.AllGameNodesInScene(true, false);
-
-            //Query to obtain all the inner nodes of the specific scene.
             ICollection<GameObject> allInnerNodesInScene = SceneQueries.AllGameNodesInScene(false, true);
 
-            //List with the graphs roots or most likely only a single root of the specific city.
+            ///List with the graphs roots or most likely only a single root of the specific city.
             List<Node> rootList = city.LoadedGraph.GetRoots();
 
-            // In the special case the graph only consists of one leaf, we will have to check in the list of all leafs, which has the count of one in that case,
-            // if there is the root node.
+            /// In the special case the graph only consists of one leaf, we will have to check in the list of all leafs, which has the count of one in that case,
+            /// if there is the root node.
             if (allLeafsInScene.Count == 1 && allInnerNodesInScene.Count == 0)
             {
                 dir_Root = RootSearch(allLeafsInScene, rootList);
-
+                //FRAGE: BEDEUTET DAS NICHT AUTOMATISCH, DASS DAS EINE LEAF DIE ROOT IST?
+                //ALTERNATIVE: dir_Root = allLeafsInScene.
+                //GameObject dir_RootBetterCode = allLeafsInScene.OfType<GameObject>().FirstOrDefault();
+                //Debug.Log(dir_RootBetterCode);
             }
 
-            // Search for the graphs root in the set of all inner nodes.
             dir_Root = RootSearch(allInnerNodesInScene, rootList);
 
-
-            // Fill the lists with the specific lossyscales of all the nodes, either leafs or innernodes.
+            ///Lists of the sizes of Inner
             leafSize = ListOfLossyscale(allLeafsInScene);
             innerNodeSize = ListOfLossyscale(allInnerNodesInScene);
 
-            // Calculate the median of the specific sets, either leafs or innernodes. 
+            /// Calculate the median of the specific sets, either leafs or innernodes. 
             medianOfLeaf = MathFunctions.CalcMedian(leafSize);
             medianOfInnerNode = MathFunctions.CalcMedian(innerNodeSize);
 
@@ -495,32 +464,18 @@ namespace SEE.Controls
             {
                 return null;
             }
+
             List<Vector3> lossyScaleList = new List<Vector3>();
+
             foreach (GameObject go in pListOfGameObjects)
             {
-                //to specify if the specific node belongt to the specific graph.
-                if (CheckNodeAndGraph(go, city.LoadedGraph))
+                ///to specify if the specific node belong to the specific graph. 
+                if (go.GetComponent<NodeRef>().node.ItsGraph == city.LoadedGraph)
                 {
                     lossyScaleList.Add(go.transform.lossyScale);
                 }
             }
             return lossyScaleList;
-        }
-
-        /// <summary>
-        /// Specifies whether the node representation of a given gameObject belongs to the certain graph.
-        /// </summary>
-        /// <param name="pGameObject"></param>
-        /// <param name="g"></param>
-        /// <returns true, if graph belongs to the gameObject represented as a node, else false </returns>
-        public static bool CheckNodeAndGraph(GameObject pGameObject, Graph g)
-        {
-            if (pGameObject == null || g == null)
-            {
-                return false;
-            }
-
-            return pGameObject.GetComponent<NodeRef>().node.ItsGraph == g;
         }
 
         /// <summary>
@@ -549,6 +504,11 @@ namespace SEE.Controls
             }
 
             return dir_Root;
+        }
+
+        public void SetState(Progress p)
+        {
+            progress = p;
         }
 
     }
