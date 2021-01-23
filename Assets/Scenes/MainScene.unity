@@ -1787,6 +1787,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: HoloLensAppBar
       objectReference: {fileID: 0}
+    - target: {fileID: 5019665777652161805, guid: 2b712e916e329da46823a23b42d9899a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5025193351834278769, guid: 2b712e916e329da46823a23b42d9899a,
         type: 3}
       propertyPath: m_RootOrder
@@ -2180,8 +2185,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ee170c9be383554ea5041c415e05ce5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Radius: 0.3
-  Depth: 0.01
 --- !u!20 &1566173681
 Camera:
   m_ObjectHideFlags: 0
@@ -3361,7 +3364,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.0030533075
+  HeightOffset: 0.0030565262
 --- !u!65 &1649116648
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3716,10 +3719,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useInOfflineMode: 1
-  hostServer: 0
-  remoteServerIPAddress: 
-  localServerPort: 55555
-  remoteServerPort: 0
+  hostServer: 1
+  remoteServerIPAddress: 192.168.178.147
+  localServerPort: 3141
+  remoteServerPort: 3141
   loadCityOnStart: 0
   networkCommsLoggingEnabled: 0
   internalLoggingEnabled: 1
