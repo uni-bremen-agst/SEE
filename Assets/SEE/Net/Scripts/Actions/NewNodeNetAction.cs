@@ -34,11 +34,20 @@ public class NewNodeNetAction : AbstractAction
     {
         if (!IsRequester())
         {
-            DesktopNewNodeAction desktopNewNodeAction = new DesktopNewNodeAction();
-            desktopNewNodeAction.SetIsInnerNode(isInnerNode);
-            desktopNewNodeAction.SetCity(city);
-            desktopNewNodeAction.SetNodeMetrics(nodeMetrics);
-            desktopNewNodeAction.NetworkNewNode(position);
+            GameObject dummy = new GameObject();
+            dummy.AddComponent<DesktopNewNodeAction>();
+            dummy.GetComponent<DesktopNewNodeAction>().SetCity(city);
+            dummy.GetComponent<DesktopNewNodeAction>().SetIsInnerNode(isInnerNode);
+            dummy.GetComponent<DesktopNewNodeAction>().SetNodeMetrics(nodeMetrics);
+            dummy.GetComponent<DesktopNewNodeAction>().NetworkNewNode(position);
+
+
+
+           // DesktopNewNodeAction desktopNewNodeAction = new DesktopNewNodeAction();
+           // desktopNewNodeAction.SetIsInnerNode(isInnerNode);
+           // desktopNewNodeAction.SetCity(city);
+           // desktopNewNodeAction.SetNodeMetrics(nodeMetrics);
+          //  desktopNewNodeAction.NetworkNewNode(position);
                 
         }
     }
