@@ -144,7 +144,7 @@ namespace SEE.GO
         private float timer = 0.0f;
 
         /// <summary>
-        /// If the menu entry is transient and currenlty activated, <see cref="timer"/>
+        /// If the menu entry is transient and currently activated, <see cref="timer"/>
         /// will be decreased by the amount of time since the last frame. If that 
         /// <see cref="timer"/> reaches 0 (or becomes negative), the menu entry will
         /// be deactivated.

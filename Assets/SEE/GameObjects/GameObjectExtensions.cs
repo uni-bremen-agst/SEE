@@ -1,6 +1,6 @@
-﻿using System;
+﻿using SEE.DataModel.DG;
+using System;
 using OdinSerializer.Utilities;
-using SEE.DataModel.DG;
 using UnityEngine;
 
 namespace SEE.GO
@@ -28,8 +28,10 @@ namespace SEE.GO
                 {
                     return gameObject.name;
                 }
-
-                return edgeRef.edge.ID;
+                else
+                {
+                    return edgeRef.edge.ID;
+                }
             }
 
             return nodeRef.node.ID;
