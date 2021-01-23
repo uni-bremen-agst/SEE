@@ -14,18 +14,18 @@ namespace SEE.Controls
         /// <summary>
         /// The Code City in wich the node should be placed
         /// </summary>
-        SEECity city = null;
+        private SEECity city = null;
 
         /// <summary>
         /// The New GameObject
         /// </summary>
-        GameObject GONode = null;
+        private GameObject GONode = null;
 
         /// <summary>
         /// The Meta infos from the new node, set by the GUI
         /// 1. ID, 2. SourceName, 3. Type
         /// </summary>
-        Tuple<String, String, String> nodeMetrics = null;
+        private Tuple<String, String, String> nodeMetrics = null;
 
         /// <summary>
         /// The script which instantiates the adding-node-canvas
@@ -322,7 +322,6 @@ namespace SEE.Controls
         /// <summary>
         /// Creates a new node
         /// </summary>
-        /// <returns>New Node as GameObject</returns>
         private void NewNode()
         {
             GameObject gameNode;
@@ -549,6 +548,48 @@ namespace SEE.Controls
             }
 
             return dir_Root;
+        }
+
+
+
+        /// <summary>
+        /// Sets the param IsInnerNode for Network Use
+        /// </summary>
+        /// <param name="IsInnerNode">Should the new node be a inner or not</param>
+        public void SetIsInnerNode(bool IsInnerNode)
+        {
+            isInnerNode = IsInnerNode;
+        }
+
+        /// <summary>
+        /// Set the City for Network Use
+        /// </summary>
+        /// <param name="cit">the city</param>
+        public void SetCity(SEECity City)
+        {
+            city = City;
+        }
+
+        /// <summary>
+        /// Sets the Node Metrics for NEtwork Use
+        /// </summary>
+        /// <param name="NodeMetrics">the node metrics</param>
+        public void SetNodeMetrics(Tuple<string,string,string> NodeMetrics)
+        {
+            nodeMetrics = NodeMetrics;
+        }
+
+        /// <summary>
+        /// For Network Use Only, creates the new node on the Clients
+        /// </summary>
+        /// <param name="position">The position of the new node</param>
+        public void NetworkNewNode(Vector3 position)
+        {
+            NewNode();
+            GameNodeMover.FinalizePosition(GONode, position);
+            GONode = null;
+            RemoveScript();
+            }
         }
 
     }
