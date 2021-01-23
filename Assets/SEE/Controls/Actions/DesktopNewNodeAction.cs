@@ -126,11 +126,11 @@ namespace SEE.Controls
         /// </summary>
         private List<GameObject> listOfRoots = null;
 
-       
+
         public void Start()
         {
             listOfRoots = new List<GameObject>();
-            InitialiseCanvasObject();   
+            InitialiseCanvasObject();
         }
 
         public void Update()
@@ -138,7 +138,7 @@ namespace SEE.Controls
 
             if (city == null)
             {
-               //City Selection
+                //City Selection
                 SelectCity();
             }
             else
@@ -217,11 +217,11 @@ namespace SEE.Controls
                     ChangeColor(hoveredObject, hoveredObject.gameObject.GetComponent<Renderer>().material.color);
                 }
             }
-            
+
             if (hoveredObject != null && Input.GetMouseButtonDown(0))
-            { 
+            {
                 Undye();
-                
+
                 //Gets the SEECity from the hoverdObject
                 SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject.TryGetComponent<SEECity>(out city);
                 GetNodesOfScene();
@@ -257,7 +257,7 @@ namespace SEE.Controls
         /// Sets the Metrics from the GUI
         /// </summary>
         private void GetMetrics()
-        { 
+        {
             string randomID = RandomizeString();
             System.Random rnd = new System.Random();
             //YOU CANT MODIFY THE VALUES OF A TUPLE, SO YOU NEED TO CREATE A NEW ONE IF YOU WANT TO MODIFY
@@ -388,23 +388,23 @@ namespace SEE.Controls
                 }
 
                 SEECity cityTmp;
-  
-                    //checks if the currently hovered object is part of the preselected city
-                    GameObject tmp = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
-                    try
-                    {
-                        tmp.TryGetComponent<SEECity>(out cityTmp);
-                    }
-                    catch (Exception)
-                    {
-                        Debug.Log("city not selected"); // FIXME
-                        return;
-                    }
-                    if (cityTmp != null && city.Equals(cityTmp))
-                    {
-                        GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
-                        valuesAreGiven = false;
-                    }
+
+                //checks if the currently hovered object is part of the preselected city
+                GameObject tmp = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
+                try
+                {
+                    tmp.TryGetComponent<SEECity>(out cityTmp);
+                }
+                catch (Exception)
+                {
+                    Debug.Log("city not selected"); // FIXME
+                    return;
+                }
+                if (cityTmp != null && city.Equals(cityTmp))
+                {
+                    GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
+                    valuesAreGiven = false;
+                }
                 else
                 {
                     //FIXME: DO WE NEED TO DESTROY THE NODE TOO?
@@ -415,7 +415,7 @@ namespace SEE.Controls
                 GONode = null;
                 city = null;
                 nodeMetrics = null;
-                
+
             }
         }
 
@@ -574,7 +574,7 @@ namespace SEE.Controls
         /// Sets the Node Metrics for NEtwork Use
         /// </summary>
         /// <param name="NodeMetrics">the node metrics</param>
-        public void SetNodeMetrics(Tuple<string,string,string> NodeMetrics)
+        public void SetNodeMetrics(Tuple<string, string, string> NodeMetrics)
         {
             nodeMetrics = NodeMetrics;
         }
@@ -589,9 +589,8 @@ namespace SEE.Controls
             GameNodeMover.FinalizePosition(GONode, position);
             GONode = null;
             RemoveScript();
-            }
         }
-
     }
 
 }
+
