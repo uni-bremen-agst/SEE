@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class NewNodeNetAction : AbstractAction
 {
-    public SEECity city = null;;
+    public SEECity city = null;
     public string gameObjectID;
     public bool isInnerNode;
     public  string nodeMetrics1;
