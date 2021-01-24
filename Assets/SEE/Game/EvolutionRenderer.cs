@@ -554,40 +554,45 @@ namespace SEE.Game
 
         bool moveEdges = false;
 
+        AbstractSEECity settings;
+
         IList<(GameObject, GameObject)> matchedEdges;
 
         protected virtual void MoveEdges(){
            try{
-            IList<GameObject> newEdges = objectManager.CalculateNewEdgeControlPoints().ToList();
-            IList<GameObject> oldEdges = objectManager.GetEdges().ToList();
+              
+                IList<GameObject> newEdges = objectManager.CalculateNewEdgeControlPoints().ToList();
+                IList<GameObject> oldEdges = objectManager.GetEdges().ToList();
 
-            matchedEdges =  EdgeMatcher(oldEdges,newEdges);
-
-
-            foreach((GameObject oldEdge, GameObject newEdge) in matchedEdges){
-                oldEdge.TryGetComponent<Points>(out Points oP);
-                newEdge.TryGetComponent<Points>(out Points nP);
-
-                oP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePoints200(oP.controlPoints);
-                nP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePoints200(nP.controlPoints);
+                matchedEdges =  EdgeMatcher(oldEdges,newEdges);
 
 
-                //----Begin Test----//
-                //TinySpline.BSpline spline = SEE.Layout.Utils.LinePoints.BSpline(oP.controlPoints);
-                //Debug.LogFormat("Lenght Controlpoints before insertion: " + spline.NumControlPoints);
-                //spline = spline.InsertKnot(0,1);
-                //Debug.LogFormat("Lenght Controlpoints after insertion: " + spline.NumControlPoints);
-                //----End Test----//
+                AbstractSEECity settings = graphRenderer.GetSettings();
+                
+
+                if(!settings.EdgeLayout.Equals(SEE.Layout.EdgeLayouts.EdgeLayoutKind.Straight)){
+                    foreach((GameObject oldEdge, GameObject newEdge) in matchedEdges){
+                    oldEdge.TryGetComponent<Points>(out Points oP);
+                    newEdge.TryGetComponent<Points>(out Points nP);
+
+                    uint sampleRate = (uint)Math.Max(oP.linePoints.Count(),nP.linePoints.Count());
+
+                    oP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePoints200(oP.controlPoints, sampleRate);
+                    nP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePoints200(nP.controlPoints, sampleRate);
 
 
-                oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
-                lineRenderer.positionCount = oP.linePoints.Count();
-                lineRenderer.SetPositions(oP.linePoints);
 
-            }
-                timer = 0f;
+                    oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
+                    lineRenderer.positionCount = oP.linePoints.Count();
+                    lineRenderer.SetPositions(oP.linePoints);
+                    }
 
-                moveEdges = true;
+                
+
+                }
+                    timer = 0f;
+
+                    moveEdges = true;
 
             }catch{
                 moveEdges = false;
@@ -605,7 +610,7 @@ namespace SEE.Game
                     oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
                     newEdge.TryGetComponent<Points>(out Points newLinePoints);
                     for(int i = 0; i < lineRenderer.positionCount; i++){
-                        lineRenderer.SetPosition(i, Vector3.Lerp(lineRenderer.GetPosition(i), newLinePoints.linePoints[i],timer/AnimationDuration));
+                        lineRenderer.SetPosition(i,  Vector3.Lerp(lineRenderer.GetPosition(i), newLinePoints.linePoints[i],timer/AnimationDuration));
                     }
                 }
             }

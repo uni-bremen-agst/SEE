@@ -95,6 +95,10 @@ namespace SEE.Game
         /// </summary>
         private readonly AbstractSEECity settings;
 
+        public AbstractSEECity GetSettings(){
+            return settings;
+        }
+
         /// <summary>
         /// The factory used to create blocks for leaves.
         /// </summary>

@@ -58,7 +58,7 @@ namespace SEE.Layout.Utils
         }
 
 
-        public static Vector3[] BSplineLinePoints200(Vector3[] controlPoints, float tension = tensionDefault)
+        public static Vector3[] BSplineLinePoints200(Vector3[] controlPoints, uint sampleRate = 200, float tension = tensionDefault)
         {
             Debug.Assert(controlPoints.Length > 3);
             Debug.Assert(0.0f <= tension && tension <= 1.0f);
@@ -70,7 +70,7 @@ namespace SEE.Layout.Utils
                 ControlPoints = VectorsToList(controlPoints)
             };
 
-            IList<double> list = spline.Tension(tension).Sample(200);
+            IList<double> list = spline.Tension(tension).Sample(sampleRate);
             return ListToVectors(list);
         }
 
