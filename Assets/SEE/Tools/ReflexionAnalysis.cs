@@ -616,6 +616,11 @@ namespace SEE.Tools
         }
 
         /// <summary>
+        /// The edge type maps-to edges mapping implementation entities onto architecture entities.
+        /// </summary>
+        private const string MapsToType = "Maps_To";
+
+        /// <summary>
         /// Adds a clone of 'from' and a clone of 'to' to the mapping graph if
         /// they do not have one already and adds a Maps_To edge in between.
         /// 
@@ -632,8 +637,8 @@ namespace SEE.Tools
             Node from_clone = CloneInMapping(from);
             Node to_clone = CloneInMapping(to);
             // add maps_to edge to _mapping
-            Edge mapsTo = new Edge();
-            mapsTo.Type = "Maps_To";
+            Edge mapsTo = new Edge(MapsToType + "#" + from_clone.ID + "#" + to_clone.ID);
+            mapsTo.Type = MapsToType;
             mapsTo.Source = from_clone;
             mapsTo.Target = to_clone;
             _mapping.AddEdge(mapsTo);
@@ -1739,7 +1744,7 @@ namespace SEE.Tools
             // Note: there may be a specified as well as a propagated edge between the
             // same two architectural entities; hence, we may have multiple edges
             // in between
-            Edge result = new Edge
+            Edge result = new Edge("propagated#" + its_type + "#" + from.ID + "#" + to.ID)
             {
                 Type = its_type,
                 Source = from,

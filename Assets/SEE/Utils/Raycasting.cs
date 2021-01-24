@@ -35,6 +35,10 @@ namespace SEE.Utils
             return result;
         }
 
+        /// <summary>
+        /// The cached event system. It is cached because it needs to be queried in
+        /// each Update cycle.
+        /// </summary>
         private static EventSystem eventSystem = null;
 
         /// <summary>
@@ -45,7 +49,11 @@ namespace SEE.Utils
         {
             if (eventSystem == null)
             {
-                eventSystem = Object.FindObjectOfType<EventSystem>();
+                eventSystem = UnityEngine.Object.FindObjectOfType<EventSystem>();
+                if (eventSystem == null)
+                {
+                    throw new System.Exception("No EventSystem found.");
+                }
             }
             return eventSystem.IsPointerOverGameObject();
         }

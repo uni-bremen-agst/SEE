@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,63 +22,70 @@ namespace SEE.Game
     /// is the representation of a graph including the settings that have lead
     /// to its visualization.
     /// </summary>
-    public abstract class AbstractSEECity : SerializedMonoBehaviour
+    public abstract partial class AbstractSEECity : SerializedMonoBehaviour
     {
-        /// <summary>
-        /// The internal representation of property PathPrefix.
-        /// The internal representation of this path is always in the Unix style
-        /// (or also Unity style), independent from the operating system we are currently
-        /// running on.
-        /// </summary>
-        /// Must not be readonly because it will be modified in an editor of the inspector.
-        [SerializeField] private string pathPrefix = null;
+        /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
+        /// configuration file, make sure you save and restore it in 
+        /// <see cref="AbstractSEECity.Save(ConfigWriter)"/> and 
+        /// <see cref="AbstractSEECity.Restore(Dictionary{string, object})"/>, 
+        /// respectively (both declared in AbstractSEECityIO). You should also
+        /// extend the test cases in TestConfigIO.
 
         /// <summary>
-        /// The prefix of the absolute paths for the GXL, CSV, layout data; that is,
-        /// the directory where these data files are located in.
-        /// 
-        /// The style of this path prefix is always the one of the current operating
-        /// system we are running on, that is, the directory separator will be \
-        /// on Windows and / on all other platforms.
-        /// 
-        /// If the path prefix has never been set or was set to the empty string, the path 
-        /// prefix is the path to the Unity project.
-        /// 
-        /// The last character will always be the directory separator of the current platform.
+        /// Saves the settings of this code city to <see cref="CityPath"/>.
         /// </summary>
-        public string PathPrefix
+        public void Save()
         {
-            get
+            Save(CityPath.Path);
+        }
+
+        /// <summary>
+        /// Loads the settings of this code city from <see cref="CityPath"/>.
+        /// </summary>
+        public void Load()
+        {
+            Load(CityPath.Path);
+        }
+
+        /// <summary>
+        /// Saves the settings of this code city to <paramref name="filename"/>
+        /// </summary>
+        /// <param name="filename"></param>
+        public void Save(string filename)
+        {
+            using (ConfigWriter writer = new ConfigWriter(filename))
             {
-                if (string.IsNullOrEmpty(pathPrefix))
-                {
-                    pathPrefix = Application.dataPath;
-                }
-                string result = pathPrefix;
-                if (result[result.Length - 1] != Filenames.UnixDirectorySeparator)
-                {
-                    result += Filenames.UnixDirectorySeparator;
-                }
-                result = Filenames.OnCurrentPlatform(result);
-                return result;
+                Save(writer);
             }
         }
 
         /// <summary>
-        /// The relative path for the layout file containing the node layout information.
-        /// If the file extension is <see cref="Filenames.GVLExtension"/> is Axivion's Gravis layout 
-        /// file with 2D co-ordinates. 
-        /// If the extension is <see cref="Filenames.SLDExtension"/> is our own layout format 
-        /// saving the complete Transform data of a game object.
+        /// Reads the settings of this city from <paramref name="filename"/>.
         /// </summary>
-        public string layoutPath = "..\\Data\\GXL\\linux-clones\\net" + Filenames.GVLExtension;
+        /// <param name="filename"></param>
+        public void Load(string filename)
+        {
+            using (ConfigReader stream = new ConfigReader(filename))
+            {
+                Restore(stream.Read());
+            }
+        }
 
         /// <summary>
-        /// Returns the concatenation of <see cref="PathPrefix"/> and <see cref="LayoutPath"/>. 
-        /// That is the complete absolute path to the file containing the layout information.
+        /// The screen relative height to use for the culling a game node [0-1].
+        /// If the game node uses less than this percentage it will be culled.
         /// </summary>
-        /// <returns>concatenation of <see cref="PathPrefix"/> and <see cref="LayoutPath"/></returns>
-        public string LayoutPath => PathPrefix + layoutPath;
+        public float LODCulling = 0.01f;
+
+        /// <summary>
+        /// The path for the layout file containing the node layout information.
+        /// If the file extension is <see cref="Filenames.GVLExtension"/>, the layout is expected
+        /// to be stored in Axivion's Gravis layout (GVL) with 2D co-ordinates. 
+        /// Otherwise is our own layout format SDL is expected, which saves the complete Transform 
+        /// data of a game object.
+        /// </summary>
+        [OdinSerialize]
+        public DataPath LayoutPath = new DataPath();
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
@@ -110,15 +116,13 @@ namespace SEE.Game
         /// they should be visualized or not.
         /// </summary>
         [NonSerialized, OdinSerialize]
-        protected Dictionary<string, bool> nodeTypes = new Dictionary<string, bool>();
+        public Dictionary<string, bool> SelectedNodeTypes = new Dictionary<string, bool>();
+
         /// <summary>
-        /// A mapping of all node types of the nodes in the graph onto whether
-        /// they should be visualized or not.
+        /// The path where the settings (the attributes of this class) are stored.
         /// </summary>
-        public Dictionary<string, bool> SelectedNodeTypes
-        {
-            get => nodeTypes;
-        }
+        [OdinSerialize]
+        public DataPath CityPath = new DataPath();
 
         /// <summary>
         /// Resets everything that is specific to a given graph. Here: 
@@ -134,7 +138,7 @@ namespace SEE.Game
         /// </summary>
         public void ResetSelectedNodeTypes()
         {
-            nodeTypes.Clear();
+            SelectedNodeTypes.Clear();
         }
 
         /// <summary>
@@ -200,7 +204,7 @@ namespace SEE.Game
         {
             get
             {
-                foreach (bool relevant in nodeTypes.Values)
+                foreach (bool relevant in SelectedNodeTypes.Values)
                 {
                     if (!relevant)
                     {
@@ -239,10 +243,10 @@ namespace SEE.Game
                 Dictionary<string, bool> newNodeTypes = new Dictionary<string, bool>();
                 foreach (string type in newTypes)
                 {
-                    if (nodeTypes.ContainsKey(type))
+                    if (SelectedNodeTypes.ContainsKey(type))
                     {
                         // preserve existing node types
-                        newNodeTypes[type] = nodeTypes[type];
+                        newNodeTypes[type] = SelectedNodeTypes[type];
                     }
                     else
                     {
@@ -250,7 +254,7 @@ namespace SEE.Game
                         newNodeTypes[type] = true;
                     }
                 }
-                nodeTypes = newNodeTypes;
+                SelectedNodeTypes = newNodeTypes;
             }
         }
 
@@ -263,7 +267,7 @@ namespace SEE.Game
         /// <param name="graph">graph whose subgraph is requested</param>
         /// <returns>subgraph of <paramref name="graph"/> (copy) or <paramref name="graph"/></returns>
         public Graph RelevantGraph(Graph graph)
-        {            
+        {
             if (AllNodeTypesAreRelevant)
             {
                 Debug.Log("All node types are relevant.\n");
@@ -271,7 +275,7 @@ namespace SEE.Game
             }
             else
             {
-                ICollection<string> matches = nodeTypes.Where(pair => pair.Value == true)
+                ICollection<string> matches = SelectedNodeTypes.Where(pair => pair.Value == true)
                   .Select(pair => pair.Key).ToList();
                 Debug.Log("The following node types are relevant:\n");
                 foreach (string nodeType in matches)
@@ -311,22 +315,13 @@ namespace SEE.Game
         /// The attribute name of the metric to be used for determining the style of leaf nodes.
         /// </summary>
         public string LeafStyleMetric = NumericAttributeNames.Complexity.Name(); // serialized by Unity
-        
+
         //----------------------------------
         // Attributes of a leaf node's label
         //----------------------------------
-        /// <summary>
-        /// If true, label's with the node's SourceName will be displayed above each leaf node.
-        /// </summary>
-        public bool ShowLabel = true;
-        /// <summary>
-        /// The distance between the top of the leaf node and its label.
-        /// </summary>
-        public float LeafLabelDistance = 0.2f;
-        /// <summary>
-        /// The font size of the leaf node's label.
-        /// </summary>
-        public float LeafLabelFontSize = 0.4f;
+        [OdinSerialize]
+        public LabelSettings LeafLabelSettings = new LabelSettings();
+
 
         /// <summary>
         /// All metrics used for visual attributes of a leaf node (WidthMetric, HeightMetric,
@@ -504,24 +499,12 @@ namespace SEE.Game
         /// The attribute name of the metric to be used for determining the style of inner nodes.
         /// </summary>
         public string InnerNodeStyleMetric = NumericAttributeNames.IssuesTotal.Name(); // serialized by Unity
-        
+
         //-----------------------------------
         // Visual attributes of an inner node
         //-----------------------------------
-        
-        /// <summary>
-        /// If true, label's with the node's SourceName will be displayed above each inner node.
-        /// </summary>
-        public bool InnerNodeShowLabel = true;
-        /// <summary>
-        /// The distance between the top of the inner node and its label.
-        /// </summary>
-        public float InnerNodeLabelDistance = 0.2f;
-        /// <summary>
-        /// The font size of the inner node's label.
-        /// </summary>
-        public float InnerNodeLabelFontSize = 0.4f;
-
+        [OdinSerialize]
+        public LabelSettings InnerNodeLabelSettings = new LabelSettings();
 
         /// <summary>
         /// All metrics used for visual attributes of inner nodes (InnerNodeStyleMetric
@@ -599,7 +582,7 @@ namespace SEE.Game
         /// <summary>
         /// The width of the line representing edges in world space.
         /// </summary>
-        public float EdgeWidth = 0.3f; // serialized by Unity
+        public float EdgeWidth = 0.1f; // serialized by Unity
 
         /// <summary>
         /// Whether erosions should be visible above blocks.
@@ -610,6 +593,7 @@ namespace SEE.Game
         /// The maximal absolute width of a sprite representing an erosion in world-space Unity units.
         /// </summary>
         public float MaxErosionWidth = 1.0f; // serialized by Unity
+
 
         /// <summary>
         /// Orientation of the edges; 
@@ -650,56 +634,32 @@ namespace SEE.Game
                 Debug.LogError("Empty graph path.\n");
                 return new Graph();
             }
-            else
-            {
-                if (File.Exists(filename))
-                {
-                    Performance p = Performance.Begin("loading graph data from " + filename);
-                    GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, logger: new SEELogger());
-                    graphCreator.Load();
-                    Graph graph = graphCreator.GetGraph();
-                    p.End();
-                    Debug.Log("Loaded graph data successfully:"
-                        + "\nFilename: " + filename
-                        + "\nNumber of nodes: " + graph.NodeCount
-                        + "\nNumber of edges: " + graph.EdgeCount
-                        + "\nElapsed time: " + p.GetElapsedTime() + "[h:m:s:ms]\n");
 
-                    LoadDataForGraphListing(graph);
-                    return graph;
-                }
-                else
-                {
-                    Debug.LogErrorFormat("GXL file {0} does not exist.\n", filename);
-                    return new Graph();
-                }
+            if (File.Exists(filename))
+            {
+                Performance p = Performance.Begin("loading graph data from " + filename);
+                GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, logger: new SEELogger());
+                graphCreator.Load();
+                Graph graph = graphCreator.GetGraph();
+                p.End();
+                Debug.Log("Loaded graph data successfully:"
+                          + "\nFilename: " + filename
+                          + "\nNumber of nodes: " + graph.NodeCount
+                          + "\nNumber of edges: " + graph.EdgeCount
+                          + "\nElapsed time: " + p.GetElapsedTime() + "[h:m:s:ms]\n");
+
+                LoadDataForGraphListing(graph);
+                return graph;
             }
+
+            Debug.LogErrorFormat("GXL file {0} does not exist.\n", filename);
+            return new Graph();
         }
 
         /// <summary>
         /// Cosegraph settings
         /// </summary>
         public CoseGraphSettings CoseGraphSettings = new CoseGraphSettings();
-
-        /// <summary>
-        /// measurements of the layout
-        /// </summary>
-        public SortedDictionary<string, string> Measurements = new SortedDictionary<string, string>();
-
-        /// <summary>
-        /// Indicates whether the measurements should be calculated or not
-        /// </summary>
-        public bool calculateMeasurements = false;
-
-        /// <summary>
-        /// Dictionary with all Nodelayouts for leaf and inner nodes
-        /// </summary>
-        public Dictionary<NodeLayoutKind, string> SubLayoutsInnerNodes = Enum.GetValues(typeof(NodeLayoutKind)).Cast<NodeLayoutKind>().Where(nodeLayout => !nodeLayout.GetModel().OnlyLeaves).OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
-
-        /// <summary>
-        ///  Dictionary with all Nodelayouts only for leaf nodes
-        /// </summary>
-        public Dictionary<NodeLayoutKind, string> SubLayoutsLeafNodes = Enum.GetValues(typeof(NodeLayoutKind)).Cast<NodeLayoutKind>().OrderBy(x => x.ToString()).ToDictionary(i => i, i => i.ToString());
 
         /// <summary>
         /// Saves all data needed for the listing of the dirs in gui in cosegraphSettings
@@ -709,7 +669,7 @@ namespace SEE.Game
         {
             if (NodeLayout == NodeLayoutKind.CompoundSpringEmbedder)
             {
-                Dictionary<string, bool> dirs = CoseGraphSettings.ListDirToggle;
+                Dictionary<string, bool> dirs = CoseGraphSettings.ListInnerNodeToggle;
                 // die neuen dirs 
                 Dictionary<string, bool> dirsLocal = new Dictionary<string, bool>();
 
@@ -729,8 +689,6 @@ namespace SEE.Game
                 // falls der key nicht in den alten dictonary ist
                 //dirsLocal = dirsLocal.Where(i => !dirs.ContainsKey(i.Key)).ToDictionary(i => i.Key, i => i.Value);
 
-                CoseGraphSettings.show = new Dictionary<string, bool>();
-
                 bool diff1 = dirs.Keys.Except(dirsLocal.Keys).Any();
                 bool diff2 = dirsLocal.Keys.Except(dirs.Keys).Any();
 
@@ -740,15 +698,13 @@ namespace SEE.Game
                 }
                 else
                 {
-                    CoseGraphSettings.DirShape = dirsShape;
-                    CoseGraphSettings.DirNodeLayout = dirsLayout;
-                    CoseGraphSettings.ListDirToggle = dirsLocal;
-                    // get roots
-                    CoseGraphSettings.rootDirs = graph.GetRoots();
+                    CoseGraphSettings.InnerNodeShape = dirsShape;
+                    CoseGraphSettings.InnerNodeLayout = dirsLayout;
+                    CoseGraphSettings.ListInnerNodeToggle = dirsLocal;
                 }
 
-                CoseGraphSettings.loadedForNodeTypes = SelectedNodeTypes.Where(type => type.Value == true).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-                CoseGraphSettings.rootDirs = graph.GetRoots();
+                CoseGraphSettings.LoadedForNodeTypes = SelectedNodeTypes.Where(type => type.Value)
+                                                                        .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             }
         }
     }

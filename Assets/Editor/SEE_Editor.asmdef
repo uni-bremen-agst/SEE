@@ -2,7 +2,8 @@
     "name": "SEE_Editor",
     "references": [
         "GUID:74fd32818bdd6ed012fb3490ef6e9793",
-        "GUID:cafbae0046a0f094db2fd816ce654fea"
+        "GUID:cafbae0046a0f094db2fd816ce654fea",
+        "GUID:1fbf338ef6b952a448262a7ff7df5fe4"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

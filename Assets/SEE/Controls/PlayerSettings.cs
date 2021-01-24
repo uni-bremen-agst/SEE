@@ -1,9 +1,14 @@
-﻿using System;
+﻿
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.MixedReality.Toolkit;
+using Microsoft.MixedReality.Toolkit.UI;
+using Microsoft.MixedReality.Toolkit.UI.BoundsControl;
 using Microsoft.MixedReality.Toolkit.Utilities;
 using OdinSerializer;
 using SEE.DataModel;
+using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.XR;
@@ -22,6 +27,7 @@ namespace SEE.Controls
     {
         /// <summary>
         /// What kind of input devices the player uses.
+        /// The order must be consistent with <see cref="PlayerName"/>.
         /// </summary>
         public enum PlayerInputType
         {
@@ -63,16 +69,28 @@ namespace SEE.Controls
         [Tooltip("The factor by which code cities should be scaled on startup."), OdinSerialize, Min(0.01f)]
         public float CityScalingFactor = 1f;
 
+        [Tooltip("Whether eye gaze should trigger hovering actions, such as node labels.")]
+        public bool EyeGazeHover = true;
+
+        [Range(0, 20)]
+        [Tooltip("The time in seconds after which staring at an object triggers its hovering action.")]
+        public float EyeStareDelay = 1;
+
         /// <summary>
         /// The game object representing the active local player, that is, the player 
         /// executing on this local instance of Unity.
         /// </summary>
-        [HideInInspector]
         public static GameObject LocalPlayer
         {
             get;
             private set;
         }
+        
+        /// <summary>
+        /// The cached player settings within this local instance of Unity.
+        /// Will be updated by <see cref="GetPlayerSettings"/> on its first call.
+        /// </summary>
+        private static PlayerSettings localPlayerSettings;
 
         /// <summary>
         /// The cached player input type within this local instance of Unity.
@@ -88,9 +106,22 @@ namespace SEE.Controls
         {
             if (localPlayerInputType == PlayerInputType.None)
             {
-                localPlayerInputType = FindObjectOfType<PlayerSettings>().playerInputType;
+                localPlayerInputType = GetPlayerSettings().playerInputType;
             }
             return localPlayerInputType;
+        }
+
+        /// <summary>
+        /// The player settings within this local instance of Unity.
+        /// </summary>
+        /// <returns>player settings</returns>
+        public static PlayerSettings GetPlayerSettings()
+        {
+            if (localPlayerSettings == null)
+            {
+                localPlayerSettings = FindObjectOfType<PlayerSettings>();
+            }
+            return localPlayerSettings;
         }
 
         /// <summary>
@@ -125,9 +156,9 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Disabbles all TeleportAreas and Teleports (SteamVR).
+        /// Disables all TeleportAreas and Teleports (SteamVR).
         /// </summary>
-        private void DisableSteamVRTeleporting()
+        private static void DisableSteamVRTeleporting()
         {
             foreach (TeleportArea area in FindObjectsOfType<TeleportArea>())
             {
@@ -161,7 +192,7 @@ namespace SEE.Controls
         /// <summary>
         /// Enables or disables mixed reality capabilities, including the Mixed Reality Toolkit.
         /// </summary>
-        /// param name = "isActive" > If true, mixed reality capabilities are enabled, otherwise they will be disabled.</param>
+        /// <param name = "isActive"> If true, mixed reality capabilities are enabled, otherwise they will be disabled.</param>
         private void SetMixedReality(bool isActive)
         {
             playerHoloLens?.SetActive(playerInputType == PlayerInputType.HoloLens);
@@ -184,6 +215,7 @@ namespace SEE.Controls
                 // Set selected experience scale 
                 MixedRealityToolkit.Instance.ActiveProfile.TargetExperienceScale = experienceScale;
                 
+                Debug.Log($"Current HoloLens scale: {experienceScale.ToString()}\n");
                 if (experienceScale == ExperienceScale.Seated || experienceScale == ExperienceScale.OrientationOnly)
                 {
                     // Position and scale planes and CodeCities accordingly using CityCollection grid
@@ -207,13 +239,13 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Enables or disables a game object with the given <paramref name="name" />.
+        /// Enables or disables a game object with the given <paramref name="gameObjectName" />.
         /// </summary>
-        /// <param name="name">name of the object to be enabled/disabled</param>
+        /// <param name="gameObjectName">name of the object to be enabled/disabled</param>
         /// <param name="activate">whether to enable or disable the object</param>
-        private void SetActive(string name, bool activate)
+        private void SetActive(string gameObjectName, bool activate)
         {
-            GameObject player = GameObject.Find(name);
+            GameObject player = GameObject.Find(gameObjectName);
             player?.SetActive(activate);           
         }
 
