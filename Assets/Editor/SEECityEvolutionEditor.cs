@@ -2,7 +2,6 @@
 
 using SEE.DataModel.DG;
 using SEE.Game;
-using SEE.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -17,11 +16,11 @@ namespace SEEEditor
     public class SEECityEvolutionEditor : StoredSEECityEditor
     {
         public override void OnInspectorGUI()
-        {
+        {            
             base.OnInspectorGUI();
             SEECityEvolution city = target as SEECityEvolution;
             Attributes();
-            city.maxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.maxRevisionsToLoad);
+            city.MaxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.MaxRevisionsToLoad);
             city.MarkerWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width of markers", city.MarkerWidth));
             city.MarkerHeight = Mathf.Max(0, EditorGUILayout.FloatField("Height of markers", city.MarkerHeight));
             ShowNodeTypes(city);
@@ -37,12 +36,13 @@ namespace SEEEditor
         /// Creates the buttons for loading the first graph of the evolution series.
         /// </summary>
         private void Buttons()
-        {            
+        {
             SEECityEvolution city = target as SEECityEvolution;
+          
             if (firstGraph == null && GUILayout.Button("Load First Graph"))
             {
                 firstGraph = city.LoadFirstGraph();
-                city.InspectSchema(firstGraph);                      
+                city.InspectSchema(firstGraph);
             }
             if (firstGraph != null && GUILayout.Button("Draw"))
             {

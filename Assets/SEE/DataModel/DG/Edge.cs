@@ -53,15 +53,6 @@ namespace SEE.DataModel.DG
         /// </summary>
         public const string IsLiftedToggle = "IsLifted";
 
-        public override string Type
-        {
-            get => base.Type;
-            set
-            {
-                base.Type = !string.IsNullOrEmpty(value) ? value : "Unknown";               
-            }
-        }
-
         /// <summary>
         /// The source of the edge.
         /// </summary

@@ -53,12 +53,12 @@ namespace SEE.Layout.NodeLayouts.Cose
         private CoseGraph lowestCommonAncestor;
 
         /// <summary>
-        /// the lowest common anchestor of the source node
+        /// the lowest common ancestor of the source node
         /// </summary>
         private CoseNode sourceInLca;
 
         /// <summary>
-        /// the lowest common anchestor of the target node
+        /// the lowest common ancestor of the target node
         /// </summary>
         private CoseNode targetInLca;
 
@@ -171,7 +171,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// updates the legth of the edge (diffrent node sizes)
+        /// updates the legth of the edge (different node sizes)
         /// </summary>
         public void UpdateLenght()
         {

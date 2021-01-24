@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.MixedReality.Toolkit.Input;
 using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
@@ -13,7 +14,7 @@ namespace SEE.Controls
     /// </summary>
     [RequireComponent(typeof(Interactable))]
     [RequireComponent(typeof(NodeRef))]
-    public sealed class InteractableObject : MonoBehaviour
+    public sealed class InteractableObject : MonoBehaviour, IMixedRealityFocusHandler
     {
         // Tutorial on grabbing objects:
         // https://www.youtube.com/watch?v=MKOc8J877tI&t=15s
@@ -96,11 +97,7 @@ namespace SEE.Controls
             ID = nextID++;
             interactableObjects.Add(ID, this);
 
-            interactable = GetComponent<Interactable>();
-            if (interactable == null)
-            {
-                Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
-            }
+            gameObject.TryGetComponentOrLog(out interactable);
         }
 
         /// <summary>
@@ -111,10 +108,7 @@ namespace SEE.Controls
         /// <returns></returns>
         public static InteractableObject Get(uint id)
         {
-            if (!interactableObjects.TryGetValue(id, out InteractableObject result))
-            {
-                result = null;
-            }
+            interactableObjects.TryGetValue(id, out InteractableObject result);
             return result;
         }
 
@@ -369,6 +363,36 @@ namespace SEE.Controls
                 SetHover(false, true);
             }
         }
+        
+        //----------------------------------------
+        // Actions called by the MRTK on HoloLens.
+        //----------------------------------------
+        
+        public void OnFocusEnter(FocusEventData eventData)
+        {
+            // In case of eye gaze, we discard the input.
+            // We handle eye gaze using the BaseEyeFocusHandler in order to only activate hovering mechanisms
+            // when the user dwells on the object, otherwise the sudden changes would be too jarring.
+            if (eventData.Pointer.InputSourceParent.SourceType != InputSourceType.Eyes)
+            {
+                SetHover(true, true);
+            }
+        }
+
+        public void OnFocusExit(FocusEventData eventData)
+        {
+            // Similarly to OnFocusEnter(), we discard the input in case of eye gaze to avoid jarring changes.
+            if (eventData.Pointer.InputSourceParent.SourceType != InputSourceType.Eyes 
+                && !eventData.Pointer.PointerName.StartsWith("None"))
+            {
+                // Unfortunately, there seems to be a bug in the MRTK:
+                // The SourceType is falsely reported by the MRTK as "Hands" here
+                // (in contrast to OnFocusEnter(), where Eyes are correctly reported.)
+                // The only recognizable difference seems to be that the pointer isn't attached to any hand
+                // so it's just called "None Hand" instead of "Right Hand", we use this to detect it.
+                SetHover(false, true);
+            }
+        }
 
         //----------------------------------------------------------------
         // Private actions called by the hand when the object is hovered.
@@ -378,13 +402,14 @@ namespace SEE.Controls
 
         private const Hand.AttachmentFlags AttachmentFlags
             = Hand.defaultAttachmentFlags
-            & (~Hand.AttachmentFlags.SnapOnAttach)
-            & (~Hand.AttachmentFlags.DetachOthers)
-            & (~Hand.AttachmentFlags.VelocityMovement);
+            & ~Hand.AttachmentFlags.SnapOnAttach
+            & ~Hand.AttachmentFlags.DetachOthers
+            & ~Hand.AttachmentFlags.VelocityMovement;
 
         private void OnHandHoverBegin(Hand hand) => SetHover(true, true);
         private void OnHandHoverEnd(Hand hand) => SetHover(false, true);
 
-#endregion
+        #endregion
+
     }
 }
