@@ -21,27 +21,30 @@
 // SOFTWARE.
 
 using SEE.DataModel;
+using SEE.Utils;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
 namespace SEE.Game
 {
+    /// <summary>
+    /// Configuration of a code city for the visualization of dynamic data in
+    /// traced at the level of statements.
+    /// </summary>
     public class SEEJlgCity : SEECity
     {
-        /// <summary>
-        /// The full path to the jlg source file.
-        /// </summary>
-        public string jlgPath;
+        /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
+        /// configuration file, make sure you save and restore it in 
+        /// <see cref="SEEJlgCity.Save(ConfigWriter)"/> and 
+        /// <see cref="SEEJlgCity.Restore(Dictionary{string, object})"/>, 
+        /// respectively. You should also extend the test cases in TestConfigIO.
 
         /// <summary>
-        /// Returns the concatenation of pathPrefix and jlgPath. That is the complete
-        /// absolute path to the JLG file containing the runtime trace data.
+        /// Path to the JLG file containing the runtime trace data.
         /// </summary>
-        /// <returns>concatenation of pathPrefix and jlgPath</returns>
-        public string JLGPath()
-        {
-            return PathPrefix + jlgPath;
-        }
+        /// <returns>path of JLG file</returns>
+        public DataPath JLGPath = new DataPath();
 
         public override void LoadData()
         {
@@ -54,7 +57,7 @@ namespace SEE.Game
         /// </summary>
         private void LoadJLG()
         {
-            string path = JLGPath();
+            string path = JLGPath.Path;
 
             if (string.IsNullOrEmpty(path))
             {
@@ -93,6 +96,31 @@ namespace SEE.Game
             jlgVisualisationGameObject.tag = Tags.JLGVisualization;
 
             jlgVisualisationGameObject.AddComponent<Runtime.JLGVisualizer>().jlgFilePath = path;
+        }
+
+        //----------------------------------------------------------------------------
+        // Input/output of configuration attributes
+        //----------------------------------------------------------------------------
+
+        // The labels for the configuration attributes in the configuration file.
+        private const string JLGPathLabel = "JLGPath";
+
+        /// <summary>
+        /// <see cref="AbstractSEECity.Save(ConfigWriter)"/>
+        /// </summary>
+        protected override void Save(ConfigWriter writer)
+        {
+            base.Save(writer);
+            JLGPath.Save(writer, JLGPathLabel);
+        }
+
+        /// <summary>
+        /// <see cref="AbstractSEECity.Restore(Dictionary{string, object})"/>.
+        /// </summary>
+        protected override void Restore(Dictionary<string, object> attributes)
+        {
+            base.Restore(attributes);
+            JLGPath.Restore(attributes, JLGPathLabel);
         }
     }
 }
