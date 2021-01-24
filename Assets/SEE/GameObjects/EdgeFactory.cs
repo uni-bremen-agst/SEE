@@ -1,9 +1,9 @@
-﻿using SEE.DataModel;
+﻿using System.Collections.Generic;
+using System.Linq;
+using SEE.DataModel;
 using SEE.Game;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.GO
