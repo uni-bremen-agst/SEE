@@ -16,6 +16,8 @@ namespace SEE.Controls
         /// </summary>
         private SEECity city = null;
 
+        public SEECity City { get => city; set => city = value; }
+
         /// <summary>
         /// The New GameObject
         /// </summary>
@@ -26,6 +28,8 @@ namespace SEE.Controls
         /// 1. ID, 2. SourceName, 3. Type
         /// </summary>
         private Tuple<String, String, String> nodeMetrics = null;
+
+        public Tuple<string, string, string> NodeMetrics { get => nodeMetrics; set => nodeMetrics = value; }
 
         /// <summary>
         /// The script which instantiates the adding-node-canvas
@@ -121,7 +125,12 @@ namespace SEE.Controls
             CanvasIsClosed
         }
 
+        /// <summary>
+        /// The specific state of the progress of adding a node to the implementation.
+        /// </summary>
         private Progress progress = Progress.NoCitySelected;
+
+        public Progress Progress1 { get => progress; set => progress = value; }
 
         public void Start()
         {
@@ -129,56 +138,57 @@ namespace SEE.Controls
             InitialiseCanvasObject();
         }
 
+
         public void Update()
         {
-            if (progress.Equals(Progress.NoCitySelected))
+            switch (Progress1)
             {
-                SelectCity();
-                if (city != null)
-                {
-                    progress = Progress.CityIsSelected;
-                }
-                Debug.Log(progress.ToString());
-            }
+                case Progress.NoCitySelected:
 
-            if (progress.Equals(Progress.CityIsSelected))
-            {
-                OpenDialog();
-                progress = Progress.WaitingForValues;
-            }
-
-            if (progress.Equals(Progress.CanvasIsClosed))
-            {
-                CanvasGenerator c = canvasObject.GetComponent<CanvasGenerator>();
-                AddingNodeCanvasScript script = canvasObject.GetComponent<AddingNodeCanvasScript>();
-                script.GetNodeMetrics();
-                c.DestroyAddNodeCanvas();
-                progress = Progress.ValuesAreGiven;
-            }
-
-            if (progress.Equals(Progress.ValuesAreGiven))
-            {
-
-                if (GONode == null)
-                {
-                    NewNode();
-                    GameNodeMover.MoveTo(GONode);
-                }
-                else
-                {
-                    if (Input.GetMouseButtonDown(0))
+                    SelectCity();
+                    if (city != null)
                     {
-                        Place();
-                        progress = Progress.NoCitySelected;
+                        Progress1 = Progress.CityIsSelected;
+                    }
+                    break;
+
+                case Progress.CityIsSelected:
+
+                    OpenDialog();
+                    Progress1 = Progress.WaitingForValues;
+                    break;
+
+                case Progress.CanvasIsClosed:
+                    //Removes the canvasObject and extracts the values from it to create a new node with these params.
+
+                    CanvasGenerator c = canvasObject.GetComponent<CanvasGenerator>();
+                    AddingNodeCanvasScript script = canvasObject.GetComponent<AddingNodeCanvasScript>();
+                    script.GetNodeMetrics();
+                    c.DestroyAddNodeCanvas();
+                    Progress1 = Progress.ValuesAreGiven;
+                    break;
+
+                case Progress.ValuesAreGiven:
+
+                    if (GONode == null)
+                    {
+                        NewNode();
+                        GameNodeMover.MoveTo(GONode);
                     }
                     else
                     {
-                        GameNodeMover.MoveTo(GONode);
+                        if (Input.GetMouseButtonDown(0))
+                        {
+                            Place();
+                            Progress1 = Progress.NoCitySelected;
+                        }
+                        else
+                        {
+                            GameNodeMover.MoveTo(GONode);
+                        }
                     }
-                }
-
+                    break;
             }
-
         }
 
         /// <summary>
@@ -186,7 +196,6 @@ namespace SEE.Controls
         /// </summary>
         private void SelectCity()
         {
-
             /// The case the user hovers an object and has hovered objects before. The former colours of the specific objects are set again.
             if (hoveredObject != null && hoveredObjectList.Count > 0 && hoveredObject.gameObject.GetComponent<Renderer>().material.color != defaultHoverCityColor || hoveredObject == null && hoveredObjectList.Count > 0)
             {
@@ -209,6 +218,7 @@ namespace SEE.Controls
 
                 //Gets the SEECity from the hoverdObject
                 SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject.TryGetComponent<SEECity>(out city);
+                ///start-methode?
                 GetNodesOfScene();
                 if (dir_Root != null)
                 {
@@ -233,7 +243,7 @@ namespace SEE.Controls
             c.InstantiateAddingNodeCanvas();
         }
 
-        // <summary>
+        /// <summary>
         /// Undyes the the current colour of the object, i.e. changes the color of to its original color.
         /// </summary>
         public void Undye()
@@ -276,16 +286,11 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Adds a node to the loadedGraph and creats its ID. Repeats the process in case the generated ID is not unique.
-        /// Precondition: The parameter may be null, it is checked again before beeing added to the loadedGraph.
+        /// Adds a node to the loadedGraph and creates its ID. Repeats the process in case the generated ID is not unique.
         /// </summary>
         /// <param name="node">The node to add to the graph</param>
         private void AddNode(Node node)
         {
-            if (node == null)
-            {
-                return;
-            }
             try
             {
                 city.LoadedGraph.AddNode(node);
@@ -299,48 +304,40 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Creates a new node
+        /// Creates a new node. First, it is created with default-values which will be replaced by inputValues by the user if they are given.
+        /// Sets this node in the hierachy of the graph. 
         /// </summary>
         private void NewNode()
         {
             GameObject gameNode;
             System.Random rnd = new System.Random();
-            nodeMetrics = new Tuple<string, string, string>(Utils.RandomStrings.Get(), "NODE" + rnd.Next(0, 999999999), "Type" + rnd.Next(0, 999999999));
+            NodeMetrics = new Tuple<string, string, string>(Utils.RandomStrings.Get(), "NODE" + rnd.Next(0, 999999999), "Type" + rnd.Next(0, 999999999));
             Node node = new Node
             {
                 //Set the metrics of the new node
-                ID = nodeMetrics.Item1,
-                SourceName = nodeMetrics.Item2,
-                Type = nodeMetrics.Item3
+                ID = NodeMetrics.Item1,
+                SourceName = NodeMetrics.Item2,
+                Type = NodeMetrics.Item3
             };
 
-            //Adds the new Node to the City Graph
             AddNode(node);
+
             //Redraw the node Graph
             city.LoadedGraph.FinalizeNodeHierarchy();
 
-            //gets the renderer
             GraphRenderer graphRenderer = city.Renderer;
 
             if (isInnerNode)
             {
                 gameNode = graphRenderer.NewInnerNode(node);
-            }
-            else
-            {
-                gameNode = graphRenderer.NewLeafNode(node);
-            }
-
-            //Sets the The GONode so the main work can continue;
-            GONode = gameNode;
-
-            if (isInnerNode)
-            {
+                GONode = gameNode;
                 GONode.transform.localScale = medianOfInnerNode;
                 GONode.gameObject.GetComponent<Renderer>().material.color = innerNodeColor;
             }
-            else
+            if(!isInnerNode)
             {
+                gameNode = graphRenderer.NewLeafNode(node);
+                GONode = gameNode;
                 GONode.transform.localScale = medianOfLeaf;
                 GONode.gameObject.GetComponent<Renderer>().material.color = leafColor;
             }
@@ -349,7 +346,8 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Places a node on call and checks if the city is the preselected one
+        /// Places a node on call and checks if the city is the preselected one. Before this node will be placed, 
+        /// the default-values will be replaced by the users input, if it is given. 
         /// </summary>
         private void Place()
         {
@@ -369,7 +367,7 @@ namespace SEE.Controls
 
             SEECity cityTmp;
 
-            //checks if the currently hovered object is part of the preselected city
+            ///checks if the currently hovered object is part of the preselected city
             GameObject tmp = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
             try
             {
@@ -377,7 +375,7 @@ namespace SEE.Controls
             }
             catch (Exception)
             {
-                Debug.Log("city not selected"); // FIXME
+                Debug.Log("city not selected");
                 return;
             }
             if (cityTmp != null && city.Equals(cityTmp))
@@ -388,17 +386,17 @@ namespace SEE.Controls
             }
             else
             {
-                //FIXME: DO WE NEED TO DESTROY THE NODE TOO?
                 Destroy(GONode);
             }
+
             GONode = null;
             city = null;
-            nodeMetrics = null;
+            NodeMetrics = null;
         }
 
         /// <summary>
-        /// Removes The Script
-        /// Places the new Node if not placed
+        /// Removes this Script.
+        /// Places the new Node if it is not placed
         /// </summary>
         public override void RemoveScript()
         {
@@ -411,18 +409,20 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// 
+        /// Gets all Nodes of the scene and saves them inside of Collections - one InnerNode and one Leaf.
+        /// If there is just one Node, it is the root automatically. 
+        /// Else, this method searchs for all roots of the scene, too. 
+        /// Finally, the median of all nodes will calculated by the lists of Lossyscale of the gameObject-Nodes 
+        /// for constructing the node with a default-size.
         /// </summary>
         public void GetNodesOfScene()
         {
-
             List<Vector3> leafSize;
             List<Vector3> innerNodeSize;
 
             ICollection<GameObject> allLeafsInScene = SceneQueries.AllGameNodesInScene(true, false);
             ICollection<GameObject> allInnerNodesInScene = SceneQueries.AllGameNodesInScene(false, true);
 
-            ///List with the graphs roots or most likely only a single root of the specific city.
             List<Node> rootList = city.LoadedGraph.GetRoots();
 
             /// In the special case the graph only consists of one leaf, we will have to check in the list of all leafs, which has the count of one in that case,
@@ -432,17 +432,18 @@ namespace SEE.Controls
                 dir_Root = RootSearch(allLeafsInScene, rootList);
                 //FRAGE: BEDEUTET DAS NICHT AUTOMATISCH, DASS DAS EINE LEAF DIE ROOT IST?
                 //ALTERNATIVE: dir_Root = allLeafsInScene.
+                //Ich hab es dir gesagt Goedecke ;) 
                 //GameObject dir_RootBetterCode = allLeafsInScene.OfType<GameObject>().FirstOrDefault();
                 //Debug.Log(dir_RootBetterCode);
             }
 
             dir_Root = RootSearch(allInnerNodesInScene, rootList);
 
-            ///Lists of the sizes of Inner
+            //Lists of the gameObject-sizes of the nodes
             leafSize = ListOfLossyscale(allLeafsInScene);
             innerNodeSize = ListOfLossyscale(allInnerNodesInScene);
 
-            /// Calculate the median of the specific sets, either leafs or innernodes. 
+            
             medianOfLeaf = MathFunctions.CalcMedian(leafSize);
             medianOfInnerNode = MathFunctions.CalcMedian(innerNodeSize);
 
@@ -471,7 +472,7 @@ namespace SEE.Controls
 
             foreach (GameObject go in pListOfGameObjects)
             {
-                ///to specify if the specific node belong to the specific graph. 
+                //to specify if the specific node belong to the specific graph. 
                 if (go.GetComponent<NodeRef>().node.ItsGraph == city.LoadedGraph)
                 {
                     lossyScaleList.Add(go.transform.lossyScale);
@@ -484,6 +485,7 @@ namespace SEE.Controls
         /// Search for a rootNode in a given list of Gameobjects. 
         /// </summary>
         /// <param name="pListOfGameNodes"></param>
+        /// <param name="pListofRoots"></param>
         /// <returns> The rootnode as gameObject in case the root is found, else dir_root (which can be null).</returns>
         private GameObject RootSearch(ICollection<GameObject> pListOfGameNodes, List<Node> pListofRoots)
         {
@@ -508,50 +510,28 @@ namespace SEE.Controls
             return dir_Root;
         }
 
-        public void SetState(Progress p)
-        {
-            progress = p;
-        }
-
-        /// <summary>
-        /// Sets the param IsInnerNode for Network Use
-        /// </summary>
-        /// <param name="IsInnerNode">Should the new node be a inner or not</param>
-        public void SetIsInnerNode(bool IsInnerNode)
-        {
-            isInnerNode = IsInnerNode;
-        }
-
-        /// <summary>
-        /// Set the City for Network Use
-        /// </summary>
-        /// <param name="cit">the city</param>
-        public void SetCity(SEECity City)
-        {
-            city = City;
-        }
-
-        /// <summary>
-        /// Sets the Node Metrics for NEtwork Use
-        /// </summary>
-        /// <param name="NodeMetrics">the node metrics</param>
-        public void SetNodeMetrics(string NodeMetrics1, string NodeMetrics2, string NodeMetrics3)
-        {
-            nodeMetrics = new Tuple<string, string, string> ( NodeMetrics1,NodeMetrics2,NodeMetrics3);
-        }
-
         /// <summary>
         /// For Network Use Only, creates the new node on the Clients
         /// </summary>
-        /// <param name="position">The position of the new node</param>
+        /// <param name="position"> The position of the new node</param>
+        /// <param name="parentID"></param>
+        /// <param name="scale"></param>
         public void NetworkNewNode(Vector3 position,Vector3 scale ,string parentID)
         {
-
             NewNode();
             GONode.SetScale(scale);
             GameNodeMover.NetworkFinalizeNodePosition(GONode,parentID,position);
             GONode = null;
             RemoveScript();
+        }
+
+        /// <summary>
+        /// Setter for the Static isInnerNode-variable
+        /// </summary>
+        /// <param name="isInnerNode"></param>
+        public void SetIsInnerNode(bool isInnerNode)
+        {
+            IsInnerNode = isInnerNode;
         }
     }
 
