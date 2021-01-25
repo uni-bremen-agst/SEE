@@ -1370,9 +1370,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 907e5a4f306d4124f98d747b8a17e920, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  addingButton: {fileID: 2912748952741219896}
+  addingButton: {fileID: 0}
   editNodeCancel: {fileID: 826077016185094173}
   editNodeButton: {fileID: 2912748952741219896}
+  playerActions: {fileID: 0}
 --- !u!1 &9140197740766457383
 GameObject:
   m_ObjectHideFlags: 0
