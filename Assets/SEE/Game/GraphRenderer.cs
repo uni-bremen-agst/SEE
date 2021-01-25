@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -267,14 +267,7 @@ namespace SEE.Game
         }
 
 
-
-
-
-
-
-
-
-    /// <summary>
+        /// <summary>
         /// Applies the edge layout according to the the user's choice (settings) for
         /// all edges in between nodes in <paramref name="gameNodes"/>.
         /// </summary>

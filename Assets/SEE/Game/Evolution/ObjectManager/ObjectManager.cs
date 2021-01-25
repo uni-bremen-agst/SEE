@@ -223,9 +223,10 @@ namespace SEE.Game.Evolution
         /// </summary>
         private ICollection<GameObject> edges;
 
+        /// <summary>
+        /// The list of edges calculated for the next graph.
+        /// </summary>
         private ICollection<GameObject> newEdges;
-
-        private ICollection<GameObject> newEdges2;
 
         /// <summary>
         /// Renders all edges for the nodes in the node cache according to the settings.
@@ -234,34 +235,22 @@ namespace SEE.Game.Evolution
         public void RenderEdges()
         {
             ClearEdges();
+            ClearNewEdges();
             // FIXME: Provide meaningful values for scaleFactor.
-
-
 
             edges = _graphRenderer.EdgeLayout(nodes.Values);
-
-
-           
-        }
-
-        public void RenderEdges2()
-        {
-            ClearEdges2();
-            // FIXME: Provide meaningful values for scaleFactor.
-
-
-
-            newEdges2 = _graphRenderer.EdgeLayout(nodes.Values);
-
-
-           
         }
 
 
-        public ICollection<GameObject> GetEdges2(){return newEdges2;}
 
+        
+        /// <returns>The list of edges rendered for this graph</returns>
         public ICollection<GameObject> GetEdges(){return edges;}
 
+        /// <summary>
+        /// Calculates the edges of the next graph
+        /// </summary>
+        /// <returns>The list of calculated edges of the next graph</returns>
         public ICollection<GameObject> CalculateNewEdgeControlPoints(){
             ClearNewEdges();
             newEdges = _graphRenderer.CalculateNewEdgeLayout(nodes.Values);
@@ -269,6 +258,9 @@ namespace SEE.Game.Evolution
 
         }
 
+        /// <summary>
+        /// Destroys an edge from the graph
+        /// </summary>
         public void RemoveEdge(Edge edge){
             foreach(GameObject go in edges.ToList<GameObject>()){
                 if(edge.ID.Equals(go.ID())){
@@ -278,6 +270,10 @@ namespace SEE.Game.Evolution
             }
         }
 
+        /// <summary>
+        /// Destroys all game objects created for newEdges.
+        /// Postcondition: 
+        /// </summary>
         private void ClearNewEdges()
         {
             if (newEdges != null)
@@ -327,20 +323,6 @@ namespace SEE.Game.Evolution
                 Destroyer.DestroyGameObject(gameObject);
             }
             nodes.Clear();
-        }
-
-        private void ClearEdges2()
-        {
-            if (newEdges2 != null)
-            {
-                foreach (GameObject gameObject in newEdges2)
-                {
-                    Destroyer.DestroyGameObject(gameObject);
-                }
-                // edges will be overridden in RenderEdges() each time, that is why we
-                // do not Clear() it but reset it to null
-                edges = null;
-            }
         }
 
         /// <summary>
