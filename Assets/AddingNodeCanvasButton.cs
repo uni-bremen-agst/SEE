@@ -4,7 +4,7 @@ using SEE.Controls;
 using SEE.Controls.Actions;
 
 /// <summary>
-/// This script is been added to the Button of the adding-node-canvas.
+/// This script is been added to the Button of the adding-node-canvas and the edit-node-canvas.
 /// </summary>
 public class AddingNodeCanvasButton : MonoBehaviour
 {
@@ -25,14 +25,19 @@ public class AddingNodeCanvasButton : MonoBehaviour
     /// </summary>
     public Button editNodeButton;
 
+    public PlayerActions playerActions;
+
+
+
+
     /// <summary>
     /// Adds a listener to the button which calls a method when the button is pushed.
-    /// </summary>
+    /// </summary>   
     void Start()
     {
         if (addingButton != null)
         {
-            addingButton.onClick.AddListener(SetCanvasIsActive);
+            addingButton.onClick.AddListener(SetNextAddingNodeStep);
         }
         if (editNodeCancel != null)
         {
@@ -42,17 +47,18 @@ public class AddingNodeCanvasButton : MonoBehaviour
         {
             editNodeButton.onClick.AddListener(EditNode);
         }
+
+        GameObject g = GameObject.Find("DesktopPlayer");
+        Component playerActions = g.GetComponent<PlayerActions>();
     }
 
     /// <summary>
-    /// Sets a bool in the DesktopNewNodeAction-script which is finishing the .
+    /// Increases the enum in the DesktopNewNodeAction-instance. This results in the next step of addingNode.
     /// </summary>
-    public void SetCanvasIsActive()
+    public void SetNextAddingNodeStep()
     {
-        GameObject g = GameObject.Find("DesktopPlayer");
-        Component c = g.GetComponent<PlayerActions>();
-        DesktopNewNodeAction current = c.GetComponent<DesktopNewNodeAction>();
-        current.SetState(DesktopNewNodeAction.Progress.CanvasIsClosed);
+        DesktopNewNodeAction current = playerActions.GetComponent<DesktopNewNodeAction>();
+        current.Progress1 = DesktopNewNodeAction.Progress.CanvasIsClosed;
     }
 
     /// <summary>
@@ -60,9 +66,13 @@ public class AddingNodeCanvasButton : MonoBehaviour
     /// </summary>
     public void EditIsCanceled()
     {
-        DesktopEditNodeAction.EditIsCanceled = true;
+        DesktopEditNodeAction current = playerActions.GetComponent<DesktopEditNodeAction>();
+        current.EditProgress = DesktopEditNodeAction.Progress.EditIsCanceled;
     }
 
+    /// <summary>
+    /// Sets a bool in the EditNodeCanvas-script which starts the edit-process and evaluation of the inputFields.
+    /// </summary>
     public void EditNode()
     {
         EditNodeCanvasScript.EditNode = true;

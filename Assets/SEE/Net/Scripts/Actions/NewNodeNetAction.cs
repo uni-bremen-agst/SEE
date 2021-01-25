@@ -1,6 +1,5 @@
 ﻿using SEE.Controls;
 using SEE.Game;
-using SEE.GO;
 using SEE.Net;
 using System;
 using UnityEngine;
@@ -19,7 +18,7 @@ public class NewNodeNetAction : AbstractAction
     public Vector3 scale;
 
     /// <summary>
-    /// Creates a new NewNodeNetActio
+    /// Creates a new NewNodeNetAction
     /// </summary>
     /// <param name="GameObjectID">the  GameObject on that the city is attached for the new node</param>
     /// <param name="IsInnerNode">should it be a inner node</param>
@@ -29,7 +28,6 @@ public class NewNodeNetAction : AbstractAction
     /// <param name="Position">the postition for the new node</param>
     public NewNodeNetAction(string GameObjectID, bool IsInnerNode, string NodeMetrics1, string NodeMetrics2, string NodeMetrics3, Vector3 Position, Vector3 Scale,string ParentID) : base()
     {
-        //city = City;
         gameObjectID = GameObjectID;
         parentID = ParentID;
         isInnerNode = IsInnerNode;
@@ -39,13 +37,16 @@ public class NewNodeNetAction : AbstractAction
         position = Position;
         scale = Scale;
     }
+
     /// <summary>
-    /// Things to Execute on the Server (None for this Class)
+    /// Things to Execute on the Server (None for this Class). Nessecary, because its abstract
+    /// in the superclass.
     /// </summary>
     protected override void ExecuteOnServer()
     {
 
     }
+
     /// <summary>
     /// Things to Execute on the Client Creates a new GameObject on each client
     /// </summary>
@@ -58,9 +59,9 @@ public class NewNodeNetAction : AbstractAction
             {
                 GameObject dummy = new GameObject();
                 dummy.AddComponent<DesktopNewNodeAction>();
-                dummy.GetComponent<DesktopNewNodeAction>().SetCity(city);
+                dummy.GetComponent<DesktopNewNodeAction>().City = city;
                 dummy.GetComponent<DesktopNewNodeAction>().SetIsInnerNode(isInnerNode);
-                dummy.GetComponent<DesktopNewNodeAction>().SetNodeMetrics(nodeMetrics1, nodeMetrics2, nodeMetrics3);
+                dummy.GetComponent<DesktopNewNodeAction>().NodeMetrics =  new Tuple <string, string,string >(nodeMetrics1, nodeMetrics2, nodeMetrics3);
                 dummy.GetComponent<DesktopNewNodeAction>().NetworkNewNode(position, scale, parentID);
             }
         }
