@@ -126,7 +126,7 @@ namespace SEE.Controls.Actions
                                    activeColor: Color.blue,
                                    inactiveColor: Lighter(Color.blue),
                                    entryOn: BrowseOn,
-                                   entryOff: null,
+                                   entryOff: Hide,
                                    isTransient: true),
                 // Moving a node within a graph
                 new MenuDescriptor(label: "Move",
@@ -158,7 +158,7 @@ namespace SEE.Controls.Actions
                                    activeColor: Color.green,
                                    inactiveColor: Lighter(Color.green),
                                    entryOn: ScaleNodeOn,
-                                   entryOff: null,
+                                   entryOff: Hide,
                                    isTransient: true),
                  //Starts the Edit-Node-Mode
                     new MenuDescriptor(label: "Edit Node",

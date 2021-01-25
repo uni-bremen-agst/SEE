@@ -25,9 +25,10 @@ public class DesktopEditNodeAction : DesktopNodeAction
     }
 
     /// <summary>
-    /// Waits until a node is selected by pushing mouse button on a gameNode 
-    /// Instantiates the canvasObject if a gameNode is selected 
-    /// Removes the canvas and resets values if the process is canceled
+    /// The update-method interacts in dependency of the edit-progress-state. (sequencial series)
+    /// NoNodeSelected: Waits until a node is selected by pushing mouse button on a gameNode 
+    /// NodeSelected: Instantiates the canvasObject if a gameNode is selected 
+    /// EditIsCanceled: Removes the canvas and resets values if the process is canceled
     /// </summary>
     void Update()
     {

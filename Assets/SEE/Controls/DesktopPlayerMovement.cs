@@ -11,8 +11,6 @@ namespace SEE.Controls
         [Tooltip("Boost factor of speed, applied when shift is pressed.")]
         public float BoostFactor = 2.0f;
 
-       
-
         private struct CameraState
         {
             internal float distance;
@@ -132,9 +130,7 @@ namespace SEE.Controls
                 }
                 mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
             }
-
-
-           
+  
         }
     }
 }
