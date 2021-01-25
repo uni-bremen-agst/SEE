@@ -98,11 +98,6 @@ namespace SEE.Controls
         private Vector3 medianOfInnerNode;
 
         /// <summary>
-        /// A gamobject which stores the graphs root. 
-        /// </summary>
-        private GameObject dir_Root = null;
-
-        /// <summary>
         /// The colour the graphs leafs graphical representation is dyed, set red by default . // To be changed when the metrics are considered
         /// </summary>
         private Color leafColor = Color.red;
@@ -230,8 +225,6 @@ namespace SEE.Controls
                 SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject.TryGetComponent<SEECity>(out city);
                 ///start-methode?
                 GetNodesOfScene();
-                if (dir_Root != null)
-                {
                     foreach (GameObject root in listOfRoots)
                     {
                         if (root.GetComponent<NodeRef>().node.ItsGraph == city.LoadedGraph)
@@ -239,7 +232,6 @@ namespace SEE.Controls
                             ChangeColor(root, Color.white);
                         }
                     }
-                }
             }
         }
 
@@ -433,21 +425,13 @@ namespace SEE.Controls
 
             List<Node> rootList = city.LoadedGraph.GetRoots();
 
-            /// In the special case the graph only consists of one leaf, we can set the only element of the 
-            /// leafslist directly to dir_root. 
-            if (allLeafsInScene.Count == 1 && allInnerNodesInScene.Count == 0)
-            {
-                dir_Root = allLeafsInScene.ElementAt(0);
-                
-            }
-
-            dir_Root = RootSearch(allInnerNodesInScene, rootList);
+            //It is nessecary to find the GameObjects, which are containing the specific root-nodes.
+            listOfRoots = RootSearch(allInnerNodesInScene,allLeafsInScene, rootList);
 
             //Lists of the gameObject-sizes of the nodes
             leafSize = ListOfLossyscale(allLeafsInScene);
             innerNodeSize = ListOfLossyscale(allInnerNodesInScene);
 
-            
             medianOfLeaf = MathFunctions.CalcMedian(leafSize);
             medianOfInnerNode = MathFunctions.CalcMedian(innerNodeSize);
 
@@ -458,6 +442,7 @@ namespace SEE.Controls
                 medianOfInnerNode = medianOfLeaf;
             }
         }
+
 
         /// <summary>
         /// Iterates the list of gameobjects and adds the lossyscale of the given objects to a list. 
@@ -486,32 +471,53 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Search for a rootNode in a given list of Gameobjects. 
+        /// Search for all rootNode-GameObjects in the given lists of Gameobjects. 
+        /// Special cases for the root-search: 
+        /// There is no node in the scene -> root = null
+        /// There is just one node in the scene -> root is this node
+        /// There are multipleRoots in the graph.
+        /// There is exactly one root in the graph
         /// </summary>
         /// <param name="pListOfGameNodes">The list of </param>
         /// <param name="pListofRoots"></param>
         /// <returns> The rootnode as gameObject in case the root is found, else dir_root (which can be null).</returns>
-        private GameObject RootSearch(ICollection<GameObject> pListOfGameNodes, List<Node> pListofRoots)
+        private List <GameObject> RootSearch(ICollection<GameObject> listOfInnerNodes, ICollection<GameObject> listofLeafs , List<Node> pListofRoots)
         {
-            Node rootTmp;
+            List<GameObject> listsOfRoot = new List<GameObject>();
 
-            ///In the special case a graph has not only a single root, we would have to iterate the list of Roots in order to 
-            ///compare the GameObject and search. 
+            if (listofLeafs.Count == 1 && listOfInnerNodes.Count == 0)
+            {
+               listsOfRoot.Add(listofLeafs.ElementAt(0));
+
+            }
+            if (listofLeafs.Count == 0 && listOfInnerNodes.Count == 0)
+            {
+                listsOfRoot = null;
+            }
+
             foreach (Node root in pListofRoots)
             {
                 Node rootOfCity = root;
-                foreach (GameObject rootSearchItem in pListOfGameNodes)
+                Node rootTmp;
+
+                foreach (GameObject rootSearchItem in listOfInnerNodes)
                 {
                     rootTmp = rootSearchItem.GetComponent<NodeRef>().node;
                     if (rootTmp.IsRoot() && rootTmp == rootOfCity && !(rootTmp == null))
                     {
-                        listOfRoots.Add(rootSearchItem);
-                        dir_Root = rootSearchItem;
+                        listsOfRoot.Add(rootSearchItem);
+                    }
+                }
+                foreach (GameObject rootSearchItem in listofLeafs)
+                {
+                    rootTmp = rootSearchItem.GetComponent<NodeRef>().node;
+                    if (rootTmp.IsRoot() && rootTmp == rootOfCity && !(rootTmp == null))
+                    {
+                        listsOfRoot.Add(rootSearchItem);
                     }
                 }
             }
-
-            return dir_Root;
+            return listsOfRoot;
         }
 
         /// <summary>
