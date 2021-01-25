@@ -54,7 +54,20 @@ namespace SEE.Controls
         [OdinSerialize]
         public PlayerInputType playerInputType = PlayerInputType.Desktop;
 
+        [Tooltip("The GameObject containing the desktop player.")]
+        [SerializeField] private GameObject playerDesktop;
+
+        [Tooltip("The GameObject containing the HoloLens player.")]
+        [SerializeField] private GameObject playerHoloLens;
+
+        [Tooltip("The GameObject containing the touch gamepad player.")]
+        [SerializeField] private GameObject playerTouchGamepad;
+
+        [Tooltip("The GameObject containing the VR player.")]
+        [SerializeField] private GameObject playerVR;
+
         [Header("VR specific settings (relevant only for VR players)")]
+
         [Tooltip("Whether the VR controllers should be hidden.")]
         public bool HideVRControllers = false;
 
@@ -148,11 +161,10 @@ namespace SEE.Controls
 
             Debug.LogFormat("Player input type: {0}\n", playerInputType.ToString());
 
-            SetActive(PlayerName[(int)PlayerInputType.Desktop], playerInputType == PlayerInputType.Desktop);
-            SetActive(PlayerName[(int)PlayerInputType.VR], playerInputType == PlayerInputType.VR);
-            SetActive(PlayerName[(int)PlayerInputType.TouchGamepad], playerInputType == PlayerInputType.TouchGamepad);
+            playerDesktop?.SetActive(playerInputType == PlayerInputType.Desktop);
             SetMixedReality(playerInputType == PlayerInputType.HoloLens);
-            SetLocalPlayer(PlayerName[(int)playerInputType]);
+            playerTouchGamepad?.SetActive(playerInputType == PlayerInputType.TouchGamepad);
+            playerVR?.SetActive(playerInputType == PlayerInputType.VR);
         }
 
         /// <summary>
@@ -195,7 +207,7 @@ namespace SEE.Controls
         /// <param name = "isActive"> If true, mixed reality capabilities are enabled, otherwise they will be disabled.</param>
         private void SetMixedReality(bool isActive)
         {
-            SetActive(PlayerName[(int)PlayerInputType.HoloLens], isActive);
+            playerHoloLens?.SetActive(playerInputType == PlayerInputType.HoloLens);
             SetActive("MixedRealityToolkit", isActive);
             SetActive("CityCollection", isActive);
             

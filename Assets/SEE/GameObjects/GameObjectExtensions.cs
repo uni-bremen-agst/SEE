@@ -31,8 +31,7 @@ namespace SEE.GO
 
                 return edgeRef.edge.ID;
             }
-
-            return nodeRef.node.ID;
+            return nodeRef.Value.ID;
         }
 
         /// <summary>
@@ -156,7 +155,7 @@ namespace SEE.GO
             {
                 if (nodeRef != null)
                 {
-                    return nodeRef.node;
+                    return nodeRef.Value;
                 }
                 else
                 {

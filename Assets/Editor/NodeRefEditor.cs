@@ -18,9 +18,9 @@ namespace SEEEditor
             NodeRef nodeRef = target as NodeRef;
 
             GUILayout.Label("Node attributes", EditorStyles.boldLabel);
-            if (nodeRef.node != null)
+            if (nodeRef.Value != null)
             {
-                ShowTypeAndAttributes(nodeRef.node);
+                ShowTypeAndAttributes(nodeRef.Value);
             }
             else
             {

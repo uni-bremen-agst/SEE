@@ -288,7 +288,7 @@ namespace SEE.Controls.Actions
             {
                 if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
                 {
-                    Node node = nodeRef.node;
+                    Node node = nodeRef.Value;
                     if (node != null)
                     {
                         nodes[node.ID] = gameObject;
@@ -391,20 +391,24 @@ namespace SEE.Controls.Actions
 
             if (Input.GetMouseButtonDown(0)) // Left mouse button
             {
-                if (Raycasting.RaycastNodes(out _, out NodeRef nodeRef)) // Select, replace or map
+                if (Raycasting.RaycastNodes(out RaycastHit hit, out NodeRef nodeRef)) // Select, replace or map
                 {
                     Assert.IsNotNull(nodeRef);
-                    Assert.IsNotNull(nodeRef.node);
+                    Assert.IsNotNull(nodeRef.Value);
 
-                    if (nodeRef.node.ItsGraph == implementation) // Set or replace implementation node
+                    // TODO @Torben: Please check.
+                    hit.transform.gameObject.TryGetComponent(out selection.interactableObject);
+                    selection.nodeRef = nodeRef;
+
+                    if (nodeRef.Value.ItsGraph == implementation) // Set or replace implementation node
                     {
                         selection.interactableObject?.SetSelect(false, true);
                         nodeRef.GetComponent<InteractableObject>().SetSelect(true, true);
                     }
                     else if (selection.nodeRef != null) // Create mapping
                     {
-                        Node n0 = selection.nodeRef.node;
-                        Node n1 = nodeRef.node;
+                        Node n0 = selection.nodeRef.Value;
+                        Node n1 = nodeRef.Value;
                         if (Reflexion.Is_Explicitly_Mapped(n0))
                         {
                             Node mapped = Reflexion.Get_Mapping().GetNode(n0.ID);
@@ -470,10 +474,10 @@ namespace SEE.Controls.Actions
         {
             foreach (Selection implementation in objectsInClipboard)
             {
-                if (!Reflexion.Is_Explicitly_Mapped(implementation.nodeRef.node))
+                if (!Reflexion.Is_Explicitly_Mapped(implementation.nodeRef.Value))
                 {
                     Debug.LogFormat("Mapping {0} -> {1}.\n", implementation.nodeRef.name, target.nodeRef.name);
-                    Reflexion.Add_To_Mapping(from: implementation.nodeRef.node, to: target.nodeRef.node);
+                    Reflexion.Add_To_Mapping(from: implementation.nodeRef.Value, to: target.nodeRef.Value);
                 }
                 else
                 {

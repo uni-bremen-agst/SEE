@@ -77,18 +77,18 @@ namespace SEE.Game.Runtime
                 for (int j = 0; j < gameObjectsWithTag.Length; j++)
                 {
                     NodeRef nodeRef = gameObjectsWithTag[j].GetComponent<NodeRef>();
-                    if (nodeRef != null && nodeRef.node != null)
+                    if (nodeRef != null && nodeRef.Value != null)
                     {
                         // We retrieve the linkname because that contains the encoding of the signature
                         // of a method specifying its parameters and return type.
                         // FIXME: This makes assumptions about the information content of a linkname
                         // that may not necessarily hold. 
-                        if (nodeRef.node.TryGetString(Node.LinknameAttribute, out string linkname))
+                        if (nodeRef.Value.TryGetString(Node.LinknameAttribute, out string linkname))
                         {
                             gameObjectsWithTag[j].GetComponentInChildren<MeshRenderer>().material.color = Color.black;
                             if (gameObjects.ContainsKey(linkname))
                             {
-                                Debug.LogWarning("Contains '" + nodeRef.node + "' already!");
+                                Debug.LogWarning("Contains '" + nodeRef.Value + "' already!");
                             }
                             else
                             {
@@ -97,7 +97,7 @@ namespace SEE.Game.Runtime
                         }
                         else
                         {
-                            Debug.LogWarningFormat("Node with ID {0} has no linkname.\n", nodeRef.node.ID);
+                            Debug.LogWarningFormat("Node with ID {0} has no linkname.\n", nodeRef.Value.ID);
                         }
                     }
                 }

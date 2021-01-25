@@ -13,7 +13,7 @@ namespace SEE.Game
     internal class SceneQueries
     {
         /// <summary>
-        /// Returns all game objects in the current scene tagged by Tags.Node and having 
+        /// Returns all game objects in the current scene tagged by Tags.Node and having
         /// a valid reference to a graph node.
         /// </summary>
         /// <returns>all game objects representing graph nodes in the scene</returns>
@@ -22,9 +22,9 @@ namespace SEE.Game
             List<GameObject> result = new List<GameObject>();
             foreach (GameObject go in GameObject.FindGameObjectsWithTag(Tags.Node))
             {
-                if (go.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+                if (go.TryGetComponent(out NodeRef nodeRef))
                 {
-                    Node node = nodeRef.node;
+                    Node node = nodeRef.Value;
                     if (node != null)
                     {
                         if ((includeLeaves && node.IsLeaf()) || (includeInnerNodes && !node.IsLeaf()))
@@ -42,7 +42,39 @@ namespace SEE.Game
                     Debug.LogWarningFormat("Game node {0} without node reference.\n", go.name);
                 }
             }
+            return result;
+        }
 
+        /// <summary>
+        /// Returns all node refs in the current scene of objects tagged by Tags.Node and
+        /// having a valid reference to a graph node.
+        /// </summary>
+        /// <returns>all game objects representing graph nodes in the scene</returns>
+        public static List<NodeRef> AllNodeRefsInScene(bool includeLeaves, bool includeInnerNodes)
+        {
+            List<NodeRef> result = new List<NodeRef>();
+            foreach (GameObject go in GameObject.FindGameObjectsWithTag(Tags.Node))
+            {
+                if (go.TryGetComponent(out NodeRef nodeRef))
+                {
+                    Node node = nodeRef.Value;
+                    if (node != null)
+                    {
+                        if ((includeLeaves && node.IsLeaf()) || (includeInnerNodes && !node.IsLeaf()))
+                        {
+                            result.Add(nodeRef);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarningFormat("Game node {0} has a null node reference.\n", go.name);
+                    }
+                }
+                else
+                {
+                    Debug.LogWarningFormat("Game node {0} without node reference.\n", go.name);
+                }
+            }
             return result;
         }
 
@@ -54,14 +86,33 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">game nodes whose roots are to be returned</param>
         /// <returns>all root nodes in the scene</returns>
-        public static ICollection<Node> GetRoots(ICollection<GameObject> gameNodes)
+        public static List<Node> GetRoots(ICollection<GameObject> gameNodes)
         {
             List<Node> result = new List<Node>();
             foreach (Graph graph in GetGraphs(gameNodes))
             {
                 result.AddRange(graph.GetRoots());
             }
+            return result;
+        }
 
+        public static HashSet<Node> GetRoots(ICollection<NodeRef> nodeRefs)
+        {
+            HashSet<Node> result = new HashSet<Node>();
+            foreach (NodeRef nodeRef in nodeRefs)
+            {
+                IEnumerable<Node> nodes = nodeRef?.Value?.ItsGraph?.GetRoots();
+                if (nodes != null)
+                {
+                    foreach (Node node in nodes)
+                    {
+                        if (node != null)
+                        {
+                            result.Add(node);
+                        }
+                    }
+                }
+            }
             return result;
         }
 
@@ -78,7 +129,7 @@ namespace SEE.Game
             HashSet<Graph> result = new HashSet<Graph>();
             foreach (GameObject go in gameNodes)
             {
-                result.Add(go.GetComponent<NodeRef>().node.ItsGraph);
+                result.Add(go.GetComponent<NodeRef>().Value.ItsGraph);
             }
 
             return result;
@@ -94,7 +145,12 @@ namespace SEE.Game
         /// <returns>true if <paramref name="gameNode"/> represents a leaf in the graph</returns>
         public static bool IsLeaf(GameObject gameNode)
         {
-            return gameNode.GetComponent<NodeRef>()?.node?.IsLeaf() ?? false;
+            return gameNode.GetComponent<NodeRef>()?.Value?.IsLeaf() ?? false;
+        }
+
+        public static bool IsLeaf(NodeRef nodeRef)
+        {
+            return nodeRef?.Value?.IsLeaf() ?? false;
         }
 
         /// <summary>
@@ -107,7 +163,7 @@ namespace SEE.Game
         /// <returns>true if <paramref name="gameNode"/> represents an inner node in the graph</returns>
         public static bool IsInnerNode(GameObject gameNode)
         {
-            return gameNode.GetComponent<NodeRef>()?.node?.IsInnerNode() ?? false;
+            return gameNode.GetComponent<NodeRef>()?.Value?.IsInnerNode() ?? false;
         }
 
         /// <summary>
@@ -121,13 +177,25 @@ namespace SEE.Game
         {
             if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
-                if (nodeRef.node != null)
+                if (nodeRef.Value != null)
                 {
-                    return nodeRef.node.SourceName;
+                    return nodeRef.Value.SourceName;
                 }
             }
 
             return gameNode.name;
+        }
+
+        public static string SourceName(NodeRef nodeRef)
+        {
+            string result = string.Empty;
+
+            if (nodeRef)
+            {
+                result = nodeRef.Value?.SourceName ?? nodeRef.gameObject.name;
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -202,14 +270,14 @@ namespace SEE.Game
             {
                 return null;
             }
-
-            NodeRef nodeRef = transform.GetComponent<NodeRef>();
-            if (nodeRef == null)
+            else if (transform.TryGetComponent(out NodeRef nodeRef))
+            {
+                return nodeRef.Value;
+            }
+            else
             {
                 return null;
             }
-
-            return nodeRef.node;
         }
 
         /// <summary>

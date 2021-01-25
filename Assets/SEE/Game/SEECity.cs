@@ -215,15 +215,15 @@ namespace SEE.Game
             foreach (Transform childTransform in parent.transform)
             {
                 GameObject child = childTransform.gameObject;
-                if (child.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+                if (child.TryGetComponent(out NodeRef nodeRef))
                 {
-                    nodeRef.node = graph.GetNode(child.name);
-                    if (nodeRef.node == null)
+                    nodeRef.Value = graph.GetNode(child.name);
+                    if (nodeRef.Value == null)
                     {
                         Debug.LogWarningFormat("Could not resolve node reference {0}.\n", child.name);
                     }
                 }
-                else if (child.TryGetComponent<EdgeRef>(out EdgeRef edgeRef))
+                else if (child.TryGetComponent(out EdgeRef edgeRef))
                 {
                     edgeRef.edge = graph.GetEdge(child.name);
                     if (edgeRef.edge == null)
@@ -231,6 +231,12 @@ namespace SEE.Game
                         Debug.LogWarningFormat("Could not resolve edge reference {0}.\n", child.name);          
                     }
                 }
+#if UNITY_EDITOR
+                else if (child.CompareTag(DataModel.Tags.Node) || child.CompareTag(DataModel.Tags.Edge))
+                {
+                    Debug.LogWarningFormat("Game object {0} has neither node nor edge reference.\n", child.name);
+                }
+#endif
                 SetNodeEdgeRefs(graph, child);
             }
         }

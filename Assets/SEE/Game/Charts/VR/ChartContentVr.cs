@@ -19,6 +19,8 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using SEE.Controls;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -41,12 +43,12 @@ namespace SEE.Game.Charts.VR
 
         /// <summary>
         /// FIXME: Obsolete. Should be removed. Is this used in the prefab?
-        /// A checkbox to toggle the <see cref="ChartManager.selectionMode" />.
+        /// A checkbox to toggle the <see cref="ChartManager.selectionMode"/>.
         /// </summary>
-        [SerializeField] private Toggle selectionToggle;
+        [SerializeField] private Toggle selectionToggle; // TODO(torben): remove?
 
         /// <summary>
-        /// Activates the <see cref="selectionToggle" />.
+        /// Activates the <see cref="selectionToggle"/>.
         /// </summary>
         protected override void Start()
         {
@@ -55,32 +57,23 @@ namespace SEE.Game.Charts.VR
         }
 
         /// <summary>
-        /// VR version of <see cref="ChartContent.AreaSelection" />.
+        /// Selects every linked <see cref="InteractableObject"/> of every
+        /// <see cref="ChartMarker"/> within given bounds.
         /// </summary>
-        /// <param name="min">The starting edge of the rectangle.</param>
-        /// <param name="max">The ending edge of the rectangle.</param>
-        /// <param name="direction">If <see cref="max" /> lies above or below <see cref="min" /></param>
-        public override void AreaSelection(Vector2 min, Vector2 max, bool direction)
+        /// <param name="min">The min value of the bounds.</param>
+        /// <param name="max">The max value of the bounds.</param>
+        public override void AreaSelection(Vector2 min, Vector2 max)
         {
-            if (direction)
+            foreach (ChartMarker marker in activeMarkers)
             {
-                foreach (GameObject marker in ActiveMarkers)
+                Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition; // TODO(torben): could i just use marker.transform.[...]?
+                if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                 {
-                    Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
-                    if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
+                    List<uint> ids = marker.ids;
+                    foreach (uint id in ids)
                     {
-                        ChartManager.OnSelect(marker.GetComponent<ChartMarker>().linkedObject);
-                    }
-                }
-            }
-            else
-            {
-                foreach (GameObject marker in ActiveMarkers)
-                {
-                    Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
-                    if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y < min.y && markerPos.y > max.y)
-                    {
-                        ChartManager.OnSelect(marker.GetComponent<ChartMarker>().linkedObject);
+                        InteractableObject o = InteractableObject.Get(id);
+                        o.SetSelect(true, true);
                     }
                 }
             }
