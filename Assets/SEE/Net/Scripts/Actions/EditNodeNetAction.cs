@@ -6,21 +6,35 @@ using UnityEngine;
 
 public class EditNodeNetAction : AbstractAction
 {
+
+    /// <summary>
+    /// The new name of the node which has to be edited.
+    /// </summary>
     public string scname;
+
+    /// <summary>
+    /// The new type of the node which has to be edited
+    /// </summary>
     public string type;
+
+    /// <summary>
+    /// The id of the GameNode-Object which has to be edited.
+    /// It cant be changed after the node-creation.
+    /// </summary>
     public string gameObjectID;
+
    /// <summary>
    /// Constructs a EditNodeNetAction
    /// </summary>
    /// <param name="SourceName">The new sourcename</param>
    /// <param name="Type">the new type</param>
    /// <param name="GameObjectID">the gameobject id which the node belongs to</param>
-    public EditNodeNetAction(string SourceName, string Type, string GameObjectID) : base()
+    public EditNodeNetAction(string sourceName, string type, string gameObjectID) : base()
     {
        // nodeToEdit = node;
-        scname = SourceName;
-        type = Type;
-        gameObjectID = GameObjectID;
+        scname = sourceName;
+        this.type = type;
+        this.gameObjectID = gameObjectID;
   
     }
     /// <summary>
@@ -53,6 +67,5 @@ public class EditNodeNetAction : AbstractAction
         }
 
     }
-
 
 }

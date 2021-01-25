@@ -25,6 +25,9 @@ public class AddingNodeCanvasButton : MonoBehaviour
     /// </summary>
     public Button editNodeButton;
 
+    /// <summary>
+    /// The Component playerActions, which is the parent of the DesktopNewNodeAction and DesktopEditNodeAction-scripts.
+    /// </summary>
     public PlayerActions playerActions;
 
 
@@ -54,7 +57,7 @@ public class AddingNodeCanvasButton : MonoBehaviour
     }
 
     /// <summary>
-    /// Increases the enum in the DesktopNewNodeAction-instance. This results in the next step of addingNode.
+    /// Increases the progress-enum in the DesktopNewNodeAction-instance. This results in the next step of addingNode.
     /// </summary>
     public void SetNextAddingNodeStep()
     {
