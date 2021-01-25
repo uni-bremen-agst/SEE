@@ -31,12 +31,24 @@ namespace SEE.Controls
         /// </summary>
         public enum PlayerInputType
         {
-            None         = 0, // no player at all
-            Desktop,          // player for desktop and mouse input
-            HoloLens,         // player for mixed reality devices
-            TouchGamepad,     // player for touch devices or gamepads using InControl
-            VR                // player for virtual reality devices
+            Desktop = 0,      // player for desktop and mouse input
+            TouchGamepad = 1, // player for touch devices or gamepads using InControl
+            VR = 2,           // player for virtual reality devices
+            HoloLens = 3,     // player for mixed reality devices
+            None = 4,         // no player at all
         }
+
+        /// <summary>
+        /// A mapping from PlayerInputType onto the names of the player game objects.
+        /// The order must be consistent with <see cref="PlayerInputType"/>.
+        /// </summary>
+        public static readonly string[] PlayerName = {
+            "DesktopPlayer", // Desktop
+            "InControl",     // TouchGamepad
+            "VRPlayer",      // VR          
+            "MRPlayer",      // HoloLens
+            "No Player",     // None
+            };
 
         [Tooltip("What kind of player type should be enabled.")]
         [OdinSerialize]
@@ -220,22 +232,53 @@ namespace SEE.Controls
                 {
                     // Position and scale planes and CodeCities accordingly using CityCollection grid
                     GameObject cityCollection = GameObject.Find("CityCollection").AssertNotNull("CityCollection");
-                    // Note: For unknown reasons, 'grid' mustn't be inlined so that it is possible to build the game...
-                    GridObjectCollection grid = null;
-                    UnityEngine.Assertions.Assert.IsTrue(cityCollection.TryGetComponent(out grid));
-                    GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
-                    foreach (GameObject city in cities)
-                    {
-                        city.transform.localScale *= CityScalingFactor;
-                        // City needs to be parented to collection to be organized by it
-                        city.transform.parent = cityCollection.transform;
-                    }
 
-                    // To avoid overlaps, set cell width to maximum length of code cities
-                    grid.CellWidth = cities.Select(x => x.transform.localScale.MaxComponent()).Max();
-                    grid.UpdateCollection();
+                    if (cityCollection.TryGetComponentOrLog(out GridObjectCollection grid))
+                    {
+
+                        GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
+
+                        foreach (GameObject city in cities)
+                        {
+                            // Scale city by given factor, and reset position to origin
+                            city.transform.localScale *= CityScalingFactor;
+                            // City needs to be parented to collection to be organized by it
+                            city.transform.parent = cityCollection.transform;
+                            
+                            AddInteractions(city);
+                            AppBarCityConfiguration(city);
+                        }
+
+                        SetGridCellWidth(grid, cities);
+                    }
                 }
-            }            
+            }
+
+            #region Local Methods
+
+            //Sets the width of the Grid containing the cities
+            void SetGridCellWidth(GridObjectCollection grid, IEnumerable<GameObject> cities)
+            {
+                // To avoid overlaps, set cell width to maximum length of code cities
+                grid.CellWidth = cities.Max(x => x.transform.localScale.MaxComponent());
+                grid.UpdateCollection();
+            }
+
+            // Adds AppBar and ObjectManipulator components to City
+            void AddInteractions(GameObject city)
+            {
+                city.AddComponent<AppBarInteractableObject>();
+                city.AddComponent<ObjectManipulator>();
+            }
+
+            void AppBarCityConfiguration(GameObject city)
+            {
+                BoundsControl boundsControl = city.AddComponent<BoundsControl>();
+                boundsControl.BoundsControlActivation = Microsoft.MixedReality.Toolkit.UI.BoundsControlTypes
+                                                                 .BoundsControlActivationType.ActivateManually;
+            }
+
+            #endregion
         }
 
         /// <summary>

@@ -5,7 +5,6 @@ using System.Linq;
 using SEE.Controls;
 using SEE.DataModel;
 using SEE.DataModel.DG;
-using SEE.Game.Charts;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
@@ -1373,17 +1372,15 @@ namespace SEE.Game
             {
                 throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
             }
+
+            Node node = noderef.Value;
+            if (node.IsLeaf())
+            {
+                return leafNodeFactory.Roof(gameNode);
+            }
             else
             {
-                Node node = noderef.Value;
-                if (node.IsLeaf())
-                {
-                    return leafNodeFactory.Roof(gameNode);
-                }
-                else
-                {
-                    return innerNodeFactory.Roof(gameNode);
-                }
+                return innerNodeFactory.Roof(gameNode);
             }
         }
 
@@ -1401,17 +1398,14 @@ namespace SEE.Game
             {
                 throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
             }
+            Node node = noderef.Value;
+            if (node.IsLeaf())
+            {
+                return leafNodeFactory.GetSize(gameNode);
+            }
             else
             {
-                Node node = noderef.Value;
-                if (node.IsLeaf())
-                {
-                    return leafNodeFactory.GetSize(gameNode);
-                }
-                else
-                {
-                    return innerNodeFactory.GetSize(gameNode);
-                }
+                return innerNodeFactory.GetSize(gameNode);
             }
         }
 
@@ -1455,18 +1449,16 @@ namespace SEE.Game
             {
                 throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
             }
+
+            Node node = noderef.Value;
+            int style = SelectStyle(node, innerNodeFactory);
+            if (node.IsLeaf())
+            {
+                leafNodeFactory.SetStyle(gameNode, style);
+            }
             else
             {
-                Node node = noderef.Value;
-                int style = SelectStyle(node, innerNodeFactory);
-                if (node.IsLeaf())
-                {
-                    leafNodeFactory.SetStyle(gameNode, style);
-                }
-                else
-                {
-                    innerNodeFactory.SetStyle(gameNode, style); // TODO: for some reason, the material is selected twice. once here and once somewhere earlier (i believe in NewBlock somewhere).
-                }
+                innerNodeFactory.SetStyle(gameNode, style); // TODO: for some reason, the material is selected twice. once here and once somewhere earlier (i believe in NewBlock somewhere).
             }
         }
 
@@ -1487,34 +1479,32 @@ namespace SEE.Game
             {
                 throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
             }
-            else
-            {
-                Node node = nodeRef.Value;
-                if (node.IsLeaf())
-                {
-                    // Scaled metric values for the three dimensions.
-                    Vector3 scale = GetScale(node);
 
-                    // Scale according to the metrics.
-                    if (settings.NodeLayout == NodeLayoutKind.Treemap)
-                    {
-                        // FIXME: This is ugly. The graph renderer should not need to care what
-                        // kind of layout was applied.
-                        // In case of treemaps, the width metric is mapped on the ground area.
-                        float widthOfSquare = Mathf.Sqrt(scale.x);
-                        leafNodeFactory.SetWidth(gameNode, leafNodeFactory.Unit * widthOfSquare);
-                        leafNodeFactory.SetDepth(gameNode, leafNodeFactory.Unit * widthOfSquare);
-                        leafNodeFactory.SetHeight(gameNode, leafNodeFactory.Unit * scale.y);
-                    }
-                    else
-                    {
-                        gameNode.transform.localScale = leafNodeFactory.Unit * scale;
-                    }
+            Node node = nodeRef.Value;
+            if (node.IsLeaf())
+            {
+                // Scaled metric values for the three dimensions.
+                Vector3 scale = GetScale(node);
+
+                // Scale according to the metrics.
+                if (settings.NodeLayout == NodeLayoutKind.Treemap)
+                {
+                    // FIXME: This is ugly. The graph renderer should not need to care what
+                    // kind of layout was applied.
+                    // In case of treemaps, the width metric is mapped on the ground area.
+                    float widthOfSquare = Mathf.Sqrt(scale.x);
+                    leafNodeFactory.SetWidth(gameNode, leafNodeFactory.Unit * widthOfSquare);
+                    leafNodeFactory.SetDepth(gameNode, leafNodeFactory.Unit * widthOfSquare);
+                    leafNodeFactory.SetHeight(gameNode, leafNodeFactory.Unit * scale.y);
                 }
                 else
                 {
-                    throw new Exception("Game object " + gameNode.name + " is not a leaf.");
+                    gameNode.transform.localScale = leafNodeFactory.Unit * scale;
                 }
+            }
+            else
+            {
+                throw new Exception("Game object " + gameNode.name + " is not a leaf.");
             }
         }
 
