@@ -42,7 +42,6 @@ namespace SEE.Game
                     Debug.LogWarningFormat("Game node {0} without node reference.\n", go.name);
                 }
             }
-
             return result;
         }
 
@@ -94,7 +93,6 @@ namespace SEE.Game
             {
                 result.AddRange(graph.GetRoots());
             }
-
             return result;
         }
 
@@ -272,17 +270,13 @@ namespace SEE.Game
             {
                 return null;
             }
+            else if (transform.TryGetComponent(out NodeRef nodeRef))
+            {
+                return nodeRef.Value;
+            }
             else
             {
-                NodeRef nodeRef = transform.GetComponent<NodeRef>();
-                if (nodeRef == null)
-                {
-                    return null;
-                }
-                else
-                {
-                    return nodeRef.Value;
-                }
+                return null;
             }
         }
 

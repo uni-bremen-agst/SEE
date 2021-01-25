@@ -232,7 +232,7 @@ namespace SEE.Game
                     }
                 }
 #if UNITY_EDITOR
-                else if (child.tag.CompareTo(DataModel.Tags.Node) == 0 || child.tag.CompareTo(DataModel.Tags.Edge) == 0)
+                else if (child.CompareTag(DataModel.Tags.Node) || child.CompareTag(DataModel.Tags.Edge))
                 {
                     Debug.LogWarningFormat("Game object {0} has neither node nor edge reference.\n", child.name);
                 }
