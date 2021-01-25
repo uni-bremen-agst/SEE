@@ -158,6 +158,21 @@ namespace SEE.Game
         private bool _isStillAnimating = false;  // serialized by Unity
 
         /// <summary>
+        /// Whether the edge animation is ongoing.
+        /// </summary>
+        private bool moveEdges = false;
+
+        /// <summary>
+        /// Saves pairs of old and new edges.
+        /// </summary>
+        private IList<(GameObject, GameObject)> matchedEdges;
+
+        /// <summary>
+        /// Timer for edge animation
+        /// </summary>
+        private float timer = 0f;
+
+        /// <summary>
         /// True if animation is still ongoing.
         /// </summary>
         public bool IsStillAnimating
@@ -484,14 +499,18 @@ namespace SEE.Game
             Invoke("AnimateEdges", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
         }
 
+        /// <summary>
+        /// Event function triggered when the knot animation is finished. Starts the animation of the edges.
+        /// </summary>
         private void AnimateEdges()
         {
+            //Starts the edge animation
             MoveEdges();
             Invoke("OnAnimationsFinished", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
         }
 
         /// <summary>
-        /// Event function triggered when alls animations are finished. Renders all edges
+        /// Event function triggered when alls animations are finished. Animates the transition of the edges and renders all edges
         /// as new and notifies everyone that the animation is finished.
         /// </summary>
         private void OnAnimationsFinished()
@@ -501,7 +520,7 @@ namespace SEE.Game
             // of the animation cycle.
             
             objectManager.RenderEdges();
-
+            //Stops the edge animation
             moveEdges = false;
             IsStillAnimating = false;
             AnimationFinishedEvent.Invoke();
@@ -533,11 +552,11 @@ namespace SEE.Game
                 Tweens.Scale(plane, scale, moveAnimator.MaxAnimationTime);
                 Tweens.Move(plane, centerPosition, moveAnimator.MaxAnimationTime);
             }
-            MoveEdges();
-            
         }
 
-
+        /// <summary>
+        /// Combines the edges of the old and the new graph by their ID. Called by the MoveEdges method
+        /// </summary>
         protected virtual IList<(GameObject, GameObject)> EdgeMatcher(IList<GameObject> oldEdges, IList<GameObject> newEdges){
             IList<(GameObject, GameObject)> result = new List<(GameObject, GameObject)>();
             foreach(GameObject oGO in oldEdges){
@@ -552,46 +571,41 @@ namespace SEE.Game
             return result;
         }
 
-        bool moveEdges = false;
-
-        AbstractSEECity settings;
-
-        IList<(GameObject, GameObject)> matchedEdges;
-
+        
+        /// <summary>
+        /// Calculates the control points of the edges of the next graph and generates their actual line points from them. 
+        /// </summary>
         protected virtual void MoveEdges(){
            try{
-              
+                //Calculates the edges for the next graph
                 IList<GameObject> newEdges = objectManager.CalculateNewEdgeControlPoints().ToList();
                 IList<GameObject> oldEdges = objectManager.GetEdges().ToList();
-
-                matchedEdges =  EdgeMatcher(oldEdges,newEdges);
-
-
-                AbstractSEECity settings = graphRenderer.GetSettings();
                 
+                //Searches for pairs between old and new edges
+                matchedEdges =  EdgeMatcher(oldEdges,newEdges);              
+                //Case distinction in case the layout does not need sample points
+                if(!graphRenderer.GetSettings().EdgeLayout.Equals(SEE.Layout.EdgeLayouts.EdgeLayoutKind.Straight)){
 
-                if(!settings.EdgeLayout.Equals(SEE.Layout.EdgeLayouts.EdgeLayoutKind.Straight)){
                     foreach((GameObject oldEdge, GameObject newEdge) in matchedEdges){
+
                     oldEdge.TryGetComponent<Points>(out Points oP);
                     newEdge.TryGetComponent<Points>(out Points nP);
 
                     uint sampleRate = (uint)Math.Max(oP.linePoints.Count(),nP.linePoints.Count());
 
-                    oP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePoints200(oP.controlPoints, sampleRate);
-                    nP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePoints200(nP.controlPoints, sampleRate);
+                    //Creates new line points from the control points 
+                    oP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(oP.controlPoints, sampleRate);
+                    nP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(nP.controlPoints, sampleRate);
 
-
-
+                    //Saves the new line points to the LineRenderer
                     oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
                     lineRenderer.positionCount = oP.linePoints.Count();
                     lineRenderer.SetPositions(oP.linePoints);
                     }
-
-                
-
                 }
+                    //Sets the timer for the animation to zero
                     timer = 0f;
-
+                    //Starts the animation of the edges
                     moveEdges = true;
 
             }catch{
@@ -599,11 +613,11 @@ namespace SEE.Game
             }
         }
 
-        float timer;
-
+        
+        /// <summary>
+        /// Interpolates the points of the old edges with those of the new edges over time.
+        /// </summary>
         void Update(){
-
-            
             if(moveEdges == true){
                 timer += Time.deltaTime;
                  foreach((GameObject oldEdge, GameObject newEdge) in matchedEdges){
@@ -688,7 +702,6 @@ namespace SEE.Game
             }
             //
             moveScaleShakeAnimator.AnimateTo(currentGameNode, layoutNode, difference, OnRenderNodeFinishedAnimation);
-            //objectManager.RenderEdges();
         }
 
         /// <summary>
