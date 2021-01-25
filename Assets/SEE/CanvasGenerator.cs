@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// This class is a component of the AddingNodeCanvas and instantiates and destroys the adding-node-canvas script, which contains the addingNodeCanvas-prefab.
+/// This class instantiates and destroys the adding-node-canvas script, which contains the addingNodeCanvas-prefab.
 /// This also applies to the EditNodeCanvas.
 /// </summary>
 public class CanvasGenerator : MonoBehaviour
