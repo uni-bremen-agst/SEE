@@ -700,7 +700,6 @@ namespace SEE.Game
                     difference = Difference.None;
                 }
             }
-            //
             moveScaleShakeAnimator.AnimateTo(currentGameNode, layoutNode, difference, OnRenderNodeFinishedAnimation);
         }
 
