@@ -24,6 +24,11 @@ public class DesktopEditNodeAction : DesktopNodeAction
         InitialiseCanvasObject();
     }
 
+    /// <summary>
+    /// Waits until a node is selected by pushing mouse button on a gameNode 
+    /// Instantiates the canvasObject if a gameNode is selected 
+    /// Removes the canvas and resets values if the process is canceled
+    /// </summary>
     void Update()
     {
         switch (editProgress)
