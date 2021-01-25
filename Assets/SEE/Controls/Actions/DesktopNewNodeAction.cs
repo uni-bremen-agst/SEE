@@ -5,6 +5,7 @@ using System;
 using SEE.GO;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Utils;
 
 namespace SEE.Controls
 {
@@ -173,7 +174,8 @@ namespace SEE.Controls
                     if (GONode == null)
                     {
                         NewNode();
-                        GameNodeMover.MoveTo(GONode);
+                        //  GameNodeMover.MoveTo(GONode);
+                        Tweens.Move(GONode, new Vector3(GONode.transform.position.x,GONode.transform.position.y+0.8f,GONode.transform.position.z),0.8f);
                     }
                     else
                     {
@@ -184,7 +186,7 @@ namespace SEE.Controls
                         }
                         else
                         {
-                            GameNodeMover.MoveTo(GONode);
+                          //  GameNodeMover.MoveTo(GONode);
                         }
                     }
                     break;
@@ -342,7 +344,7 @@ namespace SEE.Controls
                 GONode.gameObject.GetComponent<Renderer>().material.color = leafColor;
             }
 
-            GameNodeMover.MoveTo(GONode);
+            GONode.transform.position = hoveredObjectList.ElementAt(hoveredObjectList.Count - 1).transform.position;
         }
 
         /// <summary>
@@ -425,16 +427,12 @@ namespace SEE.Controls
 
             List<Node> rootList = city.LoadedGraph.GetRoots();
 
-            /// In the special case the graph only consists of one leaf, we will have to check in the list of all leafs, which has the count of one in that case,
-            /// if there is the root node.
+            /// In the special case the graph only consists of one leaf, we can set the only element of the 
+            /// leafslist directly to dir_root. 
             if (allLeafsInScene.Count == 1 && allInnerNodesInScene.Count == 0)
             {
-                dir_Root = RootSearch(allLeafsInScene, rootList);
-                //FRAGE: BEDEUTET DAS NICHT AUTOMATISCH, DASS DAS EINE LEAF DIE ROOT IST?
-                //ALTERNATIVE: dir_Root = allLeafsInScene.
-                //Ich hab es dir gesagt Goedecke ;) 
-                //GameObject dir_RootBetterCode = allLeafsInScene.OfType<GameObject>().FirstOrDefault();
-                //Debug.Log(dir_RootBetterCode);
+                dir_Root = allLeafsInScene.ElementAt(0);
+                
             }
 
             dir_Root = RootSearch(allInnerNodesInScene, rootList);
