@@ -49,7 +49,11 @@ public class AddingNodeCanvasButton : MonoBehaviour
         }
 
         GameObject g = GameObject.Find("DesktopPlayer");
+
         Component playerActions = g.GetComponent<PlayerActions>();
+
+        playerActions = g.GetComponent<PlayerActions>();
+
     }
 
     /// <summary>

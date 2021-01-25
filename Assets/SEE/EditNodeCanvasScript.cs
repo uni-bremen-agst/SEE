@@ -82,6 +82,10 @@ public class EditNodeCanvasScript : NodeCanvasScript
             DesktopEditNodeAction current = c.GetComponent<DesktopEditNodeAction>();
             current.EditProgress = DesktopEditNodeAction.Progress.NoNodeSelected;
 
+
+            editNode = false;
+
+
         }
     }
 }
