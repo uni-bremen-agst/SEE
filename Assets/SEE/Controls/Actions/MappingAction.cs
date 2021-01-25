@@ -405,7 +405,7 @@ namespace SEE.Controls.Actions
                     {
                         Node n0 = selection.nodeRef.node;
                         Node n1 = nodeRef.node;
-                        if (Reflexion.Is_Mapped(n0))
+                        if (Reflexion.Is_Explicitly_Mapped(n0))
                         {
                             Node mapped = Reflexion.Get_Mapping().GetNode(n0.ID);
                             Assert.IsTrue(mapped.Outgoings.Count == 1);
@@ -470,7 +470,7 @@ namespace SEE.Controls.Actions
         {
             foreach (Selection implementation in objectsInClipboard)
             {
-                if (!Reflexion.Is_Mapped(implementation.nodeRef.node))
+                if (!Reflexion.Is_Explicitly_Mapped(implementation.nodeRef.node))
                 {
                     Debug.LogFormat("Mapping {0} -> {1}.\n", implementation.nodeRef.name, target.nodeRef.name);
                     Reflexion.Add_To_Mapping(from: implementation.nodeRef.node, to: target.nodeRef.node);
