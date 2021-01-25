@@ -330,8 +330,6 @@ namespace SEE.Game
 
 
 
-
-
         /// <summary>
         /// Applies the edge layout according to the the user's choice (settings) for
         /// all edges in between nodes in <paramref name="gameNodes"/>.
