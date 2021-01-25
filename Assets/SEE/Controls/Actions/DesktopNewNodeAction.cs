@@ -183,7 +183,7 @@ namespace SEE.Controls
                     {
                         NewNode();
                         //  GameNodeMover.MoveTo(GONode);
-                        Tweens.Move(GONode, new Vector3(GONode.transform.position.x,GONode.transform.position.y+0.8f,GONode.transform.position.z),0.8f);
+                        Tweens.Move(GONode, new Vector3(GONode.transform.position.x,GONode.transform.position.y+0.4f,GONode.transform.position.z),0.6f);
                     }
                     else
                     {
