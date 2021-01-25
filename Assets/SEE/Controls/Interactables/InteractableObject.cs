@@ -92,23 +92,12 @@ namespace SEE.Controls
         /// </summary>
         public Net.Synchronizer InteractableSynchronizer { get; private set; }
 
-        /// <summary>
-        /// The local player to be informed about his/her own hovered, selected,
-        /// or grabbed objects.
-        /// </summary>
-        private PlayerActions localPlayerActions;
-
         private void Awake()
         {
             ID = nextID++;
             interactableObjects.Add(ID, this);
 
             gameObject.TryGetComponentOrLog(out interactable);
-        }
-
-        private void Start()
-        {
-            localPlayerActions = PlayerSettings.LocalPlayer?.GetComponent<PlayerActions>();
         }
 
         /// <summary>
@@ -144,20 +133,14 @@ namespace SEE.Controls
             if (hover)
             {
                 HoverIn?.Invoke(isOwner);
+                AnyHoverIn?.Invoke(this, isOwner);
                 HoveredObjects.Add(this);
-                if (isOwner)
-                {
-                    localPlayerActions?.HoverOn(gameObject);
-                }
             }
             else
             {
                 HoverOut?.Invoke(isOwner);
+                AnyHoverOut?.Invoke(this, isOwner);
                 HoveredObjects.Remove(this);
-                if (isOwner)
-                {
-                    localPlayerActions?.HoverOff(gameObject);
-                }
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
@@ -186,20 +169,14 @@ namespace SEE.Controls
             if (select)
             {
                 SelectIn?.Invoke(isOwner);
+                AnySelectIn?.Invoke(this, isOwner);
                 SelectedObjects.Add(this);
-                if (isOwner)
-                {
-                    localPlayerActions?.SelectOn(gameObject);
-                }
             }
             else
             {
                 SelectOut?.Invoke(isOwner);
+                AnySelectOut?.Invoke(this, isOwner);
                 SelectedObjects.Remove(this);
-                if (isOwner)
-                {
-                    localPlayerActions?.SelectOff(gameObject);
-                }
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
@@ -236,19 +213,13 @@ namespace SEE.Controls
             if (grab)
             {
                 GrabIn?.Invoke(isOwner);
+                AnyGrabIn?.Invoke(this, isOwner);
                 GrabbedObjects.Add(this);
-                if (isOwner)
-                {
-                    localPlayerActions?.GrabOn(gameObject);
-                }
             }
             else
             {
                 GrabOut?.Invoke(isOwner);
-                if (isOwner)
-                {
-                    localPlayerActions?.GrabOff(gameObject);
-                }
+                AnyGrabOut?.Invoke(this, isOwner);
                 // Hovering and selection are continuous operations, that is why we call them here
                 // when the object is in the focus but not grabbed any longer.
                 if (IsSelected)
@@ -303,6 +274,10 @@ namespace SEE.Controls
         /// </summary>
         public event HoverAction HoverOut;
 
+        public delegate void AnyHoverAction(InteractableObject interactableObject, bool isOwner);
+        public static event AnyHoverAction AnyHoverIn;
+        public static event AnyHoverAction AnyHoverOut;
+
         /// ----------------------------
         /// Selection event system
         /// ----------------------------
@@ -320,6 +295,10 @@ namespace SEE.Controls
         /// </summary>
         public event SelectAction SelectOut;
 
+        public delegate void AnySelectAction(InteractableObject interactableObject, bool isOwner);
+        public static event AnySelectAction AnySelectIn;
+        public static event AnySelectAction AnySelectOut;
+
         /// ----------------------------
         /// Grabbing event system
         /// ----------------------------
@@ -336,6 +315,19 @@ namespace SEE.Controls
         /// Event to be triggered when this game object is no longer grabbed.
         /// </summary>
         public event GrabAction GrabOut;
+
+        public delegate void AnyGrabAction(InteractableObject interactableObject, bool isOwner);
+        public static event AnyGrabAction AnyGrabIn;
+        public static event AnyGrabAction AnyGrabOut;
+
+#if false // TODO(torben): will we ever need this?
+        public delegate void CollisionAction(InteractableObject interactableObject, Collision collision);
+        public event CollisionAction CollisionIn;
+        public event CollisionAction CollisionOut;
+
+        private void OnCollisionEnter(Collision collision) => CollisionIn?.Invoke(this, collision);
+        private void OnCollisionExit(Collision collision) => CollisionIn?.Invoke(this, collision);
+#endif
 
         //----------------------------------------------------------------
         // Mouse actions

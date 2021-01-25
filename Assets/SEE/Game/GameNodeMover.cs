@@ -28,7 +28,7 @@ namespace SEE.Game
         public static void MoveTo(GameObject movingObject)
         {
             float step = MovingSpeed * Time.deltaTime;
-            Vector3 target = TipOfRayPosition(movingObject);
+            Vector3 target = TipOfRayPosition(movingObject); // TODO(torben): this should probably not be the same distance but raycast onto everything and put object on top of the closest hit or something like that?
             movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, target, step);
         }
 
