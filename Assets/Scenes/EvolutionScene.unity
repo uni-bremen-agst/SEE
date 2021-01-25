@@ -1249,6 +1249,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1087713771}
     m_Modifications:
+    - target: {fileID: 419627336, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1611227358, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1262,7 +1270,7 @@ PrefabInstance:
     - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.697
       objectReference: {fileID: 0}
     - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8,
         type: 3}
@@ -1307,22 +1315,22 @@ PrefabInstance:
     - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 0.13
       objectReference: {fileID: 0}
     - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 5462
       objectReference: {fileID: 0}
     - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 962
       objectReference: {fileID: 0}
     - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 444
       objectReference: {fileID: 0}
     - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8,
         type: 3}
@@ -1347,27 +1355,12 @@ PrefabInstance:
     - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8,
         type: 3}
       propertyPath: m_Pivot.x
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8,
         type: 3}
       propertyPath: m_Pivot.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8,
-        type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 4461994104216227615, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8,
         type: 3}
@@ -1535,7 +1528,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: nodeTypes
+    - Name: SelectedNodeTypes
       Entry: 7
       Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
@@ -1548,33 +1541,24 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 2
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Directory
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: File
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
+      Data: 0
     - Name: 
       Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CityPath
+      Entry: 7
+      Data: 4|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
       Data: 
     - Name: 
       Entry: 8
@@ -1669,9 +1653,45 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: LeafLabelSettings
+      Entry: 7
+      Data: 5|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeLabelSettings
+      Entry: 7
+      Data: 6|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 4|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
+      Data: 7|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -1696,353 +1716,36 @@ MonoBehaviour:
     - Name: RepulsionStrength
       Entry: 4
       Data: 50
-    - Name: multiLevelScaling
+    - Name: MultiLevelScaling
       Entry: 5
       Data: false
-    - Name: ListDirToggle
-      Entry: 7
-      Data: 5|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 6|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
+    - Name: ListInnerNodeToggle
+      Entry: 6
       Data: 
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
+    - Name: InnerNodeLayout
+      Entry: 6
       Data: 
-    - Name: 
-      Entry: 8
+    - Name: InnerNodeShape
+      Entry: 6
       Data: 
-    - Name: DirNodeLayout
-      Entry: 7
-      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Layout.NodeLayouts.NodeLayoutKind,
-        SEE]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 6
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
+    - Name: LoadedForNodeTypes
+      Entry: 6
       Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: DirShape
-      Entry: 7
-      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+InnerNodeKinds,
-        SEE]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 6
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: rootDirs
-      Entry: 7
-      Data: 9|System.Collections.Generic.List`1[[SEE.DataModel.DG.Node, SEE]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: show
-      Entry: 7
-      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 6
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: showGraphListing
+    - Name: UseCalculationParameter
       Entry: 5
-      Data: true
-    - Name: loadedForNodeTypes
-      Entry: 7
-      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 6
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: useCalculationParameter
-      Entry: 5
-      Data: true
-    - Name: useIterativeCalculation
+      Data: false
+    - Name: UseIterativeCalculation
       Entry: 5
       Data: false
     - Name: 
       Entry: 8
       Data: 
-    - Name: Measurements
-      Entry: 7
-      Data: 12|System.Collections.Generic.SortedDictionary`2[[System.String, mscorlib],[System.String,
-        mscorlib]], System
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: SubLayoutsInnerNodes
-      Entry: 7
-      Data: 13|System.Collections.Generic.Dictionary`2[[SEE.Layout.NodeLayouts.NodeLayoutKind,
-        SEE],[System.String, mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 14|System.Collections.Generic.EnumEqualityComparer`1[[SEE.Layout.NodeLayouts.NodeLayoutKind,
-        SEE]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 7
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 1
-    - Name: $v
-      Entry: 1
-      Data: Balloon
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 4
-    - Name: $v
-      Entry: 1
-      Data: CirclePacking
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 6
-    - Name: $v
-      Entry: 1
-      Data: CompoundSpringEmbedder
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 0
-    - Name: $v
-      Entry: 1
-      Data: EvoStreets
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 7
-    - Name: $v
-      Entry: 1
-      Data: FromFile
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 2
-    - Name: $v
-      Entry: 1
-      Data: RectanglePacking
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 3
-    - Name: $v
-      Entry: 1
-      Data: Treemap
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: SubLayoutsLeafNodes
-      Entry: 7
-      Data: 15|System.Collections.Generic.Dictionary`2[[SEE.Layout.NodeLayouts.NodeLayoutKind,
-        SEE],[System.String, mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 14
-    - Name: 
-      Entry: 12
-      Data: 8
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 1
-    - Name: $v
-      Entry: 1
-      Data: Balloon
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 4
-    - Name: $v
-      Entry: 1
-      Data: CirclePacking
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 6
-    - Name: $v
-      Entry: 1
-      Data: CompoundSpringEmbedder
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 0
-    - Name: $v
-      Entry: 1
-      Data: EvoStreets
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 7
-    - Name: $v
-      Entry: 1
-      Data: FromFile
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 5
-    - Name: $v
-      Entry: 1
-      Data: Manhattan
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 2
-    - Name: $v
-      Entry: 1
-      Data: RectanglePacking
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 3
-    - Name: $v
-      Entry: 1
-      Data: Treemap
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+  LODCulling: 0.01
   LayoutPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  CityPath:
     Root: 2
     relativePath: 
     absolutePath: 
@@ -2050,9 +1753,6 @@ MonoBehaviour:
   HeightMetric: Metric.Clone_Rate
   DepthMetric: Metric.LOC
   LeafStyleMetric: Metric.Complexity
-  ShowLabel: 1
-  LeafLabelDistance: 0.2
-  LeafLabelFontSize: 0.4
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -2070,9 +1770,6 @@ MonoBehaviour:
   InnerDonutMetric: Metric.IssuesTotal
   InnerNodeHeightMetric: 
   InnerNodeStyleMetric: Metric.IssuesTotal
-  InnerNodeShowLabel: 1
-  InnerNodeLabelDistance: 0.2
-  InnerNodeLabelFontSize: 0.4
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
   LeafObjects: 0
@@ -2086,8 +1783,7 @@ MonoBehaviour:
   EdgesAboveBlocks: 1
   Tension: 0.85
   RDP: 0.05
-  calculateMeasurements: 0
-  maxRevisionsToLoad: 500
+  MaxRevisionsToLoad: 500
   MarkerHeight: 0.2
   MarkerWidth: 0.01
   AdditionBeamColor: {r: 0, g: 1, b: 0, a: 1}
@@ -2574,6 +2270,8 @@ MonoBehaviour:
   ShowControllerHints: 0
   experienceScale: 1
   CityScalingFactor: 1
+  EyeGazeHover: 1
+  EyeStareDelay: 1
 --- !u!4 &1510433995
 Transform:
   m_ObjectHideFlags: 0
@@ -3004,7 +2702,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1636335451}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5.15625, y: -4, z: 0}
+  m_LocalPosition: {x: -12.389611, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -3191,7 +2889,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1776319858}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 5.15625, y: -4, z: 0}
+  m_LocalPosition: {x: 12.389611, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
