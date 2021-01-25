@@ -618,7 +618,7 @@ namespace SEE.Game
         /// Interpolates the points of the old edges with those of the new edges over time.
         /// </summary>
         void Update(){
-            if(moveEdges == true){
+            if (moveEdges) {
                 timer += Time.deltaTime;
                  foreach((GameObject oldEdge, GameObject newEdge) in matchedEdges){
                     oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
