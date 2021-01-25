@@ -2,12 +2,12 @@
 using SEE.Net;
 using UnityEngine;
 
-
 public class ScaleNodeNetAction : AbstractAction
 {
     public string gameObjectID;
     public Vector3 scale;
     public Vector3 position;
+
     /// <summary>
     /// Constructs a ScaleNodeNetAction
     /// </summary>
@@ -20,6 +20,7 @@ public class ScaleNodeNetAction : AbstractAction
         scale = Scale;
         position = Positon;
     }
+
     /// <summary>
     /// Things to Execute on the Server (None for this Class)
     /// </summary>
@@ -27,6 +28,7 @@ public class ScaleNodeNetAction : AbstractAction
     {
 
     }
+
     /// <summary>
     /// Things to Execute on the Client Sets finds the GameObject on the Client and sets its scale and position
     /// </summary>
@@ -42,7 +44,7 @@ public class ScaleNodeNetAction : AbstractAction
             }
             else
             {
-               //FIXME: Controll if a Debug Log is the right thing
+               //FIXME: Control whether a Debug Log is the right thing
                 Debug.LogWarning("Kein GameObject gefunden: " + gameObjectID);
             }
         }

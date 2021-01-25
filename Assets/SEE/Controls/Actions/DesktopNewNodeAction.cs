@@ -20,12 +20,12 @@ namespace SEE.Controls
         public SEECity City { get => city; set => city = value; }
 
         /// <summary>
-        /// The New GameObject
+        /// The New GameObject which contains the new Node
         /// </summary>
         private GameObject GONode = null;
 
         /// <summary>
-        /// The Meta infos from the new node, set by the GUI
+        /// The Meta infos from the new node, overwritten by the values of the GUI
         /// 1. ID, 2. SourceName, 3. Type
         /// </summary>
         private Tuple<String, String, String> nodeMetrics = null;
@@ -33,7 +33,7 @@ namespace SEE.Controls
         public Tuple<string, string, string> NodeMetrics { get => nodeMetrics; set => nodeMetrics = value; }
 
         /// <summary>
-        /// The script which instantiates the adding-node-canvas
+        /// The script which instantiates the adding-node-canvas and the edit-node-canvas
         /// </summary>
         public CanvasGenerator canvasGenerator;
 
@@ -122,8 +122,8 @@ namespace SEE.Controls
             NoCitySelected,
             CityIsSelected,
             WaitingForValues,
+            CanvasIsClosed,
             ValuesAreGiven,
-            CanvasIsClosed
         }
 
         /// <summary>
@@ -139,7 +139,15 @@ namespace SEE.Controls
             InitialiseCanvasObject();
         }
 
-
+        /// <summary>
+        /// The update-method interacts in dependency of the progress-state. (sequencial series)
+        /// NoCitySelected: Searching for a selected city, where a node can be added
+        /// CityIsSelected: Opens a canvas-object where values for the node can be added
+        /// WaitingForValues: This State is active while the canvas is open, but the button "AddNode" on it is not pushed
+        /// CanvasIsClosed: Closes the canvas-object after extracting the values for the creation of a node. This state is reached by pushing the "AddNode"-Button
+        /// ValuesAreGiven: Moves the node and waits for a mouseInput to place the node, if its inside of the previous chosen city
+        /// 
+        /// </summary>
         public void Update()
         {
             switch (Progress1)
@@ -198,7 +206,7 @@ namespace SEE.Controls
         /// </summary>
         private void SelectCity()
         {
-            /// The case the user hovers an object and has hovered objects before. The former colours of the specific objects are set again.
+            // The case the user hovers an object and has hovered objects before. The former colours of the specific objects are set again.
             if (hoveredObject != null && hoveredObjectList.Count > 0 && hoveredObject.gameObject.GetComponent<Renderer>().material.color != defaultHoverCityColor || hoveredObject == null && hoveredObjectList.Count > 0)
             {
                 Undye();
@@ -237,7 +245,7 @@ namespace SEE.Controls
 
         /// <summary>
         /// Opens a dialog-canvas where the user can insert some node-metrics. Therefore, a CanvasGenerator-script-component 
-        /// will be added to this gameObject which contains the canvas.
+        /// will be added to this gameObject which contains the canvas as a gameObject-instance of a prefab.
         /// </summary>
         public void OpenDialog()
         {
@@ -265,8 +273,8 @@ namespace SEE.Controls
         /// the object is already dyed in that color.
         /// The colors are about to be set by the user itself in the inspector or via GUI.
         /// </summary>
-        /// <param name="colorOfCity"></param>
-        /// <param name="objectToDye"></param>
+        /// <param name="colorOfCity">the default-color of the city.</param>
+        /// <param name="objectToDye"> the object which will get dyed</param>
         private void ChangeColor(GameObject objectToDye, Color colorOfCity)
         {
             Color newCityColor;
@@ -354,9 +362,7 @@ namespace SEE.Controls
         private void Place()
         {
             Node node = GONode.GetComponent<NodeRef>().node;
-
-            //this will reached only if the nodename is not set in the inputField
-            //FIXME: nodename und nodetype sind nur null oder leerer String, andere Abfrage unnütz aber muss nochmal gecheckt werden.
+          //FIXME: nodename und nodetype sind nur null oder leerer String, andere Abfrage unnütz aber muss nochmal gecheckt werden.
             if (nodename != null && !nodename.Equals(""))
             {
                 node.SourceName = nodename;
@@ -482,7 +488,7 @@ namespace SEE.Controls
         /// <summary>
         /// Search for a rootNode in a given list of Gameobjects. 
         /// </summary>
-        /// <param name="pListOfGameNodes"></param>
+        /// <param name="pListOfGameNodes">The list of </param>
         /// <param name="pListofRoots"></param>
         /// <returns> The rootnode as gameObject in case the root is found, else dir_root (which can be null).</returns>
         private GameObject RootSearch(ICollection<GameObject> pListOfGameNodes, List<Node> pListofRoots)
@@ -512,8 +518,8 @@ namespace SEE.Controls
         /// For Network Use Only, creates the new node on the Clients
         /// </summary>
         /// <param name="position"> The position of the new node</param>
-        /// <param name="parentID"></param>
-        /// <param name="scale"></param>
+        /// <param name="parentID">The id of the new GameObject</param>
+        /// <param name="scale">the size of the new GameObject</param>
         public void NetworkNewNode(Vector3 position,Vector3 scale ,string parentID)
         {
             NewNode();

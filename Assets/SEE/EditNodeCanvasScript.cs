@@ -1,5 +1,4 @@
-﻿using SEE.Controls;
-using SEE.Controls.Actions;
+﻿using SEE.Controls.Actions;
 using SEE.DataModel.DG;
 using UnityEngine;
 using UnityEngine.UI;
@@ -49,7 +48,6 @@ public class EditNodeCanvasScript : NodeCanvasScript
     {
         InstantiatePrefab(prefabDirectory);
         canvas.transform.SetParent(gameObject.transform);
-
         Component[] c = canvas.GetComponentsInChildren<InputField>();
         inputname = (InputField)c[0];
         inputtype = (InputField)c[1];
@@ -81,10 +79,7 @@ public class EditNodeCanvasScript : NodeCanvasScript
             Component c = g.GetComponent<PlayerActions>();
             DesktopEditNodeAction current = c.GetComponent<DesktopEditNodeAction>();
             current.EditProgress = DesktopEditNodeAction.Progress.NoNodeSelected;
-
-
             editNode = false;
-
 
         }
     }

@@ -127,12 +127,9 @@ namespace SEE.GO
         /// <param name="scale">the new scale</param>
         public static void SetScale(this GameObject node, Vector3 scale)
         {
-            //Debug.LogFormat("Scale Called {0} \n ", node.transform.lossyScale);
             Transform parent = node.transform.parent;
             node.transform.parent = null;
             node.transform.localScale =scale;
-           // Debug.LogFormat("Scale Called {0} \n ", node.transform.lossyScale);
-
             node.transform.parent = parent;
         }
 
@@ -144,7 +141,6 @@ namespace SEE.GO
         public static float GetRoof(this GameObject node)
         {
             return node.transform.position.y + node.Size().y / 2.0f;
-
         }
 
         /// <summary>
@@ -195,7 +191,6 @@ namespace SEE.GO
             {
                 throw new Exception($"Game object {gameObject.name} has no NodeRef");
             }
-
         }
     }
 }

@@ -7,14 +7,49 @@ using UnityEngine;
 
 public class NewNodeNetAction : AbstractAction
 {
+    /// <summary>
+    /// The city where the new node has to be placed
+    /// </summary>
     public SEECity city = null;
+
+    /// <summary>
+    /// The ID of the creators Game-Node-Object
+    /// </summary>
     public string gameObjectID;
+
+    /// <summary>
+    /// The ID of the parent-gameObject of the new GameObject
+    /// </summary>
     public string parentID;
+
+    /// <summary>
+    /// true, if the new Node is an inner node, false if its a leaf.
+    /// </summary>
     public bool isInnerNode;
-    public  string nodeMetrics1;
-    public  string nodeMetrics2;
-    public  string nodeMetrics3;
+
+    /// <summary>
+    /// The id of the new node.
+    /// </summary>
+    public  string id;
+
+    /// <summary>
+    /// The sourceName of the new node.
+    /// </summary>
+    public  string sourceName;
+
+    /// <summary>
+    /// The type of the new node.
+    /// </summary>
+    public  string type;
+
+    /// <summary>
+    /// The position of the new node.
+    /// </summary>
     public Vector3 position;
+
+    /// <summary>
+    /// The scale of the new node.
+    /// </summary>
     public Vector3 scale;
 
     /// <summary>
@@ -22,20 +57,20 @@ public class NewNodeNetAction : AbstractAction
     /// </summary>
     /// <param name="GameObjectID">the  GameObject on that the city is attached for the new node</param>
     /// <param name="IsInnerNode">should it be a inner node</param>
-    /// <param name="NodeMetrics1">metrics1 for the new node</param>
-    /// <param name="NodeMetrics2">metrics2 for the new node</param>
-    /// <param name="NodeMetrics3">metrics3 for the new node</param>
+    /// <param name="NodeMetrics1">id for the new node</param>
+    /// <param name="NodeMetrics2">name for the new node</param>
+    /// <param name="NodeMetrics3">type for the new node</param>
     /// <param name="Position">the postition for the new node</param>
-    public NewNodeNetAction(string GameObjectID, bool IsInnerNode, string NodeMetrics1, string NodeMetrics2, string NodeMetrics3, Vector3 Position, Vector3 Scale,string ParentID) : base()
+    public NewNodeNetAction(string gameObjectID, bool isInnerNode, string nodeMetrics1, string nodeMetrics2, string nodeMetrics3, Vector3 position, Vector3 scale,string parentID) : base()
     {
-        gameObjectID = GameObjectID;
-        parentID = ParentID;
-        isInnerNode = IsInnerNode;
-        nodeMetrics1 = NodeMetrics1;
-        nodeMetrics2 = NodeMetrics2;
-        nodeMetrics3 = NodeMetrics3;
-        position = Position;
-        scale = Scale;
+        this.gameObjectID = gameObjectID;
+        this.parentID = parentID;
+        this.isInnerNode = isInnerNode;
+        id = nodeMetrics1;
+        sourceName = nodeMetrics2;
+        type = nodeMetrics3;
+        this.position = position;
+        this.scale = scale;
     }
 
     /// <summary>
@@ -61,7 +96,7 @@ public class NewNodeNetAction : AbstractAction
                 dummy.AddComponent<DesktopNewNodeAction>();
                 dummy.GetComponent<DesktopNewNodeAction>().City = city;
                 dummy.GetComponent<DesktopNewNodeAction>().SetIsInnerNode(isInnerNode);
-                dummy.GetComponent<DesktopNewNodeAction>().NodeMetrics =  new Tuple <string, string,string >(nodeMetrics1, nodeMetrics2, nodeMetrics3);
+                dummy.GetComponent<DesktopNewNodeAction>().NodeMetrics =  new Tuple <string, string,string >(id, sourceName, type);
                 dummy.GetComponent<DesktopNewNodeAction>().NetworkNewNode(position, scale, parentID);
             }
         }

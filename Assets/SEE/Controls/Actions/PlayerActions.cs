@@ -1,8 +1,6 @@
 ﻿using SEE.Game;
 using SEE.Game.Charts;
-using SEE.GO;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
@@ -64,12 +62,12 @@ namespace SEE.Controls.Actions
                     break;
                 case State.NewNode:
                     //places new nodes as long as the user doesnt switch the modes
-                    //Ads the newComponent if not already done
+                    //Adds the newComponent if not already done
                     if (!gameObject.GetComponent<DesktopNewNodeAction>())
                     {
                         gameObject.AddComponent<DesktopNewNodeAction>();
                     }
-                    else //Sets the Hovered Object
+                    else
                     { 
                         gameObject.GetComponent<DesktopNewNodeAction>().hoveredObject = hoveredObject;
                     }
@@ -77,7 +75,6 @@ namespace SEE.Controls.Actions
                 case State.ScaleNode:
                     if (selectedObject.gameObject != null )
                     {
-                       
                         selectedObject.gameObject.AddComponent<GameNodeScaleAction>();
                         Browse();
                     }
@@ -86,9 +83,8 @@ namespace SEE.Controls.Actions
 
                     break;
                 case State.EditNode:
-                    //NOTE: JUST COPIED AND PASTED FROM NEWNODE
-                    //places new nodes as long as the user doesnt switch the modes
-                    //Ads the newComponent if not already done
+                    //edits existing nodes as long as the user doesnt switch the modes
+                    //Adds the newComponent if not already done
                     if (!gameObject.GetComponent<DesktopEditNodeAction>())
                     {
                         gameObject.AddComponent<DesktopEditNodeAction>();
