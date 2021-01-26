@@ -75,9 +75,8 @@ public class EditNodeCanvasScript : NodeCanvasScript
             CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
             generator.DestroyEditNodeCanvas();
             new EditNodeNetAction(nodeToEdit.SourceName,nodeToEdit.Type,gameObjectID).Execute(null);
-            GameObject g = GameObject.Find("DesktopPlayer");
-            Component c = g.GetComponent<PlayerActions>();
-            DesktopEditNodeAction current = c.GetComponent<DesktopEditNodeAction>();
+            GameObject g = GameObject.Find("Player Desktop");
+            DesktopEditNodeAction current = g.GetComponent<DesktopEditNodeAction>();
             current.EditProgress = DesktopEditNodeAction.Progress.NoNodeSelected;
             editNode = false;
 

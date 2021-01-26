@@ -28,7 +28,7 @@ namespace SEE.Game
         public static void MoveTo(GameObject movingObject)
         {
             float step = MovingSpeed * Time.deltaTime;
-            Vector3 target = TipOfRayPosition(movingObject);
+            Vector3 target = TipOfRayPosition(movingObject); // TODO(torben): this should probably not be the same distance but raycast onto everything and put object on top of the closest hit or something like that?
             movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, target, step);
         }
 
@@ -91,7 +91,7 @@ namespace SEE.Game
         public static void FinalizePosition(GameObject movingObject, Vector3 originalPosition)
         {
             // The underlying graph node of the moving object.
-            Node movingNode = movingObject.GetComponent<NodeRef>().node;
+            Node movingNode = movingObject.GetComponent<NodeRef>().Value;
             // The new parent of the movingNode in the underlying graph.
             Node newGraphParent = null;
             // The new parent of the movingNode in the game-object hierarchy.
@@ -111,12 +111,12 @@ namespace SEE.Game
                 {
                     NodeRef nodeRef = hit.transform.GetComponent<NodeRef>();
                     // Is it a node at all and if so, are they in the same graph?
-                    if (nodeRef != null && nodeRef.node.ItsGraph == movingNode.ItsGraph)
+                    if (nodeRef != null && nodeRef.Value.ItsGraph == movingNode.ItsGraph)
                     {
                         // update newParent when we found a node deeper into the tree
-                        if (newGraphParent == null || nodeRef.node.Level > newGraphParent.Level)
+                        if (newGraphParent == null || nodeRef.Value.Level > newGraphParent.Level)
                         {
-                            newGraphParent = nodeRef.node;
+                            newGraphParent = nodeRef.Value;
                             newGameParent = hit.collider.gameObject;
                             newPosition = hit.point;
                         }
@@ -154,7 +154,7 @@ namespace SEE.Game
             GameObject parent = GameObject.Find(parentID);
             child.transform.position = position;
             PutOn(child, parent);
-            child.GetComponent<NodeRef>().node.Reparent(parent.GetComponent<NodeRef>().node);
+            child.GetComponent<NodeRef>().Value.Reparent(parent.GetComponent<NodeRef>().Value);
             child.transform.SetParent(parent.transform);
         }
 

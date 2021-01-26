@@ -30,7 +30,7 @@ namespace SEE.Game
         /// <param name="nodeFactory">the node factory that created <paramref name="gameObject"/>; 
         /// may be null for inner nodes</param>
         public GameNode(Dictionary<Node, ILayoutNode> to_layout_node, GameObject gameObject, NodeFactory nodeFactory)
-            : base(gameObject.GetComponent<NodeRef>().node, to_layout_node)
+            : base(gameObject.GetComponent<NodeRef>().Value, to_layout_node)
         {
             this.gameObject = gameObject;
             this.nodeFactory = nodeFactory;
