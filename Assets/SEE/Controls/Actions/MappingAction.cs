@@ -18,6 +18,8 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class MappingAction : CityAction, Observer
     {
+        private const float SelectedAlpha = 0.8f;
+
         private const KeyCode SaveKey = KeyCode.S;
         private const KeyCode CopyKey = KeyCode.C;
         private const KeyCode PasteKey = KeyCode.V;
@@ -379,6 +381,17 @@ namespace SEE.Controls.Actions
             }
         }
 
+        private struct SpinningCube
+        {
+            internal GameObject gameObject;
+            internal MeshRenderer meshRenderer;
+            internal float timer;
+            internal Color c0;
+            internal Color c1;
+        }
+
+        SpinningCube spinningCube;
+
         // Update is called once per frame
         private void Update()
         {
@@ -396,13 +409,12 @@ namespace SEE.Controls.Actions
                     Assert.IsNotNull(nodeRef);
                     Assert.IsNotNull(nodeRef.Value);
 
-                    // TODO @Torben: Please check.
-                    hit.transform.gameObject.TryGetComponent(out selection.interactableObject);
-                    selection.nodeRef = nodeRef;
-
                     if (nodeRef.Value.ItsGraph == implementation) // Set or replace implementation node
                     {
-                        selection.interactableObject?.SetSelect(false, true);
+                        if (selection.interactableObject != null)
+                        {
+                            selection.interactableObject.SetSelect(false, true);
+                        }
                         nodeRef.GetComponent<InteractableObject>().SetSelect(true, true);
                     }
                     else if (selection.nodeRef != null) // Create mapping
@@ -423,6 +435,28 @@ namespace SEE.Controls.Actions
                 {
                     selection.interactableObject?.SetSelect(false, true);
                 }
+            }
+
+            if (spinningCube.gameObject != null)
+            {
+                const float PERIOD = 4.0f;
+                spinningCube.timer += Time.deltaTime;
+                while (spinningCube.timer > PERIOD)
+                {
+                    spinningCube.timer -= PERIOD;
+                }
+                float tPos = Mathf.Sin(2.0f * Mathf.PI * spinningCube.timer / PERIOD * 2.0f) * 0.5f + 0.5f; // y-range: [0.0, 1.0]
+                float gr = 0.5f * MathExtensions.GoldenRatio;
+                float ls = spinningCube.gameObject.transform.localScale.x;
+
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                Physics.Raycast(ray, out RaycastHit hit);
+
+                spinningCube.gameObject.transform.position = hit.point + new Vector3(0.0f, gr * ls + tPos * gr * ls, 0.0f);
+                spinningCube.gameObject.transform.rotation = Quaternion.AngleAxis(spinningCube.timer / PERIOD * 180.0f, Vector3.up);
+
+                float tCol = Mathf.Sin(2.0f * Mathf.PI * spinningCube.timer / PERIOD) * 0.5f + 0.5f;
+                spinningCube.meshRenderer.material.color = (1.0f - tCol) * spinningCube.c0 + tCol * spinningCube.c1;
             }
 
 #if false
@@ -523,15 +557,43 @@ namespace SEE.Controls.Actions
             Assert.IsNull(selection.nodeRef);
             Assert.IsNull(selection.interactableObject);
 
+            spinningCube.gameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            spinningCube.gameObject.name = "MappingAction.spinningCube";
+            // Note: This will make raycasting ignore this object. Physics.IgnoreRaycastLayer contains the wrong value (water mask)!
+            spinningCube.gameObject.layer = 2;
+            float scale = 0.1f * Implementation.GetComponent<GO.Plane>().MinLengthXZ;
+            spinningCube.gameObject.transform.localScale = new Vector3(scale, scale, scale);
+
+            spinningCube.meshRenderer = spinningCube.gameObject.GetComponent<MeshRenderer>();
+            spinningCube.meshRenderer.material = new Material(interactableObject.GetComponent<MeshRenderer>().material);
+            spinningCube.meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            spinningCube.meshRenderer.material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Overlay;
+            Portal.SetInfinitePortal(spinningCube.gameObject);
+
+            spinningCube.timer = -Time.deltaTime;
+
+            spinningCube.c0 = spinningCube.meshRenderer.material.color;
+            spinningCube.c0.a = SelectedAlpha;
+            spinningCube.c1 = spinningCube.c0 + new Color(0.2f, 0.2f, 0.2f, 0.0f);
+
             selection.nodeRef = interactableObject.GetComponent<NodeRef>();
             selection.interactableObject = interactableObject;
-            SetAlpha(selection.nodeRef, 0.5f);
+            SetAlpha(selection.nodeRef, SelectedAlpha);
         }
 
         private void AnySelectOut(InteractableObject interactableObject, bool isOwner)
         {
             Assert.IsNotNull(selection.nodeRef);
             Assert.IsNotNull(selection.interactableObject);
+
+            Destroy(spinningCube.gameObject);
+#if UNITY_EDITOR
+            spinningCube.gameObject = null;
+            spinningCube.meshRenderer = null;
+            spinningCube.timer = 0.0f;
+            spinningCube.c0 = new Color();
+            spinningCube.c1 = new Color();
+#endif
 
             SetAlpha(selection.nodeRef, 1.0f);
             selection.interactableObject = null;
