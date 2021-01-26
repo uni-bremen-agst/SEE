@@ -159,6 +159,7 @@ namespace SEE.Controls.Actions
         {
             selectedObject.gameObect = selection;
             selectedObject.originalPosition = selection.transform.position;
+            //Debug.Log($"Player selects {selection.name}.\n");
         }
 
         /// <summary>
@@ -170,6 +171,7 @@ namespace SEE.Controls.Actions
         /// <param name="selection">the interactable object no longer selected</param>
         public void SelectOff(GameObject selection)
         {
+            //Debug.Log($"Player deselects {selection.name}.\n");
             selectedObject.gameObect = null;
         }
 
@@ -188,6 +190,7 @@ namespace SEE.Controls.Actions
         /// <param name="hovered">the hovered interactable object</param>
         public void HoverOn(GameObject hovered)
         {
+            //Debug.Log($"Player hovers on {hovered.name}.\n");
             hoveredObject = hovered;
         }
 
@@ -200,6 +203,7 @@ namespace SEE.Controls.Actions
         /// <param name="hovered">the interactable object no longer hovered</param>
         public void HoverOff(GameObject hovered)
         {
+            //Debug.Log($"Player hovers off {hovered.name}.\n");
             hoveredObject = null;
         }
 
