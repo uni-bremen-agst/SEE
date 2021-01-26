@@ -145,7 +145,7 @@ namespace SEE.GO
         /// component attached to it.
         /// </summary>
         /// <param name="gameObject">the game object whose NodeRef is checked</param>
-        /// <returns>if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
+        /// <returns>true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
         /// component attached to it</returns>
         public static bool HasNodeRef(this GameObject gameObject)
         {
