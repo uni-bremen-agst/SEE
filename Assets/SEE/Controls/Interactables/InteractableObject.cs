@@ -121,13 +121,23 @@ namespace SEE.Controls
         {
             ID = nextID++;
             idToInteractableObjectDict.Add(ID, this);
-
             gameObject.TryGetComponentOrLog(out interactable);
         }
 
         private void Start()
         {
-            localPlayerActions = PlayerSettings.LocalPlayer?.GetComponent<PlayerActions>();
+            if (PlayerSettings.LocalPlayer == null)
+            {
+                Debug.LogError($"InteractableObject {name} could not connect to a player.\n");
+            }
+            else
+            {
+                localPlayerActions = PlayerSettings.LocalPlayer?.GetComponent<PlayerActions>();
+                if (localPlayerActions == null)
+                {
+                    Debug.LogError($"The player {PlayerSettings.LocalPlayer.name} the InteractableObject {name} is connected to has no PlayerActions component.\n");
+                }
+            }
         }
 
         /// <summary>
@@ -155,12 +165,24 @@ namespace SEE.Controls
             {
                 HoverIn?.Invoke(this, isOwner);
                 AnyHoverIn?.Invoke(this, isOwner);
+                if (isOwner)
+                {
+                    // The local player has hovered on this object and needs to be informed about it.
+                    // Non-local player are not concerned here.
+                    localPlayerActions?.HoverOn(gameObject);
+                }
                 HoveredObjects.Add(this);
             }
             else
             {
                 HoverOut?.Invoke(this, isOwner);
                 AnyHoverOut?.Invoke(this, isOwner);
+                if (isOwner)
+                {
+                    // The local player has finished hovering on this object and needs to be informed about it.
+                    // Non-local player are not concerned here.
+                    localPlayerActions?.HoverOff(gameObject);
+                }
                 HoveredObjects.Remove(this);
             }
 
@@ -226,12 +248,24 @@ namespace SEE.Controls
             {
                 SelectIn?.Invoke(this, isOwner);
                 AnySelectIn?.Invoke(this, isOwner);
+                if (isOwner)
+                {
+                    // The local player has selected this object and needs to be informed about it.
+                    // Non-local player are not concerned here.
+                    localPlayerActions?.SelectOn(gameObject);
+                }
                 SelectedObjects.Add(this);
             }
             else
             {
                 SelectOut?.Invoke(this, isOwner);
                 AnySelectOut?.Invoke(this, isOwner);
+                if (isOwner)
+                {
+                    // The local player has deselected this object and needs to be informed about it.
+                    // Non-local player are not concerned here.
+                    localPlayerActions?.SelectOff(gameObject);
+                }
                 SelectedObjects.Remove(this);
             }
 
@@ -267,16 +301,24 @@ namespace SEE.Controls
             {
                 GrabIn?.Invoke(this, isOwner);
                 AnyGrabIn?.Invoke(this, isOwner);
+                if (isOwner)
+                {
+                    // The local player has grabbed this object and needs to be informed about it.
+                    // Non-local player are not concerned here.
+                    localPlayerActions?.GrabOn(gameObject);
+                }
                 GrabbedObjects.Add(this);
             }
             else
             {
                 GrabOut?.Invoke(this, isOwner);
+                AnyGrabOut?.Invoke(this, isOwner);
                 if (isOwner)
                 {
+                    // The local player has finished grabbing this object and needs to be informed about it.
+                    // Non-local player are not concerned here.
                     localPlayerActions?.GrabOff(gameObject);
                 }
-                AnyGrabOut?.Invoke(this, isOwner);
 
                 // Hovering and selection are continuous operations, that is why we call them here
                 // when the object is in the focus but not grabbed any longer.
