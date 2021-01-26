@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class DesktopNodeAction : MonoBehaviour
+public class NodeAction : MonoBehaviour
 {
     /// <summary>
     /// The gameObject which contains the CanvasGenerator-Scripts and the actual CanvasObject-Script

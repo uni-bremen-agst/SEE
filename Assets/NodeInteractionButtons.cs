@@ -6,7 +6,7 @@ using SEE.Controls.Actions;
 /// <summary>
 /// This script is been added to the Button of the adding-node-canvas and the edit-node-canvas.
 /// </summary>
-public class AddingNodeCanvasButton : MonoBehaviour
+public class NodeInteractionButtons : MonoBehaviour
 {
     // Start is called before the first frame update
 
@@ -59,8 +59,8 @@ public class AddingNodeCanvasButton : MonoBehaviour
     /// </summary>
     public void SetNextAddingNodeStep()
     {
-        DesktopNewNodeAction current = playerDesktop.GetComponent<DesktopNewNodeAction>();
-        current.Progress1 = DesktopNewNodeAction.Progress.CanvasIsClosed;
+        NewNodeAction current = playerDesktop.GetComponent<NewNodeAction>();
+        current.Progress1 = NewNodeAction.Progress.CanvasIsClosed;
     }
 
     /// <summary>
@@ -68,8 +68,8 @@ public class AddingNodeCanvasButton : MonoBehaviour
     /// </summary>
     public void EditIsCanceled()
     {
-        DesktopEditNodeAction current = playerDesktop.GetComponent<DesktopEditNodeAction>();
-        current.EditProgress = DesktopEditNodeAction.Progress.EditIsCanceled;
+        EditNodeAction current = playerDesktop.GetComponent<EditNodeAction>();
+        current.EditProgress = EditNodeAction.Progress.EditIsCanceled;
     }
 
     /// <summary>
@@ -77,6 +77,6 @@ public class AddingNodeCanvasButton : MonoBehaviour
     /// </summary>
     public void EditNode()
     {
-        EditNodeCanvasScript.EditNode = true;
+        EditNodeCanvasAction.EditNode = true;
     }
 }

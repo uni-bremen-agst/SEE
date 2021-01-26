@@ -93,11 +93,11 @@ public class NewNodeNetAction : AbstractAction
             if (city != null)
             {
                 GameObject dummy = new GameObject();
-                dummy.AddComponent<DesktopNewNodeAction>();
-                dummy.GetComponent<DesktopNewNodeAction>().City = city;
-                dummy.GetComponent<DesktopNewNodeAction>().SetIsInnerNode(isInnerNode);
-                dummy.GetComponent<DesktopNewNodeAction>().NodeMetrics =  new Tuple <string, string,string >(id, sourceName, type);
-                dummy.GetComponent<DesktopNewNodeAction>().NetworkNewNode(position, scale, parentID);
+                dummy.AddComponent<NewNodeAction>();
+                dummy.GetComponent<NewNodeAction>().City = city;
+                dummy.GetComponent<NewNodeAction>().SetIsInnerNode(isInnerNode);
+                dummy.GetComponent<NewNodeAction>().NodeMetrics =  new Tuple <string, string,string >(id, sourceName, type);
+                dummy.GetComponent<NewNodeAction>().NetworkNewNode(position, scale, parentID);
             }
         }
     }

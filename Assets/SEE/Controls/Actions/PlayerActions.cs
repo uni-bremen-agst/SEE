@@ -62,13 +62,13 @@ namespace SEE.Controls.Actions
                 case State.NewNode:
                     //places new nodes as long as the user doesnt switch the modes
                     //Adds the newComponent if not already done
-                    if (!gameObject.GetComponent<DesktopNewNodeAction>())
+                    if (!gameObject.GetComponent<NewNodeAction>())
                     {
-                        gameObject.AddComponent<DesktopNewNodeAction>();
+                        gameObject.AddComponent<NewNodeAction>();
                     }
                     else
                     { 
-                        gameObject.GetComponent<DesktopNewNodeAction>().hoveredObject = hoveredObject;
+                        gameObject.GetComponent<NewNodeAction>().hoveredObject = hoveredObject;
                     }
                     break;
                 case State.ScaleNode:
@@ -84,13 +84,13 @@ namespace SEE.Controls.Actions
                 case State.EditNode:
                     //edits existing nodes as long as the user doesnt switch the modes
                     //Adds the newComponent if not already done
-                    if (!gameObject.GetComponent<DesktopEditNodeAction>())
+                    if (!gameObject.GetComponent<EditNodeAction>())
                     {
-                        gameObject.AddComponent<DesktopEditNodeAction>();
+                        gameObject.AddComponent<EditNodeAction>();
                     }
                     else //Sets the Hovered Object
                     {
-                        gameObject.GetComponent<DesktopEditNodeAction>().hoveredObject = hoveredObject;
+                        gameObject.GetComponent<EditNodeAction>().hoveredObject = hoveredObject;
                     }
                     break;
                 default:
@@ -192,17 +192,17 @@ namespace SEE.Controls.Actions
                     break;
                 case State.NewNode:
                     generator.DestroyAddNodeCanvas();
-                    gameObject.GetComponent<DesktopNewNodeAction>().hoveredObject = null;
-                    GetComponent<DesktopNewNodeAction>().Undye();
-                    gameObject.GetComponent<DesktopNewNodeAction>().RemoveScript();
+                    gameObject.GetComponent<NewNodeAction>().hoveredObject = null;
+                    GetComponent<NewNodeAction>().Undye();
+                    gameObject.GetComponent<NewNodeAction>().RemoveScript();
                     
                     break;
                 case State.ScaleNode:
                     break;
                 case State.EditNode:
                     generator.DestroyEditNodeCanvas();
-                    gameObject.GetComponent<DesktopEditNodeAction>().hoveredObject = null;
-                    gameObject.GetComponent<DesktopEditNodeAction>().RemoveScript();
+                    gameObject.GetComponent<EditNodeAction>().hoveredObject = null;
+                    gameObject.GetComponent<EditNodeAction>().RemoveScript();
                     break;
                 default:
                     throw new System.NotImplementedException();

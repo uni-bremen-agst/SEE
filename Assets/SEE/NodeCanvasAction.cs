@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class NodeCanvasScript : MonoBehaviour
+public class NodeCanvasAction : MonoBehaviour
 {
     /// <summary>
     /// The gameObject, which contains the canvas-prefab-clone.

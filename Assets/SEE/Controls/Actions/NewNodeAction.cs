@@ -10,7 +10,7 @@ using SEE.Utils;
 namespace SEE.Controls
 {
 
-    public class DesktopNewNodeAction : DesktopNodeAction
+    public class NewNodeAction : NodeAction
     {
         /// <summary>
         /// The Code City in wich the node should be placed
@@ -31,11 +31,6 @@ namespace SEE.Controls
         private Tuple<String, String, String> nodeMetrics = null;
 
         public Tuple<string, string, string> NodeMetrics { get => nodeMetrics; set => nodeMetrics = value; }
-
-        /// <summary>
-        /// The script which instantiates the adding-node-canvas and the edit-node-canvas
-        /// </summary>
-        public CanvasGenerator canvasGenerator;
 
         /// <summary>
         /// True, if the node which will be created is an innerNode, else false
@@ -81,11 +76,6 @@ namespace SEE.Controls
         /// A list the colors of the hovered GameObjects are stored in.
         /// </summary>
         private List<Color> listOfColors = new List<Color>();
-
-        /// <summary>
-        /// A list the gamenodes are stored in.
-        /// </summary>
-        public ICollection<GameNode> gameNodes = null;
 
         /// <summary>
         /// The median of the lossyscale of the graphs leafs  
@@ -163,10 +153,10 @@ namespace SEE.Controls
                     break;
 
                 case Progress.CanvasIsClosed:
-                    //Removes the canvasObject and extracts the values from it to create a new node with these params.
 
+                    //Removes the canvasObject and extracts the values from it to create a new node with these params.
                     CanvasGenerator c = canvasObject.GetComponent<CanvasGenerator>();
-                    AddingNodeCanvasScript script = canvasObject.GetComponent<AddingNodeCanvasScript>();
+                    AddingNodeCanvasAction script = canvasObject.GetComponent<AddingNodeCanvasAction>();
                     script.GetNodeMetrics();
                     c.DestroyAddNodeCanvas();
                     Progress1 = Progress.ValuesAreGiven;
@@ -177,8 +167,7 @@ namespace SEE.Controls
                     if (GONode == null)
                     {
                         NewNode();
-                        //  GameNodeMover.MoveTo(GONode);
-                        Tweens.Move(GONode, new Vector3(GONode.transform.position.x,GONode.transform.position.y+0.4f,GONode.transform.position.z),0.6f);
+                        Tweens.Move(GONode, new Vector3(GONode.transform.position.x, GONode.transform.position.y + 0.4f, GONode.transform.position.z), 0.6f);
                     }
                     else
                     {
@@ -186,10 +175,6 @@ namespace SEE.Controls
                         {
                             Place();
                             Progress1 = Progress.NoCitySelected;
-                        }
-                        else
-                        {
-                          //  GameNodeMover.MoveTo(GONode);
                         }
                     }
                     break;
@@ -223,15 +208,15 @@ namespace SEE.Controls
 
                 //Gets the SEECity from the hoverdObject
                 SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject.TryGetComponent<SEECity>(out city);
-                ///start-methode?
+
                 GetNodesOfScene();
-                    foreach (GameObject root in listOfRoots)
+                foreach (GameObject root in listOfRoots)
+                {
+                    if (root.GetComponent<NodeRef>().Value.ItsGraph == city.LoadedGraph)
                     {
-                        if (root.GetComponent<NodeRef>().Value.ItsGraph == city.LoadedGraph)
-                        {
-                            ChangeColor(root, Color.white);
-                        }
+                        ChangeColor(root, Color.white);
                     }
+                }
             }
         }
 
@@ -313,7 +298,7 @@ namespace SEE.Controls
         {
             GameObject gameNode;
             System.Random rnd = new System.Random();
-            NodeMetrics = new Tuple<string, string, string>(Utils.RandomStrings.Get(), "NODE" + rnd.Next(0, 999999999), "Type" + rnd.Next(0, 999999999));
+            NodeMetrics = new Tuple<string, string, string>(Utils.RandomStrings.Get(), "Node" + rnd.Next(0, 999999999), "Type" + rnd.Next(0, 999999999));
             Node node = new Node
             {
                 //Set the metrics of the new node
@@ -336,7 +321,7 @@ namespace SEE.Controls
                 GONode.transform.localScale = medianOfInnerNode;
                 GONode.gameObject.GetComponent<Renderer>().material.color = innerNodeColor;
             }
-            if(!isInnerNode)
+            if (!isInnerNode)
             {
                 gameNode = graphRenderer.NewLeafNode(node);
                 GONode = gameNode;
@@ -349,18 +334,17 @@ namespace SEE.Controls
 
         /// <summary>
         /// Places a node on call and checks if the city is the preselected one. Before this node will be placed, 
-        /// the default-values will be replaced by the users input, if it is given. 
+        /// the default-values will be replaced by the users input, if it is given and they are not only whitespaces. 
         /// </summary>
         private void Place()
         {
             Node node = GONode.GetComponent<NodeRef>().Value;
-          //FIXME: nodename und nodetype sind nur null oder leerer String, andere Abfrage unnütz aber muss nochmal gecheckt werden.
-            if (nodename != null && !nodename.Equals(""))
+
+            if (nodename.Trim().Length != 0)
             {
                 node.SourceName = nodename;
             }
-
-            if (nodetype != null && !nodetype.Equals(""))
+            if (nodetype.Trim().Length != 0)
             {
                 node.Type = nodetype;
             }
@@ -426,7 +410,7 @@ namespace SEE.Controls
             List<Node> rootList = city.LoadedGraph.GetRoots();
 
             //It is nessecary to find the GameObjects, which are containing the specific root-nodes.
-            listOfRoots = RootSearch(allInnerNodesInScene,allLeafsInScene, rootList);
+            listOfRoots = RootSearch(allInnerNodesInScene, allLeafsInScene, rootList);
 
             //Lists of the gameObject-sizes of the nodes
             leafSize = ListOfLossyscale(allLeafsInScene);
@@ -478,18 +462,19 @@ namespace SEE.Controls
         /// There are multipleRoots in the graph.
         /// There is exactly one root in the graph
         /// </summary>
-        /// <param name="pListOfGameNodes">The list of </param>
-        /// <param name="pListofRoots"></param>
-        /// <returns> The rootnode as gameObject in case the root is found, else dir_root (which can be null).</returns>
-        private List <GameObject> RootSearch(ICollection<GameObject> listOfInnerNodes, ICollection<GameObject> listofLeafs , List<Node> pListofRoots)
+        /// <param name="listofLeafs">A collection of all leafs in a loaded scene</param>
+        /// <param name="listOfInnerNodes">A collection of all InnerNodes in a loaded scene</param>
+        /// <param name="pListofRoots">A list of all root-nodes in a loaded scene</param>
+        /// <returns>A list with all root-GameObjects in the loaded scene</returns>
+        private List<GameObject> RootSearch(ICollection<GameObject> listOfInnerNodes, ICollection<GameObject> listofLeafs, List<Node> pListofRoots)
         {
             List<GameObject> listsOfRoot = new List<GameObject>();
 
             if (listofLeafs.Count == 1 && listOfInnerNodes.Count == 0)
             {
-               listsOfRoot.Add(listofLeafs.ElementAt(0));
-
+                listsOfRoot.Add(listofLeafs.ElementAt(0));
             }
+
             if (listofLeafs.Count == 0 && listOfInnerNodes.Count == 0)
             {
                 listsOfRoot = null;
@@ -521,16 +506,16 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// For Network Use Only, creates the new node on the Clients
+        /// For Network Use Only, creates the new node on all other clients.
         /// </summary>
         /// <param name="position"> The position of the new node</param>
         /// <param name="parentID">The id of the new GameObject</param>
         /// <param name="scale">the size of the new GameObject</param>
-        public void NetworkNewNode(Vector3 position,Vector3 scale ,string parentID)
+        public void NetworkNewNode(Vector3 position, Vector3 scale, string parentID)
         {
             NewNode();
             GONode.SetScale(scale);
-            GameNodeMover.NetworkFinalizeNodePosition(GONode,parentID,position);
+            GameNodeMover.NetworkFinalizeNodePosition(GONode, parentID, position);
             GONode = null;
             RemoveScript();
         }
@@ -544,6 +529,5 @@ namespace SEE.Controls
             IsInnerNode = isInnerNode;
         }
     }
-
 }
 

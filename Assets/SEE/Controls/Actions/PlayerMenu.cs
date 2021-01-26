@@ -169,6 +169,10 @@ namespace SEE.Controls.Actions
             };
         }
 
+        /// <summary>
+        /// Closes the CircularMenu after pushing one of its buttons.
+        /// The current state wont left until another state is chosen.
+        /// </summary>
         protected void Hide()
         {
             try
