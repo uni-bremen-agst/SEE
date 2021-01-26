@@ -96,7 +96,6 @@ public class NewNodeNetAction : AbstractAction
                 dummy.AddComponent<NewNodeAction>();
                 dummy.GetComponent<NewNodeAction>().City = city;
                 dummy.GetComponent<NewNodeAction>().SetIsInnerNode(isInnerNode);
-                dummy.GetComponent<NewNodeAction>().NodeMetrics =  new Tuple <string, string,string >(id, sourceName, type);
                 dummy.GetComponent<NewNodeAction>().NetworkNewNode(position, scale, parentID);
             }
         }
