@@ -70,8 +70,8 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Called from the menu as a callback when the user selects the map menu entry.
-        /// Passes the map request on to <see cref="playerActions"/>.
+        /// Called from the menu as a callback when the user selects the draw-edge menu entry.
+        /// Passes the draw-edge request on to <see cref="playerActions"/>.
         /// </summary>
         private void DrawOn()
         {
