@@ -25,14 +25,6 @@ namespace SEE.Controls
         private GameObject GONode = null;
 
         /// <summary>
-        /// The Meta infos from the new node, overwritten by the values of the GUI
-        /// 1. ID, 2. SourceName, 3. Type
-        /// </summary>
-        private Tuple<String, String, String> nodeMetrics = null;
-
-        public Tuple<string, string, string> NodeMetrics { get => nodeMetrics; set => nodeMetrics = value; }
-
-        /// <summary>
         /// True, if the node which will be created is an innerNode, else false
         /// </summary>
         private static bool isInnerNode = false;
@@ -284,7 +276,7 @@ namespace SEE.Controls
             }
             catch (Exception)
             {
-                node.ID = Utils.RandomStrings.Get();
+                node.ID = RandomStrings.Get();
                 AddNode(node);
                 return;
             }
@@ -298,13 +290,12 @@ namespace SEE.Controls
         {
             GameObject gameNode;
             System.Random rnd = new System.Random();
-            NodeMetrics = new Tuple<string, string, string>(Utils.RandomStrings.Get(), "Node" + rnd.Next(0, 999999999), "Type" + rnd.Next(0, 999999999));
             Node node = new Node
             {
                 //Set the metrics of the new node
-                ID = NodeMetrics.Item1,
-                SourceName = NodeMetrics.Item2,
-                Type = NodeMetrics.Item3
+                ID = RandomStrings.Get(),
+                SourceName = "Node" + rnd.Next(0, 999999999),
+                Type = "Type" + rnd.Next(0, 999999999)
             };
 
             AddNode(node);
@@ -375,7 +366,6 @@ namespace SEE.Controls
 
             GONode = null;
             city = null;
-            NodeMetrics = null;
         }
 
         /// <summary>
