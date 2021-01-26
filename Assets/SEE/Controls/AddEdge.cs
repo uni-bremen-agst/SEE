@@ -1,50 +1,57 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using SEE.Game;
 using SEE.GO;
 using System;
 
 public class AddEdge : MonoBehaviour
 {
-    // Update is called once per frame
     void Update()
     {
-        //Assigning the gameobjects to be connected.
-        //Checking whether the two gameobjects are not null and whether the are on the same graph.
-        if (Input.GetMouseButtonDown(0) && hoveredObject != null)
+        // Assigning the game objects to be connected.
+        // Checking whether the two game objects are not null and whether they are 
+        // actually nodes.
+        if (Input.GetMouseButtonDown(0) && hoveredObject != null && hoveredObject.HasNodeRef())
         {
             if (from == null)
             {
                 from = hoveredObject;
             }
-            if (!from.Equals(hoveredObject) && to == null)
+            else if (to == null)
             {
-                    to = hoveredObject;
-            }
-            else
-            {
-                throw new Exception($"The source and target of the edge cannot be the same gameobject!");
+                to = hoveredObject;
             }
         }
+        // Note: from == to may be possible.
         if (from != null && to != null)
         {
-                SEECity city;
-                city = SceneQueries.GetCodeCity(from.transform).GetComponent<SEECity>();
-                city.Renderer.DrawEdge(from, to);
-                from = null;
-                to = null;
+            Transform cityObject = SceneQueries.GetCodeCity(from.transform);
+            if (cityObject != null)
+            {
+                if (cityObject.TryGetComponent(out SEECity city))
+                {
+                    try
+                    {
+                        city.Renderer.DrawEdge(from, to);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError($"The new edge from {from.name} to {to.name} could not be created: {e.Message}.\n");
+                    }
+                    from = null;
+                    to = null;
+                }
+            }
         }
-        //Adding the key "F1" in order to delete the first selected gameobject.
+        // Adding the key "F1" in order to delete the selected gameobjects.
         if (Input.GetKeyDown(KeyCode.F1))
         {
             from = null;
+            to = null;
         }
-
     }
 
     /// <summary>
-    /// Var to get the life hovered object.
+    /// The currently hovered object.
     /// </summary>
     public GameObject hoveredObject;
 
@@ -59,19 +66,14 @@ public class AddEdge : MonoBehaviour
     public GameObject to;
 
     /// <summary>
-    /// An abstract to call the needed function DrawEdge.
+    /// Set the currently hovered game node to <paramref name="node"/>
+    /// that will be either the source or the target of the edge to be
+    /// drawn. Which role it will play (source or target) depends upon
+    /// the order (the first one hovered will be the source).
     /// </summary>
-    private GraphRenderer abstractGraphRenderer;
-
-    /// <summary>
-    /// Function to set the source <paramref name="GameObject"/>
-    /// </summary>
-    /// <param name="GameObject">GameObject as source for the edge</param>
-    public void SetHoveredObject(GameObject source)
+    /// <param name="node">GameObject as source for the edge</param>
+    public void SetHoveredObject(GameObject node)
     {
-        hoveredObject = source;
+        hoveredObject = node;
     }
-
-    
-
 }
