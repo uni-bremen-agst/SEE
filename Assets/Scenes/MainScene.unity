@@ -331,8 +331,9 @@ GameObject:
   - component: {fileID: 186778475}
   - component: {fileID: 186778474}
   - component: {fileID: 186778473}
+  - component: {fileID: 186778476}
   m_Layer: 0
-  m_Name: Player Tough Gamepad
+  m_Name: Player Touch Gamepad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -404,6 +405,18 @@ Transform:
   m_Father: {fileID: 1510433995}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &186778476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 186778472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33c7e69bbbcb32f4f995b716e96c7970, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &225793075
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1386,6 +1399,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 844925775}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &844967657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844967653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33c7e69bbbcb32f4f995b716e96c7970, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &844967658
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1512,8 +1537,9 @@ GameObject:
   - component: {fileID: 1046553560}
   - component: {fileID: 1046553559}
   - component: {fileID: 1046553558}
+  - component: {fileID: 1046553562}
   m_Layer: 0
-  m_Name: Player Holo Lens
+  m_Name: Player HoloLens
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1633,6 +1659,18 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!114 &1046553562
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046553556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33c7e69bbbcb32f4f995b716e96c7970, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1093528283
 GameObject:
   m_ObjectHideFlags: 0
@@ -2799,7 +2837,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.0043594837
+  HeightOffset: 0.003486514
 --- !u!65 &1649116648
 BoxCollider:
   m_ObjectHideFlags: 0
