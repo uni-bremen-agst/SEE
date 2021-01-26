@@ -242,7 +242,6 @@ namespace SEE.Game
             result.transform.SetParent(rootNode.transform);
             // The portal of the new edge is inherited from the codeCity.
             Portal.SetPortal(root: codeCity, gameObject: result);
-            Debug.Log("Kante:" + edge);
             return result;
         }
 
