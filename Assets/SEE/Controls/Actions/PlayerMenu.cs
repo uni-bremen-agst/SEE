@@ -126,7 +126,7 @@ namespace SEE.Controls.Actions
                                    entryOn: MapOn,
                                    entryOff: null,
                                    isTransient: true),
-                // Drawing a new edge between to gameobjects
+                // Drawing a new edge between two gameobjects
                 new MenuDescriptor(label: "DrawEdge",
                                    spriteFile: menuEntrySprite,
                                    activeColor: Color.green,
