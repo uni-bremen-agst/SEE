@@ -227,7 +227,7 @@ namespace SEE.Controls
                 GetNodesOfScene();
                     foreach (GameObject root in listOfRoots)
                     {
-                        if (root.GetComponent<NodeRef>().node.ItsGraph == city.LoadedGraph)
+                        if (root.GetComponent<NodeRef>().Value.ItsGraph == city.LoadedGraph)
                         {
                             ChangeColor(root, Color.white);
                         }
@@ -353,7 +353,7 @@ namespace SEE.Controls
         /// </summary>
         private void Place()
         {
-            Node node = GONode.GetComponent<NodeRef>().node;
+            Node node = GONode.GetComponent<NodeRef>().Value;
           //FIXME: nodename und nodetype sind nur null oder leerer String, andere Abfrage unnütz aber muss nochmal gecheckt werden.
             if (nodename != null && !nodename.Equals(""))
             {
@@ -462,7 +462,7 @@ namespace SEE.Controls
             foreach (GameObject go in pListOfGameObjects)
             {
                 //to specify if the specific node belong to the specific graph. 
-                if (go.GetComponent<NodeRef>().node.ItsGraph == city.LoadedGraph)
+                if (go.GetComponent<NodeRef>().Value.ItsGraph == city.LoadedGraph)
                 {
                     lossyScaleList.Add(go.transform.lossyScale);
                 }
@@ -502,7 +502,7 @@ namespace SEE.Controls
 
                 foreach (GameObject rootSearchItem in listOfInnerNodes)
                 {
-                    rootTmp = rootSearchItem.GetComponent<NodeRef>().node;
+                    rootTmp = rootSearchItem.GetComponent<NodeRef>().Value;
                     if (rootTmp.IsRoot() && rootTmp == rootOfCity && !(rootTmp == null))
                     {
                         listsOfRoot.Add(rootSearchItem);
@@ -510,7 +510,7 @@ namespace SEE.Controls
                 }
                 foreach (GameObject rootSearchItem in listofLeafs)
                 {
-                    rootTmp = rootSearchItem.GetComponent<NodeRef>().node;
+                    rootTmp = rootSearchItem.GetComponent<NodeRef>().Value;
                     if (rootTmp.IsRoot() && rootTmp == rootOfCity && !(rootTmp == null))
                     {
                         listsOfRoot.Add(rootSearchItem);

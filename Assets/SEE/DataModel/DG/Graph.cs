@@ -401,7 +401,7 @@ namespace SEE.DataModel.DG
         /// Returns the list of nodes without parent.
         /// </summary>
         /// <returns>root nodes of the hierarchy</returns>
-        public List<Node> GetRoots()
+        public List<Node> GetRoots() // TODO(torben): this query could be cached to improve performance
         {
             List<Node> result = new List<Node>();
             foreach (Node node in nodes.Values)

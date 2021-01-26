@@ -28,7 +28,7 @@ public class AddingNodeCanvasButton : MonoBehaviour
     /// <summary>
     /// The Component playerActions, which is the parent of the DesktopNewNodeAction and DesktopEditNodeAction-scripts.
     /// </summary>
-    public PlayerActions playerActions;
+    private GameObject playerDesktop;
 
 
 
@@ -51,9 +51,7 @@ public class AddingNodeCanvasButton : MonoBehaviour
             editNodeButton.onClick.AddListener(EditNode);
         }
 
-        GameObject g = GameObject.Find("DesktopPlayer");
-        playerActions = g.GetComponent<PlayerActions>();
-
+         playerDesktop = GameObject.Find("Player Desktop");
     }
 
     /// <summary>
@@ -61,7 +59,7 @@ public class AddingNodeCanvasButton : MonoBehaviour
     /// </summary>
     public void SetNextAddingNodeStep()
     {
-        DesktopNewNodeAction current = playerActions.GetComponent<DesktopNewNodeAction>();
+        DesktopNewNodeAction current = playerDesktop.GetComponent<DesktopNewNodeAction>();
         current.Progress1 = DesktopNewNodeAction.Progress.CanvasIsClosed;
     }
 
@@ -70,7 +68,7 @@ public class AddingNodeCanvasButton : MonoBehaviour
     /// </summary>
     public void EditIsCanceled()
     {
-        DesktopEditNodeAction current = playerActions.GetComponent<DesktopEditNodeAction>();
+        DesktopEditNodeAction current = playerDesktop.GetComponent<DesktopEditNodeAction>();
         current.EditProgress = DesktopEditNodeAction.Progress.EditIsCanceled;
     }
 

@@ -38,25 +38,24 @@ namespace SEE.Controls.Actions
             if (Input.GetKeyDown(KeyCode.U))
             {
                 InteractableObject.UnselectAll(true);
-                ChartManager.Instance.UnselectAll();
             }
 
             switch (state)
             {
                 case State.MoveNode:
                     // an object must be selected; otherwise we cannot move it
-                    if (selectedObject.gameObject != null)
+                    if (selectedObject.gameObect != null)
                     {                        
                         if (UserWantsToMove())
                         {
-                            GameNodeMover.MoveTo(selectedObject.gameObject);
+                            GameNodeMover.MoveTo(selectedObject.gameObect);
                         }
                         else
                         {
                             // The selected object has reached its final destination.
                             // It needs to be placed there.
-                            GameNodeMover.FinalizePosition(selectedObject.gameObject, selectedObject.originalPosition);
-                            selectedObject.gameObject = null;
+                            GameNodeMover.FinalizePosition(selectedObject.gameObect, selectedObject.originalPosition);
+                            selectedObject.gameObect = null;
                         }
                     }
                     break;
@@ -73,9 +72,9 @@ namespace SEE.Controls.Actions
                     }
                     break;
                 case State.ScaleNode:
-                    if (selectedObject.gameObject != null )
+                    if (selectedObject.gameObect != null )
                     {
-                        selectedObject.gameObject.AddComponent<GameNodeScaleAction>();
+                        selectedObject.gameObect.AddComponent<GameNodeScaleAction>();
                         Browse();
                     }
                     break;
@@ -216,7 +215,7 @@ namespace SEE.Controls.Actions
 
         private struct ObjectInfo
         {
-            public GameObject gameObject;
+            public GameObject gameObect;
             public Vector3 originalPosition;
         }
 
@@ -242,8 +241,9 @@ namespace SEE.Controls.Actions
         /// <param name="selection">the selected interactable object</param>
         public void SelectOn(GameObject selection)
         {
-            selectedObject.gameObject = selection;
+            selectedObject.gameObect = selection;
             selectedObject.originalPosition = selection.transform.position;
+            //Debug.Log($"Player selects {selection.name}.\n");
         }
 
         /// <summary>
@@ -255,7 +255,8 @@ namespace SEE.Controls.Actions
         /// <param name="selection">the interactable object no longer selected</param>
         public void SelectOff(GameObject selection)
         {
-            selectedObject.gameObject = null;
+            //Debug.Log($"Player deselects {selection.name}.\n");
+            selectedObject.gameObect = null;
         }
 
         /// <summary>
@@ -273,6 +274,7 @@ namespace SEE.Controls.Actions
         /// <param name="hovered">the hovered interactable object</param>
         public void HoverOn(GameObject hovered)
         {
+            //Debug.Log($"Player hovers on {hovered.name}.\n");
             hoveredObject = hovered;
         }
 
@@ -285,6 +287,7 @@ namespace SEE.Controls.Actions
         /// <param name="hovered">the interactable object no longer hovered</param>
         public void HoverOff(GameObject hovered)
         {
+            //Debug.Log($"Player hovers off {hovered.name}.\n");
             hoveredObject = null;
         }
 

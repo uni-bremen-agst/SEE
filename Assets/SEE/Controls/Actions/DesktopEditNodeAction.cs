@@ -47,7 +47,7 @@ public class DesktopEditNodeAction : DesktopNodeAction
                 {
                     CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
                     EditNodeCanvasScript script = generator.InstantiateEditNodeCanvas();
-                    script.nodeToEdit = hoveredObject.GetComponent<NodeRef>().node;
+                    script.nodeToEdit = hoveredObject.GetComponent<NodeRef>().Value;
                     script.gameObjectID = hoveredObject.name;
                 }
                 break;
