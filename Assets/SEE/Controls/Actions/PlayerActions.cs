@@ -19,7 +19,7 @@ namespace SEE.Controls.Actions
             Browse,   // the user just browses the city; this is the default
             MoveNode, // a game node is being moved within its city
             MapNode,   // a game node is mapped from one city to another city
-            DrawEdge  // a new egde has to be drawn
+            DrawEdge  // a new edge has to be drawn
         }
 
         /// <summary>
