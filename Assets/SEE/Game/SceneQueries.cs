@@ -289,7 +289,6 @@ namespace SEE.Game
         public static Graph GetGraph(GameObject codeCity)
         {
             Node root = GetCityRootGraphNode(codeCity);
-
             return root?.ItsGraph;
         }
     }
