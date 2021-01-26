@@ -21,7 +21,7 @@ namespace SEE.Controls.Actions
         /// Called when the object is selected.
         /// </summary>
         /// <param name="isOwner">true if a local user initiated this call</param>
-        protected override void On(bool isOwner)
+        protected override void On(InteractableObject interactableObject, bool isOwner)
         {
             if (!interactable.IsGrabbed)
             {
@@ -41,7 +41,7 @@ namespace SEE.Controls.Actions
         /// that outline will be removed.
         /// </summary>
         /// <param name="isOwner">true if a local user initiated this call</param>
-        protected override void Off(bool isOwner)
+        protected override void Off(InteractableObject interactableObject, bool isOwner)
         {
             if (!interactable.IsGrabbed && !interactable.IsHovered && TryGetComponent(out Outline outline))
             {

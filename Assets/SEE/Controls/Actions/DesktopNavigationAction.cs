@@ -194,7 +194,7 @@ namespace SEE.Controls.Actions
                 {
                     actionState.zoomToggleToObject |= Input.GetKeyDown(KeyCode.F);
 
-                    if (Input.GetMouseButtonDown(0))
+                    if (Input.GetMouseButtonDown(0) && !isMouseOverGUI)
                     {
                         Select(actionState.hoveredTransform ? actionState.hoveredTransform.gameObject : null, !actionState.selectToggle);
                     }
@@ -345,7 +345,7 @@ namespace SEE.Controls.Actions
                         #region FinalizePosition
 
                         // The underlying graph node of the moving object.
-                        Node movingNode = moveState.draggedTransform.GetComponent<NodeRef>().node;
+                        Node movingNode = moveState.draggedTransform.GetComponent<NodeRef>().Value;
                         // The new parent of the movingNode in the underlying graph.
                         Node newGraphParent = null;
                         // The new parent of the movingNode in the game-object hierarchy.
@@ -365,12 +365,12 @@ namespace SEE.Controls.Actions
                             {
                                 NodeRef nodeRef = hit.transform.GetComponent<NodeRef>();
                                 // Is it a node at all and if so, are they in the same graph?
-                                if (nodeRef != null && nodeRef.node.ItsGraph == movingNode.ItsGraph)
+                                if (nodeRef != null && nodeRef.Value.ItsGraph == movingNode.ItsGraph)
                                 {
                                     // update newParent when we found a node deeper into the tree
-                                    if (newGraphParent == null || nodeRef.node.Level > newGraphParent.Level)
+                                    if (newGraphParent == null || nodeRef.Value.Level > newGraphParent.Level)
                                     {
-                                        newGraphParent = nodeRef.node;
+                                        newGraphParent = nodeRef.Value;
                                         newGameParent = hit.collider.gameObject;
                                         newPosition = hit.point;
                                     }

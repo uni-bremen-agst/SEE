@@ -40,7 +40,7 @@ namespace SEE.Utils
         /// The cached event system. It is cached because it needs to be queried in
         /// each Update cycle.
         /// </summary>
-        private static EventSystem eventSystem;
+        private static EventSystem eventSystem = null;
 
         /// <summary>
         /// Whether the mouse currently hovers over a GUI element.

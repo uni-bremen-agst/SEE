@@ -40,14 +40,14 @@ namespace SEE.Game.Charts
         public const string MetricPrefix = "Metric.";
 
         /// <summary>
-        /// The instance of the <see cref="ChartManager" />, to ensure there will be only one.
-        /// </summary>
-        private static ChartManager _instance;
-
-        /// <summary>
         /// Tag of a game object having a ChartManager as a component.
         /// </summary>
         private const string ChartManagerTag = "ChartManager";
+
+        /// <summary>
+        /// The instance of the <see cref="ChartManager" />, to ensure there will be only one.
+        /// </summary>
+        private static ChartManager _instance;
 
         /// <summary>
         /// Returns the unique chart manager component in the scene.
@@ -84,10 +84,12 @@ namespace SEE.Game.Charts
             }
         }
 
+        [Header("Metric Settings")]
+
         /// <summary>
         /// Whether metrics of leave nodes should be shown in the charts.
         /// </summary>
-        [Header("Metric Settings"), Tooltip("Whether the metrics of leaf nodes should be shown in the charts")]
+        [Tooltip("Whether the metrics of leaf nodes should be shown in the charts")]
         public bool ShowLeafMetrics = true;
 
         /// <summary>
@@ -107,44 +109,16 @@ namespace SEE.Game.Charts
         [Range(0.1f, 1f)] public float dragDelay = 0.2f;
 
         /// <summary>
-        /// The <see cref="Material" /> making the object look highlighted.
-        /// </summary>
-        [Header("Highlights"), Tooltip("Material for highlighting a selected game node.")]
-        public Material buildingHighlightMaterial;
-
-        /// <summary>
-        /// The <see cref="Material" /> making the object look accentuated.
-        /// </summary>
-        [Tooltip("Material for highlighting a selected accentuated game node.")]
-        public Material buildingHighlightMaterialAccentuated;
-
-        /// <summary>
-        /// The thickness of the highlight outline of <see cref="buildingHighlightMaterial" />.
-        /// </summary>
-        [SerializeField, Tooltip("Width of the line drawn around selected game nodes as an outline")]
-        private float highlightOutline = 0.1f;
-
-        /// <summary>
-        /// The color highlighted objects will have.
-        /// </summary>
-        [Tooltip("Color for selected game nodes")]
-        public Color standardColor = Color.red;
-
-        /// <summary>
-        /// The color accentuated highlighted objects will have.
-        /// </summary>
-        [Tooltip("Color for accentuated selected game nodes")]
-        public Color accentuationColor = Color.blue;
-
-        /// <summary>
         /// Determines if the scene is being played in VR or not.
         /// </summary>
         private bool _isVirtualReality;
 
+        [Header("Virtual Reality")]
+
         /// <summary>
         /// The length of the pointer attached to the controller.
         /// </summary>
-        [Header("Virtual Reality")] public float pointerLength = 5.0f;
+        public float pointerLength = 5.0f;
 
         /// <summary>
         /// The speed at which charts will be moved in or out when the player scrolls.
@@ -157,10 +131,12 @@ namespace SEE.Game.Charts
         /// </summary>
         public float distanceThreshold = 1.0f;
 
+        [Header("Prefabs")]
+
         /// <summary>
         /// The canvas setup for charts that is used in non VR.
         /// </summary>
-        [Header("Prefabs"), SerializeField] private GameObject chartsPrefab;
+        [SerializeField]private GameObject chartsPrefab;
 
         /// <summary>
         /// The prefab of a new chart when in VR.
@@ -168,27 +144,16 @@ namespace SEE.Game.Charts
         [SerializeField] private GameObject chartPrefabVr;
 
         /// <summary>
-        /// All objects in the scene that are used by the non VR representation of charts before the game
-        /// starts.
-        /// </summary>
-        [SerializeField] private GameObject[] nonVrObjects;
-
-        /// <summary>
         /// The sprite for the drag button when the chart is maximized.
         /// </summary>
-        public Sprite maximizedSprite;
+        [SerializeField] private Sprite maximizedSprite;
+        public Sprite MaximizedSprite => maximizedSprite;
 
         /// <summary>
         /// The sprite for the drag button when the chart is minimized.
-        /// </summary>
-        public Sprite minimizedSprite;
-
-        /// <summary>
-        /// The current thickness of the highlight outline of <see cref="buildingHighlightMaterial" /> used in
-        /// animations.
-        /// </summary>
-        [Header("DO NOT CHANGE THIS"), SerializeField]
-        private float highlightOutlineAnim = 0.001f;
+        /// </summary>y
+        [SerializeField] private Sprite minimizedSprite;
+        public Sprite MinimizedSprite => minimizedSprite;
 
         /// <summary>
         /// Contains the chart UI.
@@ -207,30 +172,6 @@ namespace SEE.Game.Charts
                     ? GameObject.Find("ChartCanvas").transform.Find("ChartsOpen").gameObject
                     : Instantiate(chartsPrefab).transform.Find("ChartsOpen").gameObject;
             }
-            else
-            {
-                foreach (GameObject nonVrObject in nonVrObjects)
-                {
-                    Destroy(nonVrObject);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Update is called once per frame.
-        /// </summary>
-        private void Update()
-        {
-            AnimateHighlight();
-        }
-
-        /// <summary>
-        /// Animates the highlight material.
-        /// </summary>
-        private void AnimateHighlight()
-        {
-            buildingHighlightMaterial.SetFloat("g_flOutlineWidth", highlightOutlineAnim);
-            buildingHighlightMaterialAccentuated.SetFloat("g_flOutlineWidth", highlightOutlineAnim);
         }
 
         /// <summary>
@@ -245,90 +186,6 @@ namespace SEE.Game.Charts
             {
                 chart.transform.position = cameraPosition.position + (2.0f + offset) * cameraPosition.forward;
                 offset += 0.01f;
-            }
-        }
-
-        // All created and still existing charts. Charts are game objects tagged by Tags.Chart
-        // representing a metric chart.
-        private readonly HashSet<GameObject> allCharts = new HashSet<GameObject>();
-
-        private ICollection<GameObject> AllCharts()
-        {
-            return allCharts;
-        }
-
-        /// <summary>
-        /// Registers the descendant of given <paramref name="gameObject"/> tagged by Tags.Chart
-        /// in allCharts. Hightlighting and accentuation works only for elements of registered
-        /// charts.
-        /// </summary>
-        /// <param name="gameObject">a game object containing a chart</param>
-        public void RegisterChart(GameObject gameObject)
-        {
-            GameObject chart = Tags.FindChildWithTag(gameObject, Tags.Chart);
-            Assert.IsNotNull(chart);
-            allCharts.Add(chart);
-        }
-
-        /// <summary>
-        /// Unregisters the descendant of given <paramref name="gameObject"/> tagged by Tags.Chart
-        /// in allCharts. Hightlighting and accentuation works only for elements of registered
-        /// charts.
-        /// </summary>
-        /// <param name="gameObject">a game object containing a chart</param>
-        public void UnregisterChart(GameObject gameObject)
-        {
-            GameObject chart = Tags.FindChildWithTag(gameObject, Tags.Chart);
-            Assert.IsNotNull(chart);
-            allCharts.Remove(chart);
-        }
-
-        public static void OnSelect(GameObject highlight)
-        {
-            SetCorrespondingMarkers(highlight, true);
-        }
-
-        public static void OnDeselect(GameObject highlight)
-        {
-            SetCorrespondingMarkers(highlight, false);
-        }
-
-        private static void SetCorrespondingMarkers(GameObject highlight, bool isSelected)
-        {
-            foreach (GameObject chart in Instance.AllCharts())
-            {
-                chart.GetComponent<ChartContent>()?.HighlightCorrespondingMarker(highlight, isSelected);
-            }
-        }
-
-        /// <summary>
-        /// Accentuates an object and all markers associated with it.
-        /// </summary>
-        /// <param name="highlight"></param>
-        public static void Accentuate(GameObject highlight)
-        {
-            foreach (GameObject chart in Instance.AllCharts())
-            {
-                chart.GetComponent<ChartContent>()?.AccentuateCorrespondingMarker(highlight);
-            }
-
-            Transform highlightTransform = highlight.transform;
-
-            for (int i = 0; i < highlightTransform.childCount; i++)
-            {
-                Transform child = highlightTransform.GetChild(i);
-                if (child.gameObject.name.Equals(highlight.name + "(Clone)"))
-                {
-                    for (int x = 0; x < child.childCount; x++)
-                    {
-                        Transform secondChild = child.GetChild(x);
-                        if (secondChild.gameObject.name.Equals("HighlightLine(Clone)"))
-                        {
-                            secondChild.GetComponent<HighlightLine>()?.ToggleAccentuation();
-                            return;
-                        }
-                    }
-                }
             }
         }
 
@@ -355,30 +212,10 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Initializes a new chart in front of the player in VR.
         /// </summary>
-        public void CreateChartVr()
+        public void CreateChartVR()
         {
             Transform cameraPosition = MainCamera.Camera.transform;
             Instantiate(chartPrefabVr, cameraPosition.position + 2 * cameraPosition.forward, Quaternion.identity, transform.GetChild(0));
-        }
-
-        /// <summary>
-        /// Sets the properties of <see cref="buildingHighlightMaterial" /> to their original state.
-        /// </summary>
-        private void OnDestroy()
-        {
-            buildingHighlightMaterial.SetFloat("g_flOutlineWidth", highlightOutline);
-            buildingHighlightMaterialAccentuated.SetFloat("g_flOutlineWidth", highlightOutline);
-        }
-
-        /// <summary>
-        /// Unselects all currently selected markers of all existing charts.
-        /// </summary>
-        public void UnselectAll()
-        {
-            foreach (var chart in AllCharts())
-            {
-                chart.GetComponent<ChartContent>()?.UnselectAll();
-            }
         }
     }
 }

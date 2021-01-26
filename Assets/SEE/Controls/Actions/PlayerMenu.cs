@@ -25,7 +25,11 @@ namespace SEE.Controls.Actions
         [Range(0, 0.1f)]
         public float Depth = 0.01f;
 
-
+        /// <summary>
+        /// The player actions attached to the gameObject. The selection of 
+        /// menu entries will be forwarded to this component.
+        /// </summary>
+        private PlayerActions playerActions;
 
         /// <summary>
         /// Creates the <see cref="menu"/> if it does not exist yet.
@@ -34,6 +38,11 @@ namespace SEE.Controls.Actions
         protected virtual void Start()
         {
             MenuFactory.CreateMenu(EntriesParameter, Radius, Depth);
+            if (!gameObject.TryGetComponent<PlayerActions>(out playerActions))
+            {
+                Debug.LogErrorFormat("Player {0} does not have PlayerActions.\n", name);
+                enabled = false;
+            }
         }
 
         /// <summary>

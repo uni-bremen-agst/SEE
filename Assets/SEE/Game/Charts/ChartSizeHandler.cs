@@ -143,38 +143,30 @@ namespace SEE.Game.Charts
             dataPanel.sizeDelta = new Vector2(width - 80, height - 80);
             dataPanel.anchoredPosition = new Vector2(width / 2, height / 2);
             noDataWarning.sizeDelta = new Vector2(width - 150, height - 150);
+
             RectTransform labelsPanel = _chartContent.labelsPanel;
             labelsPanel.sizeDelta = new Vector2(width, height);
             labelsPanel.anchoredPosition = new Vector2(width / 2, height / 2);
+
             RectTransform xDropdown = _chartContent.axisDropdownX.GetComponent<RectTransform>();
             xDropdown.anchoredPosition = new Vector2(width / 2, xDropdown.anchoredPosition.y);
             xDropdown.sizeDelta = new Vector2(width / 2, xDropdown.sizeDelta.y);
+
             RectTransform yDropdown = _chartContent.axisDropdownY.GetComponent<RectTransform>();
             yDropdown.anchoredPosition = new Vector2(yDropdown.anchoredPosition.x, height / 2);
             yDropdown.sizeDelta = new Vector2(height / 2, yDropdown.sizeDelta.y);
+
             Chart.sizeDelta = new Vector2(width, height);
             topRight.localPosition = new Vector2(width / 2, height / 2);
             topLeft.localPosition = new Vector2(-width / 2, height / 2);
             bottomRight.localPosition = new Vector2(width / 2, -height / 2);
             bottomLeft.localPosition = new Vector2(-width / 2, -height / 2);
             dragButton.localPosition = bottomRight.localPosition - new Vector3(20f, -20f);
-            contentSelection.anchoredPosition =
-                new Vector2(width / 2 + contentSelection.sizeDelta.x / 2, 0);
+            contentSelection.anchoredPosition = new Vector2(width / 2 + contentSelection.sizeDelta.x / 2, 0);
             contentSelection.sizeDelta = new Vector2(contentSelection.sizeDelta.x, height);
             scrollView.sizeDelta = new Vector2(scrollView.sizeDelta.x, height - 50);
             contentSelectionHeader.anchoredPosition = new Vector2(0, height / 2 - 20);
-
-            if (_chartContent.TotalNumberOfGraphNodesInTheScene > 50)
-            {
-                if (_chartContent.drawing == null)
-                {
-                    _chartContent.drawing = StartCoroutine(_chartContent.QueueDraw());
-                }
-            }
-            else
-            {
-                _chartContent.DrawData(false);
-            }
+            _chartContent.DrawData();
         }
 
         /// <summary>
