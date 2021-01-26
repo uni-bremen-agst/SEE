@@ -46,30 +46,27 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Called from the menu as a callback when the user selects the browse menu entry.
-        /// Passes the browse request on to <see cref="playerActions"/>.
-        /// </summary>
-        private void BrowseOn()
-        {
-            playerActions.Browse();
-        }
-
-        /// <summary>
         /// Called from the menu as a callback when the user selects the move menu entry.
-        /// Passes the move request on to <see cref="playerActions"/>.
         /// </summary>
         private void MoveOn()
         {
-            playerActions.Move();
+            ActionState.Value = ActionState.Type.Move;
+        }
+
+        /// <summary>
+        /// Called from the menu as a callback when the user selects the rotate menu entry.
+        /// </summary>
+        private void RotateOn()
+        {
+            ActionState.Value = ActionState.Type.Rotate;
         }
 
         /// <summary>
         /// Called from the menu as a callback when the user selects the map menu entry.
-        /// Passes the map request on to <see cref="playerActions"/>.
         /// </summary>
         private void MapOn()
         {
-            playerActions.Map();
+            ActionState.Value = ActionState.Type.Map;
         }
 
         /// <summary>
@@ -105,20 +102,20 @@ namespace SEE.Controls.Actions
         {
             EntriesParameter = new MenuDescriptor[]
             {
-                // Normal browsing mode 
-                new MenuDescriptor(label: "Browse",
-                                   spriteFile: menuEntrySprite,
-                                   activeColor: Color.blue,
-                                   inactiveColor: Lighter(Color.blue),
-                                   entryOn: BrowseOn,
-                                   entryOff: null,
-                                   isTransient: true),
                 // Moving a node within a graph
                 new MenuDescriptor(label: "Move",
                                    spriteFile: menuEntrySprite,
                                    activeColor: Color.red,
                                    inactiveColor: Lighter(Color.red),
                                    entryOn: MoveOn,
+                                   entryOff: null,
+                                   isTransient: true),
+                // Rotating everything around the selected node within a graph
+                new MenuDescriptor(label: "Rotate",
+                                   spriteFile: menuEntrySprite,
+                                   activeColor: Color.blue,
+                                   inactiveColor: Lighter(Color.blue),
+                                   entryOn: RotateOn,
                                    entryOff: null,
                                    isTransient: true),
                 // Mapping a node from one graph to another graph

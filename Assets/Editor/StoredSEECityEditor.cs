@@ -49,7 +49,7 @@ namespace SEEEditor
                     }
                 }
 
-                if (city.CoseGraphSettings.LoadedForNodeTypes.Count == 0)
+                if (city.CoseGraphSettings.LoadedForNodeTypes == null || city.CoseGraphSettings.LoadedForNodeTypes.Count == 0)
                 {
                     ShowGraphListing = true;
                 }
