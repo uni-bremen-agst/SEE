@@ -56,15 +56,12 @@ namespace SEE.Controls.Actions
                     break;
 
                 case State.DrawEdge:
-                    // first we need an Object to be selected as source
-                    if (!gameObject.GetComponent<AddEdge>())
+                    // first we need a game node to be selected as source
+                    if (!gameObject.TryGetComponent(out AddEdge addEdge))
                     {
-                        gameObject.AddComponent<AddEdge>();
+                        addEdge = gameObject.AddComponent<AddEdge>();
                     }
-                    else
-                    {
-                        gameObject.GetComponent<AddEdge>().SetHoveredObject(hoveredObject);
-                    }
+                    addEdge.SetHoveredObject(hoveredObject);
                     break; 
             }
         }
