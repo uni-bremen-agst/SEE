@@ -152,7 +152,7 @@ namespace SEE.GO
             return gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef);
         }
 
-	    /// <summary>
+        /// <summary>
         /// Returns the graph node represented by this <paramref name="gameObject"/>.
         /// 
         /// Precondition: <paramref name="gameObject"/> must have a <see cref="NodeRef"/>
