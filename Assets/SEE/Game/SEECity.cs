@@ -389,7 +389,7 @@ namespace SEE.Game
             {
                 if (graphRenderer == null)
                 {
-                    return new GraphRenderer(this, VisualizedSubGraph);
+                    graphRenderer = new GraphRenderer(this, VisualizedSubGraph);
                 }
                 return graphRenderer;
             }

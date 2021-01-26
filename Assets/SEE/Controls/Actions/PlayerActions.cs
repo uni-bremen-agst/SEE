@@ -18,7 +18,8 @@ namespace SEE.Controls.Actions
         {
             Browse,   // the user just browses the city; this is the default
             MoveNode, // a game node is being moved within its city
-            MapNode   // a game node is mapped from one city to another city
+            MapNode,   // a game node is mapped from one city to another city
+            DrawEdge  // a new edge has to be drawn
         }
 
         /// <summary>
@@ -53,6 +54,15 @@ namespace SEE.Controls.Actions
                         }
                     }
                     break;
+
+                case State.DrawEdge:
+                    // first we need a game node to be selected as source
+                    if (!gameObject.TryGetComponent(out AddEdge addEdge))
+                    {
+                        addEdge = gameObject.AddComponent<AddEdge>();
+                    }
+                    addEdge.SetHoveredObject(hoveredObject);
+                    break; 
             }
         }
 
@@ -91,6 +101,16 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Changes the state to DrawEdge. 
+        /// 
+        /// This method is called as a callback from the menu.
+        /// </summary>
+        public void Draw()
+        {
+            Enter(State.DrawEdge);
+        }
+
+        /// <summary>
         /// If <paramref name="newState"/> is different from the current state,
         /// <see cref="Cancel"/> is called and <paramref name="newState"/> is
         /// entered.
@@ -119,6 +139,9 @@ namespace SEE.Controls.Actions
                 case State.MapNode:
                     break;
                 case State.MoveNode:
+                    break;
+                case State.DrawEdge:
+                    Destroy(gameObject.GetComponent<AddEdge>());
                     break;
                 default:
                     throw new System.NotImplementedException();
