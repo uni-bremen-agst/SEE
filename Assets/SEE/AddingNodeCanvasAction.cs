@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class AddingNodeCanvasScript : NodeCanvasScript
+public class AddingNodeCanvasAction : NodeCanvasAction
 {
     /// <summary>
     /// The directory of the AddingNodeCanvas-prefab.
@@ -27,7 +27,7 @@ public class AddingNodeCanvasScript : NodeCanvasScript
         string inputNodetype;
 
         //this part has to be removed by the new UI-Team
-        AddingNodeCanvasScript script = gameObject.GetComponent<AddingNodeCanvasScript>();
+        AddingNodeCanvasAction script = gameObject.GetComponent<AddingNodeCanvasAction>();
 
         Component[] c = script.canvas.GetComponentsInChildren<InputField>();
         InputField inputname = (InputField)c[0];
@@ -39,19 +39,19 @@ public class AddingNodeCanvasScript : NodeCanvasScript
 
         if (toggles[0].isOn)
         {
-            DesktopNewNodeAction.IsInnerNode = true;
+            NewNodeAction.IsInnerNode = true;
         }
         if (toggles[1].isOn)
         {
-            DesktopNewNodeAction.IsInnerNode = false;
+            NewNodeAction.IsInnerNode = false;
         }
         inputNodename = inputname.text;
         inputNodetype = inputtype.text;
         //until here 
 
 
-        DesktopNewNodeAction.Nodename = inputNodename;
-        DesktopNewNodeAction.Nodetype = inputNodetype;
+        NewNodeAction.Nodename = inputNodename;
+        NewNodeAction.Nodetype = inputNodetype;
 
     }
 

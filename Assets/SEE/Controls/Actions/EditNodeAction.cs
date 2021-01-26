@@ -1,7 +1,7 @@
 ﻿using SEE.GO;
 using UnityEngine;
 
-public class DesktopEditNodeAction : DesktopNodeAction
+public class EditNodeAction : NodeAction
 {
 
     public enum Progress
@@ -43,10 +43,10 @@ public class DesktopEditNodeAction : DesktopNodeAction
                 break;
 
             case Progress.NodeSelected:
-                if (canvasObject.GetComponent<EditNodeCanvasScript>() == null)
+                if (canvasObject.GetComponent<EditNodeCanvasAction>() == null)
                 {
                     CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
-                    EditNodeCanvasScript script = generator.InstantiateEditNodeCanvas();
+                    EditNodeCanvasAction script = generator.InstantiateEditNodeCanvas();
                     script.nodeToEdit = hoveredObject.GetComponent<NodeRef>().Value;
                     script.gameObjectID = hoveredObject.name;
                 }

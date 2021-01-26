@@ -11,10 +11,10 @@ public class CanvasGenerator : MonoBehaviour
     /// Instantiates the AddingNodeCanvasScript and adds it to the CanvasObject gameObject.
     /// </summary>
     /// <returns>the added AddingNodeCanvasScript</returns>
-    public AddingNodeCanvasScript InstantiateAddingNodeCanvas()
+    public AddingNodeCanvasAction InstantiateAddingNodeCanvas()
     {
-        gameObject.AddComponent<AddingNodeCanvasScript>();
-        AddingNodeCanvasScript script = gameObject.GetComponent<AddingNodeCanvasScript>();
+        gameObject.AddComponent<AddingNodeCanvasAction>();
+        AddingNodeCanvasAction script = gameObject.GetComponent<AddingNodeCanvasAction>();
         return script;
     }
 
@@ -22,10 +22,10 @@ public class CanvasGenerator : MonoBehaviour
     /// Instantiates the EditNodeCanvasScript and adds it to the CanvasObject gameObject.
     /// </summary>
     /// <returns>the added EditNodeCanvasScript</returns>
-    public EditNodeCanvasScript InstantiateEditNodeCanvas()
+    public EditNodeCanvasAction InstantiateEditNodeCanvas()
     {
-        gameObject.AddComponent<EditNodeCanvasScript>();
-        EditNodeCanvasScript script = gameObject.GetComponent<EditNodeCanvasScript>();
+        gameObject.AddComponent<EditNodeCanvasAction>();
+        EditNodeCanvasAction script = gameObject.GetComponent<EditNodeCanvasAction>();
         return script;
 
     }
@@ -35,11 +35,11 @@ public class CanvasGenerator : MonoBehaviour
     /// </summary>
     public void DestroyAddNodeCanvas()
     {
-        AddingNodeCanvasScript script = gameObject.GetComponent<AddingNodeCanvasScript>();
+        AddingNodeCanvasAction script = gameObject.GetComponent<AddingNodeCanvasAction>();
         if (script != null)
         {
             script.DestroyGOAndAllChilds();
-            Destroy(gameObject.GetComponent<AddingNodeCanvasScript>());
+            Destroy(gameObject.GetComponent<AddingNodeCanvasAction>());
         }
     }
 
@@ -48,11 +48,11 @@ public class CanvasGenerator : MonoBehaviour
     /// </summary>
     public void DestroyEditNodeCanvas()
     {
-        EditNodeCanvasScript script = gameObject.GetComponent<EditNodeCanvasScript>();
+        EditNodeCanvasAction script = gameObject.GetComponent<EditNodeCanvasAction>();
         if (script != null)
         {
             script.DestroyGOAndAllChilds();
-            Destroy(gameObject.GetComponent<EditNodeCanvasScript>());
+            Destroy(gameObject.GetComponent<EditNodeCanvasAction>());
         }
     }
 

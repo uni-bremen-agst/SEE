@@ -1,10 +1,9 @@
-﻿using SEE.Controls.Actions;
-using SEE.DataModel.DG;
+﻿using SEE.DataModel.DG;
 using UnityEngine;
 using UnityEngine.UI;
 
 
-public class EditNodeCanvasScript : NodeCanvasScript
+public class EditNodeCanvasAction : NodeCanvasAction
 {
     /// <summary>
     /// The specific node which has to be edited.
@@ -76,8 +75,8 @@ public class EditNodeCanvasScript : NodeCanvasScript
             generator.DestroyEditNodeCanvas();
             new EditNodeNetAction(nodeToEdit.SourceName,nodeToEdit.Type,gameObjectID).Execute(null);
             GameObject g = GameObject.Find("Player Desktop");
-            DesktopEditNodeAction current = g.GetComponent<DesktopEditNodeAction>();
-            current.EditProgress = DesktopEditNodeAction.Progress.NoNodeSelected;
+            EditNodeAction current = g.GetComponent<EditNodeAction>();
+            current.EditProgress = EditNodeAction.Progress.NoNodeSelected;
             editNode = false;
 
         }
