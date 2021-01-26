@@ -5,6 +5,9 @@ using System;
 
 namespace SEE.Controls
 {
+    /// <summary>
+    /// Action to create an edge between two selected nodes.
+    /// </summary>
     public class AddEdge : MonoBehaviour
     {
         void Update()
