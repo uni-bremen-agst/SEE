@@ -84,11 +84,6 @@ namespace SEE.Controls.Actions
         private Game.UI3D.Cursor cursor;
 
         /// <summary>
-        /// Object to be connected with the next selected object.
-        /// </summary>
-        private GameObject objectToBeConnected;
-
-        /// <summary>
         /// The current move state.
         /// </summary>
         private _MoveState moveState;
