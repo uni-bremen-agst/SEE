@@ -195,9 +195,9 @@ namespace SEE.Game.Evolution
             }
             else
             {
-                formerNode = noderef.node;
+                formerNode = noderef.Value;
             }
-            noderef.node = node;
+            noderef.Value = node;
             return formerNode;
         }
 
