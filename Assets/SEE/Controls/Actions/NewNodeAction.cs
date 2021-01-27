@@ -94,6 +94,10 @@ namespace SEE.Controls
         /// </summary>
         private List<GameObject> listOfRoots = null;
 
+        private bool nodesLoaded = false;
+
+        private SEECity cityToDye = null;
+
         public enum Progress
         {
             NoCitySelected,
@@ -135,6 +139,7 @@ namespace SEE.Controls
                     if (city != null)
                     {
                         Progress1 = Progress.CityIsSelected;
+
                     }
                     break;
 
@@ -159,6 +164,7 @@ namespace SEE.Controls
                     if (GONode == null)
                     {
                         NewNode();
+                        nodesLoaded = false;
                         Tweens.Move(GONode, new Vector3(GONode.transform.position.x, GONode.transform.position.y + 0.4f, GONode.transform.position.z), 0.6f);
                     }
                     else
@@ -166,6 +172,7 @@ namespace SEE.Controls
                         if (Input.GetMouseButtonDown(0))
                         {
                             Place();
+
                             Progress1 = Progress.NoCitySelected;
                         }
                     }
@@ -186,29 +193,38 @@ namespace SEE.Controls
 
             if (hoveredObject != null)
             {
-                // The case the user hovers over an object which is not stored yet in the datastructure.
-                // The object is either dyed green in case it is not already green, else black.
-                if (!(hoveredObjectList.Contains(hoveredObject)))
+                if (!nodesLoaded)
                 {
-                    ChangeColor(hoveredObject, hoveredObject.gameObject.GetComponent<Renderer>().material.color);
+                    SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject.TryGetComponent<SEECity>(out cityToDye);
+                    GetNodesOfScene();
                 }
-            }
 
+                foreach (GameObject go in listOfRoots)
+                {
+                    if (go.GetComponent<NodeRef>().Value.ItsGraph == cityToDye.LoadedGraph)
+                    {
+                        ChangeColor(go, defaultHoverCityColor);
+                    }
+                }
+
+            }
+            nodesLoaded = false;
             if (hoveredObject != null && Input.GetMouseButtonDown(0))
             {
-                Undye();
+                //Undye();
 
                 //Gets the SEECity from the hoverdObject
                 SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject.TryGetComponent<SEECity>(out city);
 
-                GetNodesOfScene();
+                //  GetNodesOfScene();
                 foreach (GameObject root in listOfRoots)
                 {
                     if (root.GetComponent<NodeRef>().Value.ItsGraph == city.LoadedGraph)
                     {
-                        ChangeColor(root, Color.white);
+                        ChangeColor(root, defaultHoverCityColor);
                     }
                 }
+
             }
         }
 
@@ -366,6 +382,9 @@ namespace SEE.Controls
 
             GONode = null;
             city = null;
+            nodesLoaded = false;
+            cityToDye = null;
+
         }
 
         /// <summary>
@@ -397,7 +416,7 @@ namespace SEE.Controls
             ICollection<GameObject> allLeafsInScene = SceneQueries.AllGameNodesInScene(true, false);
             ICollection<GameObject> allInnerNodesInScene = SceneQueries.AllGameNodesInScene(false, true);
 
-            List<Node> rootList = city.LoadedGraph.GetRoots();
+            List<Node> rootList = cityToDye.LoadedGraph.GetRoots();
 
             //It is nessecary to find the GameObjects, which are containing the specific root-nodes.
             listOfRoots = RootSearch(allInnerNodesInScene, allLeafsInScene, rootList);
@@ -415,6 +434,8 @@ namespace SEE.Controls
             {
                 medianOfInnerNode = medianOfLeaf;
             }
+
+            nodesLoaded = true;
         }
 
 
@@ -436,7 +457,7 @@ namespace SEE.Controls
             foreach (GameObject go in pListOfGameObjects)
             {
                 //to specify if the specific node belong to the specific graph. 
-                if (go.GetComponent<NodeRef>().Value.ItsGraph == city.LoadedGraph)
+                if (go.GetComponent<NodeRef>().Value.ItsGraph == cityToDye.LoadedGraph)
                 {
                     lossyScaleList.Add(go.transform.lossyScale);
                 }
