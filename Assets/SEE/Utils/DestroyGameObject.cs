@@ -51,6 +51,10 @@ namespace SEE.Utils
             }
         }
 
+        /// <summary>
+        /// Destroys given <paramref name="gameObject"/> with all his attached childs.
+        /// </summary>
+        /// <param name="gameObject"></param>
         public static void DestroyGameObjectWithChilds(GameObject gameObject)
         {
             if (gameObject.TryGetComponent(out NodeRef nodeRef))
@@ -64,6 +68,11 @@ namespace SEE.Utils
             }
         }
 
+        /// <summary>
+        /// Searches all Edges attached to given <paramref name="nodeRef"/> 
+        /// and returns their Ids.
+        /// </summary>
+        /// <param name="nodeRef"></param>
         private static List<string> GetEdgeIds(NodeRef nodeRef)
         {
             List<String> edgeIDs = new List<string>();
@@ -78,6 +87,11 @@ namespace SEE.Utils
             return edgeIDs;
         }
 
+        /// <summary>
+        /// Searches through all childs of given <paramref name="gameObject"/>
+        /// and deletes all Edges attached to given childs.
+        /// </summary>
+        /// <param name="gameObject"></param>
         private static void DestroyEdges(GameObject gameObject)
         {
             if (gameObject.TryGetComponent(out NodeRef nodeRef))

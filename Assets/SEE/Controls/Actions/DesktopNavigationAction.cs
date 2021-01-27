@@ -1,4 +1,5 @@
-﻿using SEE.DataModel.DG;
+﻿using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.Game.UI3D;
 using SEE.GO;
 using SEE.Utils;
@@ -237,7 +238,14 @@ namespace SEE.Controls.Actions
                             {
                                 interactable.SetSelect(false, false);
                                 cursor.RemoveFocus(selected);
-                                Destroyer.DestroyGameObjectWithChilds(selected.gameObject);                             
+                                if (selected.CompareTag(Tags.Edge))
+                                {
+                                    Destroyer.DestroyGameObject(selected.gameObject);
+                                }
+                                else
+                                {
+                                    Destroyer.DestroyGameObjectWithChilds(selected.gameObject);
+                                }
                             }
                         }
                     }
