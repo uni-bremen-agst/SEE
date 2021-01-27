@@ -1,4 +1,5 @@
-﻿using SEE.DataModel.DG;
+﻿using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.Game.UI3D;
 using SEE.GO;
 using SEE.Utils;
