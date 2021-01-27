@@ -221,8 +221,7 @@ namespace SEE.Controls.Actions
             }
         }
 
-        // This logic is in FixedUpdate(), so that the behaviour is framerate-
-        // 'independent'.
+        // This logic is in FixedUpdate(), so that the behaviour is framerate-'independent'.
         private void FixedUpdate()
         {
             if (CityTransform == null)
