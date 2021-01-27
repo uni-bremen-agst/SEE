@@ -94,7 +94,8 @@ namespace SEE.Game.Charts.VR
         {
             base.Awake();
             Transform parent = transform.parent;
-            _parent = parent.GetComponent<ChartContent>().parent.transform;
+            // TODO(torben): vvv
+            //_parent = parent.GetComponent<ChartContent>().parent.transform;
             _pointerCamera = GameObject.FindGameObjectWithTag("Pointer").GetComponent<Camera>();
             _chartContent = parent.GetComponent<ChartContentVr>();
             _physicalOpen = _chartContent.physicalOpen;

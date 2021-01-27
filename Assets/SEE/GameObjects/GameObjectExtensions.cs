@@ -31,8 +31,7 @@ namespace SEE.GO
 
                 return edgeRef.edge.ID;
             }
-
-            return nodeRef.node.ID;
+            return nodeRef.Value.ID;
         }
 
         /// <summary>
@@ -141,8 +140,19 @@ namespace SEE.GO
             return true;
         }
 
+        /// <summary>
+        /// Returns true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
+        /// component attached to it.
+        /// </summary>
+        /// <param name="gameObject">the game object whose NodeRef is checked</param>
+        /// <returns>true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
+        /// component attached to it</returns>
+        public static bool HasNodeRef(this GameObject gameObject)
+        {
+            return gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef);
+        }
 
-	/// <summary>
+        /// <summary>
         /// Returns the graph node represented by this <paramref name="gameObject"/>.
         /// 
         /// Precondition: <paramref name="gameObject"/> must have a <see cref="NodeRef"/>
@@ -156,7 +166,7 @@ namespace SEE.GO
             {
                 if (nodeRef != null)
                 {
-                    return nodeRef.node;
+                    return nodeRef.Value;
                 }
                 else
                 {
