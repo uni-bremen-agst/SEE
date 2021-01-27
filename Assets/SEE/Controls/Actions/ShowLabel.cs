@@ -74,7 +74,7 @@ namespace SEE.Controls.Actions
         /// the label is shown.
         /// </summary>
         /// <param name="isOwner">true if a local user initiated this call</param>
-        private void SelectionOn(bool isOwner)
+        private void SelectionOn(InteractableObject interactableObject, bool isOwner)
         {
             if (isOwner)
             {
@@ -93,7 +93,7 @@ namespace SEE.Controls.Actions
         /// the label is destroyed unless the object is still hovered.
         /// </summary>
         /// <param name="isOwner">true if a local user initiated this call</param>
-        private void SelectionOff(bool isOwner)
+        private void SelectionOff(InteractableObject interactableObject, bool isOwner)
         {
             if (isOwner)
             {
@@ -111,7 +111,7 @@ namespace SEE.Controls.Actions
         /// the label is shown.
         /// </summary>
         /// <param name="isOwner">true if a local user initiated this call</param>
-        private void HoverOn(bool isOwner)
+        private void HoverOn(InteractableObject interactableObject, bool isOwner)
         {
             if (isOwner)
             {
@@ -130,7 +130,7 @@ namespace SEE.Controls.Actions
         /// Otherwise the label is destroyed unless the object is still selected.
         /// </summary>
         /// <param name="isOwner">true if a local user initiated this call</param>
-        private void HoverOff(bool isOwner)
+        private void HoverOff(InteractableObject interactableObject, bool isOwner)
         {
             if (isOwner)
             {
@@ -227,7 +227,7 @@ namespace SEE.Controls.Actions
             currentlyDestroying = false;
 
 
-            Node node = nodeRef.node;
+            Node node = nodeRef.Value;
             if (node == null)
             {
                 Debug.LogErrorFormat("Game node {0} has no valid node reference.\n", name);
