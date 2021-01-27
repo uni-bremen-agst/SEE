@@ -22,12 +22,12 @@ namespace SEE.Utils
             if (Application.isPlaying)
             {
                 // playing either in a built player or in the player of the editor
-                Object.Destroy(gameObject);
+                UnityEngine.Object.Destroy(gameObject);
             }
             else
             {
                 // game is not played; we are in the editor mode
-                Object.DestroyImmediate(gameObject);
+                UnityEngine.Object.DestroyImmediate(gameObject);
             }
         }
 
@@ -42,12 +42,12 @@ namespace SEE.Utils
             if (Application.isPlaying)
             {
                 // playing either in a built player or in the player of the editor
-                Object.Destroy(component);
+                UnityEngine.Object.Destroy(component);
             }
             else
             {
                 // game is not played; we are in the editor mode
-                Object.DestroyImmediate(component);
+                UnityEngine.Object.DestroyImmediate(component);
             }
         }
 
@@ -76,11 +76,11 @@ namespace SEE.Utils
         private static List<string> GetEdgeIds(NodeRef nodeRef)
         {
             List<String> edgeIDs = new List<string>();
-            foreach (Edge edge in nodeRef.node.Outgoings)
+            foreach (Edge edge in nodeRef.Value.Outgoings)
             {
                 edgeIDs.Add(edge.ID);
             }
-            foreach (Edge edge in nodeRef.node.Incomings)
+            foreach (Edge edge in nodeRef.Value.Incomings)
             {
                 edgeIDs.Add(edge.ID);
             }
