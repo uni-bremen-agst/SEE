@@ -21,7 +21,8 @@ namespace SEE.Controls.Actions
             MapNode,   // a game node is mapped from one city to another city
             NewNode, //a  game node is being created
             ScaleNode, //a game node is scaled with mouse drag
-            EditNode // a game node is being edited
+            EditNode, // a game node is being edited
+            DrawEdge  // a new edge has to be drawn
         }
 
 
@@ -93,8 +94,15 @@ namespace SEE.Controls.Actions
                         gameObject.GetComponent<EditNodeAction>().hoveredObject = hoveredObject;
                     }
                     break;
-                default:
-                   
+                case State.DrawEdge:
+                    // first we need a game node to be selected as source
+                    if (!gameObject.TryGetComponent(out AddEdge addEdge))
+                    {
+                        addEdge = gameObject.AddComponent<AddEdge>();
+                    }
+                    addEdge.SetHoveredObject(hoveredObject);
+                    break;
+                default:      
                     break;
             }
         }
@@ -136,7 +144,6 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Changes the state to NewNode. 
-        /// 
         /// This method is called as a callback from the menu.
         /// </summary>
         public void NewNode()
@@ -153,6 +160,16 @@ namespace SEE.Controls.Actions
         {
             Enter(State.ScaleNode);
         }
+        /// <summary>
+        /// Changes the state to DrawEdge. 
+        /// 
+        /// This method is called as a callback from the menu.
+        /// </summary>
+        public void Draw()
+        {
+            Enter(State.DrawEdge);
+        }
+
         /// <summary>
         /// If <paramref name="newState"/> is different from the current state,
         /// <see cref="Cancel"/> is called and <paramref name="newState"/> is
@@ -203,6 +220,9 @@ namespace SEE.Controls.Actions
                     generator.DestroyEditNodeCanvas();
                     gameObject.GetComponent<EditNodeAction>().hoveredObject = null;
                     gameObject.GetComponent<EditNodeAction>().RemoveScript();
+                    break;
+                case State.DrawEdge:
+                    Destroy(gameObject.GetComponent<AddEdge>());
                     break;
                 default:
                     throw new System.NotImplementedException();

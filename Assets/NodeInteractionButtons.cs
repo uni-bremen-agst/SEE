@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using SEE.Controls;
-using SEE.Controls.Actions;
 
 /// <summary>
 /// This script is been added to the Button of the adding-node-canvas and the edit-node-canvas.
