@@ -377,10 +377,10 @@ namespace SEE.Layout.NodeLayouts.Cose
             CoseLayoutSettings.Gravity_Strength = settings.GravityStrength;
             CoseLayoutSettings.Compound_Gravity_Strength = settings.CompoundGravityStrength;
             CoseLayoutSettings.Repulsion_Strength = settings.RepulsionStrength;
-            CoseLayoutSettings.Multilevel_Scaling = settings.multiLevelScaling;
+            CoseLayoutSettings.Multilevel_Scaling = settings.MultiLevelScaling;
             CoseLayoutSettings.Use_Smart_Multilevel_Calculation = settings.UseSmartMultilevelScaling;
-            CoseLayoutSettings.Automatic_Parameter_Calculation = settings.useCalculationParameter;
-            CoseLayoutSettings.Iterativ_Parameter_Calculation = settings.useIterativeCalculation;
+            CoseLayoutSettings.Automatic_Parameter_Calculation = settings.UseCalculationParameter;
+            CoseLayoutSettings.Iterativ_Parameter_Calculation = settings.UseIterativeCalculation;
 
             coseLayoutSettings = new CoseLayoutSettings();
 

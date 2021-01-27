@@ -121,14 +121,14 @@ namespace SEE.Controls
                 result.OutlineWidth = 4.0f;
 
                 NodeRef nodeRef = go.GetComponent<NodeRef>();
-                if (nodeRef != null && nodeRef.node != null)
+                if (nodeRef != null && nodeRef.Value != null)
                 {
-                    Node node = nodeRef.node;
+                    Node node = nodeRef.Value;
                     Graph graph = node.ItsGraph;
                     int maxDepth = graph.MaxDepth;
 
                     int inverseRenderQueueOffset = node.Level;
-                    if (nodeRef.node.Type.Equals("Directory"))
+                    if (nodeRef.Value.Type.Equals("Directory"))
                     {
                         inverseRenderQueueOffset += maxDepth;
                     }

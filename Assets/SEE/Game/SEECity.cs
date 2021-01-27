@@ -14,6 +14,12 @@ namespace SEE.Game
     /// </summary>
     public class SEECity : AbstractSEECity
     {
+        /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
+        /// configuration file, make sure you save and restore it in 
+        /// <see cref="SEECity.Save(ConfigWriter)"/> and 
+        /// <see cref="SEECity.Restore(Dictionary{string, object})"/>, 
+        /// respectively. You should also extend the test cases in TestConfigIO.
+        
         /// <summary>
         /// The graph that is visualized in the scene and whose visualization settings are 
         /// managed here.
@@ -32,6 +38,8 @@ namespace SEE.Game
         /// from the GXL file, i.e., the GXL file is our persistent serialization we 
         /// use to re-create the graph. We need, however, to set the NodeRefs at runtime.
         /// All that is being done in Start() below.
+        /// 
+        /// Neither serialized nor saved to the config file.
         /// </summary>
         [NonSerialized]
         private Graph loadedGraph = null;
@@ -40,6 +48,8 @@ namespace SEE.Game
         /// The graph underlying this SEE city that was loaded from disk. May be null.
         /// If a new graph is assigned to this property, the selected node types will
         /// be updated, too.
+        /// 
+        /// Neither serialized nor saved to the config file.
         /// </summary>
         public Graph LoadedGraph
         {
@@ -205,15 +215,15 @@ namespace SEE.Game
             foreach (Transform childTransform in parent.transform)
             {
                 GameObject child = childTransform.gameObject;
-                if (child.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+                if (child.TryGetComponent(out NodeRef nodeRef))
                 {
-                    nodeRef.node = graph.GetNode(child.name);
-                    if (nodeRef.node == null)
+                    nodeRef.Value = graph.GetNode(child.name);
+                    if (nodeRef.Value == null)
                     {
                         Debug.LogWarningFormat("Could not resolve node reference {0}.\n", child.name);
                     }
                 }
-                else if (child.TryGetComponent<EdgeRef>(out EdgeRef edgeRef))
+                else if (child.TryGetComponent(out EdgeRef edgeRef))
                 {
                     edgeRef.edge = graph.GetEdge(child.name);
                     if (edgeRef.edge == null)
@@ -221,6 +231,12 @@ namespace SEE.Game
                         Debug.LogWarningFormat("Could not resolve edge reference {0}.\n", child.name);          
                     }
                 }
+#if UNITY_EDITOR
+                else if (child.CompareTag(DataModel.Tags.Node) || child.CompareTag(DataModel.Tags.Edge))
+                {
+                    Debug.LogWarningFormat("Game object {0} has neither node nor edge reference.\n", child.name);
+                }
+#endif
                 SetNodeEdgeRefs(graph, child);
             }
         }
@@ -331,11 +347,6 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// The graph renderer used to draw the city.
-        /// </summary>
-        private GraphRenderer graphRenderer;
-
-        /// <summary>
         /// Draws the graph.
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
@@ -363,6 +374,13 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// The graph renderer used to draw the city.
+        /// 
+        /// Neither serialized nor saved to the config file.
+        /// </summary>
+        private GraphRenderer graphRenderer;
+
+        /// <summary>
         /// Yields a graph renderer that can draw this city.
         /// </summary>
         public GraphRenderer Renderer
@@ -371,7 +389,7 @@ namespace SEE.Game
             {
                 if (graphRenderer == null)
                 {
-                    return new GraphRenderer(this, VisualizedSubGraph);
+                    graphRenderer = new GraphRenderer(this, VisualizedSubGraph);
                 }
                 return graphRenderer;
             }
@@ -410,7 +428,33 @@ namespace SEE.Game
                 loadedGraph.Destroy();
             }
             LoadedGraph = null;
-            Measurements.Clear();
+        }
+
+        //--------------------------------
+        // Configuration file input/output
+        //--------------------------------
+
+        /// <summary>
+        /// Label of attribute <see cref="GXLPath"/> in the configuration file.
+        /// </summary>
+        private const string GXLPathLabel = "GXLPath";
+        /// <summary>
+        /// Label of attribute <see cref="CSVPath"/> in the configuration file.
+        /// </summary>
+        private const string CSVPathLabel = "CSVPath";
+
+        protected override void Save(ConfigWriter writer)
+        {
+            base.Save(writer);
+            GXLPath.Save(writer, GXLPathLabel);
+            CSVPath.Save(writer, CSVPathLabel);
+        }
+
+        protected override void Restore(Dictionary<string, object> attributes)
+        {
+            base.Restore(attributes);
+            GXLPath.Restore(attributes, GXLPathLabel);
+            CSVPath.Restore(attributes, CSVPathLabel);
         }
     }
 }

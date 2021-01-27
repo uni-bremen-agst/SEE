@@ -45,12 +45,12 @@ namespace SEE.Controls.Actions
         /// Called when the object is hovered over.
         /// </summary>
         /// <param name="isOwner">true if a local user initiated this call</param>
-        protected abstract void On(bool isOwner);
+        protected abstract void On(InteractableObject interactableObject, bool isOwner);
 
         /// <summary>
         /// Called when the object is no longer being hovered over.
         /// </summary>
         /// <param name="isOwner">true if a local user initiated this call</param>
-        protected abstract void Off(bool isOwner);
+        protected abstract void Off(InteractableObject interactableObject, bool isOwner);
     }
 }

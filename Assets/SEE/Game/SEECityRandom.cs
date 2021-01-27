@@ -1,5 +1,6 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Tools;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,12 @@ namespace SEE.Game
     /// </summary>
     public class SEECityRandom : SEECity
     {
+        /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
+        /// configuration file, make sure you save and restore it in 
+        /// <see cref="SEECityRandom.Save(ConfigWriter)"/> and 
+        /// <see cref="SEECityRandom.Restore(Dictionary{string, object})"/>, 
+        /// respectively. You should also extend the test cases in TestConfigIO.
+
         /// <summary>
         /// Constraints for the random generation of leaf nodes.
         /// </summary>
@@ -24,7 +31,7 @@ namespace SEE.Game
         /// <summary>
         /// The leaf node attributes and their constraints for the random generation of their values.
         /// </summary>
-        public List<RandomAttributeDescriptor> LeafAttributes = Defaults();
+        public IList<RandomAttributeDescriptor> LeafAttributes = Defaults();
 
         public static int DefaultAttributeMean = 10;
 
@@ -64,6 +71,38 @@ namespace SEE.Game
             // generate graph randomly
             RandomGraphs randomGraphs = new RandomGraphs();
             LoadedGraph = randomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes);
+        }
+
+        //----------------------------------------------------------------------------
+        // Input/output of configuration attributes
+        //----------------------------------------------------------------------------
+
+        // The labels for the configuration attributes in the configuration file.
+        private const string LeafConstraintLabel = "LeafConstraint";
+        private const string InnerNodeConstraintLabel = "InnerNodeConstraint";
+        private const string LeafAttributesLabel = "LeafAttributes";
+
+        /// <summary>
+        /// <see cref="AbstractSEECity.Save(ConfigWriter)"/>
+        /// </summary>
+        protected override void Save(ConfigWriter writer)
+        {
+            base.Save(writer);
+            LeafConstraint.Save(writer, LeafConstraintLabel);
+            InnerNodeConstraint.Save(writer, InnerNodeConstraintLabel);
+            writer.Save(LeafAttributes, LeafAttributesLabel); // LeafAttributes are stored as a list       
+        }
+
+        /// <summary>
+        /// <see cref="AbstractSEECity.Restore(Dictionary{string, object})"/>.
+        /// </summary>
+        protected override void Restore(Dictionary<string, object> attributes)
+        {
+            base.Restore(attributes);
+            LeafConstraint.Restore(attributes, LeafConstraintLabel);
+            InnerNodeConstraint.Restore(attributes, InnerNodeConstraintLabel);
+            // LeafAttributes are stored as a list
+            ConfigIO.RestoreList<RandomAttributeDescriptor>(attributes, LeafAttributesLabel, ref LeafAttributes);
         }
     }
 }

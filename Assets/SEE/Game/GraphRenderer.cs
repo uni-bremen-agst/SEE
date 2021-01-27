@@ -5,7 +5,6 @@ using System.Linq;
 using SEE.Controls;
 using SEE.DataModel;
 using SEE.DataModel.DG;
-using SEE.Game.Charts;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
@@ -15,6 +14,7 @@ using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 using static SEE.Game.AbstractSEECity;
+using Plane = SEE.GO.Plane;
 
 namespace SEE.Game
 {
@@ -37,7 +37,7 @@ namespace SEE.Game
             ShaderType = Materials.ShaderType.Transparent;
             switch (this.settings.LeafObjects)
             {
-                case SEECity.LeafNodeKinds.Blocks:
+                case LeafNodeKinds.Blocks:
                     leafNodeFactory = new CubeFactory(ShaderType, this.settings.LeafNodeColorRange);
                     break;
                 default:
@@ -64,20 +64,20 @@ namespace SEE.Game
         /// </summary>
         /// <param name="innerNodeKinds">the kind of the inner nodes</param>
         /// <returns>inner node factory</returns>
-        private InnerNodeFactory GetInnerNodeFactory(AbstractSEECity.InnerNodeKinds innerNodeKinds)
+        private InnerNodeFactory GetInnerNodeFactory(InnerNodeKinds innerNodeKinds)
         {
             switch (innerNodeKinds)
             {
-                case AbstractSEECity.InnerNodeKinds.Empty:
-                case AbstractSEECity.InnerNodeKinds.Donuts:
+                case InnerNodeKinds.Empty:
+                case InnerNodeKinds.Donuts:
                     return new VanillaFactory(ShaderType, settings.InnerNodeColorRange);
-                case AbstractSEECity.InnerNodeKinds.Circles:
+                case InnerNodeKinds.Circles:
                     return new CircleFactory(settings.InnerNodeColorRange, leafNodeFactory.Unit);
-                case AbstractSEECity.InnerNodeKinds.Cylinders:
+                case InnerNodeKinds.Cylinders:
                     return new CylinderFactory(ShaderType, settings.InnerNodeColorRange);
-                case AbstractSEECity.InnerNodeKinds.Rectangles:
+                case InnerNodeKinds.Rectangles:
                     return new RectangleFactory(settings.InnerNodeColorRange, leafNodeFactory.Unit);
-                case AbstractSEECity.InnerNodeKinds.Blocks:
+                case InnerNodeKinds.Blocks:
                     return new CubeFactory(ShaderType, settings.InnerNodeColorRange);
                 default:
                     throw new Exception("Unhandled GraphSettings.InnerNodeKinds");
@@ -147,7 +147,7 @@ namespace SEE.Game
         /// <param name="graph">graph whose node metrics are to be scaled</param>
         public void SetScaler(Graph graph)
         {
-            SetScaler(new List<Graph>() { graph });
+            SetScaler(new List<Graph> { graph });
         }
 
         /// <summary>
@@ -171,78 +171,78 @@ namespace SEE.Game
             {
                 throw new Exception($"The source {from.name} of the edge is not contained in any graph.");
             }
-            else if (toNode == null)
+
+            if (toNode == null)
             {
                 throw new Exception($"The target {to.name} of the edge is not contained in any graph.");
             }
-            else if (fromNode.ItsGraph != toNode.ItsGraph)
+
+            //TODO: Should this be a ReferenceEquals() or Equals() comparison?
+            if (fromNode.ItsGraph != toNode.ItsGraph)
             {
                 throw new Exception($"The source {from.name} and target {to.name} of the edge are in different graphs.");
             }
-            else
+
+            // Creating the edge in the underlying graph
+            Edge edge = new Edge
             {
-                // Creating the edge in the underlying graph
-                Edge edge = new Edge
-                {
-                    Source = fromNode,
-                    Target = toNode,
-                    Type = Graph.UnknownType // FIXME: We need to set the type of the edge.
-                };
+                Source = fromNode,
+                Target = toNode,
+                Type = Graph.UnknownType // FIXME: We need to set the type of the edge.
+            };
                 
-                Graph graph = fromNode.ItsGraph;
-                graph.AddEdge(edge);
+            Graph graph = fromNode.ItsGraph;
+            graph.AddEdge(edge);
 
-                if (settings.EdgeLayout == EdgeLayoutKind.None)
+            if (settings.EdgeLayout == EdgeLayoutKind.None)
+            {
+                Debug.LogWarning($"An edge {edge.ID} from {fromNode.ID} to {toNode.ID} was added to the graph, but no edge layout was chosen.\n");
+                return null;
+            }
+
+            // Creating the game object representing the edge.
+            // The edge layout will be calculated for the following gameNodes. This list will
+            // contain the source and target of the edge but also all their ascendants. The
+            // ascendants are needed for hierarchical layouts.
+            HashSet<GameObject> gameNodes = new HashSet<GameObject>();
+            // We add the descendants of the source and target nodes in case the edge layout is hierarchical.
+            AddAscendants(from, gameNodes);
+            AddAscendants(to, gameNodes);
+            Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
+            // The layout nodes corresponding to those game nodes.
+            ICollection<GameNode> layoutNodes = ToLayoutNodes(gameNodes, leafNodeFactory, innerNodeFactory, to_layout_node);
+
+            GameNode fromLayoutNode = null; // layout node in layoutNodes corresponding to source node
+            GameNode toLayoutNode = null;   // layout node in layoutNodes corresponding to target node
+            // We need fromLayoutNode and toLayoutNode to create a single layout edge to be passed
+            // to the edge layouter.
+            foreach (GameNode layoutNode in layoutNodes)
+            {
+                //TODO: Should this be a ReferenceEquals() or Equals() comparison?
+                if (layoutNode.ItsNode == fromNode)
                 {
-                    Debug.LogWarning($"An edge {edge.ID} from {fromNode.ID} to {toNode.ID} was added to the graph, but no edge layout was chosen.\n");
-                    return null;
+                    fromLayoutNode = layoutNode;
                 }
-                else
+                // note: fromNode = toNode is possible, hence, there is no 'else' here.
+                if (layoutNode.ItsNode == toNode)
                 {
-                    // Creating the game object representing the edge.
-                    // The edge layout will be calculated for the following gameNodes. This list will
-                    // contain the source and target of the edge but also all their ascendants. The
-                    // ascendants are needed for hierarchical layouts.
-                    HashSet<GameObject> gameNodes = new HashSet<GameObject>();
-                    // We add the descendants of the source and target nodes in case the edge layout is hierarchical.
-                    AddAscendants(from, gameNodes);
-                    AddAscendants(to, gameNodes);
-                    Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
-                    // The layout nodes corresponding to those game nodes.
-                    ICollection<GameNode> layoutNodes = ToLayoutNodes(gameNodes, leafNodeFactory, innerNodeFactory, to_layout_node);
-
-                    GameNode fromLayoutNode = null; // layout node in layoutNodes corresponding to source node
-                    GameNode toLayoutNode = null;   // layout node in layoutNodes corresponding to target node
-                                                    // We need fromLayoutNode and toLayoutNode to create a single layout edge to be passed
-                                                    // to the edge layouter.
-                    foreach (GameNode layoutNode in layoutNodes)
-                    {
-                        if (layoutNode.ItsNode == fromNode)
-                        {
-                            fromLayoutNode = layoutNode;
-                        }
-                        // note: fromNode = toNode is possible, hence, there is no 'else' here.
-                        if (layoutNode.ItsNode == toNode)
-                        {
-                            toLayoutNode = layoutNode;
-                        }
-                    }
-                    UnityEngine.Assertions.Assert.IsNotNull(fromLayoutNode, $"source node {fromNode.ID} does not have a layout node.\n");
-                    UnityEngine.Assertions.Assert.IsNotNull(toLayoutNode, $"target node {toNode.ID} does not have a layout node.\n");
-                    // The single layout edge between source and target. We want the layout only for this edge.
-                    ICollection<LayoutEdge> layoutEdges = new List<LayoutEdge> { new LayoutEdge(fromLayoutNode, toLayoutNode, edge) };
-                    // Calculate the edge layout (for the single edge only).
-                    ICollection<GameObject> edges = EdgeLayout(layoutNodes, layoutEdges);
-                    GameObject result = edges.FirstOrDefault<GameObject>();
-                    // The edge becomes a child of the root node of the game-node hierarchy
-                    GameObject codeCity = SceneQueries.GetCodeCity(from.transform).gameObject;
-                    GameObject rootNode = SceneQueries.GetCityRootNode(codeCity).gameObject;                                        
-                    result.transform.SetParent(rootNode.transform);
-                    // The portal of the new edge is inherited from the codeCity.
-                    Portal.SetPortal(root: codeCity, gameObject: result);
-                    return result;
+                    toLayoutNode = layoutNode;
                 }
             }
+            Assert.IsNotNull(fromLayoutNode, $"source node {fromNode.ID} does not have a layout node.\n");
+            Assert.IsNotNull(toLayoutNode, $"target node {toNode.ID} does not have a layout node.\n");
+            // The single layout edge between source and target. We want the layout only for this edge.
+            ICollection<LayoutEdge> layoutEdges = new List<LayoutEdge> { new LayoutEdge(fromLayoutNode, toLayoutNode, edge) };
+            // Calculate the edge layout (for the single edge only).
+            ICollection<GameObject> edges = EdgeLayout(layoutNodes, layoutEdges);
+            GameObject result = edges.FirstOrDefault();
+            // The edge becomes a child of the root node of the game-node hierarchy
+            GameObject codeCity = SceneQueries.GetCodeCity(from.transform).gameObject;
+            GameObject rootNode = SceneQueries.GetCityRootNode(codeCity).gameObject;                                        
+            result.transform.SetParent(rootNode.transform);
+            // The portal of the new edge is inherited from the codeCity.
+            Portal.SetPortal(root: codeCity, gameObject: result);
+            return result;
         }
 
         /// <summary>
@@ -308,7 +308,7 @@ namespace SEE.Game
                     // nothing to be done
                     return new List<GameObject>();
                 default:
-                    throw new Exception("Unhandled edge layout " + settings.EdgeLayout.ToString());
+                    throw new Exception("Unhandled edge layout " + settings.EdgeLayout);
             }
             Performance p = Performance.Begin("edge layout " + layout.Name);
             EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
@@ -439,17 +439,6 @@ namespace SEE.Game
                     {
                         AddDecorationsForSublayouts(layoutNodes, sublayoutLayoutNodes, parent);
                     }
-
-                    // Gather the layout quality measurements.
-                    if (settings.calculateMeasurements)
-                    {
-                        Measurements measurements = new Measurements(layoutNodes, graph, leftFrontCorner, rightBackCorner, p);
-                        settings.Measurements = measurements.ToStringDictionary(true);
-                    }
-                    else
-                    {
-                        settings.Measurements = new SortedDictionary<string, string>();
-                    }
                 }
                 finally
                 {
@@ -526,7 +515,7 @@ namespace SEE.Game
             // Add light to simulate emissive effect
             AddLight(nodeToGameObject, rootGameNode);
 
-            if (parent.TryGetComponent<GO.Plane>(out GO.Plane portalPlane))
+            if (parent.TryGetComponent(out Plane portalPlane))
             {
                 portalPlane.HeightOffset = rootGameNode.transform.position.y - parent.transform.position.y;
             }
@@ -545,7 +534,7 @@ namespace SEE.Game
         /// <param name="layout">layout to be applied to the game node</param>
         public void Apply(GameObject gameNode, GameObject itsParent, ILayoutNode layout)
         {
-            Node node = gameNode.GetComponent<NodeRef>().node;
+            Node node = gameNode.GetComponent<NodeRef>().Value;
 
             if (node.IsLeaf())
             {
@@ -732,17 +721,17 @@ namespace SEE.Game
         private List<SublayoutNode> CreateSublayoutNodes(List<Node> nodes)
         {
             List<SublayoutNode> coseSublayoutNodes = new List<SublayoutNode>();
-            foreach (KeyValuePair<string, bool> dir in settings.CoseGraphSettings.ListDirToggle)
+            foreach (KeyValuePair<string, bool> dir in settings.CoseGraphSettings.ListInnerNodeToggle)
             {
                 if (dir.Value)
                 {
                     string name = dir.Key;
-                    if (settings.CoseGraphSettings.DirNodeLayout.ContainsKey(name) && settings.CoseGraphSettings.DirShape.ContainsKey(name))
+                    if (settings.CoseGraphSettings.InnerNodeLayout.ContainsKey(name) && settings.CoseGraphSettings.InnerNodeShape.ContainsKey(name))
                     {
                         IEnumerable<Node> matches = nodes.Where(i => i.ID.Equals(name));
                         if (matches.Count() > 0)
                         {
-                            coseSublayoutNodes.Add(new SublayoutNode(matches.First(), settings.CoseGraphSettings.DirShape[name], settings.CoseGraphSettings.DirNodeLayout[name]));
+                            coseSublayoutNodes.Add(new SublayoutNode(matches.First(), settings.CoseGraphSettings.InnerNodeShape[name], settings.CoseGraphSettings.InnerNodeLayout[name]));
                         }
                     }
                 }
@@ -831,7 +820,7 @@ namespace SEE.Game
 
             if (roots.Count > 1)
             {
-                Node artificalRoot = new Node()
+                Node artificalRoot = new Node
                 {
                     ID = graph.Name + "#ROOT",
                     SourceName = graph.Name + "#ROOT",
@@ -845,10 +834,8 @@ namespace SEE.Game
                 nodeMap[artificalRoot] = NewInnerNode(artificalRoot);
                 return artificalRoot;
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         /// <summary>
@@ -922,7 +909,7 @@ namespace SEE.Game
                 case NodeLayoutKind.FromFile:
                     return new LoadedNodeLayout(groundLevel, settings.LayoutPath.Path);
                 default:
-                    throw new Exception("Unhandled node layout " + settings.NodeLayout.ToString());
+                    throw new Exception("Unhandled node layout " + settings.NodeLayout);
             }
         }
 
@@ -1008,7 +995,7 @@ namespace SEE.Game
         /// <param name="gameNode"></param>
         protected void AddDecorations(GameObject gameNode)
         {
-            AddDecorations(new List<GameObject>() { gameNode });
+            AddDecorations(new List<GameObject> { gameNode });
         }
 
         /// <summary>
@@ -1051,35 +1038,35 @@ namespace SEE.Game
 
             switch (innerNodeKinds)
             {
-                case SEECity.InnerNodeKinds.Empty:
+                case InnerNodeKinds.Empty:
                     // do nothing
                     break;
-                case SEECity.InnerNodeKinds.Circles:
+                case InnerNodeKinds.Circles:
                     {
                         // We want to adjust the size and the line width of the circle line created by the CircleFactory.
                         CircleDecorator decorator = new CircleDecorator(innerNodeFactory, Color.white);
                         decorator.Add(InnerNodes(gameNodes));
                     }
                     break;
-                case SEECity.InnerNodeKinds.Rectangles:
+                case InnerNodeKinds.Rectangles:
                     {
                         // We want to adjust the line width of the rectangle line created by the RectangleFactory.
                         RectangleDecorator decorator = new RectangleDecorator(innerNodeFactory, Color.white);
                         decorator.Add(InnerNodes(gameNodes));
                     }
                     break;
-                case SEECity.InnerNodeKinds.Donuts:
+                case InnerNodeKinds.Donuts:
                     {
                         DonutDecorator decorator = new DonutDecorator(innerNodeFactory, scaler, settings.InnerDonutMetric,
-                                                                      settings.AllInnerNodeIssues().ToArray<string>());
+                                                                      settings.AllInnerNodeIssues().ToArray());
                         // the circle segments and the inner circle for the donut are added as children by Add();
                         // that is why we do not add the result to decorations.
                         decorator.Add(InnerNodes(gameNodes));
                     }
                     break;
-                case SEECity.InnerNodeKinds.Cylinders:
+                case InnerNodeKinds.Cylinders:
                     break;
-                case SEECity.InnerNodeKinds.Blocks:
+                case InnerNodeKinds.Blocks:
                     // TODO
                     break;
                 default:
@@ -1141,7 +1128,7 @@ namespace SEE.Game
 
             foreach (GameObject gameObject in gameNodes)
             {
-                Node node = gameObject.GetComponent<NodeRef>().node;
+                Node node = gameObject.GetComponent<NodeRef>().Value;
                 if (node.IsLeaf())
                 {
                     result.Add(new GameNode(to_layout_node, gameObject, leafNodeFactory));
@@ -1168,7 +1155,7 @@ namespace SEE.Game
                 Vector3 size = innerNodeFactory.GetSize(node);
                 float length = Mathf.Min(size.x, size.z);
                 // The text may occupy up to 30% of the length.
-                GameObject text = TextFactory.GetTextWithWidth(node.GetComponent<NodeRef>().node.SourceName,
+                GameObject text = TextFactory.GetTextWithWidth(node.GetComponent<NodeRef>().Value.SourceName,
                                                       node.transform.position, length * 0.3f);
                 text.transform.SetParent(node.transform);
             }
@@ -1201,7 +1188,7 @@ namespace SEE.Game
         /// <returns>true iff gameNode is a leaf in the graph</returns>
         private static bool IsLeaf(GameObject gameNode)
         {
-            return gameNode.GetComponent<NodeRef>().node.IsLeaf();
+            return gameNode.GetComponent<NodeRef>().Value.IsLeaf();
         }
 
         /// <summary>
@@ -1211,7 +1198,7 @@ namespace SEE.Game
         /// <param name="degree">degree of rotation</param>
         private void Rotate(GameObject gameNode, float degree)
         {
-            Node node = gameNode.GetComponent<NodeRef>().node;
+            Node node = gameNode.GetComponent<NodeRef>().Value;
             if (node.IsLeaf())
             {
                 leafNodeFactory.Rotate(gameNode, degree);
@@ -1273,8 +1260,7 @@ namespace SEE.Game
             // That is why we put them at the highest necessary rendering queue offset.
             GameObject block = leafNodeFactory.NewBlock(SelectStyle(node, innerNodeFactory), node.ItsGraph.MaxDepth);
             block.name = node.ID;
-            block.AddComponent<NodeRef>().node = node;
-            block.AddComponent<NodeHighlights>();
+            block.AddComponent<NodeRef>().Value = node;
             AdjustScaleOfLeaf(block);
             AddLOD(block);
             return block;
@@ -1386,17 +1372,15 @@ namespace SEE.Game
             {
                 throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
             }
+
+            Node node = noderef.Value;
+            if (node.IsLeaf())
+            {
+                return leafNodeFactory.Roof(gameNode);
+            }
             else
             {
-                Node node = noderef.node;
-                if (node.IsLeaf())
-                {
-                    return leafNodeFactory.Roof(gameNode);
-                }
-                else
-                {
-                    return innerNodeFactory.Roof(gameNode);
-                }
+                return innerNodeFactory.Roof(gameNode);
             }
         }
 
@@ -1414,17 +1398,14 @@ namespace SEE.Game
             {
                 throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
             }
+            Node node = noderef.Value;
+            if (node.IsLeaf())
+            {
+                return leafNodeFactory.GetSize(gameNode);
+            }
             else
             {
-                Node node = noderef.node;
-                if (node.IsLeaf())
-                {
-                    return leafNodeFactory.GetSize(gameNode);
-                }
-                else
-                {
-                    return innerNodeFactory.GetSize(gameNode);
-                }
+                return innerNodeFactory.GetSize(gameNode);
             }
         }
 
@@ -1445,7 +1426,7 @@ namespace SEE.Game
             }
             else
             {
-                float value = GetMetricValue(noderef.node, settings.InnerNodeHeightMetric);
+                float value = GetMetricValue(noderef.Value, settings.InnerNodeHeightMetric);
                 innerNodeFactory.SetHeight(gameNode, value);
             }
         }
@@ -1468,18 +1449,16 @@ namespace SEE.Game
             {
                 throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
             }
+
+            Node node = noderef.Value;
+            int style = SelectStyle(node, innerNodeFactory);
+            if (node.IsLeaf())
+            {
+                leafNodeFactory.SetStyle(gameNode, style);
+            }
             else
             {
-                Node node = noderef.node;
-                int style = SelectStyle(node, innerNodeFactory);
-                if (node.IsLeaf())
-                {
-                    leafNodeFactory.SetStyle(gameNode, style);
-                }
-                else
-                {
-                    innerNodeFactory.SetStyle(gameNode, style); // TODO: for some reason, the material is selected twice. once here and once somewhere earlier (i believe in NewBlock somewhere).
-                }
+                innerNodeFactory.SetStyle(gameNode, style); // TODO: for some reason, the material is selected twice. once here and once somewhere earlier (i believe in NewBlock somewhere).
             }
         }
 
@@ -1500,34 +1479,32 @@ namespace SEE.Game
             {
                 throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
             }
-            else
-            {
-                Node node = nodeRef.node;
-                if (node.IsLeaf())
-                {
-                    // Scaled metric values for the three dimensions.
-                    Vector3 scale = GetScale(node);
 
-                    // Scale according to the metrics.
-                    if (settings.NodeLayout == NodeLayoutKind.Treemap)
-                    {
-                        // FIXME: This is ugly. The graph renderer should not need to care what
-                        // kind of layout was applied.
-                        // In case of treemaps, the width metric is mapped on the ground area.
-                        float widthOfSquare = Mathf.Sqrt(scale.x);
-                        leafNodeFactory.SetWidth(gameNode, leafNodeFactory.Unit * widthOfSquare);
-                        leafNodeFactory.SetDepth(gameNode, leafNodeFactory.Unit * widthOfSquare);
-                        leafNodeFactory.SetHeight(gameNode, leafNodeFactory.Unit * scale.y);
-                    }
-                    else
-                    {
-                        gameNode.transform.localScale = leafNodeFactory.Unit * scale;
-                    }
+            Node node = nodeRef.Value;
+            if (node.IsLeaf())
+            {
+                // Scaled metric values for the three dimensions.
+                Vector3 scale = GetScale(node);
+
+                // Scale according to the metrics.
+                if (settings.NodeLayout == NodeLayoutKind.Treemap)
+                {
+                    // FIXME: This is ugly. The graph renderer should not need to care what
+                    // kind of layout was applied.
+                    // In case of treemaps, the width metric is mapped on the ground area.
+                    float widthOfSquare = Mathf.Sqrt(scale.x);
+                    leafNodeFactory.SetWidth(gameNode, leafNodeFactory.Unit * widthOfSquare);
+                    leafNodeFactory.SetDepth(gameNode, leafNodeFactory.Unit * widthOfSquare);
+                    leafNodeFactory.SetHeight(gameNode, leafNodeFactory.Unit * scale.y);
                 }
                 else
                 {
-                    throw new Exception("Game object " + gameNode.name + " is not a leaf.");
+                    gameNode.transform.localScale = leafNodeFactory.Unit * scale;
                 }
+            }
+            else
+            {
+                throw new Exception("Game object " + gameNode.name + " is not a leaf.");
             }
         }
 
@@ -1558,10 +1535,8 @@ namespace SEE.Game
             {
                 return value;
             }
-            else
-            {
-                return scaler.GetNormalizedValue(metricName, node);
-            }
+
+            return scaler.GetNormalizedValue(metricName, node);
         }
 
         /// <summary>
@@ -1591,8 +1566,7 @@ namespace SEE.Game
             GameObject innerGameObject = innerNodeFactory.NewBlock(0, node.Level);
             innerGameObject.name = node.ID;
             innerGameObject.tag = Tags.Node;
-            innerGameObject.AddComponent<NodeRef>().node = node;
-            innerGameObject.AddComponent<NodeHighlights>();
+            innerGameObject.AddComponent<NodeRef>().Value = node;
             AdjustStyle(innerGameObject);
             AdjustHeightOfInnerNode(innerGameObject);
             AddLOD(innerGameObject);
@@ -1639,7 +1613,7 @@ namespace SEE.Game
 
                 foreach (GameObject go in gameNodes)
                 {
-                    Node node = go.GetComponent<NodeRef>().node;
+                    Node node = go.GetComponent<NodeRef>().Value;
 
                     Vector3 extent = node.IsLeaf() ? leafNodeFactory.GetSize(go) / 2.0f : innerNodeFactory.GetSize(go) / 2.0f;
                     // Note: position denotes the center of the object
@@ -1766,10 +1740,8 @@ namespace SEE.Game
             {
                 throw new Exception("Code city " + codeCity.name + " has no child tagged by " + Tags.Node);
             }
-            else
-            {
-                return result;
-            }
+
+            return result;
         }
     }
 }

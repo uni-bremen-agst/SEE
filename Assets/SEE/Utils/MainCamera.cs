@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.DataModel;
+using UnityEngine;
 
 namespace SEE.Utils
 {
@@ -36,7 +37,7 @@ namespace SEE.Utils
                             foreach (Camera c in Camera.allCameras)
                             {
                                 // Analogous to Camera.main we are returning the first enabled camera tagged "MainCamera".
-                                if (camera == null && c.CompareTag("MainCamera"))
+                                if (camera == null && c.CompareTag(Tags.MainCamera))
                                 {
                                     camera = c;
                                 }
