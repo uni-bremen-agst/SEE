@@ -104,6 +104,7 @@ namespace SEEEditor
         {
             GameObject codeCity = new GameObject {tag = Tags.CodeCity, name = cityName};
             codeCity.transform.localScale = new Vector3(1f, 0.0001f, 1f); // choose sensible y-scale
+            codeCity.transform.position = new Vector3(0, 0.964f, 0);
 
             // Add required components
             codeCity.AddComponent<MeshRenderer>();
@@ -112,6 +113,7 @@ namespace SEEEditor
             Plane plane = codeCity.AddComponent<Plane>();
             codeCity.AddComponent<DesktopNavigationAction>().portalPlane = plane;
             codeCity.AddComponent<XRNavigationAction>().portalPlane = plane;
+
             codeCity.AddComponent(CityTypes[selectedCityType]);
         }
 
@@ -141,6 +143,8 @@ namespace SEEEditor
             UnityEngine.Object desktopPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Players/DesktopPlayer.prefab");
             GameObject desktopPlayer = Instantiate(desktopPrefab) as GameObject;
             UnityEngine.Assertions.Assert.IsNotNull(desktopPlayer);
+            //throw new NotImplementedException("Reference must be set in PlayerSettings.cs");
+            //desktopPlayer.name = "DesktopPlayer"; // TODO(torben): set reference in PlayerSettings.cs
             desktopPlayer.name = PlayerSettings.PlayerName[(int)PlayerSettings.PlayerInputType.Desktop];
             desktopPlayer.tag = Tags.MainCamera;
             desktopPlayer.GetComponent<DesktopPlayerMovement>().focusedObject = table.GetComponent<Plane>();
@@ -157,6 +161,12 @@ namespace SEEEditor
             UnityEngine.Assertions.Assert.IsNotNull(chartManager);
             chartManager.name = "Chart Manager";
             chartManager.transform.GetChild(0).GetComponent<ChartPositionVr>().cameraTransform = vrCamera.transform;
+            
+            // Create HoloLensAppBar from prefab
+            UnityEngine.Object appBarPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Resources/Prefabs/HoloLensAppBar.prefab");
+            GameObject appBar = Instantiate(appBarPrefab) as GameObject;
+            UnityEngine.Assertions.Assert.IsNotNull(appBar);
+            chartManager.name = AppBarInteractableObject.AppBarName;
         }
 
         /// <summary>
@@ -169,6 +179,8 @@ namespace SEEEditor
                 AssetDatabase.LoadAssetAtPath<GameObject>("Assets/SteamVR/InteractionSystem/Core/Prefabs/Player.prefab");
             GameObject vrPlayer = Instantiate(steamVrPrefab) as GameObject;
             UnityEngine.Assertions.Assert.IsNotNull(vrPlayer);
+            //throw new NotImplementedException("Reference must be set in PlayerSettings.cs");
+            //vrPlayer.name = "VRPlayer"; // TODO(torben): set reference in PlayerSettings.cs
             vrPlayer.name = PlayerSettings.PlayerName[(int)PlayerSettings.PlayerInputType.VR]; ;
             // We need to find the right and left hand first to use them later
             Hand rightHand = GameObjectHierarchy.Descendants(vrPlayer)

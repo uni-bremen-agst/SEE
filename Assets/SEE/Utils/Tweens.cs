@@ -27,24 +27,6 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Moves a GameObject to a specific position over a given duration.
-        /// </summary>
-        /// <param name="gameObject">
-        /// A <see cref="GameObject"/> to be the target of the animation.
-        /// </param>
-        /// <param name="position">
-        /// A <see cref="Vector3"/> for the destination Vector3.
-        /// </param>
-        /// <param name="MaxAnimationTime">
-        /// A <see cref="System.Single"/> for the time in seconds the animation will take to complete.
-        /// </param>
-        public static void Move(GameObject gameObject, Vector3 position, float MaxAnimationTime, 
-                                GameObject callBackTarget, String callBackMethod, System.Object callBackParams)
-        {
-            gameObject.transform.DOMove(position, MaxAnimationTime);
-        }
-
-        /// <summary>
         /// Randomly shakes a GameObject's rotation by a diminishing amount over time with.
         /// </summary>
         /// <param name="gameObject">

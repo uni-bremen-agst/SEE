@@ -14,7 +14,7 @@ namespace SEEEditor
         public override void OnInspectorGUI()
         {
             NodeRef nodeRef = target as NodeRef;
-            Node node = nodeRef.node;
+            Node node = nodeRef.Value;
             if (ReferenceEquals(node, null))
             {
                 Debug.LogError("NodeRef references null");

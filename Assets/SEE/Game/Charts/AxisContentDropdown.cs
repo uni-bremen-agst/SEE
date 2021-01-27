@@ -52,10 +52,15 @@ namespace SEE.Game.Charts
         /// <summary>
         ///     Adds all possible options to the <see cref="TMP_Dropdown" />.
         /// </summary>
-        private void Start()
+        public void Initialize()
         {
             _chartContent = transform.parent.parent.GetComponent<ChartContent>();
             _dropdown = GetComponent<TMP_Dropdown>();
+            UpdateInternal();
+        }
+
+        private void UpdateInternal()
+        {
             FillDropDown();
             if (_dropdown.options.Count > 0)
             {
@@ -101,6 +106,7 @@ namespace SEE.Game.Charts
         {
             Assert.IsTrue(string.IsNullOrEmpty(specialEntry));
             specialEntry = entry;
+            UpdateInternal();
         }
 
         /// <summary>
@@ -119,7 +125,7 @@ namespace SEE.Game.Charts
             }
             {
                 // Add all node metrics without their prefix
-                string[] options = _chartContent.AllMetricNames.ToArray();
+                string[] options = _chartContent.allMetricNames.ToArray();
                 int MetricPrefixLength = ChartManager.MetricPrefix.Length;
                 for (int i = 0; i < options.Length; i++)
                 {
@@ -136,9 +142,8 @@ namespace SEE.Game.Charts
         {
             string currentValue = _dropdown.options[_dropdown.value].text;
             CurrentlySelectedMetric = GetEntry(currentValue);
-            _chartContent.DrawData(true);
+            _chartContent.DrawData();
             _chartContent.SetInfoText();
-            //_other.OtherChanged(_dropdown.value);
         }
 
         /// <summary>

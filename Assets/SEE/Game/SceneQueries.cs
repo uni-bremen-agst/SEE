@@ -1,7 +1,8 @@
-﻿using SEE.DataModel;
+﻿using System.Collections.Generic;
+using SEE.Controls;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.GO;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game
@@ -12,7 +13,7 @@ namespace SEE.Game
     internal class SceneQueries
     {
         /// <summary>
-        /// Returns all game objects in the current scene tagged by Tags.Node and having 
+        /// Returns all game objects in the current scene tagged by Tags.Node and having
         /// a valid reference to a graph node.
         /// </summary>
         /// <returns>all game objects representing graph nodes in the scene</returns>
@@ -21,14 +22,47 @@ namespace SEE.Game
             List<GameObject> result = new List<GameObject>();
             foreach (GameObject go in GameObject.FindGameObjectsWithTag(Tags.Node))
             {
-                if (go.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+                if (go.TryGetComponent(out NodeRef nodeRef))
                 {
-                    Node node = nodeRef.node;
+                    Node node = nodeRef.Value;
                     if (node != null)
                     {
                         if ((includeLeaves && node.IsLeaf()) || (includeInnerNodes && !node.IsLeaf()))
                         {
                             result.Add(go);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarningFormat("Game node {0} has a null node reference.\n", go.name);
+                    }
+                }
+                else
+                {
+                    Debug.LogWarningFormat("Game node {0} without node reference.\n", go.name);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns all node refs in the current scene of objects tagged by Tags.Node and
+        /// having a valid reference to a graph node.
+        /// </summary>
+        /// <returns>all game objects representing graph nodes in the scene</returns>
+        public static List<NodeRef> AllNodeRefsInScene(bool includeLeaves, bool includeInnerNodes)
+        {
+            List<NodeRef> result = new List<NodeRef>();
+            foreach (GameObject go in GameObject.FindGameObjectsWithTag(Tags.Node))
+            {
+                if (go.TryGetComponent(out NodeRef nodeRef))
+                {
+                    Node node = nodeRef.Value;
+                    if (node != null)
+                    {
+                        if ((includeLeaves && node.IsLeaf()) || (includeInnerNodes && !node.IsLeaf()))
+                        {
+                            result.Add(nodeRef);
                         }
                     }
                     else
@@ -52,12 +86,32 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">game nodes whose roots are to be returned</param>
         /// <returns>all root nodes in the scene</returns>
-        public static ICollection<Node> GetRoots(ICollection<GameObject> gameNodes)
+        public static List<Node> GetRoots(ICollection<GameObject> gameNodes)
         {
             List<Node> result = new List<Node>();
             foreach (Graph graph in GetGraphs(gameNodes))
             {
                 result.AddRange(graph.GetRoots());
+            }
+            return result;
+        }
+
+        public static HashSet<Node> GetRoots(ICollection<NodeRef> nodeRefs)
+        {
+            HashSet<Node> result = new HashSet<Node>();
+            foreach (NodeRef nodeRef in nodeRefs)
+            {
+                IEnumerable<Node> nodes = nodeRef?.Value?.ItsGraph?.GetRoots();
+                if (nodes != null)
+                {
+                    foreach (Node node in nodes)
+                    {
+                        if (node != null)
+                        {
+                            result.Add(node);
+                        }
+                    }
+                }
             }
             return result;
         }
@@ -75,8 +129,9 @@ namespace SEE.Game
             HashSet<Graph> result = new HashSet<Graph>();
             foreach (GameObject go in gameNodes)
             {
-                result.Add(go.GetComponent<NodeRef>().node.ItsGraph);
+                result.Add(go.GetComponent<NodeRef>().Value.ItsGraph);
             }
+
             return result;
         }
 
@@ -90,7 +145,12 @@ namespace SEE.Game
         /// <returns>true if <paramref name="gameNode"/> represents a leaf in the graph</returns>
         public static bool IsLeaf(GameObject gameNode)
         {
-            return gameNode.GetComponent<NodeRef>()?.node?.IsLeaf() ?? false;
+            return gameNode.GetComponent<NodeRef>()?.Value?.IsLeaf() ?? false;
+        }
+
+        public static bool IsLeaf(NodeRef nodeRef)
+        {
+            return nodeRef?.Value?.IsLeaf() ?? false;
         }
 
         /// <summary>
@@ -103,7 +163,7 @@ namespace SEE.Game
         /// <returns>true if <paramref name="gameNode"/> represents an inner node in the graph</returns>
         public static bool IsInnerNode(GameObject gameNode)
         {
-            return gameNode.GetComponent<NodeRef>()?.node?.IsInnerNode() ?? false;
+            return gameNode.GetComponent<NodeRef>()?.Value?.IsInnerNode() ?? false;
         }
 
         /// <summary>
@@ -117,12 +177,25 @@ namespace SEE.Game
         {
             if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
-                if (nodeRef.node != null)
+                if (nodeRef.Value != null)
                 {
-                    return nodeRef.node.SourceName;
+                    return nodeRef.Value.SourceName;
                 }
             }
+
             return gameNode.name;
+        }
+
+        public static string SourceName(NodeRef nodeRef)
+        {
+            string result = string.Empty;
+
+            if (nodeRef)
+            {
+                result = nodeRef.Value?.SourceName ?? nodeRef.gameObject.name;
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -133,7 +206,7 @@ namespace SEE.Game
         /// <param name="codeCity">object representing a code city (generally tagged by Tags.CodeCity)</param>
         /// <returns>game object representing the root of the graph or null if there is none</returns>
         public static Transform GetCityRootNode(GameObject codeCity)
-        {            
+        {
             foreach (Transform child in codeCity.transform)
             {
                 if (child.CompareTag(Tags.Node))
@@ -141,6 +214,7 @@ namespace SEE.Game
                     return child.transform;
                 }
             }
+
             return null;
         }
 
@@ -156,7 +230,24 @@ namespace SEE.Game
         /// Tags.CodeCity or null</returns>
         public static Transform GetCodeCity(Transform transform)
         {
-            Transform result = transform.root;
+            Transform result = transform;
+            if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.HoloLens)
+            {
+                // If the MRTK is enabled, the cities will be part of a CityCollection, so we can't simply use the root.
+                // In this case, we actually have to traverse the tree up until the Tags match.
+
+                while (result != null)
+                {
+                    if (result.CompareTag(Tags.CodeCity))
+                    {
+                        return result;
+                    }
+                    result = result.parent;
+                }
+                return result;
+            }
+            result = transform.root;
+
             if (result.CompareTag(Tags.CodeCity))
             {
                 return result;
@@ -179,17 +270,13 @@ namespace SEE.Game
             {
                 return null;
             }
+            else if (transform.TryGetComponent(out NodeRef nodeRef))
+            {
+                return nodeRef.Value;
+            }
             else
             {
-                NodeRef nodeRef = transform.GetComponent<NodeRef>();
-                if (nodeRef == null)
-                {
-                    return null;
-                }
-                else
-                {
-                    return nodeRef.node;
-                }
+                return null;
             }
         }
 
@@ -202,14 +289,7 @@ namespace SEE.Game
         public static Graph GetGraph(GameObject codeCity)
         {
             Node root = GetCityRootGraphNode(codeCity);
-            if (root == null)
-            {
-                return null;
-            }
-            else
-            {
-                return root.ItsGraph;
-            }
+            return root?.ItsGraph;
         }
     }
 }
