@@ -111,33 +111,11 @@ namespace SEE.Controls
         /// </summary>
         public Net.Synchronizer InteractableSynchronizer { get; private set; }
 
-        /// <summary>
-        /// The local player to be informed about his/her own hovered, selected,
-        /// or grabbed objects.
-        /// </summary>
-        private PlayerActions localPlayerActions;
-
         private void Awake()
         {
             ID = nextID++;
             idToInteractableObjectDict.Add(ID, this);
             gameObject.TryGetComponentOrLog(out interactable);
-        }
-
-        private void Start()
-        {
-            if (PlayerSettings.LocalPlayer == null)
-            {
-                Debug.LogError($"InteractableObject {name} could not connect to a player.\n");
-            }
-            else
-            {
-                localPlayerActions = PlayerSettings.LocalPlayer?.GetComponent<PlayerActions>();
-                if (localPlayerActions == null)
-                {
-                    Debug.LogError($"The player {PlayerSettings.LocalPlayer.name} the InteractableObject {name} is connected to has no PlayerActions component.\n");
-                }
-            }
         }
 
         /// <summary>
@@ -169,7 +147,8 @@ namespace SEE.Controls
                 {
                     // The local player has hovered on this object and needs to be informed about it.
                     // Non-local player are not concerned here.
-                    localPlayerActions?.HoverOn(gameObject);
+                    LocalHoverIn?.Invoke(this);
+                    LocalAnyHoverIn?.Invoke(this);
                 }
                 HoveredObjects.Add(this);
             }
@@ -181,7 +160,8 @@ namespace SEE.Controls
                 {
                     // The local player has finished hovering on this object and needs to be informed about it.
                     // Non-local player are not concerned here.
-                    localPlayerActions?.HoverOff(gameObject);
+                    LocalHoverOut?.Invoke(this);
+                    LocalAnyHoverOut?.Invoke(this);
                 }
                 HoveredObjects.Remove(this);
             }
@@ -252,7 +232,8 @@ namespace SEE.Controls
                 {
                     // The local player has selected this object and needs to be informed about it.
                     // Non-local player are not concerned here.
-                    localPlayerActions?.SelectOn(gameObject);
+                    LocalSelectIn?.Invoke(this);
+                    LocalAnySelectIn?.Invoke(this);
                 }
                 SelectedObjects.Add(this);
             }
@@ -264,7 +245,8 @@ namespace SEE.Controls
                 {
                     // The local player has deselected this object and needs to be informed about it.
                     // Non-local player are not concerned here.
-                    localPlayerActions?.SelectOff(gameObject);
+                    LocalSelectOut?.Invoke(this);
+                    LocalAnySelectOut?.Invoke(this);
                 }
                 SelectedObjects.Remove(this);
             }
@@ -305,7 +287,8 @@ namespace SEE.Controls
                 {
                     // The local player has grabbed this object and needs to be informed about it.
                     // Non-local player are not concerned here.
-                    localPlayerActions?.GrabOn(gameObject);
+                    LocalGrabIn?.Invoke(this);
+                    LocalAnyGrabIn?.Invoke(this);
                 }
                 GrabbedObjects.Add(this);
             }
@@ -317,7 +300,8 @@ namespace SEE.Controls
                 {
                     // The local player has finished grabbing this object and needs to be informed about it.
                     // Non-local player are not concerned here.
-                    localPlayerActions?.GrabOff(gameObject);
+                    LocalGrabOut?.Invoke(this);
+                    LocalAnyGrabOut?.Invoke(this);
                 }
 
                 // Hovering and selection are continuous operations, that is why we call them here
@@ -386,6 +370,14 @@ namespace SEE.Controls
         public static event AnyHoverAction AnyHoverIn;
         public static event AnyHoverAction AnyHoverOut;
 
+        public delegate void LocalHoverAction(InteractableObject interactableObject);
+        public event LocalHoverAction LocalHoverIn;
+        public event LocalHoverAction LocalHoverOut;
+
+        public delegate void LocalAnyHoverAction(InteractableObject interactableObject);
+        public event LocalAnyHoverAction LocalAnyHoverIn;
+        public event LocalAnyHoverAction LocalAnyHoverOut;
+
         /// ----------------------------
         /// Selection event system
         /// ----------------------------
@@ -407,6 +399,14 @@ namespace SEE.Controls
         public static event AnySelectAction AnySelectIn;
         public static event AnySelectAction AnySelectOut;
 
+        public delegate void LocalSelectAction(InteractableObject interactableObject);
+        public event LocalSelectAction LocalSelectIn;
+        public event LocalSelectAction LocalSelectOut;
+
+        public delegate void LocalAnySelectAction(InteractableObject interactableObject);
+        public event LocalAnySelectAction LocalAnySelectIn;
+        public event LocalAnySelectAction LocalAnySelectOut;
+
         /// ----------------------------
         /// Grabbing event system
         /// ----------------------------
@@ -427,6 +427,14 @@ namespace SEE.Controls
         public delegate void AnyGrabAction(InteractableObject interactableObject, bool isOwner);
         public static event AnyGrabAction AnyGrabIn;
         public static event AnyGrabAction AnyGrabOut;
+
+        public delegate void LocalGrabAction(InteractableObject interactableObject);
+        public event LocalGrabAction LocalGrabIn;
+        public event LocalGrabAction LocalGrabOut;
+
+        public delegate void LocalAnyGrabAction(InteractableObject interactableObject);
+        public event LocalAnyGrabAction LocalAnyGrabIn;
+        public event LocalAnyGrabAction LocalAnyGrabOut;
 
 #if false // TODO(torben): will we ever need this?
         public delegate void CollisionAction(InteractableObject interactableObject, Collision collision);

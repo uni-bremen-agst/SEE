@@ -14,7 +14,8 @@
         {
             Move,    // the user wants to move a node
             Rotate,  // the user wants to rotate a node
-            Map      // the user wants to map an implementation node onto an architecture node (reflexion analysis)
+            Map,     // the user wants to map an implementation node onto an architecture node (reflexion analysis)
+            DrawEdge // The user wants to draw an edge between nodes
         }
 
         private static Type value = 0;
@@ -34,6 +35,18 @@
                     OnStateChanged?.Invoke(ActionState.value);
                 }
             }
+        }
+
+        /// <summary>
+        /// Whether the given type of the state-based action is currently active.
+        /// </summary>
+        /// <param name="value">The type to check</param>
+        /// <returns><code>true</code> if the given type if currently active,
+        /// <code>false</code> otherwise.</returns>
+        public static bool Is(Type value)
+        {
+            bool result = ActionState.value == value;
+            return result;
         }
 
         /// <summary>
