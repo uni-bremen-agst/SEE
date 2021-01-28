@@ -43,11 +43,11 @@ namespace SEE.Controls
         /// The order must be consistent with <see cref="PlayerInputType"/>.
         /// </summary>
         public static readonly string[] PlayerName = {
-            "DesktopPlayer", // Desktop
-            "InControl",     // TouchGamepad
-            "VRPlayer",      // VR          
-            "MRPlayer",      // HoloLens
-            "No Player",     // None
+            "Player Desktop",       // Desktop
+            "Player Touch Gamepad", // TouchGamepad
+            "Player VR",            // VR          
+            "Player HoloLens",      // HoloLens
+            "Player None",          // None
             };
 
         [Tooltip("What kind of player type should be enabled.")]
@@ -165,6 +165,7 @@ namespace SEE.Controls
             SetMixedReality(playerInputType == PlayerInputType.HoloLens);
             playerTouchGamepad?.SetActive(playerInputType == PlayerInputType.TouchGamepad);
             playerVR?.SetActive(playerInputType == PlayerInputType.VR);
+            SetLocalPlayer(PlayerName[(int)playerInputType]);
         }
 
         /// <summary>
@@ -305,7 +306,7 @@ namespace SEE.Controls
             }
             else
             {
-                Debug.LogErrorFormat("A player object named {0} to be activated could not be found.", name);
+                Debug.LogError($"A player object named {name} to be activated could not be found.\n");
             }
         }
 
