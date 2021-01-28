@@ -35,6 +35,12 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void Start()
         {
+            UnityEngine.Assertions.Assert.IsTrue(System.Enum.GetNames(typeof(ActionState.Type)).Length == 4);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Move == 0);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Rotate == 1);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Map == 2);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.DrawEdge == 3);
+
             MenuDescriptor[] menuDescriptors = new MenuDescriptor[]
             {
                 // Moving a node within a graph
