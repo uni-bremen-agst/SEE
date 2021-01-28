@@ -4,7 +4,6 @@ using SEE.GO;
 using SEE.Utils;
 using System;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
