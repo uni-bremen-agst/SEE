@@ -94,8 +94,14 @@ namespace SEE.Controls
         /// </summary>
         private List<GameObject> listOfRoots = null;
 
+        /// <summary>
+        /// True, if allNodesOfScene() is called, else false.
+        /// </summary>
         private bool nodesLoaded = false;
 
+        /// <summary>
+        /// The current hovered city, which has to be colored while selecting a city-process for creating a new node.
+        /// </summary>
         private SEECity cityToDye = null;
 
         public enum Progress
@@ -105,6 +111,7 @@ namespace SEE.Controls
             WaitingForValues,
             CanvasIsClosed,
             ValuesAreGiven,
+            AddingIsCanceled
         }
 
         /// <summary>
@@ -127,6 +134,7 @@ namespace SEE.Controls
         /// WaitingForValues: This State is active while the canvas is open, but the button "AddNode" on it is not pushed
         /// CanvasIsClosed: Closes the canvas-object after extracting the values for the creation of a node. This state is reached by pushing the "AddNode"-Button
         /// ValuesAreGiven: Moves the node and waits for a mouseInput to place the node, if its inside of the previous chosen city
+        /// AddingIsCanceled: Removes all attributes and states and resets the progress-state to noCitySelected
         /// 
         /// </summary>
         public void Update()
@@ -134,7 +142,6 @@ namespace SEE.Controls
             switch (Progress1)
             {
                 case Progress.NoCitySelected:
-
                     SelectCity();
                     if (city != null)
                     {
@@ -177,11 +184,22 @@ namespace SEE.Controls
                         }
                     }
                     break;
+
+                case Progress.AddingIsCanceled:
+                    c = canvasObject.GetComponent<CanvasGenerator>();
+                    script = canvasObject.GetComponent<AddingNodeCanvasAction>();
+                    script.GetNodeMetrics();
+                    c.DestroyAddNodeCanvas();
+                    city = null;
+                    Progress1 = Progress.NoCitySelected;
+                    break;
             }
         }
 
         /// <summary>
-        /// Selects the City with hovering. Sets the City Object on Click on a GameObject
+        /// Selects the City with hovering. Sets the City Object on Click on a GameObject.
+        /// While there is no city selected by mousceclick, the rootList of the current hovered city will be colored in a different color
+        /// to support the selection-process visually.
         /// </summary>
         private void SelectCity()
         {
@@ -203,7 +221,7 @@ namespace SEE.Controls
                 {
                     if (go.GetComponent<NodeRef>().Value.ItsGraph == cityToDye.LoadedGraph)
                     {
-                        ChangeColor(go, defaultHoverCityColor);
+                        ChangeColor(go, go.GetComponent<Renderer>().material.color);
                     }
                 }
 
@@ -211,20 +229,16 @@ namespace SEE.Controls
             nodesLoaded = false;
             if (hoveredObject != null && Input.GetMouseButtonDown(0))
             {
-                //Undye();
-
                 //Gets the SEECity from the hoverdObject
                 SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject.TryGetComponent<SEECity>(out city);
 
-                //  GetNodesOfScene();
                 foreach (GameObject root in listOfRoots)
                 {
                     if (root.GetComponent<NodeRef>().Value.ItsGraph == city.LoadedGraph)
                     {
-                        ChangeColor(root, defaultHoverCityColor);
+                        ChangeColor(root, root.GetComponent<Renderer>().material.color);
                     }
                 }
-
             }
         }
 
@@ -262,16 +276,16 @@ namespace SEE.Controls
         /// <param name="objectToDye"> the object which will get dyed</param>
         private void ChangeColor(GameObject objectToDye, Color colorOfCity)
         {
-            Color newCityColor;
+           Color newCityColor = defaultHoverCityColor;
 
-            if (colorOfCity == defaultHoverCityColor)
-            {
-                newCityColor = alternativeHoverCityColor;
-            }
-            else
-            {
-                newCityColor = defaultHoverCityColor;
-            }
+        //    if (colorOfCity == defaultHoverCityColor)
+        //    {
+        //        newCityColor = alternativeHoverCityColor;
+        //    }
+        //    else
+        //    {
+        //        newCityColor = defaultHoverCityColor;
+        //    }
             if (!(hoveredObjectList.Contains(objectToDye)))
             {
                 hoveredObjectList.Add(objectToDye);

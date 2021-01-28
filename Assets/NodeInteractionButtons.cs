@@ -25,9 +25,19 @@ public class NodeInteractionButtons : MonoBehaviour
     public Button editNodeButton;
 
     /// <summary>
+    /// The button on the addNode-canvas, which is canceling the addingNode-process.
+    /// </summary>
+    public Button addNodeCancel;
+
+    /// <summary>
     /// The Component playerActions, which is the parent of the DesktopNewNodeAction and DesktopEditNodeAction-scripts.
     /// </summary>
     private GameObject playerDesktop;
+
+    /// <summary>
+    /// The name of the GameObject which is the parent of the newNodeAction and editNodeAction
+    /// </summary>
+    private string gameObjectName = "Player Desktop";
 
 
 
@@ -49,8 +59,12 @@ public class NodeInteractionButtons : MonoBehaviour
         {
             editNodeButton.onClick.AddListener(EditNode);
         }
+        if(addNodeCancel != null)
+        {
+            addNodeCancel.onClick.AddListener(AddingIsCanceled);
+        }
 
-         playerDesktop = GameObject.Find("Player Desktop");
+         playerDesktop = GameObject.Find(gameObjectName);
     }
 
     /// <summary>
@@ -77,5 +91,11 @@ public class NodeInteractionButtons : MonoBehaviour
     public void EditNode()
     {
         EditNodeCanvasAction.EditNode = true;
+    }
+
+    public void AddingIsCanceled()
+    {
+        NewNodeAction current = playerDesktop.GetComponent<NewNodeAction>();
+        current.Progress1 = NewNodeAction.Progress.AddingIsCanceled;
     }
 }
