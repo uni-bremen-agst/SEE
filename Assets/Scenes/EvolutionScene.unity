@@ -1534,7 +1534,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 2
+      Data: 3
     - Name: 
       Entry: 7
       Data: 
@@ -1553,6 +1553,18 @@ MonoBehaviour:
     - Name: $k
       Entry: 1
       Data: File
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: ROOT
     - Name: $v
       Entry: 5
       Data: true
@@ -2029,7 +2041,7 @@ MonoBehaviour:
       Entry: 8
       Data: 
   pathPrefix: C:\Users\Leonard\Desktop\Uni\5.Semester\SEA\SEE\Data\GXL\animation-clones-log4j
-  gvlPath: ..\Data\GXL\linux-clones\net.gvl
+  layoutPath: ..\Data\GXL\linux-clones\net.gvl
   WidthMetric: Metric.Number_of_Tokens
   HeightMetric: Metric.Clone_Rate
   DepthMetric: Metric.LOC
@@ -2230,10 +2242,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a402756c70fc7b8428d1580ad8b0d004, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NewBeamColor: {r: 0.031480715, g: 0.9716981, b: 0, a: 0}
-  ChangedBeamColor: {r: 0.16197933, g: 0.7904972, b: 0.9811321, a: 0}
-  DeletedBeamColor: {r: 0.8396226, g: 0, b: 0, a: 0}
-  PowerBeamDimensions: {x: 0.02, y: 3, z: 0.03}
+  InspectorNewBeamColor: {r: 0, g: 1, b: 0.10232139, a: 0}
+  InspectorChangedBeamColor: {r: 0, g: 0.98000383, b: 1, a: 0}
+  InspectorDeletedBeamColor: {r: 1, g: 0, b: 0, a: 0}
+  InspectorPowerBeamDimensions: {x: 0, y: 0, z: 0}
 --- !u!1 &1093528283
 GameObject:
   m_ObjectHideFlags: 0
@@ -2563,8 +2575,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerInputType: 0
+  playerDesktop: {fileID: 0}
+  playerHoloLens: {fileID: 0}
+  playerTouchGamepad: {fileID: 0}
+  playerVR: {fileID: 0}
   HideVRControllers: 0
   ShowControllerHints: 0
+  experienceScale: 1
+  CityScalingFactor: 1
 --- !u!4 &1510433995
 Transform:
   m_ObjectHideFlags: 0
@@ -2906,6 +2924,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79ef9858c6f1d9d4184e7310d93dc51b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Speed: 2
+  BoostFactor: 2
   focusedObject: {fileID: 1093528284}
 --- !u!1 &1626562202
 GameObject:
@@ -3293,6 +3313,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useInOfflineMode: 1
+  hostServer: 0
+  remoteServerIPAddress: 
+  localServerPort: 55555
+  remoteServerPort: 0
+  loadCityOnStart: 0
+  networkCommsLoggingEnabled: 0
+  internalLoggingEnabled: 1
+  minimalSeverity: 2
+  vivoxChannelName: 
 --- !u!4 &1925924586
 Transform:
   m_ObjectHideFlags: 0

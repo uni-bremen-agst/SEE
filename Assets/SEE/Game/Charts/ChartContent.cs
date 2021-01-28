@@ -207,6 +207,11 @@ namespace SEE.Game.Charts
         private Color hoveringOverLabelTextColor;
 
         /// <summary>
+        /// List containing the scroll view entries to be decorated
+        /// </summary>
+        List<ScrollViewEntry> decorativeScrollViewEntries = new List<ScrollViewEntry>(); 
+
+        /// <summary>
         /// The hierarchy-indices of every <see cref="treeDataObjects"/>-element. Both
         /// always have same number of elements.
         /// </summary>
@@ -246,6 +251,9 @@ namespace SEE.Game.Charts
         /// </summary>
         private void Awake()
         {
+            // Load color profile for chart entries
+            FetchLableColorProfile();
+
             Assert.IsTrue(scrollContent.transform.childCount == 0);
 
             FindDataObjects();
@@ -285,6 +293,15 @@ namespace SEE.Game.Charts
             DrawData();
         }
 
+        private void UpdateScrollView()
+        {
+            for (int i = 0; i < decorativeScrollViewEntries.Count(); i++)
+            {
+                // Change color for changed nodes
+                ChangeScrollViewEntryColor(decorativeScrollViewEntries[i].transform.gameObject.transform.Find("Label").gameObject, decorativeScrollViewEntries[i].transform.gameObject);
+            }
+        }
+
         private void Update()
         {
             float panelEntryCount = totalHeight * (1.0f - verticalScrollBar.size) / ScrollViewEntryHeight;
@@ -294,16 +311,13 @@ namespace SEE.Game.Charts
 
             void _NewScrollViewEntries(int fst, int opl)
             {
+                decorativeScrollViewEntries.Clear();
                 if (scrollViewIsTree)
                 {
                     for (int i = fst; i < opl; i++)
                     {
                         scrollViewEntries[i] = NewScrollViewEntry(treeDataObjects[i].name, i, treeHierarchies[i]);
-
-                        // Load color profile for chart entries
-                        FetchLableColorProfile();
-                        // Change color for changed nodes
-                        ChangedScrollViewEntryColor(scrollViewEntries[i].transform.gameObject.transform.Find("Label").gameObject, scrollViewEntries[i].transform.gameObject);
+                        decorativeScrollViewEntries.Add(scrollViewEntries[i]);
                     }
                 }
                 else
@@ -330,11 +344,7 @@ namespace SEE.Game.Charts
                         {
                             scrollViewEntries[i] = NewScrollViewEntry(listDataObjects[i - 2].name, i, 1);
                         }
-
-                        // Load color profile for chart entries
-                        FetchLableColorProfile();
-                        // Change color for changed nodes
-                        ChangedScrollViewEntryColor(scrollViewEntries[i].transform.gameObject.transform.Find("Label").gameObject, scrollViewEntries[i].transform.gameObject);
+                        decorativeScrollViewEntries.Add(scrollViewEntries[i]);
                     }
                 }
             }
@@ -349,6 +359,7 @@ namespace SEE.Game.Charts
 
             previousFirst = first;
             previousOnePastLast = onePastLast;
+            UpdateScrollView();
         }
 
 
@@ -1009,7 +1020,7 @@ namespace SEE.Game.Charts
         /// </summary>
         /// <param name="scrollViewEntry">The scrollview entry, the color of which should be changed</param>
         /// <param name="parent">The parent gameObject of the scrollview entry gameObject</param>
-        private void ChangedScrollViewEntryColor(GameObject scrollViewEntry, GameObject parent)
+        private void ChangeScrollViewEntryColor(GameObject scrollViewEntry, GameObject parent)
         {
             TextMeshProUGUI textMesh = scrollViewEntry.GetComponent<TextMeshProUGUI>();
             ColorBlock colors = parent.transform.GetComponent<Toggle>().colors;
@@ -1018,20 +1029,29 @@ namespace SEE.Game.Charts
             {
                 textMesh.color = addedNodesLabelColor;
                 colors.normalColor = addedNodesLabelColor;
+                colors.selectedColor = addedNodesLabelColor;
+                colors.pressedColor = addedNodesLabelColor;
+                colors.disabledColor = addedNodesLabelColor;
             }
             else if (this.changedNodeIDs.Contains(textMesh.text))
             {
                 textMesh.color = changedNodesLabelColor;
                 colors.normalColor = changedNodesLabelColor;
+                colors.selectedColor = changedNodesLabelColor;
+                colors.pressedColor = changedNodesLabelColor;
+                colors.disabledColor = changedNodesLabelColor;
             }
             else if (this.removedNodeIDs.Contains(textMesh.text))
             {
                 textMesh.color = removedNodeLabelColor;
                 colors.normalColor = removedNodeLabelColor;
+                colors.selectedColor = removedNodeLabelColor;
+                colors.pressedColor = changedNodesLabelColor;
+                colors.disabledColor = changedNodesLabelColor;
             }
             else
             {
-                textMesh.color = Color.white;
+                textMesh.color = Color.cyan;
                 colors.normalColor = Color.white;
             }
             colors.highlightedColor = hoveringOverLabelTextColor;
