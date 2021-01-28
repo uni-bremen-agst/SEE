@@ -79,6 +79,12 @@ namespace SEE.Controls.Actions
             MenuFactory.CreateMenu(menuDescriptors, Radius, Depth);
         }
 
+        /// <summary>
+        /// The delegates called upon the selection of a menu entry. Assignments to
+        /// ActionState.Value will enter a new ActionState and as a consequence
+        /// invoke all delegates <see cref="ActionState.OnStateChangedFn"/> listing 
+        /// to a change of the state via <see cref="ActionState.OnStateChanged"/>.
+        /// </summary>
         private void MoveOn() => ActionState.Value = ActionState.Type.Move;
         private void RotateOn() => ActionState.Value = ActionState.Type.Rotate;
         private void MapOn() => ActionState.Value = ActionState.Type.Map;
