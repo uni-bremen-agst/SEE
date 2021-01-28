@@ -45,8 +45,7 @@
         /// <code>false</code> otherwise.</returns>
         public static bool Is(Type value)
         {
-            bool result = ActionState.value == value;
-            return result;
+            return ActionState.value == value;
         }
 
         /// <summary>
