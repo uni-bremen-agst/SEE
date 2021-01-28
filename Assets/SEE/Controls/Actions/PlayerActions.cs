@@ -62,7 +62,7 @@ namespace SEE.Controls.Actions
                     break;
                 case State.NewNode:
                     //places new nodes as long as the user doesnt switch the modes
-                    //Adds the newComponent if not already done
+                    //Adds the newComponent if its not already done
                     if (!gameObject.GetComponent<NewNodeAction>())
                     {
                         gameObject.AddComponent<NewNodeAction>();
@@ -84,7 +84,7 @@ namespace SEE.Controls.Actions
                     break;
                 case State.EditNode:
                     //edits existing nodes as long as the user doesnt switch the modes
-                    //Adds the newComponent if not already done
+                    //Adds the newComponent if its not already done
                     if (!gameObject.GetComponent<EditNodeAction>())
                     {
                         gameObject.AddComponent<EditNodeAction>();
@@ -209,6 +209,10 @@ namespace SEE.Controls.Actions
                     break;
                 case State.NewNode:
                     generator.DestroyAddNodeCanvas();
+                    GameObject playerDesktop = GameObject.Find("Player Desktop");
+                    playerDesktop.GetComponent<NewNodeAction>().hoveredObject = null;
+                    playerDesktop.GetComponent<NewNodeAction>().RemoveScript();
+                    playerDesktop.GetComponent<NewNodeAction>().Undye();
                     gameObject.GetComponent<NewNodeAction>().hoveredObject = null;
                     GetComponent<NewNodeAction>().Undye();
                     gameObject.GetComponent<NewNodeAction>().RemoveScript();
