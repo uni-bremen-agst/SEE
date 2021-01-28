@@ -375,8 +375,8 @@ namespace SEE.Controls
         public event LocalHoverAction LocalHoverOut;
 
         public delegate void LocalAnyHoverAction(InteractableObject interactableObject);
-        public event LocalAnyHoverAction LocalAnyHoverIn;
-        public event LocalAnyHoverAction LocalAnyHoverOut;
+        public static event LocalAnyHoverAction LocalAnyHoverIn;
+        public static event LocalAnyHoverAction LocalAnyHoverOut;
 
         /// ----------------------------
         /// Selection event system
@@ -404,8 +404,8 @@ namespace SEE.Controls
         public event LocalSelectAction LocalSelectOut;
 
         public delegate void LocalAnySelectAction(InteractableObject interactableObject);
-        public event LocalAnySelectAction LocalAnySelectIn;
-        public event LocalAnySelectAction LocalAnySelectOut;
+        public static event LocalAnySelectAction LocalAnySelectIn;
+        public static event LocalAnySelectAction LocalAnySelectOut;
 
         /// ----------------------------
         /// Grabbing event system
@@ -433,8 +433,8 @@ namespace SEE.Controls
         public event LocalGrabAction LocalGrabOut;
 
         public delegate void LocalAnyGrabAction(InteractableObject interactableObject);
-        public event LocalAnyGrabAction LocalAnyGrabIn;
-        public event LocalAnyGrabAction LocalAnyGrabOut;
+        public static event LocalAnyGrabAction LocalAnyGrabIn;
+        public static event LocalAnyGrabAction LocalAnyGrabOut;
 
 #if false // TODO(torben): will we ever need this?
         public delegate void CollisionAction(InteractableObject interactableObject, Collision collision);

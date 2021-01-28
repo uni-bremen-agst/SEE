@@ -35,14 +35,14 @@ namespace SEE.Controls.Actions
                 if (v == ThisActionState)
                 {
                     enabled = true;
-                    InteractableObject.AnyHoverIn += AnyHoverIn;
-                    InteractableObject.AnyHoverOut += AnyHoverOut;
+                    InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
+                    InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
                 }
                 else
                 {
                     enabled = false;
-                    InteractableObject.AnyHoverIn -= AnyHoverIn;
-                    InteractableObject.AnyHoverOut -= AnyHoverOut;
+                    InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
+                    InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
                 }
             };
             enabled = ActionState.Is(ThisActionState);
@@ -96,13 +96,13 @@ namespace SEE.Controls.Actions
             }
         }
 
-        private void AnyHoverIn(InteractableObject interactableObject, bool isOwner)
+        private void LocalAnyHoverIn(InteractableObject interactableObject)
         {
             Assert.IsNull(hoveredObject);
             hoveredObject = interactableObject.gameObject;
         }
 
-        private void AnyHoverOut(InteractableObject interactableObject, bool isOwner)
+        private void LocalAnyHoverOut(InteractableObject interactableObject)
         {
             Assert.IsTrue(hoveredObject == interactableObject.gameObject);
             hoveredObject = null;
