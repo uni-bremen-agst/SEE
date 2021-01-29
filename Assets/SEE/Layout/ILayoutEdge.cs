@@ -20,7 +20,7 @@ namespace SEE.Layout
         /// </summary>
         public Vector3[] Points;
         /// <summary>
-        /// The control points of the polygone for rendering the edge.
+        /// The control points of the polygon for rendering the edge.
         /// </summary>
         public Vector3[] ControlPoints;
 
