@@ -295,7 +295,7 @@ namespace SEE.Game.Evolution
                 {
                     Destroyer.DestroyGameObject(gameObject);
                 }
-                // edges will be overridden in RenderEdges() each time, that is why we
+                // edges will be overwritten in RenderEdges() each time, that is why we
                 // do not Clear() it but reset it to null
                 newEdges.Clear();
             }
