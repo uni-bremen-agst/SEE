@@ -149,7 +149,6 @@ namespace SEE.GO
                 GameObject gameEdge = NewGameEdge(layoutEdge);
                 result.Add(gameEdge);
 
-
                 Points p  = gameEdge.AddComponent<Points>();
                 p.controlPoints = layoutEdge.ControlPoints;
                 p.linePoints = layoutEdge.Points;

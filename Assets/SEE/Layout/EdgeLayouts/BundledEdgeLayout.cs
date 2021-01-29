@@ -105,7 +105,6 @@ namespace SEE.Layout.EdgeLayouts
                 foreach (ILayoutEdge edge in edges)
                 {
                     edge.ControlPoints = GetLinePoints(edge.Source, edge.Target, lca, maxLevel);
-                    
                     edge.Points = Simplify(LinePoints.BSplineLinePoints(edge.ControlPoints, tension), rdp);
                 }
             }
@@ -288,9 +287,6 @@ namespace SEE.Layout.EdgeLayouts
                         }
                         
                         controlPoints[controlPoints.Length - 1] = edgesAboveBlocks ? target.Roof : target.Ground;
-                        
-                        //iledge.ControlPoints = controlPoints;
-
                         return controlPoints;
                     }
                 }

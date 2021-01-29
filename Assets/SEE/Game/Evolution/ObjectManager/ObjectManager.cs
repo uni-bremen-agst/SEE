@@ -202,6 +202,15 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
+        /// Cleares old and new edges
+        /// </summary>
+        private void ClearAllEdges()
+        {
+            ClearEdges();
+            ClearNewEdges();
+        }
+
+        /// <summary>
         /// Removes the game object representing the given <paramref name="node"/> by using the ID 
         /// of the <paramref name="node"/> and returns the removed node in <paramref name="gameObject"/>, if 
         /// it existed. Returns true if such a game object existed in the cache.
@@ -234,8 +243,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         public void RenderEdges()
         {
-            ClearEdges();
-            ClearNewEdges();
+            ClearAllEdges();
             // FIXME: Provide meaningful values for scaleFactor.
 
             edges = _graphRenderer.EdgeLayout(nodes.Values);
@@ -245,7 +253,10 @@ namespace SEE.Game.Evolution
 
         
         /// <returns>The list of edges rendered for this graph</returns>
-        public ICollection<GameObject> GetEdges(){return edges;}
+        public ICollection<GameObject> GetEdges()
+        {
+            return edges;
+        }
 
         /// <summary>
         /// Calculates the edges of the next graph
@@ -253,7 +264,7 @@ namespace SEE.Game.Evolution
         /// <returns>The list of calculated edges of the next graph</returns>
         public ICollection<GameObject> CalculateNewEdgeControlPoints(){
             ClearNewEdges();
-            newEdges = _graphRenderer.CalculateNewEdgeLayout(nodes.Values);
+            newEdges = _graphRenderer.EdgeLayout(nodes.Values, false);
             return newEdges;
 
         }
@@ -262,8 +273,10 @@ namespace SEE.Game.Evolution
         /// Destroys an edge from the graph
         /// </summary>
         public void RemoveEdge(Edge edge){
-            foreach(GameObject go in edges.ToList<GameObject>()){
-                if(edge.ID.Equals(go.ID())){
+            foreach (GameObject go in edges.ToList<GameObject>())
+            {
+                if (edge.ID.Equals(go.ID()))
+                {
                     edges.Remove(go);
                     Destroyer.DestroyGameObject(go);
                 }
@@ -284,7 +297,7 @@ namespace SEE.Game.Evolution
                 }
                 // edges will be overridden in RenderEdges() each time, that is why we
                 // do not Clear() it but reset it to null
-                newEdges = null;
+                newEdges.Clear();
             }
         }
 
@@ -296,8 +309,7 @@ namespace SEE.Game.Evolution
         {
             ClearPlane();
             ClearNodes();
-            ClearEdges();
-            ClearNewEdges();
+            ClearAllEdges();
         }
 
         /// <summary>
