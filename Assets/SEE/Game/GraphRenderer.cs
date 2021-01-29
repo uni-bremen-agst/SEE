@@ -320,7 +320,7 @@ namespace SEE.Game
             EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
             ICollection<GameObject> result;
             //Calculate only
-            if (draw == false)
+            if (!draw)
             {
                 result = edgeFactory.CalculateNewEdges(gameNodes.Cast<ILayoutNode>().ToList(), layoutEdges);
             }
