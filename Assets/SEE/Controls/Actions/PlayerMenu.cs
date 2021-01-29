@@ -10,8 +10,13 @@ namespace SEE.Controls.Actions
     /// code city, mapping a node between two code cities, and undoing these
     /// two actions.
     /// </summary>
-    public class PlayerMenu : MonoBehaviour
+    public sealed class PlayerMenu : MonoBehaviour
     {
+        /// <summary>
+        /// Path of the prefix for the sprite to be instantiated for the menu entries.
+        /// </summary>
+        private const string menuEntrySprite = "Icons/Circle";
+
         /// <summary>
         /// Radius of the menu.
         /// </summary>
@@ -27,104 +32,20 @@ namespace SEE.Controls.Actions
         public float Depth = 0.01f;
 
         /// <summary>
-        /// The player actions attached to the gameObject. The selection of 
-        /// menu entries will be forwarded to this component.
-        /// </summary>
-        private PlayerActions playerActions;
-
-        /// <summary>
         /// Creates the <see cref="menu"/> if it does not exist yet.
-        /// Sets <see cref="mainCamera"/>.
         /// </summary>
-        protected virtual void Start()
+        private void Start()
         {
-            MenuFactory.CreateMenu(EntriesParameter, Radius, Depth);
-            if (!gameObject.TryGetComponent<PlayerActions>(out playerActions))
-            {
-                Debug.LogErrorFormat("Player {0} does not have PlayerActions.\n", name);
-                enabled = false;
-            }
-        }
+            UnityEngine.Assertions.Assert.IsTrue(System.Enum.GetNames(typeof(ActionState.Type)).Length == 4);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Move == 0);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Rotate == 1);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Map == 2);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.DrawEdge == 3);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.AddNode == 4);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.EditNode == 5);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.ScaleNode == 6);
 
-        /// <summary>
-        /// Called from the menu as a callback when the user selects the move menu entry.
-        /// </summary>
-        private void MoveOn()
-        {
-            ActionState.Value = ActionState.Type.Move;
-        }
-
-        /// <summary>
-        /// Called from the menu as a callback when the user selects the rotate menu entry.
-        /// </summary>
-        private void RotateOn()
-        {
-            ActionState.Value = ActionState.Type.Rotate;
-        }
-
-        /// <summary>
-        /// Called from the menu as a callback when the user selects the map menu entry.
-        /// </summary>
-        private void MapOn()
-        {
-            ActionState.Value = ActionState.Type.Map;
-        }
-
-        /// <summary>
-        /// Called from the menu as a callback when the user selects the map menu entry.
-        /// Passes the map request on to <see cref="playerActions"/>.
-        /// </summary>
-        private void NewNodeOn()
-        {
-            playerActions.NewNode();
-        }
-
-        /// <summary>
-        /// Called from the menu as callback when the user selects the map menu entry.
-        /// Passes the map request on to <see cref="playerActions"/>.
-        /// </summary>
-        private void ScaleNodeOn()
-        {
-            playerActions.ScaleNode();
-        }
-
-        private void EditNodeOn()
-        {
-            playerActions.EditNode();
-        }
-
-        /// <summary>
-        /// Called from the menu as a callback when the user selects the draw-edge menu entry.
-        /// Passes the draw-edge request on to <see cref="playerActions"/>.
-        /// </summary>
-        private void DrawOn()
-        {
-            playerActions.Draw();
-        }
-
-        /// <summary>
-        /// Path of the prefix for the sprite to be instantiated for the menu entries.
-        /// </summary>
-        private const string menuEntrySprite = "Icons/Circle";
-
-        /// <summary>
-        /// Returns given <paramref name="color"/> lightened by 50%.
-        /// </summary>
-        /// <param name="color">base color to be lightened</param>
-        /// <returns>given <paramref name="color"/> lightened by 50%</returns>
-        private static Color Lighter(Color color)
-        {
-            return Color.Lerp(color, Color.white, 0.5f); // To lighten by 50 %
-        }
-
-        /// <summary>
-        /// The entries of the menu.
-        /// </summary>
-        private MenuDescriptor[] EntriesParameter;
-
-        private void Awake()
-        {
-            EntriesParameter = new MenuDescriptor[]
+            MenuDescriptor[] menuDescriptors = new MenuDescriptor[]
             {
                 // Moving a node within a graph
                 new MenuDescriptor(label: "Move",
@@ -132,7 +53,7 @@ namespace SEE.Controls.Actions
                                    activeColor: Color.red,
                                    inactiveColor: Lighter(Color.red),
                                    entryOn: MoveOn,
-                                   entryOff: Hide,
+                                   entryOff: null,
                                    isTransient: true),
                 // Rotating everything around the selected node within a graph
                 new MenuDescriptor(label: "Rotate",
@@ -156,7 +77,7 @@ namespace SEE.Controls.Actions
                                    activeColor: Color.green,
                                    inactiveColor: Lighter(Color.green),
                                    entryOn: NewNodeOn,
-                                   entryOff: Hide,
+                                   entryOff: null,
                                    isTransient: true),
                  //Starts the Scaling Mode
                  new MenuDescriptor(label: "Scale Node",
@@ -164,7 +85,7 @@ namespace SEE.Controls.Actions
                                    activeColor: Color.green,
                                    inactiveColor: Lighter(Color.green),
                                    entryOn: ScaleNodeOn,
-                                   entryOff: Hide,
+                                   entryOff: null,
                                    isTransient: true),
                  //Starts the Edit-Node-Mode
                     new MenuDescriptor(label: "Edit Node",
@@ -172,34 +93,44 @@ namespace SEE.Controls.Actions
                                    activeColor: Color.yellow,
                                    inactiveColor: Lighter(Color.yellow),
                                    entryOn: EditNodeOn,
-                                   entryOff: Hide,
+                                   entryOff: null,
                                    isTransient: true),
                 // Drawing a new edge between two gameobjects
                 new MenuDescriptor(label: "DrawEdge",
                                    spriteFile: menuEntrySprite,
                                    activeColor: Color.green,
                                    inactiveColor: Lighter(Color.green),
-                                   entryOn: DrawOn,
+                                   entryOn: DrawEdgeOn,
                                    entryOff: null,
                                    isTransient: true),
             };
+            MenuFactory.CreateMenu(menuDescriptors, Radius, Depth);
         }
 
         /// <summary>
-        /// Closes the CircularMenu after pushing one of its buttons.
-        /// The current state wont left until another state is chosen.
+        /// The delegates called upon the selection of a menu entry. Assignments to
+        /// ActionState.Value will enter a new ActionState and as a consequence
+        /// invoke all delegates <see cref="ActionState.OnStateChangedFn"/> listing 
+        /// to a change of the state via <see cref="ActionState.OnStateChanged"/>.
         /// </summary>
-        protected void Hide()
+        private void MoveOn() => ActionState.Value = ActionState.Type.Move;
+        private void RotateOn() => ActionState.Value = ActionState.Type.Rotate;
+        private void MapOn() => ActionState.Value = ActionState.Type.Map;
+        private void DrawEdgeOn() => ActionState.Value = ActionState.Type.DrawEdge;
+        private void NewNodeOn() => ActionState.Value = ActionState.Type.NewNode;
+        private void ScaleNodeOn() => ActionState.Value = ActionState.Type.ScaleNode;
+        private void EditNodeOn() => ActionState.Value = ActionState.Type.EditNode;
+
+
+        /// <summary>
+        /// Returns given <paramref name="color"/> lightened by 50%.
+        /// </summary>
+        /// <param name="color">base color to be lightened</param>
+        /// <returns>given <paramref name="color"/> lightened by 50%</returns>
+        private static Color Lighter(Color color)
         {
-            try
-            {
-                CircularMenu circularMenu = GameObject.Find("0").GetComponent<CircularMenu>();
-                circularMenu.Off();
-                circularMenu.MenuIsOn = false;
-            }
-            catch (Exception)
-            {
-            }
+            return Color.Lerp(color, Color.white, 0.5f); // To lighten by 50 %
         }
+
     }
 }

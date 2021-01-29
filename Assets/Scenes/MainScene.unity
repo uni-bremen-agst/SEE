@@ -331,7 +331,6 @@ GameObject:
   - component: {fileID: 186778475}
   - component: {fileID: 186778474}
   - component: {fileID: 186778473}
-  - component: {fileID: 186778476}
   m_Layer: 0
   m_Name: Player Touch Gamepad
   m_TagString: Untagged
@@ -405,18 +404,6 @@ Transform:
   m_Father: {fileID: 1510433995}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &186778476
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 186778472}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33c7e69bbbcb32f4f995b716e96c7970, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &225793075
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1399,18 +1386,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 844925775}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &844967657
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 844967653}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33c7e69bbbcb32f4f995b716e96c7970, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &844967658
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1580,7 +1555,6 @@ GameObject:
   - component: {fileID: 1046553560}
   - component: {fileID: 1046553559}
   - component: {fileID: 1046553558}
-  - component: {fileID: 1046553562}
   m_Layer: 0
   m_Name: Player HoloLens
   m_TagString: MainCamera
@@ -1702,18 +1676,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!114 &1046553562
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1046553556}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33c7e69bbbcb32f4f995b716e96c7970, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1093528283
 GameObject:
   m_ObjectHideFlags: 0
@@ -2135,8 +2097,8 @@ GameObject:
   - component: {fileID: 1566173696}
   - component: {fileID: 1566173694}
   - component: {fileID: 1566173680}
-  - component: {fileID: 1566173682}
   - component: {fileID: 1566173683}
+  - component: {fileID: 1566173682}
   m_Layer: 0
   m_Name: Player Desktop
   m_TagString: MainCamera
@@ -2210,7 +2172,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1566173679}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33c7e69bbbcb32f4f995b716e96c7970, type: 3}
+  m_Script: {fileID: 11500000, guid: 24a5b87b6de8e3b4b84877fb92110abc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &1566173683
@@ -2585,7 +2547,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Directory
+      Data: Class
     - Name: $v
       Entry: 5
       Data: true
@@ -2597,7 +2559,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: File
+      Data: Package
     - Name: $v
       Entry: 5
       Data: true
@@ -2839,7 +2801,7 @@ MonoBehaviour:
   NodeLayout: 1
   EdgeLayout: 3
   ZScoreScale: 1
-  EdgeWidth: 0.001
+  EdgeWidth: 0.01
   ShowErosions: 0
   MaxErosionWidth: 1
   EdgesAboveBlocks: 1
@@ -2847,11 +2809,11 @@ MonoBehaviour:
   RDP: 0.0001
   GXLPath:
     Root: 1
-    relativePath: /Data/GXL/minimal/CodeFacts.gxl
+    relativePath: /Data/GXL/reflexion/mini/CodeFacts.gxl
     absolutePath: 
   CSVPath:
     Root: 1
-    relativePath: /Data/GXL/minimal/CodeFacts.csv
+    relativePath: 
     absolutePath: 
 --- !u!114 &1649116646
 MonoBehaviour:
@@ -2880,7 +2842,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.003486514
+  HeightOffset: 0.014835119
 --- !u!65 &1649116648
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3315,7 +3277,7 @@ MonoBehaviour:
       Data: 1
     - Name: relativePath
       Entry: 1
-      Data: /Data/GXL/SEE/Architecture.gvl
+      Data: /Data/GXL/reflexion/mini/Architecture.gvl
     - Name: absolutePath
       Entry: 1
       Data: 
@@ -3359,13 +3321,25 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 1
+      Data: 2
     - Name: 
       Entry: 7
       Data: 
     - Name: $k
       Entry: 1
       Data: Cluster
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Architecture_Layer
     - Name: $v
       Entry: 5
       Data: true
@@ -3573,7 +3547,7 @@ MonoBehaviour:
   LODCulling: 0.01
   LayoutPath:
     Root: 1
-    relativePath: /Data/GXL/SEE/Architecture.gvl
+    relativePath: /Data/GXL/reflexion/mini/Architecture.gvl
     absolutePath: 
   CityPath:
     Root: 2
@@ -3615,11 +3589,11 @@ MonoBehaviour:
   RDP: 0.0001
   GXLPath:
     Root: 1
-    relativePath: /Data/GXL/SEE/Architecture.gxl
+    relativePath: /Data/GXL/reflexion/mini/Architecture.gxl
     absolutePath: 
   CSVPath:
     Root: 1
-    relativePath: /Data/GXL/SEE/Architecture.csv
+    relativePath: 
     absolutePath: 
 --- !u!65 &1930472484
 BoxCollider:
@@ -3722,7 +3696,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.0030500889
+  HeightOffset: 0.0030502677
 --- !u!114 &1930472490
 MonoBehaviour:
   m_ObjectHideFlags: 0
