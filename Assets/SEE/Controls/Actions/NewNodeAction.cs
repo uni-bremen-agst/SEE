@@ -172,10 +172,12 @@ namespace SEE.Controls
                     {
                         NewNode();
                         nodesLoaded = false;
-                        Tweens.Move(GONode, new Vector3(GONode.transform.position.x, GONode.transform.position.y + 0.4f, GONode.transform.position.z), 0.6f);
+                        GameNodeMover.MoveTo(GONode);
+                       // Tweens.Move(GONode, new Vector3(GONode.transform.position.x, GONode.transform.position.y + 0.4f, GONode.transform.position.z), 0.6f);
                     }
                     else
                     {
+                        GameNodeMover.MoveTo(GONode);
                         if (Input.GetMouseButtonDown(0))
                         {
                             Place();
@@ -350,7 +352,12 @@ namespace SEE.Controls
                 GONode.gameObject.GetComponent<Renderer>().material.color = leafColor;
             }
 
+            
+          
             GONode.transform.position = hoveredObjectList.ElementAt(hoveredObjectList.Count - 1).transform.position;
+            GONode.gameObject.GetComponent<Collider>().enabled = false;
+            
+            GameNodeMover.MoveTo(GONode);
         }
 
         /// <summary>
@@ -385,6 +392,7 @@ namespace SEE.Controls
             }
             if (cityTmp != null && city.Equals(cityTmp))
             {
+                GONode.gameObject.GetComponent<Collider>().enabled = true;
                 GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
 
                 new NewNodeNetAction(hoveredObject.name, isInnerNode, node.ID, node.SourceName, node.Type, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name).Execute(null);
