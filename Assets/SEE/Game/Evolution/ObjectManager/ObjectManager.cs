@@ -272,6 +272,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Destroys an edge from the graph
         /// </summary>
+        /// <param name="edge">The edge to be removed</param>
         public void RemoveEdge(Edge edge){
             foreach (GameObject go in edges.ToList<GameObject>())
             {
@@ -295,8 +296,6 @@ namespace SEE.Game.Evolution
                 {
                     Destroyer.DestroyGameObject(gameObject);
                 }
-                // edges will be overridden in RenderEdges() each time, that is why we
-                // do not Clear() it but reset it to null
                 newEdges.Clear();
             }
         }

@@ -9,10 +9,14 @@ namespace SEE.GO
     /// </summary>
     public class Points : SerializedMonoBehaviour
     {
+        /// <summary>
         ///The control points of the edge
+        /// </summary>
         public Vector3[] controlPoints;
 
+        /// <summary>
         ///The line points of the edge
+        /// </summary>
         public Vector3[] linePoints;
     }
 }
