@@ -4,7 +4,6 @@ using SEE.Game.UI3D;
 using SEE.GO;
 using SEE.Utils;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -231,7 +230,7 @@ namespace SEE.Controls.Actions
                             if (interactable)
                             {
                                 interactable.SetSelect(false, false);
-                                cursor.RemoveFocus(selected);
+                                //cursor.RemoveFocus(selected);
                                 if (selected.CompareTag(Tags.Edge))
                                 {
                                     Destroyer.DestroyGameObject(selected.gameObject);
