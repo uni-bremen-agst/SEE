@@ -271,6 +271,7 @@ namespace SEE.Game
         /// all edges in between nodes in <paramref name="gameNodes"/>.
         /// </summary>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
+        /// <param name="draw">Decides whether the edges should only be calculated, or whether they should also be drawn.</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
         public ICollection<GameObject> EdgeLayout(ICollection<GameObject> gameNodes, bool draw = true)
         {
@@ -282,6 +283,7 @@ namespace SEE.Game
         /// all edges in between nodes in <paramref name="gameNodes"/>.
         /// </summary>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
+        /// <param name="draw">Decides whether the edges should only be calculated, or whether they should also be drawn.</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
         private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes, bool draw = true)
         {
