@@ -266,16 +266,15 @@ namespace SEE.Game
             }
         }
 
-
         /// <summary>
         /// Applies the edge layout according to the the user's choice (settings) for
         /// all edges in between nodes in <paramref name="gameNodes"/>.
         /// </summary>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        public ICollection<GameObject> CalculateNewEdgeLayout(ICollection<GameObject> gameNodes)
+        public ICollection<GameObject> EdgeLayout(ICollection<GameObject> gameNodes, bool draw = true)
         {
-            return CalculateNewEdgeLayout(ToLayoutNodes(gameNodes));
+            return EdgeLayout(ToLayoutNodes(gameNodes), draw);
         }
 
         /// <summary>
@@ -284,9 +283,9 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        private ICollection<GameObject> CalculateNewEdgeLayout(ICollection<GameNode> gameNodes)
+        private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes, bool draw = true)
         {
-            return CalculateNewEdgeLayout(gameNodes, ConnectingEdges(gameNodes));
+            return EdgeLayout(gameNodes, ConnectingEdges(gameNodes), draw);
         }
 
         /// <summary>
@@ -294,71 +293,9 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">the set of layout nodes for which to create game edges</param>
         /// <param name="layoutEdges">the edges to be laid out</param>
+        /// <param name="draw">Decides whether the edges should only be calculated, or whether they should also be drawn.</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        private ICollection<GameObject> CalculateNewEdgeLayout(ICollection<GameNode> gameNodes, ICollection<LayoutEdge> layoutEdges)
-        {
-            float minimalEdgeLevelDistance = 2.5f * settings.EdgeWidth;
-            IEdgeLayout layout;
-            switch (settings.EdgeLayout)
-            {
-                case EdgeLayoutKind.Straight:
-                    layout = new StraightEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance);
-                    break;
-                case EdgeLayoutKind.Spline:
-                    layout = new SplineEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance, settings.RDP);
-                    break;
-                case EdgeLayoutKind.Bundling:
-                    layout = new BundledEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance, settings.Tension, settings.RDP);
-                    break;
-                case EdgeLayoutKind.None:
-                    // nothing to be done
-                    return new List<GameObject>();
-                default:
-                    throw new Exception("Unhandled edge layout " + settings.EdgeLayout);
-            }
-            EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
-            ICollection<GameObject> result = edgeFactory.CalculateNewEdges(gameNodes.Cast<ILayoutNode>().ToList(), layoutEdges);
-            AddLOD(result);
-            return result;
-        }
-
-
-
-
-
-
-
-
-
-        /// <summary>
-        /// Applies the edge layout according to the the user's choice (settings) for
-        /// all edges in between nodes in <paramref name="gameNodes"/>.
-        /// </summary>
-        /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
-        /// <returns>all game objects created to represent the edges; may be empty</returns>
-        public ICollection<GameObject> EdgeLayout(ICollection<GameObject> gameNodes)
-        {
-            return EdgeLayout(ToLayoutNodes(gameNodes));
-        }
-
-        /// <summary>
-        /// Applies the edge layout according to the the user's choice (settings) for
-        /// all edges in between nodes in <paramref name="gameNodes"/>.
-        /// </summary>
-        /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
-        /// <returns>all game objects created to represent the edges; may be empty</returns>
-        private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes)
-        {
-            return EdgeLayout(gameNodes, ConnectingEdges(gameNodes));
-        }
-
-        /// <summary>
-        /// Applies the edge layout according to the the user's choice (settings).
-        /// </summary>
-        /// <param name="gameNodes">the set of layout nodes for which to create game edges</param>
-        /// <param name="layoutEdges">the edges to be laid out</param>
-        /// <returns>all game objects created to represent the edges; may be empty</returns>
-        private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes, ICollection<LayoutEdge> layoutEdges)
+        private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes, ICollection<LayoutEdge> layoutEdges, bool draw = true)
         {
             float minimalEdgeLevelDistance = 2.5f * settings.EdgeWidth;
             IEdgeLayout layout;
@@ -381,8 +318,20 @@ namespace SEE.Game
             }
             Performance p = Performance.Begin("edge layout " + layout.Name);
             EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
-            ICollection<GameObject> result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), layoutEdges);
-            AddLOD(result);
+            ICollection<GameObject> result;
+            //Calculate only
+            if (draw == false)
+            {
+                result = edgeFactory.CalculateNewEdges(gameNodes.Cast<ILayoutNode>().ToList(), layoutEdges);
+            }
+            //Calculate and draw edges
+            else
+            {
+                result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), layoutEdges);
+                AddLOD(result);
+            }
+            
+            
             p.End();
             Debug.LogFormat("Built \"" + settings.EdgeLayout + "\" edge layout for " + gameNodes.Count + " nodes in {0} [h:m:s:ms].\n", p.GetElapsedTime());
             return result;

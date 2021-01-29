@@ -557,14 +557,25 @@ namespace SEE.Game
         /// <summary>
         /// Combines the edges of the old and the new graph by their ID. Called by the MoveEdges method
         /// </summary>
-        protected virtual IList<(GameObject, GameObject)> EdgeMatcher(IList<GameObject> oldEdges, IList<GameObject> newEdges){
+        /// <param name="oldEdges">List of currently drawn edges</param>
+        /// <param name="newEdges">List of new edges to be drawn</param>
+        /// <returns>List of related edges</returns>
+        protected virtual IList<(GameObject, GameObject)> EdgeMatcher(IList<GameObject> oldEdges, IList<GameObject> newEdges)
+        {
             IList<(GameObject, GameObject)> result = new List<(GameObject, GameObject)>();
-            foreach(GameObject oGO in oldEdges){
-                foreach(GameObject nGO in newEdges){
-                    oGO.TryGetComponent<EdgeRef>(out EdgeRef oER);
-                    nGO.TryGetComponent<EdgeRef>(out EdgeRef nER);
-                    if(oER.edge.Equals(nER.edge)){
-                        result.Add((oGO,nGO));
+            foreach (GameObject oldEdgeGameObject in oldEdges)
+            {
+                foreach (GameObject newEdgeGameObject in newEdges)
+                {
+                    oldEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef oldEdgeRef);
+                    newEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef newEdgeRef);
+                    if (oldEdgeRef == null || newEdgeRef == null)
+                    {
+                        continue;
+                    }
+                    if (oldEdgeRef.edge.Equals(newEdgeRef.edge))
+                    {
+                        result.Add((oldEdgeGameObject,newEdgeGameObject));
                     }
                 }
             }
@@ -575,8 +586,10 @@ namespace SEE.Game
         /// <summary>
         /// Calculates the control points of the edges of the next graph and generates their actual line points from them. 
         /// </summary>
-        protected virtual void MoveEdges(){
-           try{
+        protected virtual void MoveEdges()
+        {
+           try
+           {
                 //Calculates the edges for the next graph
                 IList<GameObject> newEdges = objectManager.CalculateNewEdgeControlPoints().ToList();
                 IList<GameObject> oldEdges = objectManager.GetEdges().ToList();
@@ -584,31 +597,32 @@ namespace SEE.Game
                 //Searches for pairs between old and new edges
                 matchedEdges =  EdgeMatcher(oldEdges,newEdges);              
                 //Case distinction in case the layout does not need sample points
-                if(!graphRenderer.GetSettings().EdgeLayout.Equals(SEE.Layout.EdgeLayouts.EdgeLayoutKind.Straight)){
+                if(!graphRenderer.GetSettings().EdgeLayout.Equals(SEE.Layout.EdgeLayouts.EdgeLayoutKind.Straight))
+                {
+                    foreach((GameObject oldEdge, GameObject newEdge) in matchedEdges)
+                    {
+                        oldEdge.TryGetComponent<Points>(out Points oP);
+                        newEdge.TryGetComponent<Points>(out Points nP);
 
-                    foreach((GameObject oldEdge, GameObject newEdge) in matchedEdges){
+                        uint sampleRate = (uint)Math.Max(oP.linePoints.Count(),nP.linePoints.Count());
 
-                    oldEdge.TryGetComponent<Points>(out Points oP);
-                    newEdge.TryGetComponent<Points>(out Points nP);
+                        //Creates new line points from the control points 
+                        oP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(oP.controlPoints, sampleRate);
+                        nP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(nP.controlPoints, sampleRate);
 
-                    uint sampleRate = (uint)Math.Max(oP.linePoints.Count(),nP.linePoints.Count());
-
-                    //Creates new line points from the control points 
-                    oP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(oP.controlPoints, sampleRate);
-                    nP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(nP.controlPoints, sampleRate);
-
-                    //Saves the new line points to the LineRenderer
-                    oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
-                    lineRenderer.positionCount = oP.linePoints.Count();
-                    lineRenderer.SetPositions(oP.linePoints);
+                        //Saves the new line points to the LineRenderer
+                        oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
+                        lineRenderer.positionCount = oP.linePoints.Count();
+                        lineRenderer.SetPositions(oP.linePoints);
                     }
                 }
                     //Sets the timer for the animation to zero
                     timer = 0f;
                     //Starts the animation of the edges
                     moveEdges = true;
-
-            }catch{
+            }
+            catch(ArgumentNullException)
+            {
                 moveEdges = false;
             }
         }
@@ -618,12 +632,19 @@ namespace SEE.Game
         /// Interpolates the points of the old edges with those of the new edges over time.
         /// </summary>
         void Update(){
-            if (moveEdges) {
+            if (moveEdges) 
+            {
                 timer += Time.deltaTime;
-                 foreach((GameObject oldEdge, GameObject newEdge) in matchedEdges){
+                 foreach ((GameObject oldEdge, GameObject newEdge) in matchedEdges)
+                 {
                     oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
                     newEdge.TryGetComponent<Points>(out Points newLinePoints);
-                    for(int i = 0; i < lineRenderer.positionCount; i++){
+                    if (newLinePoints == null || lineRenderer == null)
+                    {
+                        continue;
+                    }
+                    for (int i = 0; i < lineRenderer.positionCount; i++)
+                    {
                         lineRenderer.SetPosition(i,  Vector3.Lerp(lineRenderer.GetPosition(i), newLinePoints.linePoints[i],timer/AnimationDuration));
                     }
                 }
