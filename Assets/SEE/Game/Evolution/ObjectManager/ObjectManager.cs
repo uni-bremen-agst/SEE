@@ -202,7 +202,7 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Cleares old and new edges
+        /// Clears old and new edges
         /// </summary>
         private void ClearAllEdges()
         {
