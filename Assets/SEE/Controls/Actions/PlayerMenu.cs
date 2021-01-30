@@ -36,12 +36,12 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void Start()
         {
-            UnityEngine.Assertions.Assert.IsTrue(System.Enum.GetNames(typeof(ActionState.Type)).Length == 4);
+            UnityEngine.Assertions.Assert.IsTrue(System.Enum.GetNames(typeof(ActionState.Type)).Length == 7);
             UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Move == 0);
             UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Rotate == 1);
             UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Map == 2);
             UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.DrawEdge == 3);
-            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.AddNode == 4);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.NewNode == 4);
             UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.EditNode == 5);
             UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.ScaleNode == 6);
 
@@ -79,7 +79,7 @@ namespace SEE.Controls.Actions
                                    entryOn: NewNodeOn,
                                    entryOff: null,
                                    isTransient: true),
-                 //Starts the Scaling Mode
+                 //Starts the Scaling Mode for scaling an existing node
                  new MenuDescriptor(label: "Scale Node",
                                    spriteFile: menuEntrySprite,
                                    activeColor: Color.green,
@@ -87,7 +87,7 @@ namespace SEE.Controls.Actions
                                    entryOn: ScaleNodeOn,
                                    entryOff: null,
                                    isTransient: true),
-                 //Starts the Edit-Node-Mode
+                 //Starts the Edit-Node-Mode for editing an existing node
                     new MenuDescriptor(label: "Edit Node",
                                    spriteFile: menuEntrySprite,
                                    activeColor: Color.yellow,

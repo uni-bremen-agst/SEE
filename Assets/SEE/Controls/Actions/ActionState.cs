@@ -15,7 +15,10 @@
             Move,    // the user wants to move a node
             Rotate,  // the user wants to rotate a node
             Map,     // the user wants to map an implementation node onto an architecture node (reflexion analysis)
-            DrawEdge // The user wants to draw an edge between nodes
+            DrawEdge, // the user wants to draw an edge between nodes
+            NewNode, // the user wants to add a new node
+            EditNode, // the user wants to edit an existing node
+            ScaleNode // the user wants to scale an existing node
         }
 
         private static Type value = 0;
