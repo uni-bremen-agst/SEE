@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Reflection;
 using Microsoft.MixedReality.Toolkit.Input;
-using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -64,7 +63,7 @@ namespace SEE.Controls
         protected override void OnEyeFocusDwell()
         {
             shouldDehover = false;
-            interactable.SetHover(true, true);
+            interactable.SetHoverFlag(HoverFlag.World, true, true);
             base.OnEyeFocusDwell();
         }
 
@@ -79,7 +78,7 @@ namespace SEE.Controls
             yield return new WaitForSecondsRealtime(eyeStareDelay*1.5f);
             if (shouldDehover)
             {
-                interactable.SetHover(false, true);
+                interactable.SetHoverFlag(HoverFlag.World, false, true);
             }
         }
     }

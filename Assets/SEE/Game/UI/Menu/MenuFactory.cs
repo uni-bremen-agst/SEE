@@ -1,5 +1,4 @@
-﻿using SEE.Controls.Actions;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Game.UI
 {
@@ -15,13 +14,39 @@ namespace SEE.Game.UI
         /// - Browsing
         /// - Moving
         /// - Mapping
+        /// - Drawing Edges
+        /// - Rotating
         /// </summary>
         /// <param name="attachTo">The game object the menu should be attached to. If <c>null</c>, a
         /// new game object will be created.</param>
         /// <returns>the newly created mode menu game object, or if it wasn't null
         /// <paramref name="attachTo"/> with the mode menu attached.</returns>
-        public static GameObject CreateModeMenu(PlayerActions actions, GameObject attachTo = null)
+        public static GameObject CreateModeMenu(GameObject attachTo = null)
         {
+                // // Rotating everything around the selected node within a graph
+                // new MenuDescriptor(label: "Rotate",
+                //                    spriteFile: menuEntrySprite,
+                //                    activeColor: Color.blue,
+                //                    inactiveColor: Lighter(Color.blue),
+                //                    entryOn: RotateOn,
+                //                    entryOff: null,
+                //                    isTransient: true),
+                // // Mapping a node from one graph to another graph
+                // new MenuDescriptor(label: "Map",
+                //                    spriteFile: menuEntrySprite,
+                //                    activeColor: Color.green,
+                //                    inactiveColor: Lighter(Color.green),
+                //                    entryOn: MapOn,
+                //                    entryOff: null,
+                //                    isTransient: true),
+                // // Drawing a new edge between two gameobjects
+                // new MenuDescriptor(label: "DrawEdge",
+                //                    spriteFile: menuEntrySprite,
+                //                    activeColor: Color.green,
+                //                    inactiveColor: Lighter(Color.green),
+                //                    entryOn: DrawEdgeOn,
+                //                    entryOff: null,
+                //                    isTransient: true),
             ToggleMenuEntry[] entries = {
                 new ToggleMenuEntry(
                     active: true,

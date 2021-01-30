@@ -21,7 +21,7 @@ namespace SEE.Controls.Actions
         /// Called when the object is hovered over.
         /// </summary>
         /// <param name="isOwner">true if a local user initiated this call</param>
-        protected override void On(bool isOwner)
+        protected override void On(InteractableObject interactableObject, bool isOwner)
         {
             if (!interactable.IsSelected && !interactable.IsGrabbed)
             {
@@ -42,7 +42,7 @@ namespace SEE.Controls.Actions
         /// Called when the object is no longer being hovered over.
         /// </summary>
         /// <param name="isOwner">true if a local user initiated this call</param>
-        protected override void Off(bool isOwner)
+        protected override void Off(InteractableObject interactableObject, bool isOwner)
         {
             if (!interactable.IsSelected && !interactable.IsGrabbed)
             {
