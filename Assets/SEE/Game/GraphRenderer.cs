@@ -94,7 +94,12 @@ namespace SEE.Game
         /// </summary>
         private readonly AbstractSEECity settings;
 
-        public AbstractSEECity GetSettings(){
+        /// <summary>
+        /// Returns the settings for the visualization.
+        /// </summary>
+        /// <returns>settings for the visualization</returns>
+        public AbstractSEECity GetSettings()
+        {
             return settings;
         }
 
