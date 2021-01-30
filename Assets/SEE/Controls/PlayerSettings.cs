@@ -43,18 +43,31 @@ namespace SEE.Controls
         /// The order must be consistent with <see cref="PlayerInputType"/>.
         /// </summary>
         public static readonly string[] PlayerName = {
-            "DesktopPlayer", // Desktop
-            "InControl",     // TouchGamepad
-            "VRPlayer",      // VR          
-            "MRPlayer",      // HoloLens
-            "No Player",     // None
+            "Player Desktop",       // Desktop
+            "Player Touch Gamepad", // TouchGamepad
+            "Player VR",            // VR          
+            "Player HoloLens",      // HoloLens
+            "Player None",          // None
             };
 
         [Tooltip("What kind of player type should be enabled.")]
         [OdinSerialize]
         public PlayerInputType playerInputType = PlayerInputType.Desktop;
 
+        [Tooltip("The GameObject containing the desktop player.")]
+        [SerializeField] private GameObject playerDesktop;
+
+        [Tooltip("The GameObject containing the HoloLens player.")]
+        [SerializeField] private GameObject playerHoloLens;
+
+        [Tooltip("The GameObject containing the touch gamepad player.")]
+        [SerializeField] private GameObject playerTouchGamepad;
+
+        [Tooltip("The GameObject containing the VR player.")]
+        [SerializeField] private GameObject playerVR;
+
         [Header("VR specific settings (relevant only for VR players)")]
+
         [Tooltip("Whether the VR controllers should be hidden.")]
         public bool HideVRControllers = false;
 
@@ -148,10 +161,10 @@ namespace SEE.Controls
 
             Debug.LogFormat("Player input type: {0}\n", playerInputType.ToString());
 
-            SetActive(PlayerName[(int)PlayerInputType.Desktop], playerInputType == PlayerInputType.Desktop);
-            SetActive(PlayerName[(int)PlayerInputType.VR], playerInputType == PlayerInputType.VR);
-            SetActive(PlayerName[(int)PlayerInputType.TouchGamepad], playerInputType == PlayerInputType.TouchGamepad);
+            playerDesktop?.SetActive(playerInputType == PlayerInputType.Desktop);
             SetMixedReality(playerInputType == PlayerInputType.HoloLens);
+            playerTouchGamepad?.SetActive(playerInputType == PlayerInputType.TouchGamepad);
+            playerVR?.SetActive(playerInputType == PlayerInputType.VR);
             SetLocalPlayer(PlayerName[(int)playerInputType]);
         }
 
@@ -195,7 +208,7 @@ namespace SEE.Controls
         /// <param name = "isActive"> If true, mixed reality capabilities are enabled, otherwise they will be disabled.</param>
         private void SetMixedReality(bool isActive)
         {
-            SetActive(PlayerName[(int)PlayerInputType.HoloLens], isActive);
+            playerHoloLens?.SetActive(playerInputType == PlayerInputType.HoloLens);
             SetActive("MixedRealityToolkit", isActive);
             SetActive("CityCollection", isActive);
             SetActive(AppBarInteractableObject.AppBarName, isActive);
@@ -294,7 +307,7 @@ namespace SEE.Controls
             }
             else
             {
-                Debug.LogErrorFormat("A player object named {0} to be activated could not be found.", name);
+                Debug.LogError($"A player object named {name} to be activated could not be found.\n");
             }
         }
 

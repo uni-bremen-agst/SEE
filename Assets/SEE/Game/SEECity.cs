@@ -1,9 +1,9 @@
+using System;
+using System.Collections.Generic;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.GO;
 using SEE.Utils;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game
@@ -17,7 +17,7 @@ namespace SEE.Game
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in 
         /// <see cref="SEECity.Save(ConfigWriter)"/> and 
-        /// <see cref="SEECity.Restore(Dictionary{string, object})"/>, 
+        /// <see cref="SEECity.Restore(Dictionary{string,object})"/>, 
         /// respectively. You should also extend the test cases in TestConfigIO.
         
         /// <summary>
@@ -215,15 +215,15 @@ namespace SEE.Game
             foreach (Transform childTransform in parent.transform)
             {
                 GameObject child = childTransform.gameObject;
-                if (child.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+                if (child.TryGetComponent(out NodeRef nodeRef))
                 {
-                    nodeRef.node = graph.GetNode(child.name);
-                    if (nodeRef.node == null)
+                    nodeRef.Value = graph.GetNode(child.name);
+                    if (nodeRef.Value == null)
                     {
                         Debug.LogWarningFormat("Could not resolve node reference {0}.\n", child.name);
                     }
                 }
-                else if (child.TryGetComponent<EdgeRef>(out EdgeRef edgeRef))
+                else if (child.TryGetComponent(out EdgeRef edgeRef))
                 {
                     edgeRef.edge = graph.GetEdge(child.name);
                     if (edgeRef.edge == null)
@@ -231,6 +231,12 @@ namespace SEE.Game
                         Debug.LogWarningFormat("Could not resolve edge reference {0}.\n", child.name);          
                     }
                 }
+#if UNITY_EDITOR
+                else if (child.CompareTag(DataModel.Tags.Node) || child.CompareTag(DataModel.Tags.Edge))
+                {
+                    Debug.LogWarningFormat("Game object {0} has neither node nor edge reference.\n", child.name);
+                }
+#endif
                 SetNodeEdgeRefs(graph, child);
             }
         }
@@ -383,7 +389,7 @@ namespace SEE.Game
             {
                 if (graphRenderer == null)
                 {
-                    return new GraphRenderer(this, VisualizedSubGraph);
+                    graphRenderer = new GraphRenderer(this, VisualizedSubGraph);
                 }
                 return graphRenderer;
             }

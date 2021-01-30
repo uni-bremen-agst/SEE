@@ -1,5 +1,5 @@
-﻿using SEE.GO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Layout.IO
@@ -64,9 +64,9 @@ namespace SEE.Layout.IO
         {
             if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
-                if (nodeRef.node != null)
+                if (nodeRef.Value != null)
                 {
-                    return nodeRef.node.ID;
+                    return nodeRef.Value.ID;
                 }
                 else
                 {

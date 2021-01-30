@@ -1,9 +1,9 @@
 ﻿#if UNITY_EDITOR
 
-using SEE.Game;
 using System.Collections.Generic;
-using UnityEditor;
 using SEE.DataModel.DG;
+using SEE.Game;
+using UnityEditor;
 
 namespace SEEEditor
 {
@@ -49,7 +49,7 @@ namespace SEEEditor
                     }
                 }
 
-                if (city.CoseGraphSettings.LoadedForNodeTypes.Count == 0)
+                if (city.CoseGraphSettings.LoadedForNodeTypes == null || city.CoseGraphSettings.LoadedForNodeTypes.Count == 0)
                 {
                     ShowGraphListing = true;
                 }
