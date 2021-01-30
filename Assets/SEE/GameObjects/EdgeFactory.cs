@@ -85,7 +85,6 @@ namespace SEE.GO
                 GameObject gameEdge = NewGameEdge(layoutEdge);
                 result.Add(gameEdge);
 
-
                 Points p  = gameEdge.AddComponent<Points>();
                 p.controlPoints = layoutEdge.ControlPoints;
                 p.linePoints = layoutEdge.Points;
@@ -126,7 +125,6 @@ namespace SEE.GO
             }
             return result;
         }
-
 
         /// <summary>
         /// Creates and returns game objects for the given <paramref name="edges"/> among the given 
