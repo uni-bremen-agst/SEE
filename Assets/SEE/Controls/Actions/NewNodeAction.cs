@@ -6,12 +6,28 @@ using SEE.GO;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.Utils;
+using UnityEngine.Assertions;
 
-namespace SEE.Controls
+namespace SEE.Controls.Actions
 {
 
     public class NewNodeAction : NodeAction
     {
+        /// <summary>
+        /// Start() will register an anonymous delegate of type 
+        /// <see cref="ActionState.OnStateChangedFn"/> on the event
+        /// <see cref="ActionState.OnStateChanged"/> to be called upon every
+        /// change of the action state, where the newly entered state will
+        /// be passed as a parameter. The anonymous delegate will compare whether
+        /// this state equals <see cref="ThisActionState"/> and if so, execute
+        /// what needs to be done for this action here. If that parameter is
+        /// different from <see cref="ThisActionState"/>, this action will
+        /// put itself to sleep. 
+        /// Thus, this action will be executed only if the new state is 
+        /// <see cref="ThisActionState"/>.
+        /// </summary>
+        const ActionState.Type ThisActionState = ActionState.Type.NewNode;
+
         /// <summary>
         /// The Code City in wich the node should be placed
         /// </summary>
@@ -114,6 +130,8 @@ namespace SEE.Controls
             AddingIsCanceled
         }
 
+        private bool instantiated = false;
+
         /// <summary>
         /// The specific state of the progress of adding a node to the implementation.
         /// </summary>
@@ -124,7 +142,40 @@ namespace SEE.Controls
         public void Start()
         {
             listOfRoots = new List<GameObject>();
-            InitialiseCanvasObject();
+            //ChangeState(ThisActionState);
+            // An anonymous delegate is registered for the event <see cref="ActionState.OnStateChanged"/>.
+            // This delegate will be called from <see cref="ActionState"/> upon every
+            // state changed where the passed parameter is the newly entered state.
+            ActionState.OnStateChanged += (ActionState.Type newState) =>
+            {
+                // Is this our action state where we need to do something?
+                if (newState == ThisActionState)
+                {
+                    // The monobehaviour is enabled and Update() will be called by Unity.
+                    enabled = true;
+                    InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
+                    InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
+                    if (!instantiated)
+                    {
+                        InitialiseCanvasObject();
+                        instantiated = true;
+                    }
+
+                }
+                else
+                {
+                    // The monobehaviour is diabled and Update() no longer be called by Unity.
+                    enabled = false;
+                    CanvasGenerator c = canvasObject.GetComponent<CanvasGenerator>();
+                    c.DestroyAddNodeCanvas();
+                    Undye();
+                    instantiated = false;
+
+
+                }
+            };
+            enabled = ActionState.Is(ThisActionState);
+
         }
 
         /// <summary>
@@ -194,6 +245,7 @@ namespace SEE.Controls
                     c.DestroyAddNodeCanvas();
                     city = null;
                     Progress1 = Progress.NoCitySelected;
+                    instantiated = false;
                     break;
             }
         }
@@ -210,7 +262,6 @@ namespace SEE.Controls
             {
                 Undye();
             }
-
             if (hoveredObject != null)
             {
                 if (!nodesLoaded)
@@ -563,4 +614,5 @@ namespace SEE.Controls
         }
     }
 }
+
 

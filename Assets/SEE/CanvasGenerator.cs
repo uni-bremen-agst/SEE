@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using SEE.Controls;
+using SEE.Controls.Actions;
+using UnityEngine;
 
 /// <summary>
 /// This class instantiates and destroys the adding-node-canvas script, which contains the addingNodeCanvas-prefab.

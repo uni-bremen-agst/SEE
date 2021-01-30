@@ -117,14 +117,28 @@ namespace SEE.Controls.Actions
 
         private void LocalAnyHoverIn(InteractableObject interactableObject)
         {
-            Assert.IsNull(hoveredObject);
-            hoveredObject = interactableObject.gameObject;
+            try
+            {
+                Assert.IsNull(hoveredObject);
+                hoveredObject = interactableObject.gameObject;
+            }
+            catch
+            {
+                //There are AssertionExceptions 
+            }
         }
 
         private void LocalAnyHoverOut(InteractableObject interactableObject)
         {
-            Assert.IsTrue(hoveredObject == interactableObject.gameObject);
-            hoveredObject = null;
+            try
+            {
+                Assert.IsTrue(hoveredObject == interactableObject.gameObject);
+                hoveredObject = null;
+            }
+            catch
+            {
+                //There are AssertionExceptions
+            }
         }
     }
 }

@@ -1,13 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using SEE.Controls;
+using SEE.Controls.Actions;
 
 /// <summary>
 /// This script is been added to the Button of the adding-node-canvas and the edit-node-canvas.
 /// </summary>
 public class NodeInteractionButtons : MonoBehaviour
 {
-    // Start is called before the first frame update
 
     /// <summary>
     /// The button on the adding-node-canvas, which is finishing the addNode-process.
