@@ -107,7 +107,6 @@ namespace SEE.Controls.Actions
                     CanvasGenerator canvasGenerator = canvasObject.GetComponent<CanvasGenerator>();
                     canvasGenerator.DestroyEditNodeCanvas();
                     hoveredObject = null;
-                    RemoveScript();
                     EditProgress = Progress.NoNodeSelected;
                     break;
             }
