@@ -17,7 +17,6 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
 using SEE.DataModel.DG;
 using SEE.Game.Evolution;
 using SEE.GO;
@@ -520,7 +519,7 @@ namespace SEE.Game
             // of the animation cycle.
             
             objectManager.RenderEdges();
-            //Stops the edge animation
+            // Stops the edge animation
             moveEdges = false;
             IsStillAnimating = false;
             AnimationFinishedEvent.Invoke();
@@ -566,22 +565,17 @@ namespace SEE.Game
             foreach (GameObject oldEdgeGameObject in oldEdges)
             {
                 foreach (GameObject newEdgeGameObject in newEdges)
-                {
-                    oldEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef oldEdgeRef);
-                    newEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef newEdgeRef);
-                    if (oldEdgeRef == null || newEdgeRef == null)
+                {                    
+                    if (oldEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef oldEdgeRef) 
+                        && newEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef newEdgeRef)
+                        && oldEdgeRef.edge.Equals(newEdgeRef.edge))
                     {
-                        continue;
-                    }
-                    if (oldEdgeRef.edge.Equals(newEdgeRef.edge))
-                    {
-                        result.Add((oldEdgeGameObject,newEdgeGameObject));
+                        result.Add((oldEdgeGameObject, newEdgeGameObject));
                     }
                 }
             }
             return result;
         }
-
         
         /// <summary>
         /// Calculates the control points of the edges of the next graph and generates their actual line points from them. 
@@ -590,13 +584,13 @@ namespace SEE.Game
         {
            try
            {
-                //Calculates the edges for the next graph
+                // Calculates the edges for the next graph
                 IList<GameObject> newEdges = objectManager.CalculateNewEdgeControlPoints().ToList();
                 IList<GameObject> oldEdges = objectManager.GetEdges().ToList();
                 
-                //Searches for pairs between old and new edges
+                // Searches for pairs between old and new edges
                 matchedEdges =  EdgeMatcher(oldEdges,newEdges);              
-                //Case distinction in case the layout does not need sample points
+                // Case distinction in case the layout does not need sample points
                 if(!graphRenderer.GetSettings().EdgeLayout.Equals(SEE.Layout.EdgeLayouts.EdgeLayoutKind.Straight))
                 {
                     foreach((GameObject oldEdge, GameObject newEdge) in matchedEdges)
@@ -606,51 +600,50 @@ namespace SEE.Game
 
                         uint sampleRate = (uint)Math.Max(oP.linePoints.Count(),nP.linePoints.Count());
 
-                        //Creates new line points from the control points 
+                        // Creates new line points from the control points 
                         oP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(oP.controlPoints, sampleRate);
                         nP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(nP.controlPoints, sampleRate);
 
-                        //Saves the new line points to the LineRenderer
+                        // Saves the new line points to the LineRenderer
                         oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
                         lineRenderer.positionCount = oP.linePoints.Count();
                         lineRenderer.SetPositions(oP.linePoints);
                     }
                 }
-                    //Sets the timer for the animation to zero
+                    // Sets the timer for the animation to zero
                     timer = 0f;
-                    //Starts the animation of the edges
+                    // Starts the animation of the edges
                     moveEdges = true;
             }
-            catch(ArgumentNullException)
+            catch (ArgumentNullException)
             {
                 moveEdges = false;
             }
         }
-
         
         /// <summary>
         /// Interpolates the points of the old edges with those of the new edges over time.
         /// </summary>
-        void Update(){
+        void Update()
+        {
             if (moveEdges) 
             {
                 timer += Time.deltaTime;
                  foreach ((GameObject oldEdge, GameObject newEdge) in matchedEdges)
                  {
-                    oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
-                    newEdge.TryGetComponent<Points>(out Points newLinePoints);
-                    if (newLinePoints == null || lineRenderer == null)
+                    if (oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer)
+                        && newEdge.TryGetComponent<Points>(out Points newLinePoints))
                     {
-                        continue;
-                    }
-                    for (int i = 0; i < lineRenderer.positionCount; i++)
-                    {
-                        lineRenderer.SetPosition(i,  Vector3.Lerp(lineRenderer.GetPosition(i), newLinePoints.linePoints[i],timer/AnimationDuration));
+                        for (int i = 0; i < lineRenderer.positionCount; i++)
+                        {
+                            lineRenderer.SetPosition(i, Vector3.Lerp(lineRenderer.GetPosition(i),
+                                                                     newLinePoints.linePoints[i],
+                                                                     timer / AnimationDuration));
+                        }
                     }
                 }
             }
         }
-
 
         /// <summary>
         /// Event function that adjusts the given <paramref name="gameNode"/>
@@ -663,7 +656,7 @@ namespace SEE.Game
         /// <param name="gameNode">game node object that was just modified by the animation</param>
         public void OnRenderNodeFinishedAnimation(object gameNode)
         {
-            if (gameNode != null && gameNode is GameObject)
+            if (gameNode is GameObject)
             {
                 graphRenderer.AdjustStyle(gameNode as GameObject);
             }
