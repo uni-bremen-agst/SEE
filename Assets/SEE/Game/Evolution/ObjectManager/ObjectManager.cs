@@ -245,13 +245,12 @@ namespace SEE.Game.Evolution
         {
             ClearAllEdges();
             // FIXME: Provide meaningful values for scaleFactor.
-
             edges = _graphRenderer.EdgeLayout(nodes.Values);
         }
 
-
-
-        
+        /// <summary>
+        /// Returns the list of edges rendered for this graph.
+        /// </summary>
         /// <returns>The list of edges rendered for this graph</returns>
         public ICollection<GameObject> GetEdges()
         {
@@ -262,18 +261,19 @@ namespace SEE.Game.Evolution
         /// Calculates the edges of the next graph
         /// </summary>
         /// <returns>The list of calculated edges of the next graph</returns>
-        public ICollection<GameObject> CalculateNewEdgeControlPoints(){
+        public ICollection<GameObject> CalculateNewEdgeControlPoints()
+        {
             ClearNewEdges();
             newEdges = _graphRenderer.EdgeLayout(nodes.Values, false);
             return newEdges;
-
         }
 
         /// <summary>
         /// Destroys an edge from the graph
         /// </summary>
         /// <param name="edge">The edge to be removed</param>
-        public void RemoveEdge(Edge edge){
+        public void RemoveEdge(Edge edge)
+        {
             foreach (GameObject go in edges.ToList<GameObject>())
             {
                 if (edge.ID.Equals(go.ID()))

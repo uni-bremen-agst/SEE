@@ -3,7 +3,6 @@ using OdinSerializer;
 
 namespace SEE.GO
 {
-
     /// <summary>
     /// Saves the control points and line points of an edge.
     /// </summary>
