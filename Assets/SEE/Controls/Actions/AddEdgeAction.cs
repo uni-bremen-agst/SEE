@@ -9,7 +9,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Action to create an edge between two selected nodes.
     /// </summary>
-    public class AddEdgeAction : MonoBehaviour
+    public class AddEdgeAction : NodeAction
     {
         /// <summary>
         /// Start() will register an anonymous delegate of type 
@@ -25,11 +25,6 @@ namespace SEE.Controls.Actions
         /// <see cref="ThisActionState"/>.
         /// </summary>
         const ActionState.Type ThisActionState = ActionState.Type.DrawEdge;
-
-        /// <summary>
-        /// The currently hovered object.
-        /// </summary>
-        private GameObject hoveredObject;
 
         /// <summary>
         /// The source for the edge to be drawn.
@@ -62,6 +57,7 @@ namespace SEE.Controls.Actions
                     enabled = false;
                     InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
+                    hoveredObject = null;
                 }
             };
             enabled = ActionState.Is(ThisActionState);
@@ -112,32 +108,6 @@ namespace SEE.Controls.Actions
             {
                 from = null;
                 to = null;
-            }
-        }
-
-        private void LocalAnyHoverIn(InteractableObject interactableObject)
-        {
-            try
-            {
-                Assert.IsNull(hoveredObject);
-                hoveredObject = interactableObject.gameObject;
-            }
-            catch
-            {
-                //There are AssertionExceptions 
-            }
-        }
-
-        private void LocalAnyHoverOut(InteractableObject interactableObject)
-        {
-            try
-            {
-                Assert.IsTrue(hoveredObject == interactableObject.gameObject);
-                hoveredObject = null;
-            }
-            catch
-            {
-                //There are AssertionExceptions
             }
         }
     }

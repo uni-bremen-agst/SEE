@@ -142,6 +142,7 @@ namespace SEE.Controls.Actions
         public void Start()
         {
             listOfRoots = new List<GameObject>();
+            InitialiseCanvasObject();
             //ChangeState(ThisActionState);
             // An anonymous delegate is registered for the event <see cref="ActionState.OnStateChanged"/>.
             // This delegate will be called from <see cref="ActionState"/> upon every
@@ -157,7 +158,6 @@ namespace SEE.Controls.Actions
                     InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
                     if (!instantiated)
                     {
-                        InitialiseCanvasObject();
                         instantiated = true;
                     }
 
@@ -170,7 +170,9 @@ namespace SEE.Controls.Actions
                     c.DestroyAddNodeCanvas();
                     Undye();
                     instantiated = false;
-
+                    InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
+                    InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
+                    hoveredObject = null;
 
                 }
             };
