@@ -85,8 +85,15 @@ namespace SEE.GO.Menu
                 selectedMenuEntry--;
                 if (selectedMenuEntry < transform.childCount)
                 {
+                    Debug.Log(transform.GetChild(selectedMenuEntry));
+                    Component []c = transform.GetChild(selectedMenuEntry).GetComponents<MenuEntry>();
+                    foreach(Component co in c)
+                    {
+                       // Debug.Log(co.ToString());
+                    }
                     if (transform.GetChild(selectedMenuEntry).TryGetComponent<MenuEntry>(out MenuEntry entry))
                     {
+                       // Debug.Log(entry);
                         entry.Selected();
                     }
                     else
@@ -105,6 +112,7 @@ namespace SEE.GO.Menu
             else if (selectedMenuEntry == 0 && TryGetComponent<MenuEntry>(out MenuEntry menuEntryOfMenu))
             {
                 menuEntryOfMenu.Selected();
+                Debug.Log(menuEntryOfMenu + "ELSEIF");
             }
         }
 
