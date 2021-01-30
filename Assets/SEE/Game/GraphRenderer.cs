@@ -271,7 +271,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Applies the edge layout according to the the user's choice (settings) for
+        /// Applies the edge layout according to the user's choice (settings) for
         /// all edges in between nodes in <paramref name="gameNodes"/>.
         /// </summary>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
@@ -335,8 +335,7 @@ namespace SEE.Game
             {
                 result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), layoutEdges);
                 AddLOD(result);
-            }
-            
+            }            
             
             p.End();
             Debug.LogFormat("Built \"" + settings.EdgeLayout + "\" edge layout for " + gameNodes.Count + " nodes in {0} [h:m:s:ms].\n", p.GetElapsedTime());
