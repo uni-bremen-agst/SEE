@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Controls.Actions;
+using UnityEngine;
 
 namespace SEE.Game.UI
 {
@@ -23,42 +24,18 @@ namespace SEE.Game.UI
         /// <paramref name="attachTo"/> with the mode menu attached.</returns>
         public static GameObject CreateModeMenu(GameObject attachTo = null)
         {
-                // // Rotating everything around the selected node within a graph
-                // new MenuDescriptor(label: "Rotate",
-                //                    spriteFile: menuEntrySprite,
-                //                    activeColor: Color.blue,
-                //                    inactiveColor: Lighter(Color.blue),
-                //                    entryOn: RotateOn,
-                //                    entryOff: null,
-                //                    isTransient: true),
-                // // Mapping a node from one graph to another graph
-                // new MenuDescriptor(label: "Map",
-                //                    spriteFile: menuEntrySprite,
-                //                    activeColor: Color.green,
-                //                    inactiveColor: Lighter(Color.green),
-                //                    entryOn: MapOn,
-                //                    entryOff: null,
-                //                    isTransient: true),
-                // // Drawing a new edge between two gameobjects
-                // new MenuDescriptor(label: "DrawEdge",
-                //                    spriteFile: menuEntrySprite,
-                //                    activeColor: Color.green,
-                //                    inactiveColor: Lighter(Color.green),
-                //                    entryOn: DrawEdgeOn,
-                //                    entryOff: null,
-                //                    isTransient: true),
             ToggleMenuEntry[] entries = {
                 new ToggleMenuEntry(
-                    active: true,
-                    entryAction: actions.Browse,
+                    active: false,
+                    entryAction: () => ActionState.Value = ActionState.Type.Rotate,
                     exitAction: null,
-                    title: "Browse",
-                    description: "Normal browsing mode",
+                    title: "Rotate",
+                    description: "Rotate everything around the selected node within a graph",
                     entryColor: Color.blue
                     ),
                 new ToggleMenuEntry(
                     active: false,
-                    entryAction: actions.Move,
+                    entryAction: () => ActionState.Value = ActionState.Type.Move,
                     exitAction: null,
                     title: "Move",
                     description: "Move a node within a graph",
@@ -66,12 +43,20 @@ namespace SEE.Game.UI
                     ),
                 new ToggleMenuEntry(
                     active: false,
-                    entryAction: actions.Map,
+                    entryAction: () => ActionState.Value = ActionState.Type.Map,
                     exitAction: null,
                     title: "Map",
                     description: "Map a node from one graph to another graph",
                     entryColor: Color.green
                     ),
+                new ToggleMenuEntry(
+                    active: false,
+                    entryAction: () => ActionState.Value = ActionState.Type.DrawEdge,
+                    exitAction: null,
+                    title: "Draw Edge",
+                    description: "Draw a new edge between two nodes",
+                    entryColor: Color.green
+                    )
             };
             
             GameObject modeMenuGO = attachTo ?? new GameObject { name = "Mode Menu" };

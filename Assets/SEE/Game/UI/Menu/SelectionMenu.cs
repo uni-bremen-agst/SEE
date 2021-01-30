@@ -21,11 +21,13 @@ namespace SEE.Game.UI
 
         /// <summary>
         /// Returns the first active entry in the <see cref="entries"/> list.
+        /// If no entry is active, <c>null</c> will be returned.
         /// </summary>
-        /// <returns>the first active entry in the <see cref="entries"/> list.</returns>
+        /// <returns>the first active entry in the <see cref="entries"/> list,
+        /// or <c>null</c> if there is no such entry.</returns>
         private ToggleMenuEntry GetActiveEntry()
         {
-            return Entries.First(x => x.Active);
+            return Entries.FirstOrDefault(x => x.Active);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SEE.Game.UI
 {
@@ -25,12 +26,20 @@ namespace SEE.Game.UI
         {
             MenuShown = show;
         }
+
+        /// <summary>
+        /// Displays the menu when it's hidden, and vice versa.
+        /// </summary>
+        public void ToggleMenu()
+        {
+            ShowMenu(!MenuShown);
+        }
         
         /// <summary>
         /// A list of menu entries for this menu.
         /// </summary>
         /// <seealso cref="MenuEntry"/>
-        protected readonly IList<T> Entries = new List<T>();
+        public readonly IList<T> Entries = new List<T>();
 
         /// <summary>
         /// Adds an <paramref name="entry"/> to this menu's <see cref="Entries"/>.
@@ -40,6 +49,22 @@ namespace SEE.Game.UI
         public void AddEntry(T entry)
         {
             Entries.Add(entry);
+        }
+
+        /// <summary>
+        /// Selects the entry at <paramref name="index"/>.
+        /// </summary>
+        /// <param name="index">The index in <see cref="Entries"/> of the selected entry.</param>
+        /// <exception cref="ArgumentOutOfRangeException">When <paramref name="index"/> is above the size of
+        /// <see cref="Entries"/></exception>
+        public void SelectEntry(int index)
+        {
+            if (index > Entries.Count)
+            {
+                throw new ArgumentOutOfRangeException($"Entry index {index} doesn't exist in "
+                                                   + $"{Entries.Count}-element array entries.");
+            }
+            OnEntrySelected(Entries[index]);
         }
 
         /// <summary>
