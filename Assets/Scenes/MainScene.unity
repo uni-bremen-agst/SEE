@@ -2099,6 +2099,10 @@ GameObject:
   - component: {fileID: 1566173680}
   - component: {fileID: 1566173683}
   - component: {fileID: 1566173682}
+  - component: {fileID: 1566173686}
+  - component: {fileID: 1566173685}
+  - component: {fileID: 1566173684}
+  - component: {fileID: 1566173687}
   m_Layer: 0
   m_Name: Player Desktop
   m_TagString: MainCamera
@@ -2198,6 +2202,58 @@ MonoBehaviour:
   gazeTransform: {fileID: 0}
   minHeadVelocityThreshold: 0.5
   maxHeadVelocityThreshold: 2
+--- !u!114 &1566173684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1566173679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84e12c3233bc9474a83b753fa9e68414, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoveredObject: {fileID: 0}
+--- !u!114 &1566173685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1566173679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d17164181a66124b9c9e8ec82e826e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoveredObject: {fileID: 0}
+--- !u!114 &1566173686
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1566173679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50b033c15fe3cd041ad43eaddc96a590, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoveredObject: {fileID: 0}
+--- !u!114 &1566173687
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1566173679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69e973e5790cc084585dbe094083fdda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoveredObject: {fileID: 0}
 --- !u!4 &1566173689
 Transform:
   m_ObjectHideFlags: 0
