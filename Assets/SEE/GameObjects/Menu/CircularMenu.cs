@@ -1,8 +1,10 @@
 ﻿using SEE.Controls;
+using SEE.Controls.Actions;
 using SEE.DataModel;
 using SEE.Utils;
 using System;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.GO.Menu
 {
@@ -74,6 +76,38 @@ namespace SEE.GO.Menu
             return entry != -1;
         }
 
+        private void SelectMenuEntry(int selectedMenuEntry)
+        {
+            // hitEntry == 0 => the menu itself was selected
+            if (selectedMenuEntry > 0)
+            {
+                // the index of menu entries starts at 1, while the first child of a game object has index 0
+                selectedMenuEntry--;
+                if (selectedMenuEntry < transform.childCount)
+                {
+                    if (transform.GetChild(selectedMenuEntry).TryGetComponent<MenuEntry>(out MenuEntry entry))
+                    {
+                        entry.Selected();
+                    }
+                    else
+                    {
+                        Debug.LogErrorFormat("Menu entry {0} has no MenuEntry component attached to it.\n",
+                                              selectedMenuEntry + 1);
+                    }
+                }
+                else
+                {
+                    Debug.LogErrorFormat("Invalid index of menu entry: {0}. Menu has only {1} children.\n",
+                                         selectedMenuEntry + 1, transform.childCount);
+                }
+
+            }
+            else if (selectedMenuEntry == 0 && TryGetComponent<MenuEntry>(out MenuEntry menuEntryOfMenu))
+            {
+                menuEntryOfMenu.Selected();
+            }
+        }
+
         /// <summary>
         /// If true (and only if), the menu is visible.
         /// </summary>
@@ -131,11 +165,29 @@ namespace SEE.GO.Menu
             }
         }
 
+        private readonly ActionState.Type[] actionStateTypes = (ActionState.Type[])Enum.GetValues(typeof(ActionState.Type));
+
+        private void Start()
+        {
+            ActionState.OnStateChanged += OnStateChanged;
+        }
+
         /// <summary>
         /// The menu can be enabled/disabled by pressing the space bar.
         /// </summary>
         private void Update()
         {
+            // Select action state via numbers on the keyboard
+            Assert.IsTrue(actionStateTypes.Length <= 9, "Only up to 9 (10 if zero is included) entries can be selected via the numbers on the keyboard!");
+            for (int i = 0; i < actionStateTypes.Length; i++)
+            {
+                if (Input.GetKeyDown(KeyCode.Alpha1 + i))
+                {
+                    ActionState.Value = actionStateTypes[i];
+                    break;
+                }
+            }
+
             bool oldState = menuIsOn;
             // space bar toggles menu            
             if (Input.GetKeyDown(KeyCode.Space))
@@ -148,44 +200,24 @@ namespace SEE.GO.Menu
                 {
                     On();
                 }
+
                 // Menu should be facing the camera
                 gameObject.transform.LookAt(MainCamera.Camera.transform);
                 if (SelectedMenuEntry(out int hitEntry))
                 {
-                    // hitEntry == 0 => the menu itself was selected
-                    if (hitEntry > 0)
-                    {
-                        // the index of menu entries starts at 1, while the first child of a game object has index 0
-                        hitEntry--;
-                        if (hitEntry < transform.childCount)
-                        {
-                            if (transform.GetChild(hitEntry).TryGetComponent<MenuEntry>(out MenuEntry entry))
-                            {
-                                entry.Selected();
-                            }
-                            else
-                            {
-                                Debug.LogErrorFormat("Menu entry {0} has no MenuEntry component attached to it.\n",
-                                                      hitEntry + 1);
-                            }
-                        }
-                        else
-                        {
-                            Debug.LogErrorFormat("Invalid index of menu entry: {0}. Menu has only {1} children.\n",
-                                                 hitEntry+1, transform.childCount);
-                        }
-
-                    }
-                    else if (hitEntry == 0 && TryGetComponent<MenuEntry>(out MenuEntry menuEntryOfMenu))
-                    {
-                        menuEntryOfMenu.Selected();
-                    }
+                    SelectMenuEntry(hitEntry);
                 }
             }
             else if (oldState != menuIsOn)
             {
                 Off();
             }
+        }
+
+        private void OnStateChanged(ActionState.Type value)
+        {
+            int selectedMenuEntry = (int)value + 1;
+            SelectMenuEntry(selectedMenuEntry);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using SEE.Game.UI3D;
+﻿using SEE.DataModel.DG;
+using SEE.Game.UI3D;
+using SEE.GO;
 using SEE.Utils;
 using System;
 using UnityEngine;
@@ -12,19 +14,9 @@ namespace SEE.Controls.Actions
     public class DesktopNavigationAction : NavigationAction
     {
         /// <summary>
-        /// The mode of interaction. In desktop mode, movement and rotation are always
-        /// separate interactions.
-        /// </summary>
-        private enum NavigationMode
-        {
-            Move,
-            Rotate
-        }
-
-        /// <summary>
         /// The state for moving the city or parts of the city.
         /// </summary>
-        private struct MoveState
+        private struct _MoveState
         {
             internal const float MaxVelocity = 10.0f;                        // This is only used, if the city was moved as a whole
             internal const float MaxSqrVelocity = MaxVelocity * MaxVelocity;
@@ -44,7 +36,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The state for rotating the city.
         /// </summary>
-        private struct RotateState
+        private struct _RotateState
         {
             internal const float SnapStepCount = 8;
             internal const float SnapStepAngle = 360.0f / SnapStepCount;
@@ -59,7 +51,7 @@ namespace SEE.Controls.Actions
         /// The actions, that are currently active. This is initially set by
         /// <see cref="Update"/> and used and partly reset in <see cref="FixedUpdate"/>.
         /// </summary>
-        private struct ActionState
+        private struct _ActionState
         {
             internal bool selectToggle;       // Whether selected elements should be toggled instead of being selected separate
             internal bool startDrag;
@@ -80,11 +72,6 @@ namespace SEE.Controls.Actions
         private UnityEngine.Plane raycastPlane;
 
         /// <summary>
-        /// The current mode of navigation.
-        /// </summary>
-        private NavigationMode mode;
-
-        /// <summary>
         /// Whether the city is currently moved or rotated by the player.
         /// </summary>
         private bool movingOrRotating;
@@ -98,17 +85,17 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The current move state.
         /// </summary>
-        private MoveState moveState;
+        private _MoveState moveState;
 
         /// <summary>
         /// The current rotate state.
         /// </summary>
-        private RotateState rotateState;
+        private _RotateState rotateState;
 
         /// <summary>
         /// The current action state.
         /// </summary>
-        private ActionState actionState;
+        private _ActionState actionState;
 
         protected sealed override void Awake()
         {
@@ -119,12 +106,13 @@ namespace SEE.Controls.Actions
             }
 
             base.Awake();
+
+            ActionState.OnStateChanged += OnStateChanged;
         }
 
         protected sealed override void OnCityAvailable()
         {
-            raycastPlane = new Plane(Vector3.up, CityTransform.position);
-            mode = 0;
+            raycastPlane = new UnityEngine.Plane(Vector3.up, CityTransform.position);
             movingOrRotating = false;
             cursor = Game.UI3D.Cursor.Create();
 
@@ -139,6 +127,11 @@ namespace SEE.Controls.Actions
             rotateState.originalEulerAngleY = 0.0f;
             rotateState.originalPosition = Vector3.zero;
             rotateState.startAngle = 0.0f;
+        }
+
+        private void OnDestroy()
+        {
+            ActionState.OnStateChanged -= OnStateChanged;
         }
 
         public sealed override void Update()
@@ -166,7 +159,11 @@ namespace SEE.Controls.Actions
                 actionState.hoveredTransform = null;
                 if (insideClippingArea)
                 {
-                    if (Raycasting.RaycastNodes(out RaycastHit raycastHit))
+                    if (Input.GetKeyDown(KeyCode.U))
+                    {
+                        InteractableObject.UnselectAll(true);
+                    }
+                    else if (Raycasting.RaycastNodes(out RaycastHit raycastHit, out NodeRef nodeRef))
                     {
                         Transform hoveredTransform = raycastHit.transform;
                         Transform parentTransform = hoveredTransform;
@@ -192,31 +189,17 @@ namespace SEE.Controls.Actions
                     }
                 }
 
-                if (!actionState.drag)
+                if (!actionState.drag && ActionState.Value != ActionState.Type.Map)
                 {
                     actionState.zoomToggleToObject |= Input.GetKeyDown(KeyCode.F);
 
-                    if (Input.GetMouseButtonDown(0))
+                    if (Input.GetMouseButtonDown(0) && !isMouseOverGUI)
                     {
                         Select(actionState.hoveredTransform ? actionState.hoveredTransform.gameObject : null, !actionState.selectToggle);
                     }
                 }
 
-                // Select mode
-                if (mode != NavigationMode.Move && Input.GetKeyDown(KeyCode.Alpha1))
-                {
-                    mode = NavigationMode.Move;
-                    movingOrRotating = false;
-                    rotateState.rotateGizmo.gameObject.SetActive(false);
-                }
-                else if (mode != NavigationMode.Rotate && Input.GetKeyDown(KeyCode.Alpha2))
-                {
-                    mode = NavigationMode.Rotate;
-                    movingOrRotating = false;
-                    moveState.moveGizmo.gameObject.SetActive(false);
-                }
-
-                if (mode == NavigationMode.Rotate && cursor.HasFocus())
+                if (ActionState.Value == ActionState.Type.Rotate && cursor.HasFocus())
                 {
                     rotateState.rotateGizmo.Center = cursor.GetPosition();
                     rotateState.rotateGizmo.Radius = 0.2f * (MainCamera.Camera.transform.position - rotateState.rotateGizmo.Center).magnitude;
@@ -224,8 +207,7 @@ namespace SEE.Controls.Actions
             }
         }
 
-        // This logic is in FixedUpdate(), so that the behaviour is framerate-
-        // 'independent'.
+        // This logic is in FixedUpdate(), so that the behaviour is framerate-'independent'.
         private void FixedUpdate()
         {
             if (CityTransform == null)
@@ -243,7 +225,7 @@ namespace SEE.Controls.Actions
 
             #region Move City
 
-            else if (mode == NavigationMode.Move)
+            else if (ActionState.Value == ActionState.Type.Move)
             {
                 if (actionState.reset) // reset to center of table
                 {
@@ -321,7 +303,7 @@ namespace SEE.Controls.Actions
                         {
                             Vector2 point2 = new Vector2(totalDragOffsetFromStart.x, totalDragOffsetFromStart.z);
                             float angleDeg = point2.Angle360();
-                            float snappedAngleDeg = Mathf.Round(angleDeg / MoveState.SnapStepAngle) * MoveState.SnapStepAngle;
+                            float snappedAngleDeg = Mathf.Round(angleDeg / _MoveState.SnapStepAngle) * _MoveState.SnapStepAngle;
                             float snappedAngleRad = Mathf.Deg2Rad * snappedAngleDeg;
                             Vector2 dir = new Vector2(Mathf.Cos(snappedAngleRad), Mathf.Sin(-snappedAngleRad));
                             Vector2 proj = dir * Vector2.Dot(point2, dir);
@@ -341,6 +323,72 @@ namespace SEE.Controls.Actions
                 }
                 else if (movingOrRotating) // finalize movement
                 {
+                    if (moveState.draggedTransform != CityTransform) // only reparent non-root nodes
+                    {
+                        synchronize = true;
+
+                        #region FinalizePosition
+
+                        // The underlying graph node of the moving object.
+                        Node movingNode = moveState.draggedTransform.GetComponent<NodeRef>().Value;
+                        // The new parent of the movingNode in the underlying graph.
+                        Node newGraphParent = null;
+                        // The new parent of the movingNode in the game-object hierarchy.
+                        GameObject newGameParent = null;
+                        // The new position of the movingNode in world space.
+                        Vector3 newPosition = Vector3.negativeInfinity;
+
+                        // Note that the order of the results of RaycastAll() is undefined.
+                        // Hence, we need to identify the node in the node hierarchy that
+                        // is at the lowest level in the tree (more precisely, the one with
+                        // the greatest value of the node attribute Level; Level counting
+                        // starts at the root and increases downward into the tree).            
+                        foreach (RaycastHit hit in Physics.RaycastAll(MainCamera.Camera.ScreenPointToRay(actionState.mousePosition)))
+                        {
+                            // Must be different from the movingObject itself
+                            if (hit.collider.transform != moveState.draggedTransform)
+                            {
+                                NodeRef nodeRef = hit.transform.GetComponent<NodeRef>();
+                                // Is it a node at all and if so, are they in the same graph?
+                                if (nodeRef != null && nodeRef.Value.ItsGraph == movingNode.ItsGraph)
+                                {
+                                    // update newParent when we found a node deeper into the tree
+                                    if (newGraphParent == null || nodeRef.Value.Level > newGraphParent.Level)
+                                    {
+                                        newGraphParent = nodeRef.Value;
+                                        newGameParent = hit.collider.gameObject;
+                                        newPosition = hit.point;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (newGraphParent != null)
+                        {
+                            moveState.draggedTransform.position = newPosition;
+                            if (movingNode.Parent != newGraphParent)
+                            {
+                                movingNode.Reparent(newGraphParent);
+                                #region PutOn
+                                // FIXME: child may not actually fit into parent, in which we should 
+                                // downscale it until it fits
+                                Vector3 childCenter = moveState.draggedTransform.position;
+                                float parentRoof = newGameParent.transform.position.y + newGameParent.transform.lossyScale.y / 2;
+                                childCenter.y = parentRoof + moveState.draggedTransform.lossyScale.y / 2;
+                                moveState.draggedTransform.position = childCenter;
+                                moveState.draggedTransform.SetParent(newGameParent.transform);
+                                #endregion
+                            }
+                        }
+                        else
+                        {
+                            moveState.draggedTransform.position =
+                                moveState.dragStartTransformPosition + moveState.dragStartOffset
+                                - Vector3.Scale(moveState.dragCanonicalOffset, moveState.draggedTransform.localScale);
+                        }
+                        #endregion
+                    }
+
                     actionState.startDrag = false;
                     movingOrRotating = false;
 
@@ -358,7 +406,7 @@ namespace SEE.Controls.Actions
 
             #region Rotate
 
-            else // mode == NavigationMode.Rotate
+            else if (ActionState.Value == ActionState.Type.Rotate)
             {
                 if (actionState.reset) // reset rotation to identity();
                 {
@@ -411,7 +459,7 @@ namespace SEE.Controls.Actions
                         float angle = AngleMod(rotateState.startAngle + toHitAngle);
                         if (actionState.snap)
                         {
-                            angle = AngleMod(Mathf.Round(angle / RotateState.SnapStepAngle) * RotateState.SnapStepAngle);
+                            angle = AngleMod(Mathf.Round(angle / _RotateState.SnapStepAngle) * _RotateState.SnapStepAngle);
                         }
                         CityTransform.RotateAround(cursor.GetPosition(), Vector3.up, angle - CityTransform.rotation.eulerAngles.y);
 
@@ -428,7 +476,7 @@ namespace SEE.Controls.Actions
                         }
                         if (actionState.snap)
                         {
-                            currAngle = Mathf.Round((currAngle + rotateState.startAngle) / (RotateState.SnapStepAngle)) * (RotateState.SnapStepAngle) - rotateState.startAngle;
+                            currAngle = Mathf.Round((currAngle + rotateState.startAngle) / (_RotateState.SnapStepAngle)) * (_RotateState.SnapStepAngle) - rotateState.startAngle;
                         }
 
                         rotateState.rotateGizmo.SetMaxAngle(Mathf.Deg2Rad * currAngle);
@@ -498,9 +546,9 @@ namespace SEE.Controls.Actions
             {
                 // Clamp velocity
                 float sqrMag = moveState.moveVelocity.sqrMagnitude;
-                if (sqrMag > MoveState.MaxSqrVelocity)
+                if (sqrMag > _MoveState.MaxSqrVelocity)
                 {
-                    moveState.moveVelocity = moveState.moveVelocity / Mathf.Sqrt(sqrMag) * MoveState.MaxVelocity;
+                    moveState.moveVelocity = moveState.moveVelocity / Mathf.Sqrt(sqrMag) * _MoveState.MaxVelocity;
                 }
 
                 // Apply velocity to city position
@@ -511,7 +559,7 @@ namespace SEE.Controls.Actions
                 }
 
                 // Apply friction to velocity
-                Vector3 acceleration = MoveState.DragFrictionFactor * -moveState.moveVelocity;
+                Vector3 acceleration = _MoveState.DragFrictionFactor * -moveState.moveVelocity;
                 moveState.moveVelocity += acceleration * Time.fixedDeltaTime;
             }
 
@@ -553,6 +601,19 @@ namespace SEE.Controls.Actions
 
 
 
+        private void OnStateChanged(ActionState.Type value)
+        {
+            movingOrRotating = false;
+            if (value == ActionState.Type.Move)
+            {
+                rotateState.rotateGizmo.gameObject.SetActive(false);
+            }
+            else if (value == ActionState.Type.Rotate)
+            {
+                moveState.moveGizmo.gameObject.SetActive(false);
+            }
+        }
+
         /// <summary>
         /// Converts the given angle in degrees into the range [0, 360) degrees and returns the result.
         /// </summary>
@@ -582,7 +643,7 @@ namespace SEE.Controls.Actions
                     InteractableObject interactable = oldFocus.GetComponent<InteractableObject>();
                     if (interactable)
                     {
-                        interactable.SetSelect(false, true);
+                        interactable.SetSelect(false, true); // TODO(torben): callback and have cursor always focus on every 'InteractableObject.SelectedObjects'-element
                         cursor.RemoveFocus(oldFocus);
                     }
                 }

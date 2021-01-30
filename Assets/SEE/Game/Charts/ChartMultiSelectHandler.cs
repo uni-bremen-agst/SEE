@@ -19,6 +19,7 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using SEE.Controls;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -27,8 +28,7 @@ namespace SEE.Game.Charts
     /// <summary>
     /// Handles selection of multiple markers in selection mode.
     /// </summary>
-    public class ChartMultiSelectHandler : MonoBehaviour, IPointerDownHandler, IDragHandler,
-        IPointerUpHandler
+    public class ChartMultiSelectHandler : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
     {
         /// <summary>
         /// The rectangle used to visualize the selection process for the user.
@@ -36,7 +36,7 @@ namespace SEE.Game.Charts
         [SerializeField] protected RectTransform selectionRect;
 
         /// <summary>
-        /// Needed for access to <see cref="Scripts.ChartContent.AreaSelection" />.
+        /// Needed for access to <see cref="Scripts.ChartContent.AreaSelection"/>.
         /// </summary>
         protected ChartContent chartContent;
 
@@ -46,15 +46,17 @@ namespace SEE.Game.Charts
         protected Vector3 startingPos;
 
         /// <summary>
-        /// Assigns <see cref="chartContent" />.
+        /// Assigns <see cref="chartContent"/>.
         /// </summary>
         private void Awake()
         {
             chartContent = transform.parent.GetComponent<ChartContent>();
         }
 
+        #region UnityEngine Callbacks
+
         /// <summary>
-        /// Activates and sets starting position of <see cref="selectionRect" />.
+        /// Activates and sets starting position of <see cref="selectionRect"/>.
         /// </summary>
         /// <param name="eventData">Contains the position data.</param>
         public virtual void OnPointerDown(PointerEventData eventData)
@@ -62,12 +64,17 @@ namespace SEE.Game.Charts
             selectionRect.gameObject.SetActive(true);
             selectionRect.position = eventData.pressPosition;
             startingPos = selectionRect.position;
-            selectionRect.sizeDelta = new Vector2(0f, 0f);
+            selectionRect.sizeDelta = new Vector2(0.0f, 0.0f);
+            if (!Input.GetKey(KeyCode.LeftControl))
+            {
+                InteractableObject.UnhoverAll(true);
+                InteractableObject.UnselectAll(true);
+            }
         }
 
         /// <summary>
-        /// Resizes the <see cref="selectionRect" /> to make it span from <see cref="startingPos" /> to
-        /// <see cref="PointerEventData.position" />.
+        /// Resizes the <see cref="selectionRect"/> to make it span from <see cref="startingPos"/> to
+        /// <see cref="PointerEventData.position"/>.
         /// </summary>
         /// <param name="eventData">Contains the position data.</param>
         public virtual void OnDrag(PointerEventData eventData)
@@ -123,28 +130,36 @@ namespace SEE.Game.Charts
 
             if (!negative)
             {
-                selectionRect.sizeDelta = new Vector2((eventData.position.x - startingPos.x) / lossyScale.x, (eventData.position.y - startingPos.y) / lossyScale.y);
+                selectionRect.sizeDelta = new Vector2(
+                    (eventData.position.x - startingPos.x) / lossyScale.x,
+                    (eventData.position.y - startingPos.y) / lossyScale.y
+                );
                 sizeDelta = selectionRect.sizeDelta;
-                selectionRect.position = new Vector3(startingPos.x + sizeDelta.x / 2 * lossyScale.x, startingPos.y + sizeDelta.y / 2 * lossyScale.y, 0);
+                selectionRect.position = new Vector3(
+                    startingPos.x + sizeDelta.x / 2 * lossyScale.x,
+                    startingPos.y + sizeDelta.y / 2 * lossyScale.y,
+                    0
+                );
             }
+
+            Vector2 min = Vector2.Min(startingPos, eventData.position);
+            Vector2 max = Vector2.Max(startingPos, eventData.position);
+            chartContent.AreaHover(min, max);
         }
 
         /// <summary>
-        /// Highlights all markers in <see cref="selectionRect" /> and deactivates it.
+        /// Highlights all markers in <see cref="selectionRect"/> and deactivates it.
         /// </summary>
         /// <param name="eventData">Contains the position data.</param>
         public virtual void OnPointerUp(PointerEventData eventData)
         {
-            if (startingPos.x < eventData.position.x)
-            {
-                chartContent.AreaSelection(startingPos, eventData.position, startingPos.y < eventData.position.y);
-            }
-            else
-            {
-                chartContent.AreaSelection(eventData.position, startingPos, startingPos.y > eventData.position.y);
-            }
-
+            InteractableObject.UnhoverAll(true);
+            Vector2 min = Vector2.Min(startingPos, eventData.position);
+            Vector2 max = Vector2.Max(startingPos, eventData.position);
+            chartContent.AreaSelection(min, max);
             selectionRect.gameObject.SetActive(false);
         }
+
+        #endregion
     }
 }
