@@ -58,7 +58,7 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    // The monobehaviour is diabled and Update() no longer be called by Unity.
+                    // The monobehaviour is disabled and Update() no longer be called by Unity.
                     enabled = false;
                     InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
@@ -69,7 +69,12 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
-            Assert.IsTrue(ActionState.Is(ThisActionState));
+            if (!ActionState.Is(ThisActionState))
+            {
+                enabled = false;
+                InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
+                InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
+            }
 
             // Assigning the game objects to be connected.
             // Checking whether the two game objects are not null and whether they are 

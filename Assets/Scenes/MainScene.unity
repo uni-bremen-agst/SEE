@@ -1796,7 +1796,7 @@ PrefabInstance:
     - target: {fileID: 5025193351834278769, guid: 2b712e916e329da46823a23b42d9899a,
         type: 3}
       propertyPath: m_RootOrder
-      value: 21
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 5025193351834278769, guid: 2b712e916e329da46823a23b42d9899a,
         type: 3}
@@ -2172,9 +2172,9 @@ GameObject:
   - component: {fileID: 1566173691}
   - component: {fileID: 1566173696}
   - component: {fileID: 1566173694}
-  - component: {fileID: 1566173680}
   - component: {fileID: 1566173683}
   - component: {fileID: 1566173682}
+  - component: {fileID: 1566173680}
   m_Layer: 0
   m_Name: Player Desktop
   m_TagString: MainCamera
@@ -2191,11 +2191,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1566173679}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ee170c9be383554ea5041c415e05ce5, type: 3}
+  m_Script: {fileID: 11500000, guid: 83f7b5d2afa8b8c4aae1d8f769c0da13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Radius: 0.3
-  Depth: 0.01
 --- !u!20 &1566173681
 Camera:
   m_ObjectHideFlags: 0
@@ -2918,7 +2916,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.0030533075
+  HeightOffset: 0.014835119
 --- !u!65 &1649116648
 BoxCollider:
   m_ObjectHideFlags: 0
