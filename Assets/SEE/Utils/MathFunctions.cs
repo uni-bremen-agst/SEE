@@ -96,4 +96,43 @@ public static class MathFunctions
         median /= 2;
         return median;
     }
+
+    public static float medianOfFloats(List<float> floatList)
+    {
+        int lengthOfList = floatList.Count;
+        float median = 0;
+
+
+        switch (lengthOfList)
+        {
+            //nothing to be calculated, list is empty
+            case 0:
+                return median;
+
+            // we can just return the single element of the list
+            case 1:
+                return floatList.ElementAt(0);
+
+            //As the amount of the length of the list is pair, we have to interpolate linearly and divide the result by 2 .
+            case 2:
+                median = floatList.ElementAt(0) + floatList.ElementAt(1);
+                return median / 2;
+
+            default:
+                // this is the case, the list consists of more than 2 entries and we have to determine the median.
+                floatList.Sort();
+                int indexOfMedian = floatList.Count / 2;
+                indexOfMedian -= 1;
+
+                //if the lists length is impair, we can just return the entry stored directly "in the middle".
+                if (!(floatList.Count % 2 == 0))
+                {
+                    return median;
+                }
+                // else we have to add the next entry and divive the sum of each entries by 2 
+                median = median + (floatList.ElementAt(indexOfMedian + 1));
+                return median / 2;
+        }
+
+    }
 }
