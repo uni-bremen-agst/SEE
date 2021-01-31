@@ -71,6 +71,7 @@ public static class MathFunctions
         }
         int indexOfMid = floatList.Count;
         indexOfMid /= 2;
+        indexOfMid -= 1; 
         median = floatList.ElementAt(indexOfMid);
 
         // If the amount of the list is impair, we will return the element which is located at the middle of the list,
@@ -80,9 +81,11 @@ public static class MathFunctions
             return median;
         }
 
+        Debug.Log("count:" + floatList.Count + " index of Mid" + indexOfMid);
         // If the amount is impair, we have to interpolate linearly between the value at the index at the half of the lists size,
         // and the value of the following index. E.g. size = 13 -> index 6 and 7 .
         int indexSecondMedianValue = indexOfMid + 1;
+        Debug.Log("indexsecondCoordinate" + indexSecondMedianValue);
         float SecondCoordinate = floatList.ElementAt(indexSecondMedianValue);
         median += SecondCoordinate;
         median /= 2;
