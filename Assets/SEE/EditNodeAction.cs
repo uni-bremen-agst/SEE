@@ -4,7 +4,10 @@ using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
-    public class EditNodeAction : NodeAction
+    /// <summary>
+    /// Action to edit an existing node which has to be selected first.
+    /// </summary>
+    public class EditNodeAction : AbstractPlayerAction
     {
 
         /// <summary>
@@ -35,8 +38,6 @@ namespace SEE.Controls.Actions
         private Progress editProgress = Progress.NoNodeSelected;
 
         public Progress EditProgress { get => editProgress; set => editProgress = value; }
-
-        private bool instantiated = false;
 
         void Start()
         {

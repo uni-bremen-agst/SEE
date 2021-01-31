@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
+
+    /// <summary>
+    /// This class is responsible for the edit-node-process via network from one client to all others and to the server. 
+    /// </summary>
     public class EditNodeNetAction : AbstractAction
     {
 

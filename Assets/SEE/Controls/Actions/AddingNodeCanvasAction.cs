@@ -3,6 +3,9 @@ using UnityEngine.UI;
 
 namespace SEE.Controls.Actions
 {
+    /// <summary>
+    /// Creates a clone of a canvas-prefab for adding a new node. Extracts these values from the canvas after closing it.
+    /// </summary>
     public class AddingNodeCanvasAction : NodeCanvasAction
     {
         /// <summary>

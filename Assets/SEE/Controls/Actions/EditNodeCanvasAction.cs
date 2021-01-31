@@ -4,6 +4,9 @@ using UnityEngine.UI;
 
 namespace SEE.Controls.Actions
 {
+    /// <summary>
+    /// Creates a clone of a canvas prefab for editing an existing node. Extracts these new values from the canvas after closing it.
+    /// </summary>
     public class EditNodeCanvasAction : NodeCanvasAction
     {
         /// <summary>

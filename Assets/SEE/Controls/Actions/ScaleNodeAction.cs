@@ -5,7 +5,10 @@ using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
-    public class ScaleNodeAction : NodeAction
+    /// <summary>
+    /// Action to scale an existing node which has to be selected first.
+    /// </summary>
+    public class ScaleNodeAction : AbstractPlayerAction
     {
         /// <summary>
         /// Start() will register an anonymous delegate of type 
@@ -49,8 +52,6 @@ namespace SEE.Controls.Actions
 
         GameObject tmpSphere = null;
 
-        private bool initialised = false;
-
         private GameObject objectToScale;
 
 
@@ -73,7 +74,7 @@ namespace SEE.Controls.Actions
                     InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
                     hoveredObject = null;
-                    initialised = false;
+                    instantiated = false;
                     RemoveSpheres();
                     objectToScale = null;
                 }
@@ -86,7 +87,7 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
-            if (objectToScale != null && initialised == false)
+            if (objectToScale != null && instantiated == false)
             {
                 originalScale = objectToScale.transform.lossyScale;
                 originalPosition = objectToScale.transform.position;
@@ -134,14 +135,14 @@ namespace SEE.Controls.Actions
                 //Positioning
                 SetOnRoof();
                 SetOnSide();
-                initialised = true;
+                instantiated = true;
             }
             //ScaleNode(gameObject);
             if (Input.GetMouseButtonDown(0) && objectToScale == null)
             {
                 objectToScale = hoveredObject;
             }
-            if (initialised && Input.GetMouseButton(0))
+            if (instantiated && Input.GetMouseButton(0))
             {
                 if (tmpSphere == null)
                 {
@@ -232,7 +233,7 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                if (objectToScale != null && initialised)
+                if (objectToScale != null && instantiated)
                 {
                     tmpSphere = null;
                     //Adjust the size of the scaling elements
@@ -476,7 +477,7 @@ namespace SEE.Controls.Actions
             Destroy(endWithSave);
             Destroy(endWithOutSave);
             objectToScale = null;
-            initialised = false;
+            instantiated = false;
         }
     }
 }
