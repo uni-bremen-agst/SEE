@@ -462,19 +462,6 @@ namespace SEE.Controls.Actions
 
         }
 
-        /// <summary>
-        /// Removes this Script.
-        /// Places the new Node if it is not placed
-        /// </summary>
-        public override void RemoveScript()
-        {
-            if (GONode != null)
-            {
-                Place();
-            }
-
-            base.RemoveScript();
-        }
 
         /// <summary>
         /// Gets all Nodes of the scene and saves them inside of Collections - one InnerNode and one Leaf.
@@ -603,7 +590,6 @@ namespace SEE.Controls.Actions
             GONode.SetScale(scale);
             GameNodeMover.NetworkFinalizeNodePosition(GONode, parentID, position);
             GONode = null;
-            RemoveScript();
         }
 
         /// <summary>

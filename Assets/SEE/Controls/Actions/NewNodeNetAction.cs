@@ -1,7 +1,5 @@
-﻿using SEE.Controls;
-using SEE.Game;
+﻿using SEE.Game;
 using SEE.Net;
-using System;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -101,7 +99,6 @@ namespace SEE.Controls.Actions
                 }
             }
         }
-
 
     }
 }
