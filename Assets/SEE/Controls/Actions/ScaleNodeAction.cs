@@ -51,7 +51,7 @@ namespace SEE.Controls.Actions
 
         private bool initialised = false;
 
-        public GameObject objectToScale;
+        private GameObject objectToScale;
 
 
         public void Start()

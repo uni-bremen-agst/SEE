@@ -1,5 +1,4 @@
-﻿using SEE.Controls;
-using SEE.Controls.Actions;
+﻿using SEE.Controls.Actions;
 using UnityEngine;
 
 /// <summary>

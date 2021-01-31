@@ -6,8 +6,19 @@ namespace SEE.Controls.Actions
 {
     public class ScaleNodeNetAction : AbstractAction
     {
+        /// <summary>
+        /// The id of the gameObject which has to be scaled
+        /// </summary>
         public string gameObjectID;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public Vector3 scale;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public Vector3 position;
 
         /// <summary>
@@ -47,12 +58,11 @@ namespace SEE.Controls.Actions
                 else
                 {
                     //FIXME: Control whether a Debug Log is the right thing
-                    Debug.LogWarning("Kein GameObject gefunden: " + gameObjectID);
+                    Debug.LogWarning("Found no gameObject: " + gameObjectID);
                 }
             }
 
         }
-
 
     }
 }
