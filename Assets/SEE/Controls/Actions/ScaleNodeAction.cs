@@ -222,14 +222,17 @@ namespace SEE.Controls.Actions
                     tmpSphere = null;
                 }
 
-
-                ScaleNode();
-                SetOnRoof();
-                SetOnSide();
+                if(objectToScale != null)
+                {
+                    ScaleNode();
+                    SetOnRoof();
+                    SetOnSide();
+                }
+                
             }
             else
             {
-                if (objectToScale != null)
+                if (objectToScale != null && initialised)
                 {
                     tmpSphere = null;
                     //Adjust the size of the scaling elements
