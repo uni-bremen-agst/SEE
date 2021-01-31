@@ -9,7 +9,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Action to create an edge between two selected nodes.
     /// </summary>
-    public class AddEdgeAction : NodeAction
+    public class AddEdgeAction : AbstractPlayerAction
     {
         /// <summary>
         /// Start() will register an anonymous delegate of type 

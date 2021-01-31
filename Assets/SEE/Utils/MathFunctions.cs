@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// This class is responsible for the median-calculation of the vectors and sizes of gameObjects of a city.
+/// It is important for the default node-size.
+/// </summary>
 public static class MathFunctions
 {
 

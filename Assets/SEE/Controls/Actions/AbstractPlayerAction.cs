@@ -3,7 +3,11 @@ using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
-    public class NodeAction : MonoBehaviour
+    /// <summary>
+    /// An abstract superclass of all PlayerActions such as NewNodeAction, ScaleNodeAction, EditNodeAction and AddEdgeAction.
+    /// The most important attribute for all of them is the hoveredObject, which will be instantiated and updated by LocalAnyHoverIn and LocalAnyHoverOut.
+    /// </summary>
+    public abstract class AbstractPlayerAction : MonoBehaviour
     {
         /// <summary>
         /// The gameObject which contains the CanvasGenerator-Scripts and the actual CanvasObject-Script
@@ -21,6 +25,11 @@ namespace SEE.Controls.Actions
         private readonly string nameOfCanvasObject = "CanvasObject";
 
         /// <summary>
+        /// true, if the active script is already initialised, else false
+        /// </summary>
+        protected bool instantiated = false;
+
+        /// <summary>
         /// Finds the GameObject, which contains the CanvasOperations and components
         /// and saves it in the canvasObject-variable.
         /// </summary>
@@ -29,6 +38,10 @@ namespace SEE.Controls.Actions
             canvasObject = GameObject.Find(nameOfCanvasObject);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="interactableObject"></param>
         protected void LocalAnyHoverIn(InteractableObject interactableObject)
         {
             try
@@ -38,10 +51,14 @@ namespace SEE.Controls.Actions
             }
             catch
             {
-                //There are AssertionExceptions 
+              // FIXME: There are AssertionExceptions 
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="interactableObject"></param>
         protected void LocalAnyHoverOut(InteractableObject interactableObject)
         {
             try
@@ -51,7 +68,7 @@ namespace SEE.Controls.Actions
             }
             catch
             {
-                //There are AssertionExceptions
+            //FIXME: There are AssertionExceptions
             }
         }
 

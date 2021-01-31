@@ -2,7 +2,10 @@
 
 namespace SEE.Controls.Actions
 {
-    public class NodeCanvasAction : MonoBehaviour
+    /// <summary>
+    /// The abstract superclass for the EditNodeCanvasAction and the AddNodeCanvasAction
+    /// </summary>
+    public abstract class NodeCanvasAction : MonoBehaviour
     {
         /// <summary>
         /// The gameObject, which contains the canvas-prefab-clone.

@@ -87,7 +87,6 @@ namespace SEE.GO.Menu
                 {
                     if (transform.GetChild(selectedMenuEntry).TryGetComponent<MenuEntry>(out MenuEntry entry))
                     {
-                       // Debug.Log(entry);
                         entry.Selected();
                     }
                     else
@@ -106,7 +105,6 @@ namespace SEE.GO.Menu
             else if (selectedMenuEntry == 0 && TryGetComponent<MenuEntry>(out MenuEntry menuEntryOfMenu))
             {
                 menuEntryOfMenu.Selected();
-                Debug.Log(menuEntryOfMenu + "ELSEIF");
             }
         }
 
@@ -116,7 +114,6 @@ namespace SEE.GO.Menu
         private bool menuIsOn = false;
 
         public bool MenuIsOn { get => menuIsOn; set => menuIsOn = value; }
-
 
         /// <summary>
         /// Shows the menu.
@@ -130,7 +127,7 @@ namespace SEE.GO.Menu
         /// <summary>
         /// Hides the menu.
         /// </summary>
-        public virtual void Off()
+        protected virtual void Off()
         {
             SetVisible(gameObject, false);
         }

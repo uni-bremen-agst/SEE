@@ -6,12 +6,14 @@ using SEE.GO;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.Utils;
-using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
 
-    public class NewNodeAction : NodeAction
+    /// <summary>
+    /// Action to create a new node for a selected city.
+    /// </summary>
+    public class NewNodeAction : AbstractPlayerAction
     {
         /// <summary>
         /// Start() will register an anonymous delegate of type 
@@ -129,8 +131,6 @@ namespace SEE.Controls.Actions
             ValuesAreGiven,
             AddingIsCanceled
         }
-
-        private bool instantiated = false;
 
         /// <summary>
         /// The specific state of the progress of adding a node to the implementation.

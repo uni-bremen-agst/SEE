@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
+    /// <summary>
+    /// This class is responsible for the scale-Node-process via network from one client to all others and to the server. 
+    /// </summary>
     public class ScaleNodeNetAction : AbstractAction
     {
         /// <summary>
