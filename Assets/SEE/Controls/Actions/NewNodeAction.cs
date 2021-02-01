@@ -413,6 +413,7 @@ namespace SEE.Controls.Actions
             GONode.gameObject.GetComponent<Collider>().enabled = false;
             
             GameNodeMover.MoveTo(GONode);
+            new ScaleNodeNetAction(GONode.name, GONode.transform.lossyScale, GONode.transform.position).Execute(null);
         }
 
         /// <summary>
