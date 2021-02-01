@@ -104,26 +104,8 @@ public static class MathFunctions
                 medianVector.y = medianOfFloats(yAxis);
                 medianVector.z = medianOfFloats(zAxis);
 
-                //if the lists length is impair, we cant directly return the vector just calculated.
-                if (!(pVectorList.Count % 2 == 0))
-                {
-                    return medianVector;
-                }
-
-
-                // else, i.e. the length of the list is pair, we have to add the next entry and divide the sum of each entries by 2 
-                int indexSecondMedian = (xAxis.Count + 1) / 2;
-                float SecondXCoordinate = medianOfFloats(xAxis);
-                float SecondYCoordinate = medianOfFloats(yAxis);
-                float SecondZCoordinate = medianOfFloats(zAxis);
-
-                medianVector.x = (medianVector.x + SecondXCoordinate) / 2;
-                medianVector.y = (medianVector.y + SecondYCoordinate) / 2;
-                medianVector.z = (medianVector.z + SecondZCoordinate) / 2;
-
                 return medianVector;
         }
-
     }
 
     /// <summary>
