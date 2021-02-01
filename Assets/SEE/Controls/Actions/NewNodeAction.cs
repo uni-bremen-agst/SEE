@@ -407,9 +407,15 @@ namespace SEE.Controls.Actions
                 GONode.gameObject.GetComponent<Renderer>().material.color = leafColor;
             }
 
-            
-          
-            GONode.transform.position = hoveredObjectList.ElementAt(hoveredObjectList.Count - 1).transform.position;
+
+            try
+            {
+                GONode.transform.position = hoveredObjectList.ElementAt(hoveredObjectList.Count - 1).transform.position;
+            }
+            catch (Exception)
+            {
+                Debug.LogWarning("Im Netzwerk ist die Liste Leer");
+            }
             GONode.gameObject.GetComponent<Collider>().enabled = false;
             
             GameNodeMover.MoveTo(GONode);
