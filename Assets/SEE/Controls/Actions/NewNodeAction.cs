@@ -226,11 +226,13 @@ namespace SEE.Controls.Actions
                         NewNode();
                         nodesLoaded = false;
                         GameNodeMover.MoveTo(GONode);
-                       // Tweens.Move(GONode, new Vector3(GONode.transform.position.x, GONode.transform.position.y + 0.4f, GONode.transform.position.z), 0.6f);
+                        new ScaleNodeNetAction(GONode.name, GONode.transform.lossyScale, GONode.transform.position).Execute(null);
+                        // Tweens.Move(GONode, new Vector3(GONode.transform.position.x, GONode.transform.position.y + 0.4f, GONode.transform.position.z), 0.6f);
                     }
                     else
                     {
                         GameNodeMover.MoveTo(GONode);
+                        new ScaleNodeNetAction(GONode.name, GONode.transform.lossyScale, GONode.transform.position).Execute(null);
                         if (Input.GetMouseButtonDown(0))
                         {
                             Place();
