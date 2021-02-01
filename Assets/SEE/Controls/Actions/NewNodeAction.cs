@@ -487,8 +487,8 @@ namespace SEE.Controls.Actions
             leafSize = ListOfLossyscale(allLeafsInScene);
             innerNodeSize = ListOfLossyscale(allInnerNodesInScene);
 
-            medianOfLeaf = MathFunctions.CalcMedian(leafSize);
-            medianOfInnerNode = MathFunctions.CalcMedian(innerNodeSize);
+            medianOfLeaf = MathFunctions.medianOfVectors(leafSize);
+            medianOfInnerNode = MathFunctions.medianOfVectors(innerNodeSize);
 
             // In the special case there are no inner nodes, the median of the graphs only leaf is set 
             // as a default value for any inner node that might be created.

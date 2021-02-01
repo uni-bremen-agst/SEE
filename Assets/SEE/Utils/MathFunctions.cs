@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
-/// This class is responsible for the median-calculation of the vectors and sizes of gameObjects of a city.
-/// It is important for the default node-size.
+/// This class is responsible for the median-calculation of vectors which represent the gameObjects size of of a SEE city.
+/// It is useful when determining the default node-size for a new node .
 /// </summary>
 public static class MathFunctions
 {
@@ -34,9 +34,6 @@ public static class MathFunctions
             zAxis.Add(vect.z);
         }
 
-        xAxis.Sort();
-        yAxis.Sort();
-        zAxis.Sort();
 
         result.x = CalcMedian(xAxis);
         result.y = CalcMedian(yAxis);
@@ -59,6 +56,75 @@ public static class MathFunctions
         return result;
     }
 
+
+    /// <summary>
+    /// Calculates the median of a vector list. PreCondition: The list of vectors does not have to be sorted.
+    /// </summary>
+    /// <param name="pVectorlist"></param>
+    /// <returns> A vector3 with the calculated median of the vector list or a null-vector in 
+    /// case the given vector list is empty or null itself</returns>
+    public static Vector3 medianOfVectors(List<Vector3> pVectorList)
+    {
+        int lengthOfList = pVectorList.Count;
+        if (pVectorList == null)
+        {
+            return new Vector3(0, 0, 0);
+        }
+
+
+        switch (lengthOfList)
+        {
+            //nothing to be calculated, list is empty
+            case 0:
+                return new Vector3(0, 0, 0);
+
+            // we can just return the single element of the list
+            case 1:
+                return pVectorList.ElementAt(0);
+
+            //As the amount of the length is just two, which is pair,  we have to interpolate linearly and divide the result by 2 .
+            case 2:
+                return (pVectorList.ElementAt(0) + pVectorList.ElementAt(1)) / 2;
+
+            // this is the case, the list consists of more than 2 entries and we have to determine the median.
+            default:
+                Vector3 medianVector = new Vector3();
+                List<float> xAxis = new List<float>();
+                List<float> yAxis = new List<float>();
+                List<float> zAxis = new List<float>();
+
+                foreach (Vector3 vect in pVectorList)
+                {
+                    xAxis.Add(vect.x);
+                    yAxis.Add(vect.y);
+                    zAxis.Add(vect.z);
+                }
+
+                medianVector.x = medianOfFloats(xAxis);
+                medianVector.y = medianOfFloats(yAxis);
+                medianVector.z = medianOfFloats(zAxis);
+
+                //if the lists length is impair, we cant directly return the vector just calculated.
+                if (!(pVectorList.Count % 2 == 0))
+                {
+                    return medianVector;
+                }
+
+
+                // else, i.e. the length of the list is pair, we have to add the next entry and divide the sum of each entries by 2 
+                int indexSecondMedian = (xAxis.Count + 1) / 2;
+                float SecondXCoordinate = medianOfFloats(xAxis);
+                float SecondYCoordinate = medianOfFloats(yAxis);
+                float SecondZCoordinate = medianOfFloats(zAxis);
+
+                medianVector.x = (medianVector.x + SecondXCoordinate) / 2;
+                medianVector.y = (medianVector.y + SecondYCoordinate) / 2;
+                medianVector.z = (medianVector.z + SecondZCoordinate) / 2;
+
+                return medianVector;
+        }
+
+    }
 
     /// <summary>
     /// Calculates the median of a list of floats. Precondition: The list of vectors does not have to be sorted.
@@ -88,7 +154,7 @@ public static class MathFunctions
             return median;
         }
 
-        // If the amount is impair, we have to interpolate linearly between the value at the index at the half of the lists size,
+        // If the amount is pair, we have to interpolate linearly between the value at the index at the half of the lists size,
         // and the value of the following index. E.g. size = 13 -> index 6 and 7 .
         int indexSecondMedianValue = indexOfMid + 1;
         float SecondCoordinate = floatList.ElementAt(indexSecondMedianValue);
@@ -97,6 +163,13 @@ public static class MathFunctions
         return median;
     }
 
+
+    /// <summary>
+    /// Calculates the median of a list of floats. Precondition: The list of vectors does not have to be sorted.
+    /// </summary>
+    /// <param name="floatList"></param>
+    /// <returns> The single median of the list as a float or null in 
+    /// case the given vector list is empty or null itself</returns>
     public static float medianOfFloats(List<float> floatList)
     {
         int lengthOfList = floatList.Count;
@@ -113,7 +186,7 @@ public static class MathFunctions
             case 1:
                 return floatList.ElementAt(0);
 
-            //As the amount of the length of the list is pair, we have to interpolate linearly and divide the result by 2 .
+            //As the amount of the length is just two, which is pair,  we have to interpolate linearly and divide the result by 2 .
             case 2:
                 median = floatList.ElementAt(0) + floatList.ElementAt(1);
                 return median / 2;
@@ -123,14 +196,16 @@ public static class MathFunctions
                 floatList.Sort();
                 int indexOfMedian = floatList.Count / 2;
                 indexOfMedian -= 1;
+                median = floatList.ElementAt(indexOfMedian);
 
                 //if the lists length is impair, we can just return the entry stored directly "in the middle".
                 if (!(floatList.Count % 2 == 0))
                 {
                     return median;
                 }
-                // else we have to add the next entry and divive the sum of each entries by 2 
-                median = median + (floatList.ElementAt(indexOfMedian + 1));
+
+                // else we have to add the next entry and divide the sum of each entries by 2 
+                median = floatList.ElementAt(indexOfMedian) + (floatList.ElementAt(indexOfMedian + 1));
                 return median / 2;
         }
 
