@@ -15,12 +15,12 @@ namespace SEE.Controls.Actions
         public string gameObjectID;
 
         /// <summary>
-        /// 
+        /// The new Scale to bring over the network 
         /// </summary>
         public Vector3 scale;
 
         /// <summary>
-        /// 
+        /// The new position to bring over the network
         /// </summary>
         public Vector3 position;
 
