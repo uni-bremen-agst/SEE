@@ -237,13 +237,13 @@ namespace SEE.Controls.Actions
                         Debug.Log("NACH dwpfvjerpvgjerpvr");
                         nodesLoaded = false;
                         GameNodeMover.MoveTo(GONode);
-                        new NewNodeNetAction(hoveredObject.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, false, false).Execute(null);
+                        new NewNodeNetAction("", isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false).Execute(null);
                         // Tweens.Move(GONode, new Vector3(GONode.transform.position.x, GONode.transform.position.y + 0.4f, GONode.transform.position.z), 0.6f);
                     }
                     else
                     {
                         GameNodeMover.MoveTo(GONode);
-                        new NewNodeNetAction(hoveredObject.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, false, false).Execute(null);
+                        new NewNodeNetAction("", isInnerNode, nodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false).Execute(null);
                         if (Input.GetMouseButtonDown(0))
                         {
                             Place();
@@ -431,7 +431,11 @@ namespace SEE.Controls.Actions
             GONode.gameObject.GetComponent<Collider>().enabled = false;
             
             GameNodeMover.MoveTo(GONode);
-            new NewNodeNetAction(hoveredObject.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, false, true).Execute(null);
+            Debug.Log(hoveredObject);
+            Debug.Log(GONode);
+            Debug.Log(isInnerNode);
+            Debug.Log(nodeID);
+            new NewNodeNetAction("hoveredObject.name", isInnerNode, nodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, true).Execute(null);
         }
 
         /// <summary>
