@@ -207,11 +207,6 @@ namespace SEE.Game.Charts
         private Color hoveringOverLabelTextColor;
 
         /// <summary>
-        /// List containing the scroll view entries to be decorated
-        /// </summary>
-        List<ScrollViewEntry> decorativeScrollViewEntries = new List<ScrollViewEntry>(); 
-
-        /// <summary>
         /// The hierarchy-indices of every <see cref="treeDataObjects"/>-element. Both
         /// always have same number of elements.
         /// </summary>
@@ -293,15 +288,6 @@ namespace SEE.Game.Charts
             DrawData();
         }
 
-        private void UpdateScrollView()
-        {
-            for (int i = 0; i < decorativeScrollViewEntries.Count(); i++)
-            {
-                // Change color for changed nodes
-                ChangeScrollViewEntryColor(decorativeScrollViewEntries[i].transform.gameObject.transform.Find("Label").gameObject, decorativeScrollViewEntries[i].transform.gameObject);
-            }
-        }
-
         private void Update()
         {
             float panelEntryCount = totalHeight * (1.0f - verticalScrollBar.size) / ScrollViewEntryHeight;
@@ -311,13 +297,12 @@ namespace SEE.Game.Charts
 
             void _NewScrollViewEntries(int fst, int opl)
             {
-                decorativeScrollViewEntries.Clear();
                 if (scrollViewIsTree)
                 {
                     for (int i = fst; i < opl; i++)
                     {
                         scrollViewEntries[i] = NewScrollViewEntry(treeDataObjects[i].name, i, treeHierarchies[i]);
-                        decorativeScrollViewEntries.Add(scrollViewEntries[i]);
+                        ChangeScrollViewEntryColor(scrollViewEntries[i].transform.gameObject.transform.Find("Label").gameObject, scrollViewEntries[i].transform.gameObject);
                     }
                 }
                 else
@@ -344,7 +329,7 @@ namespace SEE.Game.Charts
                         {
                             scrollViewEntries[i] = NewScrollViewEntry(listDataObjects[i - 2].name, i, 1);
                         }
-                        decorativeScrollViewEntries.Add(scrollViewEntries[i]);
+                        ChangeScrollViewEntryColor(scrollViewEntries[i].transform.gameObject.transform.Find("Label").gameObject, scrollViewEntries[i].transform.gameObject);
                     }
                 }
             }
@@ -359,7 +344,6 @@ namespace SEE.Game.Charts
 
             previousFirst = first;
             previousOnePastLast = onePastLast;
-            UpdateScrollView();
         }
 
 
@@ -975,18 +959,21 @@ namespace SEE.Game.Charts
         /// </summary>
         private void FillListsWithChanges(List<NodeRef> nodeRefs)
         {
+            // Temporary storage of node id lists
             List<string> newNodes = NodeChangesBuffer.GetSingleton().addedNodeIDs;
             List<string> changedNodes = NodeChangesBuffer.GetSingleton().changedNodeIDs;
             List<string> removedNodes = NodeChangesBuffer.GetSingleton().removedNodeIDs;
 
             // Lists have been cleared, use cache of lists to load the data instead
+            // used when graph is closed and re-opened while in same revision
             if (newNodes.Count <= 0 && changedNodes.Count <= 0 && removedNodes.Count <= 0)
             {
                 this.newNodeIDs = NodeChangesBuffer.GetSingleton().addedNodeIDsCache;
                 this.changedNodeIDs = NodeChangesBuffer.GetSingleton().changedNodeIDsCache;
                 this.removedNodeIDs = NodeChangesBuffer.GetSingleton().removedNodeIDsCache;
             }
-            // Read the lists data and copy it to both the cache and store it locally
+            // Read the lists data and copy it to the cache and store it locally
+            // used when a new revision is loaded
             else
             {
                 NodeChangesBuffer.GetSingleton().addedNodeIDsCache.Clear();
@@ -1008,7 +995,7 @@ namespace SEE.Game.Charts
                     this.removedNodeIDs.Add(s);
                     NodeChangesBuffer.GetSingleton().removedNodeIDsCache.Add(s);
                 }
-
+                // Clear previous lists, in preparation for future changes
                 NodeChangesBuffer.GetSingleton().addedNodeIDs.Clear();
                 NodeChangesBuffer.GetSingleton().changedNodeIDs.Clear();
                 NodeChangesBuffer.GetSingleton().removedNodeIDs.Clear();
@@ -1023,7 +1010,7 @@ namespace SEE.Game.Charts
         private void ChangeScrollViewEntryColor(GameObject scrollViewEntry, GameObject parent)
         {
             TextMeshProUGUI textMesh = scrollViewEntry.GetComponent<TextMeshProUGUI>();
-            ColorBlock colors = parent.transform.GetComponent<Toggle>().colors;
+            ColorBlock colors = parent.GetComponent<Toggle>().colors;
             
             if (this.newNodeIDs.Contains(textMesh.text))
             {
@@ -1051,11 +1038,11 @@ namespace SEE.Game.Charts
             }
             else
             {
-                textMesh.color = Color.cyan;
+                textMesh.color = Color.white;
                 colors.normalColor = Color.white;
             }
             colors.highlightedColor = hoveringOverLabelTextColor;
-            parent.transform.GetComponent<Toggle>().colors = colors;
+            parent.GetComponent<Toggle>().colors = colors;
         }
     }
 
