@@ -55,24 +55,38 @@ namespace SEE.Controls.Actions
         public Vector3 scale;
 
         /// <summary>
+        /// Should the node be placed or moved
+        /// </summary>
+        public bool place;
+
+        /// <summary>
+        /// Should a new node be created
+        /// </summary>
+        public bool create;
+
+        /// <summary>
         /// Creates a new NewNodeNetAction
         /// </summary>
-        /// <param name="GameObjectID">the  GameObject on that the city is attached for the new node</param>
-        /// <param name="IsInnerNode">should it be a inner node</param>
-        /// <param name="NodeMetrics1">id for the new node</param>
-        /// <param name="NodeMetrics2">name for the new node</param>
-        /// <param name="NodeMetrics3">type for the new node</param>
-        /// <param name="Position">the postition for the new node</param>
-        public NewNodeNetAction(string gameObjectID, bool isInnerNode, string nodeMetrics1, string nodeMetrics2, string nodeMetrics3, Vector3 position, Vector3 scale, string parentID) : base()
+        /// <param name="gameObjectID">the  GameObject on that the city is attached for the new node</param>
+        /// <param name="isInnerNode">should it be a inner node</param>
+        /// <param name="nodeMetrics1">id for the new node</param>
+        /// <param name="nodeMetrics2">name for the new node</param>
+        /// <param name="nodeMetrics3">type for the new node</param>
+        /// <param name="position">the position for the new node</param>
+        /// <param name="place">is the new node in moving or in placing state</param>
+        /// <param name="create">in the first method call a new node needs to be created, but only once</param>
+        public NewNodeNetAction(string gameObjectID, bool isInnerNode, string nodeMetrics1,Vector3 position, Vector3 scale, string parentID, bool place, bool create) : base()
         {
             this.gameObjectID = gameObjectID;
             this.parentID = parentID;
             this.isInnerNode = isInnerNode;
             id = nodeMetrics1;
-            sourceName = nodeMetrics2;
-            type = nodeMetrics3;
+            //sourceName = nodeMetrics2;
+            //type = nodeMetrics3;
             this.position = position;
             this.scale = scale;
+            this.place = place;
+            this.create = create;
         }
 
         /// <summary>
@@ -91,14 +105,27 @@ namespace SEE.Controls.Actions
         {
             if (!IsRequester())
             {
-                SceneQueries.GetCodeCity(GameObject.Find(gameObjectID).transform)?.gameObject.TryGetComponent(out city);
-                if (city != null)
+                if (create)
                 {
-                    GameObject dummy = new GameObject();
-                    dummy.AddComponent<NewNodeAction>();
-                    dummy.GetComponent<NewNodeAction>().City = city;
-                    dummy.GetComponent<NewNodeAction>().SetIsInnerNode(isInnerNode);
-                    dummy.GetComponent<NewNodeAction>().NetworkNewNode(position, scale, parentID);
+                    SceneQueries.GetCodeCity(GameObject.Find(gameObjectID).transform)?.gameObject.TryGetComponent(out city);
+                    if (city != null)
+                    {
+                        GameObject dummy = new GameObject();
+                        dummy.AddComponent<NewNodeAction>();
+                        dummy.GetComponent<NewNodeAction>().NodeID = id;
+                        dummy.GetComponent<NewNodeAction>().City = city;
+                        dummy.GetComponent<NewNodeAction>().SetIsInnerNode(isInnerNode);
+                        dummy.GetComponent<NewNodeAction>().NewNode();
+                        //dummy.GetComponent<NewNodeAction>().NetworkNewNode(position, scale, parentID);
+                    }
+                }
+                else if(place)
+                {
+                    GameObject.Find(id).GetComponent<NewNodeAction>().NetworkPlaceNode(position, scale, parentID);
+                }
+                else
+                {
+                    GameObject.Find(id).transform.position = position;
                 }
             }
         }
