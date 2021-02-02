@@ -80,7 +80,8 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The node id must be saved to use in the network
         /// </summary>
-        public String NodeID { get => NodeID; set => NodeID = value; }
+        private String nodeID;
+        public String NodeID { get => nodeID; set => nodeID = value; }
 
         /// <summary>
         /// A list the hovered GameObjects are stored in.
@@ -230,8 +231,10 @@ namespace SEE.Controls.Actions
 
                     if (GONode == null)
                     {
+                        Debug.Log("VOR NWTWvevert");
                         NodeID = RandomStrings.Get();
                         NewNode();
+                        Debug.Log("NACH dwpfvjerpvgjerpvr");
                         nodesLoaded = false;
                         GameNodeMover.MoveTo(GONode);
                         new NewNodeNetAction(hoveredObject.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, false, false).Execute(null);
