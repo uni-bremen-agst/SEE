@@ -2,10 +2,19 @@
   "scopedRegistries": [
     {
       "name": "Microsoft Mixed Reality",
-      "url": "https://pkgs.dev.azure.com/aipmr/MixedReality-Unity-Packages/_packaging/Unity-packages/npm/registry/",
+      "url": "https://pkgs.dev.azure.com/aipmr/MixedReality-Unity-Packages/_packaging/Unity-packages/npm/registry",
       "scopes": [
         "com.microsoft.mixedreality",
         "com.microsoft.spatialaudio"
+      ]
+    },
+    {
+      "name": "UnityMeshSimplifier",
+      "url": "https://github.com/Whinarn/UnityMeshSimplifier.git",
+      "scopes": [
+        "com.whinarn.unitymeshsimplifier",
+        "com.unity.mathematics",
+        "com.unity.package-manager-ui"
       ]
     }
   ],
@@ -31,6 +40,7 @@
     "com.unity.xr.legacyinputhelpers": "2.1.6",
     "com.unity.xr.openvr.standalone": "2.0.5",
     "com.unity.xr.windowsmr.metro": "4.2.3",
+    "com.whinarn.unitymeshsimplifier": "https://github.com/Whinarn/UnityMeshSimplifier.git",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
