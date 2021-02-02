@@ -238,6 +238,7 @@ namespace SEE.Controls.Actions
                     {
                         NodeID = RandomStrings.Get();
                         NewNode();
+                        Debug.LogError("TESTSTS");
                         new NewNodeNetAction(rndObjectInCity.name, isInnerNode, nodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, true).Execute(null);
                         nodesLoaded = false;
                         GameNodeMover.MoveTo(GONode);

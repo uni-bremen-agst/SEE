@@ -120,6 +120,7 @@ namespace SEE.Controls.Actions
                         
                         dummy.GetComponent<NewNodeAction>().SetIsInnerNode(isInnerNode);
                         dummy.GetComponent<NewNodeAction>().NewNode();
+                        
                         dummy.name = dummyName;
                         //dummy.GetComponent<NewNodeAction>().NetworkNewNode(position, scale, parentID);
                     }
@@ -131,7 +132,6 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    Debug.Log(position);
                     GameObject.Find(dummyName).GetComponent<NewNodeAction>().GONode.transform.position = position;
                     GameObject.Find(dummyName).GetComponent<NewNodeAction>().GONode.SetScale(scale);
                 }
