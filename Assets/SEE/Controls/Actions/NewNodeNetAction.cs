@@ -116,16 +116,17 @@ namespace SEE.Controls.Actions
                         dummy.GetComponent<NewNodeAction>().City = city;
                         dummy.GetComponent<NewNodeAction>().SetIsInnerNode(isInnerNode);
                         dummy.GetComponent<NewNodeAction>().NewNode();
+                        dummy.name = "tmpNetNewNode";
                         //dummy.GetComponent<NewNodeAction>().NetworkNewNode(position, scale, parentID);
                     }
                 }
                 else if(place)
                 {
-                    GameObject.Find(id).GetComponent<NewNodeAction>().NetworkPlaceNode(position, scale, parentID);
+                    GameObject.Find("tmpNetNewNode").GetComponent<NewNodeAction>().NetworkPlaceNode(position, scale, parentID);
                 }
                 else
                 {
-                    GameObject.Find(id).transform.position = position;
+                    GameObject.Find("tmpNetNewNode").transform.position = position;
                 }
             }
         }
