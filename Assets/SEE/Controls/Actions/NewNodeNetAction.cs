@@ -1,4 +1,5 @@
 ﻿using SEE.Game;
+using SEE.GO;
 using SEE.Net;
 using UnityEngine;
 
@@ -116,6 +117,7 @@ namespace SEE.Controls.Actions
                         dummy.AddComponent<NewNodeAction>();
                         dummy.GetComponent<NewNodeAction>().NodeID = id;
                         dummy.GetComponent<NewNodeAction>().City = city;
+                        
                         dummy.GetComponent<NewNodeAction>().SetIsInnerNode(isInnerNode);
                         dummy.GetComponent<NewNodeAction>().NewNode();
                         dummy.name = dummyName;
@@ -130,7 +132,8 @@ namespace SEE.Controls.Actions
                 else
                 {
                     Debug.Log(position);
-                    GameObject.Find(dummyName).transform.position = position;
+                    GameObject.Find(dummyName).GetComponent<NewNodeAction>().GONode.transform.position = position;
+                    GameObject.Find(dummyName).GetComponent<NewNodeAction>().GONode.SetScale(scale);
                 }
             }
         }

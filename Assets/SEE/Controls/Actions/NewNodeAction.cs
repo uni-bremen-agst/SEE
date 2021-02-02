@@ -40,8 +40,8 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The New GameObject which contains the new Node
         /// </summary>
-        private GameObject GONode = null;
-
+        public GameObject GONode = null;
+        
         /// <summary>
         /// True, if the node which will be created is an innerNode, else false
         /// </summary>
