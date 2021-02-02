@@ -128,6 +128,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         private SEECity cityToDye = null;
 
+        /// <summary>
+        /// To use the hovered object later
+        /// </summary>
+
+        private GameObject rndObjectInCity;
        
 
         public enum Progress
@@ -231,19 +236,18 @@ namespace SEE.Controls.Actions
 
                     if (GONode == null)
                     {
-                        Debug.Log("VOR NWTWvevert");
                         NodeID = RandomStrings.Get();
                         NewNode();
-                        Debug.Log("NACH dwpfvjerpvgjerpvr");
+                        new NewNodeNetAction(rndObjectInCity.name, isInnerNode, nodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, true).Execute(null);
                         nodesLoaded = false;
                         GameNodeMover.MoveTo(GONode);
-                        new NewNodeNetAction("", isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false).Execute(null);
+                        new NewNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false).Execute(null);
                         // Tweens.Move(GONode, new Vector3(GONode.transform.position.x, GONode.transform.position.y + 0.4f, GONode.transform.position.z), 0.6f);
                     }
                     else
                     {
                         GameNodeMover.MoveTo(GONode);
-                        new NewNodeNetAction("", isInnerNode, nodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false).Execute(null);
+                        new NewNodeNetAction(rndObjectInCity.name, isInnerNode, nodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false).Execute(null);
                         if (Input.GetMouseButtonDown(0))
                         {
                             Place();
@@ -281,6 +285,7 @@ namespace SEE.Controls.Actions
             {
                 if (!nodesLoaded)
                 {
+                    rndObjectInCity = hoveredObject;
                     SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject.TryGetComponent<SEECity>(out cityToDye);
                     GetNodesOfScene();
                 }
@@ -431,11 +436,7 @@ namespace SEE.Controls.Actions
             GONode.gameObject.GetComponent<Collider>().enabled = false;
             
             GameNodeMover.MoveTo(GONode);
-            Debug.Log(hoveredObject);
-            Debug.Log(GONode);
-            Debug.Log(isInnerNode);
-            Debug.Log(nodeID);
-            new NewNodeNetAction("hoveredObject.name", isInnerNode, nodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, true).Execute(null);
+          
         }
 
         /// <summary>
@@ -473,7 +474,7 @@ namespace SEE.Controls.Actions
                 GONode.gameObject.GetComponent<Collider>().enabled = true;
                 GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
 
-                new NewNodeNetAction(hoveredObject.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, true, false).Execute(null);
+                new NewNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, true, false).Execute(null);
             }
             else
             {
