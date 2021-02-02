@@ -78,6 +78,11 @@ namespace SEE.Controls.Actions
         public Color AlternativeHoverCityColor { get => alternativeHoverCityColor; set => alternativeHoverCityColor = value; }
 
         /// <summary>
+        /// The node id must be saved to use in the network
+        /// </summary>
+        public String NodeID { get => NodeID; set => NodeID = value; }
+
+        /// <summary>
         /// A list the hovered GameObjects are stored in.
         /// </summary>
         private List<GameObject> hoveredObjectList = new List<GameObject>();
@@ -121,6 +126,8 @@ namespace SEE.Controls.Actions
         /// The current hovered city, which has to be colored while selecting a city-process for creating a new node.
         /// </summary>
         private SEECity cityToDye = null;
+
+       
 
         public enum Progress
         {
@@ -223,16 +230,17 @@ namespace SEE.Controls.Actions
 
                     if (GONode == null)
                     {
+                        NodeID = RandomStrings.Get();
                         NewNode();
                         nodesLoaded = false;
                         GameNodeMover.MoveTo(GONode);
-                        new ScaleNodeNetAction(GONode.name, GONode.transform.lossyScale, GONode.transform.position).Execute(null);
+                        new NewNodeNetAction(hoveredObject.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, false, false).Execute(null);
                         // Tweens.Move(GONode, new Vector3(GONode.transform.position.x, GONode.transform.position.y + 0.4f, GONode.transform.position.z), 0.6f);
                     }
                     else
                     {
                         GameNodeMover.MoveTo(GONode);
-                        new ScaleNodeNetAction(GONode.name, GONode.transform.lossyScale, GONode.transform.position).Execute(null);
+                        new NewNodeNetAction(hoveredObject.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, false, false).Execute(null);
                         if (Input.GetMouseButtonDown(0))
                         {
                             Place();
@@ -372,15 +380,16 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Creates a new node. First, it is created with default-values which will be replaced by inputValues by the user if they are given.
         /// Sets this node in the hierachy of the graph. 
+        /// Its important to set the id, city and isInnnerNode first
         /// </summary>
-        private void NewNode()
+        public void NewNode()
         {
             GameObject gameNode;
             System.Random rnd = new System.Random();
             Node node = new Node
             {
                 //Set the metrics of the new node
-                ID = RandomStrings.Get(),
+                ID = NodeID,
                 SourceName = "Node" + rnd.Next(0, 999999999),
                 Type = "Type" + rnd.Next(0, 999999999)
             };
@@ -419,7 +428,7 @@ namespace SEE.Controls.Actions
             GONode.gameObject.GetComponent<Collider>().enabled = false;
             
             GameNodeMover.MoveTo(GONode);
-            new ScaleNodeNetAction(GONode.name, GONode.transform.lossyScale, GONode.transform.position).Execute(null);
+            new NewNodeNetAction(hoveredObject.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, false, true).Execute(null);
         }
 
         /// <summary>
@@ -457,7 +466,7 @@ namespace SEE.Controls.Actions
                 GONode.gameObject.GetComponent<Collider>().enabled = true;
                 GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
 
-                new NewNodeNetAction(hoveredObject.name, isInnerNode, node.ID, node.SourceName, node.Type, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name).Execute(null);
+                new NewNodeNetAction(hoveredObject.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, true, false).Execute(null);
             }
             else
             {
@@ -588,14 +597,14 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// For Network Use Only, creates the new node on all other clients.
+        /// For Network Use Only, places the new node on all other clients.
         /// </summary>
         /// <param name="position"> The position of the new node</param>
         /// <param name="parentID">The id of the new GameObject</param>
         /// <param name="scale">the size of the new GameObject</param>
-        public void NetworkNewNode(Vector3 position, Vector3 scale, string parentID)
+        public void NetworkPlaceNode(Vector3 position, Vector3 scale, string parentID)
         {
-            NewNode();
+            
             GONode.SetScale(scale);
             GameNodeMover.NetworkFinalizeNodePosition(GONode, parentID, position);
             GONode = null;
