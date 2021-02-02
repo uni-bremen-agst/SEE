@@ -81,6 +81,7 @@ namespace SEE.Controls.Actions
                 GameObject g = GameObject.Find("Player Desktop");
                 EditNodeAction current = g.GetComponent<EditNodeAction>();
                 current.EditProgress = EditNodeAction.Progress.NoNodeSelected;
+                InteractableObject.UnselectAll(true);
                 editNode = false;
 
             }
