@@ -64,6 +64,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         public bool create;
 
+        public string dummyName = "tmpNetNewNode";
+
         /// <summary>
         /// Creates a new NewNodeNetAction
         /// </summary>
@@ -116,17 +118,19 @@ namespace SEE.Controls.Actions
                         dummy.GetComponent<NewNodeAction>().City = city;
                         dummy.GetComponent<NewNodeAction>().SetIsInnerNode(isInnerNode);
                         dummy.GetComponent<NewNodeAction>().NewNode();
-                        dummy.name = "tmpNetNewNode";
+                        dummy.name = dummyName;
                         //dummy.GetComponent<NewNodeAction>().NetworkNewNode(position, scale, parentID);
                     }
                 }
                 else if(place)
                 {
-                    GameObject.Find("tmpNetNewNode").GetComponent<NewNodeAction>().NetworkPlaceNode(position, scale, parentID);
+                    GameObject.Find(dummyName).GetComponent<NewNodeAction>().NetworkPlaceNode(position, scale, parentID);
+                   
                 }
                 else
                 {
-                    GameObject.Find("tmpNetNewNode").transform.position = position;
+                    Debug.Log(position);
+                    GameObject.Find(dummyName).transform.position = position;
                 }
             }
         }
