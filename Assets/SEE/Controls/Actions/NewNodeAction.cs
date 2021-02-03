@@ -133,6 +133,11 @@ namespace SEE.Controls.Actions
         /// </summary>
 
         private GameObject rndObjectInCity;
+
+        /// <summary>
+        /// The position of the graphs root.
+        /// </summary>
+        public Vector3 rootPostion; 
        
 
         public enum Progress
@@ -419,7 +424,7 @@ namespace SEE.Controls.Actions
 
             try
             {
-                GONode.transform.position = hoveredObjectList.ElementAt(hoveredObjectList.Count - 1).transform.position;
+                GONode.transform.position = rootPostion;
             }
             catch (Exception)
             {
@@ -482,7 +487,7 @@ namespace SEE.Controls.Actions
 
 
         /// <summary>
-        /// Gets all Nodes of the scene and saves them in  Collections - seperated onne for the graphs leafs
+        /// Gets all Nodes of the scene and saves them in collections - seperated one for the graphs leafs
         /// and one for the graphs innernodes.
         /// Furthermore the root or if there are more than one, the roots will be determined and stored as well in a list. 
         /// Finally, the median of the lossyscale of all nodes will calculated in order to 
@@ -588,10 +593,12 @@ namespace SEE.Controls.Actions
                     if (rootTmp.IsRoot() && rootTmp == rootOfCity && !(rootTmp == null))
                     {
                         listOfRoot.Add(rootSearchItem);
+                        rootPostion = rootSearchItem.transform.position;
                     }
                 }
                 
             }
+
             return listOfRoot;
         }
 
