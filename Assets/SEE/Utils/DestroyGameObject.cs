@@ -52,16 +52,16 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Destroys given <paramref name="gameObject"/> with all his attached childs.
+        /// Destroys given <paramref name="gameObject"/> with all its attached children.
         /// </summary>
         /// <param name="gameObject"></param>
-        public static void DestroyGameObjectWithChilds(GameObject gameObject)
+        public static void DestroyGameObjectWithChildren(GameObject gameObject)
         {
             if (gameObject.TryGetComponent(out NodeRef nodeRef))
             {
                 for (int i = 0; i < gameObject.transform.childCount; i++) {
                     GameObject child = gameObject.transform.GetChild(i).gameObject;
-                    DestroyGameObjectWithChilds(child);
+                    DestroyGameObjectWithChildren(child);
                 }
                 DestroyEdges(gameObject);
                 DestroyGameObject(gameObject);

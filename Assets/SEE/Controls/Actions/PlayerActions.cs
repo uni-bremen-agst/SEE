@@ -1,5 +1,8 @@
-﻿using SEE.Game;
+﻿using SEE.DataModel;
+using SEE.Game;
 using SEE.Game.Charts;
+using SEE.Game.UI3D;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -34,23 +37,42 @@ namespace SEE.Controls.Actions
             {
                 InteractableObject.UnselectAll(true);
             }
-
+            // If the local player presses Delete, we delete the currently selected object
+            if (Input.GetKeyDown(KeyCode.Delete))
+            {
+                if (selectedObject.gameObject != null)
+                {
+                        Transform selected = selectedObject.gameObject.transform;
+                        InteractableObject interactable = selected.GetComponent<InteractableObject>();
+                        if (interactable)
+                        {                                             
+                            if (selected.CompareTag(Tags.Edge))
+                            {
+                                Destroyer.DestroyGameObject(selected.gameObject);
+                            }
+                            else
+                            {
+                                Destroyer.DestroyGameObjectWithChildren(selected.gameObject);
+                            }                      
+                    }                    
+                }
+            }
             switch (state)
             {
                 case State.MoveNode:
                     // an object must be selected; otherwise we cannot move it
-                    if (selectedObject.gameObect != null)
+                    if (selectedObject.gameObject != null)
                     {                        
                         if (UserWantsToMove())
                         {
-                            GameNodeMover.MoveTo(selectedObject.gameObect);
+                            GameNodeMover.MoveTo(selectedObject.gameObject);
                         }
                         else
                         {
                             // The selected object has reached its final destination.
                             // It needs to be placed there.
-                            GameNodeMover.FinalizePosition(selectedObject.gameObect, selectedObject.originalPosition);
-                            selectedObject.gameObect = null;
+                            GameNodeMover.FinalizePosition(selectedObject.gameObject, selectedObject.originalPosition);
+                            selectedObject.gameObject = null;
                         }
                     }
                     break;
@@ -154,7 +176,7 @@ namespace SEE.Controls.Actions
 
         private struct ObjectInfo
         {
-            public GameObject gameObect;
+            public GameObject gameObject;
             public Vector3 originalPosition;
         }
 
@@ -180,7 +202,7 @@ namespace SEE.Controls.Actions
         /// <param name="selection">the selected interactable object</param>
         public void SelectOn(GameObject selection)
         {
-            selectedObject.gameObect = selection;
+            selectedObject.gameObject = selection;
             selectedObject.originalPosition = selection.transform.position;
             //Debug.Log($"Player selects {selection.name}.\n");
         }
@@ -195,7 +217,7 @@ namespace SEE.Controls.Actions
         public void SelectOff(GameObject selection)
         {
             //Debug.Log($"Player deselects {selection.name}.\n");
-            selectedObject.gameObect = null;
+            selectedObject.gameObject = null;
         }
 
         /// <summary>
