@@ -5,7 +5,6 @@ using SEE.GO;
 using SEE.Utils;
 using System;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
@@ -198,19 +197,6 @@ namespace SEE.Controls.Actions
                     if (Input.GetMouseButtonDown(0) && !isMouseOverGUI)
                     {
                         Select(actionState.hoveredTransform ? actionState.hoveredTransform.gameObject : null, !actionState.selectToggle);
-                    }
-                }
-
-                // Select action state
-                ActionState.Type[] actionStateTypes = (ActionState.Type[])Enum.GetValues(typeof(ActionState.Type));
-                Assert.IsTrue(actionStateTypes.Length <= 9);
-                for (int i = 0; i < actionStateTypes.Length; i++)
-                {
-                    ActionState.Type type = actionStateTypes[i];
-                    if (ActionState.Value != type && Input.GetKeyDown(KeyCode.Alpha1 + i))
-                    {
-                        ActionState.Value = type;
-                        break;
                     }
                 }
 

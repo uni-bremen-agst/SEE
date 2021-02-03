@@ -1,4 +1,4 @@
-﻿//Copyright 2020 Florian Garbade
+//Copyright 2020 Florian Garbade
 
 //Permission is hereby granted, free of charge, to any person obtaining a
 //copy of this software and associated documentation files (the "Software"),
@@ -16,7 +16,6 @@
 //LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 
 using SEE.DataModel.DG;
 using SEE.Game.Evolution;
@@ -158,6 +157,21 @@ namespace SEE.Game
         private bool _isStillAnimating = false;  // serialized by Unity
 
         /// <summary>
+        /// Whether the edge animation is ongoing.
+        /// </summary>
+        private bool moveEdges = false;
+
+        /// <summary>
+        /// Saves pairs of old and new edges.
+        /// </summary>
+        private IList<(GameObject, GameObject)> matchedEdges;
+
+        /// <summary>
+        /// Timer for edge animation
+        /// </summary>
+        private float timer = 0f;
+
+        /// <summary>
         /// True if animation is still ongoing.
         /// </summary>
         public bool IsStillAnimating
@@ -234,6 +248,8 @@ namespace SEE.Game
         /// Allows the comparison of two instances of <see cref="Node"/> from different graphs.
         /// </summary>
         private readonly NodeEqualityComparer nodeEqualityComparer = new NodeEqualityComparer();
+
+        private readonly EdgeEqualityComparer edgeEqualityComparer = new EdgeEqualityComparer();
 
         /// <summary>
         /// All pre-computed layouts for the whole graph series.
@@ -456,9 +472,9 @@ namespace SEE.Game
                 // For all edges of the current graph not in the next graph; that is, all
                 // edges removed: remove those. As above, edges are compared by their
                 // IDs.
-                // FOR ANIMATION: current.Graph?
-                // FOR ANIMATION:     .Edges().Except(next.Graph.Edges(), edgeEqualityComparer).ToList()
-                // FOR ANIMATION:     .ForEach(RenderRemovedOldEdge);
+                 current.Graph?
+                     .Edges().Except(next.Graph.Edges(), edgeEqualityComparer).ToList()
+                     .ForEach(RenderRemovedOldEdge);
             }
             // We need to assign _nextCity because the callback RenderPlane, RenderInnerNode, RenderLeaf, and 
             // RenderEdge will access it.
@@ -478,11 +494,22 @@ namespace SEE.Game
             // We have made the transition to the next graph.
             _currentCity = next;
             RenderPlane();
+            
+            Invoke("AnimateEdges", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
+        }
+
+        /// <summary>
+        /// Event function triggered when the knot animation is finished. Starts the animation of the edges.
+        /// </summary>
+        private void AnimateEdges()
+        {
+            //Starts the edge animation
+            MoveEdges();
             Invoke("OnAnimationsFinished", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
         }
 
         /// <summary>
-        /// Event function triggered when alls animations are finished. Renders all edges
+        /// Event function triggered when alls animations are finished. Animates the transition of the edges and renders all edges
         /// as new and notifies everyone that the animation is finished.
         /// </summary>
         private void OnAnimationsFinished()
@@ -490,8 +517,10 @@ namespace SEE.Game
             // Destroy all previous edges and draw all edges of next graph. This can only
             // be done when nodes have reached their final position, that is, at the end
             // of the animation cycle.
+            
             objectManager.RenderEdges();
-
+            // Stops the edge animation
+            moveEdges = false;
             IsStillAnimating = false;
             AnimationFinishedEvent.Invoke();
         }
@@ -525,6 +554,98 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Combines the edges of the old and the new graph by their ID. Called by the MoveEdges method
+        /// </summary>
+        /// <param name="oldEdges">List of currently drawn edges</param>
+        /// <param name="newEdges">List of new edges to be drawn</param>
+        /// <returns>List of related edges</returns>
+        protected virtual IList<(GameObject, GameObject)> EdgeMatcher(IList<GameObject> oldEdges, IList<GameObject> newEdges)
+        {
+            IList<(GameObject, GameObject)> result = new List<(GameObject, GameObject)>();
+            foreach (GameObject oldEdgeGameObject in oldEdges)
+            {
+                foreach (GameObject newEdgeGameObject in newEdges)
+                {                    
+                    if (oldEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef oldEdgeRef) 
+                        && newEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef newEdgeRef)
+                        && oldEdgeRef.edge.Equals(newEdgeRef.edge))
+                    {
+                        result.Add((oldEdgeGameObject, newEdgeGameObject));
+                    }
+                }
+            }
+            return result;
+        }
+        
+        /// <summary>
+        /// Calculates the control points of the edges of the next graph and generates their actual line points from them. 
+        /// </summary>
+        protected virtual void MoveEdges()
+        {
+           try
+           {
+                // Calculates the edges for the next graph
+                IList<GameObject> newEdges = objectManager.CalculateNewEdgeControlPoints().ToList();
+                IList<GameObject> oldEdges = objectManager.GetEdges().ToList();
+                
+                // Searches for pairs between old and new edges
+                matchedEdges =  EdgeMatcher(oldEdges,newEdges);              
+                // Case distinction in case the layout does not need sample points
+                if(!graphRenderer.GetSettings().EdgeLayout.Equals(SEE.Layout.EdgeLayouts.EdgeLayoutKind.Straight))
+                {
+                    foreach((GameObject oldEdge, GameObject newEdge) in matchedEdges)
+                    {
+                        oldEdge.TryGetComponent<Points>(out Points oP);
+                        newEdge.TryGetComponent<Points>(out Points nP);
+
+                        uint sampleRate = (uint)Math.Max(oP.linePoints.Count(),nP.linePoints.Count());
+
+                        // Creates new line points from the control points 
+                        oP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(oP.controlPoints, sampleRate);
+                        nP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(nP.controlPoints, sampleRate);
+
+                        // Saves the new line points to the LineRenderer
+                        oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
+                        lineRenderer.positionCount = oP.linePoints.Count();
+                        lineRenderer.SetPositions(oP.linePoints);
+                    }
+                }
+                    // Sets the timer for the animation to zero
+                    timer = 0f;
+                    // Starts the animation of the edges
+                    moveEdges = true;
+            }
+            catch (ArgumentNullException)
+            {
+                moveEdges = false;
+            }
+        }
+        
+        /// <summary>
+        /// Interpolates the points of the old edges with those of the new edges over time.
+        /// </summary>
+        void Update()
+        {
+            if (moveEdges) 
+            {
+                timer += Time.deltaTime;
+                 foreach ((GameObject oldEdge, GameObject newEdge) in matchedEdges)
+                 {
+                    if (oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer)
+                        && newEdge.TryGetComponent<Points>(out Points newLinePoints))
+                    {
+                        for (int i = 0; i < lineRenderer.positionCount; i++)
+                        {
+                            lineRenderer.SetPosition(i, Vector3.Lerp(lineRenderer.GetPosition(i),
+                                                                     newLinePoints.linePoints[i],
+                                                                     timer / AnimationDuration));
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Event function that adjusts the given <paramref name="gameNode"/>
         /// according to is attached node's color (style) metric.
         /// It will be called as a callback after the animation of a node to be 
@@ -535,7 +656,7 @@ namespace SEE.Game
         /// <param name="gameNode">game node object that was just modified by the animation</param>
         public void OnRenderNodeFinishedAnimation(object gameNode)
         {
-            if (gameNode != null && gameNode is GameObject)
+            if (gameNode is GameObject)
             {
                 graphRenderer.AdjustStyle(gameNode as GameObject);
             }
@@ -641,10 +762,10 @@ namespace SEE.Game
         /// Removes the given edge. The edge is not destroyed, however.
         /// </summary>
         /// <param name="edge"></param>
-        /// FOR ANIMATION: protected virtual void RenderRemovedOldEdge(Edge edge)
-        /// FOR ANIMATION: {
-        /// FOR ANIMATION: // FIXME.
-        /// FOR ANIMATION: }
+        protected virtual void RenderRemovedOldEdge(Edge edge)
+        {
+            objectManager.RemoveEdge(edge);
+        }
 
         // **********************************************************************
 
