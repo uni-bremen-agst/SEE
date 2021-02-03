@@ -238,12 +238,11 @@ namespace SEE.Controls.Actions
                     {
                         NodeID = RandomStrings.Get();
                         NewNode();
-                        Debug.LogError("TESTSTS");
                         new NewNodeNetAction(rndObjectInCity.name, isInnerNode, nodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, true).Execute(null);
                         nodesLoaded = false;
                         GameNodeMover.MoveTo(GONode);
                         new NewNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false).Execute(null);
-                        // Tweens.Move(GONode, new Vector3(GONode.transform.position.x, GONode.transform.position.y + 0.4f, GONode.transform.position.z), 0.6f);
+                        
                     }
                     else
                     {
@@ -295,7 +294,7 @@ namespace SEE.Controls.Actions
                 {
                     if (go.GetComponent<NodeRef>().Value.ItsGraph == cityToDye.LoadedGraph)
                     {
-                        ChangeColor(go, go.GetComponent<Renderer>().material.color);
+                        ChangeColor(go);
                     }
                 }
 
@@ -310,7 +309,7 @@ namespace SEE.Controls.Actions
                 {
                     if (root.GetComponent<NodeRef>().Value.ItsGraph == city.LoadedGraph)
                     {
-                        ChangeColor(root, root.GetComponent<Renderer>().material.color);
+                        ChangeColor(root);
                     }
                 }
             }
@@ -348,18 +347,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="colorOfCity">the default-color of the city.</param>
         /// <param name="objectToDye"> the object which will get dyed</param>
-        private void ChangeColor(GameObject objectToDye, Color colorOfCity)
+        private void ChangeColor(GameObject objectToDye)
         {
-           Color newCityColor = defaultHoverCityColor;
+            Color newCityColor = defaultHoverCityColor;
 
-        //    if (colorOfCity == defaultHoverCityColor)
-        //    {
-        //        newCityColor = alternativeHoverCityColor;
-        //    }
-        //    else
-        //    {
-        //        newCityColor = defaultHoverCityColor;
-        //    }
             if (!(hoveredObjectList.Contains(objectToDye)))
             {
                 hoveredObjectList.Add(objectToDye);
@@ -491,11 +482,11 @@ namespace SEE.Controls.Actions
 
 
         /// <summary>
-        /// Gets all Nodes of the scene and saves them inside of Collections - one InnerNode and one Leaf.
-        /// If there is just one Node, it is the root automatically. 
-        /// Else, this method searchs for all roots of the scene, too. 
-        /// Finally, the median of all nodes will calculated by the lists of Lossyscale of the gameObject-Nodes 
-        /// for constructing the node with a default-size.
+        /// Gets all Nodes of the scene and saves them in  Collections - seperated onne for the graphs leafs
+        /// and one for the graphs innernodes.
+        /// Furthermore the root or if there are more than one, the roots will be determined and stored as well in a list. 
+        /// Finally, the median of the lossyscale of all nodes will calculated in order to 
+        /// determine a default-size, which can be use when creating new nodes, either leafs or innernodes.
         /// </summary>
         public void GetNodesOfScene()
         {
@@ -545,7 +536,7 @@ namespace SEE.Controls.Actions
 
             foreach (GameObject go in pListOfGameObjects)
             {
-                //to specify if the specific node belong to the specific graph. 
+                //to specify if the specific node belongs to the specific graph. 
                 if (go.GetComponent<NodeRef>().Value.ItsGraph == cityToDye.LoadedGraph)
                 {
                     lossyScaleList.Add(go.transform.lossyScale);
@@ -555,31 +546,37 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Search for all rootNode-GameObjects in the given lists of Gameobjects. 
+        /// Search and compare all rootNode-GameObjects in the given lists of Gameobjects. 
         /// Special cases for the root-search: 
         /// There is no node in the scene -> root = null
         /// There is just one node in the scene -> root is this node
-        /// There are multipleRoots in the graph.
         /// There is exactly one root in the graph
+        /// There are multipleRoots in the graph.
         /// </summary>
         /// <param name="listofLeafs">A collection of all leafs in a loaded scene</param>
         /// <param name="listOfInnerNodes">A collection of all InnerNodes in a loaded scene</param>
         /// <param name="pListofRoots">A list of all root-nodes in a loaded scene</param>
-        /// <returns>A list with all root-GameObjects in the loaded scene</returns>
+        /// <returns>A list with all root-GameObjects in the loaded scene ; Postcondition : list might be null </returns>
         private List<GameObject> RootSearch(ICollection<GameObject> listOfInnerNodes, ICollection<GameObject> listofLeafs, List<Node> pListofRoots)
         {
-            List<GameObject> listsOfRoot = new List<GameObject>();
 
-            if (listofLeafs.Count == 1 && listOfInnerNodes.Count == 0)
-            {
-                listsOfRoot.Add(listofLeafs.ElementAt(0));
-            }
+            List<GameObject> listOfRoot = new List<GameObject>();
 
             if (listofLeafs.Count == 0 && listOfInnerNodes.Count == 0)
             {
-                listsOfRoot = null;
+                listOfRoot = null;
+                return listOfRoot;
+            }
+            /// Special case the graph only consists of one Leaf, i.e. the root.
+            if (listofLeafs.Count == 1 && listOfInnerNodes.Count == 0)
+            {
+                listOfRoot.Add(listofLeafs.ElementAt(0));
+                return listOfRoot;
             }
 
+           
+
+            // Unfortunately, there might be more than one root, so we have to compare each of them
             foreach (Node root in pListofRoots)
             {
                 Node rootOfCity = root;
@@ -590,19 +587,12 @@ namespace SEE.Controls.Actions
                     rootTmp = rootSearchItem.GetComponent<NodeRef>().Value;
                     if (rootTmp.IsRoot() && rootTmp == rootOfCity && !(rootTmp == null))
                     {
-                        listsOfRoot.Add(rootSearchItem);
+                        listOfRoot.Add(rootSearchItem);
                     }
                 }
-                foreach (GameObject rootSearchItem in listofLeafs)
-                {
-                    rootTmp = rootSearchItem.GetComponent<NodeRef>().Value;
-                    if (rootTmp.IsRoot() && rootTmp == rootOfCity && !(rootTmp == null))
-                    {
-                        listsOfRoot.Add(rootSearchItem);
-                    }
-                }
+                
             }
-            return listsOfRoot;
+            return listOfRoot;
         }
 
         /// <summary>

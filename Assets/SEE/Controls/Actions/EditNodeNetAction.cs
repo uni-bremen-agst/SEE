@@ -29,7 +29,7 @@ namespace SEE.Controls.Actions
         public string gameObjectID;
 
         /// <summary>
-        /// Constructs a EditNodeNetAction
+        /// Constructs an EditNodeNetAction object
         /// </summary>
         /// <param name="SourceName">The new sourcename</param>
         /// <param name="Type">the new type</param>

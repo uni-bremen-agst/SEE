@@ -32,7 +32,7 @@ public class CanvasGenerator : MonoBehaviour
     }
 
     /// <summary>
-    /// Destroys the AddingNodeCanvasScript and all childs of it.
+    /// Destroys the AddingNodeCanvasScript  and each of its children.
     /// </summary>
     public void DestroyAddNodeCanvas()
     {
@@ -45,7 +45,7 @@ public class CanvasGenerator : MonoBehaviour
     }
 
     /// <summary>
-    /// Destroys the EditNodeCanvasScript and all childs of it.
+    /// Destroys the EditNodeCanvasScript and each of its children.
     /// </summary>
     public void DestroyEditNodeCanvas()
     {
