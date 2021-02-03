@@ -219,30 +219,6 @@ namespace SEE.Controls.Actions
                     rotateState.rotateGizmo.Center = cursor.GetPosition();
                     rotateState.rotateGizmo.Radius = 0.2f * (MainCamera.Camera.transform.position - rotateState.rotateGizmo.Center).magnitude;
                 }
-
-                if (Input.GetKeyDown(KeyCode.Delete))
-                {
-                    if (actionState.hoveredTransform != null)
-                    {
-                        foreach (Transform selected in cursor.GetFocusses())
-                        {
-                            InteractableObject interactable = selected.GetComponent<InteractableObject>();
-                            if (interactable)
-                            {
-                                interactable.SetSelect(false, false);
-                                //cursor.RemoveFocus(selected);
-                                if (selected.CompareTag(Tags.Edge))
-                                {
-                                    Destroyer.DestroyGameObject(selected.gameObject);
-                                }
-                                else
-                                {
-                                    Destroyer.DestroyGameObjectWithChilds(selected.gameObject);
-                                }
-                            }
-                        }
-                    }
-                }
             }
 
         }
