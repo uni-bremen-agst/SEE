@@ -8,6 +8,7 @@ namespace SEE.Game
     /// <summary>
     /// Allows to move game nodes (game objects representing a graph node).
     /// </summary>
+    [System.Obsolete("This is now implemented directly in DesktopNavigationAction.cs")]
     public static class GameNodeMover
     {
         /// <summary>
