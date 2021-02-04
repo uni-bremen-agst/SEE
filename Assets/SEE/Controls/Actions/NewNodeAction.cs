@@ -248,16 +248,16 @@ namespace SEE.Controls.Actions
                     {
                         NodeID = RandomStrings.Get();
                         NewNode();
-                        new NewNodeNetAction(rndObjectInCity.name, isInnerNode, nodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, true).Execute(null);
+                        new NewNodeNetAction(rndObjectInCity.name, isInnerNode, nodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, true,false).Execute(null);
                         nodesLoaded = false;
                         GameNodeMover.MoveTo(GONode);
-                        new NewNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false).Execute(null);
+                        new NewNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false,false).Execute(null);
                         
                     }
                     else
                     {
                         GameNodeMover.MoveTo(GONode);
-                        new NewNodeNetAction(rndObjectInCity.name, isInnerNode, nodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false).Execute(null);
+                        new NewNodeNetAction(rndObjectInCity.name, isInnerNode, nodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false,false).Execute(null);
                         if (Input.GetMouseButtonDown(0))
                         {
                             Place();
@@ -464,10 +464,12 @@ namespace SEE.Controls.Actions
                 GONode.gameObject.GetComponent<Collider>().enabled = true;
                 GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
                 new EditNodeNetAction(node.SourceName, node.Type, GONode.name).Execute(null);
-                new NewNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, true, false).Execute(null);
+                new NewNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, true, false, false).Execute(null);
             }
             else
             {
+                new NewNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, true, false,true).Execute(null);
+
                 Destroy(GONode);
             }
 

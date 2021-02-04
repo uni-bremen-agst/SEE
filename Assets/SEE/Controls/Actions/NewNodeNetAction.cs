@@ -56,6 +56,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         public bool create;
 
+        /// <summary>
+        /// If a node was placed where it should not be placed it needs to be destroyed in the network
+        /// </summary>
+        public bool illegalPlace;
+
         public string dummyName = "tmpNetNewNode";
 
         /// <summary>
@@ -67,7 +72,8 @@ namespace SEE.Controls.Actions
         /// <param name="position">the position for the new node</param>
         /// <param name="place">is the new node in moving or in placing state</param>
         /// <param name="create">in the first method call a new node needs to be created, but only once</param>
-        public NewNodeNetAction(string gameObjectID, bool isInnerNode, string newNodeID,Vector3 position, Vector3 scale, string parentID, bool place, bool create) : base()
+        /// <param name="illegalPlace">Was the placement illegal</param>
+        public NewNodeNetAction(string gameObjectID, bool isInnerNode, string newNodeID,Vector3 position, Vector3 scale, string parentID, bool place, bool create, bool illegalPlace) : base()
         {
             this.gameObjectID = gameObjectID;
             this.parentID = parentID;
@@ -77,6 +83,7 @@ namespace SEE.Controls.Actions
             this.scale = scale;
             this.place = place;
             this.create = create;
+            this.illegalPlace = illegalPlace;
         }
 
         /// <summary>
@@ -116,7 +123,15 @@ namespace SEE.Controls.Actions
                 //Manages the placement of the new node on each client
                 else if(place)
                 {
-                    GameObject.Find(dummyName).GetComponent<NewNodeAction>().NetworkPlaceNode(position, scale, parentID);
+                    if (illegalPlace)
+                    {
+                        Object.Destroy(GameObject.Find(dummyName).GetComponent<NewNodeAction>().GONode);
+                    }
+                    else
+                    {
+                        GameObject.Find(dummyName).GetComponent<NewNodeAction>().NetworkPlaceNode(position, scale, parentID);
+                    }
+                    Object.Destroy(GameObject.Find(dummyName).GetComponent<NewNodeAction>());
                     Object.Destroy(GameObject.Find(dummyName));
                 }
                 //Let the new node move with the cursor of the master
