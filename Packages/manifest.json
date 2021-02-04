@@ -9,12 +9,10 @@
       ]
     },
     {
-      "name": "UnityMeshSimplifier",
-      "url": "https://github.com/Whinarn/UnityMeshSimplifier.git",
+      "name": "Tabular",
+      "url": "https://github.com/mattatz/unity-tubular/tree/master/Assets/Packages/Tubular",
       "scopes": [
-        "com.whinarn.unitymeshsimplifier",
-        "com.unity.mathematics",
-        "com.unity.package-manager-ui"
+        "Tabular"
       ]
     }
   ],

@@ -11,6 +11,10 @@ using UnityEngine;
 using SEE.Controls;
 using SEE.Controls.Actions;
 using UnityMeshSimplifier;
+using Assets.SEE.Utils;
+using Curve;
+//using Curve;
+//using Tubular;
 
 namespace SEE.GO
 {
@@ -110,30 +114,20 @@ namespace SEE.GO
                 line.positionCount = points.Length; // number of vertices
                 line.SetPositions(points);
 
-                    
-
-                LineRenderer lineRenderer = gameEdge.GetComponent<LineRenderer>();
                 MeshCollider meshCollider = gameEdge.AddComponent<MeshCollider>();
 
-                Mesh mesh = new Mesh();
-                lineRenderer.BakeMesh(mesh, Camera.main, false);
+                // Build tubular mesh with Curve
+                int tubularSegments = 50;
+                float radius = 0.001f;
+                int radialSegments = 8;
+                bool closed = false; // closed curve or not
+                var mesh = Tubular.Tubular.Build(new CatmullRomCurve(layoutEdge.Points.OfType<Vector3>().ToList()) , tubularSegments, radius, radialSegments, closed);
 
-                // Qualität zwischen 0 und 1;
-                float quality = 0.5f;
-                var meshSimplifier = new MeshSimplifier();
-                meshSimplifier.Initialize(mesh);
-                meshSimplifier.SimplifyMesh(quality);
-                var destMesh = meshSimplifier.ToMesh();
+                // visualize mesh
+                var filter = gameEdge.AddComponent<MeshFilter>();
+                filter.sharedMesh = mesh;
+                meshCollider.sharedMesh = mesh;
 
-                meshCollider.sharedMesh = destMesh;
-
-                //FIXME
-                // Convex ist eher ungeil, da zu groß. Funktioniert aber vorerst.
-                meshCollider.convex = false;
-
-
-                // FIXME
-                // Brauchen wir ein Label Hovering? Wenn ja, EdgeRef stattt NodeRef?
                 gameEdge.AddComponent<Interactable>();
                 gameEdge.AddComponent<InteractableObject>();
                 gameEdge.AddComponent<ShowHovering>();
