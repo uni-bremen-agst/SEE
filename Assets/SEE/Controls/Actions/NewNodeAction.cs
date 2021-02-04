@@ -447,9 +447,17 @@ namespace SEE.Controls.Actions
             }
 
             SEECity cityTmp;
-
-            ///checks if the currently hovered object is part of the preselected city
-            GameObject tmp = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
+            GameObject tmp = null;
+            try
+            {
+                ///checks if the currently hovered object is part of the preselected city
+                tmp =  SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
+            }
+            catch (Exception)
+            {
+                Debug.Log("No object Hoverd");
+                return;
+            } 
             try
             {
                 tmp.TryGetComponent<SEECity>(out cityTmp);
