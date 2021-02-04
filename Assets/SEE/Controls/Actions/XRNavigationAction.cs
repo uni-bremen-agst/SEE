@@ -4,10 +4,13 @@ using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls.Actions
 {
-
-    /// <summary>
-    /// Controls the interactions with the city in XR mode.
-    /// </summary>
+    /// Controls the interactions with the city in desktop mode regarding the movement
+    /// and perspective on a code city (rotating, dragging, zooming, etc.).
+    /// 
+    /// Note: These are the interactions in a VR environment with head-mounted
+    /// display and VR controllers. Similar interactions specific to a desktop 
+    /// environment with 2D display, mouse, and keyboard are implemented
+    /// in DesktopNavigationAction.
     public sealed class XRNavigationAction : NavigationAction
     {
         /// <summary>

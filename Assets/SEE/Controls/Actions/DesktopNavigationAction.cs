@@ -1,5 +1,4 @@
-﻿using SEE.DataModel;
-using SEE.DataModel.DG;
+﻿using SEE.DataModel.DG;
 using SEE.Game.UI3D;
 using SEE.GO;
 using SEE.Utils;
@@ -9,7 +8,12 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Controls the interactions with the city in desktop mode.
+    /// Controls the interactions with the city in desktop mode regarding the movement
+    /// and perspective on a code city (rotating, dragging, zooming, etc.).
+    /// 
+    /// Note: These are the interactions on a desktop environment with 2D display,
+    /// mouse, and keyboard. Similar interactions specific to VR are implemented
+    /// in XRNavigationAction.
     /// </summary>
     [RequireComponent(typeof(Collider))]
     public class DesktopNavigationAction : NavigationAction
