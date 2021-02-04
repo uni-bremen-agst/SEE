@@ -10,11 +10,9 @@ using System.Linq;
 using UnityEngine;
 using SEE.Controls;
 using SEE.Controls.Actions;
-using UnityMeshSimplifier;
 using Assets.SEE.Utils;
 using Curve;
-//using Curve;
-//using Tubular;
+using Tubular;
 
 namespace SEE.GO
 {
@@ -121,7 +119,7 @@ namespace SEE.GO
 
                 // Build tubular mesh with Curve
                 int tubularSegments = 50;
-                float radius = 0.001f;
+                float radius = 0.005f;
                 int radialSegments = 8;
                 bool closed = false; // closed curve or not
                 var mesh = Tubular.Tubular.Build(new CatmullRomCurve(layoutEdge.Points.OfType<Vector3>().ToList()) , tubularSegments, radius, radialSegments, closed);
