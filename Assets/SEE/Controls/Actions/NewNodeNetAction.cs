@@ -104,11 +104,13 @@ namespace SEE.Controls.Actions
                         //Just a gameObject to attatch the newNodeScript on
                         GameObject dummy = new GameObject();
                         dummy.AddComponent<NewNodeAction>();
+                        dummy.GetComponent<NewNodeAction>().Network = true; 
                         dummy.GetComponent<NewNodeAction>().NodeID = newNodeID;
                         dummy.GetComponent<NewNodeAction>().City = city;
                         dummy.GetComponent<NewNodeAction>().SetIsInnerNode(isInnerNode);
                         dummy.GetComponent<NewNodeAction>().NewNode();
                         dummy.name = dummyName;
+
                     }
                 }
                 //Manages the placement of the new node on each client
