@@ -16,7 +16,8 @@ namespace SEE.Controls.Actions
         public SEECity city = null;
 
         /// <summary>
-        /// The ID of the creators Game-Node-Object
+        /// The ID of the creators Game-Node-Object needed to find the city to place the new node in
+        /// Just one random object inside of the code city from the new node
         /// </summary>
         public string gameObjectID;
 
@@ -33,17 +34,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The id of the new node.
         /// </summary>
-        public string id;
-
-        /// <summary>
-        /// The sourceName of the new node.
-        /// </summary>
-        public string sourceName;
-
-        /// <summary>
-        /// The type of the new node.
-        /// </summary>
-        public string type;
+        public string newNodeID;
 
         /// <summary>
         /// The position of the new node.
@@ -72,20 +63,16 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="gameObjectID">the  GameObject on that the city is attached for the new node</param>
         /// <param name="isInnerNode">should it be a inner node</param>
-        /// <param name="nodeMetrics1">id for the new node</param>
-        /// <param name="nodeMetrics2">name for the new node</param>
-        /// <param name="nodeMetrics3">type for the new node</param>
+        /// <param name="newNodeID">id for the new node</param>
         /// <param name="position">the position for the new node</param>
         /// <param name="place">is the new node in moving or in placing state</param>
         /// <param name="create">in the first method call a new node needs to be created, but only once</param>
-        public NewNodeNetAction(string gameObjectID, bool isInnerNode, string nodeMetrics1,Vector3 position, Vector3 scale, string parentID, bool place, bool create) : base()
+        public NewNodeNetAction(string gameObjectID, bool isInnerNode, string newNodeID,Vector3 position, Vector3 scale, string parentID, bool place, bool create) : base()
         {
             this.gameObjectID = gameObjectID;
             this.parentID = parentID;
             this.isInnerNode = isInnerNode;
-            id = nodeMetrics1;
-            //sourceName = nodeMetrics2;
-            //type = nodeMetrics3;
+            this.newNodeID = newNodeID;
             this.position = position;
             this.scale = scale;
             this.place = place;
@@ -108,28 +95,29 @@ namespace SEE.Controls.Actions
         {
             if (!IsRequester())
             {
+                //Manages the Creation of a new node on each client
                 if (create)
                 {
                     SceneQueries.GetCodeCity(GameObject.Find(gameObjectID).transform)?.gameObject.TryGetComponent(out city);
                     if (city != null)
                     {
+                        //Just a gameObject to attatch the newNodeScript on
                         GameObject dummy = new GameObject();
                         dummy.AddComponent<NewNodeAction>();
-                        dummy.GetComponent<NewNodeAction>().NodeID = id;
+                        dummy.GetComponent<NewNodeAction>().NodeID = newNodeID;
                         dummy.GetComponent<NewNodeAction>().City = city;
-                        
                         dummy.GetComponent<NewNodeAction>().SetIsInnerNode(isInnerNode);
                         dummy.GetComponent<NewNodeAction>().NewNode();
-                        
                         dummy.name = dummyName;
-                        //dummy.GetComponent<NewNodeAction>().NetworkNewNode(position, scale, parentID);
                     }
                 }
+                //Manages the placement of the new node on each client
                 else if(place)
                 {
                     GameObject.Find(dummyName).GetComponent<NewNodeAction>().NetworkPlaceNode(position, scale, parentID);
                     Object.Destroy(GameObject.Find(dummyName));
                 }
+                //Let the new node move with the cursor of the master
                 else
                 {
                     GameObject.Find(dummyName).GetComponent<NewNodeAction>().GONode.transform.position = position;

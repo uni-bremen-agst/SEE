@@ -458,7 +458,7 @@ namespace SEE.Controls.Actions
             {
                 GONode.gameObject.GetComponent<Collider>().enabled = true;
                 GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
-                new EditNodeNetAction(node.SourceName, node.Type, GONode.name).Execute(null);
+                new EditNodeNetAction(node.SourceName, node.Type, GONode.name).Execute(null)ü;
                 new NewNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, true, false).Execute(null);
             }
             else
@@ -599,7 +599,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// For Network Use Only, places the new node on all other clients.
+        /// For Network Use Only, places the new node on all other clients. Additonaly it reenables the collider of the node after placement.
         /// </summary>
         /// <param name="position"> The position of the new node</param>
         /// <param name="parentID">The id of the new GameObject</param>
