@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="CopyClones" edgeids="true">
+    <node id="N2">
+      <type xlink:href="Directory"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Source.Name">
+        <string>dir_A_1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>dir_A_1</string>
+      </attr>
+    </node>
+    <node id="N4">
+      <type xlink:href="File"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Authors">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Changes">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>1</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>1</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>a1_a.cpp</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>a1_a.cpp</string>
+      </attr>
+    </node>
+    <node id="N5">
+      <type xlink:href="File"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Authors">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Changes">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>1</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>1</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>a1_b.cpp</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>a1_b.cpp</string>
+      </attr>
+    </node>
+	    <node id="N6">
+      <type xlink:href="File"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Authors">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Changes">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>1</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>1</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>a1_c.cpp</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>a1_c.cpp</string>
+      </attr>
+    </node>
+    <edge id="E3" from="N4" to="N2">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E4" from="N5" to="N2">
+      <type xlink:href="Enclosing"/>
+    </edge>
+	<edge id="E5" from="N6" to="N2">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E9" from="N5" to="N5">
+      <type xlink:href="Clone"/>
+    </edge>
+  </graph>
+</gxl>
