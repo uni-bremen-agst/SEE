@@ -609,6 +609,7 @@ namespace SEE.Controls.Actions
             
             GONode.SetScale(scale);
             GameNodeMover.NetworkFinalizeNodePosition(GONode, parentID, position);
+            GONode.gameObject.GetComponent<Collider>().enabled = true;
             GONode = null;
         }
 
