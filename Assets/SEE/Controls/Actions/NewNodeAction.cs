@@ -188,8 +188,11 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    // The monobehaviour is diabled and Update() no longer be called by Unity.
-                    enabled = false;
+                    if (!network)
+                    {
+                        // The monobehaviour is diabled and Update() no longer be called by Unity.
+                        enabled = false;
+                    }
                     CanvasGenerator c = canvasObject.GetComponent<CanvasGenerator>();
                     c.DestroyAddNodeCanvas();
                     Undye();
