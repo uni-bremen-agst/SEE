@@ -42,9 +42,6 @@ namespace SEE.Controls.Actions
         void Start()
         {
             InitialiseCanvasObject();
-            // An anonymous delegate is registered for the event <see cref="ActionState.OnStateChanged"/>.
-            // This delegate will be called from <see cref="ActionState"/> upon every
-            // state changed where the passed parameter is the newly entered state.
             ActionState.OnStateChanged += (ActionState.Type newState) =>
             {
                 // Is this our action state where we need to do something?
@@ -58,7 +55,6 @@ namespace SEE.Controls.Actions
                     {
                         instantiated = true;
                     }
-
                 }
                 else
                 {
@@ -73,7 +69,6 @@ namespace SEE.Controls.Actions
                 }
             };
             enabled = ActionState.Is(ThisActionState);
-            //ChangeState(ThisActionState);
         }
 
         /// <summary>
