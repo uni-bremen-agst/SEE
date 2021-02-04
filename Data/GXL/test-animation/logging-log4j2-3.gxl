@@ -1,0 +1,38 @@
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+    <graph id="logging-log4j2" edgeids="true">
+        <node id="N1">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>util</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>log4j2-core\src\test\java\org\apache\logging\log4j\core\util</string>
+            </attr>
+        </node>
+        <node id="N2">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>config\plugins</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>log4j2-core\src\main\java\org\apache\logging\log4j\core\config\plugins</string>
+            </attr>
+        </node>
+        <node id="N3">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>test\java\org\apache\logging\log4j\core</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>log4j2-core\src\test\java\org\apache\logging\log4j\core</string>
+            </attr>
+        </node>
+        <edge id="E0" from="N1" to="N2">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E1" from="N3" to="N1">
+            <type xlink:href="Clone"/>
+        </edge>
+    </graph>
+</gxl>
