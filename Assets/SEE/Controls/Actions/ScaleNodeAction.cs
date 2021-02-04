@@ -91,7 +91,6 @@ namespace SEE.Controls.Actions
             {
                 originalScale = objectToScale.transform.lossyScale;
                 originalPosition = objectToScale.transform.position;
-                Renderer renderer = objectToScale.GetComponent<Renderer>();
 
                 //TOP SPHERE
                 topSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -280,12 +279,7 @@ namespace SEE.Controls.Actions
             //Move the gameObject so the user thinks he scaled only in one direction
             Vector3 position = objectToScale.transform.position;
             position.y += scale.y * 0.5f;
-            // position.x += (fstSideSphere.transform.position.x - fstSideOldSpherPos.x) * 0.5f;
-            // position.x += (sndSideSphere.transform.position.x - sndSideOldSpherPos.x) * 0.5f;
-            // position.z += (thrdSideSphere.transform.position.z - thrdSideOldSpherPos.z) * 0.5f;
-            // position.z += (forthSideSphere.transform.position.z - forthSideOldSpherPos.z) * 0.5f;
-
-
+           
             //Setting the old positions
             topOldSpherPos = topSphere.transform.position;
             fstCornerOldSpherPos = fstCornerSphere.transform.position;
@@ -296,7 +290,6 @@ namespace SEE.Controls.Actions
             sndSideOldSpherPos = sndSideSphere.transform.position;
             thrdSideOldSpherPos = thrdSideSphere.transform.position;
             forthSideOldSpherPos = forthSideSphere.transform.position;
-
 
 
             scale = objectToScale.transform.lossyScale + scale;
@@ -436,8 +429,6 @@ namespace SEE.Controls.Actions
                 sphere.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
             }
 
-            //float scale = (goScale.x + goScale.z) / 4;
-
         }
 
         /// <summary>
@@ -446,8 +437,9 @@ namespace SEE.Controls.Actions
         /// <param name="save">Should the changes be saved</param>
         public void EndScale(bool save)
         {
-            if (save)//FIXME WITH USER INPUT
+            if (save)
             {
+                //FIXME: Currently, the changes will not be saved after closing the game. 
                 //SAFE THE CHANGES
                 RemoveSpheres();
             }
