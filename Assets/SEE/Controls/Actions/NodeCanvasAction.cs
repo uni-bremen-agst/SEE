@@ -22,7 +22,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Destroys the canvas-gameObject and all its childs.
+        /// Destroys the canvas-gameObject and all its children.
         /// </summary>
         public void DestroyGOAndAllChilds()
         {

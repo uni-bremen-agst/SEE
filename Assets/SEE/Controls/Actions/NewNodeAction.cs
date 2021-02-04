@@ -400,10 +400,8 @@ namespace SEE.Controls.Actions
             };
 
             AddNode(node);
-
             //Redraw the node Graph
             city.LoadedGraph.FinalizeNodeHierarchy();
-
             GraphRenderer graphRenderer = city.Renderer;
 
             if (isInnerNode)
@@ -421,19 +419,9 @@ namespace SEE.Controls.Actions
                 GONode.gameObject.GetComponent<Renderer>().material.color = leafColor;
             }
 
-
-            try
-            {
-                GONode.transform.position = rootPostion;
-            }
-            catch (Exception)
-            {
-                Debug.LogWarning("Im Netzwerk ist die Liste Leer");
-            }
+            GONode.transform.position = rootPostion;
             GONode.gameObject.GetComponent<Collider>().enabled = false;
-            
             GameNodeMover.MoveTo(GONode);
-          
         }
 
         /// <summary>
@@ -520,6 +508,13 @@ namespace SEE.Controls.Actions
                 medianOfInnerNode = medianOfLeaf;
             }
 
+            // if , for any reason , the calulated medianvector is the null-vector, we adjust the new nodes lossyscale size  
+            // 40% of the norm vector.
+            if (medianOfInnerNode == new Vector3(0,0,0))
+            {
+                medianOfInnerNode = new Vector3(0.4f,0.4f,0.4f);
+            }
+
             nodesLoaded = true;
         }
 
@@ -589,6 +584,7 @@ namespace SEE.Controls.Actions
 
                 foreach (GameObject rootSearchItem in listOfInnerNodes)
                 {
+                    
                     rootTmp = rootSearchItem.GetComponent<NodeRef>().Value;
                     if (rootTmp.IsRoot() && rootTmp == rootOfCity && !(rootTmp == null))
                     {
