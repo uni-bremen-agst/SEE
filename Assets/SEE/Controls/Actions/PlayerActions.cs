@@ -37,24 +37,23 @@ namespace SEE.Controls.Actions
             {
                 InteractableObject.UnselectAll(true);
             }
-            // If the local player presses Delete, we delete the currently selected object
+            // If the local player presses Delete, we delete the currently selected object (node or edge).
             if (Input.GetKeyDown(KeyCode.Delete))
             {
                 if (selectedObject.gameObject != null)
                 {
-                        Transform selected = selectedObject.gameObject.transform;
-                        InteractableObject interactable = selected.GetComponent<InteractableObject>();
-                        if (interactable)
-                        {                                             
-                            if (selected.CompareTag(Tags.Edge))
-                            {
-                                Destroyer.DestroyGameObject(selected.gameObject);
-                            }
-                            else
-                            {
-                                Destroyer.DestroyGameObjectWithChildren(selected.gameObject);
-                            }                      
-                    }                    
+                    Transform selected = selectedObject.gameObject.transform;
+                    if (selected.GetComponent<InteractableObject>())
+                    {
+                        if (selected.CompareTag(Tags.Edge))
+                        {
+                            Destroyer.DestroyGameObject(selected.gameObject);
+                        }
+                        else if (selected.CompareTag(Tags.Node))
+                        {
+                            Destroyer.DestroyGameObjectWithChildren(selected.gameObject);
+                        }
+                    }
                 }
             }
             switch (state)
