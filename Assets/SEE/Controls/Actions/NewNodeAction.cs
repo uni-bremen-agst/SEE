@@ -174,7 +174,10 @@ namespace SEE.Controls.Actions
                 if (newState == ThisActionState)
                 {
                     // The monobehaviour is enabled and Update() will be called by Unity.
-                    enabled = true;
+                    if (!network)
+                    {
+                        enabled = true;
+                    }
                     InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
                     if (!instantiated)
@@ -455,7 +458,7 @@ namespace SEE.Controls.Actions
             }
             catch (Exception)
             {
-                Debug.Log("No object Hoverd");
+                Debug.Log("No object hovered");
                 return;
             } 
             try
