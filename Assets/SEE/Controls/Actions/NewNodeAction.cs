@@ -137,8 +137,11 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The position of the graphs root.
         /// </summary>
-        public Vector3 rootPostion; 
-       
+        public Vector3 rootPostion;
+
+        private bool network = false;
+
+        public bool Network { get => network; set => network = value; }
 
         public enum Progress
         {
@@ -216,8 +219,10 @@ namespace SEE.Controls.Actions
                     SelectCity();
                     if (city != null)
                     {
-                        Progress1 = Progress.CityIsSelected;
-
+                        if (!network)
+                        {
+                            Progress1 = Progress.CityIsSelected;
+                        }
                     }
                     break;
 
