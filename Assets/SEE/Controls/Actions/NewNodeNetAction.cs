@@ -128,7 +128,7 @@ namespace SEE.Controls.Actions
                 else if(place)
                 {
                     GameObject.Find(dummyName).GetComponent<NewNodeAction>().NetworkPlaceNode(position, scale, parentID);
-                   
+                    Object.Destroy(GameObject.Find(dummyName));
                 }
                 else
                 {
