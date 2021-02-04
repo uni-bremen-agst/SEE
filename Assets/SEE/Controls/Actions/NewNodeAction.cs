@@ -458,7 +458,7 @@ namespace SEE.Controls.Actions
             {
                 GONode.gameObject.GetComponent<Collider>().enabled = true;
                 GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
-                new EditNodeNetAction(node.SourceName, node.Type, node.ID);
+                new EditNodeNetAction(node.SourceName, node.Type, GONode.name).Execute(null);
                 new NewNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, true, false).Execute(null);
             }
             else
