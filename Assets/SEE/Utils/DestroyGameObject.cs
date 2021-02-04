@@ -1,4 +1,5 @@
-﻿using SEE.DataModel.DG;
+﻿using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.GO;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace SEE.Utils
         /// Destroys given game object using UnityEngine.Object when in
         /// game mode or UnityEngine.Object.DestroyImmediate when in editor mode.
         /// </summary>
-        /// <param name="gameObject"></param>
+        /// <param name="gameObject">game object to be destroyed</param>
         public static void DestroyGameObject(GameObject gameObject)
         {
             // We must use DestroyImmediate when we are in the editor mode.
@@ -35,7 +36,7 @@ namespace SEE.Utils
         /// Destroys given <paramref name="component"/> using UnityEngine.Object when in
         /// game mode or UnityEngine.Object.DestroyImmediate when in editor mode.
         /// </summary>
-        /// <param name="component"></param>
+        /// <param name="component">component to be destroyed</param>
         public static void DestroyComponent(Component component)
         {
             // We must use DestroyImmediate when we are in the editor mode.
@@ -52,9 +53,14 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Destroys given <paramref name="gameObject"/> with all its attached children.
+        /// Destroys given <paramref name="gameObject"/> with all its attached children
+        /// and incoming and outgoing edges. This method is intended to be used for
+        /// game objects representing graph nodes having a component 
+        /// <see cref=">SEE.DataModel.NodeRef"/>. If the <paramref name="gameObject"/> 
+        /// does not have a <see cref=">SEE.DataModel.NodeRef"/> component, nothing
+        /// happens.
         /// </summary>
-        /// <param name="gameObject"></param>
+        /// <param name="gameObject">game object to be destroyed</param>
         public static void DestroyGameObjectWithChildren(GameObject gameObject)
         {
             if (gameObject.TryGetComponent(out NodeRef nodeRef))
@@ -69,13 +75,13 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Searches all Edges attached to given <paramref name="nodeRef"/> 
-        /// and returns their Ids.
+        /// Returns the IDs of all incoming and outgoing edges for <paramref name="nodeRef"/>.
         /// </summary>
-        /// <param name="nodeRef"></param>
-        private static List<string> GetEdgeIds(NodeRef nodeRef)
+        /// <param name="nodeRef">node whose incoming and outgoing edges are requested</param>
+        /// <returns>IDs of all incoming and outgoing edges</returns>
+        private static HashSet<string> GetEdgeIds(NodeRef nodeRef)
         {
-            List<String> edgeIDs = new List<string>();
+            HashSet<String> edgeIDs = new HashSet<string>();
             foreach (Edge edge in nodeRef.Value.Outgoings)
             {
                 edgeIDs.Add(edge.ID);
@@ -90,26 +96,24 @@ namespace SEE.Utils
         /// <summary>
         /// Searches through all childs of given <paramref name="gameObject"/>
         /// and deletes all Edges attached to given childs.
+        /// 
+        /// This method is intended to be used for game objects representing graph nodes
+        /// having a component <see cref=">SEE.DataModel.NodeRef"/>. If the 
+        /// <paramref name="gameObject"/> does not have a <see cref=">SEE.DataModel.NodeRef"/>
+        /// component, nothing happens.
         /// </summary>
-        /// <param name="gameObject"></param>
+        /// <param name="gameObject">game node whose incoming and outgoing edges are to be destroyed</param>
         private static void DestroyEdges(GameObject gameObject)
         {
             if (gameObject.TryGetComponent(out NodeRef nodeRef))
             {
-                List<String> edgeIDs = GetEdgeIds(nodeRef);
+                HashSet<String> edgeIDs = GetEdgeIds(nodeRef);
 
-                GameObject[] allObjects = UnityEngine.Object.FindObjectsOfType<GameObject>();
-                foreach (GameObject go in allObjects)
+                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
                 {
-                    if (go.activeInHierarchy)
+                    if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                     {
-                        foreach (String edgeID in edgeIDs)
-                        {
-                            if (edgeID.Equals(go.name))
-                            {
-                                Destroyer.DestroyGameObject(go);
-                            }
-                        }
+                        Destroyer.DestroyGameObject(edge);
                     }
                 }
             }
