@@ -1,0 +1,2583 @@
+
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+    <graph id="tinylog-root" edgeids="true">
+        <node id="N13">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>logback</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark\logback</string>
+            </attr>
+        </node>
+        <node id="N67">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>policies</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\policies</string>
+            </attr>
+        </node>
+        <node id="N84">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>org</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>log4j-facade\src\org</string>
+            </attr>
+        </node>
+        <node id="N23">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>apache\log4j</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>log4j-facade\src\org\apache\log4j</string>
+            </attr>
+        </node>
+        <node id="N55">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>writers</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\writers</string>
+            </attr>
+        </node>
+        <node id="N19">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>tinylog</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark\tinylog</string>
+            </attr>
+        </node>
+        <node id="N9">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>log4j</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark\log4j</string>
+            </attr>
+        </node>
+        <node id="N62">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>labellers</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\labellers</string>
+            </attr>
+        </node>
+        <node id="N80">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>writers</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\writers</string>
+            </attr>
+        </node>
+        <node id="N5">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>jdk</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark\jdk</string>
+            </attr>
+        </node>
+        <node id="N32">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>labellers</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\labellers</string>
+            </attr>
+        </node>
+        <node id="N37">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>policies</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\policies</string>
+            </attr>
+        </node>
+        <node id="N49">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>util</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\util</string>
+            </attr>
+        </node>
+        <node id="N30">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>pmw\tinylog</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>log4j-facade\src\org\pmw\tinylog</string>
+            </attr>
+        </node>
+        <node id="N2">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>benchmark\src\org\pmw\benchmark</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark</string>
+            </attr>
+        </node>
+        <node id="N59">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>tinylog\src\org\pmw\tinylog</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog</string>
+            </attr>
+        </node>
+        <node id="N35">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>tests\src\org\pmw\tinylog</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog</string>
+            </attr>
+        </node>
+        <node id="N0">
+            <type xlink:href="Directory"/>
+            <attr name="Source.Name">
+                <string>tinylog</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog-root</string>
+            </attr>
+        </node>
+        <node id="N75">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>472</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>112</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>YearlyPolicy.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\policies\YearlyPolicy.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>YearlyPolicy.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\policies\YearlyPolicy.java</string>
+            </attr>
+        </node>
+        <node id="N66">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>300</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>93</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>AbstractTimeBasedPolicy.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\policies\AbstractTimeBasedPolicy.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>AbstractTimeBasedPolicy.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\policies\AbstractTimeBasedPolicy.java</string>
+            </attr>
+        </node>
+        <node id="N57">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>968</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>165</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>RollingFileWriterTest.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\writers\RollingFileWriterTest.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>RollingFileWriterTest.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\writers\RollingFileWriterTest.java</string>
+            </attr>
+        </node>
+        <node id="N50">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>81</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>52</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>MockSystem.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\util\MockSystem.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>MockSystem.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\util\MockSystem.java</string>
+            </attr>
+        </node>
+        <node id="N65">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>2071</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>624</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>Logger.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\Logger.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>Logger.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\Logger.java</string>
+            </attr>
+        </node>
+        <node id="N83">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>665</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>186</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>RollingFileWriter.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\writers\RollingFileWriter.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>RollingFileWriter.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\writers\RollingFileWriter.java</string>
+            </attr>
+            <attr name="CodeHistory.WasModified">
+                <int>1</int>
+            </attr>
+        </node>
+        <node id="N28">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>91</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>41</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>PropertyConfigurator.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>log4j-facade\src\org\apache\log4j\PropertyConfigurator.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>PropertyConfigurator.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>log4j-facade\src\org\apache\log4j\PropertyConfigurator.java</string>
+            </attr>
+        </node>
+        <node id="N38">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>934</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>197</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>DailyPolicyTest.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\policies\DailyPolicyTest.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>DailyPolicyTest.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\policies\DailyPolicyTest.java</string>
+            </attr>
+        </node>
+        <node id="N63">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>44</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>46</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>Labeller.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\labellers\Labeller.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>Labeller.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\labellers\Labeller.java</string>
+            </attr>
+            <attr name="CodeHistory.WasAdded">
+                <int>1</int>
+            </attr>
+        </node>
+        <node id="N21">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>52</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>24</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>TinylogSingleThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark\tinylog\TinylogSingleThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>TinylogSingleThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>benchmark\src\org\pmw\benchmark\tinylog\TinylogSingleThreadBenchmarkApplication.java</string>
+            </attr>
+        </node>
+        <node id="N61">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>251</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>68</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>CountLabeller.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\labellers\CountLabeller.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>CountLabeller.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\labellers\CountLabeller.java</string>
+            </attr>
+            <attr name="CodeHistory.WasAdded">
+                <int>1</int>
+            </attr>
+        </node>
+        <node id="N6">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>52</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>24</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>NativeLoggerMultiThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark\jdk\NativeLoggerMultiThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>NativeLoggerMultiThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>benchmark\src\org\pmw\benchmark\jdk\NativeLoggerMultiThreadBenchmarkApplication.java</string>
+            </attr>
+        </node>
+        <node id="N11">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>52</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>24</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>Log4jSingleThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark\log4j\Log4jSingleThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>Log4jSingleThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>benchmark\src\org\pmw\benchmark\log4j\Log4jSingleThreadBenchmarkApplication.java</string>
+            </attr>
+        </node>
+        <node id="N18">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>221</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>54</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>TinylogBenchmark.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark\tinylog\TinylogBenchmark.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>TinylogBenchmark.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>benchmark\src\org\pmw\benchmark\tinylog\TinylogBenchmark.java</string>
+            </attr>
+        </node>
+        <node id="N31">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>932</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>158</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>CountLabellerTest.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\labellers\CountLabellerTest.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>CountLabellerTest.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\labellers\CountLabellerTest.java</string>
+            </attr>
+            <attr name="CodeHistory.WasAdded">
+                <int>1</int>
+            </attr>
+        </node>
+        <node id="N41">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>613</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>148</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>SizePolicyTest.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\policies\SizePolicyTest.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>SizePolicyTest.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\policies\SizePolicyTest.java</string>
+            </attr>
+        </node>
+        <node id="N33">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>1223</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>206</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>TimestampLabellerTest.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\labellers\TimestampLabellerTest.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>TimestampLabellerTest.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\labellers\TimestampLabellerTest.java</string>
+            </attr>
+            <attr name="CodeHistory.WasAdded">
+                <int>1</int>
+            </attr>
+        </node>
+        <node id="N73">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>98</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>49</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>StartupPolicy.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\policies\StartupPolicy.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>StartupPolicy.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\policies\StartupPolicy.java</string>
+            </attr>
+        </node>
+        <node id="N77">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>94</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>65</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>Token.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\Token.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>Token.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\Token.java</string>
+            </attr>
+        </node>
+        <node id="N3">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>48</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>28</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>IBenchmark.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark\IBenchmark.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>IBenchmark.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>benchmark\src\org\pmw\benchmark\IBenchmark.java</string>
+            </attr>
+        </node>
+        <node id="N14">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>52</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>24</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>LogbackMultiThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark\logback\LogbackMultiThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>LogbackMultiThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>benchmark\src\org\pmw\benchmark\logback\LogbackMultiThreadBenchmarkApplication.java</string>
+            </attr>
+        </node>
+        <node id="N64">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>524</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>128</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>TimestampLabeller.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\labellers\TimestampLabeller.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>TimestampLabeller.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\labellers\TimestampLabeller.java</string>
+            </attr>
+            <attr name="CodeHistory.WasAdded">
+                <int>1</int>
+            </attr>
+        </node>
+        <node id="N81">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>200</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>83</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>FileWriter.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\writers\FileWriter.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>FileWriter.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\writers\FileWriter.java</string>
+            </attr>
+        </node>
+        <node id="N29">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>79</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>29</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>LogEntryForwarder.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>log4j-facade\src\org\pmw\tinylog\LogEntryForwarder.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>LogEntryForwarder.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>log4j-facade\src\org\pmw\tinylog\LogEntryForwarder.java</string>
+            </attr>
+        </node>
+        <node id="N48">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>141</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>67</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>LabellerWriter.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\util\LabellerWriter.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>LabellerWriter.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\util\LabellerWriter.java</string>
+            </attr>
+            <attr name="CodeHistory.WasAdded">
+                <int>1</int>
+            </attr>
+        </node>
+        <node id="N17">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>98</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>36</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>SingleThreadBenchmarkRunner.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark\SingleThreadBenchmarkRunner.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>SingleThreadBenchmarkRunner.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>benchmark\src\org\pmw\benchmark\SingleThreadBenchmarkRunner.java</string>
+            </attr>
+        </node>
+        <node id="N40">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>726</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>152</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>MonthlyPolicyTest.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\policies\MonthlyPolicyTest.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>MonthlyPolicyTest.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\policies\MonthlyPolicyTest.java</string>
+            </attr>
+        </node>
+        <node id="N47">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>1364</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>169</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>TokenizerTest.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\TokenizerTest.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>TokenizerTest.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\TokenizerTest.java</string>
+            </attr>
+        </node>
+        <node id="N27">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>453</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>193</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>Priority.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>log4j-facade\src\org\apache\log4j\Priority.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>Priority.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>log4j-facade\src\org\apache\log4j\Priority.java</string>
+            </attr>
+        </node>
+        <node id="N34">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>2175</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>386</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>LoggerTest.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\LoggerTest.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>LoggerTest.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\LoggerTest.java</string>
+            </attr>
+        </node>
+        <node id="N76">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>2242</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>365</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>PropertiesLoader.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\PropertiesLoader.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>PropertiesLoader.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\PropertiesLoader.java</string>
+            </attr>
+            <attr name="CodeHistory.WasModified">
+                <int>1</int>
+            </attr>
+        </node>
+        <node id="N16">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>188</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>54</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>MultiThreadBenchmarkRunner.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark\MultiThreadBenchmarkRunner.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>MultiThreadBenchmarkRunner.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>benchmark\src\org\pmw\benchmark\MultiThreadBenchmarkRunner.java</string>
+            </attr>
+        </node>
+        <node id="N43">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>1066</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>206</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>WeeklyPolicyTest.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\policies\WeeklyPolicyTest.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>WeeklyPolicyTest.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\policies\WeeklyPolicyTest.java</string>
+            </attr>
+        </node>
+        <node id="N68">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>410</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>113</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>DailyPolicy.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\policies\DailyPolicy.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>DailyPolicy.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\policies\DailyPolicy.java</string>
+            </attr>
+        </node>
+        <node id="N72">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>379</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>100</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>SizePolicy.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\policies\SizePolicy.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>SizePolicy.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\policies\SizePolicy.java</string>
+            </attr>
+        </node>
+        <node id="N7">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>52</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>24</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>NativeLoggerSingleThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark\jdk\NativeLoggerSingleThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>NativeLoggerSingleThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>benchmark\src\org\pmw\benchmark\jdk\NativeLoggerSingleThreadBenchmarkApplication.java</string>
+            </attr>
+        </node>
+        <node id="N60">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>40</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>68</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>EToken.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\EToken.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>EToken.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\EToken.java</string>
+            </attr>
+        </node>
+        <node id="N24">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>1094</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>195</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>Category.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>log4j-facade\src\org\apache\log4j\Category.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>Category.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>log4j-facade\src\org\apache\log4j\Category.java</string>
+            </attr>
+        </node>
+        <node id="N39">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>699</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>150</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>HourlyPolicyTest.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\policies\HourlyPolicyTest.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>HourlyPolicyTest.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\policies\HourlyPolicyTest.java</string>
+            </attr>
+        </node>
+        <node id="N45">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>2937</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>443</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>PropertiesLoaderTest.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\PropertiesLoaderTest.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>PropertiesLoaderTest.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\PropertiesLoaderTest.java</string>
+            </attr>
+            <attr name="CodeHistory.WasModified">
+                <int>1</int>
+            </attr>
+        </node>
+        <node id="N70">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>213</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>78</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>MonthlyPolicy.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\policies\MonthlyPolicy.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>MonthlyPolicy.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\policies\MonthlyPolicy.java</string>
+            </attr>
+        </node>
+        <node id="N82">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>45</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>40</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>LoggingWriter.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\writers\LoggingWriter.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>LoggingWriter.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\writers\LoggingWriter.java</string>
+            </attr>
+        </node>
+        <node id="N78">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>561</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>105</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>Tokenizer.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\Tokenizer.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>Tokenizer.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\Tokenizer.java</string>
+            </attr>
+        </node>
+        <node id="N58">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>32</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>51</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>ELoggingLevel.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\ELoggingLevel.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>ELoggingLevel.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\ELoggingLevel.java</string>
+            </attr>
+        </node>
+        <node id="N52">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>77</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>45</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>SilentOutputStream.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\util\SilentOutputStream.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>SilentOutputStream.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\util\SilentOutputStream.java</string>
+            </attr>
+        </node>
+        <node id="N1">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>384</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>77</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>AbstractBenchmarkRunner.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark\AbstractBenchmarkRunner.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>AbstractBenchmarkRunner.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>benchmark\src\org\pmw\benchmark\AbstractBenchmarkRunner.java</string>
+            </attr>
+        </node>
+        <node id="N10">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>52</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>24</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>Log4jMultiThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark\log4j\Log4jMultiThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>Log4jMultiThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>benchmark\src\org\pmw\benchmark\log4j\Log4jMultiThreadBenchmarkApplication.java</string>
+            </attr>
+        </node>
+        <node id="N56">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>289</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>68</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>FileWriterTest.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\writers\FileWriterTest.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>FileWriterTest.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\writers\FileWriterTest.java</string>
+            </attr>
+        </node>
+        <node id="N69">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>179</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>73</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>HourlyPolicy.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\policies\HourlyPolicy.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>HourlyPolicy.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\policies\HourlyPolicy.java</string>
+            </attr>
+        </node>
+        <node id="N54">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>275</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>89</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>ConsoleWriterTest.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\writers\ConsoleWriterTest.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>ConsoleWriterTest.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\writers\ConsoleWriterTest.java</string>
+            </attr>
+        </node>
+        <node id="N15">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>52</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>24</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>LogbackSingleThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark\logback\LogbackSingleThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>LogbackSingleThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>benchmark\src\org\pmw\benchmark\logback\LogbackSingleThreadBenchmarkApplication.java</string>
+            </attr>
+        </node>
+        <node id="N79">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>113</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>47</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>ConsoleWriter.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\writers\ConsoleWriter.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>ConsoleWriter.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\writers\ConsoleWriter.java</string>
+            </attr>
+        </node>
+        <node id="N74">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>573</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>126</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>WeeklyPolicy.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\policies\WeeklyPolicy.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>WeeklyPolicy.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\policies\WeeklyPolicy.java</string>
+            </attr>
+        </node>
+        <node id="N8">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>279</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>58</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>Log4jBenchmark.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark\log4j\Log4jBenchmark.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>Log4jBenchmark.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>benchmark\src\org\pmw\benchmark\log4j\Log4jBenchmark.java</string>
+            </attr>
+        </node>
+        <node id="N20">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>52</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>24</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>TinylogMultiThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark\tinylog\TinylogMultiThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>TinylogMultiThreadBenchmarkApplication.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>benchmark\src\org\pmw\benchmark\tinylog\TinylogMultiThreadBenchmarkApplication.java</string>
+            </attr>
+        </node>
+        <node id="N22">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>37</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>29</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>BasicConfigurator.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>log4j-facade\src\org\apache\log4j\BasicConfigurator.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>BasicConfigurator.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>log4j-facade\src\org\apache\log4j\BasicConfigurator.java</string>
+            </attr>
+        </node>
+        <node id="N44">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>1165</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>199</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>YearlyPolicyTest.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\policies\YearlyPolicyTest.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>YearlyPolicyTest.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\policies\YearlyPolicyTest.java</string>
+            </attr>
+        </node>
+        <node id="N46">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>324</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>75</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>RegressionsTest.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\RegressionsTest.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>RegressionsTest.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\RegressionsTest.java</string>
+            </attr>
+        </node>
+        <node id="N71">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>57</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>53</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>Policy.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tinylog\src\org\pmw\tinylog\policies\Policy.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>Policy.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tinylog\src\org\pmw\tinylog\policies\Policy.java</string>
+            </attr>
+        </node>
+        <node id="N12">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>364</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>74</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>LogbackBenchmark.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark\logback\LogbackBenchmark.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>LogbackBenchmark.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>benchmark\src\org\pmw\benchmark\logback\LogbackBenchmark.java</string>
+            </attr>
+        </node>
+        <node id="N26">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>196</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>54</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>Logger.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>log4j-facade\src\org\apache\log4j\Logger.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>Logger.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>log4j-facade\src\org\apache\log4j\Logger.java</string>
+            </attr>
+        </node>
+        <node id="N53">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>142</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>70</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>StoreWriter.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\util\StoreWriter.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>StoreWriter.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\util\StoreWriter.java</string>
+            </attr>
+        </node>
+        <node id="N42">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>213</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>59</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>StartupPolicyTest.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\policies\StartupPolicyTest.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>StartupPolicyTest.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\policies\StartupPolicyTest.java</string>
+            </attr>
+        </node>
+        <node id="N4">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>453</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>85</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>NativeLoggerBenchmark.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>benchmark\src\org\pmw\benchmark\jdk\NativeLoggerBenchmark.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>NativeLoggerBenchmark.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>benchmark\src\org\pmw\benchmark\jdk\NativeLoggerBenchmark.java</string>
+            </attr>
+        </node>
+        <node id="N25">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>663</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>224</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>Level.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>log4j-facade\src\org\apache\log4j\Level.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>Level.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>log4j-facade\src\org\apache\log4j\Level.java</string>
+            </attr>
+        </node>
+        <node id="N36">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>321</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>117</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>AbstractTimeBasedTest.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\policies\AbstractTimeBasedTest.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>AbstractTimeBasedTest.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\policies\AbstractTimeBasedTest.java</string>
+            </attr>
+        </node>
+        <node id="N51">
+            <type xlink:href="File"/>
+            <attr name="Metric.Number_of_Tokens">
+                <int>234</int>
+            </attr>
+            <attr name="Metric.LOC">
+                <int>85</int>
+            </attr>
+            <attr name="Metric.Clone_Rate">
+                <float>0.0</float>
+            </attr>
+            <attr name="Source.Name">
+                <string>PolicyWriter.java</string>
+            </attr>
+            <attr name="Linkage.Name">
+                <string>tests\src\org\pmw\tinylog\util\PolicyWriter.java</string>
+            </attr>
+            <attr name="Source.File">
+                <string>PolicyWriter.java</string>
+            </attr>
+            <attr name="Source.Path">
+                <string>tests\src\org\pmw\tinylog\util\PolicyWriter.java</string>
+            </attr>
+            <attr name="CodeHistory.WasModified">
+                <int>1</int>
+            </attr>
+        </node>
+        <edge id="E0" from="N1" to="N2">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E1" from="N3" to="N2">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E2" from="N4" to="N5">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E3" from="N6" to="N5">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E4" from="N7" to="N5">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E5" from="N8" to="N9">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E6" from="N10" to="N9">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E7" from="N11" to="N9">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E8" from="N12" to="N13">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E9" from="N14" to="N13">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E10" from="N15" to="N13">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E11" from="N16" to="N2">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E12" from="N17" to="N2">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E13" from="N18" to="N19">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E14" from="N20" to="N19">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E15" from="N21" to="N19">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E16" from="N22" to="N23">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E17" from="N24" to="N23">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E18" from="N25" to="N23">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E19" from="N26" to="N23">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E20" from="N27" to="N23">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E21" from="N28" to="N23">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E22" from="N29" to="N30">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E23" from="N31" to="N32">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E24" from="N33" to="N32">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E25" from="N34" to="N35">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E26" from="N36" to="N37">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E27" from="N38" to="N37">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E28" from="N39" to="N37">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E29" from="N40" to="N37">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E30" from="N41" to="N37">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E31" from="N42" to="N37">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E32" from="N43" to="N37">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E33" from="N44" to="N37">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E34" from="N45" to="N35">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E35" from="N46" to="N35">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E36" from="N47" to="N35">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E37" from="N48" to="N49">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E38" from="N50" to="N49">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E39" from="N51" to="N49">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E40" from="N52" to="N49">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E41" from="N53" to="N49">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E42" from="N54" to="N55">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E43" from="N56" to="N55">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E44" from="N57" to="N55">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E45" from="N58" to="N59">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E46" from="N60" to="N59">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E47" from="N61" to="N62">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E48" from="N63" to="N62">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E49" from="N64" to="N62">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E50" from="N65" to="N59">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E51" from="N66" to="N67">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E52" from="N68" to="N67">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E53" from="N69" to="N67">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E54" from="N70" to="N67">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E55" from="N71" to="N67">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E56" from="N72" to="N67">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E57" from="N73" to="N67">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E58" from="N74" to="N67">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E59" from="N75" to="N67">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E60" from="N76" to="N59">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E61" from="N77" to="N59">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E62" from="N78" to="N59">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E63" from="N79" to="N80">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E64" from="N81" to="N80">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E65" from="N82" to="N80">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E66" from="N83" to="N80">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E67" from="N59" to="N0">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E68" from="N67" to="N59">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E69" from="N80" to="N59">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E70" from="N62" to="N59">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E71" from="N35" to="N0">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E72" from="N49" to="N35">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E73" from="N37" to="N35">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E74" from="N55" to="N35">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E75" from="N32" to="N35">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E76" from="N84" to="N0">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E77" from="N23" to="N84">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E78" from="N30" to="N84">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E79" from="N2" to="N0">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E80" from="N5" to="N2">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E81" from="N19" to="N2">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E82" from="N13" to="N2">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E83" from="N9" to="N2">
+            <type xlink:href="Enclosing"/>
+        </edge>
+        <edge id="E84" from="N1" to="N3">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E85" from="N4" to="N3">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E86" from="N6" to="N4">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E87" from="N6" to="N1">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E88" from="N6" to="N16">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E89" from="N7" to="N4">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E90" from="N7" to="N1">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E91" from="N7" to="N17">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E92" from="N8" to="N24">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E93" from="N8" to="N3">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E94" from="N8" to="N26">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E95" from="N8" to="N25">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E96" from="N10" to="N8">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E97" from="N10" to="N1">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E98" from="N10" to="N16">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E99" from="N11" to="N8">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E100" from="N11" to="N1">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E101" from="N11" to="N17">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E102" from="N12" to="N3">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E103" from="N14" to="N1">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E104" from="N14" to="N16">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E105" from="N14" to="N12">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E106" from="N15" to="N1">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E107" from="N15" to="N17">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E108" from="N15" to="N12">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E109" from="N16" to="N3">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E110" from="N16" to="N1">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E111" from="N17" to="N3">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E112" from="N17" to="N1">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E113" from="N18" to="N3">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E114" from="N18" to="N65">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E115" from="N18" to="N81">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E116" from="N18" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E117" from="N20" to="N1">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E118" from="N20" to="N18">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E119" from="N20" to="N16">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E120" from="N21" to="N1">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E121" from="N21" to="N18">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E122" from="N21" to="N17">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E123" from="N24" to="N27">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E124" from="N24" to="N26">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E125" from="N24" to="N65">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E126" from="N24" to="N29">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E127" from="N24" to="N25">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E128" from="N24" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E129" from="N25" to="N27">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E130" from="N26" to="N24">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E131" from="N26" to="N65">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E132" from="N26" to="N29">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E133" from="N26" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E134" from="N27" to="N25">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E135" from="N29" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E136" from="N29" to="N65">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E137" from="N31" to="N61">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E138" from="N31" to="N63">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E139" from="N33" to="N50">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E140" from="N33" to="N63">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E141" from="N33" to="N64">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E142" from="N34" to="N79">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E143" from="N34" to="N82">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E144" from="N34" to="N65">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E145" from="N34" to="N53">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E146" from="N34" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E147" from="N36" to="N50">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E148" from="N36" to="N66">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E149" from="N38" to="N71">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E150" from="N38" to="N68">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E151" from="N38" to="N66">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E152" from="N38" to="N36">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E153" from="N39" to="N71">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E154" from="N39" to="N69">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E155" from="N39" to="N66">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E156" from="N39" to="N36">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E157" from="N40" to="N71">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E158" from="N40" to="N70">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E159" from="N40" to="N66">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E160" from="N40" to="N36">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E161" from="N41" to="N71">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E162" from="N41" to="N72">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E163" from="N42" to="N71">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E164" from="N42" to="N73">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E165" from="N43" to="N71">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E166" from="N43" to="N74">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E167" from="N43" to="N66">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E168" from="N43" to="N36">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E169" from="N44" to="N71">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E170" from="N44" to="N66">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E171" from="N44" to="N75">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E172" from="N44" to="N36">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E173" from="N45" to="N68">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E174" from="N45" to="N48">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E175" from="N45" to="N79">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E176" from="N45" to="N76">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E177" from="N45" to="N82">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E178" from="N45" to="N65">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E179" from="N45" to="N61">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E180" from="N45" to="N75">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E181" from="N45" to="N81">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E182" from="N45" to="N83">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E183" from="N45" to="N74">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E184" from="N45" to="N51">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E185" from="N45" to="N69">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E186" from="N45" to="N72">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E187" from="N45" to="N70">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E188" from="N45" to="N64">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E189" from="N45" to="N53">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E190" from="N45" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E191" from="N45" to="N73">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E192" from="N46" to="N72">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E193" from="N46" to="N65">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E194" from="N46" to="N53">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E195" from="N46" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E196" from="N46" to="N83">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E197" from="N47" to="N60">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E198" from="N47" to="N77">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E199" from="N47" to="N78">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E200" from="N48" to="N63">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E201" from="N48" to="N82">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E202" from="N48" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E203" from="N51" to="N71">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E204" from="N51" to="N82">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E205" from="N51" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E206" from="N53" to="N82">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E207" from="N53" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E208" from="N54" to="N52">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E209" from="N54" to="N79">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E210" from="N54" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E211" from="N56" to="N52">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E212" from="N56" to="N81">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E213" from="N56" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E214" from="N57" to="N72">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E215" from="N57" to="N52">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E216" from="N57" to="N83">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E217" from="N57" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E218" from="N61" to="N63">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E219" from="N64" to="N65">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E220" from="N64" to="N63">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E221" from="N65" to="N79">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E222" from="N65" to="N77">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E223" from="N65" to="N82">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E224" from="N65" to="N76">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E225" from="N65" to="N78">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E226" from="N65" to="N60">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E227" from="N65" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E228" from="N66" to="N71">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E229" from="N66" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E230" from="N68" to="N66">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E231" from="N69" to="N66">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E232" from="N70" to="N66">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E233" from="N71" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E234" from="N72" to="N71">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E235" from="N72" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E236" from="N73" to="N71">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E237" from="N73" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E238" from="N74" to="N66">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E239" from="N75" to="N66">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E240" from="N76" to="N71">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E241" from="N76" to="N82">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E242" from="N76" to="N65">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E243" from="N76" to="N63">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E244" from="N76" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E245" from="N77" to="N60">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E246" from="N78" to="N60">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E247" from="N78" to="N77">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E248" from="N79" to="N82">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E249" from="N79" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E250" from="N81" to="N82">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E251" from="N81" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E252" from="N82" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E253" from="N83" to="N71">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E254" from="N83" to="N82">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E255" from="N83" to="N61">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E256" from="N83" to="N63">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E257" from="N83" to="N58">
+            <type xlink:href="Clone"/>
+        </edge>
+        <edge id="E258" from="N83" to="N73">
+            <type xlink:href="Clone"/>
+        </edge>
+    </graph>
+</gxl>
