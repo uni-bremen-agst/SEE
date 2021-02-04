@@ -262,7 +262,7 @@ namespace SEE.Controls.Actions
                         {
                             Place();
 
-                            Progress1 = Progress.NoCitySelected;
+                            
                         }
                     }
                     break;
@@ -476,11 +476,11 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                new NewNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, true, false,true).Execute(null);
+                new NewNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, "", true, false,true).Execute(null);
 
                 Destroy(GONode);
             }
-
+            Progress1 = Progress.NoCitySelected;
             GONode = null;
             city = null;
             nodesLoaded = false;
