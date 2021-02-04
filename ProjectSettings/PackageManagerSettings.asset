@@ -27,32 +27,26 @@ MonoBehaviour:
     - com.microsoft.mixedreality
     - com.microsoft.spatialaudio
     m_IsDefault: 0
-  - m_Id: scoped:UnityMeshSimplifier
-    m_Name: UnityMeshSimplifier
-    m_Url: https://github.com/Whinarn/UnityMeshSimplifier.git
+  - m_Id: scoped:Tabular
+    m_Name: Tabular
+    m_Url: https://github.com/mattatz/unity-tubular/tree/master/Assets/Packages/Tubular
     m_Scopes:
-    - com.whinarn.unitymeshsimplifier
-    - com.unity.mathematics
-    - com.unity.package-manager-ui
+    - Tabular
     m_IsDefault: 0
-  m_UserSelectedRegistryName: UnityMeshSimplifier
+  m_UserSelectedRegistryName: Tabular
   m_UserAddingNewScopedRegistry: 0
   m_RegistryInfoDraft:
     m_ErrorMessage: 
     m_Original:
-      m_Id: scoped:UnityMeshSimplifier
-      m_Name: UnityMeshSimplifier
-      m_Url: https://github.com/Whinarn/UnityMeshSimplifier.git
+      m_Id: scoped:Tabular
+      m_Name: Tabular
+      m_Url: https://github.com/mattatz/unity-tubular/tree/master/Assets/Packages/Tubular
       m_Scopes:
-      - com.whinarn.unitymeshsimplifier
-      - com.unity.mathematics
-      - com.unity.package-manager-ui
+      - Tabular
       m_IsDefault: 0
     m_Modified: 0
-    m_Name: UnityMeshSimplifier
-    m_Url: https://github.com/Whinarn/UnityMeshSimplifier.git
+    m_Name: Tabular
+    m_Url: https://github.com/mattatz/unity-tubular/tree/master/Assets/Packages/Tubular
     m_Scopes:
-    - com.whinarn.unitymeshsimplifier
-    - com.unity.mathematics
-    - com.unity.package-manager-ui
+    - Tabular
     m_SelectedScopeIndex: 0
