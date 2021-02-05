@@ -240,6 +240,8 @@ namespace SEE.Game.Charts
         private int previousFirst = 0;
         private int previousOnePastLast = 0;
 
+        int currentDataObjectsCount = 0;
+
 
         /// <summary>
         /// Calls methods to initialize a chart.
@@ -251,33 +253,9 @@ namespace SEE.Game.Charts
 
             Assert.IsTrue(scrollContent.transform.childCount == 0);
 
-            FindDataObjects();
-
-            // Note(torben): The list view contains every node + two additional parent
-            // header entries for 'Inner Nodes' and 'Leaves'. The tree view tree only the
-            // nodes, so this here is the capacity.
-            int totalEntryCount = 2 + listDataObjects.Count;
-            totalHeight = (float)totalEntryCount * ScrollViewEntryHeight;
-
-            leafCount = 0;
-            foreach (NodeRef nodeRef in listDataObjects)
-            {
-                if (nodeRef.Value.IsLeaf())
-                {
-                    leafCount++;
-                }
-            }
-
-            scrollViewEntries = new ScrollViewEntry[totalEntryCount];
-            scrollViewEntryDatas = new ScrollViewEntryData[totalEntryCount];
-
             pool = new Stack<ScrollViewEntry>(maxPanelEntryCount);
 
-            RectTransform scrollContentRect = scrollContent.GetComponent<RectTransform>();
-            scrollContentRect.sizeDelta = new Vector2(scrollContentRect.sizeDelta.x, totalHeight + 40);
-
-            FillScrollView(scrollViewIsTree);
-            GetAllNumericAttributes();
+            reload_data();
         }
         
         protected virtual void Start()
@@ -288,8 +266,59 @@ namespace SEE.Game.Charts
             DrawData();
         }
 
+        void reload_data() {
+
+            if (scrollViewEntryDatas != null && scrollViewEntryDatas.Length > 0)
+            {
+                for (int i = 0; i < scrollViewEntryDatas.Length; i++)
+                {
+                    if (scrollViewEntryDatas[i].interactableObject)
+                    {
+                        // Note(torben): This only unsubscribes from events from the
+                        // interactable object and thus can be inside of this if-statement
+                        // for better performance
+                        scrollViewEntryDatas[i].OnDestroy();
+                    }
+                }
+            }
+
+            FindDataObjects();
+
+            // Note(torben): The list view contains every node + two additional parent
+            // header entries for 'Inner Nodes' and 'Leaves'. The tree view tree only the
+            // nodes, so this here is the capacity.
+            int totalEntryCount2 = 2 + listDataObjects.Count;
+            totalHeight = (float)totalEntryCount2 * ScrollViewEntryHeight;
+
+            leafCount = 0;
+            foreach (NodeRef nodeRef in listDataObjects)
+            {
+                if (nodeRef.Value.IsLeaf())
+                {
+                    leafCount++;
+                }
+            }
+
+            scrollViewEntries = new ScrollViewEntry[totalEntryCount2];
+            scrollViewEntryDatas = new ScrollViewEntryData[totalEntryCount2];
+
+            RectTransform scrollContentRect = scrollContent.GetComponent<RectTransform>();
+            scrollContentRect.sizeDelta = new Vector2(scrollContentRect.sizeDelta.x, totalHeight + 40);
+
+            previousFirst = 0;
+            previousOnePastLast = 0;
+
+            FillScrollView(scrollViewIsTree);
+            GetAllNumericAttributes();
+        }
+
         private void Update()
         {
+            if (SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, ChartManager.Instance.ShowInnerNodeMetrics).Count != currentDataObjectsCount)
+            {
+                PushScrollViewEntriesToPool(previousFirst, previousOnePastLast); 
+                reload_data();
+            }
             float panelEntryCount = totalHeight * (1.0f - verticalScrollBar.size) / ScrollViewEntryHeight;
             int totalEntryCount = scrollViewEntries.Length - (scrollViewIsTree ? 2 : 0);
             int first = Mathf.Max(0, Mathf.FloorToInt((1.0f - verticalScrollBar.value) * panelEntryCount));
@@ -624,6 +653,7 @@ namespace SEE.Game.Charts
         {
             // list
             listDataObjects = SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, ChartManager.Instance.ShowInnerNodeMetrics);
+            currentDataObjectsCount = listDataObjects.Count;
             // Detect node changes and decorate the scrollview
             FillListsWithChanges(listDataObjects);
 
