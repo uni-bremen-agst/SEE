@@ -1,4 +1,0 @@
-ID;Metric.Architecture_Violations;Metric.Clone;Metric.Dead_Code;Metric.Cycle;Metric.Metric;Metric.Style;Metric.Universal
-a1_a.cpp;3;1;0;0;5;23123;0.1
-a1_b.cpp;3;3;1;0;8;34234;0.1
-a1_c.cpp;2;1;0;0;8;22300;0.1
