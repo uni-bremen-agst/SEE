@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.MixedReality.Toolkit.Input;
-using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -22,7 +21,6 @@ namespace SEE.Controls
     /// Super class of the behaviours of game objects the player interacts with.
     /// </summary>
     [RequireComponent(typeof(Interactable))]
-    [RequireComponent(typeof(NodeRef))]
     public sealed class InteractableObject : MonoBehaviour, IMixedRealityFocusHandler
     {
         // Tutorial on grabbing objects:
