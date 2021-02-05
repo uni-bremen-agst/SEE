@@ -75,6 +75,7 @@ namespace SEE.Controls.Actions
         {
             internal NodeRef nodeRef;
             internal InteractableObject interactableObject; // TODO(torben): it is time to combine NodeRefs and InteractableObjects or at least have some dictionary for them...
+            // Rainer: note that gameObjects with an EdgeRef instead of NodeRef now may also have a InteractableObject component.
         }
 
         /// <summary>
