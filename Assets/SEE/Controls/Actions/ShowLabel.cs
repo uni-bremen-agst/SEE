@@ -4,7 +4,6 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
