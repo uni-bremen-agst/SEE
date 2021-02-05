@@ -255,7 +255,7 @@ namespace SEE.Game.Charts
 
             pool = new Stack<ScrollViewEntry>(maxPanelEntryCount);
 
-            reload_data();
+            ReloadData();
         }
         
         protected virtual void Start()
@@ -266,58 +266,15 @@ namespace SEE.Game.Charts
             DrawData();
         }
 
-        void reload_data() {
-
-            if (scrollViewEntryDatas != null && scrollViewEntryDatas.Length > 0)
-            {
-                for (int i = 0; i < scrollViewEntryDatas.Length; i++)
-                {
-                    if (scrollViewEntryDatas[i].interactableObject)
-                    {
-                        // Note(torben): This only unsubscribes from events from the
-                        // interactable object and thus can be inside of this if-statement
-                        // for better performance
-                        scrollViewEntryDatas[i].OnDestroy();
-                    }
-                }
-            }
-
-            FindDataObjects();
-
-            // Note(torben): The list view contains every node + two additional parent
-            // header entries for 'Inner Nodes' and 'Leaves'. The tree view tree only the
-            // nodes, so this here is the capacity.
-            int totalEntryCount2 = 2 + listDataObjects.Count;
-            totalHeight = (float)totalEntryCount2 * ScrollViewEntryHeight;
-
-            leafCount = 0;
-            foreach (NodeRef nodeRef in listDataObjects)
-            {
-                if (nodeRef.Value.IsLeaf())
-                {
-                    leafCount++;
-                }
-            }
-
-            scrollViewEntries = new ScrollViewEntry[totalEntryCount2];
-            scrollViewEntryDatas = new ScrollViewEntryData[totalEntryCount2];
-
-            RectTransform scrollContentRect = scrollContent.GetComponent<RectTransform>();
-            scrollContentRect.sizeDelta = new Vector2(scrollContentRect.sizeDelta.x, totalHeight + 40);
-
-            previousFirst = 0;
-            previousOnePastLast = 0;
-
-            FillScrollView(scrollViewIsTree);
-            GetAllNumericAttributes();
-        }
-
         private void Update()
         {
+            // Performance bottleneck, needs to be replaced with a detection mechanism / button action listener
+            // Detects a graph revision change
             if (SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, ChartManager.Instance.ShowInnerNodeMetrics).Count != currentDataObjectsCount)
             {
+                // Push gameobjects to pool
                 PushScrollViewEntriesToPool(previousFirst, previousOnePastLast); 
-                reload_data();
+                ReloadData();
             }
             float panelEntryCount = totalHeight * (1.0f - verticalScrollBar.size) / ScrollViewEntryHeight;
             int totalEntryCount = scrollViewEntries.Length - (scrollViewIsTree ? 2 : 0);
@@ -336,6 +293,7 @@ namespace SEE.Game.Charts
                 }
                 else
                 {
+                    int j = 0;
                     for (int i = fst; i < opl; i++)
                     {
                         Assert.IsNull(scrollViewEntries[i]);
@@ -358,6 +316,11 @@ namespace SEE.Game.Charts
                         {
                             scrollViewEntries[i] = NewScrollViewEntry(listDataObjects[i - 2].name, i, 1);
                         }
+             //           else // removed node
+             //           {
+              //              scrollViewEntries[i] = NewScrollViewEntry(removedNodeIDs[j], j, 0);
+              //              j += 1;
+              //          }
                         ChangeScrollViewEntryColor(scrollViewEntries[i].transform.gameObject.transform.Find("Label").gameObject, scrollViewEntries[i].transform.gameObject);
                     }
                 }
@@ -959,8 +922,59 @@ namespace SEE.Game.Charts
         {
             Destroy(gameObject);
         }
-        
-        
+
+        /// <summary>
+        /// Reloads the chart data on revision change
+        /// </summary>
+        void ReloadData()
+        {
+
+            if (scrollViewEntryDatas != null && scrollViewEntryDatas.Length > 0)
+            {
+                for (int i = 0; i < scrollViewEntryDatas.Length; i++)
+                {
+                    if (scrollViewEntryDatas[i].interactableObject)
+                    {
+                        // Note(torben): This only unsubscribes from events from the
+                        // interactable object and thus can be inside of this if-statement
+                        // for better performance
+                        scrollViewEntryDatas[i].OnDestroy();
+                    }
+                }
+            }
+
+            FindDataObjects();
+
+            // Note(torben): The list view contains every node + two additional parent
+            // header entries for 'Inner Nodes' and 'Leaves'. The tree view tree only the
+            // nodes, so this here is the capacity.
+            // Note(Leo): removedNodeIDs Count needs to be added, otherwise removed nodes won't show
+            // TODO + removedNodeIDs.Count
+            int totalEntryCount2 = 2 + listDataObjects.Count;
+            totalHeight = (float)totalEntryCount2 * ScrollViewEntryHeight;
+
+            leafCount = 0;
+            foreach (NodeRef nodeRef in listDataObjects)
+            {
+                if (nodeRef.Value.IsLeaf())
+                {
+                    leafCount++;
+                }
+            }
+
+            scrollViewEntries = new ScrollViewEntry[totalEntryCount2];
+            scrollViewEntryDatas = new ScrollViewEntryData[totalEntryCount2];
+
+            RectTransform scrollContentRect = scrollContent.GetComponent<RectTransform>();
+            scrollContentRect.sizeDelta = new Vector2(scrollContentRect.sizeDelta.x, totalHeight + 40);
+
+            previousFirst = 0;
+            previousOnePastLast = 0;
+
+            FillScrollView(scrollViewIsTree);
+            GetAllNumericAttributes();
+        }
+
 
         /// <summary>
         /// Fetches the color profile selected in the ChartManager for added, edited and removed node labels
