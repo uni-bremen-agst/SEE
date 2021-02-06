@@ -1,6 +1,4 @@
-﻿#if UNITY_EDITOR
-
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 using System.CodeDom;
@@ -187,5 +185,3 @@ namespace Valve.VR
         }
     }
 }
-
-#endif

@@ -1,6 +1,4 @@
-﻿#if UNITY_EDITOR
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -87,6 +85,8 @@ namespace Valve.VR
             }
         }
 
+        private static bool previewErrorThrown = false;
+
         protected void UpdatePreviewHand(SerializedProperty instanceProperty, SerializedProperty showPreviewProperty, GameObject previewPrefab, SteamVR_Skeleton_Pose_Hand handData, SteamVR_Skeleton_Pose sourcePose, bool forceUpdate)
         {
             GameObject preview = instanceProperty.objectReferenceValue as GameObject;
@@ -101,6 +101,14 @@ namespace Valve.VR
 
                 if (preview == null)
                 {
+                    if (previewPrefab == null)
+                    {
+                        if (previewErrorThrown == false)
+                            Debug.LogError("hand preview not found. Verify SteamVRSettings.previewHandLeft and previewHandRight are set to valid prefabs.");
+                        previewErrorThrown = true;
+                        return;
+                    }
+
                     preview = GameObject.Instantiate<GameObject>(previewPrefab);
                     preview.transform.localScale = Vector3.one * poserScale.floatValue;
                     preview.transform.parent = poser.transform;
@@ -1084,5 +1092,3 @@ namespace Valve.VR
         }
     }
 }
-
-#endif
