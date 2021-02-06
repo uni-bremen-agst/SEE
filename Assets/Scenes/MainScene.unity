@@ -1348,6 +1348,7 @@ MonoBehaviour:
   disableAllOtherActionSets: 0
   activateOnStart: 1
   deactivateOnDestroy: 1
+  initialPriority: 0
 --- !u!143 &844925789
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1929,6 +1930,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: HoloLensAppBar
       objectReference: {fileID: 0}
+    - target: {fileID: 1275815092924048, guid: 83c02591e2867124181bcd3bcb65e288, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4773597359991020, guid: 83c02591e2867124181bcd3bcb65e288, type: 3}
       propertyPath: m_RootOrder
       value: 18
@@ -2204,7 +2209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcc1cedcf0a20b04ca3d2bb78035f3cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerInputType: 3
+  playerInputType: 0
   playerDesktop: {fileID: 1566173679}
   playerHoloLens: {fileID: 1046553556}
   playerTouchGamepad: {fileID: 186778472}
@@ -3103,7 +3108,7 @@ MonoBehaviour:
   InnerNodeObjects: 5
   NodeLayout: 1
   EdgeLayout: 3
-  ZScoreScale: 1
+  ZScoreScale: 0
   EdgeWidth: 0.01
   ShowErosions: 0
   MaxErosionWidth: 1
