@@ -29,7 +29,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="GameObjectID">The id from the GameObject which should be scaled through the Network</param>
         /// <param name="Scale">The new scale of the GameObject</param>
-        /// <param name="Positon">The new Postition of the GameObject</param>
+        /// <param name="Positon">The new position of the GameObject</param>
         public ScaleNodeNetAction(string GameObjectID, Vector3 Scale, Vector3 Positon) : base()
         {
             gameObjectID = GameObjectID;
@@ -46,8 +46,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Things to Execute on the Client Sets finds the GameObject on the Client and sets its scale and position
-        /// </summary>
+        /// Finds the GameObject on the Client and sets its scale and position
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
@@ -61,7 +60,7 @@ namespace SEE.Controls.Actions
                 else
                 {
                     //FIXME: Control whether a Debug Log is the right thing
-                    Debug.LogWarning("Found no gameObject: " + gameObjectID);
+                    Debug.LogError("Found no gameObject: " + gameObjectID);
                 }
             }
 
