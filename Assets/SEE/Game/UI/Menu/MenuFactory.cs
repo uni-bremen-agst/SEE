@@ -15,25 +15,27 @@ namespace SEE.Game.UI
         /// - Browsing
         /// - Moving
         /// - Mapping
+        /// - Drawing Edges
+        /// - Rotating
         /// </summary>
         /// <param name="attachTo">The game object the menu should be attached to. If <c>null</c>, a
         /// new game object will be created.</param>
         /// <returns>the newly created mode menu game object, or if it wasn't null
         /// <paramref name="attachTo"/> with the mode menu attached.</returns>
-        public static GameObject CreateModeMenu(PlayerActions actions, GameObject attachTo = null)
+        public static GameObject CreateModeMenu(GameObject attachTo = null)
         {
             ToggleMenuEntry[] entries = {
                 new ToggleMenuEntry(
-                    active: true,
-                    entryAction: actions.Browse,
+                    active: false,
+                    entryAction: () => ActionState.Value = ActionState.Type.Rotate,
                     exitAction: null,
-                    title: "Browse",
-                    description: "Normal browsing mode",
+                    title: "Rotate",
+                    description: "Rotate everything around the selected node within a graph",
                     entryColor: Color.blue
                     ),
                 new ToggleMenuEntry(
                     active: false,
-                    entryAction: actions.Move,
+                    entryAction: () => ActionState.Value = ActionState.Type.Move,
                     exitAction: null,
                     title: "Move",
                     description: "Move a node within a graph",
@@ -41,12 +43,20 @@ namespace SEE.Game.UI
                     ),
                 new ToggleMenuEntry(
                     active: false,
-                    entryAction: actions.Map,
+                    entryAction: () => ActionState.Value = ActionState.Type.Map,
                     exitAction: null,
                     title: "Map",
                     description: "Map a node from one graph to another graph",
                     entryColor: Color.green
                     ),
+                new ToggleMenuEntry(
+                    active: false,
+                    entryAction: () => ActionState.Value = ActionState.Type.DrawEdge,
+                    exitAction: null,
+                    title: "Draw Edge",
+                    description: "Draw a new edge between two nodes",
+                    entryColor: Color.green
+                    )
             };
             
             GameObject modeMenuGO = attachTo ?? new GameObject { name = "Mode Menu" };

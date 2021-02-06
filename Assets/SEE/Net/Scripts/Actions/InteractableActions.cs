@@ -1,6 +1,6 @@
-﻿using SEE.Controls;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
+using SEE.Controls;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -25,21 +25,21 @@ namespace SEE.Net
         public uint id;
 
         /// <summary>
-        /// Whether the interactable should be hovered.
+        /// The hover flags of the interactable.
         /// </summary>
-        public bool hover;
+        public uint hoverFlags;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="interactable">The interactable to be (un)hovered.</param>
-        /// <param name="hover">Whether the interactable should be hovered.</param>
-        public SetHoverAction(InteractableObject interactable, bool hover)
+        /// <param name="hoverFlags">The hover flags of the interactable.</param>
+        public SetHoverAction(InteractableObject interactable, uint hoverFlags)
         {
             Assert.IsNotNull(interactable);
 
             id = interactable.ID;
-            this.hover = hover;
+            this.hoverFlags = hoverFlags;
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace SEE.Net
         /// </summary>
         protected override void ExecuteOnServer()
         {
-            if (hover)
+            if (hoverFlags != 0)
             {
                 InteractableObject interactable = InteractableObject.Get(id);
                 if (interactable)
@@ -90,7 +90,7 @@ namespace SEE.Net
                 InteractableObject interactable = InteractableObject.Get(id);
                 if (interactable)
                 {
-                    interactable.SetHover(hover, false);
+                    interactable.SetHoverFlags(hoverFlags, false);
                 }
             }
         }

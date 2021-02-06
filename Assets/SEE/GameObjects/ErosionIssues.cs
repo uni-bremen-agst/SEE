@@ -1,5 +1,5 @@
-﻿using SEE.DataModel.DG;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using SEE.DataModel.DG;
 using UnityEngine;
 
 namespace SEE.GO
@@ -68,7 +68,7 @@ namespace SEE.GO
         /// <param name="gameNode">the game node which the sprites are to be created for</param>
         protected void AddErosionIssues(GameObject gameNode)
         {
-            Node node = gameNode.GetComponent<NodeRef>().node;
+            Node node = gameNode.GetComponent<NodeRef>().Value;
 
             // The list of sprites for the erosion issues.
             List<GameObject> sprites = new List<GameObject>();

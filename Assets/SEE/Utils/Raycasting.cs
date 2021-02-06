@@ -19,15 +19,16 @@ namespace SEE.Utils
         /// </param>
         /// <returns><code>true</code> if no GUI element is hit AND and a GameObject with
         /// an attached <see cref="NodeRef"/> is hit, <code>false</code> otherwise.</returns>
-        public static bool RaycastNodes(out RaycastHit raycastHit)
+        public static bool RaycastNodes(out RaycastHit raycastHit, out NodeRef nodeRef)
         {
             bool result = false;
 
             raycastHit = new RaycastHit();
+            nodeRef = null;
             Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
             if (!IsMouseOverGUI()
                 && Physics.Raycast(ray, out RaycastHit hit)
-                && hit.transform.GetComponent<NodeRef>() != null)
+                && hit.transform.TryGetComponent(out nodeRef))
             {
                 raycastHit = hit;
                 result = true;
@@ -39,7 +40,7 @@ namespace SEE.Utils
         /// The cached event system. It is cached because it needs to be queried in
         /// each Update cycle.
         /// </summary>
-        private static EventSystem eventSystem;
+        private static EventSystem eventSystem = null;
 
         /// <summary>
         /// Whether the mouse currently hovers over a GUI element.

@@ -1,8 +1,8 @@
-﻿using NetworkCommsDotNet;
-using NetworkCommsDotNet.Connections;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using NetworkCommsDotNet;
+using NetworkCommsDotNet.Connections;
 using UnityEngine;
 
 namespace SEE.Net
@@ -209,7 +209,7 @@ namespace SEE.Net
                         }
                         foreach (Controls.InteractableObject interactableObject in Controls.InteractableObject.HoveredObjects)
                         {
-                            new SetHoverAction(interactableObject, true).Execute(recipient);
+                            new SetHoverAction(interactableObject, interactableObject.HoverFlags).Execute(recipient);
                         }
                     }
 
@@ -289,7 +289,7 @@ namespace SEE.Net
                     {
                         foreach (Controls.InteractableObject hoveredInteractable in hoveredInteractables)
                         {
-                            SetHoverAction action = new SetHoverAction(hoveredInteractable, false);
+                            SetHoverAction action = new SetHoverAction(hoveredInteractable, 0); // TODO(torben): is the '0' correct here?
                             action.SetRequester(remoteEndPoint);
                             action.Execute();
                         }

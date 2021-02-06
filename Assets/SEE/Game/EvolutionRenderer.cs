@@ -18,15 +18,15 @@
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Game.Evolution;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
@@ -344,7 +344,7 @@ namespace SEE.Game
 
             foreach (GameObject gameObject in gameNodes)
             {
-                Node node = gameObject.GetComponent<NodeRef>().node;
+                Node node = gameObject.GetComponent<NodeRef>().Value;
                 LayoutNode layoutNode = new LayoutNode(node, to_layout_node);
                 // We must transfer the scale from gameObject to layoutNode.
                 // Rotation and CenterPosition are all zero. They will be computed by the layout,

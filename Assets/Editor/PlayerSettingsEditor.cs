@@ -143,6 +143,8 @@ namespace SEEEditor
             UnityEngine.Object desktopPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Players/DesktopPlayer.prefab");
             GameObject desktopPlayer = Instantiate(desktopPrefab) as GameObject;
             UnityEngine.Assertions.Assert.IsNotNull(desktopPlayer);
+            //throw new NotImplementedException("Reference must be set in PlayerSettings.cs");
+            //desktopPlayer.name = "DesktopPlayer"; // TODO(torben): set reference in PlayerSettings.cs
             desktopPlayer.name = PlayerSettings.PlayerName[(int)PlayerSettings.PlayerInputType.Desktop];
             desktopPlayer.tag = Tags.MainCamera;
             desktopPlayer.GetComponent<DesktopPlayerMovement>().focusedObject = table.GetComponent<Plane>();
@@ -177,6 +179,8 @@ namespace SEEEditor
                 AssetDatabase.LoadAssetAtPath<GameObject>("Assets/SteamVR/InteractionSystem/Core/Prefabs/Player.prefab");
             GameObject vrPlayer = Instantiate(steamVrPrefab) as GameObject;
             UnityEngine.Assertions.Assert.IsNotNull(vrPlayer);
+            //throw new NotImplementedException("Reference must be set in PlayerSettings.cs");
+            //vrPlayer.name = "VRPlayer"; // TODO(torben): set reference in PlayerSettings.cs
             vrPlayer.name = PlayerSettings.PlayerName[(int)PlayerSettings.PlayerInputType.VR]; ;
             // We need to find the right and left hand first to use them later
             Hand rightHand = GameObjectHierarchy.Descendants(vrPlayer)
