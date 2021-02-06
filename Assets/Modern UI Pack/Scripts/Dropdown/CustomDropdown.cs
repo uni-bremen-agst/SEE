@@ -8,7 +8,7 @@ using TMPro;
 
 namespace Michsky.UI.ModernUIPack
 {
-    public class CustomDropdown : MonoBehaviour, IPointerExitHandler, IPointerEnterHandler, IPointerClickHandler
+    public class CustomDropdown : MonoBehaviour, IPointerExitHandler, IPointerEnterHandler, IPointerClickHandler, IPointerDownHandler
     {
         // Resources
         public Animator dropdownAnimator;
@@ -268,18 +268,6 @@ namespace Michsky.UI.ModernUIPack
                 transform.SetAsLastSibling();
         }
 
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            if (outOnPointerExit == true && isOn == true)
-            {
-                Animate();
-                isOn = false;
-
-                if (isListItem == true)
-                    gameObject.transform.SetParent(currentListParent, true);
-            }
-        }
-
         public void UpdateValues()
         {
             if (enableScrollbar == true)
@@ -298,18 +286,6 @@ namespace Michsky.UI.ModernUIPack
                 selectedImage.gameObject.SetActive(false);
             else
                 selectedImage.gameObject.SetActive(true);
-        }
-
-        public void OnPointerClick(PointerEventData eventData)
-        {
-            if (enableDropdownSounds == true && useClickSound == true)
-                soundSource.PlayOneShot(clickSound);
-        }
-
-        public void OnPointerEnter(PointerEventData eventData)
-        {
-            if (enableDropdownSounds == true && useHoverSound == true)
-                soundSource.PlayOneShot(hoverSound);
         }
 
         public void CreateNewItem(string title, Sprite icon)
@@ -333,6 +309,39 @@ namespace Michsky.UI.ModernUIPack
         {
             Item item = new Item();
             dropdownItems.Add(item);
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            if (enableDropdownSounds == true && useClickSound == true)
+                soundSource.PlayOneShot(clickSound);
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (enableDropdownSounds == true && useHoverSound == true)
+                soundSource.PlayOneShot(hoverSound);
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            if (outOnPointerExit == true && isOn == true)
+            {
+                Animate();
+                isOn = false;
+
+                if (isListItem == true)
+                    gameObject.transform.SetParent(currentListParent, true);
+            }
+
+            if (triggerObject != null)
+                triggerObject.SetActive(false);
+        }
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            if (triggerObject != null)
+                triggerObject.SetActive(true);
         }
     }
 }

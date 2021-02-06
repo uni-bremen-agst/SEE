@@ -31,7 +31,7 @@ MonoBehaviour:
   dropdownItemFont: {fileID: 11400000, guid: 4bd810f1cbcb0f446a8f5a31453e243f, type: 2}
   dropdownItemFontSize: 22.5
   dropdownThemeType: 0
-  dropdownAnimationType: 1
+  dropdownAnimationType: 0
   dropdownFont: {fileID: 11400000, guid: 4bd810f1cbcb0f446a8f5a31453e243f, type: 2}
   dropdownFontSize: 25
   dropdownColor: {r: 0.21568628, g: 0.29411766, b: 0.37254903, a: 1}
