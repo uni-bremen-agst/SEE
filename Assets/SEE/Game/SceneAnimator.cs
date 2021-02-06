@@ -1,9 +1,9 @@
-﻿using UnityEngine;
-using SEE.DataModel;
-using SEE.GO;
-using SEE.DataModel.DG;
+﻿using System;
 using System.Collections.Generic;
-using System;
+using SEE.DataModel;
+using SEE.DataModel.DG;
+using SEE.GO;
+using UnityEngine;
 
 namespace SEE.Game
 {
@@ -166,7 +166,7 @@ namespace SEE.Game
         private void ColorNodes(GameObject parent, bool architectureNode, Color color)
         {
             // Is root a node at all? It may as well be an edge, for instance.
-            if (parent.TryGetComponent<NodeRef>(out NodeRef nodeRef) && nodeRef.node != null)
+            if (parent.TryGetComponent<NodeRef>(out NodeRef nodeRef) && nodeRef.Value != null)
             {
                 bool isArchitectureNode = IsArchitectureNode(parent);
                 Color childColor = color;
@@ -239,7 +239,7 @@ namespace SEE.Game
             List<GameObject> nodes = new List<GameObject>();
             foreach (GameObject go in GameObject.FindGameObjectsWithTag(Tags.Node))
             {
-                if (go.TryGetComponent<NodeRef>(out NodeRef nodeRef) && nodeRef.node != null)
+                if (go.TryGetComponent<NodeRef>(out NodeRef nodeRef) && nodeRef.Value != null)
                 {
                     nodes.Add(go);
                 }
@@ -255,7 +255,7 @@ namespace SEE.Game
         {
             if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
-                return nodeRef.node;
+                return nodeRef.Value;
             }
             else
             {

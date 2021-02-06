@@ -1,5 +1,5 @@
-﻿using SEE.DataModel.DG;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using SEE.DataModel.DG;
 using UnityEngine;
 
 namespace SEE.GO
@@ -83,7 +83,7 @@ namespace SEE.GO
 
             float[] values = new float[metrics.Length];
 
-            Node node = gameNode.GetComponent<NodeRef>().node;
+            Node node = gameNode.GetComponent<NodeRef>().Value;
 
             for (int i = 0; i < metrics.Length; i++)
             {

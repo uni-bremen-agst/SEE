@@ -1,12 +1,13 @@
-﻿using SEE.DataModel;
+﻿using System.Collections.Generic;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game;
 using SEE.GO;
 using SEE.Tools;
 using SEE.Utils;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
@@ -17,6 +18,8 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class MappingAction : CityAction, Observer
     {
+        private const float SelectedAlpha = 0.8f;
+
         private const KeyCode SaveKey = KeyCode.S;
         private const KeyCode CopyKey = KeyCode.C;
         private const KeyCode PasteKey = KeyCode.V;
@@ -56,7 +59,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// For the reflexion analysis.
         /// </summary>
-        private Reflexion reflexion;
+        public Reflexion Reflexion { get; private set; }
 
         /// <summary>
         /// Materials for the decoration of reflexion edges.
@@ -70,18 +73,8 @@ namespace SEE.Controls.Actions
 
         private struct Selection
         {
-            /// <summary>
-            /// The currently selected game object. May be null if none has been selected
-            /// or in case of deselection.
-            /// </summary>
-            internal GameObject gameNode;
-
-            /// <summary>
-            /// The graph node currently selected as retrieved from gameNode.
-            /// If gameNode is null, graphNode is null, too. If gameNode
-            /// is not null but has no attached node reference, graphNode is null, too.
-            /// </summary>
-            internal Node graphNode;
+            internal NodeRef nodeRef;
+            internal InteractableObject interactableObject; // TODO(torben): it is time to combine NodeRefs and InteractableObjects or at least have some dictionary for them...
         }
 
         /// <summary>
@@ -99,7 +92,7 @@ namespace SEE.Controls.Actions
             Implementation
         }
 
-        private struct ActionState
+        private struct _ActionState
         {
             internal bool copy;              // copy selected object (i.e., start mapping)
             internal bool paste;             // paste (map) copied object
@@ -108,7 +101,7 @@ namespace SEE.Controls.Actions
             internal HitCity hitCity;        // which city we are currently focusing on
         }
 
-        private ActionState actionState;
+        private _ActionState actionState;
 
         /// <summary>
         /// The game objects that have been copied to the clipboard via Ctrl-C.
@@ -200,9 +193,36 @@ namespace SEE.Controls.Actions
             if (enabled)
             {
                 Usage();
+                SetupReflexionDecorator();
                 SetupGameObjectMappings();
                 SetupReflexion();
-                SetupReflexionDecorator();
+            }
+
+            ActionState.OnStateChanged += OnStateChanged;
+            if (ActionState.Value == ActionState.Type.Map)
+            {
+                InteractableObject.AnySelectIn += AnySelectIn;
+                InteractableObject.AnySelectOut += AnySelectOut;
+            }
+            else
+            {
+                enabled = false;
+            }
+        }
+
+        private void OnStateChanged(ActionState.Type value)
+        {
+            if (value == ActionState.Type.Map)
+            {
+                InteractableObject.AnySelectIn += AnySelectIn;
+                InteractableObject.AnySelectOut += AnySelectOut;
+                enabled = true;
+            }
+            else
+            {
+                InteractableObject.AnySelectIn -= AnySelectIn;
+                InteractableObject.AnySelectOut -= AnySelectOut;
+                enabled = false; // We don't want to waste CPU time, if Update() doesn't do anything
             }
         }
 
@@ -270,7 +290,7 @@ namespace SEE.Controls.Actions
             {
                 if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
                 {
-                    Node node = nodeRef.node;
+                    Node node = nodeRef.Value;
                     if (node != null)
                     {
                         nodes[node.ID] = gameObject;
@@ -361,50 +381,85 @@ namespace SEE.Controls.Actions
             }
         }
 
+        private struct SpinningCube
+        {
+            internal GameObject gameObject;
+            internal MeshRenderer meshRenderer;
+            internal float timer;
+            internal Color c0;
+            internal Color c1;
+        }
+
+        SpinningCube spinningCube;
+
         // Update is called once per frame
         private void Update()
         {
+            // This script should be disabled, if the action state is not 'Map'
+            Assert.IsTrue(ActionState.Value == ActionState.Type.Map);
+
             //------------------------------------------------------------------------
             // ARCHITECTURAL MAPPING
             //------------------------------------------------------------------------
 
-            // We check whether we are focusing on the code city this NavigationAction is attached to.
-            if (Raycasting.RaycastNodes(out RaycastHit hit))
+            if (Input.GetMouseButtonDown(0)) // Left mouse button
             {
-                Transform firstHit = hit.transform;
-                if (firstHit.gameObject == Architecture)
+                if (Raycasting.RaycastNodes(out RaycastHit hit, out NodeRef nodeRef)) // Select, replace or map
                 {
-                    actionState.hitCity = HitCity.Architecture;
-                }
-                else if (firstHit.gameObject == Implementation)
-                {
-                    actionState.hitCity = HitCity.Implementation;
-                }
-                else
-                {
-                    return;
-                }
-            }
-            else
-            {
-                return;
-            }
+                    Assert.IsNotNull(nodeRef);
+                    Assert.IsNotNull(nodeRef.Value);
 
-            // Selection of an object
-            if (Input.GetMouseButtonDown(0)) // left mouse button
-            {
-                if (hit.transform.gameObject.TryGetComponent(out NodeRef nodeRef))
-                {
-                    selection.gameNode = hit.transform.gameObject;
-                    selection.graphNode = nodeRef.node;
+                    if (nodeRef.Value.ItsGraph == implementation) // Set or replace implementation node
+                    {
+                        if (selection.interactableObject != null)
+                        {
+                            selection.interactableObject.SetSelect(false, true);
+                        }
+                        nodeRef.GetComponent<InteractableObject>().SetSelect(true, true);
+                    }
+                    else if (selection.nodeRef != null) // Create mapping
+                    {
+                        Node n0 = selection.nodeRef.Value;
+                        Node n1 = nodeRef.Value;
+                        if (Reflexion.Is_Explicitly_Mapped(n0))
+                        {
+                            Node mapped = Reflexion.Get_Mapping().GetNode(n0.ID);
+                            Assert.IsTrue(mapped.Outgoings.Count == 1);
+                            Reflexion.Delete_From_Mapping(mapped.Outgoings[0]);
+                        }
+                        Reflexion.Add_To_Mapping(n0, n1);
+                        selection.interactableObject.SetSelect(false, true);
+                    }
                 }
-                else
+                else // Deselect
                 {
-                    selection.gameNode = null;
-                    selection.graphNode = null;
+                    selection.interactableObject?.SetSelect(false, true);
                 }
             }
 
+            if (spinningCube.gameObject != null)
+            {
+                const float PERIOD = 4.0f;
+                spinningCube.timer += Time.deltaTime;
+                while (spinningCube.timer > PERIOD)
+                {
+                    spinningCube.timer -= PERIOD;
+                }
+                float tPos = Mathf.Sin(2.0f * Mathf.PI * spinningCube.timer / PERIOD * 2.0f) * 0.5f + 0.5f; // y-range: [0.0, 1.0]
+                float gr = 0.5f * MathExtensions.GoldenRatio;
+                float ls = spinningCube.gameObject.transform.localScale.x;
+
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                Physics.Raycast(ray, out RaycastHit hit);
+
+                spinningCube.gameObject.transform.position = hit.point + new Vector3(0.0f, gr * ls + tPos * gr * ls, 0.0f);
+                spinningCube.gameObject.transform.rotation = Quaternion.AngleAxis(spinningCube.timer / PERIOD * 180.0f, Vector3.up);
+
+                float tCol = Mathf.Sin(2.0f * Mathf.PI * spinningCube.timer / PERIOD) * 0.5f + 0.5f;
+                spinningCube.meshRenderer.material.color = (1.0f - tCol) * spinningCube.c0 + tCol * spinningCube.c1;
+            }
+
+#if false
             bool leftControl = LeftControlPressed();
 
             actionState.save = leftControl && Input.GetKeyDown(SaveKey);
@@ -413,16 +468,16 @@ namespace SEE.Controls.Actions
             actionState.clearClipboard = leftControl && Input.GetKeyDown(ClearKey);
 
             // We can copy only from the implementation city and if there is a selected object.
-            if (actionState.copy && actionState.hitCity == HitCity.Implementation && selection.gameNode != null)
+            if (actionState.copy && actionState.hitCity == HitCity.Implementation && selection.go != null)
             {
                 if (objectsInClipboard.Contains(selection))
                 {
-                    Debug.LogFormat("Removing node {0} from clipboard\n", selection.gameNode.name);
+                    Debug.LogFormat("Removing node {0} from clipboard\n", selection.go.name);
                     objectsInClipboard.Remove(selection);
                 }
                 else
                 {
-                    Debug.LogFormat("Copying node {0} to clipboard\n", selection.gameNode.name);
+                    Debug.LogFormat("Copying node {0} to clipboard\n", selection.go.name);
                     objectsInClipboard.Add(selection);
                 }
             }
@@ -432,7 +487,7 @@ namespace SEE.Controls.Actions
                 objectsInClipboard.Clear();
             }
             // We can paste only into the architecture city and if we have a selected object as a target
-            if (actionState.paste && actionState.hitCity == HitCity.Architecture && selection.gameNode != null)
+            if (actionState.paste && actionState.hitCity == HitCity.Architecture && selection.go != null)
             {
                 MapClipboardContent(selection);
             }
@@ -441,6 +496,7 @@ namespace SEE.Controls.Actions
             {
                 SaveMapping(mapping, MappingFile);
             }
+#endif
         }
 
         /// <summary>
@@ -452,14 +508,14 @@ namespace SEE.Controls.Actions
         {
             foreach (Selection implementation in objectsInClipboard)
             {
-                if (!reflexion.Is_Mapper(implementation.graphNode))
+                if (!Reflexion.Is_Explicitly_Mapped(implementation.nodeRef.Value))
                 {
-                    Debug.LogFormat("Mapping {0} -> {1}.\n", implementation.gameNode.name, target.gameNode.name);
-                    reflexion.Add_To_Mapping(from: implementation.graphNode, to: target.graphNode);
+                    Debug.LogFormat("Mapping {0} -> {1}.\n", implementation.nodeRef.name, target.nodeRef.name);
+                    Reflexion.Add_To_Mapping(from: implementation.nodeRef.Value, to: target.nodeRef.Value);
                 }
                 else
                 {
-                    Debug.LogWarningFormat("Node {0} is already explicitly mapped..\n", implementation.gameNode.name);
+                    Debug.LogWarningFormat("Node {0} is already explicitly mapped..\n", implementation.nodeRef.name);
                 }
             }
             objectsInClipboard.Clear();
@@ -490,10 +546,66 @@ namespace SEE.Controls.Actions
 
         private void SetupReflexion()
         {
-            reflexion = new Reflexion(implementation, architecture, mapping);
-            reflexion.Register(this);
+            Reflexion = new Reflexion(implementation, architecture, mapping);
+            Reflexion.Register(this);
             // An initial run is necessary to set up the necessary data structures.
-            reflexion.Run();
+            Reflexion.Run();
+        }
+
+        private void AnySelectIn(InteractableObject interactableObject, bool isOwner)
+        {
+            Assert.IsNull(selection.nodeRef);
+            Assert.IsNull(selection.interactableObject);
+
+            spinningCube.gameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            spinningCube.gameObject.name = "MappingAction.spinningCube";
+            // Note: This will make raycasting ignore this object. Physics.IgnoreRaycastLayer contains the wrong value (water mask)!
+            spinningCube.gameObject.layer = 2;
+            float scale = 0.1f * Implementation.GetComponent<GO.Plane>().MinLengthXZ;
+            spinningCube.gameObject.transform.localScale = new Vector3(scale, scale, scale);
+
+            spinningCube.meshRenderer = spinningCube.gameObject.GetComponent<MeshRenderer>();
+            spinningCube.meshRenderer.material = new Material(interactableObject.GetComponent<MeshRenderer>().material);
+            spinningCube.meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            spinningCube.meshRenderer.material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Overlay;
+            Portal.SetInfinitePortal(spinningCube.gameObject);
+
+            spinningCube.timer = -Time.deltaTime;
+
+            spinningCube.c0 = spinningCube.meshRenderer.material.color;
+            spinningCube.c0.a = SelectedAlpha;
+            spinningCube.c1 = spinningCube.c0 + new Color(0.2f, 0.2f, 0.2f, 0.0f);
+
+            selection.nodeRef = interactableObject.GetComponent<NodeRef>();
+            selection.interactableObject = interactableObject;
+            SetAlpha(selection.nodeRef, SelectedAlpha);
+        }
+
+        private void AnySelectOut(InteractableObject interactableObject, bool isOwner)
+        {
+            Assert.IsNotNull(selection.nodeRef);
+            Assert.IsNotNull(selection.interactableObject);
+
+            Destroy(spinningCube.gameObject);
+#if UNITY_EDITOR
+            spinningCube.gameObject = null;
+            spinningCube.meshRenderer = null;
+            spinningCube.timer = 0.0f;
+            spinningCube.c0 = new Color();
+            spinningCube.c1 = new Color();
+#endif
+
+            SetAlpha(selection.nodeRef, 1.0f);
+            selection.interactableObject = null;
+            selection.nodeRef = null;
+        }
+
+        private void SetAlpha(NodeRef nodeRef, float alpha)
+        {
+            MeshRenderer meshRenderer = nodeRef.GetComponent<MeshRenderer>();
+            Color color = meshRenderer.material.color;
+            color.a = alpha;
+            meshRenderer.material.color = color;
         }
 
         /// <summary>
@@ -507,7 +619,6 @@ namespace SEE.Controls.Actions
             if (changeEvent is EdgeChange)
             {
                 HandleEdgeChange(changeEvent as EdgeChange);
-
             }
             else if (changeEvent is PropagatedEdgeAdded)
             {
@@ -563,29 +674,29 @@ namespace SEE.Controls.Actions
                         //--------------------------------------
                         // Changes for architecture dependencies
                         //--------------------------------------
-                        case State.specified:
+                        case Tools.State.specified:
                             // nothing to be done
                             break;
-                        case State.absent:
+                        case Tools.State.absent:
                             decorator.UndecorateAbsence(gameEdge);
                             break;
-                        case State.allowed_absent:
+                        case Tools.State.allowed_absent:
                             decorator.UndecorateAllowedAbsence(gameEdge);
                             break;
-                        case State.convergent:
+                        case Tools.State.convergent:
                             decorator.UndecorateConvergence(gameEdge);
                             break;
 
                         //-----------------------------------------------------------------------
                         // changes for implementation dependencies propagated to the architecture
                         //-----------------------------------------------------------------------
-                        case State.divergent:
+                        case Tools.State.divergent:
                             decorator.UndecorateDivergence(gameEdge);
                             break;
-                        case State.allowed:
+                        case Tools.State.allowed:
                             decorator.UndecorateAllowed(gameEdge);
                             break;
-                        case State.implicitly_allowed:
+                        case Tools.State.implicitly_allowed:
                             decorator.UndecorateImplicitlyAllowed(gameEdge);
                             break;
                         default:
@@ -593,34 +704,34 @@ namespace SEE.Controls.Actions
                             break;
                     }
 
-                    switch (edgeChange.oldState)
+                    switch (edgeChange.newState)
                     {
                         //--------------------------------------
                         // Changes for architecture dependencies
                         //--------------------------------------
-                        case State.specified:
+                        case Tools.State.specified:
                             // nothing to be done
                             break;
-                        case State.absent:
+                        case Tools.State.absent:
                             decorator.DecorateAbsence(gameEdge);
                             break;
-                        case State.allowed_absent:
+                        case Tools.State.allowed_absent:
                             decorator.DecorateAllowedAbsence(gameEdge);
                             break;
-                        case State.convergent:
+                        case Tools.State.convergent:
                             decorator.DecorateConvergence(gameEdge);
                             break;
 
                         //-----------------------------------------------------------------------
                         // changes for implementation dependencies propagated to the architecture
                         //-----------------------------------------------------------------------
-                        case State.divergent:
+                        case Tools.State.divergent:
                             decorator.DecorateDivergence(gameEdge);
                             break;
-                        case State.allowed:
+                        case Tools.State.allowed:
                             decorator.DecorateAllowed(gameEdge);
                             break;
-                        case State.implicitly_allowed:
+                        case Tools.State.implicitly_allowed:
                             decorator.DecorateImplicitlyAllowed(gameEdge);
                             break;
                         default:
