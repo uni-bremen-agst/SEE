@@ -9,17 +9,19 @@ namespace Michsky.UI.ModernUIPack
         public float maxSize;
         public Color startColor;
         public Color transitionColor;
+        Image colorImg;
 
         void Start()
         {
             transform.localScale = new Vector3(0f, 0f, 0f);
-            GetComponent<Image>().color = new Color(startColor.r, startColor.g, startColor.b, startColor.a);
+            colorImg = GetComponent<Image>();
+            colorImg.color = new Color(startColor.r, startColor.g, startColor.b, startColor.a);
         }
 
         void Update()
         {
             transform.localScale = Vector3.Lerp(transform.localScale, new Vector3(maxSize, maxSize, maxSize), Time.deltaTime * speed);
-            GetComponent<Image>().color = Color.Lerp(GetComponent<Image>().color, new Color(transitionColor.r, transitionColor.g, transitionColor.b, transitionColor.a), Time.deltaTime * speed);
+            colorImg.color = Color.Lerp(colorImg.color, new Color(transitionColor.r, transitionColor.g, transitionColor.b, transitionColor.a), Time.deltaTime * speed);
 
             if (transform.localScale.x >= maxSize * 0.998)
             {
