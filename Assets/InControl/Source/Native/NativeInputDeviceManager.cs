@@ -125,10 +125,8 @@ namespace InControl
 			deviceProfile = deviceProfile ?? customDeviceProfiles.Find( profile => profile.LastResortMatches( deviceInfo ) );
 			deviceProfile = deviceProfile ?? systemDeviceProfiles.Find( profile => profile.LastResortMatches( deviceInfo ) );
 
-			// Debug.Log( "MATCHED PROFILE: " + deviceProfile.DeviceName + " (" + deviceProfile.GetType() + ")" );
-
 			// Find a matching previously attached device or create a new one.
-			if (!deviceProfile.IsHidden)
+			if (deviceProfile == null || deviceProfile.IsNotHidden)
 			{
 				var device = FindDetachedDevice( deviceInfo ) ?? new NativeInputDevice();
 				device.Initialize( deviceHandle, deviceInfo, deviceProfile );
@@ -265,7 +263,7 @@ namespace InControl
 				return false;
 			}
 
-#if UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
+			#if UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 			if (!Application.HasProLicense())
 			{
 				if (errors != null)
@@ -274,7 +272,7 @@ namespace InControl
 				}
 				return false;
 			}
-#endif
+			#endif
 
 			try
 			{
@@ -303,7 +301,7 @@ namespace InControl
 			{
 				if (InputManager.NativeInputEnableMFi)
 				{
-					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.XboxOneSMacNativeProfile) );
+					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.XboxOneSBluetoothMacNativeProfile) );
 					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.PlayStation4MacNativeProfile) );
 					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.SteelseriesNimbusMacNativeProfile) );
 					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.HoriPadUltimateMacNativeProfile) );
@@ -315,7 +313,7 @@ namespace InControl
 
 			foreach (var error in errors)
 			{
-				Debug.LogError( "Error enabling NativeInputDeviceManager: " + error );
+				Logger.LogError( "Error enabling NativeInputDeviceManager: " + error );
 			}
 
 			return false;

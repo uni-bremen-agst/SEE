@@ -2,40 +2,30 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedType.Global
-namespace InControl.NativeDeviceProfiles
+namespace InControl.UnityDeviceProfiles
 {
 	// @cond nodoc
-	[Preserve, NativeInputDeviceProfile]
-	public class XboxOneMFiNativeProfile : InputDeviceProfile
+	[Preserve] [UnityInputDeviceProfile]
+	public class NVidiaShield2017NVidiaShieldUnityProfile : InputDeviceProfile
 	{
 		public override void Define()
 		{
 			base.Define();
 
-			DeviceName = "Microsoft Xbox One Controller";
-			DeviceNotes = "Microsoft Xbox One Controller on iOS / tvOS";
+			DeviceName = "NVIDIA Shield Controller";
+			DeviceNotes = "NVIDIA Shield Controller on NVIDIA Shield";
 
 			DeviceClass = InputDeviceClass.Controller;
-			DeviceStyle = InputDeviceStyle.XboxOne;
+			DeviceStyle = InputDeviceStyle.NVIDIAShield;
 
 			IncludePlatforms = new[]
 			{
-				"iOS",
-				"tvOS",
-				"iPhone",
-				"iPad",
-				"AppleTV",
-				"OS X",
+				"NVIDIA Shield"
 			};
 
 			Matchers = new[]
 			{
-				new InputDeviceMatcher
-				{
-					VendorID = 0xFFFF,
-					ProductID = 0x0001,
-					VersionNumber = 0
-				}
+				new InputDeviceMatcher { NamePattern = "NVIDIA Controller v" }
 			};
 
 			ButtonMappings = new[]
@@ -78,57 +68,21 @@ namespace InControl.NativeDeviceProfiles
 				},
 				new InputControlMapping
 				{
-					Name = "DPad Up",
-					Target = InputControlType.DPadUp,
-					Source = Button( 6 )
-				},
-				new InputControlMapping
-				{
-					Name = "DPad Down",
-					Target = InputControlType.DPadDown,
-					Source = Button( 7 )
-				},
-				new InputControlMapping
-				{
-					Name = "DPad Left",
-					Target = InputControlType.DPadLeft,
-					Source = Button( 8 )
-				},
-				new InputControlMapping
-				{
-					Name = "DPad Right",
-					Target = InputControlType.DPadRight,
-					Source = Button( 9 )
-				},
-				new InputControlMapping
-				{
 					Name = "Left Stick Button",
 					Target = InputControlType.LeftStickButton,
-					Source = Button( 10 )
+					Source = Button( 8 )
 				},
 				new InputControlMapping
 				{
 					Name = "Right Stick Button",
 					Target = InputControlType.RightStickButton,
-					Source = Button( 11 )
+					Source = Button( 9 )
 				},
 				new InputControlMapping
 				{
-					Name = "View",
-					Target = InputControlType.View,
-					Source = Button( 13 )
-				},
-				new InputControlMapping
-				{
-					Name = "Menu",
-					Target = InputControlType.Menu,
-					Source = Button( 12 )
-				},
-				new InputControlMapping
-				{
-					Name = "Guide",
-					Target = InputControlType.Home,
-					Source = Button( 14 )
+					Name = "Start",
+					Target = InputControlType.Start,
+					Source = Button( 10 )
 				}
 			};
 
@@ -136,29 +90,30 @@ namespace InControl.NativeDeviceProfiles
 			{
 				LeftStickLeftMapping( 0 ),
 				LeftStickRightMapping( 0 ),
-				LeftStickUpMapping2( 1 ),
-				LeftStickDownMapping2( 1 ),
+				LeftStickUpMapping( 1 ),
+				LeftStickDownMapping( 1 ),
 
 				RightStickLeftMapping( 2 ),
 				RightStickRightMapping( 2 ),
-				RightStickUpMapping2( 3 ),
-				RightStickDownMapping2( 3 ),
+				RightStickUpMapping( 3 ),
+				RightStickDownMapping( 3 ),
+
+				DPadLeftMapping( 4 ),
+				DPadRightMapping( 4 ),
+				DPadUpMapping( 5 ),
+				DPadDownMapping( 5 ),
 
 				new InputControlMapping
 				{
 					Name = "Left Trigger",
 					Target = InputControlType.LeftTrigger,
-					Source = Analog( 4 ),
-					SourceRange = InputRangeType.ZeroToOne,
-					TargetRange = InputRangeType.ZeroToOne,
+					Source = Analog( 12 )
 				},
 				new InputControlMapping
 				{
 					Name = "Right Trigger",
 					Target = InputControlType.RightTrigger,
-					Source = Analog( 5 ),
-					SourceRange = InputRangeType.ZeroToOne,
-					TargetRange = InputRangeType.ZeroToOne,
+					Source = Analog( 11 )
 				}
 			};
 		}
@@ -166,3 +121,4 @@ namespace InControl.NativeDeviceProfiles
 
 	// @endcond
 }
+

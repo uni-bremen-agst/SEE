@@ -1,8 +1,8 @@
 namespace InControl
 {
-#if UNITY_EDITOR
+	#if UNITY_EDITOR
 	using UnityEditor;
-#endif
+	#endif
 	using System;
 	using System.Linq;
 	using UnityEngine;
@@ -124,10 +124,10 @@ namespace InControl
 			{
 				if (GetInstanceID() != instanceId)
 				{
-#if UNITY_EDITOR
+					#if UNITY_EDITOR
 					Debug.LogWarning( "A redundant instance (" + name + ") of singleton " + typeof(TComponent) + " is present in the scene.", this );
 					EditorGUIUtility.PingObject( this );
-#endif
+					#endif
 					enabled = false;
 				}
 

@@ -141,13 +141,13 @@ namespace InControl
 				return;
 			}
 
-#if UNITY_PS4
+			#if UNITY_PS4
 			if (unityJoystickName == "Empty")
 			{
 				// On PS4 console, disconnected controllers may have this name.
 				return;
 			}
-#endif
+			#endif
 
 			if (unityJoystickName.IndexOf( "webcam", StringComparison.OrdinalIgnoreCase ) != -1)
 			{
@@ -160,9 +160,9 @@ namespace InControl
 			{
 				if (Application.platform == RuntimePlatform.OSXEditor ||
 				    Application.platform == RuntimePlatform.OSXPlayer
-#if !UNITY_5_4_OR_NEWER
+					#if !UNITY_5_4_OR_NEWER
 					|| Application.platform == RuntimePlatform.OSXWebPlayer
-#endif
+					#endif
 				)
 				{
 					if (unityJoystickName == "Unknown Wireless Controller")
@@ -178,9 +178,9 @@ namespace InControl
 			{
 				if (Application.platform == RuntimePlatform.WindowsEditor ||
 				    Application.platform == RuntimePlatform.WindowsPlayer
-#if !UNITY_5_4_OR_NEWER
+					#if !UNITY_5_4_OR_NEWER
 					|| Application.platform == RuntimePlatform.WindowsWebPlayer
-#endif
+					#endif
 				)
 				{
 					if (string.IsNullOrEmpty( unityJoystickName ))
@@ -196,7 +196,6 @@ namespace InControl
 			{
 				var joystickDevice = new UnityInputDevice( unityJoystickId, unityJoystickName );
 				AttachDevice( joystickDevice );
-				Debug.Log( "[InControl] Joystick " + unityJoystickId + ": \"" + unityJoystickName + "\"" );
 				Logger.LogWarning( "Device " + unityJoystickId + " with name \"" + unityJoystickName + "\" does not match any supported profiles and will be considered an unknown controller." );
 				return;
 			}
@@ -205,7 +204,6 @@ namespace InControl
 			{
 				var joystickDevice = new UnityInputDevice( deviceProfile, unityJoystickId, unityJoystickName );
 				AttachDevice( joystickDevice );
-				// Debug.Log( "[InControl] Joystick " + unityJoystickId + ": \"" + unityJoystickName + "\"" );
 				Logger.LogInfo( "Device " + unityJoystickId + " matched profile " + deviceProfile.GetType().Name + " (" + deviceProfile.DeviceName + ")" );
 			}
 			else
@@ -250,6 +248,7 @@ namespace InControl
 				AddSystemDeviceProfile( deviceProfile );
 			}
 		}
+
 
 		/*
 		public void AddDeviceProfile( UnityInputDeviceProfile deviceProfile )
