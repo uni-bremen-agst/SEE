@@ -45,9 +45,9 @@ namespace SEE.Game
         /// You can Lock one to three axes 
         /// </summary>
         /// <param name="movingObject">the object to be moved</param>
-        /// <param name="x">True if it should be moved on this axes</param>
-        /// <param name="y">True if it should be moved on this axes</param>
-        /// <param name="z">True if it should be moved on this axes</param>
+        /// <param name="x">True if it should be moved on this axis</param>
+        /// <param name="y">True if it should be moved on this axis</param>
+        /// <param name="z">True if it should be moved on this axis</param>
         public static void MoveToLockAxes(GameObject movingObject, bool x, bool y, bool z)
         {
             float step = MovingSpeed * Time.deltaTime;
@@ -150,7 +150,7 @@ namespace SEE.Game
         /// <param name="child">child Gamobject</param>
         /// <param name="parentID">Parent GameObject ID</param>
         /// <param name="position">new position</param>
-        public static void NetworkFinalizeNodePosition(GameObject child ,string parentID, Vector3 position)
+        public static void NetworkFinalizeNodePosition(GameObject child , string parentID, Vector3 position)
         {
             GameObject parent = GameObject.Find(parentID);
             child.transform.position = position;

@@ -51,16 +51,14 @@ namespace SEE.Controls.Actions
                     enabled = true;
                     InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
-                    if (!instantiated)
-                    {
-                        instantiated = true;
-                    }
+                    instantiated = true;
                 }
                 else
                 {
                     // The monobehaviour is diabled and Update() no longer be called by Unity.
                     enabled = false;
-                    CanvasGenerator c = canvasObject.GetComponent<CanvasGenerator>();
+                    CanvasGenerator c;
+                    canvasObject.TryGetComponentOrLog<CanvasGenerator>(out c);
                     c.DestroyEditNodeCanvas();
                     instantiated = false;
                     InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
@@ -72,7 +70,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// The update-method interacts in dependency of the edit-progress-state. (sequencial series)
+        /// The update-method interacts in dependency of the edit-progress-state. (sequenial series)
         /// NoNodeSelected: Waits until a node is selected by pushing mouse button on a gameNode 
         /// NodeSelected: Instantiates the canvasObject if a gameNode is selected 
         /// EditIsCanceled: Removes the canvas and resets values if the process is canceled

@@ -65,12 +65,12 @@ public static class MathFunctions
     /// case the given vector list is empty or null itself</returns>
     public static Vector3 medianOfVectors(List<Vector3> pVectorList)
     {
-        int lengthOfList = pVectorList.Count;
+        
         if (pVectorList == null)
         {
             return new Vector3(0, 0, 0);
         }
-
+        int lengthOfList = pVectorList.Count;
 
         switch (lengthOfList)
         {

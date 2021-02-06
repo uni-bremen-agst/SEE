@@ -120,7 +120,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Sets the Scale of this <paramref name="node"/> independed of the Loal Scale from the Parent
+        /// Sets the scale of this <paramref name="node"/> independent of the local scale from the parent
         /// </summary>
         /// <param name="node">object whose scale should be scaled</param>
         /// <param name="scale">the new scale</param>
