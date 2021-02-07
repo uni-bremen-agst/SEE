@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using SEE.Controls.Actions;
 
 /// <summary>
-/// This script is been added to the Button of the adding-node-canvas and the edit-node-canvas.
+/// This script is added to the Button of the adding-node-canvas and the edit-node-canvas.
 /// </summary>
 public class NodeInteractionButtons : MonoBehaviour
 {
