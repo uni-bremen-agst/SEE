@@ -555,7 +555,7 @@ namespace SEE.Controls.Actions
                 return null;
             }
             IList<GameObject> listOfRoots = new List<GameObject>();
-            /// Special case the graph only consists of one leaf, i.e. the root.
+            // Special case the graph only consists of one leaf, i.e. the root.
             if (listofLeaves.Count == 1 && listOfInnerNodes.Count == 0)
             {
                 listOfRoots.Add(listofLeaves.ElementAt(0));
