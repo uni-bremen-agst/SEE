@@ -41,7 +41,7 @@ namespace SEE.Controls.Actions
 
         void Start()
         {
-            InitialiseCanvasObject();
+            InitializeCanvasObject();
             ActionState.OnStateChanged += (ActionState.Type newState) =>
             {
                 // Is this our action state where we need to do something?
