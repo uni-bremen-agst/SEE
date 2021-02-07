@@ -9,7 +9,6 @@ using SEE.Utils;
 
 namespace SEE.Controls.Actions
 {
-
     /// <summary>
     /// Action to create a new node for a selected city.
     /// </summary>
@@ -184,7 +183,6 @@ namespace SEE.Controls.Actions
                     {
                         instantiated = true;
                     }
-
                 }
                 else
                 {
