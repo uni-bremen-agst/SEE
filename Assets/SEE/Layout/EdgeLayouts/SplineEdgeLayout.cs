@@ -79,6 +79,7 @@ namespace SEE.Layout.EdgeLayouts
                     start = source.Ground;
                     end = target.Ground;
                 }
+                edge.ControlPoints = LinePoints.SplineLinePoints(start, end, edgesAboveBlocks, offset);
                 edge.Points = Simplify(LinePoints.SplineLinePoints(start, end, edgesAboveBlocks, offset), rdp);
             }
         }

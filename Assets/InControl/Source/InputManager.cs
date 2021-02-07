@@ -140,7 +140,7 @@ namespace InControl
 			}
 			#endif
 
-			#if UNITY_STANDALONE_WIN || UNITY_EDITOR
+			#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
 			if (EnableXInput && enableUnityInput)
 			{
 				XInputDeviceManager.Enable();
@@ -156,6 +156,13 @@ namespace InControl
 
 			#if UNITY_XBOXONE
 			if (XboxOneInputDeviceManager.Enable())
+			{
+				enableUnityInput = false;
+			}
+			#endif
+
+			#if UNITY_GAMECORE
+			if (GameCoreInputDeviceManager.Enable())
 			{
 				enableUnityInput = false;
 			}

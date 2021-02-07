@@ -45,7 +45,7 @@
 			{
 				if (BoundTo == null)
 				{
-					// Debug.LogWarning( "Cannot query property 'Name' for unbound BindingSource." );
+					// Cannot query property 'Name' for unbound BindingSource.
 					return "";
 				}
 				else
@@ -84,7 +84,7 @@
 			{
 				if (BoundTo == null)
 				{
-					// Debug.LogWarning( "Cannot query property 'DeviceName' for unbound BindingSource." );
+					// Cannot query property 'DeviceName' for unbound BindingSource.
 					return "";
 				}
 				else
@@ -174,7 +174,7 @@
 			{
 				if (BoundTo == null)
 				{
-					Debug.LogError( "Cannot query property 'IsValid' for unbound BindingSource." );
+					Logger.LogError( "Cannot query property 'IsValid' for unbound BindingSource." );
 					return false;
 				}
 				else

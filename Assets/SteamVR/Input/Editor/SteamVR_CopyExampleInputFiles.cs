@@ -1,6 +1,4 @@
-﻿#if UNITY_EDITOR
-
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using UnityEditor;
 using System;
@@ -62,5 +60,3 @@ namespace Valve.VR
         }
     }
 }
-
-#endif

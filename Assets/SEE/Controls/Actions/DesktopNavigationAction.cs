@@ -8,7 +8,12 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Controls the interactions with the city in desktop mode.
+    /// Controls the interactions with the city in desktop mode regarding the movement
+    /// and perspective on a code city (rotating, dragging, zooming, etc.).
+    /// 
+    /// Note: These are the interactions on a desktop environment with 2D display,
+    /// mouse, and keyboard. Similar interactions specific to VR are implemented
+    /// in XRNavigationAction.
     /// </summary>
     [RequireComponent(typeof(Collider))]
     public class DesktopNavigationAction : NavigationAction
@@ -205,6 +210,7 @@ namespace SEE.Controls.Actions
                     rotateState.rotateGizmo.Radius = 0.2f * (MainCamera.Camera.transform.position - rotateState.rotateGizmo.Center).magnitude;
                 }
             }
+
         }
 
         // This logic is in FixedUpdate(), so that the behaviour is framerate-'independent'.

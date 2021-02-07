@@ -12,10 +12,11 @@
         /// </summary>
         public enum Type
         {
-            Move,    // the user wants to move a node
-            Rotate,  // the user wants to rotate a node
-            Map,     // the user wants to map an implementation node onto an architecture node (reflexion analysis)
-            DrawEdge // The user wants to draw an edge between nodes
+            Move = 0,    // the user wants to move a node
+            Delete = 1,  // the user wants to delete a node or edge
+            Rotate = 2,  // the user wants to rotate a node
+            Map = 3,     // the user wants to map an implementation node onto an architecture node (reflexion analysis)
+            DrawEdge = 4 // The user wants to draw an edge between nodes
         }
 
         private static Type value = 0;

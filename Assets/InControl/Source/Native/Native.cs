@@ -14,45 +14,45 @@ namespace InControl
 		const string libraryName = "InControlNative";
 #endif
 
+		const CallingConvention callingConvention = CallingConvention.Cdecl;
+
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX || UNITY_IOS || UNITY_TVOS
 
-
-		[DllImport( libraryName, EntryPoint = "InControl_Init" )]
+		[DllImport( libraryName, EntryPoint = "InControl_Init", CallingConvention = callingConvention)]
 		public static extern void Init( NativeInputOptions options );
 
 
-		[DllImport( libraryName, EntryPoint = "InControl_Stop" )]
+		[DllImport( libraryName, EntryPoint = "InControl_Stop", CallingConvention = callingConvention)]
 		public static extern void Stop();
 
 
-		[DllImport( libraryName, EntryPoint = "InControl_GetVersionInfo" )]
+		[DllImport( libraryName, EntryPoint = "InControl_GetVersionInfo", CallingConvention = callingConvention)]
 		public static extern void GetVersionInfo( out NativeVersionInfo versionInfo );
 
 
-		[DllImport( libraryName, EntryPoint = "InControl_GetDeviceInfo" )]
+		[DllImport( libraryName, EntryPoint = "InControl_GetDeviceInfo", CallingConvention = callingConvention)]
 		public static extern bool GetDeviceInfo( DeviceHandle handle, out InputDeviceInfo deviceInfo );
 
 
-		[DllImport( libraryName, EntryPoint = "InControl_GetDeviceState" )]
+		[DllImport( libraryName, EntryPoint = "InControl_GetDeviceState", CallingConvention = callingConvention)]
 		public static extern bool GetDeviceState( DeviceHandle handle, out IntPtr deviceState );
 
 
-		[DllImport( libraryName, EntryPoint = "InControl_GetDeviceEvents" )]
+		[DllImport( libraryName, EntryPoint = "InControl_GetDeviceEvents", CallingConvention = callingConvention)]
 		public static extern Int32 GetDeviceEvents( out IntPtr deviceEvents );
 
 
-		[DllImport( libraryName, EntryPoint = "InControl_SetHapticState" )]
+		[DllImport( libraryName, EntryPoint = "InControl_SetHapticState", CallingConvention = callingConvention)]
 		public static extern void SetHapticState( UInt32 handle, Byte motor0, Byte motor1 );
 
 
-		[DllImport( libraryName, EntryPoint = "InControl_SetLightColor" )]
+		[DllImport( libraryName, EntryPoint = "InControl_SetLightColor", CallingConvention = callingConvention)]
 		public static extern void SetLightColor( UInt32 handle, Byte red, Byte green, Byte blue );
 
 
-		[DllImport( libraryName, EntryPoint = "InControl_SetLightFlash" )]
+		[DllImport( libraryName, EntryPoint = "InControl_SetLightFlash", CallingConvention = callingConvention)]
 		public static extern void SetLightFlash( UInt32 handle, Byte flashOnDuration, Byte flashOffDuration );
-
 
 #else
 		public static void Init( NativeInputOptions options ) { }

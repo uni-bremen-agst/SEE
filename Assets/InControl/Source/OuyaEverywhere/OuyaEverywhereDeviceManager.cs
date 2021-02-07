@@ -1,4 +1,3 @@
-
 #if UNITY_ANDROID && INCONTROL_OUYA && !UNITY_EDITOR
 using tv.ouya.console.api;
 #endif
@@ -49,15 +48,14 @@ namespace InControl
 			#if UNITY_ANDROID && INCONTROL_OUYA && !UNITY_EDITOR
 			if (OuyaSDK.isRunningOnOUYASupportedHardware())
 			{
-				Debug.Log( "[InControl] All systems go; firing up OUYA adapter." );
+				Logger.Log( "[InControl] All systems go; firing up OUYA adapter." );
 				InputManager.AddDeviceManager<OuyaEverywhereDeviceManager>();
 			}
 			else
 			{
-				Debug.Log( "[InControl] OuyaSDK.isRunningOnOUYASupportedHardware() has returned false." );
+				Logger.Log( "[InControl] OuyaSDK.isRunningOnOUYASupportedHardware() has returned false." );
 			}
 			#endif
 		}
 	}
 }
-

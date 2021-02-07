@@ -8,11 +8,12 @@
 // https://assetstore.unity.com/packages/tools/particles-effects/quick-outline-115488
 //
 
+using SEE.DataModel.DG;
+using SEE.Game;
+using SEE.GO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.DataModel.DG;
-using SEE.GO;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -101,25 +102,19 @@ namespace SEE.Controls
 
             if (go)
             {
-                GameObject root = go;
-                while (root.GetComponent<GO.Plane>() == null)
+                Transform codeCityTransform = SceneQueries.GetCodeCity(go.transform);
+                if (codeCityTransform == null)
                 {
-                    Transform parent = root.transform.parent;
-                    if (parent)
-                    {
-                        root = parent.gameObject;
-                    }
-                    else
-                    {
-                        goto End;
-                    }
+                    return null;
                 }
-
+                GameObject root = codeCityTransform.gameObject;
+ 
                 result = go.AddComponent<Outline>();
                 result.OutlineMode = Mode.OutlineAll;
                 result.OutlineColor = color;
                 result.OutlineWidth = 4.0f;
 
+                // FIXME: This code needs documentation.
                 NodeRef nodeRef = go.GetComponent<NodeRef>();
                 if (nodeRef != null && nodeRef.Value != null)
                 {
@@ -128,7 +123,7 @@ namespace SEE.Controls
                     int maxDepth = graph.MaxDepth;
 
                     int inverseRenderQueueOffset = node.Level;
-                    if (nodeRef.Value.Type.Equals("Directory"))
+                    if (nodeRef.Value.IsInnerNode())
                     {
                         inverseRenderQueueOffset += maxDepth;
                     }
@@ -137,14 +132,15 @@ namespace SEE.Controls
                     result.outlineMaskMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + 2 * renderQueueOffset;
                     result.outlineFillMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + 2 * renderQueueOffset + 1;
                 }
-#if UNITY_EDITOR
-                else
-                {
-                    Debug.LogWarningFormat("Outline could not be created for '{0}'! The NodeRef seems to not be set.\n", go.name);
-                }
-#endif
+// Note: go could be an edge, which does not have a NodeRef.
+//#if UNITY_EDITOR
+//                else
+//                {
+//                    Debug.LogWarningFormat("Outline could not be created for '{0}'! The NodeRef seems to not be set.\n", go.name);
+//                }
+//#endif
 
-                Game.Portal.SetPortal(root, go);
+                Portal.SetPortal(root, go);
                 result.UpdateMaterialProperties();
             }
 

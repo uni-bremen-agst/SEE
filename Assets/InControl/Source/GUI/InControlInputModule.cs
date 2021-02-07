@@ -7,11 +7,11 @@ namespace InControl
 
 
 	[AddComponentMenu( "Event/InControl Input Module" )]
-#if UNITY_2017_1_OR_NEWER
+	#if UNITY_2017_1_OR_NEWER
 	public class InControlInputModule : PointerInputModule
-#else
+		#else
 	public class InControlInputModule : StandaloneInputModule
-#endif
+		#endif
 	{
 		public enum Button : int
 		{
@@ -21,13 +21,13 @@ namespace InControl
 			Action4 = InputControlType.Action4
 		}
 
-#if UNITY_2017_1_OR_NEWER
+		#if UNITY_2017_1_OR_NEWER
 		public Button submitButton = Button.Action1;
 		public Button cancelButton = Button.Action2;
-#else
+		#else
 		public new Button submitButton = Button.Action1;
 		public new Button cancelButton = Button.Action2;
-#endif
+		#endif
 
 		[Range( 0.1f, 0.9f )]
 		public float analogMoveThreshold = 0.5f;
@@ -36,11 +36,11 @@ namespace InControl
 		public float moveRepeatDelayDuration = 0.1f;
 
 		[FormerlySerializedAs( "allowMobileDevice" )]
-#if (UNITY_5 || UNITY_5_6_OR_NEWER) && !(UNITY_5_0 || UNITY_5_1 || UNITY_2017_1_OR_NEWER)
+		#if (UNITY_5 || UNITY_5_6_OR_NEWER) && !(UNITY_5_0 || UNITY_5_1 || UNITY_2017_1_OR_NEWER)
 		new public bool forceModuleActive;
-#else
+		#else
 		public bool forceModuleActive;
-#endif
+		#endif
 
 		public bool allowMouseInput = true;
 		public bool focusOnMouseHover;
@@ -83,24 +83,24 @@ namespace InControl
 
 		public override bool IsModuleSupported()
 		{
-#if UNITY_WII || UNITY_PS3 || UNITY_PS4 || UNITY_XBOX360 || UNITY_XBOXONE || UNITY_SWITCH
+			#if UNITY_WII || UNITY_PS3 || UNITY_PS4 || UNITY_XBOX360 || UNITY_XBOXONE || UNITY_SWITCH
 			return true;
-#else
+			#else
 
 			if (forceModuleActive || Input.mousePresent || Input.touchSupported)
 			{
 				return true;
 			}
 
-#if UNITY_5
+			#if UNITY_5
 			if (Input.touchSupported)
 			{
 				return true;
 			}
-#endif
+			#endif
 
 			return false;
-#endif
+			#endif
 		}
 
 
@@ -118,13 +118,13 @@ namespace InControl
 			shouldActivate |= CancelWasPressed;
 			shouldActivate |= VectorWasPressed;
 
-#if !UNITY_IOS || UNITY_EDITOR
+			#if !UNITY_IOS || UNITY_EDITOR
 			if (allowMouseInput)
 			{
 				shouldActivate |= MouseHasMoved;
 				shouldActivate |= MouseButtonIsPressed;
 			}
-#endif
+			#endif
 
 			if (allowTouchInput)
 			{
@@ -170,23 +170,23 @@ namespace InControl
 				}
 			}
 
-#if (UNITY_5 && !(UNITY_5_0 || UNITY_5_1)) || UNITY_2017_1_OR_NEWER
+			#if (UNITY_5 && !(UNITY_5_0 || UNITY_5_1)) || UNITY_2017_1_OR_NEWER
 			if (allowTouchInput && ProcessTouchEvents())
 			{
 				return;
 			}
-#endif
+			#endif
 
-#if !UNITY_IOS || UNITY_EDITOR
+			#if !UNITY_IOS || UNITY_EDITOR
 			if (allowMouseInput)
 			{
 				ProcessMouseEvent();
 			}
-#endif
+			#endif
 		}
 
 
-#if (UNITY_5 && !(UNITY_5_0 || UNITY_5_1)) || UNITY_2017_1_OR_NEWER
+		#if (UNITY_5 && !(UNITY_5_0 || UNITY_5_1)) || UNITY_2017_1_OR_NEWER
 		bool ProcessTouchEvents()
 		{
 			var touchCount = Input.touchCount;
@@ -218,7 +218,7 @@ namespace InControl
 
 			return touchCount > 0;
 		}
-#endif
+		#endif
 
 
 		bool SendButtonEventToSelectedObject()
@@ -425,7 +425,7 @@ namespace InControl
 
 		#region Unity 5.0 compatibility.
 
-#if UNITY_5_0
+		#if UNITY_5_0
 		bool SendUpdateEventToSelectedObject()
 		{
 			if (eventSystem.currentSelectedGameObject == null)
@@ -546,7 +546,7 @@ namespace InControl
 			return pressed || released || pointerData.IsPointerMoving() || pointerData.IsScrolling();
 		}
 
-#endif
+		#endif
 
 		#endregion
 
@@ -556,7 +556,7 @@ namespace InControl
 
 		#region Unity 5.3 / 5.4 compatibility.
 
-#if UNITY_5_3 || UNITY_5_4
+		#if UNITY_5_3 || UNITY_5_4
 		void ProcessTouchPress( PointerEventData pointerEvent, bool pressed, bool released )
 		{
 			var go = pointerEvent.pointerCurrentRaycast.gameObject;
@@ -636,7 +636,7 @@ namespace InControl
 				pointerEvent.pointerEnter = null;
 			}
 		}
-#endif
+		#endif
 
 		#endregion
 
@@ -646,13 +646,14 @@ namespace InControl
 
 		#region Unity 2017 compatibility
 
-#if UNITY_2017_1_OR_NEWER
+		#if UNITY_2017_1_OR_NEWER
 		protected bool SendUpdateEventToSelectedObject()
 		{
 			if (eventSystem.currentSelectedGameObject == null)
 			{
 				return false;
 			}
+
 			var data = GetBaseEventData();
 			ExecuteEvents.Execute( eventSystem.currentSelectedGameObject, data, ExecuteEvents.updateSelectedHandler );
 			return data.used;
@@ -715,9 +716,7 @@ namespace InControl
 				if (newPressed == null)
 					newPressed = ExecuteEvents.GetEventHandler<IPointerClickHandler>( currentOverGo );
 
-				// Debug.Log("Pressed: " + newPressed);
-
-				float time = Time.unscaledTime;
+				var time = Time.unscaledTime;
 
 				if (newPressed == pointerEvent.lastPress)
 				{
@@ -749,10 +748,7 @@ namespace InControl
 			// PointerUp notification
 			if (data.ReleasedThisFrame())
 			{
-				// Debug.Log("Executing pressup on: " + pointer.pointerPress);
 				ExecuteEvents.Execute( pointerEvent.pointerPress, pointerEvent, ExecuteEvents.pointerUpHandler );
-
-				// Debug.Log("KeyCode: " + pointer.eventData.keyCode);
 
 				// see if we mouse up on the same element that we clicked on...
 				var pointerUpHandler = ExecuteEvents.GetEventHandler<IPointerClickHandler>( currentOverGo );
@@ -822,9 +818,7 @@ namespace InControl
 				if (newPressed == null)
 					newPressed = ExecuteEvents.GetEventHandler<IPointerClickHandler>( currentOverGo );
 
-				// Debug.Log("Pressed: " + newPressed);
-
-				float time = Time.unscaledTime;
+				var time = Time.unscaledTime;
 
 				if (newPressed == pointerEvent.lastPress)
 				{
@@ -856,10 +850,7 @@ namespace InControl
 			// PointerUp notification
 			if (released)
 			{
-				// Debug.Log("Executing pressup on: " + pointer.pointerPress);
 				ExecuteEvents.Execute( pointerEvent.pointerPress, pointerEvent, ExecuteEvents.pointerUpHandler );
-
-				// Debug.Log("KeyCode: " + pointer.eventData.keyCode);
 
 				// see if we mouse up on the same element that we clicked on...
 				var pointerUpHandler = ExecuteEvents.GetEventHandler<IPointerClickHandler>( currentOverGo );
@@ -895,7 +886,8 @@ namespace InControl
 			}
 		}
 
-#endif
+
+		#endif
 
 		#endregion
 	}
