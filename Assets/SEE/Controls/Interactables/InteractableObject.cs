@@ -21,7 +21,6 @@ namespace SEE.Controls
     /// Super class of the behaviours of game objects the player interacts with.
     /// </summary>
     [RequireComponent(typeof(Interactable))]
-    [RequireComponent(typeof(NodeRef))]
     public sealed class InteractableObject : MonoBehaviour, IMixedRealityFocusHandler
     {
         // Tutorial on grabbing objects:
@@ -355,6 +354,8 @@ namespace SEE.Controls
         /// A delegate to be called when a hovering event has happened (hover over
         /// or hover off the game object).
         /// </summary>
+        /// <param name="interactableObject">the object being hovered over</param>
+        /// <param name="isOwner">true if a local user initiated this call</param>
         public delegate void HoverAction(InteractableObject interactableObject, bool isOwner);
         /// <summary>
         /// Event to be triggered when this game object is being hovered over.
@@ -365,14 +366,17 @@ namespace SEE.Controls
         /// </summary>
         public event HoverAction HoverOut;
 
+        // FIXME: Needs documentation.
         public delegate void AnyHoverAction(InteractableObject interactableObject, bool isOwner);
         public static event AnyHoverAction AnyHoverIn;
         public static event AnyHoverAction AnyHoverOut;
 
+        // FIXME: Needs documentation.
         public delegate void LocalHoverAction(InteractableObject interactableObject);
         public event LocalHoverAction LocalHoverIn;
         public event LocalHoverAction LocalHoverOut;
 
+        // FIXME: Needs documentation.
         public delegate void LocalAnyHoverAction(InteractableObject interactableObject);
         public static event LocalAnyHoverAction LocalAnyHoverIn;
         public static event LocalAnyHoverAction LocalAnyHoverOut;
@@ -384,6 +388,8 @@ namespace SEE.Controls
         /// A delegate to be called when a selection event has happened (selecting
         /// or deselecting the game object).
         /// </summary>
+        /// <param name="interactableObject">the object being selected</param>
+        /// <param name="isOwner">true if a local user initiated this call</param>
         public delegate void SelectAction(InteractableObject interactableObject, bool isOwner);
         /// <summary>
         /// Event to be triggered when this game object is being selected.
@@ -394,14 +400,17 @@ namespace SEE.Controls
         /// </summary>
         public event SelectAction SelectOut;
 
+        // FIXME: Needs documentation.
         public delegate void AnySelectAction(InteractableObject interactableObject, bool isOwner);
         public static event AnySelectAction AnySelectIn;
         public static event AnySelectAction AnySelectOut;
 
+        // FIXME: Needs documentation.
         public delegate void LocalSelectAction(InteractableObject interactableObject);
         public event LocalSelectAction LocalSelectIn;
         public event LocalSelectAction LocalSelectOut;
 
+        // FIXME: Needs documentation.
         public delegate void LocalAnySelectAction(InteractableObject interactableObject);
         public static event LocalAnySelectAction LocalAnySelectIn;
         public static event LocalAnySelectAction LocalAnySelectOut;
@@ -413,6 +422,8 @@ namespace SEE.Controls
         /// A delegate to be called when a grab event has happened (grabbing
         /// or releasing the game object).
         /// </summary>
+        /// <param name="interactableObject">the object being grabbed</param>
+        /// <param name="isOwner">true if a local user initiated this call</param>
         public delegate void GrabAction(InteractableObject interactableObject, bool isOwner);
         /// <summary>
         /// Event to be triggered when this game object is being grabbed.
@@ -423,14 +434,17 @@ namespace SEE.Controls
         /// </summary>
         public event GrabAction GrabOut;
 
+        // FIXME: Needs documentation.
         public delegate void AnyGrabAction(InteractableObject interactableObject, bool isOwner);
         public static event AnyGrabAction AnyGrabIn;
         public static event AnyGrabAction AnyGrabOut;
 
+        // FIXME: Needs documentation.
         public delegate void LocalGrabAction(InteractableObject interactableObject);
         public event LocalGrabAction LocalGrabIn;
         public event LocalGrabAction LocalGrabOut;
 
+        // FIXME: Needs documentation.
         public delegate void LocalAnyGrabAction(InteractableObject interactableObject);
         public static event LocalAnyGrabAction LocalAnyGrabIn;
         public static event LocalAnyGrabAction LocalAnyGrabOut;

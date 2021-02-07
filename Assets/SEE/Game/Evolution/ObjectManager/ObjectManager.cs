@@ -202,6 +202,15 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
+        /// Clears old and new edges
+        /// </summary>
+        private void ClearAllEdges()
+        {
+            ClearEdges();
+            ClearNewEdges();
+        }
+
+        /// <summary>
         /// Removes the game object representing the given <paramref name="node"/> by using the ID 
         /// of the <paramref name="node"/> and returns the removed node in <paramref name="gameObject"/>, if 
         /// it existed. Returns true if such a game object existed in the cache.
@@ -224,14 +233,70 @@ namespace SEE.Game.Evolution
         private ICollection<GameObject> edges;
 
         /// <summary>
+        /// The list of edges calculated for the next graph.
+        /// </summary>
+        private ICollection<GameObject> newEdges;
+
+        /// <summary>
         /// Renders all edges for the nodes in the node cache according to the settings.
         /// If edges for these nodes existed already, their game objects are destroyed first.
         /// </summary>
         public void RenderEdges()
         {
-            ClearEdges();
+            ClearAllEdges();
             // FIXME: Provide meaningful values for scaleFactor.
             edges = _graphRenderer.EdgeLayout(nodes.Values);
+        }
+
+        /// <summary>
+        /// Returns the list of edges rendered for this graph.
+        /// </summary>
+        /// <returns>The list of edges rendered for this graph</returns>
+        public ICollection<GameObject> GetEdges()
+        {
+            return edges;
+        }
+
+        /// <summary>
+        /// Calculates the edges of the next graph
+        /// </summary>
+        /// <returns>The list of calculated edges of the next graph</returns>
+        public ICollection<GameObject> CalculateNewEdgeControlPoints()
+        {
+            ClearNewEdges();
+            newEdges = _graphRenderer.EdgeLayout(nodes.Values, false);
+            return newEdges;
+        }
+
+        /// <summary>
+        /// Destroys an edge from the graph
+        /// </summary>
+        /// <param name="edge">The edge to be removed</param>
+        public void RemoveEdge(Edge edge)
+        {
+            foreach (GameObject go in edges.ToList<GameObject>())
+            {
+                if (edge.ID.Equals(go.ID()))
+                {
+                    edges.Remove(go);
+                    Destroyer.DestroyGameObject(go);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Destroys all game objects created for newEdges.
+        /// </summary>
+        private void ClearNewEdges()
+        {
+            if (newEdges != null)
+            {
+                foreach (GameObject gameObject in newEdges)
+                {
+                    Destroyer.DestroyGameObject(gameObject);
+                }
+                newEdges.Clear();
+            }
         }
 
         /// <summary>
@@ -242,7 +307,7 @@ namespace SEE.Game.Evolution
         {
             ClearPlane();
             ClearNodes();
-            ClearEdges();
+            ClearAllEdges();
         }
 
         /// <summary>
