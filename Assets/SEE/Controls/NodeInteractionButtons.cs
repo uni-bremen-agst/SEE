@@ -59,7 +59,7 @@ namespace SEE.Controls
         public void SetNextAddingNodeStep()
         {
             NewNodeAction current = playerDesktop.GetComponent<NewNodeAction>();
-            current.Progress1 = NewNodeAction.Progress.CanvasIsClosed;
+            current.Progress = NewNodeAction.ProgressState.CanvasIsClosed;
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace SEE.Controls
         public void AddingIsCanceled()
         {
             NewNodeAction current = playerDesktop.GetComponent<NewNodeAction>();
-            current.Progress1 = NewNodeAction.Progress.AddingIsCanceled;
+            current.Progress = NewNodeAction.ProgressState.AddingIsCanceled;
         }
     }
 }
