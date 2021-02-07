@@ -36,7 +36,7 @@ public class NodeInteractionButtons : MonoBehaviour
     /// <summary>
     /// The name of the GameObject which is the parent of the newNodeAction and editNodeAction
     /// </summary>
-    private string gameObjectName = "Player Desktop";
+    private const string gameObjectName = "Player Desktop";
 
 
 
