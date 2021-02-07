@@ -36,29 +36,17 @@ public class NodeInteractionButtons : MonoBehaviour
     /// <summary>
     /// The name of the GameObject which is the parent of the newNodeAction and editNodeAction
     /// </summary>
-    private string gameObjectName = "Player Desktop";
+    private const string gameObjectName = "Player Desktop";
 
     /// <summary>
     /// Adds a listener to the button which calls a method when the button is pushed.
     /// </summary>   
     void Start()
     {
-        if (addingButton != null)
-        {
-            addingButton.onClick.AddListener(SetNextAddingNodeStep);
-        }
-        if (editNodeCancel != null)
-        {
-            editNodeCancel.onClick.AddListener(EditIsCanceled);
-        }
-        if (editNodeButton != null)
-        {
-            editNodeButton.onClick.AddListener(EditNode);
-        }
-        if(addNodeCancel != null)
-        {
-            addNodeCancel.onClick.AddListener(AddingIsCanceled);
-        }
+        addingButton?.onClick?.AddListener(SetNextAddingNodeStep);
+        editNodeCancel?.onClick?.AddListener(EditIsCanceled);
+        editNodeButton?.onClick?.AddListener(EditNode);
+        addNodeCancel?.onClick?.AddListener(AddingIsCanceled);
 
          playerDesktop = GameObject.Find(gameObjectName);
     }
