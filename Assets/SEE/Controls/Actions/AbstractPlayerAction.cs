@@ -33,7 +33,7 @@ namespace SEE.Controls.Actions
         /// Finds the GameObject, which contains the CanvasOperations and components
         /// and saves it in the canvasObject-variable.
         /// </summary>
-        public void InitialiseCanvasObject()
+        public void InitializeCanvasObject()
         {
             canvasObject = GameObject.Find(nameOfCanvasObject);
         }
