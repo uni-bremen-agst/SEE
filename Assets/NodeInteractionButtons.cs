@@ -46,22 +46,10 @@ public class NodeInteractionButtons : MonoBehaviour
     /// </summary>   
     void Start()
     {
-        if (addingButton != null)
-        {
-            addingButton.onClick.AddListener(SetNextAddingNodeStep);
-        }
-        if (editNodeCancel != null)
-        {
-            editNodeCancel.onClick.AddListener(EditIsCanceled);
-        }
-        if (editNodeButton != null)
-        {
-            editNodeButton.onClick.AddListener(EditNode);
-        }
-        if(addNodeCancel != null)
-        {
-            addNodeCancel.onClick.AddListener(AddingIsCanceled);
-        }
+        addingButton?.onClick?.AddListener(SetNextAddingNodeStep);
+        editNodeCancel?.onClick?.AddListener(EditIsCanceled);
+        editNodeButton?.onClick?.AddListener(EditNode);
+        addNodeCancel?.onClick?.AddListener(AddingIsCanceled);
 
          playerDesktop = GameObject.Find(gameObjectName);
     }
