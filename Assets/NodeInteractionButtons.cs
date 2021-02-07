@@ -38,9 +38,6 @@ public class NodeInteractionButtons : MonoBehaviour
     /// </summary>
     private string gameObjectName = "Player Desktop";
 
-
-
-
     /// <summary>
     /// Adds a listener to the button which calls a method when the button is pushed.
     /// </summary>   
@@ -67,7 +64,7 @@ public class NodeInteractionButtons : MonoBehaviour
     }
 
     /// <summary>
-    /// Increases the progress-enum in the DesktopNewNodeAction-instance. This results in the next step of addingNode.
+    /// Increases the progress-enum in the DesktopNewNodeAction instance. This results in the next step of addingNode.
     /// </summary>
     public void SetNextAddingNodeStep()
     {
@@ -76,7 +73,7 @@ public class NodeInteractionButtons : MonoBehaviour
     }
 
     /// <summary>
-    /// Sets a bool in the DesktopEditNodeAction-script which closes the adding-node-canvas.
+    /// Sets a bool in the DesktopEditNodeAction which closes the adding-node canvas.
     /// </summary>
     public void EditIsCanceled()
     {
