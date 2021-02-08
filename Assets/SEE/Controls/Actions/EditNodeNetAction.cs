@@ -56,7 +56,7 @@ namespace SEE.Controls.Actions
         {
             if (!IsRequester())
             {
-                Node node = GameObject.Find(gameObjectID).GetNode();
+                Node node = GameObject.Find(gameObjectID)?.GetNode();
                 if (node != null)
                 {
                     node.SourceName = scname;
