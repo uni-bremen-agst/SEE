@@ -24,7 +24,7 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// The id of the GameNode-Object which has to be edited.
-        /// It cant be changed after the node-creation.
+        /// It can't be changed after the node-creation.
         /// </summary>
         public string gameObjectID;
 
