@@ -5,7 +5,8 @@ using UnityEngine.UI;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Creates a clone of a canvas prefab for editing an existing node. Extracts these new values from the canvas after closing it.
+    /// Creates a clone of a canvas prefab for editing an existing node. Extracts these new values from the 
+    /// canvas after closing it.
     /// </summary>
     public class EditNodeCanvasAction : NodeCanvasAction
     {
@@ -15,15 +16,14 @@ namespace SEE.Controls.Actions
         public Node nodeToEdit;
 
         /// <summary>
-        /// The id of the gameObject, which contains the nodeToEdit. Necessary for the Network-Action.
+        /// The id of the gameObject that contains the nodeToEdit. Necessary for the network action.
         /// </summary>
         public string gameObjectID;
 
-        /// <summary>
-        /// A bool which is true after pushing the editNode-button on the canvas, else false.
-        /// </summary>
         private static bool editNode = false;
-
+        /// <summary>
+        /// True when the editNode button on the canvas was pushed, else false.
+        /// </summary>
         public static bool EditNode { get => editNode; set => editNode = value; }
 
         /// <summary>
@@ -37,15 +37,15 @@ namespace SEE.Controls.Actions
         InputField inputtype;
 
         /// <summary>
-        /// The gameObject which contains the canvasPrefab.
+        /// The gameObject that contains the canvasPrefab.
         /// </summary>
         public GameObject canvasObject;
 
         /// <summary>
-        /// The directory of the Edit-Node-Prefab.
+        /// The directory of the EditNodeCanvas prefab.
+        /// FIXME: Is this really the directory? It seems as if it were the whole filename without the extension .prefab.
         /// </summary>
         private const string prefabDirectory = "Prefabs/EditNodeCanvas";
-
 
         void Start()
         {
@@ -60,8 +60,8 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Gets the values of the canvas-inputfields after pushing the edit-button and removes the canvas-gameObject.
-        /// Saves them in the DesktopEditNodeAction-script.
+        /// Gets the values of the canvas input fields after pushing the edit button and removes the
+        /// canvas gameObject. Saves them in the DesktopEditNodeAction.
         /// </summary>
         void Update()
         {
@@ -78,12 +78,14 @@ namespace SEE.Controls.Actions
                 CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
                 generator.DestroyEditNodeCanvas();
                 new EditNodeNetAction(nodeToEdit.SourceName, nodeToEdit.Type, gameObjectID).Execute(null);
+                // Avoid calls of Find() in Update(). Find is an expensive operation that traverses all objects 
+                // in the scene. If executed on every frame, it may slow down the program.
+                // Could either g or current be cached instead?
                 GameObject g = GameObject.Find("Player Desktop");
                 EditNodeAction current = g.GetComponent<EditNodeAction>();
                 current.EditProgress = EditNodeAction.Progress.NoNodeSelected;
                 InteractableObject.UnselectAll(true);
                 editNode = false;
-
             }
         }
     }
