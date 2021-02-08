@@ -35,7 +35,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Moves the given <paramref name="movingObject"/> on a sphere around the
-        /// camera. The radius sphere of this sphere is the original distance
+        /// camera. The radius of this sphere is the original distance
         /// from the <paramref name="movingObject"/> to the camera. The point
         /// on that sphere is determined by a ray driven by the user hitting
         /// this sphere. The speed of travel is defind by <see cref="MovingSpeed"/>.
