@@ -86,7 +86,7 @@ public static class MathFunctions
             case 2:
                 return (pVectorList.ElementAt(0) + pVectorList.ElementAt(1)) / 2;
 
-            // this is the case, the list consists of more than 2 entries and we have to determine the median.
+            // if this is the case, the list consists of more than 2 entries and we have to determine the median.
             default:
                 Vector3 medianVector = new Vector3();
                 List<float> xAxis = new List<float>();
