@@ -42,13 +42,14 @@ public class AddEdgeNetAction : SEE.Net.AbstractAction
         if (!IsRequester())
         {
             GameObject fromGO = GameObject.Find(fromId);
+            GameObject toGO = GameObject.Find(toId);
             SEECity city = null;
             SceneQueries.GetCodeCity(fromGO.transform)?.gameObject.TryGetComponent(out city);
-            if(city != null)
+            if(city != null && toGO != null && fromGO != null)
             {
                 try
                 {
-                    city.GetComponent<GraphRenderer>().DrawEdge(fromGO, GameObject.Find(toId));
+                    city.GetComponent<GraphRenderer>().DrawEdge(fromGO, toGO);
                 }
                 
                 catch (Exception e)
