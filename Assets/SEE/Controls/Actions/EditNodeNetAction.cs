@@ -7,70 +7,68 @@ namespace SEE.Controls.Actions
 {
 
     /// <summary>
-    /// This class is responsible for the edit-node-process via network from one client to all others and to the server. 
+    /// This class is responsible for the edit-node process via network from one client to all others and to the server. 
     /// </summary>
     public class EditNodeNetAction : AbstractAction
     {
+        /// <summary>
+        /// The new name of the node that has to be edited.
+        /// </summary>
+        public string SourceName;
 
         /// <summary>
-        /// The new name of the node which has to be edited.
+        /// The new type of the node that has to be edited
         /// </summary>
-        public string scname;
+        public string NodeType;
 
         /// <summary>
-        /// The new type of the node which has to be edited
+        /// The id of the GameNode object that has to be edited.
+        /// It can't be changed after the node creation.
         /// </summary>
-        public string type;
+        public string GameObjectID;
 
         /// <summary>
-        /// The id of the GameNode-Object which has to be edited.
-        /// It can't be changed after the node-creation.
+        /// Constructs an EditNodeNetAction object.
         /// </summary>
-        public string gameObjectID;
-
-        /// <summary>
-        /// Constructs an EditNodeNetAction object
-        /// </summary>
-        /// <param name="SourceName">The new sourcename</param>
-        /// <param name="Type">the new type</param>
-        /// <param name="GameObjectID">the gameobject id which the node belongs to</param>
+        /// <param name="sourceName">The new source name</param>
+        /// <param name="type">the new node type</param>
+        /// <param name="gameObjectID">the gameobject id the node belongs to</param>
         public EditNodeNetAction(string sourceName, string type, string gameObjectID) : base()
         {
-            // nodeToEdit = node;
-            scname = sourceName;
-            this.type = type;
-            this.gameObjectID = gameObjectID;
-
+            SourceName = sourceName;
+            this.NodeType = type;
+            this.GameObjectID = gameObjectID;
         }
+
         /// <summary>
-        /// Things to Execute on the Server (None for this Class)
+        /// Things to execute on the server (none for this class)
         /// </summary>
         protected override void ExecuteOnServer()
         {
-
+            // Intentionally left blank.
         }
+
         /// <summary>
-        /// Things to Execute on the Client Sets finds the GameObject on the Client and sets its parameter
+        /// Sets the attributes of the GameObject on the client side.
         /// </summary>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
             {
-                Node node = GameObject.Find(gameObjectID)?.GetNode();
+                // FIXME: Are the game-object ids in Unity really synchronized across
+                // the server and all clients?
+                Node node = GameObject.Find(GameObjectID)?.GetNode();
                 if (node != null)
                 {
-                    node.SourceName = scname;
-                    node.Type = type;
-
+                    node.SourceName = SourceName;
+                    node.Type = NodeType;
                 }
                 else
                 {
-                    //FIXME: Controll if a Debug Log is the right thing
-                    Debug.LogError("Found no gameObject: " + gameObjectID);
+                    // FIXME: Controll if a Debug Log is the right thing
+                    Debug.LogError($"Found no gameObject: {GameObjectID}.\n");
                 }
             }
-
         }
-
     }
 }
