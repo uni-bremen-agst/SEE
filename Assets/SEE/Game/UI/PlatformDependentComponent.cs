@@ -1,7 +1,8 @@
 ﻿using OdinSerializer.Utilities;
-using SEE.Controls;
 using SEE.Utils;
+using UnityEditor;
 using UnityEngine;
+using PlayerSettings = SEE.Controls.PlayerSettings;
 
 namespace SEE.Game.UI
 {
@@ -15,6 +16,26 @@ namespace SEE.Game.UI
     /// </summary>
     public abstract class PlatformDependentComponent: MonoBehaviour
     {
+
+        /// <summary>
+        /// Name of the canvas on which UI elements are placed.
+        /// Note that for HoloLens, the canvas will be converted to an MRTK canvas.
+        /// </summary>
+        protected const string UI_CANVAS_NAME = "UI Canvas";
+        
+        /// <summary>
+        /// Path to where the UI Canvas prefab is stored.
+        /// This prefab should contain all components necessary for the UI canvas, such as an event system,
+        /// a graphic raycaster, etc.
+        /// </summary>
+        protected const string UI_CANVAS_PREFAB = "Assets/Prefabs/UI/UICanvas.prefab";
+
+        /// <summary>
+        /// The canvas on which UI elements are placed.
+        /// This GameObject must be named <see cref="UI_CANVAS_NAME"/>.
+        /// If it doesn't exist yet, it will be created from a prefab.
+        /// </summary>
+        protected GameObject Canvas;
 
         /// <summary>
         /// The current platform.
@@ -58,6 +79,17 @@ namespace SEE.Game.UI
         
         protected void Start()
         {
+            Canvas = GameObject.Find(UI_CANVAS_NAME);
+            if (Canvas == null)
+            {
+                // Create Canvas from prefab if it doesn't exist yet
+                Object canvasPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(UI_CANVAS_PREFAB);
+                Canvas = Instantiate(canvasPrefab) as GameObject;
+                UnityEngine.Assertions.Assert.IsNotNull(Canvas);
+                Canvas.name = UI_CANVAS_NAME;
+            }
+            
+            // Execute platform dependent code
             platform = PlayerSettings.GetInputType();
             switch (platform)
             {
@@ -66,8 +98,10 @@ namespace SEE.Game.UI
                 case PlayerSettings.PlayerInputType.TouchGamepad: StartTouchGamepad();
                     break;
                 case PlayerSettings.PlayerInputType.VR: StartVR();
+                    //TODO: Apply CurvedUI to canvas
                     break;
                 case PlayerSettings.PlayerInputType.HoloLens: StartHoloLens();
+                    //TODO: Convert to MRTK Canvas and add NearInteractionTouchableUnityUI, as recommended 
                     break;
                 case PlayerSettings.PlayerInputType.None: // no UI has to be rendered
                     break;  

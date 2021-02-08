@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Events;
 using Valve.VR.InteractionSystem;
 
 namespace SEE.Game.UI
@@ -13,32 +14,37 @@ namespace SEE.Game.UI
         /// <summary>
         /// The title of this entry.
         /// </summary>
-        private readonly string Title;
+        public readonly string Title;
         
         /// <summary>
         /// A description of this entry.
         /// </summary>
-        private readonly string Description;
+        public readonly string Description;
         
         /// <summary>
         /// The color of this entry.
         /// </summary>
-        protected readonly Color EntryColor;
+        public readonly Color EntryColor;
+
+        /// <summary>
+        /// An icon for this entry.
+        /// </summary>
+        public Sprite Icon;
         
         /// <summary>
         /// The action to be taken when the entry is selected.
         /// </summary>
-        public readonly Action DoAction;
+        public readonly UnityAction DoAction;
         
         /// <summary>
         /// Whether this entry is currently enabled (i.e. whether it can be selected.)
         /// </summary>
-        protected bool Enabled;
+        public bool Enabled;
 
         /// <summary>
         /// The color of this entry when disabled.
         /// </summary>
-        private Color DisabledColor => EntryColor.ColorWithAlpha(0.2f);
+        public Color DisabledColor => EntryColor.ColorWithAlpha(0.2f);
 
         /// <summary>
         /// Instantiates and returns a new MenuEntry.
@@ -48,13 +54,16 @@ namespace SEE.Game.UI
         /// <param name="description">A description of the entry.</param>
         /// <param name="entryColor">The color with which this entry shall be displayed.</param>
         /// <param name="enabled">Whether this entry should be enabled on creation.</param>
-        public MenuEntry(Action action, string title, string description = null, Color entryColor = default, bool enabled = default)
+        /// <param name="icon">The icon which shall be displayed alongside this entry</param>
+        public MenuEntry(UnityAction action, string title, string description = null, Color entryColor = default, 
+                         bool enabled = true, Sprite icon = null)
         {
             DoAction = action;
             Title = title ?? throw new ArgumentNullException(nameof(title));
             Description = description;
             EntryColor = entryColor;
             Enabled = enabled;
+            Icon = icon;
         }
     }
 }

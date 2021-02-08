@@ -1,6 +1,6 @@
-﻿using System;
-using SEE.Utils;
+﻿using SEE.Utils;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SEE.Game.UI
 {
@@ -18,7 +18,7 @@ namespace SEE.Game.UI
         /// <summary>
         /// The action to be taken when the entry is deselected.
         /// </summary>
-        private readonly Action DoExitAction;
+        private readonly UnityAction DoExitAction;
 
         private Color inactiveColor => EntryColor.Lighter();
 
@@ -52,9 +52,11 @@ namespace SEE.Game.UI
         /// <param name="title">The title of the entry.</param>
         /// <param name="description">A description of the entry.</param>
         /// <param name="entryColor">The color with which this entry shall be displayed.</param>
+        /// <param name="icon">The icon which will be displayed alongside this entry.</param>
         /// <param name="enabled">Whether this entry should be enabled on creation.</param>
-        public ToggleMenuEntry(bool active, Action entryAction, Action exitAction, string title, 
-                               string description = null, Color entryColor = default, bool enabled = default) 
+        public ToggleMenuEntry(bool active, UnityAction entryAction, UnityAction exitAction, string title, 
+                               string description = null, Color entryColor = default, Sprite icon = null,
+                               bool enabled = true) 
             : base(entryAction, title, description, entryColor, enabled)
         {
             this.active = active;

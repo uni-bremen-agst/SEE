@@ -14,8 +14,7 @@ GameObject:
   - component: {fileID: 6839967699279661579}
   - component: {fileID: 6839967699279661552}
   - component: {fileID: 6839967699279661582}
-  - component: {fileID: 6839967699279661568}
-  - component: {fileID: 6839967699279661570}
+  - component: {fileID: 9104345819901106363}
   m_Layer: 0
   m_Name: DesktopPlayer
   m_TagString: MainCamera
@@ -144,7 +143,7 @@ MonoBehaviour:
   move: 0
   clickDown: 0
   clickUp: 0
---- !u!114 &6839967699279661568
+--- !u!114 &9104345819901106363
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -153,20 +152,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 6839967699279661599}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ee170c9be383554ea5041c415e05ce5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Radius: 0.3
-  Depth: 0.01
---- !u!114 &6839967699279661570
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6839967699279661599}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33c7e69bbbcb32f4f995b716e96c7970, type: 3}
+  m_Script: {fileID: 11500000, guid: 83f7b5d2afa8b8c4aae1d8f769c0da13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

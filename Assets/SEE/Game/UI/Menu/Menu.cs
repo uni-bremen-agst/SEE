@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
 
 namespace SEE.Game.UI
 {
@@ -14,9 +16,34 @@ namespace SEE.Game.UI
     {
 
         /// <summary>
+        /// The name of this menu. Displayed to the user.
+        /// </summary>
+        public string Title = "Unnamed Menu";
+
+        /// <summary>
+        /// Brief description of what this menu controls.
+        /// Will be displayed to the user above the choices.
+        /// The text may <i>not be longer than 3 lines!</i>
+        /// </summary>
+        public string Description = "No description added.";
+
+        /// <summary>
+        /// Icon for this menu. Displayed along the title.
+        /// Default is a generic settings (gear) icon.
+        /// </summary>
+        public Sprite Icon;
+
+        /// <summary>
         /// Whether the menu is currently being shown.
         /// </summary>
         protected bool MenuShown;
+
+        /// <summary>
+        /// Whether the menu is currently shown or not.
+        /// If this does not match <see cref="MenuShown"/>,
+        /// the <see cref="Update"/> method will update the UI accordingly.
+        /// </summary>
+        private bool CurrentMenuShown = false;
 
         /// <summary>
         /// Displays or hides the menu, depending on <paramref name="show"/>.
@@ -76,12 +103,16 @@ namespace SEE.Game.UI
             entry.DoAction();
         }
 
-        // TODO: Implement TouchGamepad UI (same as Desktop?)
+        private void Awake()
+        {
+            // Load default icon (can't be done during instantiation, only in Awake() or Start())
+            Icon = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Common/Settings.png");
+        }
+
+        
         protected override void StartTouchGamepad() => StartDesktop();
 
-        // TODO: Implement VR UI (same as Desktop, but Curved?)
         protected override void StartVR() => StartDesktop();
-
 
         protected override void UpdateTouchGamepad() => UpdateDesktop();
 

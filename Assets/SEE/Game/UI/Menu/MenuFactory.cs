@@ -1,4 +1,5 @@
 ﻿using SEE.Controls.Actions;
+using UnityEditor;
 using UnityEngine;
 
 namespace SEE.Game.UI
@@ -27,19 +28,30 @@ namespace SEE.Game.UI
             ToggleMenuEntry[] entries = {
                 new ToggleMenuEntry(
                     active: false,
-                    entryAction: () => ActionState.Value = ActionState.Type.Rotate,
-                    exitAction: null,
-                    title: "Rotate",
-                    description: "Rotate everything around the selected node within a graph",
-                    entryColor: Color.blue
-                    ),
-                new ToggleMenuEntry(
-                    active: false,
                     entryAction: () => ActionState.Value = ActionState.Type.Move,
                     exitAction: null,
                     title: "Move",
                     description: "Move a node within a graph",
-                    entryColor: Color.red
+                    entryColor: Color.red,
+                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Resources/Materials/Charts/MoveIcon.png")
+                    ),
+                new ToggleMenuEntry(
+                    active: false,
+                    entryAction: () => ActionState.Value = ActionState.Type.Delete,
+                    exitAction: null,
+                    title: "Delete",
+                    description: "Delete nodes and edges",
+                    entryColor: Color.yellow,
+                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Resources/Materials/Common/Trash.png")
+                    ),
+                new ToggleMenuEntry(
+                    active: false,
+                    entryAction: () => ActionState.Value = ActionState.Type.Rotate,
+                    exitAction: null,
+                    title: "Rotate",
+                    description: "Rotate everything around the selected node within a graph",
+                    entryColor: Color.blue,
+                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Navigation/Refresh.png")
                     ),
                 new ToggleMenuEntry(
                     active: false,
@@ -47,7 +59,8 @@ namespace SEE.Game.UI
                     exitAction: null,
                     title: "Map",
                     description: "Map a node from one graph to another graph",
-                    entryColor: Color.green
+                    entryColor: Color.green,
+                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Map/Map.png")
                     ),
                 new ToggleMenuEntry(
                     active: false,
@@ -55,12 +68,15 @@ namespace SEE.Game.UI
                     exitAction: null,
                     title: "Draw Edge",
                     description: "Draw a new edge between two nodes",
-                    entryColor: Color.green
+                    entryColor: Color.green,
+                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Navigation/Minus.png")
                     )
             };
             
             GameObject modeMenuGO = attachTo ?? new GameObject { name = "Mode Menu" };
             SelectionMenu modeMenu = modeMenuGO.AddComponent<SelectionMenu>();
+            modeMenu.Title = "Mode Selection";
+            modeMenu.Description = "Please select the mode you want to activate.";
             foreach (ToggleMenuEntry entry in entries)
             {
                 modeMenu.AddEntry(entry);
