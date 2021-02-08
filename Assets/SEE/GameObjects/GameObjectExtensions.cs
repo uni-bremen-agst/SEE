@@ -128,7 +128,7 @@ namespace SEE.GO
         {
             Transform parent = node.transform.parent;
             node.transform.parent = null;
-            node.transform.localScale =scale;
+            node.transform.localScale = scale;
             node.transform.parent = parent;
         }
 
