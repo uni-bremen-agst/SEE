@@ -30,7 +30,7 @@ namespace SEE.Controls.Actions
         protected bool instantiated = false;
 
         /// <summary>
-        /// Finds the GameObject, which contains the CanvasOperations and components
+        /// Finds the GameObject which contains the CanvasOperations and components
         /// and saves it in the canvasObject-variable.
         /// </summary>
         public void InitializeCanvasObject()
