@@ -15,7 +15,7 @@ namespace SEE.Controls.Actions
         public Node nodeToEdit;
 
         /// <summary>
-        /// The id of the gameObject, which contains the nodeToEdit. Nessecary for the Network-Action.
+        /// The id of the gameObject, which contains the nodeToEdit. Necessary for the Network-Action.
         /// </summary>
         public string gameObjectID;
 
