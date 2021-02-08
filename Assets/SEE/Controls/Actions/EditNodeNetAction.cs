@@ -66,7 +66,7 @@ namespace SEE.Controls.Actions
                 else
                 {
                     //FIXME: Controll if a Debug Log is the right thing
-                    Debug.LogWarning("Found no gameObject: " + gameObjectID);
+                    Debug.LogError("Found no gameObject: " + gameObjectID);
                 }
             }
 
