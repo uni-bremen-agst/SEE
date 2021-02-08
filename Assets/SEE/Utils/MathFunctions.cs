@@ -117,7 +117,7 @@ public static class MathFunctions
     public static float CalcMedian(List<float> floatList)
     {
         float median = 0;
-        if (floatList.Count == 0 | floatList == null)
+        if (floatList.Count == 0 || floatList == null)
         {
             return median;
         }
