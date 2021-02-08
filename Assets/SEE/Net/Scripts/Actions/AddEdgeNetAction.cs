@@ -49,7 +49,7 @@ public class AddEdgeNetAction : SEE.Net.AbstractAction
             {
                 try
                 {
-                    city.GetComponent<GraphRenderer>().DrawEdge(fromGO, toGO);
+                    city.Renderer.DrawEdge(fromGO, toGO);
                 }
                 
                 catch (Exception e)
