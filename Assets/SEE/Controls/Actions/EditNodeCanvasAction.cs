@@ -44,7 +44,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The directory of the Edit-Node-Prefab.
         /// </summary>
-        private string prefabDirectory = "Prefabs/EditNodeCanvas";
+        private const string prefabDirectory = "Prefabs/EditNodeCanvas";
 
 
         void Start()
