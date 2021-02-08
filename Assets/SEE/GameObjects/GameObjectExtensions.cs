@@ -136,7 +136,7 @@ namespace SEE.GO
         /// Gets the Height (Roof) of this <paramref name="node"/>
         /// </summary>
         /// <param name="node"></param>
-        /// <returns>The height of the Roof from thos <paramref name="node"/></returns>
+        /// <returns>The height of the Roof from this <paramref name="node"/></returns>
         public static float GetRoof(this GameObject node)
         {
             return node.transform.position.y + node.Size().y / 2.0f;
