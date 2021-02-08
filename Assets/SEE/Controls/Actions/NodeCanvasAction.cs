@@ -8,7 +8,7 @@ namespace SEE.Controls.Actions
     public abstract class NodeCanvasAction : MonoBehaviour
     {
         /// <summary>
-        /// The gameObject, which contains the canvas-prefab-clone.
+        /// The gameObject which contains the canvas-prefab-clone.
         /// </summary>
         public GameObject canvas;
 
