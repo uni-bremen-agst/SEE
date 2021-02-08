@@ -268,7 +268,7 @@ namespace SEE.Game.Charts
 
         private void Update()
         {
-            // Performance bottleneck, needs to be replaced with a detection mechanism / button action listener
+            // Performance bottleneck, needs to be replaced with a detection mechanism / button action listener  (revision change buttons should call these)
             // Detects a graph revision change
             if (SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, ChartManager.Instance.ShowInnerNodeMetrics).Count != currentDataObjectsCount)
             {
@@ -314,13 +314,17 @@ namespace SEE.Game.Charts
                         }
                         else // inner node
                         {
-                            scrollViewEntries[i] = NewScrollViewEntry(listDataObjects[i - 2].name, i, 1);
+                            try
+                            {
+                                scrollViewEntries[i] = NewScrollViewEntry(listDataObjects[i - 2].name, i, 1);
+                            }
+                            // removed node
+                            catch
+                            {
+                                scrollViewEntries[i] = NewScrollViewEntry(removedNodeIDs[j], i, 0);
+                                j += 1;
+                            }
                         }
-             //           else // removed node
-             //           {
-              //              scrollViewEntries[i] = NewScrollViewEntry(removedNodeIDs[j], j, 0);
-              //              j += 1;
-              //          }
                         ChangeScrollViewEntryColor(scrollViewEntries[i].transform.gameObject.transform.Find("Label").gameObject, scrollViewEntries[i].transform.gameObject);
                     }
                 }
@@ -561,6 +565,13 @@ namespace SEE.Game.Charts
                     InteractableObject o = listDataObjects[dataObjectIdx++].GetComponent<InteractableObject>();
                     scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, o, innerNodeIdx, 0);
                     scrollViewEntryDatas[innerNodeIdx].childIndices[i] = idx;
+                    idx++;
+                }
+
+                // Add removed nodes
+                foreach (string s in removedNodeIDs)
+                {
+                    scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, null, ScrollViewEntryData.NoParentIndex, 0);
                     idx++;
                 }
             }
@@ -950,7 +961,7 @@ namespace SEE.Game.Charts
             // nodes, so this here is the capacity.
             // Note(Leo): removedNodeIDs Count needs to be added, otherwise removed nodes won't show
             // TODO + removedNodeIDs.Count
-            int totalEntryCount2 = 2 + listDataObjects.Count;
+            int totalEntryCount2 = 2 + listDataObjects.Count + removedNodeIDs.Count;
             totalHeight = (float)totalEntryCount2 * ScrollViewEntryHeight;
 
             leafCount = 0;
@@ -1055,14 +1066,14 @@ namespace SEE.Game.Charts
         {
             TextMeshProUGUI textMesh = scrollViewEntry.GetComponent<TextMeshProUGUI>();
             ColorBlock colors = parent.GetComponent<Toggle>().colors;
-            
-            if (this.newNodeIDs.Contains(textMesh.text))
+
+            if (this.removedNodeIDs.Contains(textMesh.text))
             {
-                textMesh.color = addedNodesLabelColor;
-                colors.normalColor = addedNodesLabelColor;
-                colors.selectedColor = addedNodesLabelColor;
-                colors.pressedColor = addedNodesLabelColor;
-                colors.disabledColor = addedNodesLabelColor;
+                textMesh.color = removedNodeLabelColor;
+                colors.normalColor = removedNodeLabelColor;
+                colors.selectedColor = removedNodeLabelColor;
+                colors.pressedColor = changedNodesLabelColor;
+                colors.disabledColor = changedNodesLabelColor;
             }
             else if (this.changedNodeIDs.Contains(textMesh.text))
             {
@@ -1072,13 +1083,13 @@ namespace SEE.Game.Charts
                 colors.pressedColor = changedNodesLabelColor;
                 colors.disabledColor = changedNodesLabelColor;
             }
-            else if (this.removedNodeIDs.Contains(textMesh.text))
+            else if (this.newNodeIDs.Contains(textMesh.text))
             {
-                textMesh.color = removedNodeLabelColor;
-                colors.normalColor = removedNodeLabelColor;
-                colors.selectedColor = removedNodeLabelColor;
-                colors.pressedColor = changedNodesLabelColor;
-                colors.disabledColor = changedNodesLabelColor;
+                textMesh.color = addedNodesLabelColor;
+                colors.normalColor = addedNodesLabelColor;
+                colors.selectedColor = addedNodesLabelColor;
+                colors.pressedColor = addedNodesLabelColor;
+                colors.disabledColor = addedNodesLabelColor;
             }
             else
             {
