@@ -10,15 +10,15 @@ namespace SEE.Controls.Actions
     public class AddingNodeCanvasAction : NodeCanvasAction
     {
         /// <summary>
-        /// The directory of the AddingNodeCanvas prefab.
+        /// The path of the NewNodeCanvas prefab without the file extension .prefab.
         /// </summary>
-        private static readonly string prefabDirectory = "Prefabs/NewNodeCanvas";
+        private static readonly string prefabPath = "Prefabs/NewNodeCanvas";
 
         void Start()
         {
             /// Note: It is important that the Prefab is contained in the Resources folder to use the 
             /// Resources.Load method.
-            InstantiatePrefab(prefabDirectory);
+            InstantiatePrefab(prefabPath);
             canvas.transform.SetParent(gameObject.transform);
         }
 
@@ -49,7 +49,7 @@ namespace SEE.Controls.Actions
             }
             string inputNodename = inputname.text;
             string inputNodetype = inputtype.text;
-            //until here 
+            // until here 
 
             NewNodeAction.Nodename = inputNodename;
             NewNodeAction.Nodetype = inputNodetype;

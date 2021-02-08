@@ -42,14 +42,13 @@ namespace SEE.Controls.Actions
         public GameObject canvasObject;
 
         /// <summary>
-        /// The directory of the EditNodeCanvas prefab.
-        /// FIXME: Is this really the directory? It seems as if it were the whole filename without the extension .prefab.
+        /// The path of the EditNodeCanvas prefab without the file extension .prefab.
         /// </summary>
-        private const string prefabDirectory = "Prefabs/EditNodeCanvas";
+        private const string prefabPath = "Prefabs/EditNodeCanvas";
 
         void Start()
         {
-            InstantiatePrefab(prefabDirectory);
+            InstantiatePrefab(prefabPath);
             canvas.transform.SetParent(gameObject.transform);
             Component[] c = canvas.GetComponentsInChildren<InputField>();
             inputname = (InputField)c[0];
