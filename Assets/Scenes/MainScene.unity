@@ -2391,9 +2391,10 @@ GameObject:
   - component: {fileID: 1566173691}
   - component: {fileID: 1566173696}
   - component: {fileID: 1566173694}
-  - component: {fileID: 1566173680}
   - component: {fileID: 1566173683}
   - component: {fileID: 1566173682}
+  - component: {fileID: 1566173684}
+  - component: {fileID: 1566173680}
   m_Layer: 0
   m_Name: Player Desktop
   m_TagString: MainCamera
@@ -2410,11 +2411,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1566173679}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ee170c9be383554ea5041c415e05ce5, type: 3}
+  m_Script: {fileID: 11500000, guid: 83f7b5d2afa8b8c4aae1d8f769c0da13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Radius: 0.3
-  Depth: 0.01
 --- !u!20 &1566173681
 Camera:
   m_ObjectHideFlags: 0
