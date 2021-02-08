@@ -39,7 +39,7 @@ public static class MathFunctions
         result.y = CalcMedian(yAxis);
         result.z = CalcMedian(zAxis);
 
-        if (!(vectors.Count % 2 == 0))
+        if (vectors.Count % 2 != 0)
         {
             return result;
         }
