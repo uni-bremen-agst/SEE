@@ -4,39 +4,37 @@ using UnityEngine.UI;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Creates a clone of a canvas-prefab for adding a new node. Extracts these values from the canvas after closing it.
+    /// Creates a clone of a canvas-prefab for adding a new node. Extracts these values from the canvas 
+    /// after closing it.
     /// </summary>
     public class AddingNodeCanvasAction : NodeCanvasAction
     {
         /// <summary>
-        /// The directory of the AddingNodeCanvas-prefab.
+        /// The directory of the AddingNodeCanvas prefab.
         /// </summary>
-        private string prefabDirectory = "Prefabs/NewNodeCanvas";
+        private static readonly string prefabDirectory = "Prefabs/NewNodeCanvas";
 
         void Start()
         {
-            /// Note: Its important that the Prefab lays inside of the Resources-Folder to use the Resources.Load-Method.
+            /// Note: It is important that the Prefab is contained in the Resources folder to use the 
+            /// Resources.Load method.
             InstantiatePrefab(prefabDirectory);
             canvas.transform.SetParent(gameObject.transform);
         }
 
         /// <summary>
-        /// Extracts the given Nodename, the nodetype and wether it is a inner node or a leaf from the canvas.
+        /// Extracts the given node name, the node type and whether it is an inner node or a leaf from the canvas.
         /// Therefore, it extracts the string from the InputFields on the prefab.
-        /// Note: The sequences of the extracted Arrays are based on the sequence of the components in the prefab.
+        /// Note: The sequences of the extracted arrays are based on the sequence of the components in the prefab.
         /// </summary>
         public void GetNodeMetrics()
         {
-            string inputNodename;
-            string inputNodetype;
-
-            //this part has to be removed by the new UI-Team
+            // FIXME: this part has to be removed by the new UI Team
             AddingNodeCanvasAction script = gameObject.GetComponent<AddingNodeCanvasAction>();
 
             Component[] c = script.canvas.GetComponentsInChildren<InputField>();
             InputField inputname = (InputField)c[0];
             InputField inputtype = (InputField)c[1];
-
 
             Component toggleGroup = script.canvas.GetComponentInChildren<ToggleGroup>();
             Toggle[] toggles = toggleGroup.GetComponentsInChildren<Toggle>();
@@ -49,15 +47,12 @@ namespace SEE.Controls.Actions
             {
                 NewNodeAction.IsInnerNode = false;
             }
-            inputNodename = inputname.text;
-            inputNodetype = inputtype.text;
+            string inputNodename = inputname.text;
+            string inputNodetype = inputtype.text;
             //until here 
-
 
             NewNodeAction.Nodename = inputNodename;
             NewNodeAction.Nodetype = inputNodetype;
-
         }
-
     }
 }
