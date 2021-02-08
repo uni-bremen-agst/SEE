@@ -136,7 +136,7 @@ public static class MathFunctions
             return median;
         }
 
-        // If the amount is pair, we have to interpolate linearly between the value at the index at the half of the lists size,
+        // If the amount is even, we have to interpolate linearly between the value at the index at half of the list's size,
         // and the value of the following index. E.g. size = 13 -> index 6 and 7 .
         int indexSecondMedianValue = indexOfMid + 1;
         float SecondCoordinate = floatList.ElementAt(indexSecondMedianValue);
