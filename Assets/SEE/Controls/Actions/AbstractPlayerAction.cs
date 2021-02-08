@@ -10,68 +10,54 @@ namespace SEE.Controls.Actions
     public abstract class AbstractPlayerAction : MonoBehaviour
     {
         /// <summary>
-        /// The gameObject which contains the CanvasGenerator-Scripts and the actual CanvasObject-Script
+        /// The gameObject that contains the CanvasGenerator and the actual CanvasObject.
         /// </summary>
         protected GameObject canvasObject;
 
         /// <summary>
-        /// The Object that the Cursor hovers over
+        /// The object that the cursor hovers over.
         /// </summary>
         protected GameObject hoveredObject = null;
 
         /// <summary>
-        /// The current name of the gameObject which contains the Canvas-operations and components.
+        /// The current name of the gameObject that contains the canvas operations and components.
         /// </summary>
         private readonly string nameOfCanvasObject = "CanvasObject";
 
         /// <summary>
-        /// true, if the active script is already initialised, else false
+        /// True if the active script is already initialized, else false.
         /// </summary>
         protected bool instantiated = false;
 
         /// <summary>
-        /// Finds the GameObject which contains the CanvasOperations and components
-        /// and saves it in the canvasObject-variable.
+        /// Finds the GameObject that contains the CanvasOperations and components
+        /// and saves it in the <see cref="canvasObject"/>.
         /// </summary>
-        public void InitializeCanvasObject()
+        protected void InitializeCanvasObject()
         {
             canvasObject = GameObject.Find(nameOfCanvasObject);
         }
 
         /// <summary>
-        /// 
+        /// Sets <see cref="hoveredObject"/> to given <paramref name="interactableObject"/>.
+        /// Will be called whenever the gameObject is being hovered over.
         /// </summary>
-        /// <param name="interactableObject"></param>
+        /// <param name="interactableObject">new value for <see cref="hoveredObject"/></param>
         protected void LocalAnyHoverIn(InteractableObject interactableObject)
         {
-            try
-            {
-                Assert.IsNull(hoveredObject);
-                hoveredObject = interactableObject.gameObject;
-            }
-            catch
-            {
-              // FIXME: There are AssertionExceptions 
-            }
+            Assert.IsNull(hoveredObject);
+            hoveredObject = interactableObject.gameObject;
         }
 
         /// <summary>
-        /// 
+        /// Sets <see cref="hoveredObject"/> to <code>null</code>.
+        /// Will be called whenever the gameObject is no longer being hovered over.
         /// </summary>
-        /// <param name="interactableObject"></param>
+        /// <param name="interactableObject">object no longer be hovered over (ignored here)</param>
         protected void LocalAnyHoverOut(InteractableObject interactableObject)
         {
-            try
-            {
-                Assert.IsTrue(hoveredObject == interactableObject.gameObject);
-                hoveredObject = null;
-            }
-            catch
-            {
-            //FIXME: There are AssertionExceptions
-            }
+            Assert.IsTrue(hoveredObject == interactableObject.gameObject);
+            hoveredObject = null;
         }
-
-
     }
 }
