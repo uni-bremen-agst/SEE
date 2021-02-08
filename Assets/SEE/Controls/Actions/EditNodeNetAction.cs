@@ -56,7 +56,6 @@ namespace SEE.Controls.Actions
         {
             if (!IsRequester())
             {
-
                 Node node = GameObject.Find(gameObjectID).GetNode();
                 if (node != null)
                 {
