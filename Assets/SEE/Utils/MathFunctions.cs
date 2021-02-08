@@ -131,7 +131,7 @@ public static class MathFunctions
 
         // If the length of the list is an odd number, we will return the element which is located at the middle of the list,
         // e.g. for the amount = 13, we return the element at the index 6.
-        if (!(floatList.Count % 2 == 0))
+        if (floatList.Count % 2 != 0)
         {
             return median;
         }
