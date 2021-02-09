@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using SEE.GO;
 using SEE.Utils;
@@ -29,6 +30,23 @@ namespace SEE.Game.UI
         private const string BUTTON_PREFAB = "Assets/Prefabs/UI/Button.prefab";
         
         /// <summary>
+        /// The path to the prefab for the list game object.
+        /// Will be added as a child to the <see cref="MenuGameObject"/>.
+        /// </summary>
+        private const string LIST_PREFAB = "Assets/Prefabs/UI/MenuEntries.prefab";
+        
+        /// <summary>
+        /// The path to the prefab for the tooltip game object.
+        /// Will be added as a child to the <see cref="Canvas"/>.
+        /// </summary>
+        private const string TOOLTIP_PREFAB = "Assets/Prefabs/UI/Tooltip.prefab";
+
+        /// <summary>
+        /// The GameObject which contains the actual content of the menu, i.e. its entries.
+        /// </summary>
+        protected GameObject MenuContent;
+        
+        /// <summary>
         /// The menu object which has the <see cref="ModalWindowManager"/> component attached.
         /// </summary>
         protected GameObject MenuGameObject;
@@ -38,10 +56,16 @@ namespace SEE.Game.UI
         /// </summary>
         protected ModalWindowManager Manager;
         
+        /// <summary>
+        /// The tooltip manager, which can (as its name implies) control tooltips.
+        /// Note that this manager controls a single tooltip whose text can be changed. If multiple tooltips
+        /// are needed, more GameObjects with TooltipManagers need to be created.
+        /// </summary>
+        protected TooltipManager TooltipManager;
+        
         protected override void StartDesktop()
         {
             SetUpDesktopWindow();
-
             SetUpDesktopContent();
         }
 
@@ -73,21 +97,46 @@ namespace SEE.Game.UI
             Manager.titleText = Title;
             Manager.descriptionText = Description;
             Manager.icon = Icon;
+            
+            // Add tooltip
+            TooltipManager = MenuGameObject.GetComponentInChildren<TooltipManager>();
+            if (TooltipManager == null)
+            {
+                // Create new tooltip GameObject
+                Object tooltipPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(TOOLTIP_PREFAB);
+                GameObject tooltip = Instantiate(tooltipPrefab, Canvas.transform, false) as GameObject;
+                UnityEngine.Assertions.Assert.IsNotNull(tooltip);
+                tooltip.TryGetComponentOrLog(out TooltipManager);
+            }
+            
+            // Find content GameObject for menu entries.
+            MenuContent = MenuGameObject.transform.Find("Main Content/Content Mask/Content")?.gameObject;
+            if (MenuContent == null)
+            {
+                Debug.LogError("Couldn't find required components on MenuGameObject.");
+            }
         }
         
         /// <summary>
         /// Sets up the content of the previously created desktop window (<see cref="SetUpDesktopWindow"/>).
         /// In this case, buttons are created for each menu entry and added to the content GameObject.
         /// </summary>
-        private void SetUpDesktopContent()
+        protected virtual void SetUpDesktopContent()
         {
-            // Find content GameObject for menu entries.
-            GameObject List = MenuGameObject
-                              .transform.Find("Main Content/Content Mask/Content/List View/Scroll Area/List")?.gameObject;
+            GameObject List = MenuContent.transform.Find("Menu Entries/Scroll Area/List")?.gameObject;
             if (List == null)
             {
-                Debug.LogError("Couldn't find required components on MenuGameObject.");
-                return;
+                // Create menu entry list if it doesn't exist yet
+                Object listPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(LIST_PREFAB);
+                List = Instantiate(listPrefab, MenuContent.transform, false) as GameObject;
+                if (List == null)
+                {
+                    Debug.LogError("Couldn't instantiate List object.");
+                    return;
+                }
+                List.name = "Menu Entries";
+                // List should actually be the list, not the entry object
+                List = List.transform.Find("Scroll Area/List").gameObject;
             }
 
             // Then, add all entries as buttons
@@ -113,6 +162,7 @@ namespace SEE.Game.UI
 
                 buttonManager.buttonText = entry.Title;
                 buttonManager.buttonIcon = entry.Icon;
+                buttonManager.hoverEvent.AddListener(() => ShowTooltip(entry.Description));
                 if (entry.Enabled)
                 {
                     buttonManager.clickEvent.AddListener(entry.DoAction);
@@ -127,10 +177,33 @@ namespace SEE.Game.UI
                     textMeshPro.color = entry.DisabledColor.IdealTextColor();
                     iconImage.color = entry.DisabledColor.IdealTextColor();
                 }
-
-                //TODO: description is currently unused
             }
             
+        }
+
+        /// <summary>
+        /// Displays a tooltip with the given <paramref name="text"/>.
+        /// </summary>
+        /// <param name="text">The text to display in the tooltip.</param>
+        protected void ShowTooltip(string text)
+        {
+            TooltipManager.allowUpdating = true;
+            if (TooltipManager.tooltipObject.TryGetComponentOrLog(out CanvasGroup canvasGroup))
+            {
+                // Change text
+                TextMeshProUGUI[] texts = TooltipManager.tooltipContent.GetComponentsInChildren<TextMeshProUGUI>();
+                TextMeshProUGUI textComp = texts.FirstOrDefault(x => x.name == "Description");
+                if (textComp == null)
+                {
+                    Debug.LogError("Couldn't find Description text component for tooltip.");
+                    return;
+                }
+                textComp.text = text;
+                
+                // Fade in 
+                //FIXME Tooltip isn't displayed. I suspect this is because the alpha value of the canvas group can't be changed at runtime.
+                DOTween.To(() => canvasGroup.alpha, a => canvasGroup.alpha = a, 1f, 0.5f);
+            }
         }
 
         protected override void UpdateDesktop()

@@ -48,7 +48,7 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    // The monobehaviour is diabled and Update() no longer be called by Unity.
+                    // The MonoBehaviour is disabled and Update() no longer be called by Unity.
                     enabled = false;
                     InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
                     InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
@@ -59,7 +59,16 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
-            Assert.IsTrue(ActionState.Is(ThisActionState));
+            // This script should be disabled, if the action state is not this action's type
+            if (!ActionState.Is(ThisActionState))
+            {
+                // The MonoBehaviour is disabled and Update() no longer be called by Unity.
+                enabled = false;
+                InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
+                InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
+                return;
+            }
+            
             if (selectedObject != null) // Input.GetMouseButtonDown(0) && 
             {
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());

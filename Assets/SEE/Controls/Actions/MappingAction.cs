@@ -397,7 +397,13 @@ namespace SEE.Controls.Actions
         private void Update()
         {
             // This script should be disabled, if the action state is not 'Map'
-            Assert.IsTrue(ActionState.Value == ActionState.Type.Map);
+            if (!ActionState.Is(ActionState.Type.Map))
+            {
+                enabled = false;
+                InteractableObject.AnySelectIn -= AnySelectIn;
+                InteractableObject.AnySelectOut -= AnySelectOut;
+                return;
+            }
 
             //------------------------------------------------------------------------
             // ARCHITECTURAL MAPPING

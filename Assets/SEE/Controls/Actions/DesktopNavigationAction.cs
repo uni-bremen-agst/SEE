@@ -612,11 +612,11 @@ namespace SEE.Controls.Actions
             movingOrRotating = false;
             if (value == ActionState.Type.Move)
             {
-                rotateState.rotateGizmo.gameObject.SetActive(false);
+                rotateState.rotateGizmo?.gameObject.SetActive(false);
             }
             else if (value == ActionState.Type.Rotate)
             {
-                moveState.moveGizmo.gameObject.SetActive(false);
+                moveState.moveGizmo?.gameObject.SetActive(false);
             }
         }
 
