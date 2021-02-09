@@ -9,7 +9,7 @@ namespace SEE.Controls.Actions
     /// This class is responsible for adding a node via network from one client to all others and 
     /// to the server. 
     /// </summary>
-    public class NewNodeNetAction : AbstractAction
+    public class AddNodeNetAction : AbstractAction
     {
         // Note: All attributes are made public so that they will be serialized
         // for the network transfer.
@@ -82,7 +82,7 @@ namespace SEE.Controls.Actions
         /// <param name="place">whether the new node is in moving or in placing state</param>
         /// <param name="create">in the first method call a new node needs to be created, but only once (FIXME: meaning is unclear)</param>
         /// <param name="illegalPlace">whether the placement is illegal</param>
-        public NewNodeNetAction
+        public AddNodeNetAction
             (string gameObjectID,
              bool isInnerNode,
              string newNodeID,
@@ -129,12 +129,12 @@ namespace SEE.Controls.Actions
                     {
                         //Just a gameObject to attatch the newNodeScript on
                         GameObject dummy = new GameObject();
-                        dummy.AddComponent<NewNodeAction>();
-                        dummy.GetComponent<NewNodeAction>().Network = true;
-                        dummy.GetComponent<NewNodeAction>().NodeID = NewNodeID;
-                        dummy.GetComponent<NewNodeAction>().City = City;
-                        dummy.GetComponent<NewNodeAction>().SetIsInnerNode(IsInnerNode);
-                        dummy.GetComponent<NewNodeAction>().NewNode();
+                        dummy.AddComponent<AddNodeAction>();
+                        dummy.GetComponent<AddNodeAction>().Network = true;
+                        dummy.GetComponent<AddNodeAction>().NodeID = NewNodeID;
+                        dummy.GetComponent<AddNodeAction>().City = City;
+                        dummy.GetComponent<AddNodeAction>().SetIsInnerNode(IsInnerNode);
+                        dummy.GetComponent<AddNodeAction>().NewNode();
                         dummy.name = dummyName;
 
                     }
@@ -144,19 +144,19 @@ namespace SEE.Controls.Actions
                 {
                     if (IllegalPlace)
                     {
-                        Object.Destroy(GameObject.Find(dummyName).GetComponent<NewNodeAction>().GONode);
+                        Object.Destroy(GameObject.Find(dummyName).GetComponent<AddNodeAction>().GONode);
                     }
                     else
                     {
-                        GameObject.Find(dummyName).GetComponent<NewNodeAction>().NetworkPlaceNode(Position, Scale, ParentID);
+                        GameObject.Find(dummyName).GetComponent<AddNodeAction>().NetworkPlaceNode(Position, Scale, ParentID);
                     }
-                    Object.Destroy(GameObject.Find(dummyName).GetComponent<NewNodeAction>());
+                    Object.Destroy(GameObject.Find(dummyName).GetComponent<AddNodeAction>());
                     Object.Destroy(GameObject.Find(dummyName));
                 }
                 // Let the new node move with the cursor of the master.
                 else
                 {
-                    GameObject dummyGameNode = GameObject.Find(dummyName).GetComponent<NewNodeAction>().GONode;
+                    GameObject dummyGameNode = GameObject.Find(dummyName).GetComponent<AddNodeAction>().GONode;
                     dummyGameNode.transform.position = Position;
                     dummyGameNode.SetScale(Scale);
                 }

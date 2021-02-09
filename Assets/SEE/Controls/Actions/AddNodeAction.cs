@@ -12,7 +12,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Action to create a new node for a selected city.
     /// </summary>
-    public class NewNodeAction : AbstractPlayerAction
+    public class AddNodeAction : AbstractPlayerAction
     {
         /// <summary>
         /// Start() will register an anonymous delegate of type 
@@ -245,16 +245,16 @@ namespace SEE.Controls.Actions
                     {
                         NodeID = RandomStrings.Get();
                         NewNode();
-                        new NewNodeNetAction(rndObjectInCity.name, isInnerNode, nodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, true, false).Execute(null);
+                        new AddNodeNetAction(rndObjectInCity.name, isInnerNode, nodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, true, false).Execute(null);
                         nodesLoaded = false;
                         GameNodeMover.MoveTo(GONode);
-                        new NewNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false, false).Execute(null);
+                        new AddNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false, false).Execute(null);
 
                     }
                     else
                     {
                         GameNodeMover.MoveTo(GONode);
-                        new NewNodeNetAction(rndObjectInCity.name, isInnerNode, nodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false, false).Execute(null);
+                        new AddNodeNetAction(rndObjectInCity.name, isInnerNode, nodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false, false).Execute(null);
                         if (Input.GetMouseButtonDown(0))
                         {
                             Place();
@@ -452,11 +452,11 @@ namespace SEE.Controls.Actions
                     // FIXME: GameNodeMover is obsolete.
                     GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
                     new EditNodeNetAction(node.SourceName, node.Type, GONode.name).Execute(null);
-                    new NewNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, true, false, false).Execute(null);
+                    new AddNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, true, false, false).Execute(null);
                 }
                 else
                 {
-                    new NewNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, "", true, false, true).Execute(null);
+                    new AddNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, "", true, false, true).Execute(null);
                     Destroy(GONode);
                 }
                 Progress = ProgressState.NoCitySelected;

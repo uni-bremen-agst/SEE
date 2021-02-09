@@ -31,13 +31,13 @@ namespace SEE.Controls
         public Button EditNodeButton;
 
         /// <summary>
-        /// The player desktop that is the parent of the <see cref="NewNodeAction"/> 
+        /// The player desktop that is the parent of the <see cref="AddNodeAction"/> 
         /// and <see cref="EditNodeAction"/>.
         /// </summary>
         private GameObject playerDesktop;
 
         /// <summary>
-        /// The name of the GameObject that is the parent of the <see cref="NewNodeAction"/> 
+        /// The name of the GameObject that is the parent of the <see cref="AddNodeAction"/> 
         /// and <see cref="EditNodeAction"/>.
         /// </summary>
         private const string gameObjectName = "Player Desktop";
@@ -56,13 +56,13 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Increases the progress enum in the <see cref="NewNodeAction"/> instance. 
+        /// Increases the progress enum in the <see cref="AddNodeAction"/> instance. 
         /// This results in the next step of addingNode.
         /// </summary>
         public void SetNextAddingNodeStep()
         {
-            NewNodeAction current = playerDesktop.GetComponent<NewNodeAction>();
-            current.Progress = NewNodeAction.ProgressState.CanvasIsClosed;
+            AddNodeAction current = playerDesktop.GetComponent<AddNodeAction>();
+            current.Progress = AddNodeAction.ProgressState.CanvasIsClosed;
         }
 
         /// <summary>
@@ -89,8 +89,8 @@ namespace SEE.Controls
         /// </summary>
         public void AddingIsCanceled()
         {
-            NewNodeAction current = playerDesktop.GetComponent<NewNodeAction>();
-            current.Progress = NewNodeAction.ProgressState.AddingIsCanceled;
+            AddNodeAction current = playerDesktop.GetComponent<AddNodeAction>();
+            current.Progress = AddNodeAction.ProgressState.AddingIsCanceled;
         }
     }
 }
