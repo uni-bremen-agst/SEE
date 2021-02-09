@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace SEE.Utils
 {
+    /// <summary>
+    /// Provides various extensions methods for the Color class.
+    /// </summary>
     public static class ColorExtensions
     {
         /// <summary>
@@ -22,7 +25,7 @@ namespace SEE.Utils
         /// <returns>given <paramref name="color"/> darkened by 50%</returns>
         public static Color Darker(this Color color)
         {
-            return Color.Lerp(color, Color.black, 0.5f); // To lighten by 50 %
+            return Color.Lerp(color, Color.black, 0.5f); // To darken by 50 %
         }
 
         /// <summary>

@@ -124,7 +124,7 @@ namespace SEE.GO.Menu
 
         /// <summary>
         /// The menu can be enabled/disabled by pressing the space bar.
-        /// Additionally, the action state can be selected via numbers.
+        /// Additionally, the action state can be selected via number keys.
         /// </summary>
         private void Update()
         {

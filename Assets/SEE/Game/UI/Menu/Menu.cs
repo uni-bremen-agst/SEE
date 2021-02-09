@@ -7,7 +7,7 @@ namespace SEE.Game.UI
 {
     /// <summary>
     /// Represents a menu of various actions the user can choose from.
-    /// The Menu can consists of multiple MenuEntries of the type <paramref name="T"/>
+    /// The Menu consists of multiple MenuEntries of the type <paramref name="T"/>
     /// and can have multiple representations depending on the platform used.
     /// </summary>
     /// <typeparam name="T">the type of entries used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
@@ -34,7 +34,7 @@ namespace SEE.Game.UI
         public Sprite Icon;
 
         /// <summary>
-        /// Whether the menu is currently being shown.
+        /// Whether the menu shall be shown.
         /// </summary>
         protected bool MenuShown;
 
@@ -86,7 +86,6 @@ namespace SEE.Game.UI
         /// <see cref="Entries"/></exception>
         public void SelectEntry(int index)
         {
-            Debug.Log("Selected: " + index);
             if (index > Entries.Count)
             {
                 throw new ArgumentOutOfRangeException($"Entry index {index} doesn't exist in "

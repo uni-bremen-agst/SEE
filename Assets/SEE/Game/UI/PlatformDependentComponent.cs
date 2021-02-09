@@ -11,7 +11,7 @@ namespace SEE.Game.UI
     /// Inheritors are expected to override the respective Start() and Update() methods (e.g. <see cref="StartVR()"/>.
     /// If the current platform's method was not overridden, the component will be destroyed.
     /// 
-    /// This approach is especially suited for UI components, as their presentation is almost always different
+    /// This approach is especially well suited for UI components, as their presentation is almost always different
     /// based on the platform.
     /// </summary>
     public abstract class PlatformDependentComponent: MonoBehaviour

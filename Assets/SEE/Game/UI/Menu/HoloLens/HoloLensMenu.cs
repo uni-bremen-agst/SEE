@@ -1,5 +1,8 @@
 ﻿namespace SEE.Game.UI
 {
+    /// <summary> 
+    /// Implements HoloLens UI for menus. 
+    /// </summary>
     public partial class Menu<T>
     {
         protected override void StartHoloLens()
