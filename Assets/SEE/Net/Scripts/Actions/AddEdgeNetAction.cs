@@ -2,24 +2,24 @@
 using SEE.GO;
 using System;
 using UnityEngine;
+
 /// <summary>
-/// Creates a new edge throgh the network on each client
+/// Creates a new edge through the network on each client.
 /// </summary>
 public class AddEdgeNetAction : SEE.Net.AbstractAction
 {
     /// <summary>
-    /// The id of the gameObject from which the edge should be drawn
+    /// The id of the gameObject from which the edge should be drawn.
     /// </summary>
     public string fromId;
 
     /// <summary>
-    /// The id of the gameObject to which the edge should be drawn
+    /// The id of the gameObject to which the edge should be drawn.
     /// </summary>
     public string toId;
 
-
     /// <summary>
-    /// Constructs an AddEdgeNetAction
+    /// Constructs an AddEdgeNetAction.
     /// </summary>
     /// <param name="fromId">The id of the gameObject from which the edge should be drawn</param>
     /// <param name="toId">The id of the gameObject to which the edge should be drawn</param>
@@ -30,35 +30,56 @@ public class AddEdgeNetAction : SEE.Net.AbstractAction
     }
 
     /// <summary>
-    /// Stuff to execute on the Server
+    /// Stuff to execute on the Server. Nothing to be done here.
     /// </summary>
     protected override void ExecuteOnServer()
     {
+        // Intentionally left blank.
     }
+
     /// <summary>
-    /// Creates a new Edge on each client
+    /// Creates the new edge on each client.
     /// </summary>
     protected override void ExecuteOnClient()
     {
         if (!IsRequester())
         {
             GameObject fromGO = GameObject.Find(fromId);
-            GameObject toGO = GameObject.Find(toId);
-            SEECity city = null;
-            SceneQueries.GetCodeCity(fromGO.transform)?.gameObject.TryGetComponentOrLog(out city);
-            if(city != null && toGO != null && fromGO != null)
+            if (fromGO)
             {
-                try
+                GameObject toGO = GameObject.Find(toId);
+                if (toGO)
                 {
-                    city.Renderer.DrawEdge(fromGO, toGO);
+                    Transform codeCity = SceneQueries.GetCodeCity(fromGO.transform);
+                    if (codeCity)
+                    {
+                        if (codeCity.gameObject.TryGetComponentOrLog(out SEECity city))
+                        {
+                            try
+                            {
+                                city.Renderer.DrawEdge(fromGO, toGO);
+                            }
+
+                            catch (Exception e)
+                            {
+                                Debug.LogError($"The new edge from {fromGO.name} to {toGO.name} could not be created: {e.Message}.\n");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError($"Game node named {fromId} is not contained in a code city.\n");
+                    }
                 }
-                
-                catch (Exception e)
+                else
                 {
-                    Debug.LogError($"The new edge from {fromGO.name} to {toGO.name} could not be created: {e.Message}.\n");
+                    Debug.LogError($"There is no game node named {toId}.\n");
                 }
+            }
+            else
+            {
+                Debug.LogError($"There is no game node named {fromId}.\n");
             }
         }
     }
-
 }
