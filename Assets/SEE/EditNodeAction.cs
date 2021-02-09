@@ -38,7 +38,12 @@ namespace SEE.Controls.Actions
 
         void Start()
         {
-            InitializeCanvasObject();
+            if (!InitializeCanvasObject())
+            {
+                Debug.LogError($"No canvas object named {nameOfCanvasObject} could be found in the scene.\n");
+                enabled = false;
+                return;
+            }
             ActionState.OnStateChanged += (ActionState.Type newState) =>
             {
                 // Is this our action state where we need to do something?

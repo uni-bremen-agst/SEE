@@ -22,7 +22,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The current name of the gameObject that contains the canvas operations and components.
         /// </summary>
-        private readonly string nameOfCanvasObject = "CanvasObject";
+        protected readonly string nameOfCanvasObject = "CanvasObject";
 
         /// <summary>
         /// True if the active script is already initialized, else false.
@@ -33,9 +33,11 @@ namespace SEE.Controls.Actions
         /// Finds the GameObject that contains the CanvasOperations and components
         /// and saves it in the <see cref="canvasObject"/>.
         /// </summary>
-        protected void InitializeCanvasObject()
+        /// <returns>true if the <see cref="canvasObject"/> could be found</returns>
+        protected bool InitializeCanvasObject()
         {
             canvasObject = GameObject.Find(nameOfCanvasObject);
+            return canvasObject != null;
         }
 
         /// <summary>

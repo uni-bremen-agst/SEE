@@ -158,7 +158,12 @@ namespace SEE.Controls.Actions
         public void Start()
         {
             listOfRoots = new List<GameObject>();
-            InitializeCanvasObject();
+            if (!InitializeCanvasObject())
+            {
+                Debug.LogError($"No canvas object named {nameOfCanvasObject} could be found in the scene.\n");
+                enabled = false;
+                return;
+            }
             // An anonymous delegate is registered for the event <see cref="ActionState.OnStateChanged"/>.
             // This delegate will be called from <see cref="ActionState"/> upon every
             // state changed where the passed parameter is the newly entered state.
@@ -186,7 +191,10 @@ namespace SEE.Controls.Actions
                         // The monobehaviour is diabled and Update() no longer be called by Unity.
                         enabled = false;
                     }
-                    canvasObject.GetComponent<CanvasGenerator>().DestroyAddNodeCanvas();
+                    if (canvasObject.TryGetComponent(out CanvasGenerator canvasGenerator))
+                    {
+                        canvasGenerator.DestroyAddNodeCanvas();
+                    }
                     Undye();
                     instantiated = false;
                     InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
