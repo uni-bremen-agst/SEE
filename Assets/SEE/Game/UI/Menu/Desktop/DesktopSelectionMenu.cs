@@ -46,7 +46,7 @@ namespace SEE.Game.UI
             }
             
             // Initialize selector entries
-            foreach (ToggleMenuEntry entry in Entries)
+            foreach (ToggleMenuEntry entry in Entries.Where(x => x.Enabled))
             {
                 selector.CreateNewItem(entry.Title);
                 //TODO: Other entry attributes are not used (color, icon...)
