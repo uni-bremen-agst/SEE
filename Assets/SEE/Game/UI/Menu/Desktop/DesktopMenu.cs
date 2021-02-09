@@ -117,7 +117,6 @@ namespace SEE.Game.UI
                 {
                     buttonManager.clickEvent.AddListener(entry.DoAction);
                     buttonImage.color = entry.EntryColor;
-                    //TODO: white is used anyway, icon doesn't work
                     textMeshPro.color = entry.EntryColor.IdealTextColor();
                     iconImage.color = entry.EntryColor.IdealTextColor();
                 }
