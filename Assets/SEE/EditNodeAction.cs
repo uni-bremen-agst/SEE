@@ -1,15 +1,13 @@
 ﻿using SEE.GO;
 using UnityEngine;
 
-
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Action to edit an existing node which has to be selected first.
+    /// Action to edit an existing node.
     /// </summary>
     public class EditNodeAction : AbstractPlayerAction
     {
-
         /// <summary>
         /// Start() will register an anonymous delegate of type 
         /// <see cref="ActionState.OnStateChangedFn"/> on the event
@@ -32,11 +30,10 @@ namespace SEE.Controls.Actions
             EditIsCanceled,
         }
 
-        /// <summary>
-        /// An instance of the ProgressEnum, which represents the current state of the Edit-Node-process.
-        /// </summary>
         private Progress editProgress = Progress.NoNodeSelected;
-
+        /// <summary>
+        /// The current state of the edit-node process.
+        /// </summary>
         public Progress EditProgress { get => editProgress; set => editProgress = value; }
 
         void Start()
@@ -70,17 +67,16 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// The update-method interacts in dependency of the edit-progress-state. (sequenial series)
-        /// NoNodeSelected: Waits until a node is selected by pushing mouse button on a gameNode 
-        /// NodeSelected: Instantiates the canvasObject if a gameNode is selected 
-        /// EditIsCanceled: Removes the canvas and resets values if the process is canceled
+        /// The Update method's behavior depends on the edit-progress state (sequential series).
+        /// NoNodeSelected: Waits until a node is selected by selecting a game node via the mouse button.
+        /// NodeSelected: Instantiates the canvasObject if a gameNode is selected.
+        /// EditIsCanceled: Removes the canvas and resets all values if the process is canceled.
         /// </summary>
         void Update()
         {
             switch (editProgress)
             {
                 case Progress.NoNodeSelected:
-
                     if (hoveredObject != null && Input.GetMouseButtonDown(0))
                     {
                         EditProgress = Progress.NodeSelected;
@@ -105,7 +101,6 @@ namespace SEE.Controls.Actions
                     break;
             }
         }
-
     }
 }
 
