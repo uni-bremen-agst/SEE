@@ -42,27 +42,27 @@ namespace SEE.Game
         /// 
         /// This method is expected to be called at every Update().
         /// 
-        /// You can Lock one to three axes 
+        /// You can lock any of the three axes .
         /// </summary>
         /// <param name="movingObject">the object to be moved</param>
-        /// <param name="x">True if it should be moved on this axis</param>
-        /// <param name="y">True if it should be moved on this axis</param>
-        /// <param name="z">True if it should be moved on this axis</param>
-        public static void MoveToLockAxes(GameObject movingObject, bool x, bool y, bool z)
+        /// <param name="lockX">whether the movement should be locked on this axis</param>
+        /// <param name="lockY">whether the movement should be locked on this axis</param>
+        /// <param name="lockZ">whether the movement should be locked on this axis</param>
+        public static void MoveToLockAxes(GameObject movingObject, bool lockX, bool lockY, bool lockZ)
         {
             float step = MovingSpeed * Time.deltaTime;
             Vector3 target = TipOfRayPosition(movingObject);
             Vector3 movingObjectPos = movingObject.transform.position;
 
-            if (!x)
+            if (!lockX)
             {
                 target.x = movingObjectPos.x;
             }
-            if (!y)
+            if (!lockY)
             {
                 target.y = movingObjectPos.y;
             }
-            if (!z)
+            if (!lockZ)
             {
                 target.z = movingObjectPos.z;
             }
@@ -143,20 +143,26 @@ namespace SEE.Game
             }
         }
 
-
         /// <summary>
-        /// Sets the new Parent for a GameObject via Network
+        /// Sets the new parent for <paramref name="child"/> via the network.
         /// </summary>
-        /// <param name="child">child Gamobject</param>
-        /// <param name="parentID">Parent GameObject ID</param>
+        /// <param name="child">child whose parent is to be set</param>
+        /// <param name="parentName">the parent's name (assumed to be unique)</param>
         /// <param name="position">new position</param>
-        public static void NetworkFinalizeNodePosition(GameObject child , string parentID, Vector3 position)
+        public static void NetworkFinalizeNodePosition(GameObject child , string parentName, Vector3 position)
         {
-            GameObject parent = GameObject.Find(parentID);
-            child.transform.position = position;
-            PutOn(child, parent);
-            child.GetComponent<NodeRef>().Value.Reparent(parent.GetComponent<NodeRef>().Value);
-            child.transform.SetParent(parent.transform);
+            GameObject parent = GameObject.Find(parentName);
+            if (parent != null)
+            {
+                child.transform.position = position;
+                PutOn(child, parent);
+                child.GetComponent<NodeRef>().Value.Reparent(parent.GetComponent<NodeRef>().Value);
+                child.transform.SetParent(parent.transform);
+            }
+            else
+            {
+                throw new System.Exception($"No parent found with name {parentName}.");
+            }
         }
 
         /// <summary>
