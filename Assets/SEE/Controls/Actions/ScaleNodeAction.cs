@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Action to scale an existing node which has to be selected first.
+    /// Action to scale an existing node.
     /// </summary>
     public class ScaleNodeAction : AbstractPlayerAction
     {
@@ -25,6 +25,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         const ActionState.Type ThisActionState = ActionState.Type.ScaleNode;
 
+        // FIXME: These attributes need to be documented.
         Vector3 topOldSpherPos;
         Vector3 fstCornerOldSpherPos;
         Vector3 sndCornerOldSpherPos;
@@ -50,10 +51,10 @@ namespace SEE.Controls.Actions
         GameObject endWithSave;
         GameObject endWithOutSave;
 
+        // FIXME: Needs a better name.
         GameObject tmpSphere = null;
 
         private GameObject objectToScale;
-
 
         public void Start()
         {
@@ -82,9 +83,6 @@ namespace SEE.Controls.Actions
             enabled = ActionState.Is(ThisActionState);
         }
 
-
-
-
         private void Update()
         {
             if (objectToScale != null && instantiated == false)
@@ -92,11 +90,11 @@ namespace SEE.Controls.Actions
                 originalScale = objectToScale.transform.lossyScale;
                 originalPosition = objectToScale.transform.position;
 
-                //TOP SPHERE
+                // Top sphere
                 topSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 SphereRadius(topSphere);
 
-                //corner SPHERES
+                // Corner spheres
                 fstCornerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 SphereRadius(fstCornerSphere);
 
@@ -109,7 +107,7 @@ namespace SEE.Controls.Actions
                 forthCornerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 SphereRadius(forthCornerSphere);
 
-                //Side Spheres
+                // Side spheres
                 fstSideSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 SphereRadius(fstSideSphere);
 
@@ -122,7 +120,7 @@ namespace SEE.Controls.Actions
                 forthSideSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 SphereRadius(forthSideSphere);
 
-                //End Operations
+                // End operations
                 endWithSave = GameObject.CreatePrimitive(PrimitiveType.Capsule);
                 SphereRadius(endWithSave);
                 endWithSave.GetComponent<Renderer>().material.color = Color.green;
@@ -131,12 +129,11 @@ namespace SEE.Controls.Actions
                 SphereRadius(endWithOutSave);
                 endWithOutSave.GetComponent<Renderer>().material.color = Color.red;
 
-                //Positioning
+                // Positioning
                 SetOnRoof();
                 SetOnSide();
                 instantiated = true;
             }
-            //ScaleNode(gameObject);
             if (Input.GetMouseButtonDown(0) && objectToScale == null)
             {
                 objectToScale = hoveredObject;
@@ -151,12 +148,12 @@ namespace SEE.Controls.Actions
                     // Casts the ray and get the first game object hit
                     Physics.Raycast(ray, out hit);
 
-                    //Moves the Sphere which was hit
-                    //top
+                    // Moves the sphere that was hit.
+                    // Top
                     if (hit.collider == topSphere.GetComponent<Collider>())
                     {
                         tmpSphere = topSphere;
-                    } //Corners
+                    } // Corners
                     else if (hit.collider == fstCornerSphere.GetComponent<Collider>())
                     {
                         tmpSphere = fstCornerSphere;
@@ -173,7 +170,7 @@ namespace SEE.Controls.Actions
                     {
                         tmpSphere = forthCornerSphere;
                     }
-                    //Sides
+                    // Sides
                     else if (hit.collider == fstSideSphere.GetComponent<Collider>())
                     {
                         tmpSphere = fstSideSphere;
@@ -205,7 +202,8 @@ namespace SEE.Controls.Actions
                 {
                     GameNodeMover.MoveToLockAxes(tmpSphere, false, true, false);
                 }
-                else if (tmpSphere == fstCornerSphere || tmpSphere == sndCornerSphere || tmpSphere == thrdCornerSphere || tmpSphere == forthCornerSphere)
+                else if (tmpSphere == fstCornerSphere || tmpSphere == sndCornerSphere 
+                         || tmpSphere == thrdCornerSphere || tmpSphere == forthCornerSphere)
                 {
                     GameNodeMover.MoveToLockAxes(tmpSphere, true, false, true);
                 }
@@ -227,15 +225,14 @@ namespace SEE.Controls.Actions
                     ScaleNode();
                     SetOnRoof();
                     SetOnSide();
-                }
-                
+                }                
             }
             else
             {
                 if (objectToScale != null && instantiated)
                 {
                     tmpSphere = null;
-                    //Adjust the size of the scaling elements
+                    // Adjust the size of the scaling elements
                     SphereRadius(topSphere);
                     SphereRadius(fstSideSphere);
                     SphereRadius(sndSideSphere);
@@ -253,8 +250,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Sets the new Scale of a Node based on the sphere elements
-        /// 
+        /// Sets the new scale of a node based on the sphere elements.
         /// </summary>
         private void ScaleNode()
         {
@@ -266,7 +262,7 @@ namespace SEE.Controls.Actions
             scale.z -= thrdSideSphere.transform.position.z - thrdSideOldSpherPos.z;
             scale.z += forthSideSphere.transform.position.z - forthSideOldSpherPos.z;
 
-            //Corner Scaling
+            // Corner scaling
             float scaleCorner = 0;
             scaleCorner -= fstCornerSphere.transform.position.x - fstCornerOldSpherPos.x + (fstCornerSphere.transform.position.z - fstCornerOldSpherPos.z); //* 0.5f;
             scaleCorner += sndCornerSphere.transform.position.x - sndCornerOldSpherPos.x - (sndCornerSphere.transform.position.z - sndCornerOldSpherPos.z); //* 0.5f;
@@ -276,11 +272,11 @@ namespace SEE.Controls.Actions
             scale.x += scaleCorner;
             scale.z += scaleCorner;
 
-            //Move the gameObject so the user thinks he scaled only in one direction
+            // Move the gameObject so the user thinks she/he scaled only in one direction
             Vector3 position = objectToScale.transform.position;
             position.y += scale.y * 0.5f;
            
-            //Setting the old positions
+            // Setting the old positions
             topOldSpherPos = topSphere.transform.position;
             fstCornerOldSpherPos = fstCornerSphere.transform.position;
             sndCornerOldSpherPos = sndCornerSphere.transform.position;
@@ -291,10 +287,9 @@ namespace SEE.Controls.Actions
             thrdSideOldSpherPos = thrdSideSphere.transform.position;
             forthSideOldSpherPos = forthSideSphere.transform.position;
 
-
             scale = objectToScale.transform.lossyScale + scale;
 
-            //Fixes negative dimension
+            // Fixes negative dimension
             if (scale.x <= 0)
             {
                 scale.x = objectToScale.transform.lossyScale.x;
@@ -304,23 +299,21 @@ namespace SEE.Controls.Actions
                 scale.y = objectToScale.transform.lossyScale.y;
                 position.y = objectToScale.transform.position.y;
             }
-
             if (scale.z <= 0)
             {
                 scale.z = objectToScale.transform.lossyScale.z;
-
             }
 
-
-            //transform the new pos and scale
+            // Transform the new position and scale
             objectToScale.transform.position = position;
             objectToScale.SetScale(scale);
             new ScaleNodeNetAction(objectToScale.name, scale, position).Execute(null);
-
         }
 
         /// <summary>
-        /// Sets the top Sphere on the Top of a GameObject and the Save and Discard objects
+        /// Sets the top sphere at the top of <see cref="objectToScale"/> and
+        /// the Save (<see cref="endWithSave"/>) and Discard (<see cref="endWithOutSave"/>)
+        /// objects.
         /// </summary>
         private void SetOnRoof()
         {
@@ -337,13 +330,13 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Sets the Side Spheres
+        /// Sets the side spheres.
         /// </summary>
         private void SetOnSide()
         {
             Transform trns = objectToScale.transform;
 
-            //fstcorner
+            // first corner
             Vector3 pos = objectToScale.transform.position;
             pos.y = objectToScale.GetRoof();
             pos.x -= trns.lossyScale.x / 2 + 0.02f;
@@ -351,7 +344,7 @@ namespace SEE.Controls.Actions
             fstCornerSphere.transform.position = pos;
             fstCornerOldSpherPos = pos;
 
-            //sndcorner
+            // second corner
             pos = objectToScale.transform.position;
             pos.y = objectToScale.GetRoof();
             pos.x += trns.lossyScale.x / 2 + 0.02f;
@@ -359,7 +352,7 @@ namespace SEE.Controls.Actions
             sndCornerSphere.transform.position = pos;
             sndCornerOldSpherPos = pos;
 
-            //thrd corner
+            // third corner
             pos = objectToScale.transform.position;
             pos.y = objectToScale.GetRoof();
             pos.x += trns.lossyScale.x / 2 + 0.02f;
@@ -367,7 +360,7 @@ namespace SEE.Controls.Actions
             thrdCornerSphere.transform.position = pos;
             thrdCornerOldSpherPos = pos;
 
-            //forth corner
+            // forth corner
             pos = objectToScale.transform.position;
             pos.y = objectToScale.GetRoof();
             pos.x -= trns.lossyScale.x / 2 + 0.02f;
@@ -375,7 +368,7 @@ namespace SEE.Controls.Actions
             forthCornerSphere.transform.position = pos;
             forthCornerOldSpherPos = pos;
 
-            //fst side
+            // first side
             pos = objectToScale.transform.position;
             pos.y = objectToScale.GetRoof();
             pos.x -= trns.lossyScale.x / 2 + 0.01f;
@@ -383,7 +376,7 @@ namespace SEE.Controls.Actions
             fstSideSphere.transform.position = pos;
             fstSideOldSpherPos = pos;
 
-            //snd side
+            // second side
             pos = objectToScale.transform.position;
             pos.y = objectToScale.GetRoof();
             pos.x += trns.lossyScale.x / 2 + 0.01f;
@@ -391,7 +384,7 @@ namespace SEE.Controls.Actions
             sndSideSphere.transform.position = pos;
             sndSideOldSpherPos = pos;
 
-            //thrd side
+            // third side
             pos = objectToScale.transform.position;
             pos.y = objectToScale.GetRoof();
 
@@ -399,20 +392,19 @@ namespace SEE.Controls.Actions
             thrdSideSphere.transform.position = pos;
             thrdSideOldSpherPos = pos;
 
-            //forth side
+            // forth side
             pos = objectToScale.transform.position;
             pos.y = objectToScale.GetRoof();
 
             pos.z += trns.lossyScale.z / 2 + 0.01f;
             forthSideSphere.transform.position = pos;
             forthSideOldSpherPos = pos;
-
         }
 
         /// <summary>
-        /// Sets the Radius of a Sphere dependend on the X and Z Scale of the GameObject that is scaled
-        /// </summary>
-        /// <param name="sphere">the Sphere to be Scaled</param>
+        /// Sets the radius of a sphere dependent on the X and Z scale of <paramref name="sphere"/>
+        ///  that is to be scaled.</summary>
+        /// <param name="sphere">the sphere to be scaled</param>
         private void SphereRadius(GameObject sphere)
         {
             Vector3 goScale = objectToScale.transform.lossyScale;
@@ -428,19 +420,18 @@ namespace SEE.Controls.Actions
             {
                 sphere.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
             }
-
         }
 
         /// <summary>
-        /// This will end the Scalling Action the user Can Choose between Safe and Discard
+        /// This will end the scaling action the user can choose between save and discard.
         /// </summary>
-        /// <param name="save">Should the changes be saved</param>
+        /// <param name="save">Whether the changes should be saved</param>
         public void EndScale(bool save)
         {
             if (save)
             {
-                //FIXME: Currently, the changes will not be saved after closing the game. 
-                //SAFE THE CHANGES
+                // FIXME: Currently, the changes will not be saved after closing the game. 
+                // SAVE THE CHANGES
                 RemoveSpheres();
             }
             else
@@ -453,7 +444,9 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Removes this Script from the GameObject
+        /// Removes this component from the gameObject.
+        /// FIXME: Either the comment or the implementation is wrong. The components is *not* removed 
+        /// from its gameObject. Only its attributes are reset.
         /// </summary>
         public void RemoveSpheres()
         {
