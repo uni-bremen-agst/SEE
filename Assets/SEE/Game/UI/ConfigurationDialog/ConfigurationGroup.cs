@@ -6,6 +6,6 @@
     /// <seealso cref="ConfigurationProperty"/>
     public class ConfigurationGroup
     {
-        //TODO: List of properties
+        //TODO: This class is not finished yet and shouldn't be used.
     }
 }
