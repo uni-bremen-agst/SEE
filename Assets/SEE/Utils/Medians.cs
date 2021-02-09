@@ -7,7 +7,7 @@ namespace SEE.Utils
     /// <summary>
     /// This class is provides median calculation of vectors.
     /// </summary>
-    public static class MathFunctions
+    public static class Medians
     {
         /// <summary>
         /// Returns the median over all dimension of the given <paramref name="vectors"/>,

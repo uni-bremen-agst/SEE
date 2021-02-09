@@ -487,8 +487,8 @@ namespace SEE.Controls.Actions
 
             List<Vector3> innerNodeSize = ListOfLossyscale(allInnerNodesInScene);
 
-            medianOfLeaves = MathFunctions.Median(ListOfLossyscale(allLeavesInScene));
-            medianOfInnerNodes = MathFunctions.Median(innerNodeSize);
+            medianOfLeaves = Medians.Median(ListOfLossyscale(allLeavesInScene));
+            medianOfInnerNodes = Medians.Median(innerNodeSize);
 
             // In the special case there are no inner nodes, the median of the graph's only leaf is set 
             // as a default value for any inner node that might be created.
