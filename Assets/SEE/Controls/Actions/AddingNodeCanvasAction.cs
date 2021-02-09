@@ -19,7 +19,7 @@ namespace SEE.Controls.Actions
             /// Note: It is important that the Prefab is contained in the Resources folder to use the 
             /// Resources.Load method.
             InstantiatePrefab(prefabPath);
-            canvas.transform.SetParent(gameObject.transform);
+            Canvas.transform.SetParent(gameObject.transform);
         }
 
         /// <summary>
@@ -32,11 +32,11 @@ namespace SEE.Controls.Actions
             // FIXME: this part has to be removed by the new UI Team
             AddingNodeCanvasAction script = gameObject.GetComponent<AddingNodeCanvasAction>();
 
-            Component[] c = script.canvas.GetComponentsInChildren<InputField>();
+            Component[] c = script.Canvas.GetComponentsInChildren<InputField>();
             InputField inputname = (InputField)c[0];
             InputField inputtype = (InputField)c[1];
 
-            Component toggleGroup = script.canvas.GetComponentInChildren<ToggleGroup>();
+            Component toggleGroup = script.Canvas.GetComponentInChildren<ToggleGroup>();
             Toggle[] toggles = toggleGroup.GetComponentsInChildren<Toggle>();
 
             if (toggles[0].isOn)

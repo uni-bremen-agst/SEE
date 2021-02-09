@@ -49,8 +49,8 @@ namespace SEE.Controls.Actions
         void Start()
         {
             InstantiatePrefab(prefabPath);
-            canvas.transform.SetParent(gameObject.transform);
-            Component[] c = canvas.GetComponentsInChildren<InputField>();
+            Canvas.transform.SetParent(gameObject.transform);
+            Component[] c = Canvas.GetComponentsInChildren<InputField>();
             inputname = (InputField)c[0];
             inputtype = (InputField)c[1];
             inputname.text = nodeToEdit.SourceName;
