@@ -5,38 +5,40 @@ using SEE.Controls.Actions;
 namespace SEE.Controls
 {
     /// <summary>
-    /// This script is added to the Button of the adding-node-canvas and the edit-node-canvas.
+    /// This component is added to the button of the adding-node canvas and the edit-node canvas.
+    /// FIXME: What is the purpose of this component?
     /// </summary>
     public class NodeInteractionButtons : MonoBehaviour
     {
-
         /// <summary>
-        /// The button on the adding-node-canvas, which is finishing the addNode-process.
+        /// The button on the adding-node canvas that is finishing the addition of a new node.
         /// </summary>
-        public Button addingButton;
+        public Button AddingButton;
 
         /// <summary>
-        /// The button on the editNode-canvas, which is canceling the editNode-process.
+        /// The button on the addNode canvas that is canceling the addition of a new node.
         /// </summary>
-        public Button editNodeCancel;
+        public Button AddNodeCancel;
 
         /// <summary>
-        /// The button on the editNode-canvas, which is finishing the editNode-process.
+        /// The button on the editNode canvas that is canceling the editNode process.
         /// </summary>
-        public Button editNodeButton;
+        public Button EditNodeCancel;
 
         /// <summary>
-        /// The button on the addNode-canvas, which is canceling the addingNode-process.
+        /// The button on the editNode canvas that is finishing the editNode process.
         /// </summary>
-        public Button addNodeCancel;
+        public Button EditNodeButton;
 
         /// <summary>
-        /// The Component playerActions, which is the parent of the DesktopNewNodeAction and DesktopEditNodeAction-scripts.
+        /// The player desktop that is the parent of the <see cref="NewNodeAction"/> 
+        /// and <see cref="EditNodeAction"/>.
         /// </summary>
         private GameObject playerDesktop;
 
         /// <summary>
-        /// The name of the GameObject which is the parent of the newNodeAction and editNodeAction
+        /// The name of the GameObject that is the parent of the <see cref="NewNodeAction"/> 
+        /// and <see cref="EditNodeAction"/>.
         /// </summary>
         private const string gameObjectName = "Player Desktop";
 
@@ -45,16 +47,17 @@ namespace SEE.Controls
         /// </summary>   
         void Start()
         {
-            addingButton?.onClick?.AddListener(SetNextAddingNodeStep);
-            editNodeCancel?.onClick?.AddListener(EditIsCanceled);
-            editNodeButton?.onClick?.AddListener(EditNode);
-            addNodeCancel?.onClick?.AddListener(AddingIsCanceled);
+            AddingButton?.onClick?.AddListener(SetNextAddingNodeStep);
+            EditNodeCancel?.onClick?.AddListener(EditIsCanceled);
+            EditNodeButton?.onClick?.AddListener(EditNode);
+            AddNodeCancel?.onClick?.AddListener(AddingIsCanceled);
 
             playerDesktop = GameObject.Find(gameObjectName);
         }
 
         /// <summary>
-        /// Increases the progress-enum in the DesktopNewNodeAction instance. This results in the next step of addingNode.
+        /// Increases the progress enum in the <see cref="NewNodeAction"/> instance. 
+        /// This results in the next step of addingNode.
         /// </summary>
         public void SetNextAddingNodeStep()
         {
@@ -63,7 +66,8 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Sets a bool in the DesktopEditNodeAction which closes the adding-node canvas.
+        /// Sets a bool in the <see cref="EditNodeAction"/> which closes the adding-node canvas.
+        /// FIXME: There is no bool here. This comment must be fixed.
         /// </summary>
         public void EditIsCanceled()
         {
@@ -72,13 +76,17 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Sets a bool in the EditNodeCanvas-script which starts the edit-process and evaluation of the inputFields.
+        /// Sets <see cref="EditNodeCanvasAction.EditNode"/> to true, which starts the edit process 
+        /// and evaluation of the inputFields.
         /// </summary>
         public void EditNode()
         {
             EditNodeCanvasAction.EditNode = true;
         }
 
+        /// <summary>
+        /// FIXME: Documentation is missing.
+        /// </summary>
         public void AddingIsCanceled()
         {
             NewNodeAction current = playerDesktop.GetComponent<NewNodeAction>();
