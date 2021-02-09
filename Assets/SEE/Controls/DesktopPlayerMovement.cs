@@ -130,7 +130,6 @@ namespace SEE.Controls
                 }
                 mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
             }
-  
         }
     }
 }
