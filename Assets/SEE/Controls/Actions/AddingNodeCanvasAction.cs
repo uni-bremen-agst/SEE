@@ -41,18 +41,18 @@ namespace SEE.Controls.Actions
 
             if (toggles[0].isOn)
             {
-                NewNodeAction.IsInnerNode = true;
+                AddNodeAction.IsInnerNode = true;
             }
             if (toggles[1].isOn)
             {
-                NewNodeAction.IsInnerNode = false;
+                AddNodeAction.IsInnerNode = false;
             }
             string inputNodename = inputname.text;
             string inputNodetype = inputtype.text;
             // until here 
 
-            NewNodeAction.Nodename = inputNodename;
-            NewNodeAction.Nodetype = inputNodetype;
+            AddNodeAction.Nodename = inputNodename;
+            AddNodeAction.Nodetype = inputNodetype;
         }
     }
 }
