@@ -7,6 +7,8 @@ namespace SEE.Game.UI.ConfigurationDialog
     /// </summary>
     public class ConfigurationDialog: PlatformDependentComponent
     {
+        //TODO: This class is not finished yet and shouldn't be used.
+        
         protected IList<ConfigurationGroup> Groups;
     }
 }
