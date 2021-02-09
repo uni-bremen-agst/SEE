@@ -47,7 +47,7 @@ namespace SEE.Game.UI
         protected GameObject MenuContent;
         
         /// <summary>
-        /// The menu object which has the <see cref="ModalWindowManager"/> component attached.
+        /// The GameObject which has the <see cref="ModalWindowManager"/> component attached.
         /// </summary>
         protected GameObject MenuGameObject;
 

@@ -54,7 +54,7 @@ namespace SEE.Game.UI
         /// <param name="description">A description of the entry.</param>
         /// <param name="entryColor">The color with which this entry shall be displayed.</param>
         /// <param name="enabled">Whether this entry should be enabled on creation.</param>
-        /// <param name="icon">The icon which shall be displayed alongside this entry</param>
+        /// <param name="icon">The icon which shall be displayed alongside this entry.</param>
         public MenuEntry(UnityAction action, string title, string description = null, Color entryColor = default, 
                          bool enabled = true, Sprite icon = null)
         {

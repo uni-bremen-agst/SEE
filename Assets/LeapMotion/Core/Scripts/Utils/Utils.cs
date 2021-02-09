@@ -839,7 +839,7 @@ namespace Leap.Unity
 
         #endregion
 
-        #region RenderableComponent Utils
+        #region Component Utils
 
         /// <summary>
         /// Recursively searches the hierarchy of the argument Transform to find all of the

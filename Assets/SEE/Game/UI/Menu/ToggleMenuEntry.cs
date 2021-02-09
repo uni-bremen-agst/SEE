@@ -20,6 +20,9 @@ namespace SEE.Game.UI
         /// </summary>
         private readonly UnityAction DoExitAction;
 
+        /// <summary>
+        /// The color of this entry when it's inactive.
+        /// </summary>
         private Color inactiveColor => EntryColor.Lighter();
 
         /// <summary>
