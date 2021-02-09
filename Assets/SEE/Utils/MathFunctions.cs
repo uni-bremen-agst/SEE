@@ -3,192 +3,107 @@ using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
-/// This class is responsible for the median-calculation of vectors which represent the gameObjects size of of a SEE city.
-/// It is useful when determining the default node-size for a new node.
+/// This class is provides median calculation of vectors.
 /// </summary>
 public static class MathFunctions
 {
-
     /// <summary>
-    /// Calculates the median of a vector list. 
+    /// Returns the median over all dimension of the given <paramref name="vectors"/>,
+    /// where each element (x/y/z) of the resulting vector is the median
+    /// of the respective elements (x/y/z) of the input <paramref name="vectors"/>.
+    /// To put it differently (let result be the returned value):
+    /// 
+    ///   result.x = median over set {v.x | v in <paramref name="vectors"/>}
+    ///   result.y = median over set {v.y | v in <paramref name="vectors"/>}
+    ///   result.z = median over set {v.z | v in <paramref name="vectors"/>}
+    ///   
+    /// Precondition: vectors != null && vectors.Count > 0. Otherwise an
+    /// ArgumentException will be thrown.
     /// </summary>
-    /// <param name="vectors"></param>
-    /// <returns> A vector3 with the calculated median of the vector list or null in 
-    /// case the given vector list is empty or null itself</returns>
-    public static Vector3 CalcMedian(List<Vector3> vectors)
-    {
-        if (vectors.Count == 0 || vectors == null)
+    /// <param name="vectors">vectors whose three medians are to be determined</param>
+    /// <returns>three medians over the three dimensions as described above</returns>
+    public static Vector3 Median(ICollection<Vector3> vectors)
+    {        
+        if (vectors == null || vectors.Count == 0)
         {
-            return new Vector3(0, 0, 0);
+            throw new System.ArgumentException("Input must neither be null nor empty.");
         }
 
-        Vector3 result = new Vector3();
-        List<float> xAxis = new List<float>();
-        List<float> yAxis = new List<float>();
-        List<float> zAxis = new List<float>();
-
-        foreach (Vector3 vect in vectors)
+        switch (vectors.Count)
         {
-            xAxis.Add(vect.x);
-            yAxis.Add(vect.y);
-            zAxis.Add(vect.z);
-        }
-
-
-        result.x = CalcMedian(xAxis);
-        result.y = CalcMedian(yAxis);
-        result.z = CalcMedian(zAxis);
-
-        if (vectors.Count % 2 != 0)
-        {
-            return result;
-        }
-
-        int indexSecondMedian = (xAxis.Count + 1) / 2;
-        float SecondXCoordinate = CalcMedian(xAxis);
-        float SecondYCoordinate = CalcMedian(yAxis);
-        float SecondZCoordinate = CalcMedian(zAxis);
-
-        result.x = (result.x + SecondXCoordinate) / 2;
-        result.y = (result.y + SecondYCoordinate) / 2;
-        result.z = (result.z + SecondZCoordinate) / 2;
-
-        return result;
-    }
-
-
-    /// <summary>
-    /// Calculates the median of a vector list.
-    /// </summary>
-    /// <param name="pVectorlist"></param>
-    /// <returns> A vector3 with the calculated median of the vector list or a null-vector in 
-    /// case the given vector list is empty or null itself</returns>
-    public static Vector3 medianOfVectors(List<Vector3> pVectorList)
-    {
-        
-        if (pVectorList == null)
-        {
-            return new Vector3(0, 0, 0);
-        }
-        int lengthOfList = pVectorList.Count;
-
-        switch (lengthOfList)
-        {
-            //nothing to be calculated, list is empty
-            case 0:
-                return new Vector3(0, 0, 0);
-
-            // we can just return the single element of the list
+            // We can just return the single element of the list.
             case 1:
-                return pVectorList.ElementAt(0);
+                return vectors.ElementAt(0);
 
-            //As the amount of the length is just two, which is even ,  we have to interpolate linearly and divide the result by 2 .
+            // As there are only two elements, which is an even number, we return the average.
             case 2:
-                return (pVectorList.ElementAt(0) + pVectorList.ElementAt(1)) / 2;
+                return (vectors.ElementAt(0) + vectors.ElementAt(1)) / 2;
 
-            // if this is the case, the list consists of more than 2 entries and we have to determine the median.
+            // If there are more than two elements:
             default:
-                Vector3 medianVector = new Vector3();
                 List<float> xAxis = new List<float>();
                 List<float> yAxis = new List<float>();
                 List<float> zAxis = new List<float>();
 
-                foreach (Vector3 vect in pVectorList)
+                foreach (Vector3 vect in vectors)
                 {
                     xAxis.Add(vect.x);
                     yAxis.Add(vect.y);
                     zAxis.Add(vect.z);
                 }
-
-                medianVector.x = medianOfFloats(xAxis);
-                medianVector.y = medianOfFloats(yAxis);
-                medianVector.z = medianOfFloats(zAxis);
-
-                return medianVector;
+                return new Vector3(Median(xAxis), Median(yAxis), Median(zAxis));
         }
     }
 
     /// <summary>
-    /// Calculates the median of a list of floats. Precondition: The list of vectors does not have to be sorted.
-    /// </summary>
-    /// <param name="floatList"></param>
-    /// <returns> The single median of the list as a float or the zero-vector in 
-    /// case the given vector list is empty or null itself</returns>
-    public static float CalcMedian(List<float> floatList)
+    /// Calculates the median over <paramref name="values"/>. If <paramref name="values"/>
+    /// has an odd number of elements, the value in the middle of the sorted list
+    /// will be returned. If there is an even number instead, we return the
+    /// average of the two values in the middle of the sorted list of values.
+    /// 
+    /// Precondition: <paramref name="values"/> must neither be null
+    /// nor empty. Otherwise an ArgumentException is thrown.
+    /// 
+    /// Note: <paramref name="values"/> may or may not be sorted. <paramref name="values"/>
+    /// will not be modified.
+    /// <param name="values">list of values for which to calculate the median</param>
+    /// <returns>the median value over <paramref name="values"/></returns>
+    public static float Median(ICollection<float> values)
     {
-        float median = 0;
-        if (floatList.Count == 0 || floatList == null)
+        if (values == null || values.Count == 0)
         {
-            return median;
+            throw new System.ArgumentException("Input must neither be null nor empty.");
         }
-        int indexOfMid = floatList.Count;
-        indexOfMid /= 2;
-        if (indexOfMid != 0)
+        switch (values.Count)
         {
-            indexOfMid -= 1;
-        }
-        median = floatList.ElementAt(indexOfMid);
-
-        // If the length of the list is an odd number, we will return the element which is located at the middle of the list,
-        // e.g. for the amount = 13, we return the element at the index 6.
-        if (floatList.Count % 2 != 0)
-        {
-            return median;
-        }
-
-        // If the amount is even, we have to interpolate linearly between the value at the index at half of the list's size,
-        // and the value of the following index. E.g. size = 13 -> index 6 and 7 .
-        int indexSecondMedianValue = indexOfMid + 1;
-        float SecondCoordinate = floatList.ElementAt(indexSecondMedianValue);
-        median += SecondCoordinate;
-        median /= 2;
-        return median;
-    }
-
-
-    /// <summary>
-    /// Calculates the median of a list of floats.
-    /// <param name="floatList"></param>
-    /// <returns> The single median of the list as a float zero in 
-    /// case the given vector list is empty or null itself</returns>
-    public static float medianOfFloats(List<float> floatList)
-    {
-        int lengthOfList = floatList.Count;
-        float median = 0;
-
-
-        switch (lengthOfList)
-        {
-            //nothing to be calculated, list is empty
-            case 0:
-                return median;
-
-            // we can just return the single element of the list
+            // We can just return the single element of the list.
             case 1:
-                return floatList.ElementAt(0);
+                return values.ElementAt(0);
 
-            // As the length is just two, which is even,  we have to interpolate linearly and divide the result by 2 .
+            // As the length is just two, which is an even number, we return the average.
             case 2:
-                median = floatList.ElementAt(0) + floatList.ElementAt(1);
-                return median / 2;
+                return (values.ElementAt(0) + values.ElementAt(1)) / 2;
 
             default:
-                // if this is the case, ithe list consists of more than 2 entries and we have to determine the median.
-                floatList.Sort();
-                int indexOfMedian = floatList.Count / 2;
-                indexOfMedian -= 1;
-                median = floatList.ElementAt(indexOfMedian);
+                // If there are more than two elements:
+                // We make a copy of values that we will sort. We do not want to change
+                // the original order of values.
+                List<float> list = values.ToList<float>();
+                list.Sort();
+                // Note that the integer division will truncate to the next lower integer value.
+                int indexOfMedian = values.Count / 2;
 
-                //if the lists length is odd, we can just return the entry stored directly "in the middle".
-                if ((floatList.Count % 2 != 0))
+                // If the lists has an odd number of elements, we can just return the entry stored 
+                // directly "in the middle".
+                if ((values.Count % 2 != 0))
                 {
-                    return median;
+                    return list.ElementAt(indexOfMedian);
                 }
-
-                // else we have to add the next entry and divide the sum of each entries by 2 
-                median = floatList.ElementAt(indexOfMedian) + floatList.ElementAt(indexOfMedian + 1);
-                return median / 2;
+                else
+                {
+                    // otherwise we return the average of the two values in the middle
+                    return (values.ElementAt(indexOfMedian) + values.ElementAt(indexOfMedian - 1)) / 2;
+                }
         }
-
     }
 }
