@@ -392,9 +392,7 @@ namespace Michsky.UI.ModernUIPack
                         selectedItemIndex.intValue = EditorGUILayout.IntSlider(selectedItemIndex.intValue, 0, dropdownTarget.dropdownItems.Count - 1);
 
                         GUILayout.Space(2);
-
                         EditorGUILayout.LabelField(new GUIContent(dropdownTarget.dropdownItems[selectedItemIndex.intValue].itemName), customSkin.FindStyle("Text"));
-
                         GUILayout.EndVertical();
 
                         if (saveSelected.boolValue == true)
@@ -402,10 +400,8 @@ namespace Michsky.UI.ModernUIPack
                     }
 
                     else
-                    {
-                        EditorGUILayout.HelpBox("There is no item in the dropdown list.", MessageType.Warning);
-                    }
-     
+                        EditorGUILayout.HelpBox("There is no item in the list.", MessageType.Warning);
+
                     GUILayout.Space(4);
                     break;
             }

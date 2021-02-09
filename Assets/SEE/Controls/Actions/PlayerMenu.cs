@@ -35,14 +35,15 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void Start()
         {
-            UnityEngine.Assertions.Assert.IsTrue(System.Enum.GetNames(typeof(ActionState.Type)).Length == 7);
+            UnityEngine.Assertions.Assert.IsTrue(System.Enum.GetNames(typeof(ActionState.Type)).Length == 8);
             UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Move == 0);
             UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Rotate == 1);
             UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Map == 2);
-            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.DrawEdge == 3);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.NewEdge == 3);
             UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.NewNode == 4);
             UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.EditNode == 5);
             UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.ScaleNode == 6);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Delete == 7);
 
             MenuDescriptor[] menuDescriptors = new MenuDescriptor[]
             {
@@ -71,11 +72,11 @@ namespace SEE.Controls.Actions
                                    entryOff: null,
                                    isTransient: true),
                 // Drawing a new edge between two gameobjects
-                new MenuDescriptor(label: "DrawEdge",
+                new MenuDescriptor(label: "New Edge",
                                    spriteFile: menuEntrySprite,
                                    activeColor: Color.magenta,
                                    inactiveColor: Lighter(Color.magenta),
-                                   entryOn: DrawEdgeOn,
+                                   entryOn: NewEdgeOn,
                                    entryOff: null,
                                    isTransient: true),
                 // Creates a new node
@@ -102,6 +103,14 @@ namespace SEE.Controls.Actions
                                    entryOn: ScaleNodeOn,
                                    entryOff: null,
                                    isTransient: true),
+                // Deleting nodes or edges
+                new MenuDescriptor(label: "Delete",
+                                   spriteFile: menuEntrySprite,
+                                   activeColor: Color.yellow,
+                                   inactiveColor: Lighter(Color.yellow),
+                                   entryOn: DeleteOn,
+                                   entryOff: null,
+                                   isTransient: true),
             };
             MenuFactory.CreateMenu(menuDescriptors, Radius, Depth);
         }
@@ -114,8 +123,9 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void MoveOn() => ActionState.Value = ActionState.Type.Move;
         private void RotateOn() => ActionState.Value = ActionState.Type.Rotate;
+        private void DeleteOn() => ActionState.Value = ActionState.Type.Delete;
         private void MapOn() => ActionState.Value = ActionState.Type.Map;
-        private void DrawEdgeOn() => ActionState.Value = ActionState.Type.DrawEdge;
+        private void NewEdgeOn() => ActionState.Value = ActionState.Type.NewEdge;
         private void NewNodeOn() => ActionState.Value = ActionState.Type.NewNode;
         private void ScaleNodeOn() => ActionState.Value = ActionState.Type.ScaleNode;
         private void EditNodeOn() => ActionState.Value = ActionState.Type.EditNode;

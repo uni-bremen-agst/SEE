@@ -335,6 +335,7 @@ GameObject:
   - component: {fileID: 186778476}
   - component: {fileID: 186778479}
   - component: {fileID: 186778478}
+  - component: {fileID: 186778480}
   m_Layer: 0
   m_Name: Player Touch Gamepad
   m_TagString: Untagged
@@ -458,6 +459,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GONode: {fileID: 0}
   rootPostion: {x: 0, y: 0, z: 0}
+--- !u!114 &186778480
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 186778472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dce67dfcaa802e43a0601cdc340100e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &225793075
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1376,6 +1389,7 @@ MonoBehaviour:
   disableAllOtherActionSets: 0
   activateOnStart: 1
   deactivateOnDestroy: 1
+  initialPriority: 0
 --- !u!143 &844925789
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1505,6 +1519,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GONode: {fileID: 0}
   rootPostion: {x: 0, y: 0, z: 0}
+--- !u!114 &844967662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844967653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dce67dfcaa802e43a0601cdc340100e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &854686745 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 11401046, guid: dc06161b6d97feb419f45f03b62e14b9,
@@ -1620,6 +1646,7 @@ GameObject:
   - component: {fileID: 1046553562}
   - component: {fileID: 1046553565}
   - component: {fileID: 1046553564}
+  - component: {fileID: 1046553566}
   m_Layer: 0
   m_Name: Player HoloLens
   m_TagString: MainCamera
@@ -1791,6 +1818,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GONode: {fileID: 0}
   rootPostion: {x: 0, y: 0, z: 0}
+--- !u!114 &1046553566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046553556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dce67dfcaa802e43a0601cdc340100e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1093528283
 GameObject:
   m_ObjectHideFlags: 0
@@ -2478,6 +2517,7 @@ GameObject:
   - component: {fileID: 1566173684}
   - component: {fileID: 1566173686}
   - component: {fileID: 1566173685}
+  - component: {fileID: 1566173687}
   m_Layer: 0
   m_Name: Player Desktop
   m_TagString: MainCamera
@@ -2615,6 +2655,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GONode: {fileID: 0}
   rootPostion: {x: 0, y: 0, z: 0}
+--- !u!114 &1566173687
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1566173679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dce67dfcaa802e43a0601cdc340100e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1566173689
 Transform:
   m_ObjectHideFlags: 0

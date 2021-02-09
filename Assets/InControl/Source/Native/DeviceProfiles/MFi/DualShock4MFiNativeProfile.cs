@@ -114,16 +114,22 @@ namespace InControl.NativeDeviceProfiles
 				},
 				new InputControlMapping
 				{
-					Name = "Menu",
+					Name = "Share",
+					Target = InputControlType.Options,
+					Source = Button( 13 )
+				},
+				new InputControlMapping
+				{
+					Name = "Options",
 					Target = InputControlType.Menu,
 					Source = Button( 12 )
 				},
 				new InputControlMapping
 				{
-					Name = "Options",
-					Target = InputControlType.Options,
-					Source = Button( 13 )
-				},
+					Name = "System",
+					Target = InputControlType.Home,
+					Source = Button( 14 )
+				}
 			};
 
 			AnalogMappings = new[]

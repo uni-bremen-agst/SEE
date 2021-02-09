@@ -86,6 +86,7 @@ namespace Michsky.UI.ModernUIPack
             var notificationStyle = serializedObject.FindProperty("notificationStyle");
             var useCustomContent = serializedObject.FindProperty("useCustomContent");
             var useStacking = serializedObject.FindProperty("useStacking");
+            var destroyAfterPlaying = serializedObject.FindProperty("destroyAfterPlaying");
 
             // Draw content depending on tab index
             switch (currentTab)
@@ -202,6 +203,12 @@ namespace Michsky.UI.ModernUIPack
 
                     useStacking.boolValue = GUILayout.Toggle(useStacking.boolValue, new GUIContent("Use Stacking"), customSkin.FindStyle("Toggle"));
                     useStacking.boolValue = GUILayout.Toggle(useStacking.boolValue, new GUIContent(""), customSkin.FindStyle("Toggle Helper"));
+
+                    GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal(EditorStyles.helpBox);
+
+                    destroyAfterPlaying.boolValue = GUILayout.Toggle(destroyAfterPlaying.boolValue, new GUIContent("Destroy After Playing"), customSkin.FindStyle("Toggle"));
+                    destroyAfterPlaying.boolValue = GUILayout.Toggle(destroyAfterPlaying.boolValue, new GUIContent(""), customSkin.FindStyle("Toggle Helper"));
 
                     GUILayout.EndHorizontal();
                     GUILayout.BeginHorizontal(EditorStyles.helpBox);
