@@ -33,7 +33,6 @@ namespace SEE.Game
         public GraphRenderer(AbstractSEECity settings, Graph graph)
         {
             this.settings = settings;
-
             ShaderType = Materials.ShaderType.Transparent;
             switch (this.settings.LeafObjects)
             {
@@ -588,7 +587,6 @@ namespace SEE.Game
 
             // Add the node to the node hierarchy
             gameNode.transform.SetParent(itsParent.transform);
-
 
             // Prepare the node for interactions
             InteractionDecorator.PrepareForInteraction(gameNode);
