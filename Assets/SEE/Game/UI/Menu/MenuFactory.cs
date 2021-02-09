@@ -28,7 +28,7 @@ namespace SEE.Game.UI
         {
             ToggleMenuEntry[] entries = {
                 new ToggleMenuEntry(
-                    toggled: false,
+                    toggled: true,
                     entryAction: () => ActionState.Value = ActionState.Type.Move,
                     exitAction: null,
                     title: "Move",

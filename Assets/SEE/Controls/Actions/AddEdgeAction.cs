@@ -46,7 +46,7 @@ namespace SEE.Controls.Actions
             // An anonymous delegate is registered for the event <see cref="ActionState.OnStateChanged"/>.
             // This delegate will be called from <see cref="ActionState"/> upon every
             // state changed where the passed parameter is the newly entered state.
-            ActionState.OnStateChanged += (ActionState.Type newState) =>
+            ActionState.OnStateChanged += newState =>
             {
                 // Is this our action state where we need to do something?
                 if (newState == ThisActionState)
@@ -74,6 +74,7 @@ namespace SEE.Controls.Actions
                 enabled = false;
                 InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
                 InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
+                return;
             }
 
             // Assigning the game objects to be connected.
