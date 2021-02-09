@@ -3,7 +3,7 @@
 namespace SEE.Utils
 {
     /// <summary>
-    /// Functions to destroy GameObjects.
+    /// Functions to destroy game objects in game or editor mode.
     /// </summary>
     public static class Destroyer
     {
@@ -11,7 +11,7 @@ namespace SEE.Utils
         /// Destroys given game object using UnityEngine.Object when in
         /// game mode or UnityEngine.Object.DestroyImmediate when in editor mode.
         /// </summary>
-        /// <param name="gameObject"></param>
+        /// <param name="gameObject">object to be destroyed</param>
         public static void DestroyGameObject(GameObject gameObject)
         {
             // We must use DestroyImmediate when we are in the editor mode.
@@ -31,7 +31,7 @@ namespace SEE.Utils
         /// Destroys given <paramref name="component"/> using UnityEngine.Object when in
         /// game mode or UnityEngine.Object.DestroyImmediate when in editor mode.
         /// </summary>
-        /// <param name="component"></param>
+        /// <param name="component">object to be destroyed</param>
         public static void DestroyComponent(Component component)
         {
             // We must use DestroyImmediate when we are in the editor mode.
