@@ -5,66 +5,66 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// This class is responsible for the scale-Node-process via network from one client to all others and to the server. 
+    /// This class is responsible for the scaling nodes via network from one 
+    /// client to all others and to the server. 
     /// </summary>
     public class ScaleNodeNetAction : AbstractAction
     {
         /// <summary>
-        /// The id of the gameObject which has to be scaled
+        /// The id of the gameObject that has to be scaled.
         /// </summary>
-        public string gameObjectID;
+        public string GameObjectID;
 
         /// <summary>
-        /// The new Scale to bring over the network 
+        /// The new scale to bring over the network.
         /// </summary>
-        public Vector3 scale;
+        public Vector3 Scale;
 
         /// <summary>
-        /// The new position to bring over the network
+        /// The new position to transfer over the network.
         /// </summary>
-        public Vector3 position;
+        public Vector3 Position;
 
         /// <summary>
         /// Constructs a ScaleNodeNetAction
         /// </summary>
-        /// <param name="GameObjectID">The id from the GameObject which should be scaled through the Network</param>
+        /// <param name="GameObjectID">The id from the GameObject which should be scaled through the network</param>
         /// <param name="Scale">The new scale of the GameObject</param>
         /// <param name="Positon">The new position of the GameObject</param>
         public ScaleNodeNetAction(string GameObjectID, Vector3 Scale, Vector3 Positon) : base()
         {
-            gameObjectID = GameObjectID;
-            scale = Scale;
-            position = Positon;
+            this.GameObjectID = GameObjectID;
+            this.Scale = Scale;
+            Position = Positon;
         }
 
         /// <summary>
-        /// Things to Execute on the Server (None for this Class)
+        /// Things to execute on the server (none for this class).
         /// </summary>
         protected override void ExecuteOnServer()
         {
-
+            // Intentionally left blank
         }
 
         /// <summary>
         /// Finds the GameObject on the Client and sets its scale and position
+        /// </summary>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
             {
-                GameObject scaleObj = GameObject.Find(gameObjectID);
+                GameObject scaleObj = GameObject.Find(GameObjectID);
                 if (scaleObj != null)
                 {
-                    scaleObj.SetScale(scale);
-                    scaleObj.transform.position = position;
+                    scaleObj.SetScale(Scale);
+                    scaleObj.transform.position = Position;
                 }
                 else
                 {
                     //FIXME: Control whether a Debug Log is the right thing
-                    Debug.LogError("Found no gameObject: " + gameObjectID);
+                    Debug.LogError($"Found no game object: {GameObjectID}.\n");
                 }
             }
-
         }
-
     }
 }
