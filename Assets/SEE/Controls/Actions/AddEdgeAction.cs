@@ -93,6 +93,7 @@ namespace SEE.Controls.Actions
                         try
                         {
                             city.Renderer.DrawEdge(from, to);
+                            new AddEdgeNetAction(from.name, to.name).Execute(null);
                         }
                         catch (Exception e)
                         {
