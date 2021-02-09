@@ -1,6 +1,5 @@
 ﻿using SEE.GO;
 using SEE.GO.Menu;
-using System;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -79,7 +78,7 @@ namespace SEE.Controls.Actions
                                    entryOn: DrawEdgeOn,
                                    entryOff: null,
                                    isTransient: true),
-                //Creates a new Node
+                // Creates a new node
                 new MenuDescriptor(label: "New Node",
                                    spriteFile: menuEntrySprite,
                                    activeColor: Color.black,
@@ -87,7 +86,7 @@ namespace SEE.Controls.Actions
                                    entryOn: NewNodeOn,
                                    entryOff: null,
                                    isTransient: true),
-                //Starts the Edit-Node-Mode for editing an existing node
+                // Starts the Edit-Node mode for editing an existing node
                 new MenuDescriptor(label: "Edit Node",
                                    spriteFile: menuEntrySprite,
                                    activeColor: Color.yellow,
@@ -95,7 +94,7 @@ namespace SEE.Controls.Actions
                                    entryOn: EditNodeOn,
                                    entryOff: null,
                                    isTransient: true),
-                 //Starts the Scaling Mode for scaling an existing node
+                 // Starts the scaling mode for scaling an existing node
                 new MenuDescriptor(label: "Scale Node",
                                    spriteFile: menuEntrySprite,
                                    activeColor: Color.cyan,
@@ -121,7 +120,6 @@ namespace SEE.Controls.Actions
         private void ScaleNodeOn() => ActionState.Value = ActionState.Type.ScaleNode;
         private void EditNodeOn() => ActionState.Value = ActionState.Type.EditNode;
 
-
         /// <summary>
         /// Returns given <paramref name="color"/> lightened by 50%.
         /// </summary>
@@ -131,6 +129,5 @@ namespace SEE.Controls.Actions
         {
             return Color.Lerp(color, Color.white, 0.5f); // To lighten by 50 %
         }
-
     }
 }
