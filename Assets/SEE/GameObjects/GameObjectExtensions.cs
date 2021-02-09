@@ -7,7 +7,7 @@ using UnityEngine;
 namespace SEE.GO
 {
     /// <summary>
-    /// Provides extensions for GameObjects retrieving their ID.
+    /// Provides extensions for GameObjects.
     /// </summary>
     public static class GameObjectExtensions
     {
@@ -120,10 +120,11 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Sets the scale of this <paramref name="node"/> independent of the local scale from the parent
+        /// Sets the scale of this <paramref name="node"/> to <paramref name="scale"/> independent from 
+        /// the local scale from the parent.
         /// </summary>
-        /// <param name="node">object whose scale should be scaled</param>
-        /// <param name="scale">the new scale</param>
+        /// <param name="node">object whose scale should be set</param>
+        /// <param name="scale">the new scale in world space</param>
         public static void SetScale(this GameObject node, Vector3 scale)
         {
             Transform parent = node.transform.parent;
