@@ -32,8 +32,7 @@ public class CanvasGenerator : MonoBehaviour
     {
         if (gameObject.TryGetComponent(out AddingNodeCanvasAction action))
         {
-            action.DestroyCanvas();
-            Destroy(gameObject.GetComponent<AddingNodeCanvasAction>());
+            NodeCanvasAction.Destroy(action);
         }
     }
 
@@ -44,8 +43,7 @@ public class CanvasGenerator : MonoBehaviour
     {
         if (gameObject.TryGetComponent(out EditNodeCanvasAction action))
         {
-            action.DestroyCanvas();
-            Destroy(gameObject.GetComponent<EditNodeCanvasAction>());
+            NodeCanvasAction.Destroy(action);
         }
     }
 }

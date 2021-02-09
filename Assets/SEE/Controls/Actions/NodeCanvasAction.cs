@@ -22,11 +22,14 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Destroys <see cref="Canvas"/> and all its children.
+        /// Destroys <see cref="Canvas"/> of the <paramref name="action"/> and <paramref name="action"/>
+        /// itself.
         /// </summary>
-        public void DestroyCanvas()
-        {            
-            Destroy(Canvas);
+        public static void Destroy(ref NodeCanvasAction action)
+        {
+            Destroy(action.Canvas);
+            UnityEngine.Object.Destroy(action);
+            action = null;
         }
     }
 }
