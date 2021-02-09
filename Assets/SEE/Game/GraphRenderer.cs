@@ -243,14 +243,15 @@ namespace SEE.Game
             ICollection<LayoutEdge> layoutEdges = new List<LayoutEdge> { new LayoutEdge(fromLayoutNode, toLayoutNode, edge) };
             // Calculate the edge layout (for the single edge only).
             ICollection<GameObject> edges = EdgeLayout(layoutNodes, layoutEdges);
-            GameObject result = edges.FirstOrDefault();
+            GameObject resultingEdge = edges.FirstOrDefault();
+            InteractionDecorator.PrepareForInteraction(resultingEdge);
             // The edge becomes a child of the root node of the game-node hierarchy
             GameObject codeCity = SceneQueries.GetCodeCity(from.transform).gameObject;
             GameObject rootNode = SceneQueries.GetCityRootNode(codeCity).gameObject;                                        
-            result.transform.SetParent(rootNode.transform);
+            resultingEdge.transform.SetParent(rootNode.transform);
             // The portal of the new edge is inherited from the codeCity.
-            Portal.SetPortal(root: codeCity, gameObject: result);
-            return result;
+            Portal.SetPortal(root: codeCity, gameObject: resultingEdge);
+            return resultingEdge;
         }
 
         /// <summary>
@@ -333,6 +334,7 @@ namespace SEE.Game
             else
             {
                 result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), layoutEdges);
+                InteractionDecorator.PrepareForInteraction(result);
                 AddLOD(result);
             }            
             
@@ -1308,9 +1310,9 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Applies ADDLOD to every game object in <paramref name="gameObjects"/>.
+        /// Applies AddLOD to every game object in <paramref name="gameObjects"/>.
         /// </summary>
-        /// <param name="gameObjects">the list of game objects where ADDLOD is to be applied</param>
+        /// <param name="gameObjects">the list of game objects where AddLOD is to be applied</param>
         private void AddLOD(ICollection<GameObject> gameObjects)
         {
             foreach (GameObject go in gameObjects)

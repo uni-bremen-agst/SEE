@@ -24,7 +24,7 @@ namespace SEE.Controls.Actions
         /// Thus, this action will be executed only if the new state is 
         /// <see cref="ThisActionState"/>.
         /// </summary>
-        const ActionState.Type ThisActionState = ActionState.Type.DrawEdge;
+        const ActionState.Type ThisActionState = ActionState.Type.NewEdge;
 
         /// <summary>
         /// The source for the edge to be drawn.

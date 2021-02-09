@@ -107,6 +107,8 @@ namespace SEE.Game.Charts
                 }
             }
 
+            /// <param name="interactableObject">the object being selected</param>
+            /// <param name="isOwner">true if a local user initiated this call (unused)</param>
             private void OnSelect(InteractableObject o, bool isOwner)
             {
                 ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);
@@ -122,6 +124,8 @@ namespace SEE.Game.Charts
                 }
             }
 
+            /// <param name="interactableObject">the object being selected</param>
+            /// <param name="isOwner">true if a local user initiated this call (unused)</param>
             private void OnUnselect(InteractableObject o, bool isOwner)
             {
                 ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);
