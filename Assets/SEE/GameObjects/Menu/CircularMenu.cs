@@ -108,11 +108,10 @@ namespace SEE.GO.Menu
             }
         }
 
+        private bool menuIsOn = false;
         /// <summary>
         /// If true (and only if), the menu is visible.
         /// </summary>
-        private bool menuIsOn = false;
-
         public bool MenuIsOn { get => menuIsOn; set => menuIsOn = value; }
 
         /// <summary>
