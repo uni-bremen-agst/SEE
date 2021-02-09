@@ -30,9 +30,9 @@ public class CanvasGenerator : MonoBehaviour
     /// </summary>
     public void DestroyAddNodeCanvas()
     {
-        if (gameObject.TryGetComponent(out AddingNodeCanvasAction script))
+        if (gameObject.TryGetComponent(out AddingNodeCanvasAction action))
         {
-            script.DestroyGOAndAllChilds();
+            action.DestroyCanvas();
             Destroy(gameObject.GetComponent<AddingNodeCanvasAction>());
         }
     }
@@ -42,9 +42,9 @@ public class CanvasGenerator : MonoBehaviour
     /// </summary>
     public void DestroyEditNodeCanvas()
     {
-        if (gameObject.TryGetComponent(out EditNodeCanvasAction script))
+        if (gameObject.TryGetComponent(out EditNodeCanvasAction action))
         {
-            script.DestroyGOAndAllChilds();
+            action.DestroyCanvas();
             Destroy(gameObject.GetComponent<EditNodeCanvasAction>());
         }
     }
