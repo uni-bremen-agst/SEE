@@ -16,7 +16,6 @@ namespace SEE.Game.UI
     /// </summary>
     public abstract class PlatformDependentComponent: MonoBehaviour
     {
-
         /// <summary>
         /// Name of the canvas on which UI elements are placed.
         /// Note that for HoloLens, the canvas will be converted to an MRTK canvas.
@@ -75,7 +74,6 @@ namespace SEE.Game.UI
         /// Called when the <see cref="Update()"/> method of this component is executed on the HoloLens platform.
         /// </summary>
         protected virtual void UpdateHoloLens() => PlatformUnsupported();
-
         
         protected void Start()
         {
@@ -138,6 +136,5 @@ namespace SEE.Game.UI
                            + " Component will now self-destruct.");
             Destroyer.DestroyComponent(this);
         }
-
     }
 }

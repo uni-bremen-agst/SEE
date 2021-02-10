@@ -13,7 +13,6 @@ namespace SEE.GO.Menu
     /// </summary>
     public class PlayerMenu : MonoBehaviour
     {
-
         /// <summary>
         /// An array of all possible action state types the player can be in.
         /// </summary>

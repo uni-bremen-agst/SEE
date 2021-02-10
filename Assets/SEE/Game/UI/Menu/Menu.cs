@@ -14,7 +14,6 @@ namespace SEE.Game.UI
     /// <seealso cref="MenuEntry"/>
     public partial class Menu<T>: PlatformDependentComponent where T : MenuEntry
     {
-
         /// <summary>
         /// The name of this menu. Displayed to the user.
         /// </summary>

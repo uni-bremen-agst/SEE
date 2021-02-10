@@ -11,7 +11,6 @@ namespace SEE.Game.UI
     /// </summary>
     public partial class SelectionMenu
     {
-
         /// <summary>
         /// Path to the prefab containing the horizontal selector for the active selection.
         /// </summary>

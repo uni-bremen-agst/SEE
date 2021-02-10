@@ -16,7 +16,6 @@ namespace SEE.Game.UI
     /// <typeparam name="T">the type of entries used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
     public partial class Menu<T>
     {
-
         /// <summary>
         /// The path to the prefab for the menu game object.
         /// Will be added as a child to the <see cref="Canvas"/> if it doesn't exist yet.
@@ -68,7 +67,6 @@ namespace SEE.Game.UI
             SetUpDesktopWindow();
             SetUpDesktopContent();
         }
-
 
         /// <summary>
         /// Sets up the window of the menu. In this case, we use a <see cref="ModalWindowManager"/>, which
@@ -178,7 +176,6 @@ namespace SEE.Game.UI
                     iconImage.color = entry.DisabledColor.IdealTextColor();
                 }
             }
-            
         }
 
         /// <summary>
