@@ -45,7 +45,6 @@ namespace SEE.Game.UI
             get => active;
         }
 
-
         /// <summary>
         /// Instantiates and returns a new ToggleMenuEntry.
         /// </summary>
@@ -65,6 +64,5 @@ namespace SEE.Game.UI
             this.active = active;
             DoExitAction = exitAction ?? (() => {});
         }
-        
     }
 }
