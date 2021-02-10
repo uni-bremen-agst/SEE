@@ -86,7 +86,7 @@ namespace SEE.Game.UI
         /// <see cref="Entries"/></exception>
         public void SelectEntry(int index)
         {
-            if (index > Entries.Count)
+            if (index >= Entries.Count)
             {
                 throw new ArgumentOutOfRangeException($"Entry index {index} doesn't exist in "
                                                    + $"{Entries.Count}-element array entries.");

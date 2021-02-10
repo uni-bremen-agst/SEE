@@ -38,6 +38,7 @@ namespace SEE.Game.UI
         
         /// <summary>
         /// Whether this entry is currently enabled (i.e. whether it can be selected.)
+        /// Defaults to true.
         /// </summary>
         public bool Enabled;
 

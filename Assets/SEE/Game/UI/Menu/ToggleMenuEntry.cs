@@ -11,11 +11,6 @@ namespace SEE.Game.UI
     public class ToggleMenuEntry: MenuEntry
     {
         /// <summary>
-        /// Whether this entry is currently active (i.e., toggled).
-        /// </summary>
-        private bool Toggled;
-        
-        /// <summary>
         /// The action to be taken when the entry is deselected.
         /// </summary>
         private readonly UnityAction DoExitAction;
@@ -26,6 +21,11 @@ namespace SEE.Game.UI
         private Color inactiveColor => EntryColor.Lighter();
 
         /// <summary>
+        /// Whether this entry is currently active (i.e., toggled).
+        /// </summary>
+        private bool active;
+        
+        /// <summary>
         /// Whether this entry is currently active (i.e. toggled).
         /// Setting this value will automatically call <see cref="DoExitAction"/> on deactivation.
         /// Note that <see cref="DoAction"/> is <b>not</b> called and must be executed manually.
@@ -34,22 +34,22 @@ namespace SEE.Game.UI
         {
             set
             {
-                if (!value && Toggled)
+                if (!value && active)
                 {
                     // Will be disabled only when deactivating for the first time
                     DoExitAction();
                 }
-                Toggled = value;
+                active = value;
                 
             }
-            get => Toggled;
+            get => active;
         }
 
 
         /// <summary>
         /// Instantiates and returns a new ToggleMenuEntry.
         /// </summary>
-        /// <param name="toggled">Whether the entry should be active on creation.</param>
+        /// <param name="active">Whether the entry should be active on creation.</param>
         /// <param name="entryAction">What action to take when the entry is selected.</param>
         /// <param name="exitAction">What action to take when the entry is deselected. May be <c>null</c>.</param>
         /// <param name="title">The title of the entry.</param>
@@ -57,12 +57,12 @@ namespace SEE.Game.UI
         /// <param name="entryColor">The color with which this entry shall be displayed.</param>
         /// <param name="icon">The icon which will be displayed alongside this entry.</param>
         /// <param name="enabled">Whether this entry should be enabled on creation.</param>
-        public ToggleMenuEntry(bool toggled, UnityAction entryAction, UnityAction exitAction, string title, 
+        public ToggleMenuEntry(bool active, UnityAction entryAction, UnityAction exitAction, string title, 
                                string description = null, Color entryColor = default, Sprite icon = null,
                                bool enabled = true) 
             : base(entryAction, title, description, entryColor, enabled, icon)
         {
-            Toggled = toggled;
+            this.active = active;
             DoExitAction = exitAction ?? (() => {});
         }
         
