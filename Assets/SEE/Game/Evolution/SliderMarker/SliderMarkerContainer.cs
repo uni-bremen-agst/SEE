@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
-using System.Xml.Serialization;
 using System.IO;
+using System.Xml.Serialization;
+using UnityEngine;
 
 namespace SEE.Game.Evolution
 {

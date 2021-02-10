@@ -1,9 +1,9 @@
+using System;
+using System.Collections.Generic;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.GO;
 using SEE.Utils;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game
@@ -17,7 +17,7 @@ namespace SEE.Game
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in 
         /// <see cref="SEECity.Save(ConfigWriter)"/> and 
-        /// <see cref="SEECity.Restore(Dictionary{string, object})"/>, 
+        /// <see cref="SEECity.Restore(Dictionary{string,object})"/>, 
         /// respectively. You should also extend the test cases in TestConfigIO.
         
         /// <summary>

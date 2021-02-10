@@ -1,7 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
 using SEE.Game;
 using SEE.GO;
-using System;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
@@ -46,7 +46,7 @@ namespace SEE.Controls.Actions
             // An anonymous delegate is registered for the event <see cref="ActionState.OnStateChanged"/>.
             // This delegate will be called from <see cref="ActionState"/> upon every
             // state changed where the passed parameter is the newly entered state.
-            ActionState.OnStateChanged += (ActionState.Type newState) =>
+            ActionState.OnStateChanged += newState =>
             {
                 // Is this our action state where we need to do something?
                 if (newState == ThisActionState)
@@ -58,7 +58,7 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    // The monobehaviour is diabled and Update() no longer be called by Unity.
+                    // The monobehaviour is disabled and Update() no longer be called by Unity.
                     enabled = false;
                     InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
@@ -69,7 +69,13 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
-            Assert.IsTrue(ActionState.Is(ThisActionState));
+            if (!ActionState.Is(ThisActionState))
+            {
+                enabled = false;
+                InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
+                InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
+                return;
+            }
 
             // Assigning the game objects to be connected.
             // Checking whether the two game objects are not null and whether they are 

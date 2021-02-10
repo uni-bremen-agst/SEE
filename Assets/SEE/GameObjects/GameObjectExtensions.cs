@@ -28,8 +28,10 @@ namespace SEE.GO
                 {
                     return gameObject.name;
                 }
-
-                return edgeRef.edge.ID;
+                else
+                {
+                    return edgeRef.edge.ID;
+                }
             }
             return nodeRef.Value.ID;
         }
@@ -188,6 +190,21 @@ namespace SEE.GO
             else
             {
                 throw new Exception($"Game object {gameObject.name} has no NodeRef");
+            }
+        }
+        
+        /// <summary>
+        /// Enables/disables the renderers of <paramref name="gameObject"/> and all its
+        /// descendants so that they become visible/invisible.
+        /// </summary>
+        /// <param name="gameObject">objects whose renderer (and those of its children) is to be enabled/disabled</param>
+        /// <param name="isVisible">iff true, the renderers will be enabled</param>
+        private static void SetVisible(this GameObject gameObject, bool isVisible)
+        {
+            gameObject.GetComponent<Renderer>().enabled = isVisible;
+            foreach (Transform child in gameObject.transform)
+            {
+                SetVisible(child.gameObject, isVisible);
             }
         }
     }
