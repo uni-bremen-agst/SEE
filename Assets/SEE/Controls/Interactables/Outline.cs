@@ -143,8 +143,6 @@ namespace SEE.Controls
                 Portal.SetPortal(root, go);
                 result.UpdateMaterialProperties();
             }
-
-        End:
             return result;
         }
 
