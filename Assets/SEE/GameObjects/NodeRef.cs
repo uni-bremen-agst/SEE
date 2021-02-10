@@ -1,6 +1,6 @@
-﻿using SEE.DataModel.DG;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using SEE.DataModel.DG;
 using UnityEngine.Assertions;
 
 namespace SEE.GO

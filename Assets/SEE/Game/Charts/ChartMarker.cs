@@ -19,9 +19,9 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.Controls;
 using System.Collections.Generic;
 using System.Text;
+using SEE.Controls;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;

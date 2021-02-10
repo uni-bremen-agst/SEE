@@ -17,12 +17,12 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.Utils;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using SEE.Utils;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace SEE.Game.Evolution
 {

@@ -1,11 +1,11 @@
-﻿using SEE.DataModel;
+﻿using System.Collections.Generic;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game;
 using SEE.GO;
 using SEE.Tools;
 using SEE.Utils;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -397,7 +397,13 @@ namespace SEE.Controls.Actions
         private void Update()
         {
             // This script should be disabled, if the action state is not 'Map'
-            Assert.IsTrue(ActionState.Value == ActionState.Type.Map);
+            if (!ActionState.Is(ActionState.Type.Map))
+            {
+                enabled = false;
+                InteractableObject.AnySelectIn -= AnySelectIn;
+                InteractableObject.AnySelectOut -= AnySelectOut;
+                return;
+            }
 
             //------------------------------------------------------------------------
             // ARCHITECTURAL MAPPING
