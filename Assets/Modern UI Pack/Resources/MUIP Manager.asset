@@ -35,7 +35,7 @@ MonoBehaviour:
   dropdownThemeType: 0
   dropdownAnimationType: 2
   dropdownFont: {fileID: 11400000, guid: 4bd810f1cbcb0f446a8f5a31453e243f, type: 2}
-  dropdownFontSize: 25
+  dropdownFontSize: 20
   dropdownColor: {r: 0.21568628, g: 0.29411766, b: 0.37254903, a: 1}
   dropdownTextColor: {r: 1, g: 1, b: 1, a: 1}
   dropdownIconColor: {r: 1, g: 1, b: 1, a: 1}
@@ -49,7 +49,7 @@ MonoBehaviour:
   hSelectorInvertAnimation: 0
   hSelectorLoopSelection: 1
   inputFieldFont: {fileID: 11400000, guid: 4bd810f1cbcb0f446a8f5a31453e243f, type: 2}
-  inputFieldFontSize: 28
+  inputFieldFontSize: 20
   inputFieldColor: {r: 1, g: 1, b: 1, a: 1}
   modalWindowTitleFont: {fileID: 11400000, guid: fa328c1ae3ffb6b4583cf371153b0be6,
     type: 2}
@@ -82,7 +82,7 @@ MonoBehaviour:
   scrollbarColor: {r: 1, g: 1, b: 1, a: 1}
   scrollbarBackgroundColor: {r: 1, g: 1, b: 1, a: 0.09803922}
   sliderLabelFont: {fileID: 11400000, guid: 84dd14695854bbc43a5faa24fcf93d0d, type: 2}
-  sliderLabelFontSize: 24
+  sliderLabelFontSize: 20
   sliderThemeType: 0
   sliderColor: {r: 1, g: 1, b: 1, a: 1}
   sliderBackgroundColor: {r: 1, g: 1, b: 1, a: 0.09803922}
