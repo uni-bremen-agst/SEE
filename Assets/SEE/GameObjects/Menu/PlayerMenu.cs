@@ -42,7 +42,7 @@ namespace SEE.GO.Menu
         {
             ToggleMenuEntry[] entries = {
                 new ToggleMenuEntry(
-                    toggled: true,
+                    active: true,
                     entryAction: () => ActionState.Value = ActionState.Type.Move,
                     exitAction: null,
                     title: "Move",
@@ -51,7 +51,7 @@ namespace SEE.GO.Menu
                     icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Resources/Materials/Charts/MoveIcon.png")
                     ),
                 new ToggleMenuEntry(
-                    toggled: false,
+                    active: false,
                     entryAction: () => ActionState.Value = ActionState.Type.Delete,
                     exitAction: null,
                     title: "Delete",
@@ -60,7 +60,7 @@ namespace SEE.GO.Menu
                     icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Common/Trash.png")
                     ),
                 new ToggleMenuEntry(
-                    toggled: false,
+                    active: false,
                     entryAction: () => ActionState.Value = ActionState.Type.Rotate,
                     exitAction: null,
                     title: "Rotate",
@@ -69,7 +69,7 @@ namespace SEE.GO.Menu
                     icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Navigation/Refresh.png")
                     ),
                 new ToggleMenuEntry(
-                    toggled: false,
+                    active: false,
                     entryAction: () => ActionState.Value = ActionState.Type.Map,
                     exitAction: null,
                     title: "Map",
@@ -78,7 +78,7 @@ namespace SEE.GO.Menu
                     icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Map/Map.png")
                     ),
                 new ToggleMenuEntry(
-                    toggled: false,
+                    active: false,
                     entryAction: () => ActionState.Value = ActionState.Type.DrawEdge,
                     exitAction: null,
                     title: "Draw Edge",

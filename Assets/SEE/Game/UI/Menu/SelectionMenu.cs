@@ -13,7 +13,7 @@ namespace SEE.Game.UI
             // Disable all entries except the selected one, this will automatically call DoExitAction()
             foreach (ToggleMenuEntry listEntry in Entries)
             {
-                listEntry.Active = listEntry == entry;
+                listEntry.Active = Equals(listEntry, entry);
             }
             // This will ensure that DoAction() is called on entry
             base.OnEntrySelected(entry);
