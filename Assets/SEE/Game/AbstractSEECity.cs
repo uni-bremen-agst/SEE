@@ -624,6 +624,24 @@ namespace SEE.Game
         public float RDP = 0.05f;
 
         /// <summary>
+        /// Determines the amount of segments along the tubular.
+        /// </summary>
+        [Tooltip("The amount of segments along the tubular. Recommended: 50")]
+        public int TubularSegments = 50;
+
+        /// <summary>
+        /// Determines the radius of the tubular. 
+        /// </summary>
+        [Tooltip("The radius of the tubular. Recommended: 0.005")]
+        public float Radius = 0.005f;
+
+        /// <summary>
+        /// Determines the amount of segments around the tubular.
+        /// </summary>
+        [Tooltip("The amount of segments around the tubular. Recommended: 8")]
+        public int RadialSegments = 8;
+
+        /// <summary>
         /// Loads and returns the graph data from the GXL file with given <paramref name="filename"/>.
         /// </summary>
         /// <returns>the loaded graph (may be empty if a graph could not be loaded)</returns>
