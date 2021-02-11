@@ -1,10 +1,9 @@
 ﻿#if UNITY_EDITOR
 
-using SEE.Game;
-using SEE.Utils;
 using System.Collections.Generic;
+using SEE.DataModel.DG;
+using SEE.Game;
 using UnityEditor;
-using UnityEngine;
 
 namespace SEEEditor
 {
@@ -17,35 +16,10 @@ namespace SEEEditor
     [CanEditMultipleObjects]
     public abstract class StoredSEECityEditor : AbstractSEECityEditor
     {
-        private bool pressed = false;
-        private string path = "";
-
-        public override void OnInspectorGUI()
-        {
-            base.OnInspectorGUI();
-
-            SerializedProperty pathPrefix = serializedObject.FindProperty("pathPrefix");
-
-            EditorGUILayout.BeginHorizontal();
-            {
-                EditorGUILayout.PropertyField(pathPrefix, new GUIContent("Data path prefix"));
-                if (GUILayout.Button("Select"))
-                {
-                    pressed = true;
-                    path = Filenames.OnCurrentPlatform(EditorUtility.OpenFolderPanel("Select graph data directory", pathPrefix.stringValue, ""));
-                }
-                else if (pressed)
-                {
-                    pressed = false;
-                    if (!string.IsNullOrEmpty(path))
-                    {
-                        pathPrefix.stringValue = path;
-                    }
-                }
-            }
-            EditorGUILayout.EndHorizontal();
-            serializedObject.ApplyModifiedPropertiesWithoutUndo();
-        }
+        /// <summary>
+        /// Whether the "Relevant node types" foldout should be expanded.
+        /// </summary>
+        private bool showNodeTypes = true;
 
         /// <summary>
         /// Enables the user to select the node types to be visualized.
@@ -53,51 +27,60 @@ namespace SEEEditor
         /// <param name="city">city whose node types are to be selected</param>
         protected void ShowNodeTypes(AbstractSEECity city)
         {
-            GUILayout.Label("Node types:", EditorStyles.boldLabel);
-            // Make a copy to loop over the dictionary while making changes.
-            Dictionary<string, bool> selection = new Dictionary<string, bool>(city.SelectedNodeTypes);
-
-            int countSelected = 0;
-            foreach (KeyValuePair<string, bool> entry in selection)
+            showNodeTypes = EditorGUILayout.Foldout(showNodeTypes,
+                                                    "Relevant node types", true, EditorStyles.foldoutHeader);
+            if (showNodeTypes)
             {
-                city.SelectedNodeTypes[entry.Key] = EditorGUILayout.Toggle("  " + entry.Key, entry.Value);
+                // Make a copy to loop over the dictionary while making changes.
+                Dictionary<string, bool> selection = new Dictionary<string, bool>(city.SelectedNodeTypes);
 
-                if (city.SelectedNodeTypes[entry.Key])
-                {
-                    countSelected++;
+                int countSelected = 0;
+                foreach (KeyValuePair<string, bool> entry in selection)
+                {   
+                    // If selection contains the artifial node type, we like to neglect that
+                    // and do not show this to the user.
+                    if (!(entry.Key.Equals(Graph.UnknownType)))
+                    {
+                        city.SelectedNodeTypes[entry.Key] = EditorGUILayout.Toggle("  " + entry.Key, entry.Value);
+                        if (city.SelectedNodeTypes[entry.Key])
+                        {
+                            countSelected++;
+                        }
+                    }
                 }
-            }
 
-            if (city.CoseGraphSettings.loadedForNodeTypes.Count == 0)
-            {
-                city.CoseGraphSettings.showGraphListing = true;
-                return;
-            }
-
-            bool allTypes = true;
-            foreach (KeyValuePair<string, bool> kvp in city.CoseGraphSettings.loadedForNodeTypes)
-            {
-                if (city.SelectedNodeTypes.ContainsKey(kvp.Key))
+                if (city.CoseGraphSettings.LoadedForNodeTypes == null || city.CoseGraphSettings.LoadedForNodeTypes.Count == 0)
                 {
-                    allTypes = allTypes && city.SelectedNodeTypes[kvp.Key];
+                    ShowGraphListing = true;
                 }
                 else
                 {
-                    allTypes = false;
+                    bool allTypes = true;
+                    foreach (KeyValuePair<string, bool> kvp in city.CoseGraphSettings.LoadedForNodeTypes)
+                    {
+                        if (city.SelectedNodeTypes.ContainsKey(kvp.Key))
+                        {
+                            allTypes = allTypes && city.SelectedNodeTypes[kvp.Key];
+                        }
+                        else
+                        {
+                            allTypes = false;
+                        }
+
+                    }
+
+                    if (allTypes)
+                    {
+                        if (countSelected != city.CoseGraphSettings.LoadedForNodeTypes.Count)
+                        {
+                            allTypes = false;
+                        }
+                    }
+
+                    ShowGraphListing = allTypes;
                 }
-
             }
-
-            if (allTypes)
-            {
-                if (countSelected != city.CoseGraphSettings.loadedForNodeTypes.Count)
-                {
-                    allTypes = false;
-                }
-            }
-
-            city.CoseGraphSettings.showGraphListing = allTypes;
-        }
+        }   
     }
 }
 

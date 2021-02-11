@@ -27,10 +27,10 @@ Open issues: implementation of incremental analysis is missing.
 
 */
 
-using SEE.DataModel;
-using SEE.DataModel.DG;
 using System;
 using System.Collections.Generic;
+using SEE.DataModel;
+using SEE.DataModel.DG;
 using UnityEngine;
 
 namespace SEE.Tools
@@ -591,7 +591,7 @@ namespace SEE.Tools
         /// <param name="to">the target of the maps_to edge to be added to the mapping graph</param>
         public void Add_To_Mapping(Node from, Node to)
         {
-            if (Is_Mapper(from))
+            if (Is_Explicitly_Mapped(from))
             {
                 throw new Exception("node " + from.ID + " is already mapped explicitly.");
             }
@@ -616,6 +616,11 @@ namespace SEE.Tools
         }
 
         /// <summary>
+        /// The edge type maps-to edges mapping implementation entities onto architecture entities.
+        /// </summary>
+        private const string MapsToType = "Maps_To";
+
+        /// <summary>
         /// Adds a clone of 'from' and a clone of 'to' to the mapping graph if
         /// they do not have one already and adds a Maps_To edge in between.
         /// 
@@ -632,8 +637,8 @@ namespace SEE.Tools
             Node from_clone = CloneInMapping(from);
             Node to_clone = CloneInMapping(to);
             // add maps_to edge to _mapping
-            Edge mapsTo = new Edge();
-            mapsTo.Type = "Maps_To";
+            Edge mapsTo = new Edge(MapsToType + "#" + from_clone.ID + "#" + to_clone.ID);
+            mapsTo.Type = MapsToType;
             mapsTo.Source = from_clone;
             mapsTo.Target = to_clone;
             _mapping.AddEdge(mapsTo);
@@ -876,7 +881,7 @@ namespace SEE.Tools
             List<Node> result = new List<Node> { node };
             foreach (Node child in node.Children())
             {
-                if (!Is_Mapper(child))
+                if (!Is_Explicitly_Mapped(child))
                 {
                     result.AddRange(Mapped_Subtree(child));
                 }
@@ -932,7 +937,7 @@ namespace SEE.Tools
         /// <param name="maps_to">the mapping of impl_source onto arch_target as represented in _mapping</param>
         private void Delete_Maps_To(Node impl_source, Node arch_target, Edge maps_to)
         {
-            if (!Is_Mapper(impl_source))
+            if (!Is_Explicitly_Mapped(impl_source))
             {
                 throw new Exception("Implementation node " + impl_source + " is not mapped explicitly.");
             }
@@ -1330,7 +1335,7 @@ namespace SEE.Tools
         /// </summary>
         /// <param name="node">implementation node</param>
         /// <returns>true if node is explicitly mapped</returns>
-        public bool Is_Mapper(Node node)
+        public bool Is_Explicitly_Mapped(Node node)
         {
             return _explicit_maps_to_table.ContainsKey(node.ID);
         }
@@ -1358,7 +1363,7 @@ namespace SEE.Tools
                 //Debug.LogFormat("mapping child {0} of {1}\n", child.ID, root.ID);
 #endif
                 // child is contained in implementation
-                if (!Is_Mapper(child))
+                if (!Is_Explicitly_Mapped(child))
                 {
                     Add_Subtree_To_Implicit_Map(child, target);
                 }
@@ -1739,7 +1744,7 @@ namespace SEE.Tools
             // Note: there may be a specified as well as a propagated edge between the
             // same two architectural entities; hence, we may have multiple edges
             // in between
-            Edge result = new Edge
+            Edge result = new Edge("propagated#" + its_type + "#" + from.ID + "#" + to.ID)
             {
                 Type = its_type,
                 Source = from,

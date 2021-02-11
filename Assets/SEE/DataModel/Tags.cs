@@ -37,15 +37,18 @@ namespace SEE.DataModel
         public const string PowerBeam = "PowerBeam"; // For power beams
 
         // for game objects representing a UI element
-        public static string UI = "UI";
+        public const string UI = "UI";
+        
+        // for the main camera in the scene
+        public const string MainCamera = "MainCamera";
 
         /// <summary>
         /// All existing tags in one.
         /// </summary>
         public static readonly string[] All = new string[]
             { Graph, Node, Edge, NodePrefab, Text, Erosion, Decoration,
-              Path, Runtime, FunctionCall, CullingPlane, ChartContainer, Chart,
-              JLGVisualization};
+              Path, Runtime, FunctionCall, CullingPlane, ChartManager, ChartContainer, Chart,
+              JLGVisualization, UI, MainCamera};
 
         /// <summary>
         /// Returns any descendant (transitive children of <paramref name="gameObject"/> including
@@ -61,22 +64,21 @@ namespace SEE.DataModel
             {
                 return null;
             }
-            else if (gameObject.tag == tag)
+
+            if (gameObject.CompareTag(tag))
             {
                 return gameObject;
             }
-            else
+
+            foreach (Transform child in gameObject.transform)
             {
-                foreach (Transform child in gameObject.transform)
+                GameObject result = FindChildWithTag(child.gameObject, tag);
+                if (result != null)
                 {
-                    GameObject result = FindChildWithTag(child.gameObject, tag);
-                    if (result != null)
-                    {
-                        return result;
-                    }
+                    return result;
                 }
-                return null;
             }
+            return null;
         }
     }
 }

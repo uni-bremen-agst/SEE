@@ -6,6 +6,7 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
+using SEE.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -23,375 +24,314 @@ namespace SEEEditor
         /// </summary>
         private AbstractSEECity city;
 
+        /// <summary>
+        /// Whether the foldout for the global attributes of the city should be expanded.
+        /// </summary>
+        private bool showGlobalAttributes = true;
+
+        /// <summary>
+        /// Whether the leaf node attribute foldout should be expanded.
+        /// </summary>
+        private bool showLeafAttributes = true;
+
+        /// <summary>
+        /// Whether the inner node attribute foldout should be expanded.
+        /// </summary>
+        private bool showInnerAttributes = true;
+
+        /// <summary>
+        /// Whether the "nodes and node layout" foldout should be expanded.
+        /// </summary>
+        private bool showNodeLayout = true;
+        
+        /// <summary>
+        /// Whether the "Edges and edge layout" foldout should be expanded.
+        /// </summary>
+        private bool showEdgeLayout = true;
+
+        /// <summary>
+        /// Whether the "Compound spring embedder layout attributes" foldout should be expanded.
+        /// </summary>
+        private bool showCompoundSpringEmbedder = true;
+
+        /// <summary>
+        /// if true, listing of inner nodes with possible nodelayouts and inner node kinds is shown
+        /// </summary>
+        protected bool ShowGraphListing = true;
+
         public override void OnInspectorGUI()
         {
             city = target as AbstractSEECity;
 
-            GUILayout.Label("Attributes of leaf nodes", EditorStyles.boldLabel);
-            city.WidthMetric = EditorGUILayout.TextField("Width", city.WidthMetric);
-            city.HeightMetric = EditorGUILayout.TextField("Height", city.HeightMetric);
-            city.DepthMetric = EditorGUILayout.TextField("Depth", city.DepthMetric);
-            city.LeafStyleMetric = EditorGUILayout.TextField("Style", city.LeafStyleMetric);
-            city.LeafNodeColorRange.lower = EditorGUILayout.ColorField("Lower color", city.LeafNodeColorRange.lower);
-            city.LeafNodeColorRange.upper = EditorGUILayout.ColorField("Upper color", city.LeafNodeColorRange.upper);
-            city.LeafNodeColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)city.LeafNodeColorRange.NumberOfColors, 1, 15);
-            city.ShowLabel = EditorGUILayout.Toggle("Show labels", city.ShowLabel);
-            city.LeafLabelDistance = EditorGUILayout.FloatField("Label distance", city.LeafLabelDistance);
-            city.LeafLabelFontSize = EditorGUILayout.FloatField("Label font size", city.LeafLabelFontSize);
+            GlobalAttributes();
 
-            GUILayout.Label("Attributes of inner nodes", EditorStyles.boldLabel);
-            city.InnerNodeHeightMetric = EditorGUILayout.TextField("Height", city.InnerNodeHeightMetric);
-            city.InnerNodeStyleMetric = EditorGUILayout.TextField("Style", city.InnerNodeStyleMetric);
-            city.InnerNodeColorRange.lower = EditorGUILayout.ColorField("Lower color", city.InnerNodeColorRange.lower);
-            city.InnerNodeColorRange.upper = EditorGUILayout.ColorField("Upper color", city.InnerNodeColorRange.upper);
-            city.InnerNodeColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)city.InnerNodeColorRange.NumberOfColors, 1, 15);
-            city.InnerNodeShowLabel = EditorGUILayout.Toggle("Show labels", city.InnerNodeShowLabel);
-            city.InnerNodeLabelDistance = EditorGUILayout.FloatField("Label distance", city.InnerNodeLabelDistance);
-            city.InnerNodeLabelFontSize = EditorGUILayout.FloatField("Label font size", city.InnerNodeLabelFontSize);
+            EditorGUILayout.Separator();
 
-            GUILayout.Label("Nodes and node Layout", EditorStyles.boldLabel);
-            city.LeafObjects = (SEECity.LeafNodeKinds)EditorGUILayout.EnumPopup("Leaf nodes", city.LeafObjects);
-            city.NodeLayout = (NodeLayoutKind)EditorGUILayout.EnumPopup("Node layout", city.NodeLayout);
-            city.layoutPath = EditorGUILayout.TextField("Layout file", city.layoutPath);
+            LeafNodeAttributes();
 
-            GUILayout.BeginHorizontal();
-            EditorGUILayout.PrefixLabel("Inner nodes");
-            Dictionary<AbstractSEECity.InnerNodeKinds, string> shapeKinds = city.NodeLayout.GetInnerNodeKinds().ToDictionary(kind => kind, kind => kind.ToString());
+            EditorGUILayout.Separator();
 
-            if (shapeKinds.ContainsKey(city.InnerNodeObjects))
-            {
-                city.InnerNodeObjects = shapeKinds.ElementAt(EditorGUILayout.Popup(shapeKinds.Keys.ToList().IndexOf(city.InnerNodeObjects), shapeKinds.Values.ToArray())).Key;
-            }
-            else
-            {
-                city.InnerNodeObjects = shapeKinds.ElementAt(EditorGUILayout.Popup(shapeKinds.Keys.ToList().IndexOf(shapeKinds.First().Key), shapeKinds.Values.ToArray())).Key;
-            }
-            GUILayout.EndHorizontal();
+            InnerNodeAttributes();
 
-            city.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", city.ZScoreScale);
-            city.ShowErosions = EditorGUILayout.Toggle("Show erosions", city.ShowErosions);
-            city.MaxErosionWidth = EditorGUILayout.FloatField("Max. width of erosion icon", city.MaxErosionWidth);
+            EditorGUILayout.Separator();
+
+            NodeLayout();
+
+            EditorGUILayout.Separator();
 
             if (city.NodeLayout == NodeLayoutKind.CompoundSpringEmbedder)
             {
-                GUILayout.Label("Compound spring embedder layout attributes", EditorStyles.boldLabel);
-                city.CoseGraphSettings.EdgeLength = EditorGUILayout.IntField("Edge length", city.CoseGraphSettings.EdgeLength);
-                city.CoseGraphSettings.UseSmartIdealEdgeCalculation = EditorGUILayout.Toggle("Smart ideal edge length", city.CoseGraphSettings.UseSmartIdealEdgeCalculation);
-                city.CoseGraphSettings.PerLevelIdealEdgeLengthFactor = EditorGUILayout.FloatField("Level edge length factor", city.CoseGraphSettings.PerLevelIdealEdgeLengthFactor);
-                city.CoseGraphSettings.multiLevelScaling = EditorGUILayout.Toggle("MultiLevel-Scaling", city.CoseGraphSettings.multiLevelScaling);
-                city.CoseGraphSettings.UseSmartMultilevelScaling = EditorGUILayout.Toggle("Smart multilevel-scaling", city.CoseGraphSettings.UseSmartMultilevelScaling);
-                city.CoseGraphSettings.UseSmartRepulsionRangeCalculation = EditorGUILayout.Toggle("Smart repulsion range", city.CoseGraphSettings.UseSmartRepulsionRangeCalculation);
-                city.CoseGraphSettings.RepulsionStrength = EditorGUILayout.FloatField("Repulsion strength", city.CoseGraphSettings.RepulsionStrength);
-                city.CoseGraphSettings.GravityStrength = EditorGUILayout.FloatField("Gravity", city.CoseGraphSettings.GravityStrength);
-                city.CoseGraphSettings.CompoundGravityStrength = EditorGUILayout.FloatField("Compound gravity", city.CoseGraphSettings.CompoundGravityStrength);
-                /*city.CoseGraphSettings.useOptAlgorithm = EditorGUILayout.Toggle("Use Opt-Algorithm", city.CoseGraphSettings.useOptAlgorithm);
-                if (city.CoseGraphSettings.useOptAlgorithm)
+                CompoundSpringEmbedderAttributes();
+                EditorGUILayout.Separator();
+            }
+
+            EdgeLayout();
+
+            // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
+            // TODO: We may want to allow a user to define which node attributes should be mapped onto which icons
+        }
+
+        /// <summary>
+        /// Foldout for global settings (settings filename, LOD Culling) and buttons for 
+        /// loading and saving the settings.
+        /// </summary>
+        private void GlobalAttributes()
+        {
+            showGlobalAttributes = EditorGUILayout.Foldout(showGlobalAttributes,
+                                                           "Global attributes", true, EditorStyles.foldoutHeader);
+            if (showGlobalAttributes)
+            {                
+                city.CityPath = GetDataPath("Settings file", city.CityPath, Filenames.ExtensionWithoutPeriod(Filenames.ConfigExtension));
+                GUILayout.BeginHorizontal();
+                if (GUILayout.Button("Load", GUILayout.Width(50)))
                 {
-                    //city.CoseGraphSettings.useCalculationParameter = false; 
-                }*/
-                city.CoseGraphSettings.useCalculationParameter = EditorGUILayout.Toggle("Calc parameters automatically", city.CoseGraphSettings.useCalculationParameter);
-                city.CoseGraphSettings.useIterativeCalculation = EditorGUILayout.Toggle("Find parameters iteratively", city.CoseGraphSettings.useIterativeCalculation);
-                if (city.CoseGraphSettings.useCalculationParameter || city.CoseGraphSettings.useIterativeCalculation)
+                    city.Load();
+                }
+                if (GUILayout.Button("Save", GUILayout.Width(50)))
+                {
+                    city.Save();
+                }
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("LOD Culling");
+                city.LODCulling = EditorGUILayout.Slider(city.LODCulling, 0.0f, 1.0f);
+                GUILayout.EndHorizontal();
+            }
+
+            GUILayout.Label("Data", EditorStyles.boldLabel);
+
+            // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
+            // TODO: We may want to allow a user to define which node attributes should be mapped onto which icons
+        }
+
+        /// <summary>
+        /// Adds controls to set the attributes of <paramref name="dataPath"/>.
+        /// </summary>
+        /// <param name="label">a label in front of the controls shown in the inspector</param>
+        /// <param name="dataPath">the path to be set here</param>
+        /// <param name="extension">the extension the selected file should have (used as filter in file panel)</param>
+        /// <param name="fileDialogue">if true, a file panel is opened; otherwise a directory panel</param>
+        /// <returns>the resulting data specified as selected  by the user</returns>
+        protected DataPath GetDataPath(string label, DataPath dataPath, string extension = "", bool fileDialogue = true)
+        {
+            GUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(label);
+
+            GUILayout.BeginVertical();
+            GUILayout.BeginHorizontal();
+            dataPath.Root = (DataPath.RootKind)EditorGUILayout.EnumPopup(dataPath.Root, GUILayout.Width(100));
+            if (dataPath.Root == DataPath.RootKind.Absolute)
+            {
+                dataPath.AbsolutePath = EditorGUILayout.TextField(dataPath.AbsolutePath);
+            }
+            else
+            {
+                dataPath.RelativePath = EditorGUILayout.TextField(dataPath.RelativePath);
+            }
+            if (GUILayout.Button("...", GUILayout.Width(20)))
+            {
+                string selectedPath = fileDialogue ?
+                      EditorUtility.OpenFilePanel("Select file", dataPath.RootPath, extension)
+                    : EditorUtility.OpenFolderPanel("Select directory", dataPath.RootPath, extension);
+                if (!string.IsNullOrEmpty(selectedPath))
+                {
+                    dataPath.Set(selectedPath);
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.LabelField(dataPath.Path);
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.EndHorizontal();
+            return dataPath;
+        }
+
+        /// <summary>
+        /// Renders the GUI for Compound spring embedder layout attributes.
+        /// </summary>
+        private void CompoundSpringEmbedderAttributes()
+        {
+            showCompoundSpringEmbedder = EditorGUILayout.Foldout(showCompoundSpringEmbedder,
+                "Compound spring embedder layout attributes", true, EditorStyles.foldoutHeader);
+            if (showCompoundSpringEmbedder)
+            {
+                GUILayout.Label("", EditorStyles.boldLabel);
+                city.CoseGraphSettings.EdgeLength =
+                    EditorGUILayout.IntField("Edge length", city.CoseGraphSettings.EdgeLength);
+                city.CoseGraphSettings.UseSmartIdealEdgeCalculation =
+                    EditorGUILayout.Toggle("Smart ideal edge length",
+                        city.CoseGraphSettings.UseSmartIdealEdgeCalculation);
+                city.CoseGraphSettings.PerLevelIdealEdgeLengthFactor =
+                    EditorGUILayout.FloatField("Level edge length factor",
+                        city.CoseGraphSettings.PerLevelIdealEdgeLengthFactor);
+                city.CoseGraphSettings.MultiLevelScaling = EditorGUILayout.Toggle("MultiLevel-Scaling",
+                    city.CoseGraphSettings.MultiLevelScaling);
+                city.CoseGraphSettings.UseSmartMultilevelScaling =
+                    EditorGUILayout.Toggle("Smart multilevel-scaling",
+                        city.CoseGraphSettings.UseSmartMultilevelScaling);
+                city.CoseGraphSettings.UseSmartRepulsionRangeCalculation =
+                    EditorGUILayout.Toggle("Smart repulsion range",
+                        city.CoseGraphSettings.UseSmartRepulsionRangeCalculation);
+                city.CoseGraphSettings.RepulsionStrength = EditorGUILayout.FloatField("Repulsion strength",
+                    city.CoseGraphSettings.RepulsionStrength);
+                city.CoseGraphSettings.GravityStrength =
+                    EditorGUILayout.FloatField("Gravity", city.CoseGraphSettings.GravityStrength);
+                city.CoseGraphSettings.CompoundGravityStrength = EditorGUILayout.FloatField("Compound gravity",
+                    city.CoseGraphSettings.CompoundGravityStrength);
+                /*city.CoseGraphSettings.useOptAlgorithm = EditorGUILayout.Toggle("Use Opt-Algorithm", city.CoseGraphSettings.useOptAlgorithm);
+                    if (city.CoseGraphSettings.useOptAlgorithm)
+                    {
+                        //city.CoseGraphSettings.useCalculationParameter = false; 
+                    }*/
+                city.CoseGraphSettings.UseCalculationParameter =
+                    EditorGUILayout.Toggle("Calc parameters automatically",
+                        city.CoseGraphSettings.UseCalculationParameter);
+                city.CoseGraphSettings.UseIterativeCalculation =
+                    EditorGUILayout.Toggle("Find parameters iteratively",
+                        city.CoseGraphSettings.UseIterativeCalculation);
+                if (city.CoseGraphSettings.UseCalculationParameter ||
+                    city.CoseGraphSettings.UseIterativeCalculation)
                 {
                     city.ZScoreScale = true;
 
-                    city.CoseGraphSettings.multiLevelScaling = false;
+                    city.CoseGraphSettings.MultiLevelScaling = false;
                     city.CoseGraphSettings.UseSmartMultilevelScaling = false;
                     city.CoseGraphSettings.UseSmartIdealEdgeCalculation = false;
                     city.CoseGraphSettings.UseSmartRepulsionRangeCalculation = false;
                 }
             }
-
-            GUILayout.Label("Edges and edge Layout", EditorStyles.boldLabel);
-            city.EdgeLayout = (EdgeLayoutKind)EditorGUILayout.EnumPopup("Edge layout", city.EdgeLayout);
-            city.EdgeWidth = EditorGUILayout.FloatField("Edge width", city.EdgeWidth);
-            city.EdgesAboveBlocks = EditorGUILayout.Toggle("Edges above blocks", city.EdgesAboveBlocks);
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("Bundling tension");
-            city.Tension = EditorGUILayout.Slider(city.Tension, 0.0f, 1.0f);
-            EditorGUILayout.EndHorizontal();
-            city.RDP = EditorGUILayout.FloatField("RDP", city.RDP);
-
-            if (city.NodeLayout == NodeLayoutKind.CompoundSpringEmbedder)
-            {
-                if (city.CoseGraphSettings.rootDirs != null && city.CoseGraphSettings.rootDirs.Count > 0)
-                {
-                    GUILayout.Label("Choose sublayouts", EditorStyles.boldLabel);
-                    List<Node> roots = city.CoseGraphSettings.rootDirs;
-
-                    if (city.CoseGraphSettings.show.Count == 0)
-                    {
-                        foreach (Node root in roots)
-                        {
-                            TraverseThruNodesCounter(root);
-                        }
-                    }
-
-                    if (city.CoseGraphSettings.showGraphListing)
-                    {
-                        List<NodeLayoutKind> parentNodeLayouts = new List<NodeLayoutKind>();
-                        foreach (Node root in roots)
-                        {
-                            TraverseThruNodes(root, parentNodeLayouts);
-                        }
-                    }
-                }
-            }
-
-            EditorGUIUtility.labelWidth = 150;
-            GUILayout.Label("Measurements", EditorStyles.boldLabel);
-
-            city.calculateMeasurements = EditorGUILayout.Toggle("Calculate measurements", city.calculateMeasurements);
-
-            if (city.calculateMeasurements)
-            {
-                MeasurementsTable(city.Measurements);
-            }
-
-            GUILayout.Label("Data", EditorStyles.boldLabel);
-
-            // FIXME: Do want to set PathPrefix here?
-            //if (city.PathPrefix == null)
-            //{
-            //    // Application.dataPath (used within ProjectPath()) must not be called in a 
-            //    // constructor. That is why we need to set it here if it is not yet defined.
-            //    city.PathPrefix = UnityProject.GetPath();
-            //}
-
-            // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
-            // TODO: We may want to allow a user to define which node attributes should be mapped onto which icons
-
-            //groupEnabled = EditorGUILayout.BeginToggleGroup("Optional Settings", groupEnabled);
-            //myBool = EditorGUILayout.Toggle("Toggle", myBool);
-            //myFloat = EditorGUILayout.Slider("Slider", myFloat, -3, 3);
-            //myFloat = EditorGUILayout.Slider("Slider", myFloat, -3, 3);
-            //EditorGUILayout.EndToggleGroup();
         }
 
         /// <summary>
-        /// does the gui layout for the measurements table
+        /// Renders the GUI for Edges and edge layout.
         /// </summary>
-        /// <param name="measurements"></param>
-        private void MeasurementsTable(SortedDictionary<string, string> measurements)
+        private void EdgeLayout()
         {
-            int i = 0;
-            foreach (KeyValuePair<string, string> measure in measurements)
+            showEdgeLayout = EditorGUILayout.Foldout(showEdgeLayout, "Edges and edge layout", true, EditorStyles.foldoutHeader);
+            if (showEdgeLayout)
             {
+                city.EdgeLayout = (EdgeLayoutKind) EditorGUILayout.EnumPopup("Edge layout", city.EdgeLayout);
+                city.EdgeWidth = EditorGUILayout.FloatField("Edge width", city.EdgeWidth);
+                city.EdgesAboveBlocks = EditorGUILayout.Toggle("Edges above blocks", city.EdgesAboveBlocks);
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Label("Bundling tension");
+                city.Tension = EditorGUILayout.Slider(city.Tension, 0.0f, 1.0f);
+                EditorGUILayout.EndHorizontal();
+                city.RDP = EditorGUILayout.FloatField("RDP", city.RDP);
+            }
+        }
+
+        /// <summary>
+        /// Renders the GUI for Nodes and node layout.
+        /// </summary>
+        private void NodeLayout()
+        {
+            showNodeLayout = EditorGUILayout.Foldout(showNodeLayout, "Nodes and node layout", true, EditorStyles.foldoutHeader);
+            if (showNodeLayout)
+            {
+                city.LeafObjects = (SEECity.LeafNodeKinds) EditorGUILayout.EnumPopup("Leaf nodes", city.LeafObjects);
+                city.NodeLayout = (NodeLayoutKind) EditorGUILayout.EnumPopup("Node layout", city.NodeLayout);
+                city.LayoutPath = GetDataPath("Layout file", city.LayoutPath, "");
+
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(measure.Key, GUILayout.Width(200));
-                GUILayout.Label(measure.Value);
+                EditorGUILayout.PrefixLabel("Inner nodes");
+                Dictionary<AbstractSEECity.InnerNodeKinds, string> shapeKinds = city.NodeLayout.GetInnerNodeKinds()
+                    .ToDictionary(kind => kind, kind => kind.ToString());
+
+                if (shapeKinds.ContainsKey(city.InnerNodeObjects))
+                {
+                    city.InnerNodeObjects = shapeKinds.ElementAt(EditorGUILayout.Popup(
+                        shapeKinds.Keys.ToList().IndexOf(city.InnerNodeObjects), shapeKinds.Values.ToArray())).Key;
+                }
+                else
+                {
+                    city.InnerNodeObjects = shapeKinds.ElementAt(EditorGUILayout.Popup(
+                        shapeKinds.Keys.ToList().IndexOf(shapeKinds.First().Key), shapeKinds.Values.ToArray())).Key;
+                }
+
                 GUILayout.EndHorizontal();
 
-                if (i != measurements.Count - 1)
-                {
-                    HorizontalLine(Color.grey);
-                }
-                i++;
+                city.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", city.ZScoreScale);
+                city.ShowErosions = EditorGUILayout.Toggle("Show erosions", city.ShowErosions);
+                city.MaxErosionWidth = EditorGUILayout.FloatField("Max. width of erosion icon", city.MaxErosionWidth);
             }
         }
 
         /// <summary>
-        /// Displays a horizontal line
+        /// Renders the GUI for inner node attributes.
         /// </summary>
-        /// <param name="color">the color for the line</param>
-        private static void HorizontalLine(Color color)
+        private void InnerNodeAttributes()
         {
-            Color c = GUI.color;
-            GUI.color = color;
-            GUILayout.Box(GUIContent.none, SetupHorizontalLine());
-            GUI.color = c;
-        }
-
-        /// <summary>
-        /// returns a horizontal line
-        /// </summary>
-        /// <returns></returns>
-        private static GUIStyle SetupHorizontalLine()
-        {
-            GUIStyle horizontalLine;
-            horizontalLine = new GUIStyle();
-            horizontalLine.normal.background = EditorGUIUtility.whiteTexture;
-            horizontalLine.margin = new RectOffset(0, 0, 4, 4);
-            horizontalLine.fixedHeight = 1;
-            return horizontalLine;
-        }
-
-
-        /// <summary>
-        /// traverses thru the nodes and displays the sublayout hierarchie graph
-        /// </summary>
-        /// <param name="root"></param>
-        private void TraverseThruNodes(Node root, List<NodeLayoutKind> parentNodelayouts)
-        {
-            EditorGUIUtility.labelWidth = 80;
-            if (root.Children() != null && !root.IsLeaf())
+            showInnerAttributes = EditorGUILayout.Foldout(showInnerAttributes, "Attributes of inner nodes", true,
+                EditorStyles.foldoutHeader);
+            if (showInnerAttributes)
             {
-                GUILayout.BeginHorizontal();
-
-                GUILayout.Space(20 * root.Level);
-
-                if (root.Children() != null && root.Children().Count > 0)
-                {
-                    bool allLeaves = true;
-                    foreach (Node child in root.Children())
-                    {
-                        if (!child.IsLeaf())
-                        {
-                            allLeaves = false;
-                        }
-                    }
-
-                    if (!allLeaves)
-                    {
-                        bool showPosition = EditorGUILayout.Foldout(city.CoseGraphSettings.show[root.ID], root.ID, true);
-                        city.CoseGraphSettings.show[root.ID] = showPosition;
-
-                        if (showPosition)
-                        {
-                            ShowCheckBox(root, false, parentNodelayouts);
-
-                            GUILayout.EndHorizontal();
-
-                            if (root.Children() != null && root.Children().Count > 0)
-                            {
-                                foreach (Node child in root.Children())
-                                {
-                                    TraverseThruNodes(child, new List<NodeLayoutKind>(parentNodelayouts));
-                                }
-                            }
-                        }
-                        else
-                        {
-                            GUILayout.EndHorizontal();
-                        }
-                    }
-                    else
-                    {
-                        EditorGUIUtility.labelWidth = 80;
-                        GUILayout.Label(root.ID, GUILayout.Width(120));
-                        ShowCheckBox(root, true, parentNodelayouts);
-                        GUILayout.EndHorizontal();
-                    }
-                }
+                city.InnerNodeHeightMetric = EditorGUILayout.TextField("Height", city.InnerNodeHeightMetric);
+                city.InnerNodeStyleMetric = EditorGUILayout.TextField("Style", city.InnerNodeStyleMetric);
+                city.InnerNodeColorRange.lower = EditorGUILayout.ColorField("Lower color", city.InnerNodeColorRange.lower);
+                city.InnerNodeColorRange.upper = EditorGUILayout.ColorField("Upper color", city.InnerNodeColorRange.upper);
+                city.InnerNodeColorRange.NumberOfColors =
+                    (uint) EditorGUILayout.IntSlider("# Colors", (int) city.InnerNodeColorRange.NumberOfColors, 1, 15);
+                LabelSettings(ref city.InnerNodeLabelSettings);
             }
         }
 
         /// <summary>
-        /// displays the checkbox and dropdowns for each node
+        /// Renders the GUI for attributes of leaf nodes.
         /// </summary>
-        /// <param name="root"></param>
-        /// <param name="childrenAreLeaves"></param>
-        private void ShowCheckBox(Node root, bool childrenAreLeaves, List<NodeLayoutKind> parentNodeLayouts)
+        private void LeafNodeAttributes()
         {
-            GUILayout.FlexibleSpace();
-            GUILayout.BeginHorizontal();
-            GUILayoutOption[] guiOptionsToggle = { GUILayout.ExpandWidth(false), GUILayout.Width(20) };
-            bool toggle = EditorGUILayout.Toggle("", city.CoseGraphSettings.ListDirToggle[root.ID], guiOptionsToggle);
-            city.CoseGraphSettings.ListDirToggle[root.ID] = toggle;
-            //var checkedToggle = editorSettings.CoseGraphSettings.ListDirToggle.Where(predicate: kvp => kvp.Value);
-
-            if (toggle)
+            showLeafAttributes =
+                EditorGUILayout.Foldout(showLeafAttributes, "Attributes of leaf nodes", true, EditorStyles.foldoutHeader);
+            if (showLeafAttributes)
             {
-                ShowSublayoutEnum(city.CoseGraphSettings.DirNodeLayout[root.ID], root, childrenAreLeaves, parentNodeLayouts);
-            }
-            else
-            {
-                EditorGUI.BeginDisabledGroup(true);
-                ShowSublayoutEnum(NodeLayoutKind.CompoundSpringEmbedder, root, childrenAreLeaves, new List<NodeLayoutKind>());
-                EditorGUI.EndDisabledGroup();
-            }
-
-            GUILayout.EndHorizontal();
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            if (toggle)
-            {
-                ShowInnerNodesEnum(city.CoseGraphSettings.DirNodeLayout[root.ID], root);
-            }
-            else
-            {
-                EditorGUI.BeginDisabledGroup(true);
-                ShowInnerNodesEnum(city.CoseGraphSettings.DirNodeLayout[root.ID], root);
-                EditorGUI.EndDisabledGroup();
+                city.WidthMetric = EditorGUILayout.TextField("Width", city.WidthMetric);
+                city.HeightMetric = EditorGUILayout.TextField("Height", city.HeightMetric);
+                city.DepthMetric = EditorGUILayout.TextField("Depth", city.DepthMetric);
+                city.LeafStyleMetric = EditorGUILayout.TextField("Style", city.LeafStyleMetric);
+                city.LeafNodeColorRange.lower =
+                    EditorGUILayout.ColorField("Lower color", city.LeafNodeColorRange.lower);
+                city.LeafNodeColorRange.upper =
+                    EditorGUILayout.ColorField("Upper color", city.LeafNodeColorRange.upper);
+                city.LeafNodeColorRange.NumberOfColors = (uint) EditorGUILayout.IntSlider("# Colors",
+                    (int) city.LeafNodeColorRange.NumberOfColors, 1, 15);
+                LabelSettings(ref city.LeafLabelSettings);
             }
         }
 
         /// <summary>
-        /// Dropdown for the innernode Kinds 
+        /// Allows the user to set the attributes of <paramref name="labelSettings"/>.
         /// </summary>
-        /// <param name="nodeLayout"></param>
-        /// <param name="node"></param>
-        private void ShowInnerNodesEnum(NodeLayoutKind nodeLayout, Node node)
+        /// <param name="labelSettings">settings to be retrieved from the user</param>
+        private void LabelSettings(ref LabelSettings labelSettings)
         {
-            GUILayoutOption[] guiOptions = { GUILayout.ExpandWidth(false), GUILayout.Width(200) };
-            EditorGUIUtility.labelWidth = 80;
-            EditorGUILayout.PrefixLabel("Inner nodes");
-            Dictionary<AbstractSEECity.InnerNodeKinds, string> shapeKinds = nodeLayout.GetInnerNodeKinds().ToDictionary(kind => kind, kind => kind.ToString());
-
-            if (shapeKinds.ContainsKey(city.CoseGraphSettings.DirShape[node.ID]))
-            {
-                city.CoseGraphSettings.DirShape[node.ID] = shapeKinds.ElementAt(EditorGUILayout.Popup(shapeKinds.Keys.ToList().IndexOf(city.CoseGraphSettings.DirShape[node.ID]), shapeKinds.Values.ToArray(), guiOptions)).Key;
-            }
-            else
-            {
-                city.CoseGraphSettings.DirShape[node.ID] = shapeKinds.ElementAt(EditorGUILayout.Popup(shapeKinds.Keys.ToList().IndexOf(shapeKinds.First().Key), shapeKinds.Values.ToArray(), guiOptions)).Key;
-            }
-
-            EditorGUIUtility.labelWidth = 150;
-        }
-
-        /// <summary>
-        /// Dropdown for the sublayout kinds
-        /// </summary>
-        /// <param name="nodeLayout"></param>
-        /// <param name="root"></param>
-        /// <param name="childrenAreLeaves"></param>
-        private void ShowSublayoutEnum(NodeLayoutKind nodeLayout, Node root, bool childrenAreLeaves, List<NodeLayoutKind> parentNodeLayouts)
-        {
-            GUILayoutOption[] guiOptions = { GUILayout.ExpandWidth(false), GUILayout.Width(200) };
-            EditorGUIUtility.labelWidth = 80;
-            EditorGUILayout.PrefixLabel("Sublayouts");
-            Dictionary<NodeLayoutKind, string> subLayoutNodeLayouts = childrenAreLeaves ? city.SubLayoutsLeafNodes : city.SubLayoutsInnerNodes;
-
-            foreach (NodeLayoutKind layout in parentNodeLayouts)
-            {
-                List<NodeLayoutKind> possible = layout.GetPossibleSublayouts();
-                subLayoutNodeLayouts = subLayoutNodeLayouts.Where(elem => possible.Contains(elem.Key)).ToDictionary(x => x.Key, x => x.Value);
-            }
-
-            if (subLayoutNodeLayouts.ContainsKey(city.CoseGraphSettings.DirNodeLayout[root.ID]))
-            {
-                city.CoseGraphSettings.DirNodeLayout[root.ID] = subLayoutNodeLayouts.ElementAt(EditorGUILayout.Popup(subLayoutNodeLayouts.Keys.ToList().IndexOf(city.CoseGraphSettings.DirNodeLayout[root.ID]), subLayoutNodeLayouts.Values.ToArray(), guiOptions)).Key;
-
-            }
-            else
-            {
-                city.CoseGraphSettings.DirNodeLayout[root.ID] = subLayoutNodeLayouts.ElementAt(EditorGUILayout.Popup(subLayoutNodeLayouts.Keys.ToList().IndexOf(subLayoutNodeLayouts.First().Key), subLayoutNodeLayouts.Values.ToArray(), guiOptions)).Key;
-            }
-
-            parentNodeLayouts.Add(city.CoseGraphSettings.DirNodeLayout[root.ID]);
-            EditorGUIUtility.labelWidth = 150;
-        }
-
-        /// <summary>
-        /// traverses thru the nodes and adds them to a list
-        /// </summary>
-        /// <param name="root">the root node</param>
-        private void TraverseThruNodesCounter(Node root)
-        {
-            if (root.Children() != null && !root.IsLeaf())
-            {
-                city.CoseGraphSettings.show.Add(root.ID, true);
-                if (root.Children() != null || root.Children().Count > 0)
-                {
-                    foreach (Node child in root.Children())
-                    {
-                        TraverseThruNodesCounter(child);
-                    }
-                }
-            }
+            labelSettings.Show = EditorGUILayout.Toggle("Show labels", labelSettings.Show);
+            labelSettings.Distance = EditorGUILayout.FloatField("Label distance", labelSettings.Distance);
+            labelSettings.FontSize = EditorGUILayout.FloatField("Label font size", labelSettings.FontSize);
+            labelSettings.AnimationDuration = EditorGUILayout.FloatField("Label animation duration (in seconds)",
+                                                                         labelSettings.AnimationDuration);
         }
     }
 }

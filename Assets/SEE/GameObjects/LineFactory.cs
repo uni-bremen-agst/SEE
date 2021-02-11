@@ -5,7 +5,7 @@ namespace SEE.GO
     /// <summary>
     /// Sets attributes of lines.
     /// </summary>
-    internal class LineFactory
+    internal static class LineFactory
     {
         private const float defaultWidth = 0.1f;
 
@@ -44,7 +44,7 @@ namespace SEE.GO
             line.endWidth = width;
         }
 
-        public static void Draw(GameObject edge, Vector3[] linePoints, float width, Material material = null)
+        public static LineRenderer Draw(GameObject edge, Vector3[] linePoints, float width, Material material = null)
         {
             LineRenderer line = edge.GetComponent<LineRenderer>();
             if (line == null)
@@ -52,6 +52,7 @@ namespace SEE.GO
                 // edge does not yet have a renderer; we add a new one
                 line = edge.AddComponent<LineRenderer>();
             }
+
             line.useWorldSpace = true;
             if (material != null)
             {
@@ -64,7 +65,8 @@ namespace SEE.GO
             line.SetPositions(linePoints);
             SetDefaults(line);
             SetWidth(line, width);
-            SetColors(line);
+            SetColors(line);            
+            return line;
         }
     }
 }

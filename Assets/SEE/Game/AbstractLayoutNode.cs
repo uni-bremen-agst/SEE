@@ -1,6 +1,6 @@
-﻿using SEE.DataModel.DG;
+﻿using System.Collections.Generic;
+using SEE.DataModel.DG;
 using SEE.Layout;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game
@@ -19,10 +19,7 @@ namespace SEE.Game
         /// <summary>
         /// The underlying graph node represented by this laid out node.
         /// </summary>
-        public Node ItsNode
-        {
-            get => node;
-        }
+        public Node ItsNode => node;
 
         /// <summary>
         /// Constructor setting the graph <paramref name="node"/> corresponding to this layout node
@@ -73,7 +70,7 @@ namespace SEE.Game
         /// A unique ID for a node: the ID of the graph node underlying this layout node.
         /// </summary>
         /// <returns>unique ID for this node</returns>
-        public string ID { get => node.ID; }
+        public string ID => node.ID;
 
         /// <summary>
         /// The parent of this node. May be null if it has none.
@@ -108,7 +105,11 @@ namespace SEE.Game
 
         /// <summary>
         /// The set of children of this node. Note: For nodes for which IsLeaf
-        /// returns true, the empty list will be returned. 
+        /// is true, the empty list will be returned.
+        /// 
+        /// Note: If a child of the node in the underlying graph, has no
+        /// corresponding layout node (<see cref="to_layout_node"/>), it will be ignored silently. 
+        /// This is useful in situation where only a subset of nodes is to be considered for a layout.
         /// </summary>
         /// <returns>children of this node</returns>
         public ICollection<ILayoutNode> Children()
@@ -120,7 +121,14 @@ namespace SEE.Game
                 result = new List<ILayoutNode>(children.Count);
                 foreach (Node node in children)
                 {
-                    result.Add(to_layout_node[node]);
+                    if (to_layout_node.TryGetValue(node, out ILayoutNode layoutNode))
+                    {
+                        result.Add(layoutNode);
+                    }
+                    //else
+                    //{
+                    //    Debug.LogError($"Child {node.ID} of {ID} has no corresponding layout node.\n");
+                    //}
                 }
             }
             else

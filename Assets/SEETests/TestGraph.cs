@@ -17,9 +17,15 @@ namespace SEE.DataModel.DG
             return result;
         }
 
+        /// <summary>
+        /// Unique ID for edges.
+        /// </summary>
+        private static int edgeID = 1;
+
         private static Edge NewEdge(Graph graph, Node from, Node to, string type)
         {
-            Edge result = new Edge();
+            edgeID++;
+            Edge result = new Edge(edgeID.ToString());
             result.Type = type;
             result.Source = from;
             result.Target = to;
@@ -322,12 +328,12 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(3, ac.Depth());
             Assert.AreEqual(2, acc.Level);
             Assert.AreEqual(1, acc.Depth());
-            Assert.AreEqual(3, bc.Level);
+            Assert.AreEqual(2, bc.Level);
             Assert.AreEqual(2, bc.Depth());
-            Assert.AreEqual(4, bcc.Level);
+            Assert.AreEqual(3, bcc.Level);
             Assert.AreEqual(1, bcc.Depth());
             Assert.AreEqual(0, b.Level);
-            Assert.AreEqual(3, b.Depth());
+            Assert.AreEqual(1, b.Depth());
             Assert.AreEqual(4, g.MaxDepth);
         }
 

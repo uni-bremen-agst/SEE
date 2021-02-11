@@ -23,7 +23,7 @@ namespace SEE.Layout.NodeLayouts.Cose
     public static class CoseGeometry
     {
         /// <summary>
-        /// Calculates the amout of intersection between two rectangles
+        /// Calculates the amount of intersection between two rectangles
         /// </summary>
         /// <param name="rectA">the first rectangle</param>
         /// <param name="rectB">the second rectangle</param>
@@ -317,7 +317,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// </summary>
         /// <param name="rectA">the first rectangle</param>
         /// <param name="rectB">the second rectangle</param>
-        /// <param name="directions">the directions, -1 = left/ top, 1= right/bottom</param>
+        /// <param name="directions">the directions, -1 = left/top, 1 = right/bottom</param>
         private static void DecideDirectionsForOverlappingNodes(Rect rectA, Rect rectB, double[] directions)
         {
             if (rectA.center.x < rectB.center.x)
@@ -340,7 +340,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// calcualtes the separatoin amount between two given rectangles
+        /// calculates the separation amount between two given rectangles
         /// </summary>
         /// <param name="_rectA">the first rectangle</param>
         /// <param name="rectB">the second rectangle</param>

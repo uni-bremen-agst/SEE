@@ -20,12 +20,8 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Controls;
-using SEE.DataModel;
 using SEE.Utils;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Game.Charts
 {

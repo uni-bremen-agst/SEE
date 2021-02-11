@@ -1,6 +1,5 @@
-﻿using NUnit.Framework;
-using SEE.GO;
-using System.Collections;
+﻿using System.Collections;
+using NUnit.Framework;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;

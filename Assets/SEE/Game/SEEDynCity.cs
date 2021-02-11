@@ -1,27 +1,29 @@
 ﻿using SEE.DataModel;
 using SEE.DataModel.Runtime.IO;
 using SEE.Utils;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
 namespace SEE.Game
 {
+    /// <summary>
+    /// Configuration of a code city for the visualization of dynamic data in
+    /// traced at the level of method calls.
+    /// </summary>
     public class SEEDynCity : SEECity
     {
-        /// <summary>
-        /// The relative path for the DYN file containing the dynamic call graph.
-        /// </summary>
-        public string dynPath = "example_02.dyn";
+        /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
+        /// configuration file, make sure you save and restore it in 
+        /// <see cref="SEEDynCity.Save(ConfigWriter)"/> and 
+        /// <see cref="SEEDynCity.Restore(Dictionary{string, object})"/>, 
+        /// respectively. You should also extend the test cases in TestConfigIO.
 
         /// <summary>
-        /// Returns the concatenation of pathPrefix and dynPath. That is the complete
-        /// absolute path to the DYN file containing the additional metric values.
+        /// The path to the DYN file containing the trace data.
         /// </summary>
-        /// <returns>concatenation of pathPrefix and dynPath</returns>
-        public string DYNPath()
-        {
-            return PathPrefix + dynPath;
-        }
+        /// <returns>path of DYN file</returns>
+        public DataPath DYNPath = new DataPath();
 
         /// <summary>
         /// Loads the graph data from the GXL file with GXLPath() and the metrics
@@ -30,15 +32,8 @@ namespace SEE.Game
         /// </summary>
         public override void LoadData()
         {
-            if (string.IsNullOrEmpty(GXLPath))
-            {
-                Debug.LogError("Empty graph path.\n");
-            }
-            else
-            {
-                base.LoadData();
-                LoadDYN();
-            }
+            base.LoadData();
+            LoadDYN();
         }
 
         /// <summary>
@@ -47,7 +42,7 @@ namespace SEE.Game
         /// </summary>
         private void LoadDYN()
         {
-            string filename = DYNPath();
+            string filename = DYNPath.Path;
             if (string.IsNullOrEmpty(filename))
             {
                 Debug.LogError("Empty path for dynamic trace file.\n");
@@ -67,6 +62,31 @@ namespace SEE.Game
                 runtimeGO.tag = Tags.Runtime;
                 runtimeGO.AddComponent<Runtime.Runtime>().callTree = callTreeReader.CallTree;
             }
+        }
+
+        //----------------------------------------------------------------------------
+        // Input/output of configuration attributes
+        //----------------------------------------------------------------------------
+
+        // The labels for the configuration attributes in the configuration file.
+        private const string DYNPathLabel = "DYNPath";
+
+        /// <summary>
+        /// <see cref="AbstractSEECity.Save(ConfigWriter)"/>
+        /// </summary>
+        protected override void Save(ConfigWriter writer)
+        {
+            base.Save(writer);
+            DYNPath.Save(writer, DYNPathLabel);  
+        }
+
+        /// <summary>
+        /// <see cref="AbstractSEECity.Restore(Dictionary{string, object})"/>.
+        /// </summary>
+        protected override void Restore(Dictionary<string, object> attributes)
+        {
+            base.Restore(attributes);
+            DYNPath.Restore(attributes, DYNPathLabel);
         }
     }
 }

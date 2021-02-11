@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using SEE.Controls.Actions;
+using Microsoft.MixedReality.Toolkit.Input;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -21,8 +21,7 @@ namespace SEE.Controls
     /// Super class of the behaviours of game objects the player interacts with.
     /// </summary>
     [RequireComponent(typeof(Interactable))]
-    [RequireComponent(typeof(NodeRef))]
-    public sealed class InteractableObject : MonoBehaviour
+    public sealed class InteractableObject : MonoBehaviour, IMixedRealityFocusHandler
     {
         // Tutorial on grabbing objects:
         // https://www.youtube.com/watch?v=MKOc8J877tI&t=15s
@@ -110,27 +109,11 @@ namespace SEE.Controls
         /// </summary>
         public Net.Synchronizer InteractableSynchronizer { get; private set; }
 
-        /// <summary>
-        /// The local player to be informed about his/her own hovered, selected,
-        /// or grabbed objects.
-        /// </summary>
-        private PlayerActions localPlayerActions;
-
         private void Awake()
         {
             ID = nextID++;
             idToInteractableObjectDict.Add(ID, this);
-
-            interactable = GetComponent<Interactable>();
-            if (interactable == null)
-            {
-                Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
-            }
-        }
-
-        private void Start()
-        {
-            localPlayerActions = PlayerSettings.LocalPlayer?.GetComponent<PlayerActions>();
+            gameObject.TryGetComponentOrLog(out interactable);
         }
 
         /// <summary>
@@ -157,20 +140,28 @@ namespace SEE.Controls
             if (IsHovered)
             {
                 HoverIn?.Invoke(this, isOwner);
-                HoveredObjects.Add(this);
+                AnyHoverIn?.Invoke(this, isOwner);
                 if (isOwner)
                 {
-                    localPlayerActions?.HoverOn(gameObject);
+                    // The local player has hovered on this object and needs to be informed about it.
+                    // Non-local player are not concerned here.
+                    LocalHoverIn?.Invoke(this);
+                    LocalAnyHoverIn?.Invoke(this);
                 }
+                HoveredObjects.Add(this);
             }
             else
             {
                 HoverOut?.Invoke(this, isOwner);
-                HoveredObjects.Remove(this);
+                AnyHoverOut?.Invoke(this, isOwner);
                 if (isOwner)
                 {
-                    localPlayerActions?.HoverOff(gameObject);
+                    // The local player has finished hovering on this object and needs to be informed about it.
+                    // Non-local player are not concerned here.
+                    LocalHoverOut?.Invoke(this);
+                    LocalAnyHoverOut?.Invoke(this);
                 }
+                HoveredObjects.Remove(this);
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
@@ -234,20 +225,28 @@ namespace SEE.Controls
             if (select)
             {
                 SelectIn?.Invoke(this, isOwner);
-                SelectedObjects.Add(this);
+                AnySelectIn?.Invoke(this, isOwner);
                 if (isOwner)
                 {
-                    localPlayerActions?.SelectOn(gameObject);
+                    // The local player has selected this object and needs to be informed about it.
+                    // Non-local player are not concerned here.
+                    LocalSelectIn?.Invoke(this);
+                    LocalAnySelectIn?.Invoke(this);
                 }
+                SelectedObjects.Add(this);
             }
             else
             {
                 SelectOut?.Invoke(this, isOwner);
-                SelectedObjects.Remove(this);
+                AnySelectOut?.Invoke(this, isOwner);
                 if (isOwner)
                 {
-                    localPlayerActions?.SelectOff(gameObject);
+                    // The local player has deselected this object and needs to be informed about it.
+                    // Non-local player are not concerned here.
+                    LocalSelectOut?.Invoke(this);
+                    LocalAnySelectOut?.Invoke(this);
                 }
+                SelectedObjects.Remove(this);
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
@@ -281,19 +280,28 @@ namespace SEE.Controls
             if (grab)
             {
                 GrabIn?.Invoke(this, isOwner);
-                GrabbedObjects.Add(this);
+                AnyGrabIn?.Invoke(this, isOwner);
                 if (isOwner)
                 {
-                    localPlayerActions?.GrabOn(gameObject);
+                    // The local player has grabbed this object and needs to be informed about it.
+                    // Non-local player are not concerned here.
+                    LocalGrabIn?.Invoke(this);
+                    LocalAnyGrabIn?.Invoke(this);
                 }
+                GrabbedObjects.Add(this);
             }
             else
             {
                 GrabOut?.Invoke(this, isOwner);
+                AnyGrabOut?.Invoke(this, isOwner);
                 if (isOwner)
                 {
-                    localPlayerActions?.GrabOff(gameObject);
+                    // The local player has finished grabbing this object and needs to be informed about it.
+                    // Non-local player are not concerned here.
+                    LocalGrabOut?.Invoke(this);
+                    LocalAnyGrabOut?.Invoke(this);
                 }
+
                 // Hovering and selection are continuous operations, that is why we call them here
                 // when the object is in the focus but not grabbed any longer.
                 if (IsSelected)
@@ -346,6 +354,8 @@ namespace SEE.Controls
         /// A delegate to be called when a hovering event has happened (hover over
         /// or hover off the game object).
         /// </summary>
+        /// <param name="interactableObject">the object being hovered over</param>
+        /// <param name="isOwner">true if a local user initiated this call</param>
         public delegate void HoverAction(InteractableObject interactableObject, bool isOwner);
         /// <summary>
         /// Event to be triggered when this game object is being hovered over.
@@ -356,6 +366,21 @@ namespace SEE.Controls
         /// </summary>
         public event HoverAction HoverOut;
 
+        // FIXME: Needs documentation.
+        public delegate void AnyHoverAction(InteractableObject interactableObject, bool isOwner);
+        public static event AnyHoverAction AnyHoverIn;
+        public static event AnyHoverAction AnyHoverOut;
+
+        // FIXME: Needs documentation.
+        public delegate void LocalHoverAction(InteractableObject interactableObject);
+        public event LocalHoverAction LocalHoverIn;
+        public event LocalHoverAction LocalHoverOut;
+
+        // FIXME: Needs documentation.
+        public delegate void LocalAnyHoverAction(InteractableObject interactableObject);
+        public static event LocalAnyHoverAction LocalAnyHoverIn;
+        public static event LocalAnyHoverAction LocalAnyHoverOut;
+
         /// ----------------------------
         /// Selection event system
         /// ----------------------------
@@ -363,6 +388,8 @@ namespace SEE.Controls
         /// A delegate to be called when a selection event has happened (selecting
         /// or deselecting the game object).
         /// </summary>
+        /// <param name="interactableObject">the object being selected</param>
+        /// <param name="isOwner">true if a local user initiated this call</param>
         public delegate void SelectAction(InteractableObject interactableObject, bool isOwner);
         /// <summary>
         /// Event to be triggered when this game object is being selected.
@@ -373,6 +400,21 @@ namespace SEE.Controls
         /// </summary>
         public event SelectAction SelectOut;
 
+        // FIXME: Needs documentation.
+        public delegate void AnySelectAction(InteractableObject interactableObject, bool isOwner);
+        public static event AnySelectAction AnySelectIn;
+        public static event AnySelectAction AnySelectOut;
+
+        // FIXME: Needs documentation.
+        public delegate void LocalSelectAction(InteractableObject interactableObject);
+        public event LocalSelectAction LocalSelectIn;
+        public event LocalSelectAction LocalSelectOut;
+
+        // FIXME: Needs documentation.
+        public delegate void LocalAnySelectAction(InteractableObject interactableObject);
+        public static event LocalAnySelectAction LocalAnySelectIn;
+        public static event LocalAnySelectAction LocalAnySelectOut;
+
         /// ----------------------------
         /// Grabbing event system
         /// ----------------------------
@@ -380,6 +422,8 @@ namespace SEE.Controls
         /// A delegate to be called when a grab event has happened (grabbing
         /// or releasing the game object).
         /// </summary>
+        /// <param name="interactableObject">the object being grabbed</param>
+        /// <param name="isOwner">true if a local user initiated this call</param>
         public delegate void GrabAction(InteractableObject interactableObject, bool isOwner);
         /// <summary>
         /// Event to be triggered when this game object is being grabbed.
@@ -389,6 +433,30 @@ namespace SEE.Controls
         /// Event to be triggered when this game object is no longer grabbed.
         /// </summary>
         public event GrabAction GrabOut;
+
+        // FIXME: Needs documentation.
+        public delegate void AnyGrabAction(InteractableObject interactableObject, bool isOwner);
+        public static event AnyGrabAction AnyGrabIn;
+        public static event AnyGrabAction AnyGrabOut;
+
+        // FIXME: Needs documentation.
+        public delegate void LocalGrabAction(InteractableObject interactableObject);
+        public event LocalGrabAction LocalGrabIn;
+        public event LocalGrabAction LocalGrabOut;
+
+        // FIXME: Needs documentation.
+        public delegate void LocalAnyGrabAction(InteractableObject interactableObject);
+        public static event LocalAnyGrabAction LocalAnyGrabIn;
+        public static event LocalAnyGrabAction LocalAnyGrabOut;
+
+#if false // TODO(torben): will we ever need this?
+        public delegate void CollisionAction(InteractableObject interactableObject, Collision collision);
+        public event CollisionAction CollisionIn;
+        public event CollisionAction CollisionOut;
+
+        private void OnCollisionEnter(Collision collision) => CollisionIn?.Invoke(this, collision);
+        private void OnCollisionExit(Collision collision) => CollisionIn?.Invoke(this, collision);
+#endif
 
         //----------------------------------------------------------------
         // Mouse actions
@@ -425,6 +493,36 @@ namespace SEE.Controls
                 SetHoverFlag(HoverFlag.World, false, true);
             }
         }
+        
+        //----------------------------------------
+        // Actions called by the MRTK on HoloLens.
+        //----------------------------------------
+        
+        public void OnFocusEnter(FocusEventData eventData)
+        {
+            // In case of eye gaze, we discard the input.
+            // We handle eye gaze using the BaseEyeFocusHandler in order to only activate hovering mechanisms
+            // when the user dwells on the object, otherwise the sudden changes would be too jarring.
+            if (eventData.Pointer.InputSourceParent.SourceType != InputSourceType.Eyes)
+            {
+                SetHoverFlag(HoverFlag.World, true, true);
+            }
+        }
+
+        public void OnFocusExit(FocusEventData eventData)
+        {
+            // Similarly to OnFocusEnter(), we discard the input in case of eye gaze to avoid jarring changes.
+            if (eventData.Pointer.InputSourceParent.SourceType != InputSourceType.Eyes 
+                && !eventData.Pointer.PointerName.StartsWith("None"))
+            {
+                // Unfortunately, there seems to be a bug in the MRTK:
+                // The SourceType is falsely reported by the MRTK as "Hands" here
+                // (in contrast to OnFocusEnter(), where Eyes are correctly reported.)
+                // The only recognizable difference seems to be that the pointer isn't attached to any hand
+                // so it's just called "None Hand" instead of "Right Hand", we use this to detect it.
+                SetHoverFlag(HoverFlag.World, false, true);
+            }
+        }
 
         //----------------------------------------------------------------
         // Private actions called by the hand when the object is hovered.
@@ -434,13 +532,14 @@ namespace SEE.Controls
 
         private const Hand.AttachmentFlags AttachmentFlags
             = Hand.defaultAttachmentFlags
-            & (~Hand.AttachmentFlags.SnapOnAttach)
-            & (~Hand.AttachmentFlags.DetachOthers)
-            & (~Hand.AttachmentFlags.VelocityMovement);
+            & ~Hand.AttachmentFlags.SnapOnAttach
+            & ~Hand.AttachmentFlags.DetachOthers
+            & ~Hand.AttachmentFlags.VelocityMovement;
 
         private void OnHandHoverBegin(Hand hand) => SetHoverFlag(HoverFlag.World, true, true);
         private void OnHandHoverEnd(Hand hand) => SetHoverFlag(HoverFlag.World, false, true);
 
         #endregion
+
     }
 }
