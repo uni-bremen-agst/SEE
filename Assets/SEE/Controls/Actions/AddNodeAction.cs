@@ -200,7 +200,6 @@ namespace SEE.Controls.Actions
                     InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
                     hoveredObject = null;
-
                 }
             };
             enabled = ActionState.Is(ThisActionState);
