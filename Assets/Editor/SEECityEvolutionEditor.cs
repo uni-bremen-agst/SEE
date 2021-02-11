@@ -16,10 +16,11 @@ namespace SEEEditor
     public class SEECityEvolutionEditor : StoredSEECityEditor
     {
         public override void OnInspectorGUI()
-        {
+        {            
             base.OnInspectorGUI();
             SEECityEvolution city = target as SEECityEvolution;
-            city.maxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.maxRevisionsToLoad);
+            Attributes();
+            city.MaxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.MaxRevisionsToLoad);
             city.MarkerWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width of markers", city.MarkerWidth));
             city.MarkerHeight = Mathf.Max(0, EditorGUILayout.FloatField("Height of markers", city.MarkerHeight));
             ShowNodeTypes(city);
@@ -34,13 +35,14 @@ namespace SEEEditor
         /// <summary>
         /// Creates the buttons for loading the first graph of the evolution series.
         /// </summary>
-        protected void Buttons()
-        {            
+        private void Buttons()
+        {
             SEECityEvolution city = target as SEECityEvolution;
+          
             if (firstGraph == null && GUILayout.Button("Load First Graph"))
             {
                 firstGraph = city.LoadFirstGraph();
-                city.InspectSchema(firstGraph);                      
+                city.InspectSchema(firstGraph);
             }
             if (firstGraph != null && GUILayout.Button("Draw"))
             {
@@ -67,6 +69,17 @@ namespace SEEEditor
             // We assume here that this SEECity instance was added to a game object as
             // a component. The inherited attribute gameObject identifies this game object.
             graphRenderer.Draw(city.gameObject);
+        }
+
+        /// <summary>
+        /// Shows and sets the attributes of the SEECity managed here.
+        /// This method should be overridden by subclasses if they have additional
+        /// attributes to manage.
+        /// </summary>
+        protected void Attributes()
+        {
+            SEECityEvolution city = target as SEECityEvolution;
+            city.GXLDirectory = GetDataPath("GXL directory", city.GXLDirectory, fileDialogue: false);
         }
     }
 }

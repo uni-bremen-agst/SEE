@@ -31,11 +31,6 @@ namespace SEE.Game.Evolution
     /// </summary>
     public class AnimationDataModel : MonoBehaviour
     {
-        /// <summary>
-        /// TextField for the animation time in seconds, that is, the time in 
-        /// seconds for showing a single graph revision during auto-play animation.
-        /// </summary>
-        public Text AnimationLagText; // serialized by Unity
 
         /// <summary>
         /// TextField for the shown revision in game.
@@ -43,18 +38,77 @@ namespace SEE.Game.Evolution
         public Text RevisionNumberText; // serialized by Unity
 
         /// <summary>
-        /// Toggle that shows whether auto-play mode is active.
+        /// Slider to show the progress of the animation.
         /// </summary>
-        public Toggle AutoplayToggle; // serialized by Unity
+        public Slider Slider; // serialized by Unity
+
+        /// <summary>
+        /// Button to play/pause the animation.
+        /// </summary>
+        public Button PlayButton; // serialized by Unity
+
+        /// <summary>
+        /// Button to fast forward the animation.
+        /// </summary>
+        public Button FastForwardButton; // serialized by Unity
+
+        /// <summary>
+        /// Button to reverse/pause the animation.
+        /// </summary>
+        public Button ReverseButton; //serialized by Unity
+
+        /// <summary>
+        /// Button to fast forward the animation.
+        /// </summary>
+        public Button FastBackwardButton; // serialized by Unity
+
+        /// <summary>
+        /// Prefab for creating markers
+        /// </summary>
+        public Button MarkerPrefab; // serialized by Unity
+
+        /// <summary>
+        /// Prefab for creating comments
+        /// </summary>
+        public InputField CommentPrefab; // serialized by Unity
+
+        /// <summary>
+        /// Text of the play button.
+        /// </summary>
+        public Text PlayButtonText; // serialized by Unity
+
+        /// <summary>
+        /// Text of the reverse button.
+        /// </summary>
+        public Text ReverseButtonText; // serialized by Unity
+
+        /// <summary>
+        /// Text of the fast-forward button.
+        /// </summary>
+        public Text FastFowardButtonText; // serialized by Unity
+
+        /// <summary>
+        /// Text of the fast-backward button.
+        /// </summary>
+        public Text FastBackwardButtonText; // serialized by Unity
 
         /// <summary>
         /// Checks if all fields are initialized.
         /// </summary>
         private void Start()
         {
-            AnimationLagText.AssertNotNull("AnimationLagText");
             RevisionNumberText.AssertNotNull("RevisionNumberText");
-            AutoplayToggle.AssertNotNull("AutoplayToggle");
+            Slider.AssertNotNull("Slider");
+            PlayButton.AssertNotNull("PlayButton");
+            FastForwardButton.AssertNotNull("FastForwardButton");
+            ReverseButton.AssertNotNull("ReverseButton");
+            FastBackwardButton.AssertNotNull("FastBackwardButton");
+            MarkerPrefab.AssertNotNull("Marker");
+            CommentPrefab.AssertNotNull("Comment");
+            PlayButtonText.AssertNotNull("Text");
+            ReverseButtonText.AssertNotNull("Text");
+            FastFowardButtonText.AssertNotNull("Text");
+            FastBackwardButtonText.AssertNotNull("Text");
         }
     }
 }

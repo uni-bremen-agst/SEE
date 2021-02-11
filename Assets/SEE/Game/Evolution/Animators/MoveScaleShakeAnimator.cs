@@ -17,10 +17,11 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.Layout;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using SEE.Layout;
+using SEE.Utils;
 using UnityEngine;
 using SEE.Game.Charts;
 
@@ -49,7 +50,7 @@ namespace SEE.Game.Evolution
         private Vector3 NodeBeamDimensions = AdditionalBeamDetails.powerBeamDimensions;
 
         /// <summary>
-        /// Moves, scales, and then finally shakes (if <paramref name="wasModified"/>) the animated game object.
+        /// Moves, scales, and then finally shakes (if <paramref name="difference"/>) the animated game object.
         /// At the end of the animation, the method <paramref name="callbackName"/> will be called for the
         /// game object <paramref name="callBackTarget"/> with <paramref name="gameObject"/> as 
         /// parameter if <paramref name="callBackTarget"/> is not null. If <paramref name="callBackTarget"/>
@@ -57,13 +58,13 @@ namespace SEE.Game.Evolution
         /// </summary>
         /// <param name="gameObject">game object to be animated</param>
         /// <param name="layout">the node transformation to be applied</param>
-        /// <param name="wasModified">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph</param>
+        /// <param name="difference">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph</param>
         /// <param name="callBackTarget">an optional game object that should receive the callback</param>
         /// <param name="callbackName">the method name of the callback</param>
         protected override void AnimateToInternalWithCallback
                   (GameObject gameObject,
                    ILayoutNode layout,
-                   bool wasModified,
+                   Difference difference,
                    GameObject callBackTarget,
                    string callbackName,
                    Action<object> callback)
@@ -80,31 +81,18 @@ namespace SEE.Game.Evolution
                                      layout.LocalScale
                                    : gameObject.transform.parent.InverseTransformVector(layout.LocalScale);
 
-            //Debug.LogFormat("animating {0} from pos={1} scale={2} to pos={3} scale={4}\n",
-            //    gameObject.name,
-            //    gameObject.transform.position, gameObject.transform.localScale,
-            //    position, localScale);
-
             if (gameObject.transform.localScale != localScale)
             {
                 // Scale the object.
                 if (mustCallBack)
                 {
-                    iTween.ScaleTo(gameObject, iTween.Hash(
-                        "scale", localScale,
-                        "time", MaxAnimationTime,
-                        "oncompletetarget", callBackTarget,
-                        "oncomplete", callbackName,
-                        "oncompleteparams", gameObject
-                    ));
+                    Tweens.Scale(gameObject, localScale, MaxAnimationTime);
+                    callback?.Invoke(gameObject);
                     mustCallBack = false;
                 }
                 else
                 {
-                    iTween.ScaleTo(gameObject, iTween.Hash(
-                         "scale", localScale,
-                         "time", MaxAnimationTime
-                    ));
+                    Tweens.Scale(gameObject, localScale, MaxAnimationTime);
                 }
             }
 
@@ -113,23 +101,18 @@ namespace SEE.Game.Evolution
                 // Move the object.
                 if (mustCallBack)
                 {
-                    iTween.MoveTo(gameObject, iTween.Hash(
-                        "position", position,
-                        "time", MaxAnimationTime,
-                        "oncompletetarget", callBackTarget,
-                        "oncomplete", callbackName,
-                        "oncompleteparams", gameObject
-                    ));
+                    Tweens.Move(gameObject, position, MaxAnimationTime);
+                    callback?.Invoke(gameObject);
                     mustCallBack = false;
                 }
                 else
                 {
-                    iTween.MoveTo(gameObject, iTween.Hash("position", position, "time", MaxAnimationTime));
+                    Tweens.Move(gameObject, position, MaxAnimationTime);
                 }
             }
 
             // Shake the object if it was modified.
-            if (wasModified)
+            if (difference == Difference.Changed)
             {
                 NodeChangesBuffer.GetSingleton().changedNodeIDs.Add(gameObject.name);
                 // Changes the modified object's color to blue while animating
@@ -143,23 +126,13 @@ namespace SEE.Game.Evolution
 
                 if (mustCallBack)
                 {
-                    iTween.ShakeRotation(gameObject, iTween.Hash(
-                         "amount", new Vector3(0, 10, 0),
-                         "time", MaxAnimationTime / 2,
-                         "delay", MaxAnimationTime / 2,
-                         "oncompletetarget", callBackTarget,
-                         "oncomplete", callbackName,
-                         "oncompleteparams", gameObject
-                    ));
+                    Tweens.ShakeRotate(gameObject, MaxAnimationTime / 2, new Vector3(0, 10, 0));
+                    callback?.Invoke(gameObject);
                     mustCallBack = false;
                 }
                 else
                 {
-                    iTween.ShakeRotation(gameObject, iTween.Hash(
-                         "amount", new Vector3(0, 10, 0),
-                         "time", MaxAnimationTime / 2,
-                         "delay", MaxAnimationTime / 2
-                    ));
+                    Tweens.ShakeRotate(gameObject, MaxAnimationTime / 2, new Vector3(0, 10, 0));
                 }
             }
             if (mustCallBack)

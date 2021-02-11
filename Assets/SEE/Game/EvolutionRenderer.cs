@@ -1,4 +1,4 @@
-﻿//Copyright 2020 Florian Garbade
+//Copyright 2020 Florian Garbade
 
 //Permission is hereby granted, free of charge, to any person obtaining a
 //copy of this software and associated documentation files (the "Software"),
@@ -16,7 +16,6 @@
 //LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 
 using SEE.DataModel.DG;
 using SEE.Game.Evolution;
@@ -98,12 +97,15 @@ namespace SEE.Game
                 Assert.IsNotNull(graphRenderer);
                 diff = new NumericAttributeDiff(value.AllMetricAttributes());
                 objectManager = new ObjectManager(graphRenderer, gameObject);
-                float markerHeight = 1.0f;
-                float markerWidth = 1.0f;
                 if (gameObject.TryGetComponent<SEECityEvolution>(out SEECityEvolution cityEvolution))
                 {
-                    markerHeight = cityEvolution.MarkerHeight;
-                    markerWidth = cityEvolution.MarkerWidth;
+                    marker = new Marker(graphRenderer,
+                                        markerWidth: cityEvolution.MarkerWidth,
+                                        markerHeight: cityEvolution.MarkerHeight,
+                                        additionColor: cityEvolution.AdditionBeamColor,
+                                        changeColor: cityEvolution.ChangeBeamColor,
+                                        deletionColor: cityEvolution.DeletionBeamColor,
+                                        duration: AnimationLag);
                 }
                 else
                 {
@@ -111,7 +113,6 @@ namespace SEE.Game
                                          name);
                     enabled = false;
                 }
-                marker = new Marker(graphRenderer, markerWidth, markerHeight);
             }
         }
 
@@ -154,6 +155,21 @@ namespace SEE.Game
         /// Whether the animation is still ongoing.
         /// </summary>
         private bool _isStillAnimating = false;  // serialized by Unity
+
+        /// <summary>
+        /// Whether the edge animation is ongoing.
+        /// </summary>
+        private bool moveEdges = false;
+
+        /// <summary>
+        /// Saves pairs of old and new edges.
+        /// </summary>
+        private IList<(GameObject, GameObject)> matchedEdges;
+
+        /// <summary>
+        /// Timer for edge animation
+        /// </summary>
+        private float timer = 0f;
 
         /// <summary>
         /// True if animation is still ongoing.
@@ -232,6 +248,8 @@ namespace SEE.Game
         /// Allows the comparison of two instances of <see cref="Node"/> from different graphs.
         /// </summary>
         private readonly NodeEqualityComparer nodeEqualityComparer = new NodeEqualityComparer();
+
+        private readonly EdgeEqualityComparer edgeEqualityComparer = new EdgeEqualityComparer();
 
         /// <summary>
         /// All pre-computed layouts for the whole graph series.
@@ -455,9 +473,9 @@ namespace SEE.Game
                 // For all edges of the current graph not in the next graph; that is, all
                 // edges removed: remove those. As above, edges are compared by their
                 // IDs.
-                // FOR ANIMATION: current.Graph?
-                // FOR ANIMATION:     .Edges().Except(next.Graph.Edges(), edgeEqualityComparer).ToList()
-                // FOR ANIMATION:     .ForEach(RenderRemovedOldEdge);
+                 current.Graph?
+                     .Edges().Except(next.Graph.Edges(), edgeEqualityComparer).ToList()
+                     .ForEach(RenderRemovedOldEdge);
             }
             // We need to assign _nextCity because the callback RenderPlane, RenderInnerNode, RenderLeaf, and 
             // RenderEdge will access it.
@@ -477,11 +495,22 @@ namespace SEE.Game
             // We have made the transition to the next graph.
             _currentCity = next;
             RenderPlane();
+            
+            Invoke("AnimateEdges", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
+        }
+
+        /// <summary>
+        /// Event function triggered when the knot animation is finished. Starts the animation of the edges.
+        /// </summary>
+        private void AnimateEdges()
+        {
+            //Starts the edge animation
+            MoveEdges();
             Invoke("OnAnimationsFinished", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
         }
 
         /// <summary>
-        /// Event function triggered when alls animations are finished. Renders all edges
+        /// Event function triggered when alls animations are finished. Animates the transition of the edges and renders all edges
         /// as new and notifies everyone that the animation is finished.
         /// </summary>
         private void OnAnimationsFinished()
@@ -489,8 +518,10 @@ namespace SEE.Game
             // Destroy all previous edges and draw all edges of next graph. This can only
             // be done when nodes have reached their final position, that is, at the end
             // of the animation cycle.
+            
             objectManager.RenderEdges();
-
+            // Stops the edge animation
+            moveEdges = false;
             IsStillAnimating = false;
             AnimationFinishedEvent.Invoke();
         }
@@ -517,11 +548,101 @@ namespace SEE.Game
                 // We are re-using the existing plane, hence, we animate its change
                 // (new position and new scale).
                 objectManager.GetPlaneTransform(out Vector3 centerPosition, out Vector3 scale);
-                iTween.ScaleTo(plane, iTween.Hash(
-                         "scale", scale,
-                         "time", moveAnimator.MaxAnimationTime
-                    ));
-                iTween.MoveTo(plane, iTween.Hash("position", centerPosition, "time", moveAnimator.MaxAnimationTime));
+
+                Tweens.Scale(plane, scale, moveAnimator.MaxAnimationTime);
+                Tweens.Move(plane, centerPosition, moveAnimator.MaxAnimationTime);
+            }
+        }
+
+        /// <summary>
+        /// Combines the edges of the old and the new graph by their ID. Called by the MoveEdges method
+        /// </summary>
+        /// <param name="oldEdges">List of currently drawn edges</param>
+        /// <param name="newEdges">List of new edges to be drawn</param>
+        /// <returns>List of related edges</returns>
+        protected virtual IList<(GameObject, GameObject)> EdgeMatcher(IList<GameObject> oldEdges, IList<GameObject> newEdges)
+        {
+            IList<(GameObject, GameObject)> result = new List<(GameObject, GameObject)>();
+            foreach (GameObject oldEdgeGameObject in oldEdges)
+            {
+                foreach (GameObject newEdgeGameObject in newEdges)
+                {                    
+                    if (oldEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef oldEdgeRef) 
+                        && newEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef newEdgeRef)
+                        && oldEdgeRef.edge.Equals(newEdgeRef.edge))
+                    {
+                        result.Add((oldEdgeGameObject, newEdgeGameObject));
+                    }
+                }
+            }
+            return result;
+        }
+        
+        /// <summary>
+        /// Calculates the control points of the edges of the next graph and generates their actual line points from them. 
+        /// </summary>
+        protected virtual void MoveEdges()
+        {
+           try
+           {
+                // Calculates the edges for the next graph
+                IList<GameObject> newEdges = objectManager.CalculateNewEdgeControlPoints().ToList();
+                IList<GameObject> oldEdges = objectManager.GetEdges().ToList();
+                
+                // Searches for pairs between old and new edges
+                matchedEdges =  EdgeMatcher(oldEdges,newEdges);              
+                // Case distinction in case the layout does not need sample points
+                if(!graphRenderer.GetSettings().EdgeLayout.Equals(SEE.Layout.EdgeLayouts.EdgeLayoutKind.Straight))
+                {
+                    foreach((GameObject oldEdge, GameObject newEdge) in matchedEdges)
+                    {
+                        oldEdge.TryGetComponent<Points>(out Points oP);
+                        newEdge.TryGetComponent<Points>(out Points nP);
+
+                        uint sampleRate = (uint)Math.Max(oP.linePoints.Count(),nP.linePoints.Count());
+
+                        // Creates new line points from the control points 
+                        oP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(oP.controlPoints, sampleRate);
+                        nP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(nP.controlPoints, sampleRate);
+
+                        // Saves the new line points to the LineRenderer
+                        oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
+                        lineRenderer.positionCount = oP.linePoints.Count();
+                        lineRenderer.SetPositions(oP.linePoints);
+                    }
+                }
+                    // Sets the timer for the animation to zero
+                    timer = 0f;
+                    // Starts the animation of the edges
+                    moveEdges = true;
+            }
+            catch (ArgumentNullException)
+            {
+                moveEdges = false;
+            }
+        }
+        
+        /// <summary>
+        /// Interpolates the points of the old edges with those of the new edges over time.
+        /// </summary>
+        void Update()
+        {
+            if (moveEdges) 
+            {
+                timer += Time.deltaTime;
+                 foreach ((GameObject oldEdge, GameObject newEdge) in matchedEdges)
+                 {
+                    if (oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer)
+                        && newEdge.TryGetComponent<Points>(out Points newLinePoints))
+                    {
+                        for (int i = 0; i < lineRenderer.positionCount; i++)
+                        {
+                            lineRenderer.SetPosition(i, Vector3.Lerp(lineRenderer.GetPosition(i),
+                                                                     newLinePoints.linePoints[i],
+                                                                     timer / AnimationDuration));
+                        }
+                    }
+                }
             }
         }
 
@@ -536,7 +657,7 @@ namespace SEE.Game
         /// <param name="gameNode">game node object that was just modified by the animation</param>
         public void OnRenderNodeFinishedAnimation(object gameNode)
         {
-            if (gameNode != null && gameNode is GameObject)
+            if (gameNode is GameObject)
             {
                 graphRenderer.AdjustStyle(gameNode as GameObject);
             }
@@ -564,9 +685,7 @@ namespace SEE.Game
             // the game node representing the graphNode if there is any; null if there is none
             Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject currentGameNode);
 
-            // will be true iff the node existed in the previous graph and any of its node
-            // attributes were changed
-            bool wasModified;
+            Difference difference;
             if (formerGraphNode == null)
             {
                 // The node is new. It has no layout applied to it yet.
@@ -581,13 +700,22 @@ namespace SEE.Game
                 position.y += layoutNode.LocalScale.y;
                 layoutNode.CenterPosition = position;
                 marker.MarkBorn(currentGameNode);
-                wasModified = false;
+                difference = Difference.Added;
             }
             else
             {
-                wasModified = diff.AreDifferent(formerGraphNode, graphNode);
+                // node existed before
+                if (diff.AreDifferent(formerGraphNode, graphNode))
+                {
+                    difference = Difference.Changed;
+                    marker.MarkChanged(currentGameNode);
+                }
+                else
+                {
+                    difference = Difference.None;
+                }
             }
-            moveScaleShakeAnimator.AnimateTo(currentGameNode, layoutNode, wasModified, OnRenderNodeFinishedAnimation);
+            moveScaleShakeAnimator.AnimateTo(currentGameNode, layoutNode, difference, OnRenderNodeFinishedAnimation);
         }
 
         /// <summary>
@@ -618,7 +746,7 @@ namespace SEE.Game
                 Vector3 newPosition = block.transform.position;
                 newPosition.y = -block.transform.localScale.y;
                 ILayoutNode nodeTransform = new AnimationNode(newPosition, block.transform.localScale);
-                moveScaleShakeAnimator.AnimateTo(block, nodeTransform, false, OnRemovedNodeFinishedAnimation);
+                moveScaleShakeAnimator.AnimateTo(block, nodeTransform, Difference.Deleted, OnRemovedNodeFinishedAnimation);
             }
         }
 
@@ -635,10 +763,10 @@ namespace SEE.Game
         /// Removes the given edge. The edge is not destroyed, however.
         /// </summary>
         /// <param name="edge"></param>
-        /// FOR ANIMATION: protected virtual void RenderRemovedOldEdge(Edge edge)
-        /// FOR ANIMATION: {
-        /// FOR ANIMATION: // FIXME.
-        /// FOR ANIMATION: }
+        protected virtual void RenderRemovedOldEdge(Edge edge)
+        {
+            objectManager.RemoveEdge(edge);
+        }
 
         // **********************************************************************
 
@@ -661,6 +789,7 @@ namespace SEE.Game
             set
             {
                 AnimationDuration = value;
+                marker?.SetDuration(value);
                 shownGraphHasChangedEvent.Invoke();
             }
         }
@@ -694,6 +823,11 @@ namespace SEE.Game
         private bool _isAutoplay = false;  // not serialized by Unity
 
         /// <summary>
+        /// Whether the user has selected reverse auto-play mode.
+        /// </summary>
+        private bool _isAutoplayReverse = false;  // not serialized by Unity
+
+        /// <summary>
         /// Returns true if automatic animations are active.
         /// </summary>
         public bool IsAutoPlay
@@ -705,6 +839,20 @@ namespace SEE.Game
                 _isAutoplay = value;
             }
         }
+
+        /// <summary>
+        /// Returns true if automatic reverse animations are active.
+        /// </summary>
+        public bool IsAutoPlayReverse
+        {
+            get => _isAutoplayReverse;
+            private set
+            {
+                shownGraphHasChangedEvent.Invoke();
+                _isAutoplayReverse = value;
+            }
+        }
+
 
         /// <summary>
         /// Initiates the visualization of the evolving series of <paramref name="graphs"/>.
@@ -747,7 +895,7 @@ namespace SEE.Game
                 Debug.Log("The renderer is already occupied with animating, wait till animations are finished.\n");
                 return false;
             }
-            if (IsAutoPlay)
+            if (IsAutoPlay || IsAutoPlayReverse)
             {
                 Debug.Log("Auto-play mode is turned on. You cannot move to the next graph manually.\n");
                 return false;
@@ -820,7 +968,7 @@ namespace SEE.Game
                 Debug.Log("The renderer is already occupied with animating, wait till animations are finished.\n");
                 return;
             }
-            if (IsAutoPlay)
+            if (IsAutoPlay || IsAutoPlayReverse)
             {
                 Debug.Log("Auto-play mode is turned on. You cannot move to the next graph manually.\n");
                 return;
@@ -861,22 +1009,18 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// If we are at the begin of the graph series, nothing happens.
+        /// If we are at the beginning of the graph series, false is returned and nothing else happens.
         /// Otherwise we make the transition from the currently shown graph to its 
         /// direct predecessor graph in the graph series. CurrentGraphIndex is decreased
         /// by one accordingly.
         /// </summary>
-        public void ShowPreviousGraph()
+        /// <returns>true iff we are not at the beginning of the graph series</returns>
+        private bool ShowPreviousIfPossible()
         {
-            if (IsStillAnimating || IsAutoPlay)
-            {
-                Debug.Log("The renderer is already occupied with animating, wait till animations are finished.\n");
-                return;
-            }
             if (CurrentGraphIndex == 0)
             {
                 Debug.Log("This is already the first graph revision.\n");
-                return;
+                return false;
             }
             CurrentGraphIndex--;
 
@@ -890,6 +1034,27 @@ namespace SEE.Game
             {
                 Debug.LogError("Could not retrieve a graph layout.\n");
             }
+            return true;
+        }
+
+        /// <summary>
+        /// If we are at the beginning of the graph series, nothing happens.
+        /// Otherwise we make the transition from the currently shown graph to its 
+        /// direct predecessor graph in the graph series. CurrentGraphIndex is decreased
+        /// by one accordingly.
+        /// </summary>
+        public void ShowPreviousGraph()
+        {
+            if (IsStillAnimating || IsAutoPlay || IsAutoPlayReverse)
+            {
+                Debug.Log("The renderer is already occupied with animating, wait till animations are finished.\n");
+                return;
+            }
+            if (!ShowPreviousIfPossible())
+            {
+                Debug.Log("This is already the first graph revision.\n");
+                return;
+            }
         }
 
         /// <summary>
@@ -902,13 +1067,23 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Toggles the reverse auto-play mode. Equivalent to: SetAutoPlayReverse(!IsAutoPlayReverse)
+        /// where IsAutoPlayReverse denotes the current state of the reverse auto-play mode.
+        /// </summary>
+        internal void ToggleAutoPlayReverse()
+        {
+            SetAutoPlayReverse(!IsAutoPlayReverse);
+        }
+
+
+        /// <summary>
         /// Sets auto-play mode to <paramref name="enabled"/>. If <paramref name="enabled"/>
         /// is true, the next graph in the series is shown and from there all other 
         /// following graphs until we reach the end of the graph series or auto-play
         /// mode is turned off again. If <paramref name="enabled"/> is false instead,
         /// the currently shown graph remains visible.
         /// </summary>
-        /// <param name="enabled"></param>
+        /// <param name="enabled"> Specifies whether reverse auto-play mode should be enabled. </param>
         internal void SetAutoPlay(bool enabled)
         {
             IsAutoPlay = enabled;
@@ -928,6 +1103,33 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Sets reverse auto-play mode to <paramref name="enabled"/>. If <paramref name="enabled"/>
+        /// is true, the previous graph in the series is shown and from there all other 
+        /// previous graphs until we reach the beginning of the graph series or reverse auto-play
+        /// mode is turned off again. If <paramref name="enabled"/> is false instead,
+        /// the currently shown graph remains visible.
+        /// </summary>
+        /// <param name="enabled"> Specifies whether reverse auto-play mode should be enabled. </param>
+        internal void SetAutoPlayReverse(bool enabled)
+        {
+            IsAutoPlayReverse = enabled;
+            if (IsAutoPlayReverse)
+            {
+                AnimationFinishedEvent.AddListener(OnAutoPlayReverseCanContinue);
+                if (!ShowPreviousIfPossible())
+                {
+                    Debug.Log("This is already the first graph revision.\n");
+                }
+            }
+            
+            else
+            {
+                AnimationFinishedEvent.RemoveListener(OnAutoPlayReverseCanContinue);
+            }
+            shownGraphHasChangedEvent.Invoke();
+        }
+
+        /// <summary>
         /// If we at the end of the graph series, nothing happens.
         /// Otherwise we make the transition from the currently shown graph to its next
         /// direct successor graph in the graph series. CurrentGraphIndex is increased
@@ -938,6 +1140,20 @@ namespace SEE.Game
             if (!ShowNextIfPossible())
             {
                 ToggleAutoPlay();
+            }
+        }
+
+        /// <summary>
+        /// If we are at the beginning of the graph series, nothing happens.
+        /// Otherwise we make the transition from the currently shown graph to its next
+        /// direct successor graph in the graph series. CurrentGraphIndex is increased
+        /// by one accordingly and auto-play mode is toggled (switched off actually).
+        /// </summary>
+        private void OnAutoPlayReverseCanContinue()
+        {
+            if (!ShowPreviousIfPossible())
+            {
+                ToggleAutoPlayReverse();
             }
         }
 

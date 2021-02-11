@@ -23,6 +23,11 @@ namespace InControl.UnityDeviceProfiles
 				"Android"
 			};
 
+			ExcludePlatforms = new[]
+			{
+				"NVIDIA Shield"
+			};
+
 			Matchers = new[]
 			{
 				new InputDeviceMatcher { NamePattern = "NVIDIA Controller v" }
@@ -93,10 +98,10 @@ namespace InControl.UnityDeviceProfiles
 				LeftStickUpMapping( 1 ),
 				LeftStickDownMapping( 1 ),
 
-				RightStickLeftMapping( 2 ),
-				RightStickRightMapping( 2 ),
-				RightStickUpMapping( 3 ),
-				RightStickDownMapping( 3 ),
+				RightStickLeftMapping( 13 ),
+				RightStickRightMapping( 13 ),
+				RightStickUpMapping( 14 ),
+				RightStickDownMapping( 14 ),
 
 				DPadLeftMapping( 4 ),
 				DPadRightMapping( 4 ),

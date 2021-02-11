@@ -42,6 +42,32 @@ namespace SEE.Layout.Utils
             return ListToVectors(list);
         }
 
+
+        /// <summary>
+        /// Returns the points of the line along the B-spline constrained by the given <paramref name="controlPoints"/> and <paramref name="sampleRate"/>.
+        /// </summary>
+        /// <param name="controlPoints">control points of the B-spline</param>
+        /// <param name="tension">tension of the control points onto the spline points; must be in
+        /// the range [0, 1]</param>
+        /// <param name="sampleRate">Number of points on the line
+        /// <returns>points (depending on the sampleRate) of the line along the B-spline</returns>
+        public static Vector3[] BSplineLinePointsSampleRate(Vector3[] controlPoints, uint sampleRate = 100, float tension = tensionDefault)
+        {
+            Debug.Assert(controlPoints.Length > 3);
+            Debug.Assert(0.0f <= tension && tension <= 1.0f);
+
+            // Create a cubic spline with control points in 3D using a clamped knot vector.
+            TinySpline.BSpline spline = new TinySpline.BSpline((uint)controlPoints.Length, dimensions)
+            {
+                // Setup control points.
+                ControlPoints = VectorsToList(controlPoints)
+            };
+
+            IList<double> list = spline.Tension(tension).Sample(sampleRate);
+            return ListToVectors(list);
+        }
+
+
         /// <summary>
         /// Serializes the co-ordinates of all given vectors as a list.
         /// E.g., The list {(1.0, 2.0, 3.0), (4.0, 5.0, 6.0)} is serialized
@@ -151,7 +177,7 @@ namespace SEE.Layout.Utils
                  middle.x, middle.y, middle.z,
                  end.x,    end.y,    end.z
                };
-            return ListToVectors(TinySpline.BSpline.InterpolateCubic(path, dimensions).Sample());
+            return ListToVectors(TinySpline.BSpline.InterpolateCubicNatural(path, dimensions).Sample());
         }
 
         /// <summary>
