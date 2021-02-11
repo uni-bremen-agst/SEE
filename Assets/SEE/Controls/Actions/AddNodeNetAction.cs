@@ -52,12 +52,13 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// /Whether the the node should be placed or moved.
-        /// FIXME: What does true/false mean here (place or move)?
+        /// true = place | false = dont place
         /// </summary>
         public bool Place;
 
         /// <summary>
         /// Whether a new node should be created.
+        /// true = create new one | false = dont create new one
         /// </summary>
         public bool Create;
 
@@ -68,7 +69,7 @@ namespace SEE.Controls.Actions
         public bool IllegalPlace;
 
         /// <summary>
-        /// FIXME: Documentation required. 
+        /// The name of the dummy object on which the AddNodeAction for network purpose is added.
         /// </summary>
         private static readonly string dummyName = "tmpNetNewNode";
 
