@@ -85,7 +85,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// FIXME: Documentation is missing.
+        /// Marks the action to add a new node as being canceled.
         /// </summary>
         public void AddingIsCanceled()
         {
