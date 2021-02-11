@@ -215,7 +215,6 @@ namespace SEE.Controls.Actions
         /// CanvasIsClosed: Closes the canvas-object after extracting the values for the creation of a node. This state is reached by pushing the "AddNode"-Button
         /// ValuesAreGiven: Moves the node and waits for a mouseInput to place the node, if its inside of the previous chosen city
         /// AddingIsCanceled: Removes all attributes and states and resets the progress-state to noCitySelected
-        /// 
         /// </summary>
         public void Update()
         {
@@ -225,9 +224,7 @@ namespace SEE.Controls.Actions
                 CanvasGenerator canvas = canvasObject.GetComponent<CanvasGenerator>();
                 canvasObject.GetComponent<AddingNodeCanvasAction>().GetNodeValues();
                 canvas.DestroyAddNodeCanvas();
-                Debug.Log("AA");
             }
-
             switch (Progress)
             {
                 case ProgressState.NoCitySelected:
@@ -241,6 +238,9 @@ namespace SEE.Controls.Actions
                 case ProgressState.CityIsSelected:
                     OpenDialog();
                     Progress = ProgressState.WaitingForValues;
+                    break;
+
+                case ProgressState.WaitingForValues:
                     break;
 
                 case ProgressState.CanvasIsClosed:
@@ -275,6 +275,9 @@ namespace SEE.Controls.Actions
                     Progress = ProgressState.NoCitySelected;
                     instantiated = false;
                     break;
+
+                default:
+                    throw new NotImplementedException();
             }
         }
 
