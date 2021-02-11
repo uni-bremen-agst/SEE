@@ -62,9 +62,9 @@ namespace SEE.Controls.Actions
                 {
                     // The monobehaviour is diabled and Update() no longer be called by Unity.
                     enabled = false;
-                    CanvasGenerator c;
-                    canvasObject.TryGetComponentOrLog<CanvasGenerator>(out c);
-                    c.DestroyEditNodeCanvas();
+                    CanvasGenerator canvasGenerator;
+                    canvasObject.TryGetComponentOrLog<CanvasGenerator>(out canvasGenerator);
+                    canvasGenerator.DestroyEditNodeCanvas();
                     instantiated = false;
                     InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
