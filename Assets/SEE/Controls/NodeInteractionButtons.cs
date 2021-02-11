@@ -72,7 +72,7 @@ namespace SEE.Controls
         public void EditIsCanceled()
         {
             EditNodeAction current = playerDesktop.GetComponent<EditNodeAction>();
-            current.EditProgress = EditNodeAction.Progress.EditIsCanceled;
+            current.EditProgress = EditNodeAction.ProgressState.EditIsCanceled;
         }
 
         /// <summary>

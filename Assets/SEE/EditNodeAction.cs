@@ -26,18 +26,18 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The life cycle of this edit action.
         /// </summary>
-        public enum Progress
+        public enum ProgressState
         {
             NoNodeSelected,  // initial state when no node is selected
             NodeSelected,    // a node is currently selected
             EditIsCanceled,  // the edit action is canceled
         }
 
-        private Progress editProgress = Progress.NoNodeSelected;
+        private ProgressState editProgress = ProgressState.NoNodeSelected;
         /// <summary>
         /// The current state of the edit-node process.
         /// </summary>
-        public Progress EditProgress { get => editProgress; set => editProgress = value; }
+        public ProgressState EditProgress { get => editProgress; set => editProgress = value; }
 
         void Start()
         {
@@ -84,14 +84,14 @@ namespace SEE.Controls.Actions
         {
             switch (editProgress)
             {
-                case Progress.NoNodeSelected:
+                case ProgressState.NoNodeSelected:
                     if (hoveredObject != null && Input.GetMouseButtonDown(0))
                     {
-                        EditProgress = Progress.NodeSelected;
+                        EditProgress = ProgressState.NodeSelected;
                     }
                     break;
 
-                case Progress.NodeSelected:
+                case ProgressState.NodeSelected:
                     if (canvasObject.GetComponent<EditNodeCanvasAction>() == null)
                     {
                         CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
@@ -101,11 +101,11 @@ namespace SEE.Controls.Actions
                     }
                     break;
 
-                case Progress.EditIsCanceled:
+                case ProgressState.EditIsCanceled:
                     CanvasGenerator canvasGenerator = canvasObject.GetComponent<CanvasGenerator>();
                     canvasGenerator.DestroyEditNodeCanvas();
                     hoveredObject = null;
-                    EditProgress = Progress.NoNodeSelected;
+                    EditProgress = ProgressState.NoNodeSelected;
                     break;
             }
         }
