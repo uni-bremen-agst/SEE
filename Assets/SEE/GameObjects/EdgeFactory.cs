@@ -4,13 +4,8 @@ using SEE.DataModel;
 using SEE.Game;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
-<<<<<<< HEAD
-using System.Collections.Generic;
-using Valve.VR.InteractionSystem;
-using System.Linq;
-=======
->>>>>>> 4091bca645dc72aa272f6da60fdc6a53bed71633
 using UnityEngine;
+using SEE.Controls;
 
 namespace SEE.GO
 {
@@ -145,13 +140,7 @@ namespace SEE.GO
                 filter.sharedMesh = mesh;
                 meshCollider.sharedMesh = mesh;
 
-                //gameEdge.AddComponent<InteractionDecorator>;
-                gameEdge.AddComponent<Interactable>();
-                gameEdge.AddComponent<InteractableObject>();
-                gameEdge.AddComponent<ShowHovering>();
-                //gameEdge.AddComponent<ShowLabel>();
-                gameEdge.AddComponent<ShowSelection>();
-                //gameEdge.AddComponent<ShowGrabbing>();
+                InteractionDecorator.PrepareForInteraction(gameEdge);
             }
             return result;
         }
