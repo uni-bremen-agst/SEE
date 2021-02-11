@@ -27,7 +27,7 @@ namespace SEE.Controls.Actions
         /// Therefore, it extracts the string from the InputFields on the prefab.
         /// Note: The sequences of the extracted arrays are based on the sequence of the components in the prefab.
         /// </summary>
-        public void GetNodeMetrics()
+        public void GetNodeValues()
         {
             // FIXME: this part has to be removed by the new UI Team
             AddingNodeCanvasAction script = gameObject.GetComponent<AddingNodeCanvasAction>();

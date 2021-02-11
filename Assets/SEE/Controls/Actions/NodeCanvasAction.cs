@@ -31,5 +31,14 @@ namespace SEE.Controls.Actions
             UnityEngine.Object.Destroy(action);
             action = null;
         }
+
+        public void DestroyGOAndAllChilds()
+        {
+            foreach (Transform child in Canvas.transform)
+            {
+                Destroy(child.gameObject);
+            }
+            Destroy(Canvas);
+        }
     }
 }

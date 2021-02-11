@@ -47,7 +47,6 @@ namespace SEE.Controls.Actions
         GameObject thrdSideSphere; //x1 y1
         GameObject forthSideSphere; //x0 y1
 
-        //FIXMEE REPLACE WITH GUI
         GameObject endWithSave;
         GameObject endWithOutSave;
 
@@ -444,9 +443,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Removes this component from the gameObject.
-        /// FIXME: Either the comment or the implementation is wrong. The components is *not* removed 
-        /// from its gameObject. Only its attributes are reset.
+        /// Resets all attributes from the gameObject.
         /// </summary>
         public void RemoveSpheres()
         {

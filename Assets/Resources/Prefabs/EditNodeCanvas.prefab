@@ -140,6 +140,7 @@ MonoBehaviour:
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
+  m_ShouldActivateOnSelect: 1
 --- !u!1 &2848104518119946834
 GameObject:
   m_ObjectHideFlags: 0
@@ -867,6 +868,7 @@ MonoBehaviour:
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
+  m_ShouldActivateOnSelect: 1
 --- !u!1 &5512428839062552065
 GameObject:
   m_ObjectHideFlags: 0
@@ -1264,7 +1266,7 @@ GameObject:
   - component: {fileID: 2370707557460757017}
   - component: {fileID: 2217986901696293382}
   - component: {fileID: 4831993454436032448}
-  - component: {fileID: 2330328819237690728}
+  - component: {fileID: 166666102538015054}
   m_Layer: 5
   m_Name: EditNodeCanvas
   m_TagString: Untagged
@@ -1358,7 +1360,7 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &2330328819237690728
+--- !u!114 &166666102538015054
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1367,13 +1369,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 8513845403460309370}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 907e5a4f306d4124f98d747b8a17e920, type: 3}
+  m_Script: {fileID: 11500000, guid: 34a1e7190ce37e84081213566505012c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  addingButton: {fileID: 0}
-  editNodeCancel: {fileID: 826077016185094173}
-  editNodeButton: {fileID: 2912748952741219896}
-  addNodeCancel: {fileID: 0}
+  AddingButton: {fileID: 0}
+  AddNodeCancel: {fileID: 0}
+  EditNodeCancel: {fileID: 826077016185094173}
+  EditNodeButton: {fileID: 2912748952741219896}
 --- !u!1 &9140197740766457383
 GameObject:
   m_ObjectHideFlags: 0
