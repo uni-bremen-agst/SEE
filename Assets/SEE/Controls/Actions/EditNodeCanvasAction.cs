@@ -77,10 +77,7 @@ namespace SEE.Controls.Actions
                 CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
                 generator.DestroyEditNodeCanvas();
                 new EditNodeNetAction(nodeToEdit.SourceName, nodeToEdit.Type, gameObjectID).Execute(null);
-                // Avoid calls of Find() in Update(). Find is an expensive operation that traverses all objects 
-                // in the scene. If executed on every frame, it may slow down the program.
-                // Could either g or current be cached instead?
-                GameObject g = GameObject.Find("Player Desktop");
+                GameObject g = GameObject.Find(PlayerSettings.PlayerName[(int)PlayerSettings.PlayerInputType.Desktop]);
                 EditNodeAction current = g.GetComponent<EditNodeAction>();
                 current.EditProgress = EditNodeAction.ProgressState.NoNodeSelected;
                 InteractableObject.UnselectAll(true);
