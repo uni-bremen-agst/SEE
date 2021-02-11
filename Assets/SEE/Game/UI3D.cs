@@ -19,6 +19,9 @@ namespace SEE.Game.UI3D
         private const string OutlineShaderName = "Unlit/CursorOutlineShader";
         private const string PlainColorShaderName = "Unlit/PlainColorShader";
 
+        /// <summary>
+        /// The list of Transforms currently in the focus.
+        /// </summary>
         private List<Transform> focusses;
 
         private GameObject outline;
@@ -31,6 +34,22 @@ namespace SEE.Game.UI3D
 
         private Cursor()
         {
+        }
+
+        /// <summary>
+        /// Removes every Transform from <see cref="focusses"/> that has been
+        /// destroyed, i.e., for which == null holds (Unity has redefined operator ==).
+        /// </summary>
+        private void RemoveDestroyedTransforms()
+        {
+            for (int i = focusses.Count - 1; i >= 0; i--)
+            {
+                if (focusses[i] == null)
+                {
+                    focusses[i] = focusses[focusses.Count - 1];
+                    focusses.RemoveAt(focusses.Count - 1);
+                }
+            }
         }
 
         internal static Cursor Create()
@@ -63,7 +82,7 @@ namespace SEE.Game.UI3D
         private void Update()
         {
             hasRunThisFrame = false;
-
+            RemoveDestroyedTransforms();
             if (focusses.Count != 0)
             {
                 transform.position = GetPosition();
@@ -94,11 +113,13 @@ namespace SEE.Game.UI3D
 
         public bool HasFocus()
         {
+            RemoveDestroyedTransforms();
             return focusses.Count != 0;
         }
 
         public Transform[] GetFocusses()
         {
+            RemoveDestroyedTransforms();
             Transform[] result = new Transform[focusses.Count];
             focusses.CopyTo(result);
             return result;
@@ -155,6 +176,8 @@ namespace SEE.Game.UI3D
         {
             Vector3 result = Vector3.zero;
 
+            RemoveDestroyedTransforms();
+
             if (focusses.Count == 1)
             {
                 result = focusses[0].position;
@@ -170,6 +193,8 @@ namespace SEE.Game.UI3D
         public float GetDiameterXZ()
         {
             float result = 0.0f;
+
+            RemoveDestroyedTransforms();
 
             if (focusses.Count == 1)
             {

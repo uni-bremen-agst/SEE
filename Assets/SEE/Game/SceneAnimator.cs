@@ -1,9 +1,9 @@
-﻿using UnityEngine;
-using SEE.DataModel;
-using SEE.GO;
-using SEE.DataModel.DG;
+﻿using System;
 using System.Collections.Generic;
-using System;
+using SEE.DataModel;
+using SEE.DataModel.DG;
+using SEE.GO;
+using UnityEngine;
 
 namespace SEE.Game
 {
