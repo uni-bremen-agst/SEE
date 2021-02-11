@@ -33,11 +33,6 @@ namespace InControl.NativeDeviceProfiles
 					VendorID = 0x045e,
 					ProductID = 0x02ea,
 				},
-				new InputDeviceMatcher
-				{
-					VendorID = 0x045e,
-					ProductID = 0x02fd,
-				},
 			};
 
 			ButtonMappings = new[]
@@ -155,4 +150,3 @@ namespace InControl.NativeDeviceProfiles
 
 	// @endcond
 }
-

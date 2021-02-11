@@ -1,8 +1,8 @@
-﻿using NetworkCommsDotNet;
-using NetworkCommsDotNet.Connections;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using NetworkCommsDotNet;
+using NetworkCommsDotNet.Connections;
 using UnityEngine;
 
 namespace SEE.Net

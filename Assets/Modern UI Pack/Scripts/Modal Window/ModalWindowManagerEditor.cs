@@ -102,17 +102,14 @@ namespace Michsky.UI.ModernUIPack
 
                     GUILayout.EndHorizontal();
 
-                    if (mwTarget.windowIcon != null)
+                    if (mwTarget.windowIcon != null && useCustomValues.boolValue == false)
                         mwTarget.windowIcon.sprite = mwTarget.icon;
 
-                    else
+                    else if (mwTarget.windowIcon == null)
                     {
-                        if (mwTarget.windowIcon == null)
-                        {
-                            GUILayout.BeginHorizontal();
-                            EditorGUILayout.HelpBox("'Icon Object' is not assigned. Go to Resources tab and assign the correct variable.", MessageType.Error);
-                            GUILayout.EndHorizontal();
-                        }
+                        GUILayout.BeginHorizontal();
+                        EditorGUILayout.HelpBox("'Icon Object' is not assigned. Go to Resources tab and assign the correct variable.", MessageType.Error);
+                        GUILayout.EndHorizontal();
                     }
 
                     GUILayout.BeginHorizontal(EditorStyles.helpBox);
@@ -122,17 +119,14 @@ namespace Michsky.UI.ModernUIPack
 
                     GUILayout.EndHorizontal();
 
-                    if (mwTarget.windowTitle != null)
+                    if (mwTarget.windowTitle != null && useCustomValues.boolValue == false)
                         mwTarget.windowTitle.text = titleText.stringValue;
 
-                    else
+                    else if (mwTarget.windowTitle == null)
                     {
-                        if (mwTarget.windowTitle == null)
-                        {
-                            GUILayout.BeginHorizontal();
-                            EditorGUILayout.HelpBox("'Title Object' is not assigned. Go to Resources tab and assign the correct variable.", MessageType.Error);
-                            GUILayout.EndHorizontal();
-                        }
+                        GUILayout.BeginHorizontal();
+                        EditorGUILayout.HelpBox("'Title Object' is not assigned. Go to Resources tab and assign the correct variable.", MessageType.Error);
+                        GUILayout.EndHorizontal();
                     }
 
                     GUILayout.BeginHorizontal(EditorStyles.helpBox);
@@ -142,17 +136,14 @@ namespace Michsky.UI.ModernUIPack
 
                     GUILayout.EndHorizontal();
 
-                    if (mwTarget.windowDescription != null)
+                    if (mwTarget.windowDescription != null && useCustomValues.boolValue == false)
                         mwTarget.windowDescription.text = descriptionText.stringValue;
 
-                    else
+                    else if (mwTarget.windowDescription == null)
                     {
-                        if (mwTarget.windowDescription == null)
-                        {
-                            GUILayout.BeginHorizontal();
-                            EditorGUILayout.HelpBox("'Description Object' is not assigned. Go to Resources tab and assign the correct variable.", MessageType.Error);
-                            GUILayout.EndHorizontal();
-                        }
+                        GUILayout.BeginHorizontal();
+                        EditorGUILayout.HelpBox("'Description Object' is not assigned. Go to Resources tab and assign the correct variable.", MessageType.Error);
+                        GUILayout.EndHorizontal();
                     }
 
                     GUILayout.Space(18);

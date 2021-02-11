@@ -41,7 +41,7 @@ namespace Michsky.UI.ModernUIPack
 
                 if (currentPercent >= maxValue && speed != 0 && restart == true && invert == false)
                     currentPercent = 0;
-                else if (currentPercent == 0 && speed != 0 && restart == true && invert == true)
+                else if (currentPercent <= 0 && speed != 0 && restart == true && invert == true)
                     currentPercent = maxValue;
 
                 loadingBar.fillAmount = currentPercent / maxValue;

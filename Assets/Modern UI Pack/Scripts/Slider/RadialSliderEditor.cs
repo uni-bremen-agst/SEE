@@ -88,6 +88,7 @@ namespace Michsky.UI.ModernUIPack
             var rememberValue = serializedObject.FindProperty("rememberValue");
             var sliderTag = serializedObject.FindProperty("sliderTag");
 
+            var minValue = serializedObject.FindProperty("minValue");
             var maxValue = serializedObject.FindProperty("maxValue");
             var isPercent = serializedObject.FindProperty("isPercent");
             var decimals = serializedObject.FindProperty("decimals");
@@ -102,7 +103,7 @@ namespace Michsky.UI.ModernUIPack
                     GUILayout.BeginHorizontal(EditorStyles.helpBox);
 
                     EditorGUILayout.LabelField(new GUIContent("Current Value"), customSkin.FindStyle("Text"), GUILayout.Width(120));
-                    currentValue.floatValue = EditorGUILayout.Slider(currentValue.floatValue, 0, rsTarget.maxValue);
+                    currentValue.floatValue = EditorGUILayout.Slider(currentValue.floatValue, rsTarget.minValue, rsTarget.maxValue);
 
                     GUILayout.EndHorizontal();
 
@@ -185,11 +186,16 @@ namespace Michsky.UI.ModernUIPack
                     GUILayout.Space(2);
                     GUILayout.BeginHorizontal(EditorStyles.helpBox);
 
+                    EditorGUILayout.LabelField(new GUIContent("Min Value"), customSkin.FindStyle("Text"), GUILayout.Width(120));
+                    EditorGUILayout.PropertyField(minValue, new GUIContent(""));
+
+                    GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal(EditorStyles.helpBox);
+
                     EditorGUILayout.LabelField(new GUIContent("Max Value"), customSkin.FindStyle("Text"), GUILayout.Width(120));
                     EditorGUILayout.PropertyField(maxValue, new GUIContent(""));
 
                     GUILayout.EndHorizontal();
-
                     GUILayout.BeginHorizontal(EditorStyles.helpBox);
 
                     EditorGUILayout.LabelField(new GUIContent("Decimals"), customSkin.FindStyle("Text"), GUILayout.Width(120));

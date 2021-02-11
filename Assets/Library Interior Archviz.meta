@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD:Assets/Library Interior Archviz.meta
 guid: ccb5166c3e6dc4645a7a1ce37c4aa821
+=======
+guid: 6cdc929e5e940d3419fe7b524059a17e
+>>>>>>> 4091bca645dc72aa272f6da60fdc6a53bed71633:Assets/Prefabs/UI.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

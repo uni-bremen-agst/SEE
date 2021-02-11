@@ -1,3 +1,18 @@
+### v1.8.3
+* Fixed crash in native plugin for devices that declare an unusually high number of buttons.
+* Fixed crash in native plugin for Windows x86 IL2CPP builds.
+* Fixed issue with macOS native plugin where (non-MFi) controllers not detect attach/detach events.
+* Fixed issue with macOS native plugin (MFi enabled) where pause button on Nimbus was not detected.
+* Added Apple Silicon support to macOS native plugin binary.
+* Added basic Game Core and PS5 input profiles.
+* Added SteelSeries Nimbus Plus profile for macOS.
+
+### v1.8.2
+* Fixed regression (since 1.8.0) in device matching logic causing some devices not to be identified correctly.
+* Fixed PlayStation 4 controller profile for Android and NVidia Shield devices.
+* Fixed NVidia Shield controller profile for Android and NVidia Shield devices.
+* Fixed various `Debug` logging calls to use `InControl.Logger` instead.
+
 ### v1.8.1
 * Added armv7 support to Native Input plugin for iOS.
 * Fixed error in version parsing with some alpha and beta versions of Unity.

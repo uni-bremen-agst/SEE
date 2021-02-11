@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Reflection;
 using Microsoft.MixedReality.Toolkit.Input;
-using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;

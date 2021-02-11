@@ -2,6 +2,9 @@
 
 namespace SEE.Controls.Actions
 {
+    /// <summary>
+    /// Draws an outline for a selected object.
+    /// </summary>
     public class ShowSelection : InteractableObjectSelectionAction
     {
         /// <summary>

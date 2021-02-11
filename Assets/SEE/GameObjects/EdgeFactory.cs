@@ -4,12 +4,13 @@ using SEE.DataModel;
 using SEE.Game;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
+<<<<<<< HEAD
 using System.Collections.Generic;
 using Valve.VR.InteractionSystem;
 using System.Linq;
+=======
+>>>>>>> 4091bca645dc72aa272f6da60fdc6a53bed71633
 using UnityEngine;
-using SEE.Controls;
-using SEE.Controls.Actions;
 
 namespace SEE.GO
 {
