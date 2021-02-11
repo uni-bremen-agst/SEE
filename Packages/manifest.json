@@ -7,13 +7,6 @@
         "com.microsoft.mixedreality",
         "com.microsoft.spatialaudio"
       ]
-    },
-    {
-      "name": "Tabular",
-      "url": "https://github.com/mattatz/unity-tubular/tree/master/Assets/Packages/Tubular",
-      "scopes": [
-        "Tabular"
-      ]
     }
   ],
   "dependencies": {
