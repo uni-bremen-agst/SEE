@@ -10,9 +10,7 @@ using System.Linq;
 using UnityEngine;
 using SEE.Controls;
 using SEE.Controls.Actions;
-using Assets.SEE.Utils;
-using Curve;
-using Tubular;
+using SEE.Utils;
 
 namespace SEE.GO
 {
@@ -122,10 +120,10 @@ namespace SEE.GO
                 float radius = 0.005f;
                 int radialSegments = 8;
                 bool closed = false; // closed curve or not
-                var mesh = Tubular.Tubular.Build(new CatmullRomCurve(layoutEdge.Points.OfType<Vector3>().ToList()) , tubularSegments, radius, radialSegments, closed);
+                Mesh mesh = Tubular.Tubular.Build(new CatmullRomCurve(layoutEdge.Points.OfType<Vector3>().ToList()), tubularSegments, radius, radialSegments, closed);
 
                 // visualize mesh
-                var filter = gameEdge.AddComponent<MeshFilter>();
+                MeshFilter filter = gameEdge.AddComponent<MeshFilter>();
                 filter.sharedMesh = mesh;
                 meshCollider.sharedMesh = mesh;
 
