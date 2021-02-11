@@ -78,12 +78,12 @@ namespace SEE.Controls.Actions
         public String NodeID { get => nodeID; set => nodeID = value; }
 
         /// <summary>
-        /// A list of the hovered GameObjects are stored in. FIXME: Grammar is wrong.
+        /// A list of the hovered gameObjects.
         /// </summary>
         private List<GameObject> hoveredObjectList = new List<GameObject>();
 
         /// <summary>
-        /// A list of the colors of the hovered GameObjects are stored in. FIXME: Grammar is wrong.
+        /// A list of the colors of the hovered gameObject.
         /// </summary>
         private List<Color> listOfColors = new List<Color>();
 
@@ -136,7 +136,9 @@ namespace SEE.Controls.Actions
         public Vector3 rootPostion;
 
         private bool network = false;
-        // FIXME: Comment is missing.
+        /// <summary>
+        /// True, if a method is called from network, else false.
+        /// </summary>
         public bool Network { get => network; set => network = value; }
 
         public enum ProgressState
@@ -217,14 +219,13 @@ namespace SEE.Controls.Actions
         /// </summary>
         public void Update()
         {
-            // FIXME: Is this comment correct? I can't see where the new node is created.
-            // Removes the canvasObject and extracts the values from it to create a new node with 
-            // these params.
+            // Removes the canvasObject and extracts the inserted values from it for the new node to be created in next state.
             void RemoveCanvas()
             {
                 CanvasGenerator canvas = canvasObject.GetComponent<CanvasGenerator>();
-                canvasObject.GetComponent<AddingNodeCanvasAction>().GetNodeMetrics();
+                canvasObject.GetComponent<AddingNodeCanvasAction>().GetNodeValues();
                 canvas.DestroyAddNodeCanvas();
+                Debug.Log("AA");
             }
 
             switch (Progress)
@@ -256,7 +257,6 @@ namespace SEE.Controls.Actions
                         nodesLoaded = false;
                         GameNodeMover.MoveTo(GONode);
                         new AddNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false, false).Execute(null);
-
                     }
                     else
                     {
@@ -275,8 +275,6 @@ namespace SEE.Controls.Actions
                     Progress = ProgressState.NoCitySelected;
                     instantiated = false;
                     break;
-                default:
-                    throw new NotImplementedException();
             }
         }
 
@@ -303,7 +301,6 @@ namespace SEE.Controls.Actions
                     SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject.TryGetComponent<SEECity>(out cityToDye);
                     GetNodesOfScene();
                 }
-                // FIXME: What will happen if cityToDye is undefined? Could that ever happen?
                 foreach (GameObject go in listOfRoots)
                 {
                     if (go.GetComponent<NodeRef>().Value.ItsGraph == cityToDye.LoadedGraph)
@@ -475,11 +472,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Gets all nodes of the scene and saves them in collections - seperated one for the graph's leaves
-        /// and one for the graph's inner nodes.
-        /// Furthermore the root or if there are more than one, the roots will be determined and stored as well 
-        /// in a list. 
-        /// Finally, the median of the lossyscale of all nodes will be calculated in order to 
+        /// Gets all nodes of the scene and calculates the median of the lossyscale of all nodes in order to 
         /// determine a default size, which can be use when creating new nodes, either leaves or inner nodes.
         /// </summary>
         public void GetNodesOfScene()
@@ -515,7 +508,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Iterates the list of gameobjects and adds the lossyscale of the given objects to a list. 
+        /// Fetches all gameObject´s lossyscale to provide the scales for median-calculation 
         /// </summary>
         /// <param name="pListOfGameObjects">A List of GameObjects</param>
         /// <returns>Returns a  vector list filled with the lossyscale of the param pListOfGameObject or 

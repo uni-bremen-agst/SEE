@@ -61,7 +61,6 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    //FIXME: Control whether a Debug Log is the right thing
                     Debug.LogError($"Found no game object: {GameObjectID}.\n");
                 }
             }
