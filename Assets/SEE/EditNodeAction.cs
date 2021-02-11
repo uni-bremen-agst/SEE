@@ -23,11 +23,14 @@ namespace SEE.Controls.Actions
         /// </summary>
         const ActionState.Type ThisActionState = ActionState.Type.EditNode;
 
+        /// <summary>
+        /// The life cycle of this edit action.
+        /// </summary>
         public enum Progress
         {
-            NoNodeSelected,
-            NodeSelected,
-            EditIsCanceled,
+            NoNodeSelected,  // initial state when no node is selected
+            NodeSelected,    // a node is currently selected
+            EditIsCanceled,  // the edit action is canceled
         }
 
         private Progress editProgress = Progress.NoNodeSelected;
