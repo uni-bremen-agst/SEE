@@ -410,8 +410,14 @@ namespace SEE.Game.Charts
         /// </summary>
         public void OnPointerEnter(PointerEventData eventData)
         {
-            ref ScrollViewEntryData data = ref chartContent.GetScrollViewEntryData(index);
-            data.OnPointerEvent(true);
+            try {
+                ref ScrollViewEntryData data = ref chartContent.GetScrollViewEntryData(index);
+                data.OnPointerEvent(true);
+            }
+            catch
+            {
+                Debug.Log("Illegal index");
+            }
         }
 
         /// <summary>
@@ -419,8 +425,15 @@ namespace SEE.Game.Charts
         /// </summary>
         public void OnPointerExit(PointerEventData eventData)
         {
-            ref ScrollViewEntryData data = ref chartContent.GetScrollViewEntryData(index);
-            data.OnPointerEvent(false);
+            try
+            {
+                ref ScrollViewEntryData data = ref chartContent.GetScrollViewEntryData(index);
+                data.OnPointerEvent(false);
+            }
+            catch
+            {
+                Debug.Log("Illegal index");
+            }
         }
 
         #endregion

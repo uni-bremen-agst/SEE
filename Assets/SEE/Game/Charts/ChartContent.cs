@@ -1051,6 +1051,8 @@ namespace SEE.Game.Charts
                     NodeChangesBuffer.GetSingleton().removedNodeIDsCache.Add(s);
                 }
                 // Clear previous lists, in preparation for future changes
+                // This also needs to be done if the revision changes but the chart isn't open
+                // (Future-)TODO: Needs to be added to the next/previous revision keybinds
                 NodeChangesBuffer.GetSingleton().addedNodeIDs.Clear();
                 NodeChangesBuffer.GetSingleton().changedNodeIDs.Clear();
                 NodeChangesBuffer.GetSingleton().removedNodeIDs.Clear();
