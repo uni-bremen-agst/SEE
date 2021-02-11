@@ -103,13 +103,13 @@ namespace InControl
 
 		// void Awake()
 		// {
-		// 	Debug.Log( "Awake() => " + deviceName );
+		// 	Logger.Log( "Awake() => " + deviceName );
 		// }
 
 
 		// void OnEnable()
 		// {
-		// 	Debug.Log( "OnEnable() => " + deviceName );
+		// 	Logger.Log( "OnEnable() => " + deviceName );
 		// }
 
 
@@ -127,7 +127,7 @@ namespace InControl
 			var type = Type.GetType( typeName );
 			if (type == null)
 			{
-				Debug.Log( "Cannot find type: " + typeName + "(is the IL2CPP stripping level too high?)" );
+				Logger.LogWarning( "Cannot find type: " + typeName + "(is the IL2CPP stripping level too high?)" );
 				return null;
 			}
 
@@ -241,6 +241,12 @@ namespace InControl
 		}
 
 
+		public bool IsNotHidden
+		{
+			get { return !IsHidden; }
+		}
+
+
 		public int AnalogCount
 		{
 			get { return AnalogMappings.Length; }
@@ -260,10 +266,12 @@ namespace InControl
 			return new InputControlSource( InputControlSourceType.Button, index );
 		}
 
+
 		protected static InputControlSource Analog( int index )
 		{
 			return new InputControlSource( InputControlSourceType.Analog, index );
 		}
+
 
 		protected static readonly InputControlSource MenuKey = new InputControlSource( KeyCode.Menu );
 		protected static readonly InputControlSource EscapeKey = new InputControlSource( KeyCode.Escape );
@@ -285,6 +293,7 @@ namespace InControl
 			};
 		}
 
+
 		protected static InputControlMapping LeftStickRightMapping( int analog )
 		{
 			return new InputControlMapping
@@ -296,6 +305,7 @@ namespace InControl
 				TargetRange = InputRangeType.ZeroToOne
 			};
 		}
+
 
 		protected static InputControlMapping LeftStickUpMapping( int analog )
 		{
@@ -309,6 +319,7 @@ namespace InControl
 			};
 		}
 
+
 		protected static InputControlMapping LeftStickDownMapping( int analog )
 		{
 			return new InputControlMapping
@@ -320,6 +331,7 @@ namespace InControl
 				TargetRange = InputRangeType.ZeroToOne
 			};
 		}
+
 
 		protected static InputControlMapping LeftStickUpMapping2( int analog )
 		{
@@ -333,6 +345,7 @@ namespace InControl
 			};
 		}
 
+
 		protected static InputControlMapping LeftStickDownMapping2( int analog )
 		{
 			return new InputControlMapping
@@ -344,6 +357,7 @@ namespace InControl
 				TargetRange = InputRangeType.ZeroToOne
 			};
 		}
+
 
 		protected static InputControlMapping RightStickLeftMapping( int analog )
 		{
@@ -357,6 +371,7 @@ namespace InControl
 			};
 		}
 
+
 		protected static InputControlMapping RightStickRightMapping( int analog )
 		{
 			return new InputControlMapping
@@ -368,6 +383,7 @@ namespace InControl
 				TargetRange = InputRangeType.ZeroToOne
 			};
 		}
+
 
 		protected static InputControlMapping RightStickUpMapping( int analog )
 		{
@@ -381,6 +397,7 @@ namespace InControl
 			};
 		}
 
+
 		protected static InputControlMapping RightStickDownMapping( int analog )
 		{
 			return new InputControlMapping
@@ -392,6 +409,7 @@ namespace InControl
 				TargetRange = InputRangeType.ZeroToOne
 			};
 		}
+
 
 		protected static InputControlMapping RightStickUpMapping2( int analog )
 		{
@@ -405,6 +423,7 @@ namespace InControl
 			};
 		}
 
+
 		protected static InputControlMapping RightStickDownMapping2( int analog )
 		{
 			return new InputControlMapping
@@ -416,6 +435,7 @@ namespace InControl
 				TargetRange = InputRangeType.ZeroToOne
 			};
 		}
+
 
 		protected static InputControlMapping LeftTriggerMapping( int analog )
 		{
@@ -430,6 +450,7 @@ namespace InControl
 			};
 		}
 
+
 		protected static InputControlMapping RightTriggerMapping( int analog )
 		{
 			return new InputControlMapping
@@ -443,6 +464,7 @@ namespace InControl
 			};
 		}
 
+
 		protected static InputControlMapping DPadLeftMapping( int analog )
 		{
 			return new InputControlMapping
@@ -454,6 +476,7 @@ namespace InControl
 				TargetRange = InputRangeType.ZeroToOne
 			};
 		}
+
 
 		protected static InputControlMapping DPadRightMapping( int analog )
 		{
@@ -467,6 +490,7 @@ namespace InControl
 			};
 		}
 
+
 		protected static InputControlMapping DPadUpMapping( int analog )
 		{
 			return new InputControlMapping
@@ -478,6 +502,7 @@ namespace InControl
 				TargetRange = InputRangeType.ZeroToOne
 			};
 		}
+
 
 		protected static InputControlMapping DPadDownMapping( int analog )
 		{
@@ -491,6 +516,7 @@ namespace InControl
 			};
 		}
 
+
 		protected static InputControlMapping DPadUpMapping2( int analog )
 		{
 			return new InputControlMapping
@@ -502,6 +528,7 @@ namespace InControl
 				TargetRange = InputRangeType.ZeroToOne
 			};
 		}
+
 
 		protected static InputControlMapping DPadDownMapping2( int analog )
 		{

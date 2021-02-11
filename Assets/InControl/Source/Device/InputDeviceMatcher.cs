@@ -2,6 +2,7 @@
 // ReSharper disable UnassignedField.Global
 using UnityEngine;
 
+
 namespace InControl
 {
 	using System;
@@ -95,7 +96,8 @@ namespace InControl
 				}
 			}
 
-			if (!string.IsNullOrEmpty( NameLiteral ))
+			// Don't use IsNullOrEmpty because empty strings are valid matchers.
+			if (NameLiteral != null)
 			{
 				if (!string.Equals( deviceInfo.name, NameLiteral, StringComparison.OrdinalIgnoreCase ))
 				{
@@ -103,7 +105,8 @@ namespace InControl
 				}
 			}
 
-			if (!string.IsNullOrEmpty( NamePattern ))
+			// Don't use IsNullOrEmpty because empty strings are valid matchers.
+			if (NamePattern != null)
 			{
 				if (!Regex.IsMatch( deviceInfo.name, NamePattern, RegexOptions.IgnoreCase ))
 				{

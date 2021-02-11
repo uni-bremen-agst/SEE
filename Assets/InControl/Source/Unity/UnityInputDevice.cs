@@ -50,7 +50,7 @@ namespace InControl
 					var analogMapping = profile.AnalogMappings[i];
 					if (Utility.TargetIsAlias( analogMapping.Target ))
 					{
-						Debug.LogError( "Cannot map control \"" + analogMapping.Name + "\" as InputControlType." + analogMapping.Target + " in profile \"" + deviceProfile.DeviceName + "\" because this target is reserved as an alias. The mapping will be ignored." );
+						Logger.LogError( "Cannot map control \"" + analogMapping.Name + "\" as InputControlType." + analogMapping.Target + " in profile \"" + deviceProfile.DeviceName + "\" because this target is reserved as an alias. The mapping will be ignored." );
 					}
 					else
 					{
@@ -69,7 +69,7 @@ namespace InControl
 					var buttonMapping = profile.ButtonMappings[i];
 					if (Utility.TargetIsAlias( buttonMapping.Target ))
 					{
-						Debug.LogError( "Cannot map control \"" + buttonMapping.Name + "\" as InputControlType." + buttonMapping.Target + " in profile \"" + deviceProfile.DeviceName + "\" because this target is reserved as an alias. The mapping will be ignored." );
+						Logger.LogError( "Cannot map control \"" + buttonMapping.Name + "\" as InputControlType." + buttonMapping.Target + " in profile \"" + deviceProfile.DeviceName + "\" because this target is reserved as an alias. The mapping will be ignored." );
 					}
 					else
 					{

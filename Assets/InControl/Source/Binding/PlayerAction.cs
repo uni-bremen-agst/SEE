@@ -200,7 +200,7 @@
 
 			if (binding.BoundTo != null)
 			{
-				Debug.LogWarning( "Binding source is already bound to action " + binding.BoundTo.Name );
+				Logger.LogWarning( "Binding source is already bound to action " + binding.BoundTo.Name );
 				return false;
 			}
 
@@ -250,7 +250,7 @@
 
 			if (binding.BoundTo != null)
 			{
-				Debug.LogWarning( "Binding source is already bound to action " + binding.BoundTo.Name );
+				Logger.LogWarning( "Binding source is already bound to action " + binding.BoundTo.Name );
 				return false;
 			}
 
@@ -291,14 +291,14 @@
 
 			if (withBinding.BoundTo != null)
 			{
-				Debug.LogWarning( "Binding source is already bound to action " + withBinding.BoundTo.Name );
+				Logger.LogWarning( "Binding source is already bound to action " + withBinding.BoundTo.Name );
 				return false;
 			}
 
 			var index = regularBindings.IndexOf( findBinding );
 			if (index < 0)
 			{
-				Debug.LogWarning( "Binding source to replace is not present in this action." );
+				Logger.LogWarning( "Binding source to replace is not present in this action." );
 				return false;
 			}
 
@@ -882,9 +882,9 @@
 
 			set
 			{
-#pragma warning disable 0168, 0219
+				#pragma warning disable 0168, 0219
 				var dummy = value;
-#pragma warning restore 0168, 0219
+				#pragma warning restore 0168, 0219
 			}
 		}
 
@@ -896,9 +896,9 @@
 
 			set
 			{
-#pragma warning disable 0168, 0219
+				#pragma warning disable 0168, 0219
 				var dummy = value;
-#pragma warning restore 0168, 0219
+				#pragma warning restore 0168, 0219
 			}
 		}
 

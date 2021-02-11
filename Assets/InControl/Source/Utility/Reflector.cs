@@ -2,6 +2,8 @@ namespace InControl
 {
 	using System;
 	using System.Collections.Generic;
+
+
 	// using UnityEngine;
 
 
@@ -58,7 +60,7 @@ namespace InControl
 				var name = assembly.GetName().Name;
 				if (IgnoreAssemblyWithName( name )) continue;
 
-				// Debug.Log( "GetAllAssemblyTypes() considering: " + name );
+				// Logger.Log( "GetAllAssemblyTypes() considering: " + name );
 
 				// Ugly hack to handle misversioned DLLs.
 				Type[] innerTypes = null;
@@ -75,7 +77,7 @@ namespace InControl
 				}
 			}
 
-			// Debug.Log( "GetAllAssemblyTypes().Count = " + types.Count );
+			// Logger.Log( "GetAllAssemblyTypes().Count = " + types.Count );
 
 			return types;
 		}
