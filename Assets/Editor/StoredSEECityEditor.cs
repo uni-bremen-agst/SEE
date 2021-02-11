@@ -1,9 +1,9 @@
 ﻿#if UNITY_EDITOR
 
-using SEE.Game;
 using System.Collections.Generic;
-using UnityEditor;
 using SEE.DataModel.DG;
+using SEE.Game;
+using UnityEditor;
 
 namespace SEEEditor
 {

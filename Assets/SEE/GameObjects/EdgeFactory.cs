@@ -4,13 +4,7 @@ using SEE.DataModel;
 using SEE.Game;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
-using System.Collections.Generic;
-using Valve.VR.InteractionSystem;
-using System.Linq;
 using UnityEngine;
-using SEE.Controls;
-using SEE.Controls.Actions;
-using UnityMeshSimplifier;
 
 namespace SEE.GO
 {
@@ -113,36 +107,21 @@ namespace SEE.GO
                 line.positionCount = points.Length; // number of vertices
                 line.SetPositions(points);
 
-                    
-
-                LineRenderer lineRenderer = gameEdge.GetComponent<LineRenderer>();
-                MeshCollider meshCollider = gameEdge.AddComponent<MeshCollider>();
-
-                Mesh mesh = new Mesh();
-                lineRenderer.BakeMesh(mesh, Camera.main, false);
-
-                // Qualität zwischen 0 und 1;
-                float quality = 0.5f;
-                var meshSimplifier = new MeshSimplifier();
-                meshSimplifier.Initialize(mesh);
-                meshSimplifier.SimplifyMesh(quality);
-                var destMesh = meshSimplifier.ToMesh();
-
-                meshCollider.sharedMesh = destMesh;
-
-                //FIXME
-                // Convex ist eher ungeil, da zu groß. Funktioniert aber vorerst.
-                meshCollider.convex = false;
-
-
                 // FIXME
-                // Brauchen wir ein Label Hovering? Wenn ja, EdgeRef stattt NodeRef?
-                gameEdge.AddComponent<Interactable>();
-                gameEdge.AddComponent<InteractableObject>();
-                gameEdge.AddComponent<ShowHovering>();
-                //gameEdge.AddComponent<ShowLabel>();
-                gameEdge.AddComponent<ShowSelection>();
-                //gameEdge.AddComponent<ShowGrabbing>();
+                // put a capsule collider around the straight main line
+                // (the one from points[1] to points[2]
+                // FIXME: The following works only for straight lines with at least
+                // three points, but a layoutEdge can have fewer lines and generally
+                // is not a line in the first place. We need a better approach to
+                // make edges selectable. For the time being, this code will be
+                // disabled.
+                //CapsuleCollider capsule = gameEdge.AddComponent<CapsuleCollider>();
+                //capsule.radius = Math.Max(line.startWidth, line.endWidth) / 2.0f;
+                //capsule.center = Vector3.zero;
+                //capsule.direction = 2; // Z-axis for easier "LookAt" orientation
+                //capsule.transform.position = points[1] + (points[2] - points[1]) / 2;
+                //capsule.transform.LookAt(points[1]);
+                //capsule.height = (points[2] - points[1]).magnitude;
             }
             return result;
         }
