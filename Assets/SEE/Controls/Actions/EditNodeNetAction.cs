@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
-
     /// <summary>
     /// This class is responsible for the edit-node process via network from one client to all others and to the server. 
     /// </summary>
@@ -65,7 +64,6 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    // FIXME: Controll if a Debug Log is the right thing
                     Debug.LogError($"Found no gameObject: {GameObjectID}.\n");
                 }
             }
