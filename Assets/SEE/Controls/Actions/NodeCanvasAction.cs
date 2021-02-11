@@ -32,6 +32,9 @@ namespace SEE.Controls.Actions
             action = null;
         }
 
+        /// <summary>
+        /// Destroys the gameObject which represents the InputCanvas and all its childs.
+        /// </summary>
         public void DestroyGOAndAllChilds()
         {
             foreach (Transform child in Canvas.transform)
