@@ -82,7 +82,7 @@ namespace SEE.Controls.Actions
                 // Could either g or current be cached instead?
                 GameObject g = GameObject.Find("Player Desktop");
                 EditNodeAction current = g.GetComponent<EditNodeAction>();
-                current.EditProgress = EditNodeAction.Progress.NoNodeSelected;
+                current.EditProgress = EditNodeAction.ProgressState.NoNodeSelected;
                 InteractableObject.UnselectAll(true);
                 editNode = false;
             }
