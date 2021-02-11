@@ -240,6 +240,9 @@ namespace SEEEditor
                 city.Tension = EditorGUILayout.Slider(city.Tension, 0.0f, 1.0f);
                 EditorGUILayout.EndHorizontal();
                 city.RDP = EditorGUILayout.FloatField("RDP", city.RDP);
+                city.TubularSegments = EditorGUILayout.IntField("Tubular Segments", city.TubularSegments);
+                city.Radius = EditorGUILayout.FloatField("Radius", city.Radius);
+                city.RadialSegments = EditorGUILayout.IntField("Radial Segments", city.RadialSegments);
             }
         }
 

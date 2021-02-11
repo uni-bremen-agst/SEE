@@ -10,7 +10,6 @@ using System.Linq;
 using UnityEngine;
 using SEE.Controls;
 using SEE.Controls.Actions;
-using SEE.Utils;
 
 namespace SEE.GO
 {
@@ -26,10 +25,16 @@ namespace SEE.GO
         /// </summary>
         /// <param name="layout">the edge layouter used to calculate the line for the edges</param>
         /// <param name="edgeWidth">the width of the line for the edges</param>
-        public EdgeFactory(IEdgeLayout layout, float edgeWidth)
+        /// <param name="tubularSegments">The amount of segments of the tubular</param>
+        /// <param name="radius">The radius of the tubular</param>
+        /// <param name="radialSegments">The amount of radial segments of the tubular</param>
+        public EdgeFactory(IEdgeLayout layout, float edgeWidth, int tubularSegments, float radius, int radialSegments)
         {
             this.layout = layout;
             this.edgeWidth = edgeWidth;
+            this.tubularSegments = tubularSegments;
+            this.radius = radius;
+            this.radialSegments = radialSegments;
             defaultLineMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
         }
 
@@ -47,6 +52,21 @@ namespace SEE.GO
         /// The width of the line for the created edges, given in the constructor.
         /// </summary>
         private readonly float edgeWidth;
+
+        /// <summary>
+        /// The amount of segments of the tubular.
+        /// </summary>
+        private readonly int tubularSegments;
+
+        /// <summary>
+        /// The radius of the tubular.
+        /// </summary>
+        private readonly float radius;
+
+        /// <summary>
+        /// The amount of radial segments of the tubular.
+        /// </summary>
+        private readonly int radialSegments;
 
         /// <summary>
         /// The edge layouter used to generate the line for the edges, given in the constructor.
@@ -116,17 +136,15 @@ namespace SEE.GO
                 MeshCollider meshCollider = gameEdge.AddComponent<MeshCollider>();
 
                 // Build tubular mesh with Curve
-                int tubularSegments = 50;
-                float radius = 0.005f;
-                int radialSegments = 8;
                 bool closed = false; // closed curve or not
-                Mesh mesh = Tubular.Tubular.Build(new CatmullRomCurve(layoutEdge.Points.OfType<Vector3>().ToList()), tubularSegments, radius, radialSegments, closed);
+                Mesh mesh = Tubular.Tubular.Build(new Curve.CatmullRomCurve(layoutEdge.Points.OfType<Vector3>().ToList()), tubularSegments, radius, radialSegments, closed);
 
                 // visualize mesh
                 MeshFilter filter = gameEdge.AddComponent<MeshFilter>();
                 filter.sharedMesh = mesh;
                 meshCollider.sharedMesh = mesh;
 
+                //gameEdge.AddComponent<InteractionDecorator>;
                 gameEdge.AddComponent<Interactable>();
                 gameEdge.AddComponent<InteractableObject>();
                 gameEdge.AddComponent<ShowHovering>();
