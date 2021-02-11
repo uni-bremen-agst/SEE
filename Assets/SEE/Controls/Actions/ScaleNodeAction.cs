@@ -25,34 +25,124 @@ namespace SEE.Controls.Actions
         /// </summary>
         const ActionState.Type ThisActionState = ActionState.Type.ScaleNode;
 
-        // FIXME: These attributes need to be documented.
+        /// <summary>
+        /// The old position of the top sphere
+        /// </summary>
         Vector3 topOldSpherPos;
+
+        /// <summary>
+        /// The old position of the first corner sphere
+        /// </summary>
         Vector3 fstCornerOldSpherPos;
+
+        /// <summary>
+        /// The old position of the second corner sphere
+        /// </summary>
         Vector3 sndCornerOldSpherPos;
+
+        /// <summary>
+        /// The old position of the third corner sphere
+        /// </summary>
         Vector3 thrdCornerOldSpherPos;
+
+        /// <summary>
+        /// The old position of the forth corner sphere
+        /// </summary>
         Vector3 forthCornerOldSpherPos;
+
+        /// <summary>
+        /// The old position of the first side sphere
+        /// </summary>
         Vector3 fstSideOldSpherPos;
+
+        /// <summary>
+        /// The old position of the second side sphere
+        /// </summary>
         Vector3 sndSideOldSpherPos;
+
+        /// <summary>
+        /// The old position of the third side sphere
+        /// </summary>
         Vector3 thrdSideOldSpherPos;
+
+        /// <summary>
+        /// The old position of the forth side sphere
+        /// </summary>
         Vector3 forthSideOldSpherPos;
+
+        /// <summary>
+        /// The scale at the start so the user can reset the changes made during scaling
+        /// </summary>
         Vector3 originalScale;
+
+        /// <summary>
+        /// The position at the start so the user can reset the changes made during scaling
+        /// </summary>
         Vector3 originalPosition;
+
+        /// <summary>
+        /// The sphere on top of the gameObject to scale
+        /// </summary>
         GameObject topSphere;
+
+        /// <summary>
+        /// The sphere on the first corner of the gameObject to scale
+        /// </summary>
         GameObject fstCornerSphere; //x0 y0
+
+        /// <summary>
+        /// The sphere on the second corner of the gameObject to scale
+        /// </summary>
         GameObject sndCornerSphere; //x1 y0
+
+        /// <summary>
+        /// The sphere on the third corner of the gameObject to scale
+        /// </summary>
         GameObject thrdCornerSphere; //x1 y1
+
+        /// <summary>
+        /// The sphere on the forth corner of the gameObject to scale
+        /// </summary>
         GameObject forthCornerSphere; //x0 y1
+
+        /// <summary>
+        /// The sphere on the first side of the gameObject to scale
+        /// </summary>
         GameObject fstSideSphere; //x0 y0
+
+        /// <summary>
+        /// The sphere on the second side of the gameObject to scale
+        /// </summary>
         GameObject sndSideSphere; //x1 y0
+
+        /// <summary>
+        /// The sphere on the third side of the gameObject to scale
+        /// </summary>
         GameObject thrdSideSphere; //x1 y1
+
+        /// <summary>
+        /// The sphere on the forth side of the gameObject to scale
+        /// </summary>
         GameObject forthSideSphere; //x0 y1
 
+        /// <summary>
+        /// The gameObject which will end the scaling and start the save process
+        /// </summary>
         GameObject endWithSave;
+
+        /// <summary>
+        /// The gameObject which will end the scaling process and start the discard changes process
+        /// </summary>
         GameObject endWithOutSave;
 
-        // FIXME: Needs a better name.
-        GameObject tmpSphere = null;
+        /// <summary>
+        /// The gameObject in which will be saved which sphere was dragged
+        /// </summary>
+        GameObject draggedSphere = null;
 
+        /// <summary>
+        /// The gameObject which should be scaled
+        /// </summary>
         private GameObject objectToScale;
 
         public void Start()
@@ -139,7 +229,7 @@ namespace SEE.Controls.Actions
             }
             if (instantiated && Input.GetMouseButton(0))
             {
-                if (tmpSphere == null)
+                if (draggedSphere == null)
                 {
                     Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
 
@@ -151,40 +241,40 @@ namespace SEE.Controls.Actions
                     // Top
                     if (hit.collider == topSphere.GetComponent<Collider>())
                     {
-                        tmpSphere = topSphere;
+                        draggedSphere = topSphere;
                     } // Corners
                     else if (hit.collider == fstCornerSphere.GetComponent<Collider>())
                     {
-                        tmpSphere = fstCornerSphere;
+                        draggedSphere = fstCornerSphere;
                     }
                     else if (hit.collider == sndCornerSphere.GetComponent<Collider>())
                     {
-                        tmpSphere = sndCornerSphere;
+                        draggedSphere = sndCornerSphere;
                     }
                     else if (hit.collider == thrdCornerSphere.GetComponent<Collider>())
                     {
-                        tmpSphere = thrdCornerSphere;
+                        draggedSphere = thrdCornerSphere;
                     }
                     else if (hit.collider == forthCornerSphere.GetComponent<Collider>())
                     {
-                        tmpSphere = forthCornerSphere;
+                        draggedSphere = forthCornerSphere;
                     }
                     // Sides
                     else if (hit.collider == fstSideSphere.GetComponent<Collider>())
                     {
-                        tmpSphere = fstSideSphere;
+                        draggedSphere = fstSideSphere;
                     }
                     else if (hit.collider == sndSideSphere.GetComponent<Collider>())
                     {
-                        tmpSphere = sndSideSphere;
+                        draggedSphere = sndSideSphere;
                     }
                     else if (hit.collider == thrdSideSphere.GetComponent<Collider>())
                     {
-                        tmpSphere = thrdSideSphere;
+                        draggedSphere = thrdSideSphere;
                     }
                     else if (hit.collider == forthSideSphere.GetComponent<Collider>())
                     {
-                        tmpSphere = forthSideSphere;
+                        draggedSphere = forthSideSphere;
                     }
                     //End Scalling
                     else if (hit.collider == endWithSave.GetComponent<Collider>())
@@ -197,26 +287,26 @@ namespace SEE.Controls.Actions
                     }
                 }
 
-                if (tmpSphere == topSphere)
+                if (draggedSphere == topSphere)
                 {
-                    GameNodeMover.MoveToLockAxes(tmpSphere, false, true, false);
+                    GameNodeMover.MoveToLockAxes(draggedSphere, false, true, false);
                 }
-                else if (tmpSphere == fstCornerSphere || tmpSphere == sndCornerSphere 
-                         || tmpSphere == thrdCornerSphere || tmpSphere == forthCornerSphere)
+                else if (draggedSphere == fstCornerSphere || draggedSphere == sndCornerSphere 
+                         || draggedSphere == thrdCornerSphere || draggedSphere == forthCornerSphere)
                 {
-                    GameNodeMover.MoveToLockAxes(tmpSphere, true, false, true);
+                    GameNodeMover.MoveToLockAxes(draggedSphere, true, false, true);
                 }
-                else if (tmpSphere == fstSideSphere || tmpSphere == sndSideSphere)
+                else if (draggedSphere == fstSideSphere || draggedSphere == sndSideSphere)
                 {
-                    GameNodeMover.MoveToLockAxes(tmpSphere, true, false, false);
+                    GameNodeMover.MoveToLockAxes(draggedSphere, true, false, false);
                 }
-                else if (tmpSphere == thrdSideSphere || tmpSphere == forthSideSphere)
+                else if (draggedSphere == thrdSideSphere || draggedSphere == forthSideSphere)
                 {
-                    GameNodeMover.MoveToLockAxes(tmpSphere, false, false, true);
+                    GameNodeMover.MoveToLockAxes(draggedSphere, false, false, true);
                 }
                 else
                 {
-                    tmpSphere = null;
+                    draggedSphere = null;
                 }
 
                 if(objectToScale != null)
@@ -230,7 +320,7 @@ namespace SEE.Controls.Actions
             {
                 if (objectToScale != null && instantiated)
                 {
-                    tmpSphere = null;
+                    draggedSphere = null;
                     // Adjust the size of the scaling elements
                     SphereRadius(topSphere);
                     SphereRadius(fstSideSphere);
