@@ -30,12 +30,12 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="uniqueGameObjectName">The unique name of the GameObject that should be scaled through the network</param>
         /// <param name="scale">The new scale of the GameObject</param>
-        /// <param name="positon">The new position of the GameObject</param>
-        public ScaleNodeNetAction(string uniqueGameObjectName, Vector3 scale, Vector3 positon) : base()
+        /// <param name="position">The new position of the GameObject</param>
+        public ScaleNodeNetAction(string uniqueGameObjectName, Vector3 scale, Vector3 position) : base()
         {
             this.UniqueGameObjectName = uniqueGameObjectName;
             this.Scale = scale;
-            Position = positon;
+            Position = position;
         }
 
         /// <summary>
