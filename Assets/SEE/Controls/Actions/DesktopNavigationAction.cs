@@ -725,7 +725,7 @@ namespace SEE.Controls.Actions
         /// 
         /// This method is expected to be called at every Update().
         /// 
-        /// You can lock any of the three axes .
+        /// You can lock any of the three axes.
         /// </summary>
         /// <param name="movingObject">the object to be moved</param>
         /// <param name="lockX">whether the movement should be locked on this axis</param>
