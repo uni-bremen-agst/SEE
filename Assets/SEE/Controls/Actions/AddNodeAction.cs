@@ -198,7 +198,7 @@ namespace SEE.Controls.Actions
                     }
                     if (canvasObject.TryGetComponent(out CanvasGenerator canvasGenerator))
                     {
-                        canvasGenerator.DestroyAddNodeCanvas();
+                        canvasGenerator.DestroyAddNodeCanvasAction();
                     }
                     Undye();
                     instantiated = false;
@@ -226,7 +226,7 @@ namespace SEE.Controls.Actions
             {
                 CanvasGenerator canvas = canvasObject.GetComponent<CanvasGenerator>();
                 canvasObject.GetComponent<AddingNodeCanvasAction>().GetNodeValues();
-                canvas.DestroyAddNodeCanvas();
+                canvas.DestroyAddNodeCanvasAction();
             }
             switch (Progress)
             {

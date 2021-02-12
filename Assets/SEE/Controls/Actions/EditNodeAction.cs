@@ -64,7 +64,7 @@ namespace SEE.Controls.Actions
                     enabled = false;
                     CanvasGenerator canvasGenerator;
                     canvasObject.TryGetComponentOrLog<CanvasGenerator>(out canvasGenerator);
-                    canvasGenerator.DestroyEditNodeCanvas();
+                    canvasGenerator.DestroyEditNodeCanvasAction();
                     instantiated = false;
                     InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
@@ -103,7 +103,7 @@ namespace SEE.Controls.Actions
 
                 case ProgressState.EditIsCanceled:
                     CanvasGenerator canvasGenerator = canvasObject.GetComponent<CanvasGenerator>();
-                    canvasGenerator.DestroyEditNodeCanvas();
+                    canvasGenerator.DestroyEditNodeCanvasAction();
                     hoveredObject = null;
                     EditProgress = ProgressState.NoNodeSelected;
                     break;

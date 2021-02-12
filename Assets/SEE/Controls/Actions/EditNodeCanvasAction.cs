@@ -75,7 +75,7 @@ namespace SEE.Controls.Actions
                     nodeToEdit.Type = inputtype.text;
                 }
                 CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
-                generator.DestroyEditNodeCanvas();
+                generator.DestroyEditNodeCanvasAction();
                 new EditNodeNetAction(nodeToEdit.SourceName, nodeToEdit.Type, gameObjectID).Execute(null);
                 GameObject g = GameObject.Find(PlayerSettings.PlayerName[(int)PlayerSettings.PlayerInputType.Desktop]);
                 EditNodeAction current = g.GetComponent<EditNodeAction>();

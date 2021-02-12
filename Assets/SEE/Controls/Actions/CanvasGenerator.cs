@@ -27,26 +27,26 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Destroys the AddingNodeCanvasScript and each of its children.
+        /// Destroys the component <see cref="AddingNodeCanvasAction"/> if it is
+        /// attached to the gameObject.
         /// </summary>
-        public void DestroyAddNodeCanvas()
+        public void DestroyAddNodeCanvasAction()
         {
             if (gameObject.TryGetComponent(out AddingNodeCanvasAction action))
             {
-                action.DestroyGOAndAllChilds();
-                Destroy(action);
+                NodeCanvasAction.DestroyInstance(action);
             }
         }
 
         /// <summary>
-        /// Destroys the EditNodeCanvasScript and each of its children.
+        /// Destroys the component <see cref="EditNodeCanvasAction"/> if it is
+        /// attached to the gameObject.
         /// </summary>
-        public void DestroyEditNodeCanvas()
+        public void DestroyEditNodeCanvasAction()
         {
             if (gameObject.TryGetComponent(out EditNodeCanvasAction action))
             {
-                action.DestroyGOAndAllChilds();
-                Destroy(action);
+                NodeCanvasAction.DestroyInstance(action);
             }
         }
     }
