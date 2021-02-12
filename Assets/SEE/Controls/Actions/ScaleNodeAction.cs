@@ -289,20 +289,20 @@ namespace SEE.Controls.Actions
 
                 if (draggedSphere == topSphere)
                 {
-                    GameNodeMover.MoveToLockAxes(draggedSphere, false, true, false);
+                   DesktopNavigationAction.MoveToLockAxes(draggedSphere, false, true, false);
                 }
                 else if (draggedSphere == fstCornerSphere || draggedSphere == sndCornerSphere 
                          || draggedSphere == thrdCornerSphere || draggedSphere == forthCornerSphere)
                 {
-                    GameNodeMover.MoveToLockAxes(draggedSphere, true, false, true);
+                    DesktopNavigationAction.MoveToLockAxes(draggedSphere, true, false, true);
                 }
                 else if (draggedSphere == fstSideSphere || draggedSphere == sndSideSphere)
                 {
-                    GameNodeMover.MoveToLockAxes(draggedSphere, true, false, false);
+                    DesktopNavigationAction.MoveToLockAxes(draggedSphere, true, false, false);
                 }
                 else if (draggedSphere == thrdSideSphere || draggedSphere == forthSideSphere)
                 {
-                    GameNodeMover.MoveToLockAxes(draggedSphere, false, false, true);
+                    DesktopNavigationAction.MoveToLockAxes(draggedSphere, false, false, true);
                 }
                 else
                 {
