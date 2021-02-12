@@ -24,13 +24,18 @@ namespace SEE.GO
         /// <param name="tubularSegments">The amount of segments of the tubular</param>
         /// <param name="radius">The radius of the tubular</param>
         /// <param name="radialSegments">The amount of radial segments of the tubular</param>
-        public EdgeFactory(IEdgeLayout layout, float edgeWidth, int tubularSegments, float radius, int radialSegments)
+        /// <param name="isEdgeSelectable">Are the edges selectable or not</param>
+        public EdgeFactory(IEdgeLayout layout, float edgeWidth, int tubularSegments, float radius, int radialSegments, bool isEdgeSelectable)
         {
             this.layout = layout;
             this.edgeWidth = edgeWidth;
-            this.tubularSegments = tubularSegments;
-            this.radius = radius;
-            this.radialSegments = radialSegments;
+            if (tubularSegments > 0) this.tubularSegments = tubularSegments;
+            else this.tubularSegments = 50;
+            if (radius > 0) this.radius = radius;
+            else this.radius = 0.005f;
+            if (radialSegments > 0) this.radialSegments = radialSegments;
+            else this.radialSegments = 8;
+            this.isEdgeSelectable = isEdgeSelectable;
             defaultLineMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
         }
 
@@ -63,6 +68,11 @@ namespace SEE.GO
         /// The amount of radial segments of the tubular.
         /// </summary>
         private readonly int radialSegments;
+
+        /// <summary>
+        /// Determines if the edges are selectable or not.
+        /// </summary>
+        private readonly bool isEdgeSelectable;
 
         /// <summary>
         /// The edge layouter used to generate the line for the edges, given in the constructor.
@@ -140,7 +150,7 @@ namespace SEE.GO
                 filter.sharedMesh = mesh;
                 meshCollider.sharedMesh = mesh;
 
-                InteractionDecorator.PrepareForInteraction(gameEdge);
+                // if (isEdgeSelectable) InteractionDecorator.PrepareForInteraction(gameEdge);  FIXME: Somehow uses InteractionDecorator twice with this line.
             }
             return result;
         }

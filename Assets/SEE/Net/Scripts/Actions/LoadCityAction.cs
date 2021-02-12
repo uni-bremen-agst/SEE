@@ -92,6 +92,7 @@ namespace SEE.Net
         public int TubularSegments;
         public float Radius;
         public int RadialSegments;
+        public bool isEdgeSelectable;
 
         //-----------------------------------------------------------------------
         // SEECity
@@ -181,6 +182,7 @@ namespace SEE.Net
             TubularSegments = city.TubularSegments;
             Radius = city.Radius;
             RadialSegments = city.RadialSegments;
+            isEdgeSelectable = city.isEdgeSelectable;
 
 
             if (city.GetType() == typeof(SEECity))
@@ -310,6 +312,7 @@ namespace SEE.Net
             city.TubularSegments = TubularSegments;
             city.Radius = Radius;
             city.RadialSegments = RadialSegments;
+            city.isEdgeSelectable = isEdgeSelectable;
 
             if (t == typeof(SEECity))
             {
