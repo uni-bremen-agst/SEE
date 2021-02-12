@@ -280,7 +280,7 @@ namespace SEE.Controls.Actions
                     break;
 
                 default:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException("Unhandled case.");
             }
         }
 
