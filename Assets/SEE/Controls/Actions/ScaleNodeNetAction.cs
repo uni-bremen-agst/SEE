@@ -13,7 +13,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The id of the gameObject that has to be scaled.
         /// </summary>
-        public string GameObjectID;
+        public string UniqueGameObjectName;
 
         /// <summary>
         /// The new scale to bring over the network.
@@ -28,14 +28,14 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Constructs a ScaleNodeNetAction
         /// </summary>
-        /// <param name="GameObjectID">The id from the GameObject which should be scaled through the network</param>
-        /// <param name="Scale">The new scale of the GameObject</param>
-        /// <param name="Positon">The new position of the GameObject</param>
-        public ScaleNodeNetAction(string GameObjectID, Vector3 Scale, Vector3 Positon) : base()
+        /// <param name="uniqueGameObjectName">The unique name of the GameObject that should be scaled through the network</param>
+        /// <param name="scale">The new scale of the GameObject</param>
+        /// <param name="positon">The new position of the GameObject</param>
+        public ScaleNodeNetAction(string uniqueGameObjectName, Vector3 scale, Vector3 positon) : base()
         {
-            this.GameObjectID = GameObjectID;
-            this.Scale = Scale;
-            Position = Positon;
+            this.UniqueGameObjectName = uniqueGameObjectName;
+            this.Scale = scale;
+            Position = positon;
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace SEE.Controls.Actions
         {
             if (!IsRequester())
             {
-                GameObject scaleObj = GameObject.Find(GameObjectID);
+                GameObject scaleObj = GameObject.Find(UniqueGameObjectName);
                 if (scaleObj != null)
                 {
                     scaleObj.SetScale(Scale);
@@ -61,7 +61,7 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    Debug.LogError($"Found no game object: {GameObjectID}.\n");
+                    Debug.LogError($"Found no game object: {UniqueGameObjectName}.\n");
                 }
             }
         }
