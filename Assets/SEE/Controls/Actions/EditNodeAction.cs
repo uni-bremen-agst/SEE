@@ -107,6 +107,9 @@ namespace SEE.Controls.Actions
                     hoveredObject = null;
                     EditProgress = ProgressState.NoNodeSelected;
                     break;
+
+                default:
+                    throw new System.NotImplementedException("Unhandled case.");
             }
         }
     }
