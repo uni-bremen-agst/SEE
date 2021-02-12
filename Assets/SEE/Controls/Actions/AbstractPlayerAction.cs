@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
@@ -52,8 +53,9 @@ namespace SEE.Controls.Actions
                 Assert.IsNull(hoveredObject);
                 hoveredObject = interactableObject.gameObject;
             }
-            catch
+            catch (Exception e)
             {
+                Debug.LogError($"AbstractPlayerAction.LocalAnyHoverIn throws {e.Message}.\n");
                 // FIXME: There are AssertionExceptions 
             }
         }
