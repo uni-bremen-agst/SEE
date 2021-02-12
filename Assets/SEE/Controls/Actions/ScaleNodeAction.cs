@@ -22,122 +22,122 @@ namespace SEE.Controls.Actions
         /// Thus, this action will be executed only if the new state is 
         /// <see cref="ThisActionState"/>.
         /// </summary>
-        const ActionState.Type ThisActionState = ActionState.Type.ScaleNode;
+        private const ActionState.Type ThisActionState = ActionState.Type.ScaleNode;
 
         /// <summary>
         /// The old position of the top sphere
         /// </summary>
-        Vector3 topOldSpherPos;
+        private Vector3 topOldSpherePos;
 
         /// <summary>
         /// The old position of the first corner sphere
         /// </summary>
-        Vector3 fstCornerOldSpherPos;
+        private Vector3 firstCornerOldSpherePos;
 
         /// <summary>
         /// The old position of the second corner sphere
         /// </summary>
-        Vector3 sndCornerOldSpherPos;
+        private Vector3 secondCornerOldSpherePos;
 
         /// <summary>
         /// The old position of the third corner sphere
         /// </summary>
-        Vector3 thrdCornerOldSpherPos;
+        private Vector3 thirdCornerOldSpherePos;
 
         /// <summary>
         /// The old position of the forth corner sphere
         /// </summary>
-        Vector3 forthCornerOldSpherPos;
+        private Vector3 forthCornerOldSpherePos;
 
         /// <summary>
         /// The old position of the first side sphere
         /// </summary>
-        Vector3 fstSideOldSpherPos;
+        private Vector3 firstSideOldSpherePos;
 
         /// <summary>
         /// The old position of the second side sphere
         /// </summary>
-        Vector3 sndSideOldSpherPos;
+        private Vector3 secondSideOldSpherePos;
 
         /// <summary>
         /// The old position of the third side sphere
         /// </summary>
-        Vector3 thrdSideOldSpherPos;
+        private Vector3 thirdSideOldSpherePos;
 
         /// <summary>
         /// The old position of the forth side sphere
         /// </summary>
-        Vector3 forthSideOldSpherPos;
+        private Vector3 forthSideOldSpherePos;
 
         /// <summary>
         /// The scale at the start so the user can reset the changes made during scaling
         /// </summary>
-        Vector3 originalScale;
+        private Vector3 originalScale;
 
         /// <summary>
         /// The position at the start so the user can reset the changes made during scaling
         /// </summary>
-        Vector3 originalPosition;
+        private Vector3 originalPosition;
 
         /// <summary>
         /// The sphere on top of the gameObject to scale
         /// </summary>
-        GameObject topSphere;
+        private GameObject topSphere;
 
         /// <summary>
         /// The sphere on the first corner of the gameObject to scale
         /// </summary>
-        GameObject fstCornerSphere; //x0 y0
+        private GameObject firstCornerSphere; //x0 y0
 
         /// <summary>
         /// The sphere on the second corner of the gameObject to scale
         /// </summary>
-        GameObject sndCornerSphere; //x1 y0
+        private GameObject secondCornerSphere; //x1 y0
 
         /// <summary>
         /// The sphere on the third corner of the gameObject to scale
         /// </summary>
-        GameObject thrdCornerSphere; //x1 y1
+        private GameObject thirdCornerSphere; //x1 y1
 
         /// <summary>
         /// The sphere on the forth corner of the gameObject to scale
         /// </summary>
-        GameObject forthCornerSphere; //x0 y1
+        private GameObject forthCornerSphere; //x0 y1
 
         /// <summary>
         /// The sphere on the first side of the gameObject to scale
         /// </summary>
-        GameObject fstSideSphere; //x0 y0
+        private GameObject firstSideSphere; //x0 y0
 
         /// <summary>
         /// The sphere on the second side of the gameObject to scale
         /// </summary>
-        GameObject sndSideSphere; //x1 y0
+        private GameObject secondSideSphere; //x1 y0
 
         /// <summary>
         /// The sphere on the third side of the gameObject to scale
         /// </summary>
-        GameObject thrdSideSphere; //x1 y1
+        private GameObject thirdSideSphere; //x1 y1
 
         /// <summary>
         /// The sphere on the forth side of the gameObject to scale
         /// </summary>
-        GameObject forthSideSphere; //x0 y1
+        private GameObject forthSideSphere; //x0 y1
 
         /// <summary>
         /// The gameObject which will end the scaling and start the save process
         /// </summary>
-        GameObject endWithSave;
+        private GameObject endWithSave;
 
         /// <summary>
         /// The gameObject which will end the scaling process and start the discard changes process
         /// </summary>
-        GameObject endWithOutSave;
+        private GameObject endWithOutSave;
 
         /// <summary>
         /// The gameObject in which will be saved which sphere was dragged
         /// </summary>
-        GameObject draggedSphere = null;
+        private GameObject draggedSphere = null;
 
         /// <summary>
         /// The gameObject which should be scaled
@@ -183,27 +183,27 @@ namespace SEE.Controls.Actions
                 SphereRadius(topSphere);
 
                 // Corner spheres
-                fstCornerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                SphereRadius(fstCornerSphere);
+                firstCornerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                SphereRadius(firstCornerSphere);
 
-                sndCornerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                SphereRadius(sndCornerSphere);
+                secondCornerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                SphereRadius(secondCornerSphere);
 
-                thrdCornerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                SphereRadius(thrdCornerSphere);
+                thirdCornerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                SphereRadius(thirdCornerSphere);
 
                 forthCornerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 SphereRadius(forthCornerSphere);
 
                 // Side spheres
-                fstSideSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                SphereRadius(fstSideSphere);
+                firstSideSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                SphereRadius(firstSideSphere);
 
-                sndSideSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                SphereRadius(sndSideSphere);
+                secondSideSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                SphereRadius(secondSideSphere);
 
-                thrdSideSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                SphereRadius(thrdSideSphere);
+                thirdSideSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                SphereRadius(thirdSideSphere);
 
                 forthSideSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 SphereRadius(forthSideSphere);
@@ -242,34 +242,34 @@ namespace SEE.Controls.Actions
                     {
                         draggedSphere = topSphere;
                     } // Corners
-                    else if (hit.collider == fstCornerSphere.GetComponent<Collider>())
+                    else if (hit.collider == firstCornerSphere.GetComponent<Collider>())
                     {
-                        draggedSphere = fstCornerSphere;
+                        draggedSphere = firstCornerSphere;
                     }
-                    else if (hit.collider == sndCornerSphere.GetComponent<Collider>())
+                    else if (hit.collider == secondCornerSphere.GetComponent<Collider>())
                     {
-                        draggedSphere = sndCornerSphere;
+                        draggedSphere = secondCornerSphere;
                     }
-                    else if (hit.collider == thrdCornerSphere.GetComponent<Collider>())
+                    else if (hit.collider == thirdCornerSphere.GetComponent<Collider>())
                     {
-                        draggedSphere = thrdCornerSphere;
+                        draggedSphere = thirdCornerSphere;
                     }
                     else if (hit.collider == forthCornerSphere.GetComponent<Collider>())
                     {
                         draggedSphere = forthCornerSphere;
                     }
                     // Sides
-                    else if (hit.collider == fstSideSphere.GetComponent<Collider>())
+                    else if (hit.collider == firstSideSphere.GetComponent<Collider>())
                     {
-                        draggedSphere = fstSideSphere;
+                        draggedSphere = firstSideSphere;
                     }
-                    else if (hit.collider == sndSideSphere.GetComponent<Collider>())
+                    else if (hit.collider == secondSideSphere.GetComponent<Collider>())
                     {
-                        draggedSphere = sndSideSphere;
+                        draggedSphere = secondSideSphere;
                     }
-                    else if (hit.collider == thrdSideSphere.GetComponent<Collider>())
+                    else if (hit.collider == thirdSideSphere.GetComponent<Collider>())
                     {
-                        draggedSphere = thrdSideSphere;
+                        draggedSphere = thirdSideSphere;
                     }
                     else if (hit.collider == forthSideSphere.GetComponent<Collider>())
                     {
@@ -290,16 +290,16 @@ namespace SEE.Controls.Actions
                 {
                    DesktopNavigationAction.MoveToLockAxes(draggedSphere, false, true, false);
                 }
-                else if (draggedSphere == fstCornerSphere || draggedSphere == sndCornerSphere 
-                         || draggedSphere == thrdCornerSphere || draggedSphere == forthCornerSphere)
+                else if (draggedSphere == firstCornerSphere || draggedSphere == secondCornerSphere 
+                         || draggedSphere == thirdCornerSphere || draggedSphere == forthCornerSphere)
                 {
                     DesktopNavigationAction.MoveToLockAxes(draggedSphere, true, false, true);
                 }
-                else if (draggedSphere == fstSideSphere || draggedSphere == sndSideSphere)
+                else if (draggedSphere == firstSideSphere || draggedSphere == secondSideSphere)
                 {
                     DesktopNavigationAction.MoveToLockAxes(draggedSphere, true, false, false);
                 }
-                else if (draggedSphere == thrdSideSphere || draggedSphere == forthSideSphere)
+                else if (draggedSphere == thirdSideSphere || draggedSphere == forthSideSphere)
                 {
                     DesktopNavigationAction.MoveToLockAxes(draggedSphere, false, false, true);
                 }
@@ -322,13 +322,13 @@ namespace SEE.Controls.Actions
                     draggedSphere = null;
                     // Adjust the size of the scaling elements
                     SphereRadius(topSphere);
-                    SphereRadius(fstSideSphere);
-                    SphereRadius(sndSideSphere);
-                    SphereRadius(thrdSideSphere);
+                    SphereRadius(firstSideSphere);
+                    SphereRadius(secondSideSphere);
+                    SphereRadius(thirdSideSphere);
                     SphereRadius(forthSideSphere);
-                    SphereRadius(fstCornerSphere);
-                    SphereRadius(sndCornerSphere);
-                    SphereRadius(thrdCornerSphere);
+                    SphereRadius(firstCornerSphere);
+                    SphereRadius(secondCornerSphere);
+                    SphereRadius(thirdCornerSphere);
                     SphereRadius(forthCornerSphere);
 
                     SphereRadius(endWithOutSave);
@@ -344,18 +344,18 @@ namespace SEE.Controls.Actions
         {
 
             Vector3 scale = Vector3.zero;
-            scale.y += topSphere.transform.position.y - topOldSpherPos.y;
-            scale.x -= fstSideSphere.transform.position.x - fstSideOldSpherPos.x;
-            scale.x += sndSideSphere.transform.position.x - sndSideOldSpherPos.x;
-            scale.z -= thrdSideSphere.transform.position.z - thrdSideOldSpherPos.z;
-            scale.z += forthSideSphere.transform.position.z - forthSideOldSpherPos.z;
+            scale.y += topSphere.transform.position.y - topOldSpherePos.y;
+            scale.x -= firstSideSphere.transform.position.x - firstSideOldSpherePos.x;
+            scale.x += secondSideSphere.transform.position.x - secondSideOldSpherePos.x;
+            scale.z -= thirdSideSphere.transform.position.z - thirdSideOldSpherePos.z;
+            scale.z += forthSideSphere.transform.position.z - forthSideOldSpherePos.z;
 
             // Corner scaling
             float scaleCorner = 0;
-            scaleCorner -= fstCornerSphere.transform.position.x - fstCornerOldSpherPos.x + (fstCornerSphere.transform.position.z - fstCornerOldSpherPos.z); //* 0.5f;
-            scaleCorner += sndCornerSphere.transform.position.x - sndCornerOldSpherPos.x - (sndCornerSphere.transform.position.z - sndCornerOldSpherPos.z); //* 0.5f;
-            scaleCorner += thrdCornerSphere.transform.position.x - thrdCornerOldSpherPos.x + (thrdCornerSphere.transform.position.z - thrdCornerOldSpherPos.z);// * 0.5f;
-            scaleCorner -= forthCornerSphere.transform.position.x - forthCornerOldSpherPos.x - (forthCornerSphere.transform.position.z - forthCornerOldSpherPos.z);// * 0.5f;
+            scaleCorner -= firstCornerSphere.transform.position.x - firstCornerOldSpherePos.x + (firstCornerSphere.transform.position.z - firstCornerOldSpherePos.z); //* 0.5f;
+            scaleCorner += secondCornerSphere.transform.position.x - secondCornerOldSpherePos.x - (secondCornerSphere.transform.position.z - secondCornerOldSpherePos.z); //* 0.5f;
+            scaleCorner += thirdCornerSphere.transform.position.x - thirdCornerOldSpherePos.x + (thirdCornerSphere.transform.position.z - thirdCornerOldSpherePos.z);// * 0.5f;
+            scaleCorner -= forthCornerSphere.transform.position.x - forthCornerOldSpherePos.x - (forthCornerSphere.transform.position.z - forthCornerOldSpherePos.z);// * 0.5f;
 
             scale.x += scaleCorner;
             scale.z += scaleCorner;
@@ -365,15 +365,15 @@ namespace SEE.Controls.Actions
             position.y += scale.y * 0.5f;
            
             // Setting the old positions
-            topOldSpherPos = topSphere.transform.position;
-            fstCornerOldSpherPos = fstCornerSphere.transform.position;
-            sndCornerOldSpherPos = sndCornerSphere.transform.position;
-            thrdCornerOldSpherPos = thrdCornerSphere.transform.position;
-            forthCornerOldSpherPos = forthCornerSphere.transform.position;
-            fstSideOldSpherPos = fstSideSphere.transform.position;
-            sndSideOldSpherPos = sndSideSphere.transform.position;
-            thrdSideOldSpherPos = thrdSideSphere.transform.position;
-            forthSideOldSpherPos = forthSideSphere.transform.position;
+            topOldSpherePos = topSphere.transform.position;
+            firstCornerOldSpherePos = firstCornerSphere.transform.position;
+            secondCornerOldSpherePos = secondCornerSphere.transform.position;
+            thirdCornerOldSpherePos = thirdCornerSphere.transform.position;
+            forthCornerOldSpherePos = forthCornerSphere.transform.position;
+            firstSideOldSpherePos = firstSideSphere.transform.position;
+            secondSideOldSpherePos = secondSideSphere.transform.position;
+            thirdSideOldSpherePos = thirdSideSphere.transform.position;
+            forthSideOldSpherePos = forthSideSphere.transform.position;
 
             scale = objectToScale.transform.lossyScale + scale;
 
@@ -409,7 +409,7 @@ namespace SEE.Controls.Actions
             pos.y = objectToScale.GetRoof() + 0.01f;
             topSphere.transform.position = pos;
 
-            topOldSpherPos = topSphere.transform.position;
+            topOldSpherePos = topSphere.transform.position;
             pos.y += 0.2f;
             pos.x += 0.1f;
             endWithSave.transform.position = pos;
@@ -429,24 +429,24 @@ namespace SEE.Controls.Actions
             pos.y = objectToScale.GetRoof();
             pos.x -= trns.lossyScale.x / 2 + 0.02f;
             pos.z -= trns.lossyScale.z / 2 + 0.02f;
-            fstCornerSphere.transform.position = pos;
-            fstCornerOldSpherPos = pos;
+            firstCornerSphere.transform.position = pos;
+            firstCornerOldSpherePos = pos;
 
             // second corner
             pos = objectToScale.transform.position;
             pos.y = objectToScale.GetRoof();
             pos.x += trns.lossyScale.x / 2 + 0.02f;
             pos.z -= trns.lossyScale.z / 2 + 0.02f;
-            sndCornerSphere.transform.position = pos;
-            sndCornerOldSpherPos = pos;
+            secondCornerSphere.transform.position = pos;
+            secondCornerOldSpherePos = pos;
 
             // third corner
             pos = objectToScale.transform.position;
             pos.y = objectToScale.GetRoof();
             pos.x += trns.lossyScale.x / 2 + 0.02f;
             pos.z += trns.lossyScale.z / 2 + 0.02f;
-            thrdCornerSphere.transform.position = pos;
-            thrdCornerOldSpherPos = pos;
+            thirdCornerSphere.transform.position = pos;
+            thirdCornerOldSpherePos = pos;
 
             // forth corner
             pos = objectToScale.transform.position;
@@ -454,31 +454,31 @@ namespace SEE.Controls.Actions
             pos.x -= trns.lossyScale.x / 2 + 0.02f;
             pos.z += trns.lossyScale.z / 2 + 0.02f;
             forthCornerSphere.transform.position = pos;
-            forthCornerOldSpherPos = pos;
+            forthCornerOldSpherePos = pos;
 
             // first side
             pos = objectToScale.transform.position;
             pos.y = objectToScale.GetRoof();
             pos.x -= trns.lossyScale.x / 2 + 0.01f;
 
-            fstSideSphere.transform.position = pos;
-            fstSideOldSpherPos = pos;
+            firstSideSphere.transform.position = pos;
+            firstSideOldSpherePos = pos;
 
             // second side
             pos = objectToScale.transform.position;
             pos.y = objectToScale.GetRoof();
             pos.x += trns.lossyScale.x / 2 + 0.01f;
 
-            sndSideSphere.transform.position = pos;
-            sndSideOldSpherPos = pos;
+            secondSideSphere.transform.position = pos;
+            secondSideOldSpherePos = pos;
 
             // third side
             pos = objectToScale.transform.position;
             pos.y = objectToScale.GetRoof();
 
             pos.z -= trns.lossyScale.z / 2 + 0.01f;
-            thrdSideSphere.transform.position = pos;
-            thrdSideOldSpherPos = pos;
+            thirdSideSphere.transform.position = pos;
+            thirdSideOldSpherePos = pos;
 
             // forth side
             pos = objectToScale.transform.position;
@@ -486,7 +486,7 @@ namespace SEE.Controls.Actions
 
             pos.z += trns.lossyScale.z / 2 + 0.01f;
             forthSideSphere.transform.position = pos;
-            forthSideOldSpherPos = pos;
+            forthSideOldSpherePos = pos;
         }
 
         /// <summary>
@@ -537,13 +537,13 @@ namespace SEE.Controls.Actions
         public void RemoveSpheres()
         {
             Destroy(topSphere);
-            Destroy(fstCornerSphere);
-            Destroy(sndCornerSphere);
-            Destroy(thrdCornerSphere);
+            Destroy(firstCornerSphere);
+            Destroy(secondCornerSphere);
+            Destroy(thirdCornerSphere);
             Destroy(forthCornerSphere);
-            Destroy(fstSideSphere);
-            Destroy(sndSideSphere);
-            Destroy(thrdSideSphere);
+            Destroy(firstSideSphere);
+            Destroy(secondSideSphere);
+            Destroy(thirdSideSphere);
             Destroy(forthSideSphere);
             Destroy(endWithSave);
             Destroy(endWithOutSave);
