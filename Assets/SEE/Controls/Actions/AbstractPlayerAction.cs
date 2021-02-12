@@ -72,8 +72,9 @@ namespace SEE.Controls.Actions
                 Assert.IsTrue(hoveredObject == interactableObject.gameObject);
                 hoveredObject = null;
             }
-            catch
+            catch (Exception e)
             {
+                Debug.LogError($"AbstractPlayerAction.LocalAnyHoverOut throws {e.Message}.\n");
                 // FIXME: There are AssertionExceptions 
             }
         }
