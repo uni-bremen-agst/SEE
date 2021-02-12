@@ -141,6 +141,9 @@ namespace SEE.Controls.Actions
         /// </summary>
         public bool Network { get => network; set => network = value; }
 
+        /// <summary>
+        /// The life cycle of adding a node.
+        /// </summary>
         public enum ProgressState
         {
             NoCitySelected,
@@ -153,7 +156,7 @@ namespace SEE.Controls.Actions
 
         private ProgressState progress = ProgressState.NoCitySelected;
         /// <summary>
-        /// The specific state of the progress of adding a node to the implementation.
+        /// The specific state of the progress of adding a node.
         /// </summary>
         public ProgressState Progress { get => progress; set => progress = value; }
 
