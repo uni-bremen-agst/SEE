@@ -39,7 +39,7 @@ namespace SEE.Controls.Actions
         /// The new GameObject which contains the new node.
         /// </summary>
         public GameObject GONode = null;
-        
+
         private static bool isInnerNode = false;
         /// <summary>
         /// True if the node to be created is an inner node.
@@ -255,12 +255,12 @@ namespace SEE.Controls.Actions
                         NewNode();
                         new AddNodeNetAction(rndObjectInCity.name, isInnerNode, nodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, true, false).Execute(null);
                         nodesLoaded = false;
-                        GameNodeMover.MoveTo(GONode);
+                        DesktopNavigationAction.MoveTo(GONode);
                         new AddNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false, false).Execute(null);
                     }
                     else
                     {
-                        GameNodeMover.MoveTo(GONode);
+                        DesktopNavigationAction.MoveTo(GONode);
                         new AddNodeNetAction(rndObjectInCity.name, isInnerNode, nodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false, false).Execute(null);
                         if (Input.GetMouseButtonDown(0))
                         {
@@ -428,7 +428,10 @@ namespace SEE.Controls.Actions
 
             GONode.transform.position = rootPostion;
             GONode.gameObject.GetComponent<Collider>().enabled = false;
-            GameNodeMover.MoveTo(GONode);
+            DesktopNavigationAction.MoveTo(GONode);
+
+            InteractableObject inter = GONode.GetComponent<InteractableObject>();
+            inter.SetGrab(true, true);
         }
 
         /// <summary>
@@ -456,8 +459,7 @@ namespace SEE.Controls.Actions
                 if (city.Equals(hoveredCity))
                 {
                     GONode.gameObject.GetComponent<Collider>().enabled = true;
-                    // FIXME: GameNodeMover is obsolete.
-                    GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
+                    DesktopNavigationAction.FinalizePosition(GONode, GONode.transform.position);
                     new EditNodeNetAction(node.SourceName, node.Type, GONode.name).Execute(null);
                     new AddNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, true, false, false).Execute(null);
                 }
@@ -479,7 +481,7 @@ namespace SEE.Controls.Actions
         /// determine a default size, which can be use when creating new nodes, either leaves or inner nodes.
         /// </summary>
         public void GetNodesOfScene()
-        {           
+        {
             ICollection<GameObject> allLeavesInScene = SceneQueries.AllGameNodesInScene(true, false);
             ICollection<GameObject> allInnerNodesInScene = SceneQueries.AllGameNodesInScene(false, true);
 
@@ -502,7 +504,7 @@ namespace SEE.Controls.Actions
 
             // if, for any reason, the calulated median vector is the null vector, we adjust the new node's 
             // lossyscale size by 40% of the norm vector.
-            if (medianOfInnerNodes == new Vector3(0,0,0))
+            if (medianOfInnerNodes == new Vector3(0, 0, 0))
             {
                 medianOfInnerNodes = new Vector3(0.4f, 0.4f, 0.4f);
             }
@@ -549,10 +551,10 @@ namespace SEE.Controls.Actions
         /// <param name="pListofRoots">A list of all root-nodes in a loaded scene</param>
         /// <returns>A list with all root-GameObjects in the loaded scene ; Postcondition : list might be null </returns>
         private IList<GameObject> RootSearch
-            (ICollection<GameObject> listOfInnerNodes, 
-             ICollection<GameObject> listofLeaves, 
+            (ICollection<GameObject> listOfInnerNodes,
+             ICollection<GameObject> listofLeaves,
              IList<Node> pListofRoots)
-        {            
+        {
             if (listofLeaves.Count == 0 && listOfInnerNodes.Count == 0)
             {
                 return null;
@@ -564,7 +566,7 @@ namespace SEE.Controls.Actions
                 listOfRoots.Add(listofLeaves.ElementAt(0));
                 return listOfRoots;
             }
-          
+
             // There might be more than one root, so we have to compare each of them.
             foreach (Node root in pListofRoots)
             {
@@ -579,7 +581,7 @@ namespace SEE.Controls.Actions
                         listOfRoots.Add(rootSearchItem);
                         rootPostion = rootSearchItem.transform.position;
                     }
-                }                
+                }
             }
 
             return listOfRoots;
@@ -592,10 +594,9 @@ namespace SEE.Controls.Actions
         /// <param name="parentID">The id of the new GameObject</param>
         /// <param name="scale">the size of the new GameObject</param>
         public void NetworkPlaceNode(Vector3 position, Vector3 scale, string parentID)
-        {            
+        {
             GONode.SetScale(scale);
-            // FIXME: GameNodeMover will be removed.
-            GameNodeMover.NetworkFinalizeNodePosition(GONode, parentID, position);
+            DesktopNavigationAction.NetworkFinalizeNodePosition(GONode, parentID, position);
             GONode.gameObject.GetComponent<Collider>().enabled = true;
             GONode = null;
         }
