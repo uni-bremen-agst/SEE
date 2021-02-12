@@ -243,6 +243,7 @@ namespace SEEEditor
                 city.TubularSegments = EditorGUILayout.IntField("Tubular Segments", city.TubularSegments);
                 city.Radius = EditorGUILayout.FloatField("Radius", city.Radius);
                 city.RadialSegments = EditorGUILayout.IntField("Radial Segments", city.RadialSegments);
+                city.isEdgeSelectable = EditorGUILayout.Toggle("Edges selectable", city.isEdgeSelectable);
             }
         }
 
