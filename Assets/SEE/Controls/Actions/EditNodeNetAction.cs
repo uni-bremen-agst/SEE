@@ -21,22 +21,22 @@ namespace SEE.Controls.Actions
         public string NodeType;
 
         /// <summary>
-        /// The id of the GameNode object that has to be edited.
+        /// The unique name of the GameNode object that has to be edited.
         /// It can't be changed after the node creation.
         /// </summary>
-        public string GameObjectID;
+        public string UniqueNodeName;
 
         /// <summary>
         /// Constructs an EditNodeNetAction object.
         /// </summary>
         /// <param name="sourceName">The new source name</param>
         /// <param name="type">the new node type</param>
-        /// <param name="gameObjectID">the gameobject id the node belongs to</param>
-        public EditNodeNetAction(string sourceName, string type, string gameObjectID) : base()
+        /// <param name="uniqueNodeName">the unique name of the gameobject the node belongs to</param>
+        public EditNodeNetAction(string sourceName, string type, string uniqueNodeName) : base()
         {
             SourceName = sourceName;
             this.NodeType = type;
-            this.GameObjectID = gameObjectID;
+            this.UniqueNodeName = uniqueNodeName;
         }
 
         /// <summary>
@@ -54,9 +54,7 @@ namespace SEE.Controls.Actions
         {
             if (!IsRequester())
             {
-                // FIXME: Are the game-object ids in Unity really synchronized across
-                // the server and all clients?
-                Node node = GameObject.Find(GameObjectID)?.GetNode();
+                Node node = GameObject.Find(UniqueNodeName)?.GetNode();
                 if (node != null)
                 {
                     node.SourceName = SourceName;
@@ -64,7 +62,7 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    Debug.LogError($"Found no gameObject: {GameObjectID}.\n");
+                    Debug.LogError($"Found no gameObject: {UniqueNodeName}.\n");
                 }
             }
         }
