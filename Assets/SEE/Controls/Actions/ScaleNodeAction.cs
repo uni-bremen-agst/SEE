@@ -1,4 +1,5 @@
-﻿using SEE.GO;
+﻿using SEE.Game;
+using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 
@@ -288,20 +289,20 @@ namespace SEE.Controls.Actions
 
                 if (draggedSphere == topSphere)
                 {
-                   DesktopNavigationAction.MoveToLockAxes(draggedSphere, false, true, false);
+                    GameNodeMover.MoveToLockAxes(draggedSphere, false, true, false);
                 }
                 else if (draggedSphere == firstCornerSphere || draggedSphere == secondCornerSphere 
                          || draggedSphere == thirdCornerSphere || draggedSphere == forthCornerSphere)
                 {
-                    DesktopNavigationAction.MoveToLockAxes(draggedSphere, true, false, true);
+                    GameNodeMover.MoveToLockAxes(draggedSphere, true, false, true);
                 }
                 else if (draggedSphere == firstSideSphere || draggedSphere == secondSideSphere)
                 {
-                    DesktopNavigationAction.MoveToLockAxes(draggedSphere, true, false, false);
+                    GameNodeMover.MoveToLockAxes(draggedSphere, true, false, false);
                 }
                 else if (draggedSphere == thirdSideSphere || draggedSphere == forthSideSphere)
                 {
-                    DesktopNavigationAction.MoveToLockAxes(draggedSphere, false, false, true);
+                    GameNodeMover.MoveToLockAxes(draggedSphere, false, false, true);
                 }
                 else
                 {

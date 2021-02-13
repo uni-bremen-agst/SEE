@@ -258,12 +258,12 @@ namespace SEE.Controls.Actions
                         NewNode();
                         new AddNodeNetAction(rndObjectInCity.name, isInnerNode, nodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, true, false).Execute(null);
                         nodesLoaded = false;
-                        DesktopNavigationAction.MoveTo(GONode);
+                        GameNodeMover.MoveTo(GONode);
                         new AddNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false, false).Execute(null);
                     }
                     else
                     {
-                        DesktopNavigationAction.MoveTo(GONode);
+                        GameNodeMover.MoveTo(GONode);
                         new AddNodeNetAction(rndObjectInCity.name, isInnerNode, nodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false, false).Execute(null);
                         if (Input.GetMouseButtonDown(0))
                         {
@@ -431,7 +431,7 @@ namespace SEE.Controls.Actions
 
             GONode.transform.position = rootPostion;
             GONode.gameObject.GetComponent<Collider>().enabled = false;
-            DesktopNavigationAction.MoveTo(GONode);
+            GameNodeMover.MoveTo(GONode);
 
             InteractableObject inter = GONode.GetComponent<InteractableObject>();
             inter.SetGrab(true, true);
@@ -462,7 +462,7 @@ namespace SEE.Controls.Actions
                 if (city.Equals(hoveredCity))
                 {
                     GONode.gameObject.GetComponent<Collider>().enabled = true;
-                    DesktopNavigationAction.FinalizePosition(GONode, GONode.transform.position);
+                    GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
                     new EditNodeNetAction(node.SourceName, node.Type, GONode.name).Execute(null);
                     new AddNodeNetAction(rndObjectInCity.name, isInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, true, false, false).Execute(null);
                 }
@@ -599,7 +599,7 @@ namespace SEE.Controls.Actions
         public void NetworkPlaceNode(Vector3 position, Vector3 scale, string parentID)
         {
             GONode.SetScale(scale);
-            DesktopNavigationAction.NetworkFinalizeNodePosition(GONode, parentID, position);
+            GameNodeMover.NetworkFinalizeNodePosition(GONode, parentID, position);
             GONode.gameObject.GetComponent<Collider>().enabled = true;
             GONode = null;
         }
