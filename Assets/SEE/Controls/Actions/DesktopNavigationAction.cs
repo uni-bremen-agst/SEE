@@ -1,8 +1,8 @@
-﻿using SEE.Game;
+using System;
+using SEE.Game;
 using SEE.Game.UI3D;
 using SEE.GO;
 using SEE.Utils;
-using System;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -554,11 +554,11 @@ namespace SEE.Controls.Actions
             movingOrRotating = false;
             if (value == ActionState.Type.Move)
             {
-                rotateState.rotateGizmo.gameObject.SetActive(false);
+                rotateState.rotateGizmo?.gameObject.SetActive(false);
             }
             else if (value == ActionState.Type.Rotate)
             {
-                moveState.moveGizmo.gameObject.SetActive(false);
+                moveState.moveGizmo?.gameObject.SetActive(false);
             }
         }
 
