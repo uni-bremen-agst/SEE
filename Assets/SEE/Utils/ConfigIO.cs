@@ -288,7 +288,7 @@ namespace SEE.Utils
                             catch(InvalidCastException e)
                             {
                                 object val = pair[1];
-                                throw new InvalidCastException($"Value to be cast {val} is expected to be a boolean. Actual type is {val.GetType().Name}.");
+                                throw new InvalidCastException($"Value to be cast {val} is expected to be a boolean. Actual type is {val.GetType().Name}: {e.Message}");
                             }
                         }
                         else
