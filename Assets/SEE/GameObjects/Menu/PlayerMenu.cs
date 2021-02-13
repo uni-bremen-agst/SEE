@@ -39,6 +39,21 @@ namespace SEE.GO.Menu
         /// <paramref name="attachTo"/> with the mode menu attached.</returns>
         private static GameObject CreateModeMenu(GameObject attachTo = null)
         {
+            UnityEngine.Assertions.Assert.IsTrue(System.Enum.GetNames(typeof(ActionState.Type)).Length == 8);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Move == 0);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Rotate == 1);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Map == 2);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.NewEdge == 3);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.NewNode == 4);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.EditNode == 5);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.ScaleNode == 6);
+            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Delete == 7);
+
+            // IMPORTANT NOTE: Because a ActionState.Type value will be used as an index into 
+            // the following field of menu entries, the rank of an entry in this field of entry
+            // must correspond to the ActionState.Type value. If this is not the case, we will
+            // run into an endless recursion.
+
             ToggleMenuEntry[] entries = {
                 new ToggleMenuEntry(
                     active: true,
@@ -48,15 +63,6 @@ namespace SEE.GO.Menu
                     description: "Move a node within a graph",
                     entryColor: Color.red.Darker(),
                     icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Resources/Materials/Charts/MoveIcon.png")
-                    ),
-                new ToggleMenuEntry(
-                    active: false,
-                    entryAction: () => ActionState.Value = ActionState.Type.Delete,
-                    exitAction: null,
-                    title: "Delete",
-                    description: "Delete nodes and edges",
-                    entryColor: Color.yellow.Darker(),
-                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Common/Trash.png")
                     ),
                 new ToggleMenuEntry(
                     active: false,
@@ -78,13 +84,49 @@ namespace SEE.GO.Menu
                     ),
                 new ToggleMenuEntry(
                     active: false,
-                    entryAction: () => ActionState.Value = ActionState.Type.DrawEdge,
+                    entryAction: () => ActionState.Value = ActionState.Type.NewEdge,
                     exitAction: null,
-                    title: "Draw Edge",
+                    title: "New Edge",
                     description: "Draw a new edge between two nodes",
                     entryColor: Color.green.Darker(),
                     icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Navigation/Minus.png")
-                    )
+                    ),
+                 new ToggleMenuEntry(
+                    active: false,
+                    entryAction: () => ActionState.Value = ActionState.Type.NewNode,
+                    exitAction: null,
+                    title: "New Node",
+                    description: "Creates a new node",
+                    entryColor: Color.green.Darker(),
+                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Navigation/Plus.png")
+                    ),
+                 new ToggleMenuEntry(
+                    active: false,
+                    entryAction: () => ActionState.Value = ActionState.Type.EditNode,
+                    exitAction: null,
+                    title: "Edit Node",
+                    description: "Edits a node",
+                    entryColor: Color.green.Darker(),
+                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Common/Settings.png")
+                    ),
+                 new ToggleMenuEntry(
+                    active: false,
+                    entryAction: () => ActionState.Value = ActionState.Type.ScaleNode,
+                    exitAction: null,
+                    title: "Scale Node",
+                    description: "Scales a node",
+                    entryColor: Color.green.Darker(),
+                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Common/Crop.png")
+                    ),
+                new ToggleMenuEntry(
+                    active: false,
+                    entryAction: () => ActionState.Value = ActionState.Type.Delete,
+                    exitAction: null,
+                    title: "Delete",
+                    description: "Delete nodes and edges",
+                    entryColor: Color.yellow.Darker(),
+                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Common/Trash.png")
+                    ),
             };
             
             GameObject modeMenuGO = attachTo ?? new GameObject { name = "Mode Menu" };
