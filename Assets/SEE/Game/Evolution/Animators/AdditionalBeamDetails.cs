@@ -52,7 +52,7 @@ namespace SEE.Game.Evolution
         [Tooltip("Sets the width/height of power beams")]
         public Vector3 InspectorPowerBeamDimensions;
 
-        void Awake()
+        private void Awake()
         {
             newBeamColor = InspectorNewBeamColor;
             changedBeamColor = InspectorChangedBeamColor;
