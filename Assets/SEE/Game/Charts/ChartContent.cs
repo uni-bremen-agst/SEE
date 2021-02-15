@@ -1125,31 +1125,31 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Stores the IDs of nodes that have been added in the current revision
         /// </summary>
-        public List<string> addedNodeIDs = new List<string>();
+        public readonly List<string> addedNodeIDs = new List<string>();
 
         /// <summary>
         /// Stores the IDs of nodes that have been changed in the current revision
         /// </summary>
-        public List<string> changedNodeIDs = new List<string>();
+        public readonly List<string> changedNodeIDs = new List<string>();
 
         /// <summary>
         /// Stores the IDs of nodes that have been removed in the current revision
         /// </summary>
-        public List<string> removedNodeIDs = new List<string>();
+        public readonly List<string> removedNodeIDs = new List<string>();
 
         /// <summary>
         /// Old ids of newly added nodes, needed when closing and re-opening the chart
         /// </summary>
-        public List<string> addedNodeIDsCache = new List<string>();
+        public readonly List<string> addedNodeIDsCache = new List<string>();
 
         /// <summary>
         /// Old ids of changed nodes, needed when closing and re-opening the chart
         /// </summary>
-        public List<string> changedNodeIDsCache = new List<string>();
+        public readonly List<string> changedNodeIDsCache = new List<string>();
 
         /// <summary>
         /// Old ids of removed nodes, needed when closing and re-opening the chart
         /// </summary>
-        public List<string> removedNodeIDsCache = new List<string>();
+        public readonly List<string> removedNodeIDsCache = new List<string>();
     }
 }
