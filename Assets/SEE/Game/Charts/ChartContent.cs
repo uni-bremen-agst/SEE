@@ -956,7 +956,7 @@ namespace SEE.Game.Charts
             FindDataObjects();
 
             // Note(torben): The list view contains every node + two additional parent
-            // header entries for 'Inner Nodes' and 'Leaves'. The tree view tree only the
+            // header entries for 'Inner Nodes' and 'Leaves'. The tree view contains only the
             // nodes, so this here is the capacity.
             // Note(Leo): removedNodeIDs Count needs to be added, otherwise removed nodes won't show
             // TODO + removedNodeIDs.Count
