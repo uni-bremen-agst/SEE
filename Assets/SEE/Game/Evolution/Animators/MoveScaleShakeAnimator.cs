@@ -211,17 +211,17 @@ namespace SEE.Game.Evolution
             /// <summary>
             /// Power beams, get animated while appearing
             /// </summary>
-            private List<GameObject> powerBeams = new List<GameObject>();
+            private readonly List<GameObject> powerBeams = new List<GameObject>();
 
             /// <summary>
             /// Power beams that have been removed, get animated while disappearing
             /// </summary>
-            private GameObject[] removedBeams = new GameObject[0];
+            private readonly GameObject[] removedBeams = new GameObject[0];
 
             /// <summary>
             /// Deleted power beams, updated whenever Update is called
             /// </summary>
-            private List<GameObject> deletedBeams = new List<GameObject>();
+            private readonly List<GameObject> deletedBeams = new List<GameObject>();
 
             /// <summary>
             /// Beam appearing magic constant
