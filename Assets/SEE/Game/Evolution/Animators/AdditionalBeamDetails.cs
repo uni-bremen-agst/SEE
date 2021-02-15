@@ -9,7 +9,7 @@ namespace SEE.Game.Evolution
     {
 
         /// <summary>
-        /// Color given to power beams of newly added nodes, inherits from inspector (default grey)
+        /// Color given to power beams of newly added nodes, inherits from inspector (default is grey)
         /// </summary>
         public static Color newBeamColor;
 
