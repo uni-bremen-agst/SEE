@@ -963,14 +963,7 @@ namespace SEE.Game.Charts
             int totalEntryCount2 = 2 + listDataObjects.Count + removedNodeIDs.Count;
             totalHeight = (float)totalEntryCount2 * ScrollViewEntryHeight;
 
-            leafCount = 0;
-            foreach (NodeRef nodeRef in listDataObjects)
-            {
-                if (nodeRef.Value.IsLeaf())
-                {
-                    leafCount++;
-                }
-            }
+            leafCount = listDataObjects.Count(nodeRef => nodeRef.Value.IsLeaf());
 
             scrollViewEntries = new ScrollViewEntry[totalEntryCount2];
             scrollViewEntryDatas = new ScrollViewEntryData[totalEntryCount2];
