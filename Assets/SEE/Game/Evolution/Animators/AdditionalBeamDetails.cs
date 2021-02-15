@@ -25,7 +25,7 @@ namespace SEE.Game.Evolution
         public static Color changedBeamColor;
 
         /// <summary>
-        /// Changed nodes beam color to be pickable in inspector
+        /// Beam color of changed nodes. Can be picked in inspector.
         /// </summary>
         [Tooltip("Changes the color of the beam of changed nodes")]
         public Color InspectorChangedBeamColor;
