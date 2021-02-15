@@ -268,7 +268,7 @@ namespace SEE.Game.Charts
 
         private void Update()
         {
-            // Performance bottleneck, needs to be replaced with a detection mechanism / button action listener  (revision change buttons should call these)
+            // TODO Performance bottleneck, needs to be replaced with a detection mechanism / button action listener  (revision change buttons should call these)
             // Detects a graph revision change
             if (SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, ChartManager.Instance.ShowInnerNodeMetrics).Count != currentDataObjectsCount)
             {
