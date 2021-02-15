@@ -1,6 +1,8 @@
 ﻿using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -31,8 +33,14 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject selectedObject;
 
+
+        //FIXME: Just For Testing
+        private ActionHistory aH;
+
         private void Start()
         {
+            //FIXME: Just For Testing -AddComponent --> garbage/ trash
+            aH = new ActionHistory();
             // An anonymous delegate is registered for the event <see cref="ActionState.OnStateChanged"/>.
             // This delegate will be called from <see cref="ActionState"/> upon every
             // state changed where the passed parameter is the newly entered state.
@@ -68,19 +76,37 @@ namespace SEE.Controls.Actions
                 InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
                 return;
             }
-            
-            if (selectedObject != null) // Input.GetMouseButtonDown(0) && 
+
+            if (selectedObject != null && Input.GetMouseButtonDown(0)) // Input.GetMouseButtonDown(0) && 
             {
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
                 if (selectedObject.CompareTag(Tags.Edge))
                 {
+                    // selectedObject.GetComponent<ActionHistory>().saveObjectForUndo(selectedObject, ThisActionState);
                     Destroyer.DestroyGameObject(selectedObject);
                 }
                 else if (selectedObject.CompareTag(Tags.Node))
                 {
-                    Destroyer.DestroyGameObjectWithChildren(selectedObject);
+
+                   // Variante A : Hide the specific object - TODO : De-parenting - Reparenting after making visible
+
+                     aH.saveObjectForUndo(selectedObject, ThisActionState);
+
+                    // Variante B : Destroying the object, cloning before
+                    // GameObject copy = Instantiate(selectedObject, selectedObject.transform.position, selectedObject.transform.rotation);
+                   // Destroyer.DestroyGameObjectWithChildren(selectedObject);
                 }
+
+
             }
+
+            //FIXME : Just For Testing
+            if (Input.GetMouseButtonDown(1))
+            {
+                aH.UndoDeleteOperation();
+
+            }
+
         }
 
         private void LocalAnySelectIn(InteractableObject interactableObject)

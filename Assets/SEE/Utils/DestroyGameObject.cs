@@ -79,7 +79,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="nodeRef">node whose incoming and outgoing edges are requested</param>
         /// <returns>IDs of all incoming and outgoing edges</returns>
-        private static HashSet<string> GetEdgeIds(NodeRef nodeRef)
+        public static HashSet<string> GetEdgeIds(NodeRef nodeRef)
         {
             HashSet<String> edgeIDs = new HashSet<string>();
             foreach (Edge edge in nodeRef.Value.Outgoings)
