@@ -36,7 +36,7 @@ namespace SEE.Game.Evolution
         public static Color deletedBeamColor;
 
         /// <summary>
-        /// Deleted nodes beam color to be pickable in inspector
+        /// Beam color of deleted nodes. Can be picked in inspector.
         /// </summary>
         [Tooltip("Sets the color the beam of deleted nodes will have")]
         public Color InspectorDeletedBeamColor;
