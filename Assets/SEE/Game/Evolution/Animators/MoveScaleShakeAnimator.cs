@@ -117,7 +117,7 @@ namespace SEE.Game.Evolution
                 NodeChangesBuffer.GetSingleton().changedNodeIDs.Add(gameObject.name);
                 // Changes the modified object's color to blue while animating
                 gameObject.GetComponent<Renderer>().material.color = Color.blue;
-                // Refetch values, neccessary because this gets loaded before other scripts
+                // Refetch values, necessary because this gets loaded before other scripts
                 NewNodeBeamColor = AdditionalBeamDetails.newBeamColor;
                 ChangedNodeBeamColor = AdditionalBeamDetails.changedBeamColor;
                 NodeBeamDimensions = AdditionalBeamDetails.powerBeamDimensions;
