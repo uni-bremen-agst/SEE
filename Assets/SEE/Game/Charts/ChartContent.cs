@@ -937,7 +937,7 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Reloads the chart data on revision change
         /// </summary>
-        void ReloadData()
+        private void ReloadData()
         {
             if (scrollViewEntryDatas != null && scrollViewEntryDatas.Length > 0)
             {
