@@ -939,7 +939,6 @@ namespace SEE.Game.Charts
         /// </summary>
         void ReloadData()
         {
-
             if (scrollViewEntryDatas != null && scrollViewEntryDatas.Length > 0)
             {
                 for (int i = 0; i < scrollViewEntryDatas.Length; i++)
