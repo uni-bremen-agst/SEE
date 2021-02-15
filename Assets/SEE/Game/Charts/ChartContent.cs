@@ -171,19 +171,20 @@ namespace SEE.Game.Charts
         private List<NodeRef> treeDataObjects;
 
         /// <summary>
-        /// Ids of the nodes that have been added in this revision
+        /// IDs of the nodes that have been added in this revision
         /// </summary>
-        List<string> newNodeIDs = new List<string>();
+        private List<string> newNodeIDs = new List<string>();
 
         /// <summary>
-        /// Ids of the nodes that have changed in this revision
+        /// IDs of the nodes that have changed in this revision
         /// </summary>
-        List<string> changedNodeIDs = new List<string>();
+        private List<string> changedNodeIDs = new List<string>();
 
         /// <summary>
-        /// Ids of the nodes that have been removed in this revision
+        /// IDs of the nodes that have been removed in this revision
         /// </summary>
-        List<string> removedNodeIDs = new List<string>();
+        private List<string> removedNodeIDs = new List<string>();
+
 
         /// <summary>
         /// Color of added node labels
