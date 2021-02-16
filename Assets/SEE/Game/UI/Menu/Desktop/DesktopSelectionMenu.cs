@@ -13,7 +13,7 @@ namespace SEE.Game.UI
         /// <summary>
         /// Path to the prefab containing the horizontal selector for the active selection.
         /// </summary>
-        private const string SELECTOR_PREFAB = "EntrySelector";
+        private const string SELECTOR_PREFAB = "Prefabs/UI/EntrySelector";
 
         /// <summary>
         /// Name of the game object created from the EntrySelector prefab.

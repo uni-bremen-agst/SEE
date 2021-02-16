@@ -61,7 +61,7 @@ namespace SEE.GO.Menu
                     title: "Move",
                     description: "Move a node within a graph",
                     entryColor: Color.red.Darker(),
-                    icon: Resources.Load<Sprite>("MoveIcon")
+                    icon: Resources.Load<Sprite>("Materials/ModernUIPack/MoveIcon")
                     ),
                 new ToggleMenuEntry(
                     active: false,
@@ -70,7 +70,7 @@ namespace SEE.GO.Menu
                     title: "Rotate",
                     description: "Rotate everything around the selected node within a graph",
                     entryColor: Color.blue.Darker(),
-                    icon: Resources.Load<Sprite>("Refresh")
+                    icon: Resources.Load<Sprite>("Materials/ModernUIPack/Refresh")
                     ),
                 new ToggleMenuEntry(
                     active: false,
@@ -79,7 +79,7 @@ namespace SEE.GO.Menu
                     title: "Map",
                     description: "Map a node from one graph to another graph",
                     entryColor: Color.green.Darker(),
-                    icon: Resources.Load<Sprite>("Map")
+                    icon: Resources.Load<Sprite>("Materials/ModernUIPack/Map")
                     ),
                 new ToggleMenuEntry(
                     active: false,
@@ -88,7 +88,7 @@ namespace SEE.GO.Menu
                     title: "New Edge",
                     description: "Draw a new edge between two nodes",
                     entryColor: Color.green.Darker(),
-                    icon: Resources.Load<Sprite>("Minus")
+                    icon: Resources.Load<Sprite>("Materials/ModernUIPack/Minus")
                     ),
                  new ToggleMenuEntry(
                     active: false,
@@ -97,7 +97,7 @@ namespace SEE.GO.Menu
                     title: "New Node",
                     description: "Creates a new node",
                     entryColor: Color.green.Darker(),
-                    icon: Resources.Load<Sprite>("Plus")
+                    icon: Resources.Load<Sprite>("Materials/ModernUIPack/Plus")
                     ),
                  new ToggleMenuEntry(
                     active: false,
@@ -106,7 +106,7 @@ namespace SEE.GO.Menu
                     title: "Edit Node",
                     description: "Edits a node",
                     entryColor: Color.green.Darker(),
-                    icon: Resources.Load<Sprite>("Settings")
+                    icon: Resources.Load<Sprite>("Materials/ModernUIPack/Settings")
                     ),
                  new ToggleMenuEntry(
                     active: false,
@@ -115,7 +115,7 @@ namespace SEE.GO.Menu
                     title: "Scale Node",
                     description: "Scales a node",
                     entryColor: Color.green.Darker(),
-                    icon: Resources.Load<Sprite>("Crop")
+                    icon: Resources.Load<Sprite>("Materials/ModernUIPack/Crop")
                     ),
                 new ToggleMenuEntry(
                     active: false,
@@ -124,7 +124,7 @@ namespace SEE.GO.Menu
                     title: "Delete",
                     description: "Delete nodes and edges",
                     entryColor: Color.yellow.Darker(),
-                    icon: Resources.Load<Sprite>("Trash")
+                    icon: Resources.Load<Sprite>("Materials/ModernUIPack/Trash")
                     ),
             };
             
