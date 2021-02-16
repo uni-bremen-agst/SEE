@@ -1,8 +1,6 @@
 ﻿using SEE.DataModel;
-using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -39,8 +37,9 @@ namespace SEE.Controls.Actions
 
         private void Start()
         {
-            //FIXME: Just For Testing -AddComponent --> garbage/ trash
+            //FIXME: Just For Testing - AddComponent --> garbage/ trash
             aH = new ActionHistory();
+
             // An anonymous delegate is registered for the event <see cref="ActionState.OnStateChanged"/>.
             // This delegate will be called from <see cref="ActionState"/> upon every
             // state changed where the passed parameter is the newly entered state.
@@ -87,20 +86,11 @@ namespace SEE.Controls.Actions
                 }
                 else if (selectedObject.CompareTag(Tags.Node))
                 {
-
-                   // Variante A : Hide the specific object - TODO : De-parenting - Reparenting after making visible
-
-                     aH.saveObjectForUndo(selectedObject, ThisActionState);
-
-                    // Variante B : Destroying the object, cloning before
-                    // GameObject copy = Instantiate(selectedObject, selectedObject.transform.position, selectedObject.transform.rotation);
-                   // Destroyer.DestroyGameObjectWithChildren(selectedObject);
+                    // Option A : Hide the specific object - TODO : De-parenting - Reparenting after making visible
+                     aH.SaveObjectForUndo(selectedObject, ThisActionState);
                 }
-
-
             }
-
-            //FIXME : Just For Testing
+            //FIXME : Just For Testing - later it should be connected with an graphical garbabe can
             if (Input.GetMouseButtonDown(1))
             {
                 aH.UndoDeleteOperation();
