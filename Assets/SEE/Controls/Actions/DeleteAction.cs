@@ -76,7 +76,7 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            if (selectedObject != null && Input.GetMouseButtonDown(0)) // Input.GetMouseButtonDown(0) && 
+            if (selectedObject != null && Input.GetMouseButtonDown(0))
             {
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
                 if (selectedObject.CompareTag(Tags.Edge))
@@ -90,7 +90,7 @@ namespace SEE.Controls.Actions
                      aH.SaveObjectForUndo(selectedObject, ThisActionState);
                 }
             }
-            //FIXME : Just For Testing - later it should be connected with an graphical garbabe can
+            //FIXME : undo just For Testing with right mouse button - later it should be connected with an graphical garbabe can
             if (Input.GetMouseButtonDown(1))
             {
                 aH.UndoDeleteOperation();
