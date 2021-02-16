@@ -3318,8 +3318,8 @@ MonoBehaviour:
   Tension: 0.85
   RDP: 0.0001
   GXLPath:
-    Root: 1
-    relativePath: /Data/GXL/reflexion/mini/CodeFacts.gxl
+    Root: 3
+    relativePath: /mini/CodeFacts.gxl
     absolutePath: 
   CSVPath:
     Root: 1
@@ -3352,7 +3352,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.014835119
+  HeightOffset: 0.003061831
 --- !u!65 &1649116648
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3784,10 +3784,10 @@ MonoBehaviour:
       Data: 0|SEE.Game.DataPath, SEE
     - Name: Root
       Entry: 3
-      Data: 1
+      Data: 3
     - Name: relativePath
       Entry: 1
-      Data: /Data/GXL/reflexion/mini/Architecture.gvl
+      Data: /mini/Architecture.gvl
     - Name: absolutePath
       Entry: 1
       Data: 
@@ -4056,8 +4056,8 @@ MonoBehaviour:
       Data: 
   LODCulling: 0.01
   LayoutPath:
-    Root: 1
-    relativePath: /Data/GXL/reflexion/mini/Architecture.gvl
+    Root: 3
+    relativePath: /mini/Architecture.gvl
     absolutePath: 
   CityPath:
     Root: 2
@@ -4098,8 +4098,8 @@ MonoBehaviour:
   Tension: 0.85
   RDP: 0.0001
   GXLPath:
-    Root: 1
-    relativePath: /Data/GXL/reflexion/mini/Architecture.gxl
+    Root: 3
+    relativePath: /mini/Architecture.gxl
     absolutePath: 
   CSVPath:
     Root: 1
