@@ -43,30 +43,41 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Sets <see cref="hoveredObject"/> to given <paramref name="interactableObject"/>.
-        /// Will be called whenever the gameObject is being hovered over.
+        /// Will be called while any <see cref="InteractableObject"/> is being hovered over.
         /// </summary>
         /// <param name="interactableObject">new value for <see cref="hoveredObject"/></param>
         protected void LocalAnyHoverIn(InteractableObject interactableObject)
         {
+            Debug.LogFormat("{0}.LocalAnyHoverIn({1})\n",
+                            this.GetType().FullName, 
+                            interactableObject == null ? "NULL" : interactableObject.name);
             try
             {
-                Assert.IsNull(hoveredObject);
-                hoveredObject = interactableObject.gameObject;
+                if (interactableObject.gameObject != hoveredObject)
+                {
+                    Assert.IsNull(hoveredObject);
+                    hoveredObject = interactableObject.gameObject;
+                }
             }
             catch (Exception e)
             {
-                Debug.LogError($"AbstractPlayerAction.LocalAnyHoverIn throws {e.Message}.\n");
+                Debug.LogErrorFormat("{0}.LocalAnyHoverIn throws {1}. [hoveredObject: {2}. interactableObject: {3}.\n",
+                                      this.GetType().FullName,
+                                      e.Message, hoveredObject == null ? "NULL" : hoveredObject.name, interactableObject.name);
                 // FIXME: There are AssertionExceptions 
             }
         }
 
         /// <summary>
         /// Sets <see cref="hoveredObject"/> to <code>null</code>.
-        /// Will be called whenever the gameObject is no longer being hovered over.
+        /// Will be called whenever any <see cref="InteractableObject"/> is no longer being hovered over.
         /// </summary>
         /// <param name="interactableObject">object no longer be hovered over (ignored here)</param>
         protected void LocalAnyHoverOut(InteractableObject interactableObject)
         {
+            Debug.LogFormat("{0}.LocalAnyHoverOut({1})\n",
+                            this.GetType().FullName,
+                            interactableObject == null ? "NULL" : interactableObject.name);
             try
             {
                 Assert.IsTrue(hoveredObject == interactableObject.gameObject);
@@ -74,7 +85,9 @@ namespace SEE.Controls.Actions
             }
             catch (Exception e)
             {
-                Debug.LogError($"AbstractPlayerAction.LocalAnyHoverOut throws {e.Message}.\n");
+                Debug.LogErrorFormat("{0}.LocalAnyHoverOut throws {1}. [hoveredObject: {2}. interactableObject: {3}.\n",
+                                     this.GetType().FullName,
+                                     e.Message, hoveredObject == null ? "NULL" : hoveredObject.name, interactableObject.name);
                 // FIXME: There are AssertionExceptions 
             }
         }
