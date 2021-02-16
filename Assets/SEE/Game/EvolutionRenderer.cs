@@ -494,19 +494,11 @@ namespace SEE.Game
             // We have made the transition to the next graph.
             _currentCity = next;
             RenderPlane();
-            
-            Invoke("AnimateEdges", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
-        }
-
-        /// <summary>
-        /// Event function triggered when the knot animation is finished. Starts the animation of the edges.
-        /// </summary>
-        private void AnimateEdges()
-        {
-            //Starts the edge animation
             MoveEdges();
+
             Invoke("OnAnimationsFinished", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
         }
+
 
         /// <summary>
         /// Event function triggered when alls animations are finished. Animates the transition of the edges and renders all edges
@@ -694,7 +686,7 @@ namespace SEE.Game
                 Vector3 position = layoutNode.CenterPosition;
                 position.y -= layoutNode.LocalScale.y;
                 layoutNode.CenterPosition = position;
-                graphRenderer.Apply(currentGameNode, gameObject, layoutNode);
+               // graphRenderer.Apply(currentGameNode, gameObject, layoutNode);
                 // Revert the change to the y co-ordindate.
                 position.y += layoutNode.LocalScale.y;
                 layoutNode.CenterPosition = position;
@@ -708,12 +700,14 @@ namespace SEE.Game
                 {
                     difference = Difference.Changed;
                     marker.MarkChanged(currentGameNode);
+                    
                 }
                 else
                 {
                     difference = Difference.None;
                 }
             }
+            graphRenderer.Apply(currentGameNode, gameObject, layoutNode);
             moveScaleShakeAnimator.AnimateTo(currentGameNode, layoutNode, difference, OnRenderNodeFinishedAnimation);
         }
 
