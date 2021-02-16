@@ -1,9 +1,7 @@
 ﻿using SEE.Controls.Actions;
-using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -27,23 +25,23 @@ public class ActionHistory : MonoBehaviour
     /// 
 
     //FIXME: Action State Const definieren - PlayerMenu adden
-   // const ActionState.Type ThisActionState = ActionState.Type.Undo;
+    // const ActionState.Type ThisActionState = ActionState.Type.Undo;
 
     private LinkedList<List<GameObject>> actionHistory = new LinkedList<List<GameObject>>();
     private LinkedList<ActionState.Type> actionStates = new LinkedList<ActionState.Type>();
-    
-    private int count = 0; 
+
+    private int count = 0;
 
     // Start is called before the first frame update
     void Start()
     {
-      
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     /// <summary>
@@ -51,48 +49,49 @@ public class ActionHistory : MonoBehaviour
     /// </summary>
     /// <param name="gameObject"></param>
     /// <param name="aState"></param>
-    public void saveObjectForUndo(GameObject gameObject, ActionState.Type aState)
+    public void SaveObjectForUndo(GameObject gameObject, ActionState.Type aState)
     {
         if (gameObject == null)
         {
             Debug.LogError("null operation");
         }
-    
-        
-        if (count == actionStates.Count) {
+
+
+        if (count == actionStates.Count)
+        {
             count++;
-                } else
+        }
+        else
         {
             count = actionStates.Count + 1;
         }
         actionStates.AddLast(aState);
-        List<GameObject> NodesAndascendingEdges = new List<GameObject>();
-        gameObject.SetVisibility(false, true); 
+        List<GameObject> NodesAndAscendingEdges = new List<GameObject>();
+        gameObject.SetVisibility(false, true);
 
-            if(gameObject.TryGetComponent(out NodeRef nodeRef))
-            {
-
-
-            HashSet<String> edgeIDs = Destroyer.GetEdgeIds(nodeRef);
+        if (gameObject.TryGetComponent(out NodeRef nodeRef))
+        {
+            HashSet<string> edgeIDs = Destroyer.GetEdgeIds(nodeRef);
+            //Question: Performance in graphs with many edges like SEE?
             foreach (GameObject edge in GameObject.FindGameObjectsWithTag(SEE.DataModel.Tags.Edge))
             {
                 if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                 {
                     edge.SetVisibility(false, true);
-                    if (NodesAndascendingEdges.Contains(edge) == false)
+                    if (!NodesAndAscendingEdges.Contains(edge))
                     {
-                        NodesAndascendingEdges.Add(edge);
+                        NodesAndAscendingEdges.Add(edge);
                     }
                 }
             }
 
-            Collider collider;
-            if (gameObject.TryGetComponentOrLog(out collider)) {
-                gameObject.GetComponent<Collider>().enabled = false;
+            if (gameObject.TryGetComponentOrLog(out Collider collider))
+            {
+                collider.enabled = false;
             }
-           NodesAndascendingEdges.Add(gameObject);
+            NodesAndAscendingEdges.Add(gameObject);
         }
-        actionHistory.AddLast(NodesAndascendingEdges);
+        actionHistory.AddLast(NodesAndAscendingEdges);
     }
 
     /// <summary>
@@ -100,22 +99,19 @@ public class ActionHistory : MonoBehaviour
     /// </summary>
     public void UndoDeleteOperation()
     {
-        Debug.Log(count + "counter");
         if (actionStates == null || actionStates.Count == 0)
         {
             return;
         }
+        // CheckBoundaries(count, actionStates);
 
-        // checkBoundaries(count, actionStates);
-
-        List<GameObject> undo = actionHistory.ElementAt(count -1);
+        List<GameObject> undo = actionHistory.ElementAt(count - 1);
 
         foreach (GameObject go in undo)
         {
             go.SetVisibility(true, true);
-            Collider collider;
-            if(go.TryGetComponentOrLog(out collider))
-            { 
+            if (go.TryGetComponentOrLog(out Collider collider))
+            {
                 collider.enabled = true;
             }
         }
@@ -125,26 +121,37 @@ public class ActionHistory : MonoBehaviour
         }
     }
 
-    private static void checkBoundaries(int counter, LinkedList<ActionState.Type> states)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="counter"></param>
+    /// <param name="states"></param>
+    private static void CheckBoundaries(int counter, LinkedList<ActionState.Type> states)
     {
-        if (counter == 0 || counter > states.Count )
+        if (counter == 0 || counter > states.Count)
         {
             Debug.Log(counter + "counter");
             throw new NotSupportedException("Redo function cannot be executed");
-            
-        }  
+
+        }
     }
 
-    private static void inverActionStateExecute(ActionState.Type actionState)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="actionState"></param>
+    private static void InvertActionStateExecute(ActionState.Type actionState)
     {
-        // if actionstate == ADdNode 
+       // if actionstate == ADdNode
        // {
-          //  -->delete
-        //  }
+       //     --> delete
+       // }
 
-      //  if(ActionState == add)
-   //     {
-        //    --> AddNode();
-     //   }
+       // if (ActionState == add)
+       // {
+       //     --> AddNode();
+       // }
+
+
     }
 }
