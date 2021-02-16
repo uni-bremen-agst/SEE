@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using Michsky.UI.ModernUIPack;
 using SEE.GO;
-using UnityEditor;
 using UnityEngine;
 
 namespace SEE.Game.UI
@@ -14,7 +13,7 @@ namespace SEE.Game.UI
         /// <summary>
         /// Path to the prefab containing the horizontal selector for the active selection.
         /// </summary>
-        private const string SELECTOR_PREFAB = "Assets/Prefabs/UI/EntrySelector.prefab";
+        private const string SELECTOR_PREFAB = "EntrySelector";
 
         /// <summary>
         /// Name of the game object created from the EntrySelector prefab.
@@ -33,7 +32,7 @@ namespace SEE.Game.UI
             GameObject selectorGO = MenuContent.transform.Find(SELECTOR_NAME)?.gameObject;
             if (!selectorGO)
             {
-                Object selectorPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(SELECTOR_PREFAB);
+                Object selectorPrefab = Resources.Load<GameObject>(SELECTOR_PREFAB);
                 selectorGO = Instantiate(selectorPrefab, MenuContent.transform, false) as GameObject;
                 UnityEngine.Assertions.Assert.IsNotNull(selectorGO);
                 selectorGO.name = SELECTOR_NAME;

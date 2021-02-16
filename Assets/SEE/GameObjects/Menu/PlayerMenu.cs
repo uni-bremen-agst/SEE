@@ -2,7 +2,6 @@
 using SEE.Controls.Actions;
 using SEE.Game.UI;
 using SEE.Utils;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -62,7 +61,7 @@ namespace SEE.GO.Menu
                     title: "Move",
                     description: "Move a node within a graph",
                     entryColor: Color.red.Darker(),
-                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Resources/Materials/Charts/MoveIcon.png")
+                    icon: Resources.Load<Sprite>("MoveIcon")
                     ),
                 new ToggleMenuEntry(
                     active: false,
@@ -71,7 +70,7 @@ namespace SEE.GO.Menu
                     title: "Rotate",
                     description: "Rotate everything around the selected node within a graph",
                     entryColor: Color.blue.Darker(),
-                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Navigation/Refresh.png")
+                    icon: Resources.Load<Sprite>("Refresh")
                     ),
                 new ToggleMenuEntry(
                     active: false,
@@ -80,7 +79,7 @@ namespace SEE.GO.Menu
                     title: "Map",
                     description: "Map a node from one graph to another graph",
                     entryColor: Color.green.Darker(),
-                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Map/Map.png")
+                    icon: Resources.Load<Sprite>("Map")
                     ),
                 new ToggleMenuEntry(
                     active: false,
@@ -89,7 +88,7 @@ namespace SEE.GO.Menu
                     title: "New Edge",
                     description: "Draw a new edge between two nodes",
                     entryColor: Color.green.Darker(),
-                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Navigation/Minus.png")
+                    icon: Resources.Load<Sprite>("Minus")
                     ),
                  new ToggleMenuEntry(
                     active: false,
@@ -98,7 +97,7 @@ namespace SEE.GO.Menu
                     title: "New Node",
                     description: "Creates a new node",
                     entryColor: Color.green.Darker(),
-                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Navigation/Plus.png")
+                    icon: Resources.Load<Sprite>("Plus")
                     ),
                  new ToggleMenuEntry(
                     active: false,
@@ -107,7 +106,7 @@ namespace SEE.GO.Menu
                     title: "Edit Node",
                     description: "Edits a node",
                     entryColor: Color.green.Darker(),
-                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Common/Settings.png")
+                    icon: Resources.Load<Sprite>("Settings")
                     ),
                  new ToggleMenuEntry(
                     active: false,
@@ -116,7 +115,7 @@ namespace SEE.GO.Menu
                     title: "Scale Node",
                     description: "Scales a node",
                     entryColor: Color.green.Darker(),
-                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Common/Crop.png")
+                    icon: Resources.Load<Sprite>("Crop")
                     ),
                 new ToggleMenuEntry(
                     active: false,
@@ -125,7 +124,7 @@ namespace SEE.GO.Menu
                     title: "Delete",
                     description: "Delete nodes and edges",
                     entryColor: Color.yellow.Darker(),
-                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Common/Trash.png")
+                    icon: Resources.Load<Sprite>("Trash")
                     ),
             };
             
