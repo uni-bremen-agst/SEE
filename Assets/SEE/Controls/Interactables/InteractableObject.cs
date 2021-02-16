@@ -184,14 +184,6 @@ namespace SEE.Controls
                     // The local player has hovered on this object and needs to be informed about it.
                     // Non-local player are not concerned here.
                     LocalHoverIn?.Invoke(this);
-                    {
-                        int howMany = 0;
-                        if (LocalAnyHoverIn != null && LocalAnyHoverIn.GetInvocationList() != null)
-                        {
-                            howMany = LocalAnyHoverIn.GetInvocationList().Length;
-                        }
-                        Debug.Log($"Number of listeners: {howMany}.\n");
-                    }
                     LocalAnyHoverIn?.Invoke(this);
                 }
                 HoveredObjects.Add(this);
@@ -637,7 +629,8 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseEnter()
         {
-            Debug.LogFormat("{0}.OnMouseEnter({1}) @ {2}\n", this.GetType().FullName, gameObject.name, Time.time);
+            // FIXME: For an unknown reason, this method will be called twice per frame.
+            // Debug.LogFormat("{0}.OnMouseEnter({1}) @ {2}\n", this.GetType().FullName, gameObject.name, Time.time);
             if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop && !Raycasting.IsMouseOverGUI())
             {
                 SetHoverFlag(HoverFlag.World, setFlag: true, isOwner: true);
@@ -669,7 +662,8 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseExit()
         {
-            Debug.LogFormat("{0}.OnMouseExit({1}) @ {2}\n", this.GetType().FullName, gameObject.name, Time.time.ToString("F20"));
+            // FIXME: For an unknown reason, this method will be called twice per frame.
+            // Debug.LogFormat("{0}.OnMouseExit({1}) @ {2}\n", this.GetType().FullName, gameObject.name, Time.time.ToString("F20"));
             if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop && !Raycasting.IsMouseOverGUI())
             {
                 SetHoverFlag(HoverFlag.World, setFlag: false, isOwner: true);
