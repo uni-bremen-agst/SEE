@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 namespace SEE.Game.UI
@@ -105,7 +104,7 @@ namespace SEE.Game.UI
         private void Awake()
         {
             // Load default icon (can't be done during instantiation, only in Awake() or Start())
-            Icon = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Common/Settings.png");
+            Icon = Resources.Load<Sprite>("Settings");
         }
 
         
