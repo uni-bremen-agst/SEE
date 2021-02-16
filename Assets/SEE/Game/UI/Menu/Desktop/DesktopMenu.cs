@@ -19,25 +19,25 @@ namespace SEE.Game.UI
         /// The path to the prefab for the menu game object.
         /// Will be added as a child to the <see cref="Canvas"/> if it doesn't exist yet.
         /// </summary>
-        private const string MENU_PREFAB = "Menu";
+        private const string MENU_PREFAB = "Prefabs/UI/Menu";
 
         /// <summary>
         /// The path to the prefab for the menu game object.
         /// Will be added for each menu entry in <see cref="Entries"/>.
         /// </summary>
-        private const string BUTTON_PREFAB = "Button";
+        private const string BUTTON_PREFAB = "Prefabs/UI/Button";
         
         /// <summary>
         /// The path to the prefab for the list game object.
         /// Will be added as a child to the <see cref="MenuGameObject"/>.
         /// </summary>
-        private const string LIST_PREFAB = "MenuEntries";
+        private const string LIST_PREFAB = "Prefabs/UI/MenuEntries";
         
         /// <summary>
         /// The path to the prefab for the tooltip game object.
         /// Will be added as a child to the <see cref="Canvas"/>.
         /// </summary>
-        private const string TOOLTIP_PREFAB = "Tooltip";
+        private const string TOOLTIP_PREFAB = "Prefabs/UI/Tooltip";
 
         /// <summary>
         /// The GameObject which contains the actual content of the menu, i.e. its entries.
@@ -207,7 +207,7 @@ namespace SEE.Game.UI
             if (MenuShown != CurrentMenuShown)
             {
                 // Toggle state when menu state has been changed
-                Manager.AnimateWindow();
+                Manager?.AnimateWindow();
                 CurrentMenuShown = MenuShown;
             }
         }

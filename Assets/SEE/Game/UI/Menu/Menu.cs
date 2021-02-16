@@ -104,7 +104,7 @@ namespace SEE.Game.UI
         private void Awake()
         {
             // Load default icon (can't be done during instantiation, only in Awake() or Start())
-            Icon = Resources.Load<Sprite>("Settings");
+            Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Settings");
         }
 
         
