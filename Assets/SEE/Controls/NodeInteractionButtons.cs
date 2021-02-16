@@ -61,8 +61,14 @@ namespace SEE.Controls
         /// </summary>
         public void SetNextAddingNodeStep()
         {
-            AddNodeAction current = playerDesktop.GetComponent<AddNodeAction>();
-            current.Progress = AddNodeAction.ProgressState.CanvasIsClosed;
+            if (playerDesktop.TryGetComponent(out AddNodeAction current))
+            {
+                current.Progress = AddNodeAction.ProgressState.CanvasIsClosed;
+            }
+            else
+            {
+                Debug.LogError($"Player desktop {playerDesktop.name} does not have an AddNodeAction component.\n");
+            }            
         }
 
         /// <summary>
@@ -71,8 +77,14 @@ namespace SEE.Controls
         /// </summary>
         public void EditIsCanceled()
         {
-            EditNodeAction current = playerDesktop.GetComponent<EditNodeAction>();
-            current.EditProgress = EditNodeAction.ProgressState.EditIsCanceled;
+            if (playerDesktop.TryGetComponent(out EditNodeAction current))
+            {
+                current.EditProgress = EditNodeAction.ProgressState.EditIsCanceled;
+            }
+            else
+            {
+                Debug.LogError($"Player desktop {playerDesktop.name} does not have an EditNodeAction component.\n");
+            }
         }
 
         /// <summary>
@@ -89,8 +101,14 @@ namespace SEE.Controls
         /// </summary>
         public void AddingIsCanceled()
         {
-            AddNodeAction current = playerDesktop.GetComponent<AddNodeAction>();
-            current.Progress = AddNodeAction.ProgressState.AddingIsCanceled;
+            if (playerDesktop.TryGetComponent(out AddNodeAction current))
+            {
+                current.Progress = AddNodeAction.ProgressState.AddingIsCanceled;
+            }
+            else
+            {
+                Debug.LogError($"Player desktop {playerDesktop.name} does not have an AddNodeAction component.\n");
+            }
         }
     }
 }
