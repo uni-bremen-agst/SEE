@@ -8,7 +8,7 @@ using UnityEngine;
 namespace SEE.Utils
 {
     /// <summary>
-    /// Functions to destroy GameObjects.
+    /// Functions to destroy game objects in game or editor mode.
     /// </summary>
     public static class Destroyer
     {

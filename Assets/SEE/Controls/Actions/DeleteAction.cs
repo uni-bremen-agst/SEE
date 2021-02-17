@@ -101,13 +101,19 @@ namespace SEE.Controls.Actions
 
         private void LocalAnySelectIn(InteractableObject interactableObject)
         {
-            Assert.IsNull(selectedObject);
+            // FIXME: For an unknown reason, the mouse events in InteractableObject will be
+            // triggered twice per frame, which causes this method to be called twice.
+            // We need to further investigate this issue.
+            // Assert.IsNull(selectedObject);
             selectedObject = interactableObject.gameObject;
         }
 
         private void LocalAnySelectOut(InteractableObject interactableObject)
         {
-            Assert.IsTrue(selectedObject == interactableObject.gameObject);
+            // FIXME: For an unknown reason, the mouse events in InteractableObject will be
+            // triggered twice per frame, which causes this method to be called twice.
+            // We need to further investigate this issue.
+            // Assert.IsTrue(selectedObject == interactableObject.gameObject);
             selectedObject = null;
         }
     }

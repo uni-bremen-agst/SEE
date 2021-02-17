@@ -1,6 +1,5 @@
 ﻿using OdinSerializer.Utilities;
 using SEE.Utils;
-using UnityEditor;
 using UnityEngine;
 using PlayerSettings = SEE.Controls.PlayerSettings;
 
@@ -27,7 +26,7 @@ namespace SEE.Game.UI
         /// This prefab should contain all components necessary for the UI canvas, such as an event system,
         /// a graphic raycaster, etc.
         /// </summary>
-        protected const string UI_CANVAS_PREFAB = "Assets/Prefabs/UI/UICanvas.prefab";
+        protected const string UI_CANVAS_PREFAB = "Prefabs/UI/UICanvas";
 
         /// <summary>
         /// The canvas on which UI elements are placed.
@@ -81,7 +80,7 @@ namespace SEE.Game.UI
             if (Canvas == null)
             {
                 // Create Canvas from prefab if it doesn't exist yet
-                Object canvasPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(UI_CANVAS_PREFAB);
+                Object canvasPrefab = Resources.Load<GameObject>(UI_CANVAS_PREFAB);
                 Canvas = Instantiate(canvasPrefab) as GameObject;
                 UnityEngine.Assertions.Assert.IsNotNull(Canvas);
                 Canvas.name = UI_CANVAS_NAME;
