@@ -1,5 +1,5 @@
-﻿using System;
-using SEE.DataModel.DG;
+using System;
+using SEE.Game;
 using SEE.Game.UI3D;
 using SEE.GO;
 using SEE.Utils;
@@ -158,7 +158,7 @@ namespace SEE.Controls.Actions
                 actionState.reset |= (actionState.drag || !isMouseOverGUI) && Input.GetKeyDown(KeyCode.R);
                 actionState.mousePosition = Input.mousePosition;
 
-                RaycastClippingPlane(out bool hitPlane, out bool insideClippingArea, out Vector3 planeHitPoint);
+                RaycastClippingPlane(out bool _, out bool insideClippingArea, out Vector3 _);
 
                 // Find hovered GameObject with node, if it exists
                 actionState.hoveredTransform = null;
@@ -210,7 +210,6 @@ namespace SEE.Controls.Actions
                     rotateState.rotateGizmo.Radius = 0.2f * (MainCamera.Camera.transform.position - rotateState.rotateGizmo.Center).magnitude;
                 }
             }
-
         }
 
         // This logic is in FixedUpdate(), so that the behaviour is framerate-'independent'.
@@ -333,66 +332,11 @@ namespace SEE.Controls.Actions
                     {
                         synchronize = true;
 
-                        #region FinalizePosition
+                        Transform movingObject = moveState.draggedTransform;
+                        Vector3 originalPosition = moveState.dragStartTransformPosition + moveState.dragStartOffset
+                                - Vector3.Scale(moveState.dragCanonicalOffset, movingObject.localScale);
 
-                        // The underlying graph node of the moving object.
-                        Node movingNode = moveState.draggedTransform.GetComponent<NodeRef>().Value;
-                        // The new parent of the movingNode in the underlying graph.
-                        Node newGraphParent = null;
-                        // The new parent of the movingNode in the game-object hierarchy.
-                        GameObject newGameParent = null;
-                        // The new position of the movingNode in world space.
-                        Vector3 newPosition = Vector3.negativeInfinity;
-
-                        // Note that the order of the results of RaycastAll() is undefined.
-                        // Hence, we need to identify the node in the node hierarchy that
-                        // is at the lowest level in the tree (more precisely, the one with
-                        // the greatest value of the node attribute Level; Level counting
-                        // starts at the root and increases downward into the tree).            
-                        foreach (RaycastHit hit in Physics.RaycastAll(MainCamera.Camera.ScreenPointToRay(actionState.mousePosition)))
-                        {
-                            // Must be different from the movingObject itself
-                            if (hit.collider.transform != moveState.draggedTransform)
-                            {
-                                NodeRef nodeRef = hit.transform.GetComponent<NodeRef>();
-                                // Is it a node at all and if so, are they in the same graph?
-                                if (nodeRef != null && nodeRef.Value.ItsGraph == movingNode.ItsGraph)
-                                {
-                                    // update newParent when we found a node deeper into the tree
-                                    if (newGraphParent == null || nodeRef.Value.Level > newGraphParent.Level)
-                                    {
-                                        newGraphParent = nodeRef.Value;
-                                        newGameParent = hit.collider.gameObject;
-                                        newPosition = hit.point;
-                                    }
-                                }
-                            }
-                        }
-
-                        if (newGraphParent != null)
-                        {
-                            moveState.draggedTransform.position = newPosition;
-                            if (movingNode.Parent != newGraphParent)
-                            {
-                                movingNode.Reparent(newGraphParent);
-                                #region PutOn
-                                // FIXME: child may not actually fit into parent, in which we should 
-                                // downscale it until it fits
-                                Vector3 childCenter = moveState.draggedTransform.position;
-                                float parentRoof = newGameParent.transform.position.y + newGameParent.transform.lossyScale.y / 2;
-                                childCenter.y = parentRoof + moveState.draggedTransform.lossyScale.y / 2;
-                                moveState.draggedTransform.position = childCenter;
-                                moveState.draggedTransform.SetParent(newGameParent.transform);
-                                #endregion
-                            }
-                        }
-                        else
-                        {
-                            moveState.draggedTransform.position =
-                                moveState.dragStartTransformPosition + moveState.dragStartOffset
-                                - Vector3.Scale(moveState.dragCanonicalOffset, moveState.draggedTransform.localScale);
-                        }
-                        #endregion
+                        GameNodeMover.FinalizePosition(movingObject.gameObject, originalPosition);
                     }
 
                     actionState.startDrag = false;
@@ -601,11 +545,9 @@ namespace SEE.Controls.Actions
             {
                 new Net.SyncCitiesAction(this).Execute();
             }
-
+            
             #endregion
         }
-
-
 
         private void OnStateChanged(ActionState.Type value)
         {
@@ -627,8 +569,7 @@ namespace SEE.Controls.Actions
         /// <returns>The angle in the range [0, 360) degrees.</returns>
         private float AngleMod(float degrees)
         {
-            float result = ((degrees % 360.0f) + 360.0f) % 360.0f;
-            return result;
+            return ((degrees % 360.0f) + 360.0f) % 360.0f;
         }
 
         /// <summary>
@@ -711,5 +652,4 @@ namespace SEE.Controls.Actions
             }
         }
     }
-
 }
