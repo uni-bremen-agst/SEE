@@ -20,10 +20,21 @@ namespace SEE.GO
         /// </summary>
         /// <param name="layout">the edge layouter used to calculate the line for the edges</param>
         /// <param name="edgeWidth">the width of the line for the edges</param>
-        public EdgeFactory(IEdgeLayout layout, float edgeWidth)
+        /// <param name="tubularSegments">The amount of segments of the tubular</param>
+        /// <param name="radius">The radius of the tubular</param>
+        /// <param name="radialSegments">The amount of radial segments of the tubular</param>
+        /// <param name="isEdgeSelectable">Are the edges selectable or not</param>
+        public EdgeFactory(IEdgeLayout layout, float edgeWidth, int tubularSegments, float radius, int radialSegments, bool isEdgeSelectable)
         {
             this.layout = layout;
             this.edgeWidth = edgeWidth;
+            if (tubularSegments > 0) this.tubularSegments = tubularSegments;
+            else this.tubularSegments = 50;
+            if (radius > 0) this.radius = radius;
+            else this.radius = 0.005f;
+            if (radialSegments > 0) this.radialSegments = radialSegments;
+            else this.radialSegments = 8;
+            this.isEdgeSelectable = isEdgeSelectable;
             defaultLineMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
         }
 
@@ -41,6 +52,26 @@ namespace SEE.GO
         /// The width of the line for the created edges, given in the constructor.
         /// </summary>
         private readonly float edgeWidth;
+
+        /// <summary>
+        /// The amount of segments of the tubular.
+        /// </summary>
+        private readonly int tubularSegments;
+
+        /// <summary>
+        /// The radius of the tubular.
+        /// </summary>
+        private readonly float radius;
+
+        /// <summary>
+        /// The amount of radial segments of the tubular.
+        /// </summary>
+        private readonly int radialSegments;
+
+        /// <summary>
+        /// Determines if the edges are selectable or not.
+        /// </summary>
+        private readonly bool isEdgeSelectable;
 
         /// <summary>
         /// The edge layouter used to generate the line for the edges, given in the constructor.
@@ -107,21 +138,16 @@ namespace SEE.GO
                 line.positionCount = points.Length; // number of vertices
                 line.SetPositions(points);
 
-                // FIXME
-                // put a capsule collider around the straight main line
-                // (the one from points[1] to points[2]
-                // FIXME: The following works only for straight lines with at least
-                // three points, but a layoutEdge can have fewer lines and generally
-                // is not a line in the first place. We need a better approach to
-                // make edges selectable. For the time being, this code will be
-                // disabled.
-                //CapsuleCollider capsule = gameEdge.AddComponent<CapsuleCollider>();
-                //capsule.radius = Math.Max(line.startWidth, line.endWidth) / 2.0f;
-                //capsule.center = Vector3.zero;
-                //capsule.direction = 2; // Z-axis for easier "LookAt" orientation
-                //capsule.transform.position = points[1] + (points[2] - points[1]) / 2;
-                //capsule.transform.LookAt(points[1]);
-                //capsule.height = (points[2] - points[1]).magnitude;
+                MeshCollider meshCollider = gameEdge.AddComponent<MeshCollider>();
+
+                // Build tubular mesh with Curve
+                bool closed = false; // closed curve or not
+                Mesh mesh = Tubular.Tubular.Build(new Curve.CatmullRomCurve(layoutEdge.Points.OfType<Vector3>().ToList()), tubularSegments, radius, radialSegments, closed);
+
+                // visualize mesh
+                MeshFilter filter = gameEdge.AddComponent<MeshFilter>();
+                filter.sharedMesh = mesh;
+                meshCollider.sharedMesh = mesh;
             }
             return result;
         }
