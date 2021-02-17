@@ -158,9 +158,15 @@ namespace SEE.Controls.Actions
                 actionState.reset |= (actionState.drag || !isMouseOverGUI) && Input.GetKeyDown(KeyCode.R);
                 actionState.mousePosition = Input.mousePosition;
 
+                // FIXME: The selection of graph elements below will executed only if the 
+                // ray hits the clipping area. If the player looks at the city from aside,
+                // hit nodes and edges will not selected because the ray may not hit the 
+                // area. Large nodes and in particular edges above nodes tend to be high
+                // in the sky and may not be selectable if the player views the city from
+                // a suboptimal angle.
                 RaycastClippingPlane(out bool _, out bool insideClippingArea, out Vector3 _);
 
-                // Find hovered GameObject with node, if it exists
+                // Find hovered GameObject with node or edge, if it exists
                 actionState.hoveredTransform = null;
                 if (insideClippingArea)
                 {
@@ -168,14 +174,18 @@ namespace SEE.Controls.Actions
                     {
                         InteractableObject.UnselectAll(true);
                     }
-                    else if (Raycasting.RaycastNodes(out RaycastHit raycastHit, out NodeRef nodeRef))
+                    else if (Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.None)
                     {
                         Transform hoveredTransform = raycastHit.transform;
+                        // parentTransform walks up the game-object hierarchy toward the
+                        // containing CityTransform. If the CityTransform is reached, we
+                        // know that hoveredTransform is part of the CityTransform, thus,
+                        // belongs to the city, we are dealing with.
                         Transform parentTransform = hoveredTransform;
                         do
                         {
                             if (parentTransform == CityTransform)
-                            {
+                            {                                
                                 actionState.hoveredTransform = hoveredTransform;
                                 break;
                             }
