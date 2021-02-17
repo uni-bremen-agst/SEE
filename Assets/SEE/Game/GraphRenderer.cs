@@ -33,7 +33,6 @@ namespace SEE.Game
         public GraphRenderer(AbstractSEECity settings, Graph graph)
         {
             this.settings = settings;
-
             ShaderType = Materials.ShaderType.Transparent;
             switch (this.settings.LeafObjects)
             {
@@ -324,7 +323,7 @@ namespace SEE.Game
                     throw new Exception("Unhandled edge layout " + settings.EdgeLayout);
             }
             Performance p = Performance.Begin("edge layout " + layout.Name);
-            EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
+            EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth, settings.TubularSegments, settings.Radius, settings.RadialSegments, settings.isEdgeSelectable);
             ICollection<GameObject> result;
             //Calculate only
             if (!draw)
@@ -1287,6 +1286,8 @@ namespace SEE.Game
             block.AddComponent<NodeRef>().Value = node;
             AdjustScaleOfLeaf(block);
             AddLOD(block);
+            Portal.SetInfinitePortal(block);
+            InteractionDecorator.PrepareForInteraction(block);
             return block;
         }
 
@@ -1594,6 +1595,7 @@ namespace SEE.Game
             AdjustStyle(innerGameObject);
             AdjustHeightOfInnerNode(innerGameObject);
             AddLOD(innerGameObject);
+            InteractionDecorator.PrepareForInteraction(innerGameObject);
             return innerGameObject;
         }
 

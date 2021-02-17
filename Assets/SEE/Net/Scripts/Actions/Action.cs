@@ -31,24 +31,22 @@ namespace SEE.Net
         /// <summary>
         /// The IP-address of the requester of this action.
         /// </summary>
-        public string requesterIPAddress;
+        public string RequesterIPAddress;
 
         /// <summary>
         /// The port of the requester of this action.
         /// </summary>
-        public int requesterPort;
+        public int RequesterPort;
 
         /// <summary>
         /// The IP-addresses of the recipients.
         /// </summary>
-        public string[] recipientsIPAddresses;
+        public string[] RecipientsIPAddresses;
 
         /// <summary>
         /// The ports of the recipients.
         /// </summary>
-        public int[] recipientsPorts;
-
-
+        public int[] RecipientsPorts;
 
         /// <summary>
         /// Constructs an abstract action.
@@ -67,13 +65,13 @@ namespace SEE.Net
         {
             if (requester != null)
             {
-                requesterIPAddress = requester.Address.ToString();
-                requesterPort = requester.Port;
+                RequesterIPAddress = requester.Address.ToString();
+                RequesterPort = requester.Port;
             }
             else
             {
-                requesterIPAddress = null;
-                requesterPort = -1;
+                RequesterIPAddress = null;
+                RequesterPort = -1;
             }
         }
 
@@ -85,8 +83,7 @@ namespace SEE.Net
         /// action.</returns>
         protected IPEndPoint GetRequester()
         {
-            IPEndPoint result = new IPEndPoint(IPAddress.Parse(requesterIPAddress), requesterPort);
-            return result;
+            return new IPEndPoint(IPAddress.Parse(RequesterIPAddress), RequesterPort);
         }
 
         /// <summary>
@@ -96,14 +93,13 @@ namespace SEE.Net
         /// otherwise.</returns>
         protected bool IsRequester()
         {
-            if (Network.UseInOfflineMode || requesterIPAddress == null || requesterPort == -1)
+            if (Network.UseInOfflineMode || RequesterIPAddress == null || RequesterPort == -1)
             {
                 return true;
             }
 
             IPEndPoint requesterEndPoint = GetRequester();
-            bool result = Client.LocalEndPoint.Equals(requesterEndPoint);
-            return result;
+            return Client.LocalEndPoint.Equals(requesterEndPoint);
         }
 
         /// <summary>
@@ -114,12 +110,12 @@ namespace SEE.Net
         {
             IPEndPoint[] result = null;
 
-            if (recipientsIPAddresses != null && recipientsPorts != null)
+            if (RecipientsIPAddresses != null && RecipientsPorts != null)
             {
-                result = new IPEndPoint[recipientsIPAddresses.Length];
-                for (int i = 0; i < recipientsIPAddresses.Length; i++)
+                result = new IPEndPoint[RecipientsIPAddresses.Length];
+                for (int i = 0; i < RecipientsIPAddresses.Length; i++)
                 {
-                    result[i] = new IPEndPoint(IPAddress.Parse(recipientsIPAddresses[i]), recipientsPorts[i]);
+                    result[i] = new IPEndPoint(IPAddress.Parse(RecipientsIPAddresses[i]), RecipientsPorts[i]);
                 }
             }
 
@@ -153,17 +149,17 @@ namespace SEE.Net
             {
                 if (recipients == null)
                 {
-                    recipientsIPAddresses = null;
-                    recipientsPorts = null;
+                    RecipientsIPAddresses = null;
+                    RecipientsPorts = null;
                 }
                 else
                 {
-                    recipientsIPAddresses = new string[recipients.Length];
-                    recipientsPorts = new int[recipients.Length];
+                    RecipientsIPAddresses = new string[recipients.Length];
+                    RecipientsPorts = new int[recipients.Length];
                     for (int i = 0; i < recipients.Length; i++)
                     {
-                        recipientsIPAddresses[i] = recipients[i].Address.ToString();
-                        recipientsPorts[i] = recipients[i].Port;
+                        RecipientsIPAddresses[i] = recipients[i].Address.ToString();
+                        RecipientsPorts[i] = recipients[i].Port;
                     }
                 }
 #if UNITY_EDITOR
@@ -248,8 +244,6 @@ namespace SEE.Net
 #endif
     }
 
-
-
     /// <summary>
     /// Responsible for serialization and deserialization of actions.
     /// </summary>
@@ -262,8 +256,7 @@ namespace SEE.Net
         /// <returns>The serialized action as a string.</returns>
         internal static string Serialize(AbstractAction action)
         {
-            string result = action.GetType().ToString() + ';' + JsonUtility.ToJson(action);
-            return result;
+            return action.GetType().ToString() + ';' + JsonUtility.ToJson(action);
         }
 
         /// <summary>
@@ -275,13 +268,12 @@ namespace SEE.Net
         {
             string[] tokens = data.Split(new char[] { ';' }, 2, StringSplitOptions.None);
             AbstractAction result = (AbstractAction)JsonUtility.FromJson(tokens[1], Type.GetType(tokens[0]));
-            if (result.recipientsIPAddresses.Length == 0)
+            if (result.RecipientsIPAddresses.Length == 0)
             {
-                result.recipientsIPAddresses = null;
-                result.recipientsPorts = null;
+                result.RecipientsIPAddresses = null;
+                result.RecipientsPorts = null;
             }
             return result;
         }
     }
-
 }

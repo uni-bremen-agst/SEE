@@ -31,7 +31,6 @@ namespace SEE.Game.Evolution
     /// </summary>
     public class AnimationDataModel : MonoBehaviour
     {
-
         /// <summary>
         /// TextField for the shown revision in game.
         /// </summary>
