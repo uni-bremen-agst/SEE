@@ -243,6 +243,8 @@ namespace SEE.Game.Charts
 
         private int currentDataObjectsCount = 0;
 
+        private bool revisionChanged = false;
+
         /// <summary>
         /// Calls methods to initialize a chart.
         /// </summary>
@@ -270,8 +272,9 @@ namespace SEE.Game.Charts
         {
             // TODO Performance bottleneck, needs to be replaced with a detection mechanism / button action listener  (revision change buttons should call these)
             // Detects a graph revision change
-            if (SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, ChartManager.Instance.ShowInnerNodeMetrics).Count != currentDataObjectsCount)
+            if (SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, ChartManager.Instance.ShowInnerNodeMetrics).Count != currentDataObjectsCount && !revisionChanged)
             {
+                revisionChanged = true;
                 // Push gameobjects to pool
                 PushScrollViewEntriesToPool(previousFirst, previousOnePastLast); 
                 ReloadData();
@@ -954,7 +957,6 @@ namespace SEE.Game.Charts
             // header entries for 'Inner Nodes' and 'Leaves'. The tree view contains only the
             // nodes, so this here is the capacity.
             // Note(Leo): removedNodeIDs Count needs to be added, otherwise removed nodes won't show
-            // TODO + removedNodeIDs.Count
             int totalEntryCount2 = 2 + listDataObjects.Count + removedNodeIDs.Count;
             totalHeight = (float)totalEntryCount2 * ScrollViewEntryHeight;
 
@@ -971,6 +973,7 @@ namespace SEE.Game.Charts
 
             FillScrollView(scrollViewIsTree);
             GetAllNumericAttributes();
+            revisionChanged = false;
         }
 
 
