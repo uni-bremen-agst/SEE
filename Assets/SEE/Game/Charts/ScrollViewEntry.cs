@@ -420,7 +420,7 @@ namespace SEE.Game.Charts
             }
             catch
             {
-                Debug.Log("Illegal index");
+                Destroy(this);
             }
         }
 
@@ -436,7 +436,7 @@ namespace SEE.Game.Charts
             }
             catch
             {
-                Debug.Log("Illegal index");
+                Destroy(this);
             }
         }
 
