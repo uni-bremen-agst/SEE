@@ -241,8 +241,7 @@ namespace SEE.Game.Charts
         private int previousFirst = 0;
         private int previousOnePastLast = 0;
 
-        int currentDataObjectsCount = 0;
-
+        private int currentDataObjectsCount = 0;
 
         /// <summary>
         /// Calls methods to initialize a chart.
@@ -343,8 +342,6 @@ namespace SEE.Game.Charts
             previousOnePastLast = onePastLast;
         }
 
-
-
         public void AttachShowInChartCallbackFn(InteractableObject interactableObject, ShowInChartCallbackFn callbackFn)
         {
             Assert.IsTrue(!callbackFnDict.ContainsKey(interactableObject.ID));
@@ -353,14 +350,12 @@ namespace SEE.Game.Charts
 
         public bool DetachShowInChartCallbackFn(InteractableObject interactableObject, ShowInChartCallbackFn callbackFn)
         {
-            bool result = callbackFnDict.Remove(interactableObject.ID);
-            return result;
+            return callbackFnDict.Remove(interactableObject.ID);
         }
 
         public bool ShowInChart(InteractableObject interactableObject)
         {
-            bool result = showInChartDict[interactableObject.ID];
-            return result;
+            return showInChartDict[interactableObject.ID];
         }
 
         public void SetShowInChart(InteractableObject interactableObject, bool value)
@@ -378,8 +373,7 @@ namespace SEE.Game.Charts
 
         public ScrollViewEntry GetScrollViewEntry(int index)
         {
-            ScrollViewEntry result = scrollViewEntries[index];
-            return result;
+            return scrollViewEntries[index];
         }
 
         public ref ScrollViewEntryData GetScrollViewEntryData(int index)
