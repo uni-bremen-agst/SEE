@@ -5,7 +5,6 @@ using SEE.Game;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
 using UnityEngine;
-using SEE.Controls;
 
 namespace SEE.GO
 {
@@ -149,8 +148,6 @@ namespace SEE.GO
                 MeshFilter filter = gameEdge.AddComponent<MeshFilter>();
                 filter.sharedMesh = mesh;
                 meshCollider.sharedMesh = mesh;
-
-                // if (isEdgeSelectable) InteractionDecorator.PrepareForInteraction(gameEdge);  FIXME: Somehow uses InteractionDecorator twice with this line.
             }
             return result;
         }
