@@ -9,33 +9,43 @@ namespace Michsky.UI.ModernUIPack
     {
         static void CreateObject(string resourcePath)
         {
-            GameObject clone = Instantiate(Resources.Load<GameObject>(resourcePath), Vector3.zero, Quaternion.identity) as GameObject;
-
             try
             {
-                if (Selection.activeGameObject == null)
+                GameObject clone = Instantiate(AssetDatabase.LoadAssetAtPath("Assets/" + EditorPrefs.GetString("UIManager.RootFolder") + resourcePath + ".prefab", typeof(GameObject)), Vector3.zero, Quaternion.identity) as GameObject;
+
+                try
                 {
+                    if (Selection.activeGameObject == null)
+                    {
+                        var canvas = (Canvas)GameObject.FindObjectsOfType(typeof(Canvas))[0];
+                        Undo.RegisterCreatedObjectUndo(clone, "Created an object");
+                        clone.transform.SetParent(canvas.transform, false);
+                    }
+
+                    else
+                    {
+                        Undo.RegisterCreatedObjectUndo(clone, "Created an object");
+                        clone.transform.SetParent(Selection.activeGameObject.transform, false);
+                    }
+
+                    clone.name = clone.name.Replace("(Clone)", "").Trim();
+                }
+
+                catch
+                {
+                    Undo.RegisterCreatedObjectUndo(clone, "Created an object");
+                    CreateCanvas();
                     var canvas = (Canvas)GameObject.FindObjectsOfType(typeof(Canvas))[0];
-                    Undo.RegisterCreatedObjectUndo(clone, "Created an object");
                     clone.transform.SetParent(canvas.transform, false);
+                    clone.name = clone.name.Replace("(Clone)", "").Trim();
                 }
-
-                else
-                {
-                    Undo.RegisterCreatedObjectUndo(clone, "Created an object");
-                    clone.transform.SetParent(Selection.activeGameObject.transform, false);
-                }
-
-                clone.name = clone.name.Replace("(Clone)", "").Trim();
             }
 
             catch
             {
-                Undo.RegisterCreatedObjectUndo(clone, "Created an object");
-                CreateCanvas();
-                var canvas = (Canvas)GameObject.FindObjectsOfType(typeof(Canvas))[0];
-                clone.transform.SetParent(canvas.transform, false);
-                clone.name = clone.name.Replace("(Clone)", "").Trim();
+                if (EditorUtility.DisplayDialog("Modern UI Pack", "Cannot create the object due to missing/incorrect root folder. " +
+                    "You can change the root folder by clicking 'Fix' button and enabling 'Change Root Folder'.", "Fix", "Cancel"))
+                    ShowManager();
             }
 
             if (Application.isPlaying == false)
@@ -44,7 +54,7 @@ namespace Michsky.UI.ModernUIPack
 
         static void CreateButton(string resourcePath)
         {
-            GameObject clone = Instantiate(Resources.Load<GameObject>(resourcePath), Vector3.zero, Quaternion.identity) as GameObject;
+            GameObject clone = Instantiate(AssetDatabase.LoadAssetAtPath("Assets/" + EditorPrefs.GetString("UIManager.RootFolder") + resourcePath + ".prefab", typeof(GameObject)), Vector3.zero, Quaternion.identity) as GameObject;
 
             try
             {
@@ -72,6 +82,17 @@ namespace Michsky.UI.ModernUIPack
                 clone.transform.SetParent(canvas.transform, false);
                 clone.name = "Button";
             }
+
+            if (Application.isPlaying == false)
+                EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+        }
+
+        [MenuItem("GameObject/Modern UI Pack/Canvas", false, -1)]
+        static void CreateCanvas()
+        {
+            GameObject clone = Instantiate(AssetDatabase.LoadAssetAtPath("Assets/" + EditorPrefs.GetString("UIManager.RootFolder") + "Other/Canvas" + ".prefab", typeof(GameObject)), Vector3.zero, Quaternion.identity) as GameObject;
+            Undo.RegisterCreatedObjectUndo(clone, "Created an object");
+            clone.name = clone.name.Replace("(Clone)", "").Trim();
 
             if (Application.isPlaying == false)
                 EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
@@ -83,18 +104,7 @@ namespace Michsky.UI.ModernUIPack
             Selection.activeObject = Resources.Load("MUIP Manager");
 
             if (Selection.activeObject == null)
-                Debug.Log("Can't find a file named 'MUIP Manager'. Make sure you have 'MUIP Manager' file in Resources folder.");
-        }
-
-        [MenuItem("GameObject/Modern UI Pack/Canvas", false, -1)]
-        static void CreateCanvas()
-        {
-            GameObject clone = Instantiate(Resources.Load<GameObject>("Other/Canvas"), Vector3.zero, Quaternion.identity) as GameObject;
-            Undo.RegisterCreatedObjectUndo(clone, "Created an object");
-            clone.name = clone.name.Replace("(Clone)", "").Trim();
-
-            if (Application.isPlaying == false)
-                EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+                Debug.Log("<b>[Modern UI Pack]</b>Can't find a file named 'MUIP Manager'. Make sure you have 'MUIP Manager' file in Resources folder.");
         }
 
         [MenuItem("GameObject/Modern UI Pack/Animated Icon/Hamburger Menu", false, 0)]
@@ -1108,7 +1118,7 @@ namespace Michsky.UI.ModernUIPack
         [MenuItem("GameObject/Modern UI Pack/Input Field/Fading (Right Aligned)", false, 0)]
         static void IFFRA()
         {
-            CreateObject("Input Field/Input Field - Fading (Aligned)");
+            CreateObject("Input Field/Input Field - Fading (Right)");
         }
 
         [MenuItem("GameObject/Modern UI Pack/Input Field/Standard (Left Aligned)", false, 0)]

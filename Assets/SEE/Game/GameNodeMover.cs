@@ -8,13 +8,12 @@ namespace SEE.Game
     /// <summary>
     /// Allows to move game nodes (game objects representing a graph node).
     /// </summary>
-    [System.Obsolete("This is now implemented directly in DesktopNavigationAction.cs")]
     public static class GameNodeMover
     {
         /// <summary>
         /// The speed by which to move a selected object.
         /// </summary>
-        public static float MovingSpeed = 1.0f;
+        private static float MovingSpeed = 1.0f;
 
         /// <summary>
         /// Moves the given <paramref name="movingObject"/> on a sphere around the
@@ -92,11 +91,11 @@ namespace SEE.Game
             if (newGraphParent != null)
             {
                 movingObject.transform.position = newPosition;
-                PutOn(movingObject, newGameParent);
+                PutOn(movingObject.transform, newGameParent);
                 if (movingNode.Parent != newGraphParent)
                 {
                     movingNode.Reparent(newGraphParent);
-                    movingObject.transform.SetParent(newGameParent.transform);                    
+                    movingObject.transform.SetParent(newGameParent.transform);
                 }
             }
             else
@@ -108,18 +107,77 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Sets the new parent for <paramref name="child"/> via the network.
+        /// </summary>
+        /// <param name="child">child whose parent is to be set</param>
+        /// <param name="parentName">the parent's name (assumed to be unique)</param>
+        /// <param name="position">new position</param>
+        public static void NetworkFinalizeNodePosition(GameObject child, string parentName, Vector3 position)
+        {
+            GameObject parent = GameObject.Find(parentName);
+            if (parent != null)
+            {
+                child.transform.position = position;
+                PutOn(child.transform, parent);
+                child.GetComponent<NodeRef>().Value.Reparent(parent.GetComponent<NodeRef>().Value);
+                child.transform.SetParent(parent.transform);
+            }
+            else
+            {
+                throw new System.Exception($"No parent found with name {parentName}.");
+            }
+        }
+
+        /// <summary>
         /// Puts <paramref name="child"/> on top of <paramref name="parent"/>.
         /// </summary>
         /// <param name="child">child</param>
         /// <param name="parent">parent</param>
-        private static void PutOn(GameObject child, GameObject parent)
+        private static void PutOn(Transform child, GameObject parent)
         {
             // FIXME: child may not actually fit into parent, in which we should 
             // downscale it until it fits
-            Vector3 childCenter = child.transform.position;
+            Vector3 childCenter = child.position;
             float parentRoof = parent.transform.position.y + parent.transform.lossyScale.y / 2;
-            childCenter.y = parentRoof + child.transform.lossyScale.y / 2;
-            child.transform.position = childCenter;            
+            childCenter.y = parentRoof + child.lossyScale.y / 2;
+            child.position = childCenter;
+            child.SetParent(parent.transform);
+        }
+
+        /// <summary>
+        /// Moves the given <paramref name="movingObject"/> on a sphere around the
+        /// camera. The radius of this sphere is the original distance
+        /// from the <paramref name="movingObject"/> to the camera. The point
+        /// on that sphere is determined by a ray driven by the user hitting
+        /// this sphere. The speed of travel is defind by <see cref="MovingSpeed"/>.
+        /// 
+        /// This method is expected to be called at every Update().
+        /// 
+        /// You can lock any of the three axes.
+        /// </summary>
+        /// <param name="movingObject">the object to be moved</param>
+        /// <param name="lockX">whether the movement should be locked on this axis</param>
+        /// <param name="lockY">whether the movement should be locked on this axis</param>
+        /// <param name="lockZ">whether the movement should be locked on this axis</param>
+        public static void MoveToLockAxes(GameObject movingObject, bool lockX, bool lockY, bool lockZ)
+        {
+            float step = MovingSpeed * Time.deltaTime;
+            Vector3 target = TipOfRayPosition(movingObject);
+            Vector3 movingObjectPos = movingObject.transform.position;
+
+            if (!lockX)
+            {
+                target.x = movingObjectPos.x;
+            }
+            if (!lockY)
+            {
+                target.y = movingObjectPos.y;
+            }
+            if (!lockZ)
+            {
+                target.z = movingObjectPos.z;
+            }
+            movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, target, step);
         }
 
         // -------------------------------------------------------------
