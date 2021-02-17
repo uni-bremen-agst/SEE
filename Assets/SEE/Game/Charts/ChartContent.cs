@@ -243,7 +243,7 @@ namespace SEE.Game.Charts
 
         private int currentDataObjectsCount = 0;
 
-        private bool revisionChanged = false;
+        public static bool revisionChanged = false;
 
         /// <summary>
         /// Calls methods to initialize a chart.
@@ -276,8 +276,9 @@ namespace SEE.Game.Charts
             {
                 revisionChanged = true;
                 // Push gameobjects to pool
-                PushScrollViewEntriesToPool(previousFirst, previousOnePastLast); 
+                PushScrollViewEntriesToPool(previousFirst, previousOnePastLast);
                 ReloadData();
+                revisionChanged = false;
             }
             float panelEntryCount = totalHeight * (1.0f - verticalScrollBar.size) / ScrollViewEntryHeight;
             int totalEntryCount = scrollViewEntries.Length - (scrollViewIsTree ? 2 : 0);
@@ -973,7 +974,6 @@ namespace SEE.Game.Charts
 
             FillScrollView(scrollViewIsTree);
             GetAllNumericAttributes();
-            revisionChanged = false;
         }
 
 
