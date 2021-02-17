@@ -33,7 +33,6 @@ namespace SEE.Game
         public GraphRenderer(AbstractSEECity settings, Graph graph)
         {
             this.settings = settings;
-
             ShaderType = Materials.ShaderType.Transparent;
             switch (this.settings.LeafObjects)
             {
@@ -1287,6 +1286,8 @@ namespace SEE.Game
             block.AddComponent<NodeRef>().Value = node;
             AdjustScaleOfLeaf(block);
             AddLOD(block);
+            Portal.SetInfinitePortal(block);
+            InteractionDecorator.PrepareForInteraction(block);
             return block;
         }
 
@@ -1594,6 +1595,7 @@ namespace SEE.Game
             AdjustStyle(innerGameObject);
             AdjustHeightOfInnerNode(innerGameObject);
             AddLOD(innerGameObject);
+            InteractionDecorator.PrepareForInteraction(innerGameObject);
             return innerGameObject;
         }
 
