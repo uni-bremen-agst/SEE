@@ -1,4 +1,4 @@
-Modern UI Pack - v4.3.2
+Modern UI Pack - v4.3.3
 
 Import TextMesh Pro and its essentials from Package Manager if you haven't already!
 Online documentation: https://docs.google.com/document/d/1TMecEhM6jYPWs9xyyIhugwIhLd8aV98KcasPDq6bApA
@@ -17,6 +17,15 @@ Geno (Contributor)
 Filmos (Tester)
 Kabbouchi (Tester)
 Takashi Sakai
+
+Changelog v4.3.3
+----------------------------------------
+• New object creation system
+• UI Manager optimizations
+• UI Manager improvements
+• Editor layout improvements
+• Dropdown improvements
+----------------------------------------
 
 Changelog v4.3.2
 ----------------------------------------
