@@ -1,12 +1,13 @@
-﻿using System;
-using OdinSerializer.Utilities;
 using SEE.DataModel.DG;
+using SEE.Utils;
+using System;
+using OdinSerializer.Utilities;
 using UnityEngine;
 
 namespace SEE.GO
 {
     /// <summary>
-    /// Provides extensions for GameObjects retrieving their ID.
+    /// Provides extensions for GameObjects.
     /// </summary>
     public static class GameObjectExtensions
     {
@@ -118,6 +119,30 @@ namespace SEE.GO
                     child.gameObject.SetVisibility(show, includingChildren);
                 }
             }
+        }
+
+        /// <summary>
+        /// Sets the scale of this <paramref name="node"/> to <paramref name="scale"/> independent from 
+        /// the local scale from the parent.
+        /// </summary>
+        /// <param name="node">object whose scale should be set</param>
+        /// <param name="scale">the new scale in world space</param>
+        public static void SetScale(this GameObject node, Vector3 scale)
+        {
+            Transform parent = node.transform.parent;
+            node.transform.parent = null;
+            node.transform.localScale = scale;
+            node.transform.parent = parent;
+        }
+
+        /// <summary>
+        /// Gets the Height (Roof) of this <paramref name="node"/>
+        /// </summary>
+        /// <param name="node">node whose height has to be determined</param>
+        /// <returns>The height of the Roof from this <paramref name="node"/></returns>
+        public static float GetRoof(this GameObject node)
+        {
+            return node.transform.position.y + node.Size().y / 2.0f;
         }
 
         /// <summary>

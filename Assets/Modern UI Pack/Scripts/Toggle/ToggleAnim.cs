@@ -7,16 +7,29 @@ namespace Michsky.UI.ModernUIPack
     {
         [HideInInspector] public Toggle toggleObject;
         [HideInInspector] public Animator toggleAnimator;
+        bool isInitalized = false;
 
         void Start()
         {
-            toggleObject = gameObject.GetComponent<Toggle>();
-            toggleAnimator = gameObject.GetComponent<Animator>();
-            toggleObject.onValueChanged.AddListener(TaskOnClick);
+            if (toggleObject == null)
+                toggleObject = gameObject.GetComponent<Toggle>();
 
+            toggleAnimator = toggleObject.GetComponent<Animator>();
+            toggleObject.onValueChanged.AddListener(TaskOnClick);
+            CheckForState();
+            isInitalized = true;
+        }
+
+        void OnEnable()
+        {
+            if (isInitalized == true)
+                CheckForState();
+        }
+
+        void CheckForState()
+        {
             if (toggleObject.isOn)
                 toggleAnimator.Play("Toggle On");
-
             else
                 toggleAnimator.Play("Toggle Off");
         }
@@ -25,7 +38,6 @@ namespace Michsky.UI.ModernUIPack
         {
             if (toggleObject.isOn)
                 toggleAnimator.Play("Toggle On");
-
             else
                 toggleAnimator.Play("Toggle Off");
         }

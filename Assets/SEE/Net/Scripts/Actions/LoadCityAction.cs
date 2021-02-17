@@ -89,6 +89,11 @@ namespace SEE.Net
         public float Tension;
         public float RDP;
 
+        public int TubularSegments;
+        public float Radius;
+        public int RadialSegments;
+        public bool isEdgeSelectable;
+
         //-----------------------------------------------------------------------
         // SEECity
         //-----------------------------------------------------------------------
@@ -173,6 +178,12 @@ namespace SEE.Net
             EdgesAboveBlocks = city.EdgesAboveBlocks;
             Tension = city.Tension;
             RDP = city.RDP;
+
+            TubularSegments = city.TubularSegments;
+            Radius = city.Radius;
+            RadialSegments = city.RadialSegments;
+            isEdgeSelectable = city.isEdgeSelectable;
+
 
             if (city.GetType() == typeof(SEECity))
             {
@@ -297,6 +308,11 @@ namespace SEE.Net
             city.EdgesAboveBlocks = EdgesAboveBlocks;
             city.Tension = Tension;
             city.RDP = RDP;
+
+            city.TubularSegments = TubularSegments;
+            city.Radius = Radius;
+            city.RadialSegments = RadialSegments;
+            city.isEdgeSelectable = isEdgeSelectable;
 
             if (t == typeof(SEECity))
             {

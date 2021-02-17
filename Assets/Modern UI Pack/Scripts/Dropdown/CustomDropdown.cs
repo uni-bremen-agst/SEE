@@ -8,7 +8,7 @@ using TMPro;
 
 namespace Michsky.UI.ModernUIPack
 {
-    public class CustomDropdown : MonoBehaviour, IPointerExitHandler, IPointerEnterHandler, IPointerClickHandler, IPointerDownHandler
+    public class CustomDropdown : MonoBehaviour, IPointerExitHandler, IPointerEnterHandler, IPointerClickHandler
     {
         // Resources
         public Animator dropdownAnimator;
@@ -58,6 +58,8 @@ namespace Michsky.UI.ModernUIPack
         [HideInInspector] public int siblingIndex = 0;
         [HideInInspector] public TextMeshProUGUI setItemText;
         [HideInInspector] public Image setItemImage;
+        Button triggerButton;
+        EventTrigger triggerEvent;
         Sprite imageHelper;
         string textHelper;
 
@@ -87,6 +89,16 @@ namespace Michsky.UI.ModernUIPack
                     SetupDropdown();
 
                 currentListParent = transform.parent;
+
+                if (enableTrigger == true && triggerObject != null)
+                {
+                    triggerButton = gameObject.GetComponent<Button>();
+                    triggerEvent = triggerObject.AddComponent<EventTrigger>();
+                    EventTrigger.Entry entry = new EventTrigger.Entry();
+                    entry.eventID = EventTriggerType.PointerClick;
+                    entry.callback.AddListener((eventData) => { Animate(); });
+                    triggerEvent.GetComponent<EventTrigger>().triggers.Add(entry);
+                }
             }
 
             catch
@@ -256,16 +268,34 @@ namespace Michsky.UI.ModernUIPack
                 }
             }
 
-            if (enableTrigger == true && isOn == false)
-                triggerObject.SetActive(false);
-            else if (enableTrigger == true && isOn == true)
-                triggerObject.SetActive(true);
-
-            if (outOnPointerExit == true)
-                triggerObject.SetActive(false);
-
             if (setHighPriorty == true)
                 transform.SetAsLastSibling();
+
+            if (enableTrigger == true && isOn == false)
+            {
+                triggerObject.SetActive(false);
+                triggerButton.interactable = true;
+            }
+
+            else if (enableTrigger == true && isOn == true)
+            {
+                triggerObject.SetActive(true);
+                triggerButton.interactable = false;
+            }
+
+            if (enableTrigger == true && outOnPointerExit == true)
+            {
+                triggerObject.SetActive(false);
+                triggerButton.interactable = true;
+            }
+        }
+
+        public void GetSelectedDropdownName(TextMeshProUGUI tmpText)
+        {
+            if (tmpText != null)
+                tmpText.text = dropdownItems[selectedItemIndex].itemName;
+            else
+                Debug.Log("Dropdown - Selected item name: " + dropdownItems[selectedItemIndex].itemName);
         }
 
         public void UpdateValues()
@@ -333,15 +363,6 @@ namespace Michsky.UI.ModernUIPack
                 if (isListItem == true)
                     gameObject.transform.SetParent(currentListParent, true);
             }
-
-            if (triggerObject != null)
-                triggerObject.SetActive(false);
-        }
-
-        public void OnPointerDown(PointerEventData eventData)
-        {
-            if (triggerObject != null)
-                triggerObject.SetActive(true);
         }
     }
 }

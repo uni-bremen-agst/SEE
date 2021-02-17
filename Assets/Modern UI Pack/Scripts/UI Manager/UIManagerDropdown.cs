@@ -19,59 +19,43 @@ namespace Michsky.UI.ModernUIPack
         public Image itemBackground;
         public Image itemIcon;
         public TextMeshProUGUI itemText;
-
-        bool dynamicUpdateEnabled;
         CustomDropdown dropdownMain;
         DropdownMultiSelect dropdownMulti;
 
-        void OnEnable()
+        void Awake()
         {
             try
             {
-                dropdownMain = gameObject.GetComponent<CustomDropdown>();
-            }
+                if (dropdownMain != null)
+                    dropdownMain = gameObject.GetComponent<CustomDropdown>();
+                else
+                    dropdownMulti = gameObject.GetComponent<DropdownMultiSelect>();
 
-            catch { }
-
-            if (dropdownMain == null)
-                dropdownMulti = gameObject.GetComponent<DropdownMultiSelect>();
-
-            if (UIManagerAsset == null)
-            {
-                try
-                {
+                if (UIManagerAsset == null)
                     UIManagerAsset = Resources.Load<UIManager>("MUIP Manager");
-                }
 
-                catch
+                this.enabled = true;
+
+                if (UIManagerAsset.enableDynamicUpdate == false)
                 {
-                    Debug.LogWarning("No UI Manager found. Assign it manually, otherwise you'll get errors about it.", this);
+                    UpdateDropdown();
+                    this.enabled = false;
                 }
             }
-        }
 
-        void Awake()
-        {
-            if (dynamicUpdateEnabled == false)
+            catch
             {
-                this.enabled = true;
-                UpdateDropdown();
+                Debug.Log("<b>[Modern UI Pack]</b> No UI Manager found, assign it manually.", this);
             }
         }
 
         void LateUpdate()
         {
-            if (Application.isEditor == true && UIManagerAsset != null)
-            {
-                if (UIManagerAsset.enableDynamicUpdate == true)
-                {
-                    dynamicUpdateEnabled = true;
-                    UpdateDropdown();
-                }
+            if (UIManagerAsset == null)
+                return;
 
-                else
-                    dynamicUpdateEnabled = false;
-            }
+            if (UIManagerAsset.enableDynamicUpdate == true)
+                UpdateDropdown();
         }
 
         void UpdateDropdown()
