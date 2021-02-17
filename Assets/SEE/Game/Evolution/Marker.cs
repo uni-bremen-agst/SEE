@@ -165,7 +165,7 @@ namespace SEE.Game.Evolution
             AddEmission(beamMarker);
             //Portal.SetPortal(beamMarker.transform.parent.gameObject);
             // Add the added node id to the revision changes list
-            NodeChangesBuffer.GetSingleton().addedNodeIDs.Add(block.name);
+            NodeChangesBuffer.GetSingleton().addedNodeIDs.Add(beamMarker.name);
             return beamMarker;
         }
 
