@@ -212,6 +212,7 @@ namespace SEE.Game.Evolution
         /// <returns>the resulting beam marker</returns>
         public GameObject MarkBorn(GameObject gameNode)
         {
+            NodeChangesBuffer.GetSingleton().addedNodeIDs.Add(gameNode.gameObject.name);
             GameObject beamMarker = MarkByBeam(gameNode, additionMarkerFactory);
             beamMarker.name = "new " + gameNode.name;
             // We need to add the marker to beamMarkers so that it can be destroyed at the beginning of the
