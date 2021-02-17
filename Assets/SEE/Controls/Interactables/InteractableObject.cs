@@ -248,11 +248,11 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Visually emphasizes this object for selection.
+        /// Marks the game object this <see cref="InteractableObject"/> is attached to for selection
+        /// and triggers the necessary events accordingly.
         /// </summary>
-        /// <param name="hover">Whether this object should be selected.</param>
-        /// <param name="isOwner">Whether this client is initiating the selection action.
-        /// </param>
+        /// <param name="select">Whether this object should be selected.</param>
+        /// <param name="isOwner">Whether this client is initiating the selection action.</param>
         public void SetSelect(bool select, bool isOwner)
         {
             IsSelected = select;
