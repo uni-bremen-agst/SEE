@@ -214,9 +214,9 @@ namespace SEE.Game.Evolution
             private readonly List<GameObject> powerBeams = new List<GameObject>();
 
             /// <summary>
-            /// Power beams that have been removed, get animated while disappearing
+            /// Power beams that have been removed get animated while disappearing
             /// </summary>
-            private readonly GameObject[] removedBeams = new GameObject[0];
+            private GameObject[] removedBeams = new GameObject[0];
 
             /// <summary>
             /// Deleted power beams, updated whenever Update is called
