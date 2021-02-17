@@ -30,6 +30,7 @@ using UnityEngine.Assertions;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 using SEE.Game.Evolution;
+using System.Linq;
 
 namespace SEE.Game.Charts
 {
@@ -249,7 +250,7 @@ namespace SEE.Game.Charts
         private void Awake()
         {
             // Load color profile for chart entries
-            FetchLableColorProfile();
+            FetchLabelColorProfile();
 
             Assert.IsTrue(scrollContent.transform.childCount == 0);
 
@@ -982,7 +983,7 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Fetches the color profile selected in the ChartManager for added, edited and removed node labels
         /// </summary>
-        private void FetchLableColorProfile()
+        private void FetchLabelColorProfile()
         {
             this.hoveringOverLabelTextColor = Color.yellow;
             // Load colors used for power beams, to match the text with the visible objects
