@@ -146,7 +146,7 @@ namespace SEE.GO
 
                     // Build tubular mesh with Curve
                     bool closed = false; // closed curve or not
-                    Mesh mesh = Tubular.Tubular.Build(new Curve.CatmullRomCurve(layoutEdge.Points.OfType<Vector3>().ToList()), 
+                    Mesh mesh = Tubular.Tubular.Build(new Curve.CatmullRomCurve(layoutEdge.Points.OfType<Vector3>().ToList()),
                                                       tubularSegments, radius, radialSegments, closed);
 
                     // visualize mesh
@@ -179,7 +179,7 @@ namespace SEE.GO
                 GameObject gameEdge = NewGameEdge(layoutEdge);
                 result.Add(gameEdge);
 
-                Points p  = gameEdge.AddComponent<Points>();
+                Points p = gameEdge.AddComponent<Points>();
                 p.controlPoints = layoutEdge.ControlPoints;
                 p.linePoints = layoutEdge.Points;
             }
