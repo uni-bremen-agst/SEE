@@ -10,7 +10,7 @@ using UnityEngine.UI;
 namespace SEE.Game.UI
 {
     /// <summary>
-    /// Responsible for the Desktop UI for Menus.
+    /// Responsible for the desktop UI for menus.
     /// </summary>
     /// <typeparam name="T">the type of entries used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
     public partial class Menu<T>

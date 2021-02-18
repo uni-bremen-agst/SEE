@@ -21,6 +21,11 @@ namespace SEE.GO.Menu
         /// The UI object representing the menu the user chooses the action state from.
         /// </summary>
         private SelectionMenu ModeMenu;
+
+        /// <summary>
+        /// The UI object representing the indicator, which displays the current action state on the screen.
+        /// </summary>
+        private ActionStateIndicator Indicator;
         
         /// <summary>
         /// This creates and returns the mode menu, with which you can select the active game mode.
@@ -36,19 +41,19 @@ namespace SEE.GO.Menu
         /// new game object will be created.</param>
         /// <returns>the newly created mode menu game object, or if it wasn't null
         /// <paramref name="attachTo"/> with the mode menu attached.</returns>
-        private static GameObject CreateModeMenu(GameObject attachTo = null)
+        private static SelectionMenu CreateModeMenu(GameObject attachTo = null)
         {
-            UnityEngine.Assertions.Assert.IsTrue(System.Enum.GetNames(typeof(ActionState.Type)).Length == 8);
-            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Move == 0);
-            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Rotate == 1);
-            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Map == 2);
-            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.NewEdge == 3);
-            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.NewNode == 4);
-            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.EditNode == 5);
-            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.ScaleNode == 6);
-            UnityEngine.Assertions.Assert.IsTrue((int)ActionState.Type.Delete == 7);
+            Assert.IsTrue(Enum.GetNames(typeof(ActionState.Type)).Length == 8);
+            Assert.IsTrue((int)ActionState.Type.Move == 0);
+            Assert.IsTrue((int)ActionState.Type.Rotate == 1);
+            Assert.IsTrue((int)ActionState.Type.Map == 2);
+            Assert.IsTrue((int)ActionState.Type.NewEdge == 3);
+            Assert.IsTrue((int)ActionState.Type.NewNode == 4);
+            Assert.IsTrue((int)ActionState.Type.EditNode == 5);
+            Assert.IsTrue((int)ActionState.Type.ScaleNode == 6);
+            Assert.IsTrue((int)ActionState.Type.Delete == 7);
 
-            // IMPORTANT NOTE: Because a ActionState.Type value will be used as an index into 
+            // IMPORTANT NOTE: Because an ActionState.Type value will be used as an index into 
             // the following field of menu entries, the rank of an entry in this field of entry
             // must correspond to the ActionState.Type value. If this is not the case, we will
             // run into an endless recursion.
@@ -137,15 +142,20 @@ namespace SEE.GO.Menu
                 modeMenu.AddEntry(entry);
             }
 
-            return modeMenuGO;
+            return modeMenu;
+        }
+
+        private static ActionStateIndicator CreateActionStateIndicator(GameObject attachTo = null)
+        {
+            GameObject actionStateGO = attachTo ?? new GameObject() {name = "Action State Indicator"};
+            ActionStateIndicator indicator = actionStateGO.AddComponent<ActionStateIndicator>();
+            return indicator;
         }
 
         private void Start()
         {
-            if (!CreateModeMenu(gameObject).TryGetComponentOrLog(out ModeMenu))
-            {
-                Destroyer.DestroyComponent(this);
-            }
+            ModeMenu = CreateModeMenu(gameObject);
+            Indicator = CreateActionStateIndicator(gameObject);
 
             ActionState.OnStateChanged += OnStateChanged;
             Assert.IsTrue(actionStateTypes.Length <= 9, 
@@ -154,12 +164,13 @@ namespace SEE.GO.Menu
         
         /// <summary>
         /// Called whenever the action state changes.
-        /// This updates the menu to indicate the selected value.
+        /// This updates the menu to indicate the selected value, and updates the action state indicator.
         /// </summary>
         /// <param name="value">The new action state</param>
         private void OnStateChanged(ActionState.Type value)
         {
             ModeMenu.SelectEntry((int) value);
+            Indicator.ChangeState(value);
         }
 
         /// <summary>

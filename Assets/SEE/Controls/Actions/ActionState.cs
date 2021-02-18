@@ -1,4 +1,6 @@
-﻿namespace SEE.Controls.Actions
+﻿using UnityEngine;
+
+namespace SEE.Controls.Actions
 {
     /// <summary>
     /// Provides user action that depend upon a particular state the user can be in. 
@@ -20,6 +22,26 @@
             EditNode = 5,  // the user wants to edit an existing node
             ScaleNode = 6, // the user wants to scale an existing node
             Delete = 7,    // the user wants to delete a node or edge
+        }
+
+        public static Color TypeColor(this Type type)
+        {
+            //TODO: Maybe it's a good idea to move (almost) all attributes used in PlayerMenu.cs into the enum and
+            // turn it into a proper class. Such attributes include color (which is already defined further below),
+            // title, and description. Otherwise these could in theory be added as further extension methods,
+            // but a full class seems more clean.
+            switch (type)
+            {
+                case Type.Move: return Color.red;
+                case Type.Rotate: return Color.blue;
+                case Type.Map: return Color.green;
+                case Type.NewEdge: return Color.green;
+                case Type.NewNode: return Color.green;
+                case Type.EditNode: return Color.green;
+                case Type.ScaleNode: return Color.green;
+                case Type.Delete: return Color.yellow;
+                default: return Color.gray;
+            }
         }
 
         private static Type value = 0;
