@@ -81,7 +81,7 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            if (selectedObject != null && Input.GetMouseButtonDown(0))
+            if (selectedObject != null)
             {
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
                 if (selectedObject.CompareTag(Tags.Edge))
