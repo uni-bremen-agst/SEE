@@ -33,6 +33,7 @@ public class ActionHistory : MonoBehaviour
     private LinkedList<List<GameObject>> actionHistory = new LinkedList<List<GameObject>>();
     private LinkedList<ActionState.Type> actionStates = new LinkedList<ActionState.Type>();
     private LinkedList<Vector3> oldPosition = new LinkedList<Vector3>();
+    private LinkedList<GameObject> parentCities = new LinkedList<GameObject>();
 
     private Graph graph;
     private int count = 0;
@@ -57,7 +58,7 @@ public class ActionHistory : MonoBehaviour
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <param name="z"></param>
-    public void SaveObjectForUndo(GameObject actionHistoryObject, ActionState.Type aState, float x, float y, float z)
+    public void SaveObjectForUndo(GameObject actionHistoryObject, ActionState.Type aState, float x, float y, float z, GameObject gameObjectCity)
     {
         if (actionHistoryObject == null)
         {
@@ -133,6 +134,7 @@ public class ActionHistory : MonoBehaviour
         Debug.Log(graph);
         oldPosition.AddLast(new Vector3(x, y, z));
         graph.RemoveNode(node.Value);
+        parentCities.AddLast(gameObjectCity);
     }
 
     /// <summary>
@@ -156,7 +158,7 @@ public class ActionHistory : MonoBehaviour
         {
             if (go.TryGetComponent(out NodeRef nodeRef))
             {
-                graph.AddNode(nodeRef.Value);   
+                graph.AddNode(nodeRef.Value);
             }
   
             EdgeRef edgeReference;
@@ -177,6 +179,13 @@ public class ActionHistory : MonoBehaviour
 
         actionHistory.RemoveLast();
         return oldPositionVector;
+    }
+
+    public GameObject GetPortalFromGarbageObjects()
+    {
+        GameObject parent = parentCities.Last();
+        parentCities.RemoveLast();
+        return parent;
     }
 
     private static void checkBoundaries(int counter, LinkedList<ActionState.Type> states)
