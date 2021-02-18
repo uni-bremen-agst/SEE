@@ -81,12 +81,11 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            if (selectedObject != null)
+            if (selectedObject != null && Input.GetMouseButtonDown(0))
             {
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
                 if (selectedObject.CompareTag(Tags.Edge))
                 {
-                    Debug.Log("HÄ?");
                     // selectedObject.GetComponent<ActionHistory>().saveObjectForUndo(selectedObject, ThisActionState);
                     Destroyer.DestroyGameObject(selectedObject);
                 }
