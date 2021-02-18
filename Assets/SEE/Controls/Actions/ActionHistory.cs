@@ -1,7 +1,10 @@
 ﻿using SEE.Controls.Actions;
+using SEE.DataModel.DG;
+using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -29,7 +32,7 @@ public class ActionHistory : MonoBehaviour
 
     private LinkedList<List<GameObject>> actionHistory = new LinkedList<List<GameObject>>();
     private LinkedList<ActionState.Type> actionStates = new LinkedList<ActionState.Type>();
-
+    private Graph graph;
     private int count = 0;
 
     // Start is called before the first frame update
@@ -47,14 +50,19 @@ public class ActionHistory : MonoBehaviour
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="gameObject"></param>
+    /// <param name="actionHistoryObject"></param>
     /// <param name="aState"></param>
-    public void SaveObjectForUndo(GameObject gameObject, ActionState.Type aState)
+    public void SaveObjectForUndo(GameObject actionHistoryObject, ActionState.Type aState)
     {
-        if (gameObject == null)
+        if (actionHistoryObject == null)
         {
             Debug.LogError("null operation");
         }
+
+        SEECity city;
+        // actionHistoryObject.TryGetComponent<SEECity>(out city);
+        city = SceneQueries.GetCodeCity(actionHistoryObject.transform)?.gameObject.GetComponent<SEECity>();
+        graph = city.LoadedGraph;
 
 
         if (count == actionStates.Count)
@@ -66,32 +74,58 @@ public class ActionHistory : MonoBehaviour
             count = actionStates.Count + 1;
         }
         actionStates.AddLast(aState);
-        List<GameObject> NodesAndAscendingEdges = new List<GameObject>();
-        gameObject.SetVisibility(false, true);
+        List<GameObject> NodesAndascendingEdges = new List<GameObject>();
+        actionHistoryObject.SetVisibility(false, true);
 
-        if (gameObject.TryGetComponent(out NodeRef nodeRef))
+        if (actionHistoryObject.TryGetComponent(out NodeRef nodeRef))
         {
-            HashSet<string> edgeIDs = Destroyer.GetEdgeIds(nodeRef);
-            //Question: Performance in graphs with many edges like SEE?
+
+
+            HashSet<String> edgeIDs = Destroyer.GetEdgeIds(nodeRef);
             foreach (GameObject edge in GameObject.FindGameObjectsWithTag(SEE.DataModel.Tags.Edge))
             {
+
+
                 if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                 {
                     edge.SetVisibility(false, true);
-                    if (!NodesAndAscendingEdges.Contains(edge))
+                    if (NodesAndascendingEdges.Contains(edge) == false)
                     {
-                        NodesAndAscendingEdges.Add(edge);
+                        NodesAndascendingEdges.Add(edge);
                     }
+
                 }
             }
 
-            if (gameObject.TryGetComponentOrLog(out Collider collider))
+            Collider collider;
+            if (actionHistoryObject.TryGetComponentOrLog(out collider))
             {
-                collider.enabled = false;
+                actionHistoryObject.GetComponent<Collider>().enabled = false;
             }
-            NodesAndAscendingEdges.Add(gameObject);
+            NodesAndascendingEdges.Add(actionHistoryObject);
         }
-        actionHistory.AddLast(NodesAndAscendingEdges);
+        actionHistory.AddLast(NodesAndascendingEdges);
+
+        List<Edge> incoming = new List<Edge>();
+        List<Edge> outgoing = new List<Edge>();
+
+        NodeRef node;
+        actionHistoryObject.TryGetComponent(out node);   
+        incoming = node.Value.Incomings;
+        outgoing = node.Value.Outgoings;
+
+        for(int i = 0; i  < incoming.Count; i ++)
+        {
+            graph.RemoveEdge(incoming.ElementAt(i));
+           
+        }
+
+        for (int i = 0; i < outgoing.Count; i++)
+        {
+            graph.RemoveEdge(outgoing.ElementAt(i));
+        }
+        graph.RemoveNode(node.Value);
+
     }
 
     /// <summary>
@@ -99,59 +133,74 @@ public class ActionHistory : MonoBehaviour
     /// </summary>
     public void UndoDeleteOperation()
     {
+
         if (actionStates == null || actionStates.Count == 0)
         {
             return;
         }
-        // CheckBoundaries(count, actionStates);
 
-        List<GameObject> undo = actionHistory.ElementAt(count - 1);
+        // checkBoundaries(count, actionStates);
 
+        List<GameObject> undo = actionHistory.Last();
+        undo.Reverse();
         foreach (GameObject go in undo)
         {
-            go.SetVisibility(true, true);
-            if (go.TryGetComponentOrLog(out Collider collider))
+
+            if (go.TryGetComponent(out NodeRef nodeRef))
+            {
+                graph.AddNode(nodeRef.Value);
+                
+            }
+  
+            EdgeRef edgeReference;
+
+            if (go.TryGetComponent(out  edgeReference))
+            {
+                graph.AddEdge(edgeReference.edge);
+            }
+
+            go.SetVisibility(true, false); 
+            
+            Collider collider;
+            if (go.TryGetComponentOrLog(out collider))
             {
                 collider.enabled = true;
             }
         }
-        if (count > 0)
-        {
-            count--;
-        }
+        actionHistory.RemoveLast();
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="counter"></param>
-    /// <param name="states"></param>
-    private static void CheckBoundaries(int counter, LinkedList<ActionState.Type> states)
+    private static void checkBoundaries(int counter, LinkedList<ActionState.Type> states)
     {
         if (counter == 0 || counter > states.Count)
         {
-            Debug.Log(counter + "counter");
+
             throw new NotSupportedException("Redo function cannot be executed");
 
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="actionState"></param>
-    private static void InvertActionStateExecute(ActionState.Type actionState)
+    private static void inverActionStateExecute(ActionState.Type actionState)
     {
-       // if actionstate == ADdNode
-       // {
-       //     --> delete
-       // }
+        // if actionstate == ADdNode 
+        // {
+        //  -->delete
+        //  }
 
-       // if (ActionState == add)
-       // {
-       //     --> AddNode();
-       // }
-
-
+        //  if(ActionState == add)
+        //     {
+        //    --> AddNode();
+        //   }
     }
+
+    private static void removeForReflexionAnalysis(GameObject removedObject)
+    {
+        // remove node or edge
+    }
+
+    private static void reparent(GameObject objectToAddtoGraphHierarchy)
+    {
+        //add edge or node - reparenting.
+    }
+
 }
