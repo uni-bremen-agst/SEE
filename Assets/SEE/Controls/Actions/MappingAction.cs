@@ -411,8 +411,11 @@ namespace SEE.Controls.Actions
 
             if (Input.GetMouseButtonDown(0)) // Left mouse button
             {
-                if (Raycasting.RaycastNodes(out RaycastHit hit, out NodeRef nodeRef)) // Select, replace or map
+                if (Raycasting.RaycastGraphElement(out RaycastHit hit, out GraphElementRef elementRef) == HitGraphElement.Node) 
                 {
+                    // Select, replace or map
+                    NodeRef nodeRef = elementRef as NodeRef;
+
                     Assert.IsNotNull(nodeRef);
                     Assert.IsNotNull(nodeRef.Value);
 
