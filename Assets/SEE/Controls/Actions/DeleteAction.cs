@@ -1,6 +1,8 @@
 ﻿using SEE.DataModel;
+using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -35,6 +37,8 @@ namespace SEE.Controls.Actions
         //FIXME: Just For Testing
         private ActionHistory aH;
 
+        private GameObject garbageCan;
+
         private void Start()
         {
             //FIXME: Just For Testing - AddComponent --> garbage/ trash
@@ -49,6 +53,7 @@ namespace SEE.Controls.Actions
                 if (newState == ThisActionState)
                 {
                     // The monobehaviour is enabled and Update() will be called by Unity.
+                    garbageCan = GameObject.Find("GarbageCan");
                     enabled = true;
                     InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
                     InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
@@ -81,22 +86,42 @@ namespace SEE.Controls.Actions
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
                 if (selectedObject.CompareTag(Tags.Edge))
                 {
+                    Debug.Log("HÄ?");
                     // selectedObject.GetComponent<ActionHistory>().saveObjectForUndo(selectedObject, ThisActionState);
                     Destroyer.DestroyGameObject(selectedObject);
                 }
                 else if (selectedObject.CompareTag(Tags.Node))
                 {
-                    // Option A : Hide the specific object - TODO : De-parenting - Reparenting after making visible
-                     aH.SaveObjectForUndo(selectedObject, ThisActionState);
+                    StartCoroutine(MoveNodeToGarbage(selectedObject));
                 }
             }
             //FIXME : undo just For Testing with right mouse button - later it should be connected with an graphical garbabe can
             if (Input.GetMouseButtonDown(1))
             {
-                aH.UndoDeleteOperation();
-
+                StartCoroutine(RemoveNodeFromGarbage(selectedObject));
             }
+        }
 
+        public IEnumerator MoveNodeToGarbage(GameObject deletedNode)
+        {
+            float tmpx = deletedNode.transform.position.x;
+            float tmpy = deletedNode.transform.position.y;
+            float tmpz = deletedNode.transform.position.z;
+            Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
+            yield return new WaitForSeconds(1.5f);
+            Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), 1f);
+            yield return new WaitForSeconds(1.0f);
+
+            aH.SaveObjectForUndo(deletedNode, ThisActionState,tmpx,tmpy,tmpz);
+        }
+
+        public IEnumerator RemoveNodeFromGarbage(GameObject deletedNode)
+        {
+            Vector3 oldPosition = aH.UndoDeleteOperation();
+            Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
+            yield return new WaitForSeconds(1.5f);
+            Tweens.Move(deletedNode, oldPosition, 1f);
+            yield return new WaitForSeconds(2.0f);
         }
 
         private void LocalAnySelectIn(InteractableObject interactableObject)

@@ -29,6 +29,7 @@ public class ActionHistory : MonoBehaviour
 
     private LinkedList<List<GameObject>> actionHistory = new LinkedList<List<GameObject>>();
     private LinkedList<ActionState.Type> actionStates = new LinkedList<ActionState.Type>();
+    private LinkedList<Vector3> oldPosition = new LinkedList<Vector3>();
 
     private int count = 0;
 
@@ -49,14 +50,12 @@ public class ActionHistory : MonoBehaviour
     /// </summary>
     /// <param name="gameObject"></param>
     /// <param name="aState"></param>
-    public void SaveObjectForUndo(GameObject gameObject, ActionState.Type aState)
+    public void SaveObjectForUndo(GameObject gameObject, ActionState.Type aState, float x, float y, float z)
     {
         if (gameObject == null)
         {
             Debug.LogError("null operation");
         }
-
-
         if (count == actionStates.Count)
         {
             count++;
@@ -92,21 +91,22 @@ public class ActionHistory : MonoBehaviour
             NodesAndAscendingEdges.Add(gameObject);
         }
         actionHistory.AddLast(NodesAndAscendingEdges);
+        oldPosition.AddLast(new Vector3(x, y, z));
     }
 
     /// <summary>
     /// 
     /// </summary>
-    public void UndoDeleteOperation()
+    public Vector3 UndoDeleteOperation()
     {
+        Vector3 oldPositionVector = new Vector3();
         if (actionStates == null || actionStates.Count == 0)
         {
-            return;
+            return oldPositionVector;
         }
         // CheckBoundaries(count, actionStates);
-
         List<GameObject> undo = actionHistory.ElementAt(count - 1);
-
+        oldPositionVector = oldPosition.ElementAt(count - 1);
         foreach (GameObject go in undo)
         {
             go.SetVisibility(true, true);
@@ -119,6 +119,8 @@ public class ActionHistory : MonoBehaviour
         {
             count--;
         }
+
+        return oldPositionVector;
     }
 
     /// <summary>
