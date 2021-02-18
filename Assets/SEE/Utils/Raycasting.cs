@@ -55,7 +55,6 @@ namespace SEE.Utils
                 {
                     result = HitGraphElement.Edge;
                     elementRef = edgeRef;
-                    Debug.Log($"RaycastGraphElement: hit edge {edgeRef.name}.\n");
                 }
             }
             return result;
