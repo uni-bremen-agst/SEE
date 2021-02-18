@@ -2,6 +2,7 @@
 using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -103,6 +104,23 @@ namespace SEE.Controls.Actions
 
         public IEnumerator MoveNodeToGarbage(GameObject deletedNode)
         {
+            GameObject parent = deletedNode.transform.parent.gameObject;
+            GameObject parent2 = deletedNode;
+          
+            while(!parent.Equals(parent2))
+            {
+                try
+                {
+                    parent2 = parent;
+                    parent = parent2.transform.parent.gameObject;
+                }
+                catch(NullReferenceException)
+                {
+                    parent = parent2;
+                }
+            }
+
+            Portal.SetInfinitePortal(deletedNode);
             float tmpx = deletedNode.transform.position.x;
             float tmpy = deletedNode.transform.position.y;
             float tmpz = deletedNode.transform.position.z;
@@ -111,7 +129,7 @@ namespace SEE.Controls.Actions
             Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), 1f);
             yield return new WaitForSeconds(1.0f);
 
-            aH.SaveObjectForUndo(deletedNode, ThisActionState,tmpx,tmpy,tmpz);
+            aH.SaveObjectForUndo(deletedNode, ThisActionState,tmpx,tmpy,tmpz, parent2);
         }
 
         public IEnumerator RemoveNodeFromGarbage(GameObject deletedNode)
@@ -121,6 +139,7 @@ namespace SEE.Controls.Actions
             yield return new WaitForSeconds(1.5f);
             Tweens.Move(deletedNode, oldPosition, 1f);
             yield return new WaitForSeconds(2.0f);
+            Portal.SetPortal(aH.GetPortalFromGarbageObjects());
         }
 
         private void LocalAnySelectIn(InteractableObject interactableObject)
