@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.MixedReality.Toolkit.Input;
-using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -9,20 +8,25 @@ using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls
 {
+    /// <summary>
+    /// InteractableObject components can be attached to different kinds of objects such as game
+    /// nodes or edges but also markers or scroll views in metric charts. A HoverFlag indicates
+    /// to which kind of game object the hovering event relates to. A HoverFlag is used as a single bit
+    /// that occurs in hovering flags.
+    /// </summary>
     public enum HoverFlag
     {
-        None                     = 0x0,
-        World                    = 0x1,
-        ChartMarker              = 0x2,
-        ChartMultiSelect         = 0x4,
-        ChartScrollViewToggle    = 0x8
+        None                     = 0x0, // nothing is being hovered over
+        World                    = 0x1, // an object in the city world is being hovered over (game nodes or edges and the like)
+        ChartMarker              = 0x2, // a marker in a chart is being hovered over
+        ChartMultiSelect         = 0x4, // multiple markers in a chart are being hovered over (within a rectangular bound)
+        ChartScrollViewToggle    = 0x8  // the scroll view of a metric chart is being hovered over
     }
 
     /// <summary>
     /// Super class of the behaviours of game objects the player interacts with.
     /// </summary>
     [RequireComponent(typeof(Interactable))]
-    [RequireComponent(typeof(NodeRef))]
     public sealed class InteractableObject : MonoBehaviour, IMixedRealityFocusHandler
     {
         // Tutorial on grabbing objects:
@@ -71,11 +75,23 @@ namespace SEE.Controls
         /// </summary>
         public uint ID { get; private set; }
 
+        /// <summary>
+        /// A bit vector for hovering flags. Each flag is a bit as defined in <see cref="HoverFlag"/>.
+        /// If the bit is set, this <see cref="InteractableObject"/> is to be considered hovered over for interaction
+        /// events in the respective scope of interactable objects. For instance, if this <see cref="InteractableObject"/>
+        /// is attached to a game object representing a graph node in a code city, then <see cref="HoverFlag.World"/>
+        /// would be set and whenever a hovering event occurs relating to <see cref="HoverFlag.World"/> objects,
+        /// the graph node will be considered being hovered over. If instead this <see cref="InteractableObject"/>
+        /// is attached to a marker in a metric chart, then <see cref="HoverFlag.ChartMarker"/> will be set.
+        /// If a hovering event occurs relating to <see cref="HoverFlag.World"/> objects, the marker will not
+        /// be considered being hovered over.
+        /// </summary>
         public uint HoverFlags { get; private set; } = 0;
 
         /// <summary>
-        /// Whether the object is currently hovered by e.g. the mouse or the VR-
-        /// controller.
+        /// Whether the object is currently hovered over by e.g. the mouse or the VR
+        /// controller (no matter what kind of element it is, e.g. city object, 
+        /// metric marker, etc.).
         /// </summary>
         public bool IsHovered => HoverFlags != 0;
 
@@ -88,13 +104,13 @@ namespace SEE.Controls
         public bool IsHoverFlagSet(HoverFlag flag) => (HoverFlags & (uint)flag) != 0;
 
         /// <summary>
-        /// Whether the object is currently selected by e.g. the mouse or the VR-
+        /// Whether the object is currently selected by e.g. the mouse or the VR
         /// controller.
         /// </summary>
         public bool IsSelected { get; private set; }
 
         /// <summary>
-        /// Whether the object is currently grabbed by e.g. the mouse or the VR-
+        /// Whether the object is currently grabbed by e.g. the mouse or the VR
         /// controller.
         /// </summary>
         public bool IsGrabbed { get; private set; }
@@ -135,6 +151,26 @@ namespace SEE.Controls
 
         #region Interaction
 
+        /// <summary>
+        /// Sets <see cref="HoverFlags"/> to given <paramref name="hoverFlags"/>. Then if 
+        /// the object is being hovered over (<see cref="IsHovered"/>), the <see cref="HoverIn"/> 
+        /// and <see cref="AnyHoverIn"/> events are triggered with this <see cref="InteractableObject"/>
+        /// and <paramref name="isOwner"/> as arguments. If <paramref name="isOwner"/>, the <see cref="LocalHoverIn"/> 
+        /// and <see cref="LocalAnyHoverIn"/> events are triggered with this <see cref="InteractableObject"/>
+        /// additionally. This <see cref="InteractableObject"/> will be added to the set of <see cref="HoveredObjects"/>.
+        /// 
+        /// If instead the object is NOT being hovered over (<see cref="IsHovered"/>), the <see cref="HoverOut"/> 
+        /// and <see cref="AnyHoverOut"/> events are triggered with this <see cref="InteractableObject"/>
+        /// and <paramref name="isOwner"/> as arguments. If <paramref name="isOwner"/>, the <see cref="LocalHoverOut"/> 
+        /// and <see cref="LocalAnyHoverOut"/> events are triggered with this <see cref="InteractableObject"/>
+        /// additionally. This <see cref="InteractableObject"/> will be removed from the set of <see cref="HoveredObjects"/>.
+        /// 
+        /// At any rate, if we are running in multiplayer mode and <paramref name="isOwner"/> is true,
+        /// <see cref="Net.SetHoverAction"/> will be called with the given <paramref name="hoverFlags"/>.
+        /// and this <see cref="InteractableObject"/>.
+        /// </summary>
+        /// <param name="hoverFlags">New value for <see cref="HoverFlags"./></param>
+        /// <param name="isOwner">Whether this client is initiating the hovering action.</param>
         public void SetHoverFlags(uint hoverFlags, bool isOwner)
         {
             HoverFlags = hoverFlags;
@@ -173,7 +209,10 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Visually emphasizes this object for hovering. 
+        /// Runs <see cref="SetHoverFlags(uint, bool)"/> with the first parameter, say H,
+        /// that equals <see cref="HoverFlags"/> with the <paramref name="hoverFlag"/> bit 
+        /// turned on if <paramref name="setFlag"/> or turned off if not <paramref name="setFlag"/>.
+        /// The second parameter is <paramref name="isOwner"/>.
         /// 
         /// Note: This method may be called locally when a local user interacts with the
         /// object or remotely when a remote user has interacted with the object. In the
@@ -183,17 +222,18 @@ namespace SEE.Controls
         /// </summary>
         /// <param name="hoverFlag">The flag to be set or unset.</param>
         /// <param name="setFlag">Whether this object should be hovered.</param>
-        /// <param name="isOwner">Whether this client is initiating the hovering action.
-        /// </param>
+        /// <param name="isOwner">Whether this client is initiating the hovering action.</param>
         public void SetHoverFlag(HoverFlag hoverFlag, bool setFlag, bool isOwner)
         {
             uint hoverFlags;
             if (setFlag)
             {
+                // hoverFlag will be "turned on" in HoverFlags if not already set
                 hoverFlags = HoverFlags | (uint)hoverFlag;
             }
             else
             {
+                // hoverFlag will be "turned off" in HoverFlags
                 hoverFlags = HoverFlags & ~(uint)hoverFlag;
             }
             SetHoverFlags(hoverFlags, isOwner);
@@ -208,11 +248,11 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Visually emphasizes this object for selection.
+        /// Marks the game object this <see cref="InteractableObject"/> is attached to for selection
+        /// and triggers the necessary events accordingly.
         /// </summary>
-        /// <param name="hover">Whether this object should be selected.</param>
-        /// <param name="isOwner">Whether this client is initiating the selection action.
-        /// </param>
+        /// <param name="select">Whether this object should be selected.</param>
+        /// <param name="isOwner">Whether this client is initiating the selection action.</param>
         public void SetSelect(bool select, bool isOwner)
         {
             IsSelected = select;
@@ -352,89 +392,224 @@ namespace SEE.Controls
         /// ----------------------------
         /// Hovering event system
         /// ----------------------------
+        
         /// <summary>
         /// A delegate to be called when a hovering event has happened (hover over
-        /// or hover off the game object).
+        /// or hover off the game object) in circumstances where a distinction between
+        /// remote or local players must be made.
         /// </summary>
-        public delegate void HoverAction(InteractableObject interactableObject, bool isOwner);
+        /// <param name="interactableObject">the object being hovered over (or no longer being hovered over)</param>
+        /// <param name="isOwner">true if a local player initiated this call</param>
+        public delegate void MultiPlayerHoverAction(InteractableObject interactableObject, bool isOwner);
+
         /// <summary>
-        /// Event to be triggered when this game object is being hovered over.
+        /// A delegate to be called when a hovering event has happened (hover over
+        /// or hover off the game object). This delegate is intended to be used in 
+        /// circumstances where no distinction between remote or local players needs
+        /// to be made.
         /// </summary>
-        public event HoverAction HoverIn;
+        /// <param name="interactableObject">the object being hovered over (or no longer being hovered over)</param>
+        public delegate void LocalPlayerHoverAction(InteractableObject interactableObject);
+
         /// <summary>
-        /// Event to be triggered when this game object is no longer hovered over.
+        /// Event to be triggered when this particular <see cref="InteractableObject"/> is 
+        /// being hovered over. Intended for multiplayer actions.
         /// </summary>
-        public event HoverAction HoverOut;
+        public event MultiPlayerHoverAction HoverIn;
+        /// <summary>
+        /// Event to be triggered when this particular <see cref="InteractableObject"/> is 
+        /// no longer hovered over. Intended for multiplayer actions.
+        /// </summary>
+        public event MultiPlayerHoverAction HoverOut;
 
-        public delegate void AnyHoverAction(InteractableObject interactableObject, bool isOwner);
-        public static event AnyHoverAction AnyHoverIn;
-        public static event AnyHoverAction AnyHoverOut;
+        /// <summary>
+        /// Event to be triggered when any <see cref="InteractableObject"/> is being hovered over.
+        /// It can be used for actions of a player. Rather than requiring a player to register
+        /// for all existing instances of <see cref="InteractableObject"/ it is interested in,
+        /// the player just registers on this event here and gets notified whenever any 
+        /// <see cref="InteractableObject"/> is hovered over. The player must make the distinction
+        /// whether it is interested in this <see cref="InteractableObject"/> at all.
+        /// Intended for multiplayer actions.
+        /// 
+        /// Note: This event is declared static so that it is independent of a particular 
+        /// <see cref="InteractableObject"/.
+        /// </summary>
+        public static event MultiPlayerHoverAction AnyHoverIn;
+        /// <summary>
+        /// Event to be triggered when any <see cref="InteractableObject"/> is no longer being hovered over.
+        /// It can be used for actions of a player. Rather than requiring a player to register
+        /// for all existing instances of <see cref="InteractableObject"/ it is interested in,
+        /// the player just registers on this event here and gets notified whenever any 
+        /// <see cref="InteractableObject"/> is no longer being hovered over. The player must make the distinction
+        /// whether it is interested in this <see cref="InteractableObject"/> at all.
+        /// Intended for multiplayer actions.
+        /// 
+        /// Note: This event is declared static so that it is independent of a particular 
+        /// <see cref="InteractableObject"/.
+        /// </summary>
+        public static event MultiPlayerHoverAction AnyHoverOut;
 
-        public delegate void LocalHoverAction(InteractableObject interactableObject);
-        public event LocalHoverAction LocalHoverIn;
-        public event LocalHoverAction LocalHoverOut;
+        /// <summary>
+        /// Event to be triggered when this particular <see cref="InteractableObject"/> is 
+        /// being hovered over. Intended for actions to be executed only locally.
+        /// </summary>
+        public event LocalPlayerHoverAction LocalHoverIn;
+        /// <summary>
+        /// Event to be triggered when this particular <see cref="InteractableObject"/> is 
+        /// no longer hovered over. Intended for actions to be executed only locally.
+        /// </summary>
+        public event LocalPlayerHoverAction LocalHoverOut;
 
-        public delegate void LocalAnyHoverAction(InteractableObject interactableObject);
-        public static event LocalAnyHoverAction LocalAnyHoverIn;
-        public static event LocalAnyHoverAction LocalAnyHoverOut;
+        /// <summary>
+        /// Event to be triggered when any <see cref="InteractableObject"/> is being hovered over.
+        /// It can be used for actions of a player. Rather than requiring a player to register
+        /// for all existing instances of <see cref="InteractableObject"/ it is interested in,
+        /// the player just registers on this event here and gets notified whenever any 
+        /// <see cref="InteractableObject"/> is hovered over. The player must make the distinction
+        /// whether it is interested in this <see cref="InteractableObject"/> at all.
+        /// Intended for actions to be executed only locally.
+        /// 
+        /// Note: This event is declared static so that it is independent of a particular 
+        /// <see cref="InteractableObject"/.
+        /// </summary>
+        public static event LocalPlayerHoverAction LocalAnyHoverIn;
+        /// <summary>
+        /// Event to be triggered when any <see cref="InteractableObject"/> is no longer being hovered over.
+        /// It can be used for actions of a player. Rather than requiring a player to register
+        /// for all existing instances of <see cref="InteractableObject"/ it is interested in,
+        /// the player just registers on this event here and gets notified whenever any 
+        /// <see cref="InteractableObject"/> is no longer being hovered over. The player must make the distinction
+        /// whether it is interested in this <see cref="InteractableObject"/> at all.
+        /// Intended for actions to be executed only locally.
+        /// 
+        /// Note: This event is declared static so that it is independent of a particular 
+        /// <see cref="InteractableObject"/.
+        /// </summary>
+        public static event LocalPlayerHoverAction LocalAnyHoverOut;
 
         /// ----------------------------
         /// Selection event system
         /// ----------------------------
+        
         /// <summary>
         /// A delegate to be called when a selection event has happened (selecting
-        /// or deselecting the game object).
+        /// or deselecting the game object). Intended for multiplayer actions.
         /// </summary>
-        public delegate void SelectAction(InteractableObject interactableObject, bool isOwner);
+        /// <param name="interactableObject">the object being selected</param>
+        /// <param name="isOwner">true if a local user initiated this call</param>
+        public delegate void MultiPlayerSelectAction(InteractableObject interactableObject, bool isOwner);
         /// <summary>
-        /// Event to be triggered when this game object is being selected.
+        /// A delegate to be called when a selection event has happened (selecting
+        /// or deselecting the game object). Intended for actions of a local player only.
         /// </summary>
-        public event SelectAction SelectIn;
+        /// <param name="interactableObject">the object being selected</param>
+        public delegate void LocalPlayerSelectAction(InteractableObject interactableObject);
+
         /// <summary>
-        /// Event to be triggered when this game object is no longer selected.
+        /// Event to be triggered when this particular <see cref="InteractableObject"/> is being selected.
+        /// Intended for multiplayer actions.
         /// </summary>
-        public event SelectAction SelectOut;
+        public event MultiPlayerSelectAction SelectIn;
+        /// <summary>
+        /// Event to be triggered when this particular <see cref="InteractableObject"/> is no longer selected.
+        /// Intended for multiplayer actions.
+        /// </summary>
+        public event MultiPlayerSelectAction SelectOut;
 
-        public delegate void AnySelectAction(InteractableObject interactableObject, bool isOwner);
-        public static event AnySelectAction AnySelectIn;
-        public static event AnySelectAction AnySelectOut;
+        /// <summary>
+        /// Event to be triggered when any instance of <see cref="InteractableObject"/> is being selected.
+        /// Intended for multiplayer actions.
+        /// </summary>
+        public static event MultiPlayerSelectAction AnySelectIn;
+        /// <summary>
+        /// Event to be triggered when any instance of <see cref="InteractableObject"/> is no longer selected.
+        /// Intended for multiplayer actions.
+        /// </summary>
+        public static event MultiPlayerSelectAction AnySelectOut;
 
-        public delegate void LocalSelectAction(InteractableObject interactableObject);
-        public event LocalSelectAction LocalSelectIn;
-        public event LocalSelectAction LocalSelectOut;
+        /// <summary>
+        /// Event to be triggered when this particular <see cref="InteractableObject"/> is being selected.
+        /// Intended for actions of only the local player.
+        /// </summary>
+        public event LocalPlayerSelectAction LocalSelectIn;
+        /// <summary>
+        /// Event to be triggered when this particular <see cref="InteractableObject"/> is not longer selected.
+        /// Intended for actions of only the local player.
+        /// </summary>
+        public event LocalPlayerSelectAction LocalSelectOut;
 
-        public delegate void LocalAnySelectAction(InteractableObject interactableObject);
-        public static event LocalAnySelectAction LocalAnySelectIn;
-        public static event LocalAnySelectAction LocalAnySelectOut;
+        /// <summary>
+        /// Event to be triggered when any instance of <see cref="InteractableObject"/> is being selected.
+        /// Intended for actions of only the local player.
+        /// </summary>
+        public static event LocalPlayerSelectAction LocalAnySelectIn;
+        /// <summary>
+        /// Event to be triggered when any instance of <see cref="InteractableObject"/> is no longer selected.
+        /// Intended for actions of only the local player.
+        /// </summary>
+        public static event LocalPlayerSelectAction LocalAnySelectOut;
 
         /// ----------------------------
         /// Grabbing event system
         /// ----------------------------
+
         /// <summary>
         /// A delegate to be called when a grab event has happened (grabbing
-        /// or releasing the game object).
+        /// or releasing the game object). Intended for multiplayer actions.
         /// </summary>
-        public delegate void GrabAction(InteractableObject interactableObject, bool isOwner);
+        /// <param name="interactableObject">the object being grabbed (or no longer grabbed)</param>
+        /// <param name="isOwner">true if a local user initiated this call</param>
+        public delegate void MultiPlayerGrabAction(InteractableObject interactableObject, bool isOwner);
         /// <summary>
-        /// Event to be triggered when this game object is being grabbed.
+        /// A delegate to be called when a grab event has happened (grabbing
+        /// or releasing the game object). Intended for actions of the local player only.
         /// </summary>
-        public event GrabAction GrabIn;
+        /// <param name="interactableObject">the object being grabbed (or no longer grabbed)</param>
+        public delegate void LocalPlayerGrabAction(InteractableObject interactableObject);
+
         /// <summary>
-        /// Event to be triggered when this game object is no longer grabbed.
+        /// Event to be triggered when this particular <see cref="InteractableObject"/> is being grabbed.
+        /// Intended for multiplayer actions.
         /// </summary>
-        public event GrabAction GrabOut;
+        public event MultiPlayerGrabAction GrabIn;
+        /// <summary>
+        /// Event to be triggered when this particular <see cref="InteractableObject"/> is no longer grabbed.
+        /// Intended for multiplayer actions.
+        /// </summary>
+        public event MultiPlayerGrabAction GrabOut;
 
-        public delegate void AnyGrabAction(InteractableObject interactableObject, bool isOwner);
-        public static event AnyGrabAction AnyGrabIn;
-        public static event AnyGrabAction AnyGrabOut;
+        /// <summary>
+        /// Event to be triggered when any instance of <see cref="InteractableObject"/> is being grabbed.
+        /// Intended for multiplayer actions.
+        /// </summary>
+        public static event MultiPlayerGrabAction AnyGrabIn;
+        /// <summary>
+        /// Event to be triggered when any instance of <see cref="InteractableObject"/> is no longer grabbed.
+        /// Intended for multiplayer actions.
+        /// </summary>
+        public static event MultiPlayerGrabAction AnyGrabOut;
 
-        public delegate void LocalGrabAction(InteractableObject interactableObject);
-        public event LocalGrabAction LocalGrabIn;
-        public event LocalGrabAction LocalGrabOut;
+        /// <summary>
+        /// Event to be triggered when this particular <see cref="InteractableObject"/> is being grabbed.
+        /// Intended for actions of the local player only.
+        /// </summary>
+        public event LocalPlayerGrabAction LocalGrabIn;
+        /// <summary>
+        /// Event to be triggered when this particular <see cref="InteractableObject"/> is being grabbed.
+        /// Intended for actions of the local player only.
+        /// </summary>
+        public event LocalPlayerGrabAction LocalGrabOut;
 
-        public delegate void LocalAnyGrabAction(InteractableObject interactableObject);
-        public static event LocalAnyGrabAction LocalAnyGrabIn;
-        public static event LocalAnyGrabAction LocalAnyGrabOut;
+        /// <summary>
+        /// Event to be triggered when any instance of <see cref="InteractableObject"/> is being grabbed.
+        /// Intended for actions of the local player only.
+        /// </summary>
+        public static event LocalPlayerGrabAction LocalAnyGrabIn;
+        /// <summary>
+        /// Event to be triggered when any instance of <see cref="InteractableObject"/> is no longer grabbed.
+        /// Intended for actions of the local player only.
+        /// </summary>
+        public static event LocalPlayerGrabAction LocalAnyGrabOut;
 
 #if false // TODO(torben): will we ever need this?
         public delegate void CollisionAction(InteractableObject interactableObject, Collision collision);
@@ -449,35 +624,49 @@ namespace SEE.Controls
         // Mouse actions
         //----------------------------------------------------------------
 
+        /// <summary>
+        /// The mouse cursor entered a GUIElement or Collider.
+        /// </summary>
         private void OnMouseEnter()
         {
+            // FIXME: For an unknown reason, this method will be called twice per frame.
+            // Debug.LogFormat("{0}.OnMouseEnter({1}) @ {2}\n", this.GetType().FullName, gameObject.name, Time.time);
             if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop && !Raycasting.IsMouseOverGUI())
             {
-                SetHoverFlag(HoverFlag.World, true, true);
+                SetHoverFlag(HoverFlag.World, setFlag: true, isOwner: true);
             }
         }
 
+        /// <summary>
+        /// The mouse cursor is still positioned above a GUIElement or Collider in this frame.
+        /// </summary>
         private void OnMouseOver()
         {
             if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop)
             {
+                // Does this mouse event relate to a city-world object (game node or edge)?
                 bool isWorldBitSet = (HoverFlags & (uint)HoverFlag.World) != 0;
                 if (isWorldBitSet && Raycasting.IsMouseOverGUI())
                 {
-                    SetHoverFlag(HoverFlag.World, false, true);
+                    SetHoverFlag(HoverFlag.World, setFlag: false, isOwner: true);
                 }
                 else if (!isWorldBitSet && !Raycasting.IsMouseOverGUI())
                 {
-                    SetHoverFlag(HoverFlag.World, true, true);
+                    SetHoverFlag(HoverFlag.World, setFlag: true, isOwner: true);
                 }
             }
         }
 
+        /// <summary>
+        /// The mouse cursor left a GUIElement or Collider.
+        /// </summary>
         private void OnMouseExit()
         {
+            // FIXME: For an unknown reason, this method will be called twice per frame.
+            // Debug.LogFormat("{0}.OnMouseExit({1}) @ {2}\n", this.GetType().FullName, gameObject.name, Time.time.ToString("F20"));
             if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop && !Raycasting.IsMouseOverGUI())
             {
-                SetHoverFlag(HoverFlag.World, false, true);
+                SetHoverFlag(HoverFlag.World, setFlag: false, isOwner: true);
             }
         }
         

@@ -74,6 +74,7 @@
 			{
 				throw new IndexOutOfRangeException( "Index " + index + " is out of the range 0.." + includeSize );
 			}
+
 			return (Key) GetIncludeInt( index );
 		}
 
@@ -108,6 +109,7 @@
 			{
 				throw new IndexOutOfRangeException( "Index " + index + " is out of the range 0.." + excludeSize );
 			}
+
 			return (Key) GetExcludeInt( index );
 		}
 
@@ -124,6 +126,7 @@
 			{
 				AddExclude( keys[i] );
 			}
+
 			return this;
 		}
 
@@ -206,6 +209,12 @@
 					if (KeyInfo.KeyList[i].IsPressed)
 					{
 						keyCombo.AddIncludeInt( i );
+
+						if (i == 8 && KeyInfo.KeyList[10].IsPressed)
+						{
+							keyCombo.AddIncludeInt( 10 );
+						}
+
 						return keyCombo;
 					}
 				}
@@ -236,6 +245,8 @@
 
 
 		static Dictionary<ulong, string> cachedStrings = new Dictionary<ulong, string>();
+
+
 		public override string ToString()
 		{
 			string value;
@@ -248,10 +259,12 @@
 					{
 						value += " ";
 					}
+
 					var key = GetIncludeInt( i );
 					value += KeyInfo.KeyList[key].Name;
 				}
 			}
+
 			return value;
 		}
 
@@ -320,4 +333,3 @@
 		}
 	}
 }
-

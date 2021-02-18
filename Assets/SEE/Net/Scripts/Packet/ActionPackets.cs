@@ -89,8 +89,8 @@ namespace SEE.Net
         internal override bool ExecuteOnClient(Connection connection)
         {
             Assert.IsNotNull(connection);
-            Assert.IsNotNull(action.requesterIPAddress);
-            Assert.IsTrue(action.requesterPort != -1);
+            Assert.IsNotNull(action.RequesterIPAddress);
+            Assert.IsTrue(action.RequesterPort != -1);
 
             action.ExecuteOnClientBase();
             return true;

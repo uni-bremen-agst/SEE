@@ -3,14 +3,14 @@ namespace InControl
 	using System;
 	using System.Collections.Generic;
 	using UnityEngine;
-#if NETFX_CORE
+	#if NETFX_CORE
 	using System.Reflection;
-#endif
-#if UNITY_5_4_OR_NEWER
+	#endif
+	#if UNITY_5_4_OR_NEWER
 	using UnityEngine.SceneManagement;
 
 
-#endif
+	#endif
 
 
 	public enum InControlUpdateMode
@@ -27,10 +27,10 @@ namespace InControl
 		public bool invertYAxis = false;
 
 		// ReSharper disable once NotAccessedField.Local
-#pragma warning disable 414
+		#pragma warning disable 414
 		[SerializeField]
 		bool useFixedUpdate = false; // This is now deprecated and replaced by updateMode
-#pragma warning restore 414
+		#pragma warning restore 414
 
 		public bool dontDestroyOnLoad = true;
 		public bool suspendInBackground = false;
@@ -79,16 +79,16 @@ namespace InControl
 			{
 				if (logDebugInfo)
 				{
-					Debug.Log( "InControl (version " + InputManager.Version + ")" );
 					Logger.OnLogMessage -= LogMessage;
 					Logger.OnLogMessage += LogMessage;
+					Logger.LogInfo( "InControl (version " + InputManager.Version + ")" );
 				}
 			}
 
-#if UNITY_5_4_OR_NEWER
+			#if UNITY_5_4_OR_NEWER
 			SceneManager.sceneLoaded -= OnSceneWasLoaded;
 			SceneManager.sceneLoaded += OnSceneWasLoaded;
-#endif
+			#endif
 
 			if (dontDestroyOnLoad)
 			{
@@ -100,14 +100,14 @@ namespace InControl
 		void OnDisable()
 		{
 			if (IsNotTheSingleton) return;
-#if UNITY_5_4_OR_NEWER
+			#if UNITY_5_4_OR_NEWER
 			SceneManager.sceneLoaded -= OnSceneWasLoaded;
-#endif
+			#endif
 			InputManager.ResetInternal();
 		}
 
 
-#if UNITY_ANDROID && INCONTROL_OUYA && !UNITY_EDITOR
+		#if UNITY_ANDROID && INCONTROL_OUYA && !UNITY_EDITOR
 		void Start()
 		{
 			if (IsNotTheSingleton) return;
@@ -117,18 +117,18 @@ namespace InControl
 
 		IEnumerator CheckForOuyaEverywhereSupport()
 		{
-			Debug.Log( "[InControl] Checking for OUYA Everywhere support..." );
+			Logger.Log( "[InControl] Checking for OUYA Everywhere support..." );
 
 			while (!OuyaSDK.isIAPInitComplete())
 			{
 				yield return null;
 			}
 
-			Debug.Log( "[InControl] OUYA SDK IAP initialization has completed." );
+			Logger.Log( "[InControl] OUYA SDK IAP initialization has completed." );
 
 			OuyaEverywhereDeviceManager.Enable();
 		}
-#endif
+		#endif
 
 
 		void Update()
@@ -175,7 +175,7 @@ namespace InControl
 		}
 
 
-#if UNITY_5_4_OR_NEWER
+		#if UNITY_5_4_OR_NEWER
 		void OnSceneWasLoaded( Scene scene, LoadSceneMode loadSceneMode )
 		{
 			if (IsNotTheSingleton) return;
@@ -184,13 +184,13 @@ namespace InControl
 				InputManager.OnLevelWasLoaded();
 			}
 		}
-#else
+		#else
 		void OnLevelWasLoaded( int level )
 		{
 			if (IsNotTheSingleton) return;
 			InputManager.OnLevelWasLoaded();
 		}
-#endif
+		#endif
 
 
 		static void LogMessage( LogMessage logMessage )

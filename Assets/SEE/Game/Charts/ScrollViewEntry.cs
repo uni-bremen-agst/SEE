@@ -107,6 +107,8 @@ namespace SEE.Game.Charts
                 }
             }
 
+            /// <param name="interactableObject">the object being selected</param>
+            /// <param name="isOwner">true if a local user initiated this call (unused)</param>
             private void OnSelect(InteractableObject o, bool isOwner)
             {
                 ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);
@@ -122,6 +124,8 @@ namespace SEE.Game.Charts
                 }
             }
 
+            /// <param name="interactableObject">the object being selected</param>
+            /// <param name="isOwner">true if a local user initiated this call (unused)</param>
             private void OnUnselect(InteractableObject o, bool isOwner)
             {
                 ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);
@@ -327,7 +331,7 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Called by <see cref="ScrollViewEntry.OnPointerEnter(PointerEventData)"/> and
         /// <see cref="ScrollViewEntry.OnPointerExit(PointerEventData)"/> through Unity,
-        /// if the input device hovers over the entry. Updates the hover flags of this'
+        /// if the input device hovers over the entry. Updates the hover flags of this
         /// handled <see cref="InteractableObject"/>, depending on the value of
         /// <see cref="enter"/>.
         /// </summary>

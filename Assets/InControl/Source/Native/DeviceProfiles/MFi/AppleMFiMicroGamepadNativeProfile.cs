@@ -13,7 +13,7 @@ namespace InControl.NativeDeviceProfiles
 			base.Define();
 
 			DeviceName = "{NAME} MFi Controller";
-			DeviceNotes = "MFi Controller on iOS / tvOS";
+			DeviceNotes = "MFi Controller on iOS / tvOS / macOS";
 
 			DeviceClass = InputDeviceClass.Controller;
 			DeviceStyle = InputDeviceStyle.AppleMFi;
