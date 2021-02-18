@@ -138,18 +138,24 @@ namespace SEE.GO
                 line.positionCount = points.Length; // number of vertices
                 line.SetPositions(points);
 
-                MeshCollider meshCollider = gameEdge.AddComponent<MeshCollider>();
 
-                // Build tubular mesh with Curve
-                bool closed = false; // closed curve or not
-                Mesh mesh = Tubular.Tubular.Build(new Curve.CatmullRomCurve(layoutEdge.Points.OfType<Vector3>().ToList()), tubularSegments, radius, radialSegments, closed);
+                // The Mesh for the collider is only created if Edge is set "isSelectbale" in the inspector.
+                if (isEdgeSelectable)
+                {
+                    MeshCollider meshCollider = gameEdge.AddComponent<MeshCollider>();
 
-                // visualize mesh
-                MeshFilter filter = gameEdge.AddComponent<MeshFilter>();
-                filter.sharedMesh = mesh;
-                meshCollider.sharedMesh = mesh;
-            }
-            return result;
+                    // Build tubular mesh with Curve
+                    bool closed = false; // closed curve or not
+                    Mesh mesh = Tubular.Tubular.Build(new Curve.CatmullRomCurve(layoutEdge.Points.OfType<Vector3>().ToList()), tubularSegments, radius, radialSegments, closed);
+
+                    // visualize mesh
+                    MeshFilter filter = gameEdge.AddComponent<MeshFilter>();
+                    filter.sharedMesh = mesh;
+                    meshCollider.sharedMesh = mesh;
+
+                }
+                }
+                return result;
         }
 
         /// <summary>
