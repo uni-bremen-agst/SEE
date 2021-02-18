@@ -41,12 +41,12 @@ namespace SEE.Game.UI
 
             if (indicator.TryGetComponentOrLog(out ModePanelImage))
             {
-                ModePanelImage.color = ActionState.Value.TypeColor().ColorWithAlpha(0.5f);
+                ModePanelImage.color = ActionState.Value.Color.ColorWithAlpha(0.5f);
             }
 
             if (indicator.transform.Find("ModeText")?.gameObject.TryGetComponentOrLog(out ModePanelText) != null)
             {
-                ModePanelText.SetText(ActionState.Value.ToString());
+                ModePanelText.SetText(ActionState.Value.Name);
             }
             else
             {
@@ -58,10 +58,10 @@ namespace SEE.Game.UI
         /// Changes the indicator to display the new action state type.
         /// </summary>
         /// <param name="newState">New state which shall be displayed in the indicator</param>
-        public void ChangeState(ActionState.Type newState)
+        public void ChangeState(ActionStateType newState)
         {
-            ModePanelImage.color = newState.TypeColor().ColorWithAlpha(0.5f);
-            ModePanelText.text = newState.ToString();
+            ModePanelImage.color = newState.Color.ColorWithAlpha(0.5f);
+            ModePanelText.text = newState.Name;
         }
     }
 }

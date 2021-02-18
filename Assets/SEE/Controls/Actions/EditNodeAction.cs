@@ -21,7 +21,7 @@ namespace SEE.Controls.Actions
         /// Thus, this action will be executed only if the new state is 
         /// <see cref="ThisActionState"/>.
         /// </summary>
-        const ActionState.Type ThisActionState = ActionState.Type.EditNode;
+        private readonly ActionStateType ThisActionState = ActionStateType.EditNode;
 
         /// <summary>
         /// The life cycle of this edit action.
@@ -33,13 +33,12 @@ namespace SEE.Controls.Actions
             EditIsCanceled,  // the edit action is canceled
         }
 
-        private ProgressState editProgress = ProgressState.NoNodeSelected;
         /// <summary>
         /// The current state of the edit-node process.
         /// </summary>
-        public ProgressState EditProgress { get => editProgress; set => editProgress = value; }
+        public ProgressState EditProgress { get; set; } = ProgressState.NoNodeSelected;
 
-        void Start()
+        private void Start()
         {
             if (!InitializeCanvasObject())
             {
@@ -47,12 +46,12 @@ namespace SEE.Controls.Actions
                 enabled = false;
                 return;
             }
-            ActionState.OnStateChanged += (ActionState.Type newState) =>
+            ActionState.OnStateChanged += newState =>
             {
                 // Is this our action state where we need to do something?
-                if (newState == ThisActionState)
+                if (Equals(newState, ThisActionState))
                 {
-                    // The monobehaviour is enabled and Update() will be called by Unity.
+                    // The MonoBehaviour is enabled and Update() will be called by Unity.
                     enabled = true;
                     InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
@@ -60,10 +59,9 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    // The monobehaviour is diabled and Update() no longer be called by Unity.
+                    // The MonoBehaviour is disabled and Update() no longer be called by Unity.
                     enabled = false;
-                    CanvasGenerator canvasGenerator;
-                    canvasObject.TryGetComponentOrLog<CanvasGenerator>(out canvasGenerator);
+                    canvasObject.TryGetComponentOrLog(out CanvasGenerator canvasGenerator);
                     canvasGenerator.DestroyEditNodeCanvasAction();
                     instantiated = false;
                     InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
@@ -80,9 +78,9 @@ namespace SEE.Controls.Actions
         /// NodeSelected: Instantiates the canvasObject if a gameNode is selected.
         /// EditIsCanceled: Removes the canvas and resets all values if the process is canceled.
         /// </summary>
-        void Update()
+        private void Update()
         {
-            switch (editProgress)
+            switch (EditProgress)
             {
                 case ProgressState.NoNodeSelected:
                     if (hoveredObject != null && Input.GetMouseButtonDown(0))

@@ -134,7 +134,7 @@ namespace SEE.Controls.Actions
                         dummy.GetComponent<AddNodeAction>().Network = true;
                         dummy.GetComponent<AddNodeAction>().NodeID = NewNodeID;
                         dummy.GetComponent<AddNodeAction>().City = City;
-                        dummy.GetComponent<AddNodeAction>().SetIsInnerNode(IsInnerNode);
+                        AddNodeAction.SetIsInnerNode(IsInnerNode);
                         dummy.GetComponent<AddNodeAction>().NewNode();
                         dummy.name = dummyName;
 
