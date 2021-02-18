@@ -51,9 +51,16 @@ namespace SEE.GO
         public static NodeRef Get(Node node)
         {
             Assert.IsNotNull(node);
-            Assert.IsTrue(nodeToNodeRefDict.ContainsKey(node));
 
-            return nodeToNodeRefDict[node];
+            try
+            {
+                return nodeToNodeRefDict[node];
+            }
+            // Removed nodes are not present in the dictionary
+            catch  
+            {
+                return null;
+            }
         }
     }
 }
