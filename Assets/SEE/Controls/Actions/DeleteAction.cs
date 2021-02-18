@@ -72,6 +72,15 @@ namespace SEE.Controls.Actions
             if (selectedObject != null) // Input.GetMouseButtonDown(0) && 
             {
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
+                new DeleteNetAction(selectedObject.name).Execute(null);
+                DeleteSelectedObject(selectedObject);
+            }
+        }
+
+        public static void DeleteSelectedObject(GameObject selectedObject)
+        {
+            if (selectedObject != null)
+            {
                 if (selectedObject.CompareTag(Tags.Edge))
                 {
                     Destroyer.DestroyGameObject(selectedObject);
