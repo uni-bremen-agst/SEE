@@ -4,12 +4,7 @@ using SEE.DataModel;
 using SEE.Game;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
-using System.Collections.Generic;
-using Valve.VR.InteractionSystem;
-using System.Linq;
 using UnityEngine;
-using SEE.Controls;
-using SEE.Controls.Actions;
 
 namespace SEE.GO
 {
@@ -25,10 +20,21 @@ namespace SEE.GO
         /// </summary>
         /// <param name="layout">the edge layouter used to calculate the line for the edges</param>
         /// <param name="edgeWidth">the width of the line for the edges</param>
-        public EdgeFactory(IEdgeLayout layout, float edgeWidth)
+        /// <param name="tubularSegments">The amount of segments of the tubular</param>
+        /// <param name="radius">The radius of the tubular</param>
+        /// <param name="radialSegments">The amount of radial segments of the tubular</param>
+        /// <param name="isEdgeSelectable">Are the edges selectable or not</param>
+        public EdgeFactory(IEdgeLayout layout, float edgeWidth, int tubularSegments, float radius, int radialSegments, bool isEdgeSelectable)
         {
             this.layout = layout;
             this.edgeWidth = edgeWidth;
+            if (tubularSegments > 0) this.tubularSegments = tubularSegments;
+            else this.tubularSegments = 50;
+            if (radius > 0) this.radius = radius;
+            else this.radius = 0.005f;
+            if (radialSegments > 0) this.radialSegments = radialSegments;
+            else this.radialSegments = 8;
+            this.isEdgeSelectable = isEdgeSelectable;
             defaultLineMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
         }
 
@@ -46,6 +52,26 @@ namespace SEE.GO
         /// The width of the line for the created edges, given in the constructor.
         /// </summary>
         private readonly float edgeWidth;
+
+        /// <summary>
+        /// The amount of segments of the tubular.
+        /// </summary>
+        private readonly int tubularSegments;
+
+        /// <summary>
+        /// The radius of the tubular.
+        /// </summary>
+        private readonly float radius;
+
+        /// <summary>
+        /// The amount of radial segments of the tubular.
+        /// </summary>
+        private readonly int radialSegments;
+
+        /// <summary>
+        /// Determines if the edges are selectable or not.
+        /// </summary>
+        private readonly bool isEdgeSelectable;
 
         /// <summary>
         /// The edge layouter used to generate the line for the edges, given in the constructor.
@@ -112,33 +138,16 @@ namespace SEE.GO
                 line.positionCount = points.Length; // number of vertices
                 line.SetPositions(points);
 
-                LineRenderer lineRenderer = gameEdge.GetComponent<LineRenderer>();
                 MeshCollider meshCollider = gameEdge.AddComponent<MeshCollider>();
 
-                Mesh mesh = new Mesh();
-                lineRenderer.BakeMesh(mesh, false);
+                // Build tubular mesh with Curve
+                bool closed = false; // closed curve or not
+                Mesh mesh = Tubular.Tubular.Build(new Curve.CatmullRomCurve(layoutEdge.Points.OfType<Vector3>().ToList()), tubularSegments, radius, radialSegments, closed);
 
-                //Das Mesh scheint zu klein, Convex ist zu groß. Scaling?
-                //mesh.vertices.ForEach(vertex =>
-                //{
-                   // vertex.x *= ;
-                   // vertex.y *= ;
-                //});
+                // visualize mesh
+                MeshFilter filter = gameEdge.AddComponent<MeshFilter>();
+                filter.sharedMesh = mesh;
                 meshCollider.sharedMesh = mesh;
-
-                //FIXME
-                // Convex ist eher ungeil, da zu groß. Funktioniert aber vorerst.
-                meshCollider.convex =true;
-
-
-                // FIXME
-                // Brauchen wir ein Label Hovering? Wenn ja, EdgeRef stattt NodeRef?
-                gameEdge.AddComponent<Interactable>();
-                gameEdge.AddComponent<InteractableObject>();
-                gameEdge.AddComponent<ShowHovering>();
-                //gameEdge.AddComponent<ShowLabel>();
-                gameEdge.AddComponent<ShowSelection>();
-                //gameEdge.AddComponent<ShowGrabbing>();
             }
             return result;
         }

@@ -33,7 +33,6 @@ namespace SEE.Game
         public GraphRenderer(AbstractSEECity settings, Graph graph)
         {
             this.settings = settings;
-
             ShaderType = Materials.ShaderType.Transparent;
             switch (this.settings.LeafObjects)
             {
@@ -244,14 +243,15 @@ namespace SEE.Game
             ICollection<LayoutEdge> layoutEdges = new List<LayoutEdge> { new LayoutEdge(fromLayoutNode, toLayoutNode, edge) };
             // Calculate the edge layout (for the single edge only).
             ICollection<GameObject> edges = EdgeLayout(layoutNodes, layoutEdges);
-            GameObject result = edges.FirstOrDefault();
+            GameObject resultingEdge = edges.FirstOrDefault();
+            InteractionDecorator.PrepareForInteraction(resultingEdge);
             // The edge becomes a child of the root node of the game-node hierarchy
             GameObject codeCity = SceneQueries.GetCodeCity(from.transform).gameObject;
             GameObject rootNode = SceneQueries.GetCityRootNode(codeCity).gameObject;                                        
-            result.transform.SetParent(rootNode.transform);
+            resultingEdge.transform.SetParent(rootNode.transform);
             // The portal of the new edge is inherited from the codeCity.
-            Portal.SetPortal(root: codeCity, gameObject: result);
-            return result;
+            Portal.SetPortal(root: codeCity, gameObject: resultingEdge);
+            return resultingEdge;
         }
 
         /// <summary>
@@ -323,7 +323,7 @@ namespace SEE.Game
                     throw new Exception("Unhandled edge layout " + settings.EdgeLayout);
             }
             Performance p = Performance.Begin("edge layout " + layout.Name);
-            EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
+            EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth, settings.TubularSegments, settings.Radius, settings.RadialSegments, settings.isEdgeSelectable);
             ICollection<GameObject> result;
             //Calculate only
             if (!draw)
@@ -334,6 +334,7 @@ namespace SEE.Game
             else
             {
                 result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), layoutEdges);
+                InteractionDecorator.PrepareForInteraction(result);
                 AddLOD(result);
             }            
             
@@ -588,7 +589,6 @@ namespace SEE.Game
 
             // Add the node to the node hierarchy
             gameNode.transform.SetParent(itsParent.transform);
-
 
             // Prepare the node for interactions
             InteractionDecorator.PrepareForInteraction(gameNode);
@@ -1286,6 +1286,8 @@ namespace SEE.Game
             block.AddComponent<NodeRef>().Value = node;
             AdjustScaleOfLeaf(block);
             AddLOD(block);
+            Portal.SetInfinitePortal(block);
+            InteractionDecorator.PrepareForInteraction(block);
             return block;
         }
 
@@ -1308,9 +1310,9 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Applies ADDLOD to every game object in <paramref name="gameObjects"/>.
+        /// Applies AddLOD to every game object in <paramref name="gameObjects"/>.
         /// </summary>
-        /// <param name="gameObjects">the list of game objects where ADDLOD is to be applied</param>
+        /// <param name="gameObjects">the list of game objects where AddLOD is to be applied</param>
         private void AddLOD(ICollection<GameObject> gameObjects)
         {
             foreach (GameObject go in gameObjects)
@@ -1593,6 +1595,7 @@ namespace SEE.Game
             AdjustStyle(innerGameObject);
             AdjustHeightOfInnerNode(innerGameObject);
             AddLOD(innerGameObject);
+            InteractionDecorator.PrepareForInteraction(innerGameObject);
             return innerGameObject;
         }
 

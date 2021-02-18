@@ -8,7 +8,6 @@ namespace SEE.Controls.Actions
     /// </summary>
     public abstract class InteractableObjectHoveringAction : InteractableObjectAction
     {
-
         /// <summary>
         /// Registers On() and Off() for the respective hovering events.
         /// </summary>
@@ -44,12 +43,14 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Called when the object is hovered over.
         /// </summary>
+        /// <param name="interactableObject">the object being hovered over</param>
         /// <param name="isOwner">true if a local user initiated this call</param>
         protected abstract void On(InteractableObject interactableObject, bool isOwner);
 
         /// <summary>
         /// Called when the object is no longer being hovered over.
         /// </summary>
+        /// <param name="interactableObject">the object being hovered over</param>
         /// <param name="isOwner">true if a local user initiated this call</param>
         protected abstract void Off(InteractableObject interactableObject, bool isOwner);
     }

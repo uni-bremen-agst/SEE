@@ -27,10 +27,10 @@ Open issues: implementation of incremental analysis is missing.
 
 */
 
-using SEE.DataModel;
-using SEE.DataModel.DG;
 using System;
 using System.Collections.Generic;
+using SEE.DataModel;
+using SEE.DataModel.DG;
 using UnityEngine;
 
 namespace SEE.Tools
