@@ -23,7 +23,7 @@ namespace SEE.GO
         /// <param name="tubularSegments">The amount of segments of the tubular</param>
         /// <param name="radius">The radius of the tubular</param>
         /// <param name="radialSegments">The amount of radial segments of the tubular</param>
-        /// <param name="isEdgeSelectable">Are the edges selectable or not</param>
+        /// <param name="isEdgeSelectable">Are the edges selectable or not; if not, no colliders will be added</param>
         public EdgeFactory(IEdgeLayout layout, float edgeWidth, int tubularSegments, float radius, int radialSegments, bool isEdgeSelectable)
         {
             this.layout = layout;
@@ -69,7 +69,8 @@ namespace SEE.GO
         private readonly int radialSegments;
 
         /// <summary>
-        /// Determines if the edges are selectable or not.
+        /// Determines whether the edges are selectable or not. If they are not selectable,
+        /// no colliders will be added.
         /// </summary>
         private readonly bool isEdgeSelectable;
 
@@ -116,7 +117,7 @@ namespace SEE.GO
                 GameObject gameEdge = NewGameEdge(layoutEdge);
                 result.Add(gameEdge);
 
-                Points p  = gameEdge.AddComponent<Points>();
+                Points p = gameEdge.AddComponent<Points>();
                 p.controlPoints = layoutEdge.ControlPoints;
                 p.linePoints = layoutEdge.Points;
                 // gameEdge does not yet have a renderer; we add a new one
@@ -130,7 +131,7 @@ namespace SEE.GO
                 LineFactory.SetWidth(line, edgeWidth);
 
                 // If enabled, the lines are defined in world space.
-                // This means the object's position is ignored, and the lines are rendered around 
+                // This means the object's position is ignored and the lines are rendered around 
                 // world origin.
                 line.useWorldSpace = false;
 
@@ -138,16 +139,21 @@ namespace SEE.GO
                 line.positionCount = points.Length; // number of vertices
                 line.SetPositions(points);
 
-                MeshCollider meshCollider = gameEdge.AddComponent<MeshCollider>();
+                // The mesh for the collider is created only if "isSelectbale" is set in the inspector.
+                if (isEdgeSelectable)
+                {
+                    MeshCollider meshCollider = gameEdge.AddComponent<MeshCollider>();
 
-                // Build tubular mesh with Curve
-                bool closed = false; // closed curve or not
-                Mesh mesh = Tubular.Tubular.Build(new Curve.CatmullRomCurve(layoutEdge.Points.OfType<Vector3>().ToList()), tubularSegments, radius, radialSegments, closed);
+                    // Build tubular mesh with Curve
+                    bool closed = false; // closed curve or not
+                    Mesh mesh = Tubular.Tubular.Build(new Curve.CatmullRomCurve(layoutEdge.Points.OfType<Vector3>().ToList()),
+                                                      tubularSegments, radius, radialSegments, closed);
 
-                // visualize mesh
-                MeshFilter filter = gameEdge.AddComponent<MeshFilter>();
-                filter.sharedMesh = mesh;
-                meshCollider.sharedMesh = mesh;
+                    // visualize mesh
+                    MeshFilter filter = gameEdge.AddComponent<MeshFilter>();
+                    filter.sharedMesh = mesh;
+                    meshCollider.sharedMesh = mesh;
+                }
             }
             return result;
         }
@@ -160,7 +166,7 @@ namespace SEE.GO
         /// <param name="nodes">source and target nodes of the <paramref name="edges"/></param>
         /// <param name="edges">the layout edges for which to create game objects</param>
         /// <returns>game objects representing the <paramref name="edges"/></returns>
-         public ICollection<GameObject> CalculateNewEdges(ICollection<ILayoutNode> nodes, ICollection<LayoutEdge> edges)
+        public ICollection<GameObject> CalculateNewEdges(ICollection<ILayoutNode> nodes, ICollection<LayoutEdge> edges)
         {
             List<GameObject> result = new List<GameObject>(edges.Count);
             if (edges.Count == 0)
@@ -173,7 +179,7 @@ namespace SEE.GO
                 GameObject gameEdge = NewGameEdge(layoutEdge);
                 result.Add(gameEdge);
 
-                Points p  = gameEdge.AddComponent<Points>();
+                Points p = gameEdge.AddComponent<Points>();
                 p.controlPoints = layoutEdge.ControlPoints;
                 p.linePoints = layoutEdge.Points;
             }
