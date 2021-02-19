@@ -664,7 +664,10 @@ namespace SEE.Game.Charts
             }
             foreach (Node root in SceneQueries.GetRoots(listDataObjects))
             {
-                _FindForTree(root);
+                if (!removedNodeIDs.Contains(root.ID))
+                {
+                    _FindForTree(root);
+                }
             }
         }
 

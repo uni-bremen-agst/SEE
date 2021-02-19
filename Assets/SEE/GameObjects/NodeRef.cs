@@ -51,20 +51,7 @@ namespace SEE.GO
         public static NodeRef Get(Node node)
         {
             Assert.IsNotNull(node);
-
-            if (nodeToNodeRefDict.TryGetValue(node, out NodeRef result))
-            {
-                return result;
-            }
-            else
-            {
-                // Removed nodes are not present in the dictionary
-                // FIXME: The question, though, remains what is the real cause of this problem? 
-                // Why is anyone accessing a node that is no longer in `nodeToNodeRefDict`? That 
-                // is the root cause of the problem. The root causes should be handled, not just 
-                // the symptoms.
-                return null;
-            }
+            return nodeToNodeRefDict[node];
         }
     }
 }
