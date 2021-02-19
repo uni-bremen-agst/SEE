@@ -36,14 +36,14 @@ namespace SEE.Controls.Actions
 
 
         //FIXME: Just For Testing
-        private ActionHistory aH;
+        private ActionHistory actionHistory;
 
         private GameObject garbageCan;
 
+        private static readonly string GarbageCanName = "GarbageCan";
+
         private void Start()
         {
-            //FIXME: Just For Testing - AddComponent --> garbage/ trash
-            aH = new ActionHistory();
 
             // An anonymous delegate is registered for the event <see cref="ActionState.OnStateChanged"/>.
             // This delegate will be called from <see cref="ActionState"/> upon every
@@ -54,7 +54,9 @@ namespace SEE.Controls.Actions
                 if (newState == ThisActionState)
                 {
                     // The monobehaviour is enabled and Update() will be called by Unity.
-                    garbageCan = GameObject.Find("GarbageCan");
+                    garbageCan = GameObject.Find(GarbageCanName);
+                    garbageCan.TryGetComponent(out ActionHistory actionH);
+                    actionHistory = actionH; 
                     enabled = true;
                     InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
                     InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
@@ -129,17 +131,17 @@ namespace SEE.Controls.Actions
             Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), 1f);
             yield return new WaitForSeconds(1.0f);
 
-            aH.SaveObjectForUndo(deletedNode, ThisActionState,tmpx,tmpy,tmpz, parent2);
+            actionHistory.SaveObjectForUndo(deletedNode, ThisActionState,tmpx,tmpy,tmpz, parent2);
         }
 
         public IEnumerator RemoveNodeFromGarbage(GameObject deletedNode)
         {
-            Vector3 oldPosition = aH.UndoDeleteOperation();
+            Vector3 oldPosition = actionHistory.UndoDeleteOperation();
             Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
             yield return new WaitForSeconds(1.5f);
             Tweens.Move(deletedNode, oldPosition, 1f);
             yield return new WaitForSeconds(2.0f);
-            Portal.SetPortal(aH.GetPortalFromGarbageObjects());
+            Portal.SetPortal(actionHistory.GetPortalFromGarbageObjects());
         }
 
         private void LocalAnySelectIn(InteractableObject interactableObject)

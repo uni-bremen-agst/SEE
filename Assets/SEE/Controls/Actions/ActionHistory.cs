@@ -4,31 +4,12 @@ using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public class ActionHistory : MonoBehaviour
 {
-
-    /// <summary>
-    /// Start() will register an anonymous delegate of type 
-    /// <see cref="ActionState.OnStateChangedFn"/> on the event
-    /// <see cref="ActionState.OnStateChanged"/> to be called upon every
-    /// change of the action state, where the newly entered state will
-    /// be passed as a parameter. The anonymous delegate will compare whether
-    /// this state equals <see cref="ThisActionState"/> and if so, execute
-    /// what needs to be done for this action here. If that parameter is
-    /// different from <see cref="ThisActionState"/>, this action will
-    /// put itself to sleep. 
-    /// Thus, this action will be executed only if the new state is 
-    /// <see cref="ThisActionState"/>.
-    /// </summary>
-    /// 
-
-    //FIXME: Action State Const definieren - PlayerMenu adden
-    // const ActionState.Type ThisActionState = ActionState.Type.Undo;
 
     private LinkedList<List<GameObject>> actionHistory = new LinkedList<List<GameObject>>();
     private LinkedList<ActionState.Type> actionStates = new LinkedList<ActionState.Type>();
@@ -58,6 +39,7 @@ public class ActionHistory : MonoBehaviour
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <param name="z"></param>
+    /// <param name="gameObjectCity"></param>
     public void SaveObjectForUndo(GameObject actionHistoryObject, ActionState.Type aState, float x, float y, float z, GameObject gameObjectCity)
     {
         if (actionHistoryObject == null)
@@ -66,7 +48,6 @@ public class ActionHistory : MonoBehaviour
         }
 
         SEECity city;
-        // actionHistoryObject.TryGetComponent<SEECity>(out city);
         city = SceneQueries.GetCodeCity(actionHistoryObject.transform)?.gameObject.GetComponent<SEECity>();
         graph = city.LoadedGraph;
 
@@ -85,12 +66,9 @@ public class ActionHistory : MonoBehaviour
         if (actionHistoryObject.TryGetComponent(out NodeRef nodeRef))
         {
 
-
-            HashSet<String> edgeIDs = Destroyer.GetEdgeIds(nodeRef);
+            HashSet<string> edgeIDs = Destroyer.GetEdgeIds(nodeRef);
             foreach (GameObject edge in GameObject.FindGameObjectsWithTag(SEE.DataModel.Tags.Edge))
             {
-
-
                 if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                 {
                     edge.SetVisibility(false, true);
@@ -101,9 +79,8 @@ public class ActionHistory : MonoBehaviour
 
                 }
             }
-
-            Collider collider;
-            if (actionHistoryObject.TryGetComponentOrLog(out collider))
+            
+            if (actionHistoryObject.TryGetComponentOrLog(out Collider collider))
             {
                 actionHistoryObject.GetComponent<Collider>().enabled = false;
             }
@@ -111,15 +88,10 @@ public class ActionHistory : MonoBehaviour
         }
         actionHistory.AddLast(NodesAndascendingEdges);
 
-        List<Edge> incoming = new List<Edge>();
-        List<Edge> outgoing = new List<Edge>();
+        actionHistoryObject.TryGetComponent(out NodeRef node);
 
-        NodeRef node;
-
-        actionHistoryObject.TryGetComponent(out node);
-
-        incoming = node.Value.Incomings;
-        outgoing = node.Value.Outgoings;
+        List<Edge> incoming = node.Value.Incomings;
+        List<Edge> outgoing = node.Value.Outgoings;
 
         for(int i = 0; i  < incoming.Count; i ++)
         {
@@ -130,10 +102,11 @@ public class ActionHistory : MonoBehaviour
         {
             graph.RemoveEdge(outgoing.ElementAt(i));
         }
-        Debug.Log(city);
-        Debug.Log(graph);
+
         oldPosition.AddLast(new Vector3(x, y, z));
+
         graph.RemoveNode(node.Value);
+
         parentCities.AddLast(gameObjectCity);
     }
 
@@ -160,18 +133,15 @@ public class ActionHistory : MonoBehaviour
             {
                 graph.AddNode(nodeRef.Value);
             }
-  
-            EdgeRef edgeReference;
 
-            if (go.TryGetComponent(out  edgeReference))
+            if (go.TryGetComponent(out EdgeRef edgeReference))
             {
                 graph.AddEdge(edgeReference.edge);
             }
 
-            go.SetVisibility(true, false); 
-            
-            Collider collider;
-            if (go.TryGetComponentOrLog(out collider))
+            go.SetVisibility(true, false);
+
+            if (go.TryGetComponentOrLog(out Collider collider))
             {
                 collider.enabled = true;
             }
@@ -188,7 +158,7 @@ public class ActionHistory : MonoBehaviour
         return parent;
     }
 
-    private static void checkBoundaries(int counter, LinkedList<ActionState.Type> states)
+    private static void CheckBoundaries(int counter, LinkedList<ActionState.Type> states)
     {
         if (counter == 0 || counter > states.Count)
         {
@@ -198,7 +168,7 @@ public class ActionHistory : MonoBehaviour
         }
     }
 
-    private static void inverActionStateExecute(ActionState.Type actionState)
+    private static void InverActionStateExecute(ActionState.Type actionState)
     {
         // if actionstate == ADdNode 
         // {
@@ -211,12 +181,12 @@ public class ActionHistory : MonoBehaviour
         //   }
     }
 
-    private static void removeForReflexionAnalysis(GameObject removedObject)
+    private static void RemoveForReflexionAnalysis(GameObject removedObject)
     {
         // remove node or edge
     }
 
-    private static void reparent(GameObject objectToAddtoGraphHierarchy)
+    private static void Reparent(GameObject objectToAddtoGraphHierarchy)
     {
         //add edge or node - reparenting.
     }
