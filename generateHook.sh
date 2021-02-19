@@ -16,14 +16,14 @@ while IFS= read -r scene
 do
         if [ -n "\$scene" ]; then
                 output="\$output
-Warnung: Ungelöschte CodeCity-Knoten erkannt in Szene '\$scene'!"
+Warning: Rendered CodeCities detected in scene '\$scene'!"
         fi
 done << EOF
 \$(git diff --staged -S"m_TagString: Node" --name-only Assets/Scenes 2> /dev/null)
 EOF
 
 if [ -n "\$output" ]; then
-        printf '%s\nBitte alle gezeichneten CodeCities vor dem Commit löschen.' "\$output"
+        printf '%s\nPlease delete all drawn CodeCities before committing.' "\$output"
         exit 1
 fi
 exit 0
