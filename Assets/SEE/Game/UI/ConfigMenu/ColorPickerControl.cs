@@ -7,7 +7,7 @@ namespace SEE.Game.UI.ConfigMenu
         private HSVPicker.ColorPicker _colorPickerHost;
         private ColorPicker _registeredPicker;
 
-        private void Start()
+        private void Awake()
         {
             _colorPickerHost = GetComponent<HSVPicker.ColorPicker>();
         }
