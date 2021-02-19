@@ -18,6 +18,11 @@ Filmos (Tester)
 Kabbouchi (Tester)
 Takashi Sakai
 
+Changelog v4.4.0
+----------------------------------------
+• 
+----------------------------------------
+
 Changelog v4.3.3
 ----------------------------------------
 • New object creation system
