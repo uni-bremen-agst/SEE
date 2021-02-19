@@ -12,11 +12,12 @@ public class ActionHistory : MonoBehaviour
 {
 
     private LinkedList<List<GameObject>> actionHistory = new LinkedList<List<GameObject>>();
+
     private LinkedList<Vector3> oldPosition = new LinkedList<Vector3>();
+
     private LinkedList<GameObject> parentCities = new LinkedList<GameObject>();
 
     private Graph graph;
-    private int count = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -39,7 +40,7 @@ public class ActionHistory : MonoBehaviour
     /// <param name="y"></param>
     /// <param name="z"></param>
     /// <param name="gameObjectCity"></param>
-    public void SaveObjectForUndo(GameObject actionHistoryObject, ActionState.Type aState, float x, float y, float z, GameObject gameObjectCity)
+    public void SaveObjectForUndo(GameObject actionHistoryObject, float x, float y, float z, GameObject gameObjectCity)
     {
         if (actionHistoryObject == null)
         {
@@ -77,6 +78,7 @@ public class ActionHistory : MonoBehaviour
             NodesAndascendingEdges.Add(actionHistoryObject);
         }
         actionHistory.AddLast(NodesAndascendingEdges);
+        oldPosition.AddLast(new Vector3(x, y, z));
 
         actionHistoryObject.TryGetComponent(out NodeRef node);
 
@@ -93,8 +95,6 @@ public class ActionHistory : MonoBehaviour
             graph.RemoveEdge(outgoing.ElementAt(i));
         }
 
-        oldPosition.AddLast(new Vector3(x, y, z));
-
         graph.RemoveNode(node.Value);
 
         parentCities.AddLast(gameObjectCity);
@@ -105,9 +105,9 @@ public class ActionHistory : MonoBehaviour
     /// </summary>
     public Vector3 UndoDeleteOperation()
     {
-        Vector3 oldPositionVector = new Vector3();
+        Vector3 oldPositionVector = oldPosition.Last();
 
-        oldPositionVector = oldPosition.ElementAt(count - 1);
+        Debug.Log(oldPosition.Count);
 
         List<GameObject> undo = actionHistory.Last();
         undo.Reverse();
@@ -132,10 +132,17 @@ public class ActionHistory : MonoBehaviour
             }
         }
 
+        Debug.Log(actionHistory.Last.Value);
         actionHistory.RemoveLast();
+        oldPosition.RemoveLast();
+        Debug.Log(oldPositionVector);
         return oldPositionVector;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public GameObject GetPortalFromGarbageObjects()
     {
         GameObject parent = parentCities.Last();
@@ -143,6 +150,11 @@ public class ActionHistory : MonoBehaviour
         return parent;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="counter"></param>
+    /// <param name="states"></param>
     private static void CheckBoundaries(int counter, LinkedList<ActionState.Type> states)
     {
         if (counter == 0 || counter > states.Count)
@@ -153,6 +165,10 @@ public class ActionHistory : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="actionState"></param>
     private static void InverActionStateExecute(ActionState.Type actionState)
     {
         // if actionstate == ADdNode 
@@ -166,14 +182,26 @@ public class ActionHistory : MonoBehaviour
         //   }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="removedObject"></param>
     private static void RemoveForReflexionAnalysis(GameObject removedObject)
     {
         // remove node or edge
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="objectToAddtoGraphHierarchy"></param>
     private static void Reparent(GameObject objectToAddtoGraphHierarchy)
     {
         //add edge or node - reparenting.
     }
 
+    public LinkedList<List<GameObject>> GetActionHistory()
+    {
+        return actionHistory;
+    }
 }

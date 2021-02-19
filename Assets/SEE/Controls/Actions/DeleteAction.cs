@@ -4,6 +4,8 @@ using SEE.GO;
 using SEE.Utils;
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -34,12 +36,19 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject selectedObject;
 
-
-        //FIXME: Just For Testing
+        /// <summary>
+        /// The ActionHistory which is responsible for the undo/redo-operations.
+        /// </summary>
         private ActionHistory actionHistory;
 
+        /// <summary>
+        /// The GarbageCan which contains the deleted nodes.
+        /// </summary>
         private GameObject garbageCan;
 
+        /// <summary>
+        /// The name of the garbage-can gameObject.
+        /// </summary>
         private static readonly string GarbageCanName = "GarbageCan";
 
         private void Start()
@@ -100,7 +109,9 @@ namespace SEE.Controls.Actions
             //FIXME : undo just For Testing with right mouse button - later it should be connected with an graphical garbabe can
             if (Input.GetKeyDown(KeyCode.Z))
             {
-                StartCoroutine(RemoveNodeFromGarbage(selectedObject));
+                //FIXME: LastObject from list not selected!!
+                List<GameObject> objectToBeMoved = actionHistory.GetActionHistory().Last();
+                StartCoroutine(RemoveNodeFromGarbage(objectToBeMoved));
             }
         }
 
@@ -136,7 +147,7 @@ namespace SEE.Controls.Actions
             Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), 1f);
             yield return new WaitForSeconds(1.0f);
 
-            actionHistory.SaveObjectForUndo(deletedNode, ThisActionState,tmpx,tmpy,tmpz, parent2);
+            actionHistory.SaveObjectForUndo(deletedNode,tmpx,tmpy,tmpz, parent2);
         }
 
         /// <summary>
@@ -144,12 +155,22 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="deletedNode"></param>
         /// <returns></returns>
-        public IEnumerator RemoveNodeFromGarbage(GameObject deletedNode)
+        public IEnumerator RemoveNodeFromGarbage(List<GameObject> deletedNodes)
         {
             Vector3 oldPosition = actionHistory.UndoDeleteOperation();
-            Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
+
+            foreach (GameObject deletedNode in deletedNodes)
+            {
+                Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
+            }
+
             yield return new WaitForSeconds(1.5f);
-            Tweens.Move(deletedNode, oldPosition, 1f);
+
+            foreach (GameObject deletedNode in deletedNodes)
+            {
+                Tweens.Move(deletedNode, oldPosition, 1f);
+            }
+
             yield return new WaitForSeconds(2.0f);
             Portal.SetPortal(actionHistory.GetPortalFromGarbageObjects());
         }
