@@ -12,7 +12,6 @@ public class ActionHistory : MonoBehaviour
 {
 
     private LinkedList<List<GameObject>> actionHistory = new LinkedList<List<GameObject>>();
-    private LinkedList<ActionState.Type> actionStates = new LinkedList<ActionState.Type>();
     private LinkedList<Vector3> oldPosition = new LinkedList<Vector3>();
     private LinkedList<GameObject> parentCities = new LinkedList<GameObject>();
 
@@ -51,15 +50,6 @@ public class ActionHistory : MonoBehaviour
         city = SceneQueries.GetCodeCity(actionHistoryObject.transform)?.gameObject.GetComponent<SEECity>();
         graph = city.LoadedGraph;
 
-        if (count == actionStates.Count)
-        {
-            count++;
-        }
-        else
-        {
-            count = actionStates.Count + 1;
-        }
-        actionStates.AddLast(aState);
         List<GameObject> NodesAndascendingEdges = new List<GameObject>();
         actionHistoryObject.SetVisibility(false, true);
 
@@ -116,11 +106,6 @@ public class ActionHistory : MonoBehaviour
     public Vector3 UndoDeleteOperation()
     {
         Vector3 oldPositionVector = new Vector3();
-
-        if (actionStates == null || actionStates.Count == 0)
-        {
-            return oldPositionVector;
-        }
 
         oldPositionVector = oldPosition.ElementAt(count - 1);
 
