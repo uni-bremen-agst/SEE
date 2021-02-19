@@ -238,7 +238,7 @@ GameObject:
   - component: {fileID: 5310571123798271194}
   - component: {fileID: 5310571123798271197}
   m_Layer: 5
-  m_Name: Button
+  m_Name: TabButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -301,7 +301,7 @@ MonoBehaviour:
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
-  useRipple: 1
+  useRipple: 0
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6
@@ -459,9 +459,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b05484172f2e77c4c8a7b1a419f5f819, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonManager: {fileID: 0}
-  uiGradient: {fileID: 0}
-  group: {fileID: 0}
+  isDefaultActive: 0
+  buttonText: 
   inactiveColor: {r: 203, g: 213, b: 224, a: 1}
   activeColor: {r: 1, g: 1, b: 1, a: 1}
   hoverColor: {r: 0.45, g: 0.55, b: 0.72, a: 1}

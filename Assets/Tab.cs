@@ -1,3 +1,0 @@
-﻿namespace SEE.UI.Tab
-{
-}
