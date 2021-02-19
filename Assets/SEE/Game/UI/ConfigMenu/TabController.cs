@@ -1,14 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.UI.Tab
+namespace SEE.Game.UI.ConfigMenu
 {
     public class TabController : MonoBehaviour
     {
         public List<GameObject> pages = new List<GameObject>();
-        public int startIndex = 0;
+        public int startIndex;
 
         void Start()
         {

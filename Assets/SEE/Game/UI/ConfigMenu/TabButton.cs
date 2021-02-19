@@ -3,47 +3,55 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UI.Michsky.UI.ModernUIPack;
 
-namespace SEE.UI.Tab
+namespace SEE.Game.UI.ConfigMenu
 {
     [RequireComponent(typeof(ButtonManagerBasic))]
     public class TabButton : MonoBehaviour
     {
-        public ButtonManagerBasic buttonManager;
-        public UIGradient uiGradient;
-        public TabGroup group;
+        private ButtonManagerBasic _buttonManager;
+        private UIGradient _uiGradient;
+        private TabGroup _group;
+        
+        public bool isDefaultActive;
+        public string buttonText;
+
         private Button _button;
 
         public Color inactiveColor = new Color(0.203f, 0.213f, 0.224f, 1f);
         public Color activeColor = Color.white;
         public Color hoverColor = new Color(0.45f, 0.55f, 0.72f, 1f);
 
-        private void Awake()
+        void Start()
         {
-            group = GetComponentInParent<TabGroup>();
-            if (!group)
+            _group = GetComponentInParent<TabGroup>();
+            if (!_group)
             {
                 Debug.LogError("TabButton is not in a TabGroup.");
             }
 
-            uiGradient = GetComponent<UIGradient>();
-            buttonManager = GetComponent<ButtonManagerBasic>();
-            _button = buttonManager.GetComponent<Button>();
-        }
-
-        void Start()
-        {
+            _uiGradient = GetComponent<UIGradient>();
+            _buttonManager = GetComponent<ButtonManagerBasic>();
+            _button = _buttonManager.GetComponent<Button>();
+            
+            _buttonManager.normalText.text = buttonText;
+            
             ResetStyles();
-            group.Subscribe(this);
-            buttonManager.clickEvent.AddListener(() => group.OnTabSelected(this));
+            _group.Subscribe(this);
+            _buttonManager.clickEvent.AddListener(() => _group.OnTabSelected(this));
             var buttonColors = _button.colors;
             buttonColors.highlightedColor = hoverColor;
             _button.colors = buttonColors;
+
+            if (isDefaultActive)
+            {
+                SetActive();
+            }
         }
 
         public void ResetStyles()
         {
-            uiGradient.enabled = false;
-            buttonManager.normalText.color = inactiveColor;
+            _uiGradient.enabled = false;
+            _buttonManager.normalText.color = inactiveColor;
             var buttonColors = _button.colors;
             var normalColor = buttonColors.normalColor;
             normalColor.a = 0;
@@ -53,8 +61,8 @@ namespace SEE.UI.Tab
 
         public void SetActive()
         {
-            uiGradient.enabled = true;
-            buttonManager.normalText.color = activeColor;
+            _uiGradient.enabled = true;
+            _buttonManager.normalText.color = activeColor;
             var buttonColors = _button.colors;
             var normalColor = buttonColors.normalColor;
             normalColor.a = 1;

@@ -34,6 +34,7 @@ namespace SEE.GO
                     return edgeRef.edge.ID;
                 }
             }
+
             return nodeRef.Value.ID;
         }
 
@@ -112,6 +113,7 @@ namespace SEE.GO
             {
                 renderer.enabled = show;
             }
+
             if (includingChildren)
             {
                 foreach (Transform child in gameObject.transform)
@@ -167,6 +169,15 @@ namespace SEE.GO
             return true;
         }
 
+        public static void MustGetComponent<T>(this GameObject gameObject, out T component)
+        {
+            if (!gameObject.TryGetComponent(out component))
+            {
+                throw new InvalidOperationException(
+                    $"Couldn't find component '{typeof(T).GetNiceName()}' on game object '{gameObject.name}'");
+            }
+        }
+
         /// <summary>
         /// Returns true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
         /// component attached to it.
@@ -217,7 +228,7 @@ namespace SEE.GO
                 throw new Exception($"Game object {gameObject.name} has no NodeRef");
             }
         }
-        
+
         /// <summary>
         /// Enables/disables the renderers of <paramref name="gameObject"/> and all its
         /// descendants so that they become visible/invisible.

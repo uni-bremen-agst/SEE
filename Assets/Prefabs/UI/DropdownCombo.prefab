@@ -398,7 +398,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7464359842835689115}
   - component: {fileID: 7464359842835689109}
-  - component: {fileID: 7464359842835689108}
   - component: {fileID: 7464359842835689110}
   m_Layer: 5
   m_Name: DropdownCombo
@@ -448,21 +447,6 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
---- !u!114 &7464359842835689108
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7464359842835689114}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b61c20f2361744f59b101d1fcfd8ad97, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fieldName: WidthMetric
-  dropdown: {fileID: 0}
-  customInput: {fileID: 0}
 --- !u!114 &7464359842835689110
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -682,7 +666,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7464359842689284363}
   m_HandleRect: {fileID: 7464359842689284362}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -704,7 +688,7 @@ GameObject:
   - component: {fileID: 7464359843067104448}
   - component: {fileID: 7464359843067104476}
   m_Layer: 5
-  m_Name: Input Field - Fading (Left)
+  m_Name: Input
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1278,7 +1262,7 @@ MonoBehaviour:
   outOnPointerExit: 0
   isListItem: 0
   invokeAtStart: 0
-  animationType: 1
+  animationType: 0
   selectedItemIndex: 0
   enableDropdownSounds: 0
   useHoverSound: 1
