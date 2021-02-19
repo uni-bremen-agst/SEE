@@ -28,11 +28,14 @@ namespace SEE.Game.UI.ConfigMenu
             "Assets/Prefabs/UI/Input Group - Dropdown.prefab";
         private const string ColorPickerPrefabPath =
             "Assets/Prefabs/UI/Input Group - Color Picker.prefab";
+        private const string SliderPrefabPath =
+            "Assets/Prefabs/UI/Input Group - Slider.prefab";
 
         private GameObject _pagePrefab;
         private GameObject _tabButtonPrefab;
         private GameObject _comboSelectPrefab;
         private GameObject _colorPickerPrefab;
+        private GameObject _sliderPrefab;
 
         private GameObject _tabOutlet;
         private GameObject _tabGroup;
@@ -42,7 +45,12 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void Start()
         {
-            GameObject.Find("Implementation")?.MustGetComponent(_city);
+            GameObject.Find("Implementation")?.MustGetComponent(out _city);
+            if (!_city)
+            {
+                Debug.LogError("Did not find a city instance.");
+                return;
+            }
 
             MustGetChild("Canvas/TabNavigation/TabOutlet", out _tabOutlet);
             MustGetChild("Canvas/TabNavigation/TabGroup", out _tabGroup);
@@ -64,6 +72,7 @@ namespace SEE.Game.UI.ConfigMenu
             _pagePrefab = MustLoadPrefabAtPath(PagePrefabPath);
             _comboSelectPrefab = MustLoadPrefabAtPath(ComboSelectPrefabPath);
             _colorPickerPrefab = MustLoadPrefabAtPath(ColorPickerPrefabPath);
+            _sliderPrefab = MustLoadPrefabAtPath(SliderPrefabPath);
         }
 
         private void SetupPages()
@@ -125,7 +134,7 @@ namespace SEE.Game.UI.ConfigMenu
             GameObject lowerColorHost =
                 Instantiate(_colorPickerPrefab, controls);
             ColorPickerBuilder.Init(lowerColorHost)
-                .SetLabel("Lower Color")
+                .SetLabel("Lower color")
                 .SetDefaultValue(_city.LeafNodeColorRange.lower)
                 .SetOnChangeHandler(c => _city.LeafNodeColorRange.lower = c)
                 .SetColorPickerControl(_colorPickerControl)
@@ -135,10 +144,55 @@ namespace SEE.Game.UI.ConfigMenu
             GameObject upperColorHost =
                 Instantiate(_colorPickerPrefab, controls);
             ColorPickerBuilder.Init(upperColorHost)
-                .SetLabel("Upper Color")
+                .SetLabel("Upper color")
                 .SetDefaultValue(_city.LeafNodeColorRange.upper)
                 .SetOnChangeHandler(c => _city.LeafNodeColorRange.upper = c)
                 .SetColorPickerControl(_colorPickerControl)
+                .Build();
+
+            // Number of colors
+            GameObject numberOfColorsHost =
+                Instantiate(_sliderPrefab, controls);
+            SliderBuilder.Init(numberOfColorsHost)
+                .SetLabel("# Colors")
+                .SetMode(SliderMode.Integer)
+                .SetDefaultValue(_city.LeafNodeColorRange.NumberOfColors)
+                .SetOnChangeHandler(f => _city.LeafNodeColorRange.NumberOfColors =
+                                        (uint)Math.Round(f))
+                .SetRange((0, 15))
+                .Build();
+
+            // Label distance
+            GameObject labelDistanceHost =
+                Instantiate(_sliderPrefab, controls);
+            SliderBuilder.Init(labelDistanceHost)
+                .SetLabel("Label distance")
+                .SetMode(SliderMode.Float)
+                .SetDefaultValue(_city.LeafLabelSettings.Distance)
+                .SetOnChangeHandler(f => _city.LeafLabelSettings.Distance = f)
+                .SetRange((0, 2))
+                .Build();
+
+            // Label distance
+            GameObject labelFontSizeHost =
+                Instantiate(_sliderPrefab, controls);
+            SliderBuilder.Init(labelFontSizeHost)
+                .SetLabel("Label font size")
+                .SetMode(SliderMode.Float)
+                .SetDefaultValue(_city.LeafLabelSettings.FontSize)
+                .SetOnChangeHandler(f => _city.LeafLabelSettings.FontSize = f)
+                .SetRange((0, 2))
+                .Build();
+
+            // Label distance
+            GameObject labelAnimationDurationHost =
+                Instantiate(_sliderPrefab, controls);
+            SliderBuilder.Init(labelAnimationDurationHost)
+                .SetLabel("Label anim. duration")
+                .SetMode(SliderMode.Float)
+                .SetDefaultValue(_city.LeafLabelSettings.AnimationDuration)
+                .SetOnChangeHandler(f => _city.LeafLabelSettings.AnimationDuration = f)
+                .SetRange((0, 2))
                 .Build();
         }
 
