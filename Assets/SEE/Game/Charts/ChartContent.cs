@@ -245,6 +245,8 @@ namespace SEE.Game.Charts
 
         public static bool revisionChanged = false;
 
+        private int currentRevisionCountCache = 0;
+
         /// <summary>
         /// Calls methods to initialize a chart.
         /// </summary>
@@ -270,80 +272,82 @@ namespace SEE.Game.Charts
 
         private void Update()
         {
-            // TODO Performance bottleneck, needs to be replaced with a detection mechanism / button action listener  (revision change buttons should call these)
-            // Detects a graph revision change
-            if (SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, ChartManager.Instance.ShowInnerNodeMetrics).Count != currentDataObjectsCount && !revisionChanged)
+            if (currentRevisionCountCache != NodeChangesBuffer.GetSingleton().currentRevisionCounter)
             {
-                revisionChanged = true;
                 // Push gameobjects to pool
                 PushScrollViewEntriesToPool(previousFirst, previousOnePastLast);
                 ReloadData();
-                revisionChanged = false;
+                currentRevisionCountCache = NodeChangesBuffer.GetSingleton().currentRevisionCounter;
+                NodeChangesBuffer.GetSingleton().revisionChanged = false;
             }
-            float panelEntryCount = totalHeight * (1.0f - verticalScrollBar.size) / ScrollViewEntryHeight;
-            int totalEntryCount = scrollViewEntries.Length - (scrollViewIsTree ? 2 : 0);
-            int first = Mathf.Max(0, Mathf.FloorToInt((1.0f - verticalScrollBar.value) * panelEntryCount));
-            int onePastLast = Mathf.Min(totalEntryCount, first + maxPanelEntryCount);
-
-            void _NewScrollViewEntries(int fst, int opl)
+            // Prevents scrolling while the data is updating, as it would otherwise crash the graph (because the data takes some time to update)
+            if (!NodeChangesBuffer.GetSingleton().revisionChanged)
             {
-                if (scrollViewIsTree)
-                {
-                    for (int i = fst; i < opl; i++)
-                    {
-                        scrollViewEntries[i] = NewScrollViewEntry(treeDataObjects[i].name, i, treeHierarchies[i]);
-                        ChangeScrollViewEntryColor(scrollViewEntries[i].transform.gameObject.transform.Find("Label").gameObject, scrollViewEntries[i].transform.gameObject);
-                    }
-                }
-                else
-                {
-                    int j = 0;
-                    for (int i = fst; i < opl; i++)
-                    {
-                        Assert.IsNull(scrollViewEntries[i]);
+                float panelEntryCount = totalHeight * (1.0f - verticalScrollBar.size) / ScrollViewEntryHeight;
+                int totalEntryCount = scrollViewEntries.Length - (scrollViewIsTree ? 2 : 0);
+                int first = Mathf.Max(0, Mathf.FloorToInt((1.0f - verticalScrollBar.value) * panelEntryCount));
+                int onePastLast = Mathf.Min(totalEntryCount, first + maxPanelEntryCount);
 
-                        int leavesIndex = 0;
-                        int innerNodeIndex = leafCount + 1;
-                        if (i == leavesIndex) // 'Leaves' node
+                void _NewScrollViewEntries(int fst, int opl)
+                {
+                    if (scrollViewIsTree)
+                    {
+                        for (int i = fst; i < opl; i++)
                         {
-                            scrollViewEntries[leavesIndex] = NewScrollViewEntry("Leaves", i, 0);
+                            scrollViewEntries[i] = NewScrollViewEntry(treeDataObjects[i].name, i, treeHierarchies[i]);
+                            ChangeScrollViewEntryColor(scrollViewEntries[i].transform.gameObject.transform.Find("Label").gameObject, scrollViewEntries[i].transform.gameObject);
                         }
-                        else if (i == innerNodeIndex) // 'Inner Nodes' node
+                    }
+                    else
+                    {
+                        int j = 0;
+                        for (int i = fst; i < opl; i++)
                         {
-                            scrollViewEntries[innerNodeIndex] = NewScrollViewEntry("Inner Nodes", i, 0);
-                        }
-                        else if (i < leafCount + 1) // leaf node
-                        {
-                            scrollViewEntries[i] = NewScrollViewEntry(listDataObjects[i - 1].name, i, 1);
-                        }
-                        else // inner node
-                        {
-                            try
+                            Assert.IsNull(scrollViewEntries[i]);
+
+                            int leavesIndex = 0;
+                            int innerNodeIndex = leafCount + 1;
+                            if (i == leavesIndex) // 'Leaves' node
                             {
-                                scrollViewEntries[i] = NewScrollViewEntry(listDataObjects[i - 2].name, i, 1);
+                                scrollViewEntries[leavesIndex] = NewScrollViewEntry("Leaves", i, 0);
                             }
-                            // removed node
-                            catch
+                            else if (i == innerNodeIndex) // 'Inner Nodes' node
                             {
-                                scrollViewEntries[i] = NewScrollViewEntry(removedNodeIDs[j], i, 0);
-                                j += 1;
+                                scrollViewEntries[innerNodeIndex] = NewScrollViewEntry("Inner Nodes", i, 0);
                             }
+                            else if (i < leafCount + 1) // leaf node
+                            {
+                                scrollViewEntries[i] = NewScrollViewEntry(listDataObjects[i - 1].name, i, 1);
+                            }
+                            else // inner node
+                            {
+                                try
+                                {
+                                    scrollViewEntries[i] = NewScrollViewEntry(listDataObjects[i - 2].name, i, 1);
+                                }
+                                // removed node
+                                catch
+                                {
+                                    scrollViewEntries[i] = NewScrollViewEntry(removedNodeIDs[j], i, 0);
+                                    j += 1;
+                                }
+                            }
+                            ChangeScrollViewEntryColor(scrollViewEntries[i].transform.gameObject.transform.Find("Label").gameObject, scrollViewEntries[i].transform.gameObject);
                         }
-                        ChangeScrollViewEntryColor(scrollViewEntries[i].transform.gameObject.transform.Find("Label").gameObject, scrollViewEntries[i].transform.gameObject);
                     }
                 }
+
+                // delete out of view entries
+                PushScrollViewEntriesToPool(previousFirst, Mathf.Min(previousOnePastLast, first)); // before
+                PushScrollViewEntriesToPool(Mathf.Max(onePastLast, previousFirst), previousOnePastLast); // after
+
+                // prepend and append new entries
+                _NewScrollViewEntries(first, Mathf.Min(previousFirst, onePastLast)); // prepend
+                _NewScrollViewEntries(Mathf.Max(previousOnePastLast, first), onePastLast); // append
+
+                previousFirst = first;
+                previousOnePastLast = onePastLast;
             }
-
-            // delete out of view entries
-            PushScrollViewEntriesToPool(previousFirst, Mathf.Min(previousOnePastLast, first)); // before
-            PushScrollViewEntriesToPool(Mathf.Max(onePastLast, previousFirst), previousOnePastLast); // after
-
-            // prepend and append new entries
-            _NewScrollViewEntries(first, Mathf.Min(previousFirst, onePastLast)); // prepend
-            _NewScrollViewEntries(Mathf.Max(previousOnePastLast, first), onePastLast); // append
-
-            previousFirst = first;
-            previousOnePastLast = onePastLast;
         }
 
         public void AttachShowInChartCallbackFn(InteractableObject interactableObject, ShowInChartCallbackFn callbackFn)
@@ -652,7 +656,15 @@ namespace SEE.Game.Charts
             int hierarchy = 0;
             void _FindForTree(Node root)
             {
-                treeDataObjects.Add(NodeRef.Get(root));
+                try
+                {
+                    treeDataObjects.Add(NodeRef.Get(root));
+                }
+                // Child is a deleted node, but doesn't exist in list anymore
+                catch
+                {
+                    return;
+                }
                 treeHierarchies.Add(hierarchy);
 
                 hierarchy++;
@@ -1006,49 +1018,9 @@ namespace SEE.Game.Charts
         /// </summary>
         private void FillListsWithChanges(List<NodeRef> nodeRefs)
         {
-            // Temporary storage of node id lists
-            List<string> newNodes = NodeChangesBuffer.GetSingleton().addedNodeIDs;
-            List<string> changedNodes = NodeChangesBuffer.GetSingleton().changedNodeIDs;
-            List<string> removedNodes = NodeChangesBuffer.GetSingleton().removedNodeIDs;
-
-            // Lists have been cleared, use cache of lists to load the data instead
-            // used when graph is closed and re-opened while in same revision
-            if (newNodes.Count <= 0 && changedNodes.Count <= 0 && removedNodes.Count <= 0)
-            {
-                this.newNodeIDs = NodeChangesBuffer.GetSingleton().addedNodeIDsCache;
-                this.changedNodeIDs = NodeChangesBuffer.GetSingleton().changedNodeIDsCache;
-                this.removedNodeIDs = NodeChangesBuffer.GetSingleton().removedNodeIDsCache;
-            }
-            // Read the lists data and copy it to the cache and store it locally
-            // used when a new revision is loaded
-            else
-            {
-                NodeChangesBuffer.GetSingleton().addedNodeIDsCache.Clear();
-                NodeChangesBuffer.GetSingleton().changedNodeIDsCache.Clear();
-                NodeChangesBuffer.GetSingleton().removedNodeIDsCache.Clear();
-
-                foreach (string s in newNodes)
-                {
-                    this.newNodeIDs.Add(s);
-                    NodeChangesBuffer.GetSingleton().addedNodeIDsCache.Add(s);
-                }
-                foreach (string s in changedNodes)
-                {
-                    this.changedNodeIDs.Add(s);
-                    NodeChangesBuffer.GetSingleton().changedNodeIDsCache.Add(s);
-                }
-                foreach (string s in removedNodes)
-                {
-                    this.removedNodeIDs.Add(s);
-                    NodeChangesBuffer.GetSingleton().removedNodeIDsCache.Add(s);
-                }
-                // Clear previous lists, in preparation for future changes
-                // This also needs to be done if the revision changes but the chart isn't open
-                // (Future-)TODO: Needs to be added to the next/previous revision keybinds
-                NodeChangesBuffer.GetSingleton().addedNodeIDs.Clear();
-                NodeChangesBuffer.GetSingleton().changedNodeIDs.Clear();
-                NodeChangesBuffer.GetSingleton().removedNodeIDs.Clear();
-            }
+            this.newNodeIDs = NodeChangesBuffer.GetSingleton().addedNodeIDsCache;
+            this.changedNodeIDs = NodeChangesBuffer.GetSingleton().changedNodeIDsCache;
+            this.removedNodeIDs = NodeChangesBuffer.GetSingleton().removedNodeIDsCache;
         }
 
         /// <summary>
@@ -1115,6 +1087,16 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
+        /// Current revision "id"
+        /// </summary>
+        public int currentRevisionCounter = 0;
+
+        /// <summary>
+        /// Detects a revision change
+        /// </summary>
+        public bool revisionChanged = false;
+
+        /// <summary>
         /// Stores the IDs of nodes that have been added in the current revision
         /// </summary>
         public readonly List<string> addedNodeIDs = new List<string>();
@@ -1132,16 +1114,16 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Old ids of newly added nodes, needed when closing and re-opening the chart
         /// </summary>
-        public readonly List<string> addedNodeIDsCache = new List<string>();
+        public List<string> addedNodeIDsCache = new List<string>();
 
         /// <summary>
         /// Old ids of changed nodes, needed when closing and re-opening the chart
         /// </summary>
-        public readonly List<string> changedNodeIDsCache = new List<string>();
+        public List<string> changedNodeIDsCache = new List<string>();
 
         /// <summary>
         /// Old ids of removed nodes, needed when closing and re-opening the chart
         /// </summary>
-        public readonly List<string> removedNodeIDsCache = new List<string>();
+        public List<string> removedNodeIDsCache = new List<string>();
     }
 }
