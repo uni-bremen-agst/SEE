@@ -47,18 +47,22 @@ namespace SEE.GO
         /// Returns the NodeRef referring to <paramref name="node"/>.
         /// </summary>
         /// <param name="node">node whose NodeRef is requested</param>
-        /// <returns>the NodeRef referring to <paramref name="node"/></returns>
+        /// <returns>the NodeRef referring to <paramref name="node"/> or null if there is none</returns>
         public static NodeRef Get(Node node)
         {
             Assert.IsNotNull(node);
 
-            try
+            if (nodeToNodeRefDict.TryGetValue(node, out NodeRef result))
             {
-                return nodeToNodeRefDict[node];
+                return result;
             }
-            // Removed nodes are not present in the dictionary
-            catch  
+            else
             {
+                // Removed nodes are not present in the dictionary
+                // FIXME: The question, though, remains what is the real cause of this problem? 
+                // Why is anyone accessing a node that is no longer in `nodeToNodeRefDict`? That 
+                // is the root cause of the problem. The root causes should be handled, not just 
+                // the symptoms.
                 return null;
             }
         }
