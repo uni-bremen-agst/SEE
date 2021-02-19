@@ -74,7 +74,7 @@ namespace SEE.Utils
         {
             if (eventSystem == null)
             {
-                eventSystem = UnityEngine.Object.FindObjectOfType<EventSystem>();
+                eventSystem = EventSystem.current;
                 if (eventSystem == null)
                 {
                     throw new System.Exception("No EventSystem found.");

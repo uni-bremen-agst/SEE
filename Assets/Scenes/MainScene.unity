@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.09701417, g: 0.14021364, b: 0.20771632, a: 1}
+  m_IndirectSpecularColor: {r: 0.096983366, g: 0.14027768, b: 0.20771325, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -458,7 +458,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GONode: {fileID: 0}
-  rootPostion: {x: 0, y: 0, z: 0}
+  rootPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &186778480
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1561,7 +1561,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GONode: {fileID: 0}
-  rootPostion: {x: 0, y: 0, z: 0}
+  rootPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &844967662
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1860,7 +1860,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GONode: {fileID: 0}
-  rootPostion: {x: 0, y: 0, z: 0}
+  rootPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &1046553566
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2695,7 +2695,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GONode: {fileID: 0}
-  rootPostion: {x: 0, y: 0, z: 0}
+  rootPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &1566173687
 MonoBehaviour:
   m_ObjectHideFlags: 0
