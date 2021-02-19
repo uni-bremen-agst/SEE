@@ -29,7 +29,7 @@ namespace SEE.Game.UI
         /// <summary>
         /// An icon for this entry.
         /// </summary>
-        public Sprite Icon;
+        public readonly Sprite Icon;
         
         /// <summary>
         /// The action to be taken when the entry is selected.

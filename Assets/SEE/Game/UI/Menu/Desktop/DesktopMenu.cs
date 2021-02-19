@@ -97,6 +97,7 @@ namespace SEE.Game.UI
             Manager.titleText = Title;
             Manager.descriptionText = Description;
             Manager.icon = Icon;
+            Manager.onConfirm.AddListener(() => ShowMenu(false));
             
             // Add tooltip
             TooltipManager = MenuGameObject.GetComponentInChildren<TooltipManager>();
