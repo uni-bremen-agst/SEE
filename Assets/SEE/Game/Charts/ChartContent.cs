@@ -662,8 +662,7 @@ namespace SEE.Game.Charts
                 }
                 hierarchy--;
             }
-            HashSet<Node> roots = SceneQueries.GetRoots(listDataObjects);
-            foreach (Node root in roots)
+            foreach (Node root in SceneQueries.GetRoots(listDataObjects))
             {
                 _FindForTree(root);
             }
