@@ -3317,6 +3317,10 @@ MonoBehaviour:
   EdgesAboveBlocks: 1
   Tension: 0.85
   RDP: 0.0001
+  TubularSegments: 50
+  Radius: 0.005
+  RadialSegments: 8
+  isEdgeSelectable: 0
   GXLPath:
     Root: 3
     relativePath: /mini/CodeFacts.gxl
@@ -4097,6 +4101,10 @@ MonoBehaviour:
   EdgesAboveBlocks: 1
   Tension: 0.85
   RDP: 0.0001
+  TubularSegments: 50
+  Radius: 0.005
+  RadialSegments: 8
+  isEdgeSelectable: 1
   GXLPath:
     Root: 3
     relativePath: /mini/Architecture.gxl

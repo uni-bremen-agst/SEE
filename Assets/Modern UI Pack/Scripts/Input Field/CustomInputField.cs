@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 using UnityEngine.EventSystems;
 
@@ -26,14 +25,12 @@ namespace Michsky.UI.ModernUIPack
             // Check if text is empty or not
             if (inputText.text.Length == 0 || inputText.text.Length <= 0)
                 isEmpty = true;
-
             else
                 isEmpty = false;
 
             // Animate if it's empty
             if (isEmpty == true)
                 inputFieldAnimator.Play(outAnim);
-
             else
                 inputFieldAnimator.Play(inAnim);
         }
@@ -47,9 +44,7 @@ namespace Michsky.UI.ModernUIPack
             }
 
             else if (isClicked == false)
-            {
                 inputFieldAnimator.Play(outAnim);
-            }
         }
 
         public void Animate()

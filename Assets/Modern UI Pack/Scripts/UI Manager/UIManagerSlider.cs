@@ -19,46 +19,35 @@ namespace Michsky.UI.ModernUIPack
         [HideInInspector] public TextMeshProUGUI label;
         [HideInInspector] public TextMeshProUGUI popupLabel;
 
-        bool dynamicUpdateEnabled;
-
-        void OnEnable()
-        {
-            if (UIManagerAsset == null)
-            {
-                try
-                {
-                    UIManagerAsset = Resources.Load<UIManager>("MUIP Manager");
-                }
-
-                catch
-                {
-                    Debug.LogWarning("No UI Manager found. Assign it manually, otherwise you'll get errors about it.", this);
-                }
-            }
-        }
-
         void Awake()
         {
-            if (dynamicUpdateEnabled == false)
+            try
             {
+                if (UIManagerAsset == null)
+                    UIManagerAsset = Resources.Load<UIManager>("MUIP Manager");
+
                 this.enabled = true;
-                UpdateSlider();
+
+                if (UIManagerAsset.enableDynamicUpdate == false)
+                {
+                    UpdateSlider();
+                    this.enabled = false;
+                }
+            }
+
+            catch
+            {
+                Debug.Log("<b>[Modern UI Pack]</b> No UI Manager found, assign it manually.", this);
             }
         }
 
         void LateUpdate()
         {
-            if (UIManagerAsset != null)
-            {
-                if (Application.isEditor == true && UIManagerAsset != null)
-                {
-                    dynamicUpdateEnabled = true;
-                    UpdateSlider();
-                }
+            if (UIManagerAsset == null)
+                return;
 
-                else
-                    dynamicUpdateEnabled = false;
-            }
+            if (UIManagerAsset.enableDynamicUpdate == true)
+                UpdateSlider();
         }
 
         void UpdateSlider()
