@@ -15,6 +15,12 @@ namespace Michsky.UI.ModernUIPack
                     EditorUtility.DisplayDialog("Hello there!", "Thank you for purchasing Modern UI Pack.\r\rFirst of all, import TextMesh Pro from Package Manager if you haven't already." +
                         "\r\rTo change UI element values, go to Window > Tools > Modern UI Pack > Show UI Manager.\r\rYou can contact me at support@michsky.com for support.", "Got it!");
                 }
+
+                if (!EditorPrefs.HasKey("MUIP.ObjectCreator.Upgraded"))
+                {
+                    EditorPrefs.SetInt("MUIP.ObjectCreator.Upgraded", 1);
+                    EditorPrefs.SetString("UIManager.RootFolder", "Modern UI Pack/Prefabs/");
+                }
             }
         }
     }
