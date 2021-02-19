@@ -27,7 +27,7 @@ namespace SEE.Controls.Actions
         #region Static Types
         public static ActionStateType Move { get; } = 
             new ActionStateType(0, "Move", "Move a node within a graph", 
-                                Color.red.Darker(), "Materials/ModernUIPack/MoveIcon");
+                                Color.red.Darker(), "Materials/Charts/MoveIcon");
         public static ActionStateType Rotate { get; } = 
             new ActionStateType(1, "Rotate", "Rotate everything around the selected node within a graph", 
                                 Color.blue.Darker(), "Materials/ModernUIPack/Refresh");
