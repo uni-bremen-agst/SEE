@@ -98,12 +98,17 @@ namespace SEE.Controls.Actions
                 }
             }
             //FIXME : undo just For Testing with right mouse button - later it should be connected with an graphical garbabe can
-            if (Input.GetMouseButtonDown(1))
+            if (Input.GetKeyDown(KeyCode.Z))
             {
                 StartCoroutine(RemoveNodeFromGarbage(selectedObject));
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="deletedNode"></param>
+        /// <returns></returns>
         public IEnumerator MoveNodeToGarbage(GameObject deletedNode)
         {
             GameObject parent = deletedNode.transform.parent.gameObject;
@@ -134,6 +139,11 @@ namespace SEE.Controls.Actions
             actionHistory.SaveObjectForUndo(deletedNode, ThisActionState,tmpx,tmpy,tmpz, parent2);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="deletedNode"></param>
+        /// <returns></returns>
         public IEnumerator RemoveNodeFromGarbage(GameObject deletedNode)
         {
             Vector3 oldPosition = actionHistory.UndoDeleteOperation();
