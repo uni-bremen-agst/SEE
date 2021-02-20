@@ -54,33 +54,43 @@ namespace Michsky.UI.ModernUIPack
 
         static void CreateButton(string resourcePath)
         {
-            GameObject clone = Instantiate(AssetDatabase.LoadAssetAtPath("Assets/" + EditorPrefs.GetString("UIManager.RootFolder") + resourcePath + ".prefab", typeof(GameObject)), Vector3.zero, Quaternion.identity) as GameObject;
-
             try
             {
-                if (Selection.activeGameObject == null)
+                GameObject clone = Instantiate(AssetDatabase.LoadAssetAtPath("Assets/" + EditorPrefs.GetString("UIManager.RootFolder") + resourcePath + ".prefab", typeof(GameObject)), Vector3.zero, Quaternion.identity) as GameObject;
+
+                try
                 {
+                    if (Selection.activeGameObject == null)
+                    {
+                        var canvas = (Canvas)GameObject.FindObjectsOfType(typeof(Canvas))[0];
+                        Undo.RegisterCreatedObjectUndo(clone, "Created an object");
+                        clone.transform.SetParent(canvas.transform, false);
+                    }
+
+                    else
+                    {
+                        Undo.RegisterCreatedObjectUndo(clone, "Created an object");
+                        clone.transform.SetParent(Selection.activeGameObject.transform, false);
+                    }
+
+                    clone.name = "Button";
+                }
+
+                catch
+                {
+                    Undo.RegisterCreatedObjectUndo(clone, "Created an object");
+                    CreateCanvas();
                     var canvas = (Canvas)GameObject.FindObjectsOfType(typeof(Canvas))[0];
-                    Undo.RegisterCreatedObjectUndo(clone, "Created an object");
                     clone.transform.SetParent(canvas.transform, false);
+                    clone.name = "Button";
                 }
-
-                else
-                {
-                    Undo.RegisterCreatedObjectUndo(clone, "Created an object");
-                    clone.transform.SetParent(Selection.activeGameObject.transform, false);
-                }
-
-                clone.name = "Button";
             }
 
             catch
             {
-                Undo.RegisterCreatedObjectUndo(clone, "Created an object");
-                CreateCanvas();
-                var canvas = (Canvas)GameObject.FindObjectsOfType(typeof(Canvas))[0];
-                clone.transform.SetParent(canvas.transform, false);
-                clone.name = "Button";
+                if (EditorUtility.DisplayDialog("Modern UI Pack", "Cannot create the object due to missing/incorrect root folder. " +
+                  "You can change the root folder by clicking 'Fix' button and enabling 'Change Root Folder'.", "Fix", "Cancel"))
+                    ShowManager();
             }
 
             if (Application.isPlaying == false)
@@ -90,9 +100,19 @@ namespace Michsky.UI.ModernUIPack
         [MenuItem("GameObject/Modern UI Pack/Canvas", false, -1)]
         static void CreateCanvas()
         {
-            GameObject clone = Instantiate(AssetDatabase.LoadAssetAtPath("Assets/" + EditorPrefs.GetString("UIManager.RootFolder") + "Other/Canvas" + ".prefab", typeof(GameObject)), Vector3.zero, Quaternion.identity) as GameObject;
-            Undo.RegisterCreatedObjectUndo(clone, "Created an object");
-            clone.name = clone.name.Replace("(Clone)", "").Trim();
+            try
+            {
+                GameObject clone = Instantiate(AssetDatabase.LoadAssetAtPath("Assets/" + EditorPrefs.GetString("UIManager.RootFolder") + "Other/Canvas" + ".prefab", typeof(GameObject)), Vector3.zero, Quaternion.identity) as GameObject;
+                Undo.RegisterCreatedObjectUndo(clone, "Created an object");
+                clone.name = clone.name.Replace("(Clone)", "").Trim();
+            }
+
+            catch
+            {
+                if (EditorUtility.DisplayDialog("Modern UI Pack", "Cannot create the object due to missing/incorrect root folder. " +
+                  "You can change the root folder by clicking 'Fix' button and enabling 'Change Root Folder'.", "Fix", "Cancel"))
+                    ShowManager();
+            }
 
             if (Application.isPlaying == false)
                 EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
