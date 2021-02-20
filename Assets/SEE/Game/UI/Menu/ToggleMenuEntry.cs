@@ -1,5 +1,4 @@
-﻿using SEE.Utils;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 
 namespace SEE.Game.UI
@@ -14,11 +13,6 @@ namespace SEE.Game.UI
         /// The action to be taken when the entry is deselected.
         /// </summary>
         private readonly UnityAction DoExitAction;
-
-        /// <summary>
-        /// The color of this entry when it's inactive.
-        /// </summary>
-        private Color inactiveColor => EntryColor.Lighter();
 
         /// <summary>
         /// Whether this entry is currently active (i.e., toggled).
