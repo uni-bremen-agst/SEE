@@ -154,7 +154,6 @@ namespace SEE.Game.Evolution
         /// </summary>
         public class BeamAnimator
         {
-
             /// <summary>
             /// Adds power beam above gameObject that has been changed
             /// <param name="position">Position of the parent gameObject</param>
@@ -164,6 +163,7 @@ namespace SEE.Game.Evolution
             {
                 // Generate power beam above updated objects
                 GameObject powerBeam = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                powerBeam.name = "Beam";
                 GameObject.DestroyImmediate(powerBeam.GetComponent<Collider>());
                 powerBeam.tag = DataModel.Tags.PowerBeam;
                 Renderer powerBeamRenderer = powerBeam.GetComponent<Renderer>();
