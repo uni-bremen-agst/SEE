@@ -367,7 +367,7 @@ namespace SEE.Game.Charts
     /// <summary>
     /// The scroll view entry handles the visuals of an entry within the chart. As not
     /// every entry is visible at all times to increase performance, the main data is
-    /// kept within a <see cref="ScrollViewEntryData"/>-object with the same ID as
+    /// kept within a <see cref="ScrollViewEntryData"/> object with the same ID as
     /// <see cref="index"/>. The corresponding data object always exist and can be
     /// retrieved via <see cref="ChartContent.GetScrollViewEntryData(int)"/>.
     /// </summary>
@@ -379,6 +379,26 @@ namespace SEE.Game.Charts
 
         [SerializeField] public TMPro.TextMeshProUGUI label;  // This text field displays the label of the entry
         [SerializeField] public UnityEngine.UI.Toggle toggle; // This toggle hints, whether the corresponding marker should be enabled.
+
+        /// <summary>
+        /// Sets <see cref="label"/> and <see cref="toggle"/>.
+        /// </summary>
+        private void Awake()
+        {
+            // The following code must be run in Awake(). Start() would be too late.
+
+            // toggle is another component attached to the same game object as this ScrollViewEntry
+            if (!TryGetComponent(out toggle))
+            {
+                Debug.LogError($"ScrollViewEntry {name} of has no Toggle.\n");
+            }
+            // label is a child of the game object this ScrollViewEntry is attached to
+            label = GetComponentInChildren<TMPro.TextMeshProUGUI>();
+            if (label == null)
+            {
+                Debug.LogError($"ScrollViewEntry of {name} of has no child with a TMPro.TextMeshProUGUI component.\n");
+            }
+        }
 
         public void Init(ChartContent chartContent, ref ScrollViewEntryData data, string label)
         {
@@ -392,7 +412,7 @@ namespace SEE.Game.Charts
         {
             OnPointerExit(null);
 #if UNITY_EDITOR
-            toggle.SetIsOnWithoutNotify(true);
+            toggle?.SetIsOnWithoutNotify(true);
             label.text = "Pooled ScrollViewEntry, previously: " + label.text;
             index = 0;
             chartContent = null;
