@@ -62,6 +62,9 @@ namespace SEE.Game.UI
         /// </summary>
         protected TooltipManager TooltipManager;
 
+        /// <summary>
+        /// List of all button managers for the buttons used in this menu.
+        /// </summary>
         protected readonly List<ButtonManagerBasicWithIcon> ButtonManagers = new List<ButtonManagerBasicWithIcon>();
 
         protected override void StartDesktop()

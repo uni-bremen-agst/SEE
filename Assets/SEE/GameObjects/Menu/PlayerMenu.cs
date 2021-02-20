@@ -24,17 +24,11 @@ namespace SEE.GO.Menu
         /// <summary>
         /// This creates and returns the mode menu, with which you can select the active game mode.
         /// 
-        /// Available modes are:
-        /// - Move
-        /// - Map
-        /// - Draw Edges
-        /// - Rotate
-        /// - Delete
+        /// Available modes can be found in <see cref="ActionStateType"/>.
         /// </summary>
         /// <param name="attachTo">The game object the menu should be attached to. If <c>null</c>, a
         /// new game object will be created.</param>
-        /// <returns>the newly created mode menu game object, or if it wasn't null
-        /// <paramref name="attachTo"/> with the mode menu attached.</returns>
+        /// <returns>the newly created mode menu component.</returns>
         private static SelectionMenu CreateModeMenu(GameObject attachTo = null)
         {
             Assert.IsTrue(ActionStateType.AllTypes.Count == 8);
@@ -79,6 +73,14 @@ namespace SEE.GO.Menu
             return modeMenu;
         }
 
+        /// <summary>
+        /// This creates and returns the <see cref="ActionStateIndicator"/>, which displays the current mode.
+        /// The indicator will either be attached to the given GameObject or to a new GameObject if
+        /// <paramref name="attachTo"/> is null.
+        /// </summary>
+        /// <param name="attachTo">The GameObject the indicator shall be attached to.
+        /// If <c>null</c>, a new one will be created.</param>
+        /// <returns>The newly created ActionStateIndicator.</returns>
         private static ActionStateIndicator CreateActionStateIndicator(GameObject attachTo = null)
         {
             GameObject actionStateGO = attachTo ?? new GameObject {name = "Action State Indicator"};

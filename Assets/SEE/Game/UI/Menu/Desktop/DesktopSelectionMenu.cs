@@ -10,6 +10,12 @@ namespace SEE.Game.UI
     public partial class SelectionMenu
     {
         
+        /// <summary>
+        /// The entry which is visually marked as selected.
+        /// May be different from <see cref="GetActiveEntry"/>:
+        /// In this case, the visuals will be updated accordingly
+        /// and this variable will be set to <see cref="GetActiveEntry"/>.
+        /// </summary>
         private ToggleMenuEntry currentSelectedEntry;
         
         protected override void SetUpDesktopContent()

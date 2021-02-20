@@ -6,6 +6,11 @@ using UnityEngine.Events;
 
 namespace SEETests.UI
 {
+    /// <summary>
+    /// Tests for the <see cref="ToggleMenuEntry"/> class.
+    /// Inherits from <see cref="TestMenuEntry"/>, so all of those tests are executed here (this is because
+    /// <see cref="ToggleMenuEntry"/> is a subclass of <see cref="MenuEntry"/>.)
+    /// </summary>
     [TestFixture]
     internal class TestToggleMenuEntry: TestMenuEntry
     {
