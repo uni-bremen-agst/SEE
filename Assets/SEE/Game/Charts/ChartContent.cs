@@ -461,8 +461,6 @@ namespace SEE.Game.Charts
         /// tree.</param>
         public void FillScrollView(bool asTree)
         {
-            Performance p = Performance.Begin(asTree ? "FillScrollViewAsTree" : "FillScrollViewAsList");
-
             #region Reset
 
             for (int i = 0; i < listDataObjects.Count; i++)
@@ -582,7 +580,6 @@ namespace SEE.Game.Charts
 
             #endregion
 
-            p.End(true);
         }
 
         private void UpdateMaxPanelEntryCount()
@@ -648,8 +645,6 @@ namespace SEE.Game.Charts
                 }
                 return result;
             });
-
-            Debug.LogFormat("numberOfDataObjectsWithNodeHightLights: {0}\n", listDataObjects.Count);
 
             // tree
             treeDataObjects = new List<NodeRef>(listDataObjects.Count);
