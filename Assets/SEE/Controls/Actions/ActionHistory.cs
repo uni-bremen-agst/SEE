@@ -13,7 +13,7 @@ public class ActionHistory : MonoBehaviour
 
     private LinkedList<List<GameObject>> actionHistory = new LinkedList<List<GameObject>>();
 
-    private LinkedList<Vector3> oldPosition = new LinkedList<Vector3>();
+    private LinkedList<List<Vector3>> oldPosition = new LinkedList<List<Vector3>>();
 
     private LinkedList<GameObject> parentCities = new LinkedList<GameObject>();
 
@@ -40,72 +40,77 @@ public class ActionHistory : MonoBehaviour
     /// <param name="y"></param>
     /// <param name="z"></param>
     /// <param name="gameObjectCity"></param>
-    public void SaveObjectForUndo(GameObject actionHistoryObject, float x, float y, float z, GameObject gameObjectCity)
+    public void SaveObjectForUndo(List<GameObject> actionHistoryObjects, List<Vector3> oldPositions)
     {
-        if (actionHistoryObject == null)
+        if (actionHistoryObjects == null)
         {
             Debug.LogError("null operation");
         }
 
         SEECity city;
-        city = SceneQueries.GetCodeCity(actionHistoryObject.transform)?.gameObject.GetComponent<SEECity>();
+        city = SceneQueries.GetCodeCity(actionHistoryObjects[0]. transform)?.gameObject.GetComponent<SEECity>();
         graph = city.LoadedGraph;
 
         List<GameObject> NodesAndascendingEdges = new List<GameObject>();
-        actionHistoryObject.SetVisibility(false, true);
 
-        if (actionHistoryObject.TryGetComponent(out NodeRef nodeRef))
+        foreach(GameObject actionHistoryObject in actionHistoryObjects)
         {
 
-            HashSet<string> edgeIDs = Destroyer.GetEdgeIds(nodeRef);
-            foreach (GameObject edge in GameObject.FindGameObjectsWithTag(SEE.DataModel.Tags.Edge))
+            actionHistoryObject.SetVisibility(false, true);
+
+            if (actionHistoryObject.TryGetComponent(out NodeRef nodeRef))
             {
-                if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
+
+                HashSet<string> edgeIDs = Destroyer.GetEdgeIds(nodeRef);
+                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(SEE.DataModel.Tags.Edge))
                 {
-                    edge.SetVisibility(false, true);
-                    if (NodesAndascendingEdges.Contains(edge) == false)
+                    if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                     {
-                        NodesAndascendingEdges.Add(edge);
+                        edge.SetVisibility(false, true);
+                        if (NodesAndascendingEdges.Contains(edge) == false)
+                        {
+                            NodesAndascendingEdges.Add(edge);
+                        }
+
                     }
-
                 }
+
+                if (actionHistoryObject.TryGetComponentOrLog(out Collider collider))
+                {
+                    actionHistoryObject.GetComponent<Collider>().enabled = false;
+                }
+                NodesAndascendingEdges.Add(actionHistoryObject);
             }
-            
-            if (actionHistoryObject.TryGetComponentOrLog(out Collider collider))
+
+            actionHistoryObject.TryGetComponent(out NodeRef node);
+
+            List<Edge> incoming = node.Value.Incomings;
+            List<Edge> outgoing = node.Value.Outgoings;
+
+            for (int i = 0; i < incoming.Count; i++)
             {
-                actionHistoryObject.GetComponent<Collider>().enabled = false;
+                graph.RemoveEdge(incoming.ElementAt(i));
             }
-            NodesAndascendingEdges.Add(actionHistoryObject);
+
+            for (int i = 0; i < outgoing.Count; i++)
+            {
+                graph.RemoveEdge(outgoing.ElementAt(i));
+            }
+
+            graph.RemoveNode(node.Value);
         }
+       
         actionHistory.AddLast(NodesAndascendingEdges);
-        oldPosition.AddLast(new Vector3(x, y, z));
-
-        actionHistoryObject.TryGetComponent(out NodeRef node);
-
-        List<Edge> incoming = node.Value.Incomings;
-        List<Edge> outgoing = node.Value.Outgoings;
-
-        for(int i = 0; i  < incoming.Count; i ++)
-        {
-            graph.RemoveEdge(incoming.ElementAt(i));
-        }
-
-        for (int i = 0; i < outgoing.Count; i++)
-        {
-            graph.RemoveEdge(outgoing.ElementAt(i));
-        }
-
-        graph.RemoveNode(node.Value);
-
-        parentCities.AddLast(gameObjectCity);
+        oldPosition.AddLast(oldPositions);
+        // parentCities.AddLast(gameObjectCity);
     }
 
     /// <summary>
     /// 
     /// </summary>
-    public Vector3 UndoDeleteOperation()
+    public List<Vector3> UndoDeleteOperation()
     {
-        Vector3 oldPositionVector = oldPosition.Last();
+        List<Vector3> oldPositionVector = oldPosition.Last();
 
         Debug.Log(oldPosition.Count);
 
@@ -135,7 +140,6 @@ public class ActionHistory : MonoBehaviour
         Debug.Log(actionHistory.Last.Value);
         actionHistory.RemoveLast();
         oldPosition.RemoveLast();
-        Debug.Log(oldPositionVector);
         return oldPositionVector;
     }
 

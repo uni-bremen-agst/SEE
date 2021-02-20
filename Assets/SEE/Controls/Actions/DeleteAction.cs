@@ -103,13 +103,31 @@ namespace SEE.Controls.Actions
                 }
                 else if (selectedObject.CompareTag(Tags.Node))
                 {
-                    StartCoroutine(MoveNodeToGarbage(selectedObject));
+                    List<GameObject> selectedObjects = new List<GameObject>();
+                    foreach(Transform child in selectedObject.transform)
+                    {
+                        if(child.gameObject.CompareTag(Tags.Node))
+                        {
+                            selectedObjects.Add(child.gameObject);
+                        }
+                        if(child.gameObject.CompareTag(Tags.Edge))
+                        {
+                            selectedObjects.Add(child.gameObject);
+                        }
+                    }
+                    selectedObjects.Add(selectedObject);
+
+                    int count = 0;
+                    foreach(GameObject g in selectedObjects)
+                    {
+                        Debug.Log(count + g.name);
+                    }
+                    StartCoroutine(MoveNodeToGarbage(selectedObjects));
                 }
             }
-            //FIXME : undo just For Testing with right mouse button - later it should be connected with an graphical garbabe can
+
             if (Input.GetKeyDown(KeyCode.Z))
             {
-                //FIXME: LastObject from list not selected!!
                 List<GameObject> objectToBeMoved = actionHistory.GetActionHistory().Last();
                 StartCoroutine(RemoveNodeFromGarbage(objectToBeMoved));
             }
@@ -120,34 +138,44 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="deletedNode"></param>
         /// <returns></returns>
-        public IEnumerator MoveNodeToGarbage(GameObject deletedNode)
+        public IEnumerator MoveNodeToGarbage(List<GameObject> deletedNodes)
         {
-            GameObject parent = deletedNode.transform.parent.gameObject;
-            GameObject parent2 = deletedNode;
+          //  GameObject parent = deletedNode.transform.parent.gameObject;
+          //  GameObject parent2 = deletedNode;
           
-            while(!parent.Equals(parent2))
+         //   while(!parent.Equals(parent2))
+         //   {
+         //       try
+        //       {
+         //           parent2 = parent;
+           //         parent = parent2.transform.parent.gameObject;
+           //     }
+           //     catch(NullReferenceException)
+           //     {
+           //         parent = parent2;
+          //      }
+          //  }
+            List<Vector3> oldPositions = new List<Vector3>();
+
+            foreach (GameObject deletedNode in deletedNodes)
             {
-                try
-                {
-                    parent2 = parent;
-                    parent = parent2.transform.parent.gameObject;
-                }
-                catch(NullReferenceException)
-                {
-                    parent = parent2;
-                }
+                Portal.SetInfinitePortal(deletedNode);
+                float tmpx = deletedNode.transform.position.x;
+                float tmpy = deletedNode.transform.position.y;
+                float tmpz = deletedNode.transform.position.z;
+                oldPositions.Add(new Vector3(tmpx, tmpy, tmpz));
+                Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
             }
 
-            Portal.SetInfinitePortal(deletedNode);
-            float tmpx = deletedNode.transform.position.x;
-            float tmpy = deletedNode.transform.position.y;
-            float tmpz = deletedNode.transform.position.z;
-            Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
             yield return new WaitForSeconds(1.5f);
-            Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), 1f);
+
+            foreach (GameObject deletedNode in deletedNodes)
+            {
+                Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), 1f);
+            }
             yield return new WaitForSeconds(1.0f);
 
-            actionHistory.SaveObjectForUndo(deletedNode,tmpx,tmpy,tmpz, parent2);
+            actionHistory.SaveObjectForUndo(deletedNodes,oldPositions);
         }
 
         /// <summary>
@@ -157,22 +185,23 @@ namespace SEE.Controls.Actions
         /// <returns></returns>
         public IEnumerator RemoveNodeFromGarbage(List<GameObject> deletedNodes)
         {
-            Vector3 oldPosition = actionHistory.UndoDeleteOperation();
-
-            foreach (GameObject deletedNode in deletedNodes)
+            List<Vector3> oldPosition = actionHistory.UndoDeleteOperation();
+            for(int i = 0; i< deletedNodes.Count; i++)
             {
-                Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
+                Tweens.Move(deletedNodes[i], new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
             }
-
+          
             yield return new WaitForSeconds(1.5f);
 
-            foreach (GameObject deletedNode in deletedNodes)
+            for (int i = 0; i < deletedNodes.Count; i++)
             {
-                Tweens.Move(deletedNode, oldPosition, 1f);
+                Tweens.Move(deletedNodes[i], oldPosition[i], 1f);
             }
-
+              
             yield return new WaitForSeconds(2.0f);
-            Portal.SetPortal(actionHistory.GetPortalFromGarbageObjects());
+
+            //Fixme: Portal has to be set after undo again 
+           // Portal.SetPortal(actionHistory.GetPortalFromGarbageObjects());
         }
 
         private void LocalAnySelectIn(InteractableObject interactableObject)
