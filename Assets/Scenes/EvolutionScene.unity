@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.09701417, g: 0.14021364, b: 0.20771632, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -147,7 +147,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 141690887}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.99999994, y: -4.5, z: 0}
+  m_LocalPosition: {x: -0.93106794, y: -4.534466, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -182,7 +182,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 7, y: 7}
     lockAspectRatio: 1
-    worldSize: {x: 0.6999999, y: 0.6999999}
+    worldSize: {x: 0.6517475, y: 0.6517475}
 --- !u!1001 &145073678
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -350,7 +350,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &186778473
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1564,6 +1564,7 @@ MonoBehaviour:
   disableAllOtherActionSets: 0
   activateOnStart: 1
   deactivateOnDestroy: 1
+  initialPriority: 0
 --- !u!143 &844925789
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1907,6 +1908,7 @@ GameObject:
   - component: {fileID: 1087713764}
   - component: {fileID: 1087713772}
   - component: {fileID: 1087713773}
+  - component: {fileID: 1087713774}
   m_Layer: 0
   m_Name: SEECity Evolution
   m_TagString: Code City
@@ -2229,6 +2231,10 @@ MonoBehaviour:
   EdgesAboveBlocks: 1
   Tension: 0.85
   RDP: 0.05
+  TubularSegments: 50
+  Radius: 0.005
+  RadialSegments: 8
+  isEdgeSelectable: 1
   MaxRevisionsToLoad: 500
   MarkerHeight: 0.2
   MarkerWidth: 0.01
@@ -2383,6 +2389,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4874e0649dc8ad742a50b1d3b5845fd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1087713774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1087713763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a402756c70fc7b8428d1580ad8b0d004, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InspectorNewBeamColor: {r: 0, g: 1, b: 0.10232139, a: 0}
+  InspectorChangedBeamColor: {r: 0, g: 0.98000383, b: 1, a: 0}
+  InspectorDeletedBeamColor: {r: 1, g: 0, b: 0, a: 0}
+  InspectorPowerBeamDimensions: {x: 0, y: 0, z: 0}
 --- !u!1 &1093528283
 GameObject:
   m_ObjectHideFlags: 0
@@ -3182,7 +3204,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1626562202}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.99999994, y: -4, z: 0}
+  m_LocalPosition: {x: 0.93106794, y: -4.068932, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -3217,7 +3239,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 7, y: 7}
     lockAspectRatio: 1
-    worldSize: {x: 0.6999999, y: 0.6999999}
+    worldSize: {x: 0.6517475, y: 0.6517475}
 --- !u!1 &1636335451
 GameObject:
   m_ObjectHideFlags: 0
@@ -3243,7 +3265,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1636335451}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4, y: -4, z: 0}
+  m_LocalPosition: {x: -3.7242718, y: -4.068932, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -3314,7 +3336,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 20, y: 20}
     lockAspectRatio: 1
-    worldSize: {x: 1.9999999, y: 1.9999999}
+    worldSize: {x: 1.8621359, y: 1.8621359}
   knob:
     idleSprite: {fileID: 21300000, guid: 54a1d28b302b6484d8633cc09baf1238, type: 3}
     busySprite: {fileID: 21300000, guid: 54a1d28b302b6484d8633cc09baf1238, type: 3}
@@ -3324,7 +3346,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 10, y: 10}
     lockAspectRatio: 1
-    worldSize: {x: 0.99999994, y: 0.99999994}
+    worldSize: {x: 0.93106794, y: 0.93106794}
   knobRange: 7.5
 --- !u!1 &1640058298
 GameObject:
@@ -3491,7 +3513,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1776319858}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4, y: -4, z: 0}
+  m_LocalPosition: {x: 3.7242718, y: -4.068932, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 186778475}
@@ -3562,7 +3584,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 20, y: 20}
     lockAspectRatio: 1
-    worldSize: {x: 1.9999999, y: 1.9999999}
+    worldSize: {x: 1.8621359, y: 1.8621359}
   knob:
     idleSprite: {fileID: 21300000, guid: 54a1d28b302b6484d8633cc09baf1238, type: 3}
     busySprite: {fileID: 21300000, guid: 54a1d28b302b6484d8633cc09baf1238, type: 3}
@@ -3572,7 +3594,7 @@ MonoBehaviour:
     sizeUnitType: 0
     size: {x: 10, y: 10}
     lockAspectRatio: 1
-    worldSize: {x: 0.99999994, y: 0.99999994}
+    worldSize: {x: 0.93106794, y: 0.93106794}
   knobRange: 7.5
 --- !u!1 &1925924584
 GameObject:

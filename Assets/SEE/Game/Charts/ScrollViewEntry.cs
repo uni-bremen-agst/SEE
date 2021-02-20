@@ -23,6 +23,7 @@ using SEE.Controls;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace SEE.Game.Charts
 {
@@ -43,6 +44,11 @@ namespace SEE.Game.Charts
             private readonly ChartContent chartContent;
             private readonly int index;                             // Unique index of the entry in the chart content
             private readonly InteractableObject interactableObject; // The object, whose events are subscribed to
+
+            /// <summary>
+            /// The color the label of the scroll view entry 
+            /// </summary>
+            private Color originalLabelColor;
 
             /// <param name="index">The unique index of the <see cref="ScrollViewEntryData"/> within the <see cref="chartContent"/>.</param>
             internal EventHandler(ChartContent chartContent, int index, InteractableObject interactableObject)
@@ -81,10 +87,13 @@ namespace SEE.Game.Charts
                         const int colorIndex = 1;
 
                         Color color = UIColorScheme.GetLight(colorIndex);
-                        UnityEngine.UI.ColorBlock colors = entry.toggle.colors;
+                        // Store old colors
+                        originalLabelColor = entry.label.color;
+                        // Set new colors
+                        ColorBlock colors = entry.toggle.colors;
                         colors.normalColor = color;
-                        entry.toggle.colors = colors;
                         entry.label.color = color;
+                        entry.toggle.colors = colors;
                     }
                 }
             }
@@ -96,13 +105,10 @@ namespace SEE.Game.Charts
                     ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);
                     if (entry != null)
                     {
-                        const int colorIndex = 0;
-
-                        Color color = UIColorScheme.GetLight(colorIndex);
-                        UnityEngine.UI.ColorBlock colors = entry.toggle.colors;
-                        colors.normalColor = color;
-                        entry.toggle.colors = colors;
-                        entry.label.color = color;
+                        entry.label.color = originalLabelColor;
+                        ColorBlock block = entry.toggle.colors;
+                        block.normalColor = originalLabelColor;
+                        entry.toggle.colors = block;
                     }
                 }
             }
@@ -117,7 +123,7 @@ namespace SEE.Game.Charts
                     const int colorIndex = 2;
 
                     Color color = UIColorScheme.GetLight(colorIndex);
-                    UnityEngine.UI.ColorBlock colors = entry.toggle.colors;
+                    ColorBlock colors = entry.toggle.colors;
                     colors.normalColor = color;
                     entry.toggle.colors = colors;
                     entry.label.color = color;
@@ -408,8 +414,14 @@ namespace SEE.Game.Charts
         /// </summary>
         public void OnPointerEnter(PointerEventData eventData)
         {
-            ref ScrollViewEntryData data = ref chartContent.GetScrollViewEntryData(index);
-            data.OnPointerEvent(true);
+            try {
+                ref ScrollViewEntryData data = ref chartContent.GetScrollViewEntryData(index);
+                data.OnPointerEvent(true);
+            }
+            catch
+            {
+                Destroy(this);
+            }
         }
 
         /// <summary>
@@ -417,8 +429,15 @@ namespace SEE.Game.Charts
         /// </summary>
         public void OnPointerExit(PointerEventData eventData)
         {
-            ref ScrollViewEntryData data = ref chartContent.GetScrollViewEntryData(index);
-            data.OnPointerEvent(false);
+            try
+            {
+                ref ScrollViewEntryData data = ref chartContent.GetScrollViewEntryData(index);
+                data.OnPointerEvent(false);
+            }
+            catch
+            {
+                Destroy(this);
+            }
         }
 
         #endregion
