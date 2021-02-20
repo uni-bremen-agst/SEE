@@ -19,6 +19,7 @@
 
 using SEE.DataModel.DG;
 using SEE.Game.Evolution;
+using SEE.Game.Charts;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
@@ -441,6 +442,7 @@ namespace SEE.Game
                 Debug.Log("Graph changes are blocked while animations are running.\n");
                 return;
             }
+            MoveScaleShakeAnimator.DeletePowerBeams();
             RenderGraph(current, next);
         }
 
@@ -509,6 +511,11 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Current graph revision counter
+        /// </summary>
+        private int currentGraphRevisionCounter = 0;
+
+        /// <summary>
         /// Event function triggered when alls animations are finished. Animates the transition of the edges and renders all edges
         /// as new and notifies everyone that the animation is finished.
         /// </summary>
@@ -523,6 +530,13 @@ namespace SEE.Game
             moveEdges = false;
             IsStillAnimating = false;
             AnimationFinishedEvent.Invoke();
+            NodeChangesBuffer.GetSingleton().currentRevisionCounter = currentGraphRevisionCounter;
+            NodeChangesBuffer.GetSingleton().addedNodeIDsCache = new List<string>(NodeChangesBuffer.GetSingleton().addedNodeIDs);
+            NodeChangesBuffer.GetSingleton().addedNodeIDs.Clear();
+            NodeChangesBuffer.GetSingleton().changedNodeIDsCache = new List<string>(NodeChangesBuffer.GetSingleton().changedNodeIDs);
+            NodeChangesBuffer.GetSingleton().changedNodeIDs.Clear();
+            NodeChangesBuffer.GetSingleton().removedNodeIDsCache = new List<string>(NodeChangesBuffer.GetSingleton().removedNodeIDs);
+            NodeChangesBuffer.GetSingleton().removedNodeIDs.Clear();
         }
 
         /// <summary>
@@ -997,8 +1011,10 @@ namespace SEE.Game
             if (HasCurrentLaidOutGraph(out LaidOutGraph newlyShownGraph) &&
                 HasLaidOutGraph(CurrentGraphIndex - 1, out LaidOutGraph currentlyShownGraph))
             {
+                currentGraphRevisionCounter++;
+                NodeChangesBuffer.GetSingleton().revisionChanged = true;
                 // Note: newlyShownGraph is the very next future of currentlyShownGraph
-                TransitionToNextGraph(currentlyShownGraph, newlyShownGraph);
+                TransitionToNextGraph(currentlyShownGraph, newlyShownGraph);                
             }
             else
             {
@@ -1026,6 +1042,8 @@ namespace SEE.Game
             if (HasCurrentLaidOutGraph(out LaidOutGraph newlyShownGraph) &&
                 HasLaidOutGraph(CurrentGraphIndex + 1, out LaidOutGraph currentlyShownGraph))
             {
+                currentGraphRevisionCounter--;
+                NodeChangesBuffer.GetSingleton().revisionChanged = true;
                 // Note: newlyShownGraph is the most recent past of currentlyShownGraph
                 TransitionToNextGraph(currentlyShownGraph, newlyShownGraph);
             }
