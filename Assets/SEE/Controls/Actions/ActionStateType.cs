@@ -17,8 +17,6 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class ActionStateType
     {
-        //TODO Tests (e.g. ID)
-        
         /// <summary>
         /// A list of all available ActionStateTypes.
         /// </summary>
@@ -125,6 +123,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="ID">The ID of the ActionStateType which shall be returned</param>
         /// <returns>the ActionStateType whose ID matches the given parameter</returns>
+        /// <exception cref="InvalidOperationException">If no such ActionStateType exists.</exception>
         public static ActionStateType FromID(int ID)
         {
             return AllTypes.Single(x => x.Value == ID);
