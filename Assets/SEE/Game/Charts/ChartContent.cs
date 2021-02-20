@@ -223,6 +223,8 @@ namespace SEE.Game.Charts
         /// </summary>
         public readonly SortedSet<string> allMetricNames = new SortedSet<string>();
 
+        // FIXME: all attributes need documentation no matter whether they are public or private.
+
         private readonly Dictionary<uint, bool> showInChartDict = new Dictionary<uint, bool>();
 
         public delegate void ShowInChartCallbackFn(bool value);
@@ -240,8 +242,6 @@ namespace SEE.Game.Charts
 
         private int previousFirst = 0;
         private int previousOnePastLast = 0;
-
-        private int currentDataObjectsCount = 0;
 
         public static bool revisionChanged = false;
 
@@ -274,13 +274,14 @@ namespace SEE.Game.Charts
         {
             if (currentRevisionCountCache != NodeChangesBuffer.GetSingleton().currentRevisionCounter)
             {
-                // Push gameobjects to pool
+                // Push game objects to pool
                 PushScrollViewEntriesToPool(previousFirst, previousOnePastLast);
                 ReloadData();
                 currentRevisionCountCache = NodeChangesBuffer.GetSingleton().currentRevisionCounter;
                 NodeChangesBuffer.GetSingleton().revisionChanged = false;
             }
-            // Prevents scrolling while the data is updating, as it would otherwise crash the graph (because the data takes some time to update)
+            // Prevents scrolling while the data is updating, as it would otherwise crash the graph (because 
+            // the data takes some time to update).
             if (!NodeChangesBuffer.GetSingleton().revisionChanged)
             {
                 float panelEntryCount = totalHeight * (1.0f - verticalScrollBar.size) / ScrollViewEntryHeight;
@@ -629,19 +630,19 @@ namespace SEE.Game.Charts
         private void FindDataObjects()
         {
             // list
-            listDataObjects = SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, ChartManager.Instance.ShowInnerNodeMetrics);
-            currentDataObjectsCount = listDataObjects.Count;
+            listDataObjects = SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, 
+                                                              ChartManager.Instance.ShowInnerNodeMetrics);
             // Detect node changes and decorate the scrollview
             FillListsWithChanges(listDataObjects);
 
-            listDataObjects.Sort(delegate (NodeRef n0, NodeRef n1)
+            listDataObjects.Sort(delegate (NodeRef left, NodeRef right)
             {
                 int result = 0;
-                if (n0.Value.IsLeaf() && n1.Value.IsInnerNode())
+                if (left.Value.IsLeaf() && right.Value.IsInnerNode())
                 {
                     result = -1;
                 }
-                else if (n0.Value.IsInnerNode() && n1.Value.IsLeaf())
+                else if (left.Value.IsInnerNode() && right.Value.IsLeaf())
                 {
                     result = 1;
                 }
@@ -932,8 +933,8 @@ namespace SEE.Game.Charts
             }
             else
             {
-                moveHandler.SetInfoText(
-                    "X-Axis: " + axisDropdownX.CurrentlySelectedMetric + "\n" + "Y-Axis: " + axisDropdownY.CurrentlySelectedMetric
+                moveHandler.SetInfoText("X-Axis: " + axisDropdownX.CurrentlySelectedMetric 
+                                        + "\n" + "Y-Axis: " + axisDropdownY.CurrentlySelectedMetric
                 );
             }
         }
