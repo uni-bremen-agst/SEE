@@ -7,12 +7,11 @@ using Valve.VR.InteractionSystem;
 
 namespace SEE.Game.UI
 {
-    /**
-     * Represents an indicator which displays the current <see cref="ActionState"/>.
-     */
+    /// <summary>
+    /// Represents an indicator which displays the current <see cref="ActionState"/>.
+    /// </summary>
     public class ActionStateIndicator: PlatformDependentComponent
     {
-
         /// <summary>
         /// Text of the mode panel.
         /// </summary>
@@ -27,10 +26,12 @@ namespace SEE.Game.UI
         /// Path to the prefab of the mode panel.
         /// </summary>
         private const string MODE_PANEL_PREFAB = "Prefabs/UI/ModePanel";
-        
+
+        /// <summary>
+        /// Adds the indicator prefab and parents it to the UI Canvas.
+        /// </summary>
         protected override void StartDesktop()
         {
-            // Add the indicator prefab and parent it to the UI Canvas
             Object indicatorPrefab = Resources.Load<GameObject>(MODE_PANEL_PREFAB);
             GameObject indicator = Instantiate(indicatorPrefab, Canvas.transform, false) as GameObject;
             if (indicator == null)
