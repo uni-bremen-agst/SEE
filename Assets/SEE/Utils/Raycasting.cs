@@ -61,26 +61,12 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// The cached event system. It is cached because it needs to be queried in
-        /// each Update cycle.
-        /// </summary>
-        private static EventSystem eventSystem = null;
-
-        /// <summary>
         /// Whether the mouse currently hovers over a GUI element.
         /// </summary>
         /// <returns>Whether the mouse currently hovers over a GUI element.</returns>
         public static bool IsMouseOverGUI()
         {
-            if (eventSystem == null)
-            {
-                eventSystem = UnityEngine.Object.FindObjectOfType<EventSystem>();
-                if (eventSystem == null)
-                {
-                    throw new System.Exception("No EventSystem found.");
-                }
-            }
-            return eventSystem.IsPointerOverGameObject();
+            return EventSystem.current.IsPointerOverGameObject();
         }
     }
 }
