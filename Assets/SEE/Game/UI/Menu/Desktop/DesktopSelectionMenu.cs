@@ -3,13 +3,11 @@ using TMPro;
 
 namespace SEE.Game.UI
 {
-
     /// <summary>
     /// Implements Desktop UI for selection menus.
     /// </summary>
     public partial class SelectionMenu
     {
-        
         /// <summary>
         /// The entry which is visually marked as selected.
         /// May be different from <see cref="GetActiveEntry"/>:
