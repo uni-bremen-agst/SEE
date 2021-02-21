@@ -65,7 +65,7 @@ namespace SEE.Controls.Actions
                     // The monobehaviour is enabled and Update() will be called by Unity.
                     garbageCan = GameObject.Find(GarbageCanName);
                     garbageCan.TryGetComponent(out ActionHistory actionH);
-                    actionHistory = actionH; 
+                    actionHistory = actionH;
                     enabled = true;
                     InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
                     InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
@@ -95,43 +95,32 @@ namespace SEE.Controls.Actions
 
             if (selectedObject != null && Input.GetMouseButtonDown(0))
             {
+                actionHistory.ChildsOfParent.Clear();
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
                 if (selectedObject.CompareTag(Tags.Edge))
                 {
                     // selectedObject.GetComponent<ActionHistory>().saveObjectForUndo(selectedObject, ThisActionState);
-                    Destroyer.DestroyGameObject(selectedObject);
+                    // Destroyer.DestroyGameObject(selectedObject);
                 }
                 else if (selectedObject.CompareTag(Tags.Node))
                 {
-                    List<GameObject> selectedObjects = new List<GameObject>();
-                    foreach(Transform child in selectedObject.transform)
+                    List<GameObject> allNodesToBeDeleted = actionHistory.GetAllChildNodesAsGameObject(selectedObject);
+                    List<GameObject> tmp = allNodesToBeDeleted;
+                    foreach (GameObject c in allNodesToBeDeleted)
                     {
-                        if(child.gameObject.CompareTag(Tags.Node))
-                        {
-                            selectedObjects.Add(child.gameObject);
-                        }
-                        if(child.gameObject.CompareTag(Tags.Edge))
-                        {
-                            selectedObjects.Add(child.gameObject);
-                        }
+                        Debug.Log(c.name);
                     }
-                    selectedObjects.Add(selectedObject);
-
-                    int count = 0;
-                    foreach(GameObject g in selectedObjects)
-                    {
-                        Debug.Log(count + g.name);
-                    }
-                    StartCoroutine(MoveNodeToGarbage(selectedObjects));
+                    StartCoroutine(MoveNodeToGarbage(allNodesToBeDeleted));
                 }
             }
-
             if (Input.GetKeyDown(KeyCode.Z))
             {
-                List<GameObject> objectToBeMoved = actionHistory.GetActionHistory().Last();
+                List<GameObject> objectToBeMoved = actionHistory.actionHistory.Last();
                 StartCoroutine(RemoveNodeFromGarbage(objectToBeMoved));
             }
         }
+
+
 
         /// <summary>
         /// 
@@ -140,21 +129,6 @@ namespace SEE.Controls.Actions
         /// <returns></returns>
         public IEnumerator MoveNodeToGarbage(List<GameObject> deletedNodes)
         {
-          //  GameObject parent = deletedNode.transform.parent.gameObject;
-          //  GameObject parent2 = deletedNode;
-          
-         //   while(!parent.Equals(parent2))
-         //   {
-         //       try
-        //       {
-         //           parent2 = parent;
-           //         parent = parent2.transform.parent.gameObject;
-           //     }
-           //     catch(NullReferenceException)
-           //     {
-           //         parent = parent2;
-          //      }
-          //  }
             List<Vector3> oldPositions = new List<Vector3>();
 
             foreach (GameObject deletedNode in deletedNodes)
@@ -174,8 +148,7 @@ namespace SEE.Controls.Actions
                 Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), 1f);
             }
             yield return new WaitForSeconds(1.0f);
-
-            actionHistory.SaveObjectForUndo(deletedNodes,oldPositions);
+            actionHistory.SaveObjectForUndo(deletedNodes, oldPositions);
         }
 
         /// <summary>
@@ -186,22 +159,22 @@ namespace SEE.Controls.Actions
         public IEnumerator RemoveNodeFromGarbage(List<GameObject> deletedNodes)
         {
             List<Vector3> oldPosition = actionHistory.UndoDeleteOperation();
-            for(int i = 0; i< deletedNodes.Count; i++)
+            for (int i = 0; i < deletedNodes.Count; i++)
             {
                 Tweens.Move(deletedNodes[i], new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
             }
-          
+
             yield return new WaitForSeconds(1.5f);
 
             for (int i = 0; i < deletedNodes.Count; i++)
             {
                 Tweens.Move(deletedNodes[i], oldPosition[i], 1f);
             }
-              
+
             yield return new WaitForSeconds(2.0f);
 
             //Fixme: Portal has to be set after undo again 
-           // Portal.SetPortal(actionHistory.GetPortalFromGarbageObjects());
+            // Portal.SetPortal(actionHistory.GetPortalFromGarbageObjects());
         }
 
         private void LocalAnySelectIn(InteractableObject interactableObject)
