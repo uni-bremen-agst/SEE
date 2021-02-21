@@ -129,8 +129,6 @@ namespace SEE.Controls.Actions
             return AllTypes.Single(x => x.Value == ID);
         }
 
-
-
         #region Equality & Comparators
 
         public override bool Equals(object obj)
