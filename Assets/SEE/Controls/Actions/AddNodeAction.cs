@@ -377,7 +377,9 @@ namespace SEE.Controls.Actions
         {
             try
             {
-                city.LoadedGraph.AddNode(node);
+                Graph loadedGraph = city.LoadedGraph;
+                loadedGraph.AddNode(node);
+                loadedGraph.FinalizeNodeHierarchy();
             }
             catch (Exception)
             {
@@ -387,36 +389,29 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Creates a new node. First, it is created with default-values which will be replaced by inputValues 
+        /// Creates a new node. First, it is created with default values which will be replaced by inputValues 
         /// by the user if they are given. Sets this node in the hierarchy of the graph. 
-        /// Its important to set the id, city and isInnerNode first
+        /// It is important to set the id, city and isInnerNode first.
         /// </summary>
         public void NewNode()
-        {
-            GameObject gameNode;
+        {            
             Node node = new Node
             {
-                // Set the attributes of the new node.
                 ID = NodeID,
                 SourceName = NodeID,
                 Type = Graph.UnknownType
             };
-
             AddNode(node);
-            //Redraw the node Graph
-            city.LoadedGraph.FinalizeNodeHierarchy();
-
+            
             if (IsInnerNode)
             {
-                gameNode = city.Renderer.NewInnerNode(node);
-                GONode = gameNode;
+                GONode = city.Renderer.NewInnerNode(node);
                 GONode.transform.localScale = medianOfInnerNodes;
                 GONode.gameObject.GetComponent<Renderer>().material.color = innerNodeColor;
             } 
             else
             {
-                gameNode = city.Renderer.NewLeafNode(node);
-                GONode = gameNode;
+                GONode = city.Renderer.NewLeafNode(node);
                 GONode.transform.localScale = medianOfLeaves;
                 GONode.gameObject.GetComponent<Renderer>().material.color = leafColor;
             }
@@ -497,8 +492,8 @@ namespace SEE.Controls.Actions
                 medianOfInnerNodes = medianOfLeaves;
             }
 
-            // if, for any reason, the calculated median vector is the null vector, we adjust the new node's 
-            // lossyscale size by 40% of the norm vector.
+            // If, for any reason, the calculated median vector is the zero vector, we adjust the new node's 
+            // scale by 40% of the norm vector.
             if (medianOfInnerNodes == new Vector3(0, 0, 0))
             {
                 medianOfInnerNodes = new Vector3(0.4f, 0.4f, 0.4f);
@@ -594,15 +589,6 @@ namespace SEE.Controls.Actions
             GameNodeMover.NetworkFinalizeNodePosition(GONode, parentID, position);
             GONode.gameObject.GetComponent<Collider>().enabled = true;
             GONode = null;
-        }
-
-        /// <summary>
-        /// Setter for the static isInnerNode variable
-        /// </summary>
-        /// <param name="isInnerNode">new value for isInnerNode</param>
-        public static void SetIsInnerNode(bool isInnerNode)
-        {
-            IsInnerNode = isInnerNode;
         }
     }
 }
