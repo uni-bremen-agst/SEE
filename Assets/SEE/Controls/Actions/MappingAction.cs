@@ -349,12 +349,12 @@ namespace SEE.Controls.Actions
                 }
                 if (implementation.GetNode(edge.Source.ID) == null)
                 {
-                    Debug.LogWarning("The mapping contains an implementation node that is not in the implementation graph.\n");
+                    Debug.LogWarning($"The mapping contains an implementation node {edge.Source.ID} (source) that is not in the implementation graph for maps-to edge {edge}.\n");
                     nodesToBeRemoved.Add(edge.Source);
                 }
                 if (architecture.GetNode(edge.Target.ID) == null)
                 {
-                    Debug.LogWarning("The mapping contains an architecture node that is not in the architecture graph.\n");
+                    Debug.LogWarning($"The mapping contains an architecture node {edge.Target.ID} (target) that is not in the architecture graph for maps-to edge {edge}.\n");
                     nodesToBeRemoved.Add(edge.Target);
                 }
             }
