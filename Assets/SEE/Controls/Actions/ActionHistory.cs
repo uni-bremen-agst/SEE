@@ -1,4 +1,5 @@
 ﻿using SEE.Controls.Actions;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
@@ -11,7 +12,7 @@ using UnityEngine;
 public class ActionHistory : MonoBehaviour
 {
 
-    private LinkedList<List<GameObject>> actionHistory = new LinkedList<List<GameObject>>();
+    public LinkedList<List<GameObject>> actionHistory = new LinkedList<List<GameObject>>();
 
     private LinkedList<List<Vector3>> oldPosition = new LinkedList<List<Vector3>>();
 
@@ -19,16 +20,49 @@ public class ActionHistory : MonoBehaviour
 
     private Graph graph;
 
-    // Start is called before the first frame update
-    void Start()
+    List<GameObject> childsOfParent = new List<GameObject>();
+
+    public List<GameObject> ChildsOfParent { get => childsOfParent; set => childsOfParent = value; }
+
+    /// <summary>
+    /// Saves all childs of the graph-parent object
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <returns>List of all childs of a parent</returns>
+    public List<GameObject> GetAllChildNodesAsGameObject(GameObject parent)
     {
+        List<GameObject> childsOfThisParent = new List<GameObject>();
+        if (!childsOfParent.Contains(parent))
+        {
+            childsOfParent.Add(parent);
+        }
+        int gameNodeCount = childsOfParent.Count;
 
-    }
+        foreach (Transform child in parent.transform)
+        {
+            if (child.gameObject.CompareTag(Tags.Node))
+            {
+                if (!childsOfParent.Contains(child.gameObject))
+                {
+                    childsOfParent.Add(child.gameObject);
+                }
+                childsOfThisParent.Add(child.gameObject);
+            }
 
-    // Update is called once per frame
-    void Update()
-    {
+        }
+        if (childsOfParent.Count == gameNodeCount)
+        {
+            return childsOfParent;
+        }
+        else
+        { 
+            foreach(GameObject childs in childsOfThisParent)
+            {
+                GetAllChildNodesAsGameObject(childs);
+            }
 
+            return childsOfParent;
+        }
     }
 
     /// <summary>
@@ -48,21 +82,18 @@ public class ActionHistory : MonoBehaviour
         }
 
         SEECity city;
-        city = SceneQueries.GetCodeCity(actionHistoryObjects[0]. transform)?.gameObject.GetComponent<SEECity>();
+        city = SceneQueries.GetCodeCity(actionHistoryObjects[0].transform)?.gameObject.GetComponent<SEECity>();
         graph = city.LoadedGraph;
 
         List<GameObject> NodesAndascendingEdges = new List<GameObject>();
 
-        foreach(GameObject actionHistoryObject in actionHistoryObjects)
+        foreach (GameObject actionHistoryObject in actionHistoryObjects)
         {
-
-            actionHistoryObject.SetVisibility(false, true);
-
             if (actionHistoryObject.TryGetComponent(out NodeRef nodeRef))
             {
 
                 HashSet<string> edgeIDs = Destroyer.GetEdgeIds(nodeRef);
-                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(SEE.DataModel.Tags.Edge))
+                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
                 {
                     if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                     {
@@ -71,11 +102,10 @@ public class ActionHistory : MonoBehaviour
                         {
                             NodesAndascendingEdges.Add(edge);
                         }
-
                     }
                 }
 
-                if (actionHistoryObject.TryGetComponentOrLog(out Collider collider))
+                if (actionHistoryObject.TryGetComponent(out Collider collider))
                 {
                     actionHistoryObject.GetComponent<Collider>().enabled = false;
                 }
@@ -89,19 +119,23 @@ public class ActionHistory : MonoBehaviour
 
             for (int i = 0; i < incoming.Count; i++)
             {
-                graph.RemoveEdge(incoming.ElementAt(i));
+                // FIXME: DOESNT WORK BECAUSE MULTIPLE ADDING OF SOME EDGES IF THEY ARE INCOMING AND OUTGOING
+                //  graph.RemoveEdge(incoming.ElementAt(i));
+                //  Debug.Log(incoming);
             }
 
             for (int i = 0; i < outgoing.Count; i++)
             {
-                graph.RemoveEdge(outgoing.ElementAt(i));
+                // FIXME: DOESNT WORK BECAUSE MULTIPLE ADDING OF SOME EDGES IF THEY ARE INCOMING AND OUTGOING
+                //graph.RemoveEdge(outgoing.ElementAt(i));
+                // Debug.Log(outgoing);
             }
 
             graph.RemoveNode(node.Value);
         }
-       
-        actionHistory.AddLast(NodesAndascendingEdges);
+        // FIXME(Mr. Frenzel): justNodes currently 
         oldPosition.AddLast(oldPositions);
+        actionHistory.AddLast(actionHistoryObjects);
         // parentCities.AddLast(gameObjectCity);
     }
 
@@ -111,9 +145,6 @@ public class ActionHistory : MonoBehaviour
     public List<Vector3> UndoDeleteOperation()
     {
         List<Vector3> oldPositionVector = oldPosition.Last();
-
-        Debug.Log(oldPosition.Count);
-
         List<GameObject> undo = actionHistory.Last();
         undo.Reverse();
 
@@ -126,10 +157,9 @@ public class ActionHistory : MonoBehaviour
 
             if (go.TryGetComponent(out EdgeRef edgeReference))
             {
-                graph.AddEdge(edgeReference.edge);
+               // graph.AddEdge(edgeReference.edge);
+                go.SetVisibility(true, false);
             }
-
-            go.SetVisibility(true, false);
 
             if (go.TryGetComponentOrLog(out Collider collider))
             {
@@ -137,7 +167,6 @@ public class ActionHistory : MonoBehaviour
             }
         }
 
-        Debug.Log(actionHistory.Last.Value);
         actionHistory.RemoveLast();
         oldPosition.RemoveLast();
         return oldPositionVector;
