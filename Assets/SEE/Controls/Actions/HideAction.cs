@@ -9,7 +9,7 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class HideAction : MonoBehaviour
     {
-        const ActionState.Type ThisActionState = ActionState.Type.Hide;
+        private readonly ActionStateType ThisActionState = ActionStateType.Hide;
 
         /// <summary>
         /// The currently selected object (a node or edge).
@@ -19,9 +19,9 @@ namespace SEE.Controls.Actions
         // Start is called before the first frame update
         void Start()
         {
-            ActionState.OnStateChanged += (ActionState.Type newState) =>
+            ActionState.OnStateChanged += newState =>
             {
-                if (newState == ThisActionState)
+                if (Equals(newState, ThisActionState))
                 {
                     // The monobehaviour is enabled and Update() will be called by Unity.
                     enabled = true;
