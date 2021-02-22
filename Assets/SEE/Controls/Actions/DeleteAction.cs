@@ -93,6 +93,7 @@ namespace SEE.Controls.Actions
                 return;
             }
 
+            //Delete an object
             if (selectedObject != null && Input.GetMouseButtonDown(0))
             {
                 actionHistory.ChildsOfParent.Clear();
@@ -109,10 +110,19 @@ namespace SEE.Controls.Actions
                     StartCoroutine(MoveNodeToGarbage(allNodesToBeDeleted));
                 }
             }
+
+            //undo delete
             if (Input.GetKeyDown(KeyCode.Z))
             {
-                List<GameObject> objectToBeMoved = actionHistory.actionHistory.Last();
-                StartCoroutine(RemoveNodeFromGarbage(objectToBeMoved));
+                try
+                {
+                    List<GameObject> objectToBeMoved = actionHistory.actionHistory.Last();
+                    StartCoroutine(RemoveNodeFromGarbage(objectToBeMoved));
+                }
+                catch(InvalidOperationException)
+                {
+                    Debug.Log("No history");
+                }
             }
         }
 
@@ -137,7 +147,7 @@ namespace SEE.Controls.Actions
                 Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
             }
 
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(1.0f);
 
             foreach (GameObject deletedNode in deletedNodes)
             {
@@ -160,7 +170,7 @@ namespace SEE.Controls.Actions
                 Tweens.Move(deletedNodes[i], new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
             }
 
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(1.2f);
 
             for (int i = 0; i < deletedNodes.Count; i++)
             {
