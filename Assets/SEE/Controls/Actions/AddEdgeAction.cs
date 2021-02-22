@@ -24,7 +24,7 @@ namespace SEE.Controls.Actions
         /// Thus, this action will be executed only if the new state is 
         /// <see cref="ThisActionState"/>.
         /// </summary>
-        const ActionState.Type ThisActionState = ActionState.Type.NewEdge;
+        private readonly ActionStateType ThisActionState = ActionStateType.NewEdge;
 
         /// <summary>
         /// The source for the edge to be drawn.
@@ -44,16 +44,16 @@ namespace SEE.Controls.Actions
             ActionState.OnStateChanged += newState =>
             {
                 // Is this our action state where we need to do something?
-                if (newState == ThisActionState)
+                if (Equals(newState, ThisActionState))
                 {
-                    // The monobehaviour is enabled and Update() will be called by Unity.
+                    // The MonoBehaviour is enabled and Update() will be called by Unity.
                     enabled = true;
                     InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
                 }
                 else
                 {
-                    // The monobehaviour is disabled and Update() no longer be called by Unity.
+                    // The MonoBehaviour is disabled and Update() no longer be called by Unity.
                     enabled = false;
                     InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
@@ -99,7 +99,7 @@ namespace SEE.Controls.Actions
                         try
                         {
                             city.Renderer.DrawEdge(from, to);
-                            new AddEdgeNetAction(from.name, to.name).Execute(null);
+                            new AddEdgeNetAction(from.name, to.name).Execute();
                         }
                         catch (Exception e)
                         {
@@ -110,7 +110,7 @@ namespace SEE.Controls.Actions
                     }
                 }
             }
-            // Adding the key "F1" in order to delete the selected gameobjects.
+            // Adding the key "F1" in order to delete the selected GameObjects.
             if (Input.GetKeyDown(KeyCode.F1))
             {
                 from = null;
