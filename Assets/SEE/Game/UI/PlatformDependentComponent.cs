@@ -1,14 +1,15 @@
 ﻿using OdinSerializer.Utilities;
+using SEE.Controls;
 using SEE.Utils;
 using UnityEngine;
-using PlayerSettings = SEE.Controls.PlayerSettings;
 
 namespace SEE.Game.UI
 {
     /// <summary>
     /// This class represents a component whose Start() and Update() method differs based on the current platform.
     /// Inheritors are expected to override the respective Start() and Update() methods (e.g. <see cref="StartVR()"/>.
-    /// If the current platform's method was not overridden, the component will be destroyed.
+    /// If the current platform's start method was not overridden, the component will be destroyed.
+    /// If the current platform's update method was not overridden, nothing will happen.
     /// 
     /// This approach is especially well suited for UI components, as their presentation is almost always different
     /// based on the platform.
@@ -60,19 +61,21 @@ namespace SEE.Game.UI
         /// <summary>
         /// Called when the <see cref="Update()"/> method of this component is executed on the Desktop platform.
         /// </summary>
-        protected virtual void UpdateDesktop() => PlatformUnsupported();
+        protected virtual void UpdateDesktop() { }
         /// <summary>
         /// Called when the <see cref="Update()"/> method of this component is executed on the TouchGamepad platform.
         /// </summary>
-        protected virtual void UpdateTouchGamepad() => PlatformUnsupported();
+        protected virtual void UpdateTouchGamepad() { }
+
         /// <summary>
         /// Called when the <see cref="Update()"/> method of this component is executed on the VR platform.
         /// </summary>
-        protected virtual void UpdateVR() => PlatformUnsupported();
+        protected virtual void UpdateVR() { }
+
         /// <summary>
         /// Called when the <see cref="Update()"/> method of this component is executed on the HoloLens platform.
         /// </summary>
-        protected virtual void UpdateHoloLens() => PlatformUnsupported();
+        protected virtual void UpdateHoloLens() { }
         
         protected void Start()
         {
