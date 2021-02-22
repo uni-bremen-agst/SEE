@@ -47,6 +47,7 @@ public class ActionHistory : MonoBehaviour
                     childsOfParent.Add(child.gameObject);
                 }
                 childsOfThisParent.Add(child.gameObject);
+                Debug.Log(child.gameObject);
             }
 
         }
@@ -81,9 +82,11 @@ public class ActionHistory : MonoBehaviour
             Debug.LogError("null operation");
         }
 
+        Debug.Log(actionHistoryObjects[0] + "Node FOR THE GRAPH");
         SEECity city;
         city = SceneQueries.GetCodeCity(actionHistoryObjects[0].transform)?.gameObject.GetComponent<SEECity>();
         graph = city.LoadedGraph;
+        Debug.Log(graph + " Graph");
 
         List<GameObject> NodesAndascendingEdges = new List<GameObject>();
 
@@ -110,28 +113,33 @@ public class ActionHistory : MonoBehaviour
                     actionHistoryObject.GetComponent<Collider>().enabled = false;
                 }
                 NodesAndascendingEdges.Add(actionHistoryObject);
+                
             }
 
-            actionHistoryObject.TryGetComponent(out NodeRef node);
+            foreach (GameObject go in actionHistoryObjects) {
+                go.TryGetComponent(out NodeRef node);
+              //  Debug.Log("name des GO´s : " + go.name);
+                List<Edge> incoming = node.Value.Incomings;
+                List<Edge> outgoing = node.Value.Outgoings;
 
-            List<Edge> incoming = node.Value.Incomings;
-            List<Edge> outgoing = node.Value.Outgoings;
+                for (int i = 0; i < incoming.Count; i++)
+                {
+                    // FIXME: DOESNT WORK BECAUSE MULTIPLE ADDING OF SOME EDGES IF THEY ARE INCOMING AND OUTGOING
+                    //  graph.RemoveEdge(incoming.ElementAt(i));
+                    //  Debug.Log(incoming);
+                }
 
-            for (int i = 0; i < incoming.Count; i++)
-            {
-                // FIXME: DOESNT WORK BECAUSE MULTIPLE ADDING OF SOME EDGES IF THEY ARE INCOMING AND OUTGOING
-                //  graph.RemoveEdge(incoming.ElementAt(i));
-                //  Debug.Log(incoming);
+                for (int i = 0; i < outgoing.Count; i++)
+                {
+                    // FIXME: DOESNT WORK BECAUSE MULTIPLE ADDING OF SOME EDGES IF THEY ARE INCOMING AND OUTGOING
+                    //graph.RemoveEdge(outgoing.ElementAt(i));
+                    // Debug.Log(outgoing);
+                }
+
+               
+                    graph.RemoveNode(node.Value);
+                
             }
-
-            for (int i = 0; i < outgoing.Count; i++)
-            {
-                // FIXME: DOESNT WORK BECAUSE MULTIPLE ADDING OF SOME EDGES IF THEY ARE INCOMING AND OUTGOING
-                //graph.RemoveEdge(outgoing.ElementAt(i));
-                // Debug.Log(outgoing);
-            }
-
-            graph.RemoveNode(node.Value);
         }
         // FIXME(Mr. Frenzel): justNodes currently 
         oldPosition.AddLast(oldPositions);
