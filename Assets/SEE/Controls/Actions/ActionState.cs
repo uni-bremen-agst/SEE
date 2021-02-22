@@ -15,11 +15,12 @@
             Move = 0,      // the user wants to move a node
             Rotate = 1,    // the user wants to rotate a node
             Map = 2,       // the user wants to map an implementation node onto an architecture node (reflexion analysis)
-            NewEdge = 3,  // the user wants to draw an edge between nodes
+            NewEdge = 3,   // the user wants to draw an edge between nodes
             NewNode = 4,   // the user wants to add a new node
             EditNode = 5,  // the user wants to edit an existing node
             ScaleNode = 6, // the user wants to scale an existing node
             Delete = 7,    // the user wants to delete a node or edge
+            Hide = 8,      // the user wants to hide or show a node or edge
         }
 
         private static Type value = 0;
