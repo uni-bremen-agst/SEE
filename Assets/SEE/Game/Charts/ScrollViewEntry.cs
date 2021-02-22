@@ -23,6 +23,7 @@ using SEE.Controls;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace SEE.Game.Charts
 {
@@ -43,6 +44,11 @@ namespace SEE.Game.Charts
             private readonly ChartContent chartContent;
             private readonly int index;                             // Unique index of the entry in the chart content
             private readonly InteractableObject interactableObject; // The object, whose events are subscribed to
+
+            /// <summary>
+            /// The color the label of the scroll view entry 
+            /// </summary>
+            private Color originalLabelColor;
 
             /// <param name="index">The unique index of the <see cref="ScrollViewEntryData"/> within the <see cref="chartContent"/>.</param>
             internal EventHandler(ChartContent chartContent, int index, InteractableObject interactableObject)
@@ -81,10 +87,13 @@ namespace SEE.Game.Charts
                         const int colorIndex = 1;
 
                         Color color = UIColorScheme.GetLight(colorIndex);
-                        UnityEngine.UI.ColorBlock colors = entry.toggle.colors;
+                        // Store old colors
+                        originalLabelColor = entry.label.color;
+                        // Set new colors
+                        ColorBlock colors = entry.toggle.colors;
                         colors.normalColor = color;
-                        entry.toggle.colors = colors;
                         entry.label.color = color;
+                        entry.toggle.colors = colors;
                     }
                 }
             }
@@ -96,13 +105,10 @@ namespace SEE.Game.Charts
                     ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);
                     if (entry != null)
                     {
-                        const int colorIndex = 0;
-
-                        Color color = UIColorScheme.GetLight(colorIndex);
-                        UnityEngine.UI.ColorBlock colors = entry.toggle.colors;
-                        colors.normalColor = color;
-                        entry.toggle.colors = colors;
-                        entry.label.color = color;
+                        entry.label.color = originalLabelColor;
+                        ColorBlock block = entry.toggle.colors;
+                        block.normalColor = originalLabelColor;
+                        entry.toggle.colors = block;
                     }
                 }
             }
@@ -117,7 +123,7 @@ namespace SEE.Game.Charts
                     const int colorIndex = 2;
 
                     Color color = UIColorScheme.GetLight(colorIndex);
-                    UnityEngine.UI.ColorBlock colors = entry.toggle.colors;
+                    ColorBlock colors = entry.toggle.colors;
                     colors.normalColor = color;
                     entry.toggle.colors = colors;
                     entry.label.color = color;
@@ -361,7 +367,7 @@ namespace SEE.Game.Charts
     /// <summary>
     /// The scroll view entry handles the visuals of an entry within the chart. As not
     /// every entry is visible at all times to increase performance, the main data is
-    /// kept within a <see cref="ScrollViewEntryData"/>-object with the same ID as
+    /// kept within a <see cref="ScrollViewEntryData"/> object with the same ID as
     /// <see cref="index"/>. The corresponding data object always exist and can be
     /// retrieved via <see cref="ChartContent.GetScrollViewEntryData(int)"/>.
     /// </summary>
@@ -373,6 +379,26 @@ namespace SEE.Game.Charts
 
         [SerializeField] public TMPro.TextMeshProUGUI label;  // This text field displays the label of the entry
         [SerializeField] public UnityEngine.UI.Toggle toggle; // This toggle hints, whether the corresponding marker should be enabled.
+
+        /// <summary>
+        /// Sets <see cref="label"/> and <see cref="toggle"/>.
+        /// </summary>
+        private void Awake()
+        {
+            // The following code must be run in Awake(). Start() would be too late.
+
+            // toggle is another component attached to the same game object as this ScrollViewEntry
+            if (!TryGetComponent(out toggle))
+            {
+                Debug.LogError($"ScrollViewEntry {name} of has no Toggle.\n");
+            }
+            // label is a child of the game object this ScrollViewEntry is attached to
+            label = GetComponentInChildren<TMPro.TextMeshProUGUI>();
+            if (label == null)
+            {
+                Debug.LogError($"ScrollViewEntry of {name} of has no child with a TMPro.TextMeshProUGUI component.\n");
+            }
+        }
 
         public void Init(ChartContent chartContent, ref ScrollViewEntryData data, string label)
         {
@@ -386,7 +412,7 @@ namespace SEE.Game.Charts
         {
             OnPointerExit(null);
 #if UNITY_EDITOR
-            toggle.SetIsOnWithoutNotify(true);
+            toggle?.SetIsOnWithoutNotify(true);
             label.text = "Pooled ScrollViewEntry, previously: " + label.text;
             index = 0;
             chartContent = null;
@@ -408,8 +434,14 @@ namespace SEE.Game.Charts
         /// </summary>
         public void OnPointerEnter(PointerEventData eventData)
         {
-            ref ScrollViewEntryData data = ref chartContent.GetScrollViewEntryData(index);
-            data.OnPointerEvent(true);
+            try {
+                ref ScrollViewEntryData data = ref chartContent.GetScrollViewEntryData(index);
+                data.OnPointerEvent(true);
+            }
+            catch
+            {
+                Destroy(this);
+            }
         }
 
         /// <summary>
@@ -417,8 +449,15 @@ namespace SEE.Game.Charts
         /// </summary>
         public void OnPointerExit(PointerEventData eventData)
         {
-            ref ScrollViewEntryData data = ref chartContent.GetScrollViewEntryData(index);
-            data.OnPointerEvent(false);
+            try
+            {
+                ref ScrollViewEntryData data = ref chartContent.GetScrollViewEntryData(index);
+                data.OnPointerEvent(false);
+            }
+            catch
+            {
+                Destroy(this);
+            }
         }
 
         #endregion

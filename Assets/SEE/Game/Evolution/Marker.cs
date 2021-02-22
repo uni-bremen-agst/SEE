@@ -2,6 +2,7 @@
 using SEE.GO;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.Game.Charts;
 
 namespace SEE.Game.Evolution
 {
@@ -163,6 +164,8 @@ namespace SEE.Game.Evolution
             GameObject beamMarker = factory.NewBlock(0, renderQueueOffset);
             AddEmission(beamMarker);
             //Portal.SetPortal(beamMarker.transform.parent.gameObject);
+            // Add the added node id to the revision changes list
+            NodeChangesBuffer.GetSingleton().addedNodeIDs.Add(beamMarker.name);
             return beamMarker;
         }
 
@@ -209,6 +212,7 @@ namespace SEE.Game.Evolution
         /// <returns>the resulting beam marker</returns>
         public GameObject MarkBorn(GameObject gameNode)
         {
+            NodeChangesBuffer.GetSingleton().addedNodeIDs.Add(gameNode.gameObject.name);
             GameObject beamMarker = MarkByBeam(gameNode, additionMarkerFactory);
             beamMarker.name = "new " + gameNode.name;
             // We need to add the marker to beamMarkers so that it can be destroyed at the beginning of the
