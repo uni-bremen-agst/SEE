@@ -23,7 +23,7 @@ namespace SEE.Controls.Actions
         /// Thus, this action will be executed only if the new state is 
         /// <see cref="ThisActionState"/>.
         /// </summary>
-        private const ActionState.Type ThisActionState = ActionState.Type.ScaleNode;
+        private readonly ActionStateType ThisActionState = ActionStateType.ScaleNode;
 
         /// <summary>
         /// The old position of the top sphere
@@ -138,7 +138,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The gameObject in which will be saved which sphere was dragged
         /// </summary>
-        private GameObject draggedSphere = null;
+        private GameObject draggedSphere;
 
         /// <summary>
         /// The gameObject which should be scaled
@@ -147,19 +147,19 @@ namespace SEE.Controls.Actions
 
         public void Start()
         {
-            ActionState.OnStateChanged += (ActionState.Type newState) =>
+            ActionState.OnStateChanged += newState =>
             {
                 // Is this our action state where we need to do something?
-                if (newState == ThisActionState)
+                if (Equals(newState, ThisActionState))
                 {
-                    // The monobehaviour is enabled and Update() will be called by Unity.
+                    // The MonoBehaviour is enabled and Update() will be called by Unity.
                     enabled = true;
                     InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
                 }
                 else
                 {
-                    // The monobehaviour is diabled and Update() no longer be called by Unity.
+                    // The MonoBehaviour is disabled and Update() no longer be called by Unity.
                     enabled = false;
                     InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
@@ -233,9 +233,8 @@ namespace SEE.Controls.Actions
                 {
                     Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
 
-                    RaycastHit hit;
                     // Casts the ray and get the first game object hit
-                    Physics.Raycast(ray, out hit);
+                    Physics.Raycast(ray, out RaycastHit hit);
 
                     // Moves the sphere that was hit.
                     // Top
@@ -276,7 +275,7 @@ namespace SEE.Controls.Actions
                     {
                         draggedSphere = forthSideSphere;
                     }
-                    //End Scalling
+                    //End Scaling
                     else if (hit.collider == endWithSave.GetComponent<Collider>())
                     {
                         EndScale(true);
@@ -396,7 +395,7 @@ namespace SEE.Controls.Actions
             // Transform the new position and scale
             objectToScale.transform.position = position;
             objectToScale.SetScale(scale);
-            new ScaleNodeNetAction(objectToScale.name, scale, position).Execute(null);
+            new ScaleNodeNetAction(objectToScale.name, scale, position).Execute();
         }
 
         /// <summary>
@@ -527,7 +526,7 @@ namespace SEE.Controls.Actions
             {
                 objectToScale.SetScale(originalScale);
                 objectToScale.transform.position = originalPosition;
-                new ScaleNodeNetAction(objectToScale.name, originalScale, originalPosition).Execute(null);
+                new ScaleNodeNetAction(objectToScale.name, originalScale, originalPosition).Execute();
                 RemoveSpheres();
             }
         }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using SEE.GO;
@@ -10,7 +11,7 @@ using UnityEngine.UI;
 namespace SEE.Game.UI
 {
     /// <summary>
-    /// Responsible for the Desktop UI for Menus.
+    /// Responsible for the desktop UI for menus.
     /// </summary>
     /// <typeparam name="T">the type of entries used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
     public partial class Menu<T>
@@ -60,7 +61,12 @@ namespace SEE.Game.UI
         /// are needed, more GameObjects with TooltipManagers need to be created.
         /// </summary>
         protected TooltipManager TooltipManager;
-        
+
+        /// <summary>
+        /// List of all button managers for the buttons used in this menu.
+        /// </summary>
+        protected readonly List<ButtonManagerBasicWithIcon> ButtonManagers = new List<ButtonManagerBasicWithIcon>();
+
         protected override void StartDesktop()
         {
             SetUpDesktopWindow();
@@ -94,6 +100,7 @@ namespace SEE.Game.UI
             Manager.titleText = Title;
             Manager.descriptionText = Description;
             Manager.icon = Icon;
+            Manager.onConfirm.AddListener(() => ShowMenu(false));
             
             // Add tooltip
             TooltipManager = MenuGameObject.GetComponentInChildren<TooltipManager>();
@@ -174,6 +181,7 @@ namespace SEE.Game.UI
                     textMeshPro.color = entry.DisabledColor.IdealTextColor();
                     iconImage.color = entry.DisabledColor.IdealTextColor();
                 }
+                ButtonManagers.Add(buttonManager);
             }
         }
 
@@ -206,8 +214,15 @@ namespace SEE.Game.UI
         {
             if (MenuShown != CurrentMenuShown)
             {
-                // Toggle state when menu state has been changed
-                Manager?.AnimateWindow();
+                if (MenuShown)
+                {
+                    Manager?.OpenWindow();
+                }
+                else
+                {
+                    Manager?.CloseWindow();
+                }
+
                 CurrentMenuShown = MenuShown;
             }
         }
