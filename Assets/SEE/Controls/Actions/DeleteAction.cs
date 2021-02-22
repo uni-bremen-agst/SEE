@@ -106,10 +106,6 @@ namespace SEE.Controls.Actions
                 {
                     List<GameObject> allNodesToBeDeleted = actionHistory.GetAllChildNodesAsGameObject(selectedObject);
                     List<GameObject> tmp = allNodesToBeDeleted;
-                    foreach (GameObject c in allNodesToBeDeleted)
-                    {
-                        Debug.Log(c.name);
-                    }
                     StartCoroutine(MoveNodeToGarbage(allNodesToBeDeleted));
                 }
             }

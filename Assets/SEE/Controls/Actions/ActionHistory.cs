@@ -47,7 +47,6 @@ public class ActionHistory : MonoBehaviour
                     childsOfParent.Add(child.gameObject);
                 }
                 childsOfThisParent.Add(child.gameObject);
-                Debug.Log(child.gameObject);
             }
 
         }
@@ -56,8 +55,8 @@ public class ActionHistory : MonoBehaviour
             return childsOfParent;
         }
         else
-        { 
-            foreach(GameObject childs in childsOfThisParent)
+        {
+            foreach (GameObject childs in childsOfThisParent)
             {
                 GetAllChildNodesAsGameObject(childs);
             }
@@ -82,11 +81,10 @@ public class ActionHistory : MonoBehaviour
             Debug.LogError("null operation");
         }
 
-        Debug.Log(actionHistoryObjects[0] + "Node FOR THE GRAPH");
         SEECity city;
+        actionHistoryObjects[0].TryGetComponent(out NodeRef nodeRef2);
         city = SceneQueries.GetCodeCity(actionHistoryObjects[0].transform)?.gameObject.GetComponent<SEECity>();
         graph = city.LoadedGraph;
-        Debug.Log(graph + " Graph");
 
         List<GameObject> NodesAndascendingEdges = new List<GameObject>();
 
@@ -113,12 +111,13 @@ public class ActionHistory : MonoBehaviour
                     actionHistoryObject.GetComponent<Collider>().enabled = false;
                 }
                 NodesAndascendingEdges.Add(actionHistoryObject);
-                
+
             }
 
-            foreach (GameObject go in actionHistoryObjects) {
+            foreach (GameObject go in actionHistoryObjects)
+            {
                 go.TryGetComponent(out NodeRef node);
-              //  Debug.Log("name des GO´s : " + go.name);
+                //  Debug.Log("name des GO´s : " + go.name);
                 List<Edge> incoming = node.Value.Incomings;
                 List<Edge> outgoing = node.Value.Outgoings;
 
@@ -136,11 +135,18 @@ public class ActionHistory : MonoBehaviour
                     // Debug.Log(outgoing);
                 }
 
-               
-                    graph.RemoveNode(node.Value);
-                
             }
         }
+        List<GameObject> tmp = actionHistoryObjects;
+        tmp.Reverse();
+        foreach (GameObject g in tmp)
+        {
+            g.TryGetComponent(out NodeRef nodeRef);
+            graph.RemoveNode(nodeRef.Value);
+            Debug.Log("Removed " + g.name + " from graph");
+        }
+
+
         // FIXME(Mr. Frenzel): justNodes currently 
         oldPosition.AddLast(oldPositions);
         actionHistory.AddLast(actionHistoryObjects);
@@ -156,6 +162,7 @@ public class ActionHistory : MonoBehaviour
         List<GameObject> undo = actionHistory.Last();
         undo.Reverse();
 
+
         foreach (GameObject go in undo)
         {
             if (go.TryGetComponent(out NodeRef nodeRef))
@@ -165,7 +172,7 @@ public class ActionHistory : MonoBehaviour
 
             if (go.TryGetComponent(out EdgeRef edgeReference))
             {
-               // graph.AddEdge(edgeReference.edge);
+                // graph.AddEdge(edgeReference.edge);
                 go.SetVisibility(true, false);
             }
 
@@ -174,7 +181,6 @@ public class ActionHistory : MonoBehaviour
                 collider.enabled = true;
             }
         }
-
         actionHistory.RemoveLast();
         oldPosition.RemoveLast();
         return oldPositionVector;
