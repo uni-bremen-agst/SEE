@@ -1,4 +1,6 @@
-﻿namespace SEE.Controls.Actions
+﻿using UnityEngine;
+
+namespace SEE.Controls.Actions
 {
     /// <summary>
     /// Provides user action that depend upon a particular state the user can be in. 

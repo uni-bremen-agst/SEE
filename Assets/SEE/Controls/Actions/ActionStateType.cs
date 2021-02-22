@@ -48,7 +48,7 @@ namespace SEE.Controls.Actions
             new ActionStateType(7, "Delete Node", "Deletes a node", 
                                 Color.yellow.Darker(), "Materials/ModernUIPack/Trash");
         public static ActionStateType Hide { get; } =
-           new ActionStateType(7, "Hide Node", "Hides a node",
+           new ActionStateType(8, "Hide Node", "Hides a node",
                                Color.yellow.Darker(), "Materials/ModernUIPack/Trash");
         #endregion
 
