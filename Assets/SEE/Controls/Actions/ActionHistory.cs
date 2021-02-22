@@ -81,6 +81,12 @@ public class ActionHistory : MonoBehaviour
             Debug.LogError("null operation");
         }
 
+
+        foreach (GameObject g in actionHistoryObjects)
+        {
+            Debug.Log(g.name + "im actionHistOb");
+
+        } 
         SEECity city;
         actionHistoryObjects[0].TryGetComponent(out NodeRef nodeRef2);
         city = SceneQueries.GetCodeCity(actionHistoryObjects[0].transform)?.gameObject.GetComponent<SEECity>();
@@ -110,8 +116,9 @@ public class ActionHistory : MonoBehaviour
                 {
                     actionHistoryObject.GetComponent<Collider>().enabled = false;
                 }
+                if (!NodesAndascendingEdges.Contains(actionHistoryObject)) {
                 NodesAndascendingEdges.Add(actionHistoryObject);
-
+                }
             }
 
             foreach (GameObject go in actionHistoryObjects)
@@ -149,7 +156,7 @@ public class ActionHistory : MonoBehaviour
 
         // FIXME(Mr. Frenzel): justNodes currently 
         oldPosition.AddLast(oldPositions);
-        actionHistory.AddLast(actionHistoryObjects);
+        actionHistory.AddLast(NodesAndascendingEdges);
         // parentCities.AddLast(gameObjectCity);
     }
 
@@ -161,6 +168,15 @@ public class ActionHistory : MonoBehaviour
         List<Vector3> oldPositionVector = oldPosition.Last();
         List<GameObject> undo = actionHistory.Last();
         undo.Reverse();
+
+        foreach (List<GameObject> goList in actionHistory)
+        {
+
+            foreach (GameObject go in goList)
+            {
+                Debug.Log("golistenName" + go.name);
+            }
+        }
 
 
         foreach (GameObject go in undo)
@@ -182,6 +198,9 @@ public class ActionHistory : MonoBehaviour
             }
         }
         actionHistory.RemoveLast();
+
+        
+        Debug.Log(actionHistory.Count + "count der ActHistList");
         oldPosition.RemoveLast();
         return oldPositionVector;
     }
