@@ -24,7 +24,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.DataModel
+namespace SEE.Utils
 {
     [Serializable]
     public class ParsedJLG

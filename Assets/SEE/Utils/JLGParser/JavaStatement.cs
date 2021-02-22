@@ -25,7 +25,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-namespace SEE.DataModel
+namespace SEE.Utils
 {
     /// <summary>
     /// A JavaStatement represents a single logged executed line of Java code. It contains the location, which is a numeric value that can be looked up 
