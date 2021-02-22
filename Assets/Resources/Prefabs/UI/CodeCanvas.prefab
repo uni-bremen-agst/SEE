@@ -914,7 +914,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 1.84}
+  m_AnchoredPosition: {x: 0, y: 1.8399963}
   m_SizeDelta: {x: 800, y: 600}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &8146208787414380059
@@ -1067,8 +1067,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8146208787045684849}
   m_HandleRect: {fileID: 8146208787045684854}
   m_Direction: 2
-  m_Value: 0.5000001
-  m_Size: 0.6833416
+  m_Value: 0.5000044
+  m_Size: 0.6833417
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1303,18 +1303,18 @@ MonoBehaviour:
       m_Calls: []
   m_text: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque non dolor
     dictum, vestibulum diam ut, pellentesque tortor. Nullam eget justo tellus. Cras
-    faucibus dui in dictum vestibulum. Fusce nisl lorem, maximus et ante in, feugiat
-    suscipit tortor. Orci varius natoque penatibus et magnis dis parturient montes,
-    nascetur ridiculus mus. Maecenas rhoncus, dolor at tincidunt eleifend, nulla
-    lorem egestas erat, et posuere massa justo at enim. Class aptent taciti sociosqu
-    ad litora torquent per conubia nostra, per inceptos himenaeos. Pellentesque nisl
-    libero, lobortis laoreet molestie in, bibendum et enim. Cras a nisi ullamcorper,
-    gravida massa eget, feugiat orci. Mauris eget augue sodales, maximus nunc at,
-    vestibulum libero. Pellentesque posuere enim est, nec aliquet nisl posuere id.
-    Sed dictum, urna aliquam eleifend mattis, sapien lectus malesuada velit, a malesuada
-    mauris lorem in tellus. Sed accumsan imperdiet augue, a euismod sapien rhoncus
-    nec. Donec sodales enim eget pulvinar dapibus. Vivamus et tellus viverra augue
-    faucibus imperdiet vel eget lorem.
+    faucibus dui in dictum vestibulum. Fusce nisl lorem, maximus et ante in, suscipit
+    tortor. Orci varius natoque penatibus et magnis dis parturient montes, nascetur
+    ridiculus mus. Maecenas rhoncus, dolor at tincidunt eleifend, nulla lorem egestas
+    erat, et posuere massa justo at enim. Class aptent taciti sociosqu ad litora
+    torquent per conubia nostra, per inceptos himenaeos. Pellentesque nisl libero,
+    lobortis laoreet molestie in, bibendum et enim. Cras a nisi ullamcorper, gravida
+    massa eget, feugiat orci. Mauris eget augue sodales, maximus nunc at, vestibulum
+    libero. Pellentesque posuere enim est, nec aliquet nisl posuere id. Sed dictum,
+    urna aliquam eleifend mattis, sapien lectus malesuada velit, a malesuada mauris
+    lorem in tellus. Sed accumsan imperdiet augue, a euismod sapien rhoncus nec.
+    Donec sodales enim eget pulvinar dapibus. Vivamus et tellus viverra augue faucibus
+    imperdiet vel eget lorem.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 92937507b904a7642830aa23bef85941, type: 2}
   m_sharedMaterial: {fileID: 21347512826212414, guid: 92937507b904a7642830aa23bef85941,
