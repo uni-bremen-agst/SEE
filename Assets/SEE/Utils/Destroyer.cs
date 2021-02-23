@@ -53,8 +53,8 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Destroys given <paramref name="gameObject"/> with all its attached children
-        /// and incoming and outgoing edges. This method is intended to be used for
+        /// Destroys given <paramref name="gameObject"/> with all its incoming and outgoing 
+        /// edges and recursively all its ancestors. This method is intended to be used for
         /// game objects representing graph nodes having a component 
         /// <see cref=">SEE.DataModel.NodeRef"/>. If the <paramref name="gameObject"/> 
         /// does not have a <see cref=">SEE.DataModel.NodeRef"/> component, nothing
@@ -63,9 +63,10 @@ namespace SEE.Utils
         /// <param name="gameObject">game object to be destroyed</param>
         public static void DestroyGameObjectWithChildren(GameObject gameObject)
         {
-            if (gameObject.TryGetComponent(out NodeRef nodeRef))
+            if (gameObject.TryGetComponent(out NodeRef _))
             {
-                for (int i = 0; i < gameObject.transform.childCount; i++) {
+                for (int i = 0; i < gameObject.transform.childCount; i++) 
+                {
                     GameObject child = gameObject.transform.GetChild(i).gameObject;
                     DestroyGameObjectWithChildren(child);
                 }
