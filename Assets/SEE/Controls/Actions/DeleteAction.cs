@@ -78,10 +78,11 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Deletes given <paramref GameObject="selectedObject"/> with Children or without depending
-        /// on if the selectedObject is a Edge or a Node.
+        /// Deletes given <paramref GameObject="selectedObject"/> assumed to be either an
+        /// edge or node. If it represents a node, the incoming and outgoing edges and
+        /// its ancestors will be destroyed, too. 
         /// </summary>
-        /// <param GameObject="selectedObject">selected GameObject that should get destroyed</param>
+        /// <param GameObject="selectedObject">selected GameObject that should be destroyed</param>
         public static void DeleteSelectedObject(GameObject selectedObject)
         {
             if (selectedObject != null)
