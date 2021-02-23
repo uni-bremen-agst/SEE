@@ -51,8 +51,8 @@ namespace SEE.Controls.Actions
             string inputNodetype = inputtype.text;
             // until here 
 
-            AddNodeAction.Nodename = inputNodename;
-            AddNodeAction.Nodetype = inputNodetype;
+            AddNodeAction.NodeName = inputNodename;
+            AddNodeAction.NodeType = inputNodetype;
         }
     }
 }

@@ -1,7 +1,5 @@
-﻿using System.Linq;
-using Michsky.UI.ModernUIPack;
-using SEE.GO;
-using UnityEngine;
+﻿using Michsky.UI.ModernUIPack;
+using TMPro;
 
 namespace SEE.Game.UI
 {
@@ -11,50 +9,48 @@ namespace SEE.Game.UI
     public partial class SelectionMenu
     {
         /// <summary>
-        /// Path to the prefab containing the horizontal selector for the active selection.
+        /// The entry which is visually marked as selected.
+        /// May be different from <see cref="GetActiveEntry"/>:
+        /// In this case, the visuals will be updated accordingly
+        /// and this variable will be set to <see cref="GetActiveEntry"/>.
         /// </summary>
-        private const string SELECTOR_PREFAB = "Prefabs/UI/EntrySelector";
-
-        /// <summary>
-        /// Name of the game object created from the EntrySelector prefab.
-        /// </summary>
-        private const string SELECTOR_NAME = "Entry Selector";
-
+        private ToggleMenuEntry currentSelectedEntry;
+        
         protected override void SetUpDesktopContent()
         {
-            if (MenuGameObject.transform.Find("Main Content").gameObject.TryGetComponentOrLog(out RectTransform rect))
+            base.SetUpDesktopContent();
+            // Changes in comparison to the base method: 
+            // 1. selecting an entry will close the menu
+            // 2. the selected entry is highlighted
+            foreach (ButtonManagerBasicWithIcon buttonManager in ButtonManagers)
             {
-                // Resize menu content to not have as much empty space as is necessary in a normal menu
-                rect.sizeDelta = new Vector2(rect.sizeDelta.x, rect.sizeDelta.y / 2);
+                buttonManager.clickEvent.AddListener(ToggleMenu);
             }
-            
-            // Create selector if it doesn't exist yet
-            GameObject selectorGO = MenuContent.transform.Find(SELECTOR_NAME)?.gameObject;
-            if (!selectorGO)
-            {
-                Object selectorPrefab = Resources.Load<GameObject>(SELECTOR_PREFAB);
-                selectorGO = Instantiate(selectorPrefab, MenuContent.transform, false) as GameObject;
-                UnityEngine.Assertions.Assert.IsNotNull(selectorGO);
-                selectorGO.name = SELECTOR_NAME;
-            }
+        }
 
-            if (!selectorGO.TryGetComponentOrLog(out HorizontalSelector selector))
+        protected override void UpdateDesktop()
+        {
+            base.UpdateDesktop();
+            // Only change when a different entry has been selected
+            if (currentSelectedEntry != GetActiveEntry())
             {
-                return;
+                currentSelectedEntry = GetActiveEntry();
+                foreach (ButtonManagerBasicWithIcon manager in ButtonManagers)
+                {
+                    // Indicate selected button by typesetting it [LIKE THIS]
+                    if (manager.buttonText.Equals(currentSelectedEntry.Title))
+                    {
+                        manager.buttonText = $"[{currentSelectedEntry.Title}]";
+                        manager.normalText.fontStyle = FontStyles.UpperCase;
+                    }
+                    else
+                    {
+                        manager.buttonText = manager.buttonText.TrimStart('[').TrimEnd(']');
+                        manager.normalText.fontStyle = 0;
+                    }
+                    manager.normalText.text = manager.buttonText;
+                }
             }
-            
-            // Initialize selector entries
-            foreach (ToggleMenuEntry entry in Entries.Where(x => x.Enabled))
-            {
-                selector.CreateNewItem(entry.Title);
-                //TODO: Other entry attributes are not used (color, icon...)
-            }
-
-            // Set index to active entry so that it's selected
-            selector.index = Entries.IndexOf(Entries.First(x => x.Active));
-            selector.SetupSelector();
-            
-            selector.selectorEvent.AddListener(SelectEntry);
         }
     }
 }
