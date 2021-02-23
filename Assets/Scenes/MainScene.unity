@@ -458,7 +458,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GONode: {fileID: 0}
-  rootPostion: {x: 0, y: 0, z: 0}
+  rootPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &186778480
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1122,15 +1122,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 429506, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -38
       objectReference: {fileID: 0}
     - target: {fileID: 429506, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 3.25
       objectReference: {fileID: 0}
     - target: {fileID: 429506, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -633
       objectReference: {fileID: 0}
     - target: {fileID: 429506, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
       propertyPath: m_LocalRotation.x
@@ -1561,7 +1561,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GONode: {fileID: 0}
-  rootPostion: {x: 0, y: 0, z: 0}
+  rootPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &844967662
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1860,7 +1860,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GONode: {fileID: 0}
-  rootPostion: {x: 0, y: 0, z: 0}
+  rootPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &1046553566
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2695,7 +2695,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GONode: {fileID: 0}
-  rootPostion: {x: 0, y: 0, z: 0}
+  rootPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &1566173687
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3317,6 +3317,10 @@ MonoBehaviour:
   EdgesAboveBlocks: 1
   Tension: 0.85
   RDP: 0.0001
+  TubularSegments: 50
+  Radius: 0.005
+  RadialSegments: 8
+  isEdgeSelectable: 0
   GXLPath:
     Root: 3
     relativePath: /mini/CodeFacts.gxl
@@ -4097,6 +4101,10 @@ MonoBehaviour:
   EdgesAboveBlocks: 1
   Tension: 0.85
   RDP: 0.0001
+  TubularSegments: 50
+  Radius: 0.005
+  RadialSegments: 8
+  isEdgeSelectable: 1
   GXLPath:
     Root: 3
     relativePath: /mini/Architecture.gxl
