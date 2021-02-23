@@ -65,10 +65,9 @@ namespace SEE.Utils
         {
             if (gameObject.TryGetComponent(out NodeRef _))
             {
-                for (int i = 0; i < gameObject.transform.childCount; i++) 
+                foreach (Transform child in gameObject.transform)
                 {
-                    GameObject child = gameObject.transform.GetChild(i).gameObject;
-                    DestroyGameObjectWithChildren(child);
+                    DestroyGameObjectWithChildren(child.gameObject);
                 }
                 DestroyEdges(gameObject);
                 DestroyGameObject(gameObject);
@@ -95,8 +94,8 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Searches through all childs of given <paramref name="gameObject"/>
-        /// and deletes all Edges attached to given childs.
+        /// Searches through all children of given <paramref name="gameObject"/>
+        /// and deletes all edges attached to given childs.
         /// 
         /// This method is intended to be used for game objects representing graph nodes
         /// having a component <see cref=">SEE.DataModel.NodeRef"/>. If the 
