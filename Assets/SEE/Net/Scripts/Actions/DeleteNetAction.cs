@@ -12,17 +12,18 @@ public class DeleteNetAction : AbstractAction
     // for the network transfer.
 
     /// <summary>
-    /// The gameObject that needs to be deleted
+    /// The unique name of the gameObject of a node or edge that needs to be deleted.
     /// </summary>
-    public string gameObject;
+    public string GameObjectID;
 
     /// <summary>
     /// Creates a new DeleteNetAction.
     /// </summary>
-    /// <param name="gameObject">the name of the gameObject that has to be deleted</param>
-    public DeleteNetAction(string gameObject)
+    /// <param name="gameObjectID">the unique name of the gameObject of a node or edge 
+    /// that has to be deleted</param>
+    public DeleteNetAction(string gameObjectID)
     {
-        this.gameObject = gameObject;
+        this.GameObjectID = gameObjectID;
     }
 
     /// <summary>
@@ -41,7 +42,7 @@ public class DeleteNetAction : AbstractAction
     {
         if (!IsRequester())
         {           
-            DeleteAction.DeleteSelectedObject(GameObject.Find(gameObject));
+            DeleteAction.DeleteSelectedObject(GameObject.Find(GameObjectID));
         }
     }
 }
