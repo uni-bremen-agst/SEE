@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SEE.DataModel;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.Utils;
@@ -45,6 +46,7 @@ namespace SEE.Game.UI.CodeWindow
             }
 
             canvas.worldCamera = Camera.main;
+            canvas.sortingLayerName = Tags.UI;  // necessary to display on top of CodeCity
 
             // Position and scale canvas in world
             rectTransform.sizeDelta = Resolution;
@@ -82,7 +84,7 @@ namespace SEE.Game.UI.CodeWindow
             }
             
             // Make canvas always face the camera
-            canvas.gameObject.AddComponent<CanvasFaceCamera>();
+            CodeCanvas.AddComponent<CanvasFaceCamera>();
         }
     }
 }
