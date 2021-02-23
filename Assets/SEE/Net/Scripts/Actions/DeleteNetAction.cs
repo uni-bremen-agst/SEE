@@ -17,7 +17,7 @@ public class DeleteNetAction : AbstractAction
     public string gameObject;
 
     /// <summary>
-    /// Creates a new NewNodeNetAction
+    /// Creates a new DeleteNetAction.
     /// </summary>
     /// <param name="gameObject">the name of the gameObject that has to be deleted</param>
     public DeleteNetAction(string gameObject)
