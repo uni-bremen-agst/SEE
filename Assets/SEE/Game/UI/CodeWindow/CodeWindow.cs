@@ -9,7 +9,7 @@ namespace SEE.Game.UI.CodeWindow
     /// Represents a movable, scrollable window containing source code.
     /// The source code may either be entered manually or read from a file.
     /// </summary>
-    public class CodeWindow: PlatformDependentComponent
+    public partial class CodeWindow: PlatformDependentComponent
     {
         /// <summary>
         /// The text displayed in the code window.
@@ -37,9 +37,30 @@ namespace SEE.Game.UI.CodeWindow
         public float FontSize = 20f;
 
         /// <summary>
+        /// Resolution of the code window. By default, this is set to a resolution of 800x600.
+        /// </summary>
+        public Vector2 Resolution = new Vector2(800, 400);
+
+        /// <summary>
+        /// How wide the canvas should be in the world (in meters). Default is one meter.
+        /// This will not affect the <see cref="Resolution"/>, the canvas will simply be scaled appropriately.
+        /// </summary>
+        public float WorldWidth = 1;
+
+        /// <summary>
+        /// GameObject containing the code canvas, which in turn contains this code window.
+        /// </summary>
+        private GameObject CodeCanvas;
+
+        /// <summary>
         /// Name for the code windows group game object.
         /// </summary>
         private const string CODE_WINDOWS_NAME = "Code Windows";
+
+        /// <summary>
+        /// Path to the code canvas prefab.
+        /// </summary>
+        private const string CODE_CANVAS_PREFAB = "Prefabs/UI/CodeCanvas";
 
         /// <summary>
         /// Populates the code window with the contents of the given file.
@@ -55,12 +76,13 @@ namespace SEE.Game.UI.CodeWindow
             }
 
             int neededPadding = $"{text.Length}".Length;
+            Text = "";
             for (int i = 0; i < text.Length; i++)
             {
                 // Add whitespace next to line number so it's consistent
-                Text = string.Join("", Enumerable.Repeat(" ", neededPadding-$"{i}".Length));
+                Text += string.Join("", Enumerable.Repeat(" ", neededPadding-$"{i}".Length));
                 // Line number will be typeset in yellow to distinguish it from the rest
-                Text += $"<color=\"yellow\">{i}</color> <noparse>{text}</noparse>\n";
+                Text += $"<color=\"yellow\">{i}</color> <noparse>{text[i]}</noparse>\n";
             }
         }
 
@@ -77,24 +99,6 @@ namespace SEE.Game.UI.CodeWindow
             }
 
             EnterFromText(File.ReadAllLines(filename));
-        }
-
-        protected override void StartDesktop()
-        {
-            if (Title == null || Text == null)
-            {
-                Debug.LogError("Title and text must be defined when setting up CodeWindow!\n");
-                return;
-            }
-            
-            // We need to create a new world-space canvas instead of using the existing one.
-            // Since this is done for each one, we'll group them together.
-            GameObject group = GameObject.Find(CODE_WINDOWS_NAME);
-            if (group == null)
-            {
-                group = new GameObject {name = CODE_WINDOWS_NAME};
-            }
-            //TODO: Create new code canvas from prefab
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using SEE.Controls.Actions;
 using SEE.Game.UI;
+using SEE.Game.UI.CodeWindow;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -96,6 +97,12 @@ namespace SEE.GO.Menu
             ActionState.OnStateChanged += OnStateChanged;
             Assert.IsTrue(ActionStateType.AllTypes.Count <= 9, 
                           "Only up to 9 (10 if zero is included) entries can be selected via the numbers on the keyboard!");
+            
+            //TODO remove this! this is just here temporarily to test the code window!
+            CodeWindow window = gameObject.AddComponent<CodeWindow>();
+            window.Title = "Hello!";
+            window.EnterFromFile(@"C:\Users\drasa\Documents\SEE\Data\GXL\TestProjectToDebug\Main.java");
+            window.Anchor = GameObject.Find("Implementation");
         }
         
         /// <summary>
