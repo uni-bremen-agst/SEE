@@ -72,6 +72,21 @@ namespace SEE.Controls.Actions
             if (selectedObject != null) // Input.GetMouseButtonDown(0) && 
             {
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
+                new DeleteNetAction(selectedObject.name).Execute(null);
+                DeleteSelectedObject(selectedObject);
+            }
+        }
+
+        /// <summary>
+        /// Deletes given <paramref GameObject="selectedObject"/> assumed to be either an
+        /// edge or node. If it represents a node, the incoming and outgoing edges and
+        /// its ancestors will be destroyed, too. 
+        /// </summary>
+        /// <param GameObject="selectedObject">selected GameObject that should be destroyed</param>
+        public static void DeleteSelectedObject(GameObject selectedObject)
+        {
+            if (selectedObject != null)
+            {
                 if (selectedObject.CompareTag(Tags.Edge))
                 {
                     Destroyer.DestroyGameObject(selectedObject);
