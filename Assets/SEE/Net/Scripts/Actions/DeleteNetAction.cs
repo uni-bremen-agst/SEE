@@ -44,6 +44,4 @@ public class DeleteNetAction : AbstractAction
             DeleteAction.DeleteSelectedObject(GameObject.Find(gameObject));
         }
     }
-
-    
 }
