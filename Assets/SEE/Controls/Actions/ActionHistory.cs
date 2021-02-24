@@ -13,21 +13,19 @@ public class ActionHistory : MonoBehaviour
     /// <summary>
     /// 
     /// </summary>
-    public LinkedList<List<GameObject>> actionHistory = new LinkedList<List<GameObject>>();
+    /// 
+    //FIXME: deletedNodeHistory..?
+    public LinkedList<List<GameObject>> deletedObjectHistory = new LinkedList<List<GameObject>>();
 
     /// <summary>
     /// 
     /// </summary>
-    private LinkedList<List<Vector3>> oldPosition = new LinkedList<List<Vector3>>();
+    private LinkedList<List<Vector3>> oldPositionHistory = new LinkedList<List<Vector3>>();
 
     /// <summary>
     /// 
     /// </summary>
-    private LinkedList<GameObject> parentCities = new LinkedList<GameObject>();
-
-    /// <summary>
-    /// 
-    /// </summary>
+    //FIXME: deletedEdgesHistory..?
     private LinkedList<List<GameObject>> allEdges = new LinkedList<List<GameObject>>();
 
     /// <summary>
@@ -85,21 +83,19 @@ public class ActionHistory : MonoBehaviour
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="actionHistoryObjects"></param>
-    /// <param name="oldPositions"></param>
-    public void SaveObjectForUndo(List<GameObject> actionHistoryObjects, List<Vector3> oldPositions)
+    /// <param name="deletedNodes"></param>
+    /// <param name="oldPositionsOfDeletedNodes"></param>
+    public void SaveObjectForUndo(List<GameObject> deletedNodes, List<Vector3> oldPositionsOfDeletedNodes)
     {
-        SEECity city;
-        city = SceneQueries.GetCodeCity(actionHistoryObjects[0].transform)?.gameObject.GetComponent<SEECity>();
+        SEECity city = SceneQueries.GetCodeCity(deletedNodes[0].transform)?.gameObject.GetComponent<SEECity>();
         graph = city.LoadedGraph;
         List<GameObject> nodesAndascendingEdges = new List<GameObject>();
         List<GameObject> edgesToHide = new List<GameObject>();
 
-        foreach (GameObject actionHistoryObject in actionHistoryObjects)
+        foreach (GameObject actionHistoryObject in deletedNodes)
         {
             if (actionHistoryObject.TryGetComponent(out NodeRef nodeRef))
             {
-
                 HashSet<string> edgeIDs = Destroyer.GetEdgeIds(nodeRef);
                 foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
                 {
@@ -123,26 +119,25 @@ public class ActionHistory : MonoBehaviour
                 {
                     actionHistoryObject.GetComponent<Collider>().enabled = false;
                 }
+
                 nodesAndascendingEdges.Add(actionHistoryObject);
             }
         }
 
-        List<GameObject> tmp = actionHistoryObjects;
-        tmp.Reverse();
-
+        List<GameObject> deletedNodesReverse = deletedNodes;
+        deletedNodesReverse.Reverse();
         //deleting all children of node
-        foreach (GameObject g in tmp)
+        foreach (GameObject deletedNode in deletedNodesReverse)
         {
-            g.TryGetComponent(out NodeRef nodeRef);
+            deletedNode.TryGetComponent(out NodeRef nodeRef);
             graph.RemoveNode(nodeRef.Value);
         }
 
-        city.LoadedGraph = graph; // FIXME: Necessary?
         allEdges.AddLast(edgesToHide);
-        oldPositions.Reverse();
+        oldPositionsOfDeletedNodes.Reverse();
         nodesAndascendingEdges.Reverse();
-        oldPosition.AddLast(oldPositions);
-        actionHistory.AddLast(nodesAndascendingEdges);
+        oldPositionHistory.AddLast(oldPositionsOfDeletedNodes);
+        deletedObjectHistory.AddLast(nodesAndascendingEdges);
     }
 
     /// <summary>
@@ -150,48 +145,34 @@ public class ActionHistory : MonoBehaviour
     /// </summary>
     public List<Vector3> UndoDeleteOperation()
     {
-        List<Vector3> oldPositionVector = oldPosition.Last();
-        List<GameObject> undo = actionHistory.Last();
-
-        foreach (GameObject go in undo)
+        foreach (GameObject node in deletedObjectHistory.Last())
         {
-            if (go.TryGetComponent(out NodeRef nodeRef))
+            if (node.TryGetComponent(out NodeRef nodeRef))
             {
                 graph.AddNode(nodeRef.Value);
-
             }
 
-            if (go.TryGetComponent(out Collider collider))
+            if (node.TryGetComponent(out Collider collider))
             {
-                go.GetComponent<Collider>().enabled = true;
+                node.GetComponent<Collider>().enabled = true;
             }
         }
 
-        foreach (GameObject edgeTobeShown in allEdges.Last())
+        foreach (GameObject edge in allEdges.Last())
         {
-            if (edgeTobeShown.TryGetComponent(out EdgeRef edgeReference))
+            if (edge.TryGetComponent(out EdgeRef edgeReference))
             {
                 graph.AddEdge(edgeReference.edge);
-                edgeTobeShown.SetVisibility(true, false);
+                edge.SetVisibility(true, false);
             }
         }
 
         allEdges.RemoveLast();
-        actionHistory.RemoveLast();
-        oldPosition.RemoveLast();
-        return oldPositionVector;
+        deletedObjectHistory.RemoveLast();
+        oldPositionHistory.RemoveLast();
 
-    }
+        return oldPositionHistory.Last();
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public GameObject GetPortalFromGarbageObjects()
-    {
-        GameObject parent = parentCities.Last();
-        parentCities.RemoveLast();
-        return parent;
     }
 
     /// <summary>

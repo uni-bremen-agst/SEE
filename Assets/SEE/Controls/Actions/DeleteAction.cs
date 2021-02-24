@@ -106,7 +106,7 @@ namespace SEE.Controls.Actions
             {
                 try
                 {
-                    List<GameObject> objectToBeMoved = actionHistory.actionHistory.Last();
+                    List<GameObject> objectToBeMoved = actionHistory.deletedObjectHistory.Last();
                     StartCoroutine(RemoveNodeFromGarbage(objectToBeMoved));
                 }
                 catch (InvalidOperationException)
