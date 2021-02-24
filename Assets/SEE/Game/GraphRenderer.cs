@@ -874,35 +874,36 @@ namespace SEE.Game
         /// <paramref name="root"/></param>
         private void RemoveRootIfNecessary(ref Node root, Graph graph, Dictionary<Node, GameObject> nodeMap, ICollection<GameNode> layoutNodes)
         {
-            return; // FIXME: temporarily disabled because the current implementation of the 
-                    // custom shader for culling all city objects falling off the plane assumes 
-                    // that there is exactly one root node of the graph.
+            return; 
+            // FIXME: temporarily disabled because the current implementation of the 
+            // custom shader for culling all city objects falling off the plane assumes 
+            // that there is exactly one root node of the graph.
 
-            if (root is object)
-            {
-                if (layoutNodes != null)
-                {
-                    // Remove from layout
-                    GameNode toBeRemoved = null;
-                    foreach (GameNode layoutNode in layoutNodes)
-                    {
-                        if (layoutNode.ID.Equals(root.ID))
-                        {
-                            toBeRemoved = layoutNode;
-                            break;
-                        }
-                    }
-                    if (toBeRemoved != null)
-                    {
-                        layoutNodes.Remove(toBeRemoved);
-                    }
-                }
-                GameObject go = nodeMap[root];
-                nodeMap.Remove(root);
-                graph.RemoveNode(root);
-                Destroyer.DestroyGameObject(go);
-                root = null;
-            }
+            //if (root is object)
+            //{
+            //    if (layoutNodes != null)
+            //    {
+            //        // Remove from layout
+            //        GameNode toBeRemoved = null;
+            //        foreach (GameNode layoutNode in layoutNodes)
+            //        {
+            //            if (layoutNode.ID.Equals(root.ID))
+            //            {
+            //                toBeRemoved = layoutNode;
+            //                break;
+            //            }
+            //        }
+            //        if (toBeRemoved != null)
+            //        {
+            //            layoutNodes.Remove(toBeRemoved);
+            //        }
+            //    }
+            //    GameObject go = nodeMap[root];
+            //    nodeMap.Remove(root);
+            //    graph.RemoveNode(root);
+            //    Destroyer.DestroyGameObject(go);
+            //    root = null;
+            //}
         }
 
         /// <summary>
