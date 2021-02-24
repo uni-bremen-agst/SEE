@@ -1,5 +1,4 @@
-﻿using SEE.Controls.Actions;
-using SEE.DataModel;
+﻿using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
@@ -187,9 +186,8 @@ public class ActionHistory : MonoBehaviour
     /// </summary>
     /// <param name="counter"></param>
     /// <param name="states"></param>
-    private static void CheckBoundaries(int counter, LinkedList<ActionState.Type> states)
+    private static void CheckBoundaries(int counter)
     {
-        if (counter == 0 || counter > states.Count)
         {
 
             throw new NotSupportedException("Redo function cannot be executed");

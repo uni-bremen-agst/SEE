@@ -204,7 +204,7 @@ namespace SEE.Controls.Actions
                     }
                 }
 
-                if (!actionState.drag && ActionState.Value != ActionState.Type.Map)
+                if (!actionState.drag && !Equals(ActionState.Value, ActionStateType.Map))
                 {
                     actionState.zoomToggleToObject |= Input.GetKeyDown(KeyCode.F);
 
@@ -214,7 +214,7 @@ namespace SEE.Controls.Actions
                     }
                 }
 
-                if (ActionState.Value == ActionState.Type.Rotate && cursor.HasFocus())
+                if (Equals(ActionState.Value, ActionStateType.Rotate) && cursor.HasFocus())
                 {
                     rotateState.rotateGizmo.Center = cursor.GetPosition();
                     rotateState.rotateGizmo.Radius = 0.2f * (MainCamera.Camera.transform.position - rotateState.rotateGizmo.Center).magnitude;
@@ -240,7 +240,7 @@ namespace SEE.Controls.Actions
 
             #region Move City
 
-            else if (ActionState.Value == ActionState.Type.Move)
+            else if (Equals(ActionState.Value, ActionStateType.Move))
             {
                 if (actionState.reset) // reset to center of table
                 {
@@ -366,7 +366,7 @@ namespace SEE.Controls.Actions
 
             #region Rotate
 
-            else if (ActionState.Value == ActionState.Type.Rotate)
+            else if (Equals(ActionState.Value, ActionStateType.Rotate))
             {
                 if (actionState.reset) // reset rotation to identity();
                 {
@@ -559,14 +559,14 @@ namespace SEE.Controls.Actions
             #endregion
         }
 
-        private void OnStateChanged(ActionState.Type value)
+        private void OnStateChanged(ActionStateType value)
         {
             movingOrRotating = false;
-            if (value == ActionState.Type.Move)
+            if (Equals(value, ActionStateType.Move))
             {
                 rotateState.rotateGizmo?.gameObject.SetActive(false);
             }
-            else if (value == ActionState.Type.Rotate)
+            else if (Equals(value, ActionStateType.Rotate))
             {
                 moveState.moveGizmo?.gameObject.SetActive(false);
             }
@@ -577,7 +577,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="degrees">The angle in degrees.</param>
         /// <returns>The angle in the range [0, 360) degrees.</returns>
-        private float AngleMod(float degrees)
+        private static float AngleMod(float degrees)
         {
             return ((degrees % 360.0f) + 360.0f) % 360.0f;
         }
@@ -651,7 +651,7 @@ namespace SEE.Controls.Actions
                     portalPlane.LeftFrontCorner,
                     portalPlane.RightBackCorner,
                     out float distanceFromPoint,
-                    out Vector2 normalizedFromPointToSurfaceDirection
+                    out Vector2 _
                 );
                 insideClippingArea = distanceFromPoint < 0.0f;
             }
