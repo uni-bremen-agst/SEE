@@ -3,10 +3,12 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class ActionHistory : MonoBehaviour
 {
@@ -19,6 +21,7 @@ public class ActionHistory : MonoBehaviour
 
     private Graph graph;
 
+    int count = 0; 
     List<GameObject> childsOfParent = new List<GameObject>();
 
     public List<GameObject> ChildsOfParent { get => childsOfParent; set => childsOfParent = value; }
@@ -75,6 +78,9 @@ public class ActionHistory : MonoBehaviour
     public void SaveObjectForUndo(List<GameObject> actionHistoryObjects, List<Vector3> oldPositions)
     {
         //question to goedecke: when should this case be reached ? Maybe delete it ? At least selected object is inside
+
+        // context given: never to be honest - it is more like a defensive programming habit.
+        // there only might be null when the method of deleteAction.cs is moved...
         if (actionHistoryObjects == null)
         {
             Debug.LogError("null operation");
@@ -89,48 +95,35 @@ public class ActionHistory : MonoBehaviour
         {
             if (actionHistoryObject.TryGetComponent(out NodeRef nodeRef))
             {
-                // goedecke-code
-                //HashSet<string> edgeIDs = Destroyer.GetEdgeIds(nodeRef);
-                //         foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
-                //         {
-                //             Debug.Log("EDGES!");
-                //             if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
-                //             {
-                //                 edge.SetVisibility(false, true);
-                //                  if (NodesAndascendingEdges.Contains(edge) == false)
-                //                 {
-                //                     NodesAndascendingEdges.Add(edge);
-                //               }
-                //            }
-                //        }
+        
+                HashSet<string> edgeIDs = Destroyer.GetEdgeIds(nodeRef);
+                         foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
+                         {
+                            
+                             if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
+                             {
+                               edge.SetVisibility(false, true);
+                                  if (nodesAndascendingEdges.Contains(edge) == false)
+                                 {
+                                     nodesAndascendingEdges.Add(edge);
+                                 }
 
-                //   if (actionHistoryObject.TryGetComponent(out Collider collider))
-                // {
-                // actionHistoryObject.GetComponent<Collider>().enabled = false;
-                // }
+
+                        edge.TryGetComponent(out EdgeRef edgeRef);
+                        graph.RemoveEdge(edgeRef.edge);
+                        oldPositions.Add(edge.transform.position);     
+                        }
+                    }
+
+                   if (actionHistoryObject.TryGetComponent(out Collider collider))
+                 {
+                 actionHistoryObject.GetComponent<Collider>().enabled = false;
+                 }
                 nodesAndascendingEdges.Add(actionHistoryObject);
             }
         }
 
-        foreach (GameObject go in actionHistoryObjects)
-        {
-            go.TryGetComponent(out NodeRef node);
-            List<Edge> incoming = node.Value.Incomings;
-            List<Edge> outgoing = node.Value.Outgoings;
-
-            for (int i = 0; i < incoming.Count; i++)
-            {
-                // FIXME: DOESNT WORK BECAUSE MULTIPLE ADDING OF SOME EDGES IF THEY ARE INCOMING AND OUTGOING
-                //  graph.RemoveEdge(incoming.ElementAt(i));
-                //  Debug.Log(incoming);
-            }
-            for (int i = 0; i < outgoing.Count; i++)
-            {
-                // FIXME: DOESNT WORK BECAUSE MULTIPLE ADDING OF SOME EDGES IF THEY ARE INCOMING AND OUTGOING
-                //graph.RemoveEdge(outgoing.ElementAt(i));
-                // Debug.Log(outgoing);
-            }
-        }
+       
 
         List<GameObject> tmp = actionHistoryObjects;
         tmp.Reverse();
@@ -142,6 +135,7 @@ public class ActionHistory : MonoBehaviour
             graph.RemoveNode(nodeRef.Value);
         }
 
+        city.LoadedGraph = graph; // FIXME: Necessary?
         oldPositions.Reverse();
         nodesAndascendingEdges.Reverse();
         oldPosition.AddLast(oldPositions);
@@ -164,15 +158,17 @@ public class ActionHistory : MonoBehaviour
             }
 
             if (go.TryGetComponent(out EdgeRef edgeReference))
-            {
-                // graph.AddEdge(edgeReference.edge);
-                //go.SetVisibility(true, false);
+            {            
+                graph.AddEdge(edgeReference.edge);
+                go.SetVisibility(true, false);
             }
 
         }
+
         actionHistory.RemoveLast();
         oldPosition.RemoveLast();
         return oldPositionVector;
+        
     }
 
     /// <summary>
