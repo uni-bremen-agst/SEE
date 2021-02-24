@@ -122,14 +122,12 @@ namespace SEE.Controls.Actions
                     List<GameObject> objectToBeMoved = actionHistory.actionHistory.Last();
                     StartCoroutine(RemoveNodeFromGarbage(objectToBeMoved));
                 }
-                catch(InvalidOperationException)
+                catch (InvalidOperationException)
                 {
                     Debug.Log("No history");
                 }
             }
         }
-
-
 
         /// <summary>
         /// 
@@ -142,22 +140,21 @@ namespace SEE.Controls.Actions
 
             foreach (GameObject deletedNode in deletedNodes)
             {
-                if (deletedNode.CompareTag(Tags.Node)) {
-                    
+                if (deletedNode.CompareTag(Tags.Node))
+                {
                     float tmpx = deletedNode.transform.position.x;
                     float tmpy = deletedNode.transform.position.y;
                     float tmpz = deletedNode.transform.position.z;
                     oldPositions.Add(new Vector3(tmpx, tmpy, tmpz));
                     Portal.SetInfinitePortal(deletedNode);
-
                 }
-                
             }
 
             foreach (GameObject deletedNode in deletedNodes)
             {
                 Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
             }
+
             yield return new WaitForSeconds(1.0f);
 
             foreach (GameObject deletedNode in deletedNodes)
@@ -167,6 +164,7 @@ namespace SEE.Controls.Actions
                     Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), 1f);
                 }
             }
+
             yield return new WaitForSeconds(1.0f);
             actionHistory.SaveObjectForUndo(deletedNodes, oldPositions);
         }
@@ -181,20 +179,20 @@ namespace SEE.Controls.Actions
             List<Vector3> oldPosition = actionHistory.UndoDeleteOperation();
             for (int i = 0; i < deletedNodes.Count; i++)
             {
-                
+
                 if (deletedNodes[i].CompareTag(Tags.Node))
                 {
                     Tweens.Move(deletedNodes[i], new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
-               }
+                }
             }
 
             yield return new WaitForSeconds(1.2f);
 
             for (int i = 0; i < deletedNodes.Count; i++)
             {
-                if(deletedNodes[i].CompareTag(Tags.Node)) 
+                if (deletedNodes[i].CompareTag(Tags.Node))
                 {
-                Tweens.Move(deletedNodes[i], oldPosition[i], 1f);
+                    Tweens.Move(deletedNodes[i], oldPosition[i], 1f);
                 }
             }
 

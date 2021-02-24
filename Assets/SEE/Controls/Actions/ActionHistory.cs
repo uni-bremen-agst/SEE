@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 public class ActionHistory : MonoBehaviour
 {
@@ -23,7 +22,6 @@ public class ActionHistory : MonoBehaviour
 
     private Graph graph;
 
-    int count = 0; 
     List<GameObject> childsOfParent = new List<GameObject>();
 
     public List<GameObject> ChildsOfParent { get => childsOfParent; set => childsOfParent = value; }
@@ -79,15 +77,6 @@ public class ActionHistory : MonoBehaviour
     /// <param name="gameObjectCity"></param>
     public void SaveObjectForUndo(List<GameObject> actionHistoryObjects, List<Vector3> oldPositions)
     {
-        //question to goedecke: when should this case be reached ? Maybe delete it ? At least selected object is inside
-
-        // context given: never to be honest - it is more like a defensive programming habit.
-        // there only might be null when the method of deleteAction.cs is moved...
-        if (actionHistoryObjects == null)
-        {
-            Debug.LogError("null operation");
-        }
-
         SEECity city;
         city = SceneQueries.GetCodeCity(actionHistoryObjects[0].transform)?.gameObject.GetComponent<SEECity>();
         graph = city.LoadedGraph;
@@ -98,35 +87,33 @@ public class ActionHistory : MonoBehaviour
         {
             if (actionHistoryObject.TryGetComponent(out NodeRef nodeRef))
             {
-        
+
                 HashSet<string> edgeIDs = Destroyer.GetEdgeIds(nodeRef);
-                         foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
-                         {
-                            
-                             if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
-                             {
+                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
+                {
 
-                                 edge.SetVisibility(false, true);
+                    if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
+                    {
 
-                                  if (nodesAndascendingEdges.Contains(edge) == false)
-                                 {
-                                     edgesToHide.Add(edge);
-                                 }
-    
-                           edge.TryGetComponent(out EdgeRef edgeRef);
-                           graph.RemoveEdge(edgeRef.edge);
+                        edge.SetVisibility(false, true);
+
+                        if (nodesAndascendingEdges.Contains(edge) == false)
+                        {
+                            edgesToHide.Add(edge);
                         }
-                    }
 
-                   if (actionHistoryObject.TryGetComponent(out Collider collider))
-                 {
-                 actionHistoryObject.GetComponent<Collider>().enabled = false;
-                 }
+                        edge.TryGetComponent(out EdgeRef edgeRef);
+                        graph.RemoveEdge(edgeRef.edge);
+                    }
+                }
+
+                if (actionHistoryObject.TryGetComponent(out Collider collider))
+                {
+                    actionHistoryObject.GetComponent<Collider>().enabled = false;
+                }
                 nodesAndascendingEdges.Add(actionHistoryObject);
             }
         }
-
-       
 
         List<GameObject> tmp = actionHistoryObjects;
         tmp.Reverse();
@@ -152,14 +139,14 @@ public class ActionHistory : MonoBehaviour
     public List<Vector3> UndoDeleteOperation()
     {
         List<Vector3> oldPositionVector = oldPosition.Last();
-        List<GameObject> undo = actionHistory.Last(); 
+        List<GameObject> undo = actionHistory.Last();
 
         foreach (GameObject go in undo)
         {
             if (go.TryGetComponent(out NodeRef nodeRef))
             {
                 graph.AddNode(nodeRef.Value);
-               
+
             }
 
             if (go.TryGetComponent(out Collider collider))
@@ -181,7 +168,7 @@ public class ActionHistory : MonoBehaviour
         actionHistory.RemoveLast();
         oldPosition.RemoveLast();
         return oldPositionVector;
-        
+
     }
 
     /// <summary>
@@ -213,23 +200,6 @@ public class ActionHistory : MonoBehaviour
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="actionState"></param>
-    private static void InverActionStateExecute(ActionState.Type actionState)
-    {
-        // if actionstate == ADdNode 
-        // {
-        //  -->delete
-        //  }
-
-        //  if(ActionState == add)
-        //     {
-        //    --> AddNode();
-        //   }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
     /// <param name="removedObject"></param>
     private static void RemoveForReflexionAnalysis(GameObject removedObject)
     {
@@ -245,8 +215,4 @@ public class ActionHistory : MonoBehaviour
         //add edge or node - reparenting.
     }
 
-    public LinkedList<List<GameObject>> GetActionHistory()
-    {
-        return actionHistory;
-    }
 }
