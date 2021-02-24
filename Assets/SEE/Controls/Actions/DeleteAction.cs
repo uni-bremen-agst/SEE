@@ -100,19 +100,16 @@ namespace SEE.Controls.Actions
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
                 if (selectedObject.CompareTag(Tags.Edge))
                 {
-                    // selectedObject.GetComponent<ActionHistory>().saveObjectForUndo(selectedObject, ThisActionState);
+                    List<GameObject> edge = new List<GameObject>();
+                    edge.Add(selectedObject);
+                    actionHistory.SaveObjectForUndo(edge, new List<Vector3>());
                     // Destroyer.DestroyGameObject(selectedObject);
                 }
                 else if (selectedObject.CompareTag(Tags.Node))
                 {
                     List<GameObject> allNodesToBeDeleted = actionHistory.GetAllChildNodesAsGameObject(selectedObject);
                     List<GameObject> tmp = new List<GameObject>();
-                    tmp.Add(selectedObject);
-                    Debug.Log(selectedObject.transform.position);
-                    foreach (GameObject nodeTobeDeleted in allNodesToBeDeleted)
-                    {
-                        tmp.Add(nodeTobeDeleted);
-                    }
+                    tmp = allNodesToBeDeleted;
                     StartCoroutine(MoveNodeToGarbage(allNodesToBeDeleted));
                 }
             }
@@ -146,15 +143,21 @@ namespace SEE.Controls.Actions
             foreach (GameObject deletedNode in deletedNodes)
             {
                 if (deletedNode.CompareTag(Tags.Node)) {
-                    Portal.SetInfinitePortal(deletedNode);
+                    
                     float tmpx = deletedNode.transform.position.x;
                     float tmpy = deletedNode.transform.position.y;
                     float tmpz = deletedNode.transform.position.z;
                     oldPositions.Add(new Vector3(tmpx, tmpy, tmpz));
-                    Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
-                } 
+                    Portal.SetInfinitePortal(deletedNode);
+
+                }
+                
             }
 
+            foreach (GameObject deletedNode in deletedNodes)
+            {
+                Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
+            }
             yield return new WaitForSeconds(1.0f);
 
             foreach (GameObject deletedNode in deletedNodes)
