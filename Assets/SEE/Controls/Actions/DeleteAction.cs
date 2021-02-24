@@ -106,7 +106,13 @@ namespace SEE.Controls.Actions
                 else if (selectedObject.CompareTag(Tags.Node))
                 {
                     List<GameObject> allNodesToBeDeleted = actionHistory.GetAllChildNodesAsGameObject(selectedObject);
-                    List<GameObject> tmp = allNodesToBeDeleted;
+                    List<GameObject> tmp = new List<GameObject>();
+                    tmp.Add(selectedObject);
+                    Debug.Log(selectedObject.transform.position);
+                    foreach (GameObject nodeTobeDeleted in allNodesToBeDeleted)
+                    {
+                        tmp.Add(nodeTobeDeleted);
+                    }
                     StartCoroutine(MoveNodeToGarbage(allNodesToBeDeleted));
                 }
             }
@@ -172,10 +178,11 @@ namespace SEE.Controls.Actions
             List<Vector3> oldPosition = actionHistory.UndoDeleteOperation();
             for (int i = 0; i < deletedNodes.Count; i++)
             {
+                
                 if (deletedNodes[i].CompareTag(Tags.Node))
                 {
                     Tweens.Move(deletedNodes[i], new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
-                }
+               }
             }
 
             yield return new WaitForSeconds(1.2f);

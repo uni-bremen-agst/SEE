@@ -19,6 +19,8 @@ public class ActionHistory : MonoBehaviour
 
     private LinkedList<GameObject> parentCities = new LinkedList<GameObject>();
 
+    private LinkedList<List<GameObject>> allEdges = new LinkedList<List<GameObject>>();
+
     private Graph graph;
 
     int count = 0; 
@@ -87,9 +89,10 @@ public class ActionHistory : MonoBehaviour
         }
 
         SEECity city;
-        List<GameObject> nodesAndascendingEdges = new List<GameObject>();
         city = SceneQueries.GetCodeCity(actionHistoryObjects[0].transform)?.gameObject.GetComponent<SEECity>();
         graph = city.LoadedGraph;
+        List<GameObject> nodesAndascendingEdges = new List<GameObject>();
+        List<GameObject> edgesToHide = new List<GameObject>();
 
         foreach (GameObject actionHistoryObject in actionHistoryObjects)
         {
@@ -102,16 +105,16 @@ public class ActionHistory : MonoBehaviour
                             
                              if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                              {
-                               edge.SetVisibility(false, true);
+
+                                 edge.SetVisibility(false, true);
+
                                   if (nodesAndascendingEdges.Contains(edge) == false)
                                  {
-                                     nodesAndascendingEdges.Add(edge);
+                                     edgesToHide.Add(edge);
                                  }
-
-
-                        edge.TryGetComponent(out EdgeRef edgeRef);
-                        graph.RemoveEdge(edgeRef.edge);
-                        oldPositions.Add(edge.transform.position);     
+    
+                           edge.TryGetComponent(out EdgeRef edgeRef);
+                           graph.RemoveEdge(edgeRef.edge);
                         }
                     }
 
@@ -136,7 +139,7 @@ public class ActionHistory : MonoBehaviour
         }
 
         city.LoadedGraph = graph; // FIXME: Necessary?
-        oldPositions.Reverse();
+        allEdges.AddLast(edgesToHide);
         nodesAndascendingEdges.Reverse();
         oldPosition.AddLast(oldPositions);
         actionHistory.AddLast(nodesAndascendingEdges);
@@ -148,7 +151,7 @@ public class ActionHistory : MonoBehaviour
     public List<Vector3> UndoDeleteOperation()
     {
         List<Vector3> oldPositionVector = oldPosition.Last();
-        List<GameObject> undo = actionHistory.Last();
+        List<GameObject> undo = actionHistory.Last(); 
 
         foreach (GameObject go in undo)
         {
@@ -156,15 +159,18 @@ public class ActionHistory : MonoBehaviour
             {
                 graph.AddNode(nodeRef.Value);
             }
-
-            if (go.TryGetComponent(out EdgeRef edgeReference))
-            {            
-                graph.AddEdge(edgeReference.edge);
-                go.SetVisibility(true, false);
-            }
-
         }
 
+        foreach (GameObject edgeTobeShown in allEdges.Last())
+        {
+            if (edgeTobeShown.TryGetComponent(out EdgeRef edgeReference))
+            {
+                graph.AddEdge(edgeReference.edge);
+                edgeTobeShown.SetVisibility(true, false);
+            }
+        }
+
+        allEdges.RemoveLast();
         actionHistory.RemoveLast();
         oldPosition.RemoveLast();
         return oldPositionVector;
