@@ -10,17 +10,34 @@ using UnityEngine;
 
 public class ActionHistory : MonoBehaviour
 {
-
+    /// <summary>
+    /// 
+    /// </summary>
     public LinkedList<List<GameObject>> actionHistory = new LinkedList<List<GameObject>>();
 
+    /// <summary>
+    /// 
+    /// </summary>
     private LinkedList<List<Vector3>> oldPosition = new LinkedList<List<Vector3>>();
 
+    /// <summary>
+    /// 
+    /// </summary>
     private LinkedList<GameObject> parentCities = new LinkedList<GameObject>();
 
+    /// <summary>
+    /// 
+    /// </summary>
     private LinkedList<List<GameObject>> allEdges = new LinkedList<List<GameObject>>();
 
+    /// <summary>
+    /// 
+    /// </summary>
     private Graph graph;
 
+    /// <summary>
+    /// 
+    /// </summary>
     List<GameObject> childsOfParent = new List<GameObject>();
 
     public List<GameObject> ChildsOfParent { get => childsOfParent; set => childsOfParent = value; }
@@ -68,12 +85,8 @@ public class ActionHistory : MonoBehaviour
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="actionHistoryObject"></param>
-    /// <param name="aState"></param>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <param name="z"></param>
-    /// <param name="gameObjectCity"></param>
+    /// <param name="actionHistoryObjects"></param>
+    /// <param name="oldPositions"></param>
     public void SaveObjectForUndo(List<GameObject> actionHistoryObjects, List<Vector3> oldPositions)
     {
         SEECity city;
@@ -117,7 +130,7 @@ public class ActionHistory : MonoBehaviour
         List<GameObject> tmp = actionHistoryObjects;
         tmp.Reverse();
 
-        //deleting all children (for goedecke: childs) of node
+        //deleting all children of node
         foreach (GameObject g in tmp)
         {
             g.TryGetComponent(out NodeRef nodeRef);

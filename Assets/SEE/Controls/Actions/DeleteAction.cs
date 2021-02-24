@@ -136,8 +136,6 @@ namespace SEE.Controls.Actions
                 else if (selectedObject.CompareTag(Tags.Node))
                 {
                     List<GameObject> allNodesToBeDeleted = actionHistory.GetAllChildNodesAsGameObject(selectedObject);
-                    List<GameObject> tmp = new List<GameObject>();
-                    tmp = allNodesToBeDeleted;
                     StartCoroutine(MoveNodeToGarbage(allNodesToBeDeleted));
                 }
             }
@@ -209,11 +207,8 @@ namespace SEE.Controls.Actions
                     Tweens.Move(deletedNodes[i], oldPosition[i], 1f);
                 }
             }
-
-            yield return new WaitForSeconds(2.0f);
-
-            //Fixme: Portal has to be set after undo again 
-            // Portal.SetPortal(actionHistory.GetPortalFromGarbageObjects());
+            yield return new WaitForSeconds(1.0f);
+            InteractableObject.UnselectAll(true);
         }
 
         private void LocalAnySelectIn(InteractableObject interactableObject)
