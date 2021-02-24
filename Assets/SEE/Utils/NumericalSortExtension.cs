@@ -45,7 +45,7 @@ namespace SEE.Utils
             }
             catch (Exception e)
             {
-                UnityEngine.Debug.LogError("Sequence is empty ");
+                UnityEngine.Debug.LogError($"Sequence is empty: {e}\n");
             }
             return list.Select(s => new
             {
