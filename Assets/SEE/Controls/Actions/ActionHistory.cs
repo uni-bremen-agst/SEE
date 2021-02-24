@@ -140,6 +140,7 @@ public class ActionHistory : MonoBehaviour
 
         city.LoadedGraph = graph; // FIXME: Necessary?
         allEdges.AddLast(edgesToHide);
+        oldPositions.Reverse();
         nodesAndascendingEdges.Reverse();
         oldPosition.AddLast(oldPositions);
         actionHistory.AddLast(nodesAndascendingEdges);
@@ -158,6 +159,12 @@ public class ActionHistory : MonoBehaviour
             if (go.TryGetComponent(out NodeRef nodeRef))
             {
                 graph.AddNode(nodeRef.Value);
+               
+            }
+
+            if (go.TryGetComponent(out Collider collider))
+            {
+                go.GetComponent<Collider>().enabled = true;
             }
         }
 
