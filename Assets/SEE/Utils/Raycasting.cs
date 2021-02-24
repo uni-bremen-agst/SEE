@@ -66,7 +66,7 @@ namespace SEE.Utils
         /// <returns>Whether the mouse currently hovers over a GUI element.</returns>
         public static bool IsMouseOverGUI()
         {
-            return EventSystem.current.IsPointerOverGameObject();
+            return EventSystem.current == null || EventSystem.current.IsPointerOverGameObject();
         }
     }
 }
