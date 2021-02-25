@@ -125,11 +125,12 @@ namespace SEE.Controls.Actions
                 }
             }
 
+            List<Vector3> oldPosition = oldPositionHistory.Last();
             deletedEdgeHistory.RemoveLast();
             deletedNodeHistory.RemoveLast();
             oldPositionHistory.RemoveLast();
 
-            return oldPositionHistory.Last();
+            return oldPosition;
         }
 
         /// <summary>
