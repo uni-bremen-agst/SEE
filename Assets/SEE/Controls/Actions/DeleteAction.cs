@@ -177,7 +177,7 @@ namespace SEE.Controls.Actions
             }
 
             yield return new WaitForSeconds(1.0f);
-
+            InteractableObject.UnselectAll(true);
             actionHistory.SaveObjectForUndo(deletedNodes, oldPositions);
         }
 
@@ -193,7 +193,7 @@ namespace SEE.Controls.Actions
             for (int i = 0; i < deletedNodes.Count; i++)
             {
                 //FIXME FOR GOEDECKE: CHECK NESSECARY? INPUT JUST CAME FROM NODE-HISTORY - THERE ARE JUST NODES INSIDE
-                if (deletedNodes[i].CompareTag(Tags.Node))
+                //if (deletedNodes[i].CompareTag(Tags.Node))
                 {
                     Tweens.Move(deletedNodes[i], new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
                 }
@@ -204,7 +204,7 @@ namespace SEE.Controls.Actions
             for (int i = 0; i < deletedNodes.Count; i++)
             {
                 //FIXME FOR GOEDECKE: CHECK NESSECARY? INPUT JUST CAME FROM NODE-HISTORY - THERE ARE JUST NODES INSIDE
-                if (deletedNodes[i].CompareTag(Tags.Node))
+                //if (deletedNodes[i].CompareTag(Tags.Node))
                 {
                     Tweens.Move(deletedNodes[i], oldPositionOfDeletedObject[i], 1f);
                 }
