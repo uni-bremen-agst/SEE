@@ -42,7 +42,7 @@ namespace SEE.Controls.Actions
         private ActionHistory actionHistory;
 
         /// <summary>
-        /// The GarbageCan which contains the deleted nodes.
+        /// The Garbage-can where the deleted nodes will be moved.
         /// </summary>
         private GameObject garbageCan;
 
@@ -91,7 +91,7 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            //Delete an object
+            //Delete a gameobject and all children
             if (selectedObject != null && Input.GetMouseButtonDown(0))
             {
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
@@ -118,9 +118,9 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Deletes given <paramref GameObject="selectedObject"/> assumed to be either an
         /// edge or node. If it represents a node, the incoming and outgoing edges and
-        /// its ancestors will be destroyed, too. 
+        /// its ancestors will be removed, too. For the possibility of an undo - the deleted objects will be saved. 
         /// </summary>
-        /// <param GameObject="selectedObject">selected GameObject that should be destroyed</param>
+        /// <param GameObject="selectedObject">selected GameObject that and thats children should be removed</param>
         public void DeleteSelectedObject(GameObject selectedObject)
         {
             if (selectedObject != null)
@@ -141,10 +141,10 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// 
+        /// Moves all nodes which were deleted in the last operation to the garbage-can
         /// </summary>
-        /// <param name="deletedNode"></param>
-        /// <returns></returns>
+        /// <param name="deletedNodes">the deleted nodes which will be moved to garbage-can</param>
+        /// <returns>the waiting time between moving deleted nodes over the garbage-can and then in the garbage-can</returns>
         public IEnumerator MoveNodeToGarbage(List<GameObject> deletedNodes)
         {
             List<Vector3> oldPositions = new List<Vector3>();
@@ -182,16 +182,17 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// 
+        /// Removes all nodes from the garbage-can to the city.
         /// </summary>
         /// <param name="deletedNode"></param>
-        /// <returns></returns>
+        /// <returns>the waiting time between moving deleted nodes from the garbage-can and then to the city</returns>
         public IEnumerator RemoveNodeFromGarbage(List<GameObject> deletedNodes)
         {
             List<Vector3> oldPositionOfDeletedObject = actionHistory.UndoDeleteOperation();
 
             for (int i = 0; i < deletedNodes.Count; i++)
             {
+                //FIXME FOR GOEDECKE: CHECK NESSECARY? INPUT JUST CAME FROM NODE-HISTORY - THERE ARE JUST NODES INSIDE
                 if (deletedNodes[i].CompareTag(Tags.Node))
                 {
                     Tweens.Move(deletedNodes[i], new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
@@ -202,6 +203,7 @@ namespace SEE.Controls.Actions
 
             for (int i = 0; i < deletedNodes.Count; i++)
             {
+                //FIXME FOR GOEDECKE: CHECK NESSECARY? INPUT JUST CAME FROM NODE-HISTORY - THERE ARE JUST NODES INSIDE
                 if (deletedNodes[i].CompareTag(Tags.Node))
                 {
                     Tweens.Move(deletedNodes[i], oldPositionOfDeletedObject[i], 1f);
