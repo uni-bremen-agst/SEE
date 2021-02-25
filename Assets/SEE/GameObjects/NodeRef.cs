@@ -47,12 +47,10 @@ namespace SEE.GO
         /// Returns the NodeRef referring to <paramref name="node"/>.
         /// </summary>
         /// <param name="node">node whose NodeRef is requested</param>
-        /// <returns>the NodeRef referring to <paramref name="node"/></returns>
+        /// <returns>the NodeRef referring to <paramref name="node"/> or null if there is none</returns>
         public static NodeRef Get(Node node)
         {
             Assert.IsNotNull(node);
-            Assert.IsTrue(nodeToNodeRefDict.ContainsKey(node));
-
             return nodeToNodeRefDict[node];
         }
     }

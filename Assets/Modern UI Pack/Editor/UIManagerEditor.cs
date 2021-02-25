@@ -858,12 +858,9 @@ namespace Michsky.UI.ModernUIPack
 
             var editorHints = serializedObject.FindProperty("editorHints");
 
-            GUILayout.BeginHorizontal(EditorStyles.helpBox);
+            GUILayout.BeginVertical(EditorStyles.helpBox);
 
-            editorHints.boolValue = GUILayout.Toggle(editorHints.boolValue, new GUIContent("UI Manager Hints"), customSkin.FindStyle("Toggle"));
-            editorHints.boolValue = GUILayout.Toggle(editorHints.boolValue, new GUIContent(""), customSkin.FindStyle("Toggle Helper"));
-
-            GUILayout.EndHorizontal();
+            editorHints.boolValue = GUILayout.Toggle(editorHints.boolValue, new GUIContent("UI Manager Hints"), customSkin.FindStyle("Toggle"), GUILayout.Width(500));
 
             if (editorHints.boolValue == true)
             {
@@ -871,6 +868,8 @@ namespace Michsky.UI.ModernUIPack
                 EditorGUILayout.HelpBox("Remove 'UI Manager' component from the object if want to assign unique values.", MessageType.Info);
 				EditorGUILayout.HelpBox("You can press 'CTRL + SHIFT + M' to open UI Manager quickly.", MessageType.Info);
             }
+
+            GUILayout.EndVertical();
 
             var rootFolder = serializedObject.FindProperty("rootFolder");
             var changeRootFolder = serializedObject.FindProperty("changeRootFolder");
@@ -981,12 +980,12 @@ namespace Michsky.UI.ModernUIPack
                     Preset defaultPreset = Resources.Load<Preset>("UI Manager Presets/Default");
                     defaultPreset.ApplyTo(Resources.Load("MUIP Manager"));
                     Selection.activeObject = null;
-                    Debug.Log("UI Manager - Resetting successful.");
+                    Debug.Log("<b>[UI Manager]</b> Resetting successful.");
                 }
 
                 catch
                 {
-                    Debug.LogWarning("UI Manager - Resetting failed.");
+                    Debug.LogWarning("<b>[UI Manager]</b> Resetting failed.");
                 }
             }    
         }

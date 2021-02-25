@@ -34,6 +34,7 @@ namespace SEE.DataModel
         public const string ChartManager = "ChartManager";  // Tag of a game object having a ChartManager as a component.
         public const string ChartContainer = "ChartContainer";
         public const string Chart = "Chart"; // for a metric chart
+        public const string PowerBeam = "PowerBeam"; // For power beams
 
         // for game objects representing a UI element
         public const string UI = "UI";

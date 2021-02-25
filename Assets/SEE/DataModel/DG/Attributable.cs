@@ -191,6 +191,10 @@ namespace SEE.DataModel.DG
                 Report("other is null");
                 return false;
             }
+            else if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
             else if (GetType() != other.GetType())
             {
                 Report("other has different C# type");
