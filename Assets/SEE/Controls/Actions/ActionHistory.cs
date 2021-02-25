@@ -87,10 +87,11 @@ namespace SEE.Controls.Actions
 
             foreach (GameObject deletedNode in deletedNodesReverse)
             {
-                if (deletedNode.tag == Tags.Node) { 
-                deletedNode.TryGetComponent(out NodeRef nodeRef);
-                graph.RemoveNode(nodeRef.Value);
-              }
+                if (deletedNode.tag == Tags.Node)
+                {
+                    deletedNode.TryGetComponent(out NodeRef nodeRef);
+                    graph.RemoveNode(nodeRef.Value);
+                }
                 if (deletedNode.tag == Tags.Edge)
                 {
 
@@ -149,38 +150,6 @@ namespace SEE.Controls.Actions
             oldPositionHistory.RemoveLast();
 
             return oldPosition;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="counter"></param>
-        /// <param name="states"></param>
-        private static void CheckBoundaries(int counter)
-        {
-            {
-
-                throw new NotSupportedException("Redo function cannot be executed");
-
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="removedObject"></param>
-        private static void RemoveForReflexionAnalysis(GameObject removedObject)
-        {
-            // remove node or edge
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="objectToAddtoGraphHierarchy"></param>
-        private static void Reparent(GameObject objectToAddtoGraphHierarchy)
-        {
-            //add edge or node - reparenting.
         }
 
     }
