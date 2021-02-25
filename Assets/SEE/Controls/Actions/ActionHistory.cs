@@ -14,8 +14,7 @@ public class ActionHistory : MonoBehaviour
     /// 
     /// </summary>
     /// 
-    //FIXME: deletedNodeHistory..?
-    public LinkedList<List<GameObject>> deletedObjectHistory = new LinkedList<List<GameObject>>();
+    public LinkedList<List<GameObject>> deletedNodeHistory = new LinkedList<List<GameObject>>();
 
     /// <summary>
     /// 
@@ -25,8 +24,7 @@ public class ActionHistory : MonoBehaviour
     /// <summary>
     /// 
     /// </summary>
-    //FIXME: deletedEdgesHistory..?
-    private LinkedList<List<GameObject>> allEdges = new LinkedList<List<GameObject>>();
+    private LinkedList<List<GameObject>> deletedEdgeHistory = new LinkedList<List<GameObject>>();
 
     /// <summary>
     /// 
@@ -39,46 +37,6 @@ public class ActionHistory : MonoBehaviour
     List<GameObject> childsOfParent = new List<GameObject>();
 
     public List<GameObject> ChildsOfParent { get => childsOfParent; set => childsOfParent = value; }
-
-    /// <summary>
-    /// Saves all childs of the graph-parent object
-    /// </summary>
-    /// <param name="parent"></param>
-    /// <returns>List of all childs of a parent</returns>
-    public List<GameObject> GetAllChildNodesAsGameObject(GameObject parent)
-    {
-        List<GameObject> childsOfThisParent = new List<GameObject>();
-        if (!childsOfParent.Contains(parent))
-        {
-            childsOfParent.Add(parent);
-        }
-        int gameNodeCount = childsOfParent.Count;
-
-        foreach (Transform child in parent.transform)
-        {
-            if (child.gameObject.CompareTag(Tags.Node))
-            {
-                if (!childsOfParent.Contains(child.gameObject))
-                {
-                    childsOfParent.Add(child.gameObject);
-                }
-                childsOfThisParent.Add(child.gameObject);
-            }
-        }
-
-        if (childsOfParent.Count == gameNodeCount)
-        {
-            return childsOfParent;
-        }
-        else
-        {
-            foreach (GameObject childs in childsOfThisParent)
-            {
-                GetAllChildNodesAsGameObject(childs);
-            }
-            return childsOfParent;
-        }
-    }
 
     /// <summary>
     /// 
@@ -133,11 +91,11 @@ public class ActionHistory : MonoBehaviour
             graph.RemoveNode(nodeRef.Value);
         }
 
-        allEdges.AddLast(edgesToHide);
+        deletedEdgeHistory.AddLast(edgesToHide);
         oldPositionsOfDeletedNodes.Reverse();
         nodesAndascendingEdges.Reverse();
         oldPositionHistory.AddLast(oldPositionsOfDeletedNodes);
-        deletedObjectHistory.AddLast(nodesAndascendingEdges);
+        deletedNodeHistory.AddLast(nodesAndascendingEdges);
     }
 
     /// <summary>
@@ -145,7 +103,7 @@ public class ActionHistory : MonoBehaviour
     /// </summary>
     public List<Vector3> UndoDeleteOperation()
     {
-        foreach (GameObject node in deletedObjectHistory.Last())
+        foreach (GameObject node in deletedNodeHistory.Last())
         {
             if (node.TryGetComponent(out NodeRef nodeRef))
             {
@@ -158,7 +116,7 @@ public class ActionHistory : MonoBehaviour
             }
         }
 
-        foreach (GameObject edge in allEdges.Last())
+        foreach (GameObject edge in deletedEdgeHistory.Last())
         {
             if (edge.TryGetComponent(out EdgeRef edgeReference))
             {
@@ -167,8 +125,8 @@ public class ActionHistory : MonoBehaviour
             }
         }
 
-        allEdges.RemoveLast();
-        deletedObjectHistory.RemoveLast();
+        deletedEdgeHistory.RemoveLast();
+        deletedNodeHistory.RemoveLast();
         oldPositionHistory.RemoveLast();
 
         return oldPositionHistory.Last();

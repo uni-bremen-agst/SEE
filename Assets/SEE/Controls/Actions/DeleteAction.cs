@@ -106,7 +106,7 @@ namespace SEE.Controls.Actions
             {
                 try
                 {
-                    List<GameObject> objectToBeMoved = actionHistory.deletedObjectHistory.Last();
+                    List<GameObject> objectToBeMoved = actionHistory.deletedNodeHistory.Last();
                     StartCoroutine(RemoveNodeFromGarbage(objectToBeMoved));
                 }
                 catch (InvalidOperationException)
@@ -135,7 +135,8 @@ namespace SEE.Controls.Actions
                 }
                 else if (selectedObject.CompareTag(Tags.Node))
                 {
-                    List<GameObject> allNodesToBeDeleted = actionHistory.GetAllChildNodesAsGameObject(selectedObject);
+                    List<GameObject> childrenOfParent = new List<GameObject>();
+                    List<GameObject> allNodesToBeDeleted = GameObjectTraversion.GetAllChildNodesAsGameObject(childrenOfParent, selectedObject);
                     StartCoroutine(MoveNodeToGarbage(allNodesToBeDeleted));
                 }
             }
