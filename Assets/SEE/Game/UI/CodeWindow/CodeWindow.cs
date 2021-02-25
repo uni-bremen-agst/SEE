@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SEE.Game.UI.CodeWindow
 {
@@ -48,9 +49,29 @@ namespace SEE.Game.UI.CodeWindow
         public float WorldWidth = 1;
 
         /// <summary>
+        /// The currently visible line.
+        /// </summary>
+        public float VisibleLine
+        {
+            get => scrollbar.value * lines;
+            set => scrollbar.value = value/lines;
+            //TODO: Smooth scrolling animation & visual marking of line
+        }
+
+        /// <summary>
+        /// An event which gets called whenever the scrollbar is used to scroll to a different line.
+        /// </summary>
+        public Scrollbar.ScrollEvent ScrollEvent;
+
+        /// <summary>
         /// GameObject containing the code canvas, which in turn contains this code window.
         /// </summary>
         private GameObject CodeCanvas;
+
+        /// <summary>
+        /// Number of lines within the file.
+        /// </summary>
+        private int lines;
 
         /// <summary>
         /// Name for the code windows group game object.
@@ -84,6 +105,7 @@ namespace SEE.Game.UI.CodeWindow
                 // Line number will be typeset in yellow to distinguish it from the rest
                 Text += $"<color=\"yellow\">{i}</color> <noparse>{text[i]}</noparse>\n";
             }
+            lines = text.Length;
         }
 
         /// <summary>
@@ -93,12 +115,32 @@ namespace SEE.Game.UI.CodeWindow
         /// <param name="filename">The filename for the file to read.</param>
         public void EnterFromFile(string filename)
         {
+            // Try to read the file, otherwise display the error message.
             if (!File.Exists(filename))
             {
-                throw new FileNotFoundException($"Couldn't find file '{filename}'.");
+                Text = $"<color=\"red\">Couldn't find file '<noparse>{filename}</noparse>'.</color>";
+                Debug.LogError($"Couldn't find file {filename}");
+                return;
             }
+            try
+            {
+                EnterFromText(File.ReadAllLines(filename));
+            }
+            catch (IOException exception)
+            {
+                Text = $"<color=\"red\"><noparse>{exception}</noparse></color>";
+                Debug.LogError(exception);
+            }
+        }
 
-            EnterFromText(File.ReadAllLines(filename));
+        /// <summary>
+        /// Shows or hides the code window, depending on the <see cref="show"/> parameter.
+        /// </summary>
+        /// <param name="show"></param>
+        public void Show(bool show)
+        {
+            Debug.Log($"CodeWindow '{Title}' is now shown: {show}");
+            //TODO
         }
     }
 }
