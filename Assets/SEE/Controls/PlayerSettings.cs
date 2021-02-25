@@ -8,6 +8,7 @@ using Microsoft.MixedReality.Toolkit.UI.BoundsControl;
 using Microsoft.MixedReality.Toolkit.Utilities;
 using OdinSerializer;
 using SEE.DataModel;
+using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -197,61 +198,6 @@ namespace SEE.Controls
             }
             player.transform.position = new Vector3(0, 1.26f, -2.75f);
             return player;
-        }
-
-        //using System.Collections.Generic;
-        //using UnityEngine;
-        //using UnityEngine.XR;
-
-        public static class VRStatus
-        {                       
-            public static void Enable(bool enable)
-            {
-                List<XRDisplaySubsystem> xrDisplays = new List<XRDisplaySubsystem>();
-                SubsystemManager.GetSubsystems(xrDisplays);
-                foreach (var display in xrDisplays)
-                {
-                    if (enable)
-                    {
-                        Debug.Log($"Starting VR display {display}\n");
-                        display.Start();
-                    }
-                    else
-                    {
-                        Debug.Log($"Stopping VR display {display}\n");
-                        display.Stop();
-                    }
-                }
-            }
-
-            static bool IsActive()
-            {
-                List<XRDisplaySubsystemDescriptor> displaysDescs = new List<XRDisplaySubsystemDescriptor>();
-                
-                SubsystemManager.GetSubsystemDescriptors(displaysDescs);
-
-                // If there are registered display descriptors that is a good indication that VR is most likely "enabled"
-                return displaysDescs.Count > 0;
-            }
-
-            static bool IsVrRunning()
-            {
-                List<XRDisplaySubsystem> displays = new List<XRDisplaySubsystem>();
-                bool vrIsRunning = false;
-                displays.Clear();
-                SubsystemManager.GetInstances(displays);
-                foreach (var displaySubsystem in displays)
-                {
-                    if (displaySubsystem.running)
-                    {
-                        vrIsRunning = true;
-                        break;
-                    }
-                }
-
-                return vrIsRunning;
-            }
-
         }
 
         /// <summary>
