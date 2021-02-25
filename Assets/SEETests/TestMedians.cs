@@ -1,12 +1,12 @@
-﻿using NUnit.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using NUnit.Framework;
 
 namespace SEE.Utils
 {
     /// <summary>
     /// Test for median calculation in class Medians.
     /// </summary>
-    class TestMedians
+    internal class TestMedians
     {
         [Test]
         public void TestMedianNull()

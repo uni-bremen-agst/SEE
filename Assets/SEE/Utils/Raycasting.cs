@@ -55,17 +55,10 @@ namespace SEE.Utils
                 {
                     result = HitGraphElement.Edge;
                     elementRef = edgeRef;
-                    Debug.Log($"RaycastGraphElement: hit edge {edgeRef.name}.\n");
                 }
             }
             return result;
         }
-
-        /// <summary>
-        /// The cached event system. It is cached because it needs to be queried in
-        /// each Update cycle.
-        /// </summary>
-        private static EventSystem eventSystem = null;
 
         /// <summary>
         /// Whether the mouse currently hovers over a GUI element.
@@ -73,15 +66,7 @@ namespace SEE.Utils
         /// <returns>Whether the mouse currently hovers over a GUI element.</returns>
         public static bool IsMouseOverGUI()
         {
-            if (eventSystem == null)
-            {
-                eventSystem = UnityEngine.Object.FindObjectOfType<EventSystem>();
-                if (eventSystem == null)
-                {
-                    throw new System.Exception("No EventSystem found.");
-                }
-            }
-            return eventSystem.IsPointerOverGameObject();
+            return EventSystem.current.IsPointerOverGameObject();
         }
     }
 }
