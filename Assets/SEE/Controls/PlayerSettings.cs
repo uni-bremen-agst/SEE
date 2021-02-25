@@ -9,6 +9,7 @@ using Microsoft.MixedReality.Toolkit.Utilities;
 using OdinSerializer;
 using SEE.DataModel;
 using SEE.Game;
+using SEE.Game.Charts.VR;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -141,26 +142,9 @@ namespace SEE.Controls
                     }
                     break;
                 case PlayerInputType.VRPlayer:
-                    {                       
-                        string FloorName = "Floor";
-
-                        GameObject floor = GameObject.Find(FloorName);
-                        if (floor == null)
-                        {
-                            throw new Exception($"No game object named {FloorName} found.");
-                        }
-                        else
-                        {
-                            player = PlayerFactory.CreateVRPlayer();
-                            // Create Teleporting game object
-                            UnityEngine.Object teleportingPrefab = Resources.Load<GameObject>("Prefabs/Players/Teleporting");
-                            UnityEngine.Assertions.Assert.IsNotNull(teleportingPrefab);
-                            GameObject teleporting = GameObject.Instantiate(teleportingPrefab) as GameObject;
-                            UnityEngine.Assertions.Assert.IsNotNull(teleporting);
-                            teleporting.name = "Teleporting";
-                            // Attach TeleportArea to floor
-                            floor.AddComponent<TeleportArea>();                            
-                        }                        
+                    {
+                        player = PlayerFactory.CreateVRPlayer();
+                        SetupVR(player);                        
                     }
                     break;
                 case PlayerInputType.HoloLensPlayer:
@@ -177,7 +161,62 @@ namespace SEE.Controls
             }
             player.transform.position = new Vector3(0, 1.26f, -2.75f);
             return player;
-        }       
+        }
+
+        private static void SetupVR(GameObject player)
+        {
+            string FloorName = "Floor";
+
+            GameObject floor = GameObject.Find(FloorName);
+            if (floor == null)
+            {
+                throw new Exception($"No game object named {FloorName} found.");
+            }
+            else
+            {
+                {
+                    // Create Teleporting game object
+                    UnityEngine.Object teleportingPrefab = Resources.Load<GameObject>("Prefabs/Players/Teleporting");
+                    UnityEngine.Assertions.Assert.IsNotNull(teleportingPrefab);
+                    GameObject teleporting = GameObject.Instantiate(teleportingPrefab) as GameObject;
+                    UnityEngine.Assertions.Assert.IsNotNull(teleporting);
+                    teleporting.name = "Teleporting";
+                }
+                {
+                    // Attach TeleportArea to floor
+                    // The TeleportArea replaces the material of the game object it is attached to
+                    // it into a transparent material. This way the game object becomes invisible.
+                    // For this reason, we will clone the floor move the cloned floor slightly above 
+                    // its origin and then attached the TeleportArea to the cloned floor.
+                    Vector3 position = floor.transform.position;
+                    position.y += 0.01f;
+                    GameObject clonedFloor = Instantiate(floor, position, floor.transform.rotation);
+                    clonedFloor.AddComponent<TeleportArea>();
+                }
+                {
+                    // Assign the VR camera to the chart manager so that charts can move along with the camera.
+                    string chartManagerName = "ChartManager";
+                    GameObject chartManager = GameObject.Find(chartManagerName);
+                    if (chartManager)
+                    {
+                        ChartPositionVr chartPosition = chartManager.GetComponentInChildren<ChartPositionVr>();
+                        if (chartPosition)
+                        {
+                            chartPosition.CameraTransform = player.GetComponentInChildren<Camera>().transform;
+                            Debug.Log($"VR camera of {player.name} successfully assigned to {chartManagerName}.\n");
+                        }
+                        else
+                        {
+                            Debug.Log($"{chartManagerName} has no component ChartPositionVr.\n");
+                        }
+                    }
+                    else
+                    {
+                        Debug.Log($"No {chartManagerName} found.\n");
+                    }
+                }
+            }
+        }
 
         private void Start()
         {
