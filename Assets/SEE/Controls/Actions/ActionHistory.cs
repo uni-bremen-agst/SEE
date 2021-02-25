@@ -34,13 +34,6 @@ public class ActionHistory : MonoBehaviour
     /// <summary>
     /// 
     /// </summary>
-    List<GameObject> childsOfParent = new List<GameObject>();
-
-    public List<GameObject> ChildsOfParent { get => childsOfParent; set => childsOfParent = value; }
-
-    /// <summary>
-    /// 
-    /// </summary>
     /// <param name="deletedNodes"></param>
     /// <param name="oldPositionsOfDeletedNodes"></param>
     public void SaveObjectForUndo(List<GameObject> deletedNodes, List<Vector3> oldPositionsOfDeletedNodes)

@@ -4,39 +4,47 @@ using UnityEngine;
 
 public static class GameObjectTraversion
 {
-
-    public static List<GameObject> GetAllChildNodesAsGameObject(List<GameObject> childrenOfParent, GameObject parent)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="allChildrenOfParent"></param>
+    /// <param name="parent"></param>
+    /// <returns></returns>
+    public static List<GameObject> GetAllChildNodesAsGameObject(List<GameObject> allChildrenOfParent, GameObject parent)
     {
         List<GameObject> childrenOfThisParent = new List<GameObject>();
-        if (!childrenOfParent.Contains(parent))
+
+        if (!allChildrenOfParent.Contains(parent))
         {
-            childrenOfParent.Add(parent);
+            allChildrenOfParent.Add(parent);
         }
-        int gameNodeCount = childrenOfParent.Count;
+
+        int numberOfAllGamenodes = allChildrenOfParent.Count;
 
         foreach (Transform child in parent.transform)
         {
             if (child.gameObject.CompareTag(Tags.Node))
             {
-                if (!childrenOfParent.Contains(child.gameObject))
+                if (!allChildrenOfParent.Contains(child.gameObject))
                 {
-                    childrenOfParent.Add(child.gameObject);
+                    allChildrenOfParent.Add(child.gameObject);
                 }
                 childrenOfThisParent.Add(child.gameObject);
             }
         }
 
-        if (childrenOfParent.Count == gameNodeCount)
+        if (allChildrenOfParent.Count == numberOfAllGamenodes)
         {
-            return childrenOfParent;
+            return allChildrenOfParent;
         }
         else
         {
             foreach (GameObject childs in childrenOfThisParent)
             {
-                GetAllChildNodesAsGameObject(childrenOfParent,childs);
+                GetAllChildNodesAsGameObject(allChildrenOfParent,childs);
             }
-            return childrenOfParent;
+
+            return allChildrenOfParent;
         }
     }
 
