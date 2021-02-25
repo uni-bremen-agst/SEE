@@ -87,8 +87,22 @@ namespace SEE.Controls.Actions
 
             foreach (GameObject deletedNode in deletedNodesReverse)
             {
+                if (deletedNode.tag == Tags.Node) { 
                 deletedNode.TryGetComponent(out NodeRef nodeRef);
                 graph.RemoveNode(nodeRef.Value);
+              }
+                if (deletedNode.tag == Tags.Edge)
+                {
+
+                    deletedNode.SetVisibility(false, true);
+                    edgesToHide.Add(deletedNode);
+                    deletedNode.TryGetComponent(out EdgeRef edgeRef);
+                    graph.RemoveEdge(edgeRef.edge);
+                    if (deletedNode.TryGetComponent(out Collider collider))
+                    {
+                        deletedNode.GetComponent<Collider>().enabled = false;
+                    }
+                }
             }
 
             oldPositionsOfDeletedNodes.Reverse();
@@ -122,6 +136,10 @@ namespace SEE.Controls.Actions
                 {
                     graph.AddEdge(edgeReference.edge);
                     edge.SetVisibility(true, false);
+                }
+                if (edge.TryGetComponent(out Collider collider))
+                {
+                    edge.GetComponent<Collider>().enabled = true;
                 }
             }
 
