@@ -25,34 +25,9 @@ namespace SEE.Controls
     /// </summary>
     public class PlayerSettings : MonoBehaviour
     {
-        /// <summary>
-        /// What kind of input devices the player uses.
-        /// The order must be consistent with <see cref="PlayerName"/>.
-        /// </summary>
-        public enum PlayerInputType
-        {
-            Desktop = 0,      // player for desktop and mouse input
-            TouchGamepad = 1, // player for touch devices or gamepads using InControl
-            VR = 2,           // player for virtual reality devices
-            HoloLens = 3,     // player for mixed reality devices
-            None = 4,         // no player at all
-        }
-
-        /// <summary>
-        /// A mapping from PlayerInputType onto the names of the player game objects.
-        /// The order must be consistent with <see cref="PlayerInputType"/>.
-        /// </summary>
-        public static readonly string[] PlayerName = {
-            "Player Desktop",       // Desktop
-            "Player Touch Gamepad", // TouchGamepad
-            "Player VR",            // VR          
-            "Player HoloLens",      // HoloLens
-            "Player None",          // None
-            };
-
         [Tooltip("What kind of player type should be enabled.")]
         [OdinSerialize]
-        public PlayerInputType playerInputType = PlayerInputType.Desktop;
+        public PlayerInputType playerInputType = PlayerInputType.DesktopPlayer;
 
         [Tooltip("The GameObject containing the desktop player.")]
         [SerializeField] private GameObject playerDesktop;
@@ -97,7 +72,7 @@ namespace SEE.Controls
             get;
             private set;
         }
-        
+
         /// <summary>
         /// The cached player settings within this local instance of Unity.
         /// Will be updated by <see cref="GetPlayerSettings"/> on its first call.
@@ -147,46 +122,193 @@ namespace SEE.Controls
             // is connected. That seems to be a bug.
             try
             {
-                XRSettings.enabled = playerInputType == PlayerInputType.VR || playerInputType == PlayerInputType.HoloLens;
+                bool enableXR = playerInputType == PlayerInputType.VRPlayer || playerInputType == PlayerInputType.HoloLensPlayer;
+                VRStatus.Enable(enableXR);
+                //XRSettings.enabled = enableXR;
             }
             catch (Exception e)
             {
-                Debug.LogWarningFormat("VR enabling/disabling issue: {0}", e);
+                Debug.LogWarning($"VR enabling/disabling issue: {e.Message}");
             }
 
-            if (playerInputType != PlayerInputType.VR)
+            if (playerInputType == PlayerInputType.VRPlayer)
             {
-                DisableSteamVRTeleporting();
+                try
+                {
+                    EnableSteamVRTeleporting();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"Disabling teleporting issue: {e.Message}");
+                }
             }
 
             Debug.LogFormat("Player input type: {0}\n", playerInputType.ToString());
 
-            playerDesktop?.SetActive(playerInputType == PlayerInputType.Desktop);
-            SetMixedReality(playerInputType == PlayerInputType.HoloLens);
-            playerTouchGamepad?.SetActive(playerInputType == PlayerInputType.TouchGamepad);
-            playerVR?.SetActive(playerInputType == PlayerInputType.VR);
-            SetLocalPlayer(PlayerName[(int)playerInputType]);
+            //playerDesktop?.SetActive(playerInputType == PlayerInputType.Desktop);
+            //SetMixedReality(playerInputType == PlayerInputType.HoloLens);
+            //playerTouchGamepad?.SetActive(playerInputType == PlayerInputType.TouchGamepad);
+            //playerVR?.SetActive(playerInputType == PlayerInputType.VR);
+            LocalPlayer = CreatePlayer(playerInputType);
         }
 
         /// <summary>
-        /// Disables all TeleportAreas and Teleports (SteamVR).
+        /// Creates the kind of player required for the given <paramref name="playerInputType"/>.
+        /// For some players, additional game objects and/or components will be added to the
+        /// scene required for the particular player to work correctly.
         /// </summary>
-        private static void DisableSteamVRTeleporting()
+        /// <param name="playerInputType">the kind of environment the player is to run</param>
+        /// <returns>new player for given <paramref name="playerInputType"/></returns>
+        private GameObject CreatePlayer(PlayerInputType playerInputType)
         {
-            foreach (TeleportArea area in FindObjectsOfType<TeleportArea>())
+            GameObject player;
+
+            switch (playerInputType)
             {
-                area.gameObject.SetActive(false);
+                case PlayerInputType.DesktopPlayer:
+                    {
+                        string TableName = "Table";
+
+                        GameObject table = GameObject.Find(TableName);
+                        if (table == null)
+                        {
+                            throw new Exception($"No game object named {TableName} found.");
+                        }
+                        else
+                        {
+                            player = PlayerFactory.CreateDesktopPlayer(table.GetComponent<SEE.GO.Plane>());
+                        }
+                    }
+                    break;
+                case PlayerInputType.VRPlayer:
+                    {                       
+                        string FloorName = "Floor";
+
+                        GameObject floor = GameObject.Find(FloorName);
+                        if (floor == null)
+                        {
+                            throw new Exception($"No game object named {FloorName} found.");
+                        }
+                        else
+                        {
+                            player = PlayerFactory.CreateVRPlayer();
+                            // Create Teleporting game object
+                            UnityEngine.Object teleportingPrefab = Resources.Load<GameObject>("Prefabs/Players/Teleporting");
+                            UnityEngine.Assertions.Assert.IsNotNull(teleportingPrefab);
+                            GameObject teleporting = GameObject.Instantiate(teleportingPrefab) as GameObject;
+                            UnityEngine.Assertions.Assert.IsNotNull(teleporting);
+                            teleporting.name = "Teleporting";
+                            // Attach TeleportArea to floor
+                            floor.AddComponent<TeleportArea>();                            
+                        }                        
+                    }
+                    break;
+                default:
+                    throw new NotImplementedException($"Unhandled case {playerInputType}.");
             }
-            foreach (Teleport port in FindObjectsOfType<Teleport>())
+            player.transform.position = new Vector3(0, 1.26f, -2.75f);
+            return player;
+        }
+
+        //using System.Collections.Generic;
+        //using UnityEngine;
+        //using UnityEngine.XR;
+
+        public static class VRStatus
+        {                       
+            public static void Enable(bool enable)
             {
-                port.gameObject.SetActive(false);
+                List<XRDisplaySubsystem> xrDisplays = new List<XRDisplaySubsystem>();
+                SubsystemManager.GetSubsystems(xrDisplays);
+                foreach (var display in xrDisplays)
+                {
+                    if (enable)
+                    {
+                        Debug.Log($"Starting VR display {display}\n");
+                        display.Start();
+                    }
+                    else
+                    {
+                        Debug.Log($"Stopping VR display {display}\n");
+                        display.Stop();
+                    }
+                }
             }
+
+            static bool IsActive()
+            {
+                List<XRDisplaySubsystemDescriptor> displaysDescs = new List<XRDisplaySubsystemDescriptor>();
+                
+                SubsystemManager.GetSubsystemDescriptors(displaysDescs);
+
+                // If there are registered display descriptors that is a good indication that VR is most likely "enabled"
+                return displaysDescs.Count > 0;
+            }
+
+            static bool IsVrRunning()
+            {
+                List<XRDisplaySubsystem> displays = new List<XRDisplaySubsystem>();
+                bool vrIsRunning = false;
+                displays.Clear();
+                SubsystemManager.GetInstances(displays);
+                foreach (var displaySubsystem in displays)
+                {
+                    if (displaySubsystem.running)
+                    {
+                        vrIsRunning = true;
+                        break;
+                    }
+                }
+
+                return vrIsRunning;
+            }
+
+        }
+
+        /// <summary>
+        /// Enables all TeleportAreas and Teleports (SteamVR).
+        /// </summary>
+        private static void EnableSteamVRTeleporting()
+        {
+            {
+                GameObject teleportArea = GameObject.Find("TeleportArea");
+                if (teleportArea != null)
+                {
+                    teleportArea.SetActive(true);
+                }
+            }
+            {
+                GameObject teleporting = GameObject.Find("Teleporting");
+                if (teleporting != null)
+                {
+                    teleporting.SetActive(true);
+                }
+            }
+            //foreach (TeleportArea area in FindObjectsOfType<TeleportArea>())
+            //{
+            //    area.gameObject.SetActive(false);
+            //}
+            //foreach (Teleport port in FindObjectsOfType<Teleport>())
+            //{
+            //    try
+            //    {
+            //        Debug.Log($"Disabling Teleport {port.name}.\n");
+            //        port.gameObject.SetActive(false);
+            //    }
+            //    catch (System.Exception e)
+            //    {
+            //        // The exception is not actually thrown in SetActive. Instead SetActive
+            //        // disables an object and then OnDisable() is called on that object 
+            //        // throwing the exception
+            //        Debug.LogError($"Cannot disable Teleport {port.name}: {e.Message}.\n");
+            //    }
+            //}
         }
 
         private void Start()
         {
             // Turn off controller hints if requested in the user settings.
-            if (playerInputType == PlayerInputType.VR && !ShowControllerHints)
+            if (playerInputType == PlayerInputType.VRPlayer && !ShowControllerHints)
             {
                 foreach (Hand hand in Player.instance.hands)
                 {
@@ -208,7 +330,7 @@ namespace SEE.Controls
         /// <param name = "isActive"> If true, mixed reality capabilities are enabled, otherwise they will be disabled.</param>
         private void SetMixedReality(bool isActive)
         {
-            playerHoloLens?.SetActive(playerInputType == PlayerInputType.HoloLens);
+            playerHoloLens?.SetActive(playerInputType == PlayerInputType.HoloLensPlayer);
             SetActive("MixedRealityToolkit", isActive);
             SetActive("CityCollection", isActive);
             SetActive(AppBarInteractableObject.AppBarName, isActive);
@@ -295,23 +417,6 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Sets <see cref="LocalPlayer"/> by retrieving the game object with the given <paramref name="name"/>.
-        /// </summary>
-        /// <param name="name">name of the player game object</param>
-        private static void SetLocalPlayer(string name)
-        {
-            GameObject player = GameObject.Find(name);
-            if (player != null)
-            {
-                LocalPlayer = player;
-            }
-            else
-            {
-                Debug.LogError($"A player object named {name} to be activated could not be found.\n");
-            }
-        }
-
-        /// <summary>
         /// If and only if HideControllers is true (when a VR player is playing), the VR controllers
         /// will not be visualized together with the hands of the player. Apparently, this
         /// hiding/showing must be run at each frame and, hence, we need to put this code into
@@ -319,7 +424,30 @@ namespace SEE.Controls
         /// </summary>
         private void Update()
         {
-            if (playerInputType != PlayerInputType.VR)
+            if (false)
+            {
+                Camera mainCamera = Camera.main;
+                if (mainCamera == null)
+                {
+                    Debug.Log("No main camera found. Searching for cameras in the scene.\n");
+
+                    // If no main camera was found, try to determine one.
+                    Camera[] cameras = GameObject.FindObjectsOfType<Camera>();
+                    if (cameras.Length == 0)
+                    {
+                        Debug.LogWarning("No cameras found. Creating a \"MainCamera\".\n");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("There are many cameras in the scene tagged as \"MainCamera\".\n");
+                    }
+                }
+                else
+                {
+                    Debug.Log($"Main camera found in {mainCamera.gameObject.FullName()}.\n");
+                }
+            }
+            if (playerInputType != PlayerInputType.VRPlayer)
             {
                 return;
             }
