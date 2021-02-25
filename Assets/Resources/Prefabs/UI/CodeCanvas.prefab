@@ -1,5 +1,300 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &510942965610180868
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6818365122217450074}
+  - component: {fileID: 3231811601327608521}
+  - component: {fileID: 7869268405887630298}
+  m_Layer: 5
+  m_Name: Handle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &6818365122217450074
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 510942965610180868}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 538887652045610802}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &3231811601327608521
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 510942965610180868}
+  m_CullTransparentMesh: 0
+--- !u!114 &7869268405887630298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 510942965610180868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 5618123237d1d3f49a5a6025287065f7, type: 3}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 15
+--- !u!1 &3236985776205549586
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8195152761385141465}
+  - component: {fileID: 785691357683498670}
+  - component: {fileID: 3207545039239364349}
+  m_Layer: 5
+  m_Name: Background
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &8195152761385141465
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3236985776205549586}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1723260216858328163}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -10, y: -10}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &785691357683498670
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3236985776205549586}
+  m_CullTransparentMesh: 0
+--- !u!114 &3207545039239364349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3236985776205549586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.09803922}
+  m_RaycastTarget: 1
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 5618123237d1d3f49a5a6025287065f7, type: 3}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 15
+--- !u!1 &4038532144789144311
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 538887652045610802}
+  m_Layer: 5
+  m_Name: Sliding Area
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &538887652045610802
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4038532144789144311}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 6818365122217450074}
+  m_Father: {fileID: 1723260216858328163}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -10, y: -10}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &6741046685560624861
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1723260216858328163}
+  - component: {fileID: 5534463812221236857}
+  - component: {fileID: 7502013803888393354}
+  - component: {fileID: 1640522302539096648}
+  m_Layer: 5
+  m_Name: HorizontalScrollbar
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1723260216858328163
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6741046685560624861}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 8195152761385141465}
+  - {fileID: 538887652045610802}
+  m_Father: {fileID: 8146208787343623777}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 20}
+  m_Pivot: {x: 0.5, y: 0}
+--- !u!222 &5534463812221236857
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6741046685560624861}
+  m_CullTransparentMesh: 0
+--- !u!114 &7502013803888393354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6741046685560624861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a4db7a114972834c8e4117be1d82ba3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 0.78431374}
+    m_HighlightedColor: {r: 1, g: 1, b: 1, a: 0.9607843}
+    m_PressedColor: {r: 1, g: 1, b: 1, a: 1}
+    m_SelectedColor: {r: 1, g: 1, b: 1, a: 0.9607843}
+    m_DisabledColor: {r: 1, g: 1, b: 1, a: 0.39215687}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Highlighted
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 7869268405887630298}
+  m_HandleRect: {fileID: 6818365122217450074}
+  m_Direction: 0
+  m_Value: 0.97
+  m_Size: 0.453561
+  m_NumberOfSteps: 0
+  m_OnValueChanged:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &1640522302539096648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6741046685560624861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e098a0a519700eb4094ec2c8b9d07b30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
+  background: {fileID: 3207545039239364349}
+  bar: {fileID: 7869268405887630298}
 --- !u!1 &8146208786112772849
 GameObject:
   m_ObjectHideFlags: 0
@@ -530,6 +825,7 @@ RectTransform:
   m_Children:
   - {fileID: 8146208787835869001}
   - {fileID: 8146208787464923640}
+  - {fileID: 1723260216858328163}
   m_Father: {fileID: 8146208787357133892}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -567,9 +863,9 @@ MonoBehaviour:
   m_DecelerationRate: 0.135
   m_ScrollSensitivity: 1
   m_Viewport: {fileID: 0}
-  m_HorizontalScrollbar: {fileID: 0}
+  m_HorizontalScrollbar: {fileID: 7502013803888393354}
   m_VerticalScrollbar: {fileID: 8146208787464923642}
-  m_HorizontalScrollbarVisibility: 0
+  m_HorizontalScrollbarVisibility: 1
   m_VerticalScrollbarVisibility: 0
   m_HorizontalScrollbarSpacing: 0
   m_VerticalScrollbarSpacing: 0
@@ -932,12 +1228,12 @@ Canvas:
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
-  m_OverrideSorting: 0
+  m_OverrideSorting: 1
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 31
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 10
   m_TargetDisplay: 0
 --- !u!114 &8146208787414380056
 MonoBehaviour:
@@ -1080,8 +1376,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8146208787045684849}
   m_HandleRect: {fileID: 8146208787045684854}
   m_Direction: 2
-  m_Value: 0.9999926
-  m_Size: 0.52595186
+  m_Value: 0.99992156
+  m_Size: 0.9204179
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1283,10 +1579,10 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.0047912598}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 0.0061035156, y: 0.004852295}
   m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 1}
+  m_Pivot: {x: 0, y: 1}
 --- !u!222 &8146208787835869003
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1314,56 +1610,35 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris eget fringilla
-    ipsum. Phasellus condimentum leo eu est dignissim, non bibendum nulla auctor.
-    Maecenas nisl diam, molestie in pellentesque at, blandit et lorem. Nullam odio
-    neque, sagittis id volutpat non, tempus eget est. Integer faucibus faucibus augue,
-    facilisis auctor urna. Cras finibus a arcu non pulvinar. Fusce fermentum orci
-    at pharetra ornare. Mauris placerat condimentum lacus, in ultrices felis lobortis
-    non. Donec eros justo, tristique sit amet dignissim a, tincidunt sit amet nulla.
-    Vestibulum tempus purus non mauris malesuada consectetur. Vestibulum fermentum
-    elit in sagittis blandit. Nunc varius, magna eu accumsan dignissim, dolor nisl
-    vestibulum ante, et commodo sapien massa ac leo. Aliquam eget accumsan sapien.
-
-
-
-    Cras
-    fringilla aliquet laoreet. Curabitur ante enim, tempor vitae tincidunt a, posuere
-    quis felis. Mauris et ipsum enim. Aenean id tincidunt lorem. Sed et semper odio,
-    a molestie ipsum. Curabitur vestibulum orci quis finibus molestie. Nunc aliquam
-    ultrices arcu, lobortis bibendum nisl vestibulum non.
-
-
-
-    Aenean convallis
-    pulvinar velit, gravida volutpat nibh rutrum at. Duis sed egestas mauris. Mauris
-    et nulla libero. Nunc quis mattis felis. Donec felis nulla, imperdiet in ullamcorper
-    maximus, sollicitudin ac erat. Phasellus vitae augue a magna euismod facilisis
-    ut id mauris. Proin porttitor pharetra venenatis. Etiam cursus massa vel lorem
-    pharetra, ut porta libero aliquet. Vestibulum sagittis lobortis elit, ac sagittis
-    enim. Phasellus a pulvinar massa, sed consequat risus. Vivamus a volutpat orci,
-    nec congue lacus. Nulla vitae sagittis turpis. Sed mollis ut magna a vestibulum.
-    Duis ut tristique lacus, gravida molestie arcu. Integer metus ligula, lobortis
-    at posuere ac, scelerisque non sapien. Fusce tincidunt vitae diam aliquam rhoncus.
-
-
-
-    Sed
-    sit amet sapien lectus. Pellentesque habitant morbi tristique senectus et netus
-    et malesuada fames ac turpis egestas. Morbi efficitur nibh eu tempus bibendum.
-    Proin a diam ipsum. Donec luctus metus nulla, quis hendrerit leo eleifend sit
-    amet. Maecenas congue quam quis ullamcorper molestie. Suspendisse magna risus,
-    hendrerit vitae accumsan eu, consequat non libero.
-
-
-
-    Praesent rhoncus mauris
-    volutpat fringilla viverra. Aenean sit amet quam turpis. Donec quis faucibus
-    ligula. Integer eget lacinia nibh. Suspendisse porttitor dolor eget feugiat gravida.
-    Quisque vitae eros orci. Mauris ullamcorper dui et dolor accumsan pulvinar. Nam
-    rhoncus ex ut tincidunt egestas. Nulla non leo ut felis bibendum lacinia vitae
-    ac orci. Duis in lacus vel lacus pellentesque scelerisque vitae at neque. Phasellus
-    at metus at eros malesuada lobortis eu at augue.'
+  m_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nMauris eget
+    fringilla ipsum. Phasellus condimentum leo eu est dignissim, non bibendum nulla
+    auctor. \nMaecenas nisl diam, molestie in pellentesque at, blandit et lorem.
+    \nNullam odio neque, sagittis id volutpat non, tempus eget est.\nInteger faucibus
+    faucibus augue, facilisis auctor urna. Cras finibus a arcu non pulvinar. Fusce
+    fermentum orci at pharetra ornare.\nMauris placerat condimentum lacus, in ultrices
+    felis lobortis non. Donec eros justo, tristique sit amet dignissim a, tincidunt
+    sit amet nulla. \nVestibulum tempus purus non mauris malesuada consectetur. Vestibulum
+    fermentum elit in sagittis blandit. \nNunc varius, magna eu accumsan dignissim,
+    dolor nisl vestibulum ante, et commodo sapien massa ac leo. \nAliquam eget accumsan
+    sapien.\n\n\nCras fringilla aliquet laoreet. Curabitur ante enim, tempor vitae
+    tincidunt a, posuere quis felis. \nMauris et ipsum enim. Aenean id tincidunt
+    lorem. Sed et semper odio, a molestie ipsum. \nCurabitur vestibulum orci quis
+    finibus molestie. Nunc aliquam ultrices arcu, lobortis bibendum nisl vestibulum
+    non.\n\n\nAenean convallis pulvinar velit, gravida volutpat nibh rutrum at. Duis
+    sed egestas mauris. \nMauris et nulla libero. Nunc quis mattis felis. Donec felis
+    nulla, imperdiet in ullamcorper maximus, sollicitudin ac erat. \nPhasellus vitae
+    augue a magna euismod facilisis ut id mauris. Proin porttitor pharetra venenatis.
+    Etiam cursus massa vel lorem pharetra, ut porta libero aliquet. \nVestibulum
+    sagittis lobortis elit, ac sagittis enim. Phasellus a pulvinar massa, sed consequat
+    risus. \nVivamus a volutpat orci, nec congue lacus. Nulla vitae sagittis turpis.
+    \nSed mollis ut magna a vestibulum. Duis ut tristique lacus, gravida molestie
+    arcu. Integer metus ligula, lobortis at posuere ac, scelerisque non sapien. \nFusce
+    tincidunt vitae diam aliquam rhoncus.\n\n\nSed sit amet sapien lectus. Pellentesque
+    habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+    \nMorbi efficitur nibh eu tempus bibendum. Proin a diam ipsum. Donec luctus metus
+    nulla, quis hendrerit leo eleifend sit amet.\nMaecenas congue quam quis ullamcorper
+    molestie. Suspendisse magna risus, hendrerit vitae accumsan eu, consequat non
+    libero."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 92937507b904a7642830aa23bef85941, type: 2}
   m_sharedMaterial: {fileID: 21347512826212414, guid: 92937507b904a7642830aa23bef85941,
@@ -1398,7 +1673,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 8
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -1407,7 +1682,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_enableWordWrapping: 0
   m_wordWrappingRatios: 0.413
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -1445,5 +1720,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_HorizontalFit: 0
+  m_HorizontalFit: 2
   m_VerticalFit: 2

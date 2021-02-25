@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using SEE.Controls.Actions;
 using SEE.Game.UI;
-using SEE.Game.UI.CodeWindow;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -32,7 +31,7 @@ namespace SEE.GO.Menu
         /// <returns>the newly created mode menu component.</returns>
         private static SelectionMenu CreateModeMenu(GameObject attachTo = null)
         {
-            Assert.IsTrue(ActionStateType.AllTypes.Count == 8);
+            Assert.IsTrue(ActionStateType.AllTypes.Count == 9);
             Assert.IsTrue(ActionStateType.Move.Value == 0);
             Assert.IsTrue(ActionStateType.Rotate.Value == 1);
             Assert.IsTrue(ActionStateType.Map.Value == 2);
@@ -41,6 +40,7 @@ namespace SEE.GO.Menu
             Assert.IsTrue(ActionStateType.EditNode.Value == 5);
             Assert.IsTrue(ActionStateType.ScaleNode.Value == 6);
             Assert.IsTrue(ActionStateType.Delete.Value == 7);
+            Assert.IsTrue(ActionStateType.ShowCode.Value == 8);
 
             // IMPORTANT NOTE: Because an ActionState.Type value will be used as an index into 
             // the following field of menu entries, the rank of an entry in this field of entry
@@ -97,12 +97,6 @@ namespace SEE.GO.Menu
             ActionState.OnStateChanged += OnStateChanged;
             Assert.IsTrue(ActionStateType.AllTypes.Count <= 9, 
                           "Only up to 9 (10 if zero is included) entries can be selected via the numbers on the keyboard!");
-            
-            //TODO remove this! this is just here temporarily to test the code window!
-            CodeWindow window = gameObject.AddComponent<CodeWindow>();
-            window.Title = "Hello!";
-            window.EnterFromFile(@"C:\Users\drasa\Documents\SEE\Data\GXL\TestProjectToDebug\Main.java");
-            window.Anchor = GameObject.Find("Implementation");
         }
         
         /// <summary>

@@ -5,6 +5,7 @@ using SEE.GO;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SEE.Game.UI.CodeWindow
 {
@@ -13,6 +14,12 @@ namespace SEE.Game.UI.CodeWindow
     /// </summary>
     public partial class CodeWindow
     {
+
+        /// <summary>
+        /// Scrollbar which controls the currently visible area of the code window.
+        /// </summary>
+        private Scrollbar scrollbar;
+        
         protected override void StartDesktop()
         {
             if (Title == null || Text == null)
@@ -81,6 +88,12 @@ namespace SEE.Game.UI.CodeWindow
             {
                 text.text = Text;
                 text.fontSize = FontSize;
+            }
+            
+            // Listen to scrollbar events
+            if (canvas.transform.Find("CodeWindow/Content/Scrollable/Scrollbar").gameObject.TryGetComponentOrLog(out scrollbar))
+            {
+                ScrollEvent = scrollbar.onValueChanged;
             }
             
             // Make canvas always face the camera
