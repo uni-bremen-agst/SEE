@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Contains a utility for the traversion of game-objects, more explicit the graphical representation of the graph.
+/// </summary>
 public static class GameObjectTraversion
 {
     /// <summary>
-    /// 
+    /// Traverses the graphical representation of the nodes of the graph from the <paramref name="parent"/> parent to the last leaf.
     /// </summary>
-    /// <param name="allChildrenOfParent"></param>
-    /// <param name="parent"></param>
-    /// <returns></returns>
+    /// <param name="allChildrenOfParent">the list which has to be containing all children of parent</param>
+    /// <param name="parent">the parent from where the graph has to be traversed</param>
+    /// <returns>All gameObjects in the hierachy from the <paramref name="parent"/> to the last leaf</returns>
     public static List<GameObject> GetAllChildNodesAsGameObject(List<GameObject> allChildrenOfParent, GameObject parent)
     {
         List<GameObject> childrenOfThisParent = new List<GameObject>();
@@ -47,5 +50,4 @@ public static class GameObjectTraversion
             return allChildrenOfParent;
         }
     }
-
 }

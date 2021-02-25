@@ -27,6 +27,11 @@ public class DeleteNetAction : AbstractAction
     }
 
     /// <summary>
+    /// The name of the Player-Desktop gameobject.
+    /// </summary>
+    private const string PlayerDesktop = "PlayerDesktop";
+
+    /// <summary>
     /// Things to execute on the server (none for this class). Necessary because it is abstract
     /// in the superclass.
     /// </summary>
@@ -42,7 +47,7 @@ public class DeleteNetAction : AbstractAction
     {
         if (!IsRequester())
         {
-            GameObject playerDesktop = GameObject.Find("PlayerDesktop");
+            GameObject playerDesktop = GameObject.Find(PlayerDesktop);
             playerDesktop.TryGetComponent(out DeleteAction deleteAction);
             deleteAction.DeleteSelectedObject(GameObject.Find(GameObjectID));
         }
