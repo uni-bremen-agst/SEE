@@ -2,52 +2,55 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Contains a utility for the traversion of game-objects, more explicit the graphical representation of the graph.
-/// </summary>
-public static class GameObjectTraversion
+namespace SEE.Utils
 {
     /// <summary>
-    /// Traverses the graphical representation of the nodes of the graph from the <paramref name="parent"/> parent to the last leaf.
+    /// Contains a utility for the traversion of game-objects, more explicit the graphical representation of the graph.
     /// </summary>
-    /// <param name="allChildrenOfParent">the list which has to be containing all children of parent</param>
-    /// <param name="parent">the parent from where the graph has to be traversed</param>
-    /// <returns>All gameObjects in the hierachy from the <paramref name="parent"/> to the last leaf</returns>
-    public static List<GameObject> GetAllChildNodesAsGameObject(List<GameObject> allChildrenOfParent, GameObject parent)
+    public static class GameObjectTraversion
     {
-        List<GameObject> childrenOfThisParent = new List<GameObject>();
-
-        if (!allChildrenOfParent.Contains(parent))
+        /// <summary>
+        /// Traverses the graphical representation of the nodes of the graph from the <paramref name="parent"/> parent to the last leaf.
+        /// </summary>
+        /// <param name="allChildrenOfParent">the list which has to be containing all children of parent</param>
+        /// <param name="parent">the parent from where the graph has to be traversed</param>
+        /// <returns>All gameObjects in the hierachy from the <paramref name="parent"/> to the last leaf</returns>
+        public static List<GameObject> GetAllChildNodesAsGameObject(List<GameObject> allChildrenOfParent, GameObject parent)
         {
-            allChildrenOfParent.Add(parent);
-        }
+            List<GameObject> childrenOfThisParent = new List<GameObject>();
 
-        int numberOfAllGamenodes = allChildrenOfParent.Count;
-
-        foreach (Transform child in parent.transform)
-        {
-            if (child.gameObject.CompareTag(Tags.Node))
+            if (!allChildrenOfParent.Contains(parent))
             {
-                if (!allChildrenOfParent.Contains(child.gameObject))
+                allChildrenOfParent.Add(parent);
+            }
+
+            int numberOfAllGamenodes = allChildrenOfParent.Count;
+
+            foreach (Transform child in parent.transform)
+            {
+                if (child.gameObject.CompareTag(Tags.Node))
                 {
-                    allChildrenOfParent.Add(child.gameObject);
+                    if (!allChildrenOfParent.Contains(child.gameObject))
+                    {
+                        allChildrenOfParent.Add(child.gameObject);
+                    }
+                    childrenOfThisParent.Add(child.gameObject);
                 }
-                childrenOfThisParent.Add(child.gameObject);
             }
-        }
 
-        if (allChildrenOfParent.Count == numberOfAllGamenodes)
-        {
-            return allChildrenOfParent;
-        }
-        else
-        {
-            foreach (GameObject childs in childrenOfThisParent)
+            if (allChildrenOfParent.Count == numberOfAllGamenodes)
             {
-                GetAllChildNodesAsGameObject(allChildrenOfParent,childs);
+                return allChildrenOfParent;
             }
+            else
+            {
+                foreach (GameObject childs in childrenOfThisParent)
+                {
+                    GetAllChildNodesAsGameObject(allChildrenOfParent, childs);
+                }
 
-            return allChildrenOfParent;
+                return allChildrenOfParent;
+            }
         }
     }
 }

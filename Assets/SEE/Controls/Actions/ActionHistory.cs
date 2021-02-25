@@ -8,158 +8,161 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-/// <summary>
-/// This class is responsible for saving the deleted objects in a history for the possibility of an undo-operation.
-/// </summary>
-public class ActionHistory : MonoBehaviour
+namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// A history of all deleted nodes
+    /// This class is responsible for saving the deleted objects in a history for the possibility of an undo-operation.
     /// </summary>
-    public LinkedList<List<GameObject>> deletedNodeHistory = new LinkedList<List<GameObject>>();
-
-    /// <summary>
-    /// A history of the old positions of the deleted nodes
-    /// </summary>
-    private LinkedList<List<Vector3>> oldPositionHistory = new LinkedList<List<Vector3>>();
-
-    /// <summary>
-    /// A history of all deleted edges
-    /// </summary>
-    private LinkedList<List<GameObject>> deletedEdgeHistory = new LinkedList<List<GameObject>>();
-
-    /// <summary>
-    /// The graph of the node to be deleted
-    /// </summary>
-    private Graph graph;
-
-    /// <summary>
-    /// Saves the deleted nodes and/or edges for the possibility of an undo. 
-    /// Removes the gameObjects from the graph.
-    /// </summary>
-    /// <param name="deletedNodes"> all deleted nodes of the last operation</param>
-    /// <param name="oldPositionsOfDeletedNodes">all old positions of the deleted nodes of the last operation</param>
-    public void SaveObjectForUndo(List<GameObject> deletedNodes, List<Vector3> oldPositionsOfDeletedNodes)
+    public class ActionHistory : MonoBehaviour
     {
-        //FIXME FOR GOEDECKE: param deletedNodes -> deleted Objects..? dunno cause of outsourcing of edges in other function in future - if -> in docs and param
+        /// <summary>
+        /// A history of all deleted nodes
+        /// </summary>
+        public LinkedList<List<GameObject>> deletedNodeHistory = new LinkedList<List<GameObject>>();
 
-        SEECity city = SceneQueries.GetCodeCity(deletedNodes[0].transform)?.gameObject.GetComponent<SEECity>();
-        graph = city.LoadedGraph;
-        List<GameObject> nodesAndascendingEdges = new List<GameObject>();
-        List<GameObject> edgesToHide = new List<GameObject>();
+        /// <summary>
+        /// A history of the old positions of the deleted nodes
+        /// </summary>
+        private LinkedList<List<Vector3>> oldPositionHistory = new LinkedList<List<Vector3>>();
 
-        foreach (GameObject actionHistoryObject in deletedNodes)
+        /// <summary>
+        /// A history of all deleted edges
+        /// </summary>
+        private LinkedList<List<GameObject>> deletedEdgeHistory = new LinkedList<List<GameObject>>();
+
+        /// <summary>
+        /// The graph of the node to be deleted
+        /// </summary>
+        private Graph graph;
+
+        /// <summary>
+        /// Saves the deleted nodes and/or edges for the possibility of an undo. 
+        /// Removes the gameObjects from the graph.
+        /// </summary>
+        /// <param name="deletedNodes"> all deleted nodes of the last operation</param>
+        /// <param name="oldPositionsOfDeletedNodes">all old positions of the deleted nodes of the last operation</param>
+        public void SaveObjectForUndo(List<GameObject> deletedNodes, List<Vector3> oldPositionsOfDeletedNodes)
         {
-            if (actionHistoryObject.TryGetComponent(out NodeRef nodeRef))
+            //FIXME FOR GOEDECKE: param deletedNodes -> deleted Objects..? dunno cause of outsourcing of edges in other function in future - if -> in docs and param
+
+            SEECity city = SceneQueries.GetCodeCity(deletedNodes[0].transform)?.gameObject.GetComponent<SEECity>();
+            graph = city.LoadedGraph;
+            List<GameObject> nodesAndascendingEdges = new List<GameObject>();
+            List<GameObject> edgesToHide = new List<GameObject>();
+
+            foreach (GameObject actionHistoryObject in deletedNodes)
             {
-                HashSet<string> edgeIDs = Destroyer.GetEdgeIds(nodeRef);
-                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
+                if (actionHistoryObject.TryGetComponent(out NodeRef nodeRef))
                 {
-                    if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
+                    HashSet<string> edgeIDs = Destroyer.GetEdgeIds(nodeRef);
+                    foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
                     {
-
-                        edge.SetVisibility(false, true);
-
-                        if (nodesAndascendingEdges.Contains(edge) == false)
+                        if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                         {
-                            edgesToHide.Add(edge);
+
+                            edge.SetVisibility(false, true);
+
+                            if (nodesAndascendingEdges.Contains(edge) == false)
+                            {
+                                edgesToHide.Add(edge);
+                            }
+
+                            edge.TryGetComponent(out EdgeRef edgeRef);
+                            graph.RemoveEdge(edgeRef.edge);
                         }
-
-                        edge.TryGetComponent(out EdgeRef edgeRef);
-                        graph.RemoveEdge(edgeRef.edge);
                     }
-                }
 
-                if (actionHistoryObject.TryGetComponent(out Collider collider))
+                    if (actionHistoryObject.TryGetComponent(out Collider collider))
+                    {
+                        actionHistoryObject.GetComponent<Collider>().enabled = false;
+                    }
+
+                    nodesAndascendingEdges.Add(actionHistoryObject);
+                }
+            }
+
+            List<GameObject> deletedNodesReverse = deletedNodes;
+            //For deletion bottom-up
+            deletedNodesReverse.Reverse();
+
+            foreach (GameObject deletedNode in deletedNodesReverse)
+            {
+                deletedNode.TryGetComponent(out NodeRef nodeRef);
+                graph.RemoveNode(nodeRef.Value);
+            }
+
+            oldPositionsOfDeletedNodes.Reverse();
+            nodesAndascendingEdges.Reverse();
+            deletedEdgeHistory.AddLast(edgesToHide);
+            oldPositionHistory.AddLast(oldPositionsOfDeletedNodes);
+            deletedNodeHistory.AddLast(nodesAndascendingEdges);
+        }
+
+        /// <summary>
+        /// Gets the last operation in history and undoes it. 
+        /// </summary>
+        /// <returns>the positions of the gameObjects where they has to be moved after undo again</returns>
+        public List<Vector3> UndoDeleteOperation()
+        {
+            foreach (GameObject node in deletedNodeHistory.Last())
+            {
+                if (node.TryGetComponent(out NodeRef nodeRef))
                 {
-                    actionHistoryObject.GetComponent<Collider>().enabled = false;
+                    graph.AddNode(nodeRef.Value);
                 }
-
-                nodesAndascendingEdges.Add(actionHistoryObject);
+                if (node.TryGetComponent(out Collider collider))
+                {
+                    node.GetComponent<Collider>().enabled = true;
+                }
             }
-        }
 
-        List<GameObject> deletedNodesReverse = deletedNodes;
-        //For deletion bottom-up
-        deletedNodesReverse.Reverse();
-
-        foreach (GameObject deletedNode in deletedNodesReverse)
-        {
-            deletedNode.TryGetComponent(out NodeRef nodeRef);
-            graph.RemoveNode(nodeRef.Value);
-        }
-
-        oldPositionsOfDeletedNodes.Reverse();
-        nodesAndascendingEdges.Reverse();
-        deletedEdgeHistory.AddLast(edgesToHide);
-        oldPositionHistory.AddLast(oldPositionsOfDeletedNodes);
-        deletedNodeHistory.AddLast(nodesAndascendingEdges);
-    }
-
-    /// <summary>
-    /// Gets the last operation in history and undoes it. 
-    /// </summary>
-    /// <returns>the positions of the gameObjects where they has to be moved after undo again</returns>
-    public List<Vector3> UndoDeleteOperation()
-    {
-        foreach (GameObject node in deletedNodeHistory.Last())
-        {
-            if (node.TryGetComponent(out NodeRef nodeRef))
+            foreach (GameObject edge in deletedEdgeHistory.Last())
             {
-                graph.AddNode(nodeRef.Value);
+                if (edge.TryGetComponent(out EdgeRef edgeReference))
+                {
+                    graph.AddEdge(edgeReference.edge);
+                    edge.SetVisibility(true, false);
+                }
             }
-            if (node.TryGetComponent(out Collider collider))
-            {
-                node.GetComponent<Collider>().enabled = true;
-            }
+
+            deletedEdgeHistory.RemoveLast();
+            deletedNodeHistory.RemoveLast();
+            oldPositionHistory.RemoveLast();
+
+            return oldPositionHistory.Last();
         }
 
-        foreach (GameObject edge in deletedEdgeHistory.Last())
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="counter"></param>
+        /// <param name="states"></param>
+        private static void CheckBoundaries(int counter)
         {
-            if (edge.TryGetComponent(out EdgeRef edgeReference))
             {
-                graph.AddEdge(edgeReference.edge);
-                edge.SetVisibility(true, false);
+
+                throw new NotSupportedException("Redo function cannot be executed");
+
             }
         }
 
-        deletedEdgeHistory.RemoveLast();
-        deletedNodeHistory.RemoveLast();
-        oldPositionHistory.RemoveLast();
-
-        return oldPositionHistory.Last();
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="counter"></param>
-    /// <param name="states"></param>
-    private static void CheckBoundaries(int counter)
-    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="removedObject"></param>
+        private static void RemoveForReflexionAnalysis(GameObject removedObject)
         {
-
-            throw new NotSupportedException("Redo function cannot be executed");
-
+            // remove node or edge
         }
-    }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="removedObject"></param>
-    private static void RemoveForReflexionAnalysis(GameObject removedObject)
-    {
-        // remove node or edge
-    }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="objectToAddtoGraphHierarchy"></param>
+        private static void Reparent(GameObject objectToAddtoGraphHierarchy)
+        {
+            //add edge or node - reparenting.
+        }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="objectToAddtoGraphHierarchy"></param>
-    private static void Reparent(GameObject objectToAddtoGraphHierarchy)
-    {
-        //add edge or node - reparenting.
     }
-
 }

@@ -1,16 +1,19 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// This script is attached to the garbage-can and is responsible for interactions with the garbage-can onclick. 
+/// </summary>
 public class GarbageCan : MonoBehaviour
 {
     /// <summary>
     /// A Ray from the mouse-position to the hovered object
     /// </summary>
-    Ray ray;
+    private Ray ray;
 
     /// <summary>
     /// The object which was hitten by the ray
     /// </summary>
-    RaycastHit hit;
+    private RaycastHit hit;
 
     // Start is called before the first frame update
     void Start()
@@ -25,9 +28,8 @@ public class GarbageCan : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0) && Physics.Raycast(ray, out hit) && hit.transform == gameObject.transform)
         {
-            // Question: Is this mechanism not implemented yet?
-            // Fixme: Onclick - just the colliderName(GarbageCan) will be printed out - there has to be a interaction-possibility.
-            Debug.Log(hit.collider.name);
+            //Fixme: In future - there should be an interaction with the garbage-can possible.
+            //A user could choose from all deleted Nodes maybe for undo not only the last operation, but also a specific action from history.
         }
     }
 }
