@@ -2,7 +2,6 @@
 
 using System;
 using System.Linq;
-using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.DataModel;
 using SEE.Game;
