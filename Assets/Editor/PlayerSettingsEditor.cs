@@ -132,25 +132,12 @@ namespace SEEEditor
             table.name = "Table";
             table.tag = Tags.CullingPlane;
 
-            // Create InControl from prefab
-            UnityEngine.Object inControlPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Players/InControl.prefab");
-            GameObject inControl = Instantiate(inControlPrefab) as GameObject;
-            UnityEngine.Assertions.Assert.IsNotNull(inControl);
-            inControl.name = "InControl";
-
             // Create ChartManager from prefab
             UnityEngine.Object chartManagerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Charts/ChartManager.prefab");
             GameObject chartManager = Instantiate(chartManagerPrefab) as GameObject;
             UnityEngine.Assertions.Assert.IsNotNull(chartManager);
             chartManager.name = "Chart Manager";
-            // FIXME: retrieve vrCamera
-            // chartManager.transform.GetChild(0).GetComponent<ChartPositionVr>().cameraTransform = vrCamera.transform;
 
-            // Create HoloLensAppBar from prefab
-            UnityEngine.Object appBarPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Resources/Prefabs/HoloLensAppBar.prefab");
-            GameObject appBar = Instantiate(appBarPrefab) as GameObject;
-            UnityEngine.Assertions.Assert.IsNotNull(appBar);
-            chartManager.name = AppBarInteractableObject.AppBarName;
         }
     }
 }

@@ -107,38 +107,8 @@ namespace SEE.Controls
         /// </summary>
         private void Awake()
         {
-            // We have to explicitly disable VR if the user wants us to. Otherwise the
-            // mouse positions will be wrong if VR is enabled and a head-mounted display (HMD)
-            // is connected. That seems to be a bug.
-            try
-            {
-                bool enableXR = playerInputType == PlayerInputType.VRPlayer || playerInputType == PlayerInputType.HoloLensPlayer;
-                VRStatus.Enable(enableXR);
-                //XRSettings.enabled = enableXR;
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"VR enabling/disabling issue: {e.Message}");
-            }
-
-            if (playerInputType == PlayerInputType.VRPlayer)
-            {
-                try
-                {
-                    EnableSteamVRTeleporting();
-                }
-                catch (Exception e)
-                {
-                    Debug.LogWarning($"Disabling teleporting issue: {e.Message}");
-                }
-            }
-
             Debug.LogFormat("Player input type: {0}\n", playerInputType.ToString());
-
-            //playerDesktop?.SetActive(playerInputType == PlayerInputType.Desktop);
-            //SetMixedReality(playerInputType == PlayerInputType.HoloLens);
-            //playerTouchGamepad?.SetActive(playerInputType == PlayerInputType.TouchGamepad);
-            //playerVR?.SetActive(playerInputType == PlayerInputType.VR);
+            VRStatus.Enable(playerInputType == PlayerInputType.VRPlayer || playerInputType == PlayerInputType.HoloLensPlayer);
             LocalPlayer = CreatePlayer(playerInputType);
         }
 
@@ -193,56 +163,25 @@ namespace SEE.Controls
                         }                        
                     }
                     break;
+                case PlayerInputType.HoloLensPlayer:
+                    {                        
+                        SetupMixedReality();
+                        player = PlayerFactory.CreateVRPlayer();
+                    }
+                    break;
+                case PlayerInputType.TouchGamepadPlayer:
+                    player = PlayerFactory.CreateTouchGamepadPlayer();
+                    break;
                 default:
                     throw new NotImplementedException($"Unhandled case {playerInputType}.");
             }
             player.transform.position = new Vector3(0, 1.26f, -2.75f);
             return player;
-        }
-
-        /// <summary>
-        /// Enables all TeleportAreas and Teleports (SteamVR).
-        /// </summary>
-        private static void EnableSteamVRTeleporting()
-        {
-            {
-                GameObject teleportArea = GameObject.Find("TeleportArea");
-                if (teleportArea != null)
-                {
-                    teleportArea.SetActive(true);
-                }
-            }
-            {
-                GameObject teleporting = GameObject.Find("Teleporting");
-                if (teleporting != null)
-                {
-                    teleporting.SetActive(true);
-                }
-            }
-            //foreach (TeleportArea area in FindObjectsOfType<TeleportArea>())
-            //{
-            //    area.gameObject.SetActive(false);
-            //}
-            //foreach (Teleport port in FindObjectsOfType<Teleport>())
-            //{
-            //    try
-            //    {
-            //        Debug.Log($"Disabling Teleport {port.name}.\n");
-            //        port.gameObject.SetActive(false);
-            //    }
-            //    catch (System.Exception e)
-            //    {
-            //        // The exception is not actually thrown in SetActive. Instead SetActive
-            //        // disables an object and then OnDisable() is called on that object 
-            //        // throwing the exception
-            //        Debug.LogError($"Cannot disable Teleport {port.name}: {e.Message}.\n");
-            //    }
-            //}
-        }
+        }       
 
         private void Start()
         {
-            // Turn off controller hints if requested in the user settings.
+            // Turn off VR controller hints if requested in the user settings.
             if (playerInputType == PlayerInputType.VRPlayer && !ShowControllerHints)
             {
                 foreach (Hand hand in Player.instance.hands)
@@ -259,27 +198,30 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Enables or disables mixed reality capabilities, including the Mixed Reality Toolkit.
+        /// Enables mixed reality capabilities in the scene, including the Mixed Reality Toolkit.
         /// </summary>
-        /// <param name = "isActive"> If true, mixed reality capabilities are enabled, otherwise they will be disabled.</param>
-        private void SetMixedReality(bool isActive)
-        {            
-            SetActive("MixedRealityToolkit", isActive);
-            SetActive("CityCollection", isActive);
-            SetActive(AppBarInteractableObject.AppBarName, isActive);
-            
-            // Disable Teleporting to avoid conflict with MRTK
-            SetActive("Teleporting", !isActive);
-            SetActive("TeleportArea", !isActive);
-            
-            // Hide all decoration to improve performance
-            GameObject.FindGameObjectsWithTag(Tags.Decoration).ForEach(go => go.SetActive(!isActive));
-
-            if (!isActive)
+        private void SetupMixedReality()
+        {
             {
-                MixedRealityToolkit.SetInstanceInactive(MixedRealityToolkit.Instance);
+                // Add a MixedRealityToolkit to the scene
+                GameObject mrtk = new GameObject("MixedRealityToolkit");
+                mrtk.AddComponent<MixedRealityToolkit>();
             }
-            else
+            {
+                // Create HoloLensAppBar from prefab
+                UnityEngine.Object appBarPrefab = Resources.Load<GameObject>("Prefabs/HoloLensAppBar.prefab");
+                GameObject appBar = Instantiate(appBarPrefab) as GameObject;
+                UnityEngine.Assertions.Assert.IsNotNull(appBar);
+            }
+            {
+                // Add a city collection
+                GameObject cityCollection = new GameObject("CityCollection");
+                cityCollection.AddComponent<GridObjectCollection>();
+            }
+             
+            // Hide all decoration to improve performance
+            GameObject.FindGameObjectsWithTag(Tags.Decoration).ForEach(go => go.SetActive(false));
+
             {
                 // Set selected experience scale 
                 MixedRealityToolkit.Instance.ActiveProfile.TargetExperienceScale = experienceScale;
@@ -339,17 +281,6 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Enables or disables a game object with the given <paramref name="gameObjectName" />.
-        /// </summary>
-        /// <param name="gameObjectName">name of the object to be enabled/disabled</param>
-        /// <param name="activate">whether to enable or disable the object</param>
-        private void SetActive(string gameObjectName, bool activate)
-        {
-            GameObject player = GameObject.Find(gameObjectName);
-            player?.SetActive(activate);           
-        }
-
-        /// <summary>
         /// If and only if HideControllers is true (when a VR player is playing), the VR controllers
         /// will not be visualized together with the hands of the player. Apparently, this
         /// hiding/showing must be run at each frame and, hence, we need to put this code into
@@ -357,45 +288,20 @@ namespace SEE.Controls
         /// </summary>
         private void Update()
         {
-            if (false)
+            if (playerInputType == PlayerInputType.VRPlayer)
             {
-                Camera mainCamera = Camera.main;
-                if (mainCamera == null)
+                foreach (Hand hand in Player.instance.hands)
                 {
-                    Debug.Log("No main camera found. Searching for cameras in the scene.\n");
-
-                    // If no main camera was found, try to determine one.
-                    Camera[] cameras = GameObject.FindObjectsOfType<Camera>();
-                    if (cameras.Length == 0)
+                    if (HideVRControllers)
                     {
-                        Debug.LogWarning("No cameras found. Creating a \"MainCamera\".\n");
+                        hand.HideController();
+                        hand.SetSkeletonRangeOfMotion(EVRSkeletalMotionRange.WithoutController);
                     }
                     else
                     {
-                        Debug.LogWarning("There are many cameras in the scene tagged as \"MainCamera\".\n");
+                        hand.ShowController();
+                        hand.SetSkeletonRangeOfMotion(EVRSkeletalMotionRange.WithController);
                     }
-                }
-                else
-                {
-                    Debug.Log($"Main camera found in {mainCamera.gameObject.FullName()}.\n");
-                }
-            }
-            if (playerInputType != PlayerInputType.VRPlayer)
-            {
-                return;
-            }
-
-            foreach (Hand hand in Player.instance.hands)
-            {
-                if (HideVRControllers)
-                {
-                    hand.HideController();
-                    hand.SetSkeletonRangeOfMotion(EVRSkeletalMotionRange.WithoutController);
-                }
-                else
-                {
-                    hand.ShowController();
-                    hand.SetSkeletonRangeOfMotion(EVRSkeletalMotionRange.WithController);
                 }
             }
         }
