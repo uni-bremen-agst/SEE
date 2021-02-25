@@ -206,6 +206,7 @@ namespace SEE.Controls
                         ChartPositionVr chartPosition = chartManager.GetComponentInChildren<ChartPositionVr>();
                         if (chartPosition)
                         {
+                            chartPosition.enabled = true;
                             chartPosition.CameraTransform = player.GetComponentInChildren<Camera>().transform;
                             Debug.Log($"VR camera of {player.name} successfully assigned to {chartManagerName}.\n");
                         }
