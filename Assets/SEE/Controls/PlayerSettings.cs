@@ -21,25 +21,14 @@ namespace SEE.Controls
     /// <summary>
     /// Allows a user to select the kind of environment in which the game
     /// runs: (1) desktop with keyboard and mouse input, (2) touch devices 
-    /// or gamepads using InControl, or (3) virtual reality.
+    /// or gamepads using InControl, (3) virtual reality, or (4) augmented
+    /// reality.
     /// </summary>
     public class PlayerSettings : MonoBehaviour
     {
         [Tooltip("What kind of player type should be enabled.")]
         [OdinSerialize]
         public PlayerInputType playerInputType = PlayerInputType.DesktopPlayer;
-
-        [Tooltip("The GameObject containing the desktop player.")]
-        [SerializeField] private GameObject playerDesktop;
-
-        [Tooltip("The GameObject containing the HoloLens player.")]
-        [SerializeField] private GameObject playerHoloLens;
-
-        [Tooltip("The GameObject containing the touch gamepad player.")]
-        [SerializeField] private GameObject playerTouchGamepad;
-
-        [Tooltip("The GameObject containing the VR player.")]
-        [SerializeField] private GameObject playerVR;
 
         [Header("VR specific settings (relevant only for VR players)")]
 
@@ -323,14 +312,12 @@ namespace SEE.Controls
             }
         }
 
-
         /// <summary>
         /// Enables or disables mixed reality capabilities, including the Mixed Reality Toolkit.
         /// </summary>
         /// <param name = "isActive"> If true, mixed reality capabilities are enabled, otherwise they will be disabled.</param>
         private void SetMixedReality(bool isActive)
-        {
-            playerHoloLens?.SetActive(playerInputType == PlayerInputType.HoloLensPlayer);
+        {            
             SetActive("MixedRealityToolkit", isActive);
             SetActive("CityCollection", isActive);
             SetActive(AppBarInteractableObject.AppBarName, isActive);
