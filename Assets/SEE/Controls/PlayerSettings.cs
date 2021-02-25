@@ -32,6 +32,10 @@ namespace SEE.Controls
         [OdinSerialize]
         public PlayerInputType playerInputType = PlayerInputType.DesktopPlayer;
 
+        [Tooltip("The position at which to spawn the player initially.")]
+        [OdinSerialize]
+        public Vector3 PlayerOrigin = Vector3.one;
+
         [Header("VR specific settings (relevant only for VR players)")]
 
         [Tooltip("Whether the VR controllers should be hidden.")]
@@ -159,7 +163,7 @@ namespace SEE.Controls
                 default:
                     throw new NotImplementedException($"Unhandled case {playerInputType}.");
             }
-            player.transform.position = new Vector3(0, 1.26f, -2.75f);
+            player.transform.position = PlayerOrigin;
             return player;
         }
 
