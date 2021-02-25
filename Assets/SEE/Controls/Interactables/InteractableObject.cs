@@ -631,7 +631,7 @@ namespace SEE.Controls
         {
             // FIXME: For an unknown reason, this method will be called twice per frame.
             // Debug.LogFormat("{0}.OnMouseEnter({1}) @ {2}\n", this.GetType().FullName, gameObject.name, Time.time);
-            if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop && !Raycasting.IsMouseOverGUI())
+            if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer && !Raycasting.IsMouseOverGUI())
             {
                 SetHoverFlag(HoverFlag.World, setFlag: true, isOwner: true);
             }
@@ -642,7 +642,7 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseOver()
         {
-            if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop)
+            if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer)
             {
                 // Does this mouse event relate to a city-world object (game node or edge)?
                 bool isWorldBitSet = (HoverFlags & (uint)HoverFlag.World) != 0;
@@ -664,7 +664,7 @@ namespace SEE.Controls
         {
             // FIXME: For an unknown reason, this method will be called twice per frame.
             // Debug.LogFormat("{0}.OnMouseExit({1}) @ {2}\n", this.GetType().FullName, gameObject.name, Time.time.ToString("F20"));
-            if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.Desktop && !Raycasting.IsMouseOverGUI())
+            if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer && !Raycasting.IsMouseOverGUI())
             {
                 SetHoverFlag(HoverFlag.World, setFlag: false, isOwner: true);
             }

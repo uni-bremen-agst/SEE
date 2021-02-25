@@ -3,6 +3,7 @@ using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.UI;
 using Microsoft.MixedReality.Toolkit.UI.BoundsControl;
 using Microsoft.MixedReality.Toolkit.UI.BoundsControlTypes;
+using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 
@@ -45,7 +46,7 @@ namespace SEE.Controls
 
         private void Start()
         {
-            if (PlayerSettings.GetInputType() != PlayerSettings.PlayerInputType.HoloLens)
+            if (PlayerSettings.GetInputType() != PlayerInputType.HoloLensPlayer)
             {
                 Destroyer.DestroyComponent(this);
                 return;
