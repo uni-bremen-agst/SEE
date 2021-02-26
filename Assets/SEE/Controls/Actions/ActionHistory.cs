@@ -90,7 +90,10 @@ namespace SEE.Controls.Actions
                 if (deletedNode.tag == Tags.Node)
                 {
                     deletedNode.TryGetComponent(out NodeRef nodeRef);
-                    graph.RemoveNode(nodeRef.Value);
+                    if (graph.Contains(nodeRef.Value))
+                    {
+                        graph.RemoveNode(nodeRef.Value);
+                    }
                 }
                 if (deletedNode.tag == Tags.Edge)
                 {
@@ -123,7 +126,10 @@ namespace SEE.Controls.Actions
             {
                 if (node.TryGetComponent(out NodeRef nodeRef))
                 {
-                    graph.AddNode(nodeRef.Value);
+                    if (!graph.Contains(nodeRef.Value))
+                    {
+                        graph.AddNode(nodeRef.Value);
+                    }
                 }
                 if (node.TryGetComponent(out Collider collider))
                 {
