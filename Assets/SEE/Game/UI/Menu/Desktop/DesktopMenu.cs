@@ -1,17 +1,17 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using SEE.GO;
 using SEE.Utils;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace SEE.Game.UI
 {
     /// <summary>
-    /// Responsible for the Desktop UI for Menus.
+    /// Responsible for the desktop UI for menus.
     /// </summary>
     /// <typeparam name="T">the type of entries used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
     public partial class Menu<T>
@@ -20,25 +20,25 @@ namespace SEE.Game.UI
         /// The path to the prefab for the menu game object.
         /// Will be added as a child to the <see cref="Canvas"/> if it doesn't exist yet.
         /// </summary>
-        private const string MENU_PREFAB = "Assets/Prefabs/UI/Menu.prefab";
+        private const string MENU_PREFAB = "Prefabs/UI/Menu";
 
         /// <summary>
         /// The path to the prefab for the menu game object.
         /// Will be added for each menu entry in <see cref="Entries"/>.
         /// </summary>
-        private const string BUTTON_PREFAB = "Assets/Prefabs/UI/Button.prefab";
+        private const string BUTTON_PREFAB = "Prefabs/UI/Button";
         
         /// <summary>
         /// The path to the prefab for the list game object.
         /// Will be added as a child to the <see cref="MenuGameObject"/>.
         /// </summary>
-        private const string LIST_PREFAB = "Assets/Prefabs/UI/MenuEntries.prefab";
+        private const string LIST_PREFAB = "Prefabs/UI/MenuEntries";
         
         /// <summary>
         /// The path to the prefab for the tooltip game object.
         /// Will be added as a child to the <see cref="Canvas"/>.
         /// </summary>
-        private const string TOOLTIP_PREFAB = "Assets/Prefabs/UI/Tooltip.prefab";
+        private const string TOOLTIP_PREFAB = "Prefabs/UI/Tooltip";
 
         /// <summary>
         /// The GameObject which contains the actual content of the menu, i.e. its entries.
@@ -61,7 +61,12 @@ namespace SEE.Game.UI
         /// are needed, more GameObjects with TooltipManagers need to be created.
         /// </summary>
         protected TooltipManager TooltipManager;
-        
+
+        /// <summary>
+        /// List of all button managers for the buttons used in this menu.
+        /// </summary>
+        protected readonly List<ButtonManagerBasicWithIcon> ButtonManagers = new List<ButtonManagerBasicWithIcon>();
+
         protected override void StartDesktop()
         {
             SetUpDesktopWindow();
@@ -80,7 +85,7 @@ namespace SEE.Game.UI
             if (Manager == null)
             {
                 // Create it from prefab if it doesn't exist yet
-                Object menuPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(MENU_PREFAB);
+                Object menuPrefab = Resources.Load<GameObject>(MENU_PREFAB);
                 MenuGameObject = Instantiate(menuPrefab, Canvas.transform, false) as GameObject;
                 UnityEngine.Assertions.Assert.IsNotNull(MenuGameObject);
                 MenuGameObject.name = Title;
@@ -95,13 +100,14 @@ namespace SEE.Game.UI
             Manager.titleText = Title;
             Manager.descriptionText = Description;
             Manager.icon = Icon;
+            Manager.onConfirm.AddListener(() => ShowMenu(false));
             
             // Add tooltip
             TooltipManager = MenuGameObject.GetComponentInChildren<TooltipManager>();
             if (TooltipManager == null)
             {
                 // Create new tooltip GameObject
-                Object tooltipPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(TOOLTIP_PREFAB);
+                Object tooltipPrefab = Resources.Load<GameObject>(TOOLTIP_PREFAB);
                 GameObject tooltip = Instantiate(tooltipPrefab, Canvas.transform, false) as GameObject;
                 UnityEngine.Assertions.Assert.IsNotNull(tooltip);
                 tooltip.TryGetComponentOrLog(out TooltipManager);
@@ -125,7 +131,7 @@ namespace SEE.Game.UI
             if (List == null)
             {
                 // Create menu entry list if it doesn't exist yet
-                Object listPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(LIST_PREFAB);
+                Object listPrefab = Resources.Load<GameObject>(LIST_PREFAB);
                 List = Instantiate(listPrefab, MenuContent.transform, false) as GameObject;
                 if (List == null)
                 {
@@ -138,7 +144,7 @@ namespace SEE.Game.UI
             }
 
             // Then, add all entries as buttons
-            Object buttonPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BUTTON_PREFAB);
+            Object buttonPrefab = Resources.Load<GameObject>(BUTTON_PREFAB);
             foreach (T entry in Entries)
             {
                 GameObject button = Instantiate(buttonPrefab, List.transform, false) as GameObject;
@@ -175,6 +181,7 @@ namespace SEE.Game.UI
                     textMeshPro.color = entry.DisabledColor.IdealTextColor();
                     iconImage.color = entry.DisabledColor.IdealTextColor();
                 }
+                ButtonManagers.Add(buttonManager);
             }
         }
 
@@ -207,8 +214,15 @@ namespace SEE.Game.UI
         {
             if (MenuShown != CurrentMenuShown)
             {
-                // Toggle state when menu state has been changed
-                Manager.AnimateWindow();
+                if (MenuShown)
+                {
+                    Manager?.OpenWindow();
+                }
+                else
+                {
+                    Manager?.CloseWindow();
+                }
+
                 CurrentMenuShown = MenuShown;
             }
         }

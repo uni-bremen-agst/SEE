@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: MUIP Manager
   m_EditorClassIdentifier: 
   enableDynamicUpdate: 1
-  enableExtendedColorPicker: 1
+  enableExtendedColorPicker: 0
   editorHints: 1
+  changeRootFolder: 1
+  rootFolder: Modern UI Pack/Prefabs/
   animatedIconColor: {r: 1, g: 1, b: 1, a: 1}
   contextBackgroundColor: {r: 0.21568628, g: 0.29411766, b: 0.37254903, a: 1}
   buttonThemeType: 0
@@ -31,7 +33,7 @@ MonoBehaviour:
   dropdownItemFont: {fileID: 11400000, guid: 4bd810f1cbcb0f446a8f5a31453e243f, type: 2}
   dropdownItemFontSize: 22.5
   dropdownThemeType: 0
-  dropdownAnimationType: 0
+  dropdownAnimationType: 2
   dropdownFont: {fileID: 11400000, guid: 4bd810f1cbcb0f446a8f5a31453e243f, type: 2}
   dropdownFontSize: 25
   dropdownColor: {r: 0.21568628, g: 0.29411766, b: 0.37254903, a: 1}

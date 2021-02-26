@@ -1,8 +1,6 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using SEE.Controls.Actions;
 using SEE.Game.UI;
-using SEE.Utils;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -14,79 +12,56 @@ namespace SEE.GO.Menu
     public class PlayerMenu : MonoBehaviour
     {
         /// <summary>
-        /// An array of all possible action state types the player can be in.
-        /// </summary>
-        private readonly ActionState.Type[] actionStateTypes = (ActionState.Type[])Enum.GetValues(typeof(ActionState.Type));
-
-        /// <summary>
         /// The UI object representing the menu the user chooses the action state from.
         /// </summary>
         private SelectionMenu ModeMenu;
+
+        /// <summary>
+        /// The UI object representing the indicator, which displays the current action state on the screen.
+        /// </summary>
+        private ActionStateIndicator Indicator;
         
         /// <summary>
         /// This creates and returns the mode menu, with which you can select the active game mode.
         /// 
-        /// Available modes are:
-        /// - Move
-        /// - Map
-        /// - Draw Edges
-        /// - Rotate
-        /// - Delete
+        /// Available modes can be found in <see cref="ActionStateType"/>.
         /// </summary>
         /// <param name="attachTo">The game object the menu should be attached to. If <c>null</c>, a
         /// new game object will be created.</param>
-        /// <returns>the newly created mode menu game object, or if it wasn't null
-        /// <paramref name="attachTo"/> with the mode menu attached.</returns>
-        private static GameObject CreateModeMenu(GameObject attachTo = null)
+        /// <returns>the newly created mode menu component.</returns>
+        private static SelectionMenu CreateModeMenu(GameObject attachTo = null)
         {
-            ToggleMenuEntry[] entries = {
-                new ToggleMenuEntry(
-                    active: true,
-                    entryAction: () => ActionState.Value = ActionState.Type.Move,
+            Assert.IsTrue(ActionStateType.AllTypes.Count == 8);
+            Assert.IsTrue(ActionStateType.Move.Value == 0);
+            Assert.IsTrue(ActionStateType.Rotate.Value == 1);
+            Assert.IsTrue(ActionStateType.Map.Value == 2);
+            Assert.IsTrue(ActionStateType.NewEdge.Value == 3);
+            Assert.IsTrue(ActionStateType.NewNode.Value == 4);
+            Assert.IsTrue(ActionStateType.EditNode.Value == 5);
+            Assert.IsTrue(ActionStateType.ScaleNode.Value == 6);
+            Assert.IsTrue(ActionStateType.Delete.Value == 7);
+
+            // IMPORTANT NOTE: Because an ActionState.Type value will be used as an index into 
+            // the following field of menu entries, the rank of an entry in this field of entry
+            // must correspond to the ActionState.Type value. If this is not the case, we will
+            // run into an endless recursion.
+
+            List<ToggleMenuEntry> entries = new List<ToggleMenuEntry>();
+            bool first = true;
+            foreach (ActionStateType type in ActionStateType.AllTypes)
+            {
+                entries.Add(new ToggleMenuEntry(
+                    active: first,
+                    entryAction: () => ActionState.Value = type,
                     exitAction: null,
-                    title: "Move",
-                    description: "Move a node within a graph",
-                    entryColor: Color.red.Darker(),
-                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Resources/Materials/Charts/MoveIcon.png")
-                    ),
-                new ToggleMenuEntry(
-                    active: false,
-                    entryAction: () => ActionState.Value = ActionState.Type.Delete,
-                    exitAction: null,
-                    title: "Delete",
-                    description: "Delete nodes and edges",
-                    entryColor: Color.yellow.Darker(),
-                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Common/Trash.png")
-                    ),
-                new ToggleMenuEntry(
-                    active: false,
-                    entryAction: () => ActionState.Value = ActionState.Type.Rotate,
-                    exitAction: null,
-                    title: "Rotate",
-                    description: "Rotate everything around the selected node within a graph",
-                    entryColor: Color.blue.Darker(),
-                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Navigation/Refresh.png")
-                    ),
-                new ToggleMenuEntry(
-                    active: false,
-                    entryAction: () => ActionState.Value = ActionState.Type.Map,
-                    exitAction: null,
-                    title: "Map",
-                    description: "Map a node from one graph to another graph",
-                    entryColor: Color.green.Darker(),
-                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Map/Map.png")
-                    ),
-                new ToggleMenuEntry(
-                    active: false,
-                    entryAction: () => ActionState.Value = ActionState.Type.DrawEdge,
-                    exitAction: null,
-                    title: "Draw Edge",
-                    description: "Draw a new edge between two nodes",
-                    entryColor: Color.green.Darker(),
-                    icon: AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Modern UI Pack/Textures/Icon/Navigation/Minus.png")
-                    )
-            };
-            
+                    title: type.Name,
+                    description: type.Description,
+                    entryColor: type.Color,
+                    icon: Resources.Load<Sprite>(type.IconPath)
+                    ));
+                first = false;
+            }
+
             GameObject modeMenuGO = attachTo ?? new GameObject { name = "Mode Menu" };
             SelectionMenu modeMenu = modeMenuGO.AddComponent<SelectionMenu>();
             modeMenu.Title = "Mode Selection";
@@ -95,30 +70,43 @@ namespace SEE.GO.Menu
             {
                 modeMenu.AddEntry(entry);
             }
+            return modeMenu;
+        }
 
-            return modeMenuGO;
+        /// <summary>
+        /// This creates and returns the <see cref="ActionStateIndicator"/>, which displays the current mode.
+        /// The indicator will either be attached to the given GameObject or to a new GameObject if
+        /// <paramref name="attachTo"/> is null.
+        /// </summary>
+        /// <param name="attachTo">The GameObject the indicator shall be attached to.
+        /// If <c>null</c>, a new one will be created.</param>
+        /// <returns>The newly created ActionStateIndicator.</returns>
+        private static ActionStateIndicator CreateActionStateIndicator(GameObject attachTo = null)
+        {
+            GameObject actionStateGO = attachTo ?? new GameObject {name = "Action State Indicator"};
+            ActionStateIndicator indicator = actionStateGO.AddComponent<ActionStateIndicator>();
+            return indicator;
         }
 
         private void Start()
         {
-            if (!CreateModeMenu(gameObject).TryGetComponentOrLog(out ModeMenu))
-            {
-                Destroyer.DestroyComponent(this);
-            }
+            ModeMenu = CreateModeMenu(gameObject);
+            Indicator = CreateActionStateIndicator(gameObject);
 
             ActionState.OnStateChanged += OnStateChanged;
-            Assert.IsTrue(actionStateTypes.Length <= 9, 
+            Assert.IsTrue(ActionStateType.AllTypes.Count <= 9, 
                           "Only up to 9 (10 if zero is included) entries can be selected via the numbers on the keyboard!");
         }
         
         /// <summary>
         /// Called whenever the action state changes.
-        /// This updates the menu to indicate the selected value.
+        /// This updates the menu to indicate the selected value, and updates the action state indicator.
         /// </summary>
         /// <param name="value">The new action state</param>
-        private void OnStateChanged(ActionState.Type value)
+        private void OnStateChanged(ActionStateType value)
         {
-            ModeMenu.SelectEntry((int) value);
+            ModeMenu.SelectEntry(value.Value);
+            Indicator.ChangeState(value);
         }
 
         /// <summary>
