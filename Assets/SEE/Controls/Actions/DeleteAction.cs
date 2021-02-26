@@ -94,6 +94,7 @@ namespace SEE.Controls.Actions
             //Delete a gameobject and all children
             if (selectedObject != null && Input.GetMouseButtonDown(0))
             {
+                
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
                 //FIXME:(Thore) NetAction is no longer up to date
                 new DeleteNetAction(selectedObject.name).Execute(null);
@@ -134,6 +135,11 @@ namespace SEE.Controls.Actions
                 }
                 else if (selectedObject.CompareTag(Tags.Node))
                 {
+                    if (selectedObject.GetNode().IsRoot())
+                    {
+                        Debug.LogError("Root shall not be deleted");
+                        return;
+                    }
                     List<GameObject> allNodesToBeDeleted = GameObjectTraversion.GetAllChildNodesAsGameObject(new List<GameObject>(), selectedObject);
                     StartCoroutine(MoveNodeToGarbage(allNodesToBeDeleted));
                 }
@@ -148,7 +154,8 @@ namespace SEE.Controls.Actions
         public IEnumerator MoveNodeToGarbage(List<GameObject> deletedNodes)
         {
             List<Vector3> oldPositions = new List<Vector3>();
-
+            float timeToWait = 1f;
+            float timeForAnimation = 1f; 
             foreach (GameObject deletedNode in deletedNodes)
             {
                 if (deletedNode.CompareTag(Tags.Node))
@@ -163,20 +170,20 @@ namespace SEE.Controls.Actions
             actionHistory.SaveObjectForUndo(deletedNodes, oldPositions);
             foreach (GameObject deletedNode in deletedNodes)
             {
-                Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
+                Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), timeForAnimation);
             }
 
-            yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(timeToWait);
 
             foreach (GameObject deletedNode in deletedNodes)
             {
                 if (deletedNode.CompareTag(Tags.Node))
                 {
-                    Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), 1f);
+                    Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), timeForAnimation);
                 }
             }
 
-            yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(timeToWait);
             InteractableObject.UnselectAll(true);
             
         }
@@ -188,7 +195,7 @@ namespace SEE.Controls.Actions
         /// <returns>the waiting time between moving deleted nodes from the garbage-can and then to the city</returns>
         public IEnumerator RemoveNodeFromGarbage(List<GameObject> deletedNodes)
         {
-            List<Vector3> oldPositionOfDeletedObject = actionHistory.UndoDeleteOperation();
+            List<Vector3> oldPositionOfDeletedObject = actionHistory.oldPositionHistory.Last(); 
 
             for (int i = 0; i < deletedNodes.Count; i++)
             {
@@ -207,7 +214,7 @@ namespace SEE.Controls.Actions
                     Tweens.Move(deletedNodes[i], oldPositionOfDeletedObject[i], 1f);
                 }
             }
-
+            oldPositionOfDeletedObject = actionHistory.UndoDeleteOperation();
             yield return new WaitForSeconds(1.0f);
 
             InteractableObject.UnselectAll(true);
