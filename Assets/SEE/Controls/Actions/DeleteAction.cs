@@ -49,7 +49,17 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The name of the garbage-can gameObject.
         /// </summary>
-        private static readonly string GarbageCanName = "GarbageCan";
+        private const string GarbageCanName = "GarbageCan";
+
+        /// <summary>
+        /// The waiting-time of the animation of moving a node into a garbage-can from over the garbage-can.
+        /// </summary>
+        private const float TimeToWait = 1f;
+
+        /// <summary>
+        /// The animation-time of the animation of moving a node to the garbage-can-top.
+        /// </summary>
+        private const float TimeForAnimation = 1f;
 
         private void Start()
         {
@@ -153,8 +163,7 @@ namespace SEE.Controls.Actions
         public IEnumerator MoveNodeToGarbage(List<GameObject> deletedNodes)
         {
             List<Vector3> oldPositions = new List<Vector3>();
-            float timeToWait = 1f;
-            float timeForAnimation = 1f; 
+            
             foreach (GameObject deletedNode in deletedNodes)
             {
                 if (deletedNode.CompareTag(Tags.Node))
@@ -169,20 +178,20 @@ namespace SEE.Controls.Actions
             actionHistory.SaveObjectForUndo(deletedNodes, oldPositions);
             foreach (GameObject deletedNode in deletedNodes)
             {
-                Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), timeForAnimation);
+                Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), TimeForAnimation);
             }
 
-            yield return new WaitForSeconds(timeToWait);
+            yield return new WaitForSeconds(TimeToWait);
 
             foreach (GameObject deletedNode in deletedNodes)
             {
                 if (deletedNode.CompareTag(Tags.Node))
                 {
-                    Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), timeForAnimation);
+                    Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), TimeForAnimation);
                 }
             }
 
-            yield return new WaitForSeconds(timeToWait);
+            yield return new WaitForSeconds(TimeToWait);
             InteractableObject.UnselectAll(true);
             
         }
@@ -190,7 +199,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Removes all nodes from the garbage-can to the city.
         /// </summary>
-        /// <param name="deletedNode"></param>
+        /// <param name="deletedNode">The nodes to be removing from the garbage-can</param>
         /// <returns>the waiting time between moving deleted nodes from the garbage-can and then to the city</returns>
         public IEnumerator RemoveNodeFromGarbage(List<GameObject> deletedNodes)
         {

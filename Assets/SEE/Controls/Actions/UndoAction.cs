@@ -30,6 +30,13 @@ namespace SEE.Controls.Actions
         /// </summary>
         private Graph graph;
 
+        /// <summary>
+        /// Creates an instance of the undoAction
+        /// </summary>
+        /// <param name="deletedNodes">the deletedNodes in the last action if exiting</param>
+        /// <param name="oldPositions">the old positions of the deleted nodes if existing</param>
+        /// <param name="deletedEdges">the deletedEdges in the last action if existing</param>
+        /// <param name="graph">the graph where the action is executed</param>
         public UndoAction(List<GameObject> deletedNodes, List<Vector3> oldPositions, List<GameObject> deletedEdges, Graph graph)
         {
             this.DeletedNodes = deletedNodes;
