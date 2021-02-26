@@ -258,7 +258,7 @@ namespace SEE.Game
         /// <summary>
         /// List for saving the deactivated nodes. Is used for animation.
         /// </summary>
-        List<GameObject> currentNodes = new List<GameObject>();
+        private List<GameObject> currentNodes = new List<GameObject>();
 
         /// <summary>
         /// List to add markers to the animated nodes afterwards
