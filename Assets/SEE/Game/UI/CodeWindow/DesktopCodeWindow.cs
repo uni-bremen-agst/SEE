@@ -18,7 +18,19 @@ namespace SEE.Game.UI.CodeWindow
         /// <summary>
         /// Scrollbar which controls the currently visible area of the code window.
         /// </summary>
-        private Scrollbar scrollbar;
+        private ScrollRect scrollRect;
+
+        /// <summary>
+        /// Shows or hides the code window on Desktop platforms.
+        /// </summary>
+        /// <param name="show">Whether the code window should be shown.</param>
+        private void ShowDesktop(bool show)
+        {
+            if (CodeCanvas) 
+            {
+                CodeCanvas.SetActive(show);
+            }
+        }
         
         protected override void StartDesktop()
         {
@@ -84,20 +96,30 @@ namespace SEE.Game.UI.CodeWindow
             }
 
             canvas.transform.Find("CodeWindow/Dragger/Title").gameObject.GetComponent<TextMeshProUGUI>().text = Title;
-            if (canvas.transform.Find("CodeWindow/Content/Scrollable/Code").gameObject.TryGetComponentOrLog(out TextMeshProUGUI text))
+            if (canvas.transform.Find("CodeWindow/Content/Scrollable/Code").gameObject.TryGetComponentOrLog(out TextMesh))
             {
-                text.text = Text;
-                text.fontSize = FontSize;
+                TextMesh.text = Text;
+                TextMesh.fontSize = FontSize;
             }
             
             // Listen to scrollbar events
-            if (canvas.transform.Find("CodeWindow/Content/Scrollable/Scrollbar").gameObject.TryGetComponentOrLog(out scrollbar))
+            if (canvas.transform.Find("CodeWindow/Content/Scrollable").gameObject.TryGetComponentOrLog(out scrollRect))
             {
-                ScrollEvent = scrollbar.onValueChanged;
+                ScrollEvent = scrollRect.onValueChanged;
             }
             
             // Make canvas always face the camera
             CodeCanvas.AddComponent<CanvasFaceCamera>();
+            
+            // Calculate excess lines (see documentation for excessLines for more details)
+            TextMesh.ForceMeshUpdate();
+            if (lines > 0 && canvas.transform.Find("CodeWindow/Content/Scrollable").gameObject.TryGetComponentOrLog(out RectTransform rect))
+            {
+                excessLines = Mathf.CeilToInt(rect.rect.height / TextMesh.textInfo.lineInfo[0].lineHeight) - 1;
+            }
+
+            // Animate scrollbar to scroll to desired line
+            VisibleLine = Mathf.Max(0, Mathf.FloorToInt(PreStartLine)-1);
         }
     }
 }

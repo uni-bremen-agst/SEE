@@ -1,6 +1,9 @@
 using System;
 using System.IO;
 using System.Linq;
+using DG.Tweening;
+using SEE.Controls;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,6 +19,11 @@ namespace SEE.Game.UI.CodeWindow
         /// The text displayed in the code window.
         /// </summary>
         private string Text;
+
+        /// <summary>
+        /// TextMeshPro component containing the code.
+        /// </summary>
+        private TextMeshProUGUI TextMesh;
 
         /// <summary>
         /// The title (e.g. filename) for the code window.
@@ -49,19 +57,74 @@ namespace SEE.Game.UI.CodeWindow
         public float WorldWidth = 1;
 
         /// <summary>
-        /// The currently visible line.
+        /// An event which gets called whenever the scrollbar is used to scroll to a different line.
         /// </summary>
-        public float VisibleLine
+        public ScrollRect.ScrollRectEvent ScrollEvent;
+
+        /// <summary>
+        /// The line currently at the top of the window.
+        /// Will scroll smoothly to the line when changed and mark it visually.
+        /// </summary>
+        /// <remarks>Only a fully visible line counts. If a line is partially obscured, the next line number
+        /// will be returned.</remarks>
+        public int VisibleLine
         {
-            get => scrollbar.value * lines;
-            set => scrollbar.value = value/lines;
-            //TODO: Smooth scrolling animation & visual marking of line
+            get => Mathf.CeilToInt(visibleLine);
+            set
+            {
+                if (VisibleLine > lines)
+                {
+                    throw new ArgumentOutOfRangeException();
+                }
+                // If this is called before Start() has been called, scrollbar will be null, so we have to cache
+                // the desired visible line somehow.
+                if (scrollRect == null)
+                {
+                    PreStartLine = value;
+                }
+                else
+                {
+                    DOTween.To(() => visibleLine, f => visibleLine = f, value, 1f);
+                    // Mark selected line
+                    string[] allLines = TextMesh.text.Split('\n');
+                    string markedLine = $"<mark=#ff000044>{allLines[value]}</mark>\n";
+                    TextMesh.text = string.Join("", allLines.Select(x => x+"\n").Take(value).Append(markedLine)
+                                                            .Concat(allLines.Select(x => x + "\n").Skip(value+1)));
+                }
+            }
         }
 
         /// <summary>
-        /// An event which gets called whenever the scrollbar is used to scroll to a different line.
+        /// Holds the desired visible line before <see cref="Start"/> is called, because <see cref="scrollbar"/> will
+        /// be undefined until then.
         /// </summary>
-        public Scrollbar.ScrollEvent ScrollEvent;
+        private float PreStartLine = 1;
+        
+        /// <summary>
+        /// The line currently at the top of the window.
+        /// Will immediately set the line.
+        /// </summary>
+        private float visibleLine
+        {
+            get => scrollRect != null ? (1-scrollRect.verticalNormalizedPosition) * (lines-excessLines) : PreStartLine;
+            set
+            {
+                if (VisibleLine > lines)
+                {
+                    throw new ArgumentOutOfRangeException();
+                }
+                // If this is called before Start() has been called, scrollbar will be null, so we have to cache
+                // the desired visible line somehow.
+                if (scrollRect == null)
+                {
+                    PreStartLine = value;
+                }
+                else
+                {
+                    scrollRect.verticalNormalizedPosition = 1 - value / (lines-excessLines);
+                }
+            }
+        }
 
         /// <summary>
         /// GameObject containing the code canvas, which in turn contains this code window.
@@ -72,6 +135,15 @@ namespace SEE.Game.UI.CodeWindow
         /// Number of lines within the file.
         /// </summary>
         private int lines;
+
+        /// <summary>
+        /// Number of "excess lines" within this code window.
+        /// Excess lines are defined as lines which can't be accessed by the scrollbar, so
+        /// they're all lines which are visible when scrolling to the lowest point of the window (except for the
+        /// first line, as that one is still accessible by the scrollbar).
+        /// In our case, this can be calculated by <c>ceil(window_height/line_height)</c>.
+        /// </summary>
+        private int excessLines = 0;
 
         /// <summary>
         /// Name for the code windows group game object.
@@ -139,8 +211,21 @@ namespace SEE.Game.UI.CodeWindow
         /// <param name="show"></param>
         public void Show(bool show)
         {
-            Debug.Log($"CodeWindow '{Title}' is now shown: {show}");
-            //TODO
+            switch (Platform)
+            {
+                case PlayerSettings.PlayerInputType.Desktop: ShowDesktop(show);
+                    break;
+                case PlayerSettings.PlayerInputType.TouchGamepad: ShowDesktop(show);
+                    break;
+                case PlayerSettings.PlayerInputType.VR: PlatformUnsupported();
+                    break;
+                case PlayerSettings.PlayerInputType.HoloLens: PlatformUnsupported();
+                    break;
+                case PlayerSettings.PlayerInputType.None:  // nothing needs to be done
+                    break;
+                default: Debug.LogError($"Platform {Platform} not handled in switch case.\n");
+                    break;
+            }
         }
     }
 }

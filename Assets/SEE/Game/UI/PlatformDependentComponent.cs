@@ -39,7 +39,7 @@ namespace SEE.Game.UI
         /// <summary>
         /// The current platform.
         /// </summary>
-        private PlayerSettings.PlayerInputType platform;
+        protected PlayerSettings.PlayerInputType Platform { get; private set; }
 
         /// <summary>
         /// Called when the <see cref="Start()"/> method of this component is executed on the Desktop platform.
@@ -90,8 +90,8 @@ namespace SEE.Game.UI
             }
             
             // Execute platform dependent code
-            platform = PlayerSettings.GetInputType();
-            switch (platform)
+            Platform = PlayerSettings.GetInputType();
+            switch (Platform)
             {
                 case PlayerSettings.PlayerInputType.Desktop: StartDesktop();
                     break;
@@ -112,7 +112,7 @@ namespace SEE.Game.UI
 
         protected void Update()
         {
-            switch (platform)
+            switch (Platform)
             {
                 case PlayerSettings.PlayerInputType.Desktop: UpdateDesktop();
                     break;
@@ -132,9 +132,9 @@ namespace SEE.Game.UI
         /// <summary>
         /// Logs an error with information about this platform and component and destroys this component.
         /// </summary>
-        private void PlatformUnsupported()
+        protected void PlatformUnsupported()
         {
-            Debug.LogError($"Component '{GetType().GetNiceName()}' doesn't support platform '{platform.ToString()}'."
+            Debug.LogError($"Component '{GetType().GetNiceName()}' doesn't support platform '{Platform.ToString()}'."
                            + " Component will now self-destruct.");
             Destroyer.DestroyComponent(this);
         }
