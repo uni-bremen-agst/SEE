@@ -23,7 +23,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// A history of the old positions of the deleted nodes
         /// </summary>
-        private LinkedList<List<Vector3>> oldPositionHistory = new LinkedList<List<Vector3>>();
+        public LinkedList<List<Vector3>> oldPositionHistory = new LinkedList<List<Vector3>>();
 
         /// <summary>
         /// A history of all deleted edges
