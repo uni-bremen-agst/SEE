@@ -1,4 +1,5 @@
-﻿using SEE.Game.UI.CodeWindow;
+﻿using System.Linq;
+using SEE.Game.UI.CodeWindow;
 using SEE.GO;
 using UnityEngine;
 
@@ -105,13 +106,27 @@ namespace SEE.Controls.Actions
                     GameObject selectedGO = selectedNode.gameObject;
                     codeWindow = selectedNode.gameObject.AddComponent<CodeWindow>();
                     codeWindow.Anchor = selectedGO;
-                    codeWindow.Title = selectedNode.Value.SourceName;
+                    // Pass file name of source code file to read from it
                     if (!selectedNode.Value.TryGetString("Source.File", out string selectedFile))
                     {
                         Debug.LogError("Source.Path was set, but Source.File was not. Can't show code window.\n");
                         return;
                     }
+                    codeWindow.Title = selectedNode.Value.SourceName;
+                    // If SourceName differs from Source.File (except file extension), display both
+                    if (!codeWindow.Title.Replace(".", "").Equals(selectedFile.Split('.').Reverse().Skip(1)
+                                                                              .Aggregate("", (acc, s) => s + acc)))
+                    {
+                        codeWindow.Title += $" ({selectedFile})";
+                    }
+                    
                     codeWindow.EnterFromFile($"{selectedPath}{selectedFile}");  // selectedPath has trailing /
+                    
+                    // Pass line number to automatically scroll to it, if it exists
+                    if (selectedNode.Value.TryGetInt("Source.Line", out int line))
+                    {
+                        codeWindow.VisibleLine = line;
+                    }
 
                     //TODO: Set font size etc per SEECity settings
                 }
