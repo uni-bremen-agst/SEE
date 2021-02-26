@@ -214,9 +214,9 @@ namespace SEE.Controls.Actions
                     Tweens.Move(deletedNodes[i], oldPositionOfDeletedObject[i], 1f);
                 }
             }
-            oldPositionOfDeletedObject = actionHistory.UndoDeleteOperation();
+            
             yield return new WaitForSeconds(1.0f);
-
+            oldPositionOfDeletedObject = actionHistory.UndoDeleteOperation();
             InteractableObject.UnselectAll(true);
         }
 
