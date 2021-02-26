@@ -8,7 +8,7 @@ using UnityEngine;
 namespace SEE.Utils
 {
     /// <summary>
-    /// Functions to destroy GameObjects.
+    /// Functions to destroy game objects in game or editor mode.
     /// </summary>
     public static class Destroyer
     {
@@ -53,8 +53,8 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Destroys given <paramref name="gameObject"/> with all its attached children
-        /// and incoming and outgoing edges. This method is intended to be used for
+        /// Destroys given <paramref name="gameObject"/> with all its incoming and outgoing 
+        /// edges and recursively all its ancestors. This method is intended to be used for
         /// game objects representing graph nodes having a component 
         /// <see cref=">SEE.DataModel.NodeRef"/>. If the <paramref name="gameObject"/> 
         /// does not have a <see cref=">SEE.DataModel.NodeRef"/> component, nothing
@@ -63,11 +63,11 @@ namespace SEE.Utils
         /// <param name="gameObject">game object to be destroyed</param>
         public static void DestroyGameObjectWithChildren(GameObject gameObject)
         {
-            if (gameObject.TryGetComponent(out NodeRef nodeRef))
+            if (gameObject.TryGetComponent(out NodeRef _))
             {
-                for (int i = 0; i < gameObject.transform.childCount; i++) {
-                    GameObject child = gameObject.transform.GetChild(i).gameObject;
-                    DestroyGameObjectWithChildren(child);
+                foreach (Transform child in gameObject.transform)
+                {
+                    DestroyGameObjectWithChildren(child.gameObject);
                 }
                 DestroyEdges(gameObject);
                 DestroyGameObject(gameObject);
@@ -94,8 +94,8 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Searches through all childs of given <paramref name="gameObject"/>
-        /// and deletes all Edges attached to given childs.
+        /// Searches through all children of given <paramref name="gameObject"/>
+        /// and deletes all edges attached to given childs.
         /// 
         /// This method is intended to be used for game objects representing graph nodes
         /// having a component <see cref=">SEE.DataModel.NodeRef"/>. If the 
