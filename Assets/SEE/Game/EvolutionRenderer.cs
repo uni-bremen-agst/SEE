@@ -250,8 +250,6 @@ namespace SEE.Game
         /// </summary>
         private readonly NodeEqualityComparer nodeEqualityComparer = new NodeEqualityComparer();
 
-        //List for saving the copied nodes
-
         /// <summary>
         /// List for saving the copied nodes. Is used for animation.
         /// </summary>
