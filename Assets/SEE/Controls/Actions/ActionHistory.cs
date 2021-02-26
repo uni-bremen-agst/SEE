@@ -30,6 +30,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         private LinkedList<List<GameObject>> deletedEdgeHistory = new LinkedList<List<GameObject>>();
 
+        private LinkedList<Graph> listOfGraphs = new LinkedList<Graph>();
+
         /// <summary>
         /// The graph of the node to be deleted
         /// </summary>
@@ -49,7 +51,7 @@ namespace SEE.Controls.Actions
             graph = city.LoadedGraph;
             List<GameObject> nodesAndascendingEdges = new List<GameObject>();
             List<GameObject> edgesToHide = new List<GameObject>();
-
+            
             foreach (GameObject actionHistoryObject in deletedNodes)
             {
                 if (actionHistoryObject.TryGetComponent(out NodeRef nodeRef))
@@ -66,9 +68,14 @@ namespace SEE.Controls.Actions
                             {
                                 edgesToHide.Add(edge);
                             }
-
+                            if (edge.TryGetComponent(out Collider edgeCollider))
+                            {
+                                edge.GetComponent<Collider>().enabled = false;
+                            }
                             edge.TryGetComponent(out EdgeRef edgeRef);
                             graph.RemoveEdge(edgeRef.edge);
+
+
                         }
                     }
 
@@ -94,6 +101,7 @@ namespace SEE.Controls.Actions
                     {
                         graph.RemoveNode(nodeRef.Value);
                     }
+                   
                 }
                 if (deletedNode.tag == Tags.Edge)
                 {
@@ -114,6 +122,7 @@ namespace SEE.Controls.Actions
             deletedEdgeHistory.AddLast(edgesToHide);
             oldPositionHistory.AddLast(oldPositionsOfDeletedNodes);
             deletedNodeHistory.AddLast(nodesAndascendingEdges);
+            listOfGraphs.AddLast(graph);
         }
 
         /// <summary>
@@ -122,6 +131,7 @@ namespace SEE.Controls.Actions
         /// <returns>the positions of the gameObjects where they has to be moved after undo again</returns>
         public List<Vector3> UndoDeleteOperation()
         {
+            graph = listOfGraphs.Last();
             foreach (GameObject node in deletedNodeHistory.Last())
             {
                 if (node.TryGetComponent(out NodeRef nodeRef))
@@ -154,6 +164,7 @@ namespace SEE.Controls.Actions
             deletedEdgeHistory.RemoveLast();
             deletedNodeHistory.RemoveLast();
             oldPositionHistory.RemoveLast();
+            listOfGraphs.RemoveLast();
 
             return oldPosition;
         }
