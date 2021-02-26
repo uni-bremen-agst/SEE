@@ -94,7 +94,6 @@ namespace SEE.Controls.Actions
             //Delete a gameobject and all children
             if (selectedObject != null && Input.GetMouseButtonDown(0))
             {
-                
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
                 //FIXME:(Thore) NetAction is no longer up to date
                 new DeleteNetAction(selectedObject.name).Execute(null);
@@ -199,7 +198,6 @@ namespace SEE.Controls.Actions
 
             for (int i = 0; i < deletedNodes.Count; i++)
             {
-                
                 {
                     Tweens.Move(deletedNodes[i], new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
                 }
@@ -209,14 +207,13 @@ namespace SEE.Controls.Actions
 
             for (int i = 0; i < deletedNodes.Count; i++)
             {
-                
                 {
                     Tweens.Move(deletedNodes[i], oldPositionOfDeletedObject[i], 1f);
                 }
             }
             
             yield return new WaitForSeconds(1.0f);
-            oldPositionOfDeletedObject = actionHistory.UndoDeleteOperation();
+            actionHistory.UndoDeleteOperation();
             InteractableObject.UnselectAll(true);
         }
 

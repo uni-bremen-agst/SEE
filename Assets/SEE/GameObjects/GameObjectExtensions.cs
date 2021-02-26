@@ -112,6 +112,10 @@ namespace SEE.GO
             {
                 renderer.enabled = show;
             }
+            if (gameObject.TryGetComponent(out Collider collider))
+            {
+                collider.enabled = false;
+            }
             if (includingChildren)
             {
                 foreach (Transform child in gameObject.transform)
@@ -217,7 +221,7 @@ namespace SEE.GO
                 throw new Exception($"Game object {gameObject.name} has no NodeRef");
             }
         }
-        
+
         /// <summary>
         /// Enables/disables the renderers of <paramref name="gameObject"/> and all its
         /// descendants so that they become visible/invisible.
