@@ -249,6 +249,26 @@ namespace SEE.Game
         /// </summary>
         private readonly NodeEqualityComparer nodeEqualityComparer = new NodeEqualityComparer();
 
+        //List for saving the copied nodes
+
+        /// <summary>
+        /// List for saving the copied nodes. Is used for animation.
+        /// </summary>
+        private List<GameObject> animationNodes = new List<GameObject>();
+
+        /// <summary>
+        /// List for saving the deactivated nodes. Is used for animation.
+        /// </summary>
+        List<GameObject> currentNodes = new List<GameObject>();
+
+        /// <summary>
+        /// List to add markers to the animated nodes afterwards
+        /// </summary>
+        private List<(GameObject, char)> animationMarker = new List<(GameObject, char)>();
+
+        /// <summary>
+        /// Allows the comparison of two instances of <see cref="Edge"/> from different graphs.
+        /// </summary>
         private readonly EdgeEqualityComparer edgeEqualityComparer = new EdgeEqualityComparer();
 
         /// <summary>
@@ -451,6 +471,7 @@ namespace SEE.Game
         /// <param name="next">the new graph to be shown, in which to migrate the current graph; must not be null</param>
         private void RenderGraph(LaidOutGraph current, LaidOutGraph next)
         {
+            
             next.AssertNotNull("next");
             IsStillAnimating = true;
             // First remove all markings of the previous animation cycle.
@@ -495,7 +516,7 @@ namespace SEE.Game
             _currentCity = next;
             RenderPlane();
             MoveEdges();
-
+            
             Invoke("OnAnimationsFinished", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
         }
 
@@ -505,12 +526,45 @@ namespace SEE.Game
         /// as new and notifies everyone that the animation is finished.
         /// </summary>
         private void OnAnimationsFinished()
-        {
+        {       
+            //Activates the nodes that were deactivated for the animation    
+            foreach (GameObject currentNode in currentNodes)
+            {
+                currentNode.SetActive(true);
+            }
+
+            //Deletes the nodes created during animation
+            foreach (GameObject animationNode in animationNodes)
+            {
+                Destroyer.DestroyGameObject(animationNode);
+            }
+
+            //Adds a marker to the nodes
+            foreach ((GameObject, char) m in animationMarker)
+            {
+                switch (m.Item2)
+                {
+                    case 'c': 
+                        marker.MarkChanged(m.Item1);
+                        break;
+                    case 'b': 
+                        marker.MarkBorn(m.Item1);
+                        break;
+                    default:
+                        break;     
+                }
+            }
+
+            //Clears all lists relevant for the animation of the nodes
+            animationNodes.Clear();
+            currentNodes.Clear();
+            animationMarker.Clear();
+
             // Destroy all previous edges and draw all edges of next graph. This can only
             // be done when nodes have reached their final position, that is, at the end
             // of the animation cycle.
-            
             objectManager.RenderEdges();
+
             // Stops the edge animation
             moveEdges = false;
             IsStillAnimating = false;
@@ -576,6 +630,7 @@ namespace SEE.Game
         {
            try
            {
+
                 // Calculates the edges for the next graph
                 IList<GameObject> newEdges = objectManager.CalculateNewEdgeControlPoints().ToList();
                 IList<GameObject> oldEdges = objectManager.GetEdges().ToList();
@@ -666,7 +721,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Renders the game object corresponding to the given <paramref name="graphNode"/>.
+        /// Renders the game object corresponding to the given <paramref name="graphNode"/> by creating a copy of the GameObject that is used during the animation.
         /// </summary>
         /// <param name="graphNode">graph node to be displayed</param>
         protected virtual void RenderNode(Node graphNode)
@@ -675,6 +730,15 @@ namespace SEE.Game
             ILayoutNode layoutNode = NextLayoutToBeShown[graphNode.ID];
             // the game node representing the graphNode if there is any; null if there is none
             Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject currentGameNode);
+
+            //Copy the actual node
+            GameObject animationNode = Instantiate(currentGameNode);
+            //The copied node is added to a list so that it can be deleted after animation
+            animationNodes.Add(animationNode);
+            //The actual node is added to a list so that it can be reactivated after animation
+            currentNodes.Add(currentGameNode);
+            //Hiding the actual node for animation
+            currentGameNode.SetActive(false);
 
             Difference difference;
             if (formerGraphNode == null)
@@ -686,12 +750,17 @@ namespace SEE.Game
                 Vector3 position = layoutNode.CenterPosition;
                 position.y -= layoutNode.LocalScale.y;
                 layoutNode.CenterPosition = position;
-               // graphRenderer.Apply(currentGameNode, gameObject, layoutNode);
+                
                 // Revert the change to the y co-ordindate.
                 position.y += layoutNode.LocalScale.y;
                 layoutNode.CenterPosition = position;
-                marker.MarkBorn(currentGameNode);
+                //marker.MarkBorn(currentGameNode);
+                animationMarker.Add((currentGameNode,'b'));
                 difference = Difference.Added;
+
+                //Set the layout for the copied node
+                animationNode.transform.localScale = layoutNode.LocalScale;
+                animationNode.transform.position = layoutNode.CenterPosition;
             }
             else
             {
@@ -699,16 +768,21 @@ namespace SEE.Game
                 if (diff.AreDifferent(formerGraphNode, graphNode))
                 {
                     difference = Difference.Changed;
-                    marker.MarkChanged(currentGameNode);
-                    
+                    //marker.MarkChanged(currentGameNode);
+                    animationMarker.Add((currentGameNode,'c'));
                 }
                 else
                 {
                     difference = Difference.None;
                 }
+                //Set the layout for the copied node
+                animationNode.transform.localScale = new Vector3(currentGameNode.transform.localScale.x, 0.0001f, currentGameNode.transform.localScale.z);
+                animationNode.transform.position = currentGameNode.transform.position;
             }
+            //The actual node is shifted to its new position
             graphRenderer.Apply(currentGameNode, gameObject, layoutNode);
-            moveScaleShakeAnimator.AnimateTo(currentGameNode, layoutNode, difference, OnRenderNodeFinishedAnimation);
+            //The copied node is animated
+            moveScaleShakeAnimator.AnimateTo(animationNode,layoutNode,difference,null);
         }
 
         /// <summary>
