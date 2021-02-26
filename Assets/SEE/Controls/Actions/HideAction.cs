@@ -21,12 +21,12 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject selectedObject;
 
-        private List<GameObject> hiddenObjects;
+        private List<List<GameObject>> hiddenObjects;
 
         // Start is called before the first frame update
         private void Start()
         {
-            hiddenObjects = new List<GameObject>();
+            hiddenObjects = new List<List<GameObject>>();
             // An anonymous delegate is registered for the event <see cref="ActionState.OnStateChanged"/>.
             // This delegate will be called from <see cref="ActionState"/> upon every
             // state changed where the passed parameter is the newly entered state.
@@ -67,7 +67,11 @@ namespace SEE.Controls.Actions
 
             if(Input.GetKeyDown(KeyCode.Backspace))
             {
-                UnhideAll();
+                List<GameObject> lastHidden = hiddenObjects[hiddenObjects.Count - 1];
+                foreach (GameObject g in lastHidden){
+                    g.SetActive(true);
+                }
+                hiddenObjects.Remove(lastHidden);
                 return;
             }
 
@@ -76,12 +80,13 @@ namespace SEE.Controls.Actions
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
                 if (selectedObject.CompareTag(Tags.Edge))
                 {
-                    hiddenObjects.Add(selectedObject);
+                    //hiddenObjects.Add(selectedObject);
                     selectedObject.SetActive(false);
                     selectedObject = null;
                 }
                 else if (selectedObject.CompareTag(Tags.Node))
                 {
+                    List<GameObject> hiddenList = new List<GameObject>();
                     if (selectedObject.TryGetComponent(out NodeRef nodeRef))
                     {
                         HashSet<String> edgeIDs = GetEdgeIds(nodeRef);
@@ -90,26 +95,30 @@ namespace SEE.Controls.Actions
                         {
                             if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                             {
-                                hiddenObjects.Add(edge);
+                                hiddenList.Add(edge);
                                 edge.SetActive(false);
                             }
                         }
                     }
-                    hiddenObjects.Add(selectedObject);
+                    hiddenList.Add(selectedObject);
                     selectedObject.SetActive(false);
                     selectedObject = null;
+                    hiddenObjects.Add(hiddenList);
                 }
             }
         }
 
         private void UnhideAll()
         {
-            foreach(GameObject g in hiddenObjects)
+            foreach(List<GameObject> l in hiddenObjects)
             {
-                g.SetActive(true);
+                foreach(GameObject g in l){
+                    g.SetActive(true);
+                }
             }
             hiddenObjects.Clear();
         }
+
 
         /// <summary>
         /// Returns the IDs of all incoming and outgoing edges for <paramref name="nodeRef"/>.
