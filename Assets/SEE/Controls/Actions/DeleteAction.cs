@@ -105,7 +105,7 @@ namespace SEE.Controls.Actions
             {
                 try
                 {
-                    List<GameObject> objectToBeMoved = actionHistory.deletedNodeHistory.Last();
+                    List<GameObject> objectToBeMoved = actionHistory.GetActionHistory.Last().DeletedNodes;
                     StartCoroutine(RemoveNodeFromGarbage(objectToBeMoved));
                 }
                 catch (InvalidOperationException)
@@ -194,7 +194,7 @@ namespace SEE.Controls.Actions
         /// <returns>the waiting time between moving deleted nodes from the garbage-can and then to the city</returns>
         public IEnumerator RemoveNodeFromGarbage(List<GameObject> deletedNodes)
         {
-            List<Vector3> oldPositionOfDeletedObject = actionHistory.oldPositionHistory.Last(); 
+            List<Vector3> oldPositionsOfDeletedObjects = actionHistory.GetActionHistory.Last().OldPositions;
 
             for (int i = 0; i < deletedNodes.Count; i++)
             {
@@ -208,7 +208,7 @@ namespace SEE.Controls.Actions
             for (int i = 0; i < deletedNodes.Count; i++)
             {
                 {
-                    Tweens.Move(deletedNodes[i], oldPositionOfDeletedObject[i], 1f);
+                    Tweens.Move(deletedNodes[i], oldPositionsOfDeletedObjects[i], 1f);
                 }
             }
             
