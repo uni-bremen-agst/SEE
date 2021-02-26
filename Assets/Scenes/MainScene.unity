@@ -123,6 +123,598 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &155696305
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 155696312}
+  - component: {fileID: 155696311}
+  - component: {fileID: 155696310}
+  - component: {fileID: 155696309}
+  - component: {fileID: 155696308}
+  - component: {fileID: 155696307}
+  - component: {fileID: 155696306}
+  m_Layer: 0
+  m_Name: LJGCity
+  m_TagString: Code City
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &155696306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 155696305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ee3f0dd3920028488a41f3d7e964b5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: LayoutPath
+      Entry: 7
+      Data: 0|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: SelectedNodeTypes
+      Entry: 7
+      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 6
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: File
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Class
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Method
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Member
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Package
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Directory
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CityPath
+      Entry: 7
+      Data: 4|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LeafNodeColorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeColorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LeafLabelSettings
+      Entry: 7
+      Data: 5|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeLabelSettings
+      Entry: 7
+      Data: 6|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CoseGraphSettings
+      Entry: 7
+      Data: 7|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
+    - Name: EdgeLength
+      Entry: 3
+      Data: 20
+    - Name: UseSmartIdealEdgeCalculation
+      Entry: 5
+      Data: false
+    - Name: UseSmartMultilevelScaling
+      Entry: 5
+      Data: false
+    - Name: PerLevelIdealEdgeLengthFactor
+      Entry: 4
+      Data: 0.1
+    - Name: UseSmartRepulsionRangeCalculation
+      Entry: 5
+      Data: false
+    - Name: GravityStrength
+      Entry: 4
+      Data: 0.8
+    - Name: CompoundGravityStrength
+      Entry: 4
+      Data: 1.5
+    - Name: RepulsionStrength
+      Entry: 4
+      Data: 50
+    - Name: MultiLevelScaling
+      Entry: 5
+      Data: false
+    - Name: ListInnerNodeToggle
+      Entry: 7
+      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 9|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeLayout
+      Entry: 7
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Layout.NodeLayouts.NodeLayoutKind,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 9
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeShape
+      Entry: 7
+      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+InnerNodeKinds,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 9
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LoadedForNodeTypes
+      Entry: 7
+      Data: 12|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 9
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: UseCalculationParameter
+      Entry: 5
+      Data: true
+    - Name: UseIterativeCalculation
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+  LODCulling: 0.01
+  LayoutPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  CityPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  WidthMetric: Metric.Number_of_Tokens
+  HeightMetric: Metric.Clone_Rate
+  DepthMetric: Metric.LOC
+  LeafStyleMetric: Metric.Complexity
+  ArchitectureIssue: Metric.Architecture_Violations
+  CloneIssue: Metric.Clone
+  CycleIssue: Metric.Cycle
+  Dead_CodeIssue: Metric.Dead_Code
+  MetricIssue: Metric.Metric
+  StyleIssue: Metric.Style
+  UniversalIssue: Metric.Universal
+  ArchitectureIssue_SUM: Metric.Architecture_Violations_SUM
+  CloneIssue_SUM: Metric.Clone_SUM
+  CycleIssue_SUM: Metric.Cycle_SUM
+  Dead_CodeIssue_SUM: Metric.Dead_Code_SUM
+  MetricIssue_SUM: Metric.Metric_SUM
+  StyleIssue_SUM: Metric.Style_SUM
+  UniversalIssue_SUM: Metric.Universal_SUM
+  InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeHeightMetric: 
+  InnerNodeStyleMetric: Metric.IssuesTotal
+  MinimalBlockLength: 0.1
+  MaximalBlockLength: 100
+  LeafObjects: 0
+  InnerNodeObjects: 0
+  NodeLayout: 3
+  EdgeLayout: 0
+  ZScoreScale: 1
+  EdgeWidth: 0.1
+  ShowErosions: 0
+  MaxErosionWidth: 1
+  EdgesAboveBlocks: 1
+  Tension: 0.85
+  RDP: 0.05
+  TubularSegments: 50
+  Radius: 0.005
+  RadialSegments: 8
+  isEdgeSelectable: 1
+  GXLPath:
+    Root: 1
+    relativePath: /Data/GXL/TestProjectToDebug/CodeFacts.gxl
+    absolutePath: 
+  CSVPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  JLGPath:
+    Root: 1
+    relativePath: /Data/GXL/TestProjectToDebug/CodeFacts.jlg
+    absolutePath: 
+--- !u!114 &155696307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 155696305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92867cfc4f3c3b84ab96f006078aaad3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  portalPlane: {fileID: 155696309}
+  id: 4
+--- !u!114 &155696308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 155696305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd9537a868ba1214eba7ee3caf4c2e76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  portalPlane: {fileID: 155696309}
+  id: 4
+--- !u!114 &155696309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 155696305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ScaleFactor: 1
+  HeightOffset: 0.0031000376
+--- !u!65 &155696310
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 155696305}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &155696311
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 155696305}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!4 &155696312
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 155696305}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.84, y: 0.964, z: -1.16}
+  m_LocalScale: {x: 1, y: 0.0001, z: 1}
+  m_Children:
+  - {fileID: 675734589}
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &309964076
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -216,6 +808,137 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 175c48b70a024c3478904cbd8e8be5f1, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 01dfb375646cba84e9b92e2cedf7d149, type: 3}
+--- !u!1001 &326830031
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 551180602}
+    m_Modifications:
+    - target: {fileID: 419627336, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1611227358, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227613, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461994104216227615, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_Name
+      value: AnimationCanvas
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+--- !u!1 &326830032 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4461994104216227615, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+  m_PrefabInstance: {fileID: 326830031}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &326830033 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+  m_PrefabInstance: {fileID: 326830031}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &463545961
 GameObject:
   m_ObjectHideFlags: 0
@@ -271,7 +994,524 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1856428177}
-  m_RootOrder: 4
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &551180591
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 551180602}
+  - component: {fileID: 551180601}
+  - component: {fileID: 551180600}
+  - component: {fileID: 551180599}
+  - component: {fileID: 551180598}
+  - component: {fileID: 551180597}
+  - component: {fileID: 551180596}
+  - component: {fileID: 551180595}
+  - component: {fileID: 551180594}
+  - component: {fileID: 551180593}
+  - component: {fileID: 551180592}
+  m_Layer: 0
+  m_Name: SEECity Evolution
+  m_TagString: Code City
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &551180592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 551180591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a402756c70fc7b8428d1580ad8b0d004, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AdditionColor: {r: 0, g: 1, b: 0, a: 1}
+  ChangeColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  DeletionColor: {r: 1, g: 0, b: 0, a: 1}
+  Scale: {x: 0.02, y: 0.3, z: 0.02}
+--- !u!114 &551180593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 551180591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4874e0649dc8ad742a50b1d3b5845fd6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &551180594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 551180591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0b94ac26c08644428d063065119b125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AnimationCanvas: {fileID: 326830032}
+  RevisionSelectionCanvas: {fileID: 1305587994}
+--- !u!114 &551180595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 551180591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df55a01401a3f0c409a28477c4a418c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: LayoutPath
+      Entry: 7
+      Data: 0|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: SelectedNodeTypes
+      Entry: 7
+      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CityPath
+      Entry: 7
+      Data: 4|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 1
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LeafNodeColorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeColorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LeafLabelSettings
+      Entry: 7
+      Data: 5|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeLabelSettings
+      Entry: 7
+      Data: 6|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CoseGraphSettings
+      Entry: 7
+      Data: 7|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
+    - Name: EdgeLength
+      Entry: 3
+      Data: 20
+    - Name: UseSmartIdealEdgeCalculation
+      Entry: 5
+      Data: false
+    - Name: UseSmartMultilevelScaling
+      Entry: 5
+      Data: false
+    - Name: PerLevelIdealEdgeLengthFactor
+      Entry: 4
+      Data: 0.1
+    - Name: UseSmartRepulsionRangeCalculation
+      Entry: 5
+      Data: false
+    - Name: GravityStrength
+      Entry: 4
+      Data: 0.8
+    - Name: CompoundGravityStrength
+      Entry: 4
+      Data: 1.5
+    - Name: RepulsionStrength
+      Entry: 4
+      Data: 50
+    - Name: MultiLevelScaling
+      Entry: 5
+      Data: false
+    - Name: ListInnerNodeToggle
+      Entry: 6
+      Data: 
+    - Name: InnerNodeLayout
+      Entry: 6
+      Data: 
+    - Name: InnerNodeShape
+      Entry: 6
+      Data: 
+    - Name: LoadedForNodeTypes
+      Entry: 6
+      Data: 
+    - Name: UseCalculationParameter
+      Entry: 5
+      Data: false
+    - Name: UseIterativeCalculation
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+  LODCulling: 0.01
+  LayoutPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  CityPath:
+    Root: 1
+    relativePath: 
+    absolutePath: 
+  WidthMetric: Metric.Number_of_Tokens
+  HeightMetric: Metric.Clone_Rate
+  DepthMetric: Metric.LOC
+  LeafStyleMetric: Metric.Complexity
+  ArchitectureIssue: Metric.Architecture_Violations
+  CloneIssue: Metric.Clone
+  CycleIssue: Metric.Cycle
+  Dead_CodeIssue: Metric.Dead_Code
+  MetricIssue: Metric.Metric
+  StyleIssue: Metric.Style
+  UniversalIssue: Metric.Universal
+  ArchitectureIssue_SUM: Metric.Architecture_Violations_SUM
+  CloneIssue_SUM: Metric.Clone_SUM
+  CycleIssue_SUM: Metric.Cycle_SUM
+  Dead_CodeIssue_SUM: Metric.Dead_Code_SUM
+  MetricIssue_SUM: Metric.Metric_SUM
+  StyleIssue_SUM: Metric.Style_SUM
+  UniversalIssue_SUM: Metric.Universal_SUM
+  InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeHeightMetric: 
+  InnerNodeStyleMetric: Metric.IssuesTotal
+  MinimalBlockLength: 0.1
+  MaximalBlockLength: 100
+  LeafObjects: 0
+  InnerNodeObjects: 0
+  NodeLayout: 3
+  EdgeLayout: 0
+  ZScoreScale: 0
+  EdgeWidth: 0.3
+  ShowErosions: 0
+  MaxErosionWidth: 1
+  EdgesAboveBlocks: 1
+  Tension: 0.85
+  RDP: 0.05
+  TubularSegments: 50
+  Radius: 0.005
+  RadialSegments: 8
+  isEdgeSelectable: 1
+  MaxRevisionsToLoad: 500
+  MarkerHeight: 0.2
+  MarkerWidth: 0.01
+  AdditionBeamColor: {r: 0, g: 1, b: 0, a: 1}
+  ChangeBeamColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  DeletionBeamColor: {r: 0, g: 0, b: 0, a: 1}
+  GXLDirectory:
+    Root: 1
+    relativePath: /Data/GXL/animation-clones
+    absolutePath: 
+--- !u!114 &551180596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 551180591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ScaleFactor: 1
+  HeightOffset: 0.0031000376
+--- !u!114 &551180597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 551180591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92867cfc4f3c3b84ab96f006078aaad3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  portalPlane: {fileID: 551180596}
+  id: 3
+--- !u!114 &551180598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 551180591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd9537a868ba1214eba7ee3caf4c2e76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  portalPlane: {fileID: 551180596}
+  id: 3
+--- !u!65 &551180599
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 551180591}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &551180600
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 551180591}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &551180601
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 551180591}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &551180602
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 551180591}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.356, y: 0.942, z: -1.23}
+  m_LocalScale: {x: 1, y: 0.0001, z: 1}
+  m_Children:
+  - {fileID: 326830033}
+  - {fileID: 1305587995}
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &616085401 stripped
 Transform:
@@ -371,6 +1611,67 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!1 &675734588
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 675734589}
+  - component: {fileID: 675734590}
+  m_Layer: 0
+  m_Name: JLG Visualization
+  m_TagString: JLG Visualization
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &675734589
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 675734588}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.84, y: -9640, z: 1.16}
+  m_LocalScale: {x: 1, y: 10000, z: 1}
+  m_Children: []
+  m_Father: {fileID: 155696312}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &675734590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 675734588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9aec9929283525040bdb89e1d9cfd8ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: parsedJLG
+      Entry: 6
+      Data: 
+  jlgFilePath: C:\Users\koschke\SEA.new\Data\GXL\TestProjectToDebug\CodeFacts.jlg
+  BreakpointClass: classname
+  BreakpointLine: 0
+  DistanceAboveCity: 0.01
+  DistanceBehindCity: 0.3
+  LineWidth: 0.01
 --- !u!1 &701967151
 GameObject:
   m_ObjectHideFlags: 0
@@ -418,7 +1719,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &708170054
 GameObject:
@@ -492,7 +1793,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: ab7e43b46e30f5a409fe73d7d545bfa4, type: 3}
       propertyPath: m_RootOrder
-      value: 5
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: ab7e43b46e30f5a409fe73d7d545bfa4, type: 3}
       propertyPath: m_LocalScale.x
@@ -570,7 +1871,7 @@ GameObject:
   - component: {fileID: 870145954}
   - component: {fileID: 870145953}
   m_Layer: 0
-  m_Name: Table
+  m_Name: ArchitectureTable
   m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -664,13 +1965,123 @@ Transform:
   m_LocalScale: {x: 2.301375, y: 0.9476249, z: 1.1}
   m_Children: []
   m_Father: {fileID: 1856428177}
-  m_RootOrder: 3
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1016139504 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400014, guid: 8cef4c90a64b6564ca61184c68b8d442, type: 3}
   m_PrefabInstance: {fileID: 2074117647}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1094705350
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1094705351}
+  - component: {fileID: 1094705355}
+  - component: {fileID: 1094705354}
+  - component: {fileID: 1094705353}
+  - component: {fileID: 1094705352}
+  m_Layer: 0
+  m_Name: EvolutionTable
+  m_TagString: Decoration
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 4294967295
+  m_IsActive: 1
+--- !u!4 &1094705351
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1094705350}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -2.3560002, y: 0.465, z: -1.23}
+  m_LocalScale: {x: 1.1791095, y: 0.9476249, z: 1.1}
+  m_Children: []
+  m_Father: {fileID: 1856428177}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1094705352
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1094705350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ScaleFactor: 1
+  HeightOffset: 0
+--- !u!65 &1094705353
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1094705350}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1094705354
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1094705350}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9a21eb46837654f4f84d01d31001741d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1094705355
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1094705350}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1190604626
 GameObject:
   m_ObjectHideFlags: 0
@@ -767,6 +2178,345 @@ Transform:
   m_Father: {fileID: 1856428177}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1291713493
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1291713494}
+  - component: {fileID: 1291713498}
+  - component: {fileID: 1291713497}
+  - component: {fileID: 1291713496}
+  - component: {fileID: 1291713495}
+  m_Layer: 0
+  m_Name: JLGTable
+  m_TagString: Decoration
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 4294967295
+  m_IsActive: 1
+--- !u!4 &1291713494
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291713493}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1.84, y: 0.465, z: -1.23}
+  m_LocalScale: {x: 1.1791095, y: 0.9476249, z: 1.1}
+  m_Children: []
+  m_Father: {fileID: 1856428177}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1291713495
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291713493}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ScaleFactor: 1
+  HeightOffset: 0
+--- !u!65 &1291713496
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291713493}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1291713497
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291713493}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9a21eb46837654f4f84d01d31001741d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1291713498
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291713493}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1295253413
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1295253414}
+  - component: {fileID: 1295253418}
+  - component: {fileID: 1295253417}
+  - component: {fileID: 1295253416}
+  - component: {fileID: 1295253415}
+  m_Layer: 0
+  m_Name: DynTable
+  m_TagString: Decoration
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 4294967295
+  m_IsActive: 1
+--- !u!4 &1295253414
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1295253413}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1.84, y: 0.465, z: -2.63}
+  m_LocalScale: {x: 1.1791095, y: 0.9476249, z: 1.1}
+  m_Children: []
+  m_Father: {fileID: 1856428177}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1295253415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1295253413}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ScaleFactor: 1
+  HeightOffset: 0
+--- !u!65 &1295253416
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1295253413}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1295253417
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1295253413}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9a21eb46837654f4f84d01d31001741d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1295253418
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1295253413}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1001 &1305587993
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 551180602}
+    m_Modifications:
+    - target: {fileID: 3378868594509276436, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_Name
+      value: RevisionSelectionCanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+--- !u!1 &1305587994 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3378868594509276436, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+  m_PrefabInstance: {fileID: 1305587993}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &1305587995 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 3378868594509276437, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+  m_PrefabInstance: {fileID: 1305587993}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1381114938
 GameObject:
   m_ObjectHideFlags: 0
@@ -798,6 +2548,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerInputType: 0
   PlayerOrigin: {x: 0, y: 0.5, z: -1.5}
+  FocusPlane: {fileID: 1972412193}
   HideVRControllers: 0
   ShowControllerHints: 0
   experienceScale: 1
@@ -812,7 +2563,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1381114938}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -1.49}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -823,6 +2574,597 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400004, guid: 01dfb375646cba84e9b92e2cedf7d149, type: 3}
   m_PrefabInstance: {fileID: 309964076}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1642873243
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1642873250}
+  - component: {fileID: 1642873249}
+  - component: {fileID: 1642873248}
+  - component: {fileID: 1642873247}
+  - component: {fileID: 1642873246}
+  - component: {fileID: 1642873245}
+  - component: {fileID: 1642873244}
+  m_Layer: 0
+  m_Name: DYNCity
+  m_TagString: Code City
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1642873244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1642873243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63565e11904dea849be8462f7c86999e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: LayoutPath
+      Entry: 7
+      Data: 0|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: SelectedNodeTypes
+      Entry: 7
+      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 6
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Directory
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: File
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Method
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Routine
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Namespace
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Class
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CityPath
+      Entry: 7
+      Data: 4|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LeafNodeColorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeColorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LeafLabelSettings
+      Entry: 7
+      Data: 5|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeLabelSettings
+      Entry: 7
+      Data: 6|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CoseGraphSettings
+      Entry: 7
+      Data: 7|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
+    - Name: EdgeLength
+      Entry: 3
+      Data: 20
+    - Name: UseSmartIdealEdgeCalculation
+      Entry: 5
+      Data: false
+    - Name: UseSmartMultilevelScaling
+      Entry: 5
+      Data: false
+    - Name: PerLevelIdealEdgeLengthFactor
+      Entry: 4
+      Data: 0.1
+    - Name: UseSmartRepulsionRangeCalculation
+      Entry: 5
+      Data: false
+    - Name: GravityStrength
+      Entry: 4
+      Data: 0.8
+    - Name: CompoundGravityStrength
+      Entry: 4
+      Data: 1.5
+    - Name: RepulsionStrength
+      Entry: 4
+      Data: 50
+    - Name: MultiLevelScaling
+      Entry: 5
+      Data: false
+    - Name: ListInnerNodeToggle
+      Entry: 7
+      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 9|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeLayout
+      Entry: 7
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Layout.NodeLayouts.NodeLayoutKind,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 9
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeShape
+      Entry: 7
+      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+InnerNodeKinds,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 9
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LoadedForNodeTypes
+      Entry: 7
+      Data: 12|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 9
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: UseCalculationParameter
+      Entry: 5
+      Data: true
+    - Name: UseIterativeCalculation
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+  LODCulling: 0.01
+  LayoutPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  CityPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  WidthMetric: Metric.Number_of_Tokens
+  HeightMetric: Metric.Clone_Rate
+  DepthMetric: Metric.LOC
+  LeafStyleMetric: Metric.Complexity
+  ArchitectureIssue: Metric.Architecture_Violations
+  CloneIssue: Metric.Clone
+  CycleIssue: Metric.Cycle
+  Dead_CodeIssue: Metric.Dead_Code
+  MetricIssue: Metric.Metric
+  StyleIssue: Metric.Style
+  UniversalIssue: Metric.Universal
+  ArchitectureIssue_SUM: Metric.Architecture_Violations_SUM
+  CloneIssue_SUM: Metric.Clone_SUM
+  CycleIssue_SUM: Metric.Cycle_SUM
+  Dead_CodeIssue_SUM: Metric.Dead_Code_SUM
+  MetricIssue_SUM: Metric.Metric_SUM
+  StyleIssue_SUM: Metric.Style_SUM
+  UniversalIssue_SUM: Metric.Universal_SUM
+  InnerDonutMetric: Metric.IssuesTotal
+  InnerNodeHeightMetric: 
+  InnerNodeStyleMetric: Metric.IssuesTotal
+  MinimalBlockLength: 0.1
+  MaximalBlockLength: 100
+  LeafObjects: 0
+  InnerNodeObjects: 0
+  NodeLayout: 3
+  EdgeLayout: 0
+  ZScoreScale: 1
+  EdgeWidth: 0.1
+  ShowErosions: 0
+  MaxErosionWidth: 1
+  EdgesAboveBlocks: 1
+  Tension: 0.85
+  RDP: 0.05
+  TubularSegments: 50
+  Radius: 0.005
+  RadialSegments: 8
+  isEdgeSelectable: 1
+  GXLPath:
+    Root: 1
+    relativePath: /Data/GXL/dynamic-tests/example_01.gxl
+    absolutePath: 
+  CSVPath:
+    Root: 1
+    relativePath: /Data/GXL/dynamic-tests/empty.csv
+    absolutePath: 
+  DYNPath:
+    Root: 1
+    relativePath: /Data/GXL/dynamic-tests/example_01.dyn
+    absolutePath: 
+--- !u!114 &1642873245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1642873243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92867cfc4f3c3b84ab96f006078aaad3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  portalPlane: {fileID: 1642873247}
+  id: 5
+--- !u!114 &1642873246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1642873243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd9537a868ba1214eba7ee3caf4c2e76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  portalPlane: {fileID: 1642873247}
+  id: 5
+--- !u!114 &1642873247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1642873243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ScaleFactor: 1
+  HeightOffset: 0.0031000376
+--- !u!65 &1642873248
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1642873243}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1642873249
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1642873243}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!4 &1642873250
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1642873243}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.85, y: 0.964, z: -2.6}
+  m_LocalScale: {x: 1, y: 0.0001, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1755647557
 GameObject:
   m_ObjectHideFlags: 0
@@ -1366,7 +3708,7 @@ Transform:
   m_LocalScale: {x: 0.9, y: 0.0001, z: 0.9}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1794918250
 GameObject:
@@ -1459,7 +3801,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1856428177}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 48.473003, y: -45.645, z: -138.162}
 --- !u!1 &1856428176
 GameObject:
@@ -1491,10 +3833,13 @@ Transform:
   - {fileID: 1190604630}
   - {fileID: 1016139504}
   - {fileID: 1502973842}
-  - {fileID: 870145957}
   - {fileID: 463545963}
   - {fileID: 616085401}
   - {fileID: 1794918252}
+  - {fileID: 870145957}
+  - {fileID: 1094705351}
+  - {fileID: 1291713494}
+  - {fileID: 1295253414}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1515,7 +3860,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2342395875013397701, guid: 51821f11a04e1ab4d9151f06c2366bbc, type: 3}
       propertyPath: m_RootOrder
-      value: 7
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2342395875013397701, guid: 51821f11a04e1ab4d9151f06c2366bbc, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1954,7 +4299,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   portalPlane: {fileID: 1972412193}
-  id: 0
+  id: 2
 --- !u!114 &1972412192
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1968,7 +4313,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   portalPlane: {fileID: 1972412193}
-  id: 0
+  id: 2
 --- !u!114 &1972412193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2057,7 +4402,7 @@ Transform:
   m_LocalScale: {x: 1, y: 0.0001, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2074117647
 PrefabInstance:
