@@ -322,7 +322,9 @@ namespace SEE.Game
                 default:
                     throw new Exception("Unhandled edge layout " + settings.EdgeLayout);
             }
-            Performance p = Performance.Begin("edge layout " + layout.Name);
+#if UNITY_EDITOR
+            //Performance p = Performance.Begin("edge layout " + layout.Name);
+#endif
             EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth, settings.TubularSegments, settings.Radius, settings.RadialSegments, settings.isEdgeSelectable);
             ICollection<GameObject> result;
             //Calculate only
@@ -336,10 +338,11 @@ namespace SEE.Game
                 result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), layoutEdges);
                 InteractionDecorator.PrepareForInteraction(result);
                 AddLOD(result);
-            }            
-            
-            p.End();
-            Debug.LogFormat("Built \"" + settings.EdgeLayout + "\" edge layout for " + gameNodes.Count + " nodes in {0} [h:m:s:ms].\n", p.GetElapsedTime());
+            }
+#if UNITY_EDITOR
+            //p.End();
+            //Debug.LogFormat("Built \"" + settings.EdgeLayout + "\" edge layout for " + gameNodes.Count + " nodes in {0} [h:m:s:ms].\n", p.GetElapsedTime());
+#endif
             return result;
         }
 
