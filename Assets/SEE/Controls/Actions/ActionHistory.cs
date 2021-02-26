@@ -61,27 +61,15 @@ namespace SEE.Controls.Actions
                     {
                         if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                         {
-
                             edge.SetVisibility(false, true);
 
                             if (nodesAndascendingEdges.Contains(edge) == false)
                             {
                                 edgesToHide.Add(edge);
                             }
-                            if (edge.TryGetComponent(out Collider edgeCollider))
-                            {
-                                edge.GetComponent<Collider>().enabled = false;
-                            }
                             edge.TryGetComponent(out EdgeRef edgeRef);
                             graph.RemoveEdge(edgeRef.edge);
-
-
                         }
-                    }
-
-                    if (actionHistoryObject.TryGetComponent(out Collider collider))
-                    {
-                        actionHistoryObject.GetComponent<Collider>().enabled = false;
                     }
 
                     nodesAndascendingEdges.Add(actionHistoryObject);
@@ -94,26 +82,20 @@ namespace SEE.Controls.Actions
 
             foreach (GameObject deletedNode in deletedNodesReverse)
             {
-                if (deletedNode.tag == Tags.Node)
+                if (deletedNode.CompareTag(Tags.Node))
                 {
                     deletedNode.TryGetComponent(out NodeRef nodeRef);
                     if (graph.Contains(nodeRef.Value))
                     {
                         graph.RemoveNode(nodeRef.Value);
                     }
-                   
                 }
-                if (deletedNode.tag == Tags.Edge)
+                if (deletedNode.CompareTag(Tags.Edge))
                 {
-
                     deletedNode.SetVisibility(false, true);
                     edgesToHide.Add(deletedNode);
                     deletedNode.TryGetComponent(out EdgeRef edgeRef);
                     graph.RemoveEdge(edgeRef.edge);
-                    if (deletedNode.TryGetComponent(out Collider collider))
-                    {
-                        deletedNode.GetComponent<Collider>().enabled = false;
-                    }
                 }
             }
 
@@ -129,7 +111,7 @@ namespace SEE.Controls.Actions
         /// Gets the last operation in history and undoes it. 
         /// </summary>
         /// <returns>the positions of the gameObjects where they has to be moved after undo again</returns>
-        public List<Vector3> UndoDeleteOperation()
+        public void UndoDeleteOperation()
         {
             graph = listOfGraphs.Last();
             foreach (GameObject node in deletedNodeHistory.Last())
@@ -141,10 +123,6 @@ namespace SEE.Controls.Actions
                         graph.AddNode(nodeRef.Value);
                     }
                 }
-                if (node.TryGetComponent(out Collider collider))
-                {
-                    node.GetComponent<Collider>().enabled = true;
-                }
             }
 
             foreach (GameObject edge in deletedEdgeHistory.Last())
@@ -154,19 +132,12 @@ namespace SEE.Controls.Actions
                     graph.AddEdge(edgeReference.edge);
                     edge.SetVisibility(true, false);
                 }
-                if (edge.TryGetComponent(out Collider collider))
-                {
-                    edge.GetComponent<Collider>().enabled = true;
-                }
             }
 
-            List<Vector3> oldPosition = oldPositionHistory.Last();
             deletedEdgeHistory.RemoveLast();
             deletedNodeHistory.RemoveLast();
             oldPositionHistory.RemoveLast();
             listOfGraphs.RemoveLast();
-
-            return oldPosition;
         }
 
     }
