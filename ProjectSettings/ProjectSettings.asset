@@ -575,6 +575,7 @@ PlayerSettings:
   webGLDecompressionFallback: 0
   scriptingDefineSymbols:
     1: UNITY_CCU;CURVEDUI_STEAMVR_INT;CURVEDUI_TMP
+    14: UNITY_CCU;CURVEDUI_STEAMVR_INT;CURVEDUI_TMP
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}
