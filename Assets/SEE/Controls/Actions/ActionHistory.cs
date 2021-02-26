@@ -3,7 +3,6 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -16,26 +15,11 @@ namespace SEE.Controls.Actions
     public class ActionHistory : MonoBehaviour
     {
         /// <summary>
-        /// A history of all deleted nodes
+        /// A history of all actions of the user for the possibility of an undo. 
         /// </summary>
-        public LinkedList<List<GameObject>> deletedNodeHistory = new LinkedList<List<GameObject>>();
+        private LinkedList<UndoAction> actionHistory = new LinkedList<UndoAction>();
 
-        /// <summary>
-        /// A history of the old positions of the deleted nodes
-        /// </summary>
-        public LinkedList<List<Vector3>> oldPositionHistory = new LinkedList<List<Vector3>>();
-
-        /// <summary>
-        /// A history of all deleted edges
-        /// </summary>
-        private LinkedList<List<GameObject>> deletedEdgeHistory = new LinkedList<List<GameObject>>();
-
-        private LinkedList<Graph> listOfGraphs = new LinkedList<Graph>();
-
-        /// <summary>
-        /// The graph of the node to be deleted
-        /// </summary>
-        private Graph graph;
+        public LinkedList<UndoAction> GetActionHistory { get => actionHistory; set => actionHistory = value; }
 
         /// <summary>
         /// Saves the deleted nodes and/or edges for the possibility of an undo. 
@@ -45,10 +29,8 @@ namespace SEE.Controls.Actions
         /// <param name="oldPositionsOfDeletedNodes">all old positions of the deleted nodes of the last operation</param>
         public void SaveObjectForUndo(List<GameObject> deletedNodes, List<Vector3> oldPositionsOfDeletedNodes)
         {
-            //FIXME FOR GOEDECKE: param deletedNodes -> deleted Objects..? dunno cause of outsourcing of edges in other function in future - if -> in docs and param
-
             SEECity city = SceneQueries.GetCodeCity(deletedNodes[0].transform)?.gameObject.GetComponent<SEECity>();
-            graph = city.LoadedGraph;
+            Graph graph = city.LoadedGraph;
             List<GameObject> nodesAndascendingEdges = new List<GameObject>();
             List<GameObject> edgesToHide = new List<GameObject>();
             
@@ -101,10 +83,7 @@ namespace SEE.Controls.Actions
 
             oldPositionsOfDeletedNodes.Reverse();
             nodesAndascendingEdges.Reverse();
-            deletedEdgeHistory.AddLast(edgesToHide);
-            oldPositionHistory.AddLast(oldPositionsOfDeletedNodes);
-            deletedNodeHistory.AddLast(nodesAndascendingEdges);
-            listOfGraphs.AddLast(graph);
+            actionHistory.AddLast(new UndoAction(nodesAndascendingEdges, oldPositionsOfDeletedNodes, edgesToHide, graph));
         }
 
         /// <summary>
@@ -113,8 +92,8 @@ namespace SEE.Controls.Actions
         /// <returns>the positions of the gameObjects where they has to be moved after undo again</returns>
         public void UndoDeleteOperation()
         {
-            graph = listOfGraphs.Last();
-            foreach (GameObject node in deletedNodeHistory.Last())
+            Graph graph = actionHistory.Last().Graph;
+            foreach (GameObject node in actionHistory.Last().DeletedNodes)
             {
                 if (node.TryGetComponent(out NodeRef nodeRef))
                 {
@@ -125,7 +104,7 @@ namespace SEE.Controls.Actions
                 }
             }
 
-            foreach (GameObject edge in deletedEdgeHistory.Last())
+            foreach (GameObject edge in actionHistory.Last().DeletedEdges)
             {
                 if (edge.TryGetComponent(out EdgeRef edgeReference))
                 {
@@ -134,10 +113,7 @@ namespace SEE.Controls.Actions
                 }
             }
 
-            deletedEdgeHistory.RemoveLast();
-            deletedNodeHistory.RemoveLast();
-            oldPositionHistory.RemoveLast();
-            listOfGraphs.RemoveLast();
+            actionHistory.RemoveLast();
         }
 
     }
