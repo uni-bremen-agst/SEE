@@ -36,6 +36,10 @@ namespace SEE.Controls
         [OdinSerialize]
         public Vector3 PlayerOrigin = Vector3.one;
 
+        [Tooltip("The plane the player is to focus initially in the desktop environment.")]
+        [OdinSerialize]
+        public SEE.GO.Plane FocusPlane;
+
         [Header("VR specific settings (relevant only for VR players)")]
 
         [Tooltip("Whether the VR controllers should be hidden.")]
@@ -131,18 +135,13 @@ namespace SEE.Controls
             switch (playerInputType)
             {
                 case PlayerInputType.DesktopPlayer:
+                    if (FocusPlane == null)
                     {
-                        string TableName = "Table";
-
-                        GameObject table = GameObject.Find(TableName);
-                        if (table == null)
-                        {
-                            throw new Exception($"No game object named {TableName} found.");
-                        }
-                        else
-                        {
-                            player = PlayerFactory.CreateDesktopPlayer(table.GetComponent<SEE.GO.Plane>());
-                        }
+                        throw new Exception($"No focus plane set for the player. Set this value in the inspector.");
+                    }
+                    else
+                    {
+                        player = PlayerFactory.CreateDesktopPlayer(FocusPlane);
                     }
                     break;
                 case PlayerInputType.VRPlayer:
