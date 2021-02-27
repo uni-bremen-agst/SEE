@@ -529,8 +529,11 @@ namespace SEE.Game
         private int currentGraphRevisionCounter = 0;
 
         /// <summary>
-        /// Event function triggered when alls animations are finished. Animates the transition of the edges and renders all edges
-        /// as new and notifies everyone that the animation is finished.
+        /// Event function triggered when alls animations are finished. Animates the transition of the edges 
+        /// and renders all edges as new and notifies everyone that the animation is finished.
+        /// 
+        /// Note: This method is a callback called from the animation framework (DoTween). It is 
+        /// passed to this animation framework in <see cref="RenderGraph"/>.
         /// </summary>
         private void OnAnimationsFinished()
         {       
@@ -742,13 +745,13 @@ namespace SEE.Game
             // The game node representing the graphNode if there is any; null if there is none
             Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject currentGameNode);
 
-            // Copy the actual node
+            // Copy of the currentGameNode. This copy will be used during the animation on behalf of currentGameNode.
             GameObject animationNode = Instantiate(currentGameNode);
-            // The copied node is added to a list so that it can be deleted after animation
+            // The copied node is added to list animationNodes so that it can be deleted after animation.
             animationNodes.Add(animationNode);
-            // The actual node is added to a list so that it can be reactivated after animation
+            // The actual node is added to list currentNodes so that it can be reactivated after animation.
             currentNodes.Add(currentGameNode);
-            // Hiding the actual node for animation
+            // Hide the actual node during the animation.
             currentGameNode.SetActive(false);
 
             Difference difference;
@@ -788,10 +791,10 @@ namespace SEE.Game
                 animationNode.transform.localScale = new Vector3(currentGameNode.transform.localScale.x, 0.0001f, currentGameNode.transform.localScale.z);
                 animationNode.transform.position = currentGameNode.transform.position;
             }
-            // The actual node is shifted to its new position
+            // The actual node is shifted to its new position.
             graphRenderer.Apply(currentGameNode, gameObject, layoutNode);
-            // The copied node is animated
-            moveScaleShakeAnimator.AnimateTo(animationNode,layoutNode,difference,null);
+            // The copied node is animated.
+            moveScaleShakeAnimator.AnimateTo(animationNode, layoutNode, difference, null);
         }
 
         /// <summary>
@@ -800,7 +803,7 @@ namespace SEE.Game
         /// removed has been finished.
         /// </summary>
         /// <param name="gameObject">game object to be destroyed</param>
-        public void OnRemovedNodeFinishedAnimation(object gameObject)
+        private void OnRemovedNodeFinishedAnimation(object gameObject)
         {
             if (gameObject != null && gameObject is GameObject)
             {
