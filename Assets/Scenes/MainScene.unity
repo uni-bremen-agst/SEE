@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.09701417, g: 0.14021364, b: 0.20771632, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -333,6 +333,9 @@ GameObject:
   - component: {fileID: 186778473}
   - component: {fileID: 186778477}
   - component: {fileID: 186778476}
+  - component: {fileID: 186778479}
+  - component: {fileID: 186778478}
+  - component: {fileID: 186778480}
   m_Layer: 0
   m_Name: Player Touch Gamepad
   m_TagString: Untagged
@@ -419,6 +422,44 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &186778477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 186778472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d17164181a66124b9c9e8ec82e826e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &186778478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 186778472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a80d0d1d33e46648bd7182aeef851d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &186778479
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 186778472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57b0f5fd32c48fe4cabe6615a37e70d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GONode: {fileID: 0}
+  rootPosition: {x: 0, y: 0, z: 0}
+--- !u!114 &186778480
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -933,6 +974,49 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &802859940
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 802859942}
+  - component: {fileID: 802859941}
+  m_Layer: 0
+  m_Name: CanvasObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &802859941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 802859940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b9aa3d7d2679ca41a50a6b06a36ca12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &802859942
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 802859940}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -14.031578, y: -76.03466, z: 150.53467}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 19
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &844925775
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1038,15 +1122,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 429506, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -38
       objectReference: {fileID: 0}
     - target: {fileID: 429506, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 3.25
       objectReference: {fileID: 0}
     - target: {fileID: 429506, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -633
       objectReference: {fileID: 0}
     - target: {fileID: 429506, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
       propertyPath: m_LocalRotation.x
@@ -1449,6 +1533,44 @@ MonoBehaviour:
   m_GameObject: {fileID: 844967653}
   m_Enabled: 1
   m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d17164181a66124b9c9e8ec82e826e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &844967660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844967653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a80d0d1d33e46648bd7182aeef851d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &844967661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844967653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57b0f5fd32c48fe4cabe6615a37e70d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GONode: {fileID: 0}
+  rootPosition: {x: 0, y: 0, z: 0}
+--- !u!114 &844967662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844967653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9dce67dfcaa802e43a0601cdc340100e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -1565,6 +1687,9 @@ GameObject:
   - component: {fileID: 1046553558}
   - component: {fileID: 1046553563}
   - component: {fileID: 1046553562}
+  - component: {fileID: 1046553565}
+  - component: {fileID: 1046553564}
+  - component: {fileID: 1046553566}
   m_Layer: 0
   m_Name: Player HoloLens
   m_TagString: MainCamera
@@ -1699,6 +1824,44 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &1046553563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046553556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d17164181a66124b9c9e8ec82e826e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1046553564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046553556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a80d0d1d33e46648bd7182aeef851d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1046553565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046553556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57b0f5fd32c48fe4cabe6615a37e70d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GONode: {fileID: 0}
+  rootPosition: {x: 0, y: 0, z: 0}
+--- !u!114 &1046553566
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2391,10 +2554,13 @@ GameObject:
   - component: {fileID: 1566173691}
   - component: {fileID: 1566173696}
   - component: {fileID: 1566173694}
+  - component: {fileID: 1566173680}
   - component: {fileID: 1566173683}
   - component: {fileID: 1566173682}
   - component: {fileID: 1566173684}
-  - component: {fileID: 1566173680}
+  - component: {fileID: 1566173686}
+  - component: {fileID: 1566173685}
+  - component: {fileID: 1566173687}
   m_Layer: 0
   m_Name: Player Desktop
   m_TagString: MainCamera
@@ -2411,7 +2577,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1566173679}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 83f7b5d2afa8b8c4aae1d8f769c0da13, type: 3}
+  m_Script: {fileID: 11500000, guid: ee116443c3c6a374fa0202546963f0da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!20 &1566173681
@@ -2493,6 +2659,44 @@ MonoBehaviour:
   minHeadVelocityThreshold: 0.5
   maxHeadVelocityThreshold: 2
 --- !u!114 &1566173684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1566173679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d17164181a66124b9c9e8ec82e826e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1566173685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1566173679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a80d0d1d33e46648bd7182aeef851d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1566173686
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1566173679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57b0f5fd32c48fe4cabe6615a37e70d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GONode: {fileID: 0}
+  rootPosition: {x: 0, y: 0, z: 0}
+--- !u!114 &1566173687
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3113,9 +3317,13 @@ MonoBehaviour:
   EdgesAboveBlocks: 1
   Tension: 0.85
   RDP: 0.0001
+  TubularSegments: 50
+  Radius: 0.005
+  RadialSegments: 8
+  isEdgeSelectable: 0
   GXLPath:
-    Root: 1
-    relativePath: /Data/GXL/reflexion/mini/CodeFacts.gxl
+    Root: 3
+    relativePath: /mini/CodeFacts.gxl
     absolutePath: 
   CSVPath:
     Root: 1
@@ -3148,7 +3356,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.014835119
+  HeightOffset: 0.003061831
 --- !u!65 &1649116648
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3580,10 +3788,10 @@ MonoBehaviour:
       Data: 0|SEE.Game.DataPath, SEE
     - Name: Root
       Entry: 3
-      Data: 1
+      Data: 3
     - Name: relativePath
       Entry: 1
-      Data: /Data/GXL/reflexion/mini/Architecture.gvl
+      Data: /mini/Architecture.gvl
     - Name: absolutePath
       Entry: 1
       Data: 
@@ -3852,8 +4060,8 @@ MonoBehaviour:
       Data: 
   LODCulling: 0.01
   LayoutPath:
-    Root: 1
-    relativePath: /Data/GXL/reflexion/mini/Architecture.gvl
+    Root: 3
+    relativePath: /mini/Architecture.gvl
     absolutePath: 
   CityPath:
     Root: 2
@@ -3893,9 +4101,13 @@ MonoBehaviour:
   EdgesAboveBlocks: 1
   Tension: 0.85
   RDP: 0.0001
+  TubularSegments: 50
+  Radius: 0.005
+  RadialSegments: 8
+  isEdgeSelectable: 1
   GXLPath:
-    Root: 1
-    relativePath: /Data/GXL/reflexion/mini/Architecture.gxl
+    Root: 3
+    relativePath: /mini/Architecture.gxl
     absolutePath: 
   CSVPath:
     Root: 1

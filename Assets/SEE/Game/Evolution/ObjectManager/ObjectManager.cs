@@ -23,6 +23,7 @@ using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
+using SEE.Game.Charts;
 
 namespace SEE.Game.Evolution
 {
@@ -223,6 +224,13 @@ namespace SEE.Game.Evolution
             node.AssertNotNull("node");
             
             bool wasNodeRemoved = nodes.TryGetValue(node.ID, out gameObject);
+            // Create power beam for deleted node
+            Vector3 powerBeamDimensions = gameObject.transform.position;
+            MoveScaleShakeAnimator.BeamAnimator.GetInstance().CreatePowerBeam(powerBeamDimensions, 
+                AdditionalBeamDetails.deletedBeamColor, AdditionalBeamDetails.powerBeamDimensions);
+            // Add the removed node id to the revision changes list
+            NodeChangesBuffer.GetSingleton().removedNodeIDs.Add(node.ID);
+
             nodes.Remove(node.ID);
             return wasNodeRemoved;
         }

@@ -1,15 +1,15 @@
 ﻿using OdinSerializer.Utilities;
+using SEE.Controls;
 using SEE.Utils;
-using UnityEditor;
 using UnityEngine;
-using PlayerSettings = SEE.Controls.PlayerSettings;
 
 namespace SEE.Game.UI
 {
     /// <summary>
     /// This class represents a component whose Start() and Update() method differs based on the current platform.
     /// Inheritors are expected to override the respective Start() and Update() methods (e.g. <see cref="StartVR()"/>.
-    /// If the current platform's method was not overridden, the component will be destroyed.
+    /// If the current platform's start method was not overridden, the component will be destroyed.
+    /// If the current platform's update method was not overridden, nothing will happen.
     /// 
     /// This approach is especially well suited for UI components, as their presentation is almost always different
     /// based on the platform.
@@ -27,7 +27,7 @@ namespace SEE.Game.UI
         /// This prefab should contain all components necessary for the UI canvas, such as an event system,
         /// a graphic raycaster, etc.
         /// </summary>
-        protected const string UI_CANVAS_PREFAB = "Assets/Prefabs/UI/UICanvas.prefab";
+        protected const string UI_CANVAS_PREFAB = "Prefabs/UI/UICanvas";
 
         /// <summary>
         /// The canvas on which UI elements are placed.
@@ -61,19 +61,21 @@ namespace SEE.Game.UI
         /// <summary>
         /// Called when the <see cref="Update()"/> method of this component is executed on the Desktop platform.
         /// </summary>
-        protected virtual void UpdateDesktop() => PlatformUnsupported();
+        protected virtual void UpdateDesktop() { }
         /// <summary>
         /// Called when the <see cref="Update()"/> method of this component is executed on the TouchGamepad platform.
         /// </summary>
-        protected virtual void UpdateTouchGamepad() => PlatformUnsupported();
+        protected virtual void UpdateTouchGamepad() { }
+
         /// <summary>
         /// Called when the <see cref="Update()"/> method of this component is executed on the VR platform.
         /// </summary>
-        protected virtual void UpdateVR() => PlatformUnsupported();
+        protected virtual void UpdateVR() { }
+
         /// <summary>
         /// Called when the <see cref="Update()"/> method of this component is executed on the HoloLens platform.
         /// </summary>
-        protected virtual void UpdateHoloLens() => PlatformUnsupported();
+        protected virtual void UpdateHoloLens() { }
         
         protected void Start()
         {
@@ -81,7 +83,7 @@ namespace SEE.Game.UI
             if (Canvas == null)
             {
                 // Create Canvas from prefab if it doesn't exist yet
-                Object canvasPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(UI_CANVAS_PREFAB);
+                Object canvasPrefab = Resources.Load<GameObject>(UI_CANVAS_PREFAB);
                 Canvas = Instantiate(canvasPrefab) as GameObject;
                 UnityEngine.Assertions.Assert.IsNotNull(Canvas);
                 Canvas.name = UI_CANVAS_NAME;
