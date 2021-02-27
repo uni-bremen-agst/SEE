@@ -2225,12 +2225,12 @@ MonoBehaviour:
   NodeLayout: 3
   EdgeLayout: 0
   ZScoreScale: 0
-  EdgeWidth: 0.3
+  EdgeWidth: 0.01
   ShowErosions: 0
   MaxErosionWidth: 1
   EdgesAboveBlocks: 1
   Tension: 0.85
-  RDP: 0.05
+  RDP: 0.001
   TubularSegments: 50
   Radius: 0.005
   RadialSegments: 8
@@ -2402,9 +2402,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InspectorNewBeamColor: {r: 0, g: 1, b: 0.10232139, a: 0}
-  InspectorChangedBeamColor: {r: 0, g: 0.98000383, b: 1, a: 0}
+  InspectorChangedBeamColor: {r: 0.92156863, g: 1, b: 0, a: 0}
   InspectorDeletedBeamColor: {r: 1, g: 0, b: 0, a: 0}
-  InspectorPowerBeamDimensions: {x: 0, y: 0, z: 0}
+  InspectorPowerBeamDimensions: {x: 0, y: 0.2, z: 0}
 --- !u!1 &1093528283
 GameObject:
   m_ObjectHideFlags: 0
