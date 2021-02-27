@@ -143,7 +143,7 @@ namespace SEE.Game
         public readonly UnityEvent AnimationFinishedEvent = new UnityEvent();
 
         /// <summary>
-        /// Used to store whether a node has been bored or changed.
+        /// Used to store whether a node has been born or changed.
         /// </summary>
         private enum MarkerType {Changed, Born};
 
@@ -529,7 +529,7 @@ namespace SEE.Game
         private int currentGraphRevisionCounter = 0;
 
         /// <summary>
-        /// Event function triggered when alls animations are finished. Animates the transition of the edges 
+        /// Event function triggered when all animations are finished. Animates the transition of the edges 
         /// and renders all edges as new and notifies everyone that the animation is finished.
         /// 
         /// Note: This method is a callback called from the animation framework (DoTween). It is 
