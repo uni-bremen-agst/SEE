@@ -236,7 +236,7 @@ namespace SEE.GO
         /// <summary>
         /// Returns the full name of given <paramref name="gameObject"/>.
         /// The full name is the concatenation of all names of the ancestors of <paramref name="gameObject"/>
-        /// separated by a period. E.g., if g<paramref name="gameObject"/> has name C and its parent
+        /// separated by a period. E.g., if <paramref name="gameObject"/> has name C and its parent
         /// has name B and the parent's parent has name A, then the result will be A.B.C.        
         /// </summary>
         /// <param name="gameObject">the gameObject whose full name is to be retrieved</param>
