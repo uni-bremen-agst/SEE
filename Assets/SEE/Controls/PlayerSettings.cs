@@ -47,6 +47,11 @@ namespace SEE.Controls
         /// environment, the TeleportArea will be attached to it.
         /// </summary>
         private const string FloorName = "Floor";
+        /// <summary>
+        /// The name of the game object where the ChartManager component and his friends are 
+        /// attached to. It is used for handling the metric charts.        
+        /// </summary>
+        private const string ChartManagerName = "ChartManager";
 
         //-----------------------------------------------
         // Attributes that can be configured by the user.
@@ -220,9 +225,9 @@ namespace SEE.Controls
                 {
                     // Attach TeleportArea to floor
                     // The TeleportArea replaces the material of the game object it is attached to
-                    // it into a transparent material. This way the game object becomes invisible.
-                    // For this reason, we will clone the floor move the cloned floor slightly above 
-                    // its origin and then attached the TeleportArea to the cloned floor.
+                    // into a transparent material. This way the game object becomes invisible.
+                    // For this reason, we will clone the floor and move the cloned floor slightly above 
+                    // its origin and then attach the TeleportArea to the cloned floor.
                     Vector3 position = floor.transform.position;
                     position.y += 0.01f;
                     GameObject clonedFloor = Instantiate(floor, position, floor.transform.rotation);
@@ -230,8 +235,7 @@ namespace SEE.Controls
                 }
                 {
                     // Assign the VR camera to the chart manager so that charts can move along with the camera.
-                    string chartManagerName = "ChartManager";
-                    GameObject chartManager = GameObject.Find(chartManagerName);
+                    GameObject chartManager = GameObject.Find(ChartManagerName);
                     if (chartManager)
                     {
                         ChartPositionVr chartPosition = chartManager.GetComponentInChildren<ChartPositionVr>();
@@ -239,16 +243,16 @@ namespace SEE.Controls
                         {
                             chartPosition.enabled = true;
                             chartPosition.CameraTransform = player.GetComponentInChildren<Camera>().transform;
-                            Debug.Log($"VR camera of {player.name} successfully assigned to {chartManagerName}.\n");
+                            Debug.Log($"VR camera of {player.name} successfully assigned to {ChartManagerName}.\n");
                         }
                         else
                         {
-                            Debug.Log($"{chartManagerName} has no component ChartPositionVr.\n");
+                            Debug.Log($"{ChartManagerName} has no component ChartPositionVr.\n");
                         }
                     }
                     else
                     {
-                        Debug.Log($"No {chartManagerName} found.\n");
+                        Debug.Log($"No {ChartManagerName} found.\n");
                     }
                 }
             }
