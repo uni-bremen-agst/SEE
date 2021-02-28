@@ -2095,7 +2095,7 @@ GameObject:
   - component: {fileID: 1190604628}
   - component: {fileID: 1190604627}
   m_Layer: 0
-  m_Name: Floor
+  m_Name: Ground
   m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2549,6 +2549,7 @@ MonoBehaviour:
   playerInputType: 0
   PlayerOrigin: {x: 0, y: 0.5, z: -1.5}
   FocusPlane: {fileID: 1972412193}
+  Ground: {fileID: 1190604626}
   HideVRControllers: 0
   ShowControllerHints: 0
   experienceScale: 1

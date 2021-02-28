@@ -42,12 +42,6 @@ namespace SEE.Controls
         /// </summary>
         private const string CityCollectionName = "CityCollection";
         /// <summary>
-        /// The name of the game object representing the ground in the scene. A Unity plane
-        /// is attached to it. Will be deactivated for the Hololens player. In the VR 
-        /// environment, the TeleportArea will be attached to it.
-        /// </summary>
-        private const string FloorName = "Floor";
-        /// <summary>
         /// The name of the game object where the ChartManager component and his friends are 
         /// attached to. It is used for handling the metric charts.        
         /// </summary>
@@ -68,6 +62,15 @@ namespace SEE.Controls
         [Tooltip("The plane the player is to focus initially in the desktop environment.")]
         [OdinSerialize]
         public SEE.GO.Plane FocusPlane;
+
+        /// <summary>
+        /// The game object representing the ground in the scene. A Unity plane
+        /// should generally be attached to it. Will be deactivated for the Hololens player. In the VR 
+        /// environment, the TeleportArea will be attached to it.
+        /// </summary>
+        [Tooltip("The ground in the scene. This attribute must be set in VR for determining the teleporting area.")]
+        [OdinSerialize]
+        public GameObject Ground;
 
         [Header("VR specific settings (relevant only for VR players)")]
 
@@ -205,12 +208,11 @@ namespace SEE.Controls
         /// </summary>
         /// <param name="player">the current VR player</param>
         /// <exception cref="Exception">thrown if there is no plane named <see cref="FloorName"/> in the scene</exception>
-        private static void SetupVR(GameObject player)
+        private void SetupVR(GameObject player)
         {
-            GameObject floor = GameObject.Find(FloorName);
-            if (floor == null)
+            if (Ground == null)
             {
-                throw new Exception($"No game object named {FloorName} found.");
+                throw new Exception("A Ground must be assigned in the PlayerSettings. Use the Inspector.");
             }
             else
             {
@@ -228,9 +230,9 @@ namespace SEE.Controls
                     // into a transparent material. This way the game object becomes invisible.
                     // For this reason, we will clone the floor and move the cloned floor slightly above 
                     // its origin and then attach the TeleportArea to the cloned floor.
-                    Vector3 position = floor.transform.position;
+                    Vector3 position = Ground.transform.position;
                     position.y += 0.01f;
-                    GameObject clonedFloor = Instantiate(floor, position, floor.transform.rotation);
+                    GameObject clonedFloor = Instantiate(Ground, position, Ground.transform.rotation);
                     clonedFloor.AddComponent<TeleportArea>();
                 }
                 {
