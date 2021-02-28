@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.XR;
 
@@ -26,7 +27,7 @@ namespace SEE.Game
 
             List<XRDisplaySubsystem> xrDisplays = new List<XRDisplaySubsystem>();
             SubsystemManager.GetSubsystems(xrDisplays);
-            foreach (var display in xrDisplays)
+            foreach (XRDisplaySubsystem display in xrDisplays)
             {
                 if (enable)
                 {
@@ -62,14 +63,7 @@ namespace SEE.Game
         {
             List<XRDisplaySubsystem> displays = new List<XRDisplaySubsystem>();
             SubsystemManager.GetInstances(displays);
-            foreach (var displaySubsystem in displays)
-            {
-                if (displaySubsystem.running)
-                {
-                    return true;
-                }
-            }
-            return false;
+            return displays.Any(display => display.running);
         }
     }
 }
