@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.MixedReality.Toolkit;
@@ -13,7 +12,6 @@ using SEE.Game.Charts.VR;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
-using UnityEngine.XR;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
 using Hand = Valve.VR.InteractionSystem.Hand;
@@ -28,6 +26,32 @@ namespace SEE.Controls
     /// </summary>
     public class PlayerSettings : MonoBehaviour
     {
+        //----------------------------------------------------------------------------------
+        // Names of game objects present in the scene (possibly depending on the environment
+        // we are running in).
+        //----------------------------------------------------------------------------------
+
+        /// <summary>
+        /// The name of the game object where the MixedRealityToolkit is attached to.
+        /// Used only for the Hololens player.
+        /// </summary>
+        private const string MixedRealityToolkitName = "MixedRealityToolkit";
+        /// <summary>
+        /// The name of the game object where the GridObjectCollection is attached to.
+        /// Used only for the Hololens player.
+        /// </summary>
+        private const string CityCollectionName = "CityCollection";
+        /// <summary>
+        /// The name of the game object representing the ground in the scene. A Unity plane
+        /// is attached to it. Will be deactivated for the Hololens player. In the VR 
+        /// environment, the TeleportArea will be attached to it.
+        /// </summary>
+        private const string FloorName = "Floor";
+
+        //-----------------------------------------------
+        // Attributes that can be configured by the user.
+        //-----------------------------------------------
+
         [Tooltip("What kind of player type should be enabled.")]
         [OdinSerialize]
         public PlayerInputType playerInputType = PlayerInputType.DesktopPlayer;
@@ -137,7 +161,7 @@ namespace SEE.Controls
                 case PlayerInputType.DesktopPlayer:
                     if (FocusPlane == null)
                     {
-                        throw new Exception($"No focus plane set for the player. Set this value in the inspector.");
+                        throw new Exception("No focus plane set for the desktop player. Set this value in the inspector.");
                     }
                     else
                     {
@@ -153,7 +177,7 @@ namespace SEE.Controls
                 case PlayerInputType.HoloLensPlayer:
                     {                        
                         SetupMixedReality();
-                        player = PlayerFactory.CreateVRPlayer();
+                        player = PlayerFactory.CreateHololensPlayer();
                     }
                     break;
                 case PlayerInputType.TouchGamepadPlayer:
@@ -166,10 +190,18 @@ namespace SEE.Controls
             return player;
         }
 
+        /// <summary>
+        /// Sets up the scene for playing in an VR environment. This means to instantiate the 
+        /// Teleporting object and to attach a TeleportArea to the ground plane named <see cref="FloorName"/>.
+        /// In addition, the VR camera is assigned to the ChartManager if it exists.
+        ///
+        /// Precondition: There must be a game object named <see cref="FloorName"/> in the scene, representing
+        /// the ground (a Unity Plane would be attached to it).
+        /// </summary>
+        /// <param name="player">the current VR player</param>
+        /// <exception cref="Exception">thrown if there is no plane named <see cref="FloorName"/> in the scene</exception>
         private static void SetupVR(GameObject player)
         {
-            string FloorName = "Floor";
-
             GameObject floor = GameObject.Find(FloorName);
             if (floor == null)
             {
@@ -222,6 +254,10 @@ namespace SEE.Controls
             }
         }
 
+        /// <summary>
+        /// If we are running in a VR environment and the user wants us to hide the controllers,
+        /// we do so.
+        /// </summary>
         private void Start()
         {
             // Turn off VR controller hints if requested in the user settings.
@@ -247,7 +283,7 @@ namespace SEE.Controls
         {
             {
                 // Add a MixedRealityToolkit to the scene
-                GameObject mrtk = new GameObject("MixedRealityToolkit");
+                GameObject mrtk = new GameObject(MixedRealityToolkitName);
                 mrtk.AddComponent<MixedRealityToolkit>();
             }
             {
@@ -256,12 +292,12 @@ namespace SEE.Controls
                 GameObject appBar = Instantiate(appBarPrefab) as GameObject;
                 UnityEngine.Assertions.Assert.IsNotNull(appBar);
             }
-            {
-                // Add a city collection
-                GameObject cityCollection = new GameObject("CityCollection");
-                cityCollection.AddComponent<GridObjectCollection>();
-            }
-             
+
+            // Add a city collection
+            GameObject cityCollection = new GameObject(CityCollectionName);
+            cityCollection.AddComponent<GridObjectCollection>();
+
+
             // Hide all decoration to improve performance
             GameObject.FindGameObjectsWithTag(Tags.Decoration).ForEach(go => go.SetActive(false));
 
@@ -269,12 +305,10 @@ namespace SEE.Controls
                 // Set selected experience scale 
                 MixedRealityToolkit.Instance.ActiveProfile.TargetExperienceScale = experienceScale;
                 
-                Debug.Log($"Current HoloLens scale: {experienceScale.ToString()}\n");
+                Debug.Log($"Current HoloLens scale: {experienceScale}\n");
                 if (experienceScale == ExperienceScale.Seated || experienceScale == ExperienceScale.OrientationOnly)
                 {
                     // Position and scale planes and CodeCities accordingly using CityCollection grid
-                    GameObject cityCollection = GameObject.Find("CityCollection").AssertNotNull("CityCollection");
-
                     if (cityCollection.TryGetComponentOrLog(out GridObjectCollection grid))
                     {
 
