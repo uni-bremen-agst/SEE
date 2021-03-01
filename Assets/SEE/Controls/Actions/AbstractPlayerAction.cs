@@ -1,6 +1,4 @@
-﻿using System;
-using UnityEngine;
-using UnityEngine.Assertions;
+﻿using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
@@ -31,6 +29,21 @@ namespace SEE.Controls.Actions
         protected bool instantiated = false;
 
         /// <summary>
+        /// The ActionHistory which is responsible for the undo/redo-operations.
+        /// </summary>
+        protected ActionHistory actionHistory;
+
+        /// <summary>
+        /// The Garbage-can where the deleted nodes will be moved.
+        /// </summary>
+        protected GameObject garbageCan;
+
+        /// <summary>
+        /// The name of the garbage-can gameObject.
+        /// </summary>
+        private const string GarbageCanName = "GarbageCan";
+
+        /// <summary>
         /// Finds the GameObject that contains the CanvasOperations and components
         /// and saves it in the <see cref="canvasObject"/>.
         /// </summary>
@@ -39,6 +52,13 @@ namespace SEE.Controls.Actions
         {
             canvasObject = GameObject.Find(nameOfCanvasObject);
             return canvasObject != null;
+        }
+
+        protected void UndoInitialisation()
+        {
+            garbageCan = GameObject.Find(GarbageCanName);
+            garbageCan.TryGetComponent(out ActionHistory actionHistory);
+            this.actionHistory = actionHistory;
         }
 
         /// <summary>

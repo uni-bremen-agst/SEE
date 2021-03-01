@@ -118,6 +118,9 @@ namespace SEE.Controls.Actions
             }
         }
 
+        /// <summary>
+        /// Undoes the last AddEdgeActíon
+        /// </summary>
         public override void Undo()
         {
             throw new NotImplementedException();
