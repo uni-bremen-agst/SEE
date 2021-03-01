@@ -112,6 +112,9 @@ namespace SEE.Controls.Actions
             }
         }
 
+        /// <summary>
+        /// Undoes the last EditNodeAction
+        /// </summary>
         public override void Undo()
         {
             throw new NotImplementedException();

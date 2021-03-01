@@ -552,6 +552,9 @@ namespace SEE.Controls.Actions
             instantiated = false;
         }
 
+        /// <summary>
+        /// Undoes the last ScaleNodeAction
+        /// </summary>
         public override void Undo()
         {
             throw new NotImplementedException();
