@@ -591,6 +591,9 @@ namespace SEE.Controls.Actions
             GONode = null;
         }
 
+        /// <summary>
+        /// Undoes the last AddNodeAction
+        /// </summary>
         public override void Undo()
         {
             throw new NotImplementedException();

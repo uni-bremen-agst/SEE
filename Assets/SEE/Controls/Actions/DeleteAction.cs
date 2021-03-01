@@ -38,21 +38,6 @@ namespace SEE.Controls.Actions
         private GameObject selectedObject;
 
         /// <summary>
-        /// The ActionHistory which is responsible for the undo/redo-operations.
-        /// </summary>
-        private ActionHistory actionHistory;
-
-        /// <summary>
-        /// The Garbage-can where the deleted nodes will be moved.
-        /// </summary>
-        private GameObject garbageCan;
-
-        /// <summary>
-        /// The name of the garbage-can gameObject.
-        /// </summary>
-        private const string GarbageCanName = "GarbageCan";
-
-        /// <summary>
         /// The waiting-time of the animation of moving a node into a garbage-can from over the garbage-can.
         /// </summary>
         private const float TimeToWait = 1f;
@@ -120,9 +105,7 @@ namespace SEE.Controls.Actions
                 if (Equals(newState, ThisActionState))
                 {
                     // The monobehaviour is enabled and Update() will be called by Unity.
-                    garbageCan = GameObject.Find(GarbageCanName);
-                    garbageCan.TryGetComponent(out ActionHistory actionHistory);
-                    this.actionHistory = actionHistory;
+                    UndoInitialisation();
                     enabled = true;
                     InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
                     InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
@@ -286,23 +269,27 @@ namespace SEE.Controls.Actions
             DeleteAction deleteAction = (DeleteAction)actionHistory.GetActionHistory.Last();
             List<Vector3> oldPositionsOfDeletedObjects = deleteAction.OldPositions;
 
-            for (int i = 0; i < deletedNodes.Count; i++)
+            //In case that the deleted object is a single edge - waiting-time is unintended
+            if (deletedNodes.Count != 0)
             {
+                for (int i = 0; i < deletedNodes.Count; i++)
                 {
-                    Tweens.Move(deletedNodes[i], new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
+                    {
+                        Tweens.Move(deletedNodes[i], new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), 1f);
+                    }
                 }
-            }
 
-            yield return new WaitForSeconds(1.2f);
+                yield return new WaitForSeconds(1.2f);
 
-            for (int i = 0; i < deletedNodes.Count; i++)
-            {
+                for (int i = 0; i < deletedNodes.Count; i++)
                 {
-                    Tweens.Move(deletedNodes[i], oldPositionsOfDeletedObjects[i], 1f);
+                    {
+                        Tweens.Move(deletedNodes[i], oldPositionsOfDeletedObjects[i], 1f);
+                    }
                 }
+
+                yield return new WaitForSeconds(1.0f);
             }
-            
-            yield return new WaitForSeconds(1.0f);
             Undo();
             InteractableObject.UnselectAll(true);
         }
