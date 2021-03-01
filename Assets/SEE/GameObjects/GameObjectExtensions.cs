@@ -114,7 +114,7 @@ namespace SEE.GO
             }
             if (gameObject.TryGetComponent(out Collider collider))
             {
-                collider.enabled = false;
+                collider.enabled = show;
             }
             if (includingChildren)
             {

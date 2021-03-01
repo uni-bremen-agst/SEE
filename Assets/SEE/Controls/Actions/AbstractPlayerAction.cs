@@ -42,6 +42,11 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// The undo-operation which has to be implemented specificly by subclasses.
+        /// </summary>
+        public abstract void Undo();
+
+        /// <summary>
         /// Sets <see cref="hoveredObject"/> to given <paramref name="interactableObject"/>.
         /// Will be called while any <see cref="InteractableObject"/> is being hovered over.
         /// </summary>

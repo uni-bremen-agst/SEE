@@ -590,5 +590,10 @@ namespace SEE.Controls.Actions
             GONode.gameObject.GetComponent<Collider>().enabled = true;
             GONode = null;
         }
+
+        public override void Undo()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using SEE.GO;
+using System;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -109,6 +110,11 @@ namespace SEE.Controls.Actions
                 default:
                     throw new System.NotImplementedException("Unhandled case.");
             }
+        }
+
+        public override void Undo()
+        {
+            throw new NotImplementedException();
         }
     }
 }

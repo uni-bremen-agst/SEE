@@ -4,7 +4,6 @@ using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -17,9 +16,9 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// A history of all actions of the user for the possibility of an undo. 
         /// </summary>
-        private LinkedList<UndoAction> actionHistory = new LinkedList<UndoAction>();
+        private LinkedList<AbstractPlayerAction> actionHistory = new LinkedList<AbstractPlayerAction>();
 
-        public LinkedList<UndoAction> GetActionHistory { get => actionHistory; set => actionHistory = value; }
+        public LinkedList<AbstractPlayerAction> GetActionHistory { get => actionHistory; set => actionHistory = value; }
 
         /// <summary>
         /// Saves the deleted nodes and/or edges for the possibility of an undo. 
@@ -27,7 +26,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="deletedNodes"> all deleted nodes of the last operation</param>
         /// <param name="oldPositionsOfDeletedNodes">all old positions of the deleted nodes of the last operation</param>
-        public void SaveObjectForUndo(List<GameObject> deletedNodes, List<Vector3> oldPositionsOfDeletedNodes)
+        public void SaveObjectForDeleteUndo(List<GameObject> deletedNodes, List<Vector3> oldPositionsOfDeletedNodes)
         {
             SEECity city = SceneQueries.GetCodeCity(deletedNodes[0].transform)?.gameObject.GetComponent<SEECity>();
             Graph graph = city.LoadedGraph;
@@ -83,37 +82,7 @@ namespace SEE.Controls.Actions
 
             oldPositionsOfDeletedNodes.Reverse();
             nodesAndascendingEdges.Reverse();
-            actionHistory.AddLast(new UndoAction(nodesAndascendingEdges, oldPositionsOfDeletedNodes, edgesToHide, graph));
-        }
-
-        /// <summary>
-        /// Gets the last operation in history and undoes it. 
-        /// </summary>
-        /// <returns>the positions of the gameObjects where they has to be moved after undo again</returns>
-        public void UndoDeleteOperation()
-        {
-            Graph graph = actionHistory.Last().Graph;
-            foreach (GameObject node in actionHistory.Last().DeletedNodes)
-            {
-                if (node.TryGetComponent(out NodeRef nodeRef))
-                {
-                    if (!graph.Contains(nodeRef.Value))
-                    {
-                        graph.AddNode(nodeRef.Value);
-                    }
-                }
-            }
-
-            foreach (GameObject edge in actionHistory.Last().DeletedEdges)
-            {
-                if (edge.TryGetComponent(out EdgeRef edgeReference))
-                {
-                    graph.AddEdge(edgeReference.edge);
-                    edge.SetVisibility(true, false);
-                }
-            }
-
-            actionHistory.RemoveLast();
+            actionHistory.AddLast(new DeleteAction(nodesAndascendingEdges, oldPositionsOfDeletedNodes, edgesToHide, graph));
         }
 
     }
