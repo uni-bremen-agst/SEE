@@ -117,5 +117,10 @@ namespace SEE.Controls.Actions
                 to = null;
             }
         }
+
+        public override void Undo()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
