@@ -214,47 +214,7 @@ namespace SEE.Game.UI.ConfigMenu
                 .SetRange((0, 15))
                 .Build();
 
-            // Show labels
-            GameObject showLabelsHost =
-                Instantiate(_switchPrefab, controls);
-            SwitchBuilder.Init(showLabelsHost)
-                .SetLabel("Show labels")
-                .SetDefaultValue(_city.LeafLabelSettings.Show)
-                .SetOnChangeHandler(b => _city.LeafLabelSettings.Show = b)
-                .Build();
-
-            // Label distance
-            GameObject labelDistanceHost =
-                Instantiate(_sliderPrefab, controls);
-            SliderBuilder.Init(labelDistanceHost)
-                .SetLabel("Label distance")
-                .SetMode(SliderMode.Float)
-                .SetDefaultValue(_city.LeafLabelSettings.Distance)
-                .SetOnChangeHandler(f => _city.LeafLabelSettings.Distance = f)
-                .SetRange((0, 2))
-                .Build();
-
-            // Label font size
-            GameObject labelFontSizeHost =
-                Instantiate(_sliderPrefab, controls);
-            SliderBuilder.Init(labelFontSizeHost)
-                .SetLabel("Label font size")
-                .SetMode(SliderMode.Float)
-                .SetDefaultValue(_city.LeafLabelSettings.FontSize)
-                .SetOnChangeHandler(f => _city.LeafLabelSettings.FontSize = f)
-                .SetRange((0, 2))
-                .Build();
-
-            // Label animation duration
-            GameObject labelAnimationDurationHost =
-                Instantiate(_sliderPrefab, controls);
-            SliderBuilder.Init(labelAnimationDurationHost)
-                .SetLabel("Label anim. duration")
-                .SetMode(SliderMode.Float)
-                .SetDefaultValue(_city.LeafLabelSettings.AnimationDuration)
-                .SetOnChangeHandler(f => _city.LeafLabelSettings.AnimationDuration = f)
-                .SetRange((0, 2))
-                .Build();
+            CreateLabelSettingsInputs(controls, _city.LeafLabelSettings);
         }
 
         private void SetupInnerNodesPage()
@@ -315,45 +275,50 @@ namespace SEE.Game.UI.ConfigMenu
                 .SetRange((0, 15))
                 .Build();
 
+            CreateLabelSettingsInputs(controls, _city.InnerNodeLabelSettings);
+        }
+
+        private void CreateLabelSettingsInputs(Transform parent, LabelSettings labelSettings)
+        {
             // Show labels
             GameObject showLabelsHost =
-                Instantiate(_switchPrefab, controls);
+                Instantiate(_switchPrefab, parent);
             SwitchBuilder.Init(showLabelsHost)
                 .SetLabel("Show labels")
-                .SetDefaultValue(_city.InnerNodeLabelSettings.Show)
-                .SetOnChangeHandler(b => _city.InnerNodeLabelSettings.Show = b)
+                .SetDefaultValue(labelSettings.Show)
+                .SetOnChangeHandler(b => labelSettings.Show = b)
                 .Build();
 
             // Label distance
             GameObject labelDistanceHost =
-                Instantiate(_sliderPrefab, controls);
+                Instantiate(_sliderPrefab, parent);
             SliderBuilder.Init(labelDistanceHost)
                 .SetLabel("Label distance")
                 .SetMode(SliderMode.Float)
-                .SetDefaultValue(_city.InnerNodeLabelSettings.Distance)
-                .SetOnChangeHandler(f => _city.InnerNodeLabelSettings.Distance = f)
+                .SetDefaultValue(labelSettings.Distance)
+                .SetOnChangeHandler(f => labelSettings.Distance = f)
                 .SetRange((0, 2))
                 .Build();
 
             // Label font size
             GameObject labelFontSizeHost =
-                Instantiate(_sliderPrefab, controls);
+                Instantiate(_sliderPrefab, parent);
             SliderBuilder.Init(labelFontSizeHost)
                 .SetLabel("Label font size")
                 .SetMode(SliderMode.Float)
-                .SetDefaultValue(_city.InnerNodeLabelSettings.FontSize)
-                .SetOnChangeHandler(f => _city.InnerNodeLabelSettings.FontSize = f)
+                .SetDefaultValue(labelSettings.FontSize)
+                .SetOnChangeHandler(f => labelSettings.FontSize = f)
                 .SetRange((0, 2))
                 .Build();
 
             // Label animation duration
             GameObject labelAnimationDurationHost =
-                Instantiate(_sliderPrefab, controls);
+                Instantiate(_sliderPrefab, parent);
             SliderBuilder.Init(labelAnimationDurationHost)
                 .SetLabel("Label anim. duration")
                 .SetMode(SliderMode.Float)
-                .SetDefaultValue(_city.InnerNodeLabelSettings.AnimationDuration)
-                .SetOnChangeHandler(f => _city.InnerNodeLabelSettings.AnimationDuration = f)
+                .SetDefaultValue(labelSettings.AnimationDuration)
+                .SetOnChangeHandler(f => labelSettings.AnimationDuration = f)
                 .SetRange((0, 2))
                 .Build();
         }
