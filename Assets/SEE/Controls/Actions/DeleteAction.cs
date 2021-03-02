@@ -48,22 +48,22 @@ namespace SEE.Controls.Actions
         private const float TimeForAnimation = 1f;
 
         /// <summary>
-        /// A history of all deleted nodes.
+        /// A history of all nodes deleted by this action.
         /// </summary>
         public List<GameObject> DeletedNodes { get; set; }
 
         /// <summary>
-        /// A history of the old positions of the deleted nodes.
+        /// A history of the old positions of the nodes deleted by this action.
         /// </summary>
         public List<Vector3> OldPositions { get; set; }
 
         /// <summary>
-        /// A history of all deleted edges.
+        /// A history of all edges deleted by this action.
         /// </summary>
         public List<GameObject> DeletedEdges { get; set; }
 
         /// <summary>
-        /// The graph where the action is executed.
+        /// The graph where this action is executed.
         /// </summary>
         public Graph Graph { get; set; }
 
@@ -96,7 +96,7 @@ namespace SEE.Controls.Actions
             {
                 if (Equals(newState, ThisActionState))
                 {
-                    // The monobehaviour is enabled and Update() will be called by Unity.
+                    // The MonoBehaviour is enabled and Update() will be called by Unity.
                     UndoInitialisation();
                     enabled = true;
                     InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
@@ -125,16 +125,16 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            //Delete a gameobject and all children
+            // Delete a gameobject and all children
             if (selectedObject != null && Input.GetMouseButtonDown(0))
             {
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
-                //FIXME:(Thore) NetAction is no longer up to date
+                // FIXME:(Thore) NetAction is no longer up to date
                 new DeleteNetAction(selectedObject.name).Execute(null);
                 DeleteSelectedObject(selectedObject);
             }
 
-            //Undo last deletion
+            // Undo last deletion
             if (Input.GetKeyDown(KeyCode.Z))
             {
                 try
@@ -172,14 +172,14 @@ namespace SEE.Controls.Actions
                         Debug.LogError("Root shall not be deleted");
                         return;
                     }
-                    List<GameObject> allNodesToBeDeleted = GameObjectTraversion.GetAllChildNodesAsGameObject(new List<GameObject>(), selectedObject);
+                    List<GameObject> allNodesToBeDeleted = GameObjectTraversion.GetAllChildNodes(new List<GameObject>(), selectedObject);
                     StartCoroutine(MoveNodeToGarbage(allNodesToBeDeleted));
                 }
             }
         }
 
         /// <summary>
-        /// Gets the last operation in history and undoes it.
+        /// Undoes this DeleteAction
         /// </summary>
         public override void Undo()
         {
@@ -255,7 +255,7 @@ namespace SEE.Controls.Actions
             DeleteAction deleteAction = (DeleteAction)actionHistory.ActionHistoryList.Last();
             List<Vector3> oldPositionsOfDeletedObjects = deleteAction.OldPositions;
 
-            //In case that the deleted object is a single edge - waiting-time is unintended
+            // In case that the deleted object is a single edge - waiting-time is unintended
             if (deletedNodes.Count != 0)
             {
                 for (int i = 0; i < deletedNodes.Count; i++)

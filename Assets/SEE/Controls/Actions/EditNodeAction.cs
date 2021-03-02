@@ -113,7 +113,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Undoes the last EditNodeAction
+        /// Undoes this EditNodeAction
         /// </summary>
         public override void Undo()
         {

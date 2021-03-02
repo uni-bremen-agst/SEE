@@ -592,7 +592,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Undoes the last AddNodeAction
+        /// Undoes this AddNodeAction
         /// </summary>
         public override void Undo()
         {
