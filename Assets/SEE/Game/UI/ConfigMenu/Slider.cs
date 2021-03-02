@@ -13,7 +13,6 @@ namespace SEE.Game.UI.ConfigMenu
         Float
     }
 
-    [RequireComponent(typeof(SliderManager))]
     public class Slider : DynamicUIBehaviour
     {
         public String label;

@@ -34,6 +34,8 @@ namespace SEE.Game.UI.ConfigMenu
             "Assets/Prefabs/UI/Input Group - Color Picker.prefab";
         private const string SliderPrefabPath =
             "Assets/Prefabs/UI/Input Group - Slider.prefab";
+        private const string SwitchPrefabPath =
+            "Assets/Prefabs/UI/Input Group - Switch.prefab";
 
         private GameObject _pagePrefab;
         private GameObject _actionButtonPrefab;
@@ -41,6 +43,7 @@ namespace SEE.Game.UI.ConfigMenu
         private GameObject _comboSelectPrefab;
         private GameObject _colorPickerPrefab;
         private GameObject _sliderPrefab;
+        private GameObject _switchPrefab;
 
         private GameObject _tabOutlet;
         private GameObject _tabButtons;
@@ -93,6 +96,7 @@ namespace SEE.Game.UI.ConfigMenu
             _colorPickerPrefab = MustLoadPrefabAtPath(ColorPickerPrefabPath);
             _sliderPrefab = MustLoadPrefabAtPath(SliderPrefabPath);
             _actionButtonPrefab = MustLoadPrefabAtPath(ActionButtonPrefabPath);
+            _switchPrefab = MustLoadPrefabAtPath(SwitchPrefabPath);
         }
 
         private void SetupActions()
@@ -210,6 +214,15 @@ namespace SEE.Game.UI.ConfigMenu
                 .SetRange((0, 15))
                 .Build();
 
+            // Show labels
+            GameObject showLabelsHost =
+                Instantiate(_switchPrefab, controls);
+            SwitchBuilder.Init(showLabelsHost)
+                .SetLabel("Show labels")
+                .SetDefaultValue(_city.LeafLabelSettings.Show)
+                .SetOnChangeHandler(b => _city.LeafLabelSettings.Show = b)
+                .Build();
+
             // Label distance
             GameObject labelDistanceHost =
                 Instantiate(_sliderPrefab, controls);
@@ -221,7 +234,7 @@ namespace SEE.Game.UI.ConfigMenu
                 .SetRange((0, 2))
                 .Build();
 
-            // Label distance
+            // Label font size
             GameObject labelFontSizeHost =
                 Instantiate(_sliderPrefab, controls);
             SliderBuilder.Init(labelFontSizeHost)
@@ -232,7 +245,7 @@ namespace SEE.Game.UI.ConfigMenu
                 .SetRange((0, 2))
                 .Build();
 
-            // Label distance
+            // Label animation duration
             GameObject labelAnimationDurationHost =
                 Instantiate(_sliderPrefab, controls);
             SliderBuilder.Init(labelAnimationDurationHost)
