@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Michsky.UI.ModernUIPack;
 using SEE.DataModel.DG;
 using SEE.GO;
+using SEE.Net;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SEE.Game.UI.ConfigMenu
 {
@@ -23,6 +26,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         private const string PagePrefabPath = "Assets/Prefabs/UI/Page.prefab";
         private const string TabButtonPrefabPath = "Assets/Prefabs/UI/TabButton.prefab";
+        private const string ActionButtonPrefabPath = "Assets/Prefabs/UI/ActionButton.prefab";
 
         private const string ComboSelectPrefabPath =
             "Assets/Prefabs/UI/Input Group - Dropdown.prefab";
@@ -32,16 +36,19 @@ namespace SEE.Game.UI.ConfigMenu
             "Assets/Prefabs/UI/Input Group - Slider.prefab";
 
         private GameObject _pagePrefab;
+        private GameObject _actionButtonPrefab;
         private GameObject _tabButtonPrefab;
         private GameObject _comboSelectPrefab;
         private GameObject _colorPickerPrefab;
         private GameObject _sliderPrefab;
 
         private GameObject _tabOutlet;
-        private GameObject _tabGroup;
+        private GameObject _tabButtons;
+        private GameObject _actions;
 
         private SEECity _city;
         private ColorPickerControl _colorPickerControl;
+        private ButtonManager _cityLoadButton;
 
         private void Start()
         {
@@ -53,16 +60,28 @@ namespace SEE.Game.UI.ConfigMenu
             }
 
             MustGetChild("Canvas/TabNavigation/TabOutlet", out _tabOutlet);
-            MustGetChild("Canvas/TabNavigation/TabGroup", out _tabGroup);
+            MustGetChild("Canvas/TabNavigation/Sidebar/TabButtons", out _tabButtons);
+            MustGetChild("Canvas/Actions", out _actions);
 
             MustGetComponentInChild("Canvas/Picker 2.0", out _colorPickerControl);
             _colorPickerControl.gameObject.SetActive(false);
 
             // Reset (hide) the color picker on page changes.
-            _tabGroup.MustGetComponent(out TabGroup tabGroupController);
+            _tabButtons.MustGetComponent(out TabGroup tabGroupController);
             tabGroupController.SubscribeToUpdates(_colorPickerControl.Reset);
 
+            MustGetComponentInChild("Canvas/TabNavigation/Sidebar/CityLoadButton",
+                                    out _cityLoadButton);
+            _cityLoadButton.clickEvent.AddListener(() =>
+            {
+                _city.LoadData();
+                _actions.SetActive(true);
+                _cityLoadButton.gameObject.SetActive(false);
+            });
+
+
             LoadPrefabs();
+            SetupActions();
             SetupPages();
         }
 
@@ -73,7 +92,36 @@ namespace SEE.Game.UI.ConfigMenu
             _comboSelectPrefab = MustLoadPrefabAtPath(ComboSelectPrefabPath);
             _colorPickerPrefab = MustLoadPrefabAtPath(ColorPickerPrefabPath);
             _sliderPrefab = MustLoadPrefabAtPath(SliderPrefabPath);
+            _actionButtonPrefab = MustLoadPrefabAtPath(ActionButtonPrefabPath);
         }
+
+        private void SetupActions()
+        {
+            _actions.SetActive(false);
+            CreateActionButton("Delete Graph", () =>
+            {
+                _city.Reset();
+                _cityLoadButton.gameObject.SetActive(true);
+            });
+            CreateActionButton("Save Graph", _city.Save);
+            CreateActionButton("Draw", () =>
+            {
+                _city.DrawGraph();
+                gameObject.SetActive(false);
+            });
+            CreateActionButton("Re-Draw", _city.ReDrawGraph);
+            CreateActionButton("Save layout", _city.SaveLayout);
+            CreateActionButton("Add References", _city.SetNodeEdgeRefs);
+        }
+        private void CreateActionButton(string buttonText, UnityAction onClick)
+        {
+            GameObject deleteGraphButtonGo =
+                Instantiate(_actionButtonPrefab, _actions.transform, false);
+            deleteGraphButtonGo.MustGetComponent(out ButtonManagerBasic deleteGraphButton);
+            deleteGraphButton.buttonText = buttonText;
+            deleteGraphButton.clickEvent.AddListener(onClick);
+        }
+
 
         private void SetupPages()
         {
@@ -231,7 +279,7 @@ namespace SEE.Game.UI.ConfigMenu
         private void CreateAndInsertTabButton(string label,
                                               TabButtonState initialState = TabButtonState.Inactive)
         {
-            GameObject tabButton = Instantiate(_tabButtonPrefab, _tabGroup.transform, false);
+            GameObject tabButton = Instantiate(_tabButtonPrefab, _tabButtons.transform, false);
             tabButton.MustGetComponent(out TabButton button);
             button.buttonText = label;
             if (initialState == TabButtonState.InitialActive)

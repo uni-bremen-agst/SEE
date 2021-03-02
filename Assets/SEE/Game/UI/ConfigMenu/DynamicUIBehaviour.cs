@@ -25,7 +25,7 @@ namespace SEE.Game.UI.ConfigMenu
         protected GameObject MustLoadPrefabAtPath(string path)
         {
             return AssetDatabase.LoadAssetAtPath<GameObject>(path) ??
-                   throw new ArgumentException("Prefab not found at path: {path}");
+                   throw new ArgumentException($"Prefab not found at path: {path}");
         }
     }
 }

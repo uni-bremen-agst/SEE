@@ -11,8 +11,8 @@ namespace SEE.Game.UI.ConfigMenu
 
         void Start()
         {
-            var tabOultet = GameObject.FindGameObjectWithTag("TabOutlet");
-            foreach (Transform child in tabOultet.transform)
+            Transform tabOutlet = gameObject.transform.Find("TabOutlet");
+            foreach (Transform child in tabOutlet)
             {
                 child.gameObject.SetActive(false);
                 pages.Add(child.gameObject);
