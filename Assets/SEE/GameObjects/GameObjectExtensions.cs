@@ -90,7 +90,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Sets the visibility of this <paramref name="gameObject"/> to <paramref name="show"/>.
+        /// Sets the visibility and the collider of this <paramref name="gameObject"/> to <paramref name="show"/>.
         /// If <paramref name="show"/> is false, the object becomes invisible. If it is true
         /// instead, it becomes visible. 
         /// 

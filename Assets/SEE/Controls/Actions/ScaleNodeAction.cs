@@ -553,7 +553,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Undoes the last ScaleNodeAction
+        /// Undoes this ScaleNodeAction
         /// </summary>
         public override void Undo()
         {

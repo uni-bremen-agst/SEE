@@ -52,7 +52,7 @@ namespace SEE.Controls.Actions
         /// <returns>true if the <see cref="canvasObject"/> could be found</returns>
         protected bool InitializeCanvasObject()
         {
-            canvasObject = GameObject.Find(nameOfCanvasObject).AssertNotNull("canvasObject");
+            canvasObject = GameObject.Find(nameOfCanvasObject);
             return canvasObject != null;
         }
 

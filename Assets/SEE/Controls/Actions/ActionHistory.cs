@@ -9,11 +9,10 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// This class is responsible for saving the deleted objects in a history for the possibility of an undo-operation.
+    /// This class is responsible for saving the deleted objects in a history for the possibility of an undo operation.
     /// </summary>
     public class ActionHistory : MonoBehaviour
     {
-
         /// <summary>
         /// A history of all actions of the user for the possibility of an undo. 
         /// </summary>
@@ -22,7 +21,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Saves the deleted nodes and/or edges for the possibility of an undo. 
         /// Removes the gameObjects from the graph.
-        /// /// Precondition: deletedNodes != null.
+        /// Precondition: <see cref="deletedNodes""/> != null.
         /// </summary>
         /// <param name="deletedNodes">all deleted nodes of the last operation</param>
         /// <param name="oldPositionsOfDeletedNodes">all old positions of the deleted nodes of the last operation</param>
@@ -58,7 +57,7 @@ namespace SEE.Controls.Actions
             }
 
             List<GameObject> deletedNodesReverse = deletedNodes;
-            //For deletion bottom-up
+            // For deletion bottom-up
             deletedNodesReverse.Reverse();
 
             foreach (GameObject deletedNode in deletedNodesReverse)

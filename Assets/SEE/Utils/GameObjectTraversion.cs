@@ -10,12 +10,12 @@ namespace SEE.Utils
     public static class GameObjectTraversion
     {
         /// <summary>
-        /// Traverses the GameObjects of the graph from the <paramref name="parent"/> to the last leaf.
+        /// Traverses the GameObjects of the graph from the <paramref name="parent"/> to the last leaf and adds them to <see cref="allChildrenOfParent"/>.
         /// </summary>
         /// <param name="allChildrenOfParent">the list which has to contain all children of  the <paramref name="parent"/></param>
         /// <param name="parent">the parent from which the graph has to be traversed</param>
         /// <returns>All gameObjects in the hierachy from the <paramref name="parent"/> to the last leaf</returns>
-        public static List<GameObject> GetAllChildNodesAsGameObject(List<GameObject> allChildrenOfParent, GameObject parent)
+        public static List<GameObject> GetAllChildNodes(List<GameObject> allChildrenOfParent, GameObject parent)
         {
             List<GameObject> childrenOfThisParent = new List<GameObject>();
 
@@ -46,7 +46,7 @@ namespace SEE.Utils
             {
                 foreach (GameObject children in childrenOfThisParent)
                 {
-                    GetAllChildNodesAsGameObject(allChildrenOfParent, children);
+                    GetAllChildNodes(allChildrenOfParent, children);
                 }
 
                 return allChildrenOfParent;
