@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using SEE.GO;
+using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
@@ -29,17 +31,17 @@ namespace SEE.Controls.Actions
         protected bool instantiated = false;
 
         /// <summary>
-        /// The ActionHistory which is responsible for the undo/redo-operations.
+        /// The ActionHistory which is responsible for the undo/redo operations.
         /// </summary>
         protected ActionHistory actionHistory;
 
         /// <summary>
-        /// The Garbage-can where the deleted nodes will be moved.
+        /// The garbage can the deleted nodes will be moved to.
         /// </summary>
         protected GameObject garbageCan;
 
         /// <summary>
-        /// The name of the garbage-can gameObject.
+        /// The name of the garbage can gameObject.
         /// </summary>
         private const string GarbageCanName = "GarbageCan";
 
@@ -50,19 +52,21 @@ namespace SEE.Controls.Actions
         /// <returns>true if the <see cref="canvasObject"/> could be found</returns>
         protected bool InitializeCanvasObject()
         {
-            canvasObject = GameObject.Find(nameOfCanvasObject);
+            canvasObject = GameObject.Find(nameOfCanvasObject).AssertNotNull("canvasObject");
             return canvasObject != null;
         }
 
+        /// <summary>
+        /// Finds the gameObject that are responsible for an undo.
+        /// </summary>
         protected void UndoInitialisation()
         {
             garbageCan = GameObject.Find(GarbageCanName);
-            garbageCan.TryGetComponent(out ActionHistory actionHistory);
-            this.actionHistory = actionHistory;
+            garbageCan.TryGetComponent(out this.actionHistory);
         }
 
         /// <summary>
-        /// The undo-operation which has to be implemented specificly by subclasses.
+        /// The undo operation which has to be implemented specifically by subclasses.
         /// </summary>
         public abstract void Undo();
 

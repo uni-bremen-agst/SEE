@@ -13,24 +13,24 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class ActionHistory : MonoBehaviour
     {
+
         /// <summary>
         /// A history of all actions of the user for the possibility of an undo. 
         /// </summary>
-        private LinkedList<AbstractPlayerAction> actionHistory = new LinkedList<AbstractPlayerAction>();
-
-        public LinkedList<AbstractPlayerAction> GetActionHistory { get => actionHistory; set => actionHistory = value; }
+        public LinkedList<AbstractPlayerAction> ActionHistoryList { get; set; } = new LinkedList<AbstractPlayerAction>();
 
         /// <summary>
         /// Saves the deleted nodes and/or edges for the possibility of an undo. 
         /// Removes the gameObjects from the graph.
+        /// /// Precondition: deletedNodes != null.
         /// </summary>
-        /// <param name="deletedNodes"> all deleted nodes of the last operation</param>
+        /// <param name="deletedNodes">all deleted nodes of the last operation</param>
         /// <param name="oldPositionsOfDeletedNodes">all old positions of the deleted nodes of the last operation</param>
         public void SaveObjectForDeleteUndo(List<GameObject> deletedNodes, List<Vector3> oldPositionsOfDeletedNodes)
         {
             SEECity city = SceneQueries.GetCodeCity(deletedNodes[0].transform)?.gameObject.GetComponent<SEECity>();
             Graph graph = city.LoadedGraph;
-            List<GameObject> nodesAndascendingEdges = new List<GameObject>();
+            List<GameObject> nodesAndAscendingEdges = new List<GameObject>();
             List<GameObject> edgesToHide = new List<GameObject>();
             
             foreach (GameObject actionHistoryObject in deletedNodes)
@@ -44,7 +44,7 @@ namespace SEE.Controls.Actions
                         {
                             edge.SetVisibility(false, true);
 
-                            if (nodesAndascendingEdges.Contains(edge) == false)
+                            if (!nodesAndAscendingEdges.Contains(edge))
                             {
                                 edgesToHide.Add(edge);
                             }
@@ -53,7 +53,7 @@ namespace SEE.Controls.Actions
                         }
                     }
 
-                    nodesAndascendingEdges.Add(actionHistoryObject);
+                    nodesAndAscendingEdges.Add(actionHistoryObject);
                 }
             }
 
@@ -81,9 +81,8 @@ namespace SEE.Controls.Actions
             }
 
             oldPositionsOfDeletedNodes.Reverse();
-            nodesAndascendingEdges.Reverse();
-            actionHistory.AddLast(new DeleteAction(nodesAndascendingEdges, oldPositionsOfDeletedNodes, edgesToHide, graph));
+            nodesAndAscendingEdges.Reverse();
+            ActionHistoryList.AddLast(new DeleteAction(nodesAndAscendingEdges, oldPositionsOfDeletedNodes, edgesToHide, graph));
         }
-
     }
 }
