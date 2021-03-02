@@ -35,7 +35,8 @@ namespace SEE.Game.UI.ConfigMenu
 
             MustGetComponentInChild("Slider", out _sliderManager);
             _sliderManager.mainSlider.onValueChanged.AddListener(
-                newValue => OnValueChange(newValue));
+                newValue => OnValueChange(sliderMode == SliderMode.Integer
+                                              ? (float)Math.Round(newValue) : newValue));
             _sliderManager.mainSlider.minValue = range.Min;
             _sliderManager.mainSlider.maxValue = range.Max;
             _sliderManager.usePercent = false;
