@@ -1,0 +1,501 @@
+{
+    "Analysis": {
+        "C#-BitfieldHasNoPluralS": {
+            "_active": true
+        },
+        "C#-BracesForSingleStatementBodies": {
+            "_active": true
+        },
+        "C#-CSharpCommentsConvention": {
+            "_active": true
+        },
+        "C#-CSharpNamingConvention": {
+            "_active": true
+        },
+        "C#-CSharpNoBackwardGotoJumps": {
+            "_active": true
+        },
+        "C#-CSharpNoCatchAllExceptionsClause": {
+            "_active": true
+        },
+        "C#-CSharpNoRefAndOutParameters": {
+            "_active": true
+        },
+        "C#-CSharpReferencedLabelInSameBlockAsGoto": {
+            "_active": true
+        },
+        "C#-EnumeratorRequiresInitialization": {
+            "_active": true
+        },
+        "C#-FieldNotPrivateNorProtected": {
+            "_active": true
+        },
+        "C#-InvalidDependencyPropertyDeclaration": {
+            "_active": true
+        },
+        "C#-MethodShouldBeDeclaredStatic": {
+            "_active": true
+        },
+        "C#-NoHidingOfBaseClassMethods": {
+            "_active": true
+        },
+        "C#-VirtualCallInConstructor": {
+            "_active": true
+        },
+        "CloneDetection": {
+            "_active": true
+        },
+        "CycleDetection-CallgraphCycles": {
+            "_active": true
+        },
+        "CycleDetection-IncludeCycles": {
+            "_active": true
+        },
+        "Metric-Calling.CPP": {
+            "_active": true
+        },
+        "Metric-CloneRatio": {
+            "_active": false
+        },
+        "Metric-CloneRatioFromRFG": {
+            "_active": false
+        },
+        "Metric-Comment.Density": {
+            "_active": true
+        },
+        "Metric-Comment.Internal": {
+            "_active": true
+        },
+        "Metric-Comment.Preceding": {
+            "_active": true
+        },
+        "Metric-Coupling": {
+            "_active": true
+        },
+        "Metric-ExtendedMcCabe": {
+            "_active": true
+        },
+        "Metric-Fan.In": {
+            "_active": true
+        },
+        "Metric-Fan.In.Call": {
+            "_active": true
+        },
+        "Metric-Fan.Out": {
+            "_active": true
+        },
+        "Metric-Fan.Out.Call": {
+            "_active": true
+        },
+        "Metric-HIS.APCGCYCLE": {
+            "_active": true
+        },
+        "Metric-HIS.CALLING": {
+            "_active": true
+        },
+        "Metric-HIS.CALLS": {
+            "_active": true
+        },
+        "Metric-HIS.COMF": {
+            "_active": true
+        },
+        "Metric-HIS.GOTO": {
+            "_active": true
+        },
+        "Metric-HIS.LEVEL": {
+            "_active": true
+        },
+        "Metric-HIS.NOMV": {
+            "_active": true
+        },
+        "Metric-HIS.NOMVPR": {
+            "_active": true
+        },
+        "Metric-HIS.PARAM": {
+            "_active": true
+        },
+        "Metric-HIS.PATH": {
+            "_active": true
+        },
+        "Metric-HIS.RETURN": {
+            "_active": true
+        },
+        "Metric-HIS.STMT": {
+            "_active": true
+        },
+        "Metric-HIS.VG": {
+            "_active": true
+        },
+        "Metric-HIS.VOCF": {
+            "_active": true
+        },
+        "Metric-Halstead.DifferentOperands": {
+            "_active": true
+        },
+        "Metric-Halstead.DifferentOperators": {
+            "_active": true
+        },
+        "Metric-Halstead.Difficulty": {
+            "_active": true
+        },
+        "Metric-Halstead.Effort": {
+            "_active": true
+        },
+        "Metric-Halstead.Length": {
+            "_active": true
+        },
+        "Metric-Halstead.TotalOperands": {
+            "_active": true
+        },
+        "Metric-Halstead.TotalOperators": {
+            "_active": true
+        },
+        "Metric-Halstead.Vocabulary": {
+            "_active": true
+        },
+        "Metric-Halstead.VocabularyFrequency": {
+            "_active": true
+        },
+        "Metric-Halstead.Volume": {
+            "_active": true
+        },
+        "Metric-ImportCSV": {
+            "_active": false
+        },
+        "Metric-ImportRFGMetricAttribute": {
+            "_active": false
+        },
+        "Metric-Includes.DirectIncluders": {
+            "_active": true
+        },
+        "Metric-Includes.DirectIncludes": {
+            "_active": true
+        },
+        "Metric-Includes.IncludeBurden": {
+            "_active": true
+        },
+        "Metric-Includes.MaximumIncludeDepth": {
+            "_active": true
+        },
+        "Metric-Includes.MaximumIncluderDepth": {
+            "_active": true
+        },
+        "Metric-Includes.TransitiveIncluders": {
+            "_active": true
+        },
+        "Metric-Includes.TransitiveIncludes": {
+            "_active": true
+        },
+        "Metric-InverseCoupling": {
+            "_active": true
+        },
+        "Metric-IssueCount.Architecture": {
+            "_active": true
+        },
+        "Metric-IssueCount.Clone": {
+            "_active": true
+        },
+        "Metric-IssueCount.Cycle": {
+            "_active": true
+        },
+        "Metric-IssueCount.DeadEntity": {
+            "_active": true
+        },
+        "Metric-IssueCount.Metric": {
+            "_active": true
+        },
+        "Metric-IssueCount.Style": {
+            "_active": true
+        },
+        "Metric-LOC": {
+            "_active": true
+        },
+        "Metric-Lines.Class.Code": {
+            "_active": true
+        },
+        "Metric-Lines.Class.Comment": {
+            "_active": true
+        },
+        "Metric-Lines.Class.CommentRatio": {
+            "_active": true
+        },
+        "Metric-Lines.Class.LOC": {
+            "_active": true
+        },
+        "Metric-Lines.Code": {
+            "_active": true
+        },
+        "Metric-Lines.Comment": {
+            "_active": true
+        },
+        "Metric-Lines.Empty": {
+            "_active": true
+        },
+        "Metric-Lines.File.Code": {
+            "_active": true
+        },
+        "Metric-Lines.File.Comment": {
+            "_active": true
+        },
+        "Metric-Lines.File.CommentRatio": {
+            "_active": true
+        },
+        "Metric-Lines.File.LOC": {
+            "_active": true
+        },
+        "Metric-Lines.LOC": {
+            "_active": true
+        },
+        "Metric-Lines.OnlyComment": {
+            "_active": true
+        },
+        "Metric-Lines.PP.Define": {
+            "_active": true
+        },
+        "Metric-Lines.PP.Elif": {
+            "_active": true
+        },
+        "Metric-Lines.PP.Else": {
+            "_active": true
+        },
+        "Metric-Lines.PP.Endif": {
+            "_active": true
+        },
+        "Metric-Lines.PP.Error": {
+            "_active": true
+        },
+        "Metric-Lines.PP.Ident": {
+            "_active": true
+        },
+        "Metric-Lines.PP.If": {
+            "_active": true
+        },
+        "Metric-Lines.PP.Ifdef": {
+            "_active": true
+        },
+        "Metric-Lines.PP.Ifndef": {
+            "_active": true
+        },
+        "Metric-Lines.PP.Include": {
+            "_active": true
+        },
+        "Metric-Lines.PP.Line": {
+            "_active": true
+        },
+        "Metric-Lines.PP.Pragma": {
+            "_active": true
+        },
+        "Metric-Lines.PP.Sharp": {
+            "_active": true
+        },
+        "Metric-Lines.PP.SharpSharp": {
+            "_active": true
+        },
+        "Metric-Lines.PP.Undef": {
+            "_active": true
+        },
+        "Metric-Lines.PP.Warning": {
+            "_active": true
+        },
+        "Metric-Lines.Preproc": {
+            "_active": true
+        },
+        "Metric-Lines.Routine.Code": {
+            "_active": true
+        },
+        "Metric-Lines.Routine.Comment": {
+            "_active": true
+        },
+        "Metric-Lines.Routine.CommentRatio": {
+            "_active": true
+        },
+        "Metric-Lines.Routine.CommentRatio.LOCQualified": {
+            "_active": true
+        },
+        "Metric-Lines.Routine.LOC": {
+            "_active": true
+        },
+        "Metric-LogNPathCeiling": {
+            "_active": true
+        },
+        "Metric-LogNPathFloor": {
+            "_active": true
+        },
+        "Metric-MIPerRoutine": {
+            "_active": false
+        },
+        "Metric-MaximumExtendedNesting": {
+            "_active": true
+        },
+        "Metric-MaximumNesting": {
+            "_active": true
+        },
+        "Metric-McCabeComplexity": {
+            "_active": true
+        },
+        "Metric-NPath": {
+            "_active": true
+        },
+        "Metric-NumberOfCalledRoutines": {
+            "_active": true
+        },
+        "Metric-NumberOfCallingRoutines": {
+            "_active": true
+        },
+        "Metric-NumberOfGotos": {
+            "_active": false
+        },
+        "Metric-NumberOfInvocations": {
+            "_active": true
+        },
+        "Metric-NumberOfParameters": {
+            "_active": false
+        },
+        "Metric-NumberOfReturns": {
+            "_active": false
+        },
+        "Metric-NumberOfSCCs": {
+            "_active": true
+        },
+        "Metric-NumberOfStatements": {
+            "_active": false
+        },
+        "Metric-OO.CBO": {
+            "_active": true
+        },
+        "Metric-OO.CBOa": {
+            "_active": true
+        },
+        "Metric-OO.CBOs": {
+            "_active": true
+        },
+        "Metric-OO.DAC": {
+            "_active": true
+        },
+        "Metric-OO.DIT": {
+            "_active": true
+        },
+        "Metric-OO.LCOM": {
+            "_active": true
+        },
+        "Metric-OO.LCOMs": {
+            "_active": true
+        },
+        "Metric-OO.NIVOC": {
+            "_active": true
+        },
+        "Metric-OO.NOA": {
+            "_active": true
+        },
+        "Metric-OO.NOCC": {
+            "_active": true
+        },
+        "Metric-OO.NOFA": {
+            "_active": true
+        },
+        "Metric-OO.NOMA": {
+            "_active": true
+        },
+        "Metric-OO.NOMO": {
+            "_active": true
+        },
+        "Metric-OO.NOPC": {
+            "_active": true
+        },
+        "Metric-OO.RFC": {
+            "_active": true
+        },
+        "Metric-OO.WMC.McCabeComplexity": {
+            "_active": true
+        },
+        "Metric-OO.WMC.One": {
+            "_active": true
+        },
+        "Metric-SwitchComplexity": {
+            "_active": true
+        },
+        "Metric-Template": {
+            "_active": false
+        },
+        "Metric-TokenFileMetric.Check": {
+            "_active": true
+        },
+        "Metric-TokenFileMetric.Debug": {
+            "_active": true
+        },
+        "Metric-TokenFileMetric.Fixme": {
+            "_active": true
+        },
+        "Metric-TokenFileMetric.Hack": {
+            "_active": true
+        },
+        "Metric-TokenFileMetric.Todo": {
+            "_active": true
+        },
+        "Metric-TokenFileMetric.XXX": {
+            "_active": true
+        },
+        "Metric-TokenMetric.Check": {
+            "_active": true
+        },
+        "Metric-TokenMetric.Debug": {
+            "_active": true
+        },
+        "Metric-TokenMetric.Fixme": {
+            "_active": true
+        },
+        "Metric-TokenMetric.Hack": {
+            "_active": true
+        },
+        "Metric-TokenMetric.Todo": {
+            "_active": true
+        },
+        "Metric-TokenMetric.XXX": {
+            "_active": true
+        }
+    },
+    "Project": {
+        "BuildSystemIntegration": {
+            "child_order": [
+                "AxivionCompiler",
+                "AxivionLinker",
+                "Command",
+                "MakeIntegration",
+                "MSBuildIntegration",
+                "PrintAMessage"
+            ]
+        },
+        "Git": {
+            "_active": true
+        },
+        "MSBuildIntegration": {
+            "_active": true,
+            "binary": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "project": "SEE.csproj"
+        },
+        "PrintAMessage": {
+            "_active": true
+        },
+        "Project-GlobalOptions": {
+            "directory": "c:\\Users\\SWT\\SEE",
+            "ir": "SEE.dll.ir",
+            "name": "SEE",
+            "rfg": "SEE.rfg"
+        }
+    },
+    "Results": {
+        "Database": {
+            "ci_mode": {
+                "filename": "SEE.db"
+            }
+        }
+    },
+    "_Format": "1.0",
+    "_Version": "7.1.4",
+    "_VersionNum": [
+        7,
+        1,
+        4,
+        6285
+    ]
+}
