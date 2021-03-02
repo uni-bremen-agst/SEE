@@ -7,6 +7,12 @@ using UnityEngine;
 
 namespace SEE.Game.UI.ConfigMenu
 {
+    public enum ComboSelectMode
+    {
+        Combo,
+        Restricted,
+    }
+
     public class ComboSelect : DynamicUIBehaviour
     {
         
@@ -19,6 +25,7 @@ namespace SEE.Game.UI.ConfigMenu
         
         public string label;
         public Action<string> OnValueChange;
+        public ComboSelectMode mode = ComboSelectMode.Combo;
         
         public static string CustomInputText = "--Custom Input--";
         
@@ -39,7 +46,10 @@ namespace SEE.Game.UI.ConfigMenu
             {
                 List<string> newValues = _valuesUpdates.Dequeue();
                 _dropdown.dropdownItems.Clear();
-                _dropdown.CreateNewItemFast(CustomInputText, null);
+                if (mode == ComboSelectMode.Combo)
+                {
+                    _dropdown.CreateNewItemFast(CustomInputText, null);
+                }
                 foreach (var s in newValues)
                 {
                     _dropdown.CreateNewItemFast(s, null);
@@ -157,6 +167,12 @@ namespace SEE.Game.UI.ConfigMenu
         public ComboSelectBuilder SetDefaultValue(String defaultValue)
         {
             _comboSelect.Value = defaultValue;
+            return this;
+        }
+
+        public ComboSelectBuilder SetComboSelectMode(ComboSelectMode comboSelectMode)
+        {
+            _comboSelect.mode = comboSelectMode;
             return this;
         }
     }

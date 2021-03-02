@@ -4,9 +4,11 @@ using System.Linq;
 using Michsky.UI.ModernUIPack;
 using SEE.DataModel.DG;
 using SEE.GO;
+using SEE.Layout.NodeLayouts;
 using SEE.Net;
 using UnityEngine;
 using UnityEngine.Events;
+using static SEE.Game.AbstractSEECity;
 
 namespace SEE.Game.UI.ConfigMenu
 {
@@ -326,7 +328,70 @@ namespace SEE.Game.UI.ConfigMenu
         private void SetupNodesLayoutPage()
         {
             CreateAndInsertTabButton("Nodes layout");
-            CreateAndInsertPage("Nodes and node layout");
+            GameObject page = CreateAndInsertPage("Nodes and node layout");
+            Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
+
+            // Leaf nodes
+            GameObject leafNodesHost =
+                Instantiate(_comboSelectPrefab, controls);
+            ComboSelectBuilder.Init(leafNodesHost)
+                .SetLabel("Leaf nodes")
+                .SetAllowedValues(EnumToStr<LeafNodeKinds>())
+                .SetDefaultValue(_city.LeafObjects.ToString())
+                .SetOnChangeHandler(s => Enum.TryParse(s, out _city.LeafObjects))
+                .SetComboSelectMode(ComboSelectMode.Restricted)
+                .Build();
+
+            // Node layout
+            GameObject nodeLayoutHost =
+                Instantiate(_comboSelectPrefab, controls);
+            ComboSelectBuilder.Init(nodeLayoutHost)
+                .SetLabel("Node layout")
+                .SetAllowedValues(EnumToStr<NodeLayoutKind>())
+                .SetDefaultValue(_city.NodeLayout.ToString())
+                .SetOnChangeHandler(s => Enum.TryParse(s, out _city.NodeLayout))
+                .SetComboSelectMode(ComboSelectMode.Restricted)
+                .Build();
+
+            // Inner nodes
+            GameObject innerNodesHost =
+                Instantiate(_comboSelectPrefab, controls);
+            ComboSelectBuilder.Init(innerNodesHost)
+                .SetLabel("Inner nodes")
+                .SetAllowedValues(EnumToStr<InnerNodeKinds>())
+                .SetDefaultValue(_city.InnerNodeObjects.ToString())
+                .SetOnChangeHandler(s => Enum.TryParse(s, out _city.InnerNodeObjects))
+                .SetComboSelectMode(ComboSelectMode.Restricted)
+                .Build();
+
+            // Z-score scaling
+            GameObject zScoreScalingHost =
+                Instantiate(_switchPrefab, controls);
+            SwitchBuilder.Init(zScoreScalingHost)
+                .SetLabel("Z-score scaling")
+                .SetDefaultValue(_city.ZScoreScale)
+                .SetOnChangeHandler(b => _city.ZScoreScale = b)
+                .Build();
+
+            // Show erosions
+            GameObject showErosionsHost =
+                Instantiate(_switchPrefab, controls);
+            SwitchBuilder.Init(showErosionsHost)
+                .SetLabel("Show erosions")
+                .SetDefaultValue(_city.ShowErosions)
+                .SetOnChangeHandler(b => _city.ShowErosions = b)
+                .Build();
+
+            // Max erosion width
+            GameObject maxErosionWidth =
+                Instantiate(_sliderPrefab, controls);
+            SliderBuilder.Init(maxErosionWidth)
+                .SetLabel("Max erosion width")
+                .SetMode(SliderMode.Integer)
+                .SetDefaultValue(_city.MaxErosionWidth)
+                .SetOnChangeHandler(f => _city.MaxErosionWidth = f)
+                .SetRange((1, 10))
+                .Build();
         }
 
         private void SetupEdgesLayoutPage()
@@ -359,6 +424,12 @@ namespace SEE.Game.UI.ConfigMenu
             {
                 button.isDefaultActive = true;
             }
+        }
+
+        private List<string> EnumToStr<EnumType>() where EnumType : Enum
+        {
+            return Enum.GetValues(typeof(EnumType)).Cast<EnumType>().Select(v => v.ToString())
+                .ToList();
         }
     }
 }
