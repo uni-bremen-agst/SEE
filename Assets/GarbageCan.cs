@@ -1,30 +1,35 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// This script is attached to the garbage-can and is responsible for interactions with the garbage-can onclick. 
+/// This script is attached to the garbage can and is responsible for interactions with the garbage can on clicks. 
 /// </summary>
 public class GarbageCan : MonoBehaviour
 {
     /// <summary>
-    /// A Ray from the mouse-position to the hovered object
+    /// A ray from the mouse position to the hovered object
     /// </summary>
     private Ray ray;
 
     /// <summary>
-    /// The object which was hitten by the ray
+    /// The object which was hitt by the ray.
     /// </summary>
     private RaycastHit hit;
+
+    /// <summary>
+    /// The main camera of the scene.
+    /// </summary>
+    private Camera main;
 
     // Start is called before the first frame update
     void Start()
     {
-
+        main = Camera.main;
     }
 
     // Update is called once per frame
     void Update()
     {
-        ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        ray = main.ScreenPointToRay(Input.mousePosition);
 
         if (Input.GetMouseButtonDown(0) && Physics.Raycast(ray, out hit) && hit.transform == gameObject.transform)
         {
