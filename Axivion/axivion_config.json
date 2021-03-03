@@ -647,6 +647,9 @@
             "_active": true
         },
         "Project-GlobalOptions": {
+            "ci_mode": {
+                "update_workspace": true
+            },
             "directory": "$(SEEDIRECTORY)",
             "ir": "Temp\\bin\\Debug\\SEE.dll.ir",
             "name": "SEE",
