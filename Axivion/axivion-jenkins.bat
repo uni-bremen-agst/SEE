@@ -14,13 +14,14 @@ REM include Bauhaus bin in exectuable path
 set "PATH=C:\Program Files (x86)\Bauhaus\bin;%PATH%"
 
 REM SEE project directory
-set "SEEDIRECTORY=%USERWORKSPACE%\SEE"
+set "SEEDIRECTORY=%USERWORKSPACE%"
 
 REM where the Axivion configuration resides within SEE
 set "BAUHAUS_CONFIG=%SEEDIRECTORY%\Axivion"
 
 REM where the Axivion dashserver configuration resides
-set "AXIVION_DASHBOARD_CONFIG=%USERWORKSPACE%\Axivion"
+set "SWT=C:\Users\SWT"
+set "AXIVION_DASHBOARD_CONFIG=%SWT%\Axivion"
 set "AXIVION_DATABASES_DIR=%AXIVION_DASHBOARD_CONFIG%"
 set "REQUESTS_CA_BUNDLE=%AXIVION_DASHBOARD_CONFIG%\cert\auto.crt"
 
