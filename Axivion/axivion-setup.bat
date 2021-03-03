@@ -1,9 +1,19 @@
+REM This batch file sets the various environment variables needed to 
+REM run the Axivion Suite tools and then executes the command line parameters
+REM passed to this batch file. If there are none, only the variables are
+REM set.
+
 REM include Bauhaus bin in exectuable path
+set "PATH=C:\Users\SWT\AppData\Local\Programs\Python\Python38;%PATH%"
 set "PATH=C:\Program Files (x86)\Bauhaus\bin;%PATH%"
 
-set "BAUHAUS_CONFIG=%userprofile%\SEE\Axivion"
-set "AXIVION_DASHBOARD_CONFIG=%userprofile%\Axivion"
-set "AXIVION_DATABASES_DIR=%userprofile%\Axivion"
+REM set "BAUHAUS_CONFIG=%userprofile%\SEE\Axivion"
+set "BAUHAUS_CONFIG=%WORKSPACE%\SEE\Axivion"
+
+REM set "AXIVIONCI=%userprofile%\Axivion"
+set "AXIVIONCI=C:\Users\SWT\Axivion"
+set "AXIVION_DASHBOARD_CONFIG=%AXIVIONCI%"
+set "AXIVION_DATABASES_DIR=%AXIVIONCI%"
 set "REQUESTS_CA_BUNDLE=%AXIVION_DASHBOARD_CONFIG%\cert\auto.crt"
 
 REM specific to this machine
