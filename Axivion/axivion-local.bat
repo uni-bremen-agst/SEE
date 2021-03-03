@@ -3,6 +3,9 @@ REM run the Axivion Suite tools and then executes the command line parameters
 REM passed to this batch file. If there are none, only the variables are
 REM set.
 
+REM user workspace (generally the home directory or the Jenkins workspace)
+set "USERWORKSPACE=%userprofile%"
+
 REM Python
 set "PATH=C:\Users\SWT\AppData\Local\Programs\Python\Python38;%PATH%"
 set "BAUHAUS_PYTHON=C:\Users\SWT\AppData\Local\Programs\Python\Python38\python.exe"
@@ -10,16 +13,18 @@ set "BAUHAUS_PYTHON=C:\Users\SWT\AppData\Local\Programs\Python\Python38\python.e
 REM include Bauhaus bin in exectuable path
 set "PATH=C:\Program Files (x86)\Bauhaus\bin;%PATH%"
 
-REM set "BAUHAUS_CONFIG=%userprofile%\SEE\Axivion"
-set "BAUHAUS_CONFIG=%WORKSPACE%\Axivion"
+REM SEE project directory
+set "SEEDIRECTORY=%USERWORKSPACE%\SEE"
 
-REM set "AXIVIONCI=%userprofile%\Axivion"
-set "AXIVIONCI=C:\Users\SWT\Axivion"
-set "AXIVION_DASHBOARD_CONFIG=%AXIVIONCI%"
-set "AXIVION_DATABASES_DIR=%AXIVIONCI%"
+REM where the Axivion configuration resides within SEE
+set "BAUHAUS_CONFIG=%SEEDIRECTORY%\Axivion"
+
+REM where the Axivion dashserver configuration resides
+set "AXIVION_DASHBOARD_CONFIG=%USERWORKSPACE%\Axivion"
+set "AXIVION_DATABASES_DIR=%AXIVION_DASHBOARD_CONFIG%"
 set "REQUESTS_CA_BUNDLE=%AXIVION_DASHBOARD_CONFIG%\cert\auto.crt"
 
-REM specific to this machine
+REM URL of the dashserver
 REM set "AXIVION_DASHBOARD_URL=https://localhost:9443/axivion/"
 set "AXIVION_DASHBOARD_URL=https://swt-jenkins.informatik.uni-bremen.de:9443/axivion/"
 

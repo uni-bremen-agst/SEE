@@ -64,10 +64,10 @@
         "Architecture-GravisArchitecture": {
             "_active": true,
             "allow_dependencies_to_parents": true,
-            "architecture_file": "$(userprofile)\\SEE\\Data\\GXL\\SEE\\Architecture.gxl",
+            "architecture_file": "$(SEEDIRECTORY)\\Data\\GXL\\SEE\\Architecture.gxl",
             "base_view_name": "Code Facts",
             "hierarchy_view_name": "Code Facts",
-            "mapping_file": "$(userprofile)\\SEE\\Data\\GXL\\SEE\\Mapping.gxl"
+            "mapping_file": "$(SEEDIRECTORY)\\Data\\GXL\\SEE\\Mapping.gxl"
         },
         "Architecture-LiftedCyclesView": {
             "_active": true,
@@ -633,9 +633,9 @@
         "Git": {
             "_active": true,
             "branch": "master",
-            "gitdir": "$(userprofile)\\SEE\\.git",
+            "gitdir": "$(SEEDIRECTORY)\\.git",
             "remote": "origin",
-            "sourceserver_gitdir": "$(userprofile)\\SEE\\.git",
+            "sourceserver_gitdir": "$(SEEDIRECTORY)\\.git",
             "sourceserver_remote_url": "https://github.com/uni-bremen-agst/SEE.git"
         },
         "MSBuildIntegration": {
@@ -647,7 +647,7 @@
             "_active": true
         },
         "Project-GlobalOptions": {
-            "directory": "$(userprofile)\\SEE",
+            "directory": "$(SEEDIRECTORY)",
             "ir": "Temp\\bin\\Debug\\SEE.dll.ir",
             "name": "SEE",
             "rfg": null
