@@ -4,6 +4,7 @@ using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -19,69 +20,22 @@ namespace SEE.Controls.Actions
         public LinkedList<AbstractPlayerAction> ActionHistoryList { get; set; } = new LinkedList<AbstractPlayerAction>();
 
         /// <summary>
-        /// Saves the deleted nodes and/or edges for the possibility of an undo. 
-        /// Removes the gameObjects from the graph.
-        /// Precondition: <see cref="deletedNodes""/> != null.
+        /// Calls the undo of the last executed PlayerAction
         /// </summary>
-        /// <param name="deletedNodes">all deleted nodes of the last operation</param>
-        /// <param name="oldPositionsOfDeletedNodes">all old positions of the deleted nodes of the last operation</param>
-        public void SaveObjectForDeleteUndo(List<GameObject> deletedNodes, List<Vector3> oldPositionsOfDeletedNodes)
+        public void Undo()
         {
-            SEECity city = SceneQueries.GetCodeCity(deletedNodes[0].transform)?.gameObject.GetComponent<SEECity>();
-            Graph graph = city.LoadedGraph;
-            List<GameObject> nodesAndAscendingEdges = new List<GameObject>();
-            List<GameObject> edgesToHide = new List<GameObject>();
-            
-            foreach (GameObject actionHistoryObject in deletedNodes)
-            {
-                if (actionHistoryObject.TryGetComponent(out NodeRef nodeRef))
-                {
-                    HashSet<string> edgeIDs = Destroyer.GetEdgeIds(nodeRef);
-                    foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
-                    {
-                        if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
-                        {
-                            edge.SetVisibility(false, true);
+            ActionHistoryList.Last().Undo();
+            ActionHistoryList.RemoveLast();
+        }
 
-                            if (!nodesAndAscendingEdges.Contains(edge))
-                            {
-                                edgesToHide.Add(edge);
-                            }
-                            edge.TryGetComponent(out EdgeRef edgeRef);
-                            graph.RemoveEdge(edgeRef.edge);
-                        }
-                    }
-
-                    nodesAndAscendingEdges.Add(actionHistoryObject);
-                }
-            }
-
-            List<GameObject> deletedNodesReverse = deletedNodes;
-            // For deletion bottom-up
-            deletedNodesReverse.Reverse();
-
-            foreach (GameObject deletedNode in deletedNodesReverse)
-            {
-                if (deletedNode.CompareTag(Tags.Node))
-                {
-                    deletedNode.TryGetComponent(out NodeRef nodeRef);
-                    if (graph.Contains(nodeRef.Value))
-                    {
-                        graph.RemoveNode(nodeRef.Value);
-                    }
-                }
-                if (deletedNode.CompareTag(Tags.Edge))
-                {
-                    deletedNode.SetVisibility(false, true);
-                    edgesToHide.Add(deletedNode);
-                    deletedNode.TryGetComponent(out EdgeRef edgeRef);
-                    graph.RemoveEdge(edgeRef.edge);
-                }
-            }
-
-            oldPositionsOfDeletedNodes.Reverse();
-            nodesAndAscendingEdges.Reverse();
-            ActionHistoryList.AddLast(new DeleteAction(nodesAndAscendingEdges, oldPositionsOfDeletedNodes, edgesToHide, graph));
+        /// <summary>
+        /// Calls the redo of the last executed PlayerAction
+        /// </summary>
+        public void Redo()
+        {
+            AbstractPlayerAction playerAction = ActionHistoryList.Last();
+            ActionHistoryList.AddLast(playerAction);
+            ActionHistoryList.Last().Redo();
         }
     }
 }

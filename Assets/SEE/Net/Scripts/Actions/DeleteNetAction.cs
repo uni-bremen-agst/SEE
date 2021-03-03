@@ -45,12 +45,12 @@ public class DeleteNetAction : AbstractAction
     /// </summary>
     protected override void ExecuteOnClient()
     {
-        if (!IsRequester())
-        {
-            //Fixme(Thore): Network-DeleteAction has to be fixed in #204
-            GameObject playerDesktop = GameObject.Find(PlayerDesktop);
-            playerDesktop.TryGetComponent(out DeleteAction deleteAction);
-            deleteAction.DeleteSelectedObject(GameObject.Find(GameObjectID));
-        }
+        //if (!IsRequester())
+        //{
+        //    //Fixme(Thore): Network-DeleteAction has to be fixed in #204
+        //    GameObject playerDesktop = GameObject.Find(PlayerDesktop);
+        //    playerDesktop.TryGetComponent(out DeleteAction deleteAction);
+        //    deleteAction.DeleteSelectedObject(GameObject.Find(GameObjectID));
+        //}
     }
 }
