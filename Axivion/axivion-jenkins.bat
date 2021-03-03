@@ -29,5 +29,8 @@ REM URL of the dashserver
 REM set "AXIVION_DASHBOARD_URL=https://localhost:9443/axivion/"
 set "AXIVION_DASHBOARD_URL=https://swt-jenkins.informatik.uni-bremen.de:9443/axivion/"
 
+REM The Visual Studio .csproj files need to be created before we can start the build.
+"C:\Program Files\Unity\Hub\Editor\2019.4.21f1\Editor\Unity.exe" -batchmode -nographics -logFile - -executeMethod UnityEditor.SyncVS.SyncSolution -projectPath . -quit
+
 REM execute command line parameters
 %*
