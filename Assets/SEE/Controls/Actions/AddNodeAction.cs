@@ -598,5 +598,21 @@ namespace SEE.Controls.Actions
         {
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Redoes this DeleteAction
+        /// </summary>
+        public override void Redo()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Executes this DeleteAction
+        /// </summary>
+        public override void Execute()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

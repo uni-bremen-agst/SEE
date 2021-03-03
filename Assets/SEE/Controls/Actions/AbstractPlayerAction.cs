@@ -62,13 +62,23 @@ namespace SEE.Controls.Actions
         protected void UndoInitialisation()
         {
             garbageCan = GameObject.Find(GarbageCanName);
-            garbageCan.TryGetComponent(out this.actionHistory);
+            garbageCan?.TryGetComponent(out this.actionHistory);
         }
 
         /// <summary>
         /// The undo operation which has to be implemented specifically by subclasses.
         /// </summary>
         public abstract void Undo();
+
+        /// <summary>
+        /// The redo operation which has to be implemented specifically by subclasses.
+        /// </summary>
+        public abstract void Redo();
+
+        /// <summary>
+        /// The operation which has to be done in the specific subclass.
+        /// </summary>
+        public abstract void Execute();
 
         /// <summary>
         /// Sets <see cref="hoveredObject"/> to given <paramref name="interactableObject"/>.
