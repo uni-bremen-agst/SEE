@@ -103,9 +103,7 @@ namespace SEE.Controls.Actions
                 // Create new code window for active selection, or use existing one
                 if (!selectedNode.TryGetComponent(out codeWindow))
                 {
-                    GameObject selectedGO = selectedNode.gameObject;
                     codeWindow = selectedNode.gameObject.AddComponent<CodeWindow>();
-                    codeWindow.Anchor = selectedGO;
                     // Pass file name of source code file to read from it
                     if (!selectedNode.Value.TryGetString("Source.File", out string selectedFile))
                     {
