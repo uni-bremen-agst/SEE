@@ -31,30 +31,14 @@ namespace SEE.Game.UI.CodeWindow
         public string Title;
 
         /// <summary>
-        /// The GameObject which serves as the anchor, i.e., the GameObject above which the code window should float.
-        /// </summary>
-        public GameObject Anchor;
-
-        /// <summary>
-        /// Distance (in meters) with which the code windows should be positioned above the <see cref="Anchor"/>.
-        /// </summary>
-        public float AnchorDistance = 0.5f;
-
-        /// <summary>
         /// Size of the font used in the code window.
         /// </summary>
         public float FontSize = 20f;
 
         /// <summary>
-        /// Resolution of the code window. By default, this is set to a resolution of 800x600.
+        /// Resolution of the code window. By default, this is set to a resolution of 900x500.
         /// </summary>
-        public Vector2 Resolution = new Vector2(800, 400);
-
-        /// <summary>
-        /// How wide the canvas should be in the world (in meters). Default is one meter.
-        /// This will not affect the <see cref="Resolution"/>, the canvas will simply be scaled appropriately.
-        /// </summary>
-        public float WorldWidth = 1;
+        public Vector2 Resolution = new Vector2(900, 500);
 
         /// <summary>
         /// An event which gets called whenever the scrollbar is used to scroll to a different line.
@@ -127,9 +111,9 @@ namespace SEE.Game.UI.CodeWindow
         }
 
         /// <summary>
-        /// GameObject containing the code canvas, which in turn contains this code window.
+        /// GameObject containing the code window, which in turn contains this code window.
         /// </summary>
-        private GameObject CodeCanvas;
+        private GameObject codeWindow;
 
         /// <summary>
         /// Number of lines within the file.
@@ -143,18 +127,18 @@ namespace SEE.Game.UI.CodeWindow
         /// first line, as that one is still accessible by the scrollbar).
         /// In our case, this can be calculated by <c>ceil(window_height/line_height)</c>.
         /// </summary>
-        private int excessLines = 0;
+        private int excessLines;
+
+        /// <summary>
+        /// Path to the code canvas prefab.
+        /// </summary>
+        private const string CODE_WINDOW_PREFAB = "Prefabs/UI/CodeWindow";
 
         /// <summary>
         /// Name for the code windows group game object.
         /// </summary>
         private const string CODE_WINDOWS_NAME = "Code Windows";
-
-        /// <summary>
-        /// Path to the code canvas prefab.
-        /// </summary>
-        private const string CODE_CANVAS_PREFAB = "Prefabs/UI/CodeCanvas";
-
+        
         /// <summary>
         /// Populates the code window with the contents of the given file.
         /// This will overwrite any existing text.
