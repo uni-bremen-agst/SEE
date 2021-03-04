@@ -29,8 +29,17 @@ REM URL of the dashserver
 REM set "AXIVION_DASHBOARD_URL=https://localhost:9443/axivion/"
 set "AXIVION_DASHBOARD_URL=https://swt-jenkins.informatik.uni-bremen.de:9443/axivion/"
 
+REM If the dashserver is installed as a Windows service, you can
+REM start and stop it as follows:
+REM   net (start|stop) "axivion_dashboard_service"
+REM or use the Windows Services Console (services.msc).
+
 REM The Visual Studio .csproj files need to be created before we can start the build.
 "C:\Program Files\Unity\Hub\Editor\2019.4.21f1\Editor\Unity.exe" -batchmode -nographics -logFile - -executeMethod UnityEditor.SyncVS.SyncSolution -projectPath . -quit
 
 REM execute command line parameters
 %*
+
+REM No-error exit code so that Jenkins is happy
+exit /b 0
+
