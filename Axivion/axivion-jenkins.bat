@@ -37,9 +37,14 @@ REM or use the Windows Services Console (services.msc).
 REM The Visual Studio .csproj files need to be created before we can start the build.
 "C:\Program Files\Unity\Hub\Editor\2019.4.21f1\Editor\Unity.exe" -batchmode -nographics -logFile - -executeMethod UnityEditor.SyncVS.SyncSolution -projectPath . -quit
 
-REM execute command line parameters
-%*
+REM Execute command line parameters if there are any.
+IF [%1]==[] (
+	echo "No parameters to be executed given"
+) ELSE (    
+    %*
+)
 
-REM No-error exit code so that Jenkins is happy
-exit /b 0
+REM Exit with error code of last executed command (echo if no parameters were given;
+REM and otherwise the result of the executed command-line parameters).
+exit /b %ERRORLEVEL%
 
