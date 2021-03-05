@@ -76,28 +76,24 @@ namespace SEE.Game.UI
                 AddNodeAction nodeAction = new AddNodeAction();
                 nodeAction.Start();
                 ah.ActionHistoryList.Add(nodeAction);
-                ah.Pointer++;
             }
             if (newState.Name.Equals("New Edge"))
             {
                 AddEdgeAction addEdgeAction = new AddEdgeAction();
                 addEdgeAction.Start();
                 ah.ActionHistoryList.Add(addEdgeAction);
-                ah.Pointer++;
             }
             if (newState.Name.Equals("Scale Node"))
             {
                 ScaleNodeAction scaleNodeAction = new ScaleNodeAction();
                 scaleNodeAction.Start();
                 ah.ActionHistoryList.Add(scaleNodeAction);
-                ah.Pointer++;
             }
             if (newState.Name.Equals("Edit Node"))
             {
                 EditNodeAction editNodeAction = new EditNodeAction();
                 editNodeAction.Start();
                 ah.ActionHistoryList.Add(editNodeAction);
-                ah.Pointer++;
             }
             if (newState.Name.Equals("Rotate"))
             {
@@ -112,7 +108,6 @@ namespace SEE.Game.UI
                 DeleteAction deleteAction = new DeleteAction();
                 deleteAction.Start();
                 ah.ActionHistoryList.Add(deleteAction);
-                ah.Pointer++;
             }
         }
     }

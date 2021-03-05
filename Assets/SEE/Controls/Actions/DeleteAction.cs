@@ -102,6 +102,8 @@ namespace SEE.Controls.Actions
                 new DeleteNetAction(selectedObject.name).Execute(null);
                 DeleteSelectedObject(selectedObject);
                 deletedParent = selectedObject;
+                actionHistory.Pointer++;
+                Debug.Log("Pointer erhöht");
                 actionHistory.AnotherOperation = true;
             }
 
@@ -137,6 +139,7 @@ namespace SEE.Controls.Actions
                     GetActionHistory();
                     actionHistory.StartCoroutine(this.MoveNodeToGarbage(DeletedNodes));
                 }
+
             }
         }
 

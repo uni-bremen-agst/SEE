@@ -58,6 +58,7 @@ namespace SEE.Controls.Actions
                         {
                             city.Renderer.DrawEdge(from, to);
                             new AddEdgeNetAction(from.name, to.name).Execute();
+                            actionHistory.Pointer++;
                         }
                         catch (Exception e)
                         {

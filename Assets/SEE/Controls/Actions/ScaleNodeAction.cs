@@ -315,6 +315,7 @@ namespace SEE.Controls.Actions
                     SphereRadius(endWithSave);
                 }
             }
+
         }
 
         /// <summary>
@@ -501,6 +502,7 @@ namespace SEE.Controls.Actions
                 // FIXME: Currently, the changes will not be saved after closing the game. 
                 // SAVE THE CHANGES
                 RemoveSpheres();
+                actionHistory.Pointer++;
             }
             else
             {
