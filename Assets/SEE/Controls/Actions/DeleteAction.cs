@@ -198,8 +198,6 @@ namespace SEE.Controls.Actions
                     edge.SetVisibility(true, false);
                 }
             }
-
-            actionHistory.ActionHistoryList.RemoveLast();
         }
 
         /// <summary>
@@ -338,7 +336,7 @@ namespace SEE.Controls.Actions
 
             oldPositionsOfDeletedNodes.Reverse();
             nodesAndAscendingEdges.Reverse();
-            actionHistory.ActionHistoryList.AddLast(new DeleteAction(nodesAndAscendingEdges, oldPositionsOfDeletedNodes, edgesToHide, graph));
+            actionHistory.ActionHistoryList.Add(new DeleteAction(nodesAndAscendingEdges, oldPositionsOfDeletedNodes, edgesToHide, graph));
         }
 
 

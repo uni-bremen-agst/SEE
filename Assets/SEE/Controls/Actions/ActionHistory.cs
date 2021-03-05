@@ -12,21 +12,41 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// A history of all actions of the user for the possibility of an undo. 
         /// </summary>
-        public LinkedList<AbstractPlayerAction> ActionHistoryList { get; set; } = new LinkedList<AbstractPlayerAction>();
+        public List<AbstractPlayerAction> ActionHistoryList { get; set; } = new List<AbstractPlayerAction>();
+
+        public int Pointer { get; set; } = -1;
 
         public void Update()
         {
             if (ActionHistoryList.Count != 0)
             {
                 ActionHistoryList.Last().Update();
-                Debug.Log(ActionHistoryList.Last.Value);
             }
-            
+            if (Pointer > -2)
+            {
+                if (Input.GetKey(KeyCode.LeftShift))
+                {
+                    if (Input.GetKeyDown(KeyCode.Z))
+                    {
+                        Pointer++;
+                        Debug.Log("POINTER" + Pointer);
+                        ActionHistoryList[Pointer].Redo();
+                        Debug.Log("Redo" + Pointer);
+                    }
+                    return;
+                }
+                if (Input.GetKeyDown(KeyCode.Z))
+                {
+                    ActionHistoryList[Pointer].Undo();
+                    Pointer--;
+                    Debug.Log("Undo" + Pointer);
+                }
+            }
         }
 
         public void Start()
         {
-            
+
         }
 
         /// <summary>
@@ -34,8 +54,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public void Undo()
         {
-            ActionHistoryList.Last().Undo();
-            ActionHistoryList.RemoveLast();
+            ActionHistoryList[Pointer].Undo();
         }
 
         /// <summary>
@@ -43,9 +62,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public void Redo()
         {
-            AbstractPlayerAction playerAction = ActionHistoryList.Last();
-            ActionHistoryList.AddLast(playerAction);
-            ActionHistoryList.Last().Redo();
+            ActionHistoryList[Pointer].Redo();
         }
 
     }
