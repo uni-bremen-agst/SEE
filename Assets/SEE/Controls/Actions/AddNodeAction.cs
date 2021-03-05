@@ -225,6 +225,7 @@ namespace SEE.Controls.Actions
                         if (Input.GetMouseButtonDown(0))
                         {
                             Place();
+                            actionHistory.Pointer++;
                         }
                     }
                     break;

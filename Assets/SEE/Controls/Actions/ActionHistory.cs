@@ -25,7 +25,6 @@ namespace SEE.Controls.Actions
                 DeleteAction nextDeleteAction = new DeleteAction();
                 nextDeleteAction.Start();
                 ActionHistoryList.Add(nextDeleteAction);
-                Pointer++;
                 AnotherOperation = false;
             }
             if (ActionHistoryList.Count != 0)
