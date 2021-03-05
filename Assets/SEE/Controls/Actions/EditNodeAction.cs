@@ -44,7 +44,6 @@ namespace SEE.Controls.Actions
             if (!InitializeCanvasObject())
             {
                 Debug.LogError($"No canvas object named {nameOfCanvasObject} could be found in the scene.\n");
-                enabled = false;
                 return;
             }
             ActionState.OnStateChanged += newState =>
@@ -53,7 +52,6 @@ namespace SEE.Controls.Actions
                 if (Equals(newState, ThisActionState))
                 {
                     // The MonoBehaviour is enabled and Update() will be called by Unity.
-                    enabled = true;
                     InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
                     instantiated = true;
@@ -61,7 +59,6 @@ namespace SEE.Controls.Actions
                 else
                 {
                     // The MonoBehaviour is disabled and Update() no longer be called by Unity.
-                    enabled = false;
                     canvasObject.TryGetComponentOrLog(out CanvasGenerator canvasGenerator);
                     canvasGenerator.DestroyEditNodeCanvasAction();
                     instantiated = false;
@@ -70,7 +67,6 @@ namespace SEE.Controls.Actions
                     hoveredObject = null;
                 }
             };
-            enabled = ActionState.Is(ThisActionState);
         }
 
         /// <summary>
@@ -79,7 +75,7 @@ namespace SEE.Controls.Actions
         /// NodeSelected: Instantiates the canvasObject if a gameNode is selected.
         /// EditIsCanceled: Removes the canvas and resets all values if the process is canceled.
         /// </summary>
-        private void Update()
+        public override void Update()
         {
             switch (EditProgress)
             {
@@ -128,13 +124,6 @@ namespace SEE.Controls.Actions
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Executes this DeleteAction
-        /// </summary>
-        public override void Execute()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
 

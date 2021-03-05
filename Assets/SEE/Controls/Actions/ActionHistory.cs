@@ -1,9 +1,4 @@
-﻿using SEE.DataModel;
-using SEE.DataModel.DG;
-using SEE.Game;
-using SEE.GO;
-using SEE.Utils;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -18,6 +13,20 @@ namespace SEE.Controls.Actions
         /// A history of all actions of the user for the possibility of an undo. 
         /// </summary>
         public LinkedList<AbstractPlayerAction> ActionHistoryList { get; set; } = new LinkedList<AbstractPlayerAction>();
+
+        public void Update()
+        {
+            if (ActionHistoryList.Count != 0)
+            {
+                ActionHistoryList.Last().Update();
+            }
+            
+        }
+
+        public void Start()
+        {
+            
+        }
 
         /// <summary>
         /// Calls the undo of the last executed PlayerAction
@@ -37,5 +46,6 @@ namespace SEE.Controls.Actions
             ActionHistoryList.AddLast(playerAction);
             ActionHistoryList.Last().Redo();
         }
+
     }
 }

@@ -8,7 +8,7 @@ namespace SEE.Controls.Actions
     /// An abstract superclass of all PlayerActions such as NewNodeAction, ScaleNodeAction, EditNodeAction and AddEdgeAction.
     /// The most important attribute for all of them is the hoveredObject, which will be instantiated and updated by LocalAnyHoverIn and LocalAnyHoverOut.
     /// </summary>
-    public abstract class AbstractPlayerAction : MonoBehaviour
+    public abstract class AbstractPlayerAction
     {
         /// <summary>
         /// The gameObject that contains the CanvasGenerator and the actual CanvasObject.
@@ -78,7 +78,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The operation which has to be done in the specific subclass.
         /// </summary>
-        public abstract void Execute();
+        public abstract void Update();
 
         /// <summary>
         /// Sets <see cref="hoveredObject"/> to given <paramref name="interactableObject"/>.

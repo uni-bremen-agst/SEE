@@ -130,7 +130,7 @@ namespace SEE.Controls.Actions
                     {
                         //Just a gameObject to attatch the newNodeScript on
                         GameObject dummy = new GameObject();
-                        dummy.AddComponent<AddNodeAction>();
+                       // dummy.AddComponent<AddNodeAction>();
                         dummy.GetComponent<AddNodeAction>().Network = true;
                         dummy.GetComponent<AddNodeAction>().NodeID = NewNodeID;
                         dummy.GetComponent<AddNodeAction>().City = City;
@@ -151,7 +151,7 @@ namespace SEE.Controls.Actions
                     {
                         GameObject.Find(dummyName).GetComponent<AddNodeAction>().NetworkPlaceNode(Position, Scale, ParentID);
                     }
-                    Object.Destroy(GameObject.Find(dummyName).GetComponent<AddNodeAction>());
+                  //  Object.Destroy(GameObject.Find(dummyName).GetComponent<AddNodeAction>());
                     Object.Destroy(GameObject.Find(dummyName));
                 }
                 // Let the new node move with the cursor of the master.
