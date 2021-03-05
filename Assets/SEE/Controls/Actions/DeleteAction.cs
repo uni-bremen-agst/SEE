@@ -87,7 +87,7 @@ namespace SEE.Controls.Actions
             // Necessary for ActionStates
         }
 
-        private void Start()
+        public void Start()
         {
             // An anonymous delegate is registered for the event <see cref="ActionState.OnStateChanged"/>.
             // This delegate will be called from <see cref="ActionState"/> upon every

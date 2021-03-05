@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using SEE.Controls.Actions;
+using System.Linq;
 
 namespace SEE.Controls
 {
@@ -61,14 +62,15 @@ namespace SEE.Controls
         /// </summary>
         public void SetNextAddingNodeStep()
         {
-            if (playerDesktop.TryGetComponent(out AddNodeAction current))
+            if (playerDesktop.TryGetComponent(out ActionHistory actionHistory))
             {
-                current.Progress = AddNodeAction.ProgressState.CanvasIsClosed;
+                AddNodeAction addNodeAction = (AddNodeAction)actionHistory.ActionHistoryList.Last();
+                addNodeAction.Progress = AddNodeAction.ProgressState.CanvasIsClosed;
             }
             else
             {
-                Debug.LogError($"Player desktop {playerDesktop.name} does not have an AddNodeAction component.\n");
-            }            
+                Debug.LogError($"Player desktop {playerDesktop.name} does not have an ActionHistory component.\n");
+            }
         }
 
         /// <summary>
@@ -77,13 +79,14 @@ namespace SEE.Controls
         /// </summary>
         public void EditIsCanceled()
         {
-            if (playerDesktop.TryGetComponent(out EditNodeAction current))
+            if (playerDesktop.TryGetComponent(out ActionHistory actionHistory))
             {
-                current.EditProgress = EditNodeAction.ProgressState.EditIsCanceled;
+                EditNodeAction editNodeAction = (EditNodeAction)actionHistory.ActionHistoryList.Last();
+                editNodeAction.EditProgress = EditNodeAction.ProgressState.EditIsCanceled;
             }
             else
             {
-                Debug.LogError($"Player desktop {playerDesktop.name} does not have an EditNodeAction component.\n");
+                Debug.LogError($"Player desktop {playerDesktop.name} does not have an ActionHistory component.\n");
             }
         }
 
@@ -101,13 +104,14 @@ namespace SEE.Controls
         /// </summary>
         public void AddingIsCanceled()
         {
-            if (playerDesktop.TryGetComponent(out AddNodeAction current))
+            if (playerDesktop.TryGetComponent(out ActionHistory actionHistory))
             {
-                current.Progress = AddNodeAction.ProgressState.AddingIsCanceled;
+                AddNodeAction addNodeAction = (AddNodeAction)actionHistory.ActionHistoryList.Last();
+                addNodeAction.Progress = AddNodeAction.ProgressState.AddingIsCanceled;
             }
             else
             {
-                Debug.LogError($"Player desktop {playerDesktop.name} does not have an AddNodeAction component.\n");
+                Debug.LogError($"Player desktop {playerDesktop.name} does not have an ActionHistory component.\n");
             }
         }
     }

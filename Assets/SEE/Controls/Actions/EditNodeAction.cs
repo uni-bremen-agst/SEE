@@ -39,7 +39,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public ProgressState EditProgress { get; set; } = ProgressState.NoNodeSelected;
 
-        private void Start()
+        public void Start()
         {
             if (!InitializeCanvasObject())
             {

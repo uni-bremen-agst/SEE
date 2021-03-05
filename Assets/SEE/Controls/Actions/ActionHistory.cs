@@ -19,6 +19,7 @@ namespace SEE.Controls.Actions
             if (ActionHistoryList.Count != 0)
             {
                 ActionHistoryList.Last().Update();
+                Debug.Log(ActionHistoryList.Last.Value);
             }
             
         }

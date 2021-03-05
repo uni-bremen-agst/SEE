@@ -63,12 +63,43 @@ namespace SEE.Game.UI
         {
             ModePanelImage.color = newState.Color.ColorWithAlpha(0.5f);
             ModePanelText.text = newState.Name;
-            Debug.Log(newState.Name);
             if (newState.Name.Equals("New Node"))
             {
                 AddNodeAction nodeAction = new AddNodeAction();
                 nodeAction.Start();
                 ah.ActionHistoryList.AddLast(nodeAction);
+            }
+            if (newState.Name.Equals("New Edge"))
+            {
+                AddEdgeAction addEdgeAction = new AddEdgeAction();
+                addEdgeAction.Start();
+                ah.ActionHistoryList.AddLast(addEdgeAction);
+            }
+            if (newState.Name.Equals("Scale Node"))
+            {
+                ScaleNodeAction scaleNodeAction = new ScaleNodeAction();
+                scaleNodeAction.Start();
+                ah.ActionHistoryList.AddLast(scaleNodeAction);
+            }
+            if (newState.Name.Equals("Edit Node"))
+            {
+                EditNodeAction editNodeAction = new EditNodeAction();
+                editNodeAction.Start();
+                ah.ActionHistoryList.AddLast(editNodeAction);
+            }
+            if (newState.Name.Equals("Rotate"))
+            {
+                // Fixme: Is this an action?
+            }
+            if (newState.Name.Equals("Map"))
+            {
+                // Fixme: Is this an action?
+            }
+            if (newState.Name.Equals("Delete Node"))
+            {
+                DeleteAction deleteAction = new DeleteAction();
+                deleteAction.Start();
+                ah.ActionHistoryList.AddLast(deleteAction);
             }
         }
     }
