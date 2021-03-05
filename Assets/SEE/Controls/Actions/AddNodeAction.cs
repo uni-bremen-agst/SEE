@@ -15,20 +15,6 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class AddNodeAction : AbstractPlayerAction
     {
-        /// <summary>
-        /// Start() will register an anonymous delegate of type 
-        /// <see cref="ActionState.OnStateChangedFn"/> on the event
-        /// <see cref="ActionState.OnStateChanged"/> to be called upon every
-        /// change of the action state, where the newly entered state will
-        /// be passed as a parameter. The anonymous delegate will compare whether
-        /// this state equals <see cref="ThisActionState"/> and if so, execute
-        /// what needs to be done for this action here. If that parameter is
-        /// different from <see cref="ThisActionState"/>, this action will
-        /// put itself to sleep. 
-        /// Thus, this action will be executed only if the new state is 
-        /// <see cref="ThisActionState"/>.
-        /// </summary>
-        private readonly ActionStateType ThisActionState = ActionStateType.NewNode;
 
         private SEECity city;
         /// <summary>
@@ -157,42 +143,27 @@ namespace SEE.Controls.Actions
         public void Start()
         {
             listOfRoots = new List<GameObject>();
-            Debug.Log(1);
             if (!InitializeCanvasObject())
             {
                 Debug.LogError($"No canvas object named {nameOfCanvasObject} could be found in the scene.\n");
                 return;
             }
-            Debug.Log(2);
-            Debug.Log(ThisActionState + "Thisactionstate");
-            // An anonymous delegate is registered for the event <see cref="ActionState.OnStateChanged"/>.
-            // This delegate will be called from <see cref="ActionState"/> upon every
-            // state changed where the passed parameter is the newly entered state.
 
-            // The MonoBehaviour is enabled and Update() will be called by Unity.
             InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
             InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
             if (!instantiated)
             {
                 instantiated = true;
             }
-            Debug.Log("StartWasRunned");
 
+            // Fixme: How should be interacted with these actions?
             if (false)
             {
-                if (!Network)
-                {
-                    // The monobehaviour is diabled and Update() no longer be called by Unity.
-                }
                 if (canvasObject.TryGetComponent(out CanvasGenerator canvasGenerator))
                 {
                     canvasGenerator.DestroyAddNodeCanvasAction();
                 }
                 Undye();
-                instantiated = false;
-                InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
-                InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
-                hoveredObject = null;
             }
         }
 

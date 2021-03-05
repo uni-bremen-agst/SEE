@@ -14,13 +14,23 @@ namespace SEE.Controls.Actions
         /// </summary>
         public List<AbstractPlayerAction> ActionHistoryList { get; set; } = new List<AbstractPlayerAction>();
 
+        public bool AnotherOperation { get; set; } = false;
+
         public int Pointer { get; set; } = -1;
 
         public void Update()
         {
+            if (AnotherOperation)
+            {
+                DeleteAction nextDeleteAction = new DeleteAction();
+                nextDeleteAction.Start();
+                ActionHistoryList.Add(nextDeleteAction);
+                Pointer++;
+                AnotherOperation = false;
+            }
             if (ActionHistoryList.Count != 0)
             {
-                ActionHistoryList.Last().Update();
+                ActionHistoryList[ActionHistoryList.Count-1].Update();
             }
             if (Pointer > -2)
             {
@@ -31,6 +41,7 @@ namespace SEE.Controls.Actions
                         Pointer++;
                         Debug.Log("POINTER" + Pointer);
                         ActionHistoryList[Pointer].Redo();
+                        Debug.Log(ActionHistoryList[Pointer]);
                         Debug.Log("Redo" + Pointer);
                     }
                     return;

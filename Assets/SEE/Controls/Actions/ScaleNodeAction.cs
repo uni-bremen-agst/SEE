@@ -148,26 +148,8 @@ namespace SEE.Controls.Actions
 
         public void Start()
         {
-            ActionState.OnStateChanged += newState =>
-            {
-                // Is this our action state where we need to do something?
-                if (Equals(newState, ThisActionState))
-                {
-                    // The MonoBehaviour is enabled and Update() will be called by Unity.
                     InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
-                }
-                else
-                {
-                    // The MonoBehaviour is disabled and Update() no longer be called by Unity.
-                    InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
-                    InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
-                    hoveredObject = null;
-                    instantiated = false;
-                    RemoveSpheres();
-                    objectToScale = null;
-                }
-            };
         }
 
         public override void Update()
@@ -554,7 +536,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Undo()
         {
-            throw new NotImplementedException();
+            Debug.Log("Undo ScaleNode");
         }
 
         /// <summary>
@@ -562,7 +544,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Redo()
         {
-            throw new NotImplementedException();
+            Debug.Log("Redo ScaleNode");
         }
 
     }

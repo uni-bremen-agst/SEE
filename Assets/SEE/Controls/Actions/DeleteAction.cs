@@ -18,21 +18,6 @@ namespace SEE.Controls.Actions
     internal class DeleteAction : AbstractPlayerAction
     {
         /// <summary>
-        /// Start() will register an anonymous delegate of type 
-        /// <see cref="ActionState.OnStateChangedFn"/> on the event
-        /// <see cref="ActionState.OnStateChanged"/> to be called upon every
-        /// change of the action state, where the newly entered state will
-        /// be passed as a parameter. The anonymous delegate will compare whether
-        /// this state equals <see cref="ThisActionState"/> and if so, execute
-        /// what needs to be done for this action here. If that parameter is
-        /// different from <see cref="ThisActionState"/>, this action will
-        /// put itself to sleep. 
-        /// Thus, this action will be executed only if the new state is 
-        /// <see cref="ThisActionState"/>.
-        /// </summary>
-        private readonly ActionStateType ThisActionState = ActionStateType.Delete;
-
-        /// <summary>
         /// The currently selected object (a node or edge).
         /// </summary>
         private GameObject selectedObject;
@@ -66,6 +51,8 @@ namespace SEE.Controls.Actions
         /// The graph where this action is executed.
         /// </summary>
         public Graph Graph { get; set; }
+
+        public GameObject deletedParent;
 
         /// <summary>
         /// Constructor for UndoActions
@@ -106,14 +93,6 @@ namespace SEE.Controls.Actions
 
         public override void Update()
         {
-            // This script should be disabled, if the action state is not this action's type
-            if (!ActionState.Is(ThisActionState))
-            {
-                // The MonoBehaviour is disabled and Update() no longer be called by Unity.
-                InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
-                InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
-                return;
-            }
 
             // Delete a gameobject and all children
             if (selectedObject != null && Input.GetMouseButtonDown(0))
@@ -122,6 +101,8 @@ namespace SEE.Controls.Actions
                 // FIXME:(Thore) NetAction is no longer up to date
                 new DeleteNetAction(selectedObject.name).Execute(null);
                 DeleteSelectedObject(selectedObject);
+                deletedParent = selectedObject;
+                actionHistory.AnotherOperation = true;
             }
 
         }
@@ -134,6 +115,10 @@ namespace SEE.Controls.Actions
         /// <param GameObject="selectedObject">selected GameObject that along with its children should be removed</param>
         public void DeleteSelectedObject(GameObject selectedObject)
         {
+            if(selectedObject == null)
+            {
+                return;
+            }
             if (selectedObject != null)
             {
                 if (selectedObject.CompareTag(Tags.Edge))
@@ -161,24 +146,27 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             GetActionHistory();
-            actionHistory.StartCoroutine(this.RemoveNodeFromGarbage(DeletedNodes));
-            foreach (GameObject node in DeletedNodes)
+            if (DeletedNodes != null)
             {
-                if (node.TryGetComponentOrLog(out NodeRef nodeRef))
+                actionHistory.StartCoroutine(this.RemoveNodeFromGarbage(DeletedNodes));
+                foreach (GameObject node in DeletedNodes)
                 {
-                    if (!Graph.Contains(nodeRef.Value))
+                    if (node.TryGetComponentOrLog(out NodeRef nodeRef))
                     {
-                        Graph.AddNode(nodeRef.Value);
+                        if (!Graph.Contains(nodeRef.Value))
+                        {
+                            Graph.AddNode(nodeRef.Value);
+                        }
                     }
                 }
-            }
 
-            foreach (GameObject edge in DeletedEdges)
-            {
-                if (edge.TryGetComponentOrLog(out EdgeRef edgeReference))
+                foreach (GameObject edge in DeletedEdges)
                 {
-                    Graph.AddEdge(edgeReference.edge);
-                    edge.SetVisibility(true, false);
+                    if (edge.TryGetComponentOrLog(out EdgeRef edgeReference))
+                    {
+                        Graph.AddEdge(edgeReference.edge);
+                        edge.SetVisibility(true, false);
+                    }
                 }
             }
         }
@@ -188,7 +176,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Redo()
         {
-            throw new NotImplementedException();
+            DeleteSelectedObject(deletedParent);
         }
 
         /// <summary>
@@ -235,20 +223,20 @@ namespace SEE.Controls.Actions
         /// <returns>the waiting time between moving deleted nodes from the garbage-can and then to the city</returns>
         private IEnumerator RemoveNodeFromGarbage(List<GameObject> deletedNodes)
         {
-            for (int i = 0; i < deletedNodes.Count; i++)
-            {
-                Tweens.Move(deletedNodes[i], new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), TimeForAnimation);
-            }
+                for (int i = 0; i < deletedNodes.Count; i++)
+                {
+                    Tweens.Move(deletedNodes[i], new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), TimeForAnimation);
+                }
 
-            yield return new WaitForSeconds(TimeToWait);
+                yield return new WaitForSeconds(TimeToWait);
 
-            for (int i = 0; i < deletedNodes.Count; i++)
-            {
-                Tweens.Move(deletedNodes[i], OldPositions[i], TimeForAnimation);
-            }
+                for (int i = 0; i < deletedNodes.Count; i++)
+                {
+                    Tweens.Move(deletedNodes[i], OldPositions[i], TimeForAnimation);
+                }
 
-            yield return new WaitForSeconds(TimeToWait);
-            InteractableObject.UnselectAll(true);
+                yield return new WaitForSeconds(TimeToWait);
+                InteractableObject.UnselectAll(true);
         }
 
         /// <summary>
