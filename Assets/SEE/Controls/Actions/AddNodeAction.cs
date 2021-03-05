@@ -168,37 +168,32 @@ namespace SEE.Controls.Actions
             // An anonymous delegate is registered for the event <see cref="ActionState.OnStateChanged"/>.
             // This delegate will be called from <see cref="ActionState"/> upon every
             // state changed where the passed parameter is the newly entered state.
-            ActionState.OnStateChanged += newState =>
+
+            // The MonoBehaviour is enabled and Update() will be called by Unity.
+            InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
+            InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
+            if (!instantiated)
             {
-                // Is this our action state where we need to do something?
-                if (Equals(newState, ThisActionState))
+                instantiated = true;
+            }
+            Debug.Log("StartWasRunned");
+
+            if (false)
+            {
+                if (!Network)
                 {
-                    // The MonoBehaviour is enabled and Update() will be called by Unity.
-                    InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
-                    InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
-                    if (!instantiated)
-                    {
-                        instantiated = true;
-                    }
-                    Debug.Log("StartWasRunned");
+                    // The monobehaviour is diabled and Update() no longer be called by Unity.
                 }
-                else
+                if (canvasObject.TryGetComponent(out CanvasGenerator canvasGenerator))
                 {
-                    if (!Network)
-                    {
-                        // The monobehaviour is diabled and Update() no longer be called by Unity.
-                    }
-                    if (canvasObject.TryGetComponent(out CanvasGenerator canvasGenerator))
-                    {
-                        canvasGenerator.DestroyAddNodeCanvasAction();
-                    }
-                    Undye();
-                    instantiated = false;
-                    InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
-                    InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
-                    hoveredObject = null;
+                    canvasGenerator.DestroyAddNodeCanvasAction();
                 }
-            };
+                Undye();
+                instantiated = false;
+                InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
+                InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
+                hoveredObject = null;
+            }
         }
 
         /// <summary>
@@ -391,7 +386,7 @@ namespace SEE.Controls.Actions
         /// It is important to set the id, city and isInnerNode first.
         /// </summary>
         public void NewNode()
-        {            
+        {
             Node node = new Node
             {
                 ID = NodeID,
@@ -399,13 +394,13 @@ namespace SEE.Controls.Actions
                 Type = Graph.UnknownType
             };
             AddNode(node);
-            
+
             if (IsInnerNode)
             {
                 GONode = city.Renderer.NewInnerNode(node);
                 GONode.transform.localScale = medianOfInnerNodes;
                 GONode.gameObject.GetComponent<Renderer>().material.color = innerNodeColor;
-            } 
+            }
             else
             {
                 GONode = city.Renderer.NewLeafNode(node);
@@ -603,6 +598,5 @@ namespace SEE.Controls.Actions
         {
             throw new NotImplementedException();
         }
-
     }
 }

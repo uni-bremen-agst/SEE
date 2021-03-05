@@ -36,7 +36,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject to;
 
-        private void Start()
+        public void Start()
         {
             // An anonymous delegate is registered for the event <see cref="ActionState.OnStateChanged"/>.
             // This delegate will be called from <see cref="ActionState"/> upon every
