@@ -20,6 +20,8 @@ namespace SEE.GO.Menu
         /// The UI object representing the indicator, which displays the current action state on the screen.
         /// </summary>
         private ActionStateIndicator Indicator;
+
+        private ActionHistory ah;
         
         /// <summary>
         /// This creates and returns the mode menu, with which you can select the active game mode.
@@ -94,6 +96,11 @@ namespace SEE.GO.Menu
             Indicator = CreateActionStateIndicator(gameObject);
 
             ActionState.OnStateChanged += OnStateChanged;
+            // Fixme: Has to be fixed - for all devices - just for testing
+            GameObject playersettings = GameObject.Find("Player Settings");
+            GameObject playerdesktop = GameObject.Find("Player Desktop");
+            ah = playerdesktop.GetComponent<ActionHistory>();
+
             Assert.IsTrue(ActionStateType.AllTypes.Count <= 9, 
                           "Only up to 9 (10 if zero is included) entries can be selected via the numbers on the keyboard!");
         }
@@ -106,7 +113,8 @@ namespace SEE.GO.Menu
         private void OnStateChanged(ActionStateType value)
         {
             ModeMenu.SelectEntry(value.Value);
-            Indicator.ChangeState(value);
+            Indicator.ChangeState(value, ah);
+
         }
 
         /// <summary>

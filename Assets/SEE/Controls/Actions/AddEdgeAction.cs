@@ -47,27 +47,23 @@ namespace SEE.Controls.Actions
                 if (Equals(newState, ThisActionState))
                 {
                     // The MonoBehaviour is enabled and Update() will be called by Unity.
-                    enabled = true;
                     InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
                 }
                 else
                 {
                     // The MonoBehaviour is disabled and Update() no longer be called by Unity.
-                    enabled = false;
                     InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
                     hoveredObject = null;
                 }
             };
-            enabled = ActionState.Is(ThisActionState);
         }
 
-        private void Update()
+        public override void Update()
         {
             if (!ActionState.Is(ThisActionState))
             {
-                enabled = false;
                 InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
                 InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
                 return;
@@ -134,12 +130,5 @@ namespace SEE.Controls.Actions
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Executes this DeleteAction
-        /// </summary>
-        public override void Execute()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

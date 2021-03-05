@@ -15,7 +15,7 @@ namespace SEE.Game.UI
         /// <summary>
         /// Text of the mode panel.
         /// </summary>
-        private TextMeshProUGUI ModePanelText;
+        public TextMeshProUGUI ModePanelText;
 
         /// <summary>
         /// Background image (color) of the mode panel.
@@ -59,10 +59,17 @@ namespace SEE.Game.UI
         /// Changes the indicator to display the new action state type.
         /// </summary>
         /// <param name="newState">New state which shall be displayed in the indicator</param>
-        public void ChangeState(ActionStateType newState)
+        public void ChangeState(ActionStateType newState, ActionHistory ah)
         {
             ModePanelImage.color = newState.Color.ColorWithAlpha(0.5f);
             ModePanelText.text = newState.Name;
+            Debug.Log(newState.Name);
+            if (newState.Name.Equals("New Node"))
+            {
+                AddNodeAction nodeAction = new AddNodeAction();
+                nodeAction.Start();
+                ah.ActionHistoryList.AddLast(nodeAction);
+            }
         }
     }
 }

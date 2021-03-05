@@ -157,12 +157,14 @@ namespace SEE.Controls.Actions
         public void Start()
         {
             listOfRoots = new List<GameObject>();
+            Debug.Log(1);
             if (!InitializeCanvasObject())
             {
                 Debug.LogError($"No canvas object named {nameOfCanvasObject} could be found in the scene.\n");
-                enabled = false;
                 return;
             }
+            Debug.Log(2);
+            Debug.Log(ThisActionState + "Thisactionstate");
             // An anonymous delegate is registered for the event <see cref="ActionState.OnStateChanged"/>.
             // This delegate will be called from <see cref="ActionState"/> upon every
             // state changed where the passed parameter is the newly entered state.
@@ -172,23 +174,19 @@ namespace SEE.Controls.Actions
                 if (Equals(newState, ThisActionState))
                 {
                     // The MonoBehaviour is enabled and Update() will be called by Unity.
-                    if (!Network)
-                    {
-                        enabled = true;
-                    }
                     InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
                     if (!instantiated)
                     {
                         instantiated = true;
                     }
+                    Debug.Log("StartWasRunned");
                 }
                 else
                 {
                     if (!Network)
                     {
                         // The monobehaviour is diabled and Update() no longer be called by Unity.
-                        enabled = false;
                     }
                     if (canvasObject.TryGetComponent(out CanvasGenerator canvasGenerator))
                     {
@@ -201,7 +199,6 @@ namespace SEE.Controls.Actions
                     hoveredObject = null;
                 }
             };
-            enabled = ActionState.Is(ThisActionState);
         }
 
         /// <summary>
@@ -213,7 +210,7 @@ namespace SEE.Controls.Actions
         /// ValuesAreGiven: Moves the node and waits for a mouseInput to place the node, if its inside of the previous chosen city
         /// AddingIsCanceled: Removes all attributes and states and resets the progress-state to noCitySelected
         /// </summary>
-        public void Update()
+        public override void Update()
         {
             // Removes the canvasObject and extracts the inserted values from it for the new node to be created in next state.
             void RemoveCanvas()
@@ -456,7 +453,7 @@ namespace SEE.Controls.Actions
                 else
                 {
                     new AddNodeNetAction(rndObjectInCity.name, IsInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, "", true, false, true).Execute();
-                    Destroy(GONode);
+                    Destroyer.DestroyGameObject(GONode);
                 }
                 Progress = ProgressState.NoCitySelected;
                 GONode = null;
@@ -607,12 +604,5 @@ namespace SEE.Controls.Actions
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Executes this DeleteAction
-        /// </summary>
-        public override void Execute()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

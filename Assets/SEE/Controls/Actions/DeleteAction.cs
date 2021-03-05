@@ -98,28 +98,24 @@ namespace SEE.Controls.Actions
                 {
                     // The MonoBehaviour is enabled and Update() will be called by Unity.
                     UndoInitialisation();
-                    enabled = true;
                     InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
                     InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
                 }
                 else
                 {
                     // The MonoBehaviour is disabled and Update() no longer be called by Unity.
-                    enabled = false;
                     InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
                     InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
                 }
             };
-            enabled = ActionState.Is(ThisActionState);
         }
 
-        private void Update()
+        public override void Update()
         {
             // This script should be disabled, if the action state is not this action's type
             if (!ActionState.Is(ThisActionState))
             {
                 // The MonoBehaviour is disabled and Update() no longer be called by Unity.
-                enabled = false;
                 InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
                 InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
                 return;
@@ -141,7 +137,7 @@ namespace SEE.Controls.Actions
                 {
                     DeleteAction deleteAction = (DeleteAction)actionHistory.ActionHistoryList.Last();
                     List<GameObject> objectToBeMoved = deleteAction.DeletedNodes;
-                    StartCoroutine(RemoveNodeFromGarbage(objectToBeMoved));
+                 //   StartCoroutine(RemoveNodeFromGarbage(objectToBeMoved));
                 }
                 catch (InvalidOperationException)
                 {
@@ -173,7 +169,7 @@ namespace SEE.Controls.Actions
                         return;
                     }
                     List<GameObject> allNodesToBeDeleted = GameObjectTraversion.GetAllChildNodes(new List<GameObject>(), selectedObject);
-                    StartCoroutine(MoveNodeToGarbage(allNodesToBeDeleted));
+                  //  StartCoroutine(MoveNodeToGarbage(allNodesToBeDeleted));
                 }
             }
         }
@@ -210,14 +206,6 @@ namespace SEE.Controls.Actions
         /// Redoes this DeleteAction
         /// </summary>
         public override void Redo()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Executes this DeleteAction
-        /// </summary>
-        public override void Execute()
         {
             throw new NotImplementedException();
         }

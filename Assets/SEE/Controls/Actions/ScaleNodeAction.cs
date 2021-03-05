@@ -154,14 +154,12 @@ namespace SEE.Controls.Actions
                 if (Equals(newState, ThisActionState))
                 {
                     // The MonoBehaviour is enabled and Update() will be called by Unity.
-                    enabled = true;
                     InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
                 }
                 else
                 {
                     // The MonoBehaviour is disabled and Update() no longer be called by Unity.
-                    enabled = false;
                     InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
                     hoveredObject = null;
@@ -170,10 +168,9 @@ namespace SEE.Controls.Actions
                     objectToScale = null;
                 }
             };
-            enabled = ActionState.Is(ThisActionState);
         }
 
-        private void Update()
+        public override void Update()
         {
             if (objectToScale != null && instantiated == false)
             {
@@ -537,17 +534,17 @@ namespace SEE.Controls.Actions
         /// </summary>
         public void RemoveSpheres()
         {
-            Destroy(topSphere);
-            Destroy(firstCornerSphere);
-            Destroy(secondCornerSphere);
-            Destroy(thirdCornerSphere);
-            Destroy(forthCornerSphere);
-            Destroy(firstSideSphere);
-            Destroy(secondSideSphere);
-            Destroy(thirdSideSphere);
-            Destroy(forthSideSphere);
-            Destroy(endWithSave);
-            Destroy(endWithOutSave);
+            Destroyer.DestroyGameObject(topSphere);
+            Destroyer.DestroyGameObject(firstCornerSphere);
+            Destroyer.DestroyGameObject(secondCornerSphere);
+            Destroyer.DestroyGameObject(thirdCornerSphere);
+            Destroyer.DestroyGameObject(forthCornerSphere);
+            Destroyer.DestroyGameObject(firstSideSphere);
+            Destroyer.DestroyGameObject(secondSideSphere);
+            Destroyer.DestroyGameObject(thirdSideSphere);
+            Destroyer.DestroyGameObject(forthSideSphere);
+            Destroyer.DestroyGameObject(endWithSave);
+            Destroyer.DestroyGameObject(endWithOutSave);
             objectToScale = null;
             instantiated = false;
         }
@@ -568,12 +565,5 @@ namespace SEE.Controls.Actions
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Executes this DeleteAction
-        /// </summary>
-        public override void Execute()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
