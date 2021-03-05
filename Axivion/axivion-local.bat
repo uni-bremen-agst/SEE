@@ -7,8 +7,9 @@ REM user workspace (generally the home directory or the Jenkins workspace)
 set "USERWORKSPACE=%userprofile%"
 
 REM Python
-set "PATH=C:\Users\SWT\AppData\Local\Programs\Python\Python38;%PATH%"
-set "BAUHAUS_PYTHON=C:\Users\SWT\AppData\Local\Programs\Python\Python38\python.exe"
+REM set "PATH=C:\Users\SWT\AppData\Local\Programs\Python\Python38;%PATH%"
+REM set "BAUHAUS_PYTHON=C:\Users\SWT\AppData\Local\Programs\Python\Python38\python.exe"
+REM set "BAUHAUS_PYTHON=python.exe"
 
 REM include Bauhaus bin in exectuable path
 set "PATH=C:\Program Files (x86)\Bauhaus\bin;%PATH%"
