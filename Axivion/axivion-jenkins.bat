@@ -3,6 +3,11 @@ REM run the Axivion Suite tools and then executes the command line parameters
 REM passed to this batch file. If there are none, only the variables are
 REM set.
 
+REM Because this batch script is called by Jenkins, we apparently need to
+REM call this first to avoid failing with an error because of the error
+REM "The system cannot find the path specified.":
+cmd.exe /c
+
 REM user workspace (generally the home directory or the Jenkins workspace)
 set "USERWORKSPACE=%WORKSPACE%"
 
