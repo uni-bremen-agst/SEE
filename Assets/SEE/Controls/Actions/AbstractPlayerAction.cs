@@ -43,7 +43,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The name of the garbage can gameObject.
         /// </summary>
-        private const string GarbageCanName = "GarbageCan";
+        protected const string GarbageCanName = "GarbageCan";
 
         /// <summary>
         /// Finds the GameObject that contains the CanvasOperations and components
@@ -54,15 +54,6 @@ namespace SEE.Controls.Actions
         {
             canvasObject = GameObject.Find(nameOfCanvasObject);
             return canvasObject != null;
-        }
-
-        /// <summary>
-        /// Finds the gameObject that are responsible for an undo.
-        /// </summary>
-        protected void UndoInitialisation()
-        {
-            garbageCan = GameObject.Find(GarbageCanName);
-            garbageCan?.TryGetComponent(out this.actionHistory);
         }
 
         /// <summary>
@@ -80,6 +71,15 @@ namespace SEE.Controls.Actions
         /// </summary>
         public abstract void Update();
 
+        public void GetActionHistory()
+        {
+            GameObject playerSettings = GameObject.Find("Player Settings");
+            Debug.Log(playerSettings);
+            ActionHistory actionHistory = playerSettings.GetComponentInChildren<ActionHistory>();
+            Debug.Log(actionHistory);
+            this.actionHistory = actionHistory;
+
+        }
         /// <summary>
         /// Sets <see cref="hoveredObject"/> to given <paramref name="interactableObject"/>.
         /// Will be called while any <see cref="InteractableObject"/> is being hovered over.
