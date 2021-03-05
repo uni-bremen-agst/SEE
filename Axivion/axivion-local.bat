@@ -33,5 +33,27 @@ REM start and stop it as follows:
 REM   net (start|stop) "axivion_dashboard_service"
 REM or use the Windows Services Console (services.msc).
 
-REM execute command line parameters
-%*
+REM Count the number of command-line parameters
+setlocal enabledelayedexpansion
+set argCount=0
+for %%x in (%*) do (
+   set /A argCount+=1
+)
+
+REM echo "Number of processed arguments: %argCount%"
+
+REM Execute command line parameters if there are any.
+IF %argCount% == 0 (
+  echo "No parameters to be executed given"
+) ELSE (
+  REM We are executing only the first parameter. If this parameter is 
+  REM an executable with other parameters, the executable and its
+  REM parameters must be enclosed in double quotes.
+  
+  REM %*
+  %~1
+)
+
+REM Exit with error code of last executed command (echo if no parameters were given;
+REM and otherwise the result of the executed command-line parameters).
+exit /b %ERRORLEVEL%
