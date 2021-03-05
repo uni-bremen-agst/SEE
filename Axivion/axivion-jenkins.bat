@@ -13,6 +13,8 @@ set "BAUHAUS_PYTHON=C:\Users\SWT\AppData\Local\Programs\Python\Python38\python.e
 REM include Bauhaus bin in exectuable path
 set "PATH=C:\Program Files (x86)\Bauhaus\bin;%PATH%"
 
+echo "%PATH%"
+
 REM SEE project directory
 set "SEEDIRECTORY=%USERWORKSPACE%"
 
@@ -37,14 +39,24 @@ REM or use the Windows Services Console (services.msc).
 REM The Visual Studio .csproj files need to be created before we can start the build.
 "C:\Program Files\Unity\Hub\Editor\2019.4.21f1\Editor\Unity.exe" -batchmode -nographics -logFile - -executeMethod UnityEditor.SyncVS.SyncSolution -projectPath . -quit
 
-REM Execute command line parameters if there are any.
-IF [%1]==[] (
-	echo "No parameters to be executed given"
-) ELSE (    
-    %*
+REM Count the number of command-line parameters
+setlocal enabledelayedexpansion
+set argCount=0
+for %%x in (%*) do (
+   set /A argCount+=1
 )
 
-REM Exit with error code of last executed command (echo if no parameters were given;
-REM and otherwise the result of the executed command-line parameters).
-exit /b %ERRORLEVEL%
+REM echo "Number of processed arguments: %argCount%"
+
+REM Execute command line parameters if there are any.
+IF %argCount% == 0 (
+  echo "No parameters to be executed given"
+) ELSE (
+  REM We are executing only the first parameter. If this parameter is 
+  REM an executable with other parameters, the executable and its
+  REM parameters must be enclosed in double quotes.
+  
+  REM %*
+  %~1
+)
 
