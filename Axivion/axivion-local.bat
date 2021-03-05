@@ -3,12 +3,18 @@ REM run the Axivion Suite tools and then executes the command line parameters
 REM passed to this batch file. If there are none, only the variables are
 REM set.
 
+REM Because this batch script is called by Jenkins, we apparently need to
+REM call this first to avoid failing with an error because of the error
+REM "The system cannot find the path specified.":
+cmd.exe /c
+
 REM user workspace (generally the home directory or the Jenkins workspace)
 set "USERWORKSPACE=%userprofile%"
 
 REM Python
-set "PATH=C:\Users\SWT\AppData\Local\Programs\Python\Python38;%PATH%"
-set "BAUHAUS_PYTHON=C:\Users\SWT\AppData\Local\Programs\Python\Python38\python.exe"
+REM set "PATH=C:\Users\SWT\AppData\Local\Programs\Python\Python38;%PATH%"
+REM set "BAUHAUS_PYTHON=C:\Users\SWT\AppData\Local\Programs\Python\Python38\python.exe"
+REM set "BAUHAUS_PYTHON=python.exe"
 
 REM include Bauhaus bin in exectuable path
 set "PATH=C:\Program Files (x86)\Bauhaus\bin;%PATH%"
