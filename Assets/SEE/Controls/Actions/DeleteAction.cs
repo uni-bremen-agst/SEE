@@ -89,25 +89,19 @@ namespace SEE.Controls.Actions
 
         public void Start()
         {
-            // An anonymous delegate is registered for the event <see cref="ActionState.OnStateChanged"/>.
-            // This delegate will be called from <see cref="ActionState"/> upon every
-            // state changed where the passed parameter is the newly entered state.
-            ActionState.OnStateChanged += newState =>
-            {
-                if (Equals(newState, ThisActionState))
-                {
-                    // The MonoBehaviour is enabled and Update() will be called by Unity.
-                    UndoInitialisation();
-                    InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
-                    InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
-                }
-                else
-                {
-                    // The MonoBehaviour is disabled and Update() no longer be called by Unity.
-                    InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
-                    InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
-                }
-            };
+            // The MonoBehaviour is enabled and Update() will be called by Unity.
+            UndoInitialisation();
+            InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
+            InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
+        }
+
+        /// <summary>
+        /// Finds the gameObject that are responsible for an undo.
+        /// </summary>
+        protected void UndoInitialisation()
+        {
+            garbageCan = GameObject.Find(GarbageCanName);
+            garbageCan?.TryGetComponent(out this.actionHistory);
         }
 
         public override void Update()
@@ -130,20 +124,6 @@ namespace SEE.Controls.Actions
                 DeleteSelectedObject(selectedObject);
             }
 
-            // Undo last deletion
-            if (Input.GetKeyDown(KeyCode.Z))
-            {
-                try
-                {
-                    DeleteAction deleteAction = (DeleteAction)actionHistory.ActionHistoryList.Last();
-                    List<GameObject> objectToBeMoved = deleteAction.DeletedNodes;
-                 //   StartCoroutine(RemoveNodeFromGarbage(objectToBeMoved));
-                }
-                catch (InvalidOperationException)
-                {
-                    Debug.LogError("No history detected");
-                }
-            }
         }
 
         /// <summary>
@@ -168,8 +148,9 @@ namespace SEE.Controls.Actions
                         Debug.LogError("Root shall not be deleted");
                         return;
                     }
-                    List<GameObject> allNodesToBeDeleted = GameObjectTraversion.GetAllChildNodes(new List<GameObject>(), selectedObject);
-                  //  StartCoroutine(MoveNodeToGarbage(allNodesToBeDeleted));
+                    DeletedNodes = GameObjectTraversion.GetAllChildNodes(new List<GameObject>(), selectedObject);
+                    GetActionHistory();
+                    actionHistory.StartCoroutine(this.MoveNodeToGarbage(DeletedNodes));
                 }
             }
         }
@@ -179,6 +160,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Undo()
         {
+            GetActionHistory();
+            actionHistory.StartCoroutine(this.RemoveNodeFromGarbage(DeletedNodes));
             foreach (GameObject node in DeletedNodes)
             {
                 if (node.TryGetComponentOrLog(out NodeRef nodeRef))
@@ -216,7 +199,7 @@ namespace SEE.Controls.Actions
         private IEnumerator MoveNodeToGarbage(List<GameObject> deletedNodes)
         {
             List<Vector3> oldPositions = new List<Vector3>();
-            
+
             foreach (GameObject deletedNode in deletedNodes)
             {
                 if (deletedNode.CompareTag(Tags.Node))
@@ -252,24 +235,19 @@ namespace SEE.Controls.Actions
         /// <returns>the waiting time between moving deleted nodes from the garbage-can and then to the city</returns>
         private IEnumerator RemoveNodeFromGarbage(List<GameObject> deletedNodes)
         {
-            // In case that the deleted object is a single edge - waiting-time is unintended
-            if (deletedNodes.Count != 0)
+            for (int i = 0; i < deletedNodes.Count; i++)
             {
-                for (int i = 0; i < deletedNodes.Count; i++)
-                {
-                        Tweens.Move(deletedNodes[i], new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), TimeForAnimation);
-                }
-
-                yield return new WaitForSeconds(TimeToWait);
-
-                for (int i = 0; i < deletedNodes.Count; i++)
-                {
-                        Tweens.Move(deletedNodes[i], OldPositions[i], TimeForAnimation);
-                }
-
-                yield return new WaitForSeconds(TimeToWait);
+                Tweens.Move(deletedNodes[i], new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), TimeForAnimation);
             }
-            Undo();
+
+            yield return new WaitForSeconds(TimeToWait);
+
+            for (int i = 0; i < deletedNodes.Count; i++)
+            {
+                Tweens.Move(deletedNodes[i], OldPositions[i], TimeForAnimation);
+            }
+
+            yield return new WaitForSeconds(TimeToWait);
             InteractableObject.UnselectAll(true);
         }
 
@@ -336,7 +314,10 @@ namespace SEE.Controls.Actions
 
             oldPositionsOfDeletedNodes.Reverse();
             nodesAndAscendingEdges.Reverse();
-            actionHistory.ActionHistoryList.Add(new DeleteAction(nodesAndAscendingEdges, oldPositionsOfDeletedNodes, edgesToHide, graph));
+            DeletedNodes = nodesAndAscendingEdges;
+            OldPositions = oldPositionsOfDeletedNodes;
+            DeletedEdges = edgesToHide;
+            Graph = graph;
         }
 
 
