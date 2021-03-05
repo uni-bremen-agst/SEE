@@ -74,9 +74,7 @@ namespace SEE.Controls.Actions
         public void GetActionHistory()
         {
             GameObject playerSettings = GameObject.Find("Player Settings");
-            Debug.Log(playerSettings);
             ActionHistory actionHistory = playerSettings.GetComponentInChildren<ActionHistory>();
-            Debug.Log(actionHistory);
             this.actionHistory = actionHistory;
 
         }

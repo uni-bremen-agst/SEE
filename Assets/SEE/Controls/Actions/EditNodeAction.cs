@@ -9,20 +9,6 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class EditNodeAction : AbstractPlayerAction
     {
-        /// <summary>
-        /// Start() will register an anonymous delegate of type 
-        /// <see cref="ActionState.OnStateChangedFn"/> on the event
-        /// <see cref="ActionState.OnStateChanged"/> to be called upon every
-        /// change of the action state, where the newly entered state will
-        /// be passed as a parameter. The anonymous delegate will compare whether
-        /// this state equals <see cref="ThisActionState"/> and if so, execute
-        /// what needs to be done for this action here. If that parameter is
-        /// different from <see cref="ThisActionState"/>, this action will
-        /// put itself to sleep. 
-        /// Thus, this action will be executed only if the new state is 
-        /// <see cref="ThisActionState"/>.
-        /// </summary>
-        private readonly ActionStateType ThisActionState = ActionStateType.EditNode;
 
         /// <summary>
         /// The life cycle of this edit action.
@@ -46,27 +32,9 @@ namespace SEE.Controls.Actions
                 Debug.LogError($"No canvas object named {nameOfCanvasObject} could be found in the scene.\n");
                 return;
             }
-            ActionState.OnStateChanged += newState =>
-            {
-                // Is this our action state where we need to do something?
-                if (Equals(newState, ThisActionState))
-                {
-                    // The MonoBehaviour is enabled and Update() will be called by Unity.
-                    InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
-                    InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
-                    instantiated = true;
-                }
-                else
-                {
-                    // The MonoBehaviour is disabled and Update() no longer be called by Unity.
-                    canvasObject.TryGetComponentOrLog(out CanvasGenerator canvasGenerator);
-                    canvasGenerator.DestroyEditNodeCanvasAction();
-                    instantiated = false;
-                    InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
-                    InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
-                    hoveredObject = null;
-                }
-            };
+            InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
+            InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
+            instantiated = true;
         }
 
         /// <summary>
@@ -113,7 +81,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Undo()
         {
-            throw new NotImplementedException();
+            Debug.Log("Undo EditNode");
         }
 
         /// <summary>
@@ -121,7 +89,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Redo()
         {
-            throw new NotImplementedException();
+            Debug.Log("Redo EditNode");
         }
 
     }
