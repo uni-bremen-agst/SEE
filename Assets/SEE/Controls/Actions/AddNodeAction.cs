@@ -588,7 +588,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Undo()
         {
-            throw new NotImplementedException();
+            Debug.Log("UNDO ADDNODE");
         }
 
         /// <summary>
@@ -596,7 +596,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Redo()
         {
-            throw new NotImplementedException();
+            Debug.Log("REDO ADDNODE");
         }
     }
 }
