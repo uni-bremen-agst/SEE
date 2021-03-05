@@ -64,6 +64,13 @@ namespace SEE.Game.UI
             ModePanelImage.color = newState.Color.ColorWithAlpha(0.5f);
             ModePanelText.text = newState.Name;
 
+            GameObject playerSettings = GameObject.Find("Player Settings");
+            ActionHistory actionHistory = playerSettings.GetComponentInChildren<ActionHistory>();
+            if(actionHistory.ActionHistoryList.Count != 0)
+            {
+                actionHistory.ActionHistoryList.Remove(actionHistory.ActionHistoryList[actionHistory.ActionHistoryList.Count - 1]);
+                actionHistory.Pointer--;
+            }
             if (newState.Name.Equals("New Node"))
             {
                 AddNodeAction nodeAction = new AddNodeAction();
