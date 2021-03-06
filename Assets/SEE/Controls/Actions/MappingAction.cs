@@ -110,7 +110,7 @@ namespace SEE.Controls.Actions
         private readonly HashSet<Selection> objectsInClipboard = new HashSet<Selection>();
 
         // Use this for initialization
-        public void Start()
+        public override void Start()
         {
             if (Architecture == null)
             {
@@ -766,12 +766,17 @@ namespace SEE.Controls.Actions
 
         public override void Undo()
         {
-            throw new System.NotImplementedException();
+            Debug.Log("Undo Mapping");
         }
 
         public override void Redo()
         {
-            throw new System.NotImplementedException();
+            Debug.Log("Redo Mapping");
+        }
+
+        public override AbstractPlayerAction CreateNew()
+        {
+            return new MappingAction();
         }
     }
 }

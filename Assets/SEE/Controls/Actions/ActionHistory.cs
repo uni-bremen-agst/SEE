@@ -9,48 +9,41 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class ActionHistory : MonoBehaviour
     {
-        /// <summary>
-        /// A history of all actions of the user for the possibility of an undo. 
-        /// </summary>
-        public List<AbstractPlayerAction> ActionHistoryList { get; set; } = new List<AbstractPlayerAction>();
+        public Stack<AbstractPlayerAction> HistoryStack { get; set; } = new Stack<AbstractPlayerAction>();
+
+        public Stack<AbstractPlayerAction> UndoStack { get; set; } = new Stack<AbstractPlayerAction>();
+
+        public Stack<AbstractPlayerAction> RedoStack { get; set; } = new Stack<AbstractPlayerAction>();
 
         public bool AnotherOperation { get; set; } = false;
 
-        public int Pointer { get; set; } = -1;
-
         public void Update()
         {
-            if (AnotherOperation)
+            if (HistoryStack.Count != 0)
             {
-                DeleteAction nextDeleteAction = new DeleteAction();
-                nextDeleteAction.Start();
-                ActionHistoryList.Add(nextDeleteAction);
-                AnotherOperation = false;
-            }
-            if (ActionHistoryList.Count != 0)
-            {
-                ActionHistoryList[ActionHistoryList.Count-1].Update();
-            }
-            if (Pointer > -2)
-            {
-                if (Input.GetKey(KeyCode.LeftShift))
+                if (HistoryStack.Peek().CurrentState.Equals(AbstractPlayerAction.CurrentActionState.Running))
                 {
-                    if (Input.GetKeyDown(KeyCode.Z))
-                    {
-                        Pointer++;
-                        Debug.Log("POINTER" + Pointer);
-                        ActionHistoryList[Pointer].Redo();
-                        Debug.Log(ActionHistoryList[Pointer]);
-                        Debug.Log("Redo" + Pointer);
-                    }
-                    return;
+                    HistoryStack.Peek().Update();
                 }
+                if (HistoryStack.Peek().CurrentState.Equals(AbstractPlayerAction.CurrentActionState.Executed))
+                {
+                    UndoStack.Push(HistoryStack.Peek());
+                    HistoryStack.Push(HistoryStack.Peek().CreateNew());
+                    HistoryStack.Peek().Start();
+                    RedoStack.Clear();
+                }
+            }
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
                 if (Input.GetKeyDown(KeyCode.Z))
                 {
-                    ActionHistoryList[Pointer].Undo();
-                    Pointer--;
-                    Debug.Log("Undo" + Pointer);
+                    Redo();
                 }
+                return;
+            }
+            if (Input.GetKeyDown(KeyCode.Z))
+            {
+                Undo();
             }
         }
 
@@ -64,7 +57,17 @@ namespace SEE.Controls.Actions
         /// </summary>
         public void Undo()
         {
-            ActionHistoryList[Pointer].Undo();
+            if (UndoStack.Count >= 1)
+            {
+                AbstractPlayerAction undoneAction = UndoStack.Peek();
+                UndoStack.Pop().Undo();
+                RedoStack.Push(undoneAction);
+                Debug.Log("RedoStackSize: " + RedoStack.Count);
+            }
+            else
+            {
+                Debug.LogError("UndoStack is empty\n");
+            }
         }
 
         /// <summary>
@@ -72,7 +75,17 @@ namespace SEE.Controls.Actions
         /// </summary>
         public void Redo()
         {
-            ActionHistoryList[Pointer].Redo();
+            if (RedoStack.Count != 0)
+            {
+                AbstractPlayerAction redoneAction = RedoStack.Peek();
+                RedoStack.Pop().Redo();
+                UndoStack.Push(redoneAction);
+                Debug.Log("UndoStackSize: " + UndoStack.Count);
+            }
+            else
+            {
+                Debug.LogError("RedoStack is empty\n");
+            }
         }
 
     }

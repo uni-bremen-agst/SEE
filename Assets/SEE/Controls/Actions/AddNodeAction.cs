@@ -140,7 +140,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public ProgressState Progress { get; set; } = ProgressState.NoCitySelected;
 
-        public void Start()
+        public override void Start()
         {
             listOfRoots = new List<GameObject>();
             if (!InitializeCanvasObject())
@@ -225,7 +225,8 @@ namespace SEE.Controls.Actions
                         if (Input.GetMouseButtonDown(0))
                         {
                             Place();
-                            actionHistory.Pointer++;
+                            CurrentState = CurrentActionState.Executed;
+
                         }
                     }
                     break;
@@ -569,6 +570,11 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             Debug.Log("REDO ADDNODE");
+        }
+
+        public override AbstractPlayerAction CreateNew()
+        {
+            return new AddNodeAction();
         }
     }
 }

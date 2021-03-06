@@ -146,7 +146,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject objectToScale;
 
-        public void Start()
+        public override void Start()
         {
                     InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
                     InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
@@ -259,6 +259,8 @@ namespace SEE.Controls.Actions
                     else if (hit.collider == endWithSave.GetComponent<Collider>())
                     {
                         EndScale(true);
+                        CurrentState = CurrentActionState.Executed;
+
                     }
                     else if (hit.collider == endWithOutSave.GetComponent<Collider>())
                     {
@@ -502,7 +504,6 @@ namespace SEE.Controls.Actions
                 // FIXME: Currently, the changes will not be saved after closing the game. 
                 // SAVE THE CHANGES
                 RemoveSpheres();
-                actionHistory.Pointer++;
             }
             else
             {
@@ -549,5 +550,9 @@ namespace SEE.Controls.Actions
             Debug.Log("Redo ScaleNode");
         }
 
+        public override AbstractPlayerAction CreateNew()
+        {
+            return new ScaleNodeAction();
+        }
     }
 }
