@@ -209,8 +209,7 @@ namespace SEE.DataModel.DG.IO
                         }
                         catch (Exception e)
                         {
-                            LogError(e.Message);
-                            throw e;
+                            LogError($"Node ID {node.ID} is not unique: {e.Message}. This node will be ignored.");
                         }
                     }
                     else
@@ -357,8 +356,15 @@ namespace SEE.DataModel.DG.IO
                         edge.Target.AddChild(edge.Source);
                     }
                     else
-                    {  // non-hierarchical edges are added to the graph
-                        graph.AddEdge(edge);
+                    {  // non-hierarchical edges are added to the graph                        
+                        try
+                        {
+                            graph.AddEdge(edge);
+                        }
+                        catch (Exception e)
+                        {
+                            LogError($"Edge {edge} cannot be added to the graph: {e.Message}. This edge will be ignored.");
+                        }
                     }
                 }
                 current = null;
