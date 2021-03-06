@@ -16,7 +16,7 @@ namespace SEE.Controls.Actions
     /// This action assumes that it is attached to a game object representing
     /// the reflexion analysis during the game. 
     /// </summary>
-    public class MappingAction : AbstractPlayerAction, Observer
+    public class MappingAction : CityAction, Observer
     {
         private const float SelectedAlpha = 0.8f;
 
@@ -110,7 +110,7 @@ namespace SEE.Controls.Actions
         private readonly HashSet<Selection> objectsInClipboard = new HashSet<Selection>();
 
         // Use this for initialization
-        public override void Start()
+        public void Start()
         {
             if (Architecture == null)
             {
@@ -383,7 +383,7 @@ namespace SEE.Controls.Actions
         SpinningCube spinningCube;
 
         // Update is called once per frame
-        public override void Update()
+        public void Update()
         {
             // This script should be disabled, if the action state is not 'Map'
             if (!ActionState.Is(ActionStateType.Map))
@@ -764,19 +764,5 @@ namespace SEE.Controls.Actions
             Debug.Log(mapsToEdgeRemoved.ToString());
         }
 
-        public override void Undo()
-        {
-            Debug.Log("Undo Mapping");
-        }
-
-        public override void Redo()
-        {
-            Debug.Log("Redo Mapping");
-        }
-
-        public override AbstractPlayerAction CreateNew()
-        {
-            return new MappingAction();
-        }
     }
 }
