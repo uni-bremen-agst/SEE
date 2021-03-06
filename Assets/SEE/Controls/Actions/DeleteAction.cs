@@ -78,15 +78,15 @@ namespace SEE.Controls.Actions
 
         public override void Update()
         {
-
             // Delete a gameobject and all children
-            if (selectedObject != null && Input.GetMouseButtonDown(0))
+            if (selectedObject != null)
             {
-                Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
+                GameObject selected = selectedObject;
+                Assert.IsTrue(selected.HasNodeRef() || selected.HasEdgeRef());
                 // FIXME:(Thore) NetAction is no longer up to date
-                new DeleteNetAction(selectedObject.name).Execute(null);
-                DeleteSelectedObject(selectedObject);
-                deletedParent = selectedObject;
+                new DeleteNetAction(selected.name).Execute(null);
+                DeleteSelectedObject(selected);
+                deletedParent = selected;
                 actionHistory.AnotherOperation = true;
             }
 
@@ -100,7 +100,7 @@ namespace SEE.Controls.Actions
         /// <param GameObject="selectedObject">selected GameObject that along with its children should be removed</param>
         public void DeleteSelectedObject(GameObject selectedObject)
         {
-            if(selectedObject == null)
+            if (selectedObject == null)
             {
                 return;
             }
@@ -209,20 +209,20 @@ namespace SEE.Controls.Actions
         /// <returns>the waiting time between moving deleted nodes from the garbage-can and then to the city</returns>
         private IEnumerator RemoveNodeFromGarbage(List<GameObject> deletedNodes)
         {
-                for (int i = 0; i < deletedNodes.Count; i++)
-                {
-                    Tweens.Move(deletedNodes[i], new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), TimeForAnimation);
-                }
+            for (int i = 0; i < deletedNodes.Count; i++)
+            {
+                Tweens.Move(deletedNodes[i], new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), TimeForAnimation);
+            }
 
-                yield return new WaitForSeconds(TimeToWait);
+            yield return new WaitForSeconds(TimeToWait);
 
-                for (int i = 0; i < deletedNodes.Count; i++)
-                {
-                    Tweens.Move(deletedNodes[i], OldPositions[i], TimeForAnimation);
-                }
+            for (int i = 0; i < deletedNodes.Count; i++)
+            {
+                Tweens.Move(deletedNodes[i], OldPositions[i], TimeForAnimation);
+            }
 
-                yield return new WaitForSeconds(TimeToWait);
-                InteractableObject.UnselectAll(true);
+            yield return new WaitForSeconds(TimeToWait);
+            InteractableObject.UnselectAll(true);
         }
 
         /// <summary>
