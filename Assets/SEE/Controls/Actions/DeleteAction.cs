@@ -54,27 +54,12 @@ namespace SEE.Controls.Actions
 
         public GameObject deletedParent;
 
-        /// <summary>
-        /// Constructor for UndoActions
-        /// </summary>
-        /// <param name="deletedNodes">the deleted nodes</param>
-        /// <param name="oldPositions">the positions of the deleted nodes</param>
-        /// <param name="deletedEdges">the deleted edges</param>
-        /// <param name="graph">the graph which has the deleted node attached</param>
-        public DeleteAction(List<GameObject> deletedNodes, List<Vector3> oldPositions, List<GameObject> deletedEdges, Graph graph)
+        public override AbstractPlayerAction CreateNew()
         {
-            this.DeletedNodes = deletedNodes;
-            this.OldPositions = oldPositions;
-            this.DeletedEdges = deletedEdges;
-            this.Graph = graph;
+            return new DeleteAction();
         }
 
-        public DeleteAction()
-        {
-            // Necessary for ActionStates
-        }
-
-        public void Start()
+        public override void Start()
         {
             // The MonoBehaviour is enabled and Update() will be called by Unity.
             UndoInitialisation();
@@ -102,8 +87,6 @@ namespace SEE.Controls.Actions
                 new DeleteNetAction(selectedObject.name).Execute(null);
                 DeleteSelectedObject(selectedObject);
                 deletedParent = selectedObject;
-                actionHistory.Pointer++;
-                Debug.Log("Pointer erhöht");
                 actionHistory.AnotherOperation = true;
             }
 
@@ -139,7 +122,7 @@ namespace SEE.Controls.Actions
                     GetActionHistory();
                     actionHistory.StartCoroutine(this.MoveNodeToGarbage(DeletedNodes));
                 }
-
+                CurrentState = CurrentActionState.Executed;
             }
         }
 

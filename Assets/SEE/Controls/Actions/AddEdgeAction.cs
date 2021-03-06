@@ -22,7 +22,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject to;
 
-        public void Start()
+        public override void Start()
         {
 
                     InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
@@ -58,7 +58,7 @@ namespace SEE.Controls.Actions
                         {
                             city.Renderer.DrawEdge(from, to);
                             new AddEdgeNetAction(from.name, to.name).Execute();
-                            actionHistory.Pointer++;
+                            CurrentState = CurrentActionState.Executed;
                         }
                         catch (Exception e)
                         {
@@ -93,5 +93,9 @@ namespace SEE.Controls.Actions
             Debug.Log("Redo AddEdge");
         }
 
+        public override AbstractPlayerAction CreateNew()
+        {
+            return new AddEdgeAction();
+        }
     }
 }

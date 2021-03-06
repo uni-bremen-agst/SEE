@@ -56,6 +56,14 @@ namespace SEE.Controls.Actions
             return canvasObject != null;
         }
 
+        public enum CurrentActionState
+        {
+            Running,
+            Executed,
+        }
+
+        public CurrentActionState CurrentState { get; set; } = CurrentActionState.Running;
+
         /// <summary>
         /// The undo operation which has to be implemented specifically by subclasses.
         /// </summary>
@@ -66,10 +74,14 @@ namespace SEE.Controls.Actions
         /// </summary>
         public abstract void Redo();
 
+        public abstract void Start();
+
         /// <summary>
         /// The operation which has to be done in the specific subclass.
         /// </summary>
         public abstract void Update();
+
+        public abstract AbstractPlayerAction CreateNew();
 
         public void GetActionHistory()
         {

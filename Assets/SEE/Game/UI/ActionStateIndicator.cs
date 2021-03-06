@@ -66,34 +66,35 @@ namespace SEE.Game.UI
 
             GameObject playerSettings = GameObject.Find("Player Settings");
             ActionHistory actionHistory = playerSettings.GetComponentInChildren<ActionHistory>();
-            if(actionHistory.ActionHistoryList.Count != 0)
-            {
-                actionHistory.ActionHistoryList.Remove(actionHistory.ActionHistoryList[actionHistory.ActionHistoryList.Count - 1]);
-                actionHistory.Pointer--;
-            }
+            //if(actionHistory.ActionHistoryList.Count != 0)
+            //{
+            //    actionHistory.ActionHistoryList.Remove(actionHistory.ActionHistoryList[actionHistory.ActionHistoryList.Count - 1]);
+            //}
             if (newState.Name.Equals("New Node"))
             {
                 AddNodeAction nodeAction = new AddNodeAction();
                 nodeAction.Start();
-                ah.ActionHistoryList.Add(nodeAction);
+                actionHistory.HistoryStack.Push(nodeAction);
             }
             if (newState.Name.Equals("New Edge"))
             {
                 AddEdgeAction addEdgeAction = new AddEdgeAction();
                 addEdgeAction.Start();
-                ah.ActionHistoryList.Add(addEdgeAction);
+                actionHistory.HistoryStack.Push(addEdgeAction);
+
             }
             if (newState.Name.Equals("Scale Node"))
             {
                 ScaleNodeAction scaleNodeAction = new ScaleNodeAction();
                 scaleNodeAction.Start();
-                ah.ActionHistoryList.Add(scaleNodeAction);
+                actionHistory.HistoryStack.Push(scaleNodeAction);
+
             }
             if (newState.Name.Equals("Edit Node"))
             {
                 EditNodeAction editNodeAction = new EditNodeAction();
                 editNodeAction.Start();
-                ah.ActionHistoryList.Add(editNodeAction);
+                actionHistory.HistoryStack.Push(editNodeAction);
             }
             if (newState.Name.Equals("Rotate"))
             {
@@ -107,7 +108,7 @@ namespace SEE.Game.UI
             {
                 DeleteAction deleteAction = new DeleteAction();
                 deleteAction.Start();
-                ah.ActionHistoryList.Add(deleteAction);
+                actionHistory.HistoryStack.Push(deleteAction);
             }
         }
     }

@@ -25,7 +25,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public ProgressState EditProgress { get; set; } = ProgressState.NoNodeSelected;
 
-        public void Start()
+        public override void Start()
         {
             if (!InitializeCanvasObject())
             {
@@ -61,6 +61,7 @@ namespace SEE.Controls.Actions
                         EditNodeCanvasAction script = generator.InstantiateEditNodeCanvas();
                         script.nodeToEdit = hoveredObject.GetComponent<NodeRef>().Value;
                         script.gameObjectID = hoveredObject.name;
+                        CurrentState = CurrentActionState.Executed;
                     }
                     break;
 
@@ -92,6 +93,10 @@ namespace SEE.Controls.Actions
             Debug.Log("Redo EditNode");
         }
 
+        public override AbstractPlayerAction CreateNew()
+        {
+            return new EditNodeAction();
+        }
     }
 }
 
