@@ -61,6 +61,11 @@
             "_active": true,
             "base_view_name": "Code Facts"
         },
+        "Architecture-GXLExport": {
+            "_active": true,
+            "gxl_file": "SEE.gxl",
+            "view_name": "Code Facts"
+        },
         "Architecture-GravisArchitecture": {
             "_active": true,
             "allow_dependencies_to_parents": true,
