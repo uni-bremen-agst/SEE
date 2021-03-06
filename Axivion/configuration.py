@@ -33,6 +33,8 @@ def reduce(graph: Graph):
     In addition to the nodes kept as described above, we keep all edges between 
     nodes that are to be kept (non-hierarchical and hierarchical). All other nodes
     and edges will be removed from the view.
+    
+    Returns the resulting modified graph.
     """
     if graph.is_edge_type_name(BELONGS_TO):
         belongs_to = graph.edge_type(BELONGS_TO)
@@ -44,7 +46,8 @@ def reduce(graph: Graph):
                 print("View %s not found in RFG" % view_name)
     else:
         print("Edge type %s does not exist in RFG" % BELONGS_TO)
-
+    return graph
+    
 def reduce_view(v: View, belongs_to: EdgeType):
     """See also the documentation on function reduce. This function reduces
     the given view v as described there. The given edge type belongs_to
