@@ -363,7 +363,7 @@ namespace SEE.DataModel.DG.IO
                         }
                         catch (Exception e)
                         {
-                            LogError($"Edge {edge} cannot be added to the graph: {e.Message}. This edge will be ignored.");
+                            LogError($"Edge {edge.ID} cannot be added to the graph: {e.Message}. This edge will be ignored.");
                         }
                     }
                 }
