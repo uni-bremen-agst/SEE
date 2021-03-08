@@ -33,7 +33,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The ActionHistory which is responsible for the undo/redo operations.
         /// </summary>
-        protected ActionHistory actionHistory;
+        protected PlayerActionHistory actionHistory;
 
         /// <summary>
         /// The garbage can the deleted nodes will be moved to.
@@ -86,7 +86,7 @@ namespace SEE.Controls.Actions
         public void GetActionHistory()
         {
             GameObject playerSettings = GameObject.Find("Player Settings");
-            ActionHistory actionHistory = playerSettings.GetComponentInChildren<ActionHistory>();
+            PlayerActionHistory actionHistory = playerSettings.GetComponentInChildren<PlayerActionHistory>();
             this.actionHistory = actionHistory;
 
         }

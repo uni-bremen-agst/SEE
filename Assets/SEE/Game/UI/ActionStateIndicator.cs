@@ -59,13 +59,13 @@ namespace SEE.Game.UI
         /// Changes the indicator to display the new action state type.
         /// </summary>
         /// <param name="newState">New state which shall be displayed in the indicator</param>
-        public void ChangeState(ActionStateType newState, ActionHistory ah)
+        public void ChangeState(ActionStateType newState, PlayerActionHistory ah)
         {
             ModePanelImage.color = newState.Color.ColorWithAlpha(0.5f);
             ModePanelText.text = newState.Name;
 
             GameObject playerSettings = GameObject.Find("Player Settings");
-            ActionHistory actionHistory = playerSettings.GetComponentInChildren<ActionHistory>();
+            PlayerActionHistory actionHistory = playerSettings.GetComponentInChildren<PlayerActionHistory>();
             //if(actionHistory.ActionHistoryList.Count != 0)
             //{
             //    actionHistory.ActionHistoryList.Remove(actionHistory.ActionHistoryList[actionHistory.ActionHistoryList.Count - 1]);
