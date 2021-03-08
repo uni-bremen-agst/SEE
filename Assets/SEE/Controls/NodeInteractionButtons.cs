@@ -62,7 +62,7 @@ namespace SEE.Controls
         /// </summary>
         public void SetNextAddingNodeStep()
         {
-            if (playerDesktop.TryGetComponent(out ActionHistory actionHistory))
+            if (playerDesktop.TryGetComponent(out PlayerActionHistory actionHistory))
             {
                 AddNodeAction addNodeAction = (AddNodeAction)actionHistory.HistoryStack.Peek();
                 addNodeAction.Progress = AddNodeAction.ProgressState.CanvasIsClosed;
@@ -79,7 +79,7 @@ namespace SEE.Controls
         /// </summary>
         public void EditIsCanceled()
         {
-            if (playerDesktop.TryGetComponent(out ActionHistory actionHistory))
+            if (playerDesktop.TryGetComponent(out PlayerActionHistory actionHistory))
             {
                 EditNodeAction editNodeAction = (EditNodeAction)actionHistory.HistoryStack.Peek();
                 editNodeAction.EditProgress = EditNodeAction.ProgressState.EditIsCanceled;
@@ -104,7 +104,7 @@ namespace SEE.Controls
         /// </summary>
         public void AddingIsCanceled()
         {
-            if (playerDesktop.TryGetComponent(out ActionHistory actionHistory))
+            if (playerDesktop.TryGetComponent(out PlayerActionHistory actionHistory))
             {
                 AddNodeAction addNodeAction = (AddNodeAction)actionHistory.HistoryStack.Peek();
                 addNodeAction.Progress = AddNodeAction.ProgressState.AddingIsCanceled;

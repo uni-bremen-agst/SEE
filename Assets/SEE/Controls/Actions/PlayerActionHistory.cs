@@ -6,7 +6,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// This class is responsible for saving the deleted objects in a history for the possibility of an undo operation.
     /// </summary>
-    public class ActionHistory : MonoBehaviour
+    public class PlayerActionHistory : MonoBehaviour
     {
         public Stack<AbstractPlayerAction> HistoryStack { get; set; } = new Stack<AbstractPlayerAction>();
 

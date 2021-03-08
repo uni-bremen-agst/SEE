@@ -21,7 +21,7 @@ namespace SEE.GO.Menu
         /// </summary>
         private ActionStateIndicator Indicator;
 
-        private ActionHistory ah;
+        private PlayerActionHistory ah;
         
         /// <summary>
         /// This creates and returns the mode menu, with which you can select the active game mode.
@@ -99,7 +99,7 @@ namespace SEE.GO.Menu
             // Fixme: Has to be fixed - for all devices - just for testing
             GameObject playersettings = GameObject.Find("Player Settings");
             GameObject playerdesktop = GameObject.Find("Player Desktop");
-            ah = playerdesktop.GetComponent<ActionHistory>();
+            ah = playerdesktop.GetComponent<PlayerActionHistory>();
 
             Assert.IsTrue(ActionStateType.AllTypes.Count <= 9, 
                           "Only up to 9 (10 if zero is included) entries can be selected via the numbers on the keyboard!");
