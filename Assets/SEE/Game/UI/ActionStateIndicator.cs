@@ -15,7 +15,7 @@ namespace SEE.Game.UI
         /// <summary>
         /// Text of the mode panel.
         /// </summary>
-        public TextMeshProUGUI ModePanelText;
+        private TextMeshProUGUI ModePanelText;
 
         /// <summary>
         /// Background image (color) of the mode panel.
@@ -59,57 +59,10 @@ namespace SEE.Game.UI
         /// Changes the indicator to display the new action state type.
         /// </summary>
         /// <param name="newState">New state which shall be displayed in the indicator</param>
-        public void ChangeState(ActionStateType newState, PlayerActionHistory ah)
+        public void ChangeState(ActionStateType newState)
         {
             ModePanelImage.color = newState.Color.ColorWithAlpha(0.5f);
             ModePanelText.text = newState.Name;
-
-            GameObject playerSettings = GameObject.Find("Player Settings");
-            PlayerActionHistory actionHistory = playerSettings.GetComponentInChildren<PlayerActionHistory>();
-            //if(actionHistory.ActionHistoryList.Count != 0)
-            //{
-            //    actionHistory.ActionHistoryList.Remove(actionHistory.ActionHistoryList[actionHistory.ActionHistoryList.Count - 1]);
-            //}
-            if (newState.Name.Equals("New Node"))
-            {
-                AddNodeAction nodeAction = new AddNodeAction();
-                nodeAction.Start();
-                actionHistory.HistoryStack.Push(nodeAction);
-            }
-            if (newState.Name.Equals("New Edge"))
-            {
-                AddEdgeAction addEdgeAction = new AddEdgeAction();
-                addEdgeAction.Start();
-                actionHistory.HistoryStack.Push(addEdgeAction);
-
-            }
-            if (newState.Name.Equals("Scale Node"))
-            {
-                ScaleNodeAction scaleNodeAction = new ScaleNodeAction();
-                scaleNodeAction.Start();
-                actionHistory.HistoryStack.Push(scaleNodeAction);
-
-            }
-            if (newState.Name.Equals("Edit Node"))
-            {
-                EditNodeAction editNodeAction = new EditNodeAction();
-                editNodeAction.Start();
-                actionHistory.HistoryStack.Push(editNodeAction);
-            }
-            if (newState.Name.Equals("Rotate"))
-            {
-                // Fixme: Is this an action?
-            }
-            if (newState.Name.Equals("Map"))
-            {
-                // Fixme: Is this an action?
-            }
-            if (newState.Name.Equals("Delete Node"))
-            {
-                DeleteAction deleteAction = new DeleteAction();
-                deleteAction.Start();
-                actionHistory.HistoryStack.Push(deleteAction);
-            }
         }
     }
 }
