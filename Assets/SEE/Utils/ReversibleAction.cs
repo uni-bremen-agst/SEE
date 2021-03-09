@@ -1,6 +1,12 @@
 ﻿namespace SEE.Utils
 {
     /// <summary>
+    /// Creates a new instance of <see cref="ReversibleAction"/>.
+    /// </summary>
+    /// <returns>new instance of <see cref="ReversibleAction"/>/returns>
+    public delegate ReversibleAction CreateReversibleAction();
+
+    /// <summary>
     /// Defines the expected operations and their protocol for actions that
     /// can be reversed (have Undo() and Redo(). Their protocol resembles 
     /// Unity's protocol for MonoBehaviours regarding <see cref="Awake"/>,
