@@ -136,6 +136,24 @@ namespace SEE.Utils
                 throw new EmptyUndoHistoryException();
             }
         }
+
+        /// <summary>
+        /// The number of executed actions that can be undone.
+        /// </summary>
+        /// <returns>maximal number of actions that can be undone</returns>
+        public int UndoCount
+        {
+            get => UndoStack.Count;
+        }
+
+        /// <summary>
+        /// The number of undone actions that can be re-done.
+        /// </summary>
+        /// <returns>maximal number of actions that can be re-done</returns>
+        public int RedoCount
+        {
+            get => RedoStack.Count;
+        }
     }
 }
 
