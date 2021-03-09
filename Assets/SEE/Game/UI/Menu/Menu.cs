@@ -106,7 +106,6 @@ namespace SEE.Game.UI
             // Load default icon (can't be done during instantiation, only in Awake() or Start())
             Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Settings");
         }
-
         
         protected override void StartTouchGamepad() => StartDesktop();
 
