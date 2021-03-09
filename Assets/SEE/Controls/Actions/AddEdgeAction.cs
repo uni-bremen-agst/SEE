@@ -1,6 +1,7 @@
 ﻿using System;
 using SEE.Game;
 using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -93,7 +94,7 @@ namespace SEE.Controls.Actions
             Debug.Log("Redo AddEdge");
         }
 
-        public override AbstractPlayerAction CreateNew()
+        public static ReversibleAction CreateReversibleAction()
         {
             return new AddEdgeAction();
         }

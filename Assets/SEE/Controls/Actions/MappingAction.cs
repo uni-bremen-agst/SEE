@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
@@ -16,7 +17,7 @@ namespace SEE.Controls.Actions
     /// This action assumes that it is attached to a game object representing
     /// the reflexion analysis during the game. 
     /// </summary>
-    public class MappingAction : CityAction, Observer
+    public class MappingAction : Observer, ReversibleAction
     {
         private const float SelectedAlpha = 0.8f;
 
@@ -45,6 +46,15 @@ namespace SEE.Controls.Actions
         /// The graph containing the mapping from implementation onto architecture entities.
         /// </summary>
         private Graph mapping;
+
+        /// <summary>
+        /// Returns a new instance of <see cref="MappingAction"/>.
+        /// </summary>
+        /// <returns>new instance of <see cref="MappingAction"/></returns>
+        internal static ReversibleAction CreateReversibleAction()
+        {
+            return new MappingAction();
+        }
 
         /// <summary>
         /// The graph containing the architecture.
@@ -109,8 +119,12 @@ namespace SEE.Controls.Actions
         /// </summary>
         private readonly HashSet<Selection> objectsInClipboard = new HashSet<Selection>();
 
+        /// <summary>
+        /// Initializes this instance.
+        /// See <see cref="ReversibleAction.Awake"/>.
+        /// </summary>
         // Use this for initialization
-        public void Start()
+        public void Awake()
         {
             if (Architecture == null)
             {
@@ -199,6 +213,38 @@ namespace SEE.Controls.Actions
             {
                 // enabled = false;
             }
+        }
+
+        /// <summary>
+        /// See <see cref="ReversibleAction.Start"/>.
+        /// </summary>
+        public void Start()
+        {
+            // Intentionally left blank.
+        }
+
+        /// <summary>
+        /// See <see cref="ReversibleAction.Stop"/>.
+        /// </summary>
+        public void Stop()
+        {
+            // Intentionally left blank.
+        }
+
+        /// <summary>
+        /// See <see cref="ReversibleAction.Undo"/>.
+        /// </summary>
+        public void Undo()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// See <see cref="ReversibleAction.Redo"/>.
+        /// </summary>
+        public void Redo()
+        {
+            throw new NotImplementedException();
         }
 
         private void OnStateChanged(ActionStateType value)
@@ -612,6 +658,7 @@ namespace SEE.Controls.Actions
         /// Called by incremental reflexion for every change in the reflexion model
         /// by way of the observer protocol as a callback. Dispatches the event to
         /// the appropriate handling function.
+        /// 
         /// </summary>
         /// <param name="changeEvent">additional information about the change in the reflexion model</param>
         public void Update(ChangeEvent changeEvent)
@@ -763,6 +810,5 @@ namespace SEE.Controls.Actions
         {
             Debug.Log(mapsToEdgeRemoved.ToString());
         }
-
     }
 }

@@ -1,91 +1,61 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using SEE.Utils;
 
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// This class is responsible for saving the deleted objects in a history for the possibility of an undo operation.
+    /// This class manages the history of actions triggered by the player and that
+    /// can be undone and re-done.
     /// </summary>
-    public class PlayerActionHistory : MonoBehaviour
+    public static class PlayerActionHistory
     {
-        public Stack<AbstractPlayerAction> HistoryStack { get; set; } = new Stack<AbstractPlayerAction>();
+        /// <summary>
+        /// The history of actions.
+        /// </summary>
+        private static ActionHistory history = new ActionHistory();
 
-        public Stack<AbstractPlayerAction> UndoStack { get; set; } = new Stack<AbstractPlayerAction>();
-
-        public Stack<AbstractPlayerAction> RedoStack { get; set; } = new Stack<AbstractPlayerAction>();
-
-        public bool AnotherOperation { get; set; } = false;
-
-        public void Update()
+        /// <summary>
+        /// Executes the currently active action (if there is any).
+        /// Expected to be called once for every frame.
+        /// </summary>
+        public static void Update()
         {
-            if (HistoryStack.Count != 0)
-            {
-                if (HistoryStack.Peek().CurrentState.Equals(AbstractPlayerAction.CurrentActionState.Running))
-                {
-                    HistoryStack.Peek().Update();
-                }
-                if (HistoryStack.Peek().CurrentState.Equals(AbstractPlayerAction.CurrentActionState.Executed))
-                {
-                    UndoStack.Push(HistoryStack.Peek());
-                    HistoryStack.Push(HistoryStack.Peek().CreateNew());
-                    HistoryStack.Peek().Start();
-                    RedoStack.Clear();
-                }
-            }
-            if (Input.GetKey(KeyCode.LeftShift))
-            {
-                if (Input.GetKeyDown(KeyCode.Z))
-                {
-                    Redo();
-                }
-                return;
-            }
-            if (Input.GetKeyDown(KeyCode.Z))
-            {
-                Undo();
-            }
-        }
-
-        public void Start()
-        {
-
+            history.Update();
         }
 
         /// <summary>
-        /// Calls the undo of the last executed PlayerAction
+        /// Undoes the currently active action (if there is any).
         /// </summary>
-        public void Undo()
+        public static void Undo()
         {
-            if (UndoStack.Count >= 1)
+            if (history.UndoCount > 0)
             {
-                AbstractPlayerAction undoneAction = UndoStack.Peek();
-                UndoStack.Pop().Undo();
-                RedoStack.Push(undoneAction);
-                Debug.Log("RedoStackSize: " + RedoStack.Count);
-            }
-            else
-            {
-                Debug.LogError("UndoStack is empty\n");
+                history.Undo();
             }
         }
 
         /// <summary>
-        /// Calls the redo of the last executed PlayerAction
+        /// Re-does the action that was previously undone.
         /// </summary>
-        public void Redo()
+        public static void Redo()
         {
-            if (RedoStack.Count != 0)
+            if (history.RedoCount > 0)
             {
-                AbstractPlayerAction redoneAction = RedoStack.Peek();
-                RedoStack.Pop().Redo();
-                UndoStack.Push(redoneAction);
-                Debug.Log("UndoStackSize: " + UndoStack.Count);
-            }
-            else
-            {
-                Debug.LogError("RedoStack is empty\n");
+                history.Redo();
             }
         }
 
+        public static ActionStateType Value;
+
+        /// <summary>
+        /// Executes the given kind of <paramref name="actionType"/> as new.
+        /// </summary>
+        /// <param name="actionType">kind of action to be executed</param>
+        public static void Execute(ActionStateType actionType)
+        {
+            if (actionType.CreateReversible != null)
+            {
+                history.Execute(actionType.CreateReversible());
+            }
+        }
     }
 }

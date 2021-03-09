@@ -31,7 +31,7 @@ namespace SEE.GO.Menu
         /// <returns>the newly created mode menu component.</returns>
         private static SelectionMenu CreateModeMenu(GameObject attachTo = null)
         {
-            Assert.IsTrue(ActionStateType.AllTypes.Count == 8);
+            Assert.IsTrue(ActionStateType.AllTypes.Count == 9);
             Assert.IsTrue(ActionStateType.Move.Value == 0);
             Assert.IsTrue(ActionStateType.Rotate.Value == 1);
             Assert.IsTrue(ActionStateType.Map.Value == 2);
@@ -40,6 +40,7 @@ namespace SEE.GO.Menu
             Assert.IsTrue(ActionStateType.EditNode.Value == 5);
             Assert.IsTrue(ActionStateType.ScaleNode.Value == 6);
             Assert.IsTrue(ActionStateType.Delete.Value == 7);
+            Assert.IsTrue(ActionStateType.Dummy.Value == 8);
 
             // IMPORTANT NOTE: Because an ActionState.Type value will be used as an index into 
             // the following field of menu entries, the rank of an entry in this field of entry
@@ -52,7 +53,7 @@ namespace SEE.GO.Menu
             {
                 entries.Add(new ToggleMenuEntry(
                     active: first,
-                    entryAction: () => ActionState.Value = type,
+                    entryAction: () => PlayerActionHistory.Execute(type),
                     exitAction: null,
                     title: type.Name,
                     description: type.Description,
@@ -129,6 +130,23 @@ namespace SEE.GO.Menu
             {
                 ModeMenu.ToggleMenu();
             }
+
+            // trigger Undo or Redo if requested by keyboard shortcuts
+#if UNITY_EDITOR == false
+            // Ctrl keys are not available when running the game in the editor
+            if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
+#endif
+            {
+                if (Input.GetKeyDown(KeyCode.Z))
+                {
+                    PlayerActionHistory.Undo();
+                }
+                else if (Input.GetKeyDown(KeyCode.Y))
+                {
+                    PlayerActionHistory.Redo();
+                }
+            }
+            PlayerActionHistory.Update();
         }
     }
 }
