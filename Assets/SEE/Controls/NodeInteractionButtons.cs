@@ -62,15 +62,16 @@ namespace SEE.Controls
         /// </summary>
         public void SetNextAddingNodeStep()
         {
-            if (playerDesktop.TryGetComponent(out PlayerActionHistory actionHistory))
-            {
-                AddNodeAction addNodeAction = (AddNodeAction)actionHistory.HistoryStack.Peek();
-                addNodeAction.Progress = AddNodeAction.ProgressState.CanvasIsClosed;
-            }
-            else
-            {
-                Debug.LogError($"Player desktop {playerDesktop.name} does not have an ActionHistory component.\n");
-            }
+            // FIXME: Should be re-enabled somehow again.
+            //if (playerDesktop.TryGetComponent(out PlayerActionHistory actionHistory))
+            //{                
+            //    //AddNodeAction addNodeAction = (AddNodeAction)actionHistory.HistoryStack.Peek();
+            //    //addNodeAction.Progress = AddNodeAction.ProgressState.CanvasIsClosed;
+            //}
+            //else
+            //{
+            //    Debug.LogError($"Player desktop {playerDesktop.name} does not have an ActionHistory component.\n");
+            //}
         }
 
         /// <summary>
@@ -79,15 +80,16 @@ namespace SEE.Controls
         /// </summary>
         public void EditIsCanceled()
         {
-            if (playerDesktop.TryGetComponent(out PlayerActionHistory actionHistory))
-            {
-                EditNodeAction editNodeAction = (EditNodeAction)actionHistory.HistoryStack.Peek();
-                editNodeAction.EditProgress = EditNodeAction.ProgressState.EditIsCanceled;
-            }
-            else
-            {
-                Debug.LogError($"Player desktop {playerDesktop.name} does not have an ActionHistory component.\n");
-            }
+            // FIXME: Should be re-enabled somehow again.
+            //if (playerDesktop.TryGetComponent(out PlayerActionHistory actionHistory))
+            //{                
+            //    //EditNodeAction editNodeAction = (EditNodeAction)actionHistory.HistoryStack.Peek();
+            //    //editNodeAction.EditProgress = EditNodeAction.ProgressState.EditIsCanceled;
+            //}
+            //else
+            //{
+            //    Debug.LogError($"Player desktop {playerDesktop.name} does not have an ActionHistory component.\n");
+            //}
         }
 
         /// <summary>
@@ -104,15 +106,16 @@ namespace SEE.Controls
         /// </summary>
         public void AddingIsCanceled()
         {
-            if (playerDesktop.TryGetComponent(out PlayerActionHistory actionHistory))
-            {
-                AddNodeAction addNodeAction = (AddNodeAction)actionHistory.HistoryStack.Peek();
-                addNodeAction.Progress = AddNodeAction.ProgressState.AddingIsCanceled;
-            }
-            else
-            {
-                Debug.LogError($"Player desktop {playerDesktop.name} does not have an ActionHistory component.\n");
-            }
+            // FIXME: Should be re-enabled somehow again.
+            //if (playerDesktop.TryGetComponent(out PlayerActionHistory actionHistory))
+            //{                
+            //    AddNodeAction addNodeAction = (AddNodeAction)actionHistory.HistoryStack.Peek();
+            //    addNodeAction.Progress = AddNodeAction.ProgressState.AddingIsCanceled;
+            //}
+            //else
+            //{
+            //    Debug.LogError($"Player desktop {playerDesktop.name} does not have an ActionHistory component.\n");
+            //}
         }
     }
 }
