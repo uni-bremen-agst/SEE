@@ -1,5 +1,5 @@
 ﻿using SEE.GO;
-using System;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -93,7 +93,7 @@ namespace SEE.Controls.Actions
             Debug.Log("Redo EditNode");
         }
 
-        public override AbstractPlayerAction CreateNew()
+        public static ReversibleAction CreateReversibleAction()
         {
             return new EditNodeAction();
         }

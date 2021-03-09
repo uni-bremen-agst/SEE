@@ -15,7 +15,6 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class AddNodeAction : AbstractPlayerAction
     {
-
         private SEECity city;
         /// <summary>
         /// The Code City in which the node should be placed.
@@ -572,7 +571,7 @@ namespace SEE.Controls.Actions
             Debug.Log("REDO ADDNODE");
         }
 
-        public override AbstractPlayerAction CreateNew()
+        public static ReversibleAction CreateReversibleAction()
         {
             return new AddNodeAction();
         }

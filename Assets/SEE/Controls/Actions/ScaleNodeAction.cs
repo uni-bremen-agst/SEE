@@ -148,8 +148,8 @@ namespace SEE.Controls.Actions
 
         public override void Start()
         {
-                    InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
-                    InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
+            InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
+            InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
         }
 
         public override void Update()
@@ -550,7 +550,7 @@ namespace SEE.Controls.Actions
             Debug.Log("Redo ScaleNode");
         }
 
-        public override AbstractPlayerAction CreateNew()
+        public static ReversibleAction CreateReversibleAction()
         {
             return new ScaleNodeAction();
         }

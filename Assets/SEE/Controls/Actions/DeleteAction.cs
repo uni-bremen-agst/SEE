@@ -3,10 +3,8 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -17,6 +15,15 @@ namespace SEE.Controls.Actions
     /// </summary>
     internal class DeleteAction : AbstractPlayerAction
     {
+        /// <summary>
+        /// Returns a new instance of <see cref="DeleteAction"/>.
+        /// </summary>
+        /// <returns></returns>
+        public static ReversibleAction CreateReversibleAction()
+        {
+            return new DeleteAction();
+        }
+
         /// <summary>
         /// The currently selected object (a node or edge).
         /// </summary>
@@ -35,7 +42,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// A history of all nodes deleted by this action.
         /// </summary>
-        public List<GameObject> DeletedNodes { get; set; }
+        private List<GameObject> DeletedNodes { get; set; }
 
         /// <summary>
         /// A history of the old positions of the nodes deleted by this action.
@@ -54,26 +61,29 @@ namespace SEE.Controls.Actions
 
         public GameObject deletedParent;
 
-        public override AbstractPlayerAction CreateNew()
-        {
-            return new DeleteAction();
-        }
-
-        public override void Start()
-        {
-            // The MonoBehaviour is enabled and Update() will be called by Unity.
-            UndoInitialisation();
-            InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
-            InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
-        }
+        /// <summary>
+        /// FIXME: This does not belong here.
+        /// The garbage can the deleted nodes will be moved to.
+        /// </summary>
+        protected GameObject garbageCan;
 
         /// <summary>
-        /// Finds the gameObject that are responsible for an undo.
+        /// FIXME: This does not belong here.
+        /// The name of the garbage can gameObject.
         /// </summary>
-        protected void UndoInitialisation()
+        protected const string GarbageCanName = "GarbageCan";
+
+        public override void Awake()
         {
+            base.Awake();
             garbageCan = GameObject.Find(GarbageCanName);
-            garbageCan?.TryGetComponent(out this.actionHistory);
+        }
+        public override void Start()
+        {
+            base.Start();
+            // The MonoBehaviour is enabled and Update() will be called by Unity.
+            InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
+            InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
         }
 
         public override void Update()
@@ -87,9 +97,7 @@ namespace SEE.Controls.Actions
                 new DeleteNetAction(selected.name).Execute(null);
                 DeleteSelectedObject(selected);
                 deletedParent = selected;
-                actionHistory.AnotherOperation = true;
             }
-
         }
 
         /// <summary>
@@ -119,8 +127,8 @@ namespace SEE.Controls.Actions
                         return;
                     }
                     DeletedNodes = GameObjectTraversion.GetAllChildNodes(new List<GameObject>(), selectedObject);
-                    GetActionHistory();
-                    actionHistory.StartCoroutine(this.MoveNodeToGarbage(DeletedNodes));
+                    // FIXME: Re-enable
+                    // actionHistory.StartCoroutine(this.MoveNodeToGarbage(DeletedNodes));
                 }
                 CurrentState = CurrentActionState.Executed;
             }
@@ -131,10 +139,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Undo()
         {
-            GetActionHistory();
             if (DeletedNodes != null)
             {
-                actionHistory.StartCoroutine(this.RemoveNodeFromGarbage(DeletedNodes));
+                // FIXME: Re-enable
+                //actionHistory.StartCoroutine(this.RemoveNodeFromGarbage(DeletedNodes));
                 foreach (GameObject node in DeletedNodes)
                 {
                     if (node.TryGetComponentOrLog(out NodeRef nodeRef))
@@ -232,7 +240,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="deletedNodes">all deleted nodes of the last operation</param>
         /// <param name="oldPositionsOfDeletedNodes">all old positions of the deleted nodes of the last operation</param>
-        public void SaveObjectForDeleteUndo(List<GameObject> deletedNodes, List<Vector3> oldPositionsOfDeletedNodes)
+        private void SaveObjectForDeleteUndo(List<GameObject> deletedNodes, List<Vector3> oldPositionsOfDeletedNodes)
         {
             SEECity city = SceneQueries.GetCodeCity(deletedNodes[0].transform)?.gameObject.GetComponent<SEECity>();
             Graph graph = city.LoadedGraph;
@@ -293,7 +301,6 @@ namespace SEE.Controls.Actions
             DeletedEdges = edgesToHide;
             Graph = graph;
         }
-
 
         private void LocalAnySelectIn(InteractableObject interactableObject)
         {
