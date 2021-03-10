@@ -44,6 +44,11 @@ namespace SEE.Controls.Actions
         private NodeRef currentlySelectedNode;
 
         /// <summary>
+        /// The component managing all open code windows.
+        /// </summary>
+        private CodeWindowSpace space;
+
+        /// <summary>
         /// The selected node's filename.
         /// </summary>
         private string selectedPath;
@@ -72,6 +77,11 @@ namespace SEE.Controls.Actions
                 }
             };
             enabled = ActionState.Is(ThisActionState);
+
+            if (!TryGetComponent(out space))
+            {
+                space = gameObject.AddComponent<CodeWindowSpace>();
+            }
         }
 
         private void Update()
@@ -88,11 +98,6 @@ namespace SEE.Controls.Actions
             
             if (!Equals(selectedNode?.Value, currentlySelectedNode?.Value))
             {
-                // Hide code window in old selection
-                if (currentlySelectedNode?.TryGetComponent(out codeWindow) ?? false)
-                {
-                    codeWindow.Show(false);
-                }
                 currentlySelectedNode = selectedNode;
                 // If nothing is selected, there's nothing more we need to do
                 if (selectedNode == null)
@@ -125,10 +130,13 @@ namespace SEE.Controls.Actions
                     {
                         codeWindow.VisibleLine = line;
                     }
+                    
+                    // Add code window to our space of code windows
+                    space.AddCodeWindow(codeWindow);
 
                     //TODO: Set font size etc per SEECity settings
                 }
-                codeWindow.Show(true);
+                space.ActiveCodeWindow = codeWindow;
             }
         }
 

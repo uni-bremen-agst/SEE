@@ -1,0 +1,125 @@
+﻿using System;
+using System.Linq;
+using DynamicPanels;
+using SEE.GO;
+using UnityEngine;
+
+namespace SEE.Game.UI.CodeWindow
+{
+    public partial class CodeWindowSpace
+    {
+
+        /// <summary>
+        /// The <see cref="Panel"/> containing the code windows.
+        /// </summary>
+        private Panel Panel;
+
+        /// <summary>
+        /// The dynamic canvas of the panel.
+        /// This canvas will implement tabs, moving, tiling, and resizing for us.
+        /// </summary>
+        private DynamicPanelsCanvas PanelsCanvas;
+
+        protected override void StartDesktop()
+        {
+            // Add CodeWindowSpace component if it doesn't exist yet
+            space = Canvas.transform.Find(CODE_WINDOW_SPACE_NAME)?.gameObject;
+            if (!space)
+            {
+                GameObject spacePrefab = Resources.Load<GameObject>(CODE_WINDOW_SPACE_PREFAB);
+                space = Instantiate(spacePrefab, Canvas.transform, false);
+                space.name = CODE_WINDOW_SPACE_NAME;
+            }
+        }
+
+        /// <summary>
+        /// <p>
+        /// Sets the active tab of the panel to the <see cref="ActiveCodeWindow"/>.
+        /// If <see cref="ActiveCodeWindow"/> is not part of open <see cref="codeWindows"/>, the previous active
+        /// code window will be restored and a warning will be logged. If the previous active code window is not part
+        /// of that list as well, this component will be destroyed and a <see cref="InvalidOperationException"/>
+        /// may be thrown.
+        /// </p>
+        /// 
+        /// <p>
+        /// If any of the following are <c>null</c>, calling the method will have no effect:
+        /// <ul>
+        /// <li><see cref="Panel"/></li>
+        /// <li><see cref="ActiveCodeWindow"/></li>
+        /// <li><c>ActiveCodeWindow.codeWindow</c></li>
+        /// </ul>
+        /// </p>
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown if <see cref="ActiveCodeWindow"/> is not
+        /// part of the open code windows, and the previous active code window (<see cref="currentActiveCodeWindow"/>)
+        /// isn't part of the open code windows either. Note that this may not be thrown at all, because
+        /// <see cref="Destroy"/> is called beforehand.
+        /// </exception>
+        private void UpdateActiveTab()
+        {
+            if (Panel != null && ActiveCodeWindow != null && ActiveCodeWindow.codeWindow != null)
+            {
+                if (!codeWindows.Contains(ActiveCodeWindow))
+                {
+                    Debug.LogWarning("Active code window is not part of available code windows. Resetting to previous entry.\n");
+                    if (ActiveCodeWindow == currentActiveCodeWindow)
+                    {
+                        Debug.LogError("Neither active code window, nor previous active code window is "
+                                       + "part of available code windows. This component will now self-destruct.");
+                        Destroy(this);
+                        throw new InvalidOperationException();
+                    }
+                    ActiveCodeWindow = currentActiveCodeWindow;
+                    UpdateActiveTab();  // recursive call: ActiveCodeWindow has now been changed
+                }
+                Panel.ActiveTab = Panel.GetTabIndex((RectTransform) ActiveCodeWindow.codeWindow.transform);
+            }
+        }
+
+        protected override void UpdateDesktop()
+        {
+            if (!Panel && codeWindows.Any())
+            {
+                // We need to initialize the panel first
+                if (!space.TryGetComponentOrLog(out PanelsCanvas))
+                {
+                    Destroy(this);
+                }
+                Panel = PanelUtils.CreatePanelFor((RectTransform) codeWindows[0].codeWindow.transform, PanelsCanvas);
+                Panel.MoveTo(Vector2.zero); // Move panel to center of screen
+            }
+            
+            if (currentActiveCodeWindow != ActiveCodeWindow)
+            {
+                // Nominal active code window has been changed, so we change the actual active code window as well.
+                UpdateActiveTab();
+
+                // The window will only be actually changed when UpdateActiveTab() didn't throw an exception,
+                // so currentActiveCodeWindow is guaranteed to be part of codeWindows.
+                currentActiveCodeWindow = ActiveCodeWindow;
+            }
+            
+            // Now we need to detect changes in the open code windows
+            // Unfortunately this adds an O(m+n) call to each frame, but considering how small m and n are likely to be,
+            // this shouldn't be a problem.
+            // First, close old windows that are not open anymore
+            foreach (CodeWindow codeWindow in currentCodeWindows.Except(codeWindows))
+            {
+                Panel.RemoveTab(Panel.GetTab((RectTransform) codeWindow.codeWindow.transform));
+                currentCodeWindows.Remove(codeWindow);
+            }
+            
+            // Then, add new tabs 
+            foreach (CodeWindow codeWindow in codeWindows.Except(currentCodeWindows))
+            {
+                RectTransform rectTransform = (RectTransform) codeWindow.codeWindow.transform;
+                // Add the new window as a tab to our panel
+                PanelTab tab = Panel.AddTab(rectTransform);
+                tab.Label = codeWindow.Title;
+                //TODO: Set icon to something sensible
+                currentCodeWindows.Add(codeWindow);
+                PanelsCanvas.ForceRebuildLayoutImmediate();
+            }
+        }
+    }
+}

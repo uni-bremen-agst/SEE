@@ -36,17 +36,8 @@ namespace SEE.Game.UI.CodeWindow
                 return;
             }
 
-            GameObject group = GameObject.Find(CODE_WINDOWS_NAME);
-            if (group == null)
-            {
-                group = new GameObject {name = CODE_WINDOWS_NAME};
-                group.transform.parent = Canvas.transform;
-                group.transform.localScale = Vector3.one;
-                group.transform.localPosition = Vector3.zero;
-            }
-
             Object codeWindowPrefab = Resources.Load<GameObject>(CODE_WINDOW_PREFAB);
-            codeWindow = Instantiate(codeWindowPrefab, group.transform, false) as GameObject;
+            codeWindow = Instantiate(codeWindowPrefab) as GameObject;
             if (!codeWindow)
             {
                 Debug.LogError("Couldn't instantiate codeWindow.\n");
@@ -57,7 +48,6 @@ namespace SEE.Game.UI.CodeWindow
             if (codeWindow.TryGetComponentOrLog(out RectTransform rect))
             {
                 rect.sizeDelta = Resolution;
-                rect.position = Vector3.zero;
             }
 
             // Set title, text and preferred font size

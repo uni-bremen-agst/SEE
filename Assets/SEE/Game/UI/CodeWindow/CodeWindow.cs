@@ -111,9 +111,9 @@ namespace SEE.Game.UI.CodeWindow
         }
 
         /// <summary>
-        /// GameObject containing the code window, which in turn contains this code window.
+        /// GameObject containing the actual UI for the code window.
         /// </summary>
-        private GameObject codeWindow;
+        public GameObject codeWindow { get; private set; }
 
         /// <summary>
         /// Number of lines within the file.
@@ -159,7 +159,7 @@ namespace SEE.Game.UI.CodeWindow
                 // Add whitespace next to line number so it's consistent
                 Text += string.Join("", Enumerable.Repeat(" ", neededPadding-$"{i}".Length));
                 // Line number will be typeset in yellow to distinguish it from the rest
-                Text += $"<color=\"yellow\">{i}</color> <noparse>{text[i]}</noparse>\n";
+                Text += $"<color=\"yellow\">{i+1}</color> <noparse>{text[i]}</noparse>\n";
             }
             lines = text.Length;
         }
