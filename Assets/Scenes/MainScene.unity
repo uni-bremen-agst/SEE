@@ -2546,7 +2546,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcc1cedcf0a20b04ca3d2bb78035f3cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerInputType: 0
+  playerInputType: 3
   PlayerOrigin: {x: 0, y: 0.5, z: -1.5}
   FocusPlane: {fileID: 1972412193}
   Ground: {fileID: 1190604626}
@@ -3321,7 +3321,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Cluster
+      Data: Directory
     - Name: $v
       Entry: 5
       Data: true
@@ -3333,7 +3333,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Architecture_Layer
+      Data: File
     - Name: $v
       Entry: 5
       Data: true
@@ -3586,12 +3586,12 @@ MonoBehaviour:
   RadialSegments: 8
   isEdgeSelectable: 1
   GXLPath:
-    Root: 3
-    relativePath: /mini/Architecture.gxl
+    Root: 1
+    relativePath: /Data/GXL/three_files.gxl
     absolutePath: 
   CSVPath:
     Root: 1
-    relativePath: 
+    relativePath: /Data/GXL/three_files.csv
     absolutePath: 
 --- !u!114 &1758871330
 MonoBehaviour:
@@ -3634,7 +3634,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.0030502677
+  HeightOffset: 0.0030950308
 --- !u!65 &1758871333
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4015,7 +4015,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Class
+      Data: Directory
     - Name: $v
       Entry: 5
       Data: true
@@ -4027,7 +4027,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Package
+      Data: File
     - Name: $v
       Entry: 5
       Data: true
@@ -4280,12 +4280,12 @@ MonoBehaviour:
   RadialSegments: 8
   isEdgeSelectable: 0
   GXLPath:
-    Root: 3
-    relativePath: /mini/CodeFacts.gxl
+    Root: 1
+    relativePath: /Data/GXL/three_files.gxl
     absolutePath: 
   CSVPath:
     Root: 1
-    relativePath: 
+    relativePath: /Data/GXL/three_files.csv
     absolutePath: 
 --- !u!114 &1972412191
 MonoBehaviour:
@@ -4328,7 +4328,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.003061831
+  HeightOffset: 0.014835119
 --- !u!65 &1972412194
 BoxCollider:
   m_ObjectHideFlags: 0

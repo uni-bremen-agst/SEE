@@ -184,8 +184,9 @@ namespace SEE.Controls
                     break;
                 case PlayerInputType.HoloLensPlayer:
                     {                        
-                        SetupMixedReality();
+                        
                         player = PlayerFactory.CreateHololensPlayer();
+                        SetupMixedReality();
                     }
                     break;
                 case PlayerInputType.TouchGamepadPlayer:
@@ -287,21 +288,24 @@ namespace SEE.Controls
         /// </summary>
         private void SetupMixedReality()
         {
-            {
-                // Add a MixedRealityToolkit to the scene
-                GameObject mrtk = new GameObject(MixedRealityToolkitName);
-                mrtk.AddComponent<MixedRealityToolkit>();
-            }
-            {
-                // Create HoloLensAppBar from prefab
-                UnityEngine.Object appBarPrefab = Resources.Load<GameObject>("Prefabs/HoloLensAppBar.prefab");
-                GameObject appBar = Instantiate(appBarPrefab) as GameObject;
-                UnityEngine.Assertions.Assert.IsNotNull(appBar);
-            }
+
+            // Add a MixedRealityToolkit to the scene
+            UnityEngine.Object mrtkPrefab = Resources.Load<GameObject>("Prefabs/MixedRealityToolkit");
+            GameObject mrtk = Instantiate(mrtkPrefab) as GameObject;
+            //mrtk.AddComponent<MixedRealityToolkit>();
+            
+            
+            // Create HoloLensAppBar from prefab
+            UnityEngine.Object appBarPrefab = Resources.Load<GameObject>("Prefabs/HoloLensAppBar");
+            GameObject appBar = Instantiate(appBarPrefab) as GameObject;
+            UnityEngine.Assertions.Assert.IsNotNull(appBar);
+
 
             // Add a city collection
-            GameObject cityCollection = new GameObject(CityCollectionName);
-            cityCollection.AddComponent<GridObjectCollection>();
+            UnityEngine.Object cityCollectionPrefab = Resources.Load<GameObject>("Prefabs/CityCollection");
+            GameObject cityCollection = Instantiate(cityCollectionPrefab) as GameObject;
+            //cityCollection.AddComponent<GridObjectCollection>();
+            
 
 
             // Hide all decoration to improve performance
