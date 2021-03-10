@@ -26,8 +26,8 @@ namespace SEE.Controls.Actions
         public override void Start()
         {
 
-                    InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
-                    InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
+            InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
+            InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
         }
 
         public override void Update()
