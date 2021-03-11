@@ -48,27 +48,30 @@ namespace SEE.Game.UI.CodeWindow
         /// <summary>
         /// The line currently at the top of the window.
         /// Will scroll smoothly to the line when changed and mark it visually.
+        /// If a line outside the range of available lines is set, the highest available line number is used instead.
         /// </summary>
         /// <remarks>Only a fully visible line counts. If a line is partially obscured, the next line number
         /// will be returned.</remarks>
         public int VisibleLine
         {
-            get => Mathf.CeilToInt(visibleLine);
+            get => Mathf.CeilToInt(visibleLine)+1;
             set
             {
-                if (VisibleLine > lines)
+                if (value > lines || value < 1)
                 {
-                    throw new ArgumentOutOfRangeException();
+                    Debug.LogError($"Specified line number {value} is outside the range of lines 1-{lines}. "
+                                   + $"Using maximum line number {lines} instead.");
+                    value = lines;
                 }
                 // If this is called before Start() has been called, scrollbar will be null, so we have to cache
-                // the desired visible line somehow.
+                // the desired visible line.
                 if (scrollRect == null)
                 {
                     PreStartLine = value;
                 }
                 else
                 {
-                    DOTween.To(() => visibleLine, f => visibleLine = f, value, 1f);
+                    DOTween.To(() => visibleLine+1, f => visibleLine = f-1, value, 1f);
                     // Mark selected line
                     string[] allLines = TextMesh.text.Split('\n');
                     string markedLine = $"<mark=#ff000044>{allLines[value]}</mark>\n";
@@ -87,6 +90,7 @@ namespace SEE.Game.UI.CodeWindow
         /// <summary>
         /// The line currently at the top of the window.
         /// Will immediately set the line.
+        /// Note that the line here is 0-indexed, as opposed to <see cref="VisibleLine"/>, which is 1-indexed.
         /// </summary>
         private float visibleLine
         {
@@ -98,14 +102,14 @@ namespace SEE.Game.UI.CodeWindow
                     throw new ArgumentOutOfRangeException();
                 }
                 // If this is called before Start() has been called, scrollbar will be null, so we have to cache
-                // the desired visible line somehow.
+                // the desired visible line.
                 if (scrollRect == null)
                 {
                     PreStartLine = value;
                 }
                 else
                 {
-                    scrollRect.verticalNormalizedPosition = 1 - value / (lines-excessLines);
+                    scrollRect.verticalNormalizedPosition = 1 - (value) / (lines-excessLines);
                 }
             }
         }
@@ -133,11 +137,6 @@ namespace SEE.Game.UI.CodeWindow
         /// Path to the code canvas prefab.
         /// </summary>
         private const string CODE_WINDOW_PREFAB = "Prefabs/UI/CodeWindow";
-
-        /// <summary>
-        /// Name for the code windows group game object.
-        /// </summary>
-        private const string CODE_WINDOWS_NAME = "Code Windows";
         
         /// <summary>
         /// Populates the code window with the contents of the given file.
@@ -157,7 +156,7 @@ namespace SEE.Game.UI.CodeWindow
             for (int i = 0; i < text.Length; i++)
             {
                 // Add whitespace next to line number so it's consistent
-                Text += string.Join("", Enumerable.Repeat(" ", neededPadding-$"{i}".Length));
+                Text += string.Join("", Enumerable.Repeat(" ", neededPadding-$"{i+1}".Length));
                 // Line number will be typeset in yellow to distinguish it from the rest
                 Text += $"<color=\"yellow\">{i+1}</color> <noparse>{text[i]}</noparse>\n";
             }
@@ -174,7 +173,7 @@ namespace SEE.Game.UI.CodeWindow
             // Try to read the file, otherwise display the error message.
             if (!File.Exists(filename))
             {
-                Text = $"<color=\"red\">Couldn't find file '<noparse>{filename}</noparse>'.</color>";
+                Text = $"<color=\"red\"><b>Couldn't find file '<noparse>{filename}</noparse>'.</b></color>";
                 Debug.LogError($"Couldn't find file {filename}");
                 return;
             }
@@ -192,7 +191,9 @@ namespace SEE.Game.UI.CodeWindow
         /// <summary>
         /// Shows or hides the code window, depending on the <see cref="show"/> parameter.
         /// </summary>
-        /// <param name="show"></param>
+        /// <param name="show">Whether the code window should be shown.</param>
+        /// <remarks>If this window is used in a <see cref="CodeWindowSpace"/>, this method
+        /// needn't (and shouldn't) be used.</remarks>
         public void Show(bool show)
         {
             switch (Platform)
