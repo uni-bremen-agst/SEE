@@ -59,6 +59,10 @@ namespace SEE.Controls.Actions
             {
                 history.Execute(actionType.CreateReversible());
             }
+            if(actionType.Equals(ActionStateType.NewNode)||actionType.Equals(ActionStateType.EditNode))
+            {
+                NodeInteractionButtons.addOrEditNode = history.UndoStack.Peek();
+            }
         }
     }
 }
