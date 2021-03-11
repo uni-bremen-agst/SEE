@@ -45,14 +45,38 @@ namespace SEE.Game.UI.CodeWindow
         /// Adds a new code window to the list of active code windows.
         /// </summary>
         /// <param name="window">The active code window which should be added to the list.</param>
+        /// <exception cref="ArgumentException">If the given <paramref name="window"/> is already open.</exception>
+        /// <exception cref="ArgumentNullException">If the given <paramref name="window"/> is <c>null</c>.</exception>
         public void AddCodeWindow(CodeWindow window)
         {
             if (window == null)
             {
                 throw new ArgumentNullException(nameof(window));
+            } 
+            else if (codeWindows.Contains(window))
+            {
+                throw new ArgumentException("Given window is already open.");
             }
             codeWindows.Add(window);
             // Actual UI generation happens in Update()
+        }
+
+        /// <summary>
+        /// Closes a previously opened code window.
+        /// </summary>
+        /// <param name="window">The code window which should be closed.</param>
+        /// <exception cref="ArgumentException">If the given <paramref name="window"/> is already closed.</exception>
+        /// <exception cref="ArgumentNullException">If the given <paramref name="window"/> is <c>null</c>.</exception>
+        public void CloseCodeWindow(CodeWindow window)
+        {
+            if (window == null)
+            {
+                throw new ArgumentNullException(nameof(window));
+            } else if (!codeWindows.Contains(window))
+            {
+                throw new ArgumentException("Given window is already closed.");
+            }
+            codeWindows.Remove(window);
         }
         
         /// <summary>

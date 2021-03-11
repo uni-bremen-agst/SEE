@@ -78,7 +78,12 @@ namespace SEE.Game.UI.CodeWindow
 
         protected override void UpdateDesktop()
         {
-            if (!Panel && codeWindows.Any())
+            if (Panel && !codeWindows.Any())
+            {
+                // We need to destroy the panel now
+                Destroy(Panel);
+            } 
+            else if (!Panel && codeWindows.Any())
             {
                 // We need to initialize the panel first
                 if (!space.TryGetComponentOrLog(out PanelsCanvas))
@@ -86,7 +91,7 @@ namespace SEE.Game.UI.CodeWindow
                     Destroy(this);
                 }
                 Panel = PanelUtils.CreatePanelFor((RectTransform) codeWindows[0].codeWindow.transform, PanelsCanvas);
-                Panel.MoveTo(Vector2.zero); // Move panel to center of screen
+                //Panel.MoveTo(Vector2.zero); // Move panel to center of screen
             }
             
             if (currentActiveCodeWindow != ActiveCodeWindow)
@@ -103,22 +108,31 @@ namespace SEE.Game.UI.CodeWindow
             // Unfortunately this adds an O(m+n) call to each frame, but considering how small m and n are likely to be,
             // this shouldn't be a problem.
             // First, close old windows that are not open anymore
-            foreach (CodeWindow codeWindow in currentCodeWindows.Except(codeWindows))
+            foreach (CodeWindow codeWindow in currentCodeWindows.Except(codeWindows).ToList())
             {
                 Panel.RemoveTab(Panel.GetTab((RectTransform) codeWindow.codeWindow.transform));
                 currentCodeWindows.Remove(codeWindow);
+                Destroy(codeWindow);
             }
             
             // Then, add new tabs 
-            foreach (CodeWindow codeWindow in codeWindows.Except(currentCodeWindows))
+            foreach (CodeWindow codeWindow in codeWindows.Except(currentCodeWindows).ToList())
             {
                 RectTransform rectTransform = (RectTransform) codeWindow.codeWindow.transform;
                 // Add the new window as a tab to our panel
                 PanelTab tab = Panel.AddTab(rectTransform);
                 tab.Label = codeWindow.Title;
-                //TODO: Set icon to something sensible
+                tab.Icon = null;
                 currentCodeWindows.Add(codeWindow);
+                
+                // Allow closing the tab
+                // FIXME: Apparently, this is called twice. It seems like the problem lies in PanelNotificationCenter.
+                PanelNotificationCenter.OnTabClosed += panelTab => 
+                    CloseCodeWindow(codeWindows.First(x => x.codeWindow == panelTab.Content.gameObject));
+                
+                // Rebuild layout
                 PanelsCanvas.ForceRebuildLayoutImmediate();
+                codeWindow.RecalculateExcessLines();
             }
         }
     }

@@ -37,13 +37,13 @@ namespace SEE.Game.UI.CodeWindow
             }
 
             Object codeWindowPrefab = Resources.Load<GameObject>(CODE_WINDOW_PREFAB);
-            codeWindow = Instantiate(codeWindowPrefab) as GameObject;
+            codeWindow = Instantiate(codeWindowPrefab, Canvas.transform, false) as GameObject;
             if (!codeWindow)
             {
                 Debug.LogError("Couldn't instantiate codeWindow.\n");
                 return;
             }
-            
+
             // Set resolution to preferred values
             if (codeWindow.TryGetComponentOrLog(out RectTransform rect))
             {
@@ -64,18 +64,27 @@ namespace SEE.Game.UI.CodeWindow
                 ScrollEvent = scrollRect.onValueChanged;
             }
             
-            // Calculate excess lines (see documentation for excessLines for more details)
-            TextMesh.ForceMeshUpdate();
-            if (lines > 0 && codeWindow.transform.Find("Content/Scrollable").gameObject.TryGetComponentOrLog(out rect))
-            {
-                excessLines = Mathf.CeilToInt(rect.rect.height / TextMesh.textInfo.lineInfo[0].lineHeight) - 1;
-            }
-            
+            RecalculateExcessLines();
+
             // Position code window in center of screen
             codeWindow.transform.localPosition = Vector3.zero;
 
             // Animate scrollbar to scroll to desired line
             VisibleLine = Mathf.Max(0, Mathf.FloorToInt(PreStartLine)-1);
+        }
+
+        /// <summary>
+        /// Recalculates the <see cref="excessLines"/> using the current window height and line height of the text.
+        /// This method should be called every time the window height or the line height changes.
+        /// For more information, see the documentation of <see cref="excessLines"/>.
+        /// </summary>
+        public void RecalculateExcessLines()
+        {
+            TextMesh.ForceMeshUpdate();
+            if (lines > 0 && codeWindow.transform.Find("Content/Scrollable").gameObject.TryGetComponentOrLog(out RectTransform rect))
+            {
+                excessLines = Mathf.CeilToInt(rect.rect.height / TextMesh.textInfo.lineInfo[0].lineHeight) - 2;
+            }
         }
     }
 }
