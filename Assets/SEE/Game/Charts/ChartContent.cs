@@ -448,7 +448,7 @@ namespace SEE.Game.Charts
             float y = -ScrollViewEntryHeight * (float)index;
             go.transform.localPosition = scrollEntryOffset + new Vector2(x, y);
 
-            entry.Init(this, ref scrollViewEntryDatas[index], label);
+            entry.Init(this, scrollViewEntryDatas[index], label);
 
             return entry;
         }
