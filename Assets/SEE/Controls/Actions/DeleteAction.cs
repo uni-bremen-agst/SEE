@@ -4,6 +4,7 @@ using SEE.Game;
 using SEE.Game.UI;
 using SEE.GO;
 using SEE.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -43,7 +44,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// A history of all nodes deleted by this action.
         /// </summary>
-        private List<GameObject> DeletedNodes { get; set; } = new List<GameObject>();
+        private Dictionary<GameObject, Graph> DeletedNodes { get; set; } = new Dictionary<GameObject, Graph>();
 
         /// <summary>
         /// A history of the old positions of the nodes deleted by this action.
@@ -53,12 +54,8 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// A history of all edges deleted by this action.
         /// </summary>
-        public List<GameObject> DeletedEdges { get; set; } = new List<GameObject>();
-
-        /// <summary>
-        /// The graph where this action is executed.
-        /// </summary>
-        public Graph Graph { get; set; }
+        /// FIXME: Dictionary MIT GRAPH
+        public Dictionary<GameObject, Graph> DeletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
 
         public List<GameObject> deletedParent = new List<GameObject>();
 
@@ -68,6 +65,9 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected GameObject garbageCan;
 
+        /// <summary>
+        /// The action state indicator which is attached to the player settings
+        /// </summary>
         private ActionStateIndicator actionStateIndicator;
 
         /// <summary>
@@ -76,6 +76,9 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected const string GarbageCanName = "GarbageCan";
 
+        /// <summary>
+        /// True, if the moving-process of a node to the garbage can is running, else false
+        /// </summary>
         private bool isRunning = false;
 
         public override void Awake()
@@ -89,7 +92,7 @@ namespace SEE.Controls.Actions
             InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
             InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
             GameObject playerSettings = GameObject.Find("Player Settings");
-            actionStateIndicator = playerSettings.GetComponentInChildren<ActionStateIndicator>();
+            actionStateIndicator = playerSettings?.GetComponentInChildren<ActionStateIndicator>();
         }
 
         public override void Update()
@@ -147,36 +150,36 @@ namespace SEE.Controls.Actions
         {
             if (DeletedNodes != null)
             {
-                actionStateIndicator.StartCoroutine(this.RemoveNodeFromGarbage(DeletedNodes));
-                foreach (GameObject node in DeletedNodes)
+                List<GameObject> deletedNodes = new List<GameObject>(DeletedNodes.Keys);
+                actionStateIndicator.StartCoroutine(this.RemoveNodeFromGarbage(deletedNodes));
+                foreach (KeyValuePair<GameObject, Graph> nodeGraphPair in DeletedNodes)
                 {
-                    if (node.TryGetComponentOrLog(out NodeRef nodeRef))
+                    if (nodeGraphPair.Key.TryGetComponent(out NodeRef nodeRef))
                     {
-                        if (!Graph.Contains(nodeRef.Value))
+                        if (!nodeGraphPair.Value.Contains(nodeRef.Value))
                         {
-                            Graph.AddNode(nodeRef.Value);
+                            nodeGraphPair.Value.AddNode(nodeRef.Value);
                         }
                     }
                 }
-
-                foreach (GameObject edge in DeletedEdges)
+                foreach (KeyValuePair<GameObject, Graph> edgeGraphPair in DeletedEdges)
                 {
-                    Debug.Log(DeletedEdges.Count);
-                    if (edge.TryGetComponentOrLog(out EdgeRef edgeReference))
+                    if (edgeGraphPair.Key.TryGetComponentOrLog(out EdgeRef edgeReference))
                     {
-                        Graph.AddEdge(edgeReference.edge);
-                        edge.SetVisibility(true, false);
+                        edgeGraphPair.Value.AddEdge(edgeReference.edge);
+                        edgeGraphPair.Key.SetVisibility(true, false);
                     }
                 }
             }
         }
+
 
         /// <summary>
         /// Redoes this DeleteAction
         /// </summary>
         public override void Redo()
         {
-            foreach(GameObject parent in deletedParent)
+            foreach (GameObject parent in deletedParent)
             {
                 DeleteSelectedObject(parent);
             }
@@ -193,7 +196,7 @@ namespace SEE.Controls.Actions
 
             foreach (GameObject deletedNode in deletedNodes)
             {
-                if (deletedNode.CompareTag(Tags.Node))
+                if (deletedNode.CompareTag(Tags.Node) && (!DeletedNodes.ContainsKey(deletedNode)))
                 {
                     oldPositions.Add(deletedNode.transform.position);
                     Portal.SetInfinitePortal(deletedNode);
@@ -279,7 +282,6 @@ namespace SEE.Controls.Actions
                             graph.RemoveEdge(edgeRef.edge);
                         }
                     }
-
                     nodesAndAscendingEdges.Add(actionHistoryObject);
                 }
             }
@@ -309,12 +311,38 @@ namespace SEE.Controls.Actions
 
             oldPositionsOfDeletedNodes.Reverse();
             nodesAndAscendingEdges.Reverse();
-            DeletedNodes.AddRange(nodesAndAscendingEdges);
+
+            Dictionary<GameObject, Graph> nodeDictionary = new Dictionary<GameObject, Graph>();
+            foreach (GameObject node in nodesAndAscendingEdges)
+            {
+                nodeDictionary.Add(node, graph);
+            }
+            Dictionary<GameObject, Graph> edgeDictionary = new Dictionary<GameObject, Graph>();
+            foreach (GameObject edge in edgesToHide)
+            {
+                edgeDictionary.Add(edge, graph);
+            }
+            AddRange(nodeDictionary, DeletedNodes);
+            AddRange(edgeDictionary, DeletedEdges);
             OldPositions.AddRange(oldPositionsOfDeletedNodes);
-            DeletedEdges.AddRange(edgesToHide);
-            Graph = graph;
             isRunning = false;
             selectedObject = null;
+        }
+
+        private Dictionary<GameObject, Graph> AddRange(Dictionary<GameObject, Graph> input, Dictionary<GameObject, Graph> target)
+        {
+            foreach (KeyValuePair<GameObject, Graph> g in input)
+            {
+                try
+                {
+                    target.Add(g.Key, g.Value);
+                }
+                catch(Exception)
+                {
+                    // multiple key addition
+                }
+            }
+            return target;
         }
 
         private void LocalAnySelectIn(InteractableObject interactableObject)

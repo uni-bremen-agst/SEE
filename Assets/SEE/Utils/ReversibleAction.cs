@@ -29,6 +29,7 @@
         /// in this interface. Here code can be executed for intialization.
         /// </summary>
         void Awake();
+
         /// <summary>
         /// Will be called whenever the action is to start its execution.
         /// There two different situations in which this is the case:
@@ -42,11 +43,13 @@
         /// before <see cref="Update"/> and after <see cref="Awake"/>.
         /// </summary>
         void Start();
+
         /// <summary>
         /// Will be called after <see cref="Start"/>. Can be called multiple times
         /// (e.g., once per frame) for continuously executing the action.
         /// </summary>
         void Update();
+
         /// <summary>
         /// Will be called when the action is to stop executing. This is 
         /// generally the case when another action is superseding it.
@@ -58,6 +61,7 @@
         /// Called when the effect of the action is to be reversed.
         /// </summary>
         void Undo();
+
         /// <summary>
         /// Called when the action was previously reversed by <see cref="Undo"/>
         /// to re-establish the effect that was undone.
