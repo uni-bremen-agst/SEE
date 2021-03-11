@@ -298,6 +298,7 @@ namespace SEE.Controls
             // Create HoloLensAppBar from prefab
             UnityEngine.Object appBarPrefab = Resources.Load<GameObject>("Prefabs/HoloLensAppBar");
             GameObject appBar = Instantiate(appBarPrefab) as GameObject;
+            appBar.name = "HoloLensAppBar";
             UnityEngine.Assertions.Assert.IsNotNull(appBar);
 
 
