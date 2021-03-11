@@ -57,7 +57,7 @@ namespace SEE.Controls
             if (AppBar == null)
             {
                 Debug.LogError($"Game object with the name '{AppBarName}' is missing from scene. "
-                               + "Please add it by using the prefab under 'Assets/Resources/Prefabs'.");
+                               + "Please add it by using the prefab under 'Assets/Resources/Prefabs'.\n");
                 Destroyer.DestroyComponent(this);
             }
             else
@@ -71,8 +71,7 @@ namespace SEE.Controls
                 if (!gameObject.TryGetComponent(out BoundsControl))
                 {
                     gameObject.AddComponent<BoundsControl>();
-                    BoundsControl = gameObject.GetComponent<BoundsControl>();
-                    Debug.Log($"A BoundsControl was added to the GameObject {gameObject.name}!");
+                    BoundsControl = gameObject.GetComponent<BoundsControl>();                   
                     BoundsControl.BoundsControlActivation = BoundsControlActivationType.ActivateByPointer;
                 }
             }
