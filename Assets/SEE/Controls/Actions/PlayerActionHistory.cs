@@ -44,6 +44,9 @@ namespace SEE.Controls.Actions
             }
         }
 
+        /// <summary>
+        /// The specific action state type of each action.
+        /// </summary>
         public static ActionStateType Value;
 
         /// <summary>

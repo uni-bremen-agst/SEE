@@ -236,7 +236,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public void Undo()
         {
-            throw new NotImplementedException();
+            Debug.Log("UNDO MAPPING");
         }
 
         /// <summary>
@@ -244,7 +244,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public void Redo()
         {
-            throw new NotImplementedException();
+            Debug.Log("REDO MAPPING");
         }
 
         private void OnStateChanged(ActionStateType value)

@@ -41,12 +41,18 @@ namespace SEE.Controls.Actions
             return canvasObject != null;
         }
 
+        /// <summary>
+        /// The state of an action.
+        /// </summary>
         public enum CurrentActionState
         {
             Running,
             Executed,
         }
 
+        /// <summary>
+        /// The specific state of each action.
+        /// </summary>
         public CurrentActionState CurrentState { get; set; } = CurrentActionState.Running;
 
         /// <summary>

@@ -154,16 +154,19 @@ namespace SEE.Controls.Actions
             {
                 instantiated = true;
             }
+        }
 
-            // Fixme: How should be interacted with these actions?
-            if (false)
+        /// <summary>
+        /// Operations to do when the action is finished, more specific another action is started. Destroys
+        /// the canvas object if existing and undyes the chosen city.
+        /// </summary>
+        public override void Stop()
+        {
+            if (canvasObject.TryGetComponent(out CanvasGenerator canvasGenerator))
             {
-                if (canvasObject.TryGetComponent(out CanvasGenerator canvasGenerator))
-                {
-                    canvasGenerator.DestroyAddNodeCanvasAction();
-                }
-                Undye();
+                canvasGenerator.DestroyAddNodeCanvasAction();
             }
+            Undye();
         }
 
         /// <summary>
@@ -241,6 +244,7 @@ namespace SEE.Controls.Actions
                     throw new NotImplementedException("Unhandled case.");
             }
         }
+
 
         /// <summary>
         /// Selects the city with hovering. Sets the city object on click on a GameObject.
