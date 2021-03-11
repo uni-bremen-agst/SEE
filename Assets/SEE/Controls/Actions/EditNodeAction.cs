@@ -58,7 +58,7 @@ namespace SEE.Controls.Actions
                     if (canvasObject.GetComponent<EditNodeCanvasAction>() == null)
                     {
                         CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
-                        EditNodeCanvasAction script = generator.InstantiateEditNodeCanvas();
+                        EditNodeCanvasAction script = generator.InstantiateEditNodeCanvas(this);
                         script.nodeToEdit = hoveredObject.GetComponent<NodeRef>().Value;
                         script.gameObjectID = hoveredObject.name;
                         CurrentState = CurrentActionState.Executed;
@@ -91,6 +91,17 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             Debug.Log("Redo EditNode");
+        }
+
+        /// <summary>
+        /// Is called when a new action is started at the end of this action
+        /// </summary>
+        public override void Stop()
+        {
+            CanvasGenerator canvasGenerator = canvasObject.GetComponent<CanvasGenerator>();
+            canvasGenerator.DestroyEditNodeCanvasAction();
+            hoveredObject = null;
+            EditProgress = ProgressState.NoNodeSelected;
         }
 
         public static ReversibleAction CreateReversibleAction()
