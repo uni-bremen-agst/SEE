@@ -1,7 +1,6 @@
 ﻿using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
-using System;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -11,21 +10,6 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class ScaleNodeAction : AbstractPlayerAction
     {
-        /// <summary>
-        /// Start() will register an anonymous delegate of type 
-        /// <see cref="ActionState.OnStateChangedFn"/> on the event
-        /// <see cref="ActionState.OnStateChanged"/> to be called upon every
-        /// change of the action state, where the newly entered state will
-        /// be passed as a parameter. The anonymous delegate will compare whether
-        /// this state equals <see cref="ThisActionState"/> and if so, execute
-        /// what needs to be done for this action here. If that parameter is
-        /// different from <see cref="ThisActionState"/>, this action will
-        /// put itself to sleep. 
-        /// Thus, this action will be executed only if the new state is 
-        /// <see cref="ThisActionState"/>.
-        /// </summary>
-        private readonly ActionStateType ThisActionState = ActionStateType.ScaleNode;
-
         /// <summary>
         /// The old position of the top sphere
         /// </summary>
@@ -259,8 +243,6 @@ namespace SEE.Controls.Actions
                     else if (hit.collider == endWithSave.GetComponent<Collider>())
                     {
                         EndScale(true);
-                        CurrentState = CurrentActionState.Executed;
-
                     }
                     else if (hit.collider == endWithOutSave.GetComponent<Collider>())
                     {
@@ -317,7 +299,15 @@ namespace SEE.Controls.Actions
                     SphereRadius(endWithSave);
                 }
             }
+        }
 
+        /// <summary>
+        /// Remove the spheres after finishing the action or more explicit canceling the
+        /// action and switch to another.
+        /// </summary>
+        public override void Stop()
+        {
+            RemoveSpheres();
         }
 
         /// <summary>
@@ -550,6 +540,10 @@ namespace SEE.Controls.Actions
             Debug.Log("Redo ScaleNode");
         }
 
+        /// <summary>
+        /// Returns a new instance of <see cref="ScaleNodeAction"/>.
+        /// </summary>
+        /// <returns></returns>
         public static ReversibleAction CreateReversibleAction()
         {
             return new ScaleNodeAction();

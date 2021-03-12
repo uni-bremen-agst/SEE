@@ -227,8 +227,6 @@ namespace SEE.Controls.Actions
                         if (Input.GetMouseButtonDown(0))
                         {
                             Place();
-                            CurrentState = CurrentActionState.Executed;
-
                         }
                     }
                     break;
@@ -564,7 +562,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Undo()
         {
-            Debug.Log("UNDO ADDNODE");
+            Debug.Log("Undo AddNode");
         }
 
         /// <summary>
@@ -572,9 +570,13 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Redo()
         {
-            Debug.Log("REDO ADDNODE");
+            Debug.Log("Redo AddNode");
         }
 
+        /// <summary>
+        /// Returns a new instance of <see cref="AddNodeAction"/>.
+        /// </summary>
+        /// <returns></returns>
         public static ReversibleAction CreateReversibleAction()
         {
             return new AddNodeAction();

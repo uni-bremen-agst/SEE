@@ -25,7 +25,6 @@ namespace SEE.Controls.Actions
         protected GameObject hoveredObject = null;
 
         /// <summary>
-        /// FIXME
         /// True if the active script is already initialized, else false.
         /// </summary>
         protected bool instantiated = false;
@@ -40,20 +39,6 @@ namespace SEE.Controls.Actions
             canvasObject = GameObject.Find(nameOfCanvasObject);
             return canvasObject != null;
         }
-
-        /// <summary>
-        /// The state of an action.
-        /// </summary>
-        public enum CurrentActionState
-        {
-            Running,
-            Executed,
-        }
-
-        /// <summary>
-        /// The specific state of each action.
-        /// </summary>
-        public CurrentActionState CurrentState { get; set; } = CurrentActionState.Running;
 
         /// <summary>
         /// The undo operation which has to be implemented specifically by subclasses

@@ -16,7 +16,7 @@ namespace SEE.Controls.Actions
     /// </ul>
     /// </summary>
     public class ActionStateType
-    {        
+    {
         /// <summary>
         /// A list of all available ActionStateTypes.
         /// </summary>

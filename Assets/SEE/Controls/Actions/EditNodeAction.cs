@@ -61,7 +61,6 @@ namespace SEE.Controls.Actions
                         EditNodeCanvasAction script = generator.InstantiateEditNodeCanvas(this);
                         script.nodeToEdit = hoveredObject.GetComponent<NodeRef>().Value;
                         script.gameObjectID = hoveredObject.name;
-                        CurrentState = CurrentActionState.Executed;
                     }
                     break;
 
@@ -104,6 +103,10 @@ namespace SEE.Controls.Actions
             EditProgress = ProgressState.NoNodeSelected;
         }
 
+        /// <summary>
+        /// Returns a new instance of <see cref="EditNodeAction"/>.
+        /// </summary>
+        /// <returns></returns>
         public static ReversibleAction CreateReversibleAction()
         {
             return new EditNodeAction();
