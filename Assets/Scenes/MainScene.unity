@@ -2546,7 +2546,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcc1cedcf0a20b04ca3d2bb78035f3cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerInputType: 3
+  playerInputType: 0
   PlayerOrigin: {x: 0, y: 0.5, z: -1.5}
   FocusPlane: {fileID: 1972412193}
   Ground: {fileID: 1190604626}
@@ -3321,7 +3321,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Directory
+      Data: Cluster
     - Name: $v
       Entry: 5
       Data: true
@@ -3333,7 +3333,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: File
+      Data: Architecture_Layer
     - Name: $v
       Entry: 5
       Data: true
@@ -3586,12 +3586,12 @@ MonoBehaviour:
   RadialSegments: 8
   isEdgeSelectable: 1
   GXLPath:
-    Root: 1
-    relativePath: /Data/GXL/three_files.gxl
+    Root: 3
+    relativePath: /mini/Architecture.gxl
     absolutePath: 
   CSVPath:
-    Root: 1
-    relativePath: /Data/GXL/three_files.csv
+    Root: 3
+    relativePath: /mini/Architecture.csv
     absolutePath: 
 --- !u!114 &1758871330
 MonoBehaviour:
@@ -3634,7 +3634,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.0030950308
+  HeightOffset: 0.003060639
 --- !u!65 &1758871333
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3962,10 +3962,10 @@ MonoBehaviour:
       Data: 0|SEE.Game.DataPath, SEE
     - Name: Root
       Entry: 3
-      Data: 2
+      Data: 3
     - Name: relativePath
       Entry: 1
-      Data: 
+      Data: /mini/CodeFacts.gvl
     - Name: absolutePath
       Entry: 1
       Data: 
@@ -4015,7 +4015,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Directory
+      Data: Class
     - Name: $v
       Entry: 5
       Data: true
@@ -4027,7 +4027,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: File
+      Data: Package
     - Name: $v
       Entry: 5
       Data: true
@@ -4234,8 +4234,8 @@ MonoBehaviour:
       Data: 
   LODCulling: 0.01
   LayoutPath:
-    Root: 2
-    relativePath: 
+    Root: 3
+    relativePath: /mini/CodeFacts.gvl
     absolutePath: 
   CityPath:
     Root: 2
@@ -4265,8 +4265,8 @@ MonoBehaviour:
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
   LeafObjects: 0
-  InnerNodeObjects: 5
-  NodeLayout: 1
+  InnerNodeObjects: 3
+  NodeLayout: 4
   EdgeLayout: 3
   ZScoreScale: 0
   EdgeWidth: 0.01
@@ -4280,12 +4280,12 @@ MonoBehaviour:
   RadialSegments: 8
   isEdgeSelectable: 0
   GXLPath:
-    Root: 1
-    relativePath: /Data/GXL/three_files.gxl
+    Root: 3
+    relativePath: /mini/CodeFacts.gxl
     absolutePath: 
   CSVPath:
-    Root: 1
-    relativePath: /Data/GXL/three_files.csv
+    Root: 3
+    relativePath: /mini/CodeFacts.csv
     absolutePath: 
 --- !u!114 &1972412191
 MonoBehaviour:
@@ -4328,7 +4328,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.014835119
+  HeightOffset: 0.0030605197
 --- !u!65 &1972412194
 BoxCollider:
   m_ObjectHideFlags: 0
