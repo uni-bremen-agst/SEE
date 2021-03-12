@@ -28,6 +28,16 @@ namespace SEE.Game.UI
         private const string MODE_PANEL_PREFAB = "Prefabs/UI/ModePanel";
 
         /// <summary>
+        /// The color of the action state indicator after it has been instantiated.
+        /// </summary>
+        private Color StartColor = Color.gray.ColorWithAlpha(0.5f);
+
+        /// <summary>
+        /// The text of the action state indicator after it has been instantiated.
+        /// </summary>
+        private string StartText = "Unknown";
+
+        /// <summary>
         /// Adds the indicator prefab and parents it to the UI Canvas.
         /// </summary>
         protected override void StartDesktop()
@@ -42,12 +52,12 @@ namespace SEE.Game.UI
 
             if (indicator.TryGetComponentOrLog(out ModePanelImage))
             {
-                ModePanelImage.color = ActionState.Value.Color.ColorWithAlpha(0.5f);
+                ModePanelImage.color = StartColor;
             }
 
             if (indicator.transform.Find("ModeText")?.gameObject.TryGetComponentOrLog(out ModePanelText) != null)
             {
-                ModePanelText.SetText(ActionState.Value.Name);
+                ModePanelText.SetText(StartText);
             }
             else
             {
@@ -61,8 +71,17 @@ namespace SEE.Game.UI
         /// <param name="newState">New state which shall be displayed in the indicator</param>
         public void ChangeState(ActionStateType newState)
         {
-            ModePanelImage.color = newState.Color.ColorWithAlpha(0.5f);
-            ModePanelText.text = newState.Name;
+            if (ModePanelImage)
+            {
+                ModePanelImage.color = newState.Color.ColorWithAlpha(0.5f);
+                ModePanelText.text = newState.Name;
+            }
+            else
+            {
+                // Indicator has not yet been initialized
+                StartColor = newState.Color.ColorWithAlpha(0.5f);
+                StartText = newState.Name;
+            }
         }
     }
 }
