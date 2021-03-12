@@ -47,33 +47,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowLeafMetrics: 1
   ShowInnerNodeMetrics: 1
-  selectionMode: 0
-  cameraDistance: 40
-  moveWithRotation: 1
-  cameraFlightTime: 0.5
   minimumSize: 300
-  clickDelay: 0.1
   dragDelay: 0.2
-  buildingHighlightMaterial: {fileID: 2100000, guid: 9d631e931375b5242b8903c497a12c74,
-    type: 2}
-  buildingHighlightMaterialAccentuated: {fileID: 2100000, guid: 47a608dbb7b25de439f92bacb8350815,
-    type: 2}
-  highlightOutline: 0.005
-  standardColor: {r: 1, g: 0.9721673, b: 0.24056599, a: 1}
-  accentuationColor: {r: 1, g: 0.23921567, b: 0.62098527, a: 1}
-  highlightLineLength: 20
-  highlightDuration: 5
   pointerLength: 20
   chartScrollSpeed: 10
   distanceThreshold: 0.5
-  chartsPrefab: {fileID: 753839275229978629, guid: 87467f28fd5c34148a88077659a86497,
-    type: 3}
-  chartPrefabVr: {fileID: 5335390132035948169, guid: db3bfb72d0ee2784ebea15a0c9c8b774,
-    type: 3}
-  nonVrObjects: []
+  chartsPrefab: {fileID: 753839275229978629, guid: 87467f28fd5c34148a88077659a86497, type: 3}
+  chartPrefabVr: {fileID: 5335390132035948169, guid: db3bfb72d0ee2784ebea15a0c9c8b774, type: 3}
   maximizedSprite: {fileID: 21300000, guid: 3dd8a1777d7c2dd4f9faf31f3a995232, type: 3}
   minimizedSprite: {fileID: 21300000, guid: 582af9fbe4fe81b4680058a1f0485806, type: 3}
-  highlightOutlineAnim: 0.001
 --- !u!95 &3012320082979034755
 Animator:
   serializedVersion: 3
@@ -131,9 +113,9 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4247797971763663025}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f09694a74f8ed8949baef5a133825980, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cameraTransform: {fileID: 0}
+  CameraTransform: {fileID: 0}
