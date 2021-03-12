@@ -77,8 +77,8 @@ namespace SEE.Controls.Actions
                 CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
                 generator.DestroyEditNodeCanvasAction();
                 new EditNodeNetAction(nodeToEdit.SourceName, nodeToEdit.Type, gameObjectID).Execute(null);
-                GameObject g = GameObject.Find(PlayerSettings.PlayerName[(int)PlayerSettings.PlayerInputType.Desktop]);
-                EditNodeAction current = g.GetComponent<EditNodeAction>();
+                GameObject player = PlayerSettings.LocalPlayer;
+                EditNodeAction current = player.GetComponent<EditNodeAction>();
                 current.EditProgress = EditNodeAction.ProgressState.NoNodeSelected;
                 InteractableObject.UnselectAll(true);
                 editNode = false;

@@ -2,16 +2,11 @@
 
 using System;
 using System.Linq;
-using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.DataModel;
 using SEE.Game;
-using SEE.Game.Charts.VR;
-using SEE.Utils;
 using UnityEditor;
 using UnityEngine;
-using Valve.VR;
-using Valve.VR.InteractionSystem;
 using Plane = SEE.GO.Plane;
 using PlayerSettings = SEE.Controls.PlayerSettings;
 
@@ -136,66 +131,12 @@ namespace SEEEditor
             table.name = "Table";
             table.tag = Tags.CullingPlane;
 
-            // Create VRPlayer from SteamVR prefab
-            SetupVRPlayer(out GameObject vrCamera);
-
-            // Create Desktop player from prefab
-            UnityEngine.Object desktopPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Players/DesktopPlayer.prefab");
-            GameObject desktopPlayer = Instantiate(desktopPrefab) as GameObject;
-            UnityEngine.Assertions.Assert.IsNotNull(desktopPlayer);
-            //throw new NotImplementedException("Reference must be set in PlayerSettings.cs");
-            //desktopPlayer.name = "DesktopPlayer"; // TODO(torben): set reference in PlayerSettings.cs
-            desktopPlayer.name = PlayerSettings.PlayerName[(int)PlayerSettings.PlayerInputType.Desktop];
-            desktopPlayer.tag = Tags.MainCamera;
-            desktopPlayer.GetComponent<DesktopPlayerMovement>().focusedObject = table.GetComponent<Plane>();
-            
-            // Create InControl from prefab
-            UnityEngine.Object inControlPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Players/InControl.prefab");
-            GameObject inControl = Instantiate(inControlPrefab) as GameObject;
-            UnityEngine.Assertions.Assert.IsNotNull(inControl);
-            inControl.name = "InControl";
-            
             // Create ChartManager from prefab
             UnityEngine.Object chartManagerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Charts/ChartManager.prefab");
             GameObject chartManager = Instantiate(chartManagerPrefab) as GameObject;
             UnityEngine.Assertions.Assert.IsNotNull(chartManager);
             chartManager.name = "Chart Manager";
-            chartManager.transform.GetChild(0).GetComponent<ChartPositionVr>().cameraTransform = vrCamera.transform;
-            
-            // Create HoloLensAppBar from prefab
-            UnityEngine.Object appBarPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Resources/Prefabs/HoloLensAppBar.prefab");
-            GameObject appBar = Instantiate(appBarPrefab) as GameObject;
-            UnityEngine.Assertions.Assert.IsNotNull(appBar);
-            chartManager.name = AppBarInteractableObject.AppBarName;
-        }
 
-        /// <summary>
-        /// Sets up the VR player for use in a scene.
-        /// </summary>
-        /// <param name="vrCamera">This will be filled with the child camera object of the VRPlayer.</param>
-        private static void SetupVRPlayer(out GameObject vrCamera)
-        {
-            UnityEngine.Object steamVrPrefab =
-                AssetDatabase.LoadAssetAtPath<GameObject>("Assets/SteamVR/InteractionSystem/Core/Prefabs/Player.prefab");
-            GameObject vrPlayer = Instantiate(steamVrPrefab) as GameObject;
-            UnityEngine.Assertions.Assert.IsNotNull(vrPlayer);
-            //throw new NotImplementedException("Reference must be set in PlayerSettings.cs");
-            //vrPlayer.name = "VRPlayer"; // TODO(torben): set reference in PlayerSettings.cs
-            vrPlayer.name = PlayerSettings.PlayerName[(int)PlayerSettings.PlayerInputType.VR]; ;
-            // We need to find the right and left hand first to use them later
-            Hand rightHand = GameObjectHierarchy.Descendants(vrPlayer)
-                .First(x => x.name == "RightHand").GetComponent<Hand>();
-            Hand leftHand = GameObjectHierarchy.Descendants(vrPlayer)
-                .First(x => x.name == "LeftHand").GetComponent<Hand>();
-            // We also need the camera later for the ChartManager
-            vrCamera = GameObjectHierarchy.Descendants(vrPlayer, Tags.MainCamera).First();
-            CharacterController vrController = vrPlayer.AddComponent<CharacterController>();
-            vrPlayer.AddComponent<SteamVR_ActivateActionSetOnLoad>();
-            vrPlayer.AddComponent<XRChartAction>();
-            vrPlayer.AddComponent<XRRay>().PointingHand = rightHand;
-            XRPlayerMovement playerMovement = vrPlayer.AddComponent<XRPlayerMovement>();
-            playerMovement.characterController = vrController;
-            playerMovement.DirectingHand = leftHand;
         }
     }
 }
