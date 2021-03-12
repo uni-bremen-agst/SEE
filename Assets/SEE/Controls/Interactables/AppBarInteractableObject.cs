@@ -3,6 +3,7 @@ using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.UI;
 using Microsoft.MixedReality.Toolkit.UI.BoundsControl;
 using Microsoft.MixedReality.Toolkit.UI.BoundsControlTypes;
+using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 
@@ -45,7 +46,7 @@ namespace SEE.Controls
 
         private void Start()
         {
-            if (PlayerSettings.GetInputType() != PlayerSettings.PlayerInputType.HoloLens)
+            if (PlayerSettings.GetInputType() != PlayerInputType.HoloLensPlayer)
             {
                 Destroyer.DestroyComponent(this);
                 return;
@@ -56,7 +57,7 @@ namespace SEE.Controls
             if (AppBar == null)
             {
                 Debug.LogError($"Game object with the name '{AppBarName}' is missing from scene. "
-                               + "Please add it by using the prefab under 'Assets/Resources/Prefabs'.");
+                               + "Please add it by using the prefab under 'Assets/Resources/Prefabs'.\n");
                 Destroyer.DestroyComponent(this);
             }
             else
@@ -70,8 +71,7 @@ namespace SEE.Controls
                 if (!gameObject.TryGetComponent(out BoundsControl))
                 {
                     gameObject.AddComponent<BoundsControl>();
-                    BoundsControl = gameObject.GetComponent<BoundsControl>();
-                    Debug.Log($"A BoundsControl was added to the GameObject {gameObject.name}!");
+                    BoundsControl = gameObject.GetComponent<BoundsControl>();                   
                     BoundsControl.BoundsControlActivation = BoundsControlActivationType.ActivateByPointer;
                 }
             }
