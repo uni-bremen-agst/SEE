@@ -152,17 +152,17 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Creates the kind of player required for the given <paramref name="playerInputType"/>.
+        /// Creates the kind of player required for the given <paramref name="inputType"/>.
         /// For some players, additional game objects and/or components will be added to the
         /// scene required for the particular player to work correctly.
         /// </summary>
-        /// <param name="playerInputType">the kind of environment the player is to run</param>
-        /// <returns>new player for given <paramref name="playerInputType"/></returns>
-        private GameObject CreatePlayer(PlayerInputType playerInputType)
+        /// <param name="inputType">the kind of environment the player is to run</param>
+        /// <returns>new player for given <paramref name="inputType"/></returns>
+        private GameObject CreatePlayer(PlayerInputType inputType)
         {
             GameObject player;
 
-            switch (playerInputType)
+            switch (inputType)
             {
                 case PlayerInputType.DesktopPlayer:
                     if (FocusPlane == null)
@@ -191,7 +191,7 @@ namespace SEE.Controls
                     break;
                 case PlayerInputType.None: return null; // No player needs to be created
                 default:
-                    throw new NotImplementedException($"Unhandled case {playerInputType}.");
+                    throw new NotImplementedException($"Unhandled case {inputType}.");
             }
             player.transform.position = PlayerOrigin;
             return player;
