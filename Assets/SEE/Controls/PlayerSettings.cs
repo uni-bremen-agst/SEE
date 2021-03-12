@@ -250,12 +250,12 @@ namespace SEE.Controls
                         }
                         else
                         {
-                            Debug.Log($"{ChartManagerName} has no component ChartPositionVr.\n");
+                            Debug.LogError($"{ChartManagerName} has no component {typeof(ChartPositionVr).Name}.\n");
                         }
                     }
                     else
                     {
-                        Debug.Log($"No {ChartManagerName} found.\n");
+                        Debug.LogError($"No {ChartManagerName} found.\n");
                     }
                 }
             }
@@ -288,26 +288,21 @@ namespace SEE.Controls
         /// </summary>
         private void SetupMixedReality()
         {
-
             // Add a MixedRealityToolkit to the scene
             UnityEngine.Object mrtkPrefab = Resources.Load<GameObject>("Prefabs/MixedRealityToolkit");
             GameObject mrtk = Instantiate(mrtkPrefab) as GameObject;
             //mrtk.AddComponent<MixedRealityToolkit>();
-            
-            
+
             // Create HoloLensAppBar from prefab
             UnityEngine.Object appBarPrefab = Resources.Load<GameObject>("Prefabs/HoloLensAppBar");
             GameObject appBar = Instantiate(appBarPrefab) as GameObject;
             appBar.name = "HoloLensAppBar";
             UnityEngine.Assertions.Assert.IsNotNull(appBar);
 
-
             // Add a city collection
             UnityEngine.Object cityCollectionPrefab = Resources.Load<GameObject>("Prefabs/CityCollection");
             GameObject cityCollection = Instantiate(cityCollectionPrefab) as GameObject;
-            //cityCollection.AddComponent<GridObjectCollection>();
-            
-
+            // cityCollection.AddComponent<GridObjectCollection>();
 
             // Hide all decoration to improve performance
             GameObject.FindGameObjectsWithTag(Tags.Decoration).ForEach(go => go.SetActive(false));
