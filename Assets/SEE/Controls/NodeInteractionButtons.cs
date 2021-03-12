@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using SEE.Controls.Actions;
-using System.Linq;
 using SEE.Utils;
 
 namespace SEE.Controls
@@ -33,18 +32,6 @@ namespace SEE.Controls
         public Button EditNodeButton;
 
         /// <summary>
-        /// The player desktop that is the parent of the <see cref="AddNodeAction"/> 
-        /// and <see cref="EditNodeAction"/>.
-        /// </summary>
-        private GameObject playerDesktop;
-
-        /// <summary>
-        /// The name of the GameObject that is the parent of the <see cref="AddNodeAction"/> 
-        /// and <see cref="EditNodeAction"/>.
-        /// </summary>
-        private const string gameObjectName = "Player Desktop";
-
-        /// <summary>
         /// The action which is currently executed.
         /// </summary>
         public static ReversibleAction addOrEditNode;
@@ -58,8 +45,6 @@ namespace SEE.Controls
             EditNodeCancel?.onClick?.AddListener(EditIsCanceled);
             EditNodeButton?.onClick?.AddListener(EditNode);
             AddNodeCancel?.onClick?.AddListener(AddingIsCanceled);
-
-            playerDesktop = GameObject.Find(gameObjectName);
         }
 
         /// <summary>
@@ -73,8 +58,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Sets a bool in the <see cref="EditNodeAction"/> which closes the adding-node canvas.
-        /// FIXME: There is no bool here. This comment must be fixed.
+        /// Marks the action to edit an existing node as being canceled.
         /// </summary>
         public void EditIsCanceled()
         {
