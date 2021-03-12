@@ -56,11 +56,35 @@ namespace SEE.Game
                 CallTreeReader callTreeReader = new CallTreeReader(filename, new SEELogger());
                 callTreeReader.Load();
 
-                GameObject runtimeGO = new GameObject();
-                runtimeGO.transform.parent = transform;
-                runtimeGO.name = Tags.Runtime;
-                runtimeGO.tag = Tags.Runtime;
-                runtimeGO.AddComponent<Runtime.Runtime>().callTree = callTreeReader.CallTree;
+                // There might already be a child with a Runtime component. If that is the
+                // case, we will re-use it. Otherwise we will create a new child with a 
+                // fresh Runtime component.
+                Runtime.Runtime runTime = gameObject.GetComponentInChildren<Runtime.Runtime>();
+                if (runTime == null)
+                {
+                    GameObject runtimeGO = new GameObject();
+                    runtimeGO.transform.parent = transform;
+                    runtimeGO.name = Tags.Runtime;
+                    runtimeGO.tag = Tags.Runtime;
+                    runTime = runtimeGO.AddComponent<Runtime.Runtime>();
+                }
+                runTime.callTree = callTreeReader.CallTree;
+            }
+        }
+
+        /// <summary>
+        /// In addition to the behavior of Reset() in the superclass, all children
+        /// tagged by Tags.Runtime will be destroyed.
+        /// </summary>
+        public override void Reset()
+        {
+            base.Reset();
+            foreach (Transform child in transform)
+            {
+                if (child.CompareTag(Tags.Runtime))
+                {
+                    Destroyer.DestroyGameObject(child.gameObject);
+                }
             }
         }
 
