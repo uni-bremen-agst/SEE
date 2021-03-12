@@ -104,7 +104,7 @@ namespace SEE.Controls.Actions
 
         protected sealed override void Awake()
         {
-            if (FindObjectOfType<PlayerSettings>().playerInputType != PlayerSettings.PlayerInputType.Desktop)
+            if (FindObjectOfType<PlayerSettings>().playerInputType != PlayerInputType.DesktopPlayer)
             {
                 Destroy(this);
                 return;

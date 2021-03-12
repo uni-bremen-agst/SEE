@@ -231,7 +231,7 @@ namespace SEE.Game
         public static Transform GetCodeCity(Transform transform)
         {
             Transform result = transform;
-            if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.HoloLens)
+            if (PlayerSettings.GetInputType() == PlayerInputType.HoloLensPlayer)
             {
                 // If the MRTK is enabled, the cities will be part of a CityCollection, so we can't simply use the root.
                 // In this case, we actually have to traverse the tree up until the Tags match.

@@ -148,7 +148,7 @@ namespace SEE.GO
             string materialName = null;
 
             // When the user is on a HoloLens, the special MRTK shader variants should be used
-            if (PlayerSettings.GetInputType() != PlayerSettings.PlayerInputType.HoloLens)
+            if (PlayerSettings.GetInputType() != PlayerInputType.HoloLensPlayer)
             {
                 switch (shaderType)
                 {
