@@ -542,11 +542,6 @@ namespace SEE.Game
             {
                 currentNode.SetActive(true);
             }
-            // Deletes the nodes created during animation
-            foreach (GameObject animationNode in animationNodes)
-            {
-                Destroyer.DestroyGameObject(animationNode);
-            }
             // Adds a marker to the nodes
             foreach ((GameObject, MarkerType) nodeMarker in animationMarker)
             {
@@ -794,7 +789,7 @@ namespace SEE.Game
             // The actual node is shifted to its new position.
             graphRenderer.Apply(currentGameNode, gameObject, layoutNode);
             // The copied node is animated.
-            moveScaleShakeAnimator.AnimateTo(animationNode, layoutNode, difference, null);
+            moveScaleShakeAnimator.AnimateTo(animationNode, layoutNode, difference, OnAnimationNodeAnimationFinished);
         }
 
         /// <summary>
@@ -808,6 +803,20 @@ namespace SEE.Game
             if (gameObject != null && gameObject is GameObject)
             {
                 Destroy((GameObject)gameObject);
+            }
+        }
+
+        /// <summary>
+        /// Event function that destroys the given <paramref name="gameObject"/>.
+        /// Called as a callback and deletes the <paramref name="gameObject"/>
+        /// after the animation is finished.
+        /// </summary>
+        /// <param name="gameObject">game object to be destroyed</param>
+        private void OnAnimationNodeAnimationFinished(object gameObject)
+        {
+            if (gameObject != null && gameObject is GameObject)
+            {
+                Destroy((GameObject)gameObject,AnimationDuration);
             }
         }
 
