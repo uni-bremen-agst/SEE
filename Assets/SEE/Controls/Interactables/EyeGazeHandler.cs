@@ -32,7 +32,7 @@ namespace SEE.Controls
         private void Awake()
         {
             PlayerSettings settings = PlayerSettings.GetPlayerSettings();
-            if (settings.playerInputType != PlayerSettings.PlayerInputType.HoloLens || !settings.EyeGazeHover)
+            if (settings.playerInputType != PlayerInputType.HoloLensPlayer || !settings.EyeGazeHover)
             {
                 Destroyer.DestroyComponent(this);
                 return;
