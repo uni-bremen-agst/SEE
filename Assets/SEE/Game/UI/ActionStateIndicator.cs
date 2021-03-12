@@ -8,7 +8,7 @@ using Valve.VR.InteractionSystem;
 namespace SEE.Game.UI
 {
     /// <summary>
-    /// Represents an indicator which displays the current <see cref="ActionState"/>.
+    /// Represents an indicator which displays the current <see cref="ActionStateType"/>.
     /// </summary>
     public class ActionStateIndicator: PlatformDependentComponent
     {
