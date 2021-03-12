@@ -1,4 +1,5 @@
 ﻿using SEE.DataModel;
+using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Utils
@@ -46,7 +47,7 @@ namespace SEE.Utils
                             camera = Camera.main;
                             break;
                     }
-                    Debug.LogFormat("Selected main camera: {0}.\n", camera.name);
+                    Debug.Log($"Selected main camera {camera.name} in game object {camera.gameObject.FullName()}.\n");
                 }
                 return camera;
             }

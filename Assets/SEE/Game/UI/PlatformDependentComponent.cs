@@ -1,5 +1,6 @@
 ﻿using OdinSerializer.Utilities;
 using SEE.Controls;
+using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 
@@ -93,17 +94,17 @@ namespace SEE.Game.UI
             Platform = PlayerSettings.GetInputType();
             switch (Platform)
             {
-                case PlayerSettings.PlayerInputType.Desktop: StartDesktop();
+                case PlayerInputType.DesktopPlayer: StartDesktop();
                     break;
-                case PlayerSettings.PlayerInputType.TouchGamepad: StartTouchGamepad();
+                case PlayerInputType.TouchGamepadPlayer: StartTouchGamepad();
                     break;
-                case PlayerSettings.PlayerInputType.VR: StartVR();
+                case PlayerInputType.VRPlayer: StartVR();
                     //TODO: Apply CurvedUI to canvas
                     break;
-                case PlayerSettings.PlayerInputType.HoloLens: StartHoloLens();
+                case PlayerInputType.HoloLensPlayer: StartHoloLens();
                     //TODO: Convert to MRTK Canvas and add NearInteractionTouchableUnityUI, as recommended 
                     break;
-                case PlayerSettings.PlayerInputType.None: // no UI has to be rendered
+                case PlayerInputType.None: // no UI has to be rendered
                     break;  
                 default: PlatformUnsupported();
                     break;
@@ -114,15 +115,15 @@ namespace SEE.Game.UI
         {
             switch (Platform)
             {
-                case PlayerSettings.PlayerInputType.Desktop: UpdateDesktop();
+                case PlayerInputType.DesktopPlayer: UpdateDesktop();
                     break;
-                case PlayerSettings.PlayerInputType.TouchGamepad: UpdateTouchGamepad();
+                case PlayerInputType.TouchGamepadPlayer: UpdateTouchGamepad();
                     break;
-                case PlayerSettings.PlayerInputType.VR: UpdateVR();
+                case PlayerInputType.VRPlayer: UpdateVR();
                     break;
-                case PlayerSettings.PlayerInputType.HoloLens: UpdateHoloLens();
+                case PlayerInputType.HoloLensPlayer: UpdateHoloLens();
                     break;
-                case PlayerSettings.PlayerInputType.None: // no UI has to be rendered
+                case PlayerInputType.None: // no UI has to be rendered
                     break;  
                 default: PlatformUnsupported();
                     break;

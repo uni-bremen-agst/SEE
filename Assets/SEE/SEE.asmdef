@@ -1,18 +1,18 @@
 {
     "name": "SEE",
+    "rootNamespace": "",
     "references": [
         "GUID:b42d3f2b4b2024b0fb4b93601f0faf4c",
         "GUID:74fd32818bdd6ed012fb3490ef6e9793",
         "GUID:1fbf338ef6b952a448262a7ff7df5fe4",
-        "GUID:aa6566e932b797047baf84679039a6bb",
         "GUID:6055be8ebefd69e48b49212b09b47b2f",
-        "GUID:4193d973dd9520c4c99ad13d4f9b1f08",
         "GUID:494c63475fee9483c8fce70028bf0ec3",
         "GUID:a7a4c34601384f9389d5c4207f3c6331",
         "GUID:8b7cc3e86d77403b8b984c08cbaeaf8f",
         "GUID:624fcfd0a59299b4985987e6a89552b2",
-        "GUID:0d15e06d88ad85c4e8793535401b5eef",
         "GUID:bf06a4913aa6be5409beddfe58700866",
+        "GUID:8f5789a6cc1dc2f4c95e162ed7a64afb",
+        "GUID:35b9c7a103b322f43805bf1744257ac7",
         "GUID:47588e3d37f573d458b0eaa6cc8109c2"
     ],
     "includePlatforms": [],
