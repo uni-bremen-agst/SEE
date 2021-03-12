@@ -10,11 +10,9 @@ using SEE.DataModel;
 using SEE.Game;
 using SEE.Game.Charts.VR;
 using SEE.GO;
-using SEE.Utils;
 using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
-using Hand = Valve.VR.InteractionSystem.Hand;
 
 namespace SEE.Controls
 {
@@ -184,7 +182,6 @@ namespace SEE.Controls
                     break;
                 case PlayerInputType.HoloLensPlayer:
                     {                        
-                        
                         player = PlayerFactory.CreateHololensPlayer();
                         SetupMixedReality();
                     }
@@ -192,6 +189,7 @@ namespace SEE.Controls
                 case PlayerInputType.TouchGamepadPlayer:
                     player = PlayerFactory.CreateTouchGamepadPlayer();
                     break;
+                case PlayerInputType.None: return null; // No player needs to be created
                 default:
                     throw new NotImplementedException($"Unhandled case {playerInputType}.");
             }
