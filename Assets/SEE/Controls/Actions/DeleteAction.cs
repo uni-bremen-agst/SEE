@@ -1,7 +1,6 @@
 ﻿using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
-using SEE.Game.UI;
 using SEE.GO;
 using SEE.Utils;
 using System;
@@ -67,9 +66,9 @@ namespace SEE.Controls.Actions
         protected GameObject garbageCan;
 
         /// <summary>
-        /// The action state indicator which is attached to the player settings
+        /// The playerSettings-script which is attached to the player settings
         /// </summary>
-        private ActionStateIndicator actionStateIndicator;
+        private PlayerSettings playerSettings;
 
         /// <summary>
         /// The name of the garbage can gameObject.
@@ -92,8 +91,8 @@ namespace SEE.Controls.Actions
             // The MonoBehaviour is enabled and Update() will be called by Unity.
             InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
             InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
-            GameObject playerSettings = GameObject.Find("Player Settings");
-            actionStateIndicator = playerSettings?.GetComponentInChildren<ActionStateIndicator>();
+            GameObject player_Settings = GameObject.Find("Player Settings");
+            playerSettings = player_Settings?.GetComponentInChildren<PlayerSettings>();
         }
 
         public override void Update()
@@ -138,7 +137,7 @@ namespace SEE.Controls.Actions
                         return;
                     }
                     List<GameObject> deletedNodes = GameObjectTraversion.GetAllChildNodes(new List<GameObject>(), selectedObject);
-                    actionStateIndicator.StartCoroutine(this.MoveNodeToGarbage(deletedNodes));
+                    playerSettings.StartCoroutine(this.MoveNodeToGarbage(deletedNodes));
                 }
             }
         }
@@ -151,7 +150,7 @@ namespace SEE.Controls.Actions
             if (DeletedNodes != null)
             {
                 List<GameObject> deletedNodes = new List<GameObject>(DeletedNodes.Keys);
-                actionStateIndicator.StartCoroutine(this.RemoveNodeFromGarbage(deletedNodes));
+                playerSettings.StartCoroutine(this.RemoveNodeFromGarbage(deletedNodes));
                 foreach (KeyValuePair<GameObject, Graph> nodeGraphPair in DeletedNodes)
                 {
                     if (nodeGraphPair.Key.TryGetComponent(out NodeRef nodeRef))
@@ -172,7 +171,6 @@ namespace SEE.Controls.Actions
                 }
             }
         }
-
 
         /// <summary>
         /// Redoes this DeleteAction
