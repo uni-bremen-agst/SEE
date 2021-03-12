@@ -63,7 +63,8 @@ namespace SEE.GO.Menu
                 first = false;
             }
 
-            GameObject modeMenuGO = attachTo ?? new GameObject { name = "Mode Menu" };
+            // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
+            GameObject modeMenuGO = attachTo ? attachTo : new GameObject { name = "Mode Menu" };
             SelectionMenu modeMenu = modeMenuGO.AddComponent<SelectionMenu>();
             modeMenu.Title = "Mode Selection";
             modeMenu.Description = "Please select the mode you want to activate.";
@@ -84,7 +85,8 @@ namespace SEE.GO.Menu
         /// <returns>The newly created ActionStateIndicator.</returns>
         private static ActionStateIndicator CreateActionStateIndicator(GameObject attachTo = null)
         {
-            GameObject actionStateGO = attachTo ?? new GameObject {name = "Action State Indicator"};
+            // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
+            GameObject actionStateGO = attachTo ? attachTo : new GameObject {name = "Action State Indicator"};
             ActionStateIndicator indicator = actionStateGO.AddComponent<ActionStateIndicator>();
             return indicator;
         }
@@ -93,20 +95,17 @@ namespace SEE.GO.Menu
         {
             ModeMenu = CreateModeMenu(gameObject);
             Indicator = CreateActionStateIndicator(gameObject);
-            ActionState.OnStateChanged += OnStateChanged;
+            // Whenever the state is changed, the action state indicator should reflect that
+            ModeMenu.OnMenuEntrySelected.AddListener(SetIndicatorStateToEntry);
+            // Initialize action state indicator to current action state
+            SetIndicatorStateToEntry(ModeMenu.GetActiveEntry());
             Assert.IsTrue(ActionStateType.AllTypes.Count <= 9, 
                           "Only up to 9 (10 if zero is included) entries can be selected via the numbers on the keyboard!");
-        }
-        
-        /// <summary>
-        /// Called whenever the action state changes.
-        /// This updates the menu to indicate the selected value, and updates the action state indicator.
-        /// </summary>
-        /// <param name="value">The new action state</param>
-        private void OnStateChanged(ActionStateType value)
-        {
-            ModeMenu.SelectEntry(value.Value);
-            Indicator.ChangeState(value);
+
+            void SetIndicatorStateToEntry(ToggleMenuEntry entry)
+            {
+                Indicator.ChangeState(ActionStateType.FromID(ModeMenu.Entries.IndexOf(entry)));
+            }
         }
 
         /// <summary>

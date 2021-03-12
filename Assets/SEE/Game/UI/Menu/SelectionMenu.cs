@@ -11,7 +11,7 @@ namespace SEE.Game.UI
         protected override void OnEntrySelected(ToggleMenuEntry entry)
         {
             // Disable all entries except the selected one, this will automatically call DoExitAction()
-            foreach (ToggleMenuEntry listEntry in Entries)
+            foreach (ToggleMenuEntry listEntry in entries)
             {
                 listEntry.Active = Equals(listEntry, entry);
             }
@@ -25,9 +25,9 @@ namespace SEE.Game.UI
         /// </summary>
         /// <returns>the first active entry in the <see cref="entries"/> list,
         /// or <c>null</c> if there is no such entry.</returns>
-        private ToggleMenuEntry GetActiveEntry()
+        public ToggleMenuEntry GetActiveEntry()
         {
-            return Entries.FirstOrDefault(x => x.Active);
+            return entries.FirstOrDefault(x => x.Active);
         }
     }
 }

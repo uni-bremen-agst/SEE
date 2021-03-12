@@ -24,7 +24,7 @@ namespace SEE.Game.UI
 
         /// <summary>
         /// The path to the prefab for the menu game object.
-        /// Will be added for each menu entry in <see cref="Entries"/>.
+        /// Will be added for each menu entry in <see cref="entries"/>.
         /// </summary>
         private const string BUTTON_PREFAB = "Prefabs/UI/Button";
         
@@ -145,7 +145,7 @@ namespace SEE.Game.UI
 
             // Then, add all entries as buttons
             Object buttonPrefab = Resources.Load<GameObject>(BUTTON_PREFAB);
-            foreach (T entry in Entries)
+            foreach (T entry in entries)
             {
                 GameObject button = Instantiate(buttonPrefab, List.transform, false) as GameObject;
                 GameObject text = button?.transform.Find("Text").gameObject;
@@ -169,7 +169,7 @@ namespace SEE.Game.UI
                 buttonManager.hoverEvent.AddListener(() => ShowTooltip(entry.Description));
                 if (entry.Enabled)
                 {
-                    buttonManager.clickEvent.AddListener(entry.DoAction);
+                    buttonManager.clickEvent.AddListener(() => OnEntrySelected(entry));
                     buttonImage.color = entry.EntryColor;
                     textMeshPro.color = entry.EntryColor.IdealTextColor();
                     iconImage.color = entry.EntryColor.IdealTextColor();
