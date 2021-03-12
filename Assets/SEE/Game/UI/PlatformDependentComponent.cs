@@ -40,7 +40,7 @@ namespace SEE.Game.UI
         /// <summary>
         /// The current platform.
         /// </summary>
-        protected PlayerSettings.PlayerInputType Platform { get; private set; }
+        protected PlayerInputType Platform { get; private set; }
 
         /// <summary>
         /// Called when the <see cref="Start()"/> method of this component is executed on the Desktop platform.
