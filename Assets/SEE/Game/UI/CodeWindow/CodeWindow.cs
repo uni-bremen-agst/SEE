@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using DG.Tweening;
-using SEE.Controls;
+using SEE.GO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -198,15 +198,15 @@ namespace SEE.Game.UI.CodeWindow
         {
             switch (Platform)
             {
-                case PlayerSettings.PlayerInputType.Desktop: ShowDesktop(show);
+                case PlayerInputType.DesktopPlayer: ShowDesktop(show);
                     break;
-                case PlayerSettings.PlayerInputType.TouchGamepad: ShowDesktop(show);
+                case PlayerInputType.TouchGamepadPlayer: ShowDesktop(show);
                     break;
-                case PlayerSettings.PlayerInputType.VR: PlatformUnsupported();
+                case PlayerInputType.VRPlayer: PlatformUnsupported();
                     break;
-                case PlayerSettings.PlayerInputType.HoloLens: PlatformUnsupported();
+                case PlayerInputType.HoloLensPlayer: PlatformUnsupported();
                     break;
-                case PlayerSettings.PlayerInputType.None:  // nothing needs to be done
+                case PlayerInputType.None:  // nothing needs to be done
                     break;
                 default: Debug.LogError($"Platform {Platform} not handled in switch case.\n");
                     break;
