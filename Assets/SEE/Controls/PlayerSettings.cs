@@ -248,7 +248,7 @@ namespace SEE.Controls
                         }
                         else
                         {
-                            Debug.LogError($"{ChartManagerName} has no component {typeof(ChartPositionVr).Name}.\n");
+                            Debug.LogError($"{ChartManagerName} has no component {nameof(ChartPositionVr)}.\n");
                         }
                     }
                     else
