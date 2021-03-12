@@ -59,7 +59,6 @@ namespace SEE.Controls.Actions
                         {
                             city.Renderer.DrawEdge(from, to);
                             new AddEdgeNetAction(from.name, to.name).Execute();
-                            CurrentState = CurrentActionState.Executed;
                         }
                         catch (Exception e)
                         {
@@ -87,13 +86,17 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Redoes this DeleteAction
+        /// Redoes this AddEdgeAction
         /// </summary>
         public override void Redo()
         {
             Debug.Log("Redo AddEdge");
         }
 
+        /// <summary>
+        /// Returns a new instance of <see cref="AddEdgeAction"/>.
+        /// </summary>
+        /// <returns></returns>
         public static ReversibleAction CreateReversibleAction()
         {
             return new AddEdgeAction();

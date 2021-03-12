@@ -42,7 +42,7 @@ namespace SEE.Controls.Actions
         private const float TimeForAnimation = 1f;
 
         /// <summary>
-        /// A history of all nodes deleted by this action.
+        /// A history of all nodes and the graph where they were attached to, deleted by this action.
         /// </summary>
         private Dictionary<GameObject, Graph> DeletedNodes { get; set; } = new Dictionary<GameObject, Graph>();
 
@@ -52,15 +52,16 @@ namespace SEE.Controls.Actions
         public List<Vector3> OldPositions { get; set; } = new List<Vector3>();
 
         /// <summary>
-        /// A history of all edges deleted by this action.
+        /// A history of all edges and the graph where they were attached to, deleted by this action.
         /// </summary>
-        /// FIXME: Dictionary MIT GRAPH
         public Dictionary<GameObject, Graph> DeletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
 
+        /// <summary>
+        /// A history of all deleted parent nodes of an action for the possibility of a redo.
+        /// </summary>
         public List<GameObject> deletedParent = new List<GameObject>();
 
         /// <summary>
-        /// FIXME: This does not belong here.
         /// The garbage can the deleted nodes will be moved to.
         /// </summary>
         protected GameObject garbageCan;
@@ -71,13 +72,13 @@ namespace SEE.Controls.Actions
         private ActionStateIndicator actionStateIndicator;
 
         /// <summary>
-        /// FIXME: This does not belong here.
         /// The name of the garbage can gameObject.
         /// </summary>
         protected const string GarbageCanName = "GarbageCan";
 
         /// <summary>
-        /// True, if the moving-process of a node to the garbage can is running, else false
+        /// True, if the moving-process of a node to the garbage can is running, else false.
+        /// Avoids multiple calls of coroutine.
         /// </summary>
         private bool isRunning = false;
 
@@ -139,7 +140,6 @@ namespace SEE.Controls.Actions
                     List<GameObject> deletedNodes = GameObjectTraversion.GetAllChildNodes(new List<GameObject>(), selectedObject);
                     actionStateIndicator.StartCoroutine(this.MoveNodeToGarbage(deletedNodes));
                 }
-                CurrentState = CurrentActionState.Executed;
             }
         }
 
@@ -329,6 +329,13 @@ namespace SEE.Controls.Actions
             selectedObject = null;
         }
 
+        /// <summary>
+        /// Function to add a dictionary at the end of another dictionary.
+        /// Operates similar to List.AddRange().
+        /// </summary>
+        /// <param name="input">the dictionary which should be added to <paramref name="target"/></param>
+        /// <param name="target">the target where <paramref name="input"/> should be added to</param>
+        /// <returns><paramref name="target"/> extended by <paramref name="input"/> at the end of the dictionary</returns>
         private Dictionary<GameObject, Graph> AddRange(Dictionary<GameObject, Graph> input, Dictionary<GameObject, Graph> target)
         {
             foreach (KeyValuePair<GameObject, Graph> g in input)
@@ -339,7 +346,7 @@ namespace SEE.Controls.Actions
                 }
                 catch(Exception)
                 {
-                    // multiple key addition
+                    // multiple key addition should be ignored.
                 }
             }
             return target;
