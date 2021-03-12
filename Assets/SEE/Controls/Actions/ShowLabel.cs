@@ -268,7 +268,7 @@ namespace SEE.Controls.Actions
         {
             // On the HoloLens, we want to make the text a bit easier to read by making it bolder.
             // We do this by adding a slight outline.
-            bool enableOutline = PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.HoloLens;
+            bool enableOutline = PlayerSettings.GetInputType() == PlayerInputType.HoloLensPlayer;
             // However, when developing on a PC/Emulator, the background will be black, so we add a white outline.
             Color outlineColor = Debug.isDebugBuild ? Color.white : Color.black;
             if (nodeLabel.TryGetComponent(out TextMeshPro tm))

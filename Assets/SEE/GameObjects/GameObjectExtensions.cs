@@ -232,5 +232,33 @@ namespace SEE.GO
                 SetVisible(child.gameObject, isVisible);
             }
         }
+
+        /// <summary>
+        /// Returns the full name of given <paramref name="gameObject"/>.
+        /// The full name is the concatenation of all names of the ancestors of <paramref name="gameObject"/>
+        /// separated by a period. E.g., if <paramref name="gameObject"/> has name C and its parent
+        /// has name B and the parent's parent has name A, then the result will be A.B.C.        
+        /// </summary>
+        /// <param name="gameObject">the gameObject whose full name is to be retrieved</param>
+        /// <returns>full name</returns>
+        public static string FullName(this GameObject gameObject)
+        {
+            if (gameObject == null)
+            {
+                return "";
+            }
+            else
+            {
+                Transform parent = gameObject.transform.parent;
+                if (parent != null)
+                {
+                    return FullName(parent.gameObject) + "." + gameObject.name;
+                }
+                else
+                {
+                    return gameObject.name;
+                }
+            }
+        }
     }
 }

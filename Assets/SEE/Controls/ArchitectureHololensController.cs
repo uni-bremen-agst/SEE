@@ -1,5 +1,6 @@
 ﻿using Microsoft.MixedReality.Toolkit.UI;
 using Microsoft.MixedReality.Toolkit.UI.BoundsControl;
+using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 
@@ -17,7 +18,7 @@ namespace SEE.Controls
 
         private void Start()
         {
-            if (PlayerSettings.GetInputType() != PlayerSettings.PlayerInputType.HoloLens)
+            if (PlayerSettings.GetInputType() != PlayerInputType.HoloLensPlayer)
             {
                 // AppBar shouldn't exist outside of HoloLens platform
                 Destroyer.DestroyComponent(this);
