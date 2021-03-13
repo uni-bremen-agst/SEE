@@ -1,5 +1,7 @@
 ﻿using SEE.GO;
 using SEE.Utils;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -24,6 +26,10 @@ namespace SEE.Controls.Actions
         /// The current state of the edit-node process.
         /// </summary>
         public ProgressState EditProgress { get; set; } = ProgressState.NoNodeSelected;
+
+        private List<Tuple<GameObject,string,string>> editedNodes = new List<Tuple<GameObject,string,string>>();
+
+        private Tuple<GameObject, string, string> nodeToEdit;
 
         public override void Start()
         {
@@ -52,6 +58,13 @@ namespace SEE.Controls.Actions
                     {
                         EditProgress = ProgressState.NodeSelected;
                     }
+                    if(nodeToEdit != null)
+                    {
+                        Debug.Log("now");
+                        editedNodes.Add(nodeToEdit);
+                        nodeToEdit = null;
+                        Debug.Log(editedNodes.Count);
+                    }
                     break;
 
                 case ProgressState.NodeSelected:
@@ -61,6 +74,10 @@ namespace SEE.Controls.Actions
                         EditNodeCanvasAction script = generator.InstantiateEditNodeCanvas(this);
                         script.nodeToEdit = hoveredObject.GetComponent<NodeRef>().Value;
                         script.gameObjectID = hoveredObject.name;
+                        nodeToEdit = new Tuple<GameObject, string, string>(hoveredObject, hoveredObject.GetComponent<NodeRef>().Value.SourceName, hoveredObject.GetComponent<NodeRef>().Value.Type);
+                        Debug.Log(nodeToEdit.Item1);
+                        Debug.Log(nodeToEdit.Item2);
+                        Debug.Log(nodeToEdit.Item3);
                     }
                     break;
 
