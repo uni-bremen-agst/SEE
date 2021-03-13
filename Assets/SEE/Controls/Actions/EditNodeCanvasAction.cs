@@ -71,31 +71,13 @@ namespace SEE.Controls.Actions
         {
             if (editNode)
             {
-                UpdateNode(inputname.text, inputtype.text,nodeToEdit);
+                EditNodeAction.UpdateNode(inputname.text, inputtype.text,nodeToEdit);
                 CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
                 generator.DestroyEditNodeCanvasAction();
                 new EditNodeNetAction(nodeToEdit.SourceName, nodeToEdit.Type, gameObjectID).Execute(null);
                 editNodeAction.EditProgress = EditNodeAction.ProgressState.NoNodeSelected;
                 InteractableObject.UnselectAll(true);
                 editNode = false;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="newName"></param>
-        /// <param name="newType"></param>
-        /// <param name="node"></param>
-        public void UpdateNode(string newName, string newType, Node node)
-        {
-            if (!newName.Equals(node.SourceName))
-            {
-                nodeToEdit.SourceName = newName;
-            }
-            if (!newType.Equals(node.Type))
-            {
-                nodeToEdit.Type = newType;
             }
         }
     }
