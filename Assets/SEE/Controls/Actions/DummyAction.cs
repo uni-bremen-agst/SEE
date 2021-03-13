@@ -1,6 +1,7 @@
 ﻿using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.Net;
 
 namespace SEE.Controls.Actions
 {
@@ -68,6 +69,7 @@ namespace SEE.Controls.Actions
                 newPosition = Camera.main.ScreenToWorldPoint(newPosition);
                 positions.Add(newPosition);
                 CreateObjectAt(newPosition);
+                new DummyNetAction("create","",newPosition.x, newPosition.y,newPosition.z).Execute(null);
             }
         }
 
@@ -76,7 +78,7 @@ namespace SEE.Controls.Actions
         /// adds it to <see cref="createdObjects"/>.
         /// </summary>
         /// <param name="position">position in world-space at which to put the object</param>
-        private void CreateObjectAt(Vector3 position)
+        public void CreateObjectAt(Vector3 position)
         {
             GameObject newGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             newGameObject.transform.position = position;
