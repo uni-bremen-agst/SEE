@@ -4,6 +4,7 @@ using System.Linq;
 using Michsky.UI.ModernUIPack;
 using SEE.DataModel.DG;
 using SEE.GO;
+using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
 using SEE.Net;
 using UnityEngine;
@@ -38,6 +39,8 @@ namespace SEE.Game.UI.ConfigMenu
             "Assets/Prefabs/UI/Input Group - Slider.prefab";
         private const string SwitchPrefabPath =
             "Assets/Prefabs/UI/Input Group - Switch.prefab";
+        private const string FilePickerPrefabPath =
+            "Assets/Prefabs/UI/Input Group - File Picker.prefab";
 
         private GameObject _pagePrefab;
         private GameObject _actionButtonPrefab;
@@ -46,6 +49,7 @@ namespace SEE.Game.UI.ConfigMenu
         private GameObject _colorPickerPrefab;
         private GameObject _sliderPrefab;
         private GameObject _switchPrefab;
+        private GameObject _filePickerPrefab;
 
         private GameObject _tabOutlet;
         private GameObject _tabButtons;
@@ -99,6 +103,7 @@ namespace SEE.Game.UI.ConfigMenu
             _sliderPrefab = MustLoadPrefabAtPath(SliderPrefabPath);
             _actionButtonPrefab = MustLoadPrefabAtPath(ActionButtonPrefabPath);
             _switchPrefab = MustLoadPrefabAtPath(SwitchPrefabPath);
+            _filePickerPrefab = MustLoadPrefabAtPath(FilePickerPrefabPath);
         }
 
         private void SetupActions()
@@ -364,6 +369,13 @@ namespace SEE.Game.UI.ConfigMenu
                 .SetComboSelectMode(ComboSelectMode.Restricted)
                 .Build();
 
+            // Layout file
+            GameObject layoutFileHost = Instantiate(_filePickerPrefab, controls);
+            FilePickerBuilder.Init(layoutFileHost)
+                .SetLabel("Layout file")
+                .SetPathInstance(_city.LayoutPath)
+                .Build();
+
             // Z-score scaling
             GameObject zScoreScalingHost =
                 Instantiate(_switchPrefab, controls);
@@ -397,7 +409,52 @@ namespace SEE.Game.UI.ConfigMenu
         private void SetupEdgesLayoutPage()
         {
             CreateAndInsertTabButton("Edges layout");
-            CreateAndInsertPage("Edges and edge layout");
+            GameObject page = CreateAndInsertPage("Edges and edge layout");
+            Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
+
+            // Edge layout
+            GameObject edgeLayoutHost =
+                Instantiate(_comboSelectPrefab, controls);
+            ComboSelectBuilder.Init(edgeLayoutHost)
+                .SetLabel("Edge layout")
+                .SetAllowedValues(EnumToStr<EdgeLayoutKind>())
+                .SetDefaultValue(_city.EdgeLayout.ToString())
+                .SetOnChangeHandler(s => Enum.TryParse(s, out _city.EdgeLayout))
+                .SetComboSelectMode(ComboSelectMode.Restricted)
+                .Build();
+
+            // Edge width
+            GameObject edgeWidthHost =
+                Instantiate(_sliderPrefab, controls);
+            SliderBuilder.Init(edgeWidthHost)
+                .SetLabel("Edge width")
+                .SetMode(SliderMode.Float)
+                .SetDefaultValue(_city.EdgeWidth)
+                .SetOnChangeHandler(f => _city.EdgeWidth = f)
+                .SetRange((0, 0.5f))
+                .Build();
+
+            // Edges above block
+            GameObject edgesAboveBlockHost =
+                Instantiate(_switchPrefab, controls);
+            SwitchBuilder.Init(edgesAboveBlockHost)
+                .SetLabel("Edges above block")
+                .SetDefaultValue(_city.EdgesAboveBlocks)
+                .SetOnChangeHandler(b => _city.EdgesAboveBlocks = b)
+                .Build();
+
+            // Bundling tension
+            GameObject bundlingTensionHost =
+                Instantiate(_sliderPrefab, controls);
+            SliderBuilder.Init(bundlingTensionHost)
+                .SetLabel("Bundling tension")
+                .SetMode(SliderMode.Float)
+                .SetDefaultValue(_city.Tension)
+                .SetOnChangeHandler(f => _city.Tension = f)
+                .SetRange((0, 1))
+                .Build();
+
+            // TODO: rdp
         }
 
         private void SetupMiscellaneousPage()
@@ -426,9 +483,11 @@ namespace SEE.Game.UI.ConfigMenu
             }
         }
 
-        private List<string> EnumToStr<EnumType>() where EnumType : Enum
+        public static List<string> EnumToStr<EnumType>() where EnumType : Enum
         {
-            return Enum.GetValues(typeof(EnumType)).Cast<EnumType>().Select(v => v.ToString())
+            return Enum.GetValues(typeof(EnumType))
+                .Cast<EnumType>()
+                .Select(v => v.ToString())
                 .ToList();
         }
     }
