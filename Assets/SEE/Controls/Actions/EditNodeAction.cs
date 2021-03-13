@@ -1,4 +1,5 @@
-﻿using SEE.GO;
+﻿using SEE.DataModel.DG;
+using SEE.GO;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -27,8 +28,19 @@ namespace SEE.Controls.Actions
         /// </summary>
         public ProgressState EditProgress { get; set; } = ProgressState.NoNodeSelected;
 
-        private List<Tuple<GameObject,string,string>> editedNodes = new List<Tuple<GameObject,string,string>>();
+        /// <summary>
+        /// All nodes and their previous names and types edited by this action. 
+        /// </summary>
+        private List<Tuple<GameObject, string, string>> editedNodes = new List<Tuple<GameObject, string, string>>();
 
+        /// <summary>
+        /// All new names and new types of nodes, which was been undone.
+        /// </summary>
+        private List<Tuple<string, string, Node>> changesToRedone = new List<Tuple<string, string, Node>>();
+
+        /// <summary>
+        /// The previous values (name and type) of the GameObject node to be edited.
+        /// </summary>
         private Tuple<GameObject, string, string> nodeToEdit;
 
         public override void Start()
@@ -58,12 +70,12 @@ namespace SEE.Controls.Actions
                     {
                         EditProgress = ProgressState.NodeSelected;
                     }
-                    if(nodeToEdit != null)
+                    // this case will be reached after editing a node for saving
+                    // the previous values of the node to edit in a history (Undo/redo).
+                    if (nodeToEdit != null)
                     {
-                        Debug.Log("now");
                         editedNodes.Add(nodeToEdit);
                         nodeToEdit = null;
-                        Debug.Log(editedNodes.Count);
                     }
                     break;
 
@@ -74,10 +86,9 @@ namespace SEE.Controls.Actions
                         EditNodeCanvasAction script = generator.InstantiateEditNodeCanvas(this);
                         script.nodeToEdit = hoveredObject.GetComponent<NodeRef>().Value;
                         script.gameObjectID = hoveredObject.name;
-                        nodeToEdit = new Tuple<GameObject, string, string>(hoveredObject, hoveredObject.GetComponent<NodeRef>().Value.SourceName, hoveredObject.GetComponent<NodeRef>().Value.Type);
-                        Debug.Log(nodeToEdit.Item1);
-                        Debug.Log(nodeToEdit.Item2);
-                        Debug.Log(nodeToEdit.Item3);
+                        nodeToEdit = new Tuple<GameObject, string, string>
+                            (hoveredObject, hoveredObject.GetComponent<NodeRef>().Value.SourceName, hoveredObject.GetComponent<NodeRef>().Value.Type);
+                        changesToRedone.Clear();
                     }
                     break;
 
@@ -85,6 +96,7 @@ namespace SEE.Controls.Actions
                     CanvasGenerator canvasGenerator = canvasObject.GetComponent<CanvasGenerator>();
                     canvasGenerator.DestroyEditNodeCanvasAction();
                     hoveredObject = null;
+                    nodeToEdit = null;
                     EditProgress = ProgressState.NoNodeSelected;
                     break;
 
@@ -98,7 +110,13 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Undo()
         {
-            Debug.Log("Undo EditNode");
+            foreach (Tuple<GameObject, string, string> tuple in editedNodes)
+            {
+                changesToRedone.Add(new Tuple<string,string,Node>
+                    (tuple.Item1.GetComponent<NodeRef>().Value.SourceName, tuple.Item1.GetComponent<NodeRef>().Value.Type, tuple.Item1.GetComponent<NodeRef>().Value));
+                tuple.Item1.GetComponent<NodeRef>().Value.SourceName = tuple.Item2;
+                tuple.Item1.GetComponent<NodeRef>().Value.Type = tuple.Item3;
+            }
         }
 
         /// <summary>
@@ -106,7 +124,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Redo()
         {
-            Debug.Log("Redo EditNode");
+            foreach(Tuple<string, string, Node> tuple in changesToRedone)
+            {
+                UpdateNode(tuple.Item1, tuple.Item2, tuple.Item3);
+            }
         }
 
         /// <summary>
@@ -118,6 +139,24 @@ namespace SEE.Controls.Actions
             canvasGenerator.DestroyEditNodeCanvasAction();
             hoveredObject = null;
             EditProgress = ProgressState.NoNodeSelected;
+        }
+
+        /// <summary>
+        /// Updates the values such as nodename and nodetype of a specific <paramref name="node"/>
+        /// </summary>
+        /// <param name="newName">the new name of the <paramref name="node"/></param>
+        /// <param name="newType">the new type of the <paramref name="node"/></param>
+        /// <param name="node">the node to be edited</param>
+        public static void UpdateNode(string newName, string newType, Node node)
+        {
+            if (!newName.Equals(node.SourceName))
+            {
+                node.SourceName = newName;
+            }
+            if (!newType.Equals(node.Type))
+            {
+                node.Type = newType;
+            }
         }
 
         /// <summary>
