@@ -10,7 +10,7 @@ using SEE.Controls.Actions;
 /// </summary>
 public class DummyNetAction : AbstractAction
 {
-    string action;
+    string action = "create";
     string gameObjectID;
     float posx;
     float posy;
