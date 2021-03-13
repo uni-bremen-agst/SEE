@@ -42,6 +42,7 @@ public class DummyNetAction : AbstractAction
         Debug.Log("NET FUNZT");
         if (!IsRequester())
         {
+            action = "create";
             if (action.Equals("create"))
             {
 
