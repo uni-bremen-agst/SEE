@@ -15,15 +15,16 @@ public class DummyNetAction : AbstractAction
     float posx;
     float posy;
     float posz;
+    Vector3 pos;
 
-    public DummyNetAction(string action, string gameObjectID, float posx, float posy, float posz)
+    public DummyNetAction(Vector3 pos)
     {
-        this.action = action;
-        this.gameObjectID = gameObjectID;
-        this.posx = posx;
-        this.posy = posy;
-        this.posz = posz;
-
+        /* this.action = action;
+         this.gameObjectID = gameObjectID;
+         this.posx = posx;
+         this.posy = posy;
+         this.posz = posz; */
+        this.pos = pos;
     }
 
     /// <summary>
@@ -40,14 +41,15 @@ public class DummyNetAction : AbstractAction
     protected override void ExecuteOnClient()
     {
         Debug.Log("NET FUNZT");
+        Debug.Log(pos.x);
         if (!IsRequester())
         {
             action = "create";
             if (action.Equals("create"))
             {
-
+                
                 DummyAction dummy = new DummyAction();
-                dummy.CreateObjectAt(new Vector3(posx, posy, posz));
+                dummy.CreateObjectAt(pos);
 
             }
             else if (action == "undo")
