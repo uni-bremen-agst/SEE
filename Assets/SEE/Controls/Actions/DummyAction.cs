@@ -69,7 +69,7 @@ namespace SEE.Controls.Actions
                 newPosition = Camera.main.ScreenToWorldPoint(newPosition);
                 positions.Add(newPosition);
                 CreateObjectAt(newPosition);
-                new DummyNetAction("create","",newPosition.x, newPosition.y,newPosition.z).Execute(null);
+                new DummyNetAction("create", "",newPosition.x, newPosition.y,newPosition.z).Execute(null);
             }
         }
 
