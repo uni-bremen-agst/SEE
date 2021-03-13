@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 7026736731528904094}
   - component: {fileID: 7973683633884488676}
   - component: {fileID: 7518551113269695151}
+  - component: {fileID: 637028239384079898}
   m_Layer: 0
   m_Name: DesktopPlayer
   m_TagString: MainCamera
@@ -207,5 +208,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9dce67dfcaa802e43a0601cdc340100e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &637028239384079898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6839967699279661599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee116443c3c6a374fa0202546963f0da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
