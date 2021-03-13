@@ -40,14 +40,13 @@ public class DummyNetAction : AbstractAction
     protected override void ExecuteOnClient()
     {
         Debug.Log("NET FUNZT");
-        DummyAction dummy = new DummyAction();
-        dummy.CreateObjectAt(new Vector3(posx, posy, posz));
         if (!IsRequester())
         {
-            if (action == "create") //.equals
+            if (action.Equals("create"))
             {
 
-                
+                DummyAction dummy = new DummyAction();
+                dummy.CreateObjectAt(new Vector3(posx, posy, posz));
 
             }
             else if (action == "undo")
