@@ -110,6 +110,7 @@ namespace SEE.Game
                 this.Root = RootKind.Absolute;
                 this.absolutePath = path;
             }
+            Debug.Log(this.Root);
         }
 
         /// <summary>
