@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using SEE.Utils;
-using System;
 
 namespace SEETests
 {
