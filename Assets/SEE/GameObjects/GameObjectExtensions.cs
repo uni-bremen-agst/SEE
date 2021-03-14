@@ -3,6 +3,8 @@ using SEE.Utils;
 using System;
 using OdinSerializer.Utilities;
 using UnityEngine;
+using System.Collections.Generic;
+using SEE.DataModel;
 
 namespace SEE.GO
 {
@@ -261,6 +263,40 @@ namespace SEE.GO
                 else
                 {
                     return gameObject.name;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns all ancestors of given <paramref name="rootNode"/> tagged by <see cref="Tags.Node"/>
+        /// including <paramref name="rootNode"/> itself.
+        /// </summary>
+        /// <param name="rootNode">the root of the node hierarchy to be collected</param>
+        /// <returns>all ancestors of <paramref name="rootNode"/> including <paramref name="rootNode"/></returns>
+        public static IList<GameObject> AllAncestors(this GameObject rootNode)
+        {
+            IList<GameObject> result = new List<GameObject>() { rootNode };
+            AllAncestors(rootNode, result);
+            return result;
+        }
+
+        /// <summary>
+        /// Adds all ancestors of <paramref name="root"/> to <paramref name="result"/>
+        /// (only if tagged by <see cref="Tags.Node"/>).
+        /// 
+        /// Note: <paramref name="root"/> is assumed to be contained in <paramref name="result"/>
+        /// already.
+        /// </summary>
+        /// <param name="root">the root of the game-object hierarchy to be collected</param>
+        /// <param name="result">where to add the ancestors</param>
+        private static void AllAncestors(GameObject root, IList<GameObject> result)
+        {
+            foreach (Transform child in root.transform)
+            {
+                if (child.gameObject.CompareTag(Tags.Node))
+                {
+                    result.Add(child.gameObject);
+                    AllAncestors(child.gameObject, result);
                 }
             }
         }
