@@ -19,7 +19,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="DeleteAction"/>.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A new instance of <see cref="DeleteAction"/></returns>
         public static ReversibleAction CreateReversibleAction()
         {
             return new DeleteAction();
