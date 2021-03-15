@@ -12,7 +12,6 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class AddEdgeAction : AbstractPlayerAction
     {
-
         /// <summary>
         /// The source for the edge to be drawn.
         /// </summary>
