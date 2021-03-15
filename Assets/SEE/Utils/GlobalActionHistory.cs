@@ -185,7 +185,7 @@ public class GlobalActionHistory
         find = Find(userid, historyType.redo); //With the result we need to calculate whether we can du undo or not and what changes the gameobject need
         find.Item1.Item4.Redo(); // find.item2 als parameter so dass die action selbst brechen kann was gemacht werden muss && redo muss ein bool sein damit danach entschieden werden kann ob es ausgeführt wird
         // in jeder revesble action muss evtl. noch eine changes list mitgeführt werden, damit eine action herrauslesen kann was die anderen verändert haben, und ob man das mergen kann oder nicht 
-        if (true) //FIXME with the return value of item.redo
+        if (true) //FIXME with the return value of item.redo 
         {
 
             Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, userid, historyType.redo, find.Item1.Item4, find.Item1.Item5)); //FIXME: Brauchen wir überhaupt ein redo state? ist es nicht das gleiche wie eine Action?
