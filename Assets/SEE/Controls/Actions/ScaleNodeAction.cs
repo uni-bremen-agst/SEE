@@ -556,5 +556,14 @@ namespace SEE.Controls.Actions
         {
             return new ScaleNodeAction();
         }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="ScaleNodeAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
+        }
     }
 }

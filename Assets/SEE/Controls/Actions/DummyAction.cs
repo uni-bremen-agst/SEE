@@ -19,16 +19,25 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// The list of world-space positions of the objects created by this action.
+        /// Returns a new instance of <see cref="DummyAction"/>.
         /// </summary>
-        private IList<Vector3> positions;
+        /// <returns>new instance</returns>
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
+        }
 
         /// <summary>
-        /// The list of game objects created by this action. These objects are kept
-        /// only to be able to remove them again for Undo(). The objects can be
-        /// re-created from the <see cref="positions"/>.
+        /// The world-space position of the object created by this action.
         /// </summary>
-        private IList<GameObject> createdObjects;
+        private Vector3 position;
+
+        /// <summary>
+        /// The game object created by this action. This object is kept
+        /// only to be able to remove it again for Undo(). The object can be
+        /// re-created from the <see cref="position"/>.
+        /// </summary>
+        private GameObject createdObject;
 
         /// <summary>
         /// Will be called once when the action is started to be executing for the
@@ -39,8 +48,8 @@ namespace SEE.Controls.Actions
         {
             // Could be initialized at the point of the declaration. This illustrates
             // only the use of Awake() here.
-            createdObjects = new List<GameObject>();
-            positions = new List<Vector3>();
+            createdObject = null;
+            position = Vector3.zero;
         }
 
         /// <summary>
@@ -50,7 +59,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Start()
         {
-            Debug.Log($"Action started/resumed: Created {createdObjects.Count} many objects so far.\n");
+            Debug.Log($"Action started/resumed.\n");
         }
 
         /// <summary>
@@ -67,7 +76,7 @@ namespace SEE.Controls.Actions
                 Vector3 newPosition = Input.mousePosition;
                 newPosition.z = 1.0f;
                 newPosition = Camera.main.ScreenToWorldPoint(newPosition);
-                positions.Add(newPosition);
+                position = newPosition;
                 CreateObjectAt(newPosition);
                 return true;
             }
@@ -87,7 +96,7 @@ namespace SEE.Controls.Actions
             GameObject newGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             newGameObject.transform.position = position;
             newGameObject.transform.localScale = Vector3.one / 10.0f;
-            createdObjects.Add(newGameObject);
+            createdObject = newGameObject;
         }
 
         /// <summary>
@@ -98,7 +107,7 @@ namespace SEE.Controls.Actions
         public override void Stop()
         {
             // Nothing really needs to be done for this example action.
-            Debug.Log($"Action stopped: Created {createdObjects.Count} many objects so far.\n");
+            Debug.Log($"Action stopped.\n");
         }
 
         /// <summary>
@@ -107,10 +116,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Undo()
         {
-            foreach (GameObject gameObject in createdObjects)
-            {
-                Destroyer.DestroyGameObject(gameObject);
-            }
+            Destroyer.DestroyGameObject(createdObject);
         }
 
         /// <summary>
@@ -121,10 +127,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Redo()
         {
-            foreach (Vector3 position in positions)
-            {
-                CreateObjectAt(position);
-            }
+            CreateObjectAt(position);
         }
     }
 }

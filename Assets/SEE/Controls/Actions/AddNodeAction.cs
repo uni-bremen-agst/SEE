@@ -582,10 +582,19 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="AddNodeAction"/>.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>new instance</returns>
         public static ReversibleAction CreateReversibleAction()
         {
             return new AddNodeAction();
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="AddNodeAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
         }
     }
 }

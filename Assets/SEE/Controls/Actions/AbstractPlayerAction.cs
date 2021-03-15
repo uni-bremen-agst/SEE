@@ -89,6 +89,12 @@ namespace SEE.Controls.Actions
         public abstract bool Update();
 
         /// <summary>
+        /// Returns a new instance of the same type as this particular type of ReversibleAction.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public abstract ReversibleAction NewInstance();
+
+        /// <summary>
         /// Will be called when another action is to be executed. This signals that
         /// the action is to be put on hold. No <see cref="Update"/> will occur
         /// while on hold. It may be re-enabled by <see cref="Start"/> again.

@@ -56,6 +56,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Returns a new instance of <see cref="MappingAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
+        }
+
+        /// <summary>
         /// The graph containing the architecture.
         /// </summary>
         private Graph architecture;
