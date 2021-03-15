@@ -23,7 +23,7 @@ namespace SEE.Utils
         /// The history of actions that have been executed (and have not yet undone). The currently
         /// executed action is the top element in this stack.
         /// </summary>
-        public Stack<ReversibleAction> UndoStack { get; set; } = new Stack<ReversibleAction>();
+        private Stack<ReversibleAction> UndoStack { get; set; } = new Stack<ReversibleAction>();
 
         /// <summary>
         /// The history of actions that have been undone.
@@ -48,7 +48,7 @@ namespace SEE.Utils
         {
             if (UndoStack.Count > 0)
             {
-                UndoStack.Peek().Stop();
+                Current.Stop();
             }
             UndoStack.Push(action);
             action.Awake();
@@ -65,7 +65,7 @@ namespace SEE.Utils
         {
             if (UndoStack.Count > 0)
             {
-                UndoStack.Peek().Update();
+                Current.Update();
             }
         }
 
@@ -96,7 +96,7 @@ namespace SEE.Utils
 
                 if (UndoStack.Count > 0)
                 {
-                    UndoStack.Peek().Start();
+                    Current.Start();
                 }
             }
             else
@@ -123,7 +123,7 @@ namespace SEE.Utils
                 // stop the currently executed action
                 if (UndoStack.Count > 0)
                 {
-                    UndoStack.Peek().Stop();
+                    Current.Stop();
                 }
                 // the last undone action becomes the currently executed action again
                 ReversibleAction redoAction = RedoStack.Pop();
@@ -153,6 +153,17 @@ namespace SEE.Utils
         public int RedoCount
         {
             get => RedoStack.Count;
+        }
+
+        /// <summary>
+        /// The currently executed action.
+        /// </summary>
+        public ReversibleAction Current 
+        { 
+            get
+            {
+                return UndoStack.Peek();
+            }
         }
     }
 }
