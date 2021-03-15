@@ -78,6 +78,15 @@ namespace SEETests
                 Assert.AreEqual(StartCalls, StopCalls + 1);
                 return true;
             }
+
+            /// <summary>
+            /// Returns a new instance of <see cref="TestAction"/>.
+            /// </summary>
+            /// <returns>new instance</returns>
+            public ReversibleAction NewInstance()
+            {
+                return new TestAction();
+            }
         }
 
         /// <summary>

@@ -86,5 +86,11 @@
         /// Precondition: <see cref="Undo"/> was called before.
         /// </summary>
         void Redo();
+
+        /// <summary>
+        /// Returns a new instance of the same type as this particular type of ReversibleAction.
+        /// </summary>
+        /// <returns>new instance</returns>
+        ReversibleAction NewInstance();
     }
 }

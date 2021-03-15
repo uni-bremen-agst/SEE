@@ -20,6 +20,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Returns a new instance of <see cref="MoveAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
+        }
+
+        /// <summary>
         /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
         /// <returns>always false</returns>

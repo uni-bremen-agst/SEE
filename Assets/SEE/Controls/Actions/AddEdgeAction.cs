@@ -24,7 +24,6 @@ namespace SEE.Controls.Actions
 
         public override void Start()
         {
-
             InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
             InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
         }
@@ -104,10 +103,19 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="AddEdgeAction"/>.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>new instance</returns>
         public static ReversibleAction CreateReversibleAction()
         {
             return new AddEdgeAction();
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="AddEdgeAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
         }
     }
 }
