@@ -85,10 +85,8 @@ namespace SEE.Controls.Actions
         /// Will be called upon every frame when this action is being executed.
         /// See <see cref="ReversibleAction.Update"/>.
         /// </summary>
-        public virtual void Update()
-        {
-            // intentionally left blank; can be overridden by subclasses
-        }
+        /// <returns>true if action is completed</returns>
+        public abstract bool Update();
 
         /// <summary>
         /// Will be called when another action is to be executed. This signals that

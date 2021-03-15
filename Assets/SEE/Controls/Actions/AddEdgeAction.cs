@@ -29,8 +29,14 @@ namespace SEE.Controls.Actions
             InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
         }
 
-        public override void Update()
+        /// <summary>
+        /// <see cref="ReversibleAction.Update"/>.
+        /// </summary>
+        /// <returns>true if completed</returns>
+        public override bool Update()
         {
+            bool result = false;
+
             // Assigning the game objects to be connected.
             // Checking whether the two game objects are not null and whether they are 
             // actually nodes.
@@ -57,7 +63,7 @@ namespace SEE.Controls.Actions
                         try
                         {
                             city.Renderer.DrawEdge(from, to);
-                            new AddEdgeNetAction(from.name, to.name).Execute();
+                            new AddEdgeNetAction(from.name, to.name).Execute();                            
                         }
                         catch (Exception e)
                         {
@@ -65,15 +71,18 @@ namespace SEE.Controls.Actions
                         }
                         from = null;
                         to = null;
+                        // action is completed (successfully or not; it does not matter)
+                        result = true;
                     }
                 }
             }
-            // Adding the key "F1" in order to delete the selected GameObjects.
+            // Adding the key "F1" in order to forget the selected GameObjects.
             if (Input.GetKeyDown(KeyCode.F1))
             {
                 from = null;
                 to = null;
             }
+            return result;
         }
 
         /// <summary>

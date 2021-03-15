@@ -3,7 +3,6 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,7 +25,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// The currently selected object (a node or edge).
+        /// The currently selected object (a node or edge) to be deleted.
         /// </summary>
         private GameObject selectedObject;
 
@@ -41,6 +40,15 @@ namespace SEE.Controls.Actions
         private const float TimeForAnimation = 1f;
 
         /// <summary>
+        /// Contains all nodes and edges deleted as explicitly requested by the user.
+        /// As a consequence of deleting a node, its ancestores along with their incoming and outgoing
+        /// edges may be deleted implicitly, too. All of these are kept in <see cref="DeletedNodes"/>
+        /// and <see cref="DeletedEdges"/>. Yet, if we need to redo a deletion, we need to remember
+        /// the explicitly deleted objects.
+        /// </summary>
+        private ISet<GameObject> explicitlyDeletedNodesAndEdges = new HashSet<GameObject>();
+
+        /// <summary>
         /// A history of all nodes and the graph where they were attached to, deleted by this action.
         /// </summary>
         private Dictionary<GameObject, Graph> DeletedNodes { get; set; } = new Dictionary<GameObject, Graph>();
@@ -48,35 +56,26 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// A history of the old positions of the nodes deleted by this action.
         /// </summary>
-        public List<Vector3> OldPositions { get; set; } = new List<Vector3>();
+        private Dictionary<GameObject, Vector3> OldPositions = new Dictionary<GameObject, Vector3>();
 
         /// <summary>
         /// A history of all edges and the graph where they were attached to, deleted by this action.
         /// </summary>
-        public Dictionary<GameObject, Graph> DeletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
-
-        /// <summary>
-        /// A history of all deleted parent nodes of an action for the possibility of a redo.
-        /// </summary>
-        public List<GameObject> deletedParent = new List<GameObject>();
-
-        /// <summary>
-        /// The garbage can the deleted nodes will be moved to.
-        /// </summary>
-        protected GameObject garbageCan;
-
-        /// <summary>
-        /// The playerSettings-script which is attached to the player settings
-        /// </summary>
-        private PlayerSettings playerSettings;
+        private Dictionary<GameObject, Graph> DeletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
 
         /// <summary>
         /// The name of the garbage can gameObject.
         /// </summary>
-        protected const string GarbageCanName = "GarbageCan";
+        private const string GarbageCanName = "GarbageCan";
 
         /// <summary>
-        /// True, if the moving-process of a node to the garbage can is running, else false.
+        /// The garbage can the deleted nodes will be moved to. It is the object named 
+        /// <see cref="GarbageCanName"/>.
+        /// </summary>
+        private GameObject garbageCan;
+
+        /// <summary>
+        /// True, if the moving process of a node to the garbage can is running, else false.
         /// Avoids multiple calls of coroutine.
         /// </summary>
         private bool isRunning = false;
@@ -88,25 +87,38 @@ namespace SEE.Controls.Actions
 
         public override void Start()
         {
-            // The MonoBehaviour is enabled and Update() will be called by Unity.
+            base.Stop();
+            Debug.Log("Start\n");
             InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
             InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
-            GameObject player_Settings = GameObject.Find("Player Settings");
-            playerSettings = player_Settings?.GetComponentInChildren<PlayerSettings>();
         }
 
-        public override void Update()
+        public override void Stop()
         {
-            // Delete a gameobject and all children
-            if (selectedObject != null && isRunning == false)
+            base.Stop();
+            Debug.Log("Stop\n");
+            InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
+            InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
+        }
+        /// <summary>
+        /// See <see cref="ReversibleAction.Update"/>.
+        /// </summary>
+        /// <returns>true if completed</returns>
+        public override bool Update()
+        {
+            // Delete a gameobject and all its children and incoming and outgoing edges.
+            if (selectedObject != null && !isRunning)
             {
-                isRunning = true;
-                GameObject selected = selectedObject;
-                Assert.IsTrue(selected.HasNodeRef() || selected.HasEdgeRef());
-                // FIXME:(Thore) NetAction is no longer up to date
-                new DeleteNetAction(selected.name).Execute(null);
-                DeleteSelectedObject(selected);
-                deletedParent.Add(selected);
+                Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
+                explicitlyDeletedNodesAndEdges.Add(selectedObject);
+                DeleteSelectedObject(selectedObject);               
+                DumpStatus();
+                // the selected objects are deleted and this action is done now
+                return true; 
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -114,93 +126,109 @@ namespace SEE.Controls.Actions
         /// Deletes given <paramref GameObject="selectedObject"/> assumed to be either an
         /// edge or node. If it represents a node, the incoming and outgoing edges and
         /// its ancestors will be removed, too. For the possibility of an undo, the deleted objects will be saved. 
+        /// 
+        /// Precondition: <paramref name="selectedObject"/> != null.
         /// </summary>
         /// <param GameObject="selectedObject">selected GameObject that along with its children should be removed</param>
         public void DeleteSelectedObject(GameObject selectedObject)
         {
-            if (selectedObject == null)
+            if (selectedObject.CompareTag(Tags.Edge))
             {
-                return;
+                DeleteEdge(selectedObject);
             }
-            if (selectedObject != null)
+            else if (selectedObject.CompareTag(Tags.Node))
             {
-                if (selectedObject.CompareTag(Tags.Edge))
+                if (selectedObject.GetNode().IsRoot())
                 {
-                    List<GameObject> edge = new List<GameObject>() { selectedObject };
-                    SaveObjectForDeleteUndo(edge, new List<Vector3>());
+                    Debug.LogError("A root shall not be deleted.\n");
                 }
-                else if (selectedObject.CompareTag(Tags.Node))
+                else
                 {
-                    if (selectedObject.GetNode().IsRoot())
-                    {
-                        Debug.LogError("Root shall not be deleted");
-                        return;
-                    }
-                    List<GameObject> deletedNodes = GameObjectTraversion.GetAllChildNodes(new List<GameObject>(), selectedObject);
-                    playerSettings.StartCoroutine(this.MoveNodeToGarbage(deletedNodes));
+                    // The selectedObject (a node) and its ancestors are not deleted immediately. Instead we
+                    // will run an animation that moves them into a garbage bin. Only when they arrive there,
+                    // we will actually delete them.
+                    // FIXME: Shouldn't the edges be moved to the garbage bin, too?
+                    PlayerSettings.GetPlayerSettings().StartCoroutine(this.MoveNodeToGarbage(selectedObject.AllAncestors()));
                 }
             }
+            // FIXME:(Thore) NetAction is no longer up to date
+            new DeleteNetAction(selectedObject.name).Execute(null);
+        }
+
+        private void DumpStatus()
+        {
+            Debug.Log($"Explicitly deleted elements: {explicitlyDeletedNodesAndEdges.Count}.\n");
+            foreach (GameObject deleted in explicitlyDeletedNodesAndEdges)
+            {
+                Debug.Log($"Explicitly deleted {deleted.name}\n");
+            }
+            Debug.Log($"Implicitly deleted nodes: {DeletedNodes.Count}.\n");
+            Debug.Log($"Implicitly deleted edges: {DeletedEdges.Count}.\n");
         }
 
         /// <summary>
-        /// Undoes this DeleteAction
+        /// Undoes this DeleteAction.
         /// </summary>
         public override void Undo()
         {
-            if (DeletedNodes != null)
+            // Re-add all nodes to their graphs.
+            foreach (KeyValuePair<GameObject, Graph> nodeGraphPair in DeletedNodes)
             {
-                List<GameObject> deletedNodes = new List<GameObject>(DeletedNodes.Keys);
-                playerSettings.StartCoroutine(this.RemoveNodeFromGarbage(deletedNodes));
-                foreach (KeyValuePair<GameObject, Graph> nodeGraphPair in DeletedNodes)
+                if (nodeGraphPair.Key.TryGetComponentOrLog(out NodeRef nodeRef))
                 {
-                    if (nodeGraphPair.Key.TryGetComponent(out NodeRef nodeRef))
+                    if (!nodeGraphPair.Value.Contains(nodeRef.Value))
                     {
-                        if (!nodeGraphPair.Value.Contains(nodeRef.Value))
-                        {
-                            nodeGraphPair.Value.AddNode(nodeRef.Value);
-                        }
-                    }
-                }
-                foreach (KeyValuePair<GameObject, Graph> edgeGraphPair in DeletedEdges)
-                {
-                    if (edgeGraphPair.Key.TryGetComponentOrLog(out EdgeRef edgeReference))
-                    {
-                        edgeGraphPair.Value.AddEdge(edgeReference.edge);
-                        edgeGraphPair.Key.SetVisibility(true, false);
+                        nodeGraphPair.Value.AddNode(nodeRef.Value);
                     }
                 }
             }
+            // Re-add all edges to their graphs.
+            foreach (KeyValuePair<GameObject, Graph> edgeGraphPair in DeletedEdges)
+            {
+                if (edgeGraphPair.Key.TryGetComponentOrLog(out EdgeRef edgeReference))
+                {
+                    edgeGraphPair.Value.AddEdge(edgeReference.edge);
+                    edgeGraphPair.Key.SetVisibility(true, false);
+                }
+            }            
+            PlayerSettings.GetPlayerSettings().StartCoroutine(this.RemoveNodeFromGarbage(new List<GameObject>(DeletedNodes.Keys)));
         }
 
         /// <summary>
-        /// Redoes this DeleteAction
+        /// Redoes this DeleteAction.
         /// </summary>
         public override void Redo()
         {
-            foreach (GameObject parent in deletedParent)
+            foreach (GameObject gameObject in explicitlyDeletedNodesAndEdges)
             {
-                DeleteSelectedObject(parent);
+                DeleteSelectedObject(gameObject);
             }
         }
 
         /// <summary>
-        /// Moves all nodes which were deleted in the last operation to the garbage can.
+        /// Moves all nodes in <paramref name="deletedNodes"/> to the garbage can
+        /// using an animation. When they finally arrive there, they will be 
+        /// deleted. 
+        /// 
+        /// Assumption: <paramref name="deletedNodes"/> contains all nodes in a subtree
+        /// of the game-node hierarchy. All of them represent graph nodes.
         /// </summary>
         /// <param name="deletedNodes">the deleted nodes which will be moved to the garbage can.</param>
-        /// <returns>the waiting time between moving deleted nodes over the garbage can and then into the garbage can.</returns>
-        private IEnumerator MoveNodeToGarbage(List<GameObject> deletedNodes)
+        /// <returns>the waiting time between moving deleted nodes over the garbage can and then into the garbage can</returns>
+        private IEnumerator MoveNodeToGarbage(IList<GameObject> deletedNodes)
         {
-            List<Vector3> oldPositions = new List<Vector3>();
-
+            isRunning = true;
+            // We need to reset the portal of all all deletedNodes so that we can move
+            // them to the garbage bin. Otherwise they will become invisible if they 
+            // leave their portal.
             foreach (GameObject deletedNode in deletedNodes)
             {
-                if (deletedNode.CompareTag(Tags.Node) && (!DeletedNodes.ContainsKey(deletedNode)))
+                if (!DeletedNodes.ContainsKey(deletedNode))
                 {
-                    oldPositions.Add(deletedNode.transform.position);
                     Portal.SetInfinitePortal(deletedNode);
                 }
             }
-            SaveObjectForDeleteUndo(deletedNodes, oldPositions);
+            MarkAsDeleted(deletedNodes);
             foreach (GameObject deletedNode in deletedNodes)
             {
                 Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), TimeForAnimation);
@@ -210,10 +238,7 @@ namespace SEE.Controls.Actions
 
             foreach (GameObject deletedNode in deletedNodes)
             {
-                if (deletedNode.CompareTag(Tags.Node))
-                {
-                    Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), TimeForAnimation);
-                }
+                Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), TimeForAnimation);
             }
 
             yield return new WaitForSeconds(TimeToWait);
@@ -226,128 +251,119 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="deletedNode">The nodes to be removed from the garbage-can</param>
         /// <returns>the waiting time between moving deleted nodes from the garbage-can and then to the city</returns>
-        private IEnumerator RemoveNodeFromGarbage(List<GameObject> deletedNodes)
+        private IEnumerator RemoveNodeFromGarbage(IList<GameObject> deletedNodes)
         {
-            for (int i = 0; i < deletedNodes.Count; i++)
+            isRunning = true;
+            // up, out of the garbage can
+            foreach (GameObject deletedNode in deletedNodes)
             {
-                Tweens.Move(deletedNodes[i], new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), TimeForAnimation);
+                Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), TimeForAnimation);
             }
 
             yield return new WaitForSeconds(TimeToWait);
 
-            for (int i = 0; i < deletedNodes.Count; i++)
+            // back to the original position
+            foreach (GameObject node in deletedNodes)
             {
-                Tweens.Move(deletedNodes[i], OldPositions[i], TimeForAnimation);
+                Tweens.Move(node, OldPositions[node], TimeForAnimation);
             }
 
             yield return new WaitForSeconds(TimeToWait);
             OldPositions.Clear();
             DeletedNodes.Clear();
             DeletedEdges.Clear();
+            isRunning = false;
             InteractableObject.UnselectAll(true);
         }
 
         /// <summary>
-        /// Saves the deleted nodes and/or edges for the possibility of an undo. 
-        /// Removes the gameObjects from the graph.
-        /// Precondition: <see cref="deletedNodes""/> != null.
+        /// Marks the given <paramref name="gameNodesToDelete"/> as deleted, i.e.,
+        /// 1) removes the associated nodes represented by thos <paramref name="gameNodesToDelete"/> 
+        ///    from their graph
+        /// 2) removes the incoming and outgoing edges of <paramref name="gameNodesToDelete"/>
+        ///    from their graph and makes those invisible
+        /// 
+        /// Assumption: <paramref name="gameNodesToDelete"/> contains all nodes in a subtree
+        /// of the game-node hierarchy. All of them represent graph nodes.
         /// </summary>
-        /// <param name="deletedObject">all deleted objects of the last operation</param>
-        /// <param name="oldPositionsOfDeletedNodes">all old positions of the deleted nodes of the last operation</param>
-        private void SaveObjectForDeleteUndo(List<GameObject> deletedObject, List<Vector3> oldPositionsOfDeletedNodes)
-        {
-            SEECity city = SceneQueries.GetCodeCity(deletedObject[0].transform)?.gameObject.GetComponent<SEECity>();
-            Graph graph = city.LoadedGraph;
-            List<GameObject> nodesAndAscendingEdges = new List<GameObject>();
-            List<GameObject> edgesToHide = new List<GameObject>();
+        /// <param name="gameNodesToDelete">all deleted objects of the last operation</param>
+        private void MarkAsDeleted(IList<GameObject> gameNodesToDelete)
+        {           
+            ISet<GameObject> edgesInScene = new HashSet<GameObject>(GameObject.FindGameObjectsWithTag(Tags.Edge));
 
-            foreach (GameObject actionHistoryObject in deletedObject)
+            // First identify all incoming and outgoing edges for all nodes in gameNodesToDelete
+            HashSet<GameObject> implicitlyDeletedEdges = new HashSet<GameObject>();
+            foreach (GameObject deletedGameNode in gameNodesToDelete)
             {
-                if (actionHistoryObject.TryGetComponent(out NodeRef nodeRef))
+                if (deletedGameNode.TryGetComponentOrLog(out NodeRef nodeRef))
                 {
-                    HashSet<string> edgeIDs = Destroyer.GetEdgeIds(nodeRef);
-                    foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
+                    ISet<string> attachedEdges = nodeRef.GetEdgeIds();
+
+                    foreach (GameObject edge in edgesInScene)
                     {
-                        if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
+                        if (edge.activeInHierarchy && attachedEdges.Contains(edge.name))
                         {
-                            edge.SetVisibility(false, true);
-
-                            if (!nodesAndAscendingEdges.Contains(edge))
-                            {
-                                edgesToHide.Add(edge);
-                            }
-                            edge.TryGetComponent(out EdgeRef edgeRef);
-                            graph.RemoveEdge(edgeRef.edge);
+                            // We will not immediately delete this edge here, because it may be an
+                            // edge inbetween two nodes both contained in gameNodesToDelete, in which
+                            // case it will show up as an incoming and outgoing edge.
+                            implicitlyDeletedEdges.Add(edge);
                         }
-                    }
-                    nodesAndAscendingEdges.Add(actionHistoryObject);
+                    }                    
                 }
             }
 
-            List<GameObject> deletedNodesReverse = deletedObject;
-            // For deletion bottom-up
-            deletedNodesReverse.Reverse();
-
-            foreach (GameObject deletedNode in deletedNodesReverse)
+            // Now delete the incoming and outgoing edges.
+            foreach (GameObject implicitlyDeletedEdge in implicitlyDeletedEdges)
             {
-                if (deletedNode.CompareTag(Tags.Node))
-                {
-                    deletedNode.TryGetComponent(out NodeRef nodeRef);
-                    if (graph.Contains(nodeRef.Value))
-                    {
-                        graph.RemoveNode(nodeRef.Value);
-                    }
-                }
-                if (deletedNode.CompareTag(Tags.Edge))
-                {
-                    deletedNode.SetVisibility(false, true);
-                    edgesToHide.Add(deletedNode);
-                    deletedNode.TryGetComponent(out EdgeRef edgeRef);
-                    graph.RemoveEdge(edgeRef.edge);
-                }
+                DeleteEdge(implicitlyDeletedEdge);
             }
 
-            oldPositionsOfDeletedNodes.Reverse();
-            nodesAndAscendingEdges.Reverse();
-
-            Dictionary<GameObject, Graph> nodeDictionary = new Dictionary<GameObject, Graph>();
-            foreach (GameObject node in nodesAndAscendingEdges)
+            // Finally, we remove the nodes themselves.
+            foreach (GameObject deletedGameNode in gameNodesToDelete)
             {
-                nodeDictionary.Add(node, graph);
+                DeleteNode(deletedGameNode);
             }
-            Dictionary<GameObject, Graph> edgeDictionary = new Dictionary<GameObject, Graph>();
-            foreach (GameObject edge in edgesToHide)
-            {
-                edgeDictionary.Add(edge, graph);
-            }
-            AddRange(nodeDictionary, DeletedNodes);
-            AddRange(edgeDictionary, DeletedEdges);
-            OldPositions.AddRange(oldPositionsOfDeletedNodes);
-            isRunning = false;
             selectedObject = null;
         }
 
         /// <summary>
-        /// Function to add a dictionary at the end of another dictionary.
-        /// Operates similar to List.AddRange().
+        /// Deletes the given <paramref name="gameNode"/>, that is, it will remove
+        /// the associated Node it from its graph. The <paramref name="gameNode"/>
+        /// itself is not deleted or made invisible (because it will be needed during 
+        /// the animation).
+        /// 
+        /// Precondition: <paramref name="gameNode"/> must have an <see cref="NodeRef"/>
+        /// attached to it.
         /// </summary>
-        /// <param name="input">the dictionary which should be added to <paramref name="target"/></param>
-        /// <param name="target">the target where <paramref name="input"/> should be added to</param>
-        /// <returns><paramref name="target"/> extended by <paramref name="input"/> at the end of the dictionary</returns>
-        private Dictionary<GameObject, Graph> AddRange(Dictionary<GameObject, Graph> input, Dictionary<GameObject, Graph> target)
+        /// <param name="gameNode">a game object representing an edge</param>
+        private void DeleteNode(GameObject gameNode)
         {
-            foreach (KeyValuePair<GameObject, Graph> g in input)
+            if (gameNode.TryGetComponentOrLog(out NodeRef nodeRef))
             {
-                try
-                {
-                    target.Add(g.Key, g.Value);
-                }
-                catch(Exception)
-                {
-                    // multiple key addition should be ignored.
-                }
+                OldPositions[gameNode] = gameNode.transform.position;
+                Graph graph = nodeRef.Value.ItsGraph;
+                DeletedNodes[gameNode] = graph;
+                graph.RemoveNode(nodeRef.Value);
             }
-            return target;
+        }
+
+        /// <summary>
+        /// Deletes the given <paramref name="gameEdge"/>, that is, it will make it
+        /// invisible and remove it from its graph.
+        /// 
+        /// Precondition: <paramref name="gameEdge"/> must have an <see cref="EdgeRef"/>
+        /// attached to it.
+        /// </summary>
+        /// <param name="gameEdge">a game object representing an edge</param>
+        private void DeleteEdge(GameObject gameEdge)
+        {
+            if (gameEdge.TryGetComponentOrLog(out EdgeRef edgeRef))
+            {
+                gameEdge.SetVisibility(false, true);
+                Graph graph = edgeRef.edge.ItsGraph;
+                DeletedEdges[gameEdge] = graph;
+                graph.RemoveEdge(edgeRef.edge);
+            }
         }
 
         private void LocalAnySelectIn(InteractableObject interactableObject)

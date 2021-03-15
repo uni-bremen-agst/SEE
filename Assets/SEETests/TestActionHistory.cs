@@ -69,13 +69,14 @@ namespace SEETests
                 Assert.That(UndoCalls == RedoCalls);
             }
 
-            public void Update()
+            public bool Update()
             {
                 UpdateCalls++;
                 // AwakeCalls has been called once before.
                 Assert.AreEqual(1, AwakeCalls);
                 // The number of Start calls is always one ahead of the number of Stop calls.
                 Assert.AreEqual(StartCalls, StopCalls + 1);
+                return true;
             }
         }
 
