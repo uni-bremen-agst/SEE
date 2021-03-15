@@ -69,7 +69,7 @@ namespace SEE.Controls.Actions
             {
                 List<GameObject> lastHidden = hiddenObjects[hiddenObjects.Count - 1];
                 foreach (GameObject g in lastHidden){
-                    g.SetActive(true);
+                    GameObjectExtensions.SetVisibility(g, true, false);
                 }
                 hiddenObjects.Remove(lastHidden);
                 return;
@@ -96,12 +96,12 @@ namespace SEE.Controls.Actions
                             if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                             {
                                 hiddenList.Add(edge);
-                                edge.SetActive(false);
+                                GameObjectExtensions.SetVisibility(edge, false, false);
                             }
                         }
                     }
                     hiddenList.Add(selectedObject);
-                    selectedObject.SetActive(false);
+                    GameObjectExtensions.SetVisibility(selectedObject, false, false);
                     selectedObject = null;
                     hiddenObjects.Add(hiddenList);
                 }
@@ -113,7 +113,7 @@ namespace SEE.Controls.Actions
             foreach(List<GameObject> l in hiddenObjects)
             {
                 foreach(GameObject g in l){
-                    g.SetActive(true);
+                    GameObjectExtensions.SetVisibility(g, true, false);
                 }
             }
             hiddenObjects.Clear();
