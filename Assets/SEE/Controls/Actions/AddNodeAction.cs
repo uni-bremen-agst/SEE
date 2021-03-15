@@ -177,9 +177,13 @@ namespace SEE.Controls.Actions
         /// CanvasIsClosed: Closes the canvas-object after extracting the values for the creation of a node. This state is reached by pushing the "AddNode"-Button
         /// ValuesAreGiven: Moves the node and waits for a mouseInput to place the node, if its inside of the previous chosen city
         /// AddingIsCanceled: Removes all attributes and states and resets the progress-state to noCitySelected
+        /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
-        public override void Update()
+        /// <returns>true if completed</returns> 
+        public override bool Update()
         {
+            bool result = false;
+
             // Removes the canvasObject and extracts the inserted values from it for the new node to be created in next state.
             void RemoveCanvas()
             {
@@ -227,6 +231,8 @@ namespace SEE.Controls.Actions
                         if (Input.GetMouseButtonDown(0))
                         {
                             Place();
+                            // the new node has reached its final destination; we are done
+                            result = true;
                         }
                     }
                     break;
@@ -241,6 +247,7 @@ namespace SEE.Controls.Actions
                 default:
                     throw new NotImplementedException("Unhandled case.");
             }
+            return result;
         }
 
         /// <summary>

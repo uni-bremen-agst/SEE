@@ -136,8 +136,14 @@ namespace SEE.Controls.Actions
             InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
         }
 
-        public override void Update()
+        /// <summary
+        /// See <see cref="ReversibleAction.Update"/>.
+        /// </summary>
+        /// <returns>true if completed</returns>
+        public override bool Update()
         {
+            bool result = false;
+
             if (objectToScale != null && instantiated == false)
             {
                 originalScale = objectToScale.transform.lossyScale;
@@ -243,6 +249,8 @@ namespace SEE.Controls.Actions
                     else if (hit.collider == endWithSave.GetComponent<Collider>())
                     {
                         EndScale(true);
+                        // scaling is finalized
+                        result = true;
                     }
                     else if (hit.collider == endWithOutSave.GetComponent<Collider>())
                     {
@@ -299,6 +307,7 @@ namespace SEE.Controls.Actions
                     SphereRadius(endWithSave);
                 }
             }
+            return result;
         }
 
         /// <summary>
@@ -315,7 +324,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void ScaleNode()
         {
-
             Vector3 scale = Vector3.zero;
             scale.y += topSphere.transform.position.y - topOldSpherePos.y;
             scale.x -= firstSideSphere.transform.position.x - firstSideOldSpherePos.x;

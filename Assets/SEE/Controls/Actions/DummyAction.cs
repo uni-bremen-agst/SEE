@@ -59,7 +59,8 @@ namespace SEE.Controls.Actions
         /// button was pressed.
         /// See <see cref="ReversibleAction.Update"/>.
         /// </summary>
-        public override void Update()
+        /// <returns>true if completed</returns>
+        public override bool Update()
         {
             if (Input.GetMouseButtonDown(0))
             {
@@ -68,6 +69,11 @@ namespace SEE.Controls.Actions
                 newPosition = Camera.main.ScreenToWorldPoint(newPosition);
                 positions.Add(newPosition);
                 CreateObjectAt(newPosition);
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 

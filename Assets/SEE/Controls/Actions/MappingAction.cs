@@ -427,20 +427,25 @@ namespace SEE.Controls.Actions
 
         SpinningCube spinningCube;
 
-        // Update is called once per frame
-        public void Update()
+        /// <summary>
+        /// See <see cref="ReversibleAction.Update"/>.
+        /// </summary>
+        /// <returns>true if completed</returns>
+        public bool Update()
         {
             // This script should be disabled, if the action state is not 'Map'
             if (!ActionState.Is(ActionStateType.Map))
             {
                 InteractableObject.AnySelectIn -= AnySelectIn;
                 InteractableObject.AnySelectOut -= AnySelectOut;
-                return;
+                return false;
             }
 
             //------------------------------------------------------------------------
             // ARCHITECTURAL MAPPING
             //------------------------------------------------------------------------
+
+            bool result = false;
 
             if (Input.GetMouseButtonDown(0)) // Left mouse button
             {
@@ -471,6 +476,8 @@ namespace SEE.Controls.Actions
                             Reflexion.Delete_From_Mapping(mapped.Outgoings[0]);
                         }
                         Reflexion.Add_To_Mapping(n0, n1);
+                        // mapping is completed
+                        result = false;
                         selection.interactableObject.SetSelect(false, true);
                     }
                 }
@@ -542,6 +549,7 @@ namespace SEE.Controls.Actions
                 SaveMapping(mapping, MappingFile);
             }
 #endif
+            return result;
         }
 
         /// <summary>

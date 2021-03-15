@@ -42,9 +42,14 @@ namespace SEE.Controls.Actions
         /// NoNodeSelected: Waits until a node is selected by selecting a game node via the mouse button.
         /// NodeSelected: Instantiates the canvasObject if a gameNode is selected.
         /// EditIsCanceled: Removes the canvas and resets all values if the process is canceled.
+        /// See <see cref="ReversibleAction.Update"/>.
         /// </summary>
-        public override void Update()
+        /// <returns>true if completed</returns>
+        public override bool Update()
         {
+            bool result = false;
+
+            // FIXME: When is this action done? That is, when should result be true?
             switch (EditProgress)
             {
                 case ProgressState.NoNodeSelected:
@@ -58,9 +63,9 @@ namespace SEE.Controls.Actions
                     if (canvasObject.GetComponent<EditNodeCanvasAction>() == null)
                     {
                         CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
-                        EditNodeCanvasAction script = generator.InstantiateEditNodeCanvas(this);
-                        script.nodeToEdit = hoveredObject.GetComponent<NodeRef>().Value;
-                        script.gameObjectID = hoveredObject.name;
+                        EditNodeCanvasAction editNode = generator.InstantiateEditNodeCanvas(this);
+                        editNode.nodeToEdit = hoveredObject.GetComponent<NodeRef>().Value;
+                        editNode.gameObjectID = hoveredObject.name;                        
                     }
                     break;
 
@@ -74,6 +79,7 @@ namespace SEE.Controls.Actions
                 default:
                     throw new System.NotImplementedException("Unhandled case.");
             }
+            return result;
         }
 
         /// <summary>

@@ -18,5 +18,15 @@ namespace SEE.Controls.Actions
         {
             return new RotateAction();
         }
+
+        /// <summary>
+        /// <see cref="ReversibleAction.Update"/>.
+        /// </summary>
+        /// <returns>always false</returns>
+        public override bool Update()
+        {
+            // may continue endlessly
+            return false;
+        }
     }
 }
