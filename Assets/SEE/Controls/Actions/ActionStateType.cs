@@ -26,11 +26,11 @@ namespace SEE.Controls.Actions
         public static ActionStateType Move { get; } = 
             new ActionStateType(0, "Move", "Move a node within a graph", 
                                 Color.red.Darker(), "Materials/Charts/MoveIcon",
-                                null);
+                                MoveAction.CreateReversibleAction);
         public static ActionStateType Rotate { get; } = 
             new ActionStateType(1, "Rotate", "Rotate everything around the selected node within a graph", 
                                 Color.blue.Darker(), "Materials/ModernUIPack/Refresh",
-                                null);
+                                RotateAction.CreateReversibleAction);
         public static ActionStateType Map { get; } = 
             new ActionStateType(2, "Map", "Map a node from one graph to another graph", 
                                 Color.green.Darker(), "Materials/ModernUIPack/Map",
