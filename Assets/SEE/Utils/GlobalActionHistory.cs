@@ -1,3 +1,4 @@
+using OdinSerializer.Utilities;
 using SEE.Utils;
 using System;
 using System.Collections;
@@ -37,6 +38,8 @@ public class GlobalActionHistory
     /// </summary>
     private bool full = false;
 
+
+    private bool isRedo = false;
     /// <summary>
     /// The actionList it has an Tupel of the time as it was performed, Player ID, The type of the Action (Undo Redo Action), the ReversibleAction, and the list with the ids of the GameObjects
     /// A ringbuffer
@@ -118,5 +121,75 @@ public class GlobalActionHistory
 
         return new Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>, List<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>>>(result,results);
 
+    }
+
+    /// <summary>
+    /// Deletes all redos of a user
+    /// </summary>
+    /// <param name="userid">the user that does the new action</param>
+    private void DeleteRedo(string userid) //FIXME: maybe real delte (shifting of index?)?
+    {
+
+        for (int i = 0; i < size -1 ; i++)
+        {
+           if(actionList[i].Item2.Equals(userid) && actionList[i].Item3.Equals(historyType.undo)) actionList[i] = null; //FIXME changed to undo because  i think we need to delete this and not the undos which are actualy actions?
+        }
+        isRedo = false;
+    }
+
+
+    /// <summary>
+    /// Deletes a Item from the Action list depending on Time and Userid
+    /// </summary>
+    /// <param name="userid">the user for the action that should be deleted</param>
+    /// <param name="time">the time of the action which should be deleted</param>
+    private void DeleteItem(string userid, DateTime time)
+    {
+        for(int i = 0; i < size -1; i++)
+        {
+            if (actionList[i].Item1.Equals(time) && actionList[i].Item2.Equals(userid)) actionList[i] = null; ;
+        }
+    }
+
+    /// <summary>
+    /// Performs an Action
+    /// </summary>
+    /// <param name="userid"></param>
+    public void execute(string userid, ReversibleAction action, List<string> gameObjectid) //FIXME: action handling is missing (start stop update...) 
+    {
+
+        Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, userid, historyType.action, action, gameObjectid));
+        if(isRedo)
+        {
+            DeleteRedo(userid); //FIXME SHOULD REALY THE REDOS BEING DELETED? MAYBE I HAVE AN DENKFEHLER ALREADY IN THE UPPER PART IN FIND WHICH ITEM I SHOULD USE UNDO REDO...
+        }
+    }
+
+    public void undo(string userid)
+    {
+        Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>,List<Tuple< DateTime, string, historyType, ReversibleAction, List<string>>>> find;
+        find = Find(userid, historyType.undo); //With the result we need to calculate whether we can du undo or not and what changes the gameobject need
+        find.Item1.Item4.Undo(); // find.item2 als parameter so dass die action selbst brechen kann was gemacht werden muss && undo muss ein bool sein damit danach entschieden werden kann ob es ausgeführt wird
+        // in jeder revesble action muss evtl. noch eine changes list mitgeführt werden, damit eine action herrauslesen kann was die anderen verändert haben, und ob man das mergen kann oder nicht 
+        if(true) //FIXME with the return value of item.undo
+        {
+            
+            Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, userid, historyType.undo, find.Item1.Item4, find.Item1.Item5));
+            DeleteItem(find.Item1.Item2, find.Item1.Item1);
+            isRedo = true;
+        }
+    }
+    public void redo(string userid)
+    {
+        Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>, List<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>>> find;
+        find = Find(userid, historyType.redo); //With the result we need to calculate whether we can du undo or not and what changes the gameobject need
+        find.Item1.Item4.Redo(); // find.item2 als parameter so dass die action selbst brechen kann was gemacht werden muss && redo muss ein bool sein damit danach entschieden werden kann ob es ausgeführt wird
+        // in jeder revesble action muss evtl. noch eine changes list mitgeführt werden, damit eine action herrauslesen kann was die anderen verändert haben, und ob man das mergen kann oder nicht 
+        if (true) //FIXME with the return value of item.redo
+        {
+
+            Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, userid, historyType.redo, find.Item1.Item4, find.Item1.Item5)); //FIXME: Brauchen wir überhaupt ein redo state? ist es nicht das gleiche wie eine Action?
+            DeleteItem(find.Item1.Item2, find.Item1.Item1);
+        }
     }
 }
