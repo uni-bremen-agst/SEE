@@ -98,7 +98,7 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Removes the given node from the graph. Its incoming and outgoing edges are removed,
+        /// Removes the given node from the graph. Its incoming and outgoing edges are removed
         /// along with it.
         /// 
         /// Precondition: node must not be null and must be contained in this graph.
