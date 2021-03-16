@@ -1,9 +1,9 @@
-﻿using NetworkCommsDotNet;
-using NetworkCommsDotNet.Connections;
-using NetworkCommsDotNet.Connections.TCP;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using NetworkCommsDotNet;
+using NetworkCommsDotNet.Connections;
+using NetworkCommsDotNet.Connections.TCP;
 
 namespace SEE.Net
 {
@@ -31,12 +31,12 @@ namespace SEE.Net
         /// <summary>
         /// The local end point of the client.
         /// </summary>
-        public static IPEndPoint LocalEndPoint { get => Connection != null ? (IPEndPoint)Connection.ConnectionInfo.LocalEndPoint : null; }
+        public static IPEndPoint LocalEndPoint => (IPEndPoint) Connection?.ConnectionInfo.LocalEndPoint;
 
         /// <summary>
         /// The remote end point of the server, this client is connected to.
         /// </summary>
-        public static IPEndPoint RemoteEndPoint { get => Connection != null ? (IPEndPoint)Connection.ConnectionInfo.RemoteEndPoint : null; }
+        public static IPEndPoint RemoteEndPoint => (IPEndPoint) Connection?.ConnectionInfo.RemoteEndPoint;
 
         /// <summary>
         /// The ID of the next incoming packet of the server. Is used to ensure the
@@ -79,7 +79,7 @@ namespace SEE.Net
                     {
                         Connection = TCPConnection.GetConnection(connectionInfo);
                         success = true;
-                        Logger.Log("Connection with server established: " + Connection.ToString());
+                        Logger.Log("Connection with server established: " + Connection);
                         break;
                     }
                     catch (ConnectionSetupException) { }

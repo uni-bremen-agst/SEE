@@ -28,7 +28,7 @@ namespace SEE.Game.UI
         /// This prefab should contain all components necessary for the UI canvas, such as an event system,
         /// a graphic raycaster, etc.
         /// </summary>
-        protected const string UI_CANVAS_PREFAB = "Prefabs/UI/UICanvas";
+        private const string UI_CANVAS_PREFAB = "Prefabs/UI/UICanvas";
 
         /// <summary>
         /// The canvas on which UI elements are placed.
