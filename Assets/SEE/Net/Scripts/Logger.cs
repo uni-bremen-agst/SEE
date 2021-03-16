@@ -7,7 +7,7 @@ namespace SEE.Net
     /// <summary>
     /// An internal logger for the networking.
     /// </summary>
-    public class Logger
+    public static class Logger
     {
         /// <summary>
         /// Calls Debug.Log with networking prefix and given message.
@@ -37,11 +37,11 @@ namespace SEE.Net
             {
                 if (message != null)
                 {
-                    UnityEngine.Debug.LogErrorFormat("<b>[SEE Net]</b> Exception: {0}\n{0}\n", exception.ToString(), message);
+                    UnityEngine.Debug.LogErrorFormat("<b>[SEE Net]</b> Exception: {0}\n{1}\n", exception, message);
                 }
                 else
                 {
-                    UnityEngine.Debug.LogErrorFormat("<b>[SEE Net]</b> Exception: {0}\n", exception.ToString());
+                    UnityEngine.Debug.LogErrorFormat("<b>[SEE Net]</b> Exception: {0}\n", exception);
                 }
             }
 #endif
