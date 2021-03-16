@@ -1,11 +1,11 @@
-﻿using SEE.DataModel;
+﻿using System.Collections.Generic;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game;
 using SEE.GO;
 using SEE.Tools;
 using SEE.Utils;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -64,7 +64,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Materials for the decoration of reflexion edges.
         /// </summary>
-        [Tooltip("Prefab for absencenes")]
+        [Tooltip("Prefab for absences")]
         public GameObject AbsencePrefab;
         [Tooltip("Prefab for convergences")]
         public GameObject ConvergencePrefab;
@@ -75,6 +75,7 @@ namespace SEE.Controls.Actions
         {
             internal NodeRef nodeRef;
             internal InteractableObject interactableObject; // TODO(torben): it is time to combine NodeRefs and InteractableObjects or at least have some dictionary for them...
+            // Rainer: note that gameObjects with an EdgeRef instead of NodeRef now may also have a InteractableObject component.
         }
 
         /// <summary>
@@ -176,7 +177,7 @@ namespace SEE.Controls.Actions
                 Debug.LogErrorFormat("No material assigned for divergences.\n");
                 enabled = false;
             }
-            if (Architecture.TryGetComponent<SEECity>(out SEECity city))
+            if (Architecture.TryGetComponent(out SEECity city))
             {
                 architectureGraphRenderer = city.Renderer;
                 if (architectureGraphRenderer == null)
@@ -199,7 +200,7 @@ namespace SEE.Controls.Actions
             }
 
             ActionState.OnStateChanged += OnStateChanged;
-            if (ActionState.Value == ActionState.Type.Map)
+            if (Equals(ActionState.Value, ActionStateType.Map))
             {
                 InteractableObject.AnySelectIn += AnySelectIn;
                 InteractableObject.AnySelectOut += AnySelectOut;
@@ -210,9 +211,9 @@ namespace SEE.Controls.Actions
             }
         }
 
-        private void OnStateChanged(ActionState.Type value)
+        private void OnStateChanged(ActionStateType value)
         {
-            if (value == ActionState.Type.Map)
+            if (Equals(value, ActionStateType.Map))
             {
                 InteractableObject.AnySelectIn += AnySelectIn;
                 InteractableObject.AnySelectOut += AnySelectOut;
@@ -257,55 +258,56 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Adds all game nodes and edges that are reachable by <paramref name="gameObject"/> to
+        /// Adds all game nodes and edges that are reachable by <paramref name="rootGameObject"/> to
         /// <paramref name="nodes"/> or <paramref name="edges"/>, respectively, or by any of its
         /// descendants. Game objects representing either graph nodes or edges are recognized
         /// by either Tags.Node or Tags.Edge, respectively.
         /// </summary>
-        /// <param name="gameObject">root object of the object hierarchy</param>
+        /// <param name="rootGameObject">root object of the object hierarchy</param>
         /// <param name="nodes">where game objects representing graph nodes are to be added</param>
         /// <param name="edges">where game objects representing graph edges are to be added</param>
-        private void GatherNodesAndEdges(GameObject gameObject, Dictionary<string, GameObject> nodes, Dictionary<string, GameObject> edges)
+        private static void GatherNodesAndEdges(GameObject rootGameObject, IDictionary<string, GameObject> nodes, IDictionary<string, GameObject> edges)
         {
-            if (gameObject.tag == Tags.Edge)
+            switch (rootGameObject.tag)
             {
-                if (gameObject.TryGetComponent<EdgeRef>(out EdgeRef edgeRef))
+                case Tags.Edge when rootGameObject.TryGetComponent(out EdgeRef edgeRef):
                 {
                     Edge edge = edgeRef.edge;
                     if (edge != null)
                     {
-                        edges[edge.ID] = gameObject;
+                        edges[edge.ID] = rootGameObject;
                     }
                     else
                     {
-                        Debug.LogErrorFormat("Game-object edge {0} without an invalid graph edge reference.\n", gameObject.name);
+                        Debug.LogErrorFormat("Game-object edge {0} without an invalid graph edge reference.\n", rootGameObject.name);
                     }
+
+                    break;
                 }
-                else
+                case Tags.Edge:
                 {
-                    Debug.LogErrorFormat("Game-object edge {0} without graph edge reference.\n", gameObject.name);
+                    Debug.LogErrorFormat("Game-object edge {0} without graph edge reference.\n", rootGameObject.name);
+                    break;
                 }
-            }
-            else if (gameObject.tag == Tags.Node)
-            {
-                if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+                case Tags.Node when rootGameObject.TryGetComponent(out NodeRef nodeRef):
                 {
                     Node node = nodeRef.Value;
                     if (node != null)
                     {
-                        nodes[node.ID] = gameObject;
+                        nodes[node.ID] = rootGameObject;
                     }
                     else
                     {
-                        Debug.LogErrorFormat("Game-object node {0} without an invalid graph node reference.\n", gameObject.name);
+                        Debug.LogErrorFormat("Game-object node {0} without an invalid graph node reference.\n", rootGameObject.name);
                     }
+
+                    break;
                 }
-                else
-                {
-                    Debug.LogErrorFormat("Game-object node {0} without graph node reference.\n", gameObject.name);
-                }
+                case Tags.Node: Debug.LogErrorFormat("Game-object node {0} without graph node reference.\n", rootGameObject.name);
+                    break;
             }
-            foreach (Transform child in gameObject.transform)
+
+            foreach (Transform child in rootGameObject.transform)
             {
                 GatherNodesAndEdges(child.gameObject, nodes, edges);
             }
@@ -316,7 +318,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private static void Usage()
         {
-            Debug.Log("Keys for architecutural mapping:\n");
+            Debug.Log("Keys for architectural mapping:\n");
             Debug.LogFormat(" copy/remove selected implementation node to/from clipboard: Ctrl-{0}\n", CopyKey);
             Debug.LogFormat(" map nodes in clipboard onto selected architecture node: Ctrl-{0}\n", PasteKey);
             Debug.LogFormat(" clear clipboard: Ctrl-{0}\n", ClearKey);
@@ -326,7 +328,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Loads and returns the mapping from the given GXL <paramref name="mappingFile"/>.
         /// </summary>
-        /// <param name="mappingFile"></param>
+        /// <param name="mappingFile">GXL file from which to load the mapping</param>
         /// <returns>the loaded graph or null</returns>
         private Graph LoadMapping(string mappingFile)
         {
@@ -342,17 +344,17 @@ namespace SEE.Controls.Actions
             {
                 if (edge.Type != "Maps_To")
                 {
-                    Debug.LogWarningFormat("Unexpected edge type {0} in mapping for edge {1}.\n", edge.Type, edge.ToString());
+                    Debug.LogWarningFormat("Unexpected edge type {0} in mapping for edge {1}.\n", edge.Type, edge);
                     edgesToBeRemoved.Add(edge);
                 }
                 if (implementation.GetNode(edge.Source.ID) == null)
                 {
-                    Debug.LogWarningFormat("The mapping contains an implementation node that is not in the implementation graph.\n", edge.Source.ID);
+                    Debug.LogWarning($"The mapping contains an implementation node {edge.Source.ID} (source) that is not in the implementation graph for maps-to edge {edge}.\n");
                     nodesToBeRemoved.Add(edge.Source);
                 }
                 if (architecture.GetNode(edge.Target.ID) == null)
                 {
-                    Debug.LogWarningFormat("The mapping contains an architecture node that is not in the architecture graph.\n", edge.Source.ID);
+                    Debug.LogWarning($"The mapping contains an architecture node {edge.Target.ID} (target) that is not in the architecture graph for maps-to edge {edge}.\n");
                     nodesToBeRemoved.Add(edge.Target);
                 }
             }
@@ -396,7 +398,13 @@ namespace SEE.Controls.Actions
         private void Update()
         {
             // This script should be disabled, if the action state is not 'Map'
-            Assert.IsTrue(ActionState.Value == ActionState.Type.Map);
+            if (!ActionState.Is(ActionStateType.Map))
+            {
+                enabled = false;
+                InteractableObject.AnySelectIn -= AnySelectIn;
+                InteractableObject.AnySelectOut -= AnySelectOut;
+                return;
+            }
 
             //------------------------------------------------------------------------
             // ARCHITECTURAL MAPPING
@@ -404,8 +412,11 @@ namespace SEE.Controls.Actions
 
             if (Input.GetMouseButtonDown(0)) // Left mouse button
             {
-                if (Raycasting.RaycastNodes(out RaycastHit hit, out NodeRef nodeRef)) // Select, replace or map
+                if (Raycasting.RaycastGraphElement(out RaycastHit _, out GraphElementRef elementRef) == HitGraphElement.Node) 
                 {
+                    // Select, replace or map
+                    NodeRef nodeRef = elementRef as NodeRef;
+
                     Assert.IsNotNull(nodeRef);
                     Assert.IsNotNull(nodeRef.Value);
 
@@ -449,6 +460,8 @@ namespace SEE.Controls.Actions
                 float gr = 0.5f * MathExtensions.GoldenRatio;
                 float ls = spinningCube.gameObject.transform.localScale.x;
 
+                //TODO: Camera.main should be cached for Update(),
+                // as it has CPU overhead comparable to GameObject.GetComponent
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 Physics.Raycast(ray, out RaycastHit hit);
 
@@ -515,7 +528,7 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    Debug.LogWarningFormat("Node {0} is already explicitly mapped..\n", implementation.nodeRef.name);
+                    Debug.LogWarningFormat("Node {0} is already explicitly mapped.\n", implementation.nodeRef.name);
                 }
             }
             objectsInClipboard.Clear();
@@ -611,34 +624,25 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Called by incremental reflexion for every change in the reflexion model
         /// by way of the observer protocol as a callback. Dispatches the event to
-        /// the approriate handling function.
+        /// the appropriate handling function.
         /// </summary>
         /// <param name="changeEvent">additional information about the change in the reflexion model</param>
         public void Update(ChangeEvent changeEvent)
         {
-            if (changeEvent is EdgeChange)
+            switch (changeEvent)
             {
-                HandleEdgeChange(changeEvent as EdgeChange);
-            }
-            else if (changeEvent is PropagatedEdgeAdded)
-            {
-                HandlePropagatedEdgeAdded(changeEvent as PropagatedEdgeAdded);
-            }
-            else if (changeEvent is PropagatedEdgeRemoved)
-            {
-                HandlePropagatedEdgeRemoved(changeEvent as PropagatedEdgeRemoved);
-            }
-            else if (changeEvent is MapsToEdgeAdded)
-            {
-                HandleMapsToEdgeAdded(changeEvent as MapsToEdgeAdded);
-            }
-            else if (changeEvent is MapsToEdgeRemoved)
-            {
-                HandleMapsToEdgeRemoved(changeEvent as MapsToEdgeRemoved);
-            }
-            else
-            {
-                Debug.LogErrorFormat("UNHANDLED CALLBACK: {0}\n", changeEvent.ToString());
+                case EdgeChange changedEvent: HandleEdgeChange(changedEvent);
+                    break;
+                case PropagatedEdgeAdded changedEvent: HandlePropagatedEdgeAdded(changedEvent);
+                    break;
+                case PropagatedEdgeRemoved changedEvent: HandlePropagatedEdgeRemoved(changedEvent);
+                    break;
+                case MapsToEdgeAdded changedEvent: HandleMapsToEdgeAdded(changedEvent);
+                    break;
+                case MapsToEdgeRemoved changedEvent: HandleMapsToEdgeRemoved(changedEvent);
+                    break;
+                default: Debug.LogErrorFormat("UNHANDLED CALLBACK: {0}\n", changeEvent);
+                    break;
             }
         }
 
@@ -674,29 +678,29 @@ namespace SEE.Controls.Actions
                         //--------------------------------------
                         // Changes for architecture dependencies
                         //--------------------------------------
-                        case Tools.State.specified:
+                        case State.specified:
                             // nothing to be done
                             break;
-                        case Tools.State.absent:
+                        case State.absent:
                             decorator.UndecorateAbsence(gameEdge);
                             break;
-                        case Tools.State.allowed_absent:
+                        case State.allowed_absent:
                             decorator.UndecorateAllowedAbsence(gameEdge);
                             break;
-                        case Tools.State.convergent:
+                        case State.convergent:
                             decorator.UndecorateConvergence(gameEdge);
                             break;
 
                         //-----------------------------------------------------------------------
                         // changes for implementation dependencies propagated to the architecture
                         //-----------------------------------------------------------------------
-                        case Tools.State.divergent:
+                        case State.divergent:
                             decorator.UndecorateDivergence(gameEdge);
                             break;
-                        case Tools.State.allowed:
+                        case State.allowed:
                             decorator.UndecorateAllowed(gameEdge);
                             break;
-                        case Tools.State.implicitly_allowed:
+                        case State.implicitly_allowed:
                             decorator.UndecorateImplicitlyAllowed(gameEdge);
                             break;
                         default:
@@ -709,29 +713,29 @@ namespace SEE.Controls.Actions
                         //--------------------------------------
                         // Changes for architecture dependencies
                         //--------------------------------------
-                        case Tools.State.specified:
+                        case State.specified:
                             // nothing to be done
                             break;
-                        case Tools.State.absent:
+                        case State.absent:
                             decorator.DecorateAbsence(gameEdge);
                             break;
-                        case Tools.State.allowed_absent:
+                        case State.allowed_absent:
                             decorator.DecorateAllowedAbsence(gameEdge);
                             break;
-                        case Tools.State.convergent:
+                        case State.convergent:
                             decorator.DecorateConvergence(gameEdge);
                             break;
 
                         //-----------------------------------------------------------------------
                         // changes for implementation dependencies propagated to the architecture
                         //-----------------------------------------------------------------------
-                        case Tools.State.divergent:
+                        case State.divergent:
                             decorator.DecorateDivergence(gameEdge);
                             break;
-                        case Tools.State.allowed:
+                        case State.allowed:
                             decorator.DecorateAllowed(gameEdge);
                             break;
-                        case Tools.State.implicitly_allowed:
+                        case State.implicitly_allowed:
                             decorator.DecorateImplicitlyAllowed(gameEdge);
                             break;
                         default:

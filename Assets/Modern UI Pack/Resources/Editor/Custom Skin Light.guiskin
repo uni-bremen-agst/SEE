@@ -1418,7 +1418,7 @@ MonoBehaviour:
     m_ContentOffset: {x: 0, y: 0}
     m_FixedWidth: 30
     m_FixedHeight: 30
-    m_StretchWidth: 1
+    m_StretchWidth: 0
     m_StretchHeight: 0
   - m_Name: Toolbar Resources
     m_Normal:
@@ -1470,7 +1470,7 @@ MonoBehaviour:
       m_Bottom: 0
     m_Overflow:
       m_Left: 0
-      m_Right: 0
+      m_Right: 1
       m_Top: 0
       m_Bottom: 0
     m_Font: {fileID: 0}
@@ -1478,13 +1478,13 @@ MonoBehaviour:
     m_FontStyle: 0
     m_Alignment: 4
     m_WordWrap: 0
-    m_RichText: 1
+    m_RichText: 0
     m_TextClipping: 0
     m_ImagePosition: 2
     m_ContentOffset: {x: 0, y: 0}
     m_FixedWidth: 30
     m_FixedHeight: 30
-    m_StretchWidth: 1
+    m_StretchWidth: 0
     m_StretchHeight: 0
   - m_Name: Toolbar Saving
     m_Normal:
@@ -1536,7 +1536,7 @@ MonoBehaviour:
       m_Bottom: 0
     m_Overflow:
       m_Left: 0
-      m_Right: 0
+      m_Right: 1
       m_Top: 0
       m_Bottom: 0
     m_Font: {fileID: 0}
@@ -1544,13 +1544,13 @@ MonoBehaviour:
     m_FontStyle: 0
     m_Alignment: 4
     m_WordWrap: 0
-    m_RichText: 1
+    m_RichText: 0
     m_TextClipping: 0
     m_ImagePosition: 2
     m_ContentOffset: {x: 0, y: 0}
     m_FixedWidth: 30
     m_FixedHeight: 30
-    m_StretchWidth: 1
+    m_StretchWidth: 0
     m_StretchHeight: 0
   - m_Name: Toolbar Settings
     m_Normal:
@@ -1602,7 +1602,7 @@ MonoBehaviour:
       m_Bottom: 0
     m_Overflow:
       m_Left: 0
-      m_Right: 0
+      m_Right: 1
       m_Top: 0
       m_Bottom: 0
     m_Font: {fileID: 0}
@@ -1610,13 +1610,13 @@ MonoBehaviour:
     m_FontStyle: 0
     m_Alignment: 4
     m_WordWrap: 0
-    m_RichText: 1
+    m_RichText: 0
     m_TextClipping: 0
     m_ImagePosition: 2
     m_ContentOffset: {x: 0, y: 0}
     m_FixedWidth: 30
     m_FixedHeight: 30
-    m_StretchWidth: 1
+    m_StretchWidth: 0
     m_StretchHeight: 0
   - m_Name: Toolbar Indicators
     m_Normal:
@@ -1676,11 +1676,11 @@ MonoBehaviour:
     m_FontStyle: 0
     m_Alignment: 4
     m_WordWrap: 0
-    m_RichText: 1
+    m_RichText: 0
     m_TextClipping: 0
     m_ImagePosition: 2
     m_ContentOffset: {x: 0, y: 0}
-    m_FixedWidth: 30
+    m_FixedWidth: 30.1
     m_FixedHeight: 30
     m_StretchWidth: 1
     m_StretchHeight: 0

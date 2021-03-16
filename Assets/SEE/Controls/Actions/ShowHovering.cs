@@ -2,6 +2,9 @@
 
 namespace SEE.Controls.Actions
 {
+    /// <summary>
+    /// Draws an outline around a game object being hovered over.
+    /// </summary>
     public class ShowHovering : InteractableObjectHoveringAction
     {
         /// <summary>
@@ -20,6 +23,7 @@ namespace SEE.Controls.Actions
         /// colors will be used for the outline.
         /// Called when the object is hovered over.
         /// </summary>
+        /// <param name="interactableObject">the object being hovered over (not used here)</param>
         /// <param name="isOwner">true if a local user initiated this call</param>
         protected override void On(InteractableObject interactableObject, bool isOwner)
         {
@@ -41,6 +45,7 @@ namespace SEE.Controls.Actions
         /// this outline will be destroyed.
         /// Called when the object is no longer being hovered over.
         /// </summary>
+        /// <param name="interactableObject">the object being hovered over (not used here)</param>
         /// <param name="isOwner">true if a local user initiated this call</param>
         protected override void Off(InteractableObject interactableObject, bool isOwner)
         {

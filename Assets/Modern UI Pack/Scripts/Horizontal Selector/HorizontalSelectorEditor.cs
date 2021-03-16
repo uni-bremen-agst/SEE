@@ -227,22 +227,24 @@ namespace Michsky.UI.ModernUIPack
                     loopSelection.boolValue = GUILayout.Toggle(loopSelection.boolValue, new GUIContent(""), customSkin.FindStyle("Toggle Helper"));
 
                     GUILayout.EndHorizontal();
-                    GUILayout.BeginVertical(EditorStyles.helpBox);
 
-                    EditorGUILayout.LabelField(new GUIContent("Selected Item Index:"), customSkin.FindStyle("Text"), GUILayout.Width(120));
-                    defaultIndex.intValue = EditorGUILayout.IntSlider(defaultIndex.intValue, 0, hsTarget.itemList.Count - 1);
-
-                    GUILayout.Space(2);
-
-                    EditorGUILayout.LabelField(new GUIContent(hsTarget.itemList[defaultIndex.intValue].itemTitle), customSkin.FindStyle("Text"));
-
-                    GUILayout.EndVertical();
-
-                    if (saveValue.boolValue == true)
+                    if (hsTarget.itemList.Count != 0)
                     {
+                        GUILayout.BeginVertical(EditorStyles.helpBox);
+
+                        EditorGUILayout.LabelField(new GUIContent("Selected Item Index:"), customSkin.FindStyle("Text"), GUILayout.Width(120));
+                        defaultIndex.intValue = EditorGUILayout.IntSlider(defaultIndex.intValue, 0, hsTarget.itemList.Count - 1);
+
                         GUILayout.Space(2);
-                        EditorGUILayout.HelpBox("Save Selection is enabled. This option won't be used if there's a stored value.", MessageType.Info);
+                        EditorGUILayout.LabelField(new GUIContent(hsTarget.itemList[defaultIndex.intValue].itemTitle), customSkin.FindStyle("Text"));
+                        GUILayout.EndVertical();
+
+                        if (saveValue.boolValue == true)
+                            EditorGUILayout.HelpBox("Save Selection is enabled. This option won't be used if there's a stored value.", MessageType.Info);
                     }
+
+                    else
+                        EditorGUILayout.HelpBox("There is no item in the list.", MessageType.Warning);
 
                     GUILayout.Space(4);
                     break;

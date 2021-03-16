@@ -15,46 +15,35 @@ namespace Michsky.UI.ModernUIPack
         public List<GameObject> images = new List<GameObject>();
         public List<GameObject> texts = new List<GameObject>();
 
-        bool dynamicUpdateEnabled;
-
-        void OnEnable()
-        {
-            if (UIManagerAsset == null)
-            {
-                try
-                {
-                    UIManagerAsset = Resources.Load<UIManager>("MUIP Manager");
-                }
-
-                catch
-                {
-                    Debug.LogWarning("No UI Manager found. Assign it manually, otherwise you'll get errors about it.", this);
-                }
-            }
-        }
-
         void Awake()
         {
-            if (dynamicUpdateEnabled == false)
+            try
             {
+                if (UIManagerAsset == null)
+                    UIManagerAsset = Resources.Load<UIManager>("MUIP Manager");
+
                 this.enabled = true;
-                UpdateInputField();
+
+                if (UIManagerAsset.enableDynamicUpdate == false)
+                {
+                    UpdateInputField();
+                    this.enabled = false;
+                }
+            }
+
+            catch
+            {
+                Debug.Log("<b>[Modern UI Pack]</b> No UI Manager found, assign it manually.", this);
             }
         }
 
         void LateUpdate()
         {
-            if (UIManagerAsset != null)
-            {
-                if (UIManagerAsset.enableDynamicUpdate == true)
-                {
-                    dynamicUpdateEnabled = true;
-                    UpdateInputField();
-                }
+            if (UIManagerAsset == null)
+                return;
 
-                else
-                    dynamicUpdateEnabled = false;
-            }
+            if (UIManagerAsset.enableDynamicUpdate == true)
+                UpdateInputField();
         }
 
         void UpdateInputField()

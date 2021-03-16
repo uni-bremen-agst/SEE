@@ -20,12 +20,9 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Controls;
-using SEE.DataModel;
+using SEE.GO;
 using SEE.Utils;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Game.Charts
 {
@@ -165,7 +162,7 @@ namespace SEE.Game.Charts
         /// </summary>
         private void Start()
         {
-            _isVirtualReality = GameObject.Find("Player Settings").GetComponent<PlayerSettings>().playerInputType == PlayerSettings.PlayerInputType.VR;
+            _isVirtualReality = PlayerSettings.GetInputType() == PlayerInputType.VRPlayer;
             if (!_isVirtualReality)
             {
                 _chartsOpen = GameObject.Find("ChartCanvas") != null

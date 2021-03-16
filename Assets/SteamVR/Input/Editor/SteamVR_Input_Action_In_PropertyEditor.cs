@@ -1,6 +1,4 @@
-﻿#if UNITY_EDITOR
-
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 using System.CodeDom;
@@ -18,5 +16,3 @@ using System;
 namespace Valve.VR
 {
 }
-
-#endif

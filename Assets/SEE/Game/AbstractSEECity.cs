@@ -270,18 +270,12 @@ namespace SEE.Game
         {
             if (AllNodeTypesAreRelevant)
             {
-                Debug.Log("All node types are relevant.\n");
                 return graph;
             }
             else
             {
                 ICollection<string> matches = SelectedNodeTypes.Where(pair => pair.Value == true)
                   .Select(pair => pair.Key).ToList();
-                Debug.Log("The following node types are relevant:\n");
-                foreach (string nodeType in matches)
-                {
-                    Debug.LogFormat("  {0}\n", nodeType);
-                }
                 return graph.Subgraph(matches);
             }
         }
@@ -622,6 +616,30 @@ namespace SEE.Game
             + " line points whose distances fall below that threshold are merged. A value <= 0 means "
             + " no simplification. Recommended value: 0.05.")]
         public float RDP = 0.05f;
+
+        /// <summary>
+        /// Determines the amount of segments along the tubular.
+        /// </summary>
+        [Tooltip("The amount of segments along the tubular. Recommended: 50")]
+        public int TubularSegments = 50;
+
+        /// <summary>
+        /// Determines the radius of the tubular. 
+        /// </summary>
+        [Tooltip("The radius of the tubular. Recommended: 0.005")]
+        public float Radius = 0.005f;
+
+        /// <summary>
+        /// Determines the amount of segments around the tubular.
+        /// </summary>
+        [Tooltip("The amount of segments around the tubular. Recommended: 8")]
+        public int RadialSegments = 8;
+
+        /// <summary>
+        /// Determines wether the edges are selectable or not.
+        /// </summary>
+        [Tooltip("Are the Edges selectable? Default: True")]
+        public bool isEdgeSelectable = true;
 
         /// <summary>
         /// Loads and returns the graph data from the GXL file with given <paramref name="filename"/>.

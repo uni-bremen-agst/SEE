@@ -19,9 +19,9 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.Controls;
 using System.Collections.Generic;
 using System.Text;
+using SEE.Controls;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -269,13 +269,14 @@ namespace SEE.Game.Charts
         /// 
         /// Updates the info text.
         /// </summary>
-        public void OnHoverIn(InteractableObject o, bool isOwner)
+        /// <param name="interactableObject">the object being hovered over</param>
+        /// <param name="isOwner">true if a local user initiated this call (unused)</param>
+        public void OnHoverIn(InteractableObject interactableObject, bool isOwner)
         {
-            if (!o.IsSelected)
+            if (!interactableObject.IsSelected)
             {
-                hoveredOrSelectedIds.Add(o.ID);
+                hoveredOrSelectedIds.Add(interactableObject.ID);
             }
-
             UpdateInfoText();
         }
 
@@ -284,13 +285,14 @@ namespace SEE.Game.Charts
         /// 
         /// Updates the info text.
         /// </summary>
-        public void OnHoverOut(InteractableObject o, bool isOwner)
+        /// <param name="interactableObject">the object being hovered over</param>
+        /// <param name="isOwner">true if a local user initiated this call (unused)</param>
+        public void OnHoverOut(InteractableObject interactableObject, bool isOwner)
         {
-            if (!o.IsSelected)
+            if (!interactableObject.IsSelected)
             {
-                hoveredOrSelectedIds.Remove(o.ID);
+                hoveredOrSelectedIds.Remove(interactableObject.ID);
             }
-
             UpdateInfoText();
         }
 
@@ -299,14 +301,15 @@ namespace SEE.Game.Charts
         /// 
         /// Updates the info text and highlights this marker.
         /// </summary>
-        public void OnSelectIn(InteractableObject o, bool isOwner)
+        /// <param name="interactableObject">the object being selected</param>
+        /// <param name="isOwner">true if a local user initiated this call (unused)</param>
+        public void OnSelectIn(InteractableObject interactableObject, bool isOwner)
         {
             selectedCount++;
-            if (!o.IsHovered)
+            if (!interactableObject.IsHovered)
             {
-                hoveredOrSelectedIds.Add(o.ID);
+                hoveredOrSelectedIds.Add(interactableObject.ID);
             }
-
             UpdateInfoText();
             markerHighlight.SetActive(true);
         }
@@ -317,14 +320,15 @@ namespace SEE.Game.Charts
         /// Updates the info text and stops highlighting this marker, if no other linked
         /// interactable object is still selected.
         /// </summary>
-        public void OnSelectOut(InteractableObject o, bool isOwner)
+        /// <param name="interactableObject">the object being selected</param>
+        /// <param name="isOwner">true if a local user initiated this call (unused)</param>
+        public void OnSelectOut(InteractableObject interactableObject, bool isOwner)
         {
             selectedCount--;
-            if (!o.IsHovered)
+            if (!interactableObject.IsHovered)
             {
-                hoveredOrSelectedIds.Remove(o.ID);
+                hoveredOrSelectedIds.Remove(interactableObject.ID);
             }
-
             UpdateInfoText();
             markerHighlight.SetActive(selectedCount > 0);
         }

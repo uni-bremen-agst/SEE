@@ -53,9 +53,9 @@ namespace InControl
 
 		bool isReady;
 
-#pragma warning disable 414
+		#pragma warning disable 414
 		readonly Touch[] mouseTouches = new Touch[3];
-#pragma warning restore 414
+		#pragma warning restore 414
 
 
 		protected TouchManager() {}
@@ -66,7 +66,7 @@ namespace InControl
 			var manager = GetComponent<InControlManager>();
 			if (manager == null)
 			{
-				Debug.LogError( "Touch Manager component can only be added to the InControl Manager object." );
+				Logger.LogError( "Touch Manager component can only be added to the InControl Manager object." );
 				DestroyImmediate( this );
 				return;
 			}
@@ -76,7 +76,7 @@ namespace InControl
 				return;
 			}
 
-#if UNITY_EDITOR
+			#if UNITY_EDITOR
 			if (touchCamera == null)
 			{
 				foreach (var component in manager.gameObject.GetComponentsInChildren<Camera>())
@@ -99,7 +99,7 @@ namespace InControl
 				touchCamera.rect = new Rect( 0.0f, 0.0f, 1.0f, 1.0f );
 				touchCamera.depth = 100;
 			}
-#endif
+			#endif
 
 			touchControls = GetComponentsInChildren<TouchControl>( true );
 
@@ -194,7 +194,7 @@ namespace InControl
 		}
 
 
-#if UNITY_EDITOR
+		#if UNITY_EDITOR
 		void OnGUI()
 		{
 			var currentScreenSize = GetCurrentScreenSize();
@@ -203,7 +203,7 @@ namespace InControl
 				UpdateScreenSize( currentScreenSize );
 			}
 		}
-#endif
+		#endif
 
 
 		void CreateDevice()
@@ -340,7 +340,7 @@ namespace InControl
 			activeTouches.Clear();
 			cachedTouches.FreeEndedTouches();
 
-#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_WEBGL || UNITY_WSA
+			#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER || UNITY_WEBGL || UNITY_WSA
 			for (var i = 0; i < 3; i++)
 			{
 				if (mouseTouches[i].SetWithMouseData( i, updateTick, deltaTime ))
@@ -348,7 +348,7 @@ namespace InControl
 					activeTouches.Add( mouseTouches[i] );
 				}
 			}
-#endif
+			#endif
 
 			for (var i = 0; i < Input.touchCount; i++)
 			{

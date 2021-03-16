@@ -12,46 +12,35 @@ namespace Michsky.UI.ModernUIPack
         [Header("RESOURCES")]
         public Image backgroundImage;
 
-        bool dynamicUpdateEnabled;
-
-        void OnEnable()
-        {
-            if (UIManagerAsset == null)
-            {
-                try
-                {
-                    UIManagerAsset = Resources.Load<UIManager>("MUIP Manager");
-                }
-
-                catch
-                {
-                    Debug.Log("No UI Manager found. Assign it manually, otherwise you'll get errors about it.", this);
-                }
-            }
-        }
-
         void Awake()
         {
-            if (dynamicUpdateEnabled == false)
+            try
             {
+                if (UIManagerAsset == null)
+                    UIManagerAsset = Resources.Load<UIManager>("MUIP Manager");
+
                 this.enabled = true;
-                UpdateContextMenu();
+
+                if (UIManagerAsset.enableDynamicUpdate == false)
+                {
+                    UpdateContextMenu();
+                    this.enabled = false;
+                }
+            }
+
+            catch
+            {
+                Debug.Log("<b>[Modern UI Pack]</b> No UI Manager found, assign it manually.", this);
             }
         }
 
         void LateUpdate()
         {
-            if (Application.isEditor == true && UIManagerAsset != null)
-            {
-                if (UIManagerAsset.enableDynamicUpdate == true)
-                {
-                    dynamicUpdateEnabled = true;
-                    UpdateContextMenu();
-                }
+            if (UIManagerAsset == null)
+                return;
 
-                else
-                    dynamicUpdateEnabled = false;
-            }
+            if (UIManagerAsset.enableDynamicUpdate == true)
+                UpdateContextMenu();
         }
 
         void UpdateContextMenu()

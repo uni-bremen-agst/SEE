@@ -1,12 +1,13 @@
-﻿using System;
-using OdinSerializer.Utilities;
 using SEE.DataModel.DG;
+using SEE.Utils;
+using System;
+using OdinSerializer.Utilities;
 using UnityEngine;
 
 namespace SEE.GO
 {
     /// <summary>
-    /// Provides extensions for GameObjects retrieving their ID.
+    /// Provides extensions for GameObjects.
     /// </summary>
     public static class GameObjectExtensions
     {
@@ -28,8 +29,10 @@ namespace SEE.GO
                 {
                     return gameObject.name;
                 }
-
-                return edgeRef.edge.ID;
+                else
+                {
+                    return edgeRef.edge.ID;
+                }
             }
             return nodeRef.Value.ID;
         }
@@ -119,6 +122,30 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Sets the scale of this <paramref name="node"/> to <paramref name="scale"/> independent from 
+        /// the local scale from the parent.
+        /// </summary>
+        /// <param name="node">object whose scale should be set</param>
+        /// <param name="scale">the new scale in world space</param>
+        public static void SetScale(this GameObject node, Vector3 scale)
+        {
+            Transform parent = node.transform.parent;
+            node.transform.parent = null;
+            node.transform.localScale = scale;
+            node.transform.parent = parent;
+        }
+
+        /// <summary>
+        /// Gets the Height (Roof) of this <paramref name="node"/>
+        /// </summary>
+        /// <param name="node">node whose height has to be determined</param>
+        /// <returns>The height of the Roof from this <paramref name="node"/></returns>
+        public static float GetRoof(this GameObject node)
+        {
+            return node.transform.position.y + node.Size().y / 2.0f;
+        }
+
+        /// <summary>
         /// Tries to get the component of the given type <typeparamref name="T"/> of this <paramref name="gameObject"/>.
         /// If the component was found, it will be stored in <paramref name="component"/> and true will be returned.
         /// If it wasn't found, <paramref name="component"/> will be <code>null</code>, false will be returned,
@@ -149,7 +176,19 @@ namespace SEE.GO
         /// component attached to it</returns>
         public static bool HasNodeRef(this GameObject gameObject)
         {
-            return gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef);
+            return gameObject.TryGetComponent<NodeRef>(out NodeRef _);
+        }
+
+        /// <summary>
+        /// Returns true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
+        /// component attached to it.
+        /// </summary>
+        /// <param name="gameObject">the game object whose EdgeRef is checked</param>
+        /// <returns>true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
+        /// component attached to it</returns>
+        public static bool HasEdgeRef(this GameObject gameObject)
+        {
+            return gameObject.TryGetComponent<EdgeRef>(out EdgeRef _);
         }
 
         /// <summary>
@@ -176,6 +215,49 @@ namespace SEE.GO
             else
             {
                 throw new Exception($"Game object {gameObject.name} has no NodeRef");
+            }
+        }
+        
+        /// <summary>
+        /// Enables/disables the renderers of <paramref name="gameObject"/> and all its
+        /// descendants so that they become visible/invisible.
+        /// </summary>
+        /// <param name="gameObject">objects whose renderer (and those of its children) is to be enabled/disabled</param>
+        /// <param name="isVisible">iff true, the renderers will be enabled</param>
+        private static void SetVisible(this GameObject gameObject, bool isVisible)
+        {
+            gameObject.GetComponent<Renderer>().enabled = isVisible;
+            foreach (Transform child in gameObject.transform)
+            {
+                SetVisible(child.gameObject, isVisible);
+            }
+        }
+
+        /// <summary>
+        /// Returns the full name of given <paramref name="gameObject"/>.
+        /// The full name is the concatenation of all names of the ancestors of <paramref name="gameObject"/>
+        /// separated by a period. E.g., if <paramref name="gameObject"/> has name C and its parent
+        /// has name B and the parent's parent has name A, then the result will be A.B.C.        
+        /// </summary>
+        /// <param name="gameObject">the gameObject whose full name is to be retrieved</param>
+        /// <returns>full name</returns>
+        public static string FullName(this GameObject gameObject)
+        {
+            if (gameObject == null)
+            {
+                return "";
+            }
+            else
+            {
+                Transform parent = gameObject.transform.parent;
+                if (parent != null)
+                {
+                    return FullName(parent.gameObject) + "." + gameObject.name;
+                }
+                else
+                {
+                    return gameObject.name;
+                }
             }
         }
     }

@@ -13,7 +13,7 @@ namespace InControl.NativeDeviceProfiles
 			base.Define();
 
 			DeviceName = "{NAME} MFi Controller";
-			DeviceNotes = "MFi Controller on iOS / tvOS";
+			DeviceNotes = "MFi Controller on iOS / tvOS / macOS";
 
 			DeviceClass = InputDeviceClass.Controller;
 			DeviceStyle = InputDeviceStyle.AppleMFi;
@@ -123,6 +123,12 @@ namespace InControl.NativeDeviceProfiles
 					Name = "Options",
 					Target = InputControlType.Options,
 					Source = Button( 13 )
+				},
+				new InputControlMapping
+				{
+					Name = "Home",
+					Target = InputControlType.Home,
+					Source = Button( 14 )
 				}
 			};
 

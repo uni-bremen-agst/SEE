@@ -514,7 +514,7 @@ namespace InControl
 			}
 			catch (Exception e)
 			{
-				Debug.LogError( "Provided state could not be loaded:\n" + e.Message );
+				Logger.LogError( "Provided state could not be loaded:\n" + e.Message );
 				Reset();
 			}
 		}
@@ -548,7 +548,7 @@ namespace InControl
 			}
 			catch (Exception e)
 			{
-				Debug.LogError( "Provided state could not be loaded:\n" + e.Message );
+				Logger.LogError( "Provided state could not be loaded:\n" + e.Message );
 				Reset();
 			}
 		}
