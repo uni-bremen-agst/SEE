@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: TransparentMeshParticleMaterial
+  m_Name: MeshParticleMaterial
   m_Shader: {fileID: 4800000, guid: 3844595501563464ba1aee83079bbbe6, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
