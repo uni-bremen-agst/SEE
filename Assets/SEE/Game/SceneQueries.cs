@@ -12,6 +12,46 @@ namespace SEE.Game
     /// </summary>
     internal class SceneQueries
     {
+        private const string ArchGOName = "Architecture";
+        private const string ImplGOName = "Implementation";
+
+        private static SEECity arch = null;
+        private static SEECity impl = null;
+
+        public static SEECity GetArch()
+        {
+            if (!arch)
+            {
+                SEECity[] cities = Object.FindObjectsOfType<SEECity>();
+                foreach (SEECity city in cities)
+                {
+                    if (city.gameObject.name.Equals(ArchGOName))
+                    {
+                        arch = city;
+                        break;
+                    }
+                }
+            }
+            return arch;
+        }
+
+        public static SEECity GetImpl()
+        {
+            if (!impl)
+            {
+                SEECity[] cities = Object.FindObjectsOfType<SEECity>();
+                foreach (SEECity city in cities)
+                {
+                    if (city.gameObject.name.Equals(ImplGOName))
+                    {
+                        impl = city;
+                        break;
+                    }
+                }
+            }
+            return impl;
+        }
+
         /// <summary>
         /// Returns all game objects in the current scene tagged by Tags.Node and having
         /// a valid reference to a graph node.
