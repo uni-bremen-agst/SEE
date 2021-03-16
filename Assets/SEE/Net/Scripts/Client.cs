@@ -16,7 +16,7 @@ namespace SEE.Net
         /// <summary>
         /// The identifier for packets designated to the client.
         /// </summary>
-        public static readonly string PacketType = "Client";
+        public const string PacketType = "Client";
 
         /// <summary>
         /// The connecting to the server.

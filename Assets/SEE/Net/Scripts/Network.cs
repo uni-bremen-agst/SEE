@@ -1,11 +1,13 @@
-﻿using NetworkCommsDotNet;
-using NetworkCommsDotNet.Connections;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading;
+using NetworkCommsDotNet;
+using NetworkCommsDotNet.Connections;
+using SEE.Game;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -109,13 +111,13 @@ namespace SEE.Net
         /// <summary>
         /// <see cref="loadCityOnStart"/>
         /// </summary>
-        public static bool LoadCityOnStart => instance ? instance.loadCityOnStart : false;
+        public static bool LoadCityOnStart => instance && instance.loadCityOnStart;
 
 #if UNITY_EDITOR
         /// <summary>
         /// <see cref="internalLoggingEnabled"/>
         /// </summary>
-        public static bool InternalLoggingEnabled => instance ? instance.internalLoggingEnabled : false;
+        public static bool InternalLoggingEnabled => instance && instance.internalLoggingEnabled;
 #endif
 
         /// <summary>
@@ -136,7 +138,7 @@ namespace SEE.Net
         {
             if (instance)
             {
-                Logger.Log("There must not be more than one Network-script! This script will be destroyed!");
+                Logger.LogError("There must not be more than one Network-script! This script will be destroyed!");
                 Destroy(this);
                 return;
             }
@@ -169,7 +171,7 @@ namespace SEE.Net
                 }
                 catch (Exception e)
                 {
-                    Logger.LogWarning("Some network-error happened! Continuing in offline mode...\nException: " + e.ToString());
+                    Logger.LogError("Some network-error happened! Continuing in offline mode...\nException: " + e);
                     useInOfflineMode = true;
                 }
             }
@@ -184,11 +186,11 @@ namespace SEE.Net
         {
             if ((useInOfflineMode || hostServer) && loadCityOnStart)
             {
-                foreach (Game.AbstractSEECity city in FindObjectsOfType<Game.AbstractSEECity>())
+                foreach (AbstractSEECity city in FindObjectsOfType<AbstractSEECity>())
                 {
-                    if (city is Game.SEECity)
+                    if (city is SEECity seeCity)
                     {
-                        ((Game.SEECity)city).LoadAndDrawGraph();
+                        seeCity.LoadAndDrawGraph();
                     }
                     else
                     {
@@ -290,29 +292,24 @@ namespace SEE.Net
             string currentDirectory = Directory.GetCurrentDirectory();
             DirectoryInfo directoryInfo = new DirectoryInfo(currentDirectory);
             FileInfo[] fileInfos = directoryInfo.GetFiles();
-            for (int i = 0; i < fileInfos.Length; i++)
+            foreach (FileInfo fileInfo in fileInfos)
             {
-                FileInfo fileInfo = fileInfos[i];
                 string fileName = fileInfo.Name;
-                string[] prefixes = new string[] {
+                string[] prefixes = {
                     "CompleteIncomingItemTaskError",
                     "ConnectionKeepAlivePollError",
                     "Error",
                     "ManagedThreadPoolCallBackError",
                     "PacketHandlerErrorGlobal"
                 };
-                for (int j = 0; j < prefixes.Length; j++)
+                if (prefixes.Any(t => fileName.Contains(t)))
                 {
-                    if (fileName.Contains(prefixes[j]))
+                    try
                     {
-                        try
-                        {
-                            fileInfo.Delete();
-                        }
-                        catch (IOException)
-                        {
-                        }
-                        break;
+                        fileInfo.Delete();
+                    }
+                    catch (IOException)
+                    {
                     }
                 }
             }

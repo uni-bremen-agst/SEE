@@ -99,7 +99,7 @@ namespace SEE.Net
         /// <summary>
         /// The minimal logging severity.
         /// </summary>
-        public Severity minSeverity;
+        public readonly Severity minSeverity;
 
         /// <summary>
         /// Creates a logger with given minimal severity.
@@ -179,6 +179,7 @@ namespace SEE.Net
         /// </summary>
         public void Shutdown()
         {
+            //TODO: Why is this empty?
         }
 
         /// <summary>
