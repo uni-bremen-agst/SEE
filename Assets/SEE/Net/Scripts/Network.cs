@@ -450,7 +450,7 @@ namespace SEE.Net
         /// <returns>An array of all local IP-Addresses.</returns>
         public static IPAddress[] LookupLocalIPAddresses()
         {
-            string hostName = Dns.GetHostName(); ;
+            string hostName = Dns.GetHostName();
             IPHostEntry hostEntry = Dns.GetHostEntry(hostName);
             return hostEntry.AddressList;
         }
