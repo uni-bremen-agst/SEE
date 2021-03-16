@@ -4,7 +4,6 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
@@ -73,6 +72,7 @@ namespace SEE.Controls.Actions
         /// player has triggered this event and, hence, nothing will be done. Otherwise
         /// the label is shown.
         /// </summary>
+        /// <param name="interactableObject">the object being selected</param>
         /// <param name="isOwner">true if a local user initiated this call</param>
         private void SelectionOn(InteractableObject interactableObject, bool isOwner)
         {
@@ -92,6 +92,7 @@ namespace SEE.Controls.Actions
         /// player has triggered this event and, hence, nothing will be done. Otherwise
         /// the label is destroyed unless the object is still hovered.
         /// </summary>
+        /// <param name="interactableObject">the object being selected</param>
         /// <param name="isOwner">true if a local user initiated this call</param>
         private void SelectionOff(InteractableObject interactableObject, bool isOwner)
         {
@@ -110,6 +111,7 @@ namespace SEE.Controls.Actions
         /// player has triggered this event and, hence, nothing will be done. Otherwise
         /// the label is shown.
         /// </summary>
+        /// <param name="interactableObject">the object being hovered over</param>
         /// <param name="isOwner">true if a local user initiated this call</param>
         private void HoverOn(InteractableObject interactableObject, bool isOwner)
         {
@@ -129,6 +131,7 @@ namespace SEE.Controls.Actions
         /// is false, a remote player has triggered this event and, hence, nothing will be done.
         /// Otherwise the label is destroyed unless the object is still selected.
         /// </summary>
+        /// <param name="interactableObject">the object being hovered over</param>
         /// <param name="isOwner">true if a local user initiated this call</param>
         private void HoverOff(InteractableObject interactableObject, bool isOwner)
         {
@@ -175,7 +178,6 @@ namespace SEE.Controls.Actions
             {
                 return null;
             }
-
             codeCityObject.TryGetComponent(out AbstractSEECity city);
             return city;
         }
@@ -264,7 +266,7 @@ namespace SEE.Controls.Actions
         {
             // On the HoloLens, we want to make the text a bit easier to read by making it bolder.
             // We do this by adding a slight outline.
-            bool enableOutline = PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.HoloLens;
+            bool enableOutline = PlayerSettings.GetInputType() == PlayerInputType.HoloLensPlayer;
             // However, when developing on a PC/Emulator, the background will be black, so we add a white outline.
             Color outlineColor = Debug.isDebugBuild ? Color.white : Color.black;
             if (nodeLabel.TryGetComponent(out TextMeshPro tm))

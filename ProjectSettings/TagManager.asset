@@ -18,10 +18,12 @@ TagManager:
   - projectile
   - CullingPlane
   - Code City
+  - PowerBeam
   - MRTK
   - UI
   - JLG Visualization
   - Function Call
+  - Runtime
   layers:
   - Default
   - TransparentFX

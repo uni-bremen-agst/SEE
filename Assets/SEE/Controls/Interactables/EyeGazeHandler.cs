@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Reflection;
 using Microsoft.MixedReality.Toolkit.Input;
-using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -33,7 +32,7 @@ namespace SEE.Controls
         private void Awake()
         {
             PlayerSettings settings = PlayerSettings.GetPlayerSettings();
-            if (settings.playerInputType != PlayerSettings.PlayerInputType.HoloLens || !settings.EyeGazeHover)
+            if (settings.playerInputType != PlayerInputType.HoloLensPlayer || !settings.EyeGazeHover)
             {
                 Destroyer.DestroyComponent(this);
                 return;

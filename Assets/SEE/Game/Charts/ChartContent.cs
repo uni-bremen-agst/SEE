@@ -19,17 +19,18 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using System.Collections.Generic;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
-using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
+using SEE.Game.Evolution;
+using System.Linq;
 
 namespace SEE.Game.Charts
 {
@@ -171,6 +172,42 @@ namespace SEE.Game.Charts
         private List<NodeRef> treeDataObjects;
 
         /// <summary>
+        /// IDs of the nodes that have been added in this revision
+        /// </summary>
+        private List<string> newNodeIDs = new List<string>();
+
+        /// <summary>
+        /// IDs of the nodes that have changed in this revision
+        /// </summary>
+        private List<string> changedNodeIDs = new List<string>();
+
+        /// <summary>
+        /// IDs of the nodes that have been removed in this revision
+        /// </summary>
+        private List<string> removedNodeIDs = new List<string>();
+
+
+        /// <summary>
+        /// Color of added node labels
+        /// </summary> 
+        private Color addedNodesLabelColor;
+        
+        /// <summary>
+        /// Color of changed node labels
+        /// </summary>
+        private Color changedNodesLabelColor;
+
+        /// <summary>
+        /// Color of removed node labels
+        /// </summary>
+        private Color removedNodeLabelColor;
+
+        /// <summary>
+        /// The color the label will have when hovering over it
+        /// </summary>
+        private Color hoveringOverLabelTextColor;
+
+        /// <summary>
         /// The hierarchy-indices of every <see cref="treeDataObjects"/>-element. Both
         /// always have same number of elements.
         /// </summary>
@@ -185,6 +222,8 @@ namespace SEE.Game.Charts
         /// Contains all metric names contained in any <see cref="GameObject" /> of <see cref="listDataObjects" />.
         /// </summary>
         public readonly SortedSet<string> allMetricNames = new SortedSet<string>();
+
+        // FIXME: all attributes need documentation no matter whether they are public or private.
 
         private readonly Dictionary<uint, bool> showInChartDict = new Dictionary<uint, bool>();
 
@@ -204,41 +243,23 @@ namespace SEE.Game.Charts
         private int previousFirst = 0;
         private int previousOnePastLast = 0;
 
+        public static bool revisionChanged = false;
+
+        private int currentRevisionCountCache = 0;
 
         /// <summary>
         /// Calls methods to initialize a chart.
         /// </summary>
         private void Awake()
         {
+            // Load color profile for chart entries
+            FetchLabelColorProfile();
+
             Assert.IsTrue(scrollContent.transform.childCount == 0);
-
-            FindDataObjects();
-
-            // Note(torben): The list view contains every node + two additional parent
-            // header entries for 'Inner Nodes' and 'Leaves'. The tree view tree only the
-            // nodes, so this here is the capacity.
-            int totalEntryCount = 2 + listDataObjects.Count;
-            totalHeight = (float)totalEntryCount * ScrollViewEntryHeight;
-
-            leafCount = 0;
-            foreach (NodeRef nodeRef in listDataObjects)
-            {
-                if (nodeRef.Value.IsLeaf())
-                {
-                    leafCount++;
-                }
-            }
-
-            scrollViewEntries = new ScrollViewEntry[totalEntryCount];
-            scrollViewEntryDatas = new ScrollViewEntryData[totalEntryCount];
 
             pool = new Stack<ScrollViewEntry>(maxPanelEntryCount);
 
-            RectTransform scrollContentRect = scrollContent.GetComponent<RectTransform>();
-            scrollContentRect.sizeDelta = new Vector2(scrollContentRect.sizeDelta.x, totalHeight + 40);
-
-            FillScrollView(scrollViewIsTree);
-            GetAllNumericAttributes();
+            ReloadData();
         }
         
         protected virtual void Start()
@@ -251,61 +272,84 @@ namespace SEE.Game.Charts
 
         private void Update()
         {
-            float panelEntryCount = totalHeight * (1.0f - verticalScrollBar.size) / ScrollViewEntryHeight;
-            int totalEntryCount = scrollViewEntries.Length - (scrollViewIsTree ? 2 : 0);
-            int first = Mathf.Max(0, Mathf.FloorToInt((1.0f - verticalScrollBar.value) * panelEntryCount));
-            int onePastLast = Mathf.Min(totalEntryCount, first + maxPanelEntryCount);
-
-            void _NewScrollViewEntries(int fst, int opl)
+            if (currentRevisionCountCache != NodeChangesBuffer.GetSingleton().currentRevisionCounter)
             {
-                if (scrollViewIsTree)
-                {
-                    for (int i = fst; i < opl; i++)
-                    {
-                        scrollViewEntries[i] = NewScrollViewEntry(treeDataObjects[i].name, i, treeHierarchies[i]);
-                    }
-                }
-                else
-                {
-                    for (int i = fst; i < opl; i++)
-                    {
-                        Assert.IsNull(scrollViewEntries[i]);
-
-                        int leavesIndex = 0;
-                        int innerNodeIndex = leafCount + 1;
-                        if (i == leavesIndex) // 'Leaves' node
-                        {
-                            scrollViewEntries[leavesIndex] = NewScrollViewEntry("Leaves", i, 0);
-                        }
-                        else if (i == innerNodeIndex) // 'Inner Nodes' node
-                        {
-                            scrollViewEntries[innerNodeIndex] = NewScrollViewEntry("Inner Nodes", i, 0);
-                        }
-                        else if (i < leafCount + 1) // leaf node
-                        {
-                            scrollViewEntries[i] = NewScrollViewEntry(listDataObjects[i - 1].name, i, 1);
-                        }
-                        else // inner node
-                        {
-                            scrollViewEntries[i] = NewScrollViewEntry(listDataObjects[i - 2].name, i, 1);
-                        }
-                    }
-                }
+                // Push game objects to pool
+                PushScrollViewEntriesToPool(previousFirst, previousOnePastLast);
+                ReloadData();
+                currentRevisionCountCache = NodeChangesBuffer.GetSingleton().currentRevisionCounter;
+                NodeChangesBuffer.GetSingleton().revisionChanged = false;
             }
+            // Prevents scrolling while the data is updating, as it would otherwise crash the graph (because 
+            // the data takes some time to update).
+            if (!NodeChangesBuffer.GetSingleton().revisionChanged)
+            {
+                float panelEntryCount = totalHeight * (1.0f - verticalScrollBar.size) / ScrollViewEntryHeight;
+                int totalEntryCount = scrollViewEntries.Length - (scrollViewIsTree ? 2 : 0);
+                int first = Mathf.Max(0, Mathf.FloorToInt((1.0f - verticalScrollBar.value) * panelEntryCount));
+                int onePastLast = Mathf.Min(totalEntryCount, first + maxPanelEntryCount);
 
-            // delete out of view entries
-            PushScrollViewEntriesToPool(previousFirst, Mathf.Min(previousOnePastLast, first)); // before
-            PushScrollViewEntriesToPool(Mathf.Max(onePastLast, previousFirst), previousOnePastLast); // after
+                void _NewScrollViewEntries(int fst, int opl)
+                {
+                    if (scrollViewIsTree)
+                    {
+                        for (int i = fst; i < opl; i++)
+                        {
+                            scrollViewEntries[i] = NewScrollViewEntry(treeDataObjects[i].name, i, treeHierarchies[i]);
+                            ChangeScrollViewEntryColor(scrollViewEntries[i].transform.gameObject.transform.Find("Label").gameObject, scrollViewEntries[i].transform.gameObject);
+                        }
+                    }
+                    else
+                    {
+                        int j = 0;
+                        for (int i = fst; i < opl; i++)
+                        {
+                            Assert.IsNull(scrollViewEntries[i]);
 
-            // prepend and append new entries
-            _NewScrollViewEntries(first, Mathf.Min(previousFirst, onePastLast)); // prepend
-            _NewScrollViewEntries(Mathf.Max(previousOnePastLast, first), onePastLast); // append
+                            int leavesIndex = 0;
+                            int innerNodeIndex = leafCount + 1;
+                            if (i == leavesIndex) // 'Leaves' node
+                            {
+                                scrollViewEntries[leavesIndex] = NewScrollViewEntry("Leaves", i, 0);
+                            }
+                            else if (i == innerNodeIndex) // 'Inner Nodes' node
+                            {
+                                scrollViewEntries[innerNodeIndex] = NewScrollViewEntry("Inner Nodes", i, 0);
+                            }
+                            else if (i < leafCount + 1) // leaf node
+                            {
+                                scrollViewEntries[i] = NewScrollViewEntry(listDataObjects[i - 1].name, i, 1);
+                            }
+                            else // inner node
+                            {
+                                try
+                                {
+                                    scrollViewEntries[i] = NewScrollViewEntry(listDataObjects[i - 2].name, i, 1);
+                                }
+                                // removed node
+                                catch
+                                {
+                                    scrollViewEntries[i] = NewScrollViewEntry(removedNodeIDs[j], i, 0);
+                                    j += 1;
+                                }
+                            }
+                            ChangeScrollViewEntryColor(scrollViewEntries[i].transform.gameObject.transform.Find("Label").gameObject, scrollViewEntries[i].transform.gameObject);
+                        }
+                    }
+                }
 
-            previousFirst = first;
-            previousOnePastLast = onePastLast;
+                // delete out of view entries
+                PushScrollViewEntriesToPool(previousFirst, Mathf.Min(previousOnePastLast, first)); // before
+                PushScrollViewEntriesToPool(Mathf.Max(onePastLast, previousFirst), previousOnePastLast); // after
+
+                // prepend and append new entries
+                _NewScrollViewEntries(first, Mathf.Min(previousFirst, onePastLast)); // prepend
+                _NewScrollViewEntries(Mathf.Max(previousOnePastLast, first), onePastLast); // append
+
+                previousFirst = first;
+                previousOnePastLast = onePastLast;
+            }
         }
-
-
 
         public void AttachShowInChartCallbackFn(InteractableObject interactableObject, ShowInChartCallbackFn callbackFn)
         {
@@ -315,14 +359,12 @@ namespace SEE.Game.Charts
 
         public bool DetachShowInChartCallbackFn(InteractableObject interactableObject, ShowInChartCallbackFn callbackFn)
         {
-            bool result = callbackFnDict.Remove(interactableObject.ID);
-            return result;
+            return callbackFnDict.Remove(interactableObject.ID);
         }
 
         public bool ShowInChart(InteractableObject interactableObject)
         {
-            bool result = showInChartDict[interactableObject.ID];
-            return result;
+            return showInChartDict[interactableObject.ID];
         }
 
         public void SetShowInChart(InteractableObject interactableObject, bool value)
@@ -340,8 +382,7 @@ namespace SEE.Game.Charts
 
         public ScrollViewEntry GetScrollViewEntry(int index)
         {
-            ScrollViewEntry result = scrollViewEntries[index];
-            return result;
+            return scrollViewEntries[index];
         }
 
         public ref ScrollViewEntryData GetScrollViewEntryData(int index)
@@ -407,7 +448,7 @@ namespace SEE.Game.Charts
             float y = -ScrollViewEntryHeight * (float)index;
             go.transform.localPosition = scrollEntryOffset + new Vector2(x, y);
 
-            entry.Init(this, ref scrollViewEntryDatas[index], label);
+            entry.Init(this, scrollViewEntryDatas[index], label);
 
             return entry;
         }
@@ -420,8 +461,6 @@ namespace SEE.Game.Charts
         /// tree.</param>
         public void FillScrollView(bool asTree)
         {
-            Performance p = Performance.Begin(asTree ? "FillScrollViewAsTree" : "FillScrollViewAsList");
-
             #region Reset
 
             for (int i = 0; i < listDataObjects.Count; i++)
@@ -530,11 +569,17 @@ namespace SEE.Game.Charts
                     scrollViewEntryDatas[innerNodeIdx].childIndices[i] = idx;
                     idx++;
                 }
+
+                // Add removed nodes
+                foreach (string s in removedNodeIDs)
+                {
+                    scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, null, ScrollViewEntryData.NoParentIndex, 0);
+                    idx++;
+                }
             }
 
             #endregion
 
-            p.End(true);
         }
 
         private void UpdateMaxPanelEntryCount()
@@ -582,23 +627,24 @@ namespace SEE.Game.Charts
         private void FindDataObjects()
         {
             // list
-            listDataObjects = SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, ChartManager.Instance.ShowInnerNodeMetrics);
+            listDataObjects = SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, 
+                                                              ChartManager.Instance.ShowInnerNodeMetrics);
+            // Detect node changes and decorate the scrollview
+            FillListsWithChanges(listDataObjects);
 
-            listDataObjects.Sort(delegate (NodeRef n0, NodeRef n1)
+            listDataObjects.Sort(delegate (NodeRef left, NodeRef right)
             {
                 int result = 0;
-                if (n0.Value.IsLeaf() && n1.Value.IsInnerNode())
+                if (left.Value.IsLeaf() && right.Value.IsInnerNode())
                 {
                     result = -1;
                 }
-                else if (n0.Value.IsInnerNode() && n1.Value.IsLeaf())
+                else if (left.Value.IsInnerNode() && right.Value.IsLeaf())
                 {
                     result = 1;
                 }
                 return result;
             });
-
-            Debug.LogFormat("numberOfDataObjectsWithNodeHightLights: {0}\n", listDataObjects.Count);
 
             // tree
             treeDataObjects = new List<NodeRef>(listDataObjects.Count);
@@ -606,7 +652,15 @@ namespace SEE.Game.Charts
             int hierarchy = 0;
             void _FindForTree(Node root)
             {
-                treeDataObjects.Add(NodeRef.Get(root));
+                try
+                {
+                    treeDataObjects.Add(NodeRef.Get(root));
+                }
+                // Child is a deleted node, but doesn't exist in list anymore
+                catch
+                {
+                    return;
+                }
                 treeHierarchies.Add(hierarchy);
 
                 hierarchy++;
@@ -616,10 +670,12 @@ namespace SEE.Game.Charts
                 }
                 hierarchy--;
             }
-            HashSet<Node> roots = SceneQueries.GetRoots(listDataObjects);
-            foreach (Node root in roots)
+            foreach (Node root in SceneQueries.GetRoots(listDataObjects))
             {
-                _FindForTree(root);
+                if (!removedNodeIDs.Contains(root.ID))
+                {
+                    _FindForTree(root);
+                }
             }
         }
 
@@ -872,8 +928,8 @@ namespace SEE.Game.Charts
             }
             else
             {
-                moveHandler.SetInfoText(
-                    "X-Axis: " + axisDropdownX.CurrentlySelectedMetric + "\n" + "Y-Axis: " + axisDropdownY.CurrentlySelectedMetric
+                moveHandler.SetInfoText("X-Axis: " + axisDropdownX.CurrentlySelectedMetric 
+                                        + "\n" + "Y-Axis: " + axisDropdownY.CurrentlySelectedMetric
                 );
             }
         }
@@ -886,5 +942,184 @@ namespace SEE.Game.Charts
         {
             Destroy(gameObject);
         }
+
+        /// <summary>
+        /// Reloads the chart data on revision change
+        /// </summary>
+        private void ReloadData()
+        {
+            if (scrollViewEntryDatas != null && scrollViewEntryDatas.Length > 0)
+            {
+                for (int i = 0; i < scrollViewEntryDatas.Length; i++)
+                {
+                    if (scrollViewEntryDatas[i].interactableObject)
+                    {
+                        // Note(torben): This only unsubscribes from events from the
+                        // interactable object and thus can be inside of this if-statement
+                        // for better performance
+                        scrollViewEntryDatas[i].OnDestroy();
+                    }
+                }
+            }
+
+            FindDataObjects();
+
+            // Note(torben): The list view contains every node + two additional parent
+            // header entries for 'Inner Nodes' and 'Leaves'. The tree view contains only the
+            // nodes, so this here is the capacity.
+            // Note(Leo): removedNodeIDs Count needs to be added, otherwise removed nodes won't show
+            int totalEntryCount2 = 2 + listDataObjects.Count + removedNodeIDs.Count;
+            totalHeight = (float)totalEntryCount2 * ScrollViewEntryHeight;
+
+            leafCount = listDataObjects.Count(nodeRef => nodeRef.Value.IsLeaf());
+
+            scrollViewEntries = new ScrollViewEntry[totalEntryCount2];
+            scrollViewEntryDatas = new ScrollViewEntryData[totalEntryCount2];
+
+            RectTransform scrollContentRect = scrollContent.GetComponent<RectTransform>();
+            scrollContentRect.sizeDelta = new Vector2(scrollContentRect.sizeDelta.x, totalHeight + 40);
+
+            previousFirst = 0;
+            previousOnePastLast = 0;
+
+            FillScrollView(scrollViewIsTree);
+            GetAllNumericAttributes();
+        }
+
+
+        /// <summary>
+        /// Fetches the color profile selected in the ChartManager for added, edited and removed node labels
+        /// </summary>
+        private void FetchLabelColorProfile()
+        {
+            this.hoveringOverLabelTextColor = Color.yellow;
+            // Load colors used for power beams, to match the text with the visible objects
+            try
+            {
+                this.addedNodesLabelColor = new Color(AdditionalBeamDetails.newBeamColor.r, AdditionalBeamDetails.newBeamColor.g, AdditionalBeamDetails.newBeamColor.b);
+                this.changedNodesLabelColor = new Color(AdditionalBeamDetails.changedBeamColor.r, AdditionalBeamDetails.changedBeamColor.g, AdditionalBeamDetails.changedBeamColor.b);
+                this.removedNodeLabelColor = new Color(AdditionalBeamDetails.deletedBeamColor.r, AdditionalBeamDetails.deletedBeamColor.g, AdditionalBeamDetails.deletedBeamColor.b);
+            }
+            catch
+            {
+                // Set default colors: red for removed, green for added, cyan for changed
+                this.addedNodesLabelColor = Color.green;
+                this.changedNodesLabelColor = Color.cyan;
+                this.removedNodeLabelColor = Color.red;
+            }
+        }
+
+        /// <summary>
+        /// Fills the newNodes, changedNodes and removedNodes lists respectively
+        /// </summary>
+        private void FillListsWithChanges(List<NodeRef> nodeRefs)
+        {
+            this.newNodeIDs = NodeChangesBuffer.GetSingleton().addedNodeIDsCache;
+            this.changedNodeIDs = NodeChangesBuffer.GetSingleton().changedNodeIDsCache;
+            this.removedNodeIDs = NodeChangesBuffer.GetSingleton().removedNodeIDsCache;
+        }
+
+        /// <summary>
+        /// Changes the text colors according to node changes that happened in the current revision
+        /// </summary>
+        /// <param name="scrollViewEntry">The scrollview entry, the color of which should be changed</param>
+        /// <param name="parent">The parent gameObject of the scrollview entry gameObject</param>
+        private void ChangeScrollViewEntryColor(GameObject scrollViewEntry, GameObject parent)
+        {
+            TextMeshProUGUI textMesh = scrollViewEntry.GetComponent<TextMeshProUGUI>();
+            ColorBlock colors = parent.GetComponent<Toggle>().colors;
+
+            if (this.removedNodeIDs.Contains(textMesh.text))
+            {
+                textMesh.color = removedNodeLabelColor;
+                colors.normalColor = removedNodeLabelColor;
+                colors.selectedColor = removedNodeLabelColor;
+                colors.pressedColor = changedNodesLabelColor;
+                colors.disabledColor = changedNodesLabelColor;
+            }
+            else if (this.changedNodeIDs.Contains(textMesh.text))
+            {
+                textMesh.color = changedNodesLabelColor;
+                colors.normalColor = changedNodesLabelColor;
+                colors.selectedColor = changedNodesLabelColor;
+                colors.pressedColor = changedNodesLabelColor;
+                colors.disabledColor = changedNodesLabelColor;
+            }
+            else if (this.newNodeIDs.Contains(textMesh.text))
+            {
+                textMesh.color = addedNodesLabelColor;
+                colors.normalColor = addedNodesLabelColor;
+                colors.selectedColor = addedNodesLabelColor;
+                colors.pressedColor = addedNodesLabelColor;
+                colors.disabledColor = addedNodesLabelColor;
+            }
+            else
+            {
+                textMesh.color = Color.white;
+                colors.normalColor = Color.white;
+            }
+            colors.highlightedColor = hoveringOverLabelTextColor;
+            parent.GetComponent<Toggle>().colors = colors;
+        }
+    }
+
+    public class NodeChangesBuffer
+    {
+        /// <summary>
+        /// Singleton
+        /// </summary>
+        private static NodeChangesBuffer singleton = null;
+
+        /// <summary>
+        /// Get singleton instance
+        /// </summary>
+        public static NodeChangesBuffer GetSingleton()
+        {
+            if (singleton == null)
+            {
+                singleton = new NodeChangesBuffer();
+            }
+            return singleton;
+        }
+
+        /// <summary>
+        /// Current revision "id"
+        /// </summary>
+        public int currentRevisionCounter = 0;
+
+        /// <summary>
+        /// Detects a revision change
+        /// </summary>
+        public bool revisionChanged = false;
+
+        /// <summary>
+        /// Stores the IDs of nodes that have been added in the current revision
+        /// </summary>
+        public readonly List<string> addedNodeIDs = new List<string>();
+
+        /// <summary>
+        /// Stores the IDs of nodes that have been changed in the current revision
+        /// </summary>
+        public readonly List<string> changedNodeIDs = new List<string>();
+
+        /// <summary>
+        /// Stores the IDs of nodes that have been removed in the current revision
+        /// </summary>
+        public readonly List<string> removedNodeIDs = new List<string>();
+
+        /// <summary>
+        /// Old ids of newly added nodes, needed when closing and re-opening the chart
+        /// </summary>
+        public List<string> addedNodeIDsCache = new List<string>();
+
+        /// <summary>
+        /// Old ids of changed nodes, needed when closing and re-opening the chart
+        /// </summary>
+        public List<string> changedNodeIDsCache = new List<string>();
+
+        /// <summary>
+        /// Old ids of removed nodes, needed when closing and re-opening the chart
+        /// </summary>
+        public List<string> removedNodeIDsCache = new List<string>();
     }
 }

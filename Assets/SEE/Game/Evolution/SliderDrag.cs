@@ -1,10 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using SEE.Utils;
-using UnityEngine.UI;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
-using SEE.GO;
+using UnityEngine.UI;
 
 namespace SEE.Game.Evolution
 {

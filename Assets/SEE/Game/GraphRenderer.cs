@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -33,7 +33,6 @@ namespace SEE.Game
         public GraphRenderer(AbstractSEECity settings, Graph graph)
         {
             this.settings = settings;
-
             ShaderType = Materials.ShaderType.Transparent;
             switch (this.settings.LeafObjects)
             {
@@ -93,6 +92,15 @@ namespace SEE.Game
         /// Settings for the visualization.
         /// </summary>
         private readonly AbstractSEECity settings;
+
+        /// <summary>
+        /// Returns the settings for the visualization.
+        /// </summary>
+        /// <returns>settings for the visualization</returns>
+        public AbstractSEECity GetSettings()
+        {
+            return settings;
+        }
 
         /// <summary>
         /// The factory used to create blocks for leaves.
@@ -235,14 +243,15 @@ namespace SEE.Game
             ICollection<LayoutEdge> layoutEdges = new List<LayoutEdge> { new LayoutEdge(fromLayoutNode, toLayoutNode, edge) };
             // Calculate the edge layout (for the single edge only).
             ICollection<GameObject> edges = EdgeLayout(layoutNodes, layoutEdges);
-            GameObject result = edges.FirstOrDefault();
+            GameObject resultingEdge = edges.FirstOrDefault();
+            InteractionDecorator.PrepareForInteraction(resultingEdge);
             // The edge becomes a child of the root node of the game-node hierarchy
             GameObject codeCity = SceneQueries.GetCodeCity(from.transform).gameObject;
             GameObject rootNode = SceneQueries.GetCityRootNode(codeCity).gameObject;                                        
-            result.transform.SetParent(rootNode.transform);
+            resultingEdge.transform.SetParent(rootNode.transform);
             // The portal of the new edge is inherited from the codeCity.
-            Portal.SetPortal(root: codeCity, gameObject: result);
-            return result;
+            Portal.SetPortal(root: codeCity, gameObject: resultingEdge);
+            return resultingEdge;
         }
 
         /// <summary>
@@ -262,14 +271,15 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Applies the edge layout according to the the user's choice (settings) for
+        /// Applies the edge layout according to the user's choice (settings) for
         /// all edges in between nodes in <paramref name="gameNodes"/>.
         /// </summary>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
+        /// <param name="draw">Decides whether the edges should only be calculated, or whether they should also be drawn.</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        public ICollection<GameObject> EdgeLayout(ICollection<GameObject> gameNodes)
+        public ICollection<GameObject> EdgeLayout(ICollection<GameObject> gameNodes, bool draw = true)
         {
-            return EdgeLayout(ToLayoutNodes(gameNodes));
+            return EdgeLayout(ToLayoutNodes(gameNodes), draw);
         }
 
         /// <summary>
@@ -277,10 +287,11 @@ namespace SEE.Game
         /// all edges in between nodes in <paramref name="gameNodes"/>.
         /// </summary>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
+        /// <param name="draw">Decides whether the edges should only be calculated, or whether they should also be drawn.</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes)
+        private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes, bool draw = true)
         {
-            return EdgeLayout(gameNodes, ConnectingEdges(gameNodes));
+            return EdgeLayout(gameNodes, ConnectingEdges(gameNodes), draw);
         }
 
         /// <summary>
@@ -288,8 +299,9 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">the set of layout nodes for which to create game edges</param>
         /// <param name="layoutEdges">the edges to be laid out</param>
+        /// <param name="draw">Decides whether the edges should only be calculated, or whether they should also be drawn.</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes, ICollection<LayoutEdge> layoutEdges)
+        private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes, ICollection<LayoutEdge> layoutEdges, bool draw = true)
         {
             float minimalEdgeLevelDistance = 2.5f * settings.EdgeWidth;
             IEdgeLayout layout;
@@ -310,12 +322,31 @@ namespace SEE.Game
                 default:
                     throw new Exception("Unhandled edge layout " + settings.EdgeLayout);
             }
+#if UNITY_EDITOR
             Performance p = Performance.Begin("edge layout " + layout.Name);
-            EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth);
-            ICollection<GameObject> result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), layoutEdges);
-            AddLOD(result);
+#endif
+            EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth, settings.TubularSegments, settings.Radius, settings.RadialSegments, settings.isEdgeSelectable);
+            // The resulting game objects representing the edges.
+            ICollection<GameObject> result;
+            // Calculate only
+            if (!draw)
+            {
+                result = edgeFactory.CalculateNewEdges(gameNodes.Cast<ILayoutNode>().ToList(), layoutEdges);
+            }
+            // Calculate and draw edges
+            else
+            {
+                result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), layoutEdges);
+                InteractionDecorator.PrepareForInteraction(result);
+                AddLOD(result);
+            }
+
+
+#if UNITY_EDITOR
             p.End();
-            Debug.LogFormat("Built \"" + settings.EdgeLayout + "\" edge layout for " + gameNodes.Count + " nodes in {0} [h:m:s:ms].\n", p.GetElapsedTime());
+            Debug.Log($"Calculated \"  {settings.EdgeLayout} \" edge layout for {gameNodes.Count}"
+                      + $" nodes and {result.Count} edges in {p.GetElapsedTime()} [h:m:s:ms].\n");
+#endif
             return result;
         }
 
@@ -565,7 +596,6 @@ namespace SEE.Game
 
             // Add the node to the node hierarchy
             gameNode.transform.SetParent(itsParent.transform);
-
 
             // Prepare the node for interactions
             InteractionDecorator.PrepareForInteraction(gameNode);
@@ -851,35 +881,36 @@ namespace SEE.Game
         /// <paramref name="root"/></param>
         private void RemoveRootIfNecessary(ref Node root, Graph graph, Dictionary<Node, GameObject> nodeMap, ICollection<GameNode> layoutNodes)
         {
-            return; // FIXME: temporarily disabled because the current implementation of the 
-                    // custom shader for culling all city objects falling off the plane assumes 
-                    // that there is exactly one root node of the graph.
+            return; 
+            // FIXME: temporarily disabled because the current implementation of the 
+            // custom shader for culling all city objects falling off the plane assumes 
+            // that there is exactly one root node of the graph.
 
-            if (root is object)
-            {
-                if (layoutNodes != null)
-                {
-                    // Remove from layout
-                    GameNode toBeRemoved = null;
-                    foreach (GameNode layoutNode in layoutNodes)
-                    {
-                        if (layoutNode.ID.Equals(root.ID))
-                        {
-                            toBeRemoved = layoutNode;
-                            break;
-                        }
-                    }
-                    if (toBeRemoved != null)
-                    {
-                        layoutNodes.Remove(toBeRemoved);
-                    }
-                }
-                GameObject go = nodeMap[root];
-                nodeMap.Remove(root);
-                graph.RemoveNode(root);
-                Destroyer.DestroyGameObject(go);
-                root = null;
-            }
+            //if (root is object)
+            //{
+            //    if (layoutNodes != null)
+            //    {
+            //        // Remove from layout
+            //        GameNode toBeRemoved = null;
+            //        foreach (GameNode layoutNode in layoutNodes)
+            //        {
+            //            if (layoutNode.ID.Equals(root.ID))
+            //            {
+            //                toBeRemoved = layoutNode;
+            //                break;
+            //            }
+            //        }
+            //        if (toBeRemoved != null)
+            //        {
+            //            layoutNodes.Remove(toBeRemoved);
+            //        }
+            //    }
+            //    GameObject go = nodeMap[root];
+            //    nodeMap.Remove(root);
+            //    graph.RemoveNode(root);
+            //    Destroyer.DestroyGameObject(go);
+            //    root = null;
+            //}
         }
 
         /// <summary>
@@ -1263,6 +1294,8 @@ namespace SEE.Game
             block.AddComponent<NodeRef>().Value = node;
             AdjustScaleOfLeaf(block);
             AddLOD(block);
+            Portal.SetInfinitePortal(block);
+            InteractionDecorator.PrepareForInteraction(block);
             return block;
         }
 
@@ -1285,9 +1318,9 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Applies ADDLOD to every game object in <paramref name="gameObjects"/>.
+        /// Applies AddLOD to every game object in <paramref name="gameObjects"/>.
         /// </summary>
-        /// <param name="gameObjects">the list of game objects where ADDLOD is to be applied</param>
+        /// <param name="gameObjects">the list of game objects where AddLOD is to be applied</param>
         private void AddLOD(ICollection<GameObject> gameObjects)
         {
             foreach (GameObject go in gameObjects)
@@ -1570,6 +1603,7 @@ namespace SEE.Game
             AdjustStyle(innerGameObject);
             AdjustHeightOfInnerNode(innerGameObject);
             AddLOD(innerGameObject);
+            InteractionDecorator.PrepareForInteraction(innerGameObject);
             return innerGameObject;
         }
 
