@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using UnityEngine;
 
 namespace SEE.Utils
 {
@@ -15,13 +18,21 @@ namespace SEE.Utils
     public class EmptyUndoHistoryException : System.Exception { }
 
     /// <summary>
+    /// Thrown if a client calls <see cref="ActionHistory.Undo"/> while
+    /// there is no action running.
+    /// </summary>
+    public class NoActionRunningException : System.Exception { }
+
+    /// <summary>
     /// Maintains a history of executed action that can undone and redone.
     /// </summary>
     public class ActionHistory
     {
         /// <summary>
         /// The history of actions that have been executed (and have not yet undone). The currently
-        /// executed action is the top element in this stack.
+        /// executed action is contained in this stack only if it was completed (either by returning
+        /// true upon its Update or because another action is executed by way of 
+        /// <see cref="Execute(ReversibleAction)"/>, <see cref="Undo"/>, or <see cref="Redo"/>.
         /// </summary>
         private Stack<ReversibleAction> UndoStack { get; set; } = new Stack<ReversibleAction>();
 
@@ -29,6 +40,11 @@ namespace SEE.Utils
         /// The history of actions that have been undone.
         /// </summary>
         private Stack<ReversibleAction> RedoStack { get; set; } = new Stack<ReversibleAction>();
+
+        /// <summary>
+        /// The currently executed action.
+        /// </summary>
+        public ReversibleAction Current { get; private set; }
 
         /// <summary>
         /// Let C be the currently executed action (if there is any) in this action history. 
@@ -46,26 +62,72 @@ namespace SEE.Utils
         /// <param name="action">the action to be executed</param>
         public void Execute(ReversibleAction action)
         {
-            if (UndoStack.Count > 0)
+            if (Current != null)
             {
                 Current.Stop();
+                UndoStack.Push(Current);
             }
-            UndoStack.Push(action);
-            action.Awake();
-            action.Start();
+            Current = action;
+            Current.Awake();
+            Current.Start();
             // Whenever a new action is excuted, we consider the redo stack lost.
             RedoStack.Clear();
         }
-
+        
         /// <summary>
         /// Calls <see cref="ReversibleAction.Update"/> for the currently executed action of this 
         /// action history if there is any; otherwise nothing happens.
         /// </summary>
         public void Update()
         {
-            if (UndoStack.Count > 0)
+            if (Current != null && Current.Update())
             {
-                Current.Update();
+                // We are continuing with a fresh instance of the same type as Current.
+                Execute(Current.NewInstance());
+            }
+            Dump();
+        }
+
+        private string previousMessage = "";
+        private void Dump()
+        {
+            string newMessage = $"Current: {ToString(Current)} Undo: {ToString(UndoStack)} Redo: {ToString(RedoStack)}\n";
+            if (previousMessage != newMessage)
+            {
+                previousMessage = newMessage; 
+                Debug.Log(previousMessage);
+            }            
+        }
+
+        private object ToString(Stack<ReversibleAction> stack)
+        {
+            if (stack.Count == 0)
+            {
+                return "[]";
+            }
+            else
+            {
+                StringBuilder sb = new StringBuilder("[");
+                foreach (ReversibleAction action in stack)
+                {
+                    sb.Append(ToString(action));
+                    sb.Append(" ");
+                }
+                sb.Length--; // remove last blank 
+                sb.Append("]");
+                return sb.ToString();
+            }
+        }
+
+        private object ToString(ReversibleAction current)
+        {
+            if (current == null)
+            {
+                return "NULL";
+            }
+            else
+            {
+                return current + "@" + current.GetType().Name;
             }
         }
 
@@ -82,26 +144,43 @@ namespace SEE.Utils
         /// Precondition: There must be a currently executing action, that is, this action
         /// history must not be empty.
         /// </summary>
-        /// <exception cref="EmptyActionHistoryException">thrown if this action history is empty</exception>
+        /// <exception cref="EmptyActionHistoryException">thrown if this action history is empty and 
+        /// no action is currently running</exception>
         public void Undo()
         {
-            if (UndoStack.Count > 0)
+            if (Current == null && UndoStack.Count == 0)
             {
-                // If the user "undoes" an action, we pop off the undo stack (let the popped off 
-                // action be A), call the Undo operation of A, and then we push A onto the redo stack.
-                ReversibleAction currentAction = UndoStack.Pop();
-                currentAction.Stop();
-                currentAction.Undo();                   
-                RedoStack.Push(currentAction);
-
-                if (UndoStack.Count > 0)
-                {
-                    Current.Start();
-                }
+                throw new EmptyActionHistoryException();
             }
             else
             {
-                throw new EmptyActionHistoryException();
+                // We will cancel the current action, that means not only to stop but also
+                // to undo it. 
+                if (Current != null)
+                {
+                    Current.Stop();
+                    Current.Undo();
+                }
+
+                if (UndoStack.Count == 0)
+                {
+                    // The current action was canceled, but in the absence of any other
+                    // action on the UndoStack it will be able to continue from scratch.
+                    Current?.Start();
+                }
+                else
+                {
+                    // The current action was canceled and we can continue with the action from
+                    // the UndoStack. The current action, however, may needed to be resumed later,
+                    // hence we need to push it onto the RedoStack.
+                    if (Current != null)
+                    {
+                        RedoStack.Push(Current);
+                    }
+                    Current = UndoStack.Pop();
+                    Current.Undo();
+                    Current.Start();
+                }
             }
         }
 
@@ -120,16 +199,17 @@ namespace SEE.Utils
         {
             if (RedoStack.Count > 0)
             {
-                // stop the currently executed action
-                if (UndoStack.Count > 0)
+                // cancel the currently executed action
+                if (Current != null)
                 {
                     Current.Stop();
+                    //Current.Redo();
+                    UndoStack.Push(Current);
                 }
                 // the last undone action becomes the currently executed action again
-                ReversibleAction redoAction = RedoStack.Pop();
-                UndoStack.Push(redoAction);
-                redoAction.Redo();
-                redoAction.Start();                
+                Current = RedoStack.Pop();
+                Current.Redo();
+                Current.Start();                
             }
             else
             {
@@ -153,17 +233,6 @@ namespace SEE.Utils
         public int RedoCount
         {
             get => RedoStack.Count;
-        }
-
-        /// <summary>
-        /// The currently executed action.
-        /// </summary>
-        public ReversibleAction Current 
-        { 
-            get
-            {
-                return UndoStack.Peek();
-            }
         }
     }
 }
