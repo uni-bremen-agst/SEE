@@ -172,7 +172,7 @@ namespace SEE.Net
 
         /// Executes the action on the server locally. This function is only called by
         /// <see cref="ExecuteActionPacket"/> or by <see cref="Execute"/> directly in
-        /// offline mode directly. It must not be called otherwise!
+        /// offline mode. It must not be called otherwise!
         internal void ExecuteOnServerBase()
         {
             try

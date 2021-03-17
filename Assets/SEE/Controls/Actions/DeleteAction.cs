@@ -1,5 +1,6 @@
 ﻿using SEE.DataModel;
 using SEE.GO;
+using SEE.Net;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
