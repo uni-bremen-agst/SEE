@@ -521,7 +521,9 @@ namespace SEE.Game
                     NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + LevelDistance);
 
                     CreateObjectHierarchy(nodeMap, parent);
-                    InteractionDecorator.PrepareForInteraction(nodeToGameObject);
+
+                    // TODO(torben): This was already called before on the individual nodes. Is this obsolete or was this necessary for some special case? It created everything twice.
+                    //InteractionDecorator.PrepareForInteraction(nodeToGameObject);
 
                     // Decorations must be applied after the blocks have been placed, so that
                     // we also know their positions.

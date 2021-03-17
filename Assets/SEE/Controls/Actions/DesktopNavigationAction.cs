@@ -25,7 +25,7 @@ namespace SEE.Controls.Actions
         {
             internal const float MaxVelocity = 10.0f;                        // This is only used, if the city was moved as a whole
             internal const float MaxSqrVelocity = MaxVelocity * MaxVelocity;
-            internal const float DragFrictionFactor = 32.0f;
+            internal const float DragFrictionCoefficient = 32.0f;
             internal const float SnapStepCount = 8;
             internal const float SnapStepAngle = 360.0f / SnapStepCount;
 
@@ -505,11 +505,7 @@ namespace SEE.Controls.Actions
             if (!movingOrRotating)
             {
                 // Clamp velocity
-                float sqrMag = moveState.moveVelocity.sqrMagnitude;
-                if (sqrMag > _MoveState.MaxSqrVelocity)
-                {
-                    moveState.moveVelocity = moveState.moveVelocity / Mathf.Sqrt(sqrMag) * _MoveState.MaxVelocity;
-                }
+                moveState.moveVelocity = PhysicsUtil.ClampVelocity(moveState.moveVelocity, _MoveState.MaxVelocity);
 
                 // Apply velocity to city position
                 if (moveState.moveVelocity.sqrMagnitude != 0.0f)
@@ -519,7 +515,7 @@ namespace SEE.Controls.Actions
                 }
 
                 // Apply friction to velocity
-                Vector3 acceleration = _MoveState.DragFrictionFactor * -moveState.moveVelocity;
+                Vector3 acceleration = PhysicsUtil.Friction(moveState.moveVelocity, _MoveState.DragFrictionCoefficient);
                 moveState.moveVelocity += acceleration * Time.fixedDeltaTime;
             }
 

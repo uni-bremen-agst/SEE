@@ -4,6 +4,8 @@ using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game;
 using SEE.GO;
+using SEE.Layout;
+using SEE.Layout.EdgeLayouts;
 using SEE.Tools;
 using SEE.Utils;
 using UnityEngine;
@@ -18,8 +20,45 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class MappingAction : CityAction, Observer
     {
-        private const float SelectedAlpha = 0.8f;
+        /// <summary>
+        /// Which kind of city we are currently focusing on.
+        /// </summary>
+        private enum HitCity
+        {
+            None,
+            Architecture,
+            Implementation
+        }
 
+        private struct Selection
+        {
+            internal NodeRef nodeRef;
+            internal InteractableObject interactableObject; // TODO(torben): it is time to combine NodeRefs and InteractableObjects or at least have some dictionary for them...
+            internal Material material;
+            internal Color initialColor;
+            internal Color highlightColor;
+            // Rainer: note that gameObjects with an EdgeRef instead of NodeRef now may also have a InteractableObject component.
+        }
+
+        private struct _ActionState
+        {
+            internal bool copy;              // copy selected object (i.e., start mapping)
+            internal bool paste;             // paste (map) copied object
+            internal bool clearClipboard;    // whether the clipboard of copied nodes has been cleared
+            internal bool save;              // whether the current mapping should be stored
+            internal HitCity hitCity;        // which city we are currently focusing on
+        }
+
+        private struct SpinningCubeData
+        {
+            internal GameObject go;
+            internal float timer;
+        }
+
+        private const float HighlightLoopTimeInSeconds = 2.0f;
+        private const float SpinningCursorCubeLoopTimeInSeconds = 4.0f; // TODO(torben): maybe only use one timer for everything
+        private const uint NumEdgeCubes = 1;
+        private const float MaxVelocity = 0.003f; // TODO(torben): this should be relative and be adapted to the table size!
         private const KeyCode SaveKey = KeyCode.S;
         private const KeyCode CopyKey = KeyCode.C;
         private const KeyCode PasteKey = KeyCode.V;
@@ -33,6 +72,15 @@ namespace SEE.Controls.Actions
 
         [Tooltip("The GXL file containing the mapping from implementation onto architecture entities.")]
         public string MappingFile;
+
+        [Tooltip("Prefab for absences")]
+        public GameObject AbsencePrefab;
+
+        [Tooltip("Prefab for convergences")]
+        public GameObject ConvergencePrefab;
+
+        [Tooltip("Prefab for divergences")]
+        public GameObject DivergencePrefab;
 
         /// <summary>
         /// The graph renderer used to draw the city. There must be a component
@@ -49,12 +97,12 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The graph containing the architecture.
         /// </summary>
-        private Graph architecture;
+        private Graph archGraph;
 
         /// <summary>
         /// The graph containing the impementation.
         /// </summary>
-        private Graph implementation;
+        private Graph implGraph;
 
         /// <summary>
         /// For the reflexion analysis.
@@ -62,185 +110,32 @@ namespace SEE.Controls.Actions
         public Reflexion Reflexion { get; private set; }
 
         /// <summary>
-        /// Materials for the decoration of reflexion edges.
+        /// Used for the visualization and decoration of reflexion edges.
         /// </summary>
-        [Tooltip("Prefab for absences")]
-        public GameObject AbsencePrefab;
-        [Tooltip("Prefab for convergences")]
-        public GameObject ConvergencePrefab;
-        [Tooltip("Prefab for divergences")]
-        public GameObject DivergencePrefab;
-
-        private struct Selection
-        {
-            internal NodeRef nodeRef;
-            internal InteractableObject interactableObject; // TODO(torben): it is time to combine NodeRefs and InteractableObjects or at least have some dictionary for them...
-            // Rainer: note that gameObjects with an EdgeRef instead of NodeRef now may also have a InteractableObject component.
-        }
+        private ReflexionDecorator decorator;
 
         /// <summary>
         /// The current selection of a game object and its associated graph node.
         /// </summary>
         private Selection selection;
 
-        /// <summary>
-        /// Which kind of city we are currently focusing on.
-        /// </summary>
-        private enum HitCity
-        {
-            None,
-            Architecture,
-            Implementation
-        }
-
-        private struct _ActionState
-        {
-            internal bool copy;              // copy selected object (i.e., start mapping)
-            internal bool paste;             // paste (map) copied object
-            internal bool clearClipboard;    // whether the clipboard of copied nodes has been cleared
-            internal bool save;              // whether the current mapping should be stored
-            internal HitCity hitCity;        // which city we are currently focusing on
-        }
-
         private _ActionState actionState;
+
+        private float highlightTimer;
+        private Material materialCopy; // This mateiral has no portal
+        private SpinningCubeData spinningCubeData;
+
+        private Vector3 target;
+        private bool hasTarget;
+        private Vector3[] velocities = new Vector3[NumEdgeCubes];
+        private GameObject[] edgeGOs = new GameObject[NumEdgeCubes];
+        private MeshRenderer[] edgeMeshRenderers = new MeshRenderer[NumEdgeCubes];
+        LineRenderer tempEdge = null;
 
         /// <summary>
         /// The game objects that have been copied to the clipboard via Ctrl-C.
         /// </summary>
         private readonly HashSet<Selection> objectsInClipboard = new HashSet<Selection>();
-
-        // Use this for initialization
-        private void Start()
-        {
-            if (Architecture == null)
-            {
-                Debug.LogWarning("No architecture city was specified for architectural mapping.\n");
-                enabled = false;
-            }
-            else
-            {
-                architecture = SceneQueries.GetGraph(Architecture);
-                if (architecture == null)
-                {
-                    Debug.LogWarning("The architecture city has no associated graph.\n");
-                    enabled = false;
-                }
-            }
-
-            if (Implementation == null)
-            {
-                Debug.LogWarning("No implementation city was specified for architectural mapping.\n");
-                enabled = false;
-            }
-            else
-            {
-                implementation = SceneQueries.GetGraph(Implementation);
-                if (implementation == null)
-                {
-                    Debug.LogWarning("The implementation city has no associated graph.\n");
-                    enabled = false;
-                }
-            }
-
-            if (string.IsNullOrEmpty(MappingFile))
-            {
-                Debug.LogWarning("A filename for the architectural mapping should be set. Continuing with an empty mapping. Mapping cannot be saved.\n");
-                mapping = new Graph();
-            }
-            else
-            {
-                mapping = LoadMapping(MappingFile);
-                if (mapping == null)
-                {
-                    Debug.LogErrorFormat("A GXL containing the mapping could not be loaded from {0}. We are using an empty mapping instead.\n",
-                                         MappingFile);
-                    mapping = new Graph();
-                }
-                else
-                {
-                    Debug.LogFormat("Mapping successfully loaded from {0}\n", MappingFile);
-                }
-            }
-
-            if (AbsencePrefab == null)
-            {
-                Debug.LogErrorFormat("No material assigned for absences.\n");
-                enabled = false;
-            }
-            if (ConvergencePrefab == null)
-            {
-                Debug.LogErrorFormat("No material assigned for convergences.\n");
-                enabled = false;
-            }
-            if (DivergencePrefab == null)
-            {
-                Debug.LogErrorFormat("No material assigned for divergences.\n");
-                enabled = false;
-            }
-            if (Architecture.TryGetComponent(out SEECity city))
-            {
-                architectureGraphRenderer = city.Renderer;
-                if (architectureGraphRenderer == null)
-                {
-                    Debug.LogErrorFormat("The SEECity component attached to the object representing the architecture has no graph renderer.\n");
-                    enabled = false;
-                }
-            }
-            else
-            {
-                Debug.LogErrorFormat("The object representing the architecture has no SEECity component attached to it.\n");
-                enabled = false;
-            }
-            if (enabled)
-            {
-                Usage();
-                SetupReflexionDecorator();
-                SetupGameObjectMappings();
-                SetupReflexion();
-            }
-
-            ActionState.OnStateChanged += OnStateChanged;
-            if (Equals(ActionState.Value, ActionStateType.Map))
-            {
-                InteractableObject.AnySelectIn += AnySelectIn;
-                InteractableObject.AnySelectOut += AnySelectOut;
-            }
-            else
-            {
-                enabled = false;
-            }
-        }
-
-        private void OnStateChanged(ActionStateType value)
-        {
-            if (Equals(value, ActionStateType.Map))
-            {
-                InteractableObject.AnySelectIn += AnySelectIn;
-                InteractableObject.AnySelectOut += AnySelectOut;
-                enabled = true;
-            }
-            else
-            {
-                InteractableObject.AnySelectIn -= AnySelectIn;
-                InteractableObject.AnySelectOut -= AnySelectOut;
-                enabled = false; // We don't want to waste CPU time, if Update() doesn't do anything
-            }
-        }
-
-        /// <summary>
-        /// Used for the visualization and decoration of reflexion edges.
-        /// </summary>
-        private ReflexionDecorator decorator;
-
-        /// <summary>
-        /// Sets up the reflexion decorator.
-        /// </summary>
-        private void SetupReflexionDecorator()
-        {
-            Portal.GetDimensions(Architecture, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
-            decorator = new ReflexionDecorator(AbsencePrefab, ConvergencePrefab, DivergencePrefab,
-                                               leftFrontCorner, rightBackCorner);
-        }
 
         /// <summary>
         /// Mapping of edge IDs onto game objects representing these edges in the architecture code city.
@@ -252,9 +147,89 @@ namespace SEE.Controls.Actions
         /// </summary>
         private readonly Dictionary<string, GameObject> architectureNodes = new Dictionary<string, GameObject>();
 
-        private void SetupGameObjectMappings()
+        private void Start()
         {
-            GatherNodesAndEdges(Architecture, architectureNodes, architectureEdges);
+            if (!Assertions.DisableOnCondition(this, Architecture == null, "No architecture city was specified for architectural mapping."))
+            {
+                archGraph = SceneQueries.GetGraph(Architecture);
+                Assertions.DisableOnCondition(this, archGraph == null, "The architecture city has no associated graph.");
+            }
+            if (!Assertions.DisableOnCondition(this, Implementation == null, "No implementation city was specified for architectural mapping."))
+            {
+                implGraph = SceneQueries.GetGraph(Implementation);
+                Assertions.DisableOnCondition(this, implGraph == null, "The implementation city has no associated graph.");
+            }
+
+            if (string.IsNullOrEmpty(MappingFile))
+            {
+                Debug.LogWarning("A filename for the architectural mapping should be set. Continuing with an empty mapping. Mapping cannot be saved.");
+                mapping = new Graph();
+            }
+            else
+            {
+                mapping = LoadMapping(MappingFile);
+                if (mapping == null)
+                {
+                    Debug.LogErrorFormat("A GXL containing the mapping could not be loaded from {0}. We are using an empty mapping instead.", MappingFile);
+                    mapping = new Graph();
+                }
+                else
+                {
+                    Debug.LogFormat("Mapping successfully loaded from {0}\n", MappingFile);
+                }
+            }
+
+            Assertions.DisableOnCondition(this, AbsencePrefab == null, "No material assigned for absences.");
+            Assertions.DisableOnCondition(this, ConvergencePrefab == null, "No material assigned for convergences.");
+            Assertions.DisableOnCondition(this, DivergencePrefab == null, "No material assigned for divergences.");
+
+            if (!Assertions.DisableOnCondition(this, !Architecture.TryGetComponent(out SEECity city), "The object representing the architecture has no SEECity component attached to it."))
+            {
+                architectureGraphRenderer = city.Renderer;
+                Assertions.DisableOnCondition(this, architectureGraphRenderer == null, "The SEECity component attached to the object representing the architecture has no graph renderer.");
+            }
+
+            if (enabled)
+            {
+                // Print usage for mapping
+                Debug.Log("Keys for architectural mapping:\n");
+                Debug.LogFormat(" copy/remove selected implementation node to/from clipboard: Ctrl-{0}\n", CopyKey);
+                Debug.LogFormat(" map nodes in clipboard onto selected architecture node: Ctrl-{0}\n", PasteKey);
+                Debug.LogFormat(" clear clipboard: Ctrl-{0}\n", ClearKey);
+                Debug.LogFormat(" save mapping to GXL file: Ctrl-{0}\n", SaveKey);
+
+                // Setup reflexion decorator
+                Portal.GetDimensions(Architecture, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
+                decorator = new ReflexionDecorator(AbsencePrefab, ConvergencePrefab, DivergencePrefab, leftFrontCorner, rightBackCorner);
+
+                // Setup game object mappings
+                GatherNodesAndEdges(Architecture, architectureNodes, architectureEdges);
+
+                // Setup reflexion
+                Reflexion = new Reflexion(implGraph, archGraph, mapping);
+                Reflexion.Register(this);
+                // An initial run is necessary to set up the necessary data structures.
+                Reflexion.Run();
+            }
+
+            ActionState.OnStateChanged += OnStateChanged;
+            if (!Assertions.DisableOnCondition(this, !Equals(ActionState.Value, ActionStateType.Map)))
+            {
+                InteractableObject.AnyHoverIn += AnyHoverIn;
+                InteractableObject.AnyHoverOut += AnyHoverOut;
+                InteractableObject.AnySelectIn += AnySelectIn;
+                InteractableObject.AnySelectOut += AnySelectOut;
+            }
+
+            CubeFactory cubeFactory = new CubeFactory(Materials.ShaderType.Opaque, new ColorRange(Color.red, Color.red, 1));
+            for (uint i = 0; i < NumEdgeCubes; i++)
+            {
+                edgeGOs[i] = cubeFactory.NewBlock(0, 0);
+                edgeGOs[i].layer = 2; // Note: This will make raycasting ignore this object. Physics.IgnoreRaycastLayer contains the wrong value (water mask)!
+                edgeGOs[i].transform.position = Vector3.zero;
+                edgeGOs[i].transform.localScale = new Vector3(0.08f, 0.08f, 0.08f);
+                edgeMeshRenderers[i] = edgeGOs[i].GetComponent<MeshRenderer>();
+            }
         }
 
         /// <summary>
@@ -314,18 +289,6 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Prints the keys for all actions.
-        /// </summary>
-        private static void Usage()
-        {
-            Debug.Log("Keys for architectural mapping:\n");
-            Debug.LogFormat(" copy/remove selected implementation node to/from clipboard: Ctrl-{0}\n", CopyKey);
-            Debug.LogFormat(" map nodes in clipboard onto selected architecture node: Ctrl-{0}\n", PasteKey);
-            Debug.LogFormat(" clear clipboard: Ctrl-{0}\n", ClearKey);
-            Debug.LogFormat(" save mapping to GXL file: Ctrl-{0}\n", SaveKey);
-        }
-
-        /// <summary>
         /// Loads and returns the mapping from the given GXL <paramref name="mappingFile"/>.
         /// </summary>
         /// <param name="mappingFile">GXL file from which to load the mapping</param>
@@ -347,12 +310,12 @@ namespace SEE.Controls.Actions
                     Debug.LogWarningFormat("Unexpected edge type {0} in mapping for edge {1}.\n", edge.Type, edge);
                     edgesToBeRemoved.Add(edge);
                 }
-                if (implementation.GetNode(edge.Source.ID) == null)
+                if (implGraph.GetNode(edge.Source.ID) == null)
                 {
                     Debug.LogWarning($"The mapping contains an implementation node {edge.Source.ID} (source) that is not in the implementation graph for maps-to edge {edge}.\n");
                     nodesToBeRemoved.Add(edge.Source);
                 }
-                if (architecture.GetNode(edge.Target.ID) == null)
+                if (archGraph.GetNode(edge.Target.ID) == null)
                 {
                     Debug.LogWarning($"The mapping contains an architecture node {edge.Target.ID} (target) that is not in the architecture graph for maps-to edge {edge}.\n");
                     nodesToBeRemoved.Add(edge.Target);
@@ -383,27 +346,53 @@ namespace SEE.Controls.Actions
             }
         }
 
-        private struct SpinningCube
+        private LineRenderer CreateEdge(Node from, Node to)
         {
-            internal GameObject gameObject;
-            internal MeshRenderer meshRenderer;
-            internal float timer;
-            internal Color c0;
-            internal Color c1;
+            LineRenderer result = null;
+
+            // TODO(torben): This is way to inefficient to create an edge!!!
+            NodeRef nr0 = NodeRef.Get(from);
+            NodeRef nr1 = NodeRef.Get(to);
+            AbstractSEECity settings = Implementation.GetComponent<SEECity>().Renderer.GetSettings();
+            float minimalEdgeLevelDistance = 2.5f * settings.EdgeWidth;
+
+            IEdgeLayout edgeLayout = new SplineEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance, settings.RDP);
+            NodeFactory nodeFactory = new CubeFactory(Materials.ShaderType.Opaque, new ColorRange(Color.white, Color.white, 1));
+            EdgeFactory factory = new EdgeFactory(edgeLayout, settings.EdgeWidth, settings.TubularSegments, settings.Radius, settings.RadialSegments, settings.isEdgeSelectable);
+
+            Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
+            ILayoutNode fromLayoutNode = new GameNode(to_layout_node, nr0.gameObject, nodeFactory);
+            ILayoutNode toLayoutNode = new GameNode(to_layout_node, nr1.gameObject, nodeFactory);
+            LayoutEdge layoutEdge = new LayoutEdge(fromLayoutNode, toLayoutNode, new Edge(from, to));
+
+            ICollection<ILayoutNode> nodes = new List<ILayoutNode> { fromLayoutNode, toLayoutNode };
+            ICollection<LayoutEdge> edges = new List<LayoutEdge> { layoutEdge };
+
+            IEnumerator<GameObject> enumerator = factory.DrawEdges(nodes, edges).GetEnumerator();
+            enumerator.MoveNext();
+            result = enumerator.Current.GetComponent<LineRenderer>();
+            LineFactory.SetColor(result, new Color(1.0f, 1.0f, 1.0f, 0.5f));
+
+            return result;
         }
 
-        SpinningCube spinningCube;
-
-        // Update is called once per frame
         private void Update()
         {
             // This script should be disabled, if the action state is not 'Map'
             if (!ActionState.Is(ActionStateType.Map))
             {
                 enabled = false;
+                InteractableObject.AnyHoverIn -= AnyHoverIn;
+                InteractableObject.AnyHoverOut -= AnyHoverOut;
                 InteractableObject.AnySelectIn -= AnySelectIn;
                 InteractableObject.AnySelectOut -= AnySelectOut;
                 return;
+            }
+
+            highlightTimer += Time.deltaTime;
+            if (highlightTimer >= HighlightLoopTimeInSeconds)
+            {
+                highlightTimer -= HighlightLoopTimeInSeconds;
             }
 
             //------------------------------------------------------------------------
@@ -420,7 +409,7 @@ namespace SEE.Controls.Actions
                     Assert.IsNotNull(nodeRef);
                     Assert.IsNotNull(nodeRef.Value);
 
-                    if (nodeRef.Value.ItsGraph == implementation) // Set or replace implementation node
+                    if (nodeRef.Value.ItsGraph == implGraph) // Set or replace implementation node
                     {
                         if (selection.interactableObject != null)
                         {
@@ -439,6 +428,7 @@ namespace SEE.Controls.Actions
                             Reflexion.Delete_From_Mapping(mapped.Outgoings[0]);
                         }
                         Reflexion.Add_To_Mapping(n0, n1);
+                        CreateEdge(n0, n1);
                         selection.interactableObject.SetSelect(false, true);
                     }
                 }
@@ -448,28 +438,75 @@ namespace SEE.Controls.Actions
                 }
             }
 
-            if (spinningCube.gameObject != null)
+            if (selection.material)
             {
-                const float PERIOD = 4.0f;
-                spinningCube.timer += Time.deltaTime;
-                while (spinningCube.timer > PERIOD)
+                float t = -Mathf.Cos((2.0f * Mathf.PI * highlightTimer) / HighlightLoopTimeInSeconds) * 0.5f + 0.5f;
+                SetColor(t);
+            }
+
+            if (spinningCubeData.go != null)
+            {
+                spinningCubeData.timer += Time.deltaTime;
+                while (spinningCubeData.timer > SpinningCursorCubeLoopTimeInSeconds)
                 {
-                    spinningCube.timer -= PERIOD;
+                    spinningCubeData.timer -= SpinningCursorCubeLoopTimeInSeconds;
                 }
-                float tPos = Mathf.Sin(2.0f * Mathf.PI * spinningCube.timer / PERIOD * 2.0f) * 0.5f + 0.5f; // y-range: [0.0, 1.0]
+                float tPos = Mathf.Sin(2.0f * Mathf.PI * spinningCubeData.timer / SpinningCursorCubeLoopTimeInSeconds * 2.0f) * 0.5f + 0.5f; // y-range: [0.0, 1.0]
                 float gr = 0.5f * MathExtensions.GoldenRatio;
-                float ls = spinningCube.gameObject.transform.localScale.x;
+                float ls = spinningCubeData.go.transform.localScale.x;
 
                 //TODO: Camera.main should be cached for Update(),
                 // as it has CPU overhead comparable to GameObject.GetComponent
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 Physics.Raycast(ray, out RaycastHit hit);
 
-                spinningCube.gameObject.transform.position = hit.point + new Vector3(0.0f, gr * ls + tPos * gr * ls, 0.0f);
-                spinningCube.gameObject.transform.rotation = Quaternion.AngleAxis(spinningCube.timer / PERIOD * 180.0f, Vector3.up);
+                spinningCubeData.go.transform.position = hit.point + new Vector3(0.0f, gr * ls + tPos * gr * ls, 0.0f);
+                spinningCubeData.go.transform.rotation = Quaternion.AngleAxis(spinningCubeData.timer / SpinningCursorCubeLoopTimeInSeconds * 180.0f, Vector3.up);
 
-                float tCol = Mathf.Sin(2.0f * Mathf.PI * spinningCube.timer / PERIOD) * 0.5f + 0.5f;
-                spinningCube.meshRenderer.material.color = (1.0f - tCol) * spinningCube.c0 + tCol * spinningCube.c1;
+                float tCol = Mathf.Sin(2.0f * Mathf.PI * spinningCubeData.timer / SpinningCursorCubeLoopTimeInSeconds) * 0.5f + 0.5f;
+            }
+
+            // Apply forces
+            bool hasOrigin = selection.nodeRef != null;
+            if (hasOrigin && hasTarget)
+            {
+                for (uint i = 0; i < NumEdgeCubes; i++)
+                {
+                    // Apply forces to velocity
+                    Vector3 toTarget = target - edgeGOs[i].transform.position;
+                    float sqrMagnitude = toTarget.sqrMagnitude;
+                    if (sqrMagnitude > 0.001f) // Move towards target
+                    {
+                        Vector3 direction = toTarget / Mathf.Sqrt(sqrMagnitude);
+                        Vector3 force = 0.04f * direction;
+                        Vector3 friction = PhysicsUtil.Friction(velocities[i], 2.0f);
+                        Vector3 acceleration = force + friction;
+                        velocities[i] += acceleration * Time.deltaTime; // TODO(torben): put in fixed update! use: Time.fixedDeltaTime
+                    }
+                    else // Reset
+                    {
+                        edgeGOs[i].transform.position = selection.nodeRef.transform.position;
+                        velocities[i] = new Vector3(
+                            Random.Range(-MaxVelocity, MaxVelocity),
+                            Random.Range(0.0f, MaxVelocity),
+                            Random.Range(-MaxVelocity, MaxVelocity));
+                    }
+                }
+            }
+            else // Only friction
+            {
+                for (uint i = 0; i < NumEdgeCubes; i++)
+                {
+                    Vector3 acceleration = PhysicsUtil.Friction(velocities[i], 2.0f);
+                    velocities[i] += acceleration * Time.deltaTime; // TODO(torben): put in fixed update! use: Time.fixedDeltaTime
+                }
+            }
+
+            // Clamp and apply velocity
+            for (uint i = 0; i < NumEdgeCubes; i++)
+            {
+                velocities[i] = PhysicsUtil.ClampVelocity(velocities[i], MaxVelocity);
+                edgeGOs[i].transform.position += velocities[i];
             }
 
 #if false
@@ -534,35 +571,48 @@ namespace SEE.Controls.Actions
             objectsInClipboard.Clear();
         }
 
-        /// <summary>
-        /// Whether the left control key was pressed.
-        /// </summary>
-        /// <returns>true if the left control key was pressed</returns>
-        private static bool LeftControlPressed()
+        private void OnStateChanged(ActionStateType value)
         {
-            // Control key capturing does not really work well in the editor.
-            bool leftControl = false;
-#if UNITY_EDITOR
-            leftControl = true;
-#else
-            if (Input.GetKeyDown(KeyCode.LeftControl))
+            if (Equals(value, ActionStateType.Map))
             {
-                leftControl = true;
+                InteractableObject.AnyHoverIn += AnyHoverIn;
+                InteractableObject.AnyHoverOut += AnyHoverOut;
+                InteractableObject.AnySelectIn += AnySelectIn;
+                InteractableObject.AnySelectOut += AnySelectOut;
+                enabled = true;
             }
-            if (Input.GetKeyUp(KeyCode.LeftControl))
+            else
             {
-                leftControl = false;
+                InteractableObject.AnyHoverIn -= AnyHoverIn;
+                InteractableObject.AnyHoverOut -= AnyHoverOut;
+                InteractableObject.AnySelectIn -= AnySelectIn;
+                InteractableObject.AnySelectOut -= AnySelectOut;
+                enabled = false; // We don't want to waste CPU time, if Update() doesn't do anything
             }
-#endif
-            return leftControl;
         }
 
-        private void SetupReflexion()
+        private void AnyHoverIn(InteractableObject interactableObject, bool isOwner)
         {
-            Reflexion = new Reflexion(implementation, architecture, mapping);
-            Reflexion.Register(this);
-            // An initial run is necessary to set up the necessary data structures.
-            Reflexion.Run();
+            if (interactableObject.TryGetComponent(out NodeRef to) && interactableObject != selection.interactableObject) // TODO(torben): only, if the interactableObject is from architecture! @ArchInteract
+            {
+                if (selection.nodeRef)
+                {
+                    target = interactableObject.transform.position;
+                    hasTarget = true;
+                    Assert.IsNull(tempEdge);
+                    tempEdge = CreateEdge(selection.nodeRef.Value, to.Value);
+                }
+            }
+        }
+
+        private void AnyHoverOut(InteractableObject interactableObject, bool isOwner)
+        {
+            hasTarget = false;
+            if (tempEdge)
+            {
+                Destroy(tempEdge.gameObject);
+                tempEdge = null;
+            }
         }
 
         private void AnySelectIn(InteractableObject interactableObject, bool isOwner)
@@ -570,55 +620,77 @@ namespace SEE.Controls.Actions
             Assert.IsNull(selection.nodeRef);
             Assert.IsNull(selection.interactableObject);
 
-            spinningCube.gameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            spinningCube.gameObject.name = "MappingAction.spinningCube";
-            // Note: This will make raycasting ignore this object. Physics.IgnoreRaycastLayer contains the wrong value (water mask)!
-            spinningCube.gameObject.layer = 2;
+            // Spinning cube above cursor
+
+            spinningCubeData.go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            spinningCubeData.go.name = "MappingAction.spinningCube";
+            spinningCubeData.go.layer = 2; // Note: This will make raycasting ignore this object. Physics.IgnoreRaycastLayer contains the wrong value (water mask)!
             float scale = 0.1f * Implementation.GetComponent<GO.Plane>().MinLengthXZ;
-            spinningCube.gameObject.transform.localScale = new Vector3(scale, scale, scale);
+            spinningCubeData.go.transform.localScale = new Vector3(scale, scale, scale);
 
-            spinningCube.meshRenderer = spinningCube.gameObject.GetComponent<MeshRenderer>();
-            spinningCube.meshRenderer.material = new Material(interactableObject.GetComponent<MeshRenderer>().material);
-            spinningCube.meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            spinningCube.meshRenderer.material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Overlay;
-            Portal.SetInfinitePortal(spinningCube.gameObject);
+            materialCopy = new Material(interactableObject.GetComponent<MeshRenderer>().material);
+            spinningCubeData.go.GetComponent<MeshRenderer>().material = materialCopy;
+            Portal.SetInfinitePortal(spinningCubeData.go);
 
-            spinningCube.timer = -Time.deltaTime;
+            spinningCubeData.timer = -Time.deltaTime;
 
-            spinningCube.c0 = spinningCube.meshRenderer.material.color;
-            spinningCube.c0.a = SelectedAlpha;
-            spinningCube.c1 = spinningCube.c0 + new Color(0.2f, 0.2f, 0.2f, 0.0f);
+            // Select and highlight object
 
+            highlightTimer = 0.0f;
             selection.nodeRef = interactableObject.GetComponent<NodeRef>();
             selection.interactableObject = interactableObject;
-            SetAlpha(selection.nodeRef, SelectedAlpha);
+            selection.material = interactableObject.GetComponent<MeshRenderer>().material;
+
+            Color color0 = selection.material.color;
+            Vector3 c0 = ((Vector4)color0).XYZ();
+            Vector3 c1 = Vector3.one - c0;
+            Vector3 d = c1 - c0;
+            float sqrMag = d.sqrMagnitude;
+            const float MaxMag = 0.5f;
+            const float MaxSqrMag = MaxMag * MaxMag;
+            if (sqrMag > MaxSqrMag) // Keep the difference in colors somewhat reasonable
+            {
+                d /= Mathf.Sqrt(sqrMag) / MaxMag;
+                c1 = c0 + d;
+            }
+
+            selection.initialColor = new Color(c0.x, c0.y, c0.z, color0.a);
+            //selection.highlightColor = new Color(c1.x, c1.y, c1.z, color0.a * (color0.a >= 0.5f ? 0.5f : 2.0f));
+            selection.highlightColor = new Color(c1.x, c1.y, c1.z, color0.a);
+
+            // Edge visualization
+
+            for (uint i = 0; i < NumEdgeCubes; i++)
+            {
+                edgeGOs[i].transform.position = selection.nodeRef.transform.position;
+                edgeMeshRenderers[i].material = materialCopy;
+            }
         }
 
         private void AnySelectOut(InteractableObject interactableObject, bool isOwner)
         {
             Assert.IsNotNull(selection.nodeRef);
             Assert.IsNotNull(selection.interactableObject);
+            Assert.IsNotNull(interactableObject.GetComponent<MeshRenderer>());
+            Assert.IsNotNull(interactableObject.GetComponent<MeshRenderer>());
 
-            Destroy(spinningCube.gameObject);
+            Destroy(spinningCubeData.go);
 #if UNITY_EDITOR
-            spinningCube.gameObject = null;
-            spinningCube.meshRenderer = null;
-            spinningCube.timer = 0.0f;
-            spinningCube.c0 = new Color();
-            spinningCube.c1 = new Color();
+            spinningCubeData.go = null;
+            spinningCubeData.timer = 0.0f;
 #endif
 
-            SetAlpha(selection.nodeRef, 1.0f);
-            selection.interactableObject = null;
+            highlightTimer = 0.0f;
+            selection.material.color = selection.initialColor;
             selection.nodeRef = null;
+            selection.interactableObject = null;
+            selection.material = null;
         }
 
-        private void SetAlpha(NodeRef nodeRef, float alpha)
+        private void SetColor(float t)
         {
-            MeshRenderer meshRenderer = nodeRef.GetComponent<MeshRenderer>();
-            Color color = meshRenderer.material.color;
-            color.a = alpha;
-            meshRenderer.material.color = color;
+            selection.material.color = Color.Lerp(selection.initialColor, selection.highlightColor, t);
+            materialCopy.color = selection.material.color;
         }
 
         /// <summary>

@@ -29,6 +29,18 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// Constructor. A random ID will be used for this edge.
+        /// </summary>
+        /// <param name="source">source of the edge</param>
+        /// <param name="target">target of the edge</param>
+        public Edge(Node source, Node target)
+        {
+            this.source = source;
+            this.target = target;
+            id = Utils.RandomStrings.Get();
+        }
+
+        /// <summary>
         /// Constructor. Source, target, and type of the edge remain undefined.
         /// </summary>
         /// <param name="ID">unique ID of edge</param>
