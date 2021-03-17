@@ -148,39 +148,35 @@ namespace SEE.Utils
         /// no action is currently running</exception>
         public void Undo()
         {
-            if (Current == null && UndoStack.Count == 0)
-            {
-                throw new EmptyActionHistoryException();
-            }
-            else
-            {
-                // We will cancel the current action, that means not only to stop but also
-                // to undo it. 
+            if (UndoStack.Count == 0)
+            {                
                 if (Current != null)
                 {
+                    // We will cancel and undo the current action.
                     Current.Stop();
                     Current.Undo();
-                }
-
-                if (UndoStack.Count == 0)
-                {
-                    // The current action was canceled, but in the absence of any other
-                    // action on the UndoStack it will be able to continue from scratch.
-                    Current?.Start();
+                    // There is no other action we can continue with, hence, we
+                    // will continue with Current.
+                    Current.Start();
                 }
                 else
                 {
-                    // The current action was canceled and we can continue with the action from
-                    // the UndoStack. The current action, however, may needed to be resumed later,
-                    // hence we need to push it onto the RedoStack.
-                    if (Current != null)
-                    {
-                        RedoStack.Push(Current);
-                    }
-                    Current = UndoStack.Pop();
-                    Current.Undo();
-                    Current.Start();
+                    throw new EmptyActionHistoryException();
                 }
+            }
+            else
+            {
+                // We will cancel and undo the current action. It is not completed yet and may be
+                // resumed later. Hence, we do not undo it. Yet, we will add it to the
+                // RedoStack() so that it may resume.
+                Current.Stop();
+                Current.Undo();
+                RedoStack.Push(Current);
+
+                // Now we will resume with the top of the UndoStack.
+                // We will cancel the current action.
+                Current = UndoStack.Pop();
+                Current.Start();
             }
         }
 
@@ -203,9 +199,9 @@ namespace SEE.Utils
                 if (Current != null)
                 {
                     Current.Stop();
-                    //Current.Redo();
                     UndoStack.Push(Current);
                 }
+
                 // the last undone action becomes the currently executed action again
                 Current = RedoStack.Pop();
                 Current.Redo();
