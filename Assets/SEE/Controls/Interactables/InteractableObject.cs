@@ -629,7 +629,6 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseEnter()
         {
-            // FIXME: For an unknown reason, this method will be called twice per frame.
             // Debug.LogFormat("{0}.OnMouseEnter({1}) @ {2}\n", this.GetType().FullName, gameObject.name, Time.time);
             if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer && !Raycasting.IsMouseOverGUI())
             {
