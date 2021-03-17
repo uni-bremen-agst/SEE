@@ -45,9 +45,12 @@ namespace SEE.Game.UI.CodeWindow
         /// Adds a new code window to the list of active code windows.
         /// </summary>
         /// <param name="window">The active code window which should be added to the list.</param>
+        /// <param name="splitOff">Will create an own gameObject for the code window and parent it to that.
+        /// This CodeWindowSpace will then be responsible for maintaining the new gameObject, hence it will
+        /// also be parented to this component's gameObject.</param>
         /// <exception cref="ArgumentException">If the given <paramref name="window"/> is already open.</exception>
         /// <exception cref="ArgumentNullException">If the given <paramref name="window"/> is <c>null</c>.</exception>
-        public void AddCodeWindow(CodeWindow window)
+        public void AddCodeWindow(CodeWindow window, bool splitOff = false)
         {
             if (window == null)
             {
@@ -57,6 +60,14 @@ namespace SEE.Game.UI.CodeWindow
             {
                 throw new ArgumentException("Given window is already open.");
             }
+            
+            // Split the code window off into its own game object
+            if (splitOff)
+            {
+                GameObject windowGameObject = new GameObject {name = window.Title};
+                windowGameObject.transform.parent = gameObject.transform;
+            }
+
             codeWindows.Add(window);
             // Actual UI generation happens in Update()
         }
@@ -78,7 +89,15 @@ namespace SEE.Game.UI.CodeWindow
             }
             codeWindows.Remove(window);
         }
-        
+
+        public void OnDisable()
+        {
+            // TODO: When disabled, all code windows need to be disabled and hidden by disabling their game object.
+            // This should only be done if we are a parent of them, otherwise we'd have to interfere with external
+            // gameObjects.
+            // TODO: Similarly, OnEnable should be implemented.
+        }
+
         /// <summary>
         /// The actual active code window.
         /// </summary>
@@ -86,7 +105,6 @@ namespace SEE.Game.UI.CodeWindow
 
         /// <summary>
         /// The nominal active code window. Changes will be applied on every frame using <see cref="Update"/>.
-        /// TODO: Allow multiple active code windows
         /// </summary>
         public CodeWindow ActiveCodeWindow { get; set; }
     }
