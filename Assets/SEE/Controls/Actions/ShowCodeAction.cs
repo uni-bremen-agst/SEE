@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using SEE.Game.UI;
 using SEE.Game.UI.CodeWindow;
 using SEE.GO;
 using UnityEngine;
@@ -82,6 +83,15 @@ namespace SEE.Controls.Actions
             {
                 space = gameObject.AddComponent<CodeWindowSpace>();
             }
+            
+            // We will also create a menu of players with open code windows
+        }
+
+        private static SelectionMenu SetUpWindowSelectionMenu(GameObject attachTo)
+        {
+            SelectionMenu menu = attachTo.AddComponent<SelectionMenu>();
+            //TODO: Create local entry
+            return menu;
         }
 
         private void Update()

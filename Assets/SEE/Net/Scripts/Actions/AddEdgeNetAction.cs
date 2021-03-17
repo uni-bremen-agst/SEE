@@ -1,14 +1,14 @@
-﻿using SEE.Game;
+﻿using System;
+using SEE.Game;
 using SEE.GO;
-using System;
 using UnityEngine;
 
-namespace SEE.Controls.Actions
+namespace SEE.Net
 {
     /// <summary>
     /// Creates a new edge through the network on each client.
     /// </summary>
-    public class AddEdgeNetAction : Net.AbstractAction
+    public class AddEdgeNetAction : AbstractAction
     {
         /// <summary>
         /// The id of the gameObject from which the edge should be drawn.
