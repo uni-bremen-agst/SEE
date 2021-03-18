@@ -115,21 +115,27 @@ namespace SEE.Controls.Actions
             //TODO: Icons
             //TODO: Actions
             SelectionMenu menu = gameObject.AddComponent<SelectionMenu>();
-            ToggleMenuEntry localEntry = new ToggleMenuEntry(true, () => { }, () => { }, LOCAL_PLAYER,
+            ToggleMenuEntry localEntry = new ToggleMenuEntry(true, () => ActivateSpace(LOCAL_PLAYER), 
+                                                             DeactivateCurrentSpace, LOCAL_PLAYER,
                                                              "Code windows for the local player (you).", Color.black);
-            ToggleMenuEntry noneEntry = new ToggleMenuEntry(true, () => { }, () => { }, NO_PLAYER, 
+            ToggleMenuEntry noneEntry = new ToggleMenuEntry(false, () => CurrentPlayer = NO_PLAYER, () => { }, NO_PLAYER, 
                                                             "This option hides all code windows.", Color.grey);
             menu.AddEntry(localEntry);
             menu.AddEntry(noneEntry);
             menu.Title = "Code Window Selection";
             menu.Description = "Select the player whose code windows you want to see.";
             return menu;
-        }
 
-        private void SetActivePlayer(string playerName)
-        {
-            // Hide existing code windows
-            CurrentPlayer = playerName;
+            void ActivateSpace(string playerName)
+            {
+                CodeSpaces[playerName].enabled = true;
+                CurrentPlayer = playerName;
+            }
+
+            void DeactivateCurrentSpace()
+            {
+                CodeSpaces[CurrentPlayer].enabled = false;
+            }
         }
 
         private void Update()

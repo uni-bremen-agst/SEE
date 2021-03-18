@@ -169,7 +169,7 @@ namespace SEE.Game.UI
                 buttonManager.hoverEvent.AddListener(() => ShowTooltip(entry.Description));
                 if (entry.Enabled)
                 {
-                    buttonManager.clickEvent.AddListener(entry.DoAction);
+                    buttonManager.clickEvent.AddListener(() => OnEntrySelected(entry));
                     buttonImage.color = entry.EntryColor;
                     textMeshPro.color = entry.EntryColor.IdealTextColor();
                     iconImage.color = entry.EntryColor.IdealTextColor();

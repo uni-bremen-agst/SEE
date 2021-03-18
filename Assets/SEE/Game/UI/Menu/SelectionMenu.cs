@@ -25,9 +25,10 @@ namespace SEE.Game.UI
         /// </summary>
         /// <returns>the first active entry in the <see cref="entries"/> list,
         /// or <c>null</c> if there is no such entry.</returns>
+        /// <exception cref="InvalidOperationException">If more than one element is active</exception>
         private ToggleMenuEntry GetActiveEntry()
         {
-            return Entries.FirstOrDefault(x => x.Active);
+            return Entries.SingleOrDefault(x => x.Active);
         }
     }
 }

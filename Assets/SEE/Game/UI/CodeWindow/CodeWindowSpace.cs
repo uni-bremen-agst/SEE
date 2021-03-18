@@ -45,12 +45,9 @@ namespace SEE.Game.UI.CodeWindow
         /// Adds a new code window to the list of active code windows.
         /// </summary>
         /// <param name="window">The active code window which should be added to the list.</param>
-        /// <param name="splitOff">Will create an own gameObject for the code window and parent it to that.
-        /// This CodeWindowSpace will then be responsible for maintaining the new gameObject, hence it will
-        /// also be parented to this component's gameObject.</param>
         /// <exception cref="ArgumentException">If the given <paramref name="window"/> is already open.</exception>
         /// <exception cref="ArgumentNullException">If the given <paramref name="window"/> is <c>null</c>.</exception>
-        public void AddCodeWindow(CodeWindow window, bool splitOff = false)
+        public void AddCodeWindow(CodeWindow window)
         {
             if (window == null)
             {
@@ -59,13 +56,6 @@ namespace SEE.Game.UI.CodeWindow
             else if (codeWindows.Contains(window))
             {
                 throw new ArgumentException("Given window is already open.");
-            }
-            
-            // Split the code window off into its own game object
-            if (splitOff)
-            {
-                GameObject windowGameObject = new GameObject {name = window.Title};
-                windowGameObject.transform.parent = gameObject.transform;
             }
 
             codeWindows.Add(window);
@@ -92,10 +82,30 @@ namespace SEE.Game.UI.CodeWindow
 
         public void OnDisable()
         {
-            // TODO: When disabled, all code windows need to be disabled and hidden by disabling their game object.
-            // This should only be done if we are a parent of them, otherwise we'd have to interfere with external
-            // gameObjects.
-            // TODO: Similarly, OnEnable should be implemented.
+            // When disabled, all code windows need to be disabled and hidden.
+            foreach (CodeWindow codeWindow in codeWindows)
+            {
+                codeWindow.enabled = false;
+            }
+
+            if (space)
+            {
+                space.SetActive(false);
+            }
+        }
+
+        public void OnEnable()
+        {
+            // Re-enabling the code window space will cause its code windows to show back up.
+            foreach (CodeWindow codeWindow in codeWindows)
+            {
+                codeWindow.enabled = true;
+            }
+
+            if (space)
+            {
+                space.SetActive(true);
+            }
         }
 
         /// <summary>
