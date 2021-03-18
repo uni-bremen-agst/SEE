@@ -83,7 +83,7 @@ namespace SEE.Game.UI.CodeWindow
                 // We need to destroy the panel now
                 Destroy(Panel);
             } 
-            else if (!Panel && codeWindows.Any())
+            else if (!Panel && codeWindows.Any(x => x.codeWindow))
             {
                 // We need to initialize the panel first
                 if (!space.TryGetComponentOrLog(out PanelsCanvas))
@@ -92,6 +92,10 @@ namespace SEE.Game.UI.CodeWindow
                 }
                 Panel = PanelUtils.CreatePanelFor((RectTransform) codeWindows[0].codeWindow.transform, PanelsCanvas);
                 //Panel.MoveTo(Vector2.zero); // Move panel to center of screen
+            } else if (!Panel)
+            {
+                // If no code window is initialized yet, there's nothing we can do
+                return;
             }
             
             if (currentActiveCodeWindow != ActiveCodeWindow)
@@ -112,6 +116,7 @@ namespace SEE.Game.UI.CodeWindow
             {
                 Panel.RemoveTab(Panel.GetTab((RectTransform) codeWindow.codeWindow.transform));
                 currentCodeWindows.Remove(codeWindow);
+                // Otherwise, we'll just destroy the component
                 Destroy(codeWindow);
             }
             
@@ -128,7 +133,7 @@ namespace SEE.Game.UI.CodeWindow
                 // Allow closing the tab
                 // FIXME: Apparently, this is called twice. It seems like the problem lies in PanelNotificationCenter.
                 PanelNotificationCenter.OnTabClosed += panelTab => 
-                    CloseCodeWindow(codeWindows.First(x => x.codeWindow == panelTab.Content.gameObject));
+                    CloseCodeWindow(codeWindows.First(x => x.codeWindow.GetInstanceID() == panelTab.Content.gameObject.GetInstanceID()));
                 
                 // Rebuild layout
                 PanelsCanvas.ForceRebuildLayoutImmediate();

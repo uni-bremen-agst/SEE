@@ -212,5 +212,21 @@ namespace SEE.Game.UI.CodeWindow
                     break;
             }
         }
+
+        public void OnDisable()
+        {
+            if (codeWindow)
+            {
+                codeWindow.SetActive(false);
+            }
+        }
+
+        public void OnEnable()
+        {
+            if (codeWindow)
+            {
+                codeWindow.SetActive(true);
+            }
+        }
     }
 }
