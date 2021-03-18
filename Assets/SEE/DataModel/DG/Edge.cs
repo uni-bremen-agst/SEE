@@ -37,7 +37,7 @@ namespace SEE.DataModel.DG
         {
             this.source = source;
             this.target = target;
-            id = Utils.RandomStrings.Get();
+            id = Utils.RandomStrings.Get(); // TODO(torben): This could potentially not be unique
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         public Edge()
         {
-            id = Utils.RandomStrings.Get();
+            id = Utils.RandomStrings.Get(); // TODO(torben): This could potentially not be unique
         }
 
         /// <summary>
@@ -183,6 +183,11 @@ namespace SEE.DataModel.DG
         {
             get => id;
             set => throw new NotImplementedException();
+        }
+
+        public static implicit operator bool(Edge edge)
+        {
+            return edge != null;
         }
     }
 }

@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.MixedReality.Toolkit.Input;
+using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls
@@ -26,6 +28,7 @@ namespace SEE.Controls
     /// <summary>
     /// Super class of the behaviours of game objects the player interacts with.
     /// </summary>
+    [RequireComponent(typeof(GraphElement))]
     [RequireComponent(typeof(Interactable))]
     public sealed class InteractableObject : MonoBehaviour, IMixedRealityFocusHandler
     {
@@ -61,6 +64,11 @@ namespace SEE.Controls
         public static readonly HashSet<InteractableObject> HoveredObjects = new HashSet<InteractableObject>();
 
         /// <summary>
+        /// The object, that is currently hovered by this player.
+        /// </summary>
+        public static InteractableObject HoveredObject { get; private set; } = null;
+
+        /// <summary>
         /// The selected objects.
         /// </summary>
         public static readonly HashSet<InteractableObject> SelectedObjects = new HashSet<InteractableObject>();
@@ -71,9 +79,19 @@ namespace SEE.Controls
         public static readonly HashSet<InteractableObject> GrabbedObjects = new HashSet<InteractableObject>();
 
         /// <summary>
+        /// The selected objects per graph.
+        /// </summary>
+        private static readonly Dictionary<Graph, HashSet<InteractableObject>> graphToSelectedIOs = new Dictionary<Graph, HashSet<InteractableObject>>();
+
+        /// <summary>
         /// The unique id of the interactable object.
         /// </summary>
         public uint ID { get; private set; }
+
+        /// <summary>
+        /// The graph element, this interactable object is attached to.
+        /// </summary>
+        public GraphElementRef GraphElemRef { get; private set; }
 
         /// <summary>
         /// A bit vector for hovering flags. Each flag is a bit as defined in <see cref="HoverFlag"/>.
@@ -132,6 +150,7 @@ namespace SEE.Controls
             ID = nextID++;
             idToInteractableObjectDict.Add(ID, this);
             gameObject.TryGetComponentOrLog(out interactable);
+            GraphElemRef = GetComponent<GraphElementRef>();
         }
 
         /// <summary>
@@ -149,7 +168,22 @@ namespace SEE.Controls
             return result;
         }
 
-        #region Interaction
+        /// <summary>
+        /// Returns the currently selected objects of given graph.
+        /// </summary>
+        /// <param name="graph">The graph, that the selected objects must be contained
+        /// by.</param>
+        /// <returns>The currently selected objects of given graph.</returns>
+        public static HashSet<InteractableObject> GetSelectedObjectsOfGraph(Graph graph)
+        {
+            if (!graphToSelectedIOs.ContainsKey(graph))
+            {
+                graphToSelectedIOs[graph] = new HashSet<InteractableObject>();
+            }
+            return graphToSelectedIOs[graph];
+        }
+            
+  #region Interaction
 
         /// <summary>
         /// Sets <see cref="HoverFlags"/> to given <paramref name="hoverFlags"/>. Then if 
@@ -187,6 +221,7 @@ namespace SEE.Controls
                     LocalAnyHoverIn?.Invoke(this);
                 }
                 HoveredObjects.Add(this);
+                HoveredObject = this;
             }
             else
             {
@@ -200,6 +235,7 @@ namespace SEE.Controls
                     LocalAnyHoverOut?.Invoke(this);
                 }
                 HoveredObjects.Remove(this);
+                HoveredObject = null;
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
@@ -266,6 +302,18 @@ namespace SEE.Controls
 
             if (select)
             {
+                // Update all selected object list
+                SelectedObjects.Add(this);
+
+                // Update all selected object list per graph
+                Graph g = GraphElemRef.elem.ItsGraph;
+                if (!graphToSelectedIOs.ContainsKey(g))
+                {
+                    graphToSelectedIOs[g] = new HashSet<InteractableObject>();
+                }
+                graphToSelectedIOs[g].Add(this);
+
+                // Invoke events
                 SelectIn?.Invoke(this, isOwner);
                 AnySelectIn?.Invoke(this, isOwner);
                 if (isOwner)
@@ -275,10 +323,16 @@ namespace SEE.Controls
                     LocalSelectIn?.Invoke(this);
                     LocalAnySelectIn?.Invoke(this);
                 }
-                SelectedObjects.Add(this);
             }
             else
             {
+                // Update all selected object list
+                SelectedObjects.Remove(this);
+
+                // Update all selected object list per graph
+                graphToSelectedIOs[GraphElemRef.elem.ItsGraph].Remove(this);
+
+                // Invoke events
                 SelectOut?.Invoke(this, isOwner);
                 AnySelectOut?.Invoke(this, isOwner);
                 if (isOwner)
@@ -288,7 +342,6 @@ namespace SEE.Controls
                     LocalSelectOut?.Invoke(this);
                     LocalAnySelectOut?.Invoke(this);
                 }
-                SelectedObjects.Remove(this);
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
@@ -306,6 +359,20 @@ namespace SEE.Controls
             while (SelectedObjects.Count != 0)
             {
                 SelectedObjects.ElementAt(SelectedObjects.Count - 1).SetSelect(false, isOwner);
+            }
+        }
+
+        public static void UnselectAllInGraph(Graph graph, bool isOwner)
+        {
+            if (graphToSelectedIOs.TryGetValue(graph, out HashSet<InteractableObject> s))
+            {
+                HashSet<InteractableObject>.Enumerator e;
+                while (s.Count != 0)
+                {
+                    e = s.GetEnumerator();
+                    e.MoveNext();
+                    e.Current.SetSelect(false, isOwner);
+                }
             }
         }
 
