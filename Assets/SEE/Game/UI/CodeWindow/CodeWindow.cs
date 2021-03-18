@@ -213,6 +213,9 @@ namespace SEE.Game.UI.CodeWindow
             }
         }
 
+        /// <summary>
+        /// When disabling the code window, its controlled UI objects will also be disabled.
+        /// </summary>
         public void OnDisable()
         {
             if (codeWindow)
@@ -221,6 +224,9 @@ namespace SEE.Game.UI.CodeWindow
             }
         }
 
+        /// <summary>
+        /// When enabling the code window, its controlled UI objects will also be enabled.
+        /// </summary>
         public void OnEnable()
         {
             if (codeWindow)

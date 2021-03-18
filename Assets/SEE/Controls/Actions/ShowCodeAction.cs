@@ -101,7 +101,6 @@ namespace SEE.Controls.Actions
             }
             CodeSpaces[LOCAL_PLAYER] = space;
 
-            // TODO: We will also create a menu of players with open code windows
             CodeWindowMenu = SetUpWindowSelectionMenu();
         }
 
@@ -113,7 +112,6 @@ namespace SEE.Controls.Actions
         private SelectionMenu SetUpWindowSelectionMenu()
         {
             //TODO: Icons
-            //TODO: Actions
             SelectionMenu menu = gameObject.AddComponent<SelectionMenu>();
             ToggleMenuEntry localEntry = new ToggleMenuEntry(true, () => ActivateSpace(LOCAL_PLAYER), 
                                                              DeactivateCurrentSpace, LOCAL_PLAYER,
@@ -125,7 +123,7 @@ namespace SEE.Controls.Actions
             menu.Title = "Code Window Selection";
             menu.Description = "Select the player whose code windows you want to see.";
             return menu;
-
+            
             void ActivateSpace(string playerName)
             {
                 CodeSpaces[playerName].enabled = true;

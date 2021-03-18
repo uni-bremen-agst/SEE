@@ -80,6 +80,9 @@ namespace SEE.Game.UI.CodeWindow
             codeWindows.Remove(window);
         }
 
+        /// <summary>
+        /// When disabling this component, the associated code windows will also be disabled.
+        /// </summary>
         public void OnDisable()
         {
             // When disabled, all code windows need to be disabled and hidden.
@@ -94,6 +97,9 @@ namespace SEE.Game.UI.CodeWindow
             }
         }
 
+        /// <summary>
+        /// When enabling this component, the associated code windows will also be enabled.
+        /// </summary>
         public void OnEnable()
         {
             // Re-enabling the code window space will cause its code windows to show back up.
