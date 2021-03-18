@@ -216,6 +216,9 @@ namespace SEE.Game.UI
             {
                 if (MenuShown)
                 {
+                    // Move window to the top of the hierarchy (which, confusingly, is actually at the bottom)
+                    // so that this menu is rendered over any other potentially existing menu on the UI canvas
+                    MenuGameObject.transform.SetAsLastSibling();
                     Manager?.OpenWindow();
                 }
                 else
