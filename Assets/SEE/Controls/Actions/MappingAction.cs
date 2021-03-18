@@ -59,10 +59,6 @@ namespace SEE.Controls.Actions
         private const float SpinningCursorCubeLoopTimeInSeconds = 4.0f; // TODO(torben): maybe only use one timer for everything
         private const uint NumEdgeCubes = 1;
         private const float MaxVelocity = 0.003f; // TODO(torben): this should be relative and be adapted to the table size!
-        private const KeyCode SaveKey = KeyCode.S;
-        private const KeyCode CopyKey = KeyCode.C;
-        private const KeyCode PasteKey = KeyCode.V;
-        private const KeyCode ClearKey = KeyCode.X;
 
         [Tooltip("The game object representing the architecture.")]
         public GameObject Architecture;
@@ -130,7 +126,8 @@ namespace SEE.Controls.Actions
         private Vector3[] velocities = new Vector3[NumEdgeCubes];
         private GameObject[] edgeGOs = new GameObject[NumEdgeCubes];
         private MeshRenderer[] edgeMeshRenderers = new MeshRenderer[NumEdgeCubes];
-        LineRenderer tempEdge = null;
+
+        LineRenderer activeMappingEdge = null;
 
         /// <summary>
         /// The game objects that have been copied to the clipboard via Ctrl-C.
@@ -191,13 +188,6 @@ namespace SEE.Controls.Actions
 
             if (enabled)
             {
-                // Print usage for mapping
-                Debug.Log("Keys for architectural mapping:\n");
-                Debug.LogFormat(" copy/remove selected implementation node to/from clipboard: Ctrl-{0}\n", CopyKey);
-                Debug.LogFormat(" map nodes in clipboard onto selected architecture node: Ctrl-{0}\n", PasteKey);
-                Debug.LogFormat(" clear clipboard: Ctrl-{0}\n", ClearKey);
-                Debug.LogFormat(" save mapping to GXL file: Ctrl-{0}\n", SaveKey);
-
                 // Setup reflexion decorator
                 Portal.GetDimensions(Architecture, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
                 decorator = new ReflexionDecorator(AbsencePrefab, ConvergencePrefab, DivergencePrefab, leftFrontCorner, rightBackCorner);
@@ -229,6 +219,8 @@ namespace SEE.Controls.Actions
                 edgeGOs[i].transform.position = Vector3.zero;
                 edgeGOs[i].transform.localScale = new Vector3(0.08f, 0.08f, 0.08f);
                 edgeMeshRenderers[i] = edgeGOs[i].GetComponent<MeshRenderer>();
+
+                edgeGOs[i].SetActive(false);
             }
         }
 
@@ -371,7 +363,7 @@ namespace SEE.Controls.Actions
             IEnumerator<GameObject> enumerator = factory.DrawEdges(nodes, edges).GetEnumerator();
             enumerator.MoveNext();
             result = enumerator.Current.GetComponent<LineRenderer>();
-            LineFactory.SetColor(result, new Color(1.0f, 1.0f, 1.0f, 0.5f));
+            LineFactory.SetColor(result, new Color(1.0f, 1.0f, 1.0f, 0.2f));
 
             return result;
         }
@@ -428,7 +420,6 @@ namespace SEE.Controls.Actions
                             Reflexion.Delete_From_Mapping(mapped.Outgoings[0]);
                         }
                         Reflexion.Add_To_Mapping(n0, n1);
-                        CreateEdge(n0, n1);
                         selection.interactableObject.SetSelect(false, true);
                     }
                 }
@@ -599,8 +590,8 @@ namespace SEE.Controls.Actions
                 {
                     target = interactableObject.transform.position;
                     hasTarget = true;
-                    Assert.IsNull(tempEdge);
-                    tempEdge = CreateEdge(selection.nodeRef.Value, to.Value);
+                    Assert.IsNull(activeMappingEdge);
+                    activeMappingEdge = CreateEdge(selection.nodeRef.Value, to.Value);
                 }
             }
         }
@@ -608,10 +599,10 @@ namespace SEE.Controls.Actions
         private void AnyHoverOut(InteractableObject interactableObject, bool isOwner)
         {
             hasTarget = false;
-            if (tempEdge)
+            if (activeMappingEdge)
             {
-                Destroy(tempEdge.gameObject);
-                tempEdge = null;
+                Destroy(activeMappingEdge.gameObject);
+                activeMappingEdge = null;
             }
         }
 
@@ -633,6 +624,8 @@ namespace SEE.Controls.Actions
             Portal.SetInfinitePortal(spinningCubeData.go);
 
             spinningCubeData.timer = -Time.deltaTime;
+
+            spinningCubeData.go.SetActive(false);
 
             // Select and highlight object
 
@@ -842,6 +835,15 @@ namespace SEE.Controls.Actions
         private void HandleMapsToEdgeAdded(MapsToEdgeAdded mapsToEdgeAdded)
         {
             Debug.Log(mapsToEdgeAdded.ToString());
+
+            const float Coeff = 4.0f;
+
+            Color initialColor = activeMappingEdge.startColor;
+            Color highlightColor = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Min(1.0f, Coeff * initialColor.a));
+            Color finalColor = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Max(0.05f, initialColor.a / Coeff));
+
+            EdgeAnimator.Create(activeMappingEdge.gameObject, initialColor, highlightColor, finalColor, 1.0f, 3.0f);
+            activeMappingEdge = null;
         }
 
         private void HandleMapsToEdgeRemoved(MapsToEdgeRemoved mapsToEdgeRemoved)
