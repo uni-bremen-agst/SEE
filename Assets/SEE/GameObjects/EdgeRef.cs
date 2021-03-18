@@ -1,5 +1,4 @@
 ﻿using SEE.DataModel.DG;
-using System;
 
 namespace SEE.GO
 {
@@ -15,7 +14,6 @@ namespace SEE.GO
 		/// It will not be serialized to prevent duplicating and endless serialization
 		/// by both Unity and Odin.
         /// </summary>
-        [NonSerialized]
-        public Edge edge;
+        public Edge Value { get => (Edge)elem; set => elem = value; }
     }
 }

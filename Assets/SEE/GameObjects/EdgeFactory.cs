@@ -91,7 +91,7 @@ namespace SEE.GO
                 isStatic = false,
                 name = layoutEdge.ItsEdge.ID
             };
-            gameEdge.AddComponent<EdgeRef>().edge = layoutEdge.ItsEdge;
+            gameEdge.AddComponent<EdgeRef>().Value = layoutEdge.ItsEdge;
             return gameEdge;
         }
 

@@ -35,18 +35,21 @@ namespace SEE.GO
             timer += Time.deltaTime;
             if (timer <= initialToHighlightTime)
             {
-                float t = timer / initialToHighlightTime;
+                float x = timer / initialToHighlightTime;
+                float t = Mathf.Sin(0.5f * Mathf.PI * x);
                 Color c = Color.Lerp(initialColor, highlightColor, t);
                 LineFactory.SetColor(lineRenderer, c);
             }
             else if (timer - initialToHighlightTime <= highlightToFinalTime)
             {
-                float t = (timer - initialToHighlightTime) / highlightToFinalTime;
+                float x = (timer - initialToHighlightTime) / highlightToFinalTime;
+                float t = -Mathf.Cos(Mathf.PI * x) * 0.5f + 0.5f;
                 Color c = Color.Lerp(highlightColor, finalColor, t);
                 LineFactory.SetColor(lineRenderer, c);
             }
             else
             {
+                LineFactory.SetColor(lineRenderer, finalColor);
                 Destroy(this);
             }
         }

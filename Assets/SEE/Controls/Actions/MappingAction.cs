@@ -30,35 +30,40 @@ namespace SEE.Controls.Actions
             Implementation
         }
 
-        private struct Selection
+        private struct _MoveState
         {
-            internal NodeRef nodeRef;
-            internal InteractableObject interactableObject; // TODO(torben): it is time to combine NodeRefs and InteractableObjects or at least have some dictionary for them...
-            internal Material material;
-            internal Color initialColor;
-            internal Color highlightColor;
-            // Rainer: note that gameObjects with an EdgeRef instead of NodeRef now may also have a InteractableObject component.
+            internal struct AdditionalDraggedObject
+            {
+                internal GameObject obj; // The object to be dragged
+                internal Vector3 off;    // The offset to the main dragged transform, that must is to be maintained at all times
+            }
+
+            internal Bounds cityBounds;
+            internal Vector3 dragStartTransformPosition;
+            internal Vector3 dragStartOffset;
+            internal Vector3 dragCanonicalOffset;
+            internal Vector3 moveVelocity;
+
+            internal GameObject mainDraggedObj;
+            internal List<AdditionalDraggedObject> additionalDraggedObjs;
         }
 
         private struct _ActionState
         {
-            internal bool copy;              // copy selected object (i.e., start mapping)
-            internal bool paste;             // paste (map) copied object
-            internal bool clearClipboard;    // whether the clipboard of copied nodes has been cleared
-            internal bool save;              // whether the current mapping should be stored
-            internal HitCity hitCity;        // which city we are currently focusing on
+            internal bool startDrag;
+            internal bool dragHoveredOnly; // true, if only the element, that is hovered by the mouse should be moved instead of whole city
+            internal bool drag;
+            internal bool cancel;
         }
 
-        private struct SpinningCubeData
+        private struct MappingEdge
         {
-            internal GameObject go;
-            internal float timer;
+            internal LineRenderer r;
+            internal uint from;
+            internal uint to;
         }
 
-        private const float HighlightLoopTimeInSeconds = 2.0f;
-        private const float SpinningCursorCubeLoopTimeInSeconds = 4.0f; // TODO(torben): maybe only use one timer for everything
-        private const uint NumEdgeCubes = 1;
-        private const float MaxVelocity = 0.003f; // TODO(torben): this should be relative and be adapted to the table size!
+        const float AlphaCoefficient = 4.0f;
 
         [Tooltip("The game object representing the architecture.")]
         public GameObject Architecture;
@@ -110,29 +115,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         private ReflexionDecorator decorator;
 
-        /// <summary>
-        /// The current selection of a game object and its associated graph node.
-        /// </summary>
-        private Selection selection;
+        private readonly List<MappingEdge> activeMappingEdges = new List<MappingEdge>();
 
+        private _MoveState moveState;
         private _ActionState actionState;
-
-        private float highlightTimer;
-        private Material materialCopy; // This mateiral has no portal
-        private SpinningCubeData spinningCubeData;
-
-        private Vector3 target;
-        private bool hasTarget;
-        private Vector3[] velocities = new Vector3[NumEdgeCubes];
-        private GameObject[] edgeGOs = new GameObject[NumEdgeCubes];
-        private MeshRenderer[] edgeMeshRenderers = new MeshRenderer[NumEdgeCubes];
-
-        LineRenderer activeMappingEdge = null;
-
-        /// <summary>
-        /// The game objects that have been copied to the clipboard via Ctrl-C.
-        /// </summary>
-        private readonly HashSet<Selection> objectsInClipboard = new HashSet<Selection>();
 
         /// <summary>
         /// Mapping of edge IDs onto game objects representing these edges in the architecture code city.
@@ -210,18 +196,30 @@ namespace SEE.Controls.Actions
                 InteractableObject.AnySelectIn += AnySelectIn;
                 InteractableObject.AnySelectOut += AnySelectOut;
             }
+        }
 
-            CubeFactory cubeFactory = new CubeFactory(Materials.ShaderType.Opaque, new ColorRange(Color.red, Color.red, 1));
-            for (uint i = 0; i < NumEdgeCubes; i++)
+        private void Enable()
+        {
+            InteractableObject.AnyHoverIn += AnyHoverIn;
+            InteractableObject.AnyHoverOut += AnyHoverOut;
+            InteractableObject.AnySelectIn += AnySelectIn;
+            InteractableObject.AnySelectOut += AnySelectOut;
+            enabled = true;
+        }
+
+        private void Disable()
+        {
+            foreach (MappingEdge e in activeMappingEdges)
             {
-                edgeGOs[i] = cubeFactory.NewBlock(0, 0);
-                edgeGOs[i].layer = 2; // Note: This will make raycasting ignore this object. Physics.IgnoreRaycastLayer contains the wrong value (water mask)!
-                edgeGOs[i].transform.position = Vector3.zero;
-                edgeGOs[i].transform.localScale = new Vector3(0.08f, 0.08f, 0.08f);
-                edgeMeshRenderers[i] = edgeGOs[i].GetComponent<MeshRenderer>();
-
-                edgeGOs[i].SetActive(false);
+                Destroy(e.r.gameObject);
             }
+            activeMappingEdges.Clear();
+
+            InteractableObject.AnyHoverIn -= AnyHoverIn;
+            InteractableObject.AnyHoverOut -= AnyHoverOut;
+            InteractableObject.AnySelectIn -= AnySelectIn;
+            InteractableObject.AnySelectOut -= AnySelectOut;
+            enabled = false;
         }
 
         /// <summary>
@@ -239,7 +237,7 @@ namespace SEE.Controls.Actions
             {
                 case Tags.Edge when rootGameObject.TryGetComponent(out EdgeRef edgeRef):
                 {
-                    Edge edge = edgeRef.edge;
+                    Edge edge = edgeRef.Value;
                     if (edge != null)
                     {
                         edges[edge.ID] = rootGameObject;
@@ -370,23 +368,16 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
-            // This script should be disabled, if the action state is not 'Map'
-            if (!ActionState.Is(ActionStateType.Map))
-            {
-                enabled = false;
-                InteractableObject.AnyHoverIn -= AnyHoverIn;
-                InteractableObject.AnyHoverOut -= AnyHoverOut;
-                InteractableObject.AnySelectIn -= AnySelectIn;
-                InteractableObject.AnySelectOut -= AnySelectOut;
-                return;
-            }
+            Assert.IsTrue(ActionState.Is(ActionStateType.Map));
 
-            highlightTimer += Time.deltaTime;
-            if (highlightTimer >= HighlightLoopTimeInSeconds)
-            {
-                highlightTimer -= HighlightLoopTimeInSeconds;
-            }
+            bool isMouseOverGUI = Raycasting.IsMouseOverGUI();
 
+            actionState.drag = Input.GetMouseButton(2);
+            actionState.startDrag |= !isMouseOverGUI && Input.GetMouseButtonDown(2);
+            actionState.dragHoveredOnly = Input.GetKey(KeyCode.LeftControl);
+            actionState.cancel |= Input.GetKeyDown(KeyCode.Escape);
+
+#if false
             //------------------------------------------------------------------------
             // ARCHITECTURAL MAPPING
             //------------------------------------------------------------------------
@@ -432,7 +423,8 @@ namespace SEE.Controls.Actions
             if (selection.material)
             {
                 float t = -Mathf.Cos((2.0f * Mathf.PI * highlightTimer) / HighlightLoopTimeInSeconds) * 0.5f + 0.5f;
-                SetColor(t);
+                selection.material.color = Color.Lerp(selection.initialColor, selection.highlightColor, t);
+                materialCopy.color = selection.material.color;
             }
 
             if (spinningCubeData.go != null)
@@ -456,234 +448,219 @@ namespace SEE.Controls.Actions
 
                 float tCol = Mathf.Sin(2.0f * Mathf.PI * spinningCubeData.timer / SpinningCursorCubeLoopTimeInSeconds) * 0.5f + 0.5f;
             }
-
-            // Apply forces
-            bool hasOrigin = selection.nodeRef != null;
-            if (hasOrigin && hasTarget)
-            {
-                for (uint i = 0; i < NumEdgeCubes; i++)
-                {
-                    // Apply forces to velocity
-                    Vector3 toTarget = target - edgeGOs[i].transform.position;
-                    float sqrMagnitude = toTarget.sqrMagnitude;
-                    if (sqrMagnitude > 0.001f) // Move towards target
-                    {
-                        Vector3 direction = toTarget / Mathf.Sqrt(sqrMagnitude);
-                        Vector3 force = 0.04f * direction;
-                        Vector3 friction = PhysicsUtil.Friction(velocities[i], 2.0f);
-                        Vector3 acceleration = force + friction;
-                        velocities[i] += acceleration * Time.deltaTime; // TODO(torben): put in fixed update! use: Time.fixedDeltaTime
-                    }
-                    else // Reset
-                    {
-                        edgeGOs[i].transform.position = selection.nodeRef.transform.position;
-                        velocities[i] = new Vector3(
-                            Random.Range(-MaxVelocity, MaxVelocity),
-                            Random.Range(0.0f, MaxVelocity),
-                            Random.Range(-MaxVelocity, MaxVelocity));
-                    }
-                }
-            }
-            else // Only friction
-            {
-                for (uint i = 0; i < NumEdgeCubes; i++)
-                {
-                    Vector3 acceleration = PhysicsUtil.Friction(velocities[i], 2.0f);
-                    velocities[i] += acceleration * Time.deltaTime; // TODO(torben): put in fixed update! use: Time.fixedDeltaTime
-                }
-            }
-
-            // Clamp and apply velocity
-            for (uint i = 0; i < NumEdgeCubes; i++)
-            {
-                velocities[i] = PhysicsUtil.ClampVelocity(velocities[i], MaxVelocity);
-                edgeGOs[i].transform.position += velocities[i];
-            }
-
-#if false
-            bool leftControl = LeftControlPressed();
-
-            actionState.save = leftControl && Input.GetKeyDown(SaveKey);
-            actionState.copy = leftControl && Input.GetKeyDown(CopyKey);
-            actionState.paste = leftControl && Input.GetKeyDown(PasteKey);
-            actionState.clearClipboard = leftControl && Input.GetKeyDown(ClearKey);
-
-            // We can copy only from the implementation city and if there is a selected object.
-            if (actionState.copy && actionState.hitCity == HitCity.Implementation && selection.go != null)
-            {
-                if (objectsInClipboard.Contains(selection))
-                {
-                    Debug.LogFormat("Removing node {0} from clipboard\n", selection.go.name);
-                    objectsInClipboard.Remove(selection);
-                }
-                else
-                {
-                    Debug.LogFormat("Copying node {0} to clipboard\n", selection.go.name);
-                    objectsInClipboard.Add(selection);
-                }
-            }
-            if (actionState.clearClipboard)
-            {
-                Debug.Log("Node clipboard has been cleared.\n");
-                objectsInClipboard.Clear();
-            }
-            // We can paste only into the architecture city and if we have a selected object as a target
-            if (actionState.paste && actionState.hitCity == HitCity.Architecture && selection.go != null)
-            {
-                MapClipboardContent(selection);
-            }
-            // Save the mapping if requested.
-            if (actionState.save && (actionState.hitCity == HitCity.Implementation || actionState.hitCity == HitCity.Implementation))
-            {
-                SaveMapping(mapping, MappingFile);
-            }
 #endif
         }
 
-        /// <summary>
-        /// Maps all nodes in <code>objectsInClipboard</code> <onto <paramref name="target"/>.
-        /// Assumption: all nodes in objectsInClipboard are implementation nodes.
-        /// </summary>
-        /// <param name="target">architecture node to be mapped on</param>
-        private void MapClipboardContent(Selection target)
+        bool moving = false;
+
+        private void FixedUpdate()
         {
-            foreach (Selection implementation in objectsInClipboard)
+            bool synchronize = false;
+
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Physics.Raycast(ray, out RaycastHit raycastHit);
+            Vector3 hit = raycastHit.point;
+
+            if (actionState.cancel) // cancel movement
             {
-                if (!Reflexion.Is_Explicitly_Mapped(implementation.nodeRef.Value))
+                //if (moving)
+                //{
+                //    moving = false;
+                //
+                //    moveState.draggedTransform.GetComponent<InteractableObject>().SetGrab(false, true);
+                //    moveState.moveGizmo.gameObject.SetActive(false);
+                //
+                //    moveState.moveVelocity = Vector3.zero;
+                //    moveState.draggedTransform.position =
+                //        moveState.dragStartTransformPosition + moveState.dragStartOffset
+                //        - Vector3.Scale(moveState.dragCanonicalOffset, moveState.draggedTransform.localScale);
+                //    moveState.draggedTransform = null;
+                //    synchronize = true;
+                //}
+                //else
+                //{
+                //    Select(null, true);
+                //}
+            }
+            else if (actionState.drag) // start or continue movement
+            {
+                if (actionState.startDrag) // start movement
                 {
-                    Debug.LogFormat("Mapping {0} -> {1}.\n", implementation.nodeRef.name, target.nodeRef.name);
-                    Reflexion.Add_To_Mapping(from: implementation.nodeRef.Value, to: target.nodeRef.Value);
+                    if (actionState.dragHoveredOnly)
+                    {
+                        InteractableObject o = InteractableObject.HoveredObject;
+                        if (o != null && o.GraphElemRef.elem.ItsGraph.Equals(implGraph))
+                        {
+                            moving = true;
+                            moveState.mainDraggedObj = CreateGhost(o);
+                            //o.SetGrab(true, true);
+                        }
+                    }
+                    else
+                    {
+                        HashSet<InteractableObject> objs = InteractableObject.GetSelectedObjectsOfGraph(implGraph);
+                        if (objs.Count > 0)
+                        {
+                            moving = true;
+                            HashSet<InteractableObject>.Enumerator e = objs.GetEnumerator();
+                            e.MoveNext();
+                            moveState.mainDraggedObj = CreateGhost(e.Current);
+                            e.Current.SetGrab(true, true);
+                            while (e.MoveNext())
+                            {
+                                _MoveState.AdditionalDraggedObject t = new _MoveState.AdditionalDraggedObject()
+                                {
+                                    obj = CreateGhost(e.Current),
+                                    off = e.Current.transform.position - moveState.mainDraggedObj.transform.position
+                                };
+                                moveState.additionalDraggedObjs.Add(t);
+                                //e.Current.SetGrab(true, true);
+                            }
+                        }
+                    }
+
+                    if (moving)
+                    {
+                        moveState.dragStartTransformPosition = moveState.mainDraggedObj.transform.position;
+                        moveState.dragStartOffset = hit - moveState.mainDraggedObj.transform.position;
+                        moveState.dragCanonicalOffset = moveState.dragStartOffset.DividePairwise(moveState.mainDraggedObj.transform.localScale);
+                        moveState.moveVelocity = Vector3.zero;
+                    }
                 }
-                else
+
+                if (moving) // continue movement
                 {
-                    Debug.LogWarningFormat("Node {0} is already explicitly mapped.\n", implementation.nodeRef.name);
+                    synchronize = true;
+
+                    Vector3 totalDragOffsetFromStart = hit - (moveState.dragStartTransformPosition + moveState.dragStartOffset);
+
+                    Vector3 oldPosition = moveState.mainDraggedObj.transform.position;
+                    Vector3 newPosition = moveState.dragStartTransformPosition + totalDragOffsetFromStart;
+
+                    moveState.moveVelocity = (newPosition - oldPosition) / Time.fixedDeltaTime; // TODO(torben): it might be possible to determine velocity only on release (this todo comes from DesktopNavigationAction)
+                    moveState.mainDraggedObj.transform.position = newPosition;
+                    foreach (_MoveState.AdditionalDraggedObject o in moveState.additionalDraggedObjs)
+                    {
+                        o.obj.transform.position = newPosition + o.off;
+                    }
                 }
             }
-            objectsInClipboard.Clear();
+            else if (moving) // finalize movement
+            {
+                //if (moveState.mainDraggedObj.transform != CityTransform) // only reparent non-root nodes
+                //{
+                //    synchronize = true;
+                //
+                //    Transform movingObject = moveState.mainDraggedObj.transform;
+                //    Vector3 originalPosition = moveState.dragStartTransformPosition + moveState.dragStartOffset
+                //            - Vector3.Scale(moveState.dragCanonicalOffset, movingObject.localScale);
+                //
+                //    GameNodeMover.FinalizePosition(movingObject.gameObject, originalPosition);
+                //}
+                
+                moving = false;
+
+                //moveState.mainDraggedObj.transform.GetComponent<InteractableObject>().SetGrab(false, true);
+                //if (moveState.mainDraggedObj.transform != CityTransform)
+                //{
+                //    moveState.moveVelocity = Vector3.zero; // TODO(torben): do we want to apply velocity to individually moved buildings or keep it like this?
+                //}
+
+                Destroy(moveState.mainDraggedObj);
+                foreach (_MoveState.AdditionalDraggedObject o in moveState.additionalDraggedObjs)
+                {
+                    Destroy(o.obj);
+                }
+
+                moveState.mainDraggedObj = null;
+                moveState.additionalDraggedObjs.Clear();
+            }
         }
 
         private void OnStateChanged(ActionStateType value)
         {
             if (Equals(value, ActionStateType.Map))
             {
-                InteractableObject.AnyHoverIn += AnyHoverIn;
-                InteractableObject.AnyHoverOut += AnyHoverOut;
-                InteractableObject.AnySelectIn += AnySelectIn;
-                InteractableObject.AnySelectOut += AnySelectOut;
-                enabled = true;
+                Enable();
             }
             else
             {
-                InteractableObject.AnyHoverIn -= AnyHoverIn;
-                InteractableObject.AnyHoverOut -= AnyHoverOut;
-                InteractableObject.AnySelectIn -= AnySelectIn;
-                InteractableObject.AnySelectOut -= AnySelectOut;
-                enabled = false; // We don't want to waste CPU time, if Update() doesn't do anything
+                Disable();
             }
         }
 
         private void AnyHoverIn(InteractableObject interactableObject, bool isOwner)
         {
-            if (interactableObject.TryGetComponent(out NodeRef to) && interactableObject != selection.interactableObject) // TODO(torben): only, if the interactableObject is from architecture! @ArchInteract
+            Assert.IsTrue(activeMappingEdges.Count == 0);
+
+            if (interactableObject.GraphElemRef is NodeRef && interactableObject.GraphElemRef.elem.ItsGraph.Equals(archGraph))
             {
-                if (selection.nodeRef)
+                Node to = (Node)interactableObject.GraphElemRef.elem;
+                foreach (InteractableObject o in InteractableObject.GetSelectedObjectsOfGraph(implGraph))
                 {
-                    target = interactableObject.transform.position;
-                    hasTarget = true;
-                    Assert.IsNull(activeMappingEdge);
-                    activeMappingEdge = CreateEdge(selection.nodeRef.Value, to.Value);
+                    if (o.GraphElemRef is NodeRef)
+                    {
+                        Node from = (Node)o.GraphElemRef.elem;
+                        MappingEdge e = new MappingEdge()
+                        {
+                            r = CreateEdge(from, to),
+                            from = o.ID,
+                            to = interactableObject.ID
+                        };
+                        activeMappingEdges.Add(e);
+                    }
                 }
             }
         }
 
         private void AnyHoverOut(InteractableObject interactableObject, bool isOwner)
         {
-            hasTarget = false;
-            if (activeMappingEdge)
+            if (interactableObject.GraphElemRef is NodeRef && interactableObject.GraphElemRef.elem.ItsGraph.Equals(archGraph))
             {
-                Destroy(activeMappingEdge.gameObject);
-                activeMappingEdge = null;
+                for (int i = activeMappingEdges.Count - 1; i >= 0; i--)
+                {
+                    MappingEdge e = activeMappingEdges[i];
+                    if (e.to == interactableObject.ID)
+                    {
+                        activeMappingEdges.RemoveAt(i);
+                        Destroy(e.r);
+                    }
+                }
             }
         }
 
         private void AnySelectIn(InteractableObject interactableObject, bool isOwner)
         {
-            Assert.IsNull(selection.nodeRef);
-            Assert.IsNull(selection.interactableObject);
-
-            // Spinning cube above cursor
-
-            spinningCubeData.go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            spinningCubeData.go.name = "MappingAction.spinningCube";
-            spinningCubeData.go.layer = 2; // Note: This will make raycasting ignore this object. Physics.IgnoreRaycastLayer contains the wrong value (water mask)!
-            float scale = 0.1f * Implementation.GetComponent<GO.Plane>().MinLengthXZ;
-            spinningCubeData.go.transform.localScale = new Vector3(scale, scale, scale);
-
-            materialCopy = new Material(interactableObject.GetComponent<MeshRenderer>().material);
-            spinningCubeData.go.GetComponent<MeshRenderer>().material = materialCopy;
-            Portal.SetInfinitePortal(spinningCubeData.go);
-
-            spinningCubeData.timer = -Time.deltaTime;
-
-            spinningCubeData.go.SetActive(false);
-
-            // Select and highlight object
-
-            highlightTimer = 0.0f;
-            selection.nodeRef = interactableObject.GetComponent<NodeRef>();
-            selection.interactableObject = interactableObject;
-            selection.material = interactableObject.GetComponent<MeshRenderer>().material;
-
-            Color color0 = selection.material.color;
-            Vector3 c0 = ((Vector4)color0).XYZ();
-            Vector3 c1 = Vector3.one - c0;
-            Vector3 d = c1 - c0;
-            float sqrMag = d.sqrMagnitude;
-            const float MaxMag = 0.5f;
-            const float MaxSqrMag = MaxMag * MaxMag;
-            if (sqrMag > MaxSqrMag) // Keep the difference in colors somewhat reasonable
+            if (interactableObject.GraphElemRef is NodeRef && interactableObject.GraphElemRef.elem.ItsGraph.Equals(implGraph)
+                && InteractableObject.HoveredObject != null && InteractableObject.HoveredObject.GraphElemRef is NodeRef && InteractableObject.HoveredObject.GraphElemRef.elem.ItsGraph.Equals(archGraph))
             {
-                d /= Mathf.Sqrt(sqrMag) / MaxMag;
-                c1 = c0 + d;
-            }
-
-            selection.initialColor = new Color(c0.x, c0.y, c0.z, color0.a);
-            //selection.highlightColor = new Color(c1.x, c1.y, c1.z, color0.a * (color0.a >= 0.5f ? 0.5f : 2.0f));
-            selection.highlightColor = new Color(c1.x, c1.y, c1.z, color0.a);
-
-            // Edge visualization
-
-            for (uint i = 0; i < NumEdgeCubes; i++)
-            {
-                edgeGOs[i].transform.position = selection.nodeRef.transform.position;
-                edgeMeshRenderers[i].material = materialCopy;
+                Node from = (Node)interactableObject.GraphElemRef.elem;
+                Node to = (Node)InteractableObject.HoveredObject.GraphElemRef.elem;
+                MappingEdge e = new MappingEdge()
+                {
+                    r = CreateEdge(from, to),
+                    from = interactableObject.ID,
+                    to = InteractableObject.HoveredObject.ID
+                };
+                activeMappingEdges.Add(e);
             }
         }
 
         private void AnySelectOut(InteractableObject interactableObject, bool isOwner)
         {
-            Assert.IsNotNull(selection.nodeRef);
-            Assert.IsNotNull(selection.interactableObject);
-            Assert.IsNotNull(interactableObject.GetComponent<MeshRenderer>());
-            Assert.IsNotNull(interactableObject.GetComponent<MeshRenderer>());
-
-            Destroy(spinningCubeData.go);
-#if UNITY_EDITOR
-            spinningCubeData.go = null;
-            spinningCubeData.timer = 0.0f;
-#endif
-
-            highlightTimer = 0.0f;
-            selection.material.color = selection.initialColor;
-            selection.nodeRef = null;
-            selection.interactableObject = null;
-            selection.material = null;
-        }
-
-        private void SetColor(float t)
-        {
-            selection.material.color = Color.Lerp(selection.initialColor, selection.highlightColor, t);
-            materialCopy.color = selection.material.color;
+            if (interactableObject.GraphElemRef is NodeRef && interactableObject.GraphElemRef.elem.ItsGraph.Equals(implGraph))
+            {
+                for (int i = activeMappingEdges.Count - 1; i >= 0; i--)
+                {
+                    MappingEdge e = activeMappingEdges[i];
+                    if (e.from == interactableObject.ID)
+                    {
+                        activeMappingEdges.RemoveAt(i);
+                        Destroy(e.r);
+                        break; // Note: There can only ever be ONE edge coming from a given selected object.
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -836,19 +813,32 @@ namespace SEE.Controls.Actions
         {
             Debug.Log(mapsToEdgeAdded.ToString());
 
-            const float Coeff = 4.0f;
+            foreach (MappingEdge e in activeMappingEdges)
+            {
+                Color initialColor = e.r.startColor;
+                Color highlightColor = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Min(1.0f, AlphaCoefficient * initialColor.a));
+                Color finalColor = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Max(0.05f, initialColor.a / AlphaCoefficient));
 
-            Color initialColor = activeMappingEdge.startColor;
-            Color highlightColor = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Min(1.0f, Coeff * initialColor.a));
-            Color finalColor = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Max(0.05f, initialColor.a / Coeff));
-
-            EdgeAnimator.Create(activeMappingEdge.gameObject, initialColor, highlightColor, finalColor, 1.0f, 3.0f);
-            activeMappingEdge = null;
+                EdgeAnimator.Create(e.r.gameObject, initialColor, highlightColor, finalColor, 0.3f, 4.0f);
+            }
+            activeMappingEdges.Clear();
         }
 
         private void HandleMapsToEdgeRemoved(MapsToEdgeRemoved mapsToEdgeRemoved)
         {
             Debug.Log(mapsToEdgeRemoved.ToString());
+        }
+
+        private GameObject CreateGhost(InteractableObject o)
+        {
+            Material m = o.GetComponent<MeshRenderer>().material;
+            Color c = m.color;
+            CubeFactory f = new CubeFactory(Materials.ShaderType.Transparent, new ColorRange(new Color(c.r, c.g, c.b, c.a / AlphaCoefficient)));
+            GameObject result = f.NewBlock(0, 0);
+            result.GetComponent<MeshRenderer>().material.renderQueue = m.renderQueue;
+            result.transform.position = o.transform.position;
+            result.transform.localScale = o.transform.lossyScale;
+            return result;
         }
     }
 }
