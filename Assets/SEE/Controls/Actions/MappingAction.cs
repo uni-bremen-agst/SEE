@@ -624,6 +624,27 @@ namespace SEE.Controls.Actions
         {
             if (Equals(value, ActionStateType.Map))
             {
+                Assert.IsTrue(activeMappingEdges.Count == 0);
+
+                if (IsValidTarget(InteractableObject.HoveredObject))
+                {
+                    Node to = InteractableObject.HoveredObject.GetNode();
+                    foreach (InteractableObject o in InteractableObject.GetSelectedObjectsOfGraph(implGraph))
+                    {
+                        if (IsValidSource(o))
+                        {
+                            Node from = o.GetNode();
+                            MappingEdge e = new MappingEdge()
+                            {
+                                lineRenderer = CreateEdge(from, to),
+                                from = o.ID,
+                                to = InteractableObject.HoveredObject.ID
+                            };
+                            activeMappingEdges.Add(e);
+                        }
+                    }
+                }
+
                 InteractableObject.AnyHoverIn += AnyHoverIn;
                 InteractableObject.AnyHoverOut += AnyHoverOut;
                 InteractableObject.AnySelectIn += AnySelectIn;
