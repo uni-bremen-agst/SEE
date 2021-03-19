@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
@@ -53,6 +54,9 @@ namespace SEE.Controls.Actions
             internal bool dragHoveredOnly; // true, if only the element, that is hovered by the mouse should be moved instead of whole city
             internal bool drag;
             internal bool cancel;
+            internal bool startShowDiff;
+            internal bool showDiff;
+            internal bool stopShowDiff;
         }
 
         private struct MappingEdge
@@ -118,6 +122,8 @@ namespace SEE.Controls.Actions
         private _MoveState moveState;
         private _ActionState actionState;
         private bool moving = false;
+
+        private readonly List<Tuple<LineRenderer, Color, Color>> originalEdgeColors = new List<Tuple<LineRenderer, Color, Color>>();
 
         /// <summary>
         /// Mapping of edge IDs onto game objects representing these edges in the architecture code city.
@@ -209,79 +215,9 @@ namespace SEE.Controls.Actions
             actionState.startDrag |= !isMouseOverGUI && Input.GetMouseButtonDown(2);
             actionState.dragHoveredOnly = Input.GetKey(KeyCode.LeftControl);
             actionState.cancel |= Input.GetKeyDown(KeyCode.Escape);
-
-#if false
-            //------------------------------------------------------------------------
-            // ARCHITECTURAL MAPPING
-            //------------------------------------------------------------------------
-
-            if (Input.GetMouseButtonDown(0)) // Left mouse button
-            {
-                if (Raycasting.RaycastGraphElement(out RaycastHit _, out GraphElementRef elementRef) == HitGraphElement.Node) 
-                {
-                    // Select, replace or map
-                    NodeRef nodeRef = elementRef as NodeRef;
-
-                    Assert.IsNotNull(nodeRef);
-                    Assert.IsNotNull(nodeRef.Value);
-
-                    if (nodeRef.Value.ItsGraph == implGraph) // Set or replace implementation node
-                    {
-                        if (selection.interactableObject != null)
-                        {
-                            selection.interactableObject.SetSelect(false, true);
-                        }
-                        nodeRef.GetComponent<InteractableObject>().SetSelect(true, true);
-                    }
-                    else if (selection.nodeRef != null) // Create mapping
-                    {
-                        Node n0 = selection.nodeRef.Value;
-                        Node n1 = nodeRef.Value;
-                        if (Reflexion.Is_Explicitly_Mapped(n0))
-                        {
-                            Node mapped = Reflexion.Get_Mapping().GetNode(n0.ID);
-                            Assert.IsTrue(mapped.Outgoings.Count == 1);
-                            Reflexion.Delete_From_Mapping(mapped.Outgoings[0]);
-                        }
-                        Reflexion.Add_To_Mapping(n0, n1);
-                        selection.interactableObject.SetSelect(false, true);
-                    }
-                }
-                else // Deselect
-                {
-                    selection.interactableObject?.SetSelect(false, true);
-                }
-            }
-
-            if (selection.material)
-            {
-                float t = -Mathf.Cos((2.0f * Mathf.PI * highlightTimer) / HighlightLoopTimeInSeconds) * 0.5f + 0.5f;
-                selection.material.color = Color.Lerp(selection.initialColor, selection.highlightColor, t);
-                materialCopy.color = selection.material.color;
-            }
-
-            if (spinningCubeData.go != null)
-            {
-                spinningCubeData.timer += Time.deltaTime;
-                while (spinningCubeData.timer > SpinningCursorCubeLoopTimeInSeconds)
-                {
-                    spinningCubeData.timer -= SpinningCursorCubeLoopTimeInSeconds;
-                }
-                float tPos = Mathf.Sin(2.0f * Mathf.PI * spinningCubeData.timer / SpinningCursorCubeLoopTimeInSeconds * 2.0f) * 0.5f + 0.5f; // y-range: [0.0, 1.0]
-                float gr = 0.5f * MathExtensions.GoldenRatio;
-                float ls = spinningCubeData.go.transform.localScale.x;
-
-                //TODO: Camera.main should be cached for Update(),
-                // as it has CPU overhead comparable to GameObject.GetComponent
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                Physics.Raycast(ray, out RaycastHit hit);
-
-                spinningCubeData.go.transform.position = hit.point + new Vector3(0.0f, gr * ls + tPos * gr * ls, 0.0f);
-                spinningCubeData.go.transform.rotation = Quaternion.AngleAxis(spinningCubeData.timer / SpinningCursorCubeLoopTimeInSeconds * 180.0f, Vector3.up);
-
-                float tCol = Mathf.Sin(2.0f * Mathf.PI * spinningCubeData.timer / SpinningCursorCubeLoopTimeInSeconds) * 0.5f + 0.5f;
-            }
-#endif
+            actionState.startShowDiff |= Input.GetKeyDown(KeyCode.M);
+            actionState.showDiff = Input.GetKey(KeyCode.M);
+            actionState.stopShowDiff |= Input.GetKeyUp(KeyCode.M);
         }
 
         private void FixedUpdate()
@@ -291,6 +227,8 @@ namespace SEE.Controls.Actions
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             Physics.Raycast(ray, out RaycastHit raycastHit);
             Vector3 hit = raycastHit.point;
+
+            #region Mapping
 
             if (actionState.cancel) // cancel movement
             {
@@ -432,10 +370,43 @@ namespace SEE.Controls.Actions
                 }
             }
 
+            #endregion
+
+            #region ColorEdges
+
+            if (actionState.startShowDiff)
+            {
+                if (!actionState.stopShowDiff)
+                {
+                    Assert.IsTrue(originalEdgeColors.Count == 0);
+                    List<Edge> edges = archGraph.Edges();
+                    originalEdgeColors.Capacity = edges.Count;
+                    foreach (Edge edge in edges)
+                    {
+                        EdgeRef edgeRef = EdgeRef.Get(edge);
+                        LineRenderer r = edgeRef.GetComponent<LineRenderer>();
+                        originalEdgeColors.Add(new Tuple<LineRenderer, Color, Color>(r, r.startColor, r.endColor));
+                        LineFactory.SetColor(r, Color.cyan); // TODO(torben): select correct coloring depending on mapping
+                    }
+                }
+            }
+            else if (actionState.stopShowDiff)
+            {
+                foreach (Tuple<LineRenderer, Color, Color> t in originalEdgeColors)
+                {
+                    LineFactory.SetColors(t.Item1, t.Item2, t.Item3);
+                }
+                originalEdgeColors.Clear();
+            }
+
+            #endregion
+
             #region ResetActionState
 
             actionState.startDrag = false;
             actionState.cancel = false;
+            actionState.startShowDiff = false;
+            actionState.stopShowDiff = false;
 
             #endregion
 
