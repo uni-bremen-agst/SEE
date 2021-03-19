@@ -52,5 +52,17 @@ namespace SEE.GO
             Assert.IsNotNull(node);
             return nodeToNodeRefDict[node];
         }
+
+        public static bool TryGet(Node node, out NodeRef nodeRef)
+        {
+            bool result = false;
+            nodeRef = null;
+            if (nodeToNodeRefDict.TryGetValue(node, out NodeRef v))
+            {
+                result = true;
+                nodeRef = v;
+            }
+            return result;
+        }
     }
 }
