@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game.UI.CodeWindow
@@ -86,7 +87,7 @@ namespace SEE.Game.UI.CodeWindow
         public void OnDisable()
         {
             // When disabled, all code windows need to be disabled and hidden.
-            foreach (CodeWindow codeWindow in codeWindows)
+            foreach (CodeWindow codeWindow in codeWindows.FindAll(x => x != null))
             {
                 codeWindow.enabled = false;
             }
@@ -123,5 +124,41 @@ namespace SEE.Game.UI.CodeWindow
         /// The nominal active code window. Changes will be applied on every frame using <see cref="Update"/>.
         /// </summary>
         public CodeWindow ActiveCodeWindow { get; set; }
+
+        public CodeWindowSpaceValues ToValueObject(bool fulltext)
+        {
+            return new CodeWindowSpaceValues(CodeWindows, ActiveCodeWindow, fulltext);
+        }
+        
+        [Serializable]
+        public struct CodeWindowSpaceValues
+        {
+            /// <summary>
+            /// Generated value object of the active code window in this space.
+            /// </summary>
+            [field: SerializeField]
+            public CodeWindow.CodeWindowValues ActiveCodeWindow { get; private set; }
+            
+            /// <summary>
+            /// A list of generated value objects for each code window in this space.
+            /// </summary>
+            [field: SerializeField]
+            public List<CodeWindow.CodeWindowValues> CodeWindows { get; private set; }
+
+            /// <summary>
+            /// Creates a new CodeWindowSpaceValues object from the given parameters.
+            /// Note that this will create a CodeWindowValues object for each code window in the space.
+            /// </summary>
+            /// <param name="codeWindows">List of code windows in the space.</param>
+            /// <param name="activeCodeWindow">Currently active code window in the space.</param>
+            /// <param name="fulltext">Whether the text inside each code window should be saved.
+            /// Iff false, the path to each file will be saved instead.</param>
+            internal CodeWindowSpaceValues(IEnumerable<CodeWindow> codeWindows, CodeWindow activeCodeWindow, bool fulltext)
+            {
+                ActiveCodeWindow = activeCodeWindow.ToValueObject(fulltext);
+                CodeWindows = codeWindows.Select(x => x.ToValueObject(fulltext)).ToList();
+            }
+        }
     }
+
 }

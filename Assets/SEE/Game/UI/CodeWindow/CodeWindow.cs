@@ -26,6 +26,12 @@ namespace SEE.Game.UI.CodeWindow
         private TextMeshProUGUI TextMesh;
 
         /// <summary>
+        /// Path to the file whose content is displayed in this code window.
+        /// May be <c>null</c> if the code window was filled using <see cref="EnterFromText"/> instead.
+        /// </summary>
+        public string FilePath;
+
+        /// <summary>
         /// The title (e.g. filename) for the code window.
         /// </summary>
         public string Title;
@@ -186,6 +192,8 @@ namespace SEE.Game.UI.CodeWindow
                 Text = $"<color=\"red\"><noparse>{exception}</noparse></color>";
                 Debug.LogError(exception);
             }
+
+            FilePath = filename;
         }
 
         /// <summary>
@@ -232,6 +240,74 @@ namespace SEE.Game.UI.CodeWindow
             if (codeWindow)
             {
                 codeWindow.SetActive(true);
+            }
+        }
+
+        /// <summary>
+        /// Generates and returns a <see cref="CodeWindowValues"/> struct for this code window.
+        /// </summary>
+        /// <param name="fulltext">Whether the whole text should be included. Iff false, the filename will be saved
+        /// instead of the text.</param>
+        /// <returns>The newly created <see cref="CodeWindowValues"/>, matching this class</returns>
+        public CodeWindowValues ToValueObject(bool fulltext)
+        {
+            return fulltext ? new CodeWindowValues(Title, VisibleLine, Text) : new CodeWindowValues(Title, VisibleLine, path: FilePath);
+        }
+        
+        /// <summary>
+        /// Represents the values of a code window needed to re-create its content.
+        /// Used for serialization when sending a <see cref="CodeWindow"/> over the network.
+        /// </summary>
+        [Serializable]
+        public struct CodeWindowValues
+        {
+            /// <summary>
+            /// Text of the code window. May be <c>null</c>, in which case <see cref="Path"/> is not <c>null</c>.
+            /// </summary>
+            [field: SerializeField]
+            public string Text { get; private set; }
+
+            /// <summary>
+            /// Path to the file displayed in the code window. May be <c>null</c>, in which case <see cref="Text"/> is not
+            /// <c>null</c>.
+            /// </summary>
+            [field: SerializeField]
+            public string Path { get; private set; }
+
+            /// <summary>
+            /// Title of the code window.
+            /// </summary>
+            [field: SerializeField]
+            public string Title { get; private set; }
+
+            /// <summary>
+            /// The line number which is currently visible in / at the top of the code window.
+            /// </summary>
+            [field: SerializeField]
+            public int VisibleLine { get; private set; }
+
+            /// <summary>
+            /// Creates a new CodeWindowValues object from the given parameters.
+            /// Note that either text or Path must not be <c>null</c>.
+            /// </summary>
+            /// <param name="title">The title of the code window.</param>
+            /// <param name="visibleLine">The line currently at the top of the code window which is fully visible.</param>
+            /// <param name="text">The text of the code window. May be <c>null</c>, in which case
+            /// <paramref name="path"/> is not.</param>
+            /// <param name="path">The path to the file which should be displayed in the code window.
+            /// May be <c>null</c>, in which case <paramref name="text"/> is not.</param>
+            /// <exception cref="ArgumentException">Thrown when both <paramref name="path"/> and
+            /// <paramref name="text"/> are <c>null</c>.</exception>
+            internal CodeWindowValues(string title, int visibleLine, string text = null, string path = null)
+            {
+                if (text == null && path == null)
+                {
+                    throw new ArgumentException("Either text or filename must not be null!");
+                }
+                Text = text;
+                Path = path;
+                Title = title;
+                VisibleLine = visibleLine;
             }
         }
     }
