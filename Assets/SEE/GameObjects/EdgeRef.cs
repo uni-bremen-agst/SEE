@@ -49,5 +49,17 @@ namespace SEE.GO
             Assert.IsNotNull(edge);
             return edgeToEdgeRefDict[edge];
         }
+
+        public static bool TryGet(Edge edge, out EdgeRef edgeRef)
+        {
+            bool result = false;
+            edgeRef = null;
+            if (edgeToEdgeRefDict.TryGetValue(edge, out EdgeRef v))
+            {
+                result = true;
+                edgeRef = v;
+            }
+            return result;
+        }
     }
 }

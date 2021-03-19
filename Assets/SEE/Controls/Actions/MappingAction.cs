@@ -123,7 +123,8 @@ namespace SEE.Controls.Actions
         private _ActionState actionState;
         private bool moving = false;
 
-        private readonly List<Tuple<LineRenderer, Color, Color>> originalEdgeColors = new List<Tuple<LineRenderer, Color, Color>>();
+        private readonly Dictionary<Edge, LineRenderer> edgeToMappingEdges = new Dictionary<Edge, LineRenderer>();
+        private readonly Dictionary<Edge, LineRenderer> edgeToStateEdges = new Dictionary<Edge, LineRenderer>();
 
         /// <summary>
         /// Mapping of edge IDs onto game objects representing these edges in the architecture code city.
@@ -378,25 +379,42 @@ namespace SEE.Controls.Actions
             {
                 if (!actionState.stopShowDiff)
                 {
-                    Assert.IsTrue(originalEdgeColors.Count == 0);
-                    List<Edge> edges = archGraph.Edges();
-                    originalEdgeColors.Capacity = edges.Count;
-                    foreach (Edge edge in edges)
-                    {
-                        EdgeRef edgeRef = EdgeRef.Get(edge);
-                        LineRenderer r = edgeRef.GetComponent<LineRenderer>();
-                        originalEdgeColors.Add(new Tuple<LineRenderer, Color, Color>(r, r.startColor, r.endColor));
-                        LineFactory.SetColor(r, Color.cyan); // TODO(torben): select correct coloring depending on mapping
-                    }
+                    //Assert.IsTrue(originalEdgeColors.Count == 0);
+                    //List<Edge> edges = archGraph.Edges();
+                    //originalEdgeColors.Capacity = edges.Count;
+                    //foreach (Edge edge in edges)
+                    //{
+                    //    if (EdgeRef.TryGet(edge, out EdgeRef edgeRef))
+                    //    {
+                    //        LineRenderer r = edgeRef.GetComponent<LineRenderer>();
+                    //        originalEdgeColors.Add(new Tuple<LineRenderer, Color, Color>(r, r.startColor, r.endColor));
+                    //        State state = Reflexion.Get_State(edge);
+                    //        Color c = Color.white;
+                    //        switch (state)
+                    //        {
+                    //            case State.divergent:
+                    //                c = Color.red;
+                    //                break;
+                    //            case State.absent:
+                    //                c = Color.yellow;
+                    //                break;
+                    //            case State.convergent:
+                    //                c = Color.green;
+                    //                break;
+                    //            default: break;
+                    //        }
+                    //        LineFactory.SetColor(r, c); // TODO(torben): select correct coloring depending on mapping
+                    //    }
+                    //}
                 }
             }
             else if (actionState.stopShowDiff)
             {
-                foreach (Tuple<LineRenderer, Color, Color> t in originalEdgeColors)
-                {
-                    LineFactory.SetColors(t.Item1, t.Item2, t.Item3);
-                }
-                originalEdgeColors.Clear();
+                //foreach (Tuple<LineRenderer, Color, Color> t in originalEdgeColors)
+                //{
+                //    LineFactory.SetColors(t.Item1, t.Item2, t.Item3);
+                //}
+                //originalEdgeColors.Clear();
             }
 
             #endregion
@@ -534,7 +552,7 @@ namespace SEE.Controls.Actions
             }
         }
 
-        private LineRenderer CreateEdge(Node from, Node to)
+        private LineRenderer CreateMappingEdge(Node from, Node to)
         {
             LineRenderer result = null;
 
@@ -560,6 +578,36 @@ namespace SEE.Controls.Actions
             enumerator.MoveNext();
             result = enumerator.Current.GetComponent<LineRenderer>();
             LineFactory.SetColor(result, new Color(1.0f, 1.0f, 1.0f, 0.2f));
+
+            return result;
+        }
+
+        private LineRenderer CreateStateEdge(Node from, Node to)
+        {
+            LineRenderer result = null;
+
+            // TODO(torben): This is way to inefficient to create an edge!!!
+            NodeRef nr0 = NodeRef.Get(from);
+            NodeRef nr1 = NodeRef.Get(to);
+            AbstractSEECity settings = Implementation.GetComponent<SEECity>().Renderer.GetSettings();
+            float minimalEdgeLevelDistance = 2.5f * settings.EdgeWidth;
+
+            IEdgeLayout edgeLayout = new SplineEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance, settings.RDP);
+            NodeFactory nodeFactory = new CubeFactory(Materials.ShaderType.Opaque, new ColorRange(Color.white, Color.white, 1));
+            EdgeFactory factory = new EdgeFactory(edgeLayout, settings.EdgeWidth, settings.TubularSegments, settings.Radius, settings.RadialSegments, settings.isEdgeSelectable);
+
+            Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
+            ILayoutNode fromLayoutNode = new GameNode(to_layout_node, nr0.gameObject, nodeFactory);
+            ILayoutNode toLayoutNode = new GameNode(to_layout_node, nr1.gameObject, nodeFactory);
+            LayoutEdge layoutEdge = new LayoutEdge(fromLayoutNode, toLayoutNode, new Edge(from, to));
+
+            ICollection<ILayoutNode> nodes = new List<ILayoutNode> { fromLayoutNode, toLayoutNode };
+            ICollection<LayoutEdge> edges = new List<LayoutEdge> { layoutEdge };
+
+            IEnumerator<GameObject> enumerator = factory.DrawEdges(nodes, edges).GetEnumerator();
+            enumerator.MoveNext();
+            result = enumerator.Current.GetComponent<LineRenderer>();
+            LineFactory.SetColor(result, new Color(1.0f, 0.0f, 1.0f, 0.3f));
 
             return result;
         }
@@ -607,7 +655,7 @@ namespace SEE.Controls.Actions
                             Node from = o.GetNode();
                             MappingEdge e = new MappingEdge()
                             {
-                                lineRenderer = CreateEdge(from, to),
+                                lineRenderer = CreateMappingEdge(from, to),
                                 from = o.ID,
                                 to = InteractableObject.HoveredObject.ID
                             };
@@ -652,7 +700,7 @@ namespace SEE.Controls.Actions
                         Node from = o.GetNode();
                         MappingEdge e = new MappingEdge()
                         {
-                            lineRenderer = CreateEdge(from, to),
+                            lineRenderer = CreateMappingEdge(from, to),
                             from = o.ID,
                             to = interactableObject.ID
                         };
@@ -686,7 +734,7 @@ namespace SEE.Controls.Actions
                 Node to = InteractableObject.HoveredObject.GetNode();
                 MappingEdge e = new MappingEdge()
                 {
-                    lineRenderer = CreateEdge(from, to),
+                    lineRenderer = CreateMappingEdge(from, to),
                     from = interactableObject.ID,
                     to = InteractableObject.HoveredObject.ID
                 };
@@ -742,10 +790,36 @@ namespace SEE.Controls.Actions
         /// <param name="edgeChange"></param>
         private void HandleEdgeChange(EdgeChange edgeChange)
         {
+            Color c = new Color(0.0f, 0.0f, 0.0f, 0.0f);
+            switch (edgeChange.newState)
+            {
+                case State.divergent:
+                    c = new Color(1.0f, 0.0f, 0.0f, 1.0f / AlphaCoefficient);
+                    break;
+                case State.absent:
+                    c = new Color(1.0f, 1.0f, 0.0f, 1.0f / AlphaCoefficient);
+                    break;
+                case State.convergent:
+                    c = new Color(0.0f, 1.0f, 0.0f, 1.0f / AlphaCoefficient);
+                    break;
+            }
+
+            if (c.a != 0.0f)
+            {
+                LineRenderer r = null;
+                if (!edgeToStateEdges.TryGetValue(edgeChange.edge, out r))
+                {
+                    r = CreateStateEdge(edgeChange.edge.Source, edgeChange.edge.Target);
+                    edgeToStateEdges[edgeChange.edge] = r;
+                }
+                LineFactory.SetColor(r, c);
+            }
+
             Debug.LogFormat("edge of type {0} from {1} to {2} changed its state from {3} to {4}.\n",
                             edgeChange.edge.Type, edgeChange.edge.Source.ID, edgeChange.edge.Target.ID,
                             edgeChange.oldState, edgeChange.newState);
 
+#if false // TODO(torben): we might want to still use some of these decorations
             // Possible edge changes:
             //  for specified architecture dependencies
             //    specified          => {absent, allowed_absent, convergent}
@@ -838,6 +912,7 @@ namespace SEE.Controls.Actions
             {
                 Debug.LogErrorFormat("Edge {0} is unknown.\n", edgeChange.edge.ID);
             }
+#endif
         }
 
         private void HandlePropagatedEdgeRemoved(PropagatedEdgeRemoved propagatedEdgeRemoved)
@@ -861,20 +936,35 @@ namespace SEE.Controls.Actions
         {
             Debug.Log(mapsToEdgeAdded.ToString());
 
-            foreach (MappingEdge e in activeMappingEdges)
+            Edge edge = mapsToEdgeAdded.mapsToEdge;
+            for (int i = 0; i < activeMappingEdges.Count; i++)
             {
-                Color initialColor = e.lineRenderer.startColor;
-                Color highlightColor = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Min(1.0f, AlphaCoefficient * initialColor.a));
-                Color finalColor = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Max(0.05f, initialColor.a / AlphaCoefficient));
+                MappingEdge e = activeMappingEdges[i];
+                Node from = InteractableObject.Get(e.from).GetNodeRef().Value;
+                Node to = InteractableObject.Get(e.to).GetNodeRef().Value;
+                if (from.ID.Equals(edge.Source.ID) && to.ID.Equals(edge.Target.ID))
+                {
+                    activeMappingEdges.RemoveAt(i);
+                    edgeToMappingEdges[edge] = e.lineRenderer;
 
-                EdgeAnimator.Create(e.lineRenderer.gameObject, initialColor, highlightColor, finalColor, 0.3f, 4.0f);
+                    Color initialColor = e.lineRenderer.startColor;
+                    Color highlightColor = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Min(1.0f, AlphaCoefficient * initialColor.a));
+                    Color finalColor = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Max(0.05f, initialColor.a / AlphaCoefficient));
+                    EdgeAnimator.Create(e.lineRenderer.gameObject, initialColor, highlightColor, finalColor, 0.3f, 4.0f);
+
+                    break;
+                }
             }
-            activeMappingEdges.Clear();
         }
 
         private void HandleMapsToEdgeRemoved(MapsToEdgeRemoved mapsToEdgeRemoved)
         {
             Debug.Log(mapsToEdgeRemoved.ToString());
+
+            Edge edge = mapsToEdgeRemoved.mapsToEdge;
+            LineRenderer r = edgeToMappingEdges[edge];
+            edgeToMappingEdges.Remove(edge);
+            Destroy(r.gameObject);
         }
     }
 }
