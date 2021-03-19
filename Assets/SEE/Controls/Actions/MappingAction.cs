@@ -35,8 +35,8 @@ namespace SEE.Controls.Actions
         {
             internal struct AdditionalDraggedObject
             {
-                internal GameObject obj; // The object to be dragged
-                internal Vector3 off;    // The offset to the main dragged transform, that must is to be maintained at all times
+                internal GameObject go;  // The object to be dragged
+                internal Vector3 offset; // The offset to the main dragged transform, that must is to be maintained at all times
             }
 
             internal Vector3 dragStartTransformPosition;
@@ -77,12 +77,15 @@ namespace SEE.Controls.Actions
         [Tooltip("The GXL file containing the mapping from implementation onto architecture entities.")]
         public string MappingFile;
 
+        [Obsolete("This is currently not used for decoration")]
         [Tooltip("Prefab for absences")]
         public GameObject AbsencePrefab;
 
+        [Obsolete("This is currently not used for decoration")]
         [Tooltip("Prefab for convergences")]
         public GameObject ConvergencePrefab;
 
+        [Obsolete("This is currently not used for decoration")]
         [Tooltip("Prefab for divergences")]
         public GameObject DivergencePrefab;
 
@@ -118,23 +121,13 @@ namespace SEE.Controls.Actions
         /// </summary>
         private ReflexionDecorator decorator;
 
-        private readonly List<MappingEdge> activeMappingEdges = new List<MappingEdge>();
+        private readonly List<Tuple<uint, uint, LineRenderer>> activeHoverEdges = new List<Tuple<uint, uint, LineRenderer>>();
         private _MoveState moveState;
         private _ActionState actionState;
         private bool moving = false;
 
         private readonly Dictionary<Edge, LineRenderer> edgeToMappingEdges = new Dictionary<Edge, LineRenderer>();
         private readonly Dictionary<Edge, LineRenderer> edgeToStateEdges = new Dictionary<Edge, LineRenderer>();
-
-        /// <summary>
-        /// Mapping of edge IDs onto game objects representing these edges in the architecture code city.
-        /// </summary>
-        private readonly Dictionary<string, GameObject> architectureEdges = new Dictionary<string, GameObject>();
-
-        /// <summary>
-        /// Mapping of node IDs onto game objects representing these nodes in the architecture code city.
-        /// </summary>
-        private readonly Dictionary<string, GameObject> architectureNodes = new Dictionary<string, GameObject>();
 
         private void Start()
         {
@@ -184,9 +177,6 @@ namespace SEE.Controls.Actions
                 Portal.GetDimensions(Architecture, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
                 decorator = new ReflexionDecorator(AbsencePrefab, ConvergencePrefab, DivergencePrefab, leftFrontCorner, rightBackCorner);
 
-                // Setup game object mappings
-                GatherNodesAndEdges(Architecture, architectureNodes, architectureEdges);
-
                 // Setup reflexion
                 Reflexion = new Reflexion(implGraph, archGraph, mapping);
                 Reflexion.Register(this);
@@ -197,10 +187,10 @@ namespace SEE.Controls.Actions
             ActionState.OnStateChanged += OnStateChanged;
             if (!Assertions.DisableOnCondition(this, !Equals(ActionState.Value, ActionStateType.Map)))
             {
-                InteractableObject.AnyHoverIn += AnyHoverIn;
-                InteractableObject.AnyHoverOut += AnyHoverOut;
-                InteractableObject.AnySelectIn += AnySelectIn;
-                InteractableObject.AnySelectOut += AnySelectOut;
+                InteractableObject.AnyHoverIn += TryCreateOnHoverEdgesTo;
+                InteractableObject.AnyHoverOut += TryDestroyOnHoverEdgesTo;
+                InteractableObject.AnySelectIn += TryCreateHoverEdgeFrom;
+                InteractableObject.AnySelectOut += TryDestroyHoverEdgeFrom;
             }
 
             moveState.additionalDraggedObjs = new List<_MoveState.AdditionalDraggedObject>();
@@ -245,7 +235,7 @@ namespace SEE.Controls.Actions
                     moveState.mainDraggedObj.transform.position = p;
                     foreach (_MoveState.AdditionalDraggedObject o in moveState.additionalDraggedObjs)
                     {
-                        o.obj.transform.position = p + o.off;
+                        o.go.transform.position = p + o.offset;
                     }
                     moveState.mainDraggedObj = null;
                     moveState.additionalDraggedObjs.Clear();
@@ -288,8 +278,8 @@ namespace SEE.Controls.Actions
                             {
                                 _MoveState.AdditionalDraggedObject t = new _MoveState.AdditionalDraggedObject()
                                 {
-                                    obj = CreateGhost(e.Current),
-                                    off = e.Current.transform.position - moveState.mainDraggedObj.transform.position
+                                    go = CreateGhost(e.Current),
+                                    offset = e.Current.transform.position - moveState.mainDraggedObj.transform.position
                                 };
                                 moveState.additionalDraggedObjs.Add(t);
                                 //e.Current.SetGrab(true, true);
@@ -317,7 +307,7 @@ namespace SEE.Controls.Actions
                     moveState.mainDraggedObj.transform.position = newPosition;
                     foreach (_MoveState.AdditionalDraggedObject o in moveState.additionalDraggedObjs)
                     {
-                        o.obj.transform.position = newPosition + o.off;
+                        o.go.transform.position = newPosition + o.offset;
                     }
                     synchronize = true;
                 }
@@ -345,7 +335,7 @@ namespace SEE.Controls.Actions
                 Destroy(moveState.mainDraggedObj);
                 foreach (_MoveState.AdditionalDraggedObject o in moveState.additionalDraggedObjs)
                 {
-                    Destroy(o.obj);
+                    Destroy(o.go);
                 }
 
                 moveState.mainDraggedObj = null;
@@ -363,6 +353,7 @@ namespace SEE.Controls.Actions
                             {
                                 Node mapped = Reflexion.Get_Mapping().GetNode(from.ID);
                                 Assert.IsTrue(mapped.Outgoings.Count == 1);
+                                //edgeToMappingEdges.Remove(mapped.Outgoings[0]);
                                 Reflexion.Delete_From_Mapping(mapped.Outgoings[0]);
                             }
                             Reflexion.Add_To_Mapping(from, to);
@@ -379,42 +370,32 @@ namespace SEE.Controls.Actions
             {
                 if (!actionState.stopShowDiff)
                 {
-                    //Assert.IsTrue(originalEdgeColors.Count == 0);
-                    //List<Edge> edges = archGraph.Edges();
-                    //originalEdgeColors.Capacity = edges.Count;
-                    //foreach (Edge edge in edges)
-                    //{
-                    //    if (EdgeRef.TryGet(edge, out EdgeRef edgeRef))
-                    //    {
-                    //        LineRenderer r = edgeRef.GetComponent<LineRenderer>();
-                    //        originalEdgeColors.Add(new Tuple<LineRenderer, Color, Color>(r, r.startColor, r.endColor));
-                    //        State state = Reflexion.Get_State(edge);
-                    //        Color c = Color.white;
-                    //        switch (state)
-                    //        {
-                    //            case State.divergent:
-                    //                c = Color.red;
-                    //                break;
-                    //            case State.absent:
-                    //                c = Color.yellow;
-                    //                break;
-                    //            case State.convergent:
-                    //                c = Color.green;
-                    //                break;
-                    //            default: break;
-                    //        }
-                    //        LineFactory.SetColor(r, c); // TODO(torben): select correct coloring depending on mapping
-                    //    }
-                    //}
+                    foreach (Edge edge in archGraph.Edges())
+                    {
+                        if (EdgeRef.TryGet(edge, out EdgeRef edgeRef))
+                        {
+                            edgeRef.GetComponent<LineRenderer>().enabled = false;
+                        }
+                    }
+                    foreach (LineRenderer r in edgeToStateEdges.Values)
+                    {
+                        r.enabled = true;
+                    }
                 }
             }
             else if (actionState.stopShowDiff)
             {
-                //foreach (Tuple<LineRenderer, Color, Color> t in originalEdgeColors)
-                //{
-                //    LineFactory.SetColors(t.Item1, t.Item2, t.Item3);
-                //}
-                //originalEdgeColors.Clear();
+                foreach (Edge edge in archGraph.Edges())
+                {
+                    if (EdgeRef.TryGet(edge, out EdgeRef edgeRef))
+                    {
+                        edgeRef.GetComponent<LineRenderer>().enabled = true;
+                    }
+                }
+                foreach (LineRenderer r in edgeToStateEdges.Values)
+                {
+                    r.enabled = false;
+                }
             }
 
             #endregion
@@ -552,7 +533,7 @@ namespace SEE.Controls.Actions
             }
         }
 
-        private LineRenderer CreateMappingEdge(Node from, Node to)
+        private LineRenderer CreateHoverEdge(Node from, Node to)
         {
             LineRenderer result = null;
 
@@ -609,6 +590,8 @@ namespace SEE.Controls.Actions
             result = enumerator.Current.GetComponent<LineRenderer>();
             LineFactory.SetColor(result, new Color(1.0f, 0.0f, 1.0f, 0.3f));
 
+            result.enabled = actionState.showDiff;
+
             return result;
         }
 
@@ -643,117 +626,86 @@ namespace SEE.Controls.Actions
         {
             if (Equals(value, ActionStateType.Map))
             {
-                Assert.IsTrue(activeMappingEdges.Count == 0);
+                Assert.IsTrue(activeHoverEdges.Count == 0);
 
-                if (IsValidTarget(InteractableObject.HoveredObject))
-                {
-                    Node to = InteractableObject.HoveredObject.GetNode();
-                    foreach (InteractableObject o in InteractableObject.GetSelectedObjectsOfGraph(implGraph))
-                    {
-                        if (IsValidSource(o))
-                        {
-                            Node from = o.GetNode();
-                            MappingEdge e = new MappingEdge()
-                            {
-                                lineRenderer = CreateMappingEdge(from, to),
-                                from = o.ID,
-                                to = InteractableObject.HoveredObject.ID
-                            };
-                            activeMappingEdges.Add(e);
-                        }
-                    }
-                }
+                TryCreateOnHoverEdgesTo(InteractableObject.HoveredObject, true);
 
-                InteractableObject.AnyHoverIn += AnyHoverIn;
-                InteractableObject.AnyHoverOut += AnyHoverOut;
-                InteractableObject.AnySelectIn += AnySelectIn;
-                InteractableObject.AnySelectOut += AnySelectOut;
+                InteractableObject.AnyHoverIn += TryCreateOnHoverEdgesTo;
+                InteractableObject.AnyHoverOut += TryDestroyOnHoverEdgesTo;
+                InteractableObject.AnySelectIn += TryCreateHoverEdgeFrom;
+                InteractableObject.AnySelectOut += TryDestroyHoverEdgeFrom;
                 enabled = true;
             }
             else
             {
-                foreach (MappingEdge e in activeMappingEdges)
+                foreach (Tuple<uint, uint, LineRenderer> tuple in activeHoverEdges)
                 {
-                    Destroy(e.lineRenderer.gameObject);
+                    Destroy(tuple.Item3.gameObject);
                 }
-                activeMappingEdges.Clear();
+                activeHoverEdges.Clear();
 
-                InteractableObject.AnyHoverIn -= AnyHoverIn;
-                InteractableObject.AnyHoverOut -= AnyHoverOut;
-                InteractableObject.AnySelectIn -= AnySelectIn;
-                InteractableObject.AnySelectOut -= AnySelectOut;
+                InteractableObject.AnyHoverIn -= TryCreateOnHoverEdgesTo;
+                InteractableObject.AnyHoverOut -= TryDestroyOnHoverEdgesTo;
+                InteractableObject.AnySelectIn -= TryCreateHoverEdgeFrom;
+                InteractableObject.AnySelectOut -= TryDestroyHoverEdgeFrom;
                 enabled = false;
             }
         }
 
-        private void AnyHoverIn(InteractableObject interactableObject, bool isOwner)
+        private void TryCreateOnHoverEdgesTo(InteractableObject toObj, bool isOwner)
         {
-            Assert.IsTrue(activeMappingEdges.Count == 0);
+            Assert.IsTrue(activeHoverEdges.Count == 0);
 
-            if (IsValidTarget(interactableObject))
+            if (IsValidTarget(toObj))
             {
-                Node to = interactableObject.GetNode();
-                foreach (InteractableObject o in InteractableObject.GetSelectedObjectsOfGraph(implGraph))
+                Node toNode = toObj.GetNode();
+                foreach (InteractableObject fromObj in InteractableObject.GetSelectedObjectsOfGraph(implGraph))
                 {
-                    if (IsValidSource(o))
+                    if (IsValidSource(fromObj))
                     {
-                        Node from = o.GetNode();
-                        MappingEdge e = new MappingEdge()
-                        {
-                            lineRenderer = CreateMappingEdge(from, to),
-                            from = o.ID,
-                            to = interactableObject.ID
-                        };
-                        activeMappingEdges.Add(e);
+                        Node fromNode = fromObj.GetNode();
+                        activeHoverEdges.Add(new Tuple<uint, uint, LineRenderer>(fromObj.ID, toObj.ID, CreateHoverEdge(fromNode, toNode)));
                     }
                 }
             }
         }
 
-        private void AnyHoverOut(InteractableObject interactableObject, bool isOwner)
+        private void TryDestroyOnHoverEdgesTo(InteractableObject toObj, bool isOwner)
         {
-            if (IsValidTarget(interactableObject))
+            for (int i = activeHoverEdges.Count - 1; i >= 0; i--)
             {
-                for (int i = activeMappingEdges.Count - 1; i >= 0; i--)
+                Tuple<uint, uint, LineRenderer> tuple = activeHoverEdges[i];
+                if (tuple.Item2 == toObj.ID)
                 {
-                    MappingEdge e = activeMappingEdges[i];
-                    if (e.to == interactableObject.ID)
-                    {
-                        activeMappingEdges.RemoveAt(i);
-                        Destroy(e.lineRenderer.gameObject);
-                    }
+                    Destroy(tuple.Item3.gameObject);
+                    activeHoverEdges.RemoveAt(i);
                 }
             }
         }
 
-        private void AnySelectIn(InteractableObject interactableObject, bool isOwner)
+        private void TryCreateHoverEdgeFrom(InteractableObject fromObj, bool isOwner)
         {
-            if (IsValidSource(interactableObject) && IsValidTarget(InteractableObject.HoveredObject))
+            InteractableObject toObj = InteractableObject.HoveredObject;
+            if (IsValidSource(fromObj) && IsValidTarget(toObj))
             {
-                Node from = interactableObject.GetNode();
-                Node to = InteractableObject.HoveredObject.GetNode();
-                MappingEdge e = new MappingEdge()
-                {
-                    lineRenderer = CreateMappingEdge(from, to),
-                    from = interactableObject.ID,
-                    to = InteractableObject.HoveredObject.ID
-                };
-                activeMappingEdges.Add(e);
+                Node fromNode = fromObj.GetNode();
+                Node toNode = toObj.GetNode();
+                activeHoverEdges.Add(new Tuple<uint, uint, LineRenderer>(fromObj.ID, toObj.ID, CreateHoverEdge(fromNode, toNode)));
             }
         }
 
-        private void AnySelectOut(InteractableObject interactableObject, bool isOwner)
+        private void TryDestroyHoverEdgeFrom(InteractableObject fromObj, bool isOwner)
         {
-            if (IsValidSource(interactableObject))
+            if (IsValidSource(fromObj))
             {
-                for (int i = activeMappingEdges.Count - 1; i >= 0; i--)
+                for (int i = activeHoverEdges.Count - 1; i >= 0; i--)
                 {
-                    MappingEdge e = activeMappingEdges[i];
-                    if (e.from == interactableObject.ID)
+                    Tuple<uint, uint, LineRenderer> tuple = activeHoverEdges[i];
+                    if (tuple.Item1 == fromObj.ID)
                     {
-                        activeMappingEdges.RemoveAt(i);
-                        Destroy(e.lineRenderer.gameObject);
-                        break; // Note: There can only ever be ONE edge coming from a given selected object.
+                        Destroy(tuple.Item3.gameObject);
+                        activeHoverEdges.RemoveAt(i);
+                        break; // Note: There can only ever be ONE edge coming from a given object.
                     }
                 }
             }
@@ -794,20 +746,19 @@ namespace SEE.Controls.Actions
             switch (edgeChange.newState)
             {
                 case State.divergent:
-                    c = new Color(1.0f, 0.0f, 0.0f, 1.0f / AlphaCoefficient);
+                    c = new Color(1.0f, 0.0f, 0.0f, 1.0f);
                     break;
                 case State.absent:
-                    c = new Color(1.0f, 1.0f, 0.0f, 1.0f / AlphaCoefficient);
+                    c = new Color(1.0f, 1.0f, 0.0f, 1.0f);
                     break;
                 case State.convergent:
-                    c = new Color(0.0f, 1.0f, 0.0f, 1.0f / AlphaCoefficient);
+                    c = new Color(0.0f, 1.0f, 0.0f, 1.0f);
                     break;
             }
 
             if (c.a != 0.0f)
             {
-                LineRenderer r = null;
-                if (!edgeToStateEdges.TryGetValue(edgeChange.edge, out r))
+                if (!edgeToStateEdges.TryGetValue(edgeChange.edge, out LineRenderer r))
                 {
                     r = CreateStateEdge(edgeChange.edge.Source, edgeChange.edge.Target);
                     edgeToStateEdges[edgeChange.edge] = r;
@@ -923,13 +874,6 @@ namespace SEE.Controls.Actions
         private void HandlePropagatedEdgeAdded(PropagatedEdgeAdded propagatedEdgeAdded)
         {
             Debug.Log(propagatedEdgeAdded.ToString());
-
-            Edge edge = propagatedEdgeAdded.propagatedEdge;
-            GameObject source = architectureNodes[edge.Source.ID];
-            GameObject target = architectureNodes[edge.Target.ID];
-            List<GameObject> nodes = new List<GameObject> { source, target };
-            // FIXME: Continue here.
-            //ICollection<GameObject> edges = architectureGraphRenderer.EdgeLayout(nodes);
         }
 
         private void HandleMapsToEdgeAdded(MapsToEdgeAdded mapsToEdgeAdded)
@@ -937,24 +881,15 @@ namespace SEE.Controls.Actions
             Debug.Log(mapsToEdgeAdded.ToString());
 
             Edge edge = mapsToEdgeAdded.mapsToEdge;
-            for (int i = 0; i < activeMappingEdges.Count; i++)
-            {
-                MappingEdge e = activeMappingEdges[i];
-                Node from = InteractableObject.Get(e.from).GetNodeRef().Value;
-                Node to = InteractableObject.Get(e.to).GetNodeRef().Value;
-                if (from.ID.Equals(edge.Source.ID) && to.ID.Equals(edge.Target.ID))
-                {
-                    activeMappingEdges.RemoveAt(i);
-                    edgeToMappingEdges[edge] = e.lineRenderer;
-
-                    Color initialColor = e.lineRenderer.startColor;
-                    Color highlightColor = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Min(1.0f, AlphaCoefficient * initialColor.a));
-                    Color finalColor = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Max(0.05f, initialColor.a / AlphaCoefficient));
-                    EdgeAnimator.Create(e.lineRenderer.gameObject, initialColor, highlightColor, finalColor, 0.3f, 4.0f);
-
-                    break;
-                }
-            }
+            Node from = implGraph.GetNode(edge.Source.ID);
+            Node to = archGraph.GetNode(edge.Target.ID);
+            
+            LineRenderer lineRenderer = CreateHoverEdge(from, to);
+            Color initialColor = lineRenderer.startColor;
+            Color highlightColor = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Min(1.0f, AlphaCoefficient * initialColor.a));
+            Color finalColor = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Max(0.05f, initialColor.a / AlphaCoefficient));
+            EdgeAnimator.Create(lineRenderer.gameObject, initialColor, highlightColor, finalColor, 0.3f, 4.0f);
+            edgeToMappingEdges[edge] = lineRenderer;
         }
 
         private void HandleMapsToEdgeRemoved(MapsToEdgeRemoved mapsToEdgeRemoved)
