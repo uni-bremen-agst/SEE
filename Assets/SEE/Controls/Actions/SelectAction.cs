@@ -20,26 +20,9 @@ namespace SEE.Controls.Actions
             else if (select && !isMouseOverGUI)
             {
                 InteractableObject obj = null;
-                if (Raycasting.RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject o) != HitGraphElement.None)
+                if (Raycasting.RaycastInteractableObject(out _, out InteractableObject o) != HitGraphElement.None)
                 {
-                    Transform hoveredTransform = raycastHit.transform;
-                    // parentTransform walks up the game-object hierarchy toward the
-                    // containing CityTransform. If the CityTransform is reached, we
-                    // know that hoveredTransform is part of the CityTransform, thus,
-                    // belongs to the city, we are dealing with.
-                    Transform parentTransform = hoveredTransform;
-                    do
-                    {
-                        if (parentTransform == transform)
-                        {
-                            obj = o;
-                            break;
-                        }
-                        else
-                        {
-                            parentTransform = parentTransform.parent;
-                        }
-                    } while (parentTransform != null);
+                    obj = o;
                 }
 
                 if (toggle)

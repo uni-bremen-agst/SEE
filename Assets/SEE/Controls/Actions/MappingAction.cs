@@ -623,7 +623,7 @@ namespace SEE.Controls.Actions
                     if (e.to == interactableObject.ID)
                     {
                         activeMappingEdges.RemoveAt(i);
-                        Destroy(e.r);
+                        Destroy(e.r.gameObject);
                     }
                 }
             }
@@ -656,7 +656,7 @@ namespace SEE.Controls.Actions
                     if (e.from == interactableObject.ID)
                     {
                         activeMappingEdges.RemoveAt(i);
-                        Destroy(e.r);
+                        Destroy(e.r.gameObject);
                         break; // Note: There can only ever be ONE edge coming from a given selected object.
                     }
                 }

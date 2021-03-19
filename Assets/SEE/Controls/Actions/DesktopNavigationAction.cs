@@ -19,7 +19,6 @@ namespace SEE.Controls.Actions
     [RequireComponent(typeof(CityCursor))]
     [RequireComponent(typeof(Collider))]
     [RequireComponent(typeof(SEECity))]
-    [RequireComponent(typeof(SelectAction))]
     public class DesktopNavigationAction : NavigationAction
     {
         /// <summary>
@@ -81,8 +80,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         [Tooltip("The cursor to visualize the center of the selection")]
         [SerializeField] private CityCursor cursor;
-
-        [SerializeField] private SelectAction selectAction;
 
         /// <summary>
         /// The plane, the city is located on top of.
