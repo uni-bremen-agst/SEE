@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using SEE.Game.UI;
+﻿using System.Linq;
 using SEE.Game.UI.CodeWindow;
 using SEE.GO;
 using UnityEngine;
@@ -28,29 +26,9 @@ namespace SEE.Controls.Actions
         private readonly ActionStateType ThisActionState = ActionStateType.ShowCode;
 
         /// <summary>
-        /// String representing the local player.
+        /// Manager object who takes care of the player selection menu and code space dictionary for us.
         /// </summary>
-        private const string LOCAL_PLAYER = "Local player";
-
-        /// <summary>
-        /// String representing no player, i.e. no code windows being displayed.
-        /// </summary>
-        private const string NO_PLAYER = "None";
-        
-        /// <summary>
-        /// The name of the player whose code window is currently displayed.
-        /// </summary>
-        private string CurrentPlayer = LOCAL_PLAYER;
-
-        /// <summary>
-        /// A dictionary mapping player names to their code window spaces.
-        /// </summary>
-        private readonly Dictionary<string, CodeWindowSpace> CodeSpaces = new Dictionary<string, CodeWindowSpace>();
-
-        /// <summary>
-        /// The menu from which the user can select the player whose code windows they want to see.
-        /// </summary>
-        private SelectionMenu CodeWindowMenu;
+        private CodeSpaceManager spaceManager;
 
         /// <summary>
         /// The selected node.
@@ -94,45 +72,9 @@ namespace SEE.Controls.Actions
             };
             enabled = ActionState.Is(ThisActionState);
 
-            // Create local code window space and associate it with current player
-            if (!TryGetComponent(out CodeWindowSpace space))
+            if (!gameObject.TryGetComponent<CodeSpaceManager>(out spaceManager))
             {
-                space = gameObject.AddComponent<CodeWindowSpace>();
-            }
-            CodeSpaces[LOCAL_PLAYER] = space;
-
-            CodeWindowMenu = SetUpWindowSelectionMenu();
-        }
-
-        /// <summary>
-        /// Creates and sets up the code window selection menu, from which the user can select a player whose
-        /// code window they want to see. Initially, this will have the entries "local player" and "none".
-        /// </summary>
-        /// <returns>The newly created <see cref="SelectionMenu"/></returns>
-        private SelectionMenu SetUpWindowSelectionMenu()
-        {
-            //TODO: Icons
-            SelectionMenu menu = gameObject.AddComponent<SelectionMenu>();
-            ToggleMenuEntry localEntry = new ToggleMenuEntry(true, () => ActivateSpace(LOCAL_PLAYER), 
-                                                             DeactivateCurrentSpace, LOCAL_PLAYER,
-                                                             "Code windows for the local player (you).", Color.black);
-            ToggleMenuEntry noneEntry = new ToggleMenuEntry(false, () => CurrentPlayer = NO_PLAYER, () => { }, NO_PLAYER, 
-                                                            "This option hides all code windows.", Color.grey);
-            menu.AddEntry(localEntry);
-            menu.AddEntry(noneEntry);
-            menu.Title = "Code Window Selection";
-            menu.Description = "Select the player whose code windows you want to see.";
-            return menu;
-            
-            void ActivateSpace(string playerName)
-            {
-                CodeSpaces[playerName].enabled = true;
-                CurrentPlayer = playerName;
-            }
-
-            void DeactivateCurrentSpace()
-            {
-                CodeSpaces[CurrentPlayer].enabled = false;
+                spaceManager = gameObject.AddComponent<CodeSpaceManager>();
             }
         }
 
@@ -148,14 +90,9 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            // Show selection menu on TAB
-            if (Input.GetKeyDown(KeyCode.Tab))
-            {
-                CodeWindowMenu.ToggleMenu();
-            }
-
             // Only allow local player to open new code windows
-            if (CurrentPlayer == LOCAL_PLAYER && !Equals(selectedNode?.Value, currentlySelectedNode?.Value))
+            if (spaceManager.CurrentPlayer == CodeSpaceManager.LOCAL_PLAYER 
+                && !Equals(selectedNode?.Value, currentlySelectedNode?.Value))
             {
                 currentlySelectedNode = selectedNode;
                 // If nothing is selected, there's nothing more we need to do
@@ -193,9 +130,9 @@ namespace SEE.Controls.Actions
                 }
                     
                 // Add code window to our space of code windows
-                CodeSpaces[LOCAL_PLAYER].AddCodeWindow(codeWindow);
+                spaceManager[CodeSpaceManager.LOCAL_PLAYER].AddCodeWindow(codeWindow);
 
-                CodeSpaces[LOCAL_PLAYER].ActiveCodeWindow = codeWindow;
+                spaceManager[CodeSpaceManager.LOCAL_PLAYER].ActiveCodeWindow = codeWindow;
                 //TODO: Set font size etc per SEECity settings (maybe, or maybe that's too much)
             }
         }
