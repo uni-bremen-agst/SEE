@@ -1079,5 +1079,10 @@ namespace SEE.DataModel.DG
             }
             return result.ToList();
         }
+
+        public static implicit operator bool(Graph graph)
+        {
+            return graph != null;
+        }
     }
 }

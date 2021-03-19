@@ -294,24 +294,32 @@ namespace SEE.Controls.Actions
 
             if (actionState.cancel) // cancel movement
             {
-                //if (moving)
-                //{
-                //    moving = false;
-                //
-                //    moveState.draggedTransform.GetComponent<InteractableObject>().SetGrab(false, true);
-                //    moveState.moveGizmo.gameObject.SetActive(false);
-                //
-                //    moveState.moveVelocity = Vector3.zero;
-                //    moveState.draggedTransform.position =
-                //        moveState.dragStartTransformPosition + moveState.dragStartOffset
-                //        - Vector3.Scale(moveState.dragCanonicalOffset, moveState.draggedTransform.localScale);
-                //    moveState.draggedTransform = null;
-                //    synchronize = true;
-                //}
-                //else
-                //{
-                //    Select(null, true);
-                //}
+                if (moving)
+                {
+                    moving = false;
+                
+                    //moveState.draggedTransform.GetComponent<InteractableObject>().SetGrab(false, true);
+                
+                    moveState.moveVelocity = Vector3.zero;
+                    Vector3 p = moveState.dragStartTransformPosition + moveState.dragStartOffset
+                        - Vector3.Scale(moveState.dragCanonicalOffset, moveState.mainDraggedObj.transform.localScale);
+                    moveState.mainDraggedObj.transform.position = p;
+                    foreach (_MoveState.AdditionalDraggedObject o in moveState.additionalDraggedObjs)
+                    {
+                        o.obj.transform.position = p + o.off;
+                    }
+                    moveState.mainDraggedObj = null;
+                    moveState.additionalDraggedObjs.Clear();
+                    synchronize = true;
+                }
+                else
+                {
+                    InteractableObject o = InteractableObject.HoveredObject;
+                    if (o)
+                    {
+                        InteractableObject.UnselectAllInGraph(o.ItsGraph(), true);
+                    }
+                }
             }
             else if (actionState.drag) // start or continue movement
             {
@@ -361,8 +369,6 @@ namespace SEE.Controls.Actions
 
                 if (moving) // continue movement
                 {
-                    synchronize = true;
-
                     Vector3 totalDragOffsetFromStart = hit - (moveState.dragStartTransformPosition + moveState.dragStartOffset);
 
                     Vector3 oldPosition = moveState.mainDraggedObj.transform.position;
@@ -374,19 +380,19 @@ namespace SEE.Controls.Actions
                     {
                         o.obj.transform.position = newPosition + o.off;
                     }
+                    synchronize = true;
                 }
             }
             else if (moving) // finalize movement
             {
                 //if (moveState.mainDraggedObj.transform != CityTransform) // only reparent non-root nodes
                 //{
-                //    synchronize = true;
-                //
                 //    Transform movingObject = moveState.mainDraggedObj.transform;
                 //    Vector3 originalPosition = moveState.dragStartTransformPosition + moveState.dragStartOffset
                 //            - Vector3.Scale(moveState.dragCanonicalOffset, movingObject.localScale);
                 //
                 //    GameNodeMover.FinalizePosition(movingObject.gameObject, originalPosition);
+                //    synchronize = true;
                 //}
 
                 moving = false;
@@ -426,8 +432,21 @@ namespace SEE.Controls.Actions
                 }
             }
 
+            #region ResetActionState
+
             actionState.startDrag = false;
             actionState.cancel = false;
+
+            #endregion
+
+            #region Synchronize
+
+            if (synchronize)
+            {
+                // TODO(torben): synchronize new edges. also sync edge color animations
+            }
+
+            #endregion
         }
 
         /// <summary>
