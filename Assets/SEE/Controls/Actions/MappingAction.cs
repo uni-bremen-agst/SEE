@@ -126,7 +126,7 @@ namespace SEE.Controls.Actions
         private _ActionState actionState;
         private bool moving = false;
 
-        private readonly Dictionary<Edge, LineRenderer> edgeToMappingEdges = new Dictionary<Edge, LineRenderer>();
+        private readonly Dictionary<Edge, LineRenderer> edgeToFinalizedMappingEdges = new Dictionary<Edge, LineRenderer>();
         private readonly Dictionary<Edge, LineRenderer> edgeToStateEdges = new Dictionary<Edge, LineRenderer>();
 
         private void Start()
@@ -226,9 +226,9 @@ namespace SEE.Controls.Actions
                 if (moving)
                 {
                     moving = false;
-                
+
                     //moveState.draggedTransform.GetComponent<InteractableObject>().SetGrab(false, true);
-                
+
                     moveState.moveVelocity = Vector3.zero;
                     Vector3 p = moveState.dragStartTransformPosition + moveState.dragStartOffset
                         - Vector3.Scale(moveState.dragCanonicalOffset, moveState.mainDraggedObj.transform.localScale);
@@ -340,7 +340,7 @@ namespace SEE.Controls.Actions
 
                 moveState.mainDraggedObj = null;
                 moveState.additionalDraggedObjs.Clear();
-                
+
                 if (IsValidTarget(InteractableObject.HoveredObject))
                 {
                     Node to = InteractableObject.HoveredObject.GetNode();
@@ -433,39 +433,40 @@ namespace SEE.Controls.Actions
             switch (rootGameObject.tag)
             {
                 case Tags.Edge when rootGameObject.TryGetComponent(out EdgeRef edgeRef):
-                {
-                    Edge edge = edgeRef.Value;
-                    if (edge != null)
                     {
-                        edges[edge.ID] = rootGameObject;
-                    }
-                    else
-                    {
-                        Debug.LogErrorFormat("Game-object edge {0} without an invalid graph edge reference.\n", rootGameObject.name);
-                    }
+                        Edge edge = edgeRef.Value;
+                        if (edge != null)
+                        {
+                            edges[edge.ID] = rootGameObject;
+                        }
+                        else
+                        {
+                            Debug.LogErrorFormat("Game-object edge {0} without an invalid graph edge reference.\n", rootGameObject.name);
+                        }
 
-                    break;
-                }
+                        break;
+                    }
                 case Tags.Edge:
-                {
-                    Debug.LogErrorFormat("Game-object edge {0} without graph edge reference.\n", rootGameObject.name);
-                    break;
-                }
+                    {
+                        Debug.LogErrorFormat("Game-object edge {0} without graph edge reference.\n", rootGameObject.name);
+                        break;
+                    }
                 case Tags.Node when rootGameObject.TryGetComponent(out NodeRef nodeRef):
-                {
-                    Node node = nodeRef.Value;
-                    if (node != null)
                     {
-                        nodes[node.ID] = rootGameObject;
-                    }
-                    else
-                    {
-                        Debug.LogErrorFormat("Game-object node {0} without an invalid graph node reference.\n", rootGameObject.name);
-                    }
+                        Node node = nodeRef.Value;
+                        if (node != null)
+                        {
+                            nodes[node.ID] = rootGameObject;
+                        }
+                        else
+                        {
+                            Debug.LogErrorFormat("Game-object node {0} without an invalid graph node reference.\n", rootGameObject.name);
+                        }
 
-                    break;
-                }
-                case Tags.Node: Debug.LogErrorFormat("Game-object node {0} without graph node reference.\n", rootGameObject.name);
+                        break;
+                    }
+                case Tags.Node:
+                    Debug.LogErrorFormat("Game-object node {0} without graph node reference.\n", rootGameObject.name);
                     break;
             }
 
@@ -533,9 +534,12 @@ namespace SEE.Controls.Actions
             }
         }
 
-        private LineRenderer CreateHoverEdge(Node from, Node to)
+        private LineRenderer CreateHoverEdge(string fromID, string toID)
         {
             LineRenderer result = null;
+
+            Node from = implGraph.GetNode(fromID);
+            Node to = archGraph.GetNode(toID);
 
             // TODO(torben): This is way to inefficient to create an edge!!!
             NodeRef nr0 = NodeRef.Get(from);
@@ -560,6 +564,16 @@ namespace SEE.Controls.Actions
             result = enumerator.Current.GetComponent<LineRenderer>();
             LineFactory.SetColor(result, new Color(1.0f, 1.0f, 1.0f, 0.2f));
 
+            return result;
+        }
+
+        private LineRenderer CreateFinalizedHoverEdge(string fromID, string toID)
+        {
+            LineRenderer result = CreateHoverEdge(fromID, toID);
+            Color initialColor = result.startColor;
+            Color highlightColor = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Min(1.0f, AlphaCoefficient * initialColor.a));
+            Color finalColor = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Max(0.05f, initialColor.a / AlphaCoefficient));
+            EdgeAnimator.Create(result.gameObject, initialColor, highlightColor, finalColor, 0.3f, 4.0f);
             return result;
         }
 
@@ -618,6 +632,96 @@ namespace SEE.Controls.Actions
             return o != null && o.GraphElemRef is NodeRef && o.GraphElemRef.elem.ItsGraph.Equals(archGraph);
         }
 
+        public void UpdateGrabbed()
+        {
+            Tuple<uint, uint, LineRenderer> _RegenerateTuple(Tuple<uint, uint, LineRenderer> tuple)
+            {
+                Destroy(tuple.Item3.gameObject);
+                Node from = InteractableObject.Get(tuple.Item1).GetNode();
+                Node to = InteractableObject.Get(tuple.Item2).GetNode();
+                LineRenderer lineRenderer = CreateFinalizedHoverEdge(from.ID, to.ID);
+                return new Tuple<uint, uint, LineRenderer>(tuple.Item1, tuple.Item2, lineRenderer);
+            }
+
+            foreach (InteractableObject o in InteractableObject.GrabbedObjects)
+            {
+                if (IsValidSource(o))
+                {
+                    InteractableObject fromObj = o;
+                    for (int i = activeHoverEdges.Count - 1; i >= 0; i--)
+                    {
+                        Tuple<uint, uint, LineRenderer> tuple = activeHoverEdges[i];
+                        if (tuple.Item1 == fromObj.ID)
+                        {
+                            activeHoverEdges[i] = _RegenerateTuple(tuple);
+                        }
+                    }
+                }
+                else if (IsValidTarget(o))
+                {
+                    InteractableObject toObj = o;
+                    for (int i = activeHoverEdges.Count - 1; i >= 0; i--)
+                    {
+                        Tuple<uint, uint, LineRenderer> tuple = activeHoverEdges[i];
+                        if (tuple.Item2 == toObj.ID)
+                        {
+                            activeHoverEdges[i] = _RegenerateTuple(tuple);
+                        }
+                    }
+                }
+            }
+
+            bool _EdgeConnectsObjOrChild(Edge edge, NodeRef nodeRef)
+            {
+                bool result = false;
+
+                string id = nodeRef.Value.ID;
+                if (id.Equals(edge.Source.ID) || id.Equals(edge.Target.ID))
+                {
+                    result = true;
+                }
+
+                if (!result)
+                {
+                    Transform t = nodeRef.transform;
+                    for (int i = 0; i < t.childCount; i++)
+                    {
+                        NodeRef child = t.GetChild(i).GetComponent<NodeRef>();
+                        if (child && _EdgeConnectsObjOrChild(edge, child))
+                        {
+                            result = true;
+                            break;
+                        }
+                    }
+                }
+
+                return result;
+            }
+
+            // TODO(torben): This may become slow, if many edges are mapped (O(n^2))
+            List<Tuple<Edge, LineRenderer>> changes = new List<Tuple<Edge, LineRenderer>>();
+            foreach (KeyValuePair<Edge, LineRenderer> pair in edgeToFinalizedMappingEdges)
+            {
+                Edge edge = pair.Key;
+                LineRenderer lineRenderer = pair.Value;
+
+                foreach (InteractableObject o in InteractableObject.GrabbedObjects)
+                {
+                    if (o.TryGetNodeRef(out NodeRef nodeRef) && _EdgeConnectsObjOrChild(edge, nodeRef))
+                    {
+                        // TODO(torben): animation might be active
+                        Destroy(lineRenderer.gameObject);
+                        changes.Add(new Tuple<Edge, LineRenderer>(edge, CreateFinalizedHoverEdge(edge.Source.ID, edge.Target.ID)));
+                        break;
+                    }
+                }
+            }
+            foreach (Tuple<Edge, LineRenderer> change in changes)
+            {
+                edgeToFinalizedMappingEdges[change.Item1] = change.Item2;
+            }
+        }
+
         //----------------------------------------------------------------
         // Events
         //----------------------------------------------------------------
@@ -664,7 +768,7 @@ namespace SEE.Controls.Actions
                     if (IsValidSource(fromObj))
                     {
                         Node fromNode = fromObj.GetNode();
-                        activeHoverEdges.Add(new Tuple<uint, uint, LineRenderer>(fromObj.ID, toObj.ID, CreateHoverEdge(fromNode, toNode)));
+                        activeHoverEdges.Add(new Tuple<uint, uint, LineRenderer>(fromObj.ID, toObj.ID, CreateHoverEdge(fromNode.ID, toNode.ID)));
                     }
                 }
             }
@@ -690,7 +794,7 @@ namespace SEE.Controls.Actions
             {
                 Node fromNode = fromObj.GetNode();
                 Node toNode = toObj.GetNode();
-                activeHoverEdges.Add(new Tuple<uint, uint, LineRenderer>(fromObj.ID, toObj.ID, CreateHoverEdge(fromNode, toNode)));
+                activeHoverEdges.Add(new Tuple<uint, uint, LineRenderer>(fromObj.ID, toObj.ID, CreateHoverEdge(fromNode.ID, toNode.ID)));
             }
         }
 
@@ -721,17 +825,23 @@ namespace SEE.Controls.Actions
         {
             switch (changeEvent)
             {
-                case EdgeChange changedEvent: HandleEdgeChange(changedEvent);
+                case EdgeChange changedEvent:
+                    HandleEdgeChange(changedEvent);
                     break;
-                case PropagatedEdgeAdded changedEvent: HandlePropagatedEdgeAdded(changedEvent);
+                case PropagatedEdgeAdded changedEvent:
+                    HandlePropagatedEdgeAdded(changedEvent);
                     break;
-                case PropagatedEdgeRemoved changedEvent: HandlePropagatedEdgeRemoved(changedEvent);
+                case PropagatedEdgeRemoved changedEvent:
+                    HandlePropagatedEdgeRemoved(changedEvent);
                     break;
-                case MapsToEdgeAdded changedEvent: HandleMapsToEdgeAdded(changedEvent);
+                case MapsToEdgeAdded changedEvent:
+                    HandleMapsToEdgeAdded(changedEvent);
                     break;
-                case MapsToEdgeRemoved changedEvent: HandleMapsToEdgeRemoved(changedEvent);
+                case MapsToEdgeRemoved changedEvent:
+                    HandleMapsToEdgeRemoved(changedEvent);
                     break;
-                default: Debug.LogErrorFormat("UNHANDLED CALLBACK: {0}\n", changeEvent);
+                default:
+                    Debug.LogErrorFormat("UNHANDLED CALLBACK: {0}\n", changeEvent);
                     break;
             }
         }
@@ -881,15 +991,8 @@ namespace SEE.Controls.Actions
             Debug.Log(mapsToEdgeAdded.ToString());
 
             Edge edge = mapsToEdgeAdded.mapsToEdge;
-            Node from = implGraph.GetNode(edge.Source.ID);
-            Node to = archGraph.GetNode(edge.Target.ID);
-            
-            LineRenderer lineRenderer = CreateHoverEdge(from, to);
-            Color initialColor = lineRenderer.startColor;
-            Color highlightColor = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Min(1.0f, AlphaCoefficient * initialColor.a));
-            Color finalColor = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Max(0.05f, initialColor.a / AlphaCoefficient));
-            EdgeAnimator.Create(lineRenderer.gameObject, initialColor, highlightColor, finalColor, 0.3f, 4.0f);
-            edgeToMappingEdges[edge] = lineRenderer;
+            LineRenderer lineRenderer = CreateFinalizedHoverEdge(edge.Source.ID, edge.Target.ID);
+            edgeToFinalizedMappingEdges[edge] = lineRenderer;
         }
 
         private void HandleMapsToEdgeRemoved(MapsToEdgeRemoved mapsToEdgeRemoved)
@@ -897,8 +1000,8 @@ namespace SEE.Controls.Actions
             Debug.Log(mapsToEdgeRemoved.ToString());
 
             Edge edge = mapsToEdgeRemoved.mapsToEdge;
-            LineRenderer r = edgeToMappingEdges[edge];
-            edgeToMappingEdges.Remove(edge);
+            LineRenderer r = edgeToFinalizedMappingEdges[edge];
+            edgeToFinalizedMappingEdges.Remove(edge);
             Destroy(r.gameObject);
         }
     }
