@@ -243,7 +243,7 @@ namespace SEE.Controls.Actions
                     }
                     else
                     {
-                        Select(null, true);
+                        InteractableObject.UnselectAllInGraph(city.LoadedGraph, true);
                     }
                 }
                 else if (actionState.drag && hitPlane) // start or continue movement
@@ -310,13 +310,12 @@ namespace SEE.Controls.Actions
                 {
                     if (moveState.draggedTransform != CityTransform) // only reparent non-root nodes
                     {
-                        synchronize = true;
-
                         Transform movingObject = moveState.draggedTransform;
                         Vector3 originalPosition = moveState.dragStartTransformPosition + moveState.dragStartOffset
                                 - Vector3.Scale(moveState.dragCanonicalOffset, movingObject.localScale);
 
                         GameNodeMover.FinalizePosition(movingObject.gameObject, originalPosition);
+                        synchronize = true;
                     }
 
                     movingOrRotating = false;
@@ -365,7 +364,7 @@ namespace SEE.Controls.Actions
                     }
                     else
                     {
-                        Select(null, true);
+                        InteractableObject.UnselectAllInGraph(city.LoadedGraph, true);
                     }
                 }
                 else if (actionState.drag && hitPlane && cursor.E.HasFocus()) // start or continue rotation
@@ -534,10 +533,16 @@ namespace SEE.Controls.Actions
             if (Equals(value, ActionStateType.Move))
             {
                 rotateState.rotateGizmo?.gameObject.SetActive(false);
+                enabled = true;
             }
             else if (Equals(value, ActionStateType.Rotate))
             {
                 moveState.moveGizmo?.gameObject.SetActive(false);
+                enabled = true;
+            }
+            else
+            {
+                enabled = false;
             }
         }
 
@@ -549,28 +554,6 @@ namespace SEE.Controls.Actions
         private static float AngleMod(float degrees)
         {
             return ((degrees % 360.0f) + 360.0f) % 360.0f;
-        }
-
-        /// <summary>
-        /// If <paramref name="replaceAndDontToggle"/> is <code>true</code>, the given
-        /// object (if not <code>null</code>) will be selected and every selected object
-        /// will be deselected. Otherwise, the given objects selection state will be
-        /// toggled and the selection state of other selected objects will not change.
-        /// </summary>
-        /// <param name="go">The object to be selected/toggled.</param>
-        /// <param name="replaceAndDontToggle">Whether the object should be selected
-        /// solely or be toggled on/off.</param>
-        private void Select(InteractableObject io, bool replaceAndDontToggle)
-        {
-            if (replaceAndDontToggle)
-            {
-                InteractableObject.UnselectAllInGraph(city.LoadedGraph, true);
-                io?.SetSelect(true, true);
-            }
-            else // replaceAndDontToggle == false
-            {
-                io?.SetSelect(!io.IsSelected, true);
-            }
         }
 
         /// <summary>

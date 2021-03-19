@@ -142,6 +142,11 @@ namespace SEE.Controls
             return (Edge)GraphElemRef.elem;
         }
 
+        public Graph ItsGraph()
+        {
+            return GraphElemRef.elem.ItsGraph;
+        }
+
         /// <summary>
         /// A bit vector for hovering flags. Each flag is a bit as defined in <see cref="HoverFlag"/>.
         /// If the bit is set, this <see cref="InteractableObject"/> is to be considered hovered over for interaction
@@ -256,6 +261,8 @@ namespace SEE.Controls
         /// <param name="isOwner">Whether this client is initiating the hovering action.</param>
         public void SetHoverFlags(uint hoverFlags, bool isOwner)
         {
+            Assert.IsTrue(HoverFlags != hoverFlags);
+
             HoverFlags = hoverFlags;
 
             if (IsHovered)
@@ -344,14 +351,9 @@ namespace SEE.Controls
         /// <param name="isOwner">Whether this client is initiating the selection action.</param>
         public void SetSelect(bool select, bool isOwner)
         {
-            IsSelected = select;
+            Assert.IsTrue(IsSelected != select);
 
-            if (!IsGrabbed && !IsSelected && IsHovered)
-            {
-                // Hovering is a continuous operation, that is why we call it here
-                // when the object is in the focus but neither grabbed nor selected.
-                SetHoverFlag(HoverFlag.None, true, isOwner); // TODO(torben): is this really necessary? a hover event is invoked, even though nothing changes. these events also create unnecessary performance overhead. also: @DoubleHoverEventPerformance
-            }
+            IsSelected = select;
 
             if (select)
             {
@@ -442,6 +444,8 @@ namespace SEE.Controls
         /// <param name="isOwner">Whether this client is initiating the grabbing action.</param>
         public void SetGrab(bool grab, bool isOwner)
         {
+            Assert.IsTrue(IsGrabbed != grab);
+
             IsGrabbed = grab;
 
             if (grab)
@@ -467,17 +471,6 @@ namespace SEE.Controls
                     // Non-local player are not concerned here.
                     LocalGrabOut?.Invoke(this);
                     LocalAnyGrabOut?.Invoke(this);
-                }
-
-                // Hovering and selection are continuous operations, that is why we call them here
-                // when the object is in the focus but not grabbed any longer.
-                if (IsSelected)
-                {
-                    SetSelect(true, isOwner); // See: @DoubleHoverEventPerformance
-                }
-                else if (IsHovered)
-                {
-                    SetHoverFlag(HoverFlag.None, true, isOwner); // See: @DoubleHoverEventPerformance
                 }
                 GrabbedObjects.Remove(this);
             }
