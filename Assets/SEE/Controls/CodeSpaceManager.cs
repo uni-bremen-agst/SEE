@@ -2,6 +2,7 @@
 using SEE.Game.UI;
 using SEE.Game.UI.CodeWindow;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SEE.Controls
 {
@@ -30,7 +31,12 @@ namespace SEE.Controls
         /// <summary>
         /// A dictionary mapping player names to their code window spaces.
         /// </summary>
-        private readonly Dictionary<string, CodeWindowSpace> CodeSpaces = new Dictionary<string, CodeWindowSpace>();
+        public readonly Dictionary<string, CodeWindowSpace> CodeSpaces = new Dictionary<string, CodeWindowSpace>();
+
+        /// <summary>
+        /// This event will be invoked whenever the active code window for the <see cref="LOCAL_PLAYER"/> is changed.
+        /// </summary>
+        public UnityEvent OnActiveCodeWindowChanged = new UnityEvent();
 
         /// <summary>
         /// The menu from which the user can select the player whose code windows they want to see.
@@ -39,11 +45,12 @@ namespace SEE.Controls
 
         /// <summary>
         /// Accesses the code window space for the given <paramref name="playerName"/>.
+        /// If the given <paramref name="playerName"/> does not exist, <c>null</c> will be returned.
         /// </summary>
         /// <param name="playerName">The name of the player whose code window space should be returned.</param>
         public CodeWindowSpace this[string playerName]
         {
-            get => CodeSpaces[playerName];
+            get => CodeSpaces.ContainsKey(playerName) ? CodeSpaces[playerName] : null;
             set => CodeSpaces[playerName] = value;
         }
 
@@ -55,6 +62,7 @@ namespace SEE.Controls
                 space = gameObject.AddComponent<CodeWindowSpace>();
             }
             CodeSpaces[LOCAL_PLAYER] = space;
+            space.OnActiveCodeWindowChanged.AddListener(OnActiveCodeWindowChanged.Invoke);
             
             CodeWindowMenu = SetUpWindowSelectionMenu();
         }

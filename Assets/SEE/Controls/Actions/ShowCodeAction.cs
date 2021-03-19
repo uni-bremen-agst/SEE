@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using SEE.Game.UI.CodeWindow;
 using SEE.GO;
+using SEE.Net;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -29,6 +30,11 @@ namespace SEE.Controls.Actions
         /// Manager object who takes care of the player selection menu and code space dictionary for us.
         /// </summary>
         private CodeSpaceManager spaceManager;
+
+        /// <summary>
+        /// Action responsible for synchronizing the code spaces across the network.
+        /// </summary>
+        private SyncCodeSpaceAction syncAction;
 
         /// <summary>
         /// The selected node.
@@ -76,6 +82,9 @@ namespace SEE.Controls.Actions
             {
                 spaceManager = gameObject.AddComponent<CodeSpaceManager>();
             }
+
+            syncAction = new SyncCodeSpaceAction(spaceManager[CodeSpaceManager.LOCAL_PLAYER]);
+            spaceManager.OnActiveCodeWindowChanged.AddListener(() => syncAction.UpdateSpace(spaceManager[CodeSpaceManager.LOCAL_PLAYER]));
         }
 
         private void Update()
@@ -133,6 +142,9 @@ namespace SEE.Controls.Actions
                 spaceManager[CodeSpaceManager.LOCAL_PLAYER].AddCodeWindow(codeWindow);
 
                 spaceManager[CodeSpaceManager.LOCAL_PLAYER].ActiveCodeWindow = codeWindow;
+                //TODO: Scroll event should also be called when scrolling manually
+                //FIXME: also, scrolling doesn't work anymore
+                codeWindow.ScrollEvent.AddListener(() => syncAction.UpdateSpace(spaceManager[CodeSpaceManager.LOCAL_PLAYER]));
                 //TODO: Set font size etc per SEECity settings (maybe, or maybe that's too much)
             }
         }

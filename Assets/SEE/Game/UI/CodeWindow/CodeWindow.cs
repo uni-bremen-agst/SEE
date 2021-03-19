@@ -5,7 +5,7 @@ using DG.Tweening;
 using SEE.GO;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Events;
 
 namespace SEE.Game.UI.CodeWindow
 {
@@ -48,8 +48,9 @@ namespace SEE.Game.UI.CodeWindow
 
         /// <summary>
         /// An event which gets called whenever the scrollbar is used to scroll to a different line.
+        /// Will be called after the scroll is completed.
         /// </summary>
-        public ScrollRect.ScrollRectEvent ScrollEvent;
+        public UnityEvent ScrollEvent = new UnityEvent();
 
         /// <summary>
         /// The line currently at the top of the window.
@@ -83,6 +84,7 @@ namespace SEE.Game.UI.CodeWindow
                     string markedLine = $"<mark=#ff000044>{allLines[value]}</mark>\n";
                     TextMesh.text = string.Join("", allLines.Select(x => x+"\n").Take(value).Append(markedLine)
                                                             .Concat(allLines.Select(x => x + "\n").Skip(value+1)));
+                    ScrollEvent.Invoke();
                 }
             }
         }

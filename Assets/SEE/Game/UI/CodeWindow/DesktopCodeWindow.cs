@@ -58,12 +58,6 @@ namespace SEE.Game.UI.CodeWindow
                 TextMesh.fontSize = FontSize;
             }
             
-            // Listen to scrollbar events
-            if (codeWindow.transform.Find("Content/Scrollable").gameObject.TryGetComponentOrLog(out scrollRect))
-            {
-                ScrollEvent = scrollRect.onValueChanged;
-            }
-            
             RecalculateExcessLines();
 
             // Position code window in center of screen
