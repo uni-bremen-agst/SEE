@@ -71,8 +71,10 @@ namespace SEE.Game.UI.CodeWindow
                     }
                     ActiveCodeWindow = currentActiveCodeWindow;
                     UpdateActiveTab();  // recursive call: ActiveCodeWindow has now been changed
+                    return;
                 }
                 Panel.ActiveTab = Panel.GetTabIndex((RectTransform) ActiveCodeWindow.codeWindow.transform);
+                // TODO For some reason, this causes an infinite loop: OnActiveCodeWindowChanged.Invoke();
             }
         }
 
@@ -91,7 +93,6 @@ namespace SEE.Game.UI.CodeWindow
                     Destroy(this);
                 }
                 Panel = PanelUtils.CreatePanelFor((RectTransform) codeWindows[0].codeWindow.transform, PanelsCanvas);
-                //Panel.MoveTo(Vector2.zero); // Move panel to center of screen
             } else if (!Panel)
             {
                 // If no code window is initialized yet, there's nothing we can do

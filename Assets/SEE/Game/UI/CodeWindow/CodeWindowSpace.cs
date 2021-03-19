@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SEE.Game.UI.CodeWindow
 {
@@ -124,6 +125,8 @@ namespace SEE.Game.UI.CodeWindow
         /// The nominal active code window. Changes will be applied on every frame using <see cref="Update"/>.
         /// </summary>
         public CodeWindow ActiveCodeWindow { get; set; }
+
+        public UnityEvent OnActiveCodeWindowChanged = new UnityEvent();
 
         public CodeWindowSpaceValues ToValueObject(bool fulltext)
         {
