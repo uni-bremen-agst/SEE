@@ -28,8 +28,9 @@ namespace SEE.Controls
     /// <summary>
     /// Super class of the behaviours of game objects the player interacts with.
     /// </summary>
-    [RequireComponent(typeof(GraphElement))]
-    [RequireComponent(typeof(Interactable))]
+    //[RequireComponent(typeof(GraphElement))]
+    //[RequireComponent(typeof(Interactable))]
+    // TODO(torben): for some reason, with these enabled, unity can not attach this component, even though the required components exist... (InteractableDecorator.cs)
     public sealed class InteractableObject : MonoBehaviour, IMixedRealityFocusHandler
     {
         // Tutorial on grabbing objects:
@@ -92,6 +93,54 @@ namespace SEE.Controls
         /// The graph element, this interactable object is attached to.
         /// </summary>
         public GraphElementRef GraphElemRef { get; private set; }
+
+        public bool TryGetNodeRef(out NodeRef nodeRef)
+        {
+            bool result = false;
+            nodeRef = null;
+            if (GraphElemRef is NodeRef)
+            {
+                result = true;
+                nodeRef = (NodeRef)GraphElemRef;
+            }
+            return result;
+        }
+
+        public bool TryGetEdgeRef(out EdgeRef edgeRef)
+        {
+            bool result = false;
+            edgeRef = null;
+            if (GraphElemRef is EdgeRef)
+            {
+                result = true;
+                edgeRef = (EdgeRef)GraphElemRef;
+            }
+            return result;
+        }
+
+        public NodeRef GetNodeRef()
+        {
+            Assert.IsTrue(GraphElemRef is NodeRef);
+            return (NodeRef)GraphElemRef;
+        }
+
+        public EdgeRef GetEdgeRef()
+        {
+            Assert.IsTrue(GraphElemRef is EdgeRef);
+            return (EdgeRef)GraphElemRef;
+        }
+
+        public Node GetNode()
+        {
+            Assert.IsTrue(GraphElemRef is NodeRef);
+            return (Node)GraphElemRef.elem;
+        }
+
+        public Edge GetEdge()
+        {
+            Assert.IsTrue(GraphElemRef is EdgeRef);
+            return (Edge)GraphElemRef.elem;
+        }
 
         /// <summary>
         /// A bit vector for hovering flags. Each flag is a bit as defined in <see cref="HoverFlag"/>.
@@ -275,6 +324,10 @@ namespace SEE.Controls
             SetHoverFlags(hoverFlags, isOwner);
         }
 
+        /// <summary>
+        /// Unhovers all objects.
+        /// </summary>
+        /// <param name="isOwner">Whether this client is initiating the grabbing action.</param>
         public static void UnhoverAll(bool isOwner)
         {
             while (HoveredObjects.Count != 0)
@@ -353,7 +406,7 @@ namespace SEE.Controls
         /// <summary>
         /// Deselects all currently selected interactable objects.
         /// </summary>
-        /// <param name="isOwner">Whether this client is initiating the selection action.
+        /// <param name="isOwner">Whether this client is initiating the action.</param>
         public static void UnselectAll(bool isOwner)
         {
             while (SelectedObjects.Count != 0)
@@ -362,6 +415,12 @@ namespace SEE.Controls
             }
         }
 
+        /// <summary>
+        /// Deselects all currently selected interactable objects within given
+        /// <paramref name="graph"/>.
+        /// </summary>
+        /// <param name="graph">The graph of which the objects are to be deselected.</param>
+        /// <param name="isOwner">Whether this client is initiating the action.</param>
         public static void UnselectAllInGraph(Graph graph, bool isOwner)
         {
             if (graphToSelectedIOs.TryGetValue(graph, out HashSet<InteractableObject> s))
@@ -380,8 +439,7 @@ namespace SEE.Controls
         /// Visually emphasizes this object for grabbing.
         /// </summary>
         /// <param name="grab">Whether this object should be grabbed.</param>
-        /// <param name="isOwner">Whether this client is initiating the grabbing action.
-        /// </param>
+        /// <param name="isOwner">Whether this client is initiating the grabbing action.</param>
         public void SetGrab(bool grab, bool isOwner)
         {
             IsGrabbed = grab;
@@ -439,6 +497,10 @@ namespace SEE.Controls
             }
         }
 
+        /// <summary>
+        /// Ungrabs all objects.
+        /// </summary>
+        /// <param name="isOwner">Whether this client is initiating the grabbing action.</param>
         public static void UngrabAll(bool isOwner)
         {
             while (GrabbedObjects.Count != 0)
@@ -728,8 +790,6 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseExit()
         {
-            // FIXME: For an unknown reason, this method will be called twice per frame.
-            // Debug.LogFormat("{0}.OnMouseExit({1}) @ {2}\n", this.GetType().FullName, gameObject.name, Time.time.ToString("F20"));
             if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer && !Raycasting.IsMouseOverGUI())
             {
                 SetHoverFlag(HoverFlag.World, setFlag: false, isOwner: true);
