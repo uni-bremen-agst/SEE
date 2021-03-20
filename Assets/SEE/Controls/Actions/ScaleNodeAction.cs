@@ -11,21 +11,6 @@ namespace SEE.Controls.Actions
     public class ScaleNodeAction : AbstractPlayerAction
     {
         /// <summary>
-        /// Start() will register an anonymous delegate of type 
-        /// <see cref="ActionState.OnStateChangedFn"/> on the event
-        /// <see cref="ActionState.OnStateChanged"/> to be called upon every
-        /// change of the action state, where the newly entered state will
-        /// be passed as a parameter. The anonymous delegate will compare whether
-        /// this state equals <see cref="ThisActionState"/> and if so, execute
-        /// what needs to be done for this action here. If that parameter is
-        /// different from <see cref="ThisActionState"/>, this action will
-        /// put itself to sleep. 
-        /// Thus, this action will be executed only if the new state is 
-        /// <see cref="ThisActionState"/>.
-        /// </summary>
-        private readonly ActionStateType ThisActionState = ActionStateType.ScaleNode;
-
-        /// <summary>
         /// The old position of the top sphere
         /// </summary>
         private Vector3 topOldSpherePos;
@@ -145,37 +130,30 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject objectToScale;
 
-        public void Start()
+        public override void Start()
         {
-            ActionState.OnStateChanged += newState =>
-            {
-                // Is this our action state where we need to do something?
-                if (Equals(newState, ThisActionState))
-                {
-                    // The MonoBehaviour is enabled and Update() will be called by Unity.
-                    enabled = true;
-                    InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
-                    InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
-                }
-                else
-                {
-                    // The MonoBehaviour is disabled and Update() no longer be called by Unity.
-                    enabled = false;
-                    InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
-                    InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
-                    hoveredObject = null;
-                    instantiated = false;
-                    RemoveSpheres();
-                    objectToScale = null;
-                }
-            };
-            enabled = ActionState.Is(ThisActionState);
+            InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
+            InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
         }
 
-        private void Update()
+        /// <summary>
+        /// True if the gizmos that allow a user to scale the object in all three dimensions
+        /// are drawn.
+        /// </summary>
+        private bool scalingGizmosAreDrawn = false;
+
+        /// <summary
+        /// See <see cref="ReversibleAction.Update"/>.
+        /// </summary>
+        /// <returns>true if completed</returns>
+        public override bool Update()
         {
-            if (objectToScale != null && instantiated == false)
+            bool result = false;
+
+            if (objectToScale != null && !scalingGizmosAreDrawn)
             {
+                // We draw the gizmos that allow a user to scale the object in all three dimensions.
+
                 originalScale = objectToScale.transform.lossyScale;
                 originalPosition = objectToScale.transform.position;
 
@@ -221,13 +199,13 @@ namespace SEE.Controls.Actions
                 // Positioning
                 SetOnRoof();
                 SetOnSide();
-                instantiated = true;
+                scalingGizmosAreDrawn = true;
             }
             if (Input.GetMouseButtonDown(0) && objectToScale == null)
             {
                 objectToScale = hoveredObject;
             }
-            if (instantiated && Input.GetMouseButton(0))
+            if (scalingGizmosAreDrawn && Input.GetMouseButton(0))
             {
                 if (draggedSphere == null)
                 {
@@ -279,6 +257,8 @@ namespace SEE.Controls.Actions
                     else if (hit.collider == endWithSave.GetComponent<Collider>())
                     {
                         EndScale(true);
+                        // scaling is finalized
+                        result = true;
                     }
                     else if (hit.collider == endWithOutSave.GetComponent<Collider>())
                     {
@@ -308,7 +288,7 @@ namespace SEE.Controls.Actions
                     draggedSphere = null;
                 }
 
-                if(objectToScale != null)
+                if (objectToScale != null)
                 {
                     ScaleNode();
                     SetOnRoof();
@@ -317,7 +297,7 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                if (objectToScale != null && instantiated)
+                if (objectToScale != null && scalingGizmosAreDrawn)
                 {
                     draggedSphere = null;
                     // Adjust the size of the scaling elements
@@ -335,6 +315,16 @@ namespace SEE.Controls.Actions
                     SphereRadius(endWithSave);
                 }
             }
+            return result;
+        }
+
+        /// <summary>
+        /// Remove the spheres after finishing the action or more explicitly canceling the
+        /// action and switch to another.
+        /// </summary>
+        public override void Stop()
+        {
+            RemoveSpheres();
         }
 
         /// <summary>
@@ -342,7 +332,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void ScaleNode()
         {
-
             Vector3 scale = Vector3.zero;
             scale.y += topSphere.transform.position.y - topOldSpherePos.y;
             scale.x -= firstSideSphere.transform.position.x - firstSideOldSpherePos.x;
@@ -536,19 +525,53 @@ namespace SEE.Controls.Actions
         /// </summary>
         public void RemoveSpheres()
         {
-            Destroy(topSphere);
-            Destroy(firstCornerSphere);
-            Destroy(secondCornerSphere);
-            Destroy(thirdCornerSphere);
-            Destroy(forthCornerSphere);
-            Destroy(firstSideSphere);
-            Destroy(secondSideSphere);
-            Destroy(thirdSideSphere);
-            Destroy(forthSideSphere);
-            Destroy(endWithSave);
-            Destroy(endWithOutSave);
+            Destroyer.DestroyGameObject(topSphere);
+            Destroyer.DestroyGameObject(firstCornerSphere);
+            Destroyer.DestroyGameObject(secondCornerSphere);
+            Destroyer.DestroyGameObject(thirdCornerSphere);
+            Destroyer.DestroyGameObject(forthCornerSphere);
+            Destroyer.DestroyGameObject(firstSideSphere);
+            Destroyer.DestroyGameObject(secondSideSphere);
+            Destroyer.DestroyGameObject(thirdSideSphere);
+            Destroyer.DestroyGameObject(forthSideSphere);
+            Destroyer.DestroyGameObject(endWithSave);
+            Destroyer.DestroyGameObject(endWithOutSave);
             objectToScale = null;
-            instantiated = false;
+            scalingGizmosAreDrawn = false;
+        }
+
+        /// <summary>
+        /// Undoes this ScaleNodeAction
+        /// </summary>
+        public override void Undo()
+        {
+            Debug.Log("Undo ScaleNode");
+        }
+
+        /// <summary>
+        /// Redoes this DeleteAction
+        /// </summary>
+        public override void Redo()
+        {
+            Debug.Log("Redo ScaleNode");
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="ScaleNodeAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public static ReversibleAction CreateReversibleAction()
+        {
+            return new ScaleNodeAction();
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="ScaleNodeAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
         }
     }
 }

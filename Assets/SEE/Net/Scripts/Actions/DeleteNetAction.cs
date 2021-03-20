@@ -1,4 +1,4 @@
-﻿using SEE.Controls.Actions;
+﻿using SEE.Controls;
 using SEE.Net;
 using UnityEngine;
 
@@ -41,8 +41,11 @@ public class DeleteNetAction : AbstractAction
     protected override void ExecuteOnClient()
     {
         if (!IsRequester())
-        {           
-            DeleteAction.DeleteSelectedObject(GameObject.Find(GameObjectID));
+        {
+            //    //Fixme(Thore): Network-DeleteAction has to be fixed in #204
+            GameObject playerDesktop = PlayerSettings.LocalPlayer;
+            //    playerDesktop.TryGetComponent(out DeleteAction deleteAction);
+            //    deleteAction.DeleteSelectedObject(GameObject.Find(GameObjectID));
         }
     }
 }

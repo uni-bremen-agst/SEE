@@ -437,6 +437,10 @@ namespace SEE.DataModel.DG
             }
         }
 
+        /// <summary>
+        /// Re-assigns the node to a different <paramref name="newParent"/>.
+        /// </summary>
+        /// <param name="newParent">the new parent of this node</param>
         public void Reparent(Node newParent)
         {
             if (this == newParent)
