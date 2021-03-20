@@ -8,7 +8,7 @@
 
     /// <summary>
     /// Defines the expected operations and their protocol for actions that
-    /// can be reversed (have Undo() and Redo(). Their protocol resembles 
+    /// can be reversed (have Undo() and Redo()). Their protocol resembles 
     /// Unity's protocol for MonoBehaviours regarding <see cref="Awake"/>,
     /// <see cref="Start"/>, and <see cref="Update"/>.
     /// </summary>
