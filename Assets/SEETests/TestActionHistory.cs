@@ -87,6 +87,11 @@ namespace SEETests
             {
                 return new TestAction();
             }
+
+            public bool HadEffect()
+            {
+                return false; // FIXME
+            }
         }
 
         /// <summary>

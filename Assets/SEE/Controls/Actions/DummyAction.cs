@@ -1,11 +1,11 @@
 ﻿using SEE.Utils;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
     /// <summary>
     /// This class illustrates how to implement a reversible action.
+    /// It creates random objects when the left mouse button is pressed.
     /// </summary>
     class DummyAction : AbstractPlayerAction
     {
@@ -14,8 +14,31 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <returns>new instance of <see cref="DummyAction"/></returns>
         public static ReversibleAction CreateReversibleAction()
+        {            
+            DummyAction result = new DummyAction(nextPrimitive);
+            // Advance nextPrimitive by one but stay in the range of PrimitiveType
+            // (and we do not want to create Planes because of their scaling factor
+            // very different from other primitive objects).
+            nextPrimitive++;
+            if (nextPrimitive == PrimitiveType.Plane)
+            {
+                nextPrimitive = 0;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// The kind of object to be created by the next new instance of this action.
+        /// </summary>
+        private static PrimitiveType nextPrimitive = PrimitiveType.Sphere;
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="primitive">the kind of object to be created by this action</param>
+        public DummyAction(PrimitiveType primitive)
         {
-            return new DummyAction();
+            this.primitive = primitive;
         }
 
         /// <summary>
@@ -33,6 +56,11 @@ namespace SEE.Controls.Actions
         private Vector3 position;
 
         /// <summary>
+        /// The kind of object created by this action.
+        /// </summary>
+        private PrimitiveType primitive = PrimitiveType.Sphere;
+
+        /// <summary>
         /// The game object created by this action. This object is kept
         /// only to be able to remove it again for Undo(). The object can be
         /// re-created from the <see cref="position"/>.
@@ -46,6 +74,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Awake()
         {
+            base.Awake();
             // Could be initialized at the point of the declaration. This illustrates
             // only the use of Awake() here.
             createdObject = null;
@@ -59,7 +88,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Start()
         {
-            Debug.Log($"Action started/resumed.\n");
+            // Intentionally left blank.
         }
 
         /// <summary>
@@ -78,6 +107,7 @@ namespace SEE.Controls.Actions
                 newPosition = Camera.main.ScreenToWorldPoint(newPosition);
                 position = newPosition;
                 CreateObjectAt(newPosition);
+                hadAnEffect = true;
                 return true;
             }
             else
@@ -92,11 +122,18 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="position">position in world-space at which to put the object</param>
         private void CreateObjectAt(Vector3 position)
-        {
-            GameObject newGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            newGameObject.transform.position = position;
-            newGameObject.transform.localScale = Vector3.one / 10.0f;
-            createdObject = newGameObject;
+        {            
+            GameObject newGameObject = GameObject.CreatePrimitive(primitive);
+            if (newGameObject == null)
+            {
+                Debug.LogError($"Could not create an object of kind {primitive}.\n");
+            }
+            else
+            {
+                newGameObject.transform.position = position;
+                newGameObject.transform.localScale = Vector3.one / 10.0f;
+                createdObject = newGameObject;
+            }
         }
 
         /// <summary>
@@ -107,7 +144,6 @@ namespace SEE.Controls.Actions
         public override void Stop()
         {
             // Nothing really needs to be done for this example action.
-            Debug.Log($"Action stopped.\n");
         }
 
         /// <summary>
@@ -116,6 +152,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Undo()
         {
+            base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             Destroyer.DestroyGameObject(createdObject);
         }
 
@@ -127,6 +164,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Redo()
         {
+            base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             CreateObjectAt(position);
         }
     }

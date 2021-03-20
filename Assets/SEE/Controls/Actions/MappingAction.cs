@@ -697,6 +697,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// <see cref="ReversibleAction.HadEffect"/>
+        /// </summary>
+        /// <returns>true if this action has had already some effect that would need to be undone</returns>
+        public bool HadEffect()
+        {
+            return false; // FIXME
+        }
+
+        /// <summary>
         /// Handles every state change of an existing edge.
         /// </summary>
         /// <param name="edgeChange"></param>
