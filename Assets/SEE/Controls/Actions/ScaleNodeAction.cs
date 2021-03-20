@@ -559,7 +559,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="ScaleNodeAction"/>.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>new instance</returns>
         public static ReversibleAction CreateReversibleAction()
         {
             return new ScaleNodeAction();
