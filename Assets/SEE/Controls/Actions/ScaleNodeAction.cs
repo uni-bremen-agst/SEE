@@ -319,7 +319,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Remove the spheres after finishing the action or more explicit canceling the
+        /// Remove the spheres after finishing the action or more explicitly canceling the
         /// action and switch to another.
         /// </summary>
         public override void Stop()
