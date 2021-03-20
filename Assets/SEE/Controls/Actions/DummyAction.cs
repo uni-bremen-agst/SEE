@@ -68,7 +68,7 @@ namespace SEE.Controls.Actions
         private GameObject createdObject;
 
         /// <summary>
-        /// Will be called once when the action is started to be executing for the
+        /// Will be called once when the action is started for the
         /// first time. Intended for intialization purposes.
         /// See <see cref="ReversibleAction.Awake"/>.
         /// </summary>
