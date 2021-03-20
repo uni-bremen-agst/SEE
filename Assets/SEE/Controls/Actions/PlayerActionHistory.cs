@@ -45,11 +45,6 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// The specific action state type of each action.
-        /// </summary>
-        public static ActionStateType Value;
-
-        /// <summary>
         /// Executes the given kind of <paramref name="actionType"/> as new.
         /// </summary>
         /// <param name="actionType">kind of action to be executed</param>
