@@ -83,7 +83,7 @@ namespace SEE.Game.UI.CodeWindow
                     string[] allLines = TextMesh.text.Split('\n');
                     string markedLine = $"<mark=#ff000044>{allLines[value]}</mark>\n";
                     TextMesh.text = string.Join("", allLines.Select(x => x+"\n").Take(value).Append(markedLine)
-                                                            .Concat(allLines.Select(x => x + "\n").Skip(value+1)));
+                                                            .Concat(allLines.Select(x => x + "\n").Skip(value+1).Take(lines-value-1)));
                     ScrollEvent.Invoke();
                 }
             }
@@ -102,12 +102,12 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         private float visibleLine
         {
-            get => scrollRect != null ? (1-scrollRect.verticalNormalizedPosition) * (lines-excessLines) : PreStartLine;
+            get => scrollRect != null ? (1-scrollRect.verticalNormalizedPosition) * (lines-1-excessLines) : PreStartLine;
             set
             {
-                if (VisibleLine > lines)
+                if (value > lines-1 || value < 0)
                 {
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(value));
                 }
                 // If this is called before Start() has been called, scrollbar will be null, so we have to cache
                 // the desired visible line.
@@ -117,7 +117,7 @@ namespace SEE.Game.UI.CodeWindow
                 }
                 else
                 {
-                    scrollRect.verticalNormalizedPosition = 1 - (value) / (lines-excessLines);
+                    scrollRect.verticalNormalizedPosition = 1 - value / (lines-1-excessLines);
                 }
             }
         }
