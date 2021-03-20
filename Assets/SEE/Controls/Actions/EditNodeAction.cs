@@ -34,7 +34,6 @@ namespace SEE.Controls.Actions
             }
             InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
             InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
-            instantiated = true;
         }
 
         /// <summary>
