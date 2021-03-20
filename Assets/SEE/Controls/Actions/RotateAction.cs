@@ -12,7 +12,7 @@ namespace SEE.Controls.Actions
     {
         /// <summary>
         /// Returns a new instance of <see cref="RotateAction"/>.
-        /// </summary>RotateAction
+        /// </summary>
         /// <returns>new instance of <see cref="RotateAction"/></returns>
         internal static ReversibleAction CreateReversibleAction()
         {
