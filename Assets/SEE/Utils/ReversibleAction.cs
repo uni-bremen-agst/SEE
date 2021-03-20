@@ -49,7 +49,7 @@
 
         /// <summary>
         /// Will be called whenever the action is to start its execution.
-        /// There two different situations in which this is the case:
+        /// There are two different situations in which this is the case:
         /// (1) upon its intial start and (2) when it is resumed.
         /// Situation (1): <see cref="Start"/> will be called once after 
         /// <see cref="Awake"/> when it is executed the first time. 
