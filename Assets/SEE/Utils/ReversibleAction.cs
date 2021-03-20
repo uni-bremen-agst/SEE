@@ -88,6 +88,15 @@
         void Redo();
 
         /// <summary>
+        /// True if this action has had an effect that may need to be undone. Actions may
+        /// have been started but may not have had any effect yet because they were
+        /// waiting for input, in which case they do not need to be undone. In this
+        /// case, they will return false; otherwise true.
+        /// </summary>
+        /// <returns>if this action has had an effect that may need to be undone</returns>
+        bool HadEffect();
+
+        /// <summary>
         /// Returns a new instance of the same type as this particular type of ReversibleAction.
         /// </summary>
         /// <returns>new instance</returns>

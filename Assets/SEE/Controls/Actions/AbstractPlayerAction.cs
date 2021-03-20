@@ -30,6 +30,13 @@ namespace SEE.Controls.Actions
         protected bool instantiated = false;
 
         /// <summary>
+        /// True if this action has had already some effect that would need to be undone.
+        /// Must be set by subclasses. Will be manipulated in <see cref="Undo"/> and
+        /// <see cref="Redo"/>, too.
+        /// </summary>
+        protected bool hadAnEffect = false;
+
+        /// <summary>
         /// Finds the GameObject that contains the CanvasOperations and components
         /// and saves it in the <see cref="canvasObject"/>.
         /// </summary>
@@ -42,23 +49,25 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// The undo operation which has to be implemented specifically by subclasses
-        /// to revert the effect of an executed action.
+        /// to revert the effect of an executed action. Marks the actions as having
+        /// had no effect.
         /// See <see cref="ReversibleAction.Undo"/>.
         /// </summary>
         public virtual void Undo() 
         {
-            // intentionally left blank; can be overridden by subclasses
+            hadAnEffect = false;
         }
 
         /// <summary>
         /// The redo operation which has to be implemented specifically by subclasses
         /// to revert the effect of an undone action, in other words, to return to 
         /// the state at the point in time when <see cref="Undo"/> was called.
+        /// Marks the actions as having had an effect.
         /// See <see cref="ReversibleAction.Redo"/>.
         /// </summary>
         public virtual void Redo()
         {
-            // intentionally left blank; can be overridden by subclasses
+            hadAnEffect = true;
         }
 
         /// <summary>
@@ -163,6 +172,16 @@ namespace SEE.Controls.Actions
             //                         e.Message, hoveredObject == null ? "NULL" : hoveredObject.name, interactableObject.name);
             //    // FIXME: There are AssertionExceptions 
             //}
+        }
+
+        /// <summary>
+        /// Returns true if this action has had already some effect that would need to be undone.
+        /// <see cref="ReversibleAction.HadEffect"/>
+        /// </summary>
+        /// <returns>true if this action has had already some effect that would need to be undone</returns>
+        public bool HadEffect()
+        {
+            return hadAnEffect;
         }
     }
 }
