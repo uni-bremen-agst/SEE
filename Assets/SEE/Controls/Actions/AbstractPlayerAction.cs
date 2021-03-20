@@ -12,7 +12,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The current name of the gameObject that contains the canvas operations and components.
         /// </summary>
-        protected readonly string nameOfCanvasObject = "CanvasObject";
+        protected const string nameOfCanvasObject = "CanvasObject";
 
         /// <summary>
         /// The gameObject that contains the CanvasGenerator and the actual CanvasObject.
@@ -71,7 +71,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Will be called once when the action is started to be executing for the
+        /// Will be called once when the action is started for the
         /// first time. Intended for intialization purposes.
         /// See <see cref="ReversibleAction.Awake"/>.
         /// </summary>
