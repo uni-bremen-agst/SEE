@@ -1,6 +1,8 @@
+using System.Linq;
 using SEE.GO;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace SEE.Game.UI.CodeWindow
@@ -56,6 +58,32 @@ namespace SEE.Game.UI.CodeWindow
             {
                 TextMesh.text = Text;
                 TextMesh.fontSize = FontSize;
+            }
+
+            // Register events to find out when window was scrolled in 
+            // For this, we have to register two events in two components, namely Scrollbar and ScrollRect, with
+            // OnEndDrag and OnScroll.
+            if (codeWindow.transform.Find("Content/Scrollable").gameObject.TryGetComponentOrLog(out scrollRect))
+            {
+                if (scrollRect.gameObject.TryGetComponentOrLog(out EventTrigger trigger))
+                {
+                    trigger.triggers.ForEach(x => x.callback.AddListener(_ => ScrollEvent.Invoke()));
+                    if (!trigger.triggers.Any())
+                    {
+                        Debug.LogError("Event Trigger in 'ScrollRect' isn't set up correctly. "
+                                       + "Triggers for the 'EndDrag' and 'Scroll' event need to be added.\n");
+                    }
+                }
+
+                if (scrollRect.transform.Find("Scrollbar").gameObject.TryGetComponentOrLog(out trigger))
+                {
+                    trigger.triggers.ForEach(x => x.callback.AddListener(_ => ScrollEvent.Invoke()));
+                    if (!trigger.triggers.Any())
+                    {
+                        Debug.LogError("Event Trigger in 'Scrollbar' isn't set up correctly. "
+                                       + "Triggers for the 'EndDrag' and 'Scroll' event need to be added.\n");
+                    }
+                }
             }
             
             RecalculateExcessLines();

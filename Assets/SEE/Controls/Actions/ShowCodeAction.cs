@@ -142,8 +142,6 @@ namespace SEE.Controls.Actions
                 spaceManager[CodeSpaceManager.LOCAL_PLAYER].AddCodeWindow(codeWindow);
 
                 spaceManager[CodeSpaceManager.LOCAL_PLAYER].ActiveCodeWindow = codeWindow;
-                //TODO: Scroll event should also be called when scrolling manually
-                //FIXME: also, scrolling doesn't work anymore
                 codeWindow.ScrollEvent.AddListener(() => syncAction.UpdateSpace(spaceManager[CodeSpaceManager.LOCAL_PLAYER]));
                 //TODO: Set font size etc per SEECity settings (maybe, or maybe that's too much)
             }
