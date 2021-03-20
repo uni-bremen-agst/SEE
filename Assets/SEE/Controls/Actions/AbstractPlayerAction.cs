@@ -25,11 +25,6 @@ namespace SEE.Controls.Actions
         protected GameObject hoveredObject = null;
 
         /// <summary>
-        /// True if the active script is already initialized, else false.
-        /// </summary>
-        protected bool instantiated = false;
-
-        /// <summary>
         /// True if this action has had already some effect that would need to be undone.
         /// Must be set by subclasses. Will be manipulated in <see cref="Undo"/> and
         /// <see cref="Redo"/>, too.

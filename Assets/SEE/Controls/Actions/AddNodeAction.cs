@@ -150,10 +150,6 @@ namespace SEE.Controls.Actions
 
             InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
             InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
-            if (!instantiated)
-            {
-                instantiated = true;
-            }
         }
 
         /// <summary>
@@ -241,7 +237,6 @@ namespace SEE.Controls.Actions
                     RemoveCanvas();
                     city = null;
                     Progress = ProgressState.NoCitySelected;
-                    instantiated = false;
                     break;
 
                 default:

@@ -136,6 +136,12 @@ namespace SEE.Controls.Actions
             InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
         }
 
+        /// <summary>
+        /// True if the gizmos that allow a user to scale the object in all three dimensions
+        /// are drawn.
+        /// </summary>
+        private bool scalingGizmosAreDrawn = false;
+
         /// <summary
         /// See <see cref="ReversibleAction.Update"/>.
         /// </summary>
@@ -144,8 +150,10 @@ namespace SEE.Controls.Actions
         {
             bool result = false;
 
-            if (objectToScale != null && instantiated == false)
+            if (objectToScale != null && !scalingGizmosAreDrawn)
             {
+                // We draw the gizmos that allow a user to scale the object in all three dimensions.
+
                 originalScale = objectToScale.transform.lossyScale;
                 originalPosition = objectToScale.transform.position;
 
@@ -191,13 +199,13 @@ namespace SEE.Controls.Actions
                 // Positioning
                 SetOnRoof();
                 SetOnSide();
-                instantiated = true;
+                scalingGizmosAreDrawn = true;
             }
             if (Input.GetMouseButtonDown(0) && objectToScale == null)
             {
                 objectToScale = hoveredObject;
             }
-            if (instantiated && Input.GetMouseButton(0))
+            if (scalingGizmosAreDrawn && Input.GetMouseButton(0))
             {
                 if (draggedSphere == null)
                 {
@@ -280,7 +288,7 @@ namespace SEE.Controls.Actions
                     draggedSphere = null;
                 }
 
-                if(objectToScale != null)
+                if (objectToScale != null)
                 {
                     ScaleNode();
                     SetOnRoof();
@@ -289,7 +297,7 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                if (objectToScale != null && instantiated)
+                if (objectToScale != null && scalingGizmosAreDrawn)
                 {
                     draggedSphere = null;
                     // Adjust the size of the scaling elements
@@ -529,7 +537,7 @@ namespace SEE.Controls.Actions
             Destroyer.DestroyGameObject(endWithSave);
             Destroyer.DestroyGameObject(endWithOutSave);
             objectToScale = null;
-            instantiated = false;
+            scalingGizmosAreDrawn = false;
         }
 
         /// <summary>
