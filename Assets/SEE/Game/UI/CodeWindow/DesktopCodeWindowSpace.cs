@@ -77,7 +77,7 @@ namespace SEE.Game.UI.CodeWindow
                 // TODO For some reason, this causes an infinite loop: OnActiveCodeWindowChanged.Invoke();
             }
         }
-
+        
         protected override void UpdateDesktop()
         {
             if (Panel && !codeWindows.Any())
@@ -93,6 +93,14 @@ namespace SEE.Game.UI.CodeWindow
                     Destroy(this);
                 }
                 Panel = PanelUtils.CreatePanelFor((RectTransform) codeWindows[0].codeWindow.transform, PanelsCanvas);
+                // When the active tab *on this panel* is changed, we invoke the corresponding event
+                PanelNotificationCenter.OnActiveTabChanged += tab =>
+                {
+                    if (Panel == tab.Panel)
+                    {
+                        OnActiveCodeWindowChanged.Invoke();
+                    }
+                };
             } else if (!Panel)
             {
                 // If no code window is initialized yet, there's nothing we can do

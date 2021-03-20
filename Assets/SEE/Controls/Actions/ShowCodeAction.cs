@@ -138,11 +138,13 @@ namespace SEE.Controls.Actions
                     codeWindow.VisibleLine = line;
                 }
                     
-                // Add code window to our space of code windows
-                spaceManager[CodeSpaceManager.LOCAL_PLAYER].AddCodeWindow(codeWindow);
-
+                // Add code window to our space of code window, if it isn't in there yet
+                if (!spaceManager[CodeSpaceManager.LOCAL_PLAYER].CodeWindows.Contains(codeWindow))
+                {
+                    spaceManager[CodeSpaceManager.LOCAL_PLAYER].AddCodeWindow(codeWindow);
+                    codeWindow.ScrollEvent.AddListener(() => syncAction.UpdateSpace(spaceManager[CodeSpaceManager.LOCAL_PLAYER]));
+                }
                 spaceManager[CodeSpaceManager.LOCAL_PLAYER].ActiveCodeWindow = codeWindow;
-                codeWindow.ScrollEvent.AddListener(() => syncAction.UpdateSpace(spaceManager[CodeSpaceManager.LOCAL_PLAYER]));
                 //TODO: Set font size etc per SEECity settings (maybe, or maybe that's too much)
             }
         }
