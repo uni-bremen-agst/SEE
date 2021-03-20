@@ -180,7 +180,7 @@ namespace SEE.Game
         /// If <paramref name="gameNode"/> has no valid node reference, the name
         /// of <paramref name="gameNode"/> is returned instead.
         /// </summary>
-        /// <param name="gameNode">game object representing a nodes whose Source.Name is requested</param>
+        /// <param name="gameNode">game object representing a node whose Source.Name is requested</param>
         /// <returns>source name of <paramref name="gameNode"/></returns>
         public static string SourceName(GameObject gameNode)
         {
