@@ -27,7 +27,7 @@ public class DeleteNetAction : AbstractAction
     }
 
     /// <summary>
-    /// The name of the Player-Desktop gameobject.
+    /// The name of the PlayerDesktop GameObject.
     /// </summary>
     private const string PlayerDesktop = "PlayerDesktop";
 
