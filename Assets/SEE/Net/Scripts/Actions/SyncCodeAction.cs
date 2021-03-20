@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using SEE.Controls;
+﻿using SEE.Controls;
 using SEE.Game.UI.CodeWindow;
-using UnityEngine;
 
 namespace SEE.Net
 {
@@ -13,7 +11,7 @@ namespace SEE.Net
 
         private const bool SYNC_FULL_TEXT = false;
 
-        public Dictionary<string, CodeWindowSpace.CodeWindowSpaceValues> Spaces = new Dictionary<string, CodeWindowSpace.CodeWindowSpaceValues>();
+        public CodeWindowSpace.CodeWindowSpaceValues Space;
 
         public SyncCodeSpaceAction(CodeWindowSpace space)
         {
@@ -22,13 +20,12 @@ namespace SEE.Net
 
         public void UpdateSpace(CodeWindowSpace space, bool execute = true)
         {
-            Debug.Log("Synchronizing code now...");
             if (space == null)
             {
                 return;
             }
             
-            Spaces[CodeSpaceManager.LOCAL_PLAYER] = space.ToValueObject(SYNC_FULL_TEXT);
+            Space = space.ToValueObject(SYNC_FULL_TEXT);
 
             if (execute)
             {
@@ -45,7 +42,13 @@ namespace SEE.Net
         {
             if (!IsRequester())
             {
-                //TODO
+                if (!CodeSpaceManager.ManagerInstance)
+                {
+                    // If no code space manager exists, there is nothing we can (or should) do.
+                    return;
+                }
+                
+                CodeSpaceManager.ManagerInstance.UpdateCodeWindowSpaceFromValueObject(RequesterIPAddress, Space);
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using SEE.Game.UI;
 using SEE.Game.UI.CodeWindow;
 using UnityEngine;
@@ -10,6 +11,8 @@ namespace SEE.Controls
     /// Manages the association from players to <see cref="CodeWindowSpace"/>.
     /// Will also display a menu which can be opened using TAB. The player whose code window shall be displayed
     /// can be selected from this menu.
+    /// Note that only one instance of this class may be active in the scene. This instance can be retrieved
+    /// using <see cref="ManagerInstance"/>.
     /// </summary>
     public class CodeSpaceManager: MonoBehaviour
     {
@@ -44,6 +47,11 @@ namespace SEE.Controls
         private SelectionMenu CodeWindowMenu;
 
         /// <summary>
+        /// Represents the code space manager currently active in the scene.
+        /// </summary>
+        public static CodeSpaceManager ManagerInstance;
+
+        /// <summary>
         /// Accesses the code window space for the given <paramref name="playerName"/>.
         /// If the given <paramref name="playerName"/> does not exist, <c>null</c> will be returned.
         /// </summary>
@@ -54,8 +62,64 @@ namespace SEE.Controls
             set => CodeSpaces[playerName] = value;
         }
 
+        public void UpdateCodeWindowSpaceFromValueObject(string playerName, CodeWindowSpace.CodeWindowSpaceValues valueObject)
+        {
+            if (!CodeSpaces.ContainsKey(playerName))
+            {
+                CodeSpaces[playerName] = CodeWindowSpace.FromValueObject(valueObject, gameObject);
+            }
+            else
+            {
+                // We will try to do a partial update, otherwise we'd have to re-read each file on every update
+                
+                // Check for new entries
+                List<CodeWindow> closedWindows = new List<CodeWindow>(CodeSpaces[playerName].CodeWindows);
+                foreach (CodeWindow.CodeWindowValues windowValue in valueObject.CodeWindows)
+                {
+                    if (CodeSpaces[playerName].CodeWindows.All(x => windowValue.Title != x.Title))
+                    {
+                        // Window is new and has to be re-created
+                        CodeSpaces[playerName].AddCodeWindow(CodeWindow.FromValueObject(windowValue));
+                    }
+                    else
+                    {
+                        // Visible line may have changed
+                        CodeSpaces[playerName].CodeWindows.First(x => x.Title == windowValue.Title).VisibleLine = windowValue.VisibleLine;
+                        
+                        // Window is still open, so it's not closed
+                        closedWindows.RemoveAll(x => x.Title == windowValue.Title);
+                    }
+                }
+
+                // Close windows which are no longer open
+                closedWindows.ForEach(CodeSpaces[playerName].CloseCodeWindow);
+                
+                // Set active window if it changed
+                if (CodeSpaces[playerName].ActiveCodeWindow.Title != valueObject.ActiveCodeWindow.Title)
+                {
+                    CodeSpaces[playerName].ActiveCodeWindow = CodeSpaces[playerName].CodeWindows.First(x => x.Title == valueObject.ActiveCodeWindow.Title);
+                }
+            }
+            
+            //TODO: Instead of tearing down and recreating the menu each time, change the code 
+            // such that old entries are removed and new entries are added.
+            // This way, performance will probably be significantly improved.
+            SetUpWindowSelectionMenu();
+        }
+
         private void Start()
         {
+            if (FindObjectOfType<CodeSpaceManager>())
+            {
+                Debug.LogError("Warning: More than one CodeSpaceManager is present in the scene! "
+                               + "This will lead to undefined behaviour when synchronizing "
+                               + "code windows across the network!\n");
+            }
+            else
+            {
+                ManagerInstance = this;
+            }
+            
             // Create local code window space and associate it with current player
             if (!TryGetComponent(out CodeWindowSpace space))
             {
@@ -64,7 +128,7 @@ namespace SEE.Controls
             CodeSpaces[LOCAL_PLAYER] = space;
             space.OnActiveCodeWindowChanged.AddListener(OnActiveCodeWindowChanged.Invoke);
             
-            CodeWindowMenu = SetUpWindowSelectionMenu();
+            SetUpWindowSelectionMenu();
         }
 
         private void Update()
@@ -81,20 +145,29 @@ namespace SEE.Controls
         /// code window they want to see. Initially, this will have the entries "local player" and "none".
         /// </summary>
         /// <returns>The newly created <see cref="SelectionMenu"/></returns>
-        private SelectionMenu SetUpWindowSelectionMenu()
+        private void SetUpWindowSelectionMenu()
         {
             //TODO: Icons
-            SelectionMenu menu = gameObject.AddComponent<SelectionMenu>();
+            if (CodeWindowMenu)
+            {
+                Destroy(CodeWindowMenu);
+            }
+            CodeWindowMenu = gameObject.AddComponent<SelectionMenu>();
             ToggleMenuEntry localEntry = new ToggleMenuEntry(true, () => ActivateSpace(LOCAL_PLAYER), 
                                                              DeactivateCurrentSpace, LOCAL_PLAYER,
                                                              "Code windows for the local player (you).", Color.black);
             ToggleMenuEntry noneEntry = new ToggleMenuEntry(false, () => CurrentPlayer = NO_PLAYER, () => { }, NO_PLAYER, 
                                                             "This option hides all code windows.", Color.grey);
-            menu.AddEntry(localEntry);
-            menu.AddEntry(noneEntry);
-            menu.Title = "Code Window Selection";
-            menu.Description = "Select the player whose code windows you want to see.";
-            return menu;
+            CodeWindowMenu.AddEntry(localEntry);
+            foreach (KeyValuePair<string, CodeWindowSpace> space in CodeSpaces.Where(space => space.Key != LOCAL_PLAYER))
+            {
+                CodeWindowMenu.AddEntry(new ToggleMenuEntry(false, () => ActivateSpace(space.Key),
+                                                  DeactivateCurrentSpace, space.Key, 
+                                                  $"Code window from player with IP address '{space.Key}'.", Color.white));
+            }
+            CodeWindowMenu.AddEntry(noneEntry);
+            CodeWindowMenu.Title = "Code Window Selection";
+            CodeWindowMenu.Description = "Select the player whose code windows you want to see.";
             
             void ActivateSpace(string playerName)
             {
