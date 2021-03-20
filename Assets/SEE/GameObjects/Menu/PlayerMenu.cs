@@ -39,9 +39,9 @@ namespace SEE.GO.Menu
             Assert.IsTrue(ActionStateType.NewNode.Value == 4);
             Assert.IsTrue(ActionStateType.EditNode.Value == 5);
             Assert.IsTrue(ActionStateType.ScaleNode.Value == 6);
-            Assert.IsTrue(ActionStateType.Delete.Value == 7);
-            Assert.IsTrue(ActionStateType.Dummy.Value == 8);
-            Assert.IsTrue(ActionStateType.Draw.Value == 9);
+            Assert.IsTrue(ActionStateType.Delete.Value == 7);            
+            Assert.IsTrue(ActionStateType.Draw.Value == 8);
+            Assert.IsTrue(ActionStateType.Dummy.Value == 9);
 
             // IMPORTANT NOTE: Because an ActionState.Type value will be used as an index into 
             // the following field of menu entries, the rank of an entry in this field of entry
