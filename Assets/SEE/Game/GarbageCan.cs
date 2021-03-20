@@ -17,7 +17,7 @@ namespace SEE.Game
         private Ray ray;
 
         /// <summary>
-        /// The object which was hitt by the ray.
+        /// The object which was hit by the ray.
         /// </summary>
         private RaycastHit hit;
 
