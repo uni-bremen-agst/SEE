@@ -1,4 +1,4 @@
-﻿using SEE.Controls.Actions;
+﻿using SEE.Controls;
 using SEE.Net;
 using UnityEngine;
 
@@ -27,11 +27,6 @@ public class DeleteNetAction : AbstractAction
     }
 
     /// <summary>
-    /// The name of the PlayerDesktop GameObject.
-    /// </summary>
-    private const string PlayerDesktop = "PlayerDesktop";
-
-    /// <summary>
     /// Things to execute on the server (none for this class). Necessary because it is abstract
     /// in the superclass.
     /// </summary>
@@ -45,12 +40,12 @@ public class DeleteNetAction : AbstractAction
     /// </summary>
     protected override void ExecuteOnClient()
     {
-        //if (!IsRequester())
-        //{
-        //    //Fixme(Thore): Network-DeleteAction has to be fixed in #204
-        //    GameObject playerDesktop = GameObject.Find(PlayerDesktop);
-        //    playerDesktop.TryGetComponent(out DeleteAction deleteAction);
-        //    deleteAction.DeleteSelectedObject(GameObject.Find(GameObjectID));
-        //}
+        if (!IsRequester())
+        {
+            //    //Fixme(Thore): Network-DeleteAction has to be fixed in #204
+            GameObject playerDesktop = PlayerSettings.LocalPlayer;
+            //    playerDesktop.TryGetComponent(out DeleteAction deleteAction);
+            //    deleteAction.DeleteSelectedObject(GameObject.Find(GameObjectID));
+        }
     }
 }
