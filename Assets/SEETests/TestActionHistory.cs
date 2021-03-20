@@ -76,7 +76,8 @@ namespace SEETests
                 Assert.AreEqual(1, AwakeCalls);
                 // The number of Start calls is always one ahead of the number of Stop calls.
                 Assert.AreEqual(StartCalls, StopCalls + 1);
-                return true;
+                // This action is never finished.
+                return false;
             }
 
             /// <summary>
@@ -88,9 +89,13 @@ namespace SEETests
                 return new TestAction();
             }
 
+            /// <summary>
+            /// This action has always had an effect.
+            /// </summary>
+            /// <returns></returns>
             public bool HadEffect()
             {
-                return false; // FIXME
+                return true;
             }
         }
 
@@ -115,7 +120,7 @@ namespace SEETests
         [Test]
         public void OneAction()
         {
-            TestAction c = new TestAction();           
+            TestAction c = new TestAction();
             CheckCalls(c, value: false, awake: 0, start: 0, update: 0, stop: 0);
             hist.Execute(c);
             CheckCalls(c, value: true, awake: 1, start: 1, update: 0, stop: 0);
