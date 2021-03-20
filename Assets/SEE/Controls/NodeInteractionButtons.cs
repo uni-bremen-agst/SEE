@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using SEE.Controls.Actions;
+using SEE.Utils;
 
 namespace SEE.Controls
 {
@@ -31,16 +32,9 @@ namespace SEE.Controls
         public Button EditNodeButton;
 
         /// <summary>
-        /// The player desktop that is the parent of the <see cref="AddNodeAction"/> 
-        /// and <see cref="EditNodeAction"/>.
+        /// The action which is currently executed.
         /// </summary>
-        private GameObject playerDesktop;
-
-        /// <summary>
-        /// The name of the GameObject that is the parent of the <see cref="AddNodeAction"/> 
-        /// and <see cref="EditNodeAction"/>.
-        /// </summary>
-        private const string gameObjectName = "Player Desktop";
+        public static ReversibleAction addOrEditNode;
 
         /// <summary>
         /// Adds a listener to the button which calls a method when the button is pushed.
@@ -51,8 +45,6 @@ namespace SEE.Controls
             EditNodeCancel?.onClick?.AddListener(EditIsCanceled);
             EditNodeButton?.onClick?.AddListener(EditNode);
             AddNodeCancel?.onClick?.AddListener(AddingIsCanceled);
-
-            playerDesktop = GameObject.Find(gameObjectName);
         }
 
         /// <summary>
@@ -61,30 +53,17 @@ namespace SEE.Controls
         /// </summary>
         public void SetNextAddingNodeStep()
         {
-            if (playerDesktop.TryGetComponent(out AddNodeAction current))
-            {
-                current.Progress = AddNodeAction.ProgressState.CanvasIsClosed;
-            }
-            else
-            {
-                Debug.LogError($"Player desktop {playerDesktop.name} does not have an AddNodeAction component.\n");
-            }            
+            AddNodeAction addNodeAction = (AddNodeAction)addOrEditNode;
+            addNodeAction.Progress = AddNodeAction.ProgressState.CanvasIsClosed;
         }
 
         /// <summary>
-        /// Sets a bool in the <see cref="EditNodeAction"/> which closes the adding-node canvas.
-        /// FIXME: There is no bool here. This comment must be fixed.
+        /// Marks the action to edit an existing node as being canceled.
         /// </summary>
         public void EditIsCanceled()
         {
-            if (playerDesktop.TryGetComponent(out EditNodeAction current))
-            {
-                current.EditProgress = EditNodeAction.ProgressState.EditIsCanceled;
-            }
-            else
-            {
-                Debug.LogError($"Player desktop {playerDesktop.name} does not have an EditNodeAction component.\n");
-            }
+            EditNodeAction editNodeAction = (EditNodeAction)addOrEditNode;
+            editNodeAction.EditProgress = EditNodeAction.ProgressState.EditIsCanceled;
         }
 
         /// <summary>
@@ -101,14 +80,8 @@ namespace SEE.Controls
         /// </summary>
         public void AddingIsCanceled()
         {
-            if (playerDesktop.TryGetComponent(out AddNodeAction current))
-            {
-                current.Progress = AddNodeAction.ProgressState.AddingIsCanceled;
-            }
-            else
-            {
-                Debug.LogError($"Player desktop {playerDesktop.name} does not have an AddNodeAction component.\n");
-            }
+            AddNodeAction addNodeAction = (AddNodeAction)addOrEditNode;
+            addNodeAction.Progress = AddNodeAction.ProgressState.AddingIsCanceled;
         }
     }
 }
