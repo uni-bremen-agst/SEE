@@ -59,6 +59,10 @@ namespace SEE.Controls.Actions
             new ActionStateType(8, "Dummy", "Example action creating spheres",
                                 Color.magenta.Darker(), "Materials/ModernUIPack/Plus",
                                 DummyAction.CreateReversibleAction);
+        public static ActionStateType Draw { get; } =
+            new ActionStateType(9, "Draw", "Draws a line",
+                        Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                        DrawAction.CreateReversibleAction);
         #endregion
 
         /// <summary>
