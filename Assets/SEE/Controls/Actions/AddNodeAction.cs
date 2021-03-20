@@ -166,7 +166,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// The Update method interacts in dependency of the progress state. (sequencial series)
+        /// The Update method interacts in dependency of the progress state (sequential series).
         /// NoCitySelected: Searching for a selected city, where a node can be added
         /// CityIsSelected: Opens a canvas-object where values for the node can be added
         /// WaitingForValues: This State is active while the canvas is open, but the button "AddNode" on it is not pushed

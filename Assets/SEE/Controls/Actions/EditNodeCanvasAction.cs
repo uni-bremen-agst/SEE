@@ -47,7 +47,7 @@ namespace SEE.Controls.Actions
         private const string prefabPath = "Prefabs/EditNodeCanvas";
 
         /// <summary>
-        /// The editNodeAction instance where the progress-state has to be set
+        /// The editNodeAction instance where the progress state has to be set.
         /// </summary>
         public EditNodeAction editNodeAction;
 
