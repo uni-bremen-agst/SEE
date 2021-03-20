@@ -235,10 +235,9 @@ namespace SEE.Utils
         /// <exception cref="EmptyUndoHistoryException">thrown if there is no action previously undone</exception>
         public void Redo()
         {
-            Debug.Log("Redo.\n");
             if (RedoStack.Count > 0)
             {
-                Current.Stop();
+                Current?.Stop();
 
                 // the last undone action becomes the currently executed action again
                 ReversibleAction action = RedoStack.Pop();
