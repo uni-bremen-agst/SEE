@@ -58,6 +58,10 @@ namespace SEE.Game.UI.CodeWindow
             else if (codeWindows.Contains(window))
             {
                 throw new ArgumentException("Given window is already open.");
+            } else if (codeWindows.Find(x => x.Title == window.Title))
+            {
+                Debug.LogError("Warning: Multiple code windows with the same title are in the same space. "
+                               + "This will lead to issues when syncing across the network.\n");
             }
 
             codeWindows.Add(window);
@@ -126,13 +130,45 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         public CodeWindow ActiveCodeWindow { get; set; }
 
+        /// <summary>
+        /// This event will be invoked whenever the active code window is changed.
+        /// </summary>
         public UnityEvent OnActiveCodeWindowChanged = new UnityEvent();
 
+        /// <summary>
+        /// Re-creates a <see cref="CodeWindowSpace"/> from the given <paramref name="valueObject"/> and attaches
+        /// it to the given GameObject <paramref name="attachTo"/>.
+        /// </summary>
+        /// <param name="valueObject">The value object from which the code window space should be constructed.</param>
+        /// <param name="attachTo">The game object to which the new code window space should be attached.</param>
+        /// <returns>The newly re-created CodeWindowSpace.</returns>
+        public static CodeWindowSpace FromValueObject(CodeWindowSpaceValues valueObject, GameObject attachTo)
+        {
+            if (attachTo == null)
+            {
+                throw new ArgumentNullException(nameof(attachTo));
+            }
+            CodeWindowSpace space = attachTo.AddComponent<CodeWindowSpace>();
+            space.codeWindows.AddRange(valueObject.CodeWindows.Select(x => CodeWindow.FromValueObject(x)));
+            space.ActiveCodeWindow = space.codeWindows.First(x => valueObject.ActiveCodeWindow.Title == x.Title);
+            return space;
+        }
+
+        /// <summary>
+        /// Generates and returns a <see cref="CodeWindowSpaceValues"/> struct for this code window space.
+        /// </summary>
+        /// <param name="fulltext">Whether the whole text should be included. Iff false, the filename will be saved
+        /// instead of the text. This applies to each code window contained in this space.</param>
+        /// <returns>The newly created <see cref="CodeWindowSpaceValues"/>, matching this class</returns>
         public CodeWindowSpaceValues ToValueObject(bool fulltext)
         {
             return new CodeWindowSpaceValues(CodeWindows, ActiveCodeWindow, fulltext);
         }
         
+        /// <summary>
+        /// Represents the values of a code window space necessary to re-create its content.
+        /// Used for serialization when sending a <see cref="CodeWindowSpace"/> over the network.
+        /// </summary>
         [Serializable]
         public struct CodeWindowSpaceValues
         {
