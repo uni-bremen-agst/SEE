@@ -122,6 +122,10 @@ namespace SEE.Game.Evolution
 
         private void Init()
         {
+
+            Canvas canvas = AnimationCanvas.GetComponent<Canvas>();
+            canvas.worldCamera = MainCamera.Camera;
+
             revisionSelectionDataModel = RevisionSelectionCanvas.GetComponent<RevisionSelectionDataModel>();
             animationDataModel = AnimationCanvas.GetComponent<AnimationDataModel>();
 
