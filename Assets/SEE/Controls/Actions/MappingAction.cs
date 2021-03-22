@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
@@ -54,6 +53,15 @@ namespace SEE.Controls.Actions
         internal static ReversibleAction CreateReversibleAction()
         {
             return new MappingAction();
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="MappingAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
         }
 
         /// <summary>
@@ -428,20 +436,25 @@ namespace SEE.Controls.Actions
 
         SpinningCube spinningCube;
 
-        // Update is called once per frame
-        public void Update()
+        /// <summary>
+        /// See <see cref="ReversibleAction.Update"/>.
+        /// </summary>
+        /// <returns>true if completed</returns>
+        public bool Update()
         {
             // This script should be disabled, if the action state is not 'Map'
             if (!ActionState.Is(ActionStateType.Map))
             {
                 InteractableObject.AnySelectIn -= AnySelectIn;
                 InteractableObject.AnySelectOut -= AnySelectOut;
-                return;
+                return false;
             }
 
             //------------------------------------------------------------------------
             // ARCHITECTURAL MAPPING
             //------------------------------------------------------------------------
+
+            bool result = false;
 
             if (Input.GetMouseButtonDown(0)) // Left mouse button
             {
@@ -472,6 +485,8 @@ namespace SEE.Controls.Actions
                             Reflexion.Delete_From_Mapping(mapped.Outgoings[0]);
                         }
                         Reflexion.Add_To_Mapping(n0, n1);
+                        // mapping is completed
+                        result = false;
                         selection.interactableObject.SetSelect(false, true);
                     }
                 }
@@ -543,6 +558,7 @@ namespace SEE.Controls.Actions
                 SaveMapping(mapping, MappingFile);
             }
 #endif
+            return result;
         }
 
         /// <summary>
@@ -678,6 +694,15 @@ namespace SEE.Controls.Actions
                 default: Debug.LogErrorFormat("UNHANDLED CALLBACK: {0}\n", changeEvent);
                     break;
             }
+        }
+
+        /// <summary>
+        /// <see cref="ReversibleAction.HadEffect"/>
+        /// </summary>
+        /// <returns>true if this action has had already some effect that would need to be undone</returns>
+        public bool HadEffect()
+        {
+            return false; // FIXME
         }
 
         /// <summary>

@@ -150,15 +150,11 @@ namespace SEE.Controls.Actions
 
             InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
             InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
-            if (!instantiated)
-            {
-                instantiated = true;
-            }
         }
 
         /// <summary>
-        /// Operations to do when the action is finished, more specific another action is started. Destroys
-        /// the canvas object if existing and undyes the chosen city.
+        /// Operations to do when the action is finished, more specifically, if another action 
+        /// is started. Destroys the canvas object if it exists and undyes the chosen city.
         /// </summary>
         public override void Stop()
         {
@@ -170,16 +166,20 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// The update-method interacts in dependency of the progress-state. (sequencial series)
+        /// The Update method interacts in dependency of the progress state (sequential series).
         /// NoCitySelected: Searching for a selected city, where a node can be added
         /// CityIsSelected: Opens a canvas-object where values for the node can be added
         /// WaitingForValues: This State is active while the canvas is open, but the button "AddNode" on it is not pushed
         /// CanvasIsClosed: Closes the canvas-object after extracting the values for the creation of a node. This state is reached by pushing the "AddNode"-Button
         /// ValuesAreGiven: Moves the node and waits for a mouseInput to place the node, if its inside of the previous chosen city
         /// AddingIsCanceled: Removes all attributes and states and resets the progress-state to noCitySelected
+        /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
-        public override void Update()
+        /// <returns>true if completed</returns> 
+        public override bool Update()
         {
+            bool result = false;
+
             // Removes the canvasObject and extracts the inserted values from it for the new node to be created in next state.
             void RemoveCanvas()
             {
@@ -227,6 +227,8 @@ namespace SEE.Controls.Actions
                         if (Input.GetMouseButtonDown(0))
                         {
                             Place();
+                            // the new node has reached its final destination; we are done
+                            result = true;
                         }
                     }
                     break;
@@ -235,14 +237,13 @@ namespace SEE.Controls.Actions
                     RemoveCanvas();
                     city = null;
                     Progress = ProgressState.NoCitySelected;
-                    instantiated = false;
                     break;
 
                 default:
                     throw new NotImplementedException("Unhandled case.");
             }
+            return result;
         }
-
 
         /// <summary>
         /// Selects the city with hovering. Sets the city object on click on a GameObject.
@@ -292,8 +293,8 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Opens a dialog-canvas where the user can insert some node-metrics. Therefore, a CanvasGenerator-script-component 
-        /// will be added to this gameObject which contains the canvas as a gameObject-instance of a prefab.
+        /// Opens a dialog canvas where the user can insert some node metrics. Therefore, a CanvasGenerator-script component 
+        /// will be added to this gameObject which contains the canvas as a gameObject instance of a prefab.
         /// </summary>
         public void OpenDialog()
         {
@@ -301,7 +302,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Undyes the current color of the object, i.e., changes the color of to its original color.
+        /// Undyes the current color of the object, i.e., changes its color to its original color.
         /// </summary>
         public void Undye()
         {
@@ -558,7 +559,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Undoes this AddNodeAction
+        /// Undoes this AddNodeAction.
         /// </summary>
         public override void Undo()
         {
@@ -566,7 +567,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Redoes this DeleteAction
+        /// Redoes this AddNodeAction.
         /// </summary>
         public override void Redo()
         {
@@ -576,10 +577,19 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="AddNodeAction"/>.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>new instance</returns>
         public static ReversibleAction CreateReversibleAction()
         {
             return new AddNodeAction();
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="AddNodeAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
         }
     }
 }
