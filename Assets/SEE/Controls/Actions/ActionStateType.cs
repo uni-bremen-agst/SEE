@@ -26,11 +26,11 @@ namespace SEE.Controls.Actions
         public static ActionStateType Move { get; } = 
             new ActionStateType(0, "Move", "Move a node within a graph", 
                                 Color.red.Darker(), "Materials/Charts/MoveIcon",
-                                null);
+                                MoveAction.CreateReversibleAction);
         public static ActionStateType Rotate { get; } = 
             new ActionStateType(1, "Rotate", "Rotate everything around the selected node within a graph", 
                                 Color.blue.Darker(), "Materials/ModernUIPack/Refresh",
-                                null);
+                                RotateAction.CreateReversibleAction);
         public static ActionStateType Map { get; } = 
             new ActionStateType(2, "Map", "Map a node from one graph to another graph", 
                                 Color.green.Darker(), "Materials/ModernUIPack/Map",
@@ -55,8 +55,12 @@ namespace SEE.Controls.Actions
             new ActionStateType(7, "Delete", "Deletes a node or edge", 
                                 Color.yellow.Darker(), "Materials/ModernUIPack/Trash",
                                 DeleteAction.CreateReversibleAction);
+        public static ActionStateType Draw { get; } =
+            new ActionStateType(8, "Draw", "Draws a line",
+                        Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                        DrawAction.CreateReversibleAction);
         public static ActionStateType Dummy { get; } =
-            new ActionStateType(8, "Dummy", "Example action creating spheres",
+            new ActionStateType(9, "Dummy", "Example action creating spheres",
                                 Color.magenta.Darker(), "Materials/ModernUIPack/Plus",
                                 DummyAction.CreateReversibleAction);
         #endregion

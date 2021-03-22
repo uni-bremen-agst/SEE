@@ -31,7 +31,7 @@ namespace SEE.GO.Menu
         /// <returns>the newly created mode menu component.</returns>
         private static SelectionMenu CreateModeMenu(GameObject attachTo = null)
         {
-            Assert.IsTrue(ActionStateType.AllTypes.Count == 9);
+            Assert.IsTrue(ActionStateType.AllTypes.Count == 10);
             Assert.IsTrue(ActionStateType.Move.Value == 0);
             Assert.IsTrue(ActionStateType.Rotate.Value == 1);
             Assert.IsTrue(ActionStateType.Map.Value == 2);
@@ -39,8 +39,9 @@ namespace SEE.GO.Menu
             Assert.IsTrue(ActionStateType.NewNode.Value == 4);
             Assert.IsTrue(ActionStateType.EditNode.Value == 5);
             Assert.IsTrue(ActionStateType.ScaleNode.Value == 6);
-            Assert.IsTrue(ActionStateType.Delete.Value == 7);
-            Assert.IsTrue(ActionStateType.Dummy.Value == 8);
+            Assert.IsTrue(ActionStateType.Delete.Value == 7);            
+            Assert.IsTrue(ActionStateType.Draw.Value == 8);
+            Assert.IsTrue(ActionStateType.Dummy.Value == 9);
 
             // IMPORTANT NOTE: Because an ActionState.Type value will be used as an index into 
             // the following field of menu entries, the rank of an entry in this field of entry
@@ -60,7 +61,11 @@ namespace SEE.GO.Menu
                     entryColor: type.Color,
                     icon: Resources.Load<Sprite>(type.IconPath)
                     ));
-                first = false;
+                if (first)
+                {
+                    PlayerActionHistory.Execute(type);
+                    first = false;
+                }                
             }
 
             // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
