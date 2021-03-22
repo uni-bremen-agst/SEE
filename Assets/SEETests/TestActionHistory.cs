@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using SEE.Utils;
-using System;
 
 namespace SEETests
 {
@@ -70,13 +69,33 @@ namespace SEETests
                 Assert.That(UndoCalls == RedoCalls);
             }
 
-            public void Update()
+            public bool Update()
             {
                 UpdateCalls++;
                 // AwakeCalls has been called once before.
                 Assert.AreEqual(1, AwakeCalls);
                 // The number of Start calls is always one ahead of the number of Stop calls.
                 Assert.AreEqual(StartCalls, StopCalls + 1);
+                // This action is never finished.
+                return false;
+            }
+
+            /// <summary>
+            /// Returns a new instance of <see cref="TestAction"/>.
+            /// </summary>
+            /// <returns>new instance</returns>
+            public ReversibleAction NewInstance()
+            {
+                return new TestAction();
+            }
+
+            /// <summary>
+            /// This action has always had an effect.
+            /// </summary>
+            /// <returns></returns>
+            public bool HadEffect()
+            {
+                return true;
             }
         }
 
@@ -101,7 +120,7 @@ namespace SEETests
         [Test]
         public void OneAction()
         {
-            TestAction c = new TestAction();           
+            TestAction c = new TestAction();
             CheckCalls(c, value: false, awake: 0, start: 0, update: 0, stop: 0);
             hist.Execute(c);
             CheckCalls(c, value: true, awake: 1, start: 1, update: 0, stop: 0);
@@ -341,6 +360,172 @@ namespace SEETests
             Assert.AreEqual(start, counter.StartCalls, "start calls not matching");
             Assert.AreEqual(update, counter.UpdateCalls, "update calls not matching");
             Assert.AreEqual(stop, counter.StopCalls, "stop calls not matching");
+        }
+
+        /// <summary>
+        /// Provides a counter.
+        /// </summary>
+        private abstract class Counter : ReversibleAction
+        {
+            protected static int counter = 0;
+
+            public static int Value { get => counter; }
+
+            public void Awake()
+            {
+                // nothing to be done
+            }
+
+            public void Start()
+            {
+                // nothing to be done
+            }
+
+            public void Stop()
+            {
+                // nothing to be done
+            }
+
+            protected bool hadEffect = false;
+            public bool HadEffect()
+            {
+                return hadEffect;
+            }
+            
+            public abstract ReversibleAction NewInstance();
+            public abstract void Redo();
+            public abstract void Undo();
+            public abstract bool Update();
+        }
+
+        /// <summary>
+        /// Increments counter.
+        /// </summary>
+        private class Increment : Counter
+        {
+            public override ReversibleAction NewInstance()
+            {
+                return new Increment();
+            }
+
+            public override void Redo()
+            {
+                counter++;
+            }
+
+            public override void Undo()
+            {
+                counter--;
+            }
+
+            public override bool Update()
+            {
+                hadEffect = true;
+                counter++;
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Decrements counter.
+        /// </summary>
+        private class Decrement : Counter
+        {
+            public override ReversibleAction NewInstance()
+            {
+                return new Decrement();
+            }
+
+            public override void Redo()
+            {
+                counter--;
+            }
+
+            public override void Undo()
+            {
+                counter++;
+            }
+
+            public override bool Update()
+            {
+                hadEffect = true;
+                counter--;
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Test scenario for a non-continuous action with immediate effect.
+        /// </summary>
+        [Test]        
+        public void TestCounterAction()
+        {
+            hist.Execute(new Increment());
+            Assert.AreEqual(0, Counter.Value);
+            Assert.AreEqual(1, hist.UndoCount);
+            Assert.AreEqual(0, hist.RedoCount);            
+            hist.Update();
+            Assert.AreEqual(1, Counter.Value);
+            Assert.AreEqual(2, hist.UndoCount);
+            Assert.AreEqual(0, hist.RedoCount);
+            hist.Update();
+            Assert.AreEqual(2, Counter.Value);
+            Assert.AreEqual(3, hist.UndoCount);
+            Assert.AreEqual(0, hist.RedoCount);
+            hist.Update();
+            Assert.AreEqual(3, Counter.Value);
+            Assert.AreEqual(4, hist.UndoCount);
+            Assert.AreEqual(0, hist.RedoCount);
+            hist.Undo();
+            Assert.AreEqual(2, Counter.Value);
+            // because the effect takes place only if Update was called, there are only two actions on the stack
+            Assert.AreEqual(2, hist.UndoCount); 
+            Assert.AreEqual(1, hist.RedoCount);
+            hist.Undo();
+            Assert.AreEqual(1, Counter.Value);
+            Assert.AreEqual(1, hist.UndoCount);
+            Assert.AreEqual(2, hist.RedoCount);
+            hist.Undo();
+            Assert.AreEqual(0, Counter.Value);
+            Assert.AreEqual(0, hist.UndoCount);
+            Assert.AreEqual(3, hist.RedoCount);
+            hist.Redo();
+            Assert.AreEqual(1, Counter.Value);
+            Assert.AreEqual(1, hist.UndoCount);
+            Assert.AreEqual(2, hist.RedoCount);
+            hist.Redo();
+            Assert.AreEqual(2, Counter.Value);
+            Assert.AreEqual(2, hist.UndoCount);
+            Assert.AreEqual(1, hist.RedoCount);
+            hist.Execute(new Decrement());
+            Assert.AreEqual(2, Counter.Value); // still 2 because no Update was called
+            Assert.AreEqual(3, hist.UndoCount);
+            Assert.AreEqual(0, hist.RedoCount); // RedoStack is lost
+            hist.Update();
+            Assert.AreEqual(1, Counter.Value);
+            Assert.AreEqual(4, hist.UndoCount);
+            Assert.AreEqual(0, hist.RedoCount);
+            hist.Execute(new Increment());
+            Assert.AreEqual(1, Counter.Value);  // still 1 because no Update was called
+            Assert.AreEqual(5, hist.UndoCount);
+            Assert.AreEqual(0, hist.RedoCount);
+            // Undo without prior Update; that means we are actually undoing Decrement
+            hist.Undo();
+            Assert.AreEqual(2, Counter.Value);
+            Assert.AreEqual(2, hist.UndoCount); // 2 because we have have removed the Increment without effect and then Decrement
+            Assert.AreEqual(1, hist.RedoCount);
+            hist.Undo(); // undoing an Increment
+            Assert.AreEqual(1, Counter.Value);
+            Assert.AreEqual(1, hist.UndoCount);
+            Assert.AreEqual(2, hist.RedoCount);
+            hist.Redo(); // re-doing an Increment
+            Assert.AreEqual(2, Counter.Value);
+            Assert.AreEqual(2, hist.UndoCount);
+            Assert.AreEqual(1, hist.RedoCount);
+            hist.Redo(); // re-doing a Decrement
+            Assert.AreEqual(1, Counter.Value);
+            Assert.AreEqual(3, hist.UndoCount);
+            Assert.AreEqual(0, hist.RedoCount);
         }
     }
 }

@@ -8,7 +8,7 @@
 
     /// <summary>
     /// Defines the expected operations and their protocol for actions that
-    /// can be reversed (have Undo() and Redo(). Their protocol resembles 
+    /// can be reversed (have Undo() and Redo()). Their protocol resembles 
     /// Unity's protocol for MonoBehaviours regarding <see cref="Awake"/>,
     /// <see cref="Start"/>, and <see cref="Update"/>.
     /// </summary>
@@ -17,11 +17,28 @@
         // The protocol of the following operations over the lifecycle of a
         // reversible object is as follows (where "X . Y" means X is called
         // before Y and * denotes the Kleene star, i.e., refers to zero or
-        // more repetitions.        
-        //    Awake . (Start . Update* . Stop)*
+        // more repetitions):
+        //
+        //    Awake . Start . Update* . Stop
+        //
+        // The action signals its completion by returning true when Update is
+        // called, in which case it will receive a Stop message and then
+        // its lifecycle ends. If Update yields false instead, the lifecycle
+        // continues.
+        // The lifecycle may also be ended "from the outside", in which case
+        // Stop will be called (no matter what the return value of Update is).
+        //
+        // When Undo is called, the action restores the state at the time
+        // after Awake and before Start were called.
+        //
+        // When Redo is called, the action restores the state at the time
+        // after Stop was called.
+        //
         // Undo can be called only after Awake has been called before.
+        // Redo can be called only after Undo was called.
+        //
         // Let calls(X) denote the number of calls for method X, then
-        //    calls(Redo) = calls(Undo) or calls(Redo) = calls(Undo) - 1
+        //    0 <= calls(Undo) - calls(Redo) <= 1
         // holds as an invariant.
 
         /// <summary>
@@ -32,7 +49,7 @@
 
         /// <summary>
         /// Will be called whenever the action is to start its execution.
-        /// There two different situations in which this is the case:
+        /// There are two different situations in which this is the case:
         /// (1) upon its intial start and (2) when it is resumed.
         /// Situation (1): <see cref="Start"/> will be called once after 
         /// <see cref="Awake"/> when it is executed the first time. 
@@ -48,7 +65,8 @@
         /// Will be called after <see cref="Start"/>. Can be called multiple times
         /// (e.g., once per frame) for continuously executing the action.
         /// </summary>
-        void Update();
+        /// <returns>true if action is completed</returns>
+        bool Update();
 
         /// <summary>
         /// Will be called when the action is to stop executing. This is 
@@ -68,5 +86,20 @@
         /// Precondition: <see cref="Undo"/> was called before.
         /// </summary>
         void Redo();
+
+        /// <summary>
+        /// True if this action has had an effect that may need to be undone. Actions may
+        /// have been started but may not have had any effect yet because they were
+        /// waiting for input, in which case they do not need to be undone. In this
+        /// case, they will return false; otherwise true.
+        /// </summary>
+        /// <returns>if this action has had an effect that may need to be undone</returns>
+        bool HadEffect();
+
+        /// <summary>
+        /// Returns a new instance of the same type as this particular type of ReversibleAction.
+        /// </summary>
+        /// <returns>new instance</returns>
+        ReversibleAction NewInstance();
     }
 }

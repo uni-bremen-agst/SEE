@@ -12,7 +12,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The current name of the gameObject that contains the canvas operations and components.
         /// </summary>
-        protected readonly string nameOfCanvasObject = "CanvasObject";
+        protected const string nameOfCanvasObject = "CanvasObject";
 
         /// <summary>
         /// The gameObject that contains the CanvasGenerator and the actual CanvasObject.
@@ -25,9 +25,11 @@ namespace SEE.Controls.Actions
         protected GameObject hoveredObject = null;
 
         /// <summary>
-        /// True if the active script is already initialized, else false.
+        /// True if this action has had already some effect that would need to be undone.
+        /// Must be set by subclasses. Will be manipulated in <see cref="Undo"/> and
+        /// <see cref="Redo"/>, too.
         /// </summary>
-        protected bool instantiated = false;
+        protected bool hadAnEffect = false;
 
         /// <summary>
         /// Finds the GameObject that contains the CanvasOperations and components
@@ -42,27 +44,29 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// The undo operation which has to be implemented specifically by subclasses
-        /// to revert the effect of an executed action.
+        /// to revert the effect of an executed action. Marks the actions as having
+        /// had no effect.
         /// See <see cref="ReversibleAction.Undo"/>.
         /// </summary>
         public virtual void Undo() 
         {
-            // intentionally left blank; can be overridden by subclasses
+            hadAnEffect = false;
         }
 
         /// <summary>
         /// The redo operation which has to be implemented specifically by subclasses
         /// to revert the effect of an undone action, in other words, to return to 
         /// the state at the point in time when <see cref="Undo"/> was called.
+        /// Marks the actions as having had an effect.
         /// See <see cref="ReversibleAction.Redo"/>.
         /// </summary>
         public virtual void Redo()
         {
-            // intentionally left blank; can be overridden by subclasses
+            hadAnEffect = true;
         }
 
         /// <summary>
-        /// Will be called once when the action is started to be executing for the
+        /// Will be called once when the action is started for the
         /// first time. Intended for intialization purposes.
         /// See <see cref="ReversibleAction.Awake"/>.
         /// </summary>
@@ -85,10 +89,14 @@ namespace SEE.Controls.Actions
         /// Will be called upon every frame when this action is being executed.
         /// See <see cref="ReversibleAction.Update"/>.
         /// </summary>
-        public virtual void Update()
-        {
-            // intentionally left blank; can be overridden by subclasses
-        }
+        /// <returns>true if action is completed</returns>
+        public abstract bool Update();
+
+        /// <summary>
+        /// Returns a new instance of the same type as this particular type of ReversibleAction.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public abstract ReversibleAction NewInstance();
 
         /// <summary>
         /// Will be called when another action is to be executed. This signals that
@@ -159,6 +167,16 @@ namespace SEE.Controls.Actions
             //                         e.Message, hoveredObject == null ? "NULL" : hoveredObject.name, interactableObject.name);
             //    // FIXME: There are AssertionExceptions 
             //}
+        }
+
+        /// <summary>
+        /// Returns true if this action has had already some effect that would need to be undone.
+        /// <see cref="ReversibleAction.HadEffect"/>
+        /// </summary>
+        /// <returns>true if this action has had already some effect that would need to be undone</returns>
+        public bool HadEffect()
+        {
+            return hadAnEffect;
         }
     }
 }
