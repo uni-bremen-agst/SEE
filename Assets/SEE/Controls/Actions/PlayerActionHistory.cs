@@ -45,23 +45,18 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// The specific action state type of each action.
-        /// </summary>
-        public static ActionStateType Value;
-
-        /// <summary>
         /// Executes the given kind of <paramref name="actionType"/> as new.
         /// </summary>
         /// <param name="actionType">kind of action to be executed</param>
         public static void Execute(ActionStateType actionType)
         {
-            if (actionType.CreateReversible != null)
+            history.Execute(actionType.CreateReversible());
+
+            // FIXME: This looks like a hack and should be removed later.
+            // The PlayerActionHistory should not need to know anything about its actions.
+            if (actionType.Equals(ActionStateType.NewNode) || actionType.Equals(ActionStateType.EditNode))
             {
-                history.Execute(actionType.CreateReversible());
-            }
-            if(actionType.Equals(ActionStateType.NewNode)||actionType.Equals(ActionStateType.EditNode))
-            {
-                NodeInteractionButtons.addOrEditNode = history.UndoStack.Peek();
+                NodeInteractionButtons.addOrEditNode = history.Current;
             }
         }
     }
