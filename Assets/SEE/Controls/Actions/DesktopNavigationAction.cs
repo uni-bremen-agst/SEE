@@ -238,7 +238,7 @@ namespace SEE.Controls.Actions
                 Select(null, true);
             }
 
-            #region Move City
+            #region Move Action
 
             else if (Equals(ActionState.Value, ActionStateType.Move))
             {
@@ -288,7 +288,6 @@ namespace SEE.Controls.Actions
                                 {
                                     movingOrRotating = true;
                                     moveState.draggedTransform = actionState.hoveredTransform;
-
                                 }
                             }
                             else
@@ -364,7 +363,7 @@ namespace SEE.Controls.Actions
 
             #endregion
 
-            #region Rotate
+            #region Rotate Action
 
             else if (Equals(ActionState.Value, ActionStateType.Rotate))
             {

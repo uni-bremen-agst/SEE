@@ -23,9 +23,9 @@ namespace SEE.Controls.Actions
         /// <returns>the added EditNodeCanvasScript</returns>
         public EditNodeCanvasAction InstantiateEditNodeCanvas(EditNodeAction editNodeAction)
         {
-            gameObject.AddComponent<EditNodeCanvasAction>();
-            gameObject.GetComponent<EditNodeCanvasAction>().editNodeAction = editNodeAction;
-            return gameObject.GetComponent<EditNodeCanvasAction>();
+            EditNodeCanvasAction result = gameObject.AddComponent<EditNodeCanvasAction>();
+            result.editNodeAction = editNodeAction;
+            return result;
         }
 
         /// <summary>

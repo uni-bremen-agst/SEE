@@ -136,10 +136,24 @@ namespace SEE.Controls.Actions
             InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
         }
 
-        public override void Update()
+        /// <summary>
+        /// True if the gizmos that allow a user to scale the object in all three dimensions
+        /// are drawn.
+        /// </summary>
+        private bool scalingGizmosAreDrawn = false;
+
+        /// <summary
+        /// See <see cref="ReversibleAction.Update"/>.
+        /// </summary>
+        /// <returns>true if completed</returns>
+        public override bool Update()
         {
-            if (objectToScale != null && instantiated == false)
+            bool result = false;
+
+            if (objectToScale != null && !scalingGizmosAreDrawn)
             {
+                // We draw the gizmos that allow a user to scale the object in all three dimensions.
+
                 originalScale = objectToScale.transform.lossyScale;
                 originalPosition = objectToScale.transform.position;
 
@@ -185,13 +199,13 @@ namespace SEE.Controls.Actions
                 // Positioning
                 SetOnRoof();
                 SetOnSide();
-                instantiated = true;
+                scalingGizmosAreDrawn = true;
             }
             if (Input.GetMouseButtonDown(0) && objectToScale == null)
             {
                 objectToScale = hoveredObject;
             }
-            if (instantiated && Input.GetMouseButton(0))
+            if (scalingGizmosAreDrawn && Input.GetMouseButton(0))
             {
                 if (draggedSphere == null)
                 {
@@ -243,6 +257,8 @@ namespace SEE.Controls.Actions
                     else if (hit.collider == endWithSave.GetComponent<Collider>())
                     {
                         EndScale(true);
+                        // scaling is finalized
+                        result = true;
                     }
                     else if (hit.collider == endWithOutSave.GetComponent<Collider>())
                     {
@@ -272,7 +288,7 @@ namespace SEE.Controls.Actions
                     draggedSphere = null;
                 }
 
-                if(objectToScale != null)
+                if (objectToScale != null)
                 {
                     ScaleNode();
                     SetOnRoof();
@@ -281,7 +297,7 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                if (objectToScale != null && instantiated)
+                if (objectToScale != null && scalingGizmosAreDrawn)
                 {
                     draggedSphere = null;
                     // Adjust the size of the scaling elements
@@ -299,10 +315,11 @@ namespace SEE.Controls.Actions
                     SphereRadius(endWithSave);
                 }
             }
+            return result;
         }
 
         /// <summary>
-        /// Remove the spheres after finishing the action or more explicit canceling the
+        /// Remove the spheres after finishing the action or more explicitly canceling the
         /// action and switch to another.
         /// </summary>
         public override void Stop()
@@ -315,7 +332,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void ScaleNode()
         {
-
             Vector3 scale = Vector3.zero;
             scale.y += topSphere.transform.position.y - topOldSpherePos.y;
             scale.x -= firstSideSphere.transform.position.x - firstSideOldSpherePos.x;
@@ -521,7 +537,7 @@ namespace SEE.Controls.Actions
             Destroyer.DestroyGameObject(endWithSave);
             Destroyer.DestroyGameObject(endWithOutSave);
             objectToScale = null;
-            instantiated = false;
+            scalingGizmosAreDrawn = false;
         }
 
         /// <summary>
@@ -543,10 +559,19 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="ScaleNodeAction"/>.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>new instance</returns>
         public static ReversibleAction CreateReversibleAction()
         {
             return new ScaleNodeAction();
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="ScaleNodeAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
         }
     }
 }
