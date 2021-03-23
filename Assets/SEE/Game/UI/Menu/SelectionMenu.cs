@@ -15,7 +15,7 @@ namespace SEE.Game.UI
             // This will ensure that DoAction() is called on entry
             base.OnEntrySelected(entry);
         }
-        
+
         /// <summary>
         /// Returns the first active entry in the <see cref="entries"/> list.
         /// If no entry is active, <c>null</c> will be returned.

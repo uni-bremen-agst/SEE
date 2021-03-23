@@ -98,6 +98,10 @@ namespace SEE.Utils
         /// <returns>if this action has had an effect that may need to be undone</returns>
         bool HadEffect();
 
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this action.
+        /// </summary>
+        /// <returns>the <see cref="ActionStateType"/> of this action</returns>
         ActionStateType GetActionStateType();
 
         /// <summary>

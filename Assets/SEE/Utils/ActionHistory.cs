@@ -199,7 +199,6 @@ namespace SEE.Utils
                 // not had any effect yet.
 
                 ReversibleAction current = UndoStack.Pop();
-
                 while (!current.HadEffect())
                 {
                     current.Stop();
@@ -256,7 +255,6 @@ namespace SEE.Utils
                 UndoStack.Push(action);
                 action.Redo();
                 action.Start();
-
             }
             else
             {
@@ -274,16 +272,17 @@ namespace SEE.Utils
             PlayerSettings.LocalPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu);
             PlayerSettings.LocalPlayer.TryGetComponentOrLog(out ActionStateIndicator indicator);
 
-            foreach (ToggleMenuEntry t in playerMenu.ModeMenu.Entries)
+            foreach (ToggleMenuEntry toggleMenuEntry in playerMenu.ModeMenu.Entries)
             {
-                if (t.Title.Equals(stack.Peek().GetActionStateType().Name))
+                if (toggleMenuEntry.Title.Equals(stack.Peek().GetActionStateType().Name))
                 {
-                    playerMenu.ModeMenu.ActiveEntry = t;
+                    playerMenu.ModeMenu.ActiveEntry = toggleMenuEntry;
                     indicator.ChangeState(stack.Peek().GetActionStateType());
                 }
             }
 
         }
+
         /// <summary>
         /// The number of executed actions that can be undone.
         /// </summary>

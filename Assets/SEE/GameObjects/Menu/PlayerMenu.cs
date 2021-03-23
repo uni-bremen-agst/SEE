@@ -16,7 +16,6 @@ namespace SEE.GO.Menu
         /// </summary>
         public SelectionMenu ModeMenu;
 
-
         /// <summary>
         /// The UI object representing the indicator, which displays the current action state on the screen.
         /// </summary>

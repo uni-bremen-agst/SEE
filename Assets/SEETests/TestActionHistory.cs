@@ -99,6 +99,10 @@ namespace SEETests
                 return true;
             }
 
+            /// <summary>
+            /// Returns the <see cref="ActionStateType"/> of this action.
+            /// </summary>
+            /// <returns>the <see cref="ActionStateType"/> of this action</returns>
             public ActionStateType GetActionStateType()
             {
                 throw new System.NotImplementedException();

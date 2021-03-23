@@ -66,6 +66,10 @@ namespace SEE.Controls.Actions
             hadAnEffect = true;
         }
 
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of the specific action.
+        /// </summary>
+        /// <returns>the <see cref="ActionStateType" of the specific action/></returns>
         public abstract ActionStateType GetActionStateType();
 
         /// <summary>
@@ -95,6 +99,9 @@ namespace SEE.Controls.Actions
         /// <returns>true if action is completed</returns>
         public abstract bool Update();
 
+        /// <summary>
+        /// True, if the <see cref="PlayerMenu"/> is open, else false.
+        /// </summary>
         public static bool MenuIsOpen = true;
 
         /// <summary>
@@ -174,11 +181,6 @@ namespace SEE.Controls.Actions
             //}
         }
 
-        public static explicit operator AbstractPlayerAction(Type v)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// Returns true if this action has had already some effect that would need to be undone.
         /// <see cref="ReversibleAction.HadEffect"/>
@@ -189,6 +191,9 @@ namespace SEE.Controls.Actions
             return hadAnEffect;
         }
 
+        /// <summary>
+        /// Inverts the <see cref="MenuIsOpen"/>.
+        /// </summary>
         public static void InvertMenuIsOpen()
         {
             MenuIsOpen = !MenuIsOpen;
