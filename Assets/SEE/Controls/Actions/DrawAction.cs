@@ -44,6 +44,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject line;
 
+        private bool firstExecution = true;
+
         /// <summary>
         /// The renderer used to draw the line.
         /// </summary>
@@ -102,7 +104,14 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override bool Update()
         {
-            if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
+            if(firstExecution)
+            {
+                firstExecution = false;
+                return false;
+            }
+            if (!MenuIsOpen)
+            {
+                if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
             {
                 // FIXME: This would needed to be adjusted to VR and AR.
                 // The position at which to continue the line.
@@ -121,7 +130,9 @@ namespace SEE.Controls.Actions
                 hadAnEffect = true;
             }
             // The action is considered complete if the mouse button is no longer pressed.
-            return Input.GetMouseButtonUp(0);
+                return Input.GetMouseButtonUp(0);
+            }
+            return false;
         }
 
         /// <summary>
