@@ -1,5 +1,6 @@
 ﻿using SEE.Controls;
 using SEE.Game.UI.CodeWindow;
+using UnityEngine;
 
 namespace SEE.Net
 {
@@ -48,6 +49,8 @@ namespace SEE.Net
                     return;
                 }
                 
+                //TODO: Remove debug log
+                Debug.Log($"Received instance from {RequesterIPAddress}: {Space}\n");
                 CodeSpaceManager.ManagerInstance.UpdateCodeWindowSpaceFromValueObject(RequesterIPAddress, Space);
             }
         }

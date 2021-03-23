@@ -43,6 +43,11 @@ namespace SEE.Game.UI
         protected PlayerInputType Platform { get; private set; }
 
         /// <summary>
+        /// Whether the <see cref="Start"/> method of this component has already been called.
+        /// </summary>
+        protected bool HasStarted { get; private set; } = false;
+
+        /// <summary>
         /// Called when the <see cref="Start()"/> method of this component is executed on the Desktop platform.
         /// </summary>
         protected virtual void StartDesktop() => PlatformUnsupported();
@@ -90,6 +95,8 @@ namespace SEE.Game.UI
                 Canvas.name = UI_CANVAS_NAME;
             }
             
+            HasStarted = true;
+            
             // Execute platform dependent code
             Platform = PlayerSettings.GetInputType();
             switch (Platform)
@@ -109,6 +116,7 @@ namespace SEE.Game.UI
                 default: PlatformUnsupported();
                     break;
             }
+
         }
 
         protected void Update()

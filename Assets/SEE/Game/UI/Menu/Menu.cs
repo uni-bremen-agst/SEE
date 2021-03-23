@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game.UI
@@ -68,12 +69,33 @@ namespace SEE.Game.UI
 
         /// <summary>
         /// Adds an <paramref name="entry"/> to this menu's <see cref="Entries"/>.
-        /// This method must be called <i>before</i> this component's Start() method has been called.
         /// </summary>
         /// <param name="entry">The entry to add to this menu.</param>
         public void AddEntry(T entry)
         {
+            if (Entries.Any(x => x.Title == entry.Title))
+            {
+                throw new InvalidOperationException($"Button with the given title '{entry.Title}' already exists!\n");
+            }
             Entries.Add(entry);
+            if (HasStarted)
+            {
+                AddDesktopButtons(new []{entry});
+            }
+        }
+
+        /// <summary>
+        /// Removes the given <paramref name="entry"/> from the menu.
+        /// If the <paramref name="entry"/> is not present in the menu, nothing will happen.
+        /// </summary>
+        /// <param name="entry">The entry to remove from the menu</param>
+        public void RemoveEntry(T entry)
+        {
+            Entries.Remove(entry);
+            if (HasStarted)
+            {
+                RemoveDesktopButton(entry);
+            }
         }
 
         /// <summary>

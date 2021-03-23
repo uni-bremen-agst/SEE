@@ -6,9 +6,11 @@ using UnityEngine;
 
 namespace SEE.Game.UI.CodeWindow
 {
+    /// <summary>
+    /// This part of the class contains the Desktop UI for a code space.
+    /// </summary>
     public partial class CodeWindowSpace
     {
-
         /// <summary>
         /// The <see cref="Panel"/> containing the code windows.
         /// </summary>
@@ -23,13 +25,14 @@ namespace SEE.Game.UI.CodeWindow
         protected override void StartDesktop()
         {
             // Add CodeWindowSpace component if it doesn't exist yet
-            space = Canvas.transform.Find(CODE_WINDOW_SPACE_NAME)?.gameObject;
+            space = Canvas.transform.Find(CodeWindowSpaceName)?.gameObject;
             if (!space)
             {
                 GameObject spacePrefab = Resources.Load<GameObject>(CODE_WINDOW_SPACE_PREFAB);
                 space = Instantiate(spacePrefab, Canvas.transform, false);
-                space.name = CODE_WINDOW_SPACE_NAME;
+                space.name = CodeWindowSpaceName;
             }
+            space.SetActive(true);
         }
 
         /// <summary>
@@ -74,7 +77,6 @@ namespace SEE.Game.UI.CodeWindow
                     return;
                 }
                 Panel.ActiveTab = Panel.GetTabIndex((RectTransform) ActiveCodeWindow.codeWindow.transform);
-                // TODO For some reason, this causes an infinite loop: OnActiveCodeWindowChanged.Invoke();
             }
         }
         
@@ -98,6 +100,7 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     if (Panel == tab.Panel)
                     {
+                        ActiveCodeWindow = CodeWindows.First(x => x.codeWindow.GetInstanceID() == tab.Content.gameObject.GetInstanceID());
                         OnActiveCodeWindowChanged.Invoke();
                     }
                 };
@@ -120,6 +123,7 @@ namespace SEE.Game.UI.CodeWindow
             // Now we need to detect changes in the open code windows
             // Unfortunately this adds an O(m+n) call to each frame, but considering how small m and n are likely to be,
             // this shouldn't be a problem.
+            
             // First, close old windows that are not open anymore
             foreach (CodeWindow codeWindow in currentCodeWindows.Except(codeWindows).ToList())
             {
@@ -130,7 +134,8 @@ namespace SEE.Game.UI.CodeWindow
             }
             
             // Then, add new tabs 
-            foreach (CodeWindow codeWindow in codeWindows.Except(currentCodeWindows).ToList())
+            // We need to skip code windows who weren't initialized yet
+            foreach (CodeWindow codeWindow in codeWindows.Except(currentCodeWindows).Where(x => x.codeWindow != null).ToList())
             {
                 RectTransform rectTransform = (RectTransform) codeWindow.codeWindow.transform;
                 // Add the new window as a tab to our panel
@@ -140,10 +145,18 @@ namespace SEE.Game.UI.CodeWindow
                 currentCodeWindows.Add(codeWindow);
                 
                 // Allow closing the tab
-                // FIXME: Apparently, this is called twice. It seems like the problem lies in PanelNotificationCenter.
-                PanelNotificationCenter.OnTabClosed += panelTab => 
-                    CloseCodeWindow(codeWindows.First(x => x.codeWindow.GetInstanceID() == panelTab.Content.gameObject.GetInstanceID()));
-                
+                if (CanClose)
+                {
+                    // FIXME: Apparently, this is called twice. It seems like the problem lies in PanelNotificationCenter.
+                    PanelNotificationCenter.OnTabClosed += panelTab =>
+                    {
+                        if (panelTab.Panel == Panel)
+                        {
+                            CloseCodeWindow(codeWindows.First(x => x.codeWindow.GetInstanceID() == panelTab.Content.gameObject.GetInstanceID()));
+                        }
+                    };
+                }
+
                 // Rebuild layout
                 PanelsCanvas.ForceRebuildLayoutImmediate();
                 codeWindow.RecalculateExcessLines();

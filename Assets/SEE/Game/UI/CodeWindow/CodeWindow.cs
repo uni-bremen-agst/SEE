@@ -45,23 +45,30 @@ namespace SEE.Game.UI.CodeWindow
         /// Resolution of the code window. By default, this is set to a resolution of 900x500.
         /// </summary>
         public Vector2 Resolution = new Vector2(900, 500);
-
+        
         /// <summary>
         /// An event which gets called whenever the scrollbar is used to scroll to a different line.
         /// Will be called after the scroll is completed.
         /// </summary>
-        public UnityEvent ScrollEvent = new UnityEvent();
+        public readonly UnityEvent ScrollEvent = new UnityEvent();
+
+        /// <summary>
+        /// The line we're scrolling towards at the moment.
+        /// Will be 0 if we're not scrolling towards anything.
+        /// </summary>
+        private int ScrollingTo = 0;
 
         /// <summary>
         /// The line currently at the top of the window.
         /// Will scroll smoothly to the line when changed and mark it visually.
+        /// While scrolling to a line, this returns the line we're currently scrolling to.
         /// If a line outside the range of available lines is set, the highest available line number is used instead.
         /// </summary>
         /// <remarks>Only a fully visible line counts. If a line is partially obscured, the next line number
         /// will be returned.</remarks>
         public int VisibleLine
         {
-            get => Mathf.CeilToInt(visibleLine)+1;
+            get => ScrollingTo > 0 ? ScrollingTo : Mathf.CeilToInt(visibleLine)+1;
             set
             {
                 if (value > lines || value < 1)
@@ -72,18 +79,17 @@ namespace SEE.Game.UI.CodeWindow
                 }
                 // If this is called before Start() has been called, scrollbar will be null, so we have to cache
                 // the desired visible line.
-                if (scrollRect == null)
+                if (!HasStarted)
                 {
                     PreStartLine = value;
                 }
                 else
                 {
-                    DOTween.To(() => visibleLine+1, f => visibleLine = f-1, value, 1f);
-                    // Mark selected line
-                    string[] allLines = TextMesh.text.Split('\n');
-                    string markedLine = $"<mark=#ff000044>{allLines[value]}</mark>\n";
-                    TextMesh.text = string.Join("", allLines.Select(x => x+"\n").Take(value).Append(markedLine)
-                                                            .Concat(allLines.Select(x => x + "\n").Skip(value+1).Take(lines-value-1)));
+                    ScrollingTo = value;
+                    DOTween.Sequence().Append(DOTween.To(() => visibleLine, f => visibleLine = f, value-1, 1f))
+                           .AppendCallback(() => ScrollingTo = 0);
+                    
+                    MarkLine(value);
                     ScrollEvent.Invoke();
                 }
             }
@@ -102,7 +108,7 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         private float visibleLine
         {
-            get => scrollRect != null ? (1-scrollRect.verticalNormalizedPosition) * (lines-1-excessLines) : PreStartLine;
+            get => HasStarted ? (1-scrollRect.verticalNormalizedPosition) * (lines-1-excessLines) : PreStartLine;
             set
             {
                 if (value > lines-1 || value < 0)
@@ -145,6 +151,19 @@ namespace SEE.Game.UI.CodeWindow
         /// Path to the code canvas prefab.
         /// </summary>
         private const string CODE_WINDOW_PREFAB = "Prefabs/UI/CodeWindow";
+
+        /// <summary>
+        /// Visually marks the line at the given <paramref name="lineNumber"/> and scrolls to it.
+        /// Will also unmark any other line.
+        /// </summary>
+        /// <param name="line">The line number of the line to mark and scroll to (1-indexed)</param>
+        private void MarkLine(int lineNumber)
+        {
+            string[] allLines = TextMesh.text.Split('\n').Select(x => x.EndsWith("</mark>") ? x.Substring(16, x.Length-16-7) : x).ToArray();
+            string markedLine = $"<mark=#ff000044>{allLines[lineNumber-1]}</mark>\n";
+            TextMesh.text = string.Join("", allLines.Select(x => x+"\n").Take(lineNumber-1).Append(markedLine)
+                                                    .Concat(allLines.Select(x => x + "\n").Skip(lineNumber).Take(lines-lineNumber-2)));
+        }
         
         /// <summary>
         /// Populates the code window with the contents of the given file.
@@ -244,6 +263,8 @@ namespace SEE.Game.UI.CodeWindow
                 codeWindow.SetActive(true);
             }
         }
+        
+        #region Value Object
 
         /// <summary>
         /// Recreates a <see cref="CodeWindow"/> from the given <paramref name="valueObject"/> and attaches it to
@@ -362,5 +383,7 @@ namespace SEE.Game.UI.CodeWindow
                 VisibleLine = visibleLine;
             }
         }
+        
+        #endregion
     }
 }
