@@ -123,16 +123,19 @@ namespace SEE.Game.Runtime
 
             if (parsedJLG == null) 
             {
+                enabled = false;
                 throw new Exception("Parsed JLG is null!");
             }
             nodesGOs = GameObject.FindGameObjectsWithTag("Node");
             ///Sets the currentGO to be the node representing the Class of the first Statement in preperation.
             if (nodesGOs == null)
             {
+                enabled = false;
                 throw new Exception("There are no nodes");
             }
             if (GetNodeForStatement(statementCounter) == null) 
             {
+                enabled = false;
                 throw new Exception("Node is missing. Check whether the correct GXL is loaded.");
             }
             currentGO = GetNodeForStatement(statementCounter);
