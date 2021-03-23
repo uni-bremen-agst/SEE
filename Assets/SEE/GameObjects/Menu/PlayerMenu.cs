@@ -103,7 +103,7 @@ namespace SEE.GO.Menu
             // Whenever the state is changed, the action state indicator should reflect that
             ModeMenu.OnMenuEntrySelected.AddListener(SetIndicatorStateToEntry);
             // Initialize action state indicator to current action state
-            SetIndicatorStateToEntry(ModeMenu.GetActiveEntry());
+            SetIndicatorStateToEntry(ModeMenu.ActiveEntry);
             Assert.IsTrue(ActionStateType.AllTypes.Count <= 9, 
                           "Only up to 9 (10 if zero is included) entries can be selected via the numbers on the keyboard!");
 
