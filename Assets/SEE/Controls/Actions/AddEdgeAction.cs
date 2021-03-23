@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
@@ -13,6 +12,25 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class AddEdgeAction : AbstractPlayerAction
     {
+
+        /// <summary>
+        /// Returns a new instance of <see cref="AddEdgeAction"/>.
+        /// </summary>
+        /// <returns>new instance of <see cref="AddEdgeAction"/></returns>
+        public static ReversibleAction CreateReversibleAction()
+        {
+            return new AddEdgeAction();
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="AddEdgeAction"/>.
+        /// </summary>
+        /// <returns>new instance of <see cref="AddEdgeAction"/></returns>
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
+        }
+
         /// <summary>
         /// The source for an edge to be drawn.
         /// </summary>
@@ -27,17 +45,17 @@ namespace SEE.Controls.Actions
         /// The Objects which are needed to create a new edge:
         /// The source, the target and the city where the edge will be attached to.
         /// </summary>
-        private List<Tuple<GameObject, GameObject, SEECity>> edgesToBeDrawn = new List<Tuple<GameObject, GameObject, SEECity>>();
+        private Tuple<GameObject, GameObject, SEECity> edgeToBeDrawn;
 
         /// <summary>
-        /// All createdEdges by this action.
+        /// The edge created by this action.
         /// </summary>
-        private List<GameObject> createdEdges = new List<GameObject>();
+        private GameObject createdEdge;
 
         /// <summary>
-        /// The names of the generated edges.
+        /// The names of the generated edge.
         /// </summary>
-        private List<string> edgeNames = new List<string>();
+        private string edgeName;
 
         public override void Start()
         {
@@ -79,8 +97,8 @@ namespace SEE.Controls.Actions
                         try
                         {
                             GameObject addedEdge = city.Renderer.DrawEdge(from, to, null);
-                            edgesToBeDrawn.Add(new Tuple<GameObject, GameObject, SEECity>(from, to, city));
-                            createdEdges.Add(addedEdge);
+                            edgeToBeDrawn = new Tuple<GameObject, GameObject, SEECity>(from, to, city);
+                            createdEdge = addedEdge;
                             new AddEdgeNetAction(from.name, to.name).Execute();
                         }
                         catch (Exception e)
@@ -91,6 +109,7 @@ namespace SEE.Controls.Actions
                         to = null;
                         // action is completed (successfully or not; it does not matter)
                         result = true;
+                        hadAnEffect = true;
                     }
                 }
             }
@@ -108,13 +127,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Undo()
         {
+            base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             DeleteAction deleteAction = new DeleteAction();
-            foreach (GameObject edge in createdEdges)
-            {
-                deleteAction.DeleteSelectedObject(edge);
-                edgeNames.Add(edge.name);
-                Destroyer.DestroyGameObject(edge);
-            }
+            deleteAction.DeleteSelectedObject(createdEdge);
+            edgeName = createdEdge.name;
+            Destroyer.DestroyGameObject(createdEdge);
         }
 
         /// <summary>
@@ -122,31 +139,9 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Redo()
         {
-            createdEdges.Clear();
-            for(int i = 0; i < edgesToBeDrawn.Count; i++)
-            {
-                Tuple<GameObject, GameObject, SEECity> edgeToBeDrawn = edgesToBeDrawn[i];
-                GameObject redoneEdge = edgeToBeDrawn.Item3.Renderer.DrawEdge(edgeToBeDrawn.Item1, edgeToBeDrawn.Item2,edgeNames[i]);
-                createdEdges.Add(redoneEdge);
-            }
-        }
-
-        /// <summary>
-        /// Returns a new instance of <see cref="AddEdgeAction"/>.
-        /// </summary>
-        /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
-        {
-            return new AddEdgeAction();
-        }
-
-        /// <summary>
-        /// Returns a new instance of <see cref="AddEdgeAction"/>.
-        /// </summary>
-        /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
-        {
-            return CreateReversibleAction();
+            base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
+            GameObject redoneEdge = edgeToBeDrawn.Item3.Renderer.DrawEdge(edgeToBeDrawn.Item1, edgeToBeDrawn.Item2, edgeName);
+            createdEdge = redoneEdge;
         }
     }
 }

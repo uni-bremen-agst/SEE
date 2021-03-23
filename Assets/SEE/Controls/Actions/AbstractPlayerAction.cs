@@ -92,6 +92,8 @@ namespace SEE.Controls.Actions
         /// <returns>true if action is completed</returns>
         public abstract bool Update();
 
+        public static bool MenuIsOpen = true;
+
         /// <summary>
         /// Returns a new instance of the same type as this particular type of ReversibleAction.
         /// </summary>
@@ -177,6 +179,11 @@ namespace SEE.Controls.Actions
         public bool HadEffect()
         {
             return hadAnEffect;
+        }
+
+        public static void InvertMenuIsOpen()
+        {
+            MenuIsOpen = !MenuIsOpen;
         }
     }
 }
