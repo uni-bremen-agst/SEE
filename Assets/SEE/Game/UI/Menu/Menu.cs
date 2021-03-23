@@ -94,11 +94,11 @@ namespace SEE.Game.UI
         /// <param name="entry">The entry to add to this menu.</param>
         public void AddEntry(T entry)
         {
-            if (Entries.Any(x => x.Title == entry.Title))
+            if (entries.Any(x => x.Title == entry.Title))
             {
                 throw new InvalidOperationException($"Button with the given title '{entry.Title}' already exists!\n");
             }
-            Entries.Add(entry);
+            entries.Add(entry);
             if (HasStarted)
             {
                 AddDesktopButtons(new []{entry});
