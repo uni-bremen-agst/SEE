@@ -25,7 +25,7 @@ namespace SEE.Game.UI
 
         /// <summary>
         /// The path to the prefab for the menu game object.
-        /// Will be added for each menu entry in <see cref="Entries"/>.
+        /// Will be added for each menu entry in <see cref="entries"/>.
         /// </summary>
         private const string BUTTON_PREFAB = "Prefabs/UI/Button";
         

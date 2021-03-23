@@ -1,4 +1,5 @@
 ﻿using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -8,20 +9,6 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class EditNodeAction : AbstractPlayerAction
     {
-        /// <summary>
-        /// Start() will register an anonymous delegate of type 
-        /// <see cref="ActionState.OnStateChangedFn"/> on the event
-        /// <see cref="ActionState.OnStateChanged"/> to be called upon every
-        /// change of the action state, where the newly entered state will
-        /// be passed as a parameter. The anonymous delegate will compare whether
-        /// this state equals <see cref="ThisActionState"/> and if so, execute
-        /// what needs to be done for this action here. If that parameter is
-        /// different from <see cref="ThisActionState"/>, this action will
-        /// put itself to sleep. 
-        /// Thus, this action will be executed only if the new state is 
-        /// <see cref="ThisActionState"/>.
-        /// </summary>
-        private readonly ActionStateType ThisActionState = ActionStateType.EditNode;
 
         /// <summary>
         /// The life cycle of this edit action.
@@ -38,38 +25,15 @@ namespace SEE.Controls.Actions
         /// </summary>
         public ProgressState EditProgress { get; set; } = ProgressState.NoNodeSelected;
 
-        private void Start()
+        public override void Start()
         {
             if (!InitializeCanvasObject())
             {
                 Debug.LogError($"No canvas object named {nameOfCanvasObject} could be found in the scene.\n");
-                enabled = false;
                 return;
             }
-            ActionState.OnStateChanged += newState =>
-            {
-                // Is this our action state where we need to do something?
-                if (Equals(newState, ThisActionState))
-                {
-                    // The MonoBehaviour is enabled and Update() will be called by Unity.
-                    enabled = true;
-                    InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
-                    InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
-                    instantiated = true;
-                }
-                else
-                {
-                    // The MonoBehaviour is disabled and Update() no longer be called by Unity.
-                    enabled = false;
-                    canvasObject.TryGetComponentOrLog(out CanvasGenerator canvasGenerator);
-                    canvasGenerator.DestroyEditNodeCanvasAction();
-                    instantiated = false;
-                    InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
-                    InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
-                    hoveredObject = null;
-                }
-            };
-            enabled = ActionState.Is(ThisActionState);
+            InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
+            InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
         }
 
         /// <summary>
@@ -77,9 +41,14 @@ namespace SEE.Controls.Actions
         /// NoNodeSelected: Waits until a node is selected by selecting a game node via the mouse button.
         /// NodeSelected: Instantiates the canvasObject if a gameNode is selected.
         /// EditIsCanceled: Removes the canvas and resets all values if the process is canceled.
+        /// See <see cref="ReversibleAction.Update"/>.
         /// </summary>
-        private void Update()
+        /// <returns>true if completed</returns>
+        public override bool Update()
         {
+            bool result = false;
+
+            // FIXME: When is this action done? That is, when should result be true?
             switch (EditProgress)
             {
                 case ProgressState.NoNodeSelected:
@@ -93,9 +62,9 @@ namespace SEE.Controls.Actions
                     if (canvasObject.GetComponent<EditNodeCanvasAction>() == null)
                     {
                         CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
-                        EditNodeCanvasAction script = generator.InstantiateEditNodeCanvas();
-                        script.nodeToEdit = hoveredObject.GetComponent<NodeRef>().Value;
-                        script.gameObjectID = hoveredObject.name;
+                        EditNodeCanvasAction editNode = generator.InstantiateEditNodeCanvas(this);
+                        editNode.nodeToEdit = hoveredObject.GetComponent<NodeRef>().Value;
+                        editNode.gameObjectID = hoveredObject.name;                        
                     }
                     break;
 
@@ -109,6 +78,52 @@ namespace SEE.Controls.Actions
                 default:
                     throw new System.NotImplementedException("Unhandled case.");
             }
+            return result;
+        }
+
+        /// <summary>
+        /// Undoes this EditNodeAction
+        /// </summary>
+        public override void Undo()
+        {
+            Debug.Log("Undo EditNode");
+        }
+
+        /// <summary>
+        /// Redoes this DeleteAction
+        /// </summary>
+        public override void Redo()
+        {
+            Debug.Log("Redo EditNode");
+        }
+
+        /// <summary>
+        /// Is called when a new action is started at the end of this action
+        /// </summary>
+        public override void Stop()
+        {
+            CanvasGenerator canvasGenerator = canvasObject.GetComponent<CanvasGenerator>();
+            canvasGenerator.DestroyEditNodeCanvasAction();
+            hoveredObject = null;
+            EditProgress = ProgressState.NoNodeSelected;
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="EditNodeAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public static ReversibleAction CreateReversibleAction()
+        {
+            return new EditNodeAction();
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="EditNodeAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
         }
     }
 }

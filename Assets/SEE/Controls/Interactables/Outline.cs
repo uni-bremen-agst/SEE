@@ -120,7 +120,7 @@ namespace SEE.Controls
                 {
                     Node node = nodeRef.Value;
                     Graph graph = node.ItsGraph;
-                    int maxDepth = graph.MaxDepth;
+                    int maxDepth = graph != null ? graph.MaxDepth : 1;
 
                     int inverseRenderQueueOffset = node.Level;
                     if (nodeRef.Value.IsInnerNode())

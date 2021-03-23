@@ -2,18 +2,27 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SEE.Game.UI
 {
     /// <summary>
     /// Represents a menu of various actions the user can choose from.
-    /// The Menu consists of multiple MenuEntries of the type <paramref name="T"/>
+    /// The Menu consists of multiple MenuEntries of the type <typeparamref name="T"/>
     /// and can have multiple representations depending on the platform used.
     /// </summary>
     /// <typeparam name="T">the type of entries used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
     /// <seealso cref="MenuEntry"/>
     public partial class Menu<T>: PlatformDependentComponent where T : MenuEntry
     {
+        
+        /// <summary>
+        /// Event type which is used for the <see cref="OnMenuEntrySelected"/> event.
+        /// Has the <see cref="MenuEntry"/> type <typeparamref name="T"/> as a parameter.
+        /// </summary>
+        [Serializable]
+        public class MenuEntrySelectedEvent : UnityEvent<T> {}
+
         /// <summary>
         /// The name of this menu. Displayed to the user.
         /// </summary>
@@ -35,7 +44,7 @@ namespace SEE.Game.UI
         /// <summary>
         /// Whether the menu shall be shown.
         /// </summary>
-        protected bool MenuShown;
+        private bool MenuShown;
 
         /// <summary>
         /// Whether the menu is currently shown or not.
@@ -43,6 +52,24 @@ namespace SEE.Game.UI
         /// the <see cref="Update"/> method will update the UI accordingly.
         /// </summary>
         private bool CurrentMenuShown = false;
+
+        /// <summary>
+        /// This event will be called whenever an entry in the menu is chosen.
+        /// Its parameter will be the chosen <see cref="MenuEntry"/> with type <typeparamref name="T"/>.
+        /// </summary>
+        public readonly MenuEntrySelectedEvent OnMenuEntrySelected = new MenuEntrySelectedEvent();
+        
+        /// <summary>
+        /// A list of menu entries for this menu.
+        /// </summary>
+        /// <seealso cref="MenuEntry"/>
+        protected readonly List<T> entries = new List<T>();
+        
+        /// <summary>
+        /// A read-only wrapper around the list of menu entries for this menu.
+        /// </summary>
+        /// <seealso cref="MenuEntry"/>
+        public IList<T> Entries => entries.AsReadOnly();
 
         /// <summary>
         /// Displays or hides the menu, depending on <paramref name="show"/>.
@@ -60,15 +87,9 @@ namespace SEE.Game.UI
         {
             ShowMenu(!MenuShown);
         }
-        
-        /// <summary>
-        /// A list of menu entries for this menu.
-        /// </summary>
-        /// <seealso cref="MenuEntry"/>
-        public readonly IList<T> Entries = new List<T>();
 
         /// <summary>
-        /// Adds an <paramref name="entry"/> to this menu's <see cref="Entries"/>.
+        /// Adds an <paramref name="entry"/> to this menu's <see cref="entries"/>.
         /// </summary>
         /// <param name="entry">The entry to add to this menu.</param>
         public void AddEntry(T entry)
@@ -120,6 +141,7 @@ namespace SEE.Game.UI
         /// <param name="entry">The entry which was selected.</param>
         protected virtual void OnEntrySelected(T entry)
         {
+            OnMenuEntrySelected.Invoke(entry);
             entry.DoAction();
         }
 
@@ -128,7 +150,6 @@ namespace SEE.Game.UI
             // Load default icon (can't be done during instantiation, only in Awake() or Start())
             Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Settings");
         }
-
         
         protected override void StartTouchGamepad() => StartDesktop();
 

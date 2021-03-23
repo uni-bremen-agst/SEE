@@ -2,6 +2,7 @@
 using SEE.Game;
 using SEE.GO;
 using SEE.Net;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -13,21 +14,6 @@ namespace SEE.Controls.Actions
     public class AddEdgeAction : AbstractPlayerAction
     {
         /// <summary>
-        /// Start() will register an anonymous delegate of type 
-        /// <see cref="ActionState.OnStateChangedFn"/> on the event
-        /// <see cref="ActionState.OnStateChanged"/> to be called upon every
-        /// change of the action state, where the newly entered state will
-        /// be passed as a parameter. The anonymous delegate will compare whether
-        /// this state equals <see cref="ThisActionState"/> and if so, execute
-        /// what needs to be done for this action here. If that parameter is
-        /// different from <see cref="ThisActionState"/>, this action will
-        /// put itself to sleep. 
-        /// Thus, this action will be executed only if the new state is 
-        /// <see cref="ThisActionState"/>.
-        /// </summary>
-        private readonly ActionStateType ThisActionState = ActionStateType.NewEdge;
-
-        /// <summary>
         /// The source for the edge to be drawn.
         /// </summary>
         private GameObject from;
@@ -37,42 +23,19 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject to;
 
-        private void Start()
+        public override void Start()
         {
-            // An anonymous delegate is registered for the event <see cref="ActionState.OnStateChanged"/>.
-            // This delegate will be called from <see cref="ActionState"/> upon every
-            // state changed where the passed parameter is the newly entered state.
-            ActionState.OnStateChanged += newState =>
-            {
-                // Is this our action state where we need to do something?
-                if (Equals(newState, ThisActionState))
-                {
-                    // The MonoBehaviour is enabled and Update() will be called by Unity.
-                    enabled = true;
-                    InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
-                    InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
-                }
-                else
-                {
-                    // The MonoBehaviour is disabled and Update() no longer be called by Unity.
-                    enabled = false;
-                    InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
-                    InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
-                    hoveredObject = null;
-                }
-            };
-            enabled = ActionState.Is(ThisActionState);
+            InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
+            InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
         }
 
-        private void Update()
+        /// <summary>
+        /// <see cref="ReversibleAction.Update"/>.
+        /// </summary>
+        /// <returns>true if completed</returns>
+        public override bool Update()
         {
-            if (!ActionState.Is(ThisActionState))
-            {
-                enabled = false;
-                InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
-                InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
-                return;
-            }
+            bool result = false;
 
             // Assigning the game objects to be connected.
             // Checking whether the two game objects are not null and whether they are 
@@ -100,7 +63,7 @@ namespace SEE.Controls.Actions
                         try
                         {
                             city.Renderer.DrawEdge(from, to);
-                            new AddEdgeNetAction(from.name, to.name).Execute();
+                            new AddEdgeNetAction(from.name, to.name).Execute();                            
                         }
                         catch (Exception e)
                         {
@@ -108,15 +71,52 @@ namespace SEE.Controls.Actions
                         }
                         from = null;
                         to = null;
+                        // action is completed (successfully or not; it does not matter)
+                        result = true;
                     }
                 }
             }
-            // Adding the key "F1" in order to delete the selected GameObjects.
+            // Adding the key "F1" in order to forget the selected GameObjects.
             if (Input.GetKeyDown(KeyCode.F1))
             {
                 from = null;
                 to = null;
             }
+            return result;
+        }
+
+        /// <summary>
+        /// Undoes this AddEdgeActíon
+        /// </summary>
+        public override void Undo()
+        {
+            Debug.Log("Undo AddEdge");
+        }
+
+        /// <summary>
+        /// Redoes this AddEdgeAction
+        /// </summary>
+        public override void Redo()
+        {
+            Debug.Log("Redo AddEdge");
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="AddEdgeAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public static ReversibleAction CreateReversibleAction()
+        {
+            return new AddEdgeAction();
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="AddEdgeAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
         }
     }
 }
