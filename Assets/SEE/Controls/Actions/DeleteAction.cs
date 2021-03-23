@@ -392,5 +392,10 @@ namespace SEE.Controls.Actions
             // Assert.IsTrue(selectedObject == interactableObject.gameObject);
             selectedObject = null;
         }
+
+        public override ActionStateType GetActionStateType()
+        {
+            return ActionStateType.Delete;
+        }
     }
 }

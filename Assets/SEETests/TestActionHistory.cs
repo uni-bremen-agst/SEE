@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using SEE.Controls.Actions;
 using SEE.Utils;
 
 namespace SEETests
@@ -96,6 +97,11 @@ namespace SEETests
             public bool HadEffect()
             {
                 return true;
+            }
+
+            public ActionStateType GetActionStateType()
+            {
+                throw new System.NotImplementedException();
             }
         }
 
@@ -396,6 +402,11 @@ namespace SEETests
             public abstract void Redo();
             public abstract void Undo();
             public abstract bool Update();
+
+            public ActionStateType GetActionStateType()
+            {
+                throw new System.NotImplementedException();
+            }
         }
 
         /// <summary>

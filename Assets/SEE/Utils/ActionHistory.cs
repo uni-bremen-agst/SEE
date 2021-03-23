@@ -1,4 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using SEE.Controls;
+using SEE.Controls.Actions;
+using SEE.Game.UI;
+using SEE.GO;
+using SEE.GO.Menu;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
@@ -195,6 +200,7 @@ namespace SEE.Utils
                 // not had any effect yet.
 
                 ReversibleAction current = UndoStack.Pop();
+
                 while (!current.HadEffect())
                 {
                     current.Stop();
@@ -219,6 +225,19 @@ namespace SEE.Utils
                 // Watch out: Current relates to new the top element of UndoStack while 
                 // current relates to a previous top element that was just undone.
                 Current?.Start();
+
+                GameObject localPlayer = PlayerSettings.LocalPlayer;
+                localPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu);
+                localPlayer.TryGetComponentOrLog(out ActionStateIndicator indicator);
+                foreach (ToggleMenuEntry t in playerMenu.ModeMenu.Entries)
+                {
+                    if (t.Title.Equals(UndoStack.Peek().GetActionStateType().Name))
+                    {
+                        playerMenu.ModeMenu.ActiveEntry = t;
+                        indicator.ChangeState(UndoStack.Peek().GetActionStateType());
+                        Debug.Log(playerMenu.ModeMenu.ActiveEntry.Title);
+                    }
+                }
             }
         }
 

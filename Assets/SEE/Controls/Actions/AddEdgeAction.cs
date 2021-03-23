@@ -143,5 +143,10 @@ namespace SEE.Controls.Actions
             GameObject redoneEdge = edgeToBeDrawn.Item3.Renderer.DrawEdge(edgeToBeDrawn.Item1, edgeToBeDrawn.Item2, edgeName);
             createdEdge = redoneEdge;
         }
+
+        public override ActionStateType GetActionStateType()
+        {
+            return ActionStateType.NewEdge;
+        }
     }
 }

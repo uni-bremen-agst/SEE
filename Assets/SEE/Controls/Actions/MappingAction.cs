@@ -835,5 +835,10 @@ namespace SEE.Controls.Actions
         {
             Debug.Log(mapsToEdgeRemoved.ToString());
         }
+
+        public ActionStateType GetActionStateType()
+        {
+            return ActionStateType.Map;
+        }
     }
 }

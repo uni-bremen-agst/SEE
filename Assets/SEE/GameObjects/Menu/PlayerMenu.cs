@@ -14,7 +14,8 @@ namespace SEE.GO.Menu
         /// <summary>
         /// The UI object representing the menu the user chooses the action state from.
         /// </summary>
-        private SelectionMenu ModeMenu;
+        public SelectionMenu ModeMenu;
+
 
         /// <summary>
         /// The UI object representing the indicator, which displays the current action state on the screen.

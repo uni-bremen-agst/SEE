@@ -1,4 +1,5 @@
 ﻿using SEE.Utils;
+using System;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -48,7 +49,7 @@ namespace SEE.Controls.Actions
         /// had no effect.
         /// See <see cref="ReversibleAction.Undo"/>.
         /// </summary>
-        public virtual void Undo() 
+        public virtual void Undo()
         {
             hadAnEffect = false;
         }
@@ -64,6 +65,8 @@ namespace SEE.Controls.Actions
         {
             hadAnEffect = true;
         }
+
+        public abstract ActionStateType GetActionStateType();
 
         /// <summary>
         /// Will be called once when the action is started for the
@@ -169,6 +172,11 @@ namespace SEE.Controls.Actions
             //                         e.Message, hoveredObject == null ? "NULL" : hoveredObject.name, interactableObject.name);
             //    // FIXME: There are AssertionExceptions 
             //}
+        }
+
+        public static explicit operator AbstractPlayerAction(Type v)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
