@@ -167,5 +167,10 @@ namespace SEE.Controls.Actions
             SetUpRenderer();
             DrawLine();
         }
+
+        public override ActionStateType GetActionStateType()
+        {
+            return ActionStateType.Draw;
+        }
     }
 }

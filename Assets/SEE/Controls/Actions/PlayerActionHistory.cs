@@ -1,4 +1,7 @@
-﻿using SEE.Utils;
+﻿using SEE.GO;
+using SEE.GO.Menu;
+using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.Controls.Actions
 {

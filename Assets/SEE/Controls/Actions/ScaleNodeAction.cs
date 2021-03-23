@@ -573,5 +573,10 @@ namespace SEE.Controls.Actions
         {
             return CreateReversibleAction();
         }
+
+        public override ActionStateType GetActionStateType()
+        {
+            return ActionStateType.ScaleNode;
+        }
     }
 }

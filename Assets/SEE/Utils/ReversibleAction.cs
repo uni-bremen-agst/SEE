@@ -1,4 +1,6 @@
-﻿namespace SEE.Utils
+﻿using SEE.Controls.Actions;
+
+namespace SEE.Utils
 {
     /// <summary>
     /// Creates a new instance of <see cref="ReversibleAction"/>.
@@ -95,6 +97,8 @@
         /// </summary>
         /// <returns>if this action has had an effect that may need to be undone</returns>
         bool HadEffect();
+
+        ActionStateType GetActionStateType();
 
         /// <summary>
         /// Returns a new instance of the same type as this particular type of ReversibleAction.
