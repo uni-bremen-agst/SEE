@@ -8716,7 +8716,7 @@ Transform:
   m_LocalScale: {x: 1, y: 0.0001, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 15
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &208714555 stripped
 GameObject:
@@ -19003,7 +19003,7 @@ Transform:
   - {fileID: 176168250}
   - {fileID: 1714258978}
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &464141059
 PrefabInstance:
@@ -32782,7 +32782,7 @@ MonoBehaviour:
       Data: Method
     - Name: $v
       Entry: 5
-      Data: false
+      Data: true
     - Name: 
       Entry: 8
       Data: 
@@ -32794,7 +32794,7 @@ MonoBehaviour:
       Data: Method_Template
     - Name: $v
       Entry: 5
-      Data: false
+      Data: true
     - Name: 
       Entry: 8
       Data: 
@@ -33041,9 +33041,9 @@ MonoBehaviour:
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
   LeafObjects: 0
-  InnerNodeObjects: 5
-  NodeLayout: 4
-  EdgeLayout: 3
+  InnerNodeObjects: 0
+  NodeLayout: 3
+  EdgeLayout: 0
   ZScoreScale: 0
   EdgeWidth: 0.001
   ShowErosions: 0
@@ -33090,7 +33090,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.0030558705
+  HeightOffset: 0.003050506
 --- !u!65 &816506530
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -33165,7 +33165,7 @@ Transform:
   m_LocalScale: {x: 0.9, y: 0.0001, z: 0.9}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &816765288
 PrefabInstance:
@@ -43340,483 +43340,6 @@ MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -1504981713932161579, guid: 55577468945ed6f478d5464911b91c0f, type: 3}
   m_PrefabInstance: {fileID: 599481413}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1087763628
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1087763635}
-  - component: {fileID: 1087763634}
-  - component: {fileID: 1087763633}
-  - component: {fileID: 1087763632}
-  - component: {fileID: 1087763631}
-  - component: {fileID: 1087763630}
-  - component: {fileID: 1087763629}
-  m_Layer: 0
-  m_Name: Implementation
-  m_TagString: Code City
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1087763629
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1087763628}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 253abae38e5d8014abb73913836a3d5f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  serializationData:
-    SerializedFormat: 2
-    SerializedBytes: 
-    ReferencedUnityObjects: []
-    SerializedBytesString: 
-    Prefab: {fileID: 0}
-    PrefabModificationsReferencedUnityObjects: []
-    PrefabModifications: []
-    SerializationNodes:
-    - Name: LayoutPath
-      Entry: 7
-      Data: 0|SEE.Game.DataPath, SEE
-    - Name: Root
-      Entry: 3
-      Data: 2
-    - Name: relativePath
-      Entry: 1
-      Data: 
-    - Name: absolutePath
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: HierarchicalEdges
-      Entry: 7
-      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
-    - Name: 
-      Entry: 12
-      Data: 4
-    - Name: 
-      Entry: 1
-      Data: Enclosing
-    - Name: 
-      Entry: 1
-      Data: Belongs_To
-    - Name: 
-      Entry: 1
-      Data: Part_Of
-    - Name: 
-      Entry: 1
-      Data: Defined_In
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: SelectedNodeTypes
-      Entry: 7
-      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 2
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Class
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Package
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: CityPath
-      Entry: 7
-      Data: 4|SEE.Game.DataPath, SEE
-    - Name: Root
-      Entry: 3
-      Data: 2
-    - Name: relativePath
-      Entry: 1
-      Data: 
-    - Name: absolutePath
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LeafNodeColorRange
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: InnerNodeColorRange
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0.921568632
-    - Name: 
-      Entry: 4
-      Data: 0.0156862754
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LeafLabelSettings
-      Entry: 7
-      Data: 5|SEE.Game.LabelSettings, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationDuration
-      Entry: 4
-      Data: 0.5
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: InnerNodeLabelSettings
-      Entry: 7
-      Data: 6|SEE.Game.LabelSettings, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationDuration
-      Entry: 4
-      Data: 0.5
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: CoseGraphSettings
-      Entry: 7
-      Data: 7|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
-    - Name: EdgeLength
-      Entry: 3
-      Data: 20
-    - Name: UseSmartIdealEdgeCalculation
-      Entry: 5
-      Data: false
-    - Name: UseSmartMultilevelScaling
-      Entry: 5
-      Data: false
-    - Name: PerLevelIdealEdgeLengthFactor
-      Entry: 4
-      Data: 0.1
-    - Name: UseSmartRepulsionRangeCalculation
-      Entry: 5
-      Data: false
-    - Name: GravityStrength
-      Entry: 4
-      Data: 0.8
-    - Name: CompoundGravityStrength
-      Entry: 4
-      Data: 1.5
-    - Name: RepulsionStrength
-      Entry: 4
-      Data: 50
-    - Name: MultiLevelScaling
-      Entry: 5
-      Data: false
-    - Name: ListInnerNodeToggle
-      Entry: 6
-      Data: 
-    - Name: InnerNodeLayout
-      Entry: 6
-      Data: 
-    - Name: InnerNodeShape
-      Entry: 6
-      Data: 
-    - Name: LoadedForNodeTypes
-      Entry: 6
-      Data: 
-    - Name: UseCalculationParameter
-      Entry: 5
-      Data: false
-    - Name: UseIterativeCalculation
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-  LODCulling: 0.01
-  LayoutPath:
-    Root: 2
-    relativePath: 
-    absolutePath: 
-  CityPath:
-    Root: 2
-    relativePath: 
-    absolutePath: 
-  WidthMetric: Metric.Number_Of_Calling_Routines
-  HeightMetric: Metric.Lines.LOC
-  DepthMetric: Metric.Number_Of_Called_Routines
-  LeafStyleMetric: Metric.McCabe_Complexity
-  ArchitectureIssue: Metric.Architecture_Violations
-  CloneIssue: Metric.Clone
-  CycleIssue: Metric.Cycle
-  Dead_CodeIssue: Metric.Dead_Code
-  MetricIssue: Metric.Metric
-  StyleIssue: Metric.Style
-  UniversalIssue: Metric.Universal
-  ArchitectureIssue_SUM: Metric.Architecture_Violations_SUM
-  CloneIssue_SUM: Metric.Clone_SUM
-  CycleIssue_SUM: Metric.Cycle_SUM
-  Dead_CodeIssue_SUM: Metric.Dead_Code_SUM
-  MetricIssue_SUM: Metric.Metric_SUM
-  StyleIssue_SUM: Metric.Style_SUM
-  UniversalIssue_SUM: Metric.Universal_SUM
-  InnerDonutMetric: Metric.IssuesTotal
-  InnerNodeHeightMetric: 0.001
-  InnerNodeStyleMetric: Metric.Number_Of_Descendants
-  MinimalBlockLength: 0.1
-  MaximalBlockLength: 100
-  LeafObjects: 0
-  InnerNodeObjects: 5
-  NodeLayout: 4
-  EdgeLayout: 3
-  ZScoreScale: 0
-  EdgeWidth: 0.001
-  ShowErosions: 0
-  MaxErosionWidth: 1
-  EdgesAboveBlocks: 1
-  Tension: 0.85
-  RDP: 0.0001
-  TubularSegments: 50
-  Radius: 0.005
-  RadialSegments: 8
-  isEdgeSelectable: 1
-  GXLPath:
-    Root: 3
-    relativePath: /mini/CodeFacts.gxl
-    absolutePath: 
-  CSVPath:
-    Root: 3
-    relativePath: /mini/CodeFacts.csv
-    absolutePath: 
---- !u!114 &1087763630
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1087763628}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd9537a868ba1214eba7ee3caf4c2e76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  portalPlane: {fileID: 1087763631}
-  id: 1
---- !u!114 &1087763631
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1087763628}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ScaleFactor: 1
-  HeightOffset: 0.003068924
---- !u!65 &1087763632
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1087763628}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!23 &1087763633
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1087763628}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 3ce1607272ebf6f409222542a2548d9a, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &1087763634
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1087763628}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!4 &1087763635
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1087763628}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.962, y: 0.817, z: -4.011}
-  m_LocalScale: {x: 0.9, y: 0.0001, z: 0.9}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 11
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1088499363
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -47305,6 +46828,70 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -4216859302048453862, guid: 55577468945ed6f478d5464911b91c0f, type: 3}
   m_PrefabInstance: {fileID: 1198251365}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1198768941
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1198768943}
+  - component: {fileID: 1198768942}
+  - component: {fileID: 1198768944}
+  m_Layer: 0
+  m_Name: CameraPath
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1198768942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1198768941}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9279356c283348d40ba13d5110be723d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Directory: 
+  Basename: path
+  Take: 1
+  Period: 0.5
+  Interactive: 0
+--- !u!4 &1198768943
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1198768941}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.7355834, y: 0.44299793, z: -1.5317279}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 16
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1198768944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1198768941}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a388c80db8c323c41b6badd2530f9c6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movedObject: {fileID: 0}
+  Filename: Assets/path1.csv
+  ShowPath: 0
 --- !u!1 &1199169637 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -927199367670048503, guid: 58f261383646b734980f09f56f9a40e8, type: 3}
@@ -50328,7 +49915,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerInputType: 0
   PlayerOrigin: {x: 1, y: 1, z: 1}
-  FocusPlane: {fileID: 1409350047}
+  FocusPlane: {fileID: 816506529}
   Ground: {fileID: 162897622}
   HideVRControllers: 1
   ShowControllerHints: 0
@@ -54665,10 +54252,10 @@ MonoBehaviour:
       Data: 0|SEE.Game.DataPath, SEE
     - Name: Root
       Entry: 3
-      Data: 3
+      Data: 1
     - Name: relativePath
       Entry: 1
-      Data: /mini/Architecture.gvl
+      Data: /Data/GXL/SEE/ArchitectureCheck.sld
     - Name: absolutePath
       Entry: 1
       Data: 
@@ -54712,7 +54299,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 2
+      Data: 11
     - Name: 
       Entry: 7
       Data: 
@@ -54730,7 +54317,115 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Architecture_Layer
+      Data: Member
+    - Name: $v
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Class
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Class_Template
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Interface
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Interface_Template
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Type
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Constant
+    - Name: $v
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Method
+    - Name: $v
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Method_Template
+    - Name: $v
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Namespace
     - Name: $v
       Entry: 5
       Data: true
@@ -54937,8 +54632,8 @@ MonoBehaviour:
       Data: 
   LODCulling: 0.01
   LayoutPath:
-    Root: 3
-    relativePath: /mini/Architecture.gvl
+    Root: 1
+    relativePath: /Data/GXL/SEE/ArchitectureCheck.sld
     absolutePath: 
   CityPath:
     Root: 2
@@ -54970,7 +54665,7 @@ MonoBehaviour:
   LeafObjects: 0
   InnerNodeObjects: 0
   NodeLayout: 7
-  EdgeLayout: 2
+  EdgeLayout: 3
   ZScoreScale: 0
   EdgeWidth: 0.01
   ShowErosions: 0
@@ -54981,14 +54676,14 @@ MonoBehaviour:
   TubularSegments: 50
   Radius: 0.005
   RadialSegments: 8
-  isEdgeSelectable: 1
+  isEdgeSelectable: 0
   GXLPath:
-    Root: 3
-    relativePath: /mini/Architecture.gxl
+    Root: 1
+    relativePath: /Data/GXL/SEE/ArchitectureCheck.gxl
     absolutePath: 
   CSVPath:
-    Root: 3
-    relativePath: /mini/Architecture.csv
+    Root: 1
+    relativePath: /Data/GXL/SEE/ArchitectureCheck.csv
     absolutePath: 
 --- !u!114 &1409350046
 MonoBehaviour:
@@ -55017,7 +54712,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.0030502677
+  HeightOffset: 0.0030500889
 --- !u!65 &1409350048
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -57281,7 +56976,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3118f354b08f7af4c96f132f395a0337, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CodeCity: {fileID: 0}
+  CodeCity: {fileID: 1409350045}
   RevisionDuration: 0.25
   MinNodesPerRevision: 10
   MaxNodesPerRevision: 100
@@ -57299,7 +56994,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 16
+  m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1461766972 stripped
 GameObject:
@@ -62332,7 +62027,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 1acb8da12340e774fb04fe60ddcf6750, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.358
+      value: 0.62
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 1acb8da12340e774fb04fe60ddcf6750, type: 3}
       propertyPath: m_LocalPosition.z
@@ -70920,7 +70615,7 @@ Transform:
   m_Children:
   - {fileID: 527011022}
   m_Father: {fileID: 0}
-  m_RootOrder: 14
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1696696692 stripped
 GameObject:
