@@ -49915,7 +49915,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerInputType: 0
   PlayerOrigin: {x: 1, y: 1, z: 1}
-  FocusPlane: {fileID: 816506529}
+  FocusPlane: {fileID: 1409350047}
   Ground: {fileID: 162897622}
   HideVRControllers: 1
   ShowControllerHints: 0
@@ -54219,6 +54219,7 @@ GameObject:
   - component: {fileID: 1409350047}
   - component: {fileID: 1409350046}
   - component: {fileID: 1409350045}
+  - component: {fileID: 1409350052}
   m_Layer: 0
   m_Name: Architecture
   m_TagString: Code City
@@ -54789,6 +54790,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1409350052
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1409350044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f25e472fae0c304e994d615ed8259db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CodeCity: {fileID: 1409350045}
 --- !u!1 &1412323659 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -927199367670048503, guid: 55577468945ed6f478d5464911b91c0f, type: 3}
