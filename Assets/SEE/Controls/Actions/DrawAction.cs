@@ -154,7 +154,7 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            UnityEngine.Object.Destroy(line);
+            Destroyer.DestroyGameObject(line);
             line = null;
             renderer = null;
         }
