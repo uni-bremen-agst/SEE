@@ -10,8 +10,42 @@ namespace SEE.CameraPaths
     /// (rounded to integer) of the main camera at any point in time when the user presses
     /// the key KeyBindings.SavePathPosition.
     /// </summary>
-    public class CameraPosition : MonoBehaviour
+    public class CameraRecorder : MonoBehaviour
     {        
+        /// <summary>
+        /// The directory in which to store path files.
+        /// </summary>
+        [Tooltip("The directory in which to store path files.")]
+        public string Directory;
+
+        /// <summary>
+        /// Base name of the file where to store the captured data points (Take will be appended).
+        /// </summary>
+        [Tooltip("Base name of the file where to store the captured data points (Take will be appended).")]
+        public string Basename = "path";
+
+        /// <summary>
+        /// The number of recording to be used for the filename.
+        /// </summary>
+        [Tooltip("The number of recording to be used for the filename (will be appended to Path).")]
+        public int Take = 1;
+
+        /// <summary>
+        /// The length of a period in which to record a path position automatically (in seconds).
+        /// Not used if Interactive.
+        /// </summary>
+        [Tooltip("The length of a period in which to record a path position automatically (in seconds)"
+                 + "Not used if Interactive.")]
+        public float Period = 0.5f;
+
+        /// <summary>
+        /// Whether the recording is interactive. If true, a position is recorded only if
+        /// the user presses the recording key (see Keybindings).
+        /// </summary>
+        [Tooltip("Whether the recording is interactive. If true, a position is recorded only if "
+                 + "the user presses the recording key (see Keybindings).")]
+        public bool Interactive = false;
+
         /// <summary>
         /// This is Main Camera in the Scene.
         /// </summary>
@@ -21,21 +55,6 @@ namespace SEE.CameraPaths
         /// The recorded path.
         /// </summary>
         private CameraPath path;
-
-        /// <summary>
-        /// The directory in which to store path files.
-        /// </summary>
-        public string Directory;
-
-        /// <summary>
-        /// Base name of the file where to store the captured data points.
-        /// </summary>
-        public string Basename = "path";
-
-        /// <summary>
-        /// The number of recording to be used for the filename.
-        /// </summary>
-        public int Take = 1;
 
         /// <summary>
         /// Returns the filename that does not currently exist taking into
@@ -76,17 +95,6 @@ namespace SEE.CameraPaths
         /// The passed time of the current period.
         /// </summary>
         private float accumulatedTime = 0.0f;
-
-        /// <summary>
-        /// The length of a period in which to record a path position.
-        /// </summary>
-        public float Period = 0.5f;
-
-        /// <summary>
-        /// Whether the recording is interactive. If true, a position is recorded only if
-        /// the user presses key P.
-        /// </summary>
-        public bool Interactive = false;
 
         private void Start()
         {
