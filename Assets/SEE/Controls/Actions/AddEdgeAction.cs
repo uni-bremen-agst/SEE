@@ -123,7 +123,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Undoes this AddEdgeActíon
+        /// Undoes this AddEdgeAction
         /// </summary>
         public override void Undo()
         {
