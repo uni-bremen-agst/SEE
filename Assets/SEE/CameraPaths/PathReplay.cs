@@ -7,9 +7,9 @@ using UnityEngine;
 namespace SEE.CameraPaths
 {
     /// <summary>
-    /// A script to move a game object, e.g., a camera, programmatically along a path. 
+    /// A script to move a game object, e.g., a camera, programmatically along a recorded path. 
     /// </summary>
-    public class ScriptedCamera : MonoBehaviour
+    public class PathReplay : MonoBehaviour
     {
         /// <summary>
         /// The object to be moved along the recorded path.
