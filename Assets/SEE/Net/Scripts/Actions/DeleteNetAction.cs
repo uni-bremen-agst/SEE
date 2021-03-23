@@ -1,7 +1,4 @@
-﻿using SEE.Controls.Actions;
-using UnityEngine;
-
-namespace SEE.Net
+﻿namespace SEE.Net
 {
     /// <summary>
     /// This class is responsible for deleting a node via network from one client to all others and 
@@ -43,10 +40,10 @@ namespace SEE.Net
         {
             if (!IsRequester())
             {           
-                //    //Fixme(Thore): Network-DeleteAction has to be fixed in #204
-            	GameObject playerDesktop = PlayerSettings.LocalPlayer;
-            	//    playerDesktop.TryGetComponent(out DeleteAction deleteAction);
-            	//    deleteAction.DeleteSelectedObject(GameObject.Find(GameObjectID))
+                // Fixme(Thore): Network-DeleteAction has to be fixed in #204
+            	// GameObject playerDesktop = PlayerSettings.LocalPlayer;
+            	//playerDesktop.TryGetComponent(out DeleteAction deleteAction);
+            	//deleteAction.DeleteSelectedObject(GameObject.Find(GameObjectID))
             }
         }
     }

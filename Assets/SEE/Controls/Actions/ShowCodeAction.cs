@@ -12,21 +12,6 @@ namespace SEE.Controls.Actions
     internal class ShowCodeAction : MonoBehaviour
     {
         /// <summary>
-        /// Start() will register an anonymous delegate of type 
-        /// <see cref="ActionState.OnStateChangedFn"/> on the event
-        /// <see cref="ActionState.OnStateChanged"/> to be called upon every
-        /// change of the action state, where the newly entered state will
-        /// be passed as a parameter. The anonymous delegate will compare whether
-        /// this state equals <see cref="ThisActionState"/> and if so, execute
-        /// what needs to be done for this action here. If that parameter is
-        /// different from <see cref="ThisActionState"/>, this action will
-        /// put itself to sleep. 
-        /// Thus, this action will be executed only if the new state is 
-        /// <see cref="ThisActionState"/>.
-        /// </summary>
-        private readonly ActionStateType ThisActionState = ActionStateType.ShowCode;
-
-        /// <summary>
         /// Manager object who takes care of the player selection menu and code space dictionary for us.
         /// </summary>
         private CodeSpaceManager spaceManager;
@@ -53,31 +38,20 @@ namespace SEE.Controls.Actions
         /// </summary>
         private string selectedPath;
 
+        private void OnDisable()
+        {
+            InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
+            InteractableObject.LocalAnySelectIn -= LocalAnySelectOut;
+        }
+
+        private void OnEnable()
+        {
+            InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
+            InteractableObject.LocalAnySelectIn += LocalAnySelectOut;
+        }
+
         private void Start()
         {
-            // An anonymous delegate is registered for the event <see cref="ActionState.OnStateChanged"/>.
-            // This delegate will be called from <see cref="ActionState"/> upon every
-            // state changed where the passed parameter is the newly entered state.
-            ActionState.OnStateChanged += (ActionStateType newState) =>
-            {
-                // Is this our action state where we need to do something?
-                if (Equals(newState, ThisActionState))
-                {
-                    // The MonoBehaviour is enabled and Update() will be called by Unity.
-                    enabled = true;
-                    InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
-                    InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
-                }
-                else
-                {
-                    // The MonoBehaviour is disabled and Update() no longer be called by Unity.
-                    enabled = false;
-                    InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
-                    InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
-                }
-            };
-            enabled = ActionState.Is(ThisActionState);
-
             if (!gameObject.TryGetComponent<CodeSpaceManager>(out spaceManager))
             {
                 spaceManager = gameObject.AddComponent<CodeSpaceManager>();
@@ -89,16 +63,6 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
-            // This script should be disabled if the action state is not this action's type
-            if (!ActionState.Is(ThisActionState))
-            {
-                // The MonoBehaviour is disabled and Update() no longer be called by Unity.
-                enabled = false;
-                InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
-                InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
-                return;
-            }
-
             // Only allow local player to open new code windows
             if (spaceManager.CurrentPlayer == CodeSpaceManager.LOCAL_PLAYER 
                 && !Equals(selectedNode?.Value, currentlySelectedNode?.Value))
