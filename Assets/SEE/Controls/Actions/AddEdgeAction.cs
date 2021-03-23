@@ -12,7 +12,6 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class AddEdgeAction : AbstractPlayerAction
     {
-
         /// <summary>
         /// Returns a new instance of <see cref="AddEdgeAction"/>.
         /// </summary>
@@ -53,7 +52,7 @@ namespace SEE.Controls.Actions
         private GameObject createdEdge;
 
         /// <summary>
-        /// The names of the generated edge.
+        /// The name of the generated edge.
         /// </summary>
         private string edgeName;
 
@@ -144,6 +143,10 @@ namespace SEE.Controls.Actions
             createdEdge = redoneEdge;
         }
 
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this action.
+        /// </summary>
+        /// <returns>the <see cref="ActionStateType"/> of this action</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.NewEdge;
