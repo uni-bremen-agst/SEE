@@ -226,18 +226,9 @@ namespace SEE.Utils
                 // current relates to a previous top element that was just undone.
                 Current?.Start();
 
-                GameObject localPlayer = PlayerSettings.LocalPlayer;
-                localPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu);
-                localPlayer.TryGetComponentOrLog(out ActionStateIndicator indicator);
-                foreach (ToggleMenuEntry t in playerMenu.ModeMenu.Entries)
-                {
-                    if (t.Title.Equals(UndoStack.Peek().GetActionStateType().Name))
-                    {
-                        playerMenu.ModeMenu.ActiveEntry = t;
-                        indicator.ChangeState(UndoStack.Peek().GetActionStateType());
-                        Debug.Log(playerMenu.ModeMenu.ActiveEntry.Title);
-                    }
-                }
+                // Finally, we have to update the ActionState in the PlayerMenu and the ActionState
+                // in the ActionStateIndicator.
+                SetMenuAndIndicator(UndoStack);
             }
         }
 
@@ -258,11 +249,15 @@ namespace SEE.Utils
             {
                 Current?.Stop();
 
+                // we have to actualise the Menu and ActionStateIndicator
+                SetMenuAndIndicator(RedoStack);
+
                 // the last undone action becomes the currently executed action again
                 ReversibleAction action = RedoStack.Pop();
                 UndoStack.Push(action);
                 action.Redo();
-                action.Start();                
+                action.Start();
+
             }
             else
             {
@@ -270,6 +265,26 @@ namespace SEE.Utils
             }
         }
 
+        /// <summary>
+        /// Selects the last action of the <paramref name="stack"/> and sets the PlayerMenu and the
+        /// ActionStateIndicator to the state of the <paramref name="stack"/>:
+        /// </summary>
+        /// <param name="stack">The stack from where the last action has to be selected</param>
+        public void SetMenuAndIndicator(Stack<ReversibleAction> stack)
+        {
+            PlayerSettings.LocalPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu);
+            PlayerSettings.LocalPlayer.TryGetComponentOrLog(out ActionStateIndicator indicator);
+
+            foreach (ToggleMenuEntry t in playerMenu.ModeMenu.Entries)
+            {
+                if (t.Title.Equals(stack.Peek().GetActionStateType().Name))
+                {
+                    playerMenu.ModeMenu.ActiveEntry = t;
+                    indicator.ChangeState(stack.Peek().GetActionStateType());
+                }
+            }
+
+        }
         /// <summary>
         /// The number of executed actions that can be undone.
         /// </summary>
