@@ -33,11 +33,13 @@ namespace SEE.CameraPaths
         /// <summary>
         /// Name of the file where to load the captured data camera path points from.
         /// </summary>
+        [Tooltip("Name of the file where to load the path data.")]
         public string Filename = "path" + CameraPath.DotPathFileExtension;
 
         /// <summary>
         /// As to whether the path should be drawn as a sequence of lines in the game.
         /// </summary>
+        [Tooltip("Whether the path should be drawn as a sequence of lines in the game.")]
         public bool ShowPath = false;
 
         /// <summary>
