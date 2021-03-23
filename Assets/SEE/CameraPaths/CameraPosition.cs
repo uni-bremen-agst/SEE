@@ -8,7 +8,7 @@ namespace SEE.CameraPaths
     /// <summary>
     /// This scripts logs the position, rotation, and time in seconds since game start
     /// (rounded to integer) of the main camera at any point in time when the user presses
-    /// the key P (for position).
+    /// the key KeyBindings.SavePathPosition.
     /// </summary>
     public class CameraPosition : MonoBehaviour
     {        
