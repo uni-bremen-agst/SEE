@@ -41,13 +41,13 @@ namespace SEE.Controls.Actions
         private void OnDisable()
         {
             InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
-            InteractableObject.LocalAnySelectIn -= LocalAnySelectOut;
+            InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
         }
 
         private void OnEnable()
         {
             InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
-            InteractableObject.LocalAnySelectIn += LocalAnySelectOut;
+            InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
         }
 
         private void Start()
