@@ -67,6 +67,12 @@ namespace SEE.Controls
             if (!CodeSpaces.ContainsKey(playerName))
             {
                 CodeSpaces[playerName] = CodeWindowSpace.FromValueObject(valueObject, gameObject);
+                CodeWindowMenu.AddEntry(new ToggleMenuEntry(false, () => ActivateSpace(playerName),
+                                                  DeactivateCurrentSpace, playerName, 
+                                                  $"Code window from player with IP address '{playerName}'.", Color.white));
+                CodeSpaces[playerName].CodeWindowSpaceName += $" ({playerName})";
+                CodeSpaces[playerName].enabled = false;
+                CodeSpaces[playerName].CanClose = false;  // User may only close their own windows
             }
             else
             {
@@ -79,7 +85,10 @@ namespace SEE.Controls
                     if (CodeSpaces[playerName].CodeWindows.All(x => windowValue.Title != x.Title))
                     {
                         // Window is new and has to be re-created
-                        CodeSpaces[playerName].AddCodeWindow(CodeWindow.FromValueObject(windowValue));
+                        CodeWindow window = CodeWindow.FromValueObject(windowValue);
+                        CodeSpaces[playerName].AddCodeWindow(window);
+                        // Only enable window if code space is enabled as well
+                        window.enabled = CodeSpaces[playerName].enabled;
                     }
                     else
                     {
@@ -95,21 +104,17 @@ namespace SEE.Controls
                 closedWindows.ForEach(CodeSpaces[playerName].CloseCodeWindow);
                 
                 // Set active window if it changed
+                // FIXME: Doesn't evaluate to true when changing back to another tab
                 if (CodeSpaces[playerName].ActiveCodeWindow.Title != valueObject.ActiveCodeWindow.Title)
                 {
                     CodeSpaces[playerName].ActiveCodeWindow = CodeSpaces[playerName].CodeWindows.First(x => x.Title == valueObject.ActiveCodeWindow.Title);
                 }
             }
-            
-            //TODO: Instead of tearing down and recreating the menu each time, change the code 
-            // such that old entries are removed and new entries are added.
-            // This way, performance will probably be significantly improved.
-            SetUpWindowSelectionMenu();
         }
 
         private void Start()
         {
-            if (FindObjectOfType<CodeSpaceManager>())
+            if (FindObjectsOfType<CodeSpaceManager>().Length > 1)
             {
                 Debug.LogError("Warning: More than one CodeSpaceManager is present in the scene! "
                                + "This will lead to undefined behaviour when synchronizing "
@@ -148,16 +153,13 @@ namespace SEE.Controls
         private void SetUpWindowSelectionMenu()
         {
             //TODO: Icons
-            if (CodeWindowMenu)
-            {
-                Destroy(CodeWindowMenu);
-            }
             CodeWindowMenu = gameObject.AddComponent<SelectionMenu>();
             ToggleMenuEntry localEntry = new ToggleMenuEntry(true, () => ActivateSpace(LOCAL_PLAYER), 
                                                              DeactivateCurrentSpace, LOCAL_PLAYER,
                                                              "Code windows for the local player (you).", Color.black);
             ToggleMenuEntry noneEntry = new ToggleMenuEntry(false, () => CurrentPlayer = NO_PLAYER, () => { }, NO_PLAYER, 
                                                             "This option hides all code windows.", Color.grey);
+            CodeWindowMenu.AddEntry(noneEntry);
             CodeWindowMenu.AddEntry(localEntry);
             foreach (KeyValuePair<string, CodeWindowSpace> space in CodeSpaces.Where(space => space.Key != LOCAL_PLAYER))
             {
@@ -165,20 +167,27 @@ namespace SEE.Controls
                                                   DeactivateCurrentSpace, space.Key, 
                                                   $"Code window from player with IP address '{space.Key}'.", Color.white));
             }
-            CodeWindowMenu.AddEntry(noneEntry);
             CodeWindowMenu.Title = "Code Window Selection";
             CodeWindowMenu.Description = "Select the player whose code windows you want to see.";
-            
-            void ActivateSpace(string playerName)
-            {
-                CodeSpaces[playerName].enabled = true;
-                CurrentPlayer = playerName;
-            }
+        }
 
-            void DeactivateCurrentSpace()
-            {
-                CodeSpaces[CurrentPlayer].enabled = false;
-            }
+        /// <summary>
+        /// Calling this method will disable the <see cref="CodeSpace"/> for the <see cref="CurrentPlayer"/>.
+        /// </summary>
+        private void DeactivateCurrentSpace()
+        {
+            CodeSpaces[CurrentPlayer].enabled = false;
+        }
+
+        /// <summary>
+        /// Calling this method will enable the <see cref="CodeSpace"/> for the given <paramref name="playerName"/>
+        /// and will set them as the <see cref="CurrentPlayer"/>.
+        /// </summary>
+        /// <param name="playerName">The player whose space to activate</param>
+        private void ActivateSpace(string playerName)
+        {
+            CodeSpaces[playerName].enabled = true;
+            CurrentPlayer = playerName;
         }
     }
 }

@@ -25,8 +25,15 @@ namespace SEE.Game.UI.CodeWindow
         
         /// <summary>
         /// Name of the game object containing the code windows.
+        /// Can only be changed before <see cref="Start"/> has been called.
         /// </summary>
-        private const string CODE_WINDOW_SPACE_NAME = "CodeWindowSpace";
+        public string CodeWindowSpaceName = "CodeWindowSpace";
+
+        /// <summary>
+        /// Whether to allow the user to close the tabs containing the code windows.
+        /// Changing this value will only have an effect when doing so before <see cref="Start"/> has been called.
+        /// </summary>
+        public bool CanClose = true;
         
         /// <summary>
         /// A list of all nominal active code windows. May be empty.
@@ -97,10 +104,7 @@ namespace SEE.Game.UI.CodeWindow
                 codeWindow.enabled = false;
             }
 
-            if (space)
-            {
-                space.SetActive(false);
-            }
+            space?.SetActive(false);
         }
 
         /// <summary>
@@ -114,10 +118,7 @@ namespace SEE.Game.UI.CodeWindow
                 codeWindow.enabled = true;
             }
 
-            if (space)
-            {
-                space.SetActive(true);
-            }
+            space?.SetActive(true);
         }
 
         /// <summary>

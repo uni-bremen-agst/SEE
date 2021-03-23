@@ -92,7 +92,7 @@ namespace SEE.Game.UI.CodeWindow
             codeWindow.transform.localPosition = Vector3.zero;
 
             // Animate scrollbar to scroll to desired line
-            VisibleLine = Mathf.Max(0, Mathf.FloorToInt(PreStartLine)-1);
+            VisibleLine = Mathf.Clamp(Mathf.FloorToInt(PreStartLine), 1, lines);
         }
 
         /// <summary>
