@@ -10,16 +10,32 @@ namespace SEE.Net
     public class SyncCodeSpaceAction: AbstractAction
     {
 
+        /// <summary>
+        /// Whether the full text of the code windows should be transmitted instead of just the filename.
+        /// </summary>
         private const bool SYNC_FULL_TEXT = false;
 
-        public CodeWindowSpace.CodeWindowSpaceValues Space;
+        /// <summary>
+        /// The value object of the code space which shall be transmitted over the network.
+        /// </summary>
+        public CodeSpace.CodeSpaceValues Space;
 
-        public SyncCodeSpaceAction(CodeWindowSpace space)
+        /// <summary>
+        /// Creates a new SyncCodeSpaceAction with the given <paramref name="space"/>.
+        /// </summary>
+        /// <param name="space">The code space which shall be sent across the network.</param>
+        public SyncCodeSpaceAction(CodeSpace space)
         {
             UpdateSpace(space, false);
         }
 
-        public void UpdateSpace(CodeWindowSpace space, bool execute = true)
+        /// <summary>
+        /// For the given <paramref name="space"/>, create a value object, and depending on <paramref name="execute"/>,
+        /// send it over the network as well.
+        /// </summary>
+        /// <param name="space">The space which shall be serialized (and sent across the network).</param>
+        /// <param name="execute">Whether the <paramref name="space"/> should be sent across the network.</param>
+        public void UpdateSpace(CodeSpace space, bool execute = true)
         {
             if (space == null)
             {
@@ -51,7 +67,7 @@ namespace SEE.Net
                 
                 //TODO: Remove debug log
                 Debug.Log($"Received instance from {RequesterIPAddress}: {Space}\n");
-                CodeSpaceManager.ManagerInstance.UpdateCodeWindowSpaceFromValueObject(RequesterIPAddress, Space);
+                CodeSpaceManager.ManagerInstance.UpdateCodeSpaceFromValueObject(RequesterIPAddress, Space);
             }
         }
     }

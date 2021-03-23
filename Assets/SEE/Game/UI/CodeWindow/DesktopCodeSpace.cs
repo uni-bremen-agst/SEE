@@ -9,7 +9,7 @@ namespace SEE.Game.UI.CodeWindow
     /// <summary>
     /// This part of the class contains the Desktop UI for a code space.
     /// </summary>
-    public partial class CodeWindowSpace
+    public partial class CodeSpace
     {
         /// <summary>
         /// The <see cref="Panel"/> containing the code windows.
@@ -24,13 +24,13 @@ namespace SEE.Game.UI.CodeWindow
 
         protected override void StartDesktop()
         {
-            // Add CodeWindowSpace component if it doesn't exist yet
-            space = Canvas.transform.Find(CodeWindowSpaceName)?.gameObject;
+            // Add CodeSpace component if it doesn't exist yet
+            space = Canvas.transform.Find(CodeSpaceName)?.gameObject;
             if (!space)
             {
-                GameObject spacePrefab = Resources.Load<GameObject>(CODE_WINDOW_SPACE_PREFAB);
+                GameObject spacePrefab = Resources.Load<GameObject>(CODE_SPACE_PREFAB);
                 space = Instantiate(spacePrefab, Canvas.transform, false);
-                space.name = CodeWindowSpaceName;
+                space.name = CodeSpaceName;
             }
             space.SetActive(true);
         }

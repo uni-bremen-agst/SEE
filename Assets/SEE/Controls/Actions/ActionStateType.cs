@@ -55,13 +55,13 @@ namespace SEE.Controls.Actions
             new ActionStateType(7, "Delete", "Deletes a node or edge", 
                                 Color.yellow.Darker(), "Materials/ModernUIPack/Trash",
                                 DeleteAction.CreateReversibleAction);
+        public static ActionStateType ShowCode { get; } =
+            new ActionStateType(8, "Show Code", "Displays the source code of a node.",
+                                Color.black, "Materials/ModernUIPack/Document", null);
         public static ActionStateType Draw { get; } =
-            new ActionStateType(8, "Draw", "Draws a line",
+            new ActionStateType(9, "Draw", "Draws a line",
                         Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                         DrawAction.CreateReversibleAction);
-        public static ActionStateType ShowCode { get; } =
-            new ActionStateType(9, "Show Code", "Displays the source code of a node.",
-                                Color.black, "Materials/ModernUIPack/Document", null);
         #endregion
 
         /// <summary>

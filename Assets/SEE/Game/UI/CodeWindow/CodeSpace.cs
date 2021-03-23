@@ -11,7 +11,7 @@ namespace SEE.Game.UI.CodeWindow
     /// The user will be able to choose which of the currently active code windows will be shown.
     /// This component is responsible for arranging, displaying, and hiding the code windows.
     /// </summary>
-    public partial class CodeWindowSpace: PlatformDependentComponent
+    public partial class CodeSpace: PlatformDependentComponent
     {
         /// <summary>
         /// Returns a <b>read-only wrapper</b> around the list of active code windows.
@@ -19,15 +19,15 @@ namespace SEE.Game.UI.CodeWindow
         public IList<CodeWindow> CodeWindows => codeWindows.AsReadOnly();
         
         /// <summary>
-        /// Path to the code window space prefab, in which all code windows will be contained.
+        /// Path to the code space prefab, in which all code windows will be contained.
         /// </summary>
-        private const string CODE_WINDOW_SPACE_PREFAB = "Prefabs/UI/CodeWindowSpace";
+        private const string CODE_SPACE_PREFAB = "Prefabs/UI/CodeWindowSpace";
         
         /// <summary>
         /// Name of the game object containing the code windows.
         /// Can only be changed before <see cref="Start"/> has been called.
         /// </summary>
-        public string CodeWindowSpaceName = "CodeWindowSpace";
+        public string CodeSpaceName = "CodeSpace";
 
         /// <summary>
         /// Whether to allow the user to close the tabs containing the code windows.
@@ -112,7 +112,7 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         public void OnEnable()
         {
-            // Re-enabling the code window space will cause its code windows to show back up.
+            // Re-enabling the code space will cause its code windows to show back up.
             foreach (CodeWindow codeWindow in codeWindows)
             {
                 codeWindow.enabled = true;
@@ -137,41 +137,46 @@ namespace SEE.Game.UI.CodeWindow
         public UnityEvent OnActiveCodeWindowChanged = new UnityEvent();
 
         /// <summary>
-        /// Re-creates a <see cref="CodeWindowSpace"/> from the given <paramref name="valueObject"/> and attaches
+        /// Re-creates a <see cref="CodeSpace"/> from the given <paramref name="valueObject"/> and attaches
         /// it to the given GameObject <paramref name="attachTo"/>.
         /// </summary>
-        /// <param name="valueObject">The value object from which the code window space should be constructed.</param>
-        /// <param name="attachTo">The game object to which the new code window space should be attached.</param>
-        /// <returns>The newly re-created CodeWindowSpace.</returns>
-        public static CodeWindowSpace FromValueObject(CodeWindowSpaceValues valueObject, GameObject attachTo)
+        /// <param name="valueObject">The value object from which the code space should be constructed.</param>
+        /// <param name="attachTo">The game object to which the new code space should be attached.</param>
+        /// <param name="attachWindows">Whether the <see cref="CodeWindowValues"/> in the space should
+        /// be attached to <see cref="attachTo"/> as well, instead of the GameObject that might be defined
+        /// in them.</param>
+        /// <returns>The newly re-created <see cref="CodeSpace"/>.</returns>
+        public static CodeSpace FromValueObject(CodeSpaceValues valueObject, GameObject attachTo, 
+                                                      bool attachWindows = false)
         {
             if (attachTo == null)
             {
                 throw new ArgumentNullException(nameof(attachTo));
             }
-            CodeWindowSpace space = attachTo.AddComponent<CodeWindowSpace>();
-            space.codeWindows.AddRange(valueObject.CodeWindows.Select(x => CodeWindow.FromValueObject(x)));
+            CodeSpace space = attachTo.AddComponent<CodeSpace>();
+            space.codeWindows.AddRange(valueObject.CodeWindows.Select(
+                                           x => CodeWindow.FromValueObject(x, attachWindows ? attachTo : null)));
             space.ActiveCodeWindow = space.codeWindows.First(x => valueObject.ActiveCodeWindow.Title == x.Title);
             return space;
         }
 
         /// <summary>
-        /// Generates and returns a <see cref="CodeWindowSpaceValues"/> struct for this code window space.
+        /// Generates and returns a <see cref="CodeSpaceValues"/> struct for this code space.
         /// </summary>
         /// <param name="fulltext">Whether the whole text should be included. Iff false, the filename will be saved
         /// instead of the text. This applies to each code window contained in this space.</param>
-        /// <returns>The newly created <see cref="CodeWindowSpaceValues"/>, matching this class</returns>
-        public CodeWindowSpaceValues ToValueObject(bool fulltext)
+        /// <returns>The newly created <see cref="CodeSpaceValues"/>, matching this class</returns>
+        public CodeSpaceValues ToValueObject(bool fulltext)
         {
-            return new CodeWindowSpaceValues(CodeWindows, ActiveCodeWindow, fulltext);
+            return new CodeSpaceValues(CodeWindows, ActiveCodeWindow, fulltext);
         }
         
         /// <summary>
-        /// Represents the values of a code window space necessary to re-create its content.
-        /// Used for serialization when sending a <see cref="CodeWindowSpace"/> over the network.
+        /// Represents the values of a code space necessary to re-create its content.
+        /// Used for serialization when sending a <see cref="CodeSpace"/> over the network.
         /// </summary>
         [Serializable]
-        public struct CodeWindowSpaceValues
+        public struct CodeSpaceValues
         {
             /// <summary>
             /// Generated value object of the active code window in this space.
@@ -186,14 +191,14 @@ namespace SEE.Game.UI.CodeWindow
             public List<CodeWindow.CodeWindowValues> CodeWindows { get; private set; }
 
             /// <summary>
-            /// Creates a new CodeWindowSpaceValues object from the given parameters.
+            /// Creates a new CodeSpaceValues object from the given parameters.
             /// Note that this will create a CodeWindowValues object for each code window in the space.
             /// </summary>
             /// <param name="codeWindows">List of code windows in the space.</param>
             /// <param name="activeCodeWindow">Currently active code window in the space.</param>
             /// <param name="fulltext">Whether the text inside each code window should be saved.
             /// Iff false, the path to each file will be saved instead.</param>
-            internal CodeWindowSpaceValues(IEnumerable<CodeWindow> codeWindows, CodeWindow activeCodeWindow, bool fulltext)
+            internal CodeSpaceValues(IEnumerable<CodeWindow> codeWindows, CodeWindow activeCodeWindow, bool fulltext)
             {
                 ActiveCodeWindow = activeCodeWindow.ToValueObject(fulltext);
                 CodeWindows = codeWindows.Select(x => x.ToValueObject(fulltext)).ToList();

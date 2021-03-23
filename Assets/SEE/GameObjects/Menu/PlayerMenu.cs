@@ -58,6 +58,7 @@ namespace SEE.GO.Menu
                     ShowCodeAction action = modeMenuGO.AddComponent<ShowCodeAction>();
                     entryAction = () => action.enabled = true;
                     exitAction = () => action.enabled = false;
+                    action.enabled = false;
                 }
                 entries.Add(new ToggleMenuEntry(
                     active: first,
@@ -109,12 +110,10 @@ namespace SEE.GO.Menu
             ModeMenu.OnMenuEntrySelected.AddListener(SetIndicatorStateToEntry);
             // Initialize action state indicator to current action state
             SetIndicatorStateToEntry(ModeMenu.GetActiveEntry());
-            Assert.IsTrue(ActionStateType.AllTypes.Count <= 9, 
-                          "Only up to 9 (10 if zero is included) entries can be selected via the numbers on the keyboard!");
 
             void SetIndicatorStateToEntry(ToggleMenuEntry entry)
             {
-                Indicator.ChangeState(ActionStateType.FromID(ModeMenu.Entries.IndexOf(entry)));
+                Indicator.ChangeActionState(ActionStateType.FromID(ModeMenu.Entries.IndexOf(entry)));
             }
         }
 

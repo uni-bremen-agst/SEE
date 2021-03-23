@@ -117,7 +117,7 @@ namespace SEE.Game.UI.CodeWindow
                 }
                 // If this is called before Start() has been called, scrollbar will be null, so we have to cache
                 // the desired visible line.
-                if (scrollRect == null)
+                if (!HasStarted)
                 {
                     PreStartLine = value;
                 }
@@ -221,7 +221,7 @@ namespace SEE.Game.UI.CodeWindow
         /// Shows or hides the code window, depending on the <see cref="show"/> parameter.
         /// </summary>
         /// <param name="show">Whether the code window should be shown.</param>
-        /// <remarks>If this window is used in a <see cref="CodeWindowSpace"/>, this method
+        /// <remarks>If this window is used in a <see cref="CodeSpace"/>, this method
         /// needn't (and shouldn't) be used.</remarks>
         public void Show(bool show)
         {
@@ -314,7 +314,7 @@ namespace SEE.Game.UI.CodeWindow
         /// <returns>The newly created <see cref="CodeWindowValues"/>, matching this class</returns>
         public CodeWindowValues ToValueObject(bool fulltext)
         {
-            //TODO: Maybe use gameObject.ID()?
+            //TODO: Maybe use gameObject.ID()? The paths are present in the name, and those are client-dependent
             return fulltext ? new CodeWindowValues(Title, VisibleLine, gameObject.name, Text) 
                 : new CodeWindowValues(Title, VisibleLine, gameObject.name, path: FilePath);
         }

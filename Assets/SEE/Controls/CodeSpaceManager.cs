@@ -8,7 +8,7 @@ using UnityEngine.Events;
 namespace SEE.Controls
 {
     /// <summary>
-    /// Manages the association from players to <see cref="CodeWindowSpace"/>.
+    /// Manages the association from players to <see cref="CodeSpace"/>.
     /// Will also display a menu which can be opened using TAB. The player whose code window shall be displayed
     /// can be selected from this menu.
     /// Note that only one instance of this class may be active in the scene. This instance can be retrieved
@@ -32,9 +32,9 @@ namespace SEE.Controls
         public string CurrentPlayer { get; private set; } = LOCAL_PLAYER;
 
         /// <summary>
-        /// A dictionary mapping player names to their code window spaces.
+        /// A dictionary mapping player names to their code spaces.
         /// </summary>
-        public readonly Dictionary<string, CodeWindowSpace> CodeSpaces = new Dictionary<string, CodeWindowSpace>();
+        public readonly Dictionary<string, CodeSpace> CodeSpaces = new Dictionary<string, CodeSpace>();
 
         /// <summary>
         /// This event will be invoked whenever the active code window for the <see cref="LOCAL_PLAYER"/> is changed.
@@ -47,30 +47,35 @@ namespace SEE.Controls
         private SelectionMenu CodeWindowMenu;
 
         /// <summary>
+        /// A <see cref="StateIndicator"/> which displays the IP address of the window we're viewing currently. 
+        /// </summary>
+        private StateIndicator SpaceIndicator;
+
+        /// <summary>
         /// Represents the code space manager currently active in the scene.
         /// </summary>
         public static CodeSpaceManager ManagerInstance;
 
         /// <summary>
-        /// Accesses the code window space for the given <paramref name="playerName"/>.
+        /// Accesses the code space for the given <paramref name="playerName"/>.
         /// If the given <paramref name="playerName"/> does not exist, <c>null</c> will be returned.
         /// </summary>
-        /// <param name="playerName">The name of the player whose code window space should be returned.</param>
-        public CodeWindowSpace this[string playerName]
+        /// <param name="playerName">The name of the player whose code space should be returned.</param>
+        public CodeSpace this[string playerName]
         {
             get => CodeSpaces.ContainsKey(playerName) ? CodeSpaces[playerName] : null;
             set => CodeSpaces[playerName] = value;
         }
 
-        public void UpdateCodeWindowSpaceFromValueObject(string playerName, CodeWindowSpace.CodeWindowSpaceValues valueObject)
+        public void UpdateCodeSpaceFromValueObject(string playerName, CodeSpace.CodeSpaceValues valueObject)
         {
             if (!CodeSpaces.ContainsKey(playerName))
             {
-                CodeSpaces[playerName] = CodeWindowSpace.FromValueObject(valueObject, gameObject);
+                CodeSpaces[playerName] = CodeSpace.FromValueObject(valueObject, gameObject);
                 CodeWindowMenu.AddEntry(new ToggleMenuEntry(false, () => ActivateSpace(playerName),
                                                   DeactivateCurrentSpace, playerName, 
                                                   $"Code window from player with IP address '{playerName}'.", Color.white));
-                CodeSpaces[playerName].CodeWindowSpaceName += $" ({playerName})";
+                CodeSpaces[playerName].CodeSpaceName += $" ({playerName})";
                 CodeSpaces[playerName].enabled = false;
                 CodeSpaces[playerName].CanClose = false;  // User may only close their own windows
             }
@@ -104,7 +109,6 @@ namespace SEE.Controls
                 closedWindows.ForEach(CodeSpaces[playerName].CloseCodeWindow);
                 
                 // Set active window if it changed
-                // FIXME: Doesn't evaluate to true when changing back to another tab
                 if (CodeSpaces[playerName].ActiveCodeWindow.Title != valueObject.ActiveCodeWindow.Title)
                 {
                     CodeSpaces[playerName].ActiveCodeWindow = CodeSpaces[playerName].CodeWindows.First(x => x.Title == valueObject.ActiveCodeWindow.Title);
@@ -118,20 +122,28 @@ namespace SEE.Controls
             {
                 Debug.LogError("Warning: More than one CodeSpaceManager is present in the scene! "
                                + "This will lead to undefined behaviour when synchronizing "
-                               + "code windows across the network!\n");
+                               + "code windows across the network! No new indicator will be created.\n");
             }
             else
             {
+                SpaceIndicator = gameObject.AddComponent<StateIndicator>();
+                SpaceIndicator.name = "Code Space Indicator";
+                // Anchor to lower left
+                SpaceIndicator.AnchorMin = Vector2.zero;
+                SpaceIndicator.AnchorMax = Vector2.zero;
+                SpaceIndicator.Pivot = Vector2.zero;
                 ManagerInstance = this;
             }
             
-            // Create local code window space and associate it with current player
-            if (!TryGetComponent(out CodeWindowSpace space))
+            // Create local code space and associate it with current player
+            if (!TryGetComponent(out CodeSpace space))
             {
-                space = gameObject.AddComponent<CodeWindowSpace>();
+                space = gameObject.AddComponent<CodeSpace>();
             }
             CodeSpaces[LOCAL_PLAYER] = space;
             space.OnActiveCodeWindowChanged.AddListener(OnActiveCodeWindowChanged.Invoke);
+            
+            ManagerInstance.SpaceIndicator.ChangeState(LOCAL_PLAYER, Color.black);
             
             SetUpWindowSelectionMenu();
         }
@@ -161,7 +173,7 @@ namespace SEE.Controls
                                                             "This option hides all code windows.", Color.grey);
             CodeWindowMenu.AddEntry(noneEntry);
             CodeWindowMenu.AddEntry(localEntry);
-            foreach (KeyValuePair<string, CodeWindowSpace> space in CodeSpaces.Where(space => space.Key != LOCAL_PLAYER))
+            foreach (KeyValuePair<string, CodeSpace> space in CodeSpaces.Where(space => space.Key != LOCAL_PLAYER))
             {
                 CodeWindowMenu.AddEntry(new ToggleMenuEntry(false, () => ActivateSpace(space.Key),
                                                   DeactivateCurrentSpace, space.Key, 
@@ -177,6 +189,7 @@ namespace SEE.Controls
         private void DeactivateCurrentSpace()
         {
             CodeSpaces[CurrentPlayer].enabled = false;
+            ManagerInstance.SpaceIndicator.enabled = false;
         }
 
         /// <summary>
@@ -188,6 +201,8 @@ namespace SEE.Controls
         {
             CodeSpaces[playerName].enabled = true;
             CurrentPlayer = playerName;
+            ManagerInstance.SpaceIndicator.enabled = true;
+            ManagerInstance.SpaceIndicator.ChangeState(playerName, Color.black);
         }
     }
 }
