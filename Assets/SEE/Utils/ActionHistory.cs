@@ -247,7 +247,7 @@ namespace SEE.Utils
             {
                 Current?.Stop();
 
-                // we have to actualise the Menu and ActionStateIndicator
+                // we have to update the Menu and ActionStateIndicator
                 SetMenuAndIndicator(RedoStack);
 
                 // the last undone action becomes the currently executed action again
@@ -303,4 +303,3 @@ namespace SEE.Utils
         }
     }
 }
-
