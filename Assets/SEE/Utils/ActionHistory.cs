@@ -101,6 +101,7 @@ namespace SEE.Utils
         /// A memory of the previously emitted debugging output.
         /// </summary>
         private string previousMessage = "";
+
         /// <summary>
         /// Emits the current UndoStack and RedoStack as debugging output.
         /// If the output would be the same a in the previous call, nothing
@@ -284,9 +285,9 @@ namespace SEE.Utils
                     }
                 }
                 // If the stack is empty, the initial state (move) should be set.
-                // Fixme: This exception is reached not just in the expected case. After multiple
-                // undos and redos, this case will reached at the last undo before expected "move"-state.
-                catch (InvalidOperationException e)
+                // Hint: This exception is reached not only in the expected case. After multiple
+                // undos and redos, this case will be reached at the last undo operation before the expected "move"-state.
+                catch (InvalidOperationException)
                 {
                     ToggleMenuEntry toggleMenu = playerMenu.ModeMenu.Entries[0];
                     playerMenu.ModeMenu.ActiveEntry = toggleMenu;
@@ -294,7 +295,6 @@ namespace SEE.Utils
                     indicator.ChangeState(type);
                 }
             }
-
         }
 
         /// <summary>

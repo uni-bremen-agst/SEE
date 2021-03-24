@@ -36,10 +36,10 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The new name and new type of the node, which could be undone.
         /// </summary>
-        private Tuple<string, string, Node> changeToRedone;
+        private Tuple<string, string, Node> changesToBeRedone;
 
         /// <summary>
-        /// The previous values (name and type) of the GameObject node to be edited.
+        /// The previous values (name and type) of the edited node.
         /// </summary>
         private Tuple<GameObject, string, string> nodeToEdit;
 
@@ -74,7 +74,7 @@ namespace SEE.Controls.Actions
                         EditProgress = ProgressState.NodeSelected;
                     }
                     // this case will be reached after editing a node for saving
-                    // the previous values of the node to edit in a history (Undo/redo).
+                    // the previous values of this specific node.
                     if (nodeToEdit != null)
                     {
                         editedNode = nodeToEdit;
@@ -93,7 +93,7 @@ namespace SEE.Controls.Actions
                         editNode.gameObjectID = hoveredObject.name;
                         nodeToEdit = new Tuple<GameObject, string, string>
                             (hoveredObject, hoveredObject.GetComponent<NodeRef>().Value.SourceName, hoveredObject.GetComponent<NodeRef>().Value.Type);
-                        changeToRedone = null;
+                        changesToBeRedone = null;
                     }
                     break;
 
@@ -116,8 +116,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Undo()
         {
-            changeToRedone = new Tuple<string, string, Node>
-                (editedNode.Item1.GetComponent<NodeRef>().Value.SourceName, editedNode.Item1.GetComponent<NodeRef>().Value.Type, editedNode.Item1.GetComponent<NodeRef>().Value);
+            changesToBeRedone = new Tuple<string, string, Node>
+                (editedNode.Item1.GetComponent<NodeRef>().Value.SourceName,
+                editedNode.Item1.GetComponent<NodeRef>().Value.Type,
+                editedNode.Item1.GetComponent<NodeRef>().Value);
+
             editedNode.Item1.GetComponent<NodeRef>().Value.SourceName = editedNode.Item2;
             editedNode.Item1.GetComponent<NodeRef>().Value.Type = editedNode.Item3;
         }
@@ -127,7 +130,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Redo()
         {
-            UpdateNode(changeToRedone.Item1, changeToRedone.Item2, changeToRedone.Item3);
+            UpdateNode(changesToBeRedone.Item1, changesToBeRedone.Item2, changesToBeRedone.Item3);
         }
 
         /// <summary>
@@ -146,7 +149,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="newName">the new name of the <paramref name="node"/></param>
         /// <param name="newType">the new type of the <paramref name="node"/></param>
-        /// <param name="node">the node to be edited</param>
+        /// <param name="node">the node to be editing</param>
         public static void UpdateNode(string newName, string newType, Node node)
         {
             if (!newName.Equals(node.SourceName))
