@@ -278,6 +278,7 @@ namespace SEE.Utils
                 {
                     playerMenu.ModeMenu.ActiveEntry = toggleMenuEntry;
                     indicator.ChangeState(stack.Peek().GetActionStateType());
+                    break;
                 }
             }
 
