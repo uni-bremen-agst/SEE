@@ -79,6 +79,7 @@ namespace SEE.Controls.Actions
                     {
                         editedNode = nodeToEdit;
                         hadAnEffect = true;
+                        result = true;
                         nodeToEdit = null;
                     }
                     break;
