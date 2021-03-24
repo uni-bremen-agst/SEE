@@ -69,7 +69,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of the specific action.
         /// </summary>
-        /// <returns>the <see cref="ActionStateType" of the specific action/></returns>
+        /// <returns>the <see cref="ActionStateType"/> of the specific action</returns>
         public abstract ActionStateType GetActionStateType();
 
         /// <summary>
