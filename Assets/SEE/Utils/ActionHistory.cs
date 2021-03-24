@@ -1,7 +1,9 @@
 ﻿using SEE.Controls;
+using SEE.Controls.Actions;
 using SEE.Game.UI;
 using SEE.GO;
 using SEE.GO.Menu;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -91,6 +93,11 @@ namespace SEE.Utils
             {
                 // We are continuing with a fresh instance of the same type as Current.
                 Execute(Current.NewInstance());
+                Debug.Log(UndoStack.Count);
+                foreach (ReversibleAction act in UndoStack)
+                {
+                    Debug.Log(act.ToString());
+                }
             }
             // Dump();
         }
@@ -109,9 +116,9 @@ namespace SEE.Utils
             string newMessage = $"Current: {ToString(Current)} Undo: {ToString(UndoStack)} Redo: {ToString(RedoStack)}\n";
             if (previousMessage != newMessage)
             {
-                previousMessage = newMessage; 
+                previousMessage = newMessage;
                 Debug.Log(previousMessage);
-            }            
+            }
         }
 
         /// <summary>
@@ -249,7 +256,6 @@ namespace SEE.Utils
 
                 // we have to actualise the Menu and ActionStateIndicator
                 SetMenuAndIndicator(RedoStack);
-
                 // the last undone action becomes the currently executed action again
                 ReversibleAction action = RedoStack.Pop();
                 UndoStack.Push(action);
@@ -274,10 +280,23 @@ namespace SEE.Utils
 
             foreach (ToggleMenuEntry toggleMenuEntry in playerMenu.ModeMenu.Entries)
             {
-                if (toggleMenuEntry.Title.Equals(stack.Peek().GetActionStateType().Name))
+                try
                 {
-                    playerMenu.ModeMenu.ActiveEntry = toggleMenuEntry;
-                    indicator.ChangeState(stack.Peek().GetActionStateType());
+                    if (toggleMenuEntry.Title.Equals(stack.Peek().GetActionStateType().Name))
+                    {
+                        playerMenu.ModeMenu.ActiveEntry = toggleMenuEntry;
+                        indicator.ChangeState(stack.Peek().GetActionStateType());
+                    }
+                }
+                // If the stack is empty, the initial state (move) should be set.
+                // Fixme: This exception is reached not just in the expected case. After multiple
+                // undos and redos, this case will reached at the last undo before expected "move"-state.
+                catch (InvalidOperationException e)
+                {
+                    ToggleMenuEntry toggleMenu = playerMenu.ModeMenu.Entries[0];
+                    playerMenu.ModeMenu.ActiveEntry = toggleMenu;
+                    ActionStateType type = ActionStateType.Move;
+                    indicator.ChangeState(type);
                 }
             }
 
