@@ -835,5 +835,14 @@ namespace SEE.Controls.Actions
         {
             Debug.Log(mapsToEdgeRemoved.ToString());
         }
+
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this action.
+        /// </summary>
+        /// <returns>the <see cref="ActionStateType"/> of this action</returns>
+        public ActionStateType GetActionStateType()
+        {
+            return ActionStateType.Map;
+        }
     }
 }

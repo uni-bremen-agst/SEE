@@ -59,7 +59,7 @@ namespace SEE.Controls.Actions
                             {
                                 try
                                 {
-                                    city.Renderer.DrawEdge(fromGO, toGO);
+                                    city.Renderer.DrawEdge(fromGO, toGO, null);
                                 }
 
                                 catch (Exception e)

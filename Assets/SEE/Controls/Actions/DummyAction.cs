@@ -167,5 +167,14 @@ namespace SEE.Controls.Actions
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             CreateObjectAt(position);
         }
+
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this action.
+        /// </summary>
+        /// <returns>the <see cref="ActionStateType"/> of this action</returns>
+        public override ActionStateType GetActionStateType()
+        {
+            return ActionStateType.Dummy;
+        }
     }
 }

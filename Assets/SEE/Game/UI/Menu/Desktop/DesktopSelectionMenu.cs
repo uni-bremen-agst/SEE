@@ -32,9 +32,9 @@ namespace SEE.Game.UI
         {
             base.UpdateDesktop();
             // Only change when a different entry has been selected
-            if (currentSelectedEntry != GetActiveEntry())
+            if (currentSelectedEntry != ActiveEntry)
             {
-                currentSelectedEntry = GetActiveEntry();
+                currentSelectedEntry = ActiveEntry;
                 foreach (ButtonManagerBasicWithIcon manager in ButtonManagers)
                 {
                     // Indicate selected button by typesetting it [LIKE THIS]

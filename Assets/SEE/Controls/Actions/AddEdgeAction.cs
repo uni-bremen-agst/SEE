@@ -13,7 +13,25 @@ namespace SEE.Controls.Actions
     public class AddEdgeAction : AbstractPlayerAction
     {
         /// <summary>
-        /// The source for the edge to be drawn.
+        /// Returns a new instance of <see cref="AddEdgeAction"/>.
+        /// </summary>
+        /// <returns>new instance of <see cref="AddEdgeAction"/></returns>
+        public static ReversibleAction CreateReversibleAction()
+        {
+            return new AddEdgeAction();
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="AddEdgeAction"/>.
+        /// </summary>
+        /// <returns>new instance of <see cref="AddEdgeAction"/></returns>
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
+        }
+
+        /// <summary>
+        /// The source for an edge to be drawn.
         /// </summary>
         private GameObject from;
 
@@ -21,6 +39,22 @@ namespace SEE.Controls.Actions
         /// The target of the edge to be drawn.
         /// </summary>
         private GameObject to;
+
+        /// <summary>
+        /// The Objects which are needed to create a new edge:
+        /// The source, the target and the city where the edge will be attached to.
+        /// </summary>
+        private Tuple<GameObject, GameObject, SEECity> edgeToBeDrawn;
+
+        /// <summary>
+        /// The edge created by this action.
+        /// </summary>
+        private GameObject createdEdge;
+
+        /// <summary>
+        /// The name of the generated edge.
+        /// </summary>
+        private string edgeName;
 
         public override void Start()
         {
@@ -61,8 +95,10 @@ namespace SEE.Controls.Actions
                     {
                         try
                         {
-                            city.Renderer.DrawEdge(from, to);
-                            new AddEdgeNetAction(from.name, to.name).Execute();                            
+                            GameObject addedEdge = city.Renderer.DrawEdge(from, to, null);
+                            edgeToBeDrawn = new Tuple<GameObject, GameObject, SEECity>(from, to, city);
+                            createdEdge = addedEdge;
+                            new AddEdgeNetAction(from.name, to.name).Execute();
                         }
                         catch (Exception e)
                         {
@@ -72,6 +108,7 @@ namespace SEE.Controls.Actions
                         to = null;
                         // action is completed (successfully or not; it does not matter)
                         result = true;
+                        hadAnEffect = true;
                     }
                 }
             }
@@ -85,11 +122,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Undoes this AddEdgeActíon
+        /// Undoes this AddEdgeAction
         /// </summary>
         public override void Undo()
         {
-            Debug.Log("Undo AddEdge");
+            base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
+            DeleteAction deleteAction = new DeleteAction();
+            deleteAction.DeleteSelectedObject(createdEdge);
+            edgeName = createdEdge.name;
+            Destroyer.DestroyGameObject(createdEdge);
         }
 
         /// <summary>
@@ -97,25 +138,18 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Redo()
         {
-            Debug.Log("Redo AddEdge");
+            base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
+            GameObject redoneEdge = edgeToBeDrawn.Item3.Renderer.DrawEdge(edgeToBeDrawn.Item1, edgeToBeDrawn.Item2, edgeName);
+            createdEdge = redoneEdge;
         }
 
         /// <summary>
-        /// Returns a new instance of <see cref="AddEdgeAction"/>.
+        /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
+        /// <returns>the <see cref="ActionStateType"/> of this action</returns>
+        public override ActionStateType GetActionStateType()
         {
-            return new AddEdgeAction();
-        }
-
-        /// <summary>
-        /// Returns a new instance of <see cref="AddEdgeAction"/>.
-        /// </summary>
-        /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
-        {
-            return CreateReversibleAction();
+            return ActionStateType.NewEdge;
         }
     }
 }
