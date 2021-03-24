@@ -127,7 +127,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Redo()
         {
-                UpdateNode(changeToRedone.Item1, changeToRedone.Item2, changeToRedone.Item3);
+            UpdateNode(changeToRedone.Item1, changeToRedone.Item2, changeToRedone.Item3);
         }
 
         /// <summary>
