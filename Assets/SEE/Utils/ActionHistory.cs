@@ -93,11 +93,6 @@ namespace SEE.Utils
             {
                 // We are continuing with a fresh instance of the same type as Current.
                 Execute(Current.NewInstance());
-                Debug.Log(UndoStack.Count);
-                foreach (ReversibleAction act in UndoStack)
-                {
-                    Debug.Log(act.ToString());
-                }
             }
             // Dump();
         }
