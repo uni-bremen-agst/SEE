@@ -24,19 +24,19 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// The current state of the edit-node process.
+        /// The current state of the edit node process.
         /// </summary>
         public ProgressState EditProgress { get; set; } = ProgressState.NoNodeSelected;
 
         /// <summary>
-        /// All nodes and their previous names and types edited by this action. 
+        /// The edited node and their previous name and type edited by this action. 
         /// </summary>
-        private List<Tuple<GameObject, string, string>> editedNodes = new List<Tuple<GameObject, string, string>>();
+        private Tuple<GameObject, string, string> editedNode;
 
         /// <summary>
-        /// All new names and new types of nodes, which was been undone.
+        /// The new name and new type of the node, which could be undone.
         /// </summary>
-        private List<Tuple<string, string, Node>> changesToRedone = new List<Tuple<string, string, Node>>();
+        private Tuple<string, string, Node> changeToRedone;
 
         /// <summary>
         /// The previous values (name and type) of the GameObject node to be edited.
@@ -66,7 +66,6 @@ namespace SEE.Controls.Actions
         {
             bool result = false;
 
-            // FIXME: When is this action done? That is, when should result be true?
             switch (EditProgress)
             {
                 case ProgressState.NoNodeSelected:
@@ -78,7 +77,8 @@ namespace SEE.Controls.Actions
                     // the previous values of the node to edit in a history (Undo/redo).
                     if (nodeToEdit != null)
                     {
-                        editedNodes.Add(nodeToEdit);
+                        editedNode = nodeToEdit;
+                        hadAnEffect = true;
                         nodeToEdit = null;
                     }
                     break;
@@ -92,7 +92,7 @@ namespace SEE.Controls.Actions
                         editNode.gameObjectID = hoveredObject.name;
                         nodeToEdit = new Tuple<GameObject, string, string>
                             (hoveredObject, hoveredObject.GetComponent<NodeRef>().Value.SourceName, hoveredObject.GetComponent<NodeRef>().Value.Type);
-                        changesToRedone.Clear();
+                        changeToRedone = null;
                     }
                     break;
 
@@ -115,13 +115,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Undo()
         {
-            foreach (Tuple<GameObject, string, string> tuple in editedNodes)
-            {
-                changesToRedone.Add(new Tuple<string,string,Node>
-                    (tuple.Item1.GetComponent<NodeRef>().Value.SourceName, tuple.Item1.GetComponent<NodeRef>().Value.Type, tuple.Item1.GetComponent<NodeRef>().Value));
-                tuple.Item1.GetComponent<NodeRef>().Value.SourceName = tuple.Item2;
-                tuple.Item1.GetComponent<NodeRef>().Value.Type = tuple.Item3;
-            }
+            changeToRedone = new Tuple<string, string, Node>
+                (editedNode.Item1.GetComponent<NodeRef>().Value.SourceName, editedNode.Item1.GetComponent<NodeRef>().Value.Type, editedNode.Item1.GetComponent<NodeRef>().Value);
+            editedNode.Item1.GetComponent<NodeRef>().Value.SourceName = editedNode.Item2;
+            editedNode.Item1.GetComponent<NodeRef>().Value.Type = editedNode.Item3;
         }
 
         /// <summary>
@@ -129,10 +126,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Redo()
         {
-            foreach(Tuple<string, string, Node> tuple in changesToRedone)
-            {
-                UpdateNode(tuple.Item1, tuple.Item2, tuple.Item3);
-            }
+                UpdateNode(changeToRedone.Item1, changeToRedone.Item2, changeToRedone.Item3);
         }
 
         /// <summary>
