@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-# for_each_revision.sh first..last
 
 export PATH=$BAUHAUS/axivion/scripts/:$PATH
+
+TARGETDIR=Data/GXL/animation-clones-SEE
+mkdir -p "$TARGETDIR"
 
 let i=0
 # iterate on all merge commits into master in reverse chronological order
@@ -16,7 +18,7 @@ do
     # generate RFG
     cpfcsv2rfg clones.cpf clones.csv clones.rfg
     # export to GXL
-    rfgexport -o Clones -f GXL clones.rfg clones-"$i".gxl
+    rfgexport -o Clones -f GXL clones.rfg "$TARGETDIR"/clones-"$i".gxl
 done
 
 exit 0
