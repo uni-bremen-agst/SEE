@@ -18503,7 +18503,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AdditionColor: {r: 0, g: 1, b: 0, a: 1}
-  ChangeColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  ChangeColor: {r: 0.015686275, g: 0.14117648, b: 1, a: 1}
   DeletionColor: {r: 1, g: 0, b: 0, a: 1}
   Scale: {x: 0.02, y: 0.3, z: 0.02}
 --- !u!114 &461367509
@@ -18611,7 +18611,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Directory
+      Data: File
     - Name: $v
       Entry: 5
       Data: true
@@ -18623,7 +18623,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: File
+      Data: Directory
     - Name: $v
       Entry: 5
       Data: true
@@ -18837,10 +18837,10 @@ MonoBehaviour:
     Root: 1
     relativePath: 
     absolutePath: 
-  WidthMetric: Metric.Number_of_Tokens
-  HeightMetric: Metric.Clone_Rate
+  WidthMetric: Metric.LOC
+  HeightMetric: Metric.Number_of_Tokens
   DepthMetric: Metric.LOC
-  LeafStyleMetric: Metric.Complexity
+  LeafStyleMetric: Metric.Clone_Rate
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -18883,7 +18883,7 @@ MonoBehaviour:
   DeletionBeamColor: {r: 0, g: 0, b: 0, a: 1}
   GXLDirectory:
     Root: 1
-    relativePath: /Data/GXL/animation-clones
+    relativePath: /Data/GXL/animation-clones-SEE
     absolutePath: 
 --- !u!114 &461367512
 MonoBehaviour:
@@ -49915,7 +49915,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerInputType: 0
   PlayerOrigin: {x: 1, y: 1, z: 1}
-  FocusPlane: {fileID: 816506529}
+  FocusPlane: {fileID: 461367512}
   Ground: {fileID: 162897622}
   HideVRControllers: 1
   ShowControllerHints: 0
