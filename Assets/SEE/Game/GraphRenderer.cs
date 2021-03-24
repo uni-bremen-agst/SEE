@@ -170,8 +170,9 @@ namespace SEE.Game
         /// </summary>
         /// <param name="from">source of the new edge</param>
         /// <param name="to">target of the new edge</param>
+        /// <param name="id">id of the new edge. If it is null, there will be generated a new id</param>
         /// <returns>the new edge or null</returns>
-        public GameObject DrawEdge(GameObject from, GameObject to)
+        public GameObject DrawEdge(GameObject from, GameObject to, string id)
         {
             Node fromNode = from.GetNode();
             Node toNode = to.GetNode();
@@ -198,6 +199,10 @@ namespace SEE.Game
                 Target = toNode,
                 Type = Graph.UnknownType // FIXME: We need to set the type of the edge.
             };
+            if(id != null)
+            {
+                edge.ID = id;
+            }
                 
             Graph graph = fromNode.ItsGraph;
             graph.AddEdge(edge);

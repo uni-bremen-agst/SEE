@@ -19,6 +19,11 @@ namespace SEE.Controls.Actions
             return new RotateAction();
         }
 
+        public override ActionStateType GetActionStateType()
+        {
+            return ActionStateType.Rotate;
+        }
+
         /// <summary>
         /// Returns a new instance of <see cref="RotateAction"/>.
         /// </summary>

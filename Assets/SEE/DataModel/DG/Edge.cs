@@ -170,7 +170,7 @@ namespace SEE.DataModel.DG
         public override string ID
         {
             get => id;
-            set => throw new NotImplementedException();
+            set => id = value;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using SEE.Utils;
+using System;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -48,7 +49,7 @@ namespace SEE.Controls.Actions
         /// had no effect.
         /// See <see cref="ReversibleAction.Undo"/>.
         /// </summary>
-        public virtual void Undo() 
+        public virtual void Undo()
         {
             hadAnEffect = false;
         }
@@ -64,6 +65,12 @@ namespace SEE.Controls.Actions
         {
             hadAnEffect = true;
         }
+
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of the specific action.
+        /// </summary>
+        /// <returns>the <see cref="ActionStateType" of the specific action/></returns>
+        public abstract ActionStateType GetActionStateType();
 
         /// <summary>
         /// Will be called once when the action is started for the
@@ -91,6 +98,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <returns>true if action is completed</returns>
         public abstract bool Update();
+
+        /// <summary>
+        /// True, if the <see cref="PlayerMenu"/> is open, else false.
+        /// </summary>
+        public static bool MenuIsOpen = true;
 
         /// <summary>
         /// Returns a new instance of the same type as this particular type of ReversibleAction.
@@ -177,6 +189,14 @@ namespace SEE.Controls.Actions
         public bool HadEffect()
         {
             return hadAnEffect;
+        }
+
+        /// <summary>
+        /// Inverts the <see cref="MenuIsOpen"/>.
+        /// </summary>
+        public static void InvertMenuIsOpen()
+        {
+            MenuIsOpen = !MenuIsOpen;
         }
     }
 }
