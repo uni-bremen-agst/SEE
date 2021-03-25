@@ -59,5 +59,15 @@ namespace SEE.Controls.Actions
                 NodeInteractionButtons.addOrEditNode = history.Current;
             }
         }
+
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of the currently executed 
+        /// action. If no such action is currently executed, null is returned.
+        /// </summary>
+        /// <returns><see cref="ActionStateType"/> of the currently executed action or null</returns>
+        public static ActionStateType Current()
+        {
+            return history.Current?.GetActionStateType();
+        }
     }
 }

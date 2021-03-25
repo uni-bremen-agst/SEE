@@ -109,7 +109,7 @@ namespace SEE.GO.Menu
             // Whenever the state is changed, the action state indicator should reflect that
             ModeMenu.OnMenuEntrySelected.AddListener(SetIndicatorStateToEntry);
             // Initialize action state indicator to current action state
-            SetIndicatorStateToEntry(ModeMenu.GetActiveEntry());
+            SetIndicatorStateToEntry(ModeMenu.ActiveEntry);
 
             void SetIndicatorStateToEntry(ToggleMenuEntry entry)
             {
@@ -148,10 +148,12 @@ namespace SEE.GO.Menu
                 if (Input.GetKeyDown(KeyCode.Z))
                 {
                     PlayerActionHistory.Undo();
+                    Indicator.ChangeActionState(PlayerActionHistory.Current());
                 }
                 else if (Input.GetKeyDown(KeyCode.Y))
                 {
                     PlayerActionHistory.Redo();
+                    Indicator.ChangeActionState(PlayerActionHistory.Current());
                 }
             }
             PlayerActionHistory.Update();

@@ -5,6 +5,7 @@ using OdinSerializer.Utilities;
 using UnityEngine;
 using System.Collections.Generic;
 using SEE.DataModel;
+using SEE.Game;
 
 namespace SEE.GO
 {
@@ -299,6 +300,69 @@ namespace SEE.GO
                     AllAncestors(child.gameObject, result);
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns the source node of the given <paramref name="gameObject"/>.
+        /// The <paramref name="gameObject"/> is assumed to represent an edge, that is,
+        /// is tagged by <see cref="Tags.Edge"/> and has an <see cref="EdgeRef"/>.
+        /// If this is not the case, an exception is thrown. If the source node
+        /// of this edge does not exist, an exception is thrown, too.
+        /// </summary>
+        /// <param name="gameObject">game object representing an edge</param>
+        /// <returns>the game object representing the source of this edge</returns>
+        public static GameObject Source(this GameObject gameObject)
+        {
+            if (gameObject.CompareTag(Tags.Edge) && gameObject.TryGetComponent(out EdgeRef edgeRef))
+            {
+                return RetrieveNode(edgeRef.SourceNodeID);
+            }
+            else
+            {
+                throw new Exception($"Game object {gameObject.name} is not an edge. It has no source node.");
+            }
+        }
+
+        /// <summary>
+        /// Returns the target node of the given <paramref name="gameObject"/>.
+        /// The <paramref name="gameObject"/> is assumed to represent an edge, that is,
+        /// is tagged by <see cref="Tags.Edge"/> and has an <see cref="EdgeRef"/>.
+        /// If this is not the case, an exception is thrown. If the target node
+        /// of this edge does not exist, an exception is thrown, too.
+        /// </summary>
+        /// <param name="gameObject">game object representing an edge</param>
+        /// <returns>the game object representing the target of this edge</returns>
+        public static GameObject Target(this GameObject gameObject)
+        {
+            if (gameObject.CompareTag(Tags.Edge) && gameObject.TryGetComponent(out EdgeRef edgeRef))
+            {
+                return RetrieveNode(edgeRef.SourceNodeID);
+            }
+            else
+            {
+                throw new Exception($"Game object {gameObject.name} is not an edge. It has no target node.");
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the game object representing a node with the given <paramref name="nodeID"/>.
+        /// 
+        /// Note: This is an expensive operation as it traverses all objects in the scene.
+        /// FIXME: We may need to cache all this information in look up tables for better
+        /// performance.
+        /// </summary>
+        /// <param name="nodeID">the unique ID of the node to be retrieved</param>
+        /// <returns>the node with the given <paramref name="nodeID"/></returns>
+        private static GameObject RetrieveNode(string nodeID)
+        {
+            foreach (GameObject gameNode in SceneQueries.AllGameNodesInScene(true, true))
+            {
+                if (gameNode.name == nodeID)
+                {
+                    return gameNode;
+                }
+            }
+            throw new Exception($"Node named {nodeID} not found.");
         }
     }
 }

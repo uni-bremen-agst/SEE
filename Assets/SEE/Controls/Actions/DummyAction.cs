@@ -100,7 +100,7 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI())
             {
                 Vector3 newPosition = Input.mousePosition;
                 newPosition.z = 1.0f;
@@ -166,6 +166,16 @@ namespace SEE.Controls.Actions
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             CreateObjectAt(position);
+        }
+
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this action.
+        /// </summary>
+        /// <returns><c>null</c>, because this component is currently unused and does not have an ActionStateType</returns>
+        public override ActionStateType GetActionStateType()
+        {
+            return null;
+            //return ActionStateType.Dummy;
         }
     }
 }
