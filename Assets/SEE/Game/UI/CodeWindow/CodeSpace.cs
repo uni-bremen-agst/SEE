@@ -133,6 +133,7 @@ namespace SEE.Game.UI.CodeWindow
 
         /// <summary>
         /// This event will be invoked whenever the active code window is changed.
+        /// This includes changing the active code window to nothing (i.e. closing all of them.)
         /// </summary>
         public UnityEvent OnActiveCodeWindowChanged = new UnityEvent();
 

@@ -104,6 +104,21 @@ namespace SEE.Game.UI.CodeWindow
                         OnActiveCodeWindowChanged.Invoke();
                     }
                 };
+                PanelNotificationCenter.OnPanelClosed += panel =>
+                {
+                    if (panel == Panel)
+                    {
+                        // Close each tab
+                        foreach (CodeWindow codeWindow in codeWindows)
+                        {
+                            Panel.RemoveTab(Panel.GetTab((RectTransform) codeWindow.codeWindow.transform));
+                            Destroy(codeWindow);
+                        }
+                        codeWindows.Clear();
+                        OnActiveCodeWindowChanged.Invoke();
+                        Destroy(Panel);
+                    }
+                };
             } else if (!Panel)
             {
                 // If no code window is initialized yet, there's nothing we can do
@@ -129,7 +144,6 @@ namespace SEE.Game.UI.CodeWindow
             {
                 Panel.RemoveTab(Panel.GetTab((RectTransform) codeWindow.codeWindow.transform));
                 currentCodeWindows.Remove(codeWindow);
-                // Otherwise, we'll just destroy the component
                 Destroy(codeWindow);
             }
             
@@ -153,6 +167,12 @@ namespace SEE.Game.UI.CodeWindow
                         if (panelTab.Panel == Panel)
                         {
                             CloseCodeWindow(codeWindows.First(x => x.codeWindow.GetInstanceID() == panelTab.Content.gameObject.GetInstanceID()));
+                            if (panelTab.Panel.NumberOfTabs <= 1)
+                            {
+                                // All tabs were closed, so we send out an event 
+                                // (The PanelNotificationCenter won't trigger in this case)
+                                OnActiveCodeWindowChanged.Invoke();
+                            }
                         }
                     };
                 }
