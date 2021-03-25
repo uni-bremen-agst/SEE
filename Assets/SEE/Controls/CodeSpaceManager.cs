@@ -34,10 +34,11 @@ namespace SEE.Controls
         /// <summary>
         /// A dictionary mapping player names to their code spaces.
         /// </summary>
-        public readonly Dictionary<string, CodeSpace> CodeSpaces = new Dictionary<string, CodeSpace>();
+        private readonly Dictionary<string, CodeSpace> CodeSpaces = new Dictionary<string, CodeSpace>();
 
         /// <summary>
         /// This event will be invoked whenever the active code window for the <see cref="LOCAL_PLAYER"/> is changed.
+        /// This includes changing the active code window to nothing (i.e. closing all of them.)
         /// </summary>
         public UnityEvent OnActiveCodeWindowChanged = new UnityEvent();
 

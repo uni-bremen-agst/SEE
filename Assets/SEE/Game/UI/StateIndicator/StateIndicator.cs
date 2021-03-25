@@ -61,12 +61,12 @@ namespace SEE.Game.UI
 
         private void OnDisable()
         {
-            ModePanelImage.gameObject.SetActive(false);
+            ModePanelImage?.gameObject.SetActive(false);
         }
 
         private void OnEnable()
         {
-            ModePanelImage.gameObject.SetActive(true);
+            ModePanelImage?.gameObject.SetActive(true);
         }
 
         /// <summary>
