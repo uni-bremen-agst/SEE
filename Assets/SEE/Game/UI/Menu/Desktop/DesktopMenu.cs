@@ -192,7 +192,8 @@ namespace SEE.Game.UI
         protected void ShowTooltip(string text)
         {
             TooltipManager.allowUpdating = true;
-            if (TooltipManager.tooltipObject.TryGetComponentOrLog(out CanvasGroup canvasGroup))
+            // tooltipObject only has 1 child, and will never have more than that
+            if (TooltipManager.tooltipObject.gameObject.transform.GetChild(0).gameObject.TryGetComponentOrLog(out CanvasGroup canvasGroup))
             {
                 // Change text
                 TextMeshProUGUI[] texts = TooltipManager.tooltipContent.GetComponentsInChildren<TextMeshProUGUI>();
@@ -205,7 +206,6 @@ namespace SEE.Game.UI
                 textComp.text = text;
                 
                 // Fade in 
-                //FIXME Tooltip isn't displayed. I suspect this is because the alpha value of the canvas group can't be changed at runtime.
                 DOTween.To(() => canvasGroup.alpha, a => canvasGroup.alpha = a, 1f, 0.5f);
             }
         }
