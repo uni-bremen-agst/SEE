@@ -16,14 +16,9 @@ namespace SEE.Controls.Actions
     /// This action assumes that it is attached to a game object representing
     /// the reflexion analysis during the game. 
     /// </summary>
-    public class MappingAction : CityAction, Observer
+    public class MappingAction : Observer, ReversibleAction
     {
         private const float SelectedAlpha = 0.8f;
-
-        private const KeyCode SaveKey = KeyCode.S;
-        private const KeyCode CopyKey = KeyCode.C;
-        private const KeyCode PasteKey = KeyCode.V;
-        private const KeyCode ClearKey = KeyCode.X;
 
         [Tooltip("The game object representing the architecture.")]
         public GameObject Architecture;
@@ -45,6 +40,24 @@ namespace SEE.Controls.Actions
         /// The graph containing the mapping from implementation onto architecture entities.
         /// </summary>
         private Graph mapping;
+
+        /// <summary>
+        /// Returns a new instance of <see cref="MappingAction"/>.
+        /// </summary>
+        /// <returns>new instance of <see cref="MappingAction"/></returns>
+        internal static ReversibleAction CreateReversibleAction()
+        {
+            return new MappingAction();
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="MappingAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
+        }
 
         /// <summary>
         /// The graph containing the architecture.
@@ -109,13 +122,16 @@ namespace SEE.Controls.Actions
         /// </summary>
         private readonly HashSet<Selection> objectsInClipboard = new HashSet<Selection>();
 
+        /// <summary>
+        /// Initializes this instance.
+        /// See <see cref="ReversibleAction.Awake"/>.
+        /// </summary>
         // Use this for initialization
-        private void Start()
+        public void Awake()
         {
             if (Architecture == null)
             {
                 Debug.LogWarning("No architecture city was specified for architectural mapping.\n");
-                enabled = false;
             }
             else
             {
@@ -123,14 +139,12 @@ namespace SEE.Controls.Actions
                 if (architecture == null)
                 {
                     Debug.LogWarning("The architecture city has no associated graph.\n");
-                    enabled = false;
                 }
             }
 
             if (Implementation == null)
             {
                 Debug.LogWarning("No implementation city was specified for architectural mapping.\n");
-                enabled = false;
             }
             else
             {
@@ -138,7 +152,6 @@ namespace SEE.Controls.Actions
                 if (implementation == null)
                 {
                     Debug.LogWarning("The implementation city has no associated graph.\n");
-                    enabled = false;
                 }
             }
 
@@ -165,33 +178,27 @@ namespace SEE.Controls.Actions
             if (AbsencePrefab == null)
             {
                 Debug.LogErrorFormat("No material assigned for absences.\n");
-                enabled = false;
             }
             if (ConvergencePrefab == null)
             {
                 Debug.LogErrorFormat("No material assigned for convergences.\n");
-                enabled = false;
             }
             if (DivergencePrefab == null)
             {
                 Debug.LogErrorFormat("No material assigned for divergences.\n");
-                enabled = false;
             }
             if (Architecture.TryGetComponent(out SEECity city))
             {
                 architectureGraphRenderer = city.Renderer;
                 if (architectureGraphRenderer == null)
                 {
-                    Debug.LogErrorFormat("The SEECity component attached to the object representing the architecture has no graph renderer.\n");
-                    enabled = false;
-                }
+                    Debug.LogErrorFormat("The SEECity component attached to the object representing the architecture has no graph renderer.\n");                }
             }
             else
             {
                 Debug.LogErrorFormat("The object representing the architecture has no SEECity component attached to it.\n");
-                enabled = false;
             }
-            if (enabled)
+            //if (enabled)
             {
                 Usage();
                 SetupReflexionDecorator();
@@ -207,8 +214,40 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                enabled = false;
+                // enabled = false;
             }
+        }
+
+        /// <summary>
+        /// See <see cref="ReversibleAction.Start"/>.
+        /// </summary>
+        public void Start()
+        {
+            // Intentionally left blank.
+        }
+
+        /// <summary>
+        /// See <see cref="ReversibleAction.Stop"/>.
+        /// </summary>
+        public void Stop()
+        {
+            // Intentionally left blank.
+        }
+
+        /// <summary>
+        /// See <see cref="ReversibleAction.Undo"/>.
+        /// </summary>
+        public void Undo()
+        {
+            Debug.Log("UNDO MAPPING");
+        }
+
+        /// <summary>
+        /// See <see cref="ReversibleAction.Redo"/>.
+        /// </summary>
+        public void Redo()
+        {
+            Debug.Log("REDO MAPPING");
         }
 
         private void OnStateChanged(ActionStateType value)
@@ -217,13 +256,11 @@ namespace SEE.Controls.Actions
             {
                 InteractableObject.AnySelectIn += AnySelectIn;
                 InteractableObject.AnySelectOut += AnySelectOut;
-                enabled = true;
             }
             else
             {
                 InteractableObject.AnySelectIn -= AnySelectIn;
                 InteractableObject.AnySelectOut -= AnySelectOut;
-                enabled = false; // We don't want to waste CPU time, if Update() doesn't do anything
             }
         }
 
@@ -319,10 +356,10 @@ namespace SEE.Controls.Actions
         private static void Usage()
         {
             Debug.Log("Keys for architectural mapping:\n");
-            Debug.LogFormat(" copy/remove selected implementation node to/from clipboard: Ctrl-{0}\n", CopyKey);
-            Debug.LogFormat(" map nodes in clipboard onto selected architecture node: Ctrl-{0}\n", PasteKey);
-            Debug.LogFormat(" clear clipboard: Ctrl-{0}\n", ClearKey);
-            Debug.LogFormat(" save mapping to GXL file: Ctrl-{0}\n", SaveKey);
+            Debug.LogFormat(" copy/remove selected implementation node to/from clipboard: Ctrl-{0}\n", KeyBindings.AddOrRemoveFromClipboard);
+            Debug.LogFormat(" map nodes in clipboard onto selected architecture node: Ctrl-{0}\n", KeyBindings.PasteClipboard);
+            Debug.LogFormat(" clear clipboard: Ctrl-{0}\n", KeyBindings.ClearClipboard);
+            Debug.LogFormat(" save mapping to GXL file: Ctrl-{0}\n", KeyBindings.SaveArchitectureMapping);
         }
 
         /// <summary>
@@ -394,21 +431,25 @@ namespace SEE.Controls.Actions
 
         SpinningCube spinningCube;
 
-        // Update is called once per frame
-        private void Update()
+        /// <summary>
+        /// See <see cref="ReversibleAction.Update"/>.
+        /// </summary>
+        /// <returns>true if completed</returns>
+        public bool Update()
         {
             // This script should be disabled, if the action state is not 'Map'
             if (!ActionState.Is(ActionStateType.Map))
             {
-                enabled = false;
                 InteractableObject.AnySelectIn -= AnySelectIn;
                 InteractableObject.AnySelectOut -= AnySelectOut;
-                return;
+                return false;
             }
 
             //------------------------------------------------------------------------
             // ARCHITECTURAL MAPPING
             //------------------------------------------------------------------------
+
+            bool result = false;
 
             if (Input.GetMouseButtonDown(0)) // Left mouse button
             {
@@ -439,6 +480,8 @@ namespace SEE.Controls.Actions
                             Reflexion.Delete_From_Mapping(mapped.Outgoings[0]);
                         }
                         Reflexion.Add_To_Mapping(n0, n1);
+                        // mapping is completed
+                        result = false;
                         selection.interactableObject.SetSelect(false, true);
                     }
                 }
@@ -510,6 +553,7 @@ namespace SEE.Controls.Actions
                 SaveMapping(mapping, MappingFile);
             }
 #endif
+            return result;
         }
 
         /// <summary>
@@ -599,7 +643,7 @@ namespace SEE.Controls.Actions
             Assert.IsNotNull(selection.nodeRef);
             Assert.IsNotNull(selection.interactableObject);
 
-            Destroy(spinningCube.gameObject);
+            Destroyer.DestroyGameObject(spinningCube.gameObject);
 #if UNITY_EDITOR
             spinningCube.gameObject = null;
             spinningCube.meshRenderer = null;
@@ -625,6 +669,7 @@ namespace SEE.Controls.Actions
         /// Called by incremental reflexion for every change in the reflexion model
         /// by way of the observer protocol as a callback. Dispatches the event to
         /// the appropriate handling function.
+        /// 
         /// </summary>
         /// <param name="changeEvent">additional information about the change in the reflexion model</param>
         public void Update(ChangeEvent changeEvent)
@@ -644,6 +689,15 @@ namespace SEE.Controls.Actions
                 default: Debug.LogErrorFormat("UNHANDLED CALLBACK: {0}\n", changeEvent);
                     break;
             }
+        }
+
+        /// <summary>
+        /// <see cref="ReversibleAction.HadEffect"/>
+        /// </summary>
+        /// <returns>true if this action has had already some effect that would need to be undone</returns>
+        public bool HadEffect()
+        {
+            return false; // FIXME
         }
 
         /// <summary>
@@ -775,6 +829,15 @@ namespace SEE.Controls.Actions
         private void HandleMapsToEdgeRemoved(MapsToEdgeRemoved mapsToEdgeRemoved)
         {
             Debug.Log(mapsToEdgeRemoved.ToString());
+        }
+
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this action.
+        /// </summary>
+        /// <returns>the <see cref="ActionStateType"/> of this action</returns>
+        public ActionStateType GetActionStateType()
+        {
+            return ActionStateType.Map;
         }
     }
 }
