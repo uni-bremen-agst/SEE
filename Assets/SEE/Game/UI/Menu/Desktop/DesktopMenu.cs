@@ -167,6 +167,7 @@ namespace SEE.Game.UI
                 buttonManager.buttonText = entry.Title;
                 buttonManager.buttonIcon = entry.Icon;
                 buttonManager.hoverEvent.AddListener(() => ShowTooltip(entry.Description));
+                buttonManager.hoverExitEvent.AddListener(() => HideTooltip());
                 if (entry.Enabled)
                 {
                     buttonManager.clickEvent.AddListener(entry.DoAction);
@@ -207,6 +208,19 @@ namespace SEE.Game.UI
                 
                 // Fade in 
                 DOTween.To(() => canvasGroup.alpha, a => canvasGroup.alpha = a, 1f, 0.5f);
+            }
+        }
+
+        /// <summary>
+        /// Hides the tooltip previously displayed
+        /// </summary>
+        protected void HideTooltip()
+        {
+            TooltipManager.allowUpdating = true;
+            if (TooltipManager.tooltipObject.gameObject.transform.GetChild(0).gameObject.TryGetComponentOrLog(out CanvasGroup canvasGroup))
+            {
+                // Fade out
+                DOTween.To(() => canvasGroup.alpha, a => canvasGroup.alpha = a, 0f, 0.5f);
             }
         }
 
