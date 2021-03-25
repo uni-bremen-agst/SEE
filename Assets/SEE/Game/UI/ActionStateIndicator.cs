@@ -67,20 +67,24 @@ namespace SEE.Game.UI
 
         /// <summary>
         /// Changes the indicator to display the new action state type.
+        /// If <paramref name="newState"/> is null, nothing happens.
         /// </summary>
         /// <param name="newState">New state which shall be displayed in the indicator</param>
         public void ChangeState(ActionStateType newState)
         {
-            if (ModePanelImage)
+            if (newState != null)
             {
-                ModePanelImage.color = newState.Color.ColorWithAlpha(0.5f);
-                ModePanelText.text = newState.Name;
-            }
-            else
-            {
-                // Indicator has not yet been initialized
-                StartColor = newState.Color.ColorWithAlpha(0.5f);
-                StartText = newState.Name;
+                if (ModePanelImage)
+                {
+                    ModePanelImage.color = newState.Color.ColorWithAlpha(0.5f);
+                    ModePanelText.text = newState.Name;
+                }
+                else
+                {
+                    // Indicator has not yet been initialized
+                    StartColor = newState.Color.ColorWithAlpha(0.5f);
+                    StartText = newState.Name;
+                }
             }
         }
     }

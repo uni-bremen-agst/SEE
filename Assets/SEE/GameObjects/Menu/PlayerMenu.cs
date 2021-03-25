@@ -144,10 +144,12 @@ namespace SEE.GO.Menu
                 if (Input.GetKeyDown(KeyCode.Z))
                 {
                     PlayerActionHistory.Undo();
+                    Indicator.ChangeState(PlayerActionHistory.Current());
                 }
                 else if (Input.GetKeyDown(KeyCode.Y))
                 {
                     PlayerActionHistory.Redo();
+                    Indicator.ChangeState(PlayerActionHistory.Current());
                 }
             }
             PlayerActionHistory.Update();
