@@ -223,10 +223,6 @@ namespace SEE.Utils
                 // Watch out: Current relates to new the top element of UndoStack while 
                 // current relates to a previous top element that was just undone.
                 Current?.Start();
-
-                // Finally, we have to update the ActionState in the PlayerMenu and the ActionState
-                // in the ActionStateIndicator.
-                SetMenuAndIndicator(UndoStack);
             }
         }
 
@@ -246,10 +242,6 @@ namespace SEE.Utils
             if (RedoStack.Count > 0)
             {
                 Current?.Stop();
-
-                // we have to update the Menu and ActionStateIndicator
-                SetMenuAndIndicator(RedoStack);
-
                 // the last undone action becomes the currently executed action again
                 ReversibleAction action = RedoStack.Pop();
                 UndoStack.Push(action);
@@ -260,28 +252,6 @@ namespace SEE.Utils
             {
                 throw new EmptyUndoHistoryException();
             }
-        }
-
-        /// <summary>
-        /// Selects the last action of the <paramref name="stack"/> and sets the PlayerMenu and the
-        /// ActionStateIndicator to the state of the <paramref name="stack"/>:
-        /// </summary>
-        /// <param name="stack">The stack from where the last action has to be selected</param>
-        public void SetMenuAndIndicator(Stack<ReversibleAction> stack)
-        {
-            PlayerSettings.LocalPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu);
-            PlayerSettings.LocalPlayer.TryGetComponentOrLog(out ActionStateIndicator indicator);
-
-            foreach (ToggleMenuEntry toggleMenuEntry in playerMenu.ModeMenu.Entries)
-            {
-                if (toggleMenuEntry.Title.Equals(stack.Peek().GetActionStateType().Name))
-                {
-                    playerMenu.ModeMenu.ActiveEntry = toggleMenuEntry;
-                    indicator.ChangeState(stack.Peek().GetActionStateType());
-                    break;
-                }
-            }
-
         }
 
         /// <summary>
