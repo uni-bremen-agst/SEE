@@ -1770,18 +1770,6 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2728114383097898800, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2728114383097898800, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -110
-      objectReference: {fileID: 0}
-    - target: {fileID: 2728114383097898800, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -326
-      objectReference: {fileID: 0}
     - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -1836,7 +1824,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.875
+      value: -0.931
       objectReference: {fileID: 0}
     - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1885,14 +1873,6 @@ PrefabInstance:
     - target: {fileID: 4461994104216227615, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
       propertyPath: m_Name
       value: AnimationCanvas
-      objectReference: {fileID: 0}
-    - target: {fileID: 8411774010446772676, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -384
-      objectReference: {fileID: 0}
-    - target: {fileID: 8411774010446772676, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 30
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
