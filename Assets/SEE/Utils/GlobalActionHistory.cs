@@ -47,6 +47,10 @@ public class GlobalActionHistory
     private Tuple<DateTime, string, historyType, ReversibleAction, List<string>>[] actionList; //FIXME: GameObject ID muss eine LISTE sein
 
     /// <summary>
+    /// Contains the Active Action from each Player needs to be updated with each undo/redo/action
+    /// </summary>
+    private Dictionary<String, ReversibleAction> activeAction = new Dictionary<string, ReversibleAction>();
+    /// <summary>
     /// Constructs a new Global Action History and sets the Size of the Shared ActionList
     /// </summary>
     /// <param name="bufferSize">The Size of the shared ActionList Standard is 100</param>
@@ -192,4 +196,33 @@ public class GlobalActionHistory
             DeleteItem(find.Item1.Item2, find.Item1.Item1);
         }
     }
+
+    /// <summary>
+    /// Returns the Active Action for the Player
+    /// </summary>
+    /// <param name="player">The Player that performs an Action</param>
+    /// <returns>The active action</returns>
+    private ReversibleAction getActiveAction(string player)
+    {
+        return activeAction[player];
+    }
+
+
+    /// <summary>
+    /// Sets the Active Action of a Player 
+    /// </summary>
+    /// <param name="player">The player to set the active action</param>
+    /// <param name="action">the new active action</param>
+    private void setActiveAction(string player, ReversibleAction action)
+    {
+        if(activeAction[player] == null)
+        {
+            activeAction.Add(player, action);
+        }
+        else
+        {
+            activeAction[player] = action;
+        }
+    }
+
 }
