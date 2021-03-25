@@ -45,11 +45,6 @@ namespace SEE.Controls.Actions
         private GameObject line;
 
         /// <summary>
-        /// True, if this instance of this action is executed for the first time, else false.
-        /// </summary>
-        private bool firstExecution = true;
-
-        /// <summary>
         /// The renderer used to draw the line.
         /// </summary>
         private LineRenderer renderer;
@@ -107,12 +102,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override bool Update()
         {
-            if (firstExecution)
-            {
-                firstExecution = false;
-                return false;
-            }
-            if (!MenuIsOpen)
+            if (!Raycasting.IsMouseOverGUI())
             {
                 if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
                 {

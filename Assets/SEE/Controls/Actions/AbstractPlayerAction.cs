@@ -100,11 +100,6 @@ namespace SEE.Controls.Actions
         public abstract bool Update();
 
         /// <summary>
-        /// True, if the <see cref="PlayerMenu"/> is open, else false.
-        /// </summary>
-        public static bool MenuIsOpen = true;
-
-        /// <summary>
         /// Returns a new instance of the same type as this particular type of ReversibleAction.
         /// </summary>
         /// <returns>new instance</returns>
@@ -189,14 +184,6 @@ namespace SEE.Controls.Actions
         public bool HadEffect()
         {
             return hadAnEffect;
-        }
-
-        /// <summary>
-        /// Inverts the <see cref="MenuIsOpen"/>.
-        /// </summary>
-        public static void InvertMenuIsOpen()
-        {
-            MenuIsOpen = !MenuIsOpen;
         }
     }
 }

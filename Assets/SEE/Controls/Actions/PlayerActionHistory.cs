@@ -50,7 +50,6 @@ namespace SEE.Controls.Actions
         /// <param name="actionType">kind of action to be executed</param>
         public static void Execute(ActionStateType actionType)
         {
-            AbstractPlayerAction.InvertMenuIsOpen();
             history.Execute(actionType.CreateReversible());
 
             // FIXME: This looks like a hack and should be removed later.
