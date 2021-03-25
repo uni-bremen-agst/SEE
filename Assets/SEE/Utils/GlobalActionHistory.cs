@@ -60,6 +60,38 @@ public class GlobalActionHistory
         this.size = bufferSize;
     }
 
+    /// <summary>
+    /// Let C be the currently executed action (if there is any) in this action history. 
+    /// Then <see cref="ReversibleAction.Stop"/> will be called for C. After that 
+    /// <see cref="ReversibleAction.Awake()"/> and then <see cref="ReversibleAction.Start"/>
+    /// will be called for <paramref name="action"/> and <paramref name="action"/> is added to 
+    /// the action history and becomes the currently executed action for which 
+    /// <see cref="ReversibleAction.Update"/> will be called whenever a client
+    /// of this action history calls the action history's <see cref="Update"/> method.
+    /// 
+    /// No action previously undone can be redone anymore.
+    /// 
+    /// Precondition: <paramref name="action"/> is not already present in the action history.
+    /// </summary>
+    /// <param name="action">the action to be executed</param>
+    public void Execute(ReversibleAction action, string key)
+    {
+        activeAction[key]?.Stop();
+        Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, key, historyType.action, action, action.ChangedObject);       //UndoStack.Push(action);
+        action.Awake();
+        action.Start();
+        // Whenever a new action is excuted, we consider the redo stack lost.
+        if(isRedo) DeleteRedo(key);    //RedoStack.Clear();
+    }
+
+    /// <summary>
+    /// Calls the Update method of each Active Action
+    /// </summary>
+    public void Update() //FIXME: in der Action history wird das etwas anders gemacht
+    {
+        activeAction.ForEach(y => { if (y.Value != null && y.Value.Update()) Execute(y.Value.NewInstance(), y.Key); });
+    }
+
 
     /// <summary>
     /// Appends data to the Ringbuffer
@@ -155,35 +187,39 @@ public class GlobalActionHistory
         }
     }
 
+
     /// <summary>
-    /// Performs an Action
+    /// Undo
     /// </summary>
     /// <param name="userid"></param>
-    public void execute(string userid, ReversibleAction action, List<string> gameObjectid) //FIXME: action handling is missing (start stop update...) 
-    {
-
-        Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, userid, historyType.action, action, gameObjectid));
-        if(isRedo)
-        {
-            DeleteRedo(userid); //FIXME SHOULD REALY THE REDOS BEING DELETED? MAYBE I HAVE AN DENKFEHLER ALREADY IN THE UPPER PART IN FIND WHICH ITEM I SHOULD USE UNDO REDO...
-        }
-    }
-
-    public void undo(string userid)
+    public void Undo(string userid)
     {
         Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>,List<Tuple< DateTime, string, historyType, ReversibleAction, List<string>>>> find;
-        find = Find(userid, historyType.undo); //With the result we need to calculate whether we can du undo or not and what changes the gameobject need
-        find.Item1.Item4.Undo(); // find.item2 als parameter so dass die action selbst brechen kann was gemacht werden muss && undo muss ein bool sein damit danach entschieden werden kann ob es ausgeführt wird
-        // in jeder revesble action muss evtl. noch eine changes list mitgeführt werden, damit eine action herrauslesen kann was die anderen verändert haben, und ob man das mergen kann oder nicht 
-        if(true) //FIXME with the return value of item.undo
+        find = Find(userid, historyType.undo);         //With the result we need to calculate whether we can du undo or not and what changes the gameobject need
+        while (!find.Item1.Item4.HadEffect())
+        {
+            find.Item1.Item4.Stop();
+            //undo stack > 0 ? pop : return
+        }
+        find.Item1.Item4.Stop();
+        find.Item1.Item4.Undo();                    // find.item2 als parameter so dass die action selbst brechen kann was gemacht werden muss && undo muss ein bool sein damit danach entschieden werden kann ob es ausgeführt wird
+                                                    // in jeder revesble action muss evtl. noch eine changes list mitgeführt werden, damit eine action herrauslesen kann was die anderen verändert haben, und ob man das mergen kann oder nicht 
+        if(true)                                    //FIXME with the return value of item.undo
         {
             
             Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, userid, historyType.undo, find.Item1.Item4, find.Item1.Item5));
             DeleteItem(find.Item1.Item2, find.Item1.Item1);
             isRedo = true;
+           
         }
+        //nächstes CURRENT?. START()
     }
-    public void redo(string userid)
+
+    /// <summary>
+    /// REDO
+    /// </summary>
+    /// <param name="userid">The player that wants the redo </param>
+    public void Redo(string userid)
     {
         Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>, List<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>>> find;
         find = Find(userid, historyType.redo); //With the result we need to calculate whether we can du undo or not and what changes the gameobject need
@@ -213,7 +249,7 @@ public class GlobalActionHistory
     /// </summary>
     /// <param name="player">The player to set the active action</param>
     /// <param name="action">the new active action</param>
-    private void setActiveAction(string player, ReversibleAction action)
+    private void SetActiveAction(string player, ReversibleAction action)
     {
         if(activeAction[player] == null)
         {
