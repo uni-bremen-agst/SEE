@@ -99,7 +99,7 @@ namespace SEE.Controls.Actions
             // Assigning the game objects to be connected.
             // Checking whether the two game objects are not null and whether they are 
             // actually nodes.
-            if (Input.GetMouseButtonDown(0) && hoveredObject != null)
+            if (!Raycasting.IsMouseOverGUI() && Input.GetMouseButtonDown(0) && hoveredObject != null)
             {
                 Assert.IsTrue(hoveredObject.HasNodeRef());
                 if (from == null)
@@ -200,7 +200,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns>the <see cref="ActionStateType"/> of this action</returns>
+        /// <returns><see cref="ActionStateType.NewEdge"/></returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.NewEdge;
