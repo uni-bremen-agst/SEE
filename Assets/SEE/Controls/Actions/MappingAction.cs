@@ -20,11 +20,6 @@ namespace SEE.Controls.Actions
     {
         private const float SelectedAlpha = 0.8f;
 
-        private const KeyCode SaveKey = KeyCode.S;
-        private const KeyCode CopyKey = KeyCode.C;
-        private const KeyCode PasteKey = KeyCode.V;
-        private const KeyCode ClearKey = KeyCode.X;
-
         [Tooltip("The game object representing the architecture.")]
         public GameObject Architecture;
 
@@ -361,10 +356,10 @@ namespace SEE.Controls.Actions
         private static void Usage()
         {
             Debug.Log("Keys for architectural mapping:\n");
-            Debug.LogFormat(" copy/remove selected implementation node to/from clipboard: Ctrl-{0}\n", CopyKey);
-            Debug.LogFormat(" map nodes in clipboard onto selected architecture node: Ctrl-{0}\n", PasteKey);
-            Debug.LogFormat(" clear clipboard: Ctrl-{0}\n", ClearKey);
-            Debug.LogFormat(" save mapping to GXL file: Ctrl-{0}\n", SaveKey);
+            Debug.LogFormat(" copy/remove selected implementation node to/from clipboard: Ctrl-{0}\n", KeyBindings.AddOrRemoveFromClipboard);
+            Debug.LogFormat(" map nodes in clipboard onto selected architecture node: Ctrl-{0}\n", KeyBindings.PasteClipboard);
+            Debug.LogFormat(" clear clipboard: Ctrl-{0}\n", KeyBindings.ClearClipboard);
+            Debug.LogFormat(" save mapping to GXL file: Ctrl-{0}\n", KeyBindings.SaveArchitectureMapping);
         }
 
         /// <summary>
