@@ -46,7 +46,7 @@ namespace SEE.Controls
         private void Update()
         {
             Camera mainCamera = MainCamera.Camera;
-            if (Input.GetKeyDown(KeyCode.C))
+            if (Input.GetKeyDown(KeyBindings.ToggleCameraLock))
             {
                 if (cameraState.freeMode)
                 {
@@ -61,7 +61,7 @@ namespace SEE.Controls
             }
 
             float speed = Speed * Time.deltaTime;
-            if (Input.GetKey(KeyCode.LeftShift))
+            if (Input.GetKey(KeyBindings.BoostCameraSpeed))
             {
                 speed *= BoostFactor;
             }
@@ -69,11 +69,11 @@ namespace SEE.Controls
             if (!cameraState.freeMode)
             {
                 float d = 0.0f;
-                if (Input.GetKey(KeyCode.W))
+                if (Input.GetKey(KeyBindings.MoveForward))
                 {
                     d += speed;
                 }
-                if (Input.GetKey(KeyCode.S))
+                if (Input.GetKey(KeyBindings.MoveBackward))
                 {
                     d -= speed;
                 }
@@ -93,27 +93,27 @@ namespace SEE.Controls
             else // cameraState.freeMode == true
             {
                 Vector3 v = Vector3.zero;
-                if (Input.GetKey(KeyCode.W))
+                if (Input.GetKey(KeyBindings.MoveForward))
                 {
                     v += mainCamera.transform.forward;
                 }
-                if (Input.GetKey(KeyCode.S))
+                if (Input.GetKey(KeyBindings.MoveBackward))
                 {
                     v -= mainCamera.transform.forward;
                 }
-                if (Input.GetKey(KeyCode.D))
+                if (Input.GetKey(KeyBindings.MoveRight))
                 {
                     v += mainCamera.transform.right;
                 }
-                if (Input.GetKey(KeyCode.A))
+                if (Input.GetKey(KeyBindings.MoveLeft))
                 {
                     v -= mainCamera.transform.right;
                 }
-                if (Input.GetKey(KeyCode.Space))
+                if (Input.GetKey(KeyBindings.MoveUp))
                 {
                     v += Vector3.up;
                 }
-                if (Input.GetKey(KeyCode.LeftControl))
+                if (Input.GetKey(KeyBindings.MoveDown))
                 {
                     v += Vector3.down;
                 }
