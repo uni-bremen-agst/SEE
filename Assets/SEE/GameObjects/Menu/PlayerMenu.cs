@@ -132,7 +132,6 @@ namespace SEE.GO.Menu
             // space bar toggles menu            
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                AbstractPlayerAction.InvertMenuIsOpen(); 
                 ModeMenu.ToggleMenu();
             }
 
