@@ -192,7 +192,7 @@ namespace SEE.Game
                 throw new Exception($"The source {from.name} and target {to.name} of the edge are in different graphs.");
             }
 
-            // Creating the edge in the underlying graph            
+            // Creating the edge in the underlying graph
             Edge edge = string.IsNullOrEmpty(id) ? new Edge() : new Edge(id)
             {
                 Source = fromNode,
