@@ -75,8 +75,8 @@ namespace SEE.Controls.Actions
                     }
                 }
             }
-            // Adding the key "F1" in order to forget the selected GameObjects.
-            if (Input.GetKeyDown(KeyCode.F1))
+            // Adding the key to forget the selected GameObjects.
+            if (Input.GetKeyDown(KeyBindings.Unselect))
             {
                 from = null;
                 to = null;
