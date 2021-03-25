@@ -40,6 +40,9 @@ namespace Michsky.UI.ModernUIPack
         public bool centered = false;
         bool isPointerOn;
 
+        // Hover exit
+        public UnityEvent hoverExitEvent;
+
         void Start()
         {
             if (buttonVar == null)
@@ -122,6 +125,10 @@ namespace Michsky.UI.ModernUIPack
         public void OnPointerExit(PointerEventData eventData)
         {
             isPointerOn = false;
+            if (hoverExitEvent != null)
+            {
+                hoverExitEvent.Invoke();
+            }
         }
     }
 }
