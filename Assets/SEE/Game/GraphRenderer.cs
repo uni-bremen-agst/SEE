@@ -170,7 +170,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="from">source of the new edge</param>
         /// <param name="to">target of the new edge</param>
-        /// <param name="id">id of the new edge. If it is null, a new id will be generated</param>
+        /// <param name="id">id of the new edge. If it is null or empty, a new id will be generated</param>
         /// <returns>the new edge or null</returns>
         public GameObject DrawEdge(GameObject from, GameObject to, string id)
         {
@@ -192,17 +192,13 @@ namespace SEE.Game
                 throw new Exception($"The source {from.name} and target {to.name} of the edge are in different graphs.");
             }
 
-            // Creating the edge in the underlying graph
-            Edge edge = new Edge
+            // Creating the edge in the underlying graph            
+            Edge edge = string.IsNullOrEmpty(id) ? new Edge() : new Edge(id)
             {
                 Source = fromNode,
                 Target = toNode,
                 Type = Graph.UnknownType // FIXME: We need to set the type of the edge.
             };
-            if (id != null)
-            {
-                edge.ID = id;
-            }
                 
             Graph graph = fromNode.ItsGraph;
             graph.AddEdge(edge);
