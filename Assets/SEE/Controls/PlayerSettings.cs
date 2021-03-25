@@ -10,11 +10,9 @@ using SEE.DataModel;
 using SEE.Game;
 using SEE.Game.Charts.VR;
 using SEE.GO;
-using SEE.Utils;
 using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
-using Hand = Valve.VR.InteractionSystem.Hand;
 
 namespace SEE.Controls
 {
@@ -42,6 +40,10 @@ namespace SEE.Controls
         /// </summary>
         private const string CityCollectionName = "CityCollection";
         /// <summary>
+        /// The name of the game object which represents the app bar for a CodeCity.
+        /// </summary>
+        private const string AppBarName = "HoloLensAppBar";
+        /// <summary>
         /// The name of the game object where the ChartManager component and his friends are 
         /// attached to. It is used for handling the metric charts.        
         /// </summary>
@@ -61,7 +63,7 @@ namespace SEE.Controls
 
         [Tooltip("The plane the player is to focus initially in the desktop environment.")]
         [OdinSerialize]
-        public SEE.GO.Plane FocusPlane;
+        public GO.Plane FocusPlane;
 
         /// <summary>
         /// The game object representing the ground in the scene. A Unity plane
@@ -154,17 +156,17 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Creates the kind of player required for the given <paramref name="playerInputType"/>.
+        /// Creates the kind of player required for the given <paramref name="inputType"/>.
         /// For some players, additional game objects and/or components will be added to the
         /// scene required for the particular player to work correctly.
         /// </summary>
-        /// <param name="playerInputType">the kind of environment the player is to run</param>
-        /// <returns>new player for given <paramref name="playerInputType"/></returns>
-        private GameObject CreatePlayer(PlayerInputType playerInputType)
+        /// <param name="inputType">the kind of environment the player is to run</param>
+        /// <returns>new player for given <paramref name="inputType"/></returns>
+        private GameObject CreatePlayer(PlayerInputType inputType)
         {
             GameObject player;
 
-            switch (playerInputType)
+            switch (inputType)
             {
                 case PlayerInputType.DesktopPlayer:
                     if (FocusPlane == null)
@@ -184,7 +186,6 @@ namespace SEE.Controls
                     break;
                 case PlayerInputType.HoloLensPlayer:
                     {                        
-                        
                         player = PlayerFactory.CreateHololensPlayer();
                         SetupMixedReality();
                     }
@@ -192,8 +193,9 @@ namespace SEE.Controls
                 case PlayerInputType.TouchGamepadPlayer:
                     player = PlayerFactory.CreateTouchGamepadPlayer();
                     break;
+                case PlayerInputType.None: return null; // No player needs to be created
                 default:
-                    throw new NotImplementedException($"Unhandled case {playerInputType}.");
+                    throw new NotImplementedException($"Unhandled case {inputType}.");
             }
             player.transform.position = PlayerOrigin;
             return player;
@@ -213,7 +215,7 @@ namespace SEE.Controls
         {
             if (Ground == null)
             {
-                throw new Exception("A Ground must be assigned in the PlayerSettings. Use the Inspector.");
+                throw new InvalidOperationException("A Ground must be assigned in the PlayerSettings. Use the Inspector.");
             }
             else
             {
@@ -221,7 +223,7 @@ namespace SEE.Controls
                     // Create Teleporting game object
                     UnityEngine.Object teleportingPrefab = Resources.Load<GameObject>("Prefabs/Players/Teleporting");
                     UnityEngine.Assertions.Assert.IsNotNull(teleportingPrefab);
-                    GameObject teleporting = GameObject.Instantiate(teleportingPrefab) as GameObject;
+                    GameObject teleporting = Instantiate(teleportingPrefab) as GameObject;
                     UnityEngine.Assertions.Assert.IsNotNull(teleporting);
                     teleporting.name = "Teleporting";
                 }
@@ -250,7 +252,7 @@ namespace SEE.Controls
                         }
                         else
                         {
-                            Debug.LogError($"{ChartManagerName} has no component {typeof(ChartPositionVr).Name}.\n");
+                            Debug.LogError($"{ChartManagerName} has no component {nameof(ChartPositionVr)}.\n");
                         }
                     }
                     else
@@ -281,6 +283,7 @@ namespace SEE.Controls
                     Teleport.instance.CancelTeleportHint();
                 }
             }
+            KeyBindings.PrintBindings();
         }
 
         /// <summary>
@@ -291,18 +294,20 @@ namespace SEE.Controls
             // Add a MixedRealityToolkit to the scene
             UnityEngine.Object mrtkPrefab = Resources.Load<GameObject>("Prefabs/MixedRealityToolkit");
             GameObject mrtk = Instantiate(mrtkPrefab) as GameObject;
-            //mrtk.AddComponent<MixedRealityToolkit>();
+            UnityEngine.Assertions.Assert.IsNotNull(mrtk);
+            mrtk.name = MixedRealityToolkitName;
 
             // Create HoloLensAppBar from prefab
             UnityEngine.Object appBarPrefab = Resources.Load<GameObject>("Prefabs/HoloLensAppBar");
             GameObject appBar = Instantiate(appBarPrefab) as GameObject;
-            appBar.name = "HoloLensAppBar";
             UnityEngine.Assertions.Assert.IsNotNull(appBar);
+            appBar.name = AppBarName;
 
             // Add a city collection
             UnityEngine.Object cityCollectionPrefab = Resources.Load<GameObject>("Prefabs/CityCollection");
             GameObject cityCollection = Instantiate(cityCollectionPrefab) as GameObject;
-            // cityCollection.AddComponent<GridObjectCollection>();
+            UnityEngine.Assertions.Assert.IsNotNull(cityCollection);
+            cityCollection.name = CityCollectionName;
 
             // Hide all decoration to improve performance
             GameObject.FindGameObjectsWithTag(Tags.Decoration).ForEach(go => go.SetActive(false));
@@ -386,6 +391,10 @@ namespace SEE.Controls
                         hand.SetSkeletonRangeOfMotion(EVRSkeletalMotionRange.WithController);
                     }
                 }
+            }
+            if (Input.GetKeyDown(KeyBindings.Help))
+            {
+                KeyBindings.PrintBindings();
             }
         }
     }
