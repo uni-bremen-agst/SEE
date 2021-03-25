@@ -100,7 +100,7 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI())
             {
                 Vector3 newPosition = Input.mousePosition;
                 newPosition.z = 1.0f;
