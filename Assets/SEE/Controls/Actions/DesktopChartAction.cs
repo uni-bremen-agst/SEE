@@ -28,7 +28,7 @@ namespace SEE.Controls.Actions
     {
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.G))
+            if (Input.GetKeyDown(KeyBindings.ToggleCharts))
             {
                 ChartManager.Instance.ToggleCharts();
             }

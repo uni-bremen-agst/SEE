@@ -102,26 +102,30 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override bool Update()
         {
-            if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
+            if (!Raycasting.IsMouseOverGUI())
             {
-                // FIXME: This would needed to be adjusted to VR and AR.
-                // The position at which to continue the line.
-                Vector3 newPosition = Input.mousePosition;
-                newPosition.z = 1.0f;
-                newPosition = Camera.main.ScreenToWorldPoint(newPosition);
+                if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
+                {
+                    // FIXME: This would needed to be adjusted to VR and AR.
+                    // The position at which to continue the line.
+                    Vector3 newPosition = Input.mousePosition;
+                    newPosition.z = 1.0f;
+                    newPosition = Camera.main.ScreenToWorldPoint(newPosition);
 
-                // Add newPosition to the line renderer.
-                Vector3[] newPositions = new Vector3[positions.Length + 1];
-                Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
-                newPositions[newPositions.Length - 1] = newPosition;
-                positions = newPositions;
+                    // Add newPosition to the line renderer.
+                    Vector3[] newPositions = new Vector3[positions.Length + 1];
+                    Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
+                    newPositions[newPositions.Length - 1] = newPosition;
+                    positions = newPositions;
 
-                DrawLine();
-                // The line has been continued so this action has had a visible effect.
-                hadAnEffect = true;
+                    DrawLine();
+                    // The line has been continued so this action has had a visible effect.
+                    hadAnEffect = true;
+                }
+                // The action is considered complete if the mouse button is no longer pressed.
+                return Input.GetMouseButtonUp(0);
             }
-            // The action is considered complete if the mouse button is no longer pressed.
-            return Input.GetMouseButtonUp(0);
+            return false;
         }
 
         /// <summary>
@@ -140,7 +144,7 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            UnityEngine.Object.Destroy(line);
+            Destroyer.DestroyGameObject(line);
             line = null;
             renderer = null;
         }
@@ -155,6 +159,15 @@ namespace SEE.Controls.Actions
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             SetUpRenderer();
             DrawLine();
+        }
+
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this action.
+        /// </summary>
+        /// <returns><see cref="ActionStateType.Draw"/></returns>
+        public override ActionStateType GetActionStateType()
+        {
+            return ActionStateType.Draw;
         }
     }
 }

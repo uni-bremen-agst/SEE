@@ -170,8 +170,9 @@ namespace SEE.Game
         /// </summary>
         /// <param name="from">source of the new edge</param>
         /// <param name="to">target of the new edge</param>
+        /// <param name="id">id of the new edge. If it is null or empty, a new id will be generated</param>
         /// <returns>the new edge or null</returns>
-        public GameObject DrawEdge(GameObject from, GameObject to)
+        public GameObject DrawEdge(GameObject from, GameObject to, string id)
         {
             Node fromNode = from.GetNode();
             Node toNode = to.GetNode();
@@ -192,7 +193,7 @@ namespace SEE.Game
             }
 
             // Creating the edge in the underlying graph
-            Edge edge = new Edge
+            Edge edge = string.IsNullOrEmpty(id) ? new Edge() : new Edge(id)
             {
                 Source = fromNode,
                 Target = toNode,

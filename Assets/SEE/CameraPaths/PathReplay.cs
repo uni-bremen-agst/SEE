@@ -1,3 +1,4 @@
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using TinySpline;
@@ -6,11 +7,28 @@ using UnityEngine;
 namespace SEE.CameraPaths
 {
     /// <summary>
-    /// A script to move a camera programmatically along a path. This
-    /// script must be added as a component to a camera.
+    /// A script to move a game object, e.g., a camera, programmatically along a recorded path. 
     /// </summary>
-    public class ScriptedCamera : MonoBehaviour
+    public class PathReplay : MonoBehaviour
     {
+        /// <summary>
+        /// The object to be moved along the recorded path.
+        /// </summary>
+        [Tooltip("The object to be moved along the recorded path. If not set, the main camera will be moved.")]
+        public GameObject movedObject;
+
+        /// <summary>
+        /// Name of the file where to load the captured data camera path points from.
+        /// </summary>
+        [Tooltip("Name of the file where to load the path data.")]
+        public string Filename = "path" + CameraPath.DotPathFileExtension;
+
+        /// <summary>
+        /// As to whether the path should be drawn as a sequence of lines in the game.
+        /// </summary>
+        [Tooltip("Whether the path should be drawn as a sequence of lines in the game.")]
+        public bool ShowPath = false;
+
         /// <summary>
         /// The path of the camera to be followed.
         /// </summary>
@@ -25,16 +43,6 @@ namespace SEE.CameraPaths
         private int location = 0;
 
         /// <summary>
-        /// Name of the file where to load the captured data camera path points from.
-        /// </summary>
-        public string Filename = "path" + CameraPath.DotPathFileExtension;
-
-        /// <summary>
-        /// As to whether the path should be drawn as a sequence of lines in the game.
-        /// </summary>
-        public bool ShowPath = false;
-
-        /// <summary>
         /// The interpolated spline.
         /// </summary>
         private BSpline spline;
@@ -43,12 +51,6 @@ namespace SEE.CameraPaths
         /// Accumulated time since game start in seconds.
         /// </summary>
         private float time = 0.0f;
-
-        /// <summary>
-        /// If enabled is true, the camera follows along the loaded path.
-        /// Will be false, if an error occurs when the path is loaded.
-        /// </summary>
-        private bool pathIsEnabled;
 
         /// <summary>
         /// Returns the position co-ordinates and the times of given path
@@ -103,6 +105,19 @@ namespace SEE.CameraPaths
         /// </summary>
         private void Start()
         {
+            if (movedObject == null)
+            {                
+                movedObject = MainCamera.Camera.gameObject;
+                if (movedObject == null)
+                {
+                    Debug.LogError($"No game object to be moved was assigned. No camera was found. The movement will be disabled.\n");
+                    enabled = false;
+                }
+                else
+                {
+                    Debug.Log($"No game object to be moved was assigned. We will be using the camera at {movedObject.name}.\n");
+                }
+            }
             try
             {
                 path = CameraPath.ReadPath(Filename);
@@ -115,19 +130,19 @@ namespace SEE.CameraPaths
             catch (Exception e)
             {
                 Debug.LogErrorFormat("ScriptedCamera: Could not read path from file {0}: {1}\n", Filename, e.ToString());
-                pathIsEnabled = false;
+                enabled = false;
                 return;
             }
             if (path.Count < 1)
             {
                 Debug.LogWarning("ScriptedCamera: Requiring at least one location.\n");
-                pathIsEnabled = false;
+                enabled = false;
                 return;
             }
             try
             {
                 spline = TinySpline.BSpline.InterpolateCatmullRom(VectorsToList(path), 4);
-                pathIsEnabled = true;
+                enabled = true;
             }
             catch (Exception e)
             {
@@ -137,10 +152,10 @@ namespace SEE.CameraPaths
                 {
                     ControlPoints = new List<double> { 0, 0, 0, 0 }
                 };
-                pathIsEnabled = false;
+                enabled = false;
             }
-            transform.position = ListToVectors(spline.ControlPointAt(0))[0];
-            transform.rotation = path[0].rotation;
+            movedObject.transform.position = ListToVectors(spline.ControlPointAt(0))[0];
+            movedObject.transform.rotation = path[0].rotation;
         }
 
         /// <summary>
@@ -149,13 +164,9 @@ namespace SEE.CameraPaths
         /// </summary>
         private void Update()
         {
-            if (pathIsEnabled)
-            {
-                // Time.deltaTime is the time since the last Update() in seconds.
-                time += Time.deltaTime;
-                transform.position = ListToVectors(spline.Bisect(time, 0.001, false, 3).Result)[0];
-                transform.rotation = Forward(ref location, time);
-            }
+            time += Time.deltaTime;
+            movedObject.transform.position = ListToVectors(spline.Bisect(time, 0.001, false, 3).Result)[0];
+            movedObject.transform.rotation = Forward(ref location, time);
         }
 
         /// <summary>

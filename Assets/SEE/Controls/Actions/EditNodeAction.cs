@@ -125,6 +125,15 @@ namespace SEE.Controls.Actions
         {
             return CreateReversibleAction();
         }
+
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this action.
+        /// </summary>
+        /// <returns><see cref="ActionStateType.EditNode"/></returns>
+        public override ActionStateType GetActionStateType()
+        {
+            return ActionStateType.EditNode;
+        }
     }
 }
 
