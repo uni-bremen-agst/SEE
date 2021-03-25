@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.Game.UI;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -144,15 +147,48 @@ namespace SEE.GO.Menu
                 if (Input.GetKeyDown(KeyCode.Z))
                 {
                     PlayerActionHistory.Undo();
-                    Indicator.ChangeState(PlayerActionHistory.Current());
+                    try
+                    {
+                        SetPlayerMenu(PlayerActionHistory.GetUndoHistory());
+                        Indicator.ChangeState(PlayerActionHistory.Current());
+                    }
+                    // This case will be reached if there is no finished action in the undo history.
+                    // Special case: The user is executing his first action after moving while running the application,
+                    // but this action is not finished yet. Then, the user executes undo. 
+                    catch (InvalidOperationException)
+                    {
+                        ModeMenu.ActiveEntry = ModeMenu.Entries[0];
+                        Indicator.ChangeState(ActionStateType.Move);
+                        Debug.Log("Empty History");
+                    }
                 }
                 else if (Input.GetKeyDown(KeyCode.Y))
                 {
+                    SetPlayerMenu(PlayerActionHistory.GetRedoHistory());
                     PlayerActionHistory.Redo();
                     Indicator.ChangeState(PlayerActionHistory.Current());
                 }
             }
             PlayerActionHistory.Update();
+        }
+
+        /// <summary>
+        /// Selects the last action of the <paramref name="stack"/> and sets the PlayerMenu and the
+        /// ActionStateIndicator to the state of the <paramref name="stack"/>:
+        /// </summary>
+        /// <param name="stack">The stack from where the last action has to be selected</param>
+        private void SetPlayerMenu(Stack<ReversibleAction> stack)
+        {
+            PlayerSettings.LocalPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu);
+
+            foreach (ToggleMenuEntry toggleMenuEntry in playerMenu.ModeMenu.Entries)
+            {
+                    if (toggleMenuEntry.Title.Equals(stack.Peek().GetActionStateType().Name))
+                    {
+                        playerMenu.ModeMenu.ActiveEntry = toggleMenuEntry;
+                        break;
+                    }
+            }
         }
     }
 }
