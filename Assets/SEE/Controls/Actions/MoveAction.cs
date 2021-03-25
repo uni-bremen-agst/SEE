@@ -20,6 +20,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this action.
+        /// </summary>
+        /// <returns><see cref="ActionStateType.Move"/></returns>
+        public override ActionStateType GetActionStateType()
+        {
+            return ActionStateType.Move;
+        }
+
+        /// <summary>
         /// Returns a new instance of <see cref="MoveAction"/>.
         /// </summary>
         /// <returns>new instance</returns>

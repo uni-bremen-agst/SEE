@@ -23,36 +23,36 @@ namespace SEE.Controls.Actions
         public static List<ActionStateType> AllTypes { get; } = new List<ActionStateType>();
 
         #region Static Types
-        public static ActionStateType Move { get; } = 
-            new ActionStateType(0, "Move", "Move a node within a graph", 
+        public static ActionStateType Move { get; } =
+            new ActionStateType(0, "Move", "Move a node within a graph",
                                 Color.red.Darker(), "Materials/Charts/MoveIcon",
                                 MoveAction.CreateReversibleAction);
-        public static ActionStateType Rotate { get; } = 
-            new ActionStateType(1, "Rotate", "Rotate everything around the selected node within a graph", 
+        public static ActionStateType Rotate { get; } =
+            new ActionStateType(1, "Rotate", "Rotate everything around the selected node within a graph",
                                 Color.blue.Darker(), "Materials/ModernUIPack/Refresh",
                                 RotateAction.CreateReversibleAction);
-        public static ActionStateType Map { get; } = 
-            new ActionStateType(2, "Map", "Map a node from one graph to another graph", 
+        public static ActionStateType Map { get; } =
+            new ActionStateType(2, "Map", "Map a node from one graph to another graph",
                                 Color.green.Darker(), "Materials/ModernUIPack/Map",
                                 MappingAction.CreateReversibleAction);
-        public static ActionStateType NewEdge { get; } = 
-            new ActionStateType(3, "New Edge", "Draw a new edge between two nodes", 
+        public static ActionStateType NewEdge { get; } =
+            new ActionStateType(3, "New Edge", "Draw a new edge between two nodes",
                                 Color.green.Darker(), "Materials/ModernUIPack/Minus",
                                 AddEdgeAction.CreateReversibleAction);
-        public static ActionStateType NewNode { get; } = 
-            new ActionStateType(4, "New Node", "Creates a new node", 
+        public static ActionStateType NewNode { get; } =
+            new ActionStateType(4, "New Node", "Creates a new node",
                                 Color.green.Darker(), "Materials/ModernUIPack/Plus",
                                 AddNodeAction.CreateReversibleAction);
-        public static ActionStateType EditNode { get; } = 
-            new ActionStateType(5, "Edit Node", "Edits a node", 
+        public static ActionStateType EditNode { get; } =
+            new ActionStateType(5, "Edit Node", "Edits a node",
                                 Color.green.Darker(), "Materials/ModernUIPack/Settings",
                                 EditNodeAction.CreateReversibleAction);
-        public static ActionStateType ScaleNode { get; } = 
-            new ActionStateType(6, "Scale Node", "Scales a node", 
+        public static ActionStateType ScaleNode { get; } =
+            new ActionStateType(6, "Scale Node", "Scales a node",
                                 Color.green.Darker(), "Materials/ModernUIPack/Crop",
                                 ScaleNodeAction.CreateReversibleAction);
-        public static ActionStateType Delete { get; } = 
-            new ActionStateType(7, "Delete", "Deletes a node or edge", 
+        public static ActionStateType Delete { get; } =
+            new ActionStateType(7, "Delete", "Deletes a node or edge",
                                 Color.yellow.Darker(), "Materials/ModernUIPack/Trash",
                                 DeleteAction.CreateReversibleAction);
         public static ActionStateType Draw { get; } =
