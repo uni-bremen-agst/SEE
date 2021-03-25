@@ -176,9 +176,8 @@ namespace SEE.Controls.Actions
                     try
                     {
                         result = city.Renderer.DrawEdge(edgeMemento.from, edgeMemento.to, edgeMemento.edgeID);
-                        // FIXME: Shouldn't edgeMemento.edgeID be passed to this action, too?
-                        // Otherwise we will have different IDs for the same edge in the various clients.
-                        new AddEdgeNetAction(edgeMemento.from.name, edgeMemento.to.name).Execute();
+                        // Note that we need to result.name as edge ID because edgeMemento.edgeID could be null.
+                        new AddEdgeNetAction(edgeMemento.from.name, edgeMemento.to.name, result.name).Execute();
                     }
                     catch (Exception e)
                     {

@@ -21,14 +21,21 @@ namespace SEE.Controls.Actions
         public string toId;
 
         /// <summary>
+        /// The unique of the edge. May be empty or null, in which case a random
+        /// unique ID will be create on the client side.
+        /// </summary>
+        public string EdgeID;
+
+        /// <summary>
         /// Constructs an AddEdgeNetAction.
         /// </summary>
         /// <param name="fromId">The id of the gameObject from which the edge should be drawn</param>
         /// <param name="toId">The id of the gameObject to which the edge should be drawn</param>
-        public AddEdgeNetAction(string fromId, string toId)
+        public AddEdgeNetAction(string fromId, string toId, string edgeID)
         {
             this.fromId = fromId;
             this.toId = toId;
+            this.EdgeID = edgeID;
         }
 
         /// <summary>
@@ -59,7 +66,7 @@ namespace SEE.Controls.Actions
                             {
                                 try
                                 {
-                                    city.Renderer.DrawEdge(fromGO, toGO, null);
+                                    city.Renderer.DrawEdge(fromGO, toGO, EdgeID);
                                 }
 
                                 catch (Exception e)
