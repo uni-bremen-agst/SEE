@@ -108,17 +108,12 @@ namespace SEE.Controls.Actions
                 newPosition = Camera.main.ScreenToWorldPoint(newPosition);
                 position = newPosition;
                 CreateObjectAt(newPosition);
-<<<<<<< HEAD
-                Debug.Log(newPosition.x);
-                new DummyNetAction(newPosition).Execute();
-=======
                 hadAnEffect = true;
                 return true;
             }
             else
             {
                 return false;
->>>>>>> origin/master
             }
         }
 
@@ -127,14 +122,6 @@ namespace SEE.Controls.Actions
         /// adds it to <see cref="createdObjects"/>.
         /// </summary>
         /// <param name="position">position in world-space at which to put the object</param>
-<<<<<<< HEAD
-        public void CreateObjectAt(Vector3 position)
-        {
-            GameObject newGameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            newGameObject.transform.position = position;
-            newGameObject.transform.localScale = Vector3.one / 10.0f;
-            createdObjects.Add(newGameObject);
-=======
         private void CreateObjectAt(Vector3 position)
         {            
             GameObject newGameObject = GameObject.CreatePrimitive(primitive);
@@ -148,7 +135,6 @@ namespace SEE.Controls.Actions
                 newGameObject.transform.localScale = Vector3.one / 10.0f;
                 createdObject = newGameObject;
             }
->>>>>>> origin/master
         }
 
         /// <summary>
