@@ -6,7 +6,7 @@ namespace SEE.Game.UI
     /// <summary>
     /// Represents an indicator which displays the current <see cref="ActionStateType"/>.
     /// </summary>
-    public class ActionStateIndicator: StateIndicator
+    public class ActionStateIndicator : StateIndicator
     {
         /// <summary>
         /// Changes the indicator to display the new action state type.
@@ -14,7 +14,10 @@ namespace SEE.Game.UI
         /// <param name="newState">New state which shall be displayed in the indicator</param>
         public void ChangeActionState(ActionStateType newState)
         {
-            ChangeState(newState.Name, newState.Color.ColorWithAlpha(0.5f));
+            if (newState != null)
+            {
+                ChangeState(newState.Name, newState.Color.ColorWithAlpha(0.5f));
+            }
         }
     }
 }

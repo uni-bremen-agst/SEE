@@ -48,7 +48,7 @@ namespace SEE.Controls.Actions
         /// had no effect.
         /// See <see cref="ReversibleAction.Undo"/>.
         /// </summary>
-        public virtual void Undo() 
+        public virtual void Undo()
         {
             hadAnEffect = false;
         }
@@ -64,6 +64,12 @@ namespace SEE.Controls.Actions
         {
             hadAnEffect = true;
         }
+
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of the specific action.
+        /// </summary>
+        /// <returns>the <see cref="ActionStateType"/> of the specific action</returns>
+        public abstract ActionStateType GetActionStateType();
 
         /// <summary>
         /// Will be called once when the action is started for the

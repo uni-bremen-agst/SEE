@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 using OdinSerializer;
+using SEE.Controls;
 using SEE.DataModel;
 using SEE.Utils;
 using System;
@@ -120,16 +121,21 @@ namespace SEE.Game.Runtime
             JLGParser jlgParser = new JLGParser(jlgFilePath);
             this.parsedJLG = jlgParser.Parse();
 
-            if (parsedJLG == null) {
+            if (parsedJLG == null) 
+            {
+                enabled = false;
                 throw new Exception("Parsed JLG is null!");
             }
             nodesGOs = GameObject.FindGameObjectsWithTag("Node");
             ///Sets the currentGO to be the node representing the Class of the first Statement in preperation.
             if (nodesGOs == null)
             {
+                enabled = false;
                 throw new Exception("There are no nodes");
             }
-            if (GetNodeForStatement(statementCounter) == null) {
+            if (GetNodeForStatement(statementCounter) == null) 
+            {
+                enabled = false;
                 throw new Exception("Node is missing. Check whether the correct GXL is loaded.");
             }
             currentGO = GetNodeForStatement(statementCounter);
@@ -140,7 +146,7 @@ namespace SEE.Game.Runtime
         /// Update is called once per frame
         void Update()
         {
-            ///update Visualisation every 'interval' seconds.
+            // Update Visualisation every 'interval' seconds.
             if (Time.time >= nextUpdateTime)
             {
                 if (running)
@@ -150,8 +156,8 @@ namespace SEE.Game.Runtime
                 nextUpdateTime += updateIntervall;
             }
 
-            ///Controls
-            if (Input.GetKeyDown(KeyCode.F))
+            // Controls
+            if (Input.GetKeyDown(KeyBindings.ToggleAutomaticManualMode))
             {
                 running = !running;
                 showLabelUntil = Time.time + 1f;
@@ -180,7 +186,7 @@ namespace SEE.Game.Runtime
                     Debug.Log("Hit Detected :" + clickedGO);
                 }
             }
-            if (Input.GetKeyDown(KeyCode.R))
+            if (Input.GetKeyDown(KeyBindings.ToggleExecutionOrder))
             {
                 updateIntervall = 1;
                 playDirection = !playDirection;
@@ -201,7 +207,7 @@ namespace SEE.Game.Runtime
             }
             if (running)
             {
-                if (Input.GetKeyDown(KeyCode.Alpha3))
+                if (Input.GetKeyDown(KeyBindings.IncreaseAnimationSpeed))
                 {                    
                     SpeedUp();
                     showLabelUntil = Time.time + 1f;
@@ -214,9 +220,9 @@ namespace SEE.Game.Runtime
                     labelText = "Speed x" + 1f / updateIntervall;
                 }
             }
-
-            if (!running) {
-                if (Input.GetKeyDown(KeyCode.B)) {
+            else
+            {
+                if (Input.GetKeyDown(KeyBindings.ExecuteToBreakpoint)) {
                     showLabelUntil = Time.time + 1f;
                     labelText = "Jumping to Breakpoint...";
                     if (JumpToNextBreakpointHit())
@@ -229,22 +235,22 @@ namespace SEE.Game.Runtime
                         labelText = "Could not find Breakpoint";
                     }
                 }
-                if (Input.GetKeyDown(KeyCode.Alpha3)) {                    
+                if (Input.GetKeyDown(KeyBindings.PreviousStatement)) {                    
                     OneStep(true);
                     lastDirection = true;
                 }
-                if (Input.GetKeyDown(KeyCode.Alpha1))
+                if (Input.GetKeyDown(KeyBindings.NextStatement))
                 {                    
                     OneStep(false);
                     lastDirection = false;
                 }
-                if (Input.GetKeyDown(KeyCode.N))
+                if (Input.GetKeyDown(KeyBindings.FirstStatement))
                 {
                     ResetComplete();
                 }
             }
 
-            ///Only Update the Spheres cause this visualization uses its own highlighting for the buildings.
+            // Only update the Spheres cause this visualization uses its own highlighting for the buildings.
             foreach (GameObject f in functionCalls) 
             {
                 f.GetComponent<FunctionCallSimulator>().UpdateSpheres();
