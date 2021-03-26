@@ -96,6 +96,11 @@ namespace SEE.Game
             return result;
         }
 
+        /// <summary>
+        /// Returns the roots of all graphs currently referenced by any of the <paramref name="nodeRefs"/>.
+        /// </summary>
+        /// <param name="nodeRefs">references to nodes in any graphs whose roots are to be returned</param>
+        /// <returns>all root nodes of the graphs containing any node referenced in <paramref name="nodeRefs"/></returns>
         public static HashSet<Node> GetRoots(ICollection<NodeRef> nodeRefs)
         {
             HashSet<Node> result = new HashSet<Node>();
@@ -131,7 +136,6 @@ namespace SEE.Game
             {
                 result.Add(go.GetComponent<NodeRef>().Value.ItsGraph);
             }
-
             return result;
         }
 
@@ -141,13 +145,18 @@ namespace SEE.Game
         /// Precondition: <paramref name="gameNode"/> has a NodeRef component attached to it
         /// that is a valid graph node reference.
         /// </summary>
-        /// <param name="gameNode"></param>
+        /// <param name="gameNode">game object representing a Node to be queried whether it is a leaf</param>
         /// <returns>true if <paramref name="gameNode"/> represents a leaf in the graph</returns>
         public static bool IsLeaf(GameObject gameNode)
         {
             return gameNode.GetComponent<NodeRef>()?.Value?.IsLeaf() ?? false;
         }
 
+        /// <summary>
+        /// True if <paramref name="nodeRef"/> represents a leaf in the graph.
+        /// </summary>
+        /// <param name="nodeRef">a reference to a Node to be queried whether it is a leaf</param>
+        /// <returns>true if <paramref name="nodeRef"/> references a leaf in the graph</returns>
         public static bool IsLeaf(NodeRef nodeRef)
         {
             return nodeRef?.Value?.IsLeaf() ?? false;
@@ -171,7 +180,7 @@ namespace SEE.Game
         /// If <paramref name="gameNode"/> has no valid node reference, the name
         /// of <paramref name="gameNode"/> is returned instead.
         /// </summary>
-        /// <param name="gameNode"></param>
+        /// <param name="gameNode">game object representing a node whose Source.Name is requested</param>
         /// <returns>source name of <paramref name="gameNode"/></returns>
         public static string SourceName(GameObject gameNode)
         {
@@ -182,10 +191,18 @@ namespace SEE.Game
                     return nodeRef.Value.SourceName;
                 }
             }
-
             return gameNode.name;
         }
 
+        /// <summary>
+        /// Returns the Source.Name attribute of <paramref name="nodeRef"/>. 
+        /// If <paramref name="nodeRef"/> is no valid node reference,
+        /// then the name of the game object it is associated with is returned.
+        /// If it is neither associated with a game object, the empty
+        /// string is returned.
+        /// </summary>
+        /// <param name="nodeRef">a reference to a Node whose Source.Name is requested</param>
+        /// <returns>source name of <paramref name="nodeRef"/></returns>
         public static string SourceName(NodeRef nodeRef)
         {
             string result = string.Empty;
@@ -194,7 +211,6 @@ namespace SEE.Game
             {
                 result = nodeRef.Value?.SourceName ?? nodeRef.gameObject.name;
             }
-
             return result;
         }
 
@@ -214,7 +230,6 @@ namespace SEE.Game
                     return child.transform;
                 }
             }
-
             return null;
         }
 
@@ -231,7 +246,7 @@ namespace SEE.Game
         public static Transform GetCodeCity(Transform transform)
         {
             Transform result = transform;
-            if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.HoloLens)
+            if (PlayerSettings.GetInputType() == PlayerInputType.HoloLensPlayer)
             {
                 // If the MRTK is enabled, the cities will be part of a CityCollection, so we can't simply use the root.
                 // In this case, we actually have to traverse the tree up until the Tags match.
