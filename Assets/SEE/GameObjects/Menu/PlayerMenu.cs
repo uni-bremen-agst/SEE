@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.Game.UI;
@@ -157,9 +158,9 @@ namespace SEE.GO.Menu
                     // but this action is not finished yet. Then, the user executes undo. 
                     catch (InvalidOperationException)
                     {
-                        ModeMenu.ActiveEntry = ModeMenu.Entries[0];
+                        ModeMenu.ActiveEntry = ModeMenu.Entries.Single(x => x.Title == ActionStateType.Move.Name);
                         Indicator.ChangeState(ActionStateType.Move);
-                        Debug.LogError("empty history");
+                        Debug.LogError("empty history\n");
                     }
                 }
                 else if (Input.GetKeyDown(KeyCode.Y))
@@ -179,8 +180,12 @@ namespace SEE.GO.Menu
         /// <param name="stack">The stack from where the last action has to be selected</param>
         private void SetPlayerMenu(Stack<ReversibleAction> stack)
         {
-            PlayerSettings.LocalPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu);
-
+            if(PlayerSettings.LocalPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu))
+            {
+                // We can not use PlayerActionHistory.Current here
+                playerMenu.ModeMenu.ActiveEntry = playerMenu.ModeMenu.Entries.First
+                    (x => x.Title.Equals(stack.Peek().GetActionStateType().Name));
+            }
             foreach (ToggleMenuEntry toggleMenuEntry in playerMenu.ModeMenu.Entries)
             {
                 // Hint (can be removed after review): we can not use PlayerActionHistory.Current
