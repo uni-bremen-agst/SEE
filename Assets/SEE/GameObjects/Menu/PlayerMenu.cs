@@ -159,7 +159,7 @@ namespace SEE.GO.Menu
                     {
                         ModeMenu.ActiveEntry = ModeMenu.Entries[0];
                         Indicator.ChangeState(ActionStateType.Move);
-                        Debug.Log("Empty History");
+                        Debug.LogError("empty history");
                     }
                 }
                 else if (Input.GetKeyDown(KeyCode.Y))
@@ -173,8 +173,8 @@ namespace SEE.GO.Menu
         }
 
         /// <summary>
-        /// Selects the last action of the <paramref name="stack"/> and sets the PlayerMenu and the
-        /// ActionStateIndicator to the state of the <paramref name="stack"/>:
+        /// Selects the last action of the <paramref name="stack"/> and sets the PlayerMenu to the
+        /// <see cref="ActionStateType"/> of this last element.
         /// </summary>
         /// <param name="stack">The stack from where the last action has to be selected</param>
         private void SetPlayerMenu(Stack<ReversibleAction> stack)
@@ -183,6 +183,7 @@ namespace SEE.GO.Menu
 
             foreach (ToggleMenuEntry toggleMenuEntry in playerMenu.ModeMenu.Entries)
             {
+                // Hint (can be removed after review): we can not use PlayerActionHistory.Current
                     if (toggleMenuEntry.Title.Equals(stack.Peek().GetActionStateType().Name))
                     {
                         playerMenu.ModeMenu.ActiveEntry = toggleMenuEntry;
