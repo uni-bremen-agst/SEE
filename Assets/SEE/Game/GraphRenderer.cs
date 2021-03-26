@@ -180,26 +180,21 @@ namespace SEE.Game
             {
                 throw new Exception($"The source {from.name} of the edge is not contained in any graph.");
             }
-
             if (toNode == null)
             {
                 throw new Exception($"The target {to.name} of the edge is not contained in any graph.");
             }
-
-            //TODO: Should this be a ReferenceEquals() or Equals() comparison?
             if (fromNode.ItsGraph != toNode.ItsGraph)
             {
                 throw new Exception($"The source {from.name} and target {to.name} of the edge are in different graphs.");
             }
 
             // Creating the edge in the underlying graph
-            Edge edge = string.IsNullOrEmpty(id) ? new Edge() : new Edge(id)
-            {
-                Source = fromNode,
-                Target = toNode,
-                Type = Graph.UnknownType // FIXME: We need to set the type of the edge.
-            };
-                
+            Edge edge = string.IsNullOrEmpty(id) ? new Edge() : new Edge(id);
+            edge.Source = fromNode;
+            edge.Target = toNode;
+            edge.Type = Graph.UnknownType; // FIXME: We need to set the type of the edge.
+
             Graph graph = fromNode.ItsGraph;
             graph.AddEdge(edge);
 
