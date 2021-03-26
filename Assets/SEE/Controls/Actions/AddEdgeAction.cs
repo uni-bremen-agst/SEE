@@ -100,7 +100,7 @@ namespace SEE.Controls.Actions
             // Assigning the game objects to be connected.
             // Checking whether the two game objects are not null and whether they are 
             // actually nodes.
-            if (!Raycasting.IsMouseOverGUI() && Input.GetMouseButtonDown(0) && hoveredObject != null)
+            if (hoveredObject != null && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI())
             {
                 Assert.IsTrue(hoveredObject.HasNodeRef());
                 if (from == null)
