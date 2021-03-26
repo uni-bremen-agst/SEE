@@ -1,4 +1,5 @@
 ﻿using SEE.DataModel.DG;
+using SEE.GO.Menu;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,11 +21,15 @@ namespace SEE.Controls.Actions
         /// </summary>
         public string gameObjectID;
 
-        private static bool editNode = false;
         /// <summary>
         /// True when the editNode button on the canvas was pushed, else false.
         /// </summary>
-        public static bool EditNode { get => editNode; set => editNode = value; }
+        public static bool EditNode { get; set; } = false;
+
+        /// <summary>
+        /// True if the edit node process is canceled, else false.
+        /// </summary>
+        public static bool Canceled { get; set; } = false;
 
         /// <summary>
         /// The InputField for the new name of the node.
@@ -66,21 +71,38 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Gets the values of the canvas input fields after pushing the edit button and removes the
-        /// canvas gameObject. Saves them in the DesktopEditNodeAction.
+        /// canvas gameObject. Saves them in the EditNodeAction. If the editing of the node is canceled,
+        /// the EditNodeAction will be instructed and the process ist canceled.
         /// </summary>
         void Update()
         {
-            if (editNode)
+            Debug.Log(EditNode);
+            if (EditNode)
             {
                 EditNodeAction.UpdateNode(inputname.text, inputtype.text,nodeToEdit);
-                CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
-                generator.DestroyEditNodeCanvasAction();
-                PlayerMenu.InteractionIsForbidden = false;
+                
                 new EditNodeNetAction(nodeToEdit.SourceName, nodeToEdit.Type, gameObjectID).Execute(null);
                 editNodeAction.EditProgress = EditNodeAction.ProgressState.NoNodeSelected;
-                InteractableObject.UnselectAll(true);
-                editNode = false;
+                Finalise();
+                EditNode = false;
             }
+            if(Canceled)
+            {
+                editNodeAction.EditProgress = EditNodeAction.ProgressState.EditIsCanceled;
+                Finalise();
+            }
+        }
+
+        /// <summary>
+        /// Destroys the EditNodeCanvasAction and deselect the selected object. Re-allows the
+        /// interaction with the menu.
+        /// </summary>
+        private void Finalise()
+        {
+            CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
+            generator.DestroyEditNodeCanvasAction();
+            PlayerMenu.InteractionIsForbidden = false;
+            InteractableObject.UnselectAll(true);
         }
     }
 }

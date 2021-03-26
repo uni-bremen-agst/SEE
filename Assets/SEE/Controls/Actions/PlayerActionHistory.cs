@@ -57,7 +57,8 @@ namespace SEE.Controls.Actions
             // The PlayerActionHistory should not need to know anything about its actions.
             if (actionType.Equals(ActionStateType.NewNode) || actionType.Equals(ActionStateType.EditNode))
             {
-                NodeInteractionButtons.addOrEditNode = history.Current;
+                UnityEngine.Debug.Log(actionType);
+                NodeInteractionButtons.addOrEditNode = history.UndoStack.Peek();
             }
         }
 
