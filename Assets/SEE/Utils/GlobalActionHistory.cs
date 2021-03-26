@@ -77,7 +77,8 @@ public class GlobalActionHistory
     public void Execute(ReversibleAction action, string key)
     {
         activeAction[key]?.Stop();
-        Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, key, historyType.action, action, action.ChangedObject);       //UndoStack.Push(action);
+        Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, key, historyType.action, action, action.ChangedObjects()));       //UndoStack.Push(action);
+        SetActiveAction(key, action);
         action.Awake();
         action.Start();
         // Whenever a new action is excuted, we consider the redo stack lost.
@@ -192,27 +193,32 @@ public class GlobalActionHistory
     /// Undo
     /// </summary>
     /// <param name="userid"></param>
-    public void Undo(string userid)
+    public void Undo(string userid) //FIXME: UNDO AND REDO NEEDS TO UPDATE ALSO THE ACTIVEACTION
     {
         Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>,List<Tuple< DateTime, string, historyType, ReversibleAction, List<string>>>> find;
-        find = Find(userid, historyType.undo);         //With the result we need to calculate whether we can du undo or not and what changes the gameobject need
-        while (!find.Item1.Item4.HadEffect())
+        find = Find(userid, historyType.action);    //Should be the same as getActiveAction     //With the result we need to calculate whether we can du undo or not and what changes the gameobject need
+        while (!getActiveAction(userid).HadEffect())
         {
-            find.Item1.Item4.Stop();
-            //undo stack > 0 ? pop : return
+            getActiveAction(userid).Stop();
+            //undo stack > 0 ? pop : return //muss ich die action wirklich löschen
+
         }
-        find.Item1.Item4.Stop();
-        find.Item1.Item4.Undo();                    // find.item2 als parameter so dass die action selbst brechen kann was gemacht werden muss && undo muss ein bool sein damit danach entschieden werden kann ob es ausgeführt wird
+        getActiveAction(userid).Stop();
+                                                     // find.item2 als parameter so dass die action selbst brechen kann was gemacht werden muss && undo muss ein bool sein damit danach entschieden werden kann ob es ausgeführt wird
                                                     // in jeder revesble action muss evtl. noch eine changes list mitgeführt werden, damit eine action herrauslesen kann was die anderen verändert haben, und ob man das mergen kann oder nicht 
-        if(true)                                    //FIXME with the return value of item.undo
+        if(find.Item1.Item4.Undo())               
         {
             
             Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, userid, historyType.undo, find.Item1.Item4, find.Item1.Item5));
-            DeleteItem(find.Item1.Item2, find.Item1.Item1);
-            isRedo = true;
            
-        }
-        //nächstes CURRENT?. START()
+            //DO the POP
+            DeleteItem(find.Item1.Item2, find.Item1.Item1);
+            find = Find(userid, historyType.action);
+            SetActiveAction(userid, find.Item1.Item4); 
+            isRedo = true;
+            getActiveAction(userid)?.Start();
+           
+        } //Eventuell noch im else was erledigen, was muss passieren wenn das undo nicht performed werden kann
     }
 
     /// <summary>
@@ -221,16 +227,22 @@ public class GlobalActionHistory
     /// <param name="userid">The player that wants the redo </param>
     public void Redo(string userid)
     {
-        Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>, List<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>>> find;
-        find = Find(userid, historyType.redo); //With the result we need to calculate whether we can du undo or not and what changes the gameobject need
-        find.Item1.Item4.Redo(); // find.item2 als parameter so dass die action selbst brechen kann was gemacht werden muss && redo muss ein bool sein damit danach entschieden werden kann ob es ausgeführt wird
-        // in jeder revesble action muss evtl. noch eine changes list mitgeführt werden, damit eine action herrauslesen kann was die anderen verändert haben, und ob man das mergen kann oder nicht 
-        if (true) //FIXME with the return value of item.redo 
-        {
+        getActiveAction(userid).Stop();
 
-            Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, userid, historyType.redo, find.Item1.Item4, find.Item1.Item5)); //FIXME: Brauchen wir überhaupt ein redo state? ist es nicht das gleiche wie eine Action?
+        Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>, List<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>>> find;
+        find = Find(userid, historyType.undo);
+        
+        //With the result we need to calculate whether we can du undo or not and what changes the gameobject need
+        // find.item2 als parameter so dass die action selbst brechen kann was gemacht werden muss && redo muss ein bool sein damit danach entschieden werden kann ob es ausgeführt wird
+        // in jeder revesble action muss evtl. noch eine changes list mitgeführt werden, damit eine action herrauslesen kann was die anderen verändert haben, und ob man das mergen kann oder nicht 
+        if (find.Item1.Item4.Redo()) 
+        {
+            Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, userid, historyType.action, find.Item1.Item4, find.Item1.Item5)); //FIXME: Brauchen wir überhaupt ein redo state? ist es nicht das gleiche wie eine Action?
+            find.Item1.Item4.Start();
+            
+            SetActiveAction(userid, find.Item1.Item4); //FIXME: MUSS HIER WIRKLICH EINFACH DIE SELBE ACTION GEPUSHT WERDEN?
             DeleteItem(find.Item1.Item2, find.Item1.Item1);
-        }
+        } //FIXME Was passiert wenn das redo nicht erfolgreich wird
     }
 
     /// <summary>

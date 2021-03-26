@@ -1,4 +1,6 @@
 ﻿using SEE.Controls.Actions;
+using System;
+using System.Collections.Generic;
 
 namespace SEE.Utils
 {
@@ -80,14 +82,16 @@ namespace SEE.Utils
         /// <summary>
         /// Called when the effect of the action is to be reversed.
         /// </summary>
-        void Undo();
+        /// <returns>If the undo was succsesfull</returns>
+        bool Undo();
 
         /// <summary>
         /// Called when the action was previously reversed by <see cref="Undo"/>
         /// to re-establish the effect that was undone.
         /// Precondition: <see cref="Undo"/> was called before.
         /// </summary>
-        void Redo();
+        /// <returns>If the redo was succsesfull</returns>
+        bool Redo();
 
         /// <summary>
         /// True if this action has had an effect that may need to be undone. Actions may
@@ -97,6 +101,12 @@ namespace SEE.Utils
         /// </summary>
         /// <returns>if this action has had an effect that may need to be undone</returns>
         bool HadEffect();
+
+        /// <summary>
+        /// Provides a list with the changedGameobjectIDs 
+        /// </summary>
+        /// <returns>A List of all GameObjects that be changed by the active action</returns>
+        List<String> ChangedObjects();
 
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
