@@ -74,6 +74,12 @@ namespace SEE.Controls
         /// </summary>
         /// <param name="playerName">The name of the player whose code space should be updated.</param>
         /// <param name="valueObject">The value object which represents the new code space of the player.</param>
+        /// <summary>
+        /// Updates the code space of the player specified by <paramref name="playerName"/> using the values
+        /// from <paramref name="valueObject"/>.
+        /// </summary>
+        /// <param name="playerName">The name of the player whose code space should be updated.</param>
+        /// <param name="valueObject">The value object which represents the new code space of the player.</param>
         public void UpdateCodeSpaceFromValueObject(string playerName, CodeSpace.CodeSpaceValues valueObject)
         {
             if (!CodeSpaces.ContainsKey(playerName))
