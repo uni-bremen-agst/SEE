@@ -49,7 +49,7 @@ namespace SEE.GO.Menu
             Assert.IsTrue(ActionStateType.NewNode.Value == 4);
             Assert.IsTrue(ActionStateType.EditNode.Value == 5);
             Assert.IsTrue(ActionStateType.ScaleNode.Value == 6);
-            Assert.IsTrue(ActionStateType.Delete.Value == 7);            
+            Assert.IsTrue(ActionStateType.Delete.Value == 7);
             Assert.IsTrue(ActionStateType.Draw.Value == 8);
             Assert.IsTrue(ActionStateType.Dummy.Value == 9);
 
@@ -75,7 +75,7 @@ namespace SEE.GO.Menu
                 {
                     PlayerActionHistory.Execute(type);
                     first = false;
-                }                
+                }
             }
 
             // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
@@ -101,7 +101,7 @@ namespace SEE.GO.Menu
         private static ActionStateIndicator CreateActionStateIndicator(GameObject attachTo = null)
         {
             // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
-            GameObject actionStateGO = attachTo ? attachTo : new GameObject {name = "Action State Indicator"};
+            GameObject actionStateGO = attachTo ? attachTo : new GameObject { name = "Action State Indicator" };
             ActionStateIndicator indicator = actionStateGO.AddComponent<ActionStateIndicator>();
             return indicator;
         }
@@ -114,7 +114,7 @@ namespace SEE.GO.Menu
             ModeMenu.OnMenuEntrySelected.AddListener(SetIndicatorStateToEntry);
             // Initialize action state indicator to current action state
             SetIndicatorStateToEntry(ModeMenu.ActiveEntry);
-            Assert.IsTrue(ActionStateType.AllTypes.Count <= 9, 
+            Assert.IsTrue(ActionStateType.AllTypes.Count <= 9,
                           "Only up to 9 (10 if zero is included) entries can be selected via the numbers on the keyboard!");
 
             void SetIndicatorStateToEntry(ToggleMenuEntry entry)
@@ -198,11 +198,11 @@ namespace SEE.GO.Menu
             foreach (ToggleMenuEntry toggleMenuEntry in playerMenu.ModeMenu.Entries)
             {
                 // Hint (can be removed after review): we can not use PlayerActionHistory.Current
-                    if (toggleMenuEntry.Title.Equals(stack.Peek().GetActionStateType().Name))
-                    {
-                        playerMenu.ModeMenu.ActiveEntry = toggleMenuEntry;
-                        break;
-                    }
+                if (toggleMenuEntry.Title.Equals(stack.Peek().GetActionStateType().Name))
+                {
+                    playerMenu.ModeMenu.ActiveEntry = toggleMenuEntry;
+                    break;
+                }
             }
         }
     }
