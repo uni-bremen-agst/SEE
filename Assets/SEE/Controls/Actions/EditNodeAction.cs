@@ -102,6 +102,7 @@ namespace SEE.Controls.Actions
                     canvasGenerator.DestroyEditNodeCanvasAction();
                     hoveredObject = null;
                     nodeToEdit = null;
+                    PlayerMenu.InteractionIsForbidden = false;
                     EditProgress = ProgressState.NoNodeSelected;
                     break;
 

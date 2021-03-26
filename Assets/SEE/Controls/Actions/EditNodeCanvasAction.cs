@@ -53,6 +53,7 @@ namespace SEE.Controls.Actions
 
         void Start()
         {
+            PlayerMenu.InteractionIsForbidden = true;
             InstantiatePrefab(prefabPath);
             Canvas.transform.SetParent(gameObject.transform);
             Component[] c = Canvas.GetComponentsInChildren<InputField>();
@@ -74,6 +75,7 @@ namespace SEE.Controls.Actions
                 EditNodeAction.UpdateNode(inputname.text, inputtype.text,nodeToEdit);
                 CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
                 generator.DestroyEditNodeCanvasAction();
+                PlayerMenu.InteractionIsForbidden = false;
                 new EditNodeNetAction(nodeToEdit.SourceName, nodeToEdit.Type, gameObjectID).Execute(null);
                 editNodeAction.EditProgress = EditNodeAction.ProgressState.NoNodeSelected;
                 InteractableObject.UnselectAll(true);
