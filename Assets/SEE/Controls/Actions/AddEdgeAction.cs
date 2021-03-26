@@ -31,35 +31,61 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// The source for an edge to be drawn.
+        /// The source node for an edge to be drawn during the selection process.
         /// </summary>
         private GameObject from;
 
         /// <summary>
-        /// The target of the edge to be drawn.
+        /// The target node of the edge to be drawn during the selection process.
         /// </summary>
         private GameObject to;
 
         /// <summary>
-        /// The Objects which are needed to create a new edge:
-        /// The source, the target and the city where the edge will be attached to.
+        /// The information we need to (re-)create an edge.
         /// </summary>
-        private Tuple<GameObject, GameObject, SEECity> edgeToBeDrawn;
+        private struct EdgeMemento
+        {
+            public readonly GameObject from;
+            public readonly GameObject to;
+            public string edgeID;
+            public EdgeMemento(GameObject from, GameObject to, string edgeID)
+            {
+                this.from = from;
+                this.to = to;
+                this.edgeID = edgeID;
+            }
+        }
 
         /// <summary>
-        /// The edge created by this action.
+        /// The information needed to re-create the edge.
+        /// </summary>
+        private EdgeMemento edgeMemento;
+
+        /// <summary>
+        /// The edge created by this action. Can be null if no edge has been created yet
+        /// or whether an Undo was called. The created edge is stored only to delete
+        /// it again if Undo is called. All information to create the edge is kept in
+        /// <see cref="edgeMemento"/>.
         /// </summary>
         private GameObject createdEdge;
 
         /// <summary>
-        /// The name of the generated edge.
+        /// Registers itself at <see cref="InteractableObject"/> to listen for hovering events.
         /// </summary>
-        private string edgeName;
-
         public override void Start()
         {
             InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
             InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
+        }
+
+        /// <summary>
+        /// Unregisters itself from <see cref="InteractableObject"/>. Does no
+        /// longer listen for hovering events.
+        /// </summary>
+        public override void Stop()
+        {
+            InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
+            InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
         }
 
         /// <summary>
@@ -73,7 +99,7 @@ namespace SEE.Controls.Actions
             // Assigning the game objects to be connected.
             // Checking whether the two game objects are not null and whether they are 
             // actually nodes.
-            if (Input.GetMouseButtonDown(0) && hoveredObject != null)
+            if (hoveredObject != null && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI())
             {
                 Assert.IsTrue(hoveredObject.HasNodeRef());
                 if (from == null)
@@ -88,32 +114,22 @@ namespace SEE.Controls.Actions
             // Note: from == to may be possible.
             if (from != null && to != null)
             {
-                Transform cityObject = SceneQueries.GetCodeCity(from.transform);
-                if (cityObject != null)
+                // We do not have an edge ID yet, so we pass null to let the
+                // graph renderer create a unique ID.
+                edgeMemento = new EdgeMemento(from, to, null);
+                createdEdge = CreateEdge(edgeMemento);
+                if (createdEdge != null)
                 {
-                    if (cityObject.TryGetComponent(out SEECity city))
-                    {
-                        try
-                        {
-                            GameObject addedEdge = city.Renderer.DrawEdge(from, to, null);
-                            edgeToBeDrawn = new Tuple<GameObject, GameObject, SEECity>(from, to, city);
-                            createdEdge = addedEdge;
-                            new AddEdgeNetAction(from.name, to.name).Execute();
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.LogError($"The new edge from {from.name} to {to.name} could not be created: {e.Message}.\n");
-                        }
-                        from = null;
-                        to = null;
-                        // action is completed (successfully or not; it does not matter)
-                        result = true;
-                        hadAnEffect = true;
-                    }
+                    edgeMemento.edgeID = createdEdge.ID();
+                    from = null;
+                    to = null;
+                    // action is completed (successfully or not; it does not matter)
+                    result = true;
+                    hadAnEffect = true;
                 }
             }
-            // Adding the key "F1" in order to forget the selected GameObjects.
-            if (Input.GetKeyDown(KeyCode.F1))
+            // Adding the key to forget the selected GameObjects.
+            if (Input.GetKeyDown(KeyBindings.Unselect))
             {
                 from = null;
                 to = null;
@@ -129,24 +145,61 @@ namespace SEE.Controls.Actions
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             DeleteAction deleteAction = new DeleteAction();
             deleteAction.DeleteSelectedObject(createdEdge);
-            edgeName = createdEdge.name;
             Destroyer.DestroyGameObject(createdEdge);
+            createdEdge = null;
         }
 
         /// <summary>
-        /// Redoes this AddEdgeAction
+        /// Redoes this AddEdgeAction.
         /// </summary>
         public override void Redo()
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            GameObject redoneEdge = edgeToBeDrawn.Item3.Renderer.DrawEdge(edgeToBeDrawn.Item1, edgeToBeDrawn.Item2, edgeName);
-            createdEdge = redoneEdge;
+            createdEdge = CreateEdge(edgeMemento);
+        }
+
+        /// <summary>
+        /// Creates a new edge using the given <paramref name="edgeMemento"/>.
+        /// In case of any error, null will be returned.
+        /// </summary>
+        /// <param name="edgeMemento">information needed to create the edge</param>
+        /// <returns>a new edge or null</returns>
+        private static GameObject CreateEdge(EdgeMemento edgeMemento)
+        {
+            GameObject result = null;
+            Transform cityObject = SceneQueries.GetCodeCity(edgeMemento.from.transform);
+            if (cityObject != null)
+            {
+                // FIXME: This will work only for SEECity but not other subclasses of AbstractSEECity.
+                if (cityObject.TryGetComponent(out SEECity city))
+                {
+                    try
+                    {
+                        result = city.Renderer.DrawEdge(edgeMemento.from, edgeMemento.to, edgeMemento.edgeID);
+                        // Note that we need to result.name as edge ID because edgeMemento.edgeID could be null.
+                        new AddEdgeNetAction(edgeMemento.from.name, edgeMemento.to.name, result.name).Execute();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError($"The new edge from {edgeMemento.from.name} to {edgeMemento.to.name} could not be created: {e.Message}.\n");
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"The code city for the new edge from {edgeMemento.from.name} to {edgeMemento.to.name} has no .\n");
+                }
+            }
+            else
+            {
+                Debug.LogError($"Could not determine the code city for the new edge from {edgeMemento.from.name} to {edgeMemento.to.name}.\n");
+            }
+            return result;
         }
 
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns>the <see cref="ActionStateType"/> of this action</returns>
+        /// <returns><see cref="ActionStateType.NewEdge"/></returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.NewEdge;

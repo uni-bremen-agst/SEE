@@ -22,7 +22,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns>the <see cref="ActionStateType"/> of this action</returns>
+        /// <returns><see cref="ActionStateType.Move"/></returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.Move;

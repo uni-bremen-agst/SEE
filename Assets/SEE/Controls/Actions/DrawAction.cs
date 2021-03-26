@@ -45,11 +45,6 @@ namespace SEE.Controls.Actions
         private GameObject line;
 
         /// <summary>
-        /// True, if this instance of this action is executed for the first time, else false.
-        /// </summary>
-        private bool firstExecution = true;
-
-        /// <summary>
         /// The renderer used to draw the line.
         /// </summary>
         private LineRenderer renderer;
@@ -82,7 +77,6 @@ namespace SEE.Controls.Actions
         {
             base.Awake();
             positions = new Vector3[0];
-            SetUpRenderer();
         }
 
         /// <summary>
@@ -107,15 +101,16 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override bool Update()
         {
-            if (firstExecution)
-            {
-                firstExecution = false;
-                return false;
-            }
-            if (!MenuIsOpen)
+            if (!Raycasting.IsMouseOverGUI())
             {
                 if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
                 {
+                    // We create the line on demand so that there is no left-over
+                    // when the drawing action has never actually started to draw anything.
+                    if (line == null)
+                    {
+                        SetUpRenderer();
+                    }
                     // FIXME: This would needed to be adjusted to VR and AR.
                     // The position at which to continue the line.
                     Vector3 newPosition = Input.mousePosition;
@@ -174,7 +169,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns>the <see cref="ActionStateType"/> of this action</returns>
+        /// <returns><see cref="ActionStateType.Draw"/></returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.Draw;

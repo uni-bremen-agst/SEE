@@ -14,7 +14,7 @@ namespace SEE.GO.Menu
         /// <summary>
         /// The UI object representing the menu the user chooses the action state from.
         /// </summary>
-        public SelectionMenu ModeMenu;
+        private SelectionMenu ModeMenu;
 
         /// <summary>
         /// The UI object representing the indicator, which displays the current action state on the screen.
@@ -132,7 +132,6 @@ namespace SEE.GO.Menu
             // space bar toggles menu            
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                AbstractPlayerAction.InvertMenuIsOpen(); 
                 ModeMenu.ToggleMenu();
             }
 
@@ -145,10 +144,12 @@ namespace SEE.GO.Menu
                 if (Input.GetKeyDown(KeyCode.Z))
                 {
                     PlayerActionHistory.Undo();
+                    Indicator.ChangeState(PlayerActionHistory.Current());
                 }
                 else if (Input.GetKeyDown(KeyCode.Y))
                 {
                     PlayerActionHistory.Redo();
+                    Indicator.ChangeState(PlayerActionHistory.Current());
                 }
             }
             PlayerActionHistory.Update();

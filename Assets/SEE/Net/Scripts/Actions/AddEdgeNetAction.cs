@@ -11,24 +11,31 @@ namespace SEE.Controls.Actions
     public class AddEdgeNetAction : Net.AbstractAction
     {
         /// <summary>
-        /// The id of the gameObject from which the edge should be drawn.
+        /// The id of the gameObject from which the edge should be drawn (source node).
         /// </summary>
-        public string fromId;
+        public string FromId;
 
         /// <summary>
-        /// The id of the gameObject to which the edge should be drawn.
+        /// The id of the gameObject to which the edge should be drawn (target node).
         /// </summary>
-        public string toId;
+        public string ToId;
+
+        /// <summary>
+        /// The unique of the edge. May be empty or null, in which case a random
+        /// unique ID will be create on the client side.
+        /// </summary>
+        public string EdgeID;
 
         /// <summary>
         /// Constructs an AddEdgeNetAction.
         /// </summary>
         /// <param name="fromId">The id of the gameObject from which the edge should be drawn</param>
         /// <param name="toId">The id of the gameObject to which the edge should be drawn</param>
-        public AddEdgeNetAction(string fromId, string toId)
+        public AddEdgeNetAction(string fromId, string toId, string edgeID)
         {
-            this.fromId = fromId;
-            this.toId = toId;
+            this.FromId = fromId;
+            this.ToId = toId;
+            this.EdgeID = edgeID;
         }
 
         /// <summary>
@@ -46,10 +53,10 @@ namespace SEE.Controls.Actions
         {
             if (!IsRequester())
             {
-                GameObject fromGO = GameObject.Find(fromId);
+                GameObject fromGO = GameObject.Find(FromId);
                 if (fromGO)
                 {
-                    GameObject toGO = GameObject.Find(toId);
+                    GameObject toGO = GameObject.Find(ToId);
                     if (toGO)
                     {
                         Transform codeCity = SceneQueries.GetCodeCity(fromGO.transform);
@@ -59,7 +66,7 @@ namespace SEE.Controls.Actions
                             {
                                 try
                                 {
-                                    city.Renderer.DrawEdge(fromGO, toGO, null);
+                                    city.Renderer.DrawEdge(fromGO, toGO, EdgeID);
                                 }
 
                                 catch (Exception e)
@@ -70,17 +77,17 @@ namespace SEE.Controls.Actions
                         }
                         else
                         {
-                            Debug.LogError($"Game node named {fromId} is not contained in a code city.\n");
+                            Debug.LogError($"Game node named {FromId} is not contained in a code city.\n");
                         }
                     }
                     else
                     {
-                        Debug.LogError($"There is no game node named {toId}.\n");
+                        Debug.LogError($"There is no game node named {ToId}.\n");
                     }
                 }
                 else
                 {
-                    Debug.LogError($"There is no game node named {fromId}.\n");
+                    Debug.LogError($"There is no game node named {FromId}.\n");
                 }
             }
         }
