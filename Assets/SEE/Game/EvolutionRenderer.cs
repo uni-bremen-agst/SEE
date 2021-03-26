@@ -814,9 +814,10 @@ namespace SEE.Game
         /// <param name="gameObject">game object to be destroyed</param>
         private void OnAnimationNodeAnimationFinished(object gameObject)
         {
+            
             if (gameObject != null && gameObject is GameObject)
             {
-                Destroy((GameObject)gameObject,AnimationDuration);
+                Destroy((GameObject)gameObject);
             }
         }
 
