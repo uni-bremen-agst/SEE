@@ -11,7 +11,6 @@ namespace SEE.GameObjects
     /// </summary>
     public class CanvasFaceCamera : MonoBehaviour
     {
-        
         /// <summary>
         /// Main camera of the scene.
         /// </summary>

@@ -12,7 +12,7 @@ namespace SEE.Controls.Actions
     internal class ShowCodeAction : MonoBehaviour
     {
         /// <summary>
-        /// Manager object who takes care of the player selection menu and code space dictionary for us.
+        /// Manager object which takes care of the player selection menu and code space dictionary for us.
         /// </summary>
         private CodeSpaceManager spaceManager;
 
@@ -86,7 +86,7 @@ namespace SEE.Controls.Actions
                     }
 
                     codeWindow.Title = selectedNode.Value.SourceName;
-                    // If SourceName differs from Source.File (except file extension), display both
+                    // If SourceName differs from Source.File (except for its file extension), display both
                     if (!codeWindow.Title.Replace(".", "").Equals(selectedFile.Split('.').Reverse().Skip(1)
                                                                               .Aggregate("", (acc, s) => s + acc)))
                     {

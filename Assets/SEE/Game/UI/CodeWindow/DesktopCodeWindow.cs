@@ -12,7 +12,6 @@ namespace SEE.Game.UI.CodeWindow
     /// </summary>
     public partial class CodeWindow
     {
-
         /// <summary>
         /// Scrollbar which controls the currently visible area of the code window.
         /// </summary>
@@ -60,7 +59,7 @@ namespace SEE.Game.UI.CodeWindow
                 TextMesh.fontSize = FontSize;
             }
 
-            // Register events to find out when window was scrolled in 
+            // Register events to find out when window was scrolled in.
             // For this, we have to register two events in two components, namely Scrollbar and ScrollRect, with
             // OnEndDrag and OnScroll.
             if (codeWindow.transform.Find("Content/Scrollable").gameObject.TryGetComponentOrLog(out scrollRect))

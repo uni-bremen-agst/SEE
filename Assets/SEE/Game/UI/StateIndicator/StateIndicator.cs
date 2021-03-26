@@ -8,7 +8,7 @@ namespace SEE.Game.UI
 {
     /// <summary>
     /// Indicates some kind of state with which a text and a color is associated.
-    /// The state will be displayed on the screen at all times.
+    /// The state will be displayed on the screen.
     /// </summary>
     public class StateIndicator: PlatformDependentComponent
     {

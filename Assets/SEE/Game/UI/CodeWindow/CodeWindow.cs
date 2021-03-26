@@ -314,7 +314,6 @@ namespace SEE.Game.UI.CodeWindow
         /// <returns>The newly created <see cref="CodeWindowValues"/>, matching this class</returns>
         public CodeWindowValues ToValueObject(bool fulltext)
         {
-            //TODO: Maybe use gameObject.ID()? The paths are present in the name, and those are client-dependent
             return fulltext ? new CodeWindowValues(Title, VisibleLine, gameObject.name, Text) 
                 : new CodeWindowValues(Title, VisibleLine, gameObject.name, path: FilePath);
         }
@@ -365,9 +364,9 @@ namespace SEE.Game.UI.CodeWindow
             /// <param name="visibleLine">The line currently at the top of the code window which is fully visible.</param>
             /// <param name="attachedTo">Name of the game object the code window is attached to.</param>
             /// <param name="text">The text of the code window. May be <c>null</c>, in which case
-            /// <paramref name="path"/> is not.</param>
+            /// <paramref name="path"/> may not be.</param>
             /// <param name="path">The path to the file which should be displayed in the code window.
-            /// May be <c>null</c>, in which case <paramref name="text"/> is not.</param>
+            /// May be <c>null</c>, in which case <paramref name="text"/> may not.</param>
             /// <exception cref="ArgumentException">Thrown when both <paramref name="path"/> and
             /// <paramref name="text"/> are <c>null</c>.</exception>
             internal CodeWindowValues(string title, int visibleLine, string attachedTo = null, string text = null, string path = null)
