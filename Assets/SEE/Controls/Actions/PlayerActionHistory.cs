@@ -1,4 +1,5 @@
 ﻿using SEE.Utils;
+using System.Collections.Generic;
 
 namespace SEE.Controls.Actions
 {
@@ -68,6 +69,24 @@ namespace SEE.Controls.Actions
         public static ActionStateType Current()
         {
             return history.Current?.GetActionStateType();
+        }
+
+        /// <summary>
+        /// Returns the UndoStack of the ActionHistory.
+        /// </summary>
+        /// <returns>the UndoStack of the ActionHistory</returns>
+        public static Stack<ReversibleAction> GetUndoHistory()
+        {
+            return history.UndoStack;
+        }
+
+        /// <summary>
+        /// Returns the RedoStack of the ActionHistory.
+        /// </summary>
+        /// <returns>the RedoStack of the ActionHistory</returns>
+        public static Stack<ReversibleAction> GetRedoHistory()
+        {
+            return history.RedoStack;
         }
     }
 }
