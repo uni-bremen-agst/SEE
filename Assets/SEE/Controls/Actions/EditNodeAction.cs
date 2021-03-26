@@ -1,5 +1,6 @@
 ﻿using SEE.DataModel.DG;
 using SEE.GO;
+using SEE.GO.Menu;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -65,7 +66,7 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
             bool result = false;
-
+            Debug.Log(EditProgress);
             switch (EditProgress)
             {
                 case ProgressState.NoNodeSelected:
