@@ -52,14 +52,6 @@ namespace SEE.Controls.Actions
         public static void Execute(ActionStateType actionType)
         {
             history.Execute(actionType.CreateReversible());
-
-            // FIXME: This looks like a hack and should be removed later.
-            // The PlayerActionHistory should not need to know anything about its actions.
-            if (actionType.Equals(ActionStateType.NewNode) || actionType.Equals(ActionStateType.EditNode))
-            {
-                UnityEngine.Debug.Log(actionType);
-                NodeInteractionButtons.addOrEditNode = history.UndoStack.Peek();
-            }
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.GO.Menu;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace SEE.Controls.Actions
@@ -14,13 +15,45 @@ namespace SEE.Controls.Actions
         /// </summary>
         private static readonly string prefabPath = "Prefabs/NewNodeCanvas";
 
-        void Start()
+        /// <summary>
+        /// True if the add node process is canceled, else false.
+        /// </summary>
+        public static bool Canceled { get; set; } = false;
+
+        /// <summary>
+        /// True if the user adds a new node by pushing the "add" button, else false.
+        /// </summary>
+        public static bool NextState { get; set; } = false;
+
+        /// <summary>
+        /// The addNodeAction instance where the progress state has to be set.
+        /// </summary>
+        public AddNodeAction addNodeAction;
+
+        private void Start()
         {
             /// Note: It is important that the Prefab is contained in the Resources folder to use the 
             /// Resources.Load method.
             InstantiatePrefab(prefabPath);
             Canvas.transform.SetParent(gameObject.transform);
         }
+
+        private void Update()
+        {
+            if (NextState)
+            {
+                addNodeAction.Progress = AddNodeAction.ProgressState.CanvasIsClosed;
+                Finalise();
+                NextState = false;
+            }
+            if (Canceled)
+            {
+                addNodeAction.Progress = AddNodeAction.ProgressState.AddingIsCanceled;
+                Finalise();
+                Canceled = false;
+            }
+        }
+
 
         /// <summary>
         /// Extracts the given node name, the node type and whether it is an inner node or a leaf from the canvas.
@@ -53,6 +86,19 @@ namespace SEE.Controls.Actions
 
             AddNodeAction.NodeName = inputNodename;
             AddNodeAction.NodeType = inputNodetype;
+        }
+
+        /// <summary>
+        /// Destroys the AddingNodeCanvasAction and deselects the selected object. Re-allows the
+        /// interaction with the menu.
+        /// </summary>
+        public void Finalise()
+        {
+            CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
+            canvasObject.GetComponent<AddingNodeCanvasAction>().GetNodeValues();
+            generator.DestroyAddNodeCanvasAction();
+            PlayerMenu.InteractionIsForbidden = false;
+            InteractableObject.UnselectAll(true);
         }
     }
 }

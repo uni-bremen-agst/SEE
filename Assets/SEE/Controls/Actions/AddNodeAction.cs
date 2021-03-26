@@ -4,6 +4,7 @@ using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
+using SEE.GO.Menu;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -180,13 +181,6 @@ namespace SEE.Controls.Actions
         {
             bool result = false;
 
-            // Removes the canvasObject and extracts the inserted values from it for the new node to be created in next state.
-            void RemoveCanvas()
-            {
-                CanvasGenerator canvas = canvasObject.GetComponent<CanvasGenerator>();
-                canvasObject.GetComponent<AddingNodeCanvasAction>().GetNodeValues();
-                canvas.DestroyAddNodeCanvasAction();
-            }
             switch (Progress)
             {
                 case ProgressState.NoCitySelected:
@@ -198,6 +192,7 @@ namespace SEE.Controls.Actions
                     break;
 
                 case ProgressState.CityIsSelected:
+                    PlayerMenu.InteractionIsForbidden = true;
                     OpenDialog();
                     Progress = ProgressState.WaitingForValues;
                     break;
@@ -206,7 +201,7 @@ namespace SEE.Controls.Actions
                     break;
 
                 case ProgressState.CanvasIsClosed:
-                    RemoveCanvas();
+                    PlayerMenu.InteractionIsForbidden = false;
                     Progress = ProgressState.ValuesAreGiven;
                     break;
 
@@ -234,9 +229,10 @@ namespace SEE.Controls.Actions
                     break;
 
                 case ProgressState.AddingIsCanceled:
-                    RemoveCanvas();
+                    PlayerMenu.InteractionIsForbidden = false;
                     city = null;
                     Progress = ProgressState.NoCitySelected;
+                    PlayerMenu.InteractionIsForbidden = false;
                     break;
 
                 default:
@@ -298,7 +294,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public void OpenDialog()
         {
-            canvasObject.GetComponent<CanvasGenerator>().InstantiateAddingNodeCanvas();
+            canvasObject.GetComponent<CanvasGenerator>().InstantiateAddingNodeCanvas(this);
         }
 
         /// <summary>

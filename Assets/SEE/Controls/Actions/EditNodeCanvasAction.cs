@@ -42,11 +42,6 @@ namespace SEE.Controls.Actions
         InputField inputtype;
 
         /// <summary>
-        /// The gameObject that contains the canvasPrefab.
-        /// </summary>
-        public GameObject canvasObject;
-
-        /// <summary>
         /// The path of the EditNodeCanvas prefab without the file extension .prefab.
         /// </summary>
         private const string prefabPath = "Prefabs/EditNodeCanvas";
@@ -66,7 +61,6 @@ namespace SEE.Controls.Actions
             inputtype = (InputField)c[1];
             inputname.text = nodeToEdit.SourceName;
             inputtype.text = nodeToEdit.Type;
-            canvasObject = GameObject.Find("CanvasObject");
         }
 
         /// <summary>
@@ -76,7 +70,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         void Update()
         {
-            Debug.Log(EditNode);
             if (EditNode)
             {
                 EditNodeAction.UpdateNode(inputname.text, inputtype.text,nodeToEdit);
@@ -90,11 +83,12 @@ namespace SEE.Controls.Actions
             {
                 editNodeAction.EditProgress = EditNodeAction.ProgressState.EditIsCanceled;
                 Finalise();
+                Canceled = false;
             }
         }
 
         /// <summary>
-        /// Destroys the EditNodeCanvasAction and deselect the selected object. Re-allows the
+        /// Destroys the EditNodeCanvasAction and deselects the selected object. Re-allows the
         /// interaction with the menu.
         /// </summary>
         private void Finalise()
