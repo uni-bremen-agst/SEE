@@ -62,6 +62,7 @@ namespace SEE.Controls
         /// </summary>
         public void EditIsCanceled()
         {
+            EditNodeCanvasAction.Canceled = true;
             EditNodeAction editNodeAction = (EditNodeAction)addOrEditNode;
             editNodeAction.EditProgress = EditNodeAction.ProgressState.EditIsCanceled;
         }
