@@ -180,7 +180,7 @@ namespace SEE.GO.Menu
         /// <param name="stack">The stack from where the last action has to be selected</param>
         private void SetPlayerMenu(Stack<ReversibleAction> stack)
         {
-            if(PlayerSettings.LocalPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu))
+            if (PlayerSettings.LocalPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu))
             {
                 // We can not use PlayerActionHistory.Current here
                 playerMenu.ModeMenu.ActiveEntry = playerMenu.ModeMenu.Entries.First
