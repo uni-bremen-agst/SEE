@@ -152,10 +152,10 @@ namespace SEE.Controls.Actions
                 actionState.selectToggle = Input.GetKey(KeyCode.LeftControl);
                 actionState.drag = Input.GetMouseButton(2);
                 actionState.startDrag |= !isMouseOverGUI && Input.GetMouseButtonDown(2);
-                actionState.dragHoveredOnly = Input.GetKey(KeyCode.LeftControl);
-                actionState.cancel |= Input.GetKeyDown(KeyCode.Escape);
+                actionState.dragHoveredOnly = Input.GetKey(KeyBindings.Snap);
+                actionState.cancel |= Input.GetKeyDown(KeyBindings.Cancel);
                 actionState.snap = Input.GetKey(KeyCode.LeftAlt);
-                actionState.reset |= (actionState.drag || !isMouseOverGUI) && Input.GetKeyDown(KeyCode.R);
+                actionState.reset |= (actionState.drag || !isMouseOverGUI) && Input.GetKeyDown(KeyBindings.Reset);
                 actionState.mousePosition = Input.mousePosition;
 
                 // FIXME: The selection of graph elements below will executed only if the 
@@ -170,7 +170,7 @@ namespace SEE.Controls.Actions
                 actionState.hoveredTransform = null;
                 if (insideClippingArea)
                 {
-                    if (Input.GetKeyDown(KeyCode.U))
+                    if (Input.GetKeyDown(KeyBindings.Unselect))
                     {
                         InteractableObject.UnselectAll(true);
                     }
@@ -206,7 +206,7 @@ namespace SEE.Controls.Actions
 
                 if (!actionState.drag && !Equals(ActionState.Value, ActionStateType.Map))
                 {
-                    actionState.zoomToggleToObject |= Input.GetKeyDown(KeyCode.F);
+                    actionState.zoomToggleToObject |= Input.GetKeyDown(KeyBindings.ZoomInto);
 
                     if (Input.GetMouseButtonDown(0) && !isMouseOverGUI)
                     {

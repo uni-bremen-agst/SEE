@@ -170,7 +170,7 @@ namespace SEE.DataModel.DG
         public override string ID
         {
             get => id;
-            set => id = value;
+            set => throw new InvalidOperationException(); // ID must not be changed
         }
     }
 }
