@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.GO;
+using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
 
@@ -114,11 +115,9 @@ namespace SEE.Controls.Actions
         /// </summary>
         private Interactable attachedInteractable;
 
-
-
         protected sealed override void Awake()
         {
-            if (FindObjectOfType<PlayerSettings>().playerInputType != PlayerSettings.PlayerInputType.VR)
+            if (FindObjectOfType<PlayerSettings>().playerInputType != PlayerInputType.VRPlayer)
             {
                 Destroy(this);
                 return;

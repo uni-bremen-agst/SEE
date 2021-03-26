@@ -270,18 +270,12 @@ namespace SEE.Game
         {
             if (AllNodeTypesAreRelevant)
             {
-                Debug.Log("All node types are relevant.\n");
                 return graph;
             }
             else
             {
                 ICollection<string> matches = SelectedNodeTypes.Where(pair => pair.Value == true)
                   .Select(pair => pair.Key).ToList();
-                Debug.Log("The following node types are relevant:\n");
-                foreach (string nodeType in matches)
-                {
-                    Debug.LogFormat("  {0}\n", nodeType);
-                }
                 return graph.Subgraph(matches);
             }
         }
