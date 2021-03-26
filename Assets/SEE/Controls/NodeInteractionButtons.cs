@@ -32,11 +32,6 @@ namespace SEE.Controls
         public Button EditNodeButton;
 
         /// <summary>
-        /// The action which is currently executed.
-        /// </summary>
-        public static ReversibleAction addOrEditNode;
-
-        /// <summary>
         /// Adds a listener to the button which calls a method when the button is pushed.
         /// </summary>   
         void Start()
@@ -53,8 +48,7 @@ namespace SEE.Controls
         /// </summary>
         public void SetNextAddingNodeStep()
         {
-            AddNodeAction addNodeAction = (AddNodeAction)addOrEditNode;
-            addNodeAction.Progress = AddNodeAction.ProgressState.CanvasIsClosed;
+            AddingNodeCanvasAction.NextState = true;
         }
 
         /// <summary>
@@ -63,8 +57,6 @@ namespace SEE.Controls
         public void EditIsCanceled()
         {
             EditNodeCanvasAction.Canceled = true;
-            EditNodeAction editNodeAction = (EditNodeAction)addOrEditNode;
-            editNodeAction.EditProgress = EditNodeAction.ProgressState.EditIsCanceled;
         }
 
         /// <summary>
@@ -81,8 +73,7 @@ namespace SEE.Controls
         /// </summary>
         public void AddingIsCanceled()
         {
-            AddNodeAction addNodeAction = (AddNodeAction)addOrEditNode;
-            addNodeAction.Progress = AddNodeAction.ProgressState.AddingIsCanceled;
+            AddingNodeCanvasAction.Canceled = true;
         }
     }
 }

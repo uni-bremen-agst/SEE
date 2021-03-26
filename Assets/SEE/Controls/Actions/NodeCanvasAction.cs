@@ -13,6 +13,11 @@ namespace SEE.Controls.Actions
         public GameObject Canvas;
 
         /// <summary>
+        /// The gameObject that contains the canvasPrefab.
+        /// </summary>
+        public GameObject canvasObject;
+
+        /// <summary>
         /// Instantiates the prefab with given <paramref name="prefabPath"/> and saves it 
         /// in <see cref="Canvas"/>.
         /// </summary>
@@ -20,6 +25,7 @@ namespace SEE.Controls.Actions
         public void InstantiatePrefab(string prefabPath)
         {
             Canvas = Instantiate(Resources.Load(prefabPath, typeof(GameObject))) as GameObject;
+            canvasObject = GameObject.Find("CanvasObject");
         }
 
         /// <summary>

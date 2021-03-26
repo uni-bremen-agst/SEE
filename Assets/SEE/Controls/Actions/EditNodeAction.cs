@@ -66,7 +66,6 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
             bool result = false;
-            Debug.Log(EditProgress);
             switch (EditProgress)
             {
                 case ProgressState.NoNodeSelected:

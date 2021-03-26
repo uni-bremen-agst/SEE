@@ -12,9 +12,11 @@ namespace SEE.Controls.Actions
         /// Instantiates the AddingNodeCanvasScript and adds it to the CanvasObject gameObject.
         /// </summary>
         /// <returns>the added AddingNodeCanvasScript</returns>
-        public AddingNodeCanvasAction InstantiateAddingNodeCanvas()
+        public AddingNodeCanvasAction InstantiateAddingNodeCanvas(AddNodeAction addNodeAction)
         {
-            return gameObject.AddComponent<AddingNodeCanvasAction>();
+            AddingNodeCanvasAction result = gameObject.AddComponent<AddingNodeCanvasAction>();
+            result.addNodeAction = addNodeAction;
+            return result;
         }
 
         /// <summary>
