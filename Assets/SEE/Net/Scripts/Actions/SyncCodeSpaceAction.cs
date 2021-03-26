@@ -9,7 +9,6 @@ namespace SEE.Net
     /// </summary>
     public class SyncCodeSpaceAction: AbstractAction
     {
-
         /// <summary>
         /// Whether the full text of the code windows should be transmitted instead of just the filename.
         /// </summary>
@@ -66,7 +65,6 @@ namespace SEE.Net
                 }
                 
                 //TODO: Remove debug log
-                Debug.Log($"Received instance from {RequesterIPAddress}: {Space}\n");
                 CodeSpaceManager.ManagerInstance.UpdateCodeSpaceFromValueObject(RequesterIPAddress, Space);
             }
         }

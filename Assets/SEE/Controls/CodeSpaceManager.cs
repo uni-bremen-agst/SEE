@@ -68,6 +68,12 @@ namespace SEE.Controls
             set => CodeSpaces[playerName] = value;
         }
 
+        /// <summary>
+        /// Updates the code space of the player specified by <paramref name="playerName"/> using the values
+        /// from <paramref name="valueObject"/>.
+        /// </summary>
+        /// <param name="playerName">The name of the player whose code space should be updated.</param>
+        /// <param name="valueObject">The value object which represents the new code space of the player.</param>
         public void UpdateCodeSpaceFromValueObject(string playerName, CodeSpace.CodeSpaceValues valueObject)
         {
             if (!CodeSpaces.ContainsKey(playerName))
@@ -162,7 +168,6 @@ namespace SEE.Controls
         /// Creates and sets up the code window selection menu, from which the user can select a player whose
         /// code window they want to see. Initially, this will have the entries "local player" and "none".
         /// </summary>
-        /// <returns>The newly created <see cref="SelectionMenu"/></returns>
         private void SetUpWindowSelectionMenu()
         {
             //TODO: Icons
