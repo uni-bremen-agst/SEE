@@ -71,11 +71,19 @@ namespace SEE.Controls.Actions
             return history.Current?.GetActionStateType();
         }
 
+        /// <summary>
+        /// Returns the UndoStack of the ActionHistory.
+        /// </summary>
+        /// <returns>the UndoStack of the ActionHistory</returns>
         public static Stack<ReversibleAction> GetUndoHistory()
         {
             return history.UndoStack;
         }
 
+        /// <summary>
+        /// Returns the RedoStack of the ActionHistory.
+        /// </summary>
+        /// <returns>the RedoStack of the ActionHistory</returns>
         public static Stack<ReversibleAction> GetRedoHistory()
         {
             return history.RedoStack;
