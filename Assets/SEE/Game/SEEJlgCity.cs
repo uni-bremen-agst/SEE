@@ -32,7 +32,7 @@ namespace SEE.Game
     /// Configuration of a code city for the visualization of dynamic data in
     /// traced at the level of statements.
     /// </summary>
-    public class SEEJlgCity : SEECity
+    public partial class SEEJlgCity : SEECity
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in 
@@ -102,8 +102,35 @@ namespace SEE.Game
         // Input/output of configuration attributes
         //----------------------------------------------------------------------------
 
-        // The labels for the configuration attributes in the configuration file.
+        /// <summary>
+        /// Label for attribute <see cref="JLGPath"/> in configuration file.
+        /// </summary>
         private const string JLGPathLabel = "JLGPath";
+
+        /// <summary>
+        /// Label for attribute <see cref="BreakpointClass"/> in configuration file.
+        /// </summary>
+        private const string BreakpointClassLabel = "BreakpointClass";
+
+        /// <summary>
+        /// Label for attribute <see cref="BreakpointLine"/> in configuration file.
+        /// </summary>
+        private const string BreakpointLineLabel = "BreakpointLine";
+
+        /// <summary>
+        /// Label for attribute <see cref="DistanceAboveCity"/> in configuration file.
+        /// </summary>
+        private const string DistanceAboveCityLabel = "DistanceAboveCity";
+
+        /// <summary>
+        /// Label for attribute <see cref="DistanceBehindCity"/> in configuration file.
+        /// </summary>
+        private const string DistanceBehindCityLabel = "DistanceBehindCity";
+
+        /// <summary>
+        /// Label for attribute <see cref="LineWidth"/> in configuration file.
+        /// </summary>
+        private const string LineWidthLabel = "LineWidth";
 
         /// <summary>
         /// <see cref="AbstractSEECity.Save(ConfigWriter)"/>
@@ -112,6 +139,12 @@ namespace SEE.Game
         {
             base.Save(writer);
             JLGPath.Save(writer, JLGPathLabel);
+            // Configuration attributes relating to the animation
+            writer.Save(BreakpointClass, BreakpointClassLabel);
+            writer.Save(BreakpointLine, BreakpointLineLabel);
+            writer.Save(DistanceAboveCity, DistanceAboveCityLabel);
+            writer.Save(DistanceBehindCity, DistanceBehindCityLabel);
+            writer.Save(LineWidth, LineWidthLabel);
         }
 
         /// <summary>
@@ -121,6 +154,12 @@ namespace SEE.Game
         {
             base.Restore(attributes);
             JLGPath.Restore(attributes, JLGPathLabel);
+            // Configuration attributes relating to the animation
+            ConfigIO.Restore(attributes, BreakpointClassLabel, ref BreakpointClass);
+            ConfigIO.Restore(attributes, BreakpointLineLabel, ref BreakpointLine);
+            ConfigIO.Restore(attributes, DistanceAboveCityLabel, ref DistanceAboveCity);
+            ConfigIO.Restore(attributes, DistanceBehindCityLabel, ref DistanceBehindCity);
+            ConfigIO.Restore(attributes, LineWidthLabel, ref LineWidth);
         }
     }
 }
