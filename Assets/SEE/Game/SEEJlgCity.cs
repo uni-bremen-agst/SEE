@@ -67,35 +67,6 @@ namespace SEE.Game
             {
                 Debug.LogErrorFormat("Source file does not exist at that path {0}.\n", path);
             }
-            else
-            {
-                AddJLGVisualizationIfNecessary(path);
-            }
-        }
-
-        private void AddJLGVisualizationIfNecessary(string path)
-        {
-            // do we already have a JLGVisualization child?
-            foreach (Transform child in transform)
-            {
-                if (child.name == Tags.JLGVisualization && child.CompareTag(Tags.JLGVisualization))
-                {
-                    // make sure this child has the necessary Runtime.JLGVisualizer component
-                    if (!child.TryGetComponent<Runtime.JLGVisualizer>(out Runtime.JLGVisualizer component))
-                    {
-                        component = child.gameObject.AddComponent<Runtime.JLGVisualizer>();
-                    }
-                    component.jlgFilePath = path;
-                    return;
-                }
-            }
-            // no such child exists; we need to add one
-            GameObject jlgVisualisationGameObject = new GameObject();
-            jlgVisualisationGameObject.transform.parent = transform;
-            jlgVisualisationGameObject.name = Tags.JLGVisualization;
-            jlgVisualisationGameObject.tag = Tags.JLGVisualization;
-
-            jlgVisualisationGameObject.AddComponent<Runtime.JLGVisualizer>().jlgFilePath = path;
         }
 
         //----------------------------------------------------------------------------
