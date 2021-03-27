@@ -1,8 +1,8 @@
-﻿using OdinSerializer;
-using SEE.Controls;
+﻿using SEE.Controls;
 using SEE.DataModel;
 using SEE.DataModel.IO;
 using SEE.Game.Runtime;
+using SEE.GO;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -58,16 +58,23 @@ namespace SEE.Game
         //-------------------------------------------------------
 
         /// <summary>
+        /// This name will be added at the end of every game object representing a 
+        /// source-code viewer for an executed node.
+        /// </summary>
+        private const string FileContentNamePostfix = "FileContent";
+
+        /// <summary>
         /// A ParsedJLG object that contains a parsed JLG file. This object contains all 
         /// information needed for the visualization of a debugging process.
         /// </summary>
-        [NonSerialized, OdinSerialize]
+        //[NonSerialized, OdinSerialize]
         private ParsedJLG parsedJLG;
 
         /// <summary>
         /// Int value the represents the index of the current active statement. 
         /// All indices can be found in this.parsedJLG.allStatements.
         /// The total number of indices is this.parsedJLG.allStatements.Count.
+        /// Must always stay in the range 0 <= statementCounter <= parsedJLG.AllStatements.Count - 1
         /// </summary>
         private int statementCounter = 0;
 
@@ -77,7 +84,7 @@ namespace SEE.Game
         private string labelText = "";
 
         /// <summary>
-        /// Time value in seconds. At this point in time(running time) the next or 
+        /// Time value in seconds. At this point in time (running time) the next or 
         /// previous statement will be visualized, depending on the playing direction.
         /// </summary>
         private float nextUpdateTime = 1.0f;
@@ -94,14 +101,14 @@ namespace SEE.Game
         private float updateIntervall = 1.0f;
 
         /// <summary>
-        /// true, when visualisation is running. false, when its paused. (Pause visualization by pressing 'p')
+        /// True is visualisation is running. false if paused.
         /// </summary>
         private Boolean running = false;
 
         /// <summary>
         /// Describes the direction, in which the visualisation is running. True for forward, false for backwards.
         /// </summary>
-        private Boolean playDirection = true;
+        private Boolean playingForward = true;
 
         /// <summary>
         /// This saves the direction in which the last Statement was visualized.
@@ -116,7 +123,7 @@ namespace SEE.Game
         /// <summary>
         /// A list of all active GameObjects that are tagged with 'Node'.
         /// </summary>
-        private GameObject[] nodesGOs;
+        private Dictionary<string, GameObject> nodesGOs;
 
         /// <summary>
         /// Stack of all existing FileContent Textwindows.
@@ -124,7 +131,7 @@ namespace SEE.Game
         private Stack<GameObject> textWindows = new Stack<GameObject>();
 
         /// <summary>
-        /// Stack of all existing functioncalls.
+        /// Stack of all existing function calls.
         /// </summary>
         private Stack<GameObject> functionCalls = new Stack<GameObject>();
 
@@ -132,28 +139,50 @@ namespace SEE.Game
         void Start()
         {
             JLGParser jlgParser = new JLGParser(JLGPath.Path);
-            this.parsedJLG = jlgParser.Parse();
+            parsedJLG = jlgParser.Parse();
 
             if (parsedJLG == null)
             {
                 enabled = false;
-                throw new Exception("Parsed JLG is null!");
+                Debug.LogError("Parsed JLG is null!");
             }
-            nodesGOs = GameObject.FindGameObjectsWithTag(Tags.Node);
-            // Sets the currentGO to be the node representing the Class of the first Statement in preperation.
-            if (nodesGOs == null)
+            else
             {
-                enabled = false;
-                throw new Exception("There are no nodes");
+                nodesGOs = GetNodes();
+                Debug.Log($"[JLG] Number of nodes contained in {gameObject.name} is {nodesGOs.Count}\n");
+                // Sets the currentGO to be the node representing the Class of the first Statement in preperation.
+                if (nodesGOs.Count == 0)
+                {
+                    enabled = false;
+                    Debug.LogError("[JLG] There are no nodes.\n");
+                }
+                else if (GetNodeForStatement(statementCounter) == null)
+                {
+                    enabled = false;
+                    Debug.LogError($"[JLG] Node for statement counter {statementCounter} is missing. Check whether the correct GXL is loaded.\n");
+                }
+                else
+                {
+                    currentGO = GetNodeForStatement(statementCounter);
+                    currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(0.219f, 0.329f, 0.556f, 1f);
+                    GenerateScrollableTextWindow();
+                    Debug.Log("[JLG] Started.");
+                }
             }
-            if (GetNodeForStatement(statementCounter) == null)
+        }
+
+        /// <summary>
+        /// Returns all transitive children of <see cref="gameObject"/> tagged by <see cref="Tags.Node"/>.
+        /// </summary>
+        /// <returns>all ancestors representing nodes</returns>
+        private Dictionary<string, GameObject> GetNodes()
+        {
+            Dictionary<string, GameObject> result = new Dictionary<string, GameObject>();
+            foreach(GameObject node in gameObject.AllAncestors(Tags.Node))
             {
-                enabled = false;
-                throw new Exception($"Node for statement counter {statementCounter} is missing. Check whether the correct GXL is loaded.");
+                result[node.name] = node;
             }
-            currentGO = GetNodeForStatement(statementCounter);
-            currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(0.219f, 0.329f, 0.556f, 1f);
-            GenerateScrollableTextWindow();
+            return result;
         }
 
         /// Update is called once per frame
@@ -202,10 +231,10 @@ namespace SEE.Game
             if (Input.GetKeyDown(KeyBindings.ToggleExecutionOrder))
             {
                 updateIntervall = 1;
-                playDirection = !playDirection;
+                playingForward = !playingForward;
 
                 showLabelUntil = Time.time + 1f;
-                if (playDirection)
+                if (playingForward)
                 {
                     lastDirection = true;
                     statementCounter = statementCounter + 2; //These need to be called because the statementcounter was increased/decreased in the last UpdateVisualization call already. This prevents bugs.
@@ -226,7 +255,7 @@ namespace SEE.Game
                     showLabelUntil = Time.time + 1f;
                     labelText = "Speed x" + 1f / updateIntervall;
                 }
-                if (Input.GetKeyDown(KeyCode.Alpha1))
+                if (Input.GetKeyDown(KeyBindings.DecreaseAnimationSpeed))
                 {
                     SlowDown();
                     showLabelUntil = Time.time + 1f;
@@ -291,47 +320,63 @@ namespace SEE.Game
         /// </summary>
         private void UpdateVisualization()
         {
-            Debug.Log(statementCounter + "\n");
+            //Debug.Log($"[JLG] Current statement: {statementCounter}\n");
 
-            CheckCurrentGO();
-
-            if (!TextWindowForNodeExists(currentGO))
+            try
             {
-                GenerateScrollableTextWindow();
+                CheckCurrentGO();
+
+                if (!TextWindowForNodeExists(currentGO))
+                {
+                    GenerateScrollableTextWindow();
+                }
+                ToggleTextWindows();
+
+                UpdateStacks();
+
+                if (playingForward)
+                {
+                    NextStatement();
+                }
+                else
+                {
+                    PreviousStatement();
+                }
             }
-
-            ToggleTextWindows();
-
-            UpdateStacks();
-
-            if (playDirection)
+            catch (MalformedStatement e)
             {
-                NextStatement();
-            }
-            else
-            {
-                PreviousStatement();
+                Debug.LogError($"[JLG] Statement {statementCounter} is malformed and will be skipped: {e.Message}.\n");
+                if (playingForward)
+                {
+                    statementCounter = Mathf.Min(statementCounter + 1, parsedJLG.AllStatements.Count - 1);
+                }
+                else
+                {
+                    statementCounter = Mathf.Max(0, statementCounter - 1);
+                }
             }
         }
+
         /// <summary>
-        /// Check if currentGo is GO of current Statement. If not change currentGO
+        /// Check if currentGo is GO of current Statement. If not, change currentGO.
         /// </summary>
         private void CheckCurrentGO()
         {
             if (!NodeRepresentsStatementLocation(statementCounter, currentGO))
             {
-                if (playDirection && statementCounter > 0 && parsedJLG.AllStatements[statementCounter].StatementType.Equals("entry"))
+                GameObject nodeForStatement = GetNodeForStatement(statementCounter);
+                if (playingForward && statementCounter > 0 && parsedJLG.AllStatements[statementCounter].StatementType.Equals("entry"))
                 {
-                    CreateFunctionCall(currentGO, GetNodeForStatement(statementCounter));
+                    CreateFunctionCall(currentGO, nodeForStatement);
                 }
                 currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(0.530f, 0.637f, 0.858f, 1f);
-                currentGO = GetNodeForStatement(statementCounter);
+                currentGO = nodeForStatement;
                 currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(0.219f, 0.329f, 0.556f, 1f);
             }
         }
 
         /// <summary>
-        /// Activates the FileContent Gameobject of a given node and disables all other.
+        /// Activates the FileContent Gameobject of a given node and disables all others.
         /// </summary>
         /// <param name="gameObject"></param>
         private void ActivateNodeTextWindow(GameObject gameObject)
@@ -340,7 +385,7 @@ namespace SEE.Game
             {
                 foreach (GameObject go in textWindows)
                 {
-                    if (go.name == gameObject.name + "FileContent")
+                    if (go.name == gameObject.name + FileContentNamePostfix)
                     {
                         go.SetActive(true);
                     }
@@ -399,7 +444,7 @@ namespace SEE.Game
             {
                 foreach (GameObject go in textWindows)
                 {
-                    if (go.name.Equals(node.name + "FileContent"))
+                    if (go.name.Equals(node.name + FileContentNamePostfix))
                     {
                         exists = true;
                         break;
@@ -422,7 +467,7 @@ namespace SEE.Game
         {
             Debug.LogFormat("GenerateScrollableTextWindow: windowRotation {0} \n", (Quaternion)currentGO.transform.rotation);
             GameObject textWindow = Instantiate((GameObject)Resources.Load("ScrollableTextWindow"), Vector3.zero, rotation: currentGO.transform.rotation);
-            textWindow.name = currentGO.name + "FileContent";
+            textWindow.name = currentGO.name + FileContentNamePostfix;
 
             float textWindowHeight = GetWindowHeight(textWindow);
 
@@ -547,14 +592,15 @@ namespace SEE.Game
         /// <returns>Node for Statement, if exists, else null.</returns>
         private GameObject GetNodeForStatement(int index)
         {
-            foreach (GameObject go in nodesGOs)
+            string searchedName = parsedJLG.GetStatementLocationString(index);
+            if (nodesGOs.TryGetValue(searchedName, out GameObject result))
             {
-                if (NodeRepresentsStatementLocation(index, go))
-                {
-                    return go;
-                }
+                return result;
             }
-            return null;
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -566,7 +612,7 @@ namespace SEE.Game
         {
             foreach (GameObject fc in textWindows)
             {
-                if (fc.name.Equals(classGO.name + "FileContent"))
+                if (fc.name.Equals(classGO.name + FileContentNamePostfix))
                 {
                     return fc;
                 }
@@ -595,7 +641,7 @@ namespace SEE.Game
 
             // Generate the info text in the smaller textwindow for the currentstatement. The info text is built
             // in the parsedJLG object and then returned to the TMPro text component.
-            GameObject fileContent = GameObject.Find(currentGO.name + "FileContent");
+            GameObject fileContent = GetFileContentGOForNode(currentGO);
             fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text
                 = parsedJLG.CreateStatementInfoString(statementCounter, true);
 
@@ -607,7 +653,7 @@ namespace SEE.Game
             {
                 Debug.Log($"End of JLG reached. Press {KeyBindings.PreviousStatement} to start playing backwards.\n");
                 running = false;
-                playDirection = false;
+                playingForward = false;
             }
         }
 
@@ -616,11 +662,10 @@ namespace SEE.Game
         /// </summary>
         private void PreviousStatement()
         {
-
             HighlightCurrentLineFadePreviousReverse();
 
             //Generate the info text in the smaller textwindow for the currentstatement. The info text is build in the parsedJLG object and then returned to the TMPro text component.
-            GameObject fileContent = GameObject.Find(currentGO.name + "FileContent");
+            GameObject fileContent = GetFileContentGOForNode(currentGO);
             fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = parsedJLG.CreateStatementInfoString(statementCounter, false);
             if (statementCounter > 0)
             {
@@ -630,7 +675,7 @@ namespace SEE.Game
             {
                 Debug.Log("Start of JLG reached. Press 'P' to start.");
                 running = false;
-                playDirection = true;
+                playingForward = true;
             }
         }
 
@@ -641,8 +686,8 @@ namespace SEE.Game
         {
             foreach (GameObject go in textWindows)
             {
-                ///Textwindow of currentGO is always active
-                if (go.name == currentGO.name + "FileContent")
+                // Textwindow of currentGO is always active
+                if (go.name == currentGO.name + FileContentNamePostfix)
                 {
                     go.SetActive(true);
                 }
@@ -654,48 +699,63 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// This Method updates all stacks that are need for the Visualization, depending on the playdirection.
-        /// The Stacks modified here are: functionCalls and parsedJLG.ReturnValues.
+        /// This method updates all stacks that are need for the visualization, depending on the playdirection.
+        /// The stacks modified here are: functionCalls and parsedJLG.ReturnValues.
         /// The returnValues stack is filled inside the parsedJLG Object when playdirection is true/Forward.
         /// </summary>
         private void UpdateStacks()
         {
-            if (playDirection)
+            if (playingForward)
             {
-                ///If previous statement exitted a class, metaphorically remove the statements class from the callstack 
-                ///by disabling its functionCall and coloring it back to normal. 
-                if (statementCounter > 0
-                        && parsedJLG.AllStatements[statementCounter - 1].StatementType.Equals("exit")
-                        && currentGO != GetNodeForStatement(statementCounter - 1))
+                // Executing forward.
+
+                // If previous statement exited a class, metaphorically remove the statements class from the callstack 
+                // by disabling its functionCall and coloring it back to normal. 
+                if (statementCounter > 0 // not at the first statement
+                        && parsedJLG.AllStatements[statementCounter - 1].StatementType.Equals("exit"))
                 {
-                    if (FindFunctionCallForGameObjects(GetNodeForStatement(statementCounter - 1), currentGO, true) != null)
+                    GameObject nodeForPreviousStatement = GetNodeForStatement(statementCounter - 1);
+
+                    if (currentGO != nodeForPreviousStatement)
                     {
-                        FindFunctionCallForGameObjects(GetNodeForStatement(statementCounter - 1), currentGO, true).SetActive(false); // only disable, so it can be enabled when the visualization is running backwards
-                        GetNodeForStatement(statementCounter - 1).GetComponentInChildren<MeshRenderer>().material.color = new Color(1f, 0f, 0f, 1f);
+                        GameObject functionCall = FindFunctionCallForGameObjects(nodeForPreviousStatement, currentGO, true);
+                        if (functionCall != null)
+                        {
+                            functionCall.SetActive(false); // only disable, so it can be enabled when the visualization is running backwards
+                            nodeForPreviousStatement.GetComponentInChildren<MeshRenderer>().material.color = new Color(1f, 0f, 0f, 1f);
+                        }
                     }
                 }
             }
             else
             {
-                if (parsedJLG.AllStatements[statementCounter].StatementType.Equals("exit"))
+                // Executing backward.
+
+                bool exitingCalledFunction = parsedJLG.AllStatements[statementCounter].StatementType.Equals("exit");
+                if (exitingCalledFunction)
                 {
-                    parsedJLG.ReturnValues.Pop();//remove returnvalue from stack, that is returned in the exit statement.
+                    parsedJLG.ReturnValues.Pop(); // remove return value from stack, that is returned in the exit statement.
                 }
 
-                if (parsedJLG.AllStatements[statementCounter].StatementType.Equals("exit") && currentGO != GetNodeForStatement(statementCounter + 1)
-                    && FindFunctionCallForGameObjects(currentGO, GetNodeForStatement(statementCounter + 1), false) != null)//Check for null because sometimes, this can break if the playdirection is changed a lot in a short time.
+                GameObject nodeForNextStatement = statementCounter < parsedJLG.AllStatements.Count - 1 ? GetNodeForStatement(statementCounter + 1) : null;
+                if (exitingCalledFunction && currentGO != nodeForNextStatement && nodeForNextStatement != null)
                 {
-                    FindFunctionCallForGameObjects(currentGO, GetNodeForStatement(statementCounter + 1), false).SetActive(true);
+                    GameObject functionCall = FindFunctionCallForGameObjects(currentGO, nodeForNextStatement, false);
+                    //Check for null because sometimes, this can break if the playdirection is changed a lot in a short time.
+                    if (functionCall != null)
+                    {
+                        functionCall.SetActive(true);
+                    }
                 }
-                ///If previous statement entered a class, metaphorically remove the class from the callstack by destroying its textwindow and its FunctionCallSimulator.
-                ///Looking for an at statementCounter+1 "entrystatement", because the visualisation is running backwards.
+                // If previous statement entered a class, metaphorically remove the class from the callstack by destroying its textwindow and its FunctionCallSimulator.
+                // Looking for an at statementCounter+1 "entrystatement", because the visualisation is running backwards.
                 else if (statementCounter < parsedJLG.AllStatements.Count - 1
                     && parsedJLG.AllStatements[statementCounter + 1].StatementType.Equals("entry")
-                    && currentGO != GetNodeForStatement(statementCounter + 1))
+                    && currentGO != nodeForNextStatement)
                 {
-                    GetNodeForStatement(statementCounter + 1).GetComponentInChildren<MeshRenderer>().material.color = new Color(1f, 0f, 0f, 1f);
+                    nodeForNextStatement.GetComponentInChildren<MeshRenderer>().material.color = new Color(1f, 0f, 0f, 1f);
                     if (functionCalls.Count > 0 &&
-                        functionCalls.Peek().name.Equals("FunctionCall: " + currentGO.name + " call " + GetNodeForStatement(statementCounter + 1).name))
+                        functionCalls.Peek().name.Equals("FunctionCall: " + currentGO.name + " call " + nodeForNextStatement.name))
                     {
                         GameObject.Destroy(functionCalls.Pop());
                     }
@@ -704,15 +764,16 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// This Method returns the first FunctionCall that matches the two given GameObjects.
+        /// Returns the latest <paramref name="active"/> FunctionCall that matches the two given GameObjects.
         /// </summary>
-        /// <param name="dstGO"></param>
-        /// <param name="srcGO"></param>
-        /// <returns></returns>
+        /// <param name="dstGO">destination of the call</param>
+        /// <param name="srcGO">source of the call</param>
+        /// <param name="active">whether the returned function should be active</param>
+        /// <returns>function call</returns>
         private GameObject FindFunctionCallForGameObjects(GameObject dstGO, GameObject srcGO, bool active)
         {
-            var clonedStack = new Stack<GameObject>(functionCalls.Reverse());
-            foreach (GameObject go in clonedStack)
+            // The enumerator of a stack iterates from the top element to the very first element added to the stack.
+            foreach (GameObject go in functionCalls)
             {
                 if (go.activeSelf == active && go.GetComponent<FunctionCallSimulator>().src == srcGO
                     && go.GetComponent<FunctionCallSimulator>().dst == dstGO)
@@ -882,7 +943,7 @@ namespace SEE.Game
         /// <returns></returns>
         private Boolean JumpToNextBreakpointHit()
         {
-            playDirection = true;
+            playingForward = true;
             if (BreakpointLine <= 0)
             {
                 return false;
@@ -929,21 +990,21 @@ namespace SEE.Game
 
         private void OneStep(Boolean direction)
         {
-            Boolean saveDirection = playDirection;
-            playDirection = direction;
-            if (!playDirection == lastDirection)
+            Boolean saveDirection = playingForward;
+            playingForward = direction;
+            if (!playingForward == lastDirection)
             {
                 if (direction)
                 {
-                    statementCounter = statementCounter + 2;
+                    statementCounter += 2;
                 }
                 else
                 {
-                    statementCounter = statementCounter - 2;
+                    statementCounter -= 2;
                 }
             }
             UpdateVisualization();
-            playDirection = saveDirection;
+            playingForward = saveDirection;
         }
 
         /// <summary>
@@ -995,7 +1056,7 @@ namespace SEE.Game
         {
             ResetVisualization();
             Start();
-            foreach (GameObject go in nodesGOs)
+            foreach (GameObject go in nodesGOs.Values)
             {
                 go.GetComponentInChildren<MeshRenderer>().material.color = new Color(1f, 0f, 0f, 1f);
             }
