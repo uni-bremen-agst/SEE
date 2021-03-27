@@ -2,7 +2,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
