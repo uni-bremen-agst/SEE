@@ -62,10 +62,12 @@ namespace SEE.Game
             if (string.IsNullOrEmpty(path))
             {
                 Debug.LogError("Path to JLG source file must not be empty.\n");
+                enabled = false;
             }
             else if (!File.Exists(path))
             {
                 Debug.LogErrorFormat("Source file does not exist at that path {0}.\n", path);
+                enabled = false;
             }
         }
 
