@@ -77,17 +77,28 @@ namespace SEE.DataModel
         public ParsedJLG() { }
 
         /// <summary>
-        /// This Method returns the Location for a given Index in the list.
+        /// This method returns the location for a given index in the list.
         /// </summary>
-        /// <param name="i">index of the Java statement in List allStatements</param>
+        /// <param name="index">index of the Java statement in list <see cref="allStatements"/></param>
         /// <returns>The Location String from LocationLookupTable</returns>
-        public string GetStatementLocationString(int i) {
-            string location = locationLookupTable[int.Parse(allStatements[i].Location)];
-            int l = location.IndexOf('(');
-            location = location.Substring(0, l + 1);
-            l = location.LastIndexOf('.');
-            location = location.Substring(0, l);
-            return location;
+        public string GetStatementLocationString(int index)
+        {
+            try
+            {
+                string location = locationLookupTable[int.Parse(allStatements[index].Location)];
+                int l = location.IndexOf('(');
+                location = location.Substring(0, l + 1);
+                l = location.LastIndexOf('.');
+                location = location.Substring(0, l);
+                return location;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"ParsedJLG.GetStatementLocationString({index}).\n");
+                Debug.LogError($"ParsedJLG.allStatements[{index}].Location={allStatements[index].Location}.\n");
+                Debug.LogError($"ParsedJLG.allStatements[{index}].Line={allStatements[index].Line}.\n");
+                return "";
+            }
         }
 
         /// <summary>
@@ -95,9 +106,10 @@ namespace SEE.DataModel
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        private string LookupFieldLocation(string s) {
+        private string LookupFieldLocation(string s)
+        {
             int i = s.IndexOf('=');
-            return fieldLookupTable[int.Parse(s.Substring(0, i))] + s.Substring(i); 
+            return fieldLookupTable[int.Parse(s.Substring(0, i))] + s.Substring(i);
         }
 
         /// <summary>
@@ -149,10 +161,10 @@ namespace SEE.DataModel
             //Add the return value of this statement (and its method) to the info string
             if (js.ReturnValue != null)
             {
-                info = info + Environment.NewLine+ locationLookupTable[int.Parse(js.Location)] + " returns: "+ js.ReturnValue;
+                info = info + Environment.NewLine + locationLookupTable[int.Parse(js.Location)] + " returns: " + js.ReturnValue;
                 if (AddReturnValueToStack)
                 {
-                    returnValues.Push(locationLookupTable[int.Parse(js.Location)] +  " returned "+js.ReturnValue);
+                    returnValues.Push(locationLookupTable[int.Parse(js.Location)] + " returned " + js.ReturnValue);
                 }
             }
             return info;
