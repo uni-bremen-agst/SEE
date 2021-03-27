@@ -40,6 +40,19 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// True if <paramref name="gameNode"/> represents a leaf in the graph.
+        /// 
+        /// Precondition: <paramref name="gameNode"/> has a NodeRef component attached to it
+        /// that is a valid graph node reference.
+        /// </summary>
+        /// <param name="gameNode">game object representing a Node to be queried whether it is a leaf</param>
+        /// <returns>true if <paramref name="gameNode"/> represents a leaf in the graph</returns>
+        public static bool IsLeaf(this GameObject gameNode)
+        {
+            return gameNode.GetComponent<NodeRef>()?.Value?.IsLeaf() ?? false;
+        }
+
+        /// <summary>
         /// Returns the render-queue offset of given <paramref name="gameObject"/>.
         /// 
         /// Precondition: <paramref name="gameObject"/> must have a renderer attached
