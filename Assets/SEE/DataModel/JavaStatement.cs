@@ -56,7 +56,7 @@ namespace SEE.DataModel
         private List<String> localVariables = new List<String>();
 
         /// <summary>
-        /// Classfields changes executed by this statement. Can be empty.
+        /// Class-field changes executed by this statement. Can be empty.
         /// </summary>
         [SerializeField]
         private List<String> fieldChanges = new List<String>();
