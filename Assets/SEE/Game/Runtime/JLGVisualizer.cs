@@ -126,8 +126,8 @@ namespace SEE.Game.Runtime
                 enabled = false;
                 throw new Exception("Parsed JLG is null!");
             }
-            nodesGOs = GameObject.FindGameObjectsWithTag("Node");
-            ///Sets the currentGO to be the node representing the Class of the first Statement in preperation.
+            nodesGOs = GameObject.FindGameObjectsWithTag(Tags.Node);
+            // Sets the currentGO to be the node representing the Class of the first Statement in preperation.
             if (nodesGOs == null)
             {
                 enabled = false;
@@ -136,7 +136,7 @@ namespace SEE.Game.Runtime
             if (GetNodeForStatement(statementCounter) == null) 
             {
                 enabled = false;
-                throw new Exception("Node is missing. Check whether the correct GXL is loaded.");
+                throw new Exception($"Node for statement counter {statementCounter} is missing. Check whether the correct GXL is loaded.");
             }
             currentGO = GetNodeForStatement(statementCounter);
             currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(0.219f, 0.329f, 0.556f, 1f);
@@ -534,15 +534,18 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// Gets a GameObject tagged with Node from this objects list of GameObjects(nodesGos) that matches the location of the Statement represented by i.
-        /// A Node matches the location of a statement, when the classname of the location equals the nodes name.
+        /// Gets a GameObject tagged with Node from this objects list of GameObjects (nodesGos) that matches 
+        /// the location of the statement represented by <paramref name="index"/>.
+        /// A node matches the location of a statement if the class name of the location equals 
+        /// the node's name.
         /// </summary>
-        /// <param name="i">the index of the statement in this parsedJLG.allstatements</param>
+        /// <param name="index">the index of the statement in this <see cref="parsedJLG.allstatements"/></param>
         /// <returns>Node for Statement, if exists, else null.</returns>
-        private GameObject GetNodeForStatement(int i) {
+        private GameObject GetNodeForStatement(int index) 
+        {
             foreach (GameObject go in nodesGOs)
             {
-                if (NodeRepresentsStatementLocation(i, go))
+                if (NodeRepresentsStatementLocation(index, go))
                 {
                     return go;
                 }
@@ -555,9 +558,11 @@ namespace SEE.Game.Runtime
         /// </summary>
         /// <param name="classGO">given node</param>
         /// <returns>FileContent for node</returns>
-        private GameObject GetFileContentGOForNode(GameObject classGO){
-            foreach (GameObject fc in textWindows) {
-                if(fc.name.Equals(classGO.name + "FileContent"))
+        private GameObject GetFileContentGOForNode(GameObject classGO)
+        {
+            foreach (GameObject fc in textWindows) 
+            {
+                if (fc.name.Equals(classGO.name + "FileContent"))
                 {
                     return fc;
                 }
@@ -566,26 +571,29 @@ namespace SEE.Game.Runtime
         }
 
         /// <summary>
-        /// Tests if a GameObject is a node and the class, it is representing, is the class of the given statement.
+        /// Returns true if <see cref="go"/> is a node and the class it is representing is the class of 
+        /// the given statement.
         /// </summary>
-        /// <param name="i">index of the javastatement in parsedJLGs JavaStatement list</param>
+        /// <param name="stmtIndex">index of the Java statement in parsedJLGs JavaStatement list</param>
         /// <param name="go">the GameObject</param>
-        /// <returns></returns>
-        private Boolean NodeRepresentsStatementLocation(int i, GameObject go)
+        /// <returns>whether <paramref name="go"/> represent the class at given <paramref name="stmtIndex"/></returns>
+        private Boolean NodeRepresentsStatementLocation(int stmtIndex, GameObject go)
         {
-            return parsedJLG.GetStatementLocationString(i).Equals(go.name)&&go.tag.Equals("Node");
+            return parsedJLG.GetStatementLocationString(stmtIndex) == go.name && go.CompareTag(Tags.Node);
         }
 
         /// <summary>
         /// Visualizes the current statement and then increases statementCounter by 1.
         /// </summary>
-        private void NextStatement() {
+        private void NextStatement() 
+        {
+            HighlightCurrentLineFadePrevious();           
 
-                HighlightCurrentLineFadePrevious();           
-
-            //Generate the info text in the smaller textwindow for the currentstatement. The info text is build in the parsedJLG object and then returned to the TMPro text component.
+            // Generate the info text in the smaller textwindow for the currentstatement. The info text is built
+            // in the parsedJLG object and then returned to the TMPro text component.
             GameObject fileContent = GameObject.Find(currentGO.name + "FileContent");
-            fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = parsedJLG.CreateStatementInfoString(statementCounter, true);
+            fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text 
+                = parsedJLG.CreateStatementInfoString(statementCounter, true);
 
             if (statementCounter < parsedJLG.AllStatements.Count-1)
             {
@@ -593,7 +601,7 @@ namespace SEE.Game.Runtime
             }
             else
             {
-                Debug.Log("End of JLG reached. Press 'P' to start playing backwards.");
+                Debug.Log($"End of JLG reached. Press {KeyBindings.PreviousStatement} to start playing backwards.\n");
                 running = false;
                 playDirection = false;
             }
