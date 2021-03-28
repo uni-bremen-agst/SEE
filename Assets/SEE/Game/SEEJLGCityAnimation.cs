@@ -3,10 +3,10 @@ using SEE.DataModel;
 using SEE.DataModel.IO;
 using SEE.Game.Runtime;
 using SEE.GO;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -53,6 +53,13 @@ namespace SEE.Game
         /// </summary>
         public float LineWidth = 0.01f;
 
+        /// <summary>
+        /// If true we always move to the next/previous call statement in the execution
+        /// (depending upon whether the execution is forward or backward, respectively), 
+        /// that is, only interprocedural control flow will be shown.
+        /// </summary>
+        public bool ShowOnlyCalls = true;
+
         //-------------------------------------------------------
         // Private attributes not saved in the configuration file
         //-------------------------------------------------------
@@ -62,7 +69,7 @@ namespace SEE.Game
         /// source-code viewer for an executed node.
         /// </summary>
         private const string FileContentNamePostfix = "FileContent";
-
+        
         /// <summary>
         /// A ParsedJLG object that contains a parsed JLG file. This object contains all 
         /// information needed for the visualization of a debugging process.
@@ -71,12 +78,59 @@ namespace SEE.Game
         private ParsedJLG parsedJLG;
 
         /// <summary>
-        /// Int value the represents the index of the current active statement. 
+        /// The statement counter represents the index of the current active statement,
+        /// that is, the one whose execution is currently visualized.
         /// All indices can be found in this.parsedJLG.allStatements.
         /// The total number of indices is this.parsedJLG.allStatements.Count.
         /// Must always stay in the range 0 <= statementCounter <= parsedJLG.AllStatements.Count - 1
         /// </summary>
-        private int statementCounter = 0;
+        private StatementCounter statementCounter;
+        private struct StatementCounter
+        {
+            public StatementCounter(uint initialValue, uint maxValue)
+            {
+                value = initialValue;
+                this.maxValue = maxValue;
+            }
+            private uint value;
+            private readonly uint maxValue;
+
+            public int Value 
+            { 
+                get => (int)value; 
+                set
+                {
+                    if (value >= 0 && value <= maxValue)
+                    {
+                        this.value = (uint)value;
+                    }
+                    else
+                    {
+                        throw new ArgumentOutOfRangeException($"Does not hold: 0 <= {value} <= {maxValue}");
+                    }
+                }
+            }
+
+            public void Increase(uint delta = 1)
+            {
+                value = (uint)Mathf.Min(value + delta, maxValue);
+            }
+
+            public void Decrease(uint delta = 1)
+            {
+                value = (uint)Mathf.Max(0, (int)value - (int)delta);
+            }
+
+            public bool LowerBound()
+            {
+                return value == 0;
+            }
+
+            public bool UpperBound()
+            {
+                return value == maxValue;
+            }
+        }
 
         /// <summary>
         /// This Field saves the text, that is displayed when a button is hit is saved.
@@ -101,9 +155,12 @@ namespace SEE.Game
         private float updateIntervall = 1.0f;
 
         /// <summary>
-        /// True is visualisation is running. false if paused.
+        /// True is visualisation is running in automatic modde; false if in manual mode.
+        /// In automatic mode, the execution is played automatically at a particular
+        /// period. In manual mode, the user needs to press keys to move to the next
+        /// or previous statement to be visualized.
         /// </summary>
-        private Boolean running = false;
+        private Boolean inAutomaticMode = false;
 
         /// <summary>
         /// Describes the direction, in which the visualisation is running. True for forward, false for backwards.
@@ -111,9 +168,10 @@ namespace SEE.Game
         private Boolean playingForward = true;
 
         /// <summary>
-        /// This saves the direction in which the last Statement was visualized.
+        /// This saves the direction in which the statement executed last was visualized.
+        /// True means forward, false means backward.
         /// </summary>
-        private Boolean lastDirection = true;
+        private Boolean lastDirectionWasForward = true;
 
         /// <summary>
         /// The GameObject that represents the class the current statement belongs to. 
@@ -146,8 +204,14 @@ namespace SEE.Game
                 enabled = false;
                 Debug.LogError("Parsed JLG is null!");
             }
+            else if (parsedJLG.AllStatements.Count == 0)
+            {
+                enabled = false;
+                Debug.LogWarning("[JLG] There are no statements to be executed.\n");
+            }
             else
             {
+                statementCounter = new StatementCounter(0, (uint)(parsedJLG.AllStatements.Count - 1));
                 nodesGOs = GetNodes();
                 Debug.Log($"[JLG] Number of nodes contained in {gameObject.name} is {nodesGOs.Count}\n");
                 // Sets the currentGO to be the node representing the Class of the first Statement in preperation.
@@ -156,14 +220,14 @@ namespace SEE.Game
                     enabled = false;
                     Debug.LogError("[JLG] There are no nodes.\n");
                 }
-                else if (GetNodeForStatement(statementCounter) == null)
+                else if (GetNodeForStatement(statementCounter.Value) == null)
                 {
                     enabled = false;
                     Debug.LogError($"[JLG] Node for statement counter {statementCounter} is missing. Check whether the correct GXL is loaded.\n");
                 }
                 else
                 {
-                    currentGO = GetNodeForStatement(statementCounter);
+                    currentGO = GetNodeForStatement(statementCounter.Value);
                     currentGO.GetComponentInChildren<MeshRenderer>().material.color = new Color(0.219f, 0.329f, 0.556f, 1f);
                     GenerateScrollableTextWindow();
                     Debug.Log("[JLG] Started.");
@@ -191,7 +255,7 @@ namespace SEE.Game
             // Update Visualisation every 'interval' seconds.
             if (Time.time >= nextUpdateTime)
             {
-                if (running)
+                if (inAutomaticMode)
                 {
                     UpdateVisualization();
                 }
@@ -201,9 +265,10 @@ namespace SEE.Game
             // Controls
             if (Input.GetKeyDown(KeyBindings.ToggleAutomaticManualMode))
             {
-                running = !running;
+                // Toggling automatic/manual execution mode.
+                inAutomaticMode = !inAutomaticMode;
                 showLabelUntil = Time.time + 1f;
-                if (running)
+                if (inAutomaticMode)
                 {
                     labelText = "Play";
                     ToggleTextWindows();
@@ -213,42 +278,47 @@ namespace SEE.Game
                     labelText = "Pause";
                 }
             }
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI())
             {
+                // The user can select a node. This turns off the automatic mode
+                // and the source code of that node is shown.
                 GameObject clickedGO = MouseClickHitActiveNode();
                 if (clickedGO != null)
                 {
-                    if (running)
+                    if (inAutomaticMode)
                     {
-                        running = false;
+                        inAutomaticMode = false;
                         showLabelUntil = Time.time + 1f;
                         labelText = "Paused";
                     }
                     ActivateNodeTextWindow(clickedGO);
-                    Debug.Log("Hit Detected :" + clickedGO);
                 }
             }
             if (Input.GetKeyDown(KeyBindings.ToggleExecutionOrder))
             {
-                updateIntervall = 1;
-                playingForward = !playingForward;
-
+                // Reversing the order of execution.
+                updateIntervall = 1;                
                 showLabelUntil = Time.time + 1f;
+
+                playingForward = !playingForward;
                 if (playingForward)
                 {
-                    lastDirection = true;
-                    statementCounter = statementCounter + 2; //These need to be called because the statementcounter was increased/decreased in the last UpdateVisualization call already. This prevents bugs.
+                    lastDirectionWasForward = true;
+                    statementCounter.Increase(); // This need to be called because the statementcounter was increased/decreased in the last UpdateVisualization call already. This prevents bugs.
+                    MoveForwardToNextStatement();
                     labelText = "Forward";
                 }
                 else
                 {
-                    lastDirection = false;
-                    statementCounter = statementCounter - 2;
+                    lastDirectionWasForward = false;
+                    statementCounter.Decrease();  // Dito.
+                    MoveBackwardToPreviousStatement();
                     labelText = "Rewind";
                 }
             }
-            if (running)
+            if (inAutomaticMode)
             {
+                // automatic mode
                 if (Input.GetKeyDown(KeyBindings.IncreaseAnimationSpeed))
                 {
                     SpeedUp();
@@ -264,6 +334,7 @@ namespace SEE.Game
             }
             else
             {
+                // manual mode
                 if (Input.GetKeyDown(KeyBindings.ExecuteToBreakpoint))
                 {
                     showLabelUntil = Time.time + 1f;
@@ -281,13 +352,13 @@ namespace SEE.Game
                 }
                 if (Input.GetKeyDown(KeyBindings.PreviousStatement))
                 {
-                    OneStep(true);
-                    lastDirection = true;
+                    OneStep(false);
+                    lastDirectionWasForward = false;
                 }
                 if (Input.GetKeyDown(KeyBindings.NextStatement))
                 {
-                    OneStep(false);
-                    lastDirection = false;
+                    OneStep(true);
+                    lastDirectionWasForward = true;
                 }
                 if (Input.GetKeyDown(KeyBindings.FirstStatement))
                 {
@@ -303,14 +374,13 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Responsible for displaying small log messages that indicate what button 
-        /// was pressed and its effect.
+        /// Displays a messages (<see cref="labelText"/>) that indicates what button was pressed.
         /// </summary>
         void OnGUI()
         {
-            // FIXME: Is this the right condition? Time.time is the time since the start of the game.
             if (Time.time < showLabelUntil)
             {
+                // left upper corner
                 GUI.Label(new Rect(Screen.width / 96, Screen.height / 96, Screen.width / 3, Screen.height / 16), labelText);
             }
         }
@@ -320,8 +390,7 @@ namespace SEE.Game
         /// </summary>
         private void UpdateVisualization()
         {
-            //Debug.Log($"[JLG] Current statement: {statementCounter}\n");
-
+            //Debug.Log($"[JLG] Current statement: {statementCounter.Value}\n");
             try
             {
                 CheckCurrentGO();
@@ -348,24 +417,34 @@ namespace SEE.Game
                 Debug.LogError($"[JLG] Statement {statementCounter} is malformed and will be skipped: {e.Message}.\n");
                 if (playingForward)
                 {
-                    statementCounter = Mathf.Min(statementCounter + 1, parsedJLG.AllStatements.Count - 1);
+                    MoveForwardToNextStatement();
                 }
                 else
                 {
-                    statementCounter = Mathf.Max(0, statementCounter - 1);
+                    MoveBackwardToPreviousStatement();
                 }
             }
         }
 
         /// <summary>
-        /// Check if currentGo is GO of current Statement. If not, change currentGO.
+        /// Checks if <see cref="currentGO"/> is the game object of the currently 
+        /// statement (indexed by <see cref="statementCounter"/>). If not, <see cref="currentGO"/>
+        /// is updated to the next game objects containing the statement we are currently
+        /// executing. If we switch from game node to another one, that means we have
+        /// an interprocedural control flow in which case we create a visualization of
+        /// a call.
+        /// 
+        /// Note: This will generate a visual representation of a call if we hit an
+        /// entry statement. If we instead hit an exit statement, that means we would
+        /// leave the callee. This case will be handled later in <see cref="UpdateStacks"/>.
         /// </summary>
         private void CheckCurrentGO()
         {
-            if (!NodeRepresentsStatementLocation(statementCounter, currentGO))
+            if (!NodeRepresentsStatementLocation(statementCounter.Value, currentGO))
             {
-                GameObject nodeForStatement = GetNodeForStatement(statementCounter);
-                if (playingForward && statementCounter > 0 && parsedJLG.AllStatements[statementCounter].StatementType.Equals("entry"))
+                GameObject nodeForStatement = GetNodeForStatement(statementCounter.Value);
+                if (playingForward && statementCounter.Value > 0 
+                    && parsedJLG.AllStatements[statementCounter.Value].StatementType == StatementKind.Entry)
                 {
                     CreateFunctionCall(currentGO, nodeForStatement);
                 }
@@ -465,7 +544,6 @@ namespace SEE.Game
         /// </summary>
         private void GenerateScrollableTextWindow()
         {
-            Debug.LogFormat("GenerateScrollableTextWindow: windowRotation {0} \n", (Quaternion)currentGO.transform.rotation);
             GameObject textWindow = Instantiate((GameObject)Resources.Load("ScrollableTextWindow"), Vector3.zero, rotation: currentGO.transform.rotation);
             textWindow.name = currentGO.name + FileContentNamePostfix;
 
@@ -643,17 +721,17 @@ namespace SEE.Game
             // in the parsedJLG object and then returned to the TMPro text component.
             GameObject fileContent = GetFileContentGOForNode(currentGO);
             fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text
-                = parsedJLG.CreateStatementInfoString(statementCounter, true);
-
-            if (statementCounter < parsedJLG.AllStatements.Count - 1)
+                = parsedJLG.CreateStatementInfoString(statementCounter.Value, true);
+            
+            if (statementCounter.UpperBound())
             {
-                statementCounter++;
+                Debug.Log($"End of execution trace reached. Press '{KeyBindings.PreviousStatement}' to start playing backward.\n");
+                inAutomaticMode = false;
+                playingForward = false;                
             }
             else
             {
-                Debug.Log($"End of JLG reached. Press {KeyBindings.PreviousStatement} to start playing backwards.\n");
-                running = false;
-                playingForward = false;
+                MoveForwardToNextStatement();
             }
         }
 
@@ -664,19 +742,71 @@ namespace SEE.Game
         {
             HighlightCurrentLineFadePreviousReverse();
 
-            //Generate the info text in the smaller textwindow for the currentstatement. The info text is build in the parsedJLG object and then returned to the TMPro text component.
+            // Generate the info text in the smaller textwindow for the currentstatement.
+            // The info text is builz in the parsedJLG object and then returned to the
+            // TMPro text component.
             GameObject fileContent = GetFileContentGOForNode(currentGO);
-            fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = parsedJLG.CreateStatementInfoString(statementCounter, false);
-            if (statementCounter > 0)
+            fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text 
+                = parsedJLG.CreateStatementInfoString(statementCounter.Value, false);
+
+            if (statementCounter.LowerBound())
             {
-                statementCounter--;
+                Debug.Log($"Start of execution trace reached. Press '{KeyBindings.NextStatement}' to start playing forward.\n");
+                inAutomaticMode = false;
+                playingForward = true;
             }
             else
             {
-                Debug.Log("Start of JLG reached. Press 'P' to start.");
-                running = false;
-                playingForward = true;
+                MoveBackwardToPreviousStatement();
             }
+        }
+
+        /// <summary>
+        /// If <see cref="ShowOnlyCalls"/> is true, the <see cref="statementCounter"/> is increased
+        /// until either the very last statement or an interprocedural control-flow 
+        /// statement (entry or exit) is reached. If <see cref="ShowOnlyCalls"/> is false, 
+        /// the <see cref="statementCounter"/> is increased by one.
+        /// </summary>
+        private void MoveForwardToNextStatement()
+        {
+            statementCounter.Increase();
+            if (ShowOnlyCalls)
+            {
+                while (!statementCounter.UpperBound() && !CallOrReturnReached(statementCounter.Value))
+                {
+                    statementCounter.Increase();
+                }
+            }
+        }
+
+        /// <summary>
+        /// If <see cref="ShowOnlyCalls"/> is true, the <see cref="statementCounter"/> is decreased
+        /// until either the very first statement or an interprocedural control-flow 
+        /// statement (entry or exit) is reached. If <see cref="ShowOnlyCalls"/> is false, 
+        /// the <see cref="statementCounter"/> is decreased by one.
+        /// </summary>
+        private void MoveBackwardToPreviousStatement()
+        {
+            statementCounter.Decrease();
+            if (ShowOnlyCalls)
+            {
+                while (!statementCounter.LowerBound() && !CallOrReturnReached(statementCounter.Value))
+                {
+                    statementCounter.Decrease();
+                }
+            }     
+        }
+
+        /// <summary>
+        /// True if the statement at <paramref name="stmtIndex"/> is an <see cref="StatementKind.Entry"/>
+        /// or <see cref="StatementKind.Exit"/>.
+        /// </summary>
+        /// <param name="stmtIndex">index of the statement</param>
+        /// <returns>true for interprocedural control-flow statements</returns>
+        private bool CallOrReturnReached(int stmtIndex)
+        {
+            StatementKind statement = parsedJLG.AllStatements[stmtIndex].StatementType;
+            return statement == StatementKind.Exit || statement == StatementKind.Entry;
         }
 
         /// <summary>
@@ -710,11 +840,14 @@ namespace SEE.Game
                 // Executing forward.
 
                 // If previous statement exited a class, metaphorically remove the statements class from the callstack 
-                // by disabling its functionCall and coloring it back to normal. 
-                if (statementCounter > 0 // not at the first statement
-                        && parsedJLG.AllStatements[statementCounter - 1].StatementType.Equals("exit"))
+                // by disabling its functionCall and coloring it back to normal.
+                // FIXME: statementCounter.Value - 1 makes no sense if ShowOnlyCalls.
+                if (statementCounter.Value > 0 // not at the first statement
+                        && parsedJLG.AllStatements[statementCounter.Value - 1].StatementType == StatementKind.Exit)
                 {
-                    GameObject nodeForPreviousStatement = GetNodeForStatement(statementCounter - 1);
+                    // caller
+                    
+                    GameObject nodeForPreviousStatement = GetNodeForStatement(statementCounter.Value - 1);
 
                     if (currentGO != nodeForPreviousStatement)
                     {
@@ -731,13 +864,13 @@ namespace SEE.Game
             {
                 // Executing backward.
 
-                bool exitingCalledFunction = parsedJLG.AllStatements[statementCounter].StatementType.Equals("exit");
+                bool exitingCalledFunction = parsedJLG.AllStatements[statementCounter.Value].StatementType == StatementKind.Exit;
                 if (exitingCalledFunction)
                 {
                     parsedJLG.ReturnValues.Pop(); // remove return value from stack, that is returned in the exit statement.
                 }
 
-                GameObject nodeForNextStatement = statementCounter < parsedJLG.AllStatements.Count - 1 ? GetNodeForStatement(statementCounter + 1) : null;
+                GameObject nodeForNextStatement = statementCounter.Value < parsedJLG.AllStatements.Count - 1 ? GetNodeForStatement(statementCounter.Value + 1) : null;
                 if (exitingCalledFunction && currentGO != nodeForNextStatement && nodeForNextStatement != null)
                 {
                     GameObject functionCall = FindFunctionCallForGameObjects(currentGO, nodeForNextStatement, false);
@@ -749,8 +882,8 @@ namespace SEE.Game
                 }
                 // If previous statement entered a class, metaphorically remove the class from the callstack by destroying its textwindow and its FunctionCallSimulator.
                 // Looking for an at statementCounter+1 "entrystatement", because the visualisation is running backwards.
-                else if (statementCounter < parsedJLG.AllStatements.Count - 1
-                    && parsedJLG.AllStatements[statementCounter + 1].StatementType.Equals("entry")
+                else if (statementCounter.Value < parsedJLG.AllStatements.Count - 1
+                    && parsedJLG.AllStatements[statementCounter.Value + 1].StatementType == StatementKind.Entry
                     && currentGO != nodeForNextStatement)
                 {
                     nodeForNextStatement.GetComponentInChildren<MeshRenderer>().material.color = new Color(1f, 0f, 0f, 1f);
@@ -786,7 +919,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Highlights the currentline and fades the previous five lines bit by bit back to white.
-        /// This is calle when playdirection is forwards/true.
+        /// This is called when playdirection is forward/true.
         /// </summary>
         private void HighlightCurrentLineFadePrevious()
         {
@@ -805,9 +938,9 @@ namespace SEE.Game
 
 
             ///For some Reason this is sometimes false and it would throw an error.
-            if (lines.Length - 1 > parsedJLG.AllStatements[statementCounter].LineAsInt())
+            if (lines.Length - 1 > parsedJLG.AllStatements[statementCounter.Value].LineAsInt())
             {
-                string currentLineString = lines[parsedJLG.AllStatements[statementCounter].LineAsInt() - 1];
+                string currentLineString = lines[parsedJLG.AllStatements[statementCounter.Value].LineAsInt() - 1];
                 ///strip currentline of previous highlighting, if it has it
                 if (currentLineString.StartsWith("<color=#"))
                 {
@@ -817,14 +950,14 @@ namespace SEE.Game
                     currentLineString = currentLineString.Remove(currentLineString.LastIndexOf('<'));
                 }
                 ///highlight currentline, LineAsInt -1, because lines array starts counting at 0 and Classlines start at 1.
-                lines[parsedJLG.AllStatements[statementCounter].LineAsInt() - 1] = "<color=#5ACD5A>" + currentLineString + "</color>";
+                lines[parsedJLG.AllStatements[statementCounter.Value].LineAsInt() - 1] = "<color=#5ACD5A>" + currentLineString + "</color>";
 
                 ///return lines array back to a single string and then save the new highlighted string in the GameObject.
                 fileContent = string.Join(Environment.NewLine, lines);
                 currentFileContentGO.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = fileContent;
 
                 ///Scroll the Scroll rect so the current line is visible. This is not optimal yet, since sometimes it shows the current line right at the top of the Textwindow and not in the middle.
-                currentFileContentGO.transform.GetChild(0).GetComponent<ScrollRect>().verticalNormalizedPosition = 1 - ((float)parsedJLG.AllStatements[statementCounter].LineAsInt() / (float)lines.Length);
+                currentFileContentGO.transform.GetChild(0).GetComponent<ScrollRect>().verticalNormalizedPosition = 1 - ((float)parsedJLG.AllStatements[statementCounter.Value].LineAsInt() / (float)lines.Length);
             }
         }
 
@@ -848,14 +981,14 @@ namespace SEE.Game
             lines = UnfadePreviousLines(lines);
 
             ///For some Reason this is sometimes false and it would throw an error.
-            if (lines.Length - 1 > parsedJLG.AllStatements[statementCounter].LineAsInt())
+            if (lines.Length - 1 > parsedJLG.AllStatements[statementCounter.Value].LineAsInt())
             {
-                lines[parsedJLG.AllStatements[statementCounter].LineAsInt() - 1] = "<color=#5ACD5A>" + lines[parsedJLG.AllStatements[statementCounter].LineAsInt() - 1] + "</color>";
+                lines[parsedJLG.AllStatements[statementCounter.Value].LineAsInt() - 1] = "<color=#5ACD5A>" + lines[parsedJLG.AllStatements[statementCounter.Value].LineAsInt() - 1] + "</color>";
 
                 fileContent = string.Join(Environment.NewLine, lines);
                 currentFileContentGO.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = fileContent;
 
-                currentFileContentGO.transform.GetChild(0).GetComponent<ScrollRect>().verticalNormalizedPosition = 1 - ((float)parsedJLG.AllStatements[statementCounter].LineAsInt() / (float)lines.Length);
+                currentFileContentGO.transform.GetChild(0).GetComponent<ScrollRect>().verticalNormalizedPosition = 1 - ((float)parsedJLG.AllStatements[statementCounter.Value].LineAsInt() / (float)lines.Length);
             }
         }
 
@@ -938,7 +1071,8 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// This Method jumps to the next Breakpoint. If the Breakpoint is more than 200 Statements ahead, it only visualizes the last 150 steps.
+        /// This Method jumps to the next Breakpoint. If the Breakpoint is more 
+        /// than 200 Statements ahead, it only visualizes the last 150 steps.
         /// </summary>
         /// <returns></returns>
         private Boolean JumpToNextBreakpointHit()
@@ -948,39 +1082,39 @@ namespace SEE.Game
             {
                 return false;
             }
-            if (BreakpointClass == "" || BreakpointClass == null)
+            if (string.IsNullOrEmpty(BreakpointClass))
             {
                 return false;
             }
-            JavaStatement js = parsedJLG.AllStatements[statementCounter];
-            int count = statementCounter;
-            while (!((js.LineAsInt() == BreakpointLine) && parsedJLG.GetStatementLocationString(count).Contains(BreakpointClass)))
+            JavaStatement js = parsedJLG.AllStatements[statementCounter.Value];
+            int currentStatementCounter = statementCounter.Value;
+            // Search for the next breakpoint.
+            while (!((js.LineAsInt() == BreakpointLine) && parsedJLG.GetStatementLocationString(currentStatementCounter).Contains(BreakpointClass)))
             {
-                count++;
-                Debug.Log(count);
-                if (count < parsedJLG.AllStatements.Count)
+                currentStatementCounter++;
+                if (currentStatementCounter < parsedJLG.AllStatements.Count)
                 {
-                    js = parsedJLG.AllStatements[count];
+                    js = parsedJLG.AllStatements[currentStatementCounter];
                 }
                 else
                 {
                     return false;
                 }
             }
-            if (count <= 300 || (count - statementCounter) < 200)
+
+            if (currentStatementCounter <= 300 || (currentStatementCounter - statementCounter.Value) < 200)
             {
-                while (statementCounter <= count)
+                while (statementCounter.Value <= currentStatementCounter)
                 {
                     UpdateVisualization();
                 }
             }
-            else if ((count - statementCounter) > 200)
+            else if ((currentStatementCounter - statementCounter.Value) > 200)
             {
-
-                statementCounter = count - 150;
-                parsedJLG.AllStatements.RemoveRange(0, statementCounter - 1);
+                statementCounter.Value = currentStatementCounter - 150;
+                parsedJLG.AllStatements.RemoveRange(0, statementCounter.Value - 1);
                 ResetVisualization();
-                while (statementCounter <= 151)
+                while (statementCounter.Value <= 151)
                 {
                     UpdateVisualization();
                 }
@@ -988,23 +1122,51 @@ namespace SEE.Game
             return true;
         }
 
-        private void OneStep(Boolean direction)
+        /// <summary>
+        /// Adjusts the <see cref="statementCounter"/> to refer to the next statement
+        /// to be executed and then triggers the visualization.
+        /// </summary>
+        /// <param name="direction">the direction where we should be executing, 
+        /// true for forward, false for backward</param>
+        private void OneStep(bool direction)
         {
-            Boolean saveDirection = playingForward;
+            bool savedDirection = playingForward;
             playingForward = direction;
-            if (!playingForward == lastDirection)
+
+            if (direction != lastDirectionWasForward)
             {
+                // We have changed the direction since the last execution.
+                // The statement at the statementCounter is the one to be executed next.
+                // It has not been visualized yet. Its visualization would be done in
+                // the call to UpdateVisualization() below.
                 if (direction)
                 {
-                    statementCounter += 2;
+                    // The new direction is forward. The previous direction was backward.
+                    // The statementCounter is one before the statement just executed.
+                    // The next statement we must execute is the one immediately
+                    // after the last executed statement. Hence, we need to move the
+                    // statementCounter two steps forward.
+                    statementCounter.Increase(); // Move one step forward
+                    // Move one more step forward (and possibly more to reach the next interprocedural
+                    // control flow statement if only the calls are to be shown).
+                    MoveForwardToNextStatement();
+
                 }
                 else
                 {
-                    statementCounter -= 2;
+                    // The new direction is backward. The previous direction was forward.
+                    // The statementCounter is one behind the statement just executed.
+                    // The next statement we must execute is the one immediately
+                    // before the last executed statement. Hence, we need to move the
+                    // statementCounter two steps back.
+                    statementCounter.Decrease(); // Move one step back
+                    // Move one more step back (and possibly more to reach the next interprocedural
+                    // control flow statement if only the calls are to be shown).
+                    MoveBackwardToPreviousStatement();  
                 }
             }
             UpdateVisualization();
-            playingForward = saveDirection;
+            playingForward = savedDirection;
         }
 
         /// <summary>
@@ -1015,7 +1177,7 @@ namespace SEE.Game
             if (updateIntervall > 0.03125)
             {
                 nextUpdateTime = nextUpdateTime - updateIntervall + (updateIntervall / 2);
-                updateIntervall = updateIntervall / 2;
+                updateIntervall /= 2;
             }
         }
 
@@ -1046,7 +1208,7 @@ namespace SEE.Game
                 GameObject.Destroy(go);
             }
             functionCalls = new Stack<GameObject>();
-            statementCounter = 0;
+            statementCounter.Value = 0;
         }
 
         /// <summary>
