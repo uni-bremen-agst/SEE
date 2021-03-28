@@ -20,7 +20,6 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using SEE.DataModel;
 using SEE.Utils;
 using System.Collections.Generic;
 using System.IO;
@@ -106,6 +105,11 @@ namespace SEE.Game
         private const string LineWidthLabel = "LineWidth";
 
         /// <summary>
+        /// Label for attribute <see cref="ShowOnlyCalls"/> in configuration file.
+        /// </summary>
+        private const string ShowOnlyCallsLabel = "ShowOnlyCalls";
+
+        /// <summary>
         /// <see cref="AbstractSEECity.Save(ConfigWriter)"/>
         /// </summary>
         protected override void Save(ConfigWriter writer)
@@ -118,6 +122,7 @@ namespace SEE.Game
             writer.Save(DistanceAboveCity, DistanceAboveCityLabel);
             writer.Save(DistanceBehindCity, DistanceBehindCityLabel);
             writer.Save(LineWidth, LineWidthLabel);
+            writer.Save(ShowOnlyCalls, ShowOnlyCallsLabel);
         }
 
         /// <summary>
@@ -133,6 +138,7 @@ namespace SEE.Game
             ConfigIO.Restore(attributes, DistanceAboveCityLabel, ref DistanceAboveCity);
             ConfigIO.Restore(attributes, DistanceBehindCityLabel, ref DistanceBehindCity);
             ConfigIO.Restore(attributes, LineWidthLabel, ref LineWidth);
+            ConfigIO.Restore(attributes, ShowOnlyCallsLabel, ref ShowOnlyCalls);
         }
     }
 }
