@@ -127,7 +127,7 @@ namespace SEE.DataModel.IO
                         }
                         else if (line[i] == ' ')
                         {
-                            //do nothing in case of space
+                            // do nothing in case of space
                         }
                         else
                         {
@@ -135,7 +135,7 @@ namespace SEE.DataModel.IO
                         }
                     }
                 }
-                //Lookuptables start with *
+                // Lookuptables start with *
                 else if (line.StartsWith("*"))
                 {
                     string table = line.Substring(1);
@@ -154,16 +154,13 @@ namespace SEE.DataModel.IO
                         fieldLookupTable.Add(m.Groups[1].Value);
                     }
                 }
-                //if line in JLG starts with no special char, its a local variable
-                else
+                // if line in JLG starts with no special char, its a local variable
+                else if (javaStatement != null)
                 {
-                    if (!(javaStatement == null))
-                    {
-                        javaStatement.LocalVariables.Add(line);
-                    }
+                    javaStatement.LocalVariables.Add(line);
                 }
             }
-            javaStatements.Add(javaStatement); //make sure the last javastatement is also added
+            javaStatements.Add(javaStatement); // make sure the last javastatement is also added
             ParsedJLG parsed = new ParsedJLG(filesOfProject, locationLookupTable, fieldLookupTable, javaStatements);
             return parsed;
         }

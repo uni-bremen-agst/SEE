@@ -10,7 +10,7 @@ namespace SEE.Game
     /// <summary>
     /// Provides queries on game objects in the current scence at run-time.
     /// </summary>
-    internal class SceneQueries
+    internal static class SceneQueries
     {
         /// <summary>
         /// Returns all game objects in the current scene tagged by Tags.Node and having
@@ -140,81 +140,6 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// True if <paramref name="gameNode"/> represents a leaf in the graph.
-        /// 
-        /// Precondition: <paramref name="gameNode"/> has a NodeRef component attached to it
-        /// that is a valid graph node reference.
-        /// </summary>
-        /// <param name="gameNode">game object representing a Node to be queried whether it is a leaf</param>
-        /// <returns>true if <paramref name="gameNode"/> represents a leaf in the graph</returns>
-        public static bool IsLeaf(GameObject gameNode)
-        {
-            return gameNode.GetComponent<NodeRef>()?.Value?.IsLeaf() ?? false;
-        }
-
-        /// <summary>
-        /// True if <paramref name="nodeRef"/> represents a leaf in the graph.
-        /// </summary>
-        /// <param name="nodeRef">a reference to a Node to be queried whether it is a leaf</param>
-        /// <returns>true if <paramref name="nodeRef"/> references a leaf in the graph</returns>
-        public static bool IsLeaf(NodeRef nodeRef)
-        {
-            return nodeRef?.Value?.IsLeaf() ?? false;
-        }
-
-        /// <summary>
-        /// True if <paramref name="gameNode"/> represents an inner node in the graph.
-        /// 
-        /// Precondition: <paramref name="gameNode"/> has a NodeRef component attached to it
-        /// that is a valid graph node reference.
-        /// </summary>
-        /// <param name="gameNode"></param>
-        /// <returns>true if <paramref name="gameNode"/> represents an inner node in the graph</returns>
-        public static bool IsInnerNode(GameObject gameNode)
-        {
-            return gameNode.GetComponent<NodeRef>()?.Value?.IsInnerNode() ?? false;
-        }
-
-        /// <summary>
-        /// Returns the Source.Name attribute of <paramref name="gameNode"/>. 
-        /// If <paramref name="gameNode"/> has no valid node reference, the name
-        /// of <paramref name="gameNode"/> is returned instead.
-        /// </summary>
-        /// <param name="gameNode">game object representing a node whose Source.Name is requested</param>
-        /// <returns>source name of <paramref name="gameNode"/></returns>
-        public static string SourceName(GameObject gameNode)
-        {
-            if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
-            {
-                if (nodeRef.Value != null)
-                {
-                    return nodeRef.Value.SourceName;
-                }
-            }
-            return gameNode.name;
-        }
-
-        /// <summary>
-        /// Returns the Source.Name attribute of <paramref name="nodeRef"/>. 
-        /// If <paramref name="nodeRef"/> is no valid node reference,
-        /// then the name of the game object it is associated with is returned.
-        /// If it is neither associated with a game object, the empty
-        /// string is returned.
-        /// </summary>
-        /// <param name="nodeRef">a reference to a Node whose Source.Name is requested</param>
-        /// <returns>source name of <paramref name="nodeRef"/></returns>
-        public static string SourceName(NodeRef nodeRef)
-        {
-            string result = string.Empty;
-
-            if (nodeRef)
-            {
-                result = nodeRef.Value?.SourceName ?? nodeRef.gameObject.name;
-            }
-            return result;
-        }
-
-        /// <summary>
         /// Returns first child of <paramref name="codeCity"/> tagged by Tags.Node. 
         /// If <paramref name="codeCity"/> is a node representing a code city,
         /// the result is considered the root of the graph.
@@ -301,7 +226,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="codeCity">object representing a code city</param>
         /// <returns>the graph represented by <paramref name="codeCity"/> or null</returns>
-        public static Graph GetGraph(GameObject codeCity)
+        public static Graph GetGraph(this GameObject codeCity)
         {
             Node root = GetCityRootGraphNode(codeCity);
             return root?.ItsGraph;
