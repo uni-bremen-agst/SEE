@@ -61,11 +61,12 @@ namespace SEEEditor
             if (showAnimationAttributes)
             {
                 SEEJlgCity city = target as SEEJlgCity;
-                city.BreakpointClass = EditorGUILayout.TextField("Class of the breakpoint", city.BreakpointClass);
-                city.BreakpointLine = EditorGUILayout.IntField("Source line of the breakpoint ", city.BreakpointLine);
-                city.DistanceAboveCity = EditorGUILayout.FloatField("Distance of source viewer above city", city.DistanceAboveCity);
-                city.DistanceBehindCity = EditorGUILayout.FloatField("Distance of source viewer behind city", city.DistanceBehindCity);
-                city.LineWidth = EditorGUILayout.FloatField("Width of line connecting source viewer", city.LineWidth);
+                city.BreakpointClass = EditorGUILayout.TextField("Breakpoint class", city.BreakpointClass);
+                city.BreakpointLine = EditorGUILayout.IntField("Breakpoint line", city.BreakpointLine);
+                city.DistanceAboveCity = EditorGUILayout.FloatField("Source viewer above city", city.DistanceAboveCity);
+                city.DistanceBehindCity = EditorGUILayout.FloatField("Source viewer behind city", city.DistanceBehindCity);
+                city.LineWidth = EditorGUILayout.FloatField("Line width to source viewer", city.LineWidth);
+                city.ShowOnlyCalls = EditorGUILayout.Toggle("Interprocedural only", city.ShowOnlyCalls);
             }
         }
     }
