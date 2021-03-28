@@ -281,7 +281,7 @@ namespace SEE.Controls.Actions
         {
             yield return new WaitForSeconds(TimeToWait);
             Vector3 shrinkFactor = shrinkFactors[deletedNode];
-            float animationsCount = animations = 10;
+            float animationsCount = animations;
             float nThRoot = 1 / animations;
             float expandFactorX = (float)Math.Pow(shrinkFactor.x, nThRoot);
             float expandFactorY = (float)Math.Pow(shrinkFactor.y, nThRoot);
@@ -292,7 +292,6 @@ namespace SEE.Controls.Actions
                 yield return new WaitForSeconds(0.14f);
                 animationsCount--;
             }
-            Debug.Log(deletedNode.transform.localScale);
         }
         /// <summary>
         /// Removes all given nodes from the garbage can and back into the city.
