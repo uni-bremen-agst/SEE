@@ -92,7 +92,7 @@ namespace SEE.DataModel
         {
             Debug.Log($"[JLG] Number of files: {filesOfProject.Count}\n");
             Debug.Log($"[JLG] Number of fields: {fieldLookupTable.Count}\n");
-            Debug.Log($"[JLG] Number of Java statements: {locationLookupTable.Count}\n");
+            Debug.Log($"[JLG] Number of static statements: {locationLookupTable.Count}\n");
             Debug.Log($"[JLG] Number of executed statements: {allStatements.Count}\n");
         }
 
@@ -108,10 +108,14 @@ namespace SEE.DataModel
             int l = location.IndexOf('(');
             if (l < 0)
             {
-                throw new MalformedStatement($"Malformed statement '{locationLookupTable[int.Parse(allStatements[stmtIndex].Location)]}' at statement index {stmtIndex}");
+                throw new MalformedStatement($"Malformed statement '{locationLookupTable[int.Parse(allStatements[stmtIndex].Location)]}' at statement index {stmtIndex}: '(' expected.");
             }
             location = location.Substring(0, l + 1);
             l = location.LastIndexOf('.');
+            if (l < 0)
+            {
+                throw new MalformedStatement($"Malformed statement '{locationLookupTable[int.Parse(allStatements[stmtIndex].Location)]}' at statement index {stmtIndex}: '.' expected.");
+            }
             location = location.Substring(0, l);
             return location;
         }
