@@ -3,6 +3,7 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -73,6 +74,8 @@ namespace SEE.Controls.Actions
         private Dictionary<GameObject, Graph> DeletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
 
         private Dictionary<GameObject, Vector3> shrinkFactors { get; set; } = new Dictionary<GameObject, Vector3>();
+
+        private const float animations = 10;
 
         /// <summary>
         /// The name of the garbage can gameObject.
@@ -259,7 +262,10 @@ namespace SEE.Controls.Actions
             foreach (GameObject deletedNode in deletedNodes)
             {
                 Vector3 shrinkFactor = Shrink.shrinkFactor(deletedNode.transform, new Vector3(0.1f, 0.1f, 0.1f));
-                shrinkFactors.Add(deletedNode, shrinkFactor);
+                if (!shrinkFactors.ContainsKey(deletedNode))
+                {
+                    shrinkFactors.Add(deletedNode, shrinkFactor);
+                }
                 Shrink.shrink(deletedNode, 1, shrinkFactor);
                 Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), TimeForAnimation);
             }
@@ -275,9 +281,18 @@ namespace SEE.Controls.Actions
         {
             yield return new WaitForSeconds(TimeToWait);
             Vector3 shrinkFactor = shrinkFactors[deletedNode];
-            Debug.Log(shrinkFactor);
-            Shrink.expand(deletedNode, shrinkFactor);
-           
+            float animationsCount = animations = 10;
+            float nThRoot = 1 / animations;
+            float expandFactorX = (float)Math.Pow(shrinkFactor.x, nThRoot);
+            float expandFactorY = (float)Math.Pow(shrinkFactor.y, nThRoot);
+            float expandFactorZ = (float)Math.Pow(shrinkFactor.z, nThRoot);
+
+            while ((animationsCount) > 0 ) {
+                Shrink.expand(deletedNode, new Vector3(expandFactorX, expandFactorY, expandFactorZ));
+                yield return new WaitForSeconds(0.14f);
+                animationsCount--;
+            }
+            Debug.Log(deletedNode.transform.localScale);
         }
         /// <summary>
         /// Removes all given nodes from the garbage can and back into the city.

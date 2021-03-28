@@ -21,6 +21,8 @@ namespace SEE.Utils
 
         public static void shrink(GameObject objectToShrink, float iterations, Vector3  shrinkFactor)
         {
+            
+          
             while (iterations > 0 ) { 
                 objectToShrink.transform.localScale = new Vector3(objectToShrink.transform.localScale.x * shrinkFactor.x,objectToShrink.transform.localScale.y * shrinkFactor.y, objectToShrink.transform.localScale.z * shrinkFactor.z);
                 iterations--;
