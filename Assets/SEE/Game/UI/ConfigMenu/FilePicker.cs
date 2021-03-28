@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using Michsky.UI.ModernUIPack;
+using SEE.Controls;
 using SEE.GO;
 using SimpleFileBrowser;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Assertions;
+using UnityEngine.EventSystems;
 
 namespace SEE.Game.UI.ConfigMenu
 {
@@ -57,6 +57,22 @@ namespace SEE.Game.UI.ConfigMenu
                                            title: "Pick a file/folder",
                                            initialPath: dataPathInstance.RootPath
                 );
+
+                GameObject fileBrowser = GameObject.FindWithTag("FileBrowser");
+                fileBrowser.transform.Find("EventSystem").gameObject.SetActive(false);
+                if (PlayerSettings.GetInputType() == PlayerInputType.VRPlayer)
+                {
+                    Canvas parentCanvas = GetComponentInParent<Canvas>();
+                    RectTransform fileBrowserRect = fileBrowser.GetComponent<RectTransform>();
+                    Canvas fileBrowserCanvas = fileBrowser.GetComponent<Canvas>();
+
+                    fileBrowserCanvas.worldCamera =
+                        GameObject.FindWithTag("VRPointer").GetComponent<Camera>();
+                    fileBrowserCanvas.renderMode = RenderMode.WorldSpace;
+
+                    fileBrowserRect.transform.position = parentCanvas.transform.position;
+                    fileBrowserRect.localScale = new Vector3(0.002f, 0.002f, 0.002f);
+                }
             });
 
             _customInput.onValueChanged.AddListener(path =>
@@ -113,40 +129,35 @@ namespace SEE.Game.UI.ConfigMenu
         }
     }
 
-    public class FilePickerBuilder
+    public class FilePickerBuilder : BaseUiBuilder<FilePicker>
     {
+        protected override string PrefabPath =>
+            "Assets/Prefabs/UI/Input Group - File Picker.prefab";
 
-        private FilePicker _filePicker;
-
-        private FilePickerBuilder(FilePicker filePicker)
+        private FilePickerBuilder(Transform parent) : base(parent)
         {
-            _filePicker = filePicker;
         }
 
-        public static FilePickerBuilder Init(GameObject filePickerHost)
+        public static FilePickerBuilder Init(Transform parent)
         {
-            filePickerHost.AddComponent<FilePicker>();
-            filePickerHost.MustGetComponent(out FilePicker filePicker);
-            return new FilePickerBuilder(filePicker);
+            return new FilePickerBuilder(parent);
         }
-
-        public FilePicker Build() => _filePicker;
 
         public FilePickerBuilder SetLabel(string label)
         {
-            _filePicker.label = label;
+            Instance.label = label;
             return this;
         }
 
         public FilePickerBuilder SetPathInstance(DataPath dataPath)
         {
-            _filePicker.dataPathInstance = dataPath;
+            Instance.dataPathInstance = dataPath;
             return this;
         }
 
         public FilePickerBuilder SetPickMode(FileBrowser.PickMode pickMode)
         {
-            _filePicker.pickMode = pickMode;
+            Instance.pickMode = pickMode;
             return this;
         }
     }

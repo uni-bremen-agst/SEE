@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Michsky.UI.ModernUIPack;
-using SEE.GO;
 using TMPro;
 using UnityEngine;
 
@@ -47,39 +46,34 @@ namespace SEE.Game.UI.ConfigMenu
         public Action<bool> OnValueChange { get; set; }
     }
 
-    public class SwitchBuilder
+    public class SwitchBuilder : BaseUiBuilder<Switch>
     {
-        private readonly Switch _switch;
+        protected override string PrefabPath => "Assets/Prefabs/UI/Input Group - Switch.prefab";
 
-        private SwitchBuilder(Switch @switch)
+        private SwitchBuilder(Transform parent) : base(parent)
         {
-            _switch = @switch;
         }
 
-        public static SwitchBuilder Init(GameObject checkboxHost)
+        public static SwitchBuilder Init(Transform parent)
         {
-            checkboxHost.AddComponent<Switch>();
-            checkboxHost.MustGetComponent(out Switch checkbox);
-            return new SwitchBuilder(checkbox);
+            return new SwitchBuilder(parent);
         }
-
-        public Switch Build() => _switch;
 
         public SwitchBuilder SetLabel(string label)
         {
-            _switch.label = label;
+            Instance.label = label;
             return this;
         }
 
         public SwitchBuilder SetOnChangeHandler(Action<bool> onChangeHandler)
         {
-            _switch.OnValueChange = onChangeHandler;
+            Instance.OnValueChange = onChangeHandler;
             return this;
         }
 
         public SwitchBuilder SetDefaultValue(bool defaultValue)
         {
-            _switch.Value = defaultValue;
+            Instance.Value = defaultValue;
             return this;
         }
     }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Michsky.UI.ModernUIPack;
-using SEE.GO;
 using TMPro;
 using UnityEngine;
 
@@ -55,50 +54,45 @@ namespace SEE.Game.UI.ConfigMenu
         public Action<float> OnValueChange { get; set; }
     }
 
-    public class SliderBuilder
+    public class SliderBuilder : BaseUiBuilder<Slider>
     {
-        private readonly Slider _slider;
+        protected override string PrefabPath => "Assets/Prefabs/UI/Input Group - Slider.prefab";
 
-        private SliderBuilder(Slider slider)
+        private SliderBuilder(Transform parent) : base(parent)
         {
-            _slider = slider;
         }
 
-        public static SliderBuilder Init(GameObject sliderHost)
+        public static SliderBuilder Init(Transform parent)
         {
-            sliderHost.AddComponent<Slider>();
-            sliderHost.MustGetComponent(out Slider slider);
-            return new SliderBuilder(slider);
+            return new SliderBuilder(parent);
         }
-
-        public Slider Build() => _slider;
 
         public SliderBuilder SetLabel(string label)
         {
-            _slider.label = label;
+            Instance.label = label;
             return this;
         }
 
         public SliderBuilder SetOnChangeHandler(Action<float> onChangeHandler)
         {
-            _slider.OnValueChange = onChangeHandler;
+            Instance.OnValueChange = onChangeHandler;
             return this;
         }
 
         public SliderBuilder SetRange((float Min, float Max) range)
         {
-            _slider.range = range;
+            Instance.range = range;
             return this;
         }
 
         public SliderBuilder SetDefaultValue(float defaultValue)
         {
-            _slider.Value = defaultValue;
+            Instance.Value = defaultValue;
             return this;
         }
         public SliderBuilder SetMode(SliderMode sliderMode)
         {
-            _slider.sliderMode = sliderMode;
+            Instance.sliderMode = sliderMode;
             return this;
         }
     }

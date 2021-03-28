@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Michsky.UI.ModernUIPack;
+using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
-using SEE.Net;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using static SEE.Game.AbstractSEECity;
 
 namespace SEE.Game.UI.ConfigMenu
@@ -30,26 +31,11 @@ namespace SEE.Game.UI.ConfigMenu
         private const string PagePrefabPath = "Assets/Prefabs/UI/Page.prefab";
         private const string TabButtonPrefabPath = "Assets/Prefabs/UI/TabButton.prefab";
         private const string ActionButtonPrefabPath = "Assets/Prefabs/UI/ActionButton.prefab";
-
-        private const string ComboSelectPrefabPath =
-            "Assets/Prefabs/UI/Input Group - Dropdown.prefab";
-        private const string ColorPickerPrefabPath =
-            "Assets/Prefabs/UI/Input Group - Color Picker.prefab";
-        private const string SliderPrefabPath =
-            "Assets/Prefabs/UI/Input Group - Slider.prefab";
-        private const string SwitchPrefabPath =
-            "Assets/Prefabs/UI/Input Group - Switch.prefab";
-        private const string FilePickerPrefabPath =
-            "Assets/Prefabs/UI/Input Group - File Picker.prefab";
+        private const string PointerPrefabPath = "Assets/Prefabs/UI/Pointer.prefab";
 
         private GameObject _pagePrefab;
         private GameObject _actionButtonPrefab;
         private GameObject _tabButtonPrefab;
-        private GameObject _comboSelectPrefab;
-        private GameObject _colorPickerPrefab;
-        private GameObject _sliderPrefab;
-        private GameObject _switchPrefab;
-        private GameObject _filePickerPrefab;
 
         private GameObject _tabOutlet;
         private GameObject _tabButtons;
@@ -89,21 +75,44 @@ namespace SEE.Game.UI.ConfigMenu
             });
 
 
+            SetupCanvas();
             LoadPrefabs();
             SetupActions();
             SetupPages();
+        }
+
+        private void SetupCanvas()
+        {
+            if (PlayerSettings.GetInputType() == PlayerInputType.VRPlayer)
+            {
+                Transform attachmentPoint = GameObject
+                    .Find("VRPlayer/SteamVRObjects/RightHand/ObjectAttachmentPoint").transform;
+                GameObject pointer =
+                    Instantiate(MustLoadPrefabAtPath(PointerPrefabPath), attachmentPoint);
+                Camera pointerCamera = pointer.GetComponent<Camera>();
+
+                GameObject vrEventSystem =
+                    GameObject.FindWithTag("VREventSystem");
+                vrEventSystem.GetComponent<StandaloneInputModule>().enabled = false;
+                vrEventSystem.AddComponent<VRInputModule>();
+                VRInputModule vrInputModule = vrEventSystem.GetComponent<VRInputModule>();
+                vrInputModule.PointerCamera = pointerCamera;
+                pointer.GetComponent<Pointer>().InputModule = vrInputModule;
+
+                MustGetComponentInChild("Canvas", out Canvas canvas);
+                MustGetComponentInChild("Canvas", out RectTransform rectTransform);
+                canvas.renderMode = RenderMode.WorldSpace;
+                canvas.worldCamera = pointerCamera;
+                rectTransform.anchoredPosition3D = Vector3.zero;
+                rectTransform.localScale = Vector3.one;
+            }
         }
 
         private void LoadPrefabs()
         {
             _tabButtonPrefab = MustLoadPrefabAtPath(TabButtonPrefabPath);
             _pagePrefab = MustLoadPrefabAtPath(PagePrefabPath);
-            _comboSelectPrefab = MustLoadPrefabAtPath(ComboSelectPrefabPath);
-            _colorPickerPrefab = MustLoadPrefabAtPath(ColorPickerPrefabPath);
-            _sliderPrefab = MustLoadPrefabAtPath(SliderPrefabPath);
             _actionButtonPrefab = MustLoadPrefabAtPath(ActionButtonPrefabPath);
-            _switchPrefab = MustLoadPrefabAtPath(SwitchPrefabPath);
-            _filePickerPrefab = MustLoadPrefabAtPath(FilePickerPrefabPath);
         }
 
         private void SetupActions()
@@ -150,9 +159,7 @@ namespace SEE.Game.UI.ConfigMenu
             Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
 
             // Width metric
-            GameObject widthMetricHost =
-                Instantiate(_comboSelectPrefab, controls);
-            ComboSelectBuilder.Init(widthMetricHost)
+            ComboSelectBuilder.Init(controls.transform)
                 .SetLabel("Width")
                 .SetAllowedValues(_numericAttributes)
                 .SetDefaultValue(_city.WidthMetric)
@@ -160,9 +167,7 @@ namespace SEE.Game.UI.ConfigMenu
                 .Build();
 
             // Height metric
-            GameObject heightMetricHost =
-                Instantiate(_comboSelectPrefab, controls);
-            ComboSelectBuilder.Init(heightMetricHost)
+            ComboSelectBuilder.Init(controls.transform)
                 .SetLabel("Height")
                 .SetAllowedValues(_numericAttributes)
                 .SetDefaultValue(_city.HeightMetric)
@@ -170,9 +175,7 @@ namespace SEE.Game.UI.ConfigMenu
                 .Build();
 
             // Height metric
-            GameObject depthMetricHost =
-                Instantiate(_comboSelectPrefab, controls);
-            ComboSelectBuilder.Init(depthMetricHost)
+            ComboSelectBuilder.Init(controls.transform)
                 .SetLabel("Depth")
                 .SetAllowedValues(_numericAttributes)
                 .SetDefaultValue(_city.DepthMetric)
@@ -180,9 +183,7 @@ namespace SEE.Game.UI.ConfigMenu
                 .Build();
 
             // Leaf style metric
-            GameObject leafStyleMetricHost =
-                Instantiate(_comboSelectPrefab, controls);
-            ComboSelectBuilder.Init(leafStyleMetricHost)
+            ComboSelectBuilder.Init(controls.transform)
                 .SetLabel("Style")
                 .SetAllowedValues(_numericAttributes)
                 .SetDefaultValue(_city.LeafStyleMetric)
@@ -190,9 +191,7 @@ namespace SEE.Game.UI.ConfigMenu
                 .Build();
 
             // Lower color
-            GameObject lowerColorHost =
-                Instantiate(_colorPickerPrefab, controls);
-            ColorPickerBuilder.Init(lowerColorHost)
+            ColorPickerBuilder.Init(controls.transform)
                 .SetLabel("Lower color")
                 .SetDefaultValue(_city.LeafNodeColorRange.lower)
                 .SetOnChangeHandler(c => _city.LeafNodeColorRange.lower = c)
@@ -200,9 +199,7 @@ namespace SEE.Game.UI.ConfigMenu
                 .Build();
 
             // Upper color
-            GameObject upperColorHost =
-                Instantiate(_colorPickerPrefab, controls);
-            ColorPickerBuilder.Init(upperColorHost)
+            ColorPickerBuilder.Init(controls.transform)
                 .SetLabel("Upper color")
                 .SetDefaultValue(_city.LeafNodeColorRange.upper)
                 .SetOnChangeHandler(c => _city.LeafNodeColorRange.upper = c)
@@ -210,9 +207,7 @@ namespace SEE.Game.UI.ConfigMenu
                 .Build();
 
             // Number of colors
-            GameObject numberOfColorsHost =
-                Instantiate(_sliderPrefab, controls);
-            SliderBuilder.Init(numberOfColorsHost)
+            SliderBuilder.Init(controls.transform)
                 .SetLabel("# Colors")
                 .SetMode(SliderMode.Integer)
                 .SetDefaultValue(_city.LeafNodeColorRange.NumberOfColors)
@@ -231,9 +226,7 @@ namespace SEE.Game.UI.ConfigMenu
             Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
 
             // Height metric
-            GameObject heightMetricHost =
-                Instantiate(_comboSelectPrefab, controls);
-            ComboSelectBuilder.Init(heightMetricHost)
+            ComboSelectBuilder.Init(controls.transform)
                 .SetLabel("Height")
                 .SetAllowedValues(_numericAttributes)
                 .SetDefaultValue(_city.InnerNodeHeightMetric)
@@ -241,9 +234,7 @@ namespace SEE.Game.UI.ConfigMenu
                 .Build();
 
             // Leaf style metric
-            GameObject leafStyleMetricHost =
-                Instantiate(_comboSelectPrefab, controls);
-            ComboSelectBuilder.Init(leafStyleMetricHost)
+            ComboSelectBuilder.Init(controls.transform)
                 .SetLabel("Style")
                 .SetAllowedValues(_numericAttributes)
                 .SetDefaultValue(_city.InnerNodeStyleMetric)
@@ -251,9 +242,7 @@ namespace SEE.Game.UI.ConfigMenu
                 .Build();
 
             // Lower color
-            GameObject lowerColorHost =
-                Instantiate(_colorPickerPrefab, controls);
-            ColorPickerBuilder.Init(lowerColorHost)
+            ColorPickerBuilder.Init(controls.transform)
                 .SetLabel("Lower color")
                 .SetDefaultValue(_city.InnerNodeColorRange.lower)
                 .SetOnChangeHandler(c => _city.InnerNodeColorRange.lower = c)
@@ -261,9 +250,7 @@ namespace SEE.Game.UI.ConfigMenu
                 .Build();
 
             // Upper color
-            GameObject upperColorHost =
-                Instantiate(_colorPickerPrefab, controls);
-            ColorPickerBuilder.Init(upperColorHost)
+            ColorPickerBuilder.Init(controls.transform)
                 .SetLabel("Upper color")
                 .SetDefaultValue(_city.InnerNodeColorRange.upper)
                 .SetOnChangeHandler(c => _city.InnerNodeColorRange.upper = c)
@@ -271,9 +258,7 @@ namespace SEE.Game.UI.ConfigMenu
                 .Build();
 
             // Number of colors
-            GameObject numberOfColorsHost =
-                Instantiate(_sliderPrefab, controls);
-            SliderBuilder.Init(numberOfColorsHost)
+            SliderBuilder.Init(controls.transform)
                 .SetLabel("# Colors")
                 .SetMode(SliderMode.Integer)
                 .SetDefaultValue(_city.InnerNodeColorRange.NumberOfColors)
@@ -288,18 +273,14 @@ namespace SEE.Game.UI.ConfigMenu
         private void CreateLabelSettingsInputs(Transform parent, LabelSettings labelSettings)
         {
             // Show labels
-            GameObject showLabelsHost =
-                Instantiate(_switchPrefab, parent);
-            SwitchBuilder.Init(showLabelsHost)
+            SwitchBuilder.Init(parent)
                 .SetLabel("Show labels")
                 .SetDefaultValue(labelSettings.Show)
                 .SetOnChangeHandler(b => labelSettings.Show = b)
                 .Build();
 
             // Label distance
-            GameObject labelDistanceHost =
-                Instantiate(_sliderPrefab, parent);
-            SliderBuilder.Init(labelDistanceHost)
+            SliderBuilder.Init(parent)
                 .SetLabel("Label distance")
                 .SetMode(SliderMode.Float)
                 .SetDefaultValue(labelSettings.Distance)
@@ -308,9 +289,7 @@ namespace SEE.Game.UI.ConfigMenu
                 .Build();
 
             // Label font size
-            GameObject labelFontSizeHost =
-                Instantiate(_sliderPrefab, parent);
-            SliderBuilder.Init(labelFontSizeHost)
+            SliderBuilder.Init(parent)
                 .SetLabel("Label font size")
                 .SetMode(SliderMode.Float)
                 .SetDefaultValue(labelSettings.FontSize)
@@ -319,9 +298,7 @@ namespace SEE.Game.UI.ConfigMenu
                 .Build();
 
             // Label animation duration
-            GameObject labelAnimationDurationHost =
-                Instantiate(_sliderPrefab, parent);
-            SliderBuilder.Init(labelAnimationDurationHost)
+            SliderBuilder.Init(parent)
                 .SetLabel("Label anim. duration")
                 .SetMode(SliderMode.Float)
                 .SetDefaultValue(labelSettings.AnimationDuration)
@@ -337,9 +314,7 @@ namespace SEE.Game.UI.ConfigMenu
             Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
 
             // Leaf nodes
-            GameObject leafNodesHost =
-                Instantiate(_comboSelectPrefab, controls);
-            ComboSelectBuilder.Init(leafNodesHost)
+            ComboSelectBuilder.Init(controls.transform)
                 .SetLabel("Leaf nodes")
                 .SetAllowedValues(EnumToStr<LeafNodeKinds>())
                 .SetDefaultValue(_city.LeafObjects.ToString())
@@ -348,9 +323,7 @@ namespace SEE.Game.UI.ConfigMenu
                 .Build();
 
             // Node layout
-            GameObject nodeLayoutHost =
-                Instantiate(_comboSelectPrefab, controls);
-            ComboSelectBuilder.Init(nodeLayoutHost)
+            ComboSelectBuilder.Init(controls.transform)
                 .SetLabel("Node layout")
                 .SetAllowedValues(EnumToStr<NodeLayoutKind>())
                 .SetDefaultValue(_city.NodeLayout.ToString())
@@ -359,9 +332,7 @@ namespace SEE.Game.UI.ConfigMenu
                 .Build();
 
             // Inner nodes
-            GameObject innerNodesHost =
-                Instantiate(_comboSelectPrefab, controls);
-            ComboSelectBuilder.Init(innerNodesHost)
+            ComboSelectBuilder.Init(controls.transform)
                 .SetLabel("Inner nodes")
                 .SetAllowedValues(EnumToStr<InnerNodeKinds>())
                 .SetDefaultValue(_city.InnerNodeObjects.ToString())
@@ -370,34 +341,27 @@ namespace SEE.Game.UI.ConfigMenu
                 .Build();
 
             // Layout file
-            GameObject layoutFileHost = Instantiate(_filePickerPrefab, controls);
-            FilePickerBuilder.Init(layoutFileHost)
+            FilePickerBuilder.Init(controls.transform)
                 .SetLabel("Layout file")
                 .SetPathInstance(_city.LayoutPath)
                 .Build();
 
             // Z-score scaling
-            GameObject zScoreScalingHost =
-                Instantiate(_switchPrefab, controls);
-            SwitchBuilder.Init(zScoreScalingHost)
+            SwitchBuilder.Init(controls.transform)
                 .SetLabel("Z-score scaling")
                 .SetDefaultValue(_city.ZScoreScale)
                 .SetOnChangeHandler(b => _city.ZScoreScale = b)
                 .Build();
 
             // Show erosions
-            GameObject showErosionsHost =
-                Instantiate(_switchPrefab, controls);
-            SwitchBuilder.Init(showErosionsHost)
+            SwitchBuilder.Init(controls.transform)
                 .SetLabel("Show erosions")
                 .SetDefaultValue(_city.ShowErosions)
                 .SetOnChangeHandler(b => _city.ShowErosions = b)
                 .Build();
 
             // Max erosion width
-            GameObject maxErosionWidth =
-                Instantiate(_sliderPrefab, controls);
-            SliderBuilder.Init(maxErosionWidth)
+            SliderBuilder.Init(controls.transform)
                 .SetLabel("Max erosion width")
                 .SetMode(SliderMode.Integer)
                 .SetDefaultValue(_city.MaxErosionWidth)
@@ -413,9 +377,7 @@ namespace SEE.Game.UI.ConfigMenu
             Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
 
             // Edge layout
-            GameObject edgeLayoutHost =
-                Instantiate(_comboSelectPrefab, controls);
-            ComboSelectBuilder.Init(edgeLayoutHost)
+            ComboSelectBuilder.Init(controls.transform)
                 .SetLabel("Edge layout")
                 .SetAllowedValues(EnumToStr<EdgeLayoutKind>())
                 .SetDefaultValue(_city.EdgeLayout.ToString())
@@ -424,9 +386,7 @@ namespace SEE.Game.UI.ConfigMenu
                 .Build();
 
             // Edge width
-            GameObject edgeWidthHost =
-                Instantiate(_sliderPrefab, controls);
-            SliderBuilder.Init(edgeWidthHost)
+            SliderBuilder.Init(controls.transform)
                 .SetLabel("Edge width")
                 .SetMode(SliderMode.Float)
                 .SetDefaultValue(_city.EdgeWidth)
@@ -435,18 +395,14 @@ namespace SEE.Game.UI.ConfigMenu
                 .Build();
 
             // Edges above block
-            GameObject edgesAboveBlockHost =
-                Instantiate(_switchPrefab, controls);
-            SwitchBuilder.Init(edgesAboveBlockHost)
+            SwitchBuilder.Init(controls.transform)
                 .SetLabel("Edges above block")
                 .SetDefaultValue(_city.EdgesAboveBlocks)
                 .SetOnChangeHandler(b => _city.EdgesAboveBlocks = b)
                 .Build();
 
             // Bundling tension
-            GameObject bundlingTensionHost =
-                Instantiate(_sliderPrefab, controls);
-            SliderBuilder.Init(bundlingTensionHost)
+            SliderBuilder.Init(controls.transform)
                 .SetLabel("Bundling tension")
                 .SetMode(SliderMode.Float)
                 .SetDefaultValue(_city.Tension)
