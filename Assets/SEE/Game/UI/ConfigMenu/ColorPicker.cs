@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Michsky.UI.ModernUIPack;
-using SEE.GO;
 using TMPro;
 using UnityEngine;
 
@@ -66,46 +65,40 @@ namespace SEE.Game.UI.ConfigMenu
         }
     }
 
-    public class ColorPickerBuilder
+    public class ColorPickerBuilder : BaseUiBuilder<ColorPicker>
     {
+        protected override string PrefabPath => "Assets/Prefabs/UI/Input Group - Color Picker.prefab";
 
-        private ColorPicker _colorPicker;
-
-        private ColorPickerBuilder(ColorPicker colorPicker)
+        private ColorPickerBuilder(Transform parent) : base(parent)
         {
-            _colorPicker = colorPicker;
         }
 
-        public static ColorPickerBuilder Init(GameObject colorPickerHost)
+        public static ColorPickerBuilder Init(Transform parent)
         {
-            colorPickerHost.AddComponent<ColorPicker>();
-            colorPickerHost.MustGetComponent(out ColorPicker colorPicker);
-            return new ColorPickerBuilder(colorPicker);
+            return new ColorPickerBuilder(parent);
         }
-
-        public ColorPicker Build() => _colorPicker;
 
         public ColorPickerBuilder SetLabel(string label)
         {
-            _colorPicker.label = label;
+            Instance.label = label;
             return this;
         }
 
         public ColorPickerBuilder SetOnChangeHandler(Action<Color> onChangeHandler)
         {
-            _colorPicker.OnValueChange = onChangeHandler;
+            Instance.OnValueChange = onChangeHandler;
             return this;
         }
 
         public ColorPickerBuilder SetDefaultValue(Color defaultValue)
         {
-            _colorPicker.Value = defaultValue;
+            Instance.Value = defaultValue;
             return this;
         }
 
         public ColorPickerBuilder SetColorPickerControl(ColorPickerControl colorPickerControl)
         {
-            _colorPicker.colorPickerControl = colorPickerControl;
+            Instance.colorPickerControl = colorPickerControl;
             return this;
         }
     }

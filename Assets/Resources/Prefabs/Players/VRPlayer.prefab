@@ -791,7 +791,7 @@ GameObject:
   - component: {fileID: 114000013786455312}
   m_Layer: 0
   m_Name: InputModule
-  m_TagString: Untagged
+  m_TagString: VREventSystem
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

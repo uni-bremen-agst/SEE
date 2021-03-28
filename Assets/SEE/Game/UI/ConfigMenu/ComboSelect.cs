@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Michsky.UI.ModernUIPack;
-using SEE.GO;
 using TMPro;
 using UnityEngine;
 
@@ -15,27 +14,25 @@ namespace SEE.Game.UI.ConfigMenu
 
     public class ComboSelect : DynamicUIBehaviour
     {
-        
+
         private CustomDropdown _dropdown;
         private TMP_InputField _customInput;
         private TextMeshProUGUI _labelText;
 
         private Queue<List<string>> _valuesUpdates = new Queue<List<string>>();
         private Queue<string> _valueUpdates = new Queue<string>();
-        
+
         public string label;
         public Action<string> OnValueChange;
         public ComboSelectMode mode = ComboSelectMode.Combo;
-        
+
         public static string CustomInputText = "--Custom Input--";
-        
-        public List<string> Values
-        {
+
+        public List<string> Values {
             set => _valuesUpdates.Enqueue(value);
         }
 
-        public string Value
-        {
+        public string Value {
             get => FigureOutValue();
             set => _valueUpdates.Enqueue(value);
         }
@@ -70,7 +67,7 @@ namespace SEE.Game.UI.ConfigMenu
             MustGetComponentInChild("DropdownCombo/Dropdown", out _dropdown);
             MustGetComponentInChild("DropdownCombo/Input", out _customInput);
             MustGetComponentInChild("Label", out _labelText);
-            
+
             _dropdown.dropdownEvent.AddListener(arg0 =>
             {
                 var selectedItem = _dropdown.dropdownItems[arg0].itemName;
@@ -85,7 +82,8 @@ namespace SEE.Game.UI.ConfigMenu
 
         void SetToCustomMode(string customValue)
         {
-            _dropdown.selectedItemIndex = _dropdown.dropdownItems.FindIndex(item => item.itemName == CustomInputText);
+            _dropdown.selectedItemIndex =
+                _dropdown.dropdownItems.FindIndex(item => item.itemName == CustomInputText);
             _dropdown.SetupDropdown();
             _customInput.gameObject.SetActive(true);
             if (customValue != null)
@@ -127,52 +125,46 @@ namespace SEE.Game.UI.ConfigMenu
         }
     }
 
-    public class ComboSelectBuilder
+    public class ComboSelectBuilder : BaseUiBuilder<ComboSelect>
     {
-        
-        private ComboSelect _comboSelect;
-        
-        private ComboSelectBuilder(ComboSelect comboSelect)
+        protected override string PrefabPath => "Assets/Prefabs/UI/Input Group - Dropdown.prefab";
+
+        private ComboSelectBuilder(Transform parent) : base(parent)
         {
-            _comboSelect = comboSelect;
         }
 
-        public static ComboSelectBuilder Init(GameObject comboSelectHost)
+        public static ComboSelectBuilder Init(Transform parent)
         {
-            comboSelectHost.AddComponent<ComboSelect>();
-            comboSelectHost.MustGetComponent(out ComboSelect comboSelect);
-            return new ComboSelectBuilder(comboSelect);
+            return new ComboSelectBuilder(parent);
         }
-        
-        public ComboSelect Build() => _comboSelect;
 
         public ComboSelectBuilder SetLabel(string label)
         {
-            _comboSelect.label = label;
+            Instance.label = label;
             return this;
         }
 
         public ComboSelectBuilder SetOnChangeHandler(Action<string> onChangeHandler)
         {
-            _comboSelect.OnValueChange = onChangeHandler;
+            Instance.OnValueChange = onChangeHandler;
             return this;
         }
 
         public ComboSelectBuilder SetAllowedValues(List<String> allowedValues)
         {
-            _comboSelect.Values = allowedValues;
+            Instance.Values = allowedValues;
             return this;
         }
-        
+
         public ComboSelectBuilder SetDefaultValue(String defaultValue)
         {
-            _comboSelect.Value = defaultValue;
+            Instance.Value = defaultValue;
             return this;
         }
 
         public ComboSelectBuilder SetComboSelectMode(ComboSelectMode comboSelectMode)
         {
-            _comboSelect.mode = comboSelectMode;
+            Instance.mode = comboSelectMode;
             return this;
         }
     }
