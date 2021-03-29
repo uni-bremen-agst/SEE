@@ -63,9 +63,6 @@ namespace SEE.DataModel.DG
         // String attributes
         //----------------------------------
 
-        // Unity does not serializes Dictionaries. That is why we need to use StringStringDictionary
-        // instead here. Note that we need to declare the attribute here as a SerializeField 
-        // nevertheless.
         public Dictionary<string, string> StringAttributes { get; private set; } = new Dictionary<string, string>();
 
         public void SetString(string attributeName, string value)
