@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
@@ -36,14 +37,14 @@ namespace SEE.Net
 
         /// <summary>
         /// All new connections that have yet to be processed. New connections are
-        /// announced via a differend thread and are buffered and processed later in the
+        /// announced via a different thread and are buffered and processed later in the
         /// main thread. This is necessary, as most of the Unity features only work in
         /// the main thread.
         /// </summary>
         private static Stack<Connection> pendingEstablishedConnections;
 
         /// <summary>
-        /// All closed connectiong that have yet to be processed.
+        /// All closed connecting that have yet to be processed.
         /// </summary>
         private static Stack<Connection> pendingClosedConnections;
 
@@ -93,7 +94,7 @@ namespace SEE.Net
                     string message = "Server listening on end-points:";
                     foreach (ConnectionListenerBase connectionListener in ConnectionListeners)
                     {
-                        message += "\n" + connectionListener.LocalListenEndPoint.ToString();
+                        message += "\n" + connectionListener.LocalListenEndPoint;
                     }
                     Logger.Log(message);
 #endif
@@ -127,7 +128,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Stuts the server down. Stops listening for connections and closes all valid
+        /// Shuts the server down. Stops listening for connections and closes all valid
         /// connections.
         /// </summary>
         public static void Shutdown()
@@ -147,9 +148,9 @@ namespace SEE.Net
                     Connection.StopListening(ConnectionListeners);
                     ConnectionListeners = null;
 
-                    for (int i = 0; i < Connections.Count; i++)
+                    foreach (Connection t in Connections)
                     {
-                        Connections[i].CloseConnection(false);
+                        t.CloseConnection(false);
                     }
                     Connections = null;
                 }
@@ -177,12 +178,12 @@ namespace SEE.Net
             {
                 if (!Connections.Contains(connection))
                 {
-                    Logger.Log("Connection with client established: " + connection.ToString());
+                    Logger.Log("Connection with client established: " + connection);
 
                     // synchronize current state with new client
                     if (!connection.ConnectionInfo.RemoteEndPoint.Equals(Client.LocalEndPoint))
                     {
-                        IPEndPoint[] recipient = new IPEndPoint[1] { (IPEndPoint)connection.ConnectionInfo.RemoteEndPoint };
+                        IPEndPoint[] recipient = new IPEndPoint[] { (IPEndPoint)connection.ConnectionInfo.RemoteEndPoint };
                         List<InstantiatePrefabAction> actions = PrefabAction.GetAllActions();
                         foreach (InstantiatePrefabAction action in actions)
                         {
@@ -241,15 +242,7 @@ namespace SEE.Net
         /// <param name="connection"></param>
         private static void OnConnectionClosed(Connection connection)
         {
-            bool connectionListenerInitialized = false;
-            foreach (ConnectionListenerBase connectionListener in ConnectionListeners)
-            {
-                if (connectionListener.LocalListenEndPoint.Equals(connection.ConnectionInfo.LocalEndPoint))
-                {
-                    connectionListenerInitialized = true;
-                    break;
-                }
-            }
+            bool connectionListenerInitialized = ConnectionListeners.Any(listener => listener.LocalListenEndPoint.Equals(connection.ConnectionInfo.LocalEndPoint));
 
             if (connectionListenerInitialized)
             {
@@ -295,7 +288,7 @@ namespace SEE.Net
                         }
                     }
 
-                    Logger.Log("Connection closed: " + connection.ToString());
+                    Logger.Log("Connection closed: " + connection);
                 }
             }
         }

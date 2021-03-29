@@ -22,7 +22,7 @@ namespace SEE.Net
             }
             else
             {
-                InvokeRepeating("Synchronize", 0.1f, 0.1f);
+                InvokeRepeating(nameof(Synchronize), 0.1f, 0.1f);
             }
         }
 

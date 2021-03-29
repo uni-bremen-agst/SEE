@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using SEE.Controls;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
@@ -122,6 +123,10 @@ namespace SEE.Game.Evolution
 
         private void Init()
         {
+
+            Canvas canvas = AnimationCanvas.GetComponent<Canvas>();
+            canvas.worldCamera = MainCamera.Camera;
+
             revisionSelectionDataModel = RevisionSelectionCanvas.GetComponent<RevisionSelectionDataModel>();
             animationDataModel = AnimationCanvas.GetComponent<AnimationDataModel>();
 
@@ -166,7 +171,7 @@ namespace SEE.Game.Evolution
                 AddMarker(markerPos, comment);
             }
 
-            SetMode(true);
+            SetMode(false);
             OnShownGraphHasChanged();
             evolutionRenderer.Register(OnShownGraphHasChanged);
         }
@@ -329,9 +334,9 @@ namespace SEE.Game.Evolution
         {
             selectedMarker = clickedMarker;
             string commentName = clickedMarker.GetHashCode().ToString() + "-comment";
-            if (animationDataModel.Slider.transform.Find(commentName) != null)
+            if (clickedMarker.transform.Find(commentName) != null)
             {
-                GameObject comment = animationDataModel.Slider.transform.Find(commentName).gameObject;
+                GameObject comment = clickedMarker.transform.Find(commentName).gameObject;
                 comment.SetActive(!comment.activeSelf);
             }
         }
@@ -346,10 +351,10 @@ namespace SEE.Game.Evolution
         {
             string commentName = marker.GetHashCode().ToString() + "-comment";
             InputField commentField = Instantiate(animationDataModel.CommentPrefab);
-            Vector3 markerPos = marker.transform.position;
-            Vector3 commentPos = new Vector3(markerPos.x + 0.15f, markerPos.y, markerPos.z);
-            commentField.transform.SetParent(animationDataModel.Slider.transform, false);
-            commentField.transform.position = commentPos;
+            Vector3 commentPos = new Vector3(1500f, 0, 0);
+            commentField.transform.SetParent(marker.transform, false);
+            commentField.transform.localScale = new Vector3(16f, 1f, 1f);
+            commentField.transform.localPosition = commentPos;
             commentField.name = commentName;
             if (comment != null) 
             {
@@ -399,55 +404,56 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// Handles the user input as follows:
-        ///   k   => previous graph revision is shown
-        ///   l   => next graph revision is shown
-        ///   m   => create new marker
-        ///   tab => auto-play mode is toggled
-        ///   del => delete selected marker
-        ///   0-9 => the time in between two revisions in auto-play mode is adjusted
+        ///   KeyBindings.PreviousRevision => previous graph revision is shown
+        ///   KeyBindings.NextRevision     => next graph revision is shown
+        ///   KeyBindings.SetMarker        => create new marker
+        ///   KeyBindings.ToggleAutoPlay   => auto-play mode is toggled
+        ///   KeyBindings.DeleteMarker     => delete selected marker
+        ///   KeyBindings.IncreaseAnimationSpeed => double animation speed
+        ///   KeyBindings.DecreaseAnimationSpeed => halve animation speed
         ///   ESC => toggle between the two canvases AnimationCanvas and RevisionSelectionCanvas
         /// </summary>
         private void Update()
         {
             if (!IsRevisionSelectionOpen)
             {
-                if (Input.GetKeyDown("k"))
+                if (Input.GetKeyDown(KeyBindings.PreviousRevision))
                 {
                     evolutionRenderer.ShowPreviousGraph();
                 }
-                else if (Input.GetKeyDown("l"))
+                else if (Input.GetKeyDown(KeyBindings.NextRevision))
                 {
                     evolutionRenderer.ShowNextGraph();
                 }
-                else if (Input.GetKeyDown(KeyCode.Tab))
+                else if (Input.GetKeyDown(KeyBindings.ToggleAutoPlay))
                 {
                     evolutionRenderer.ToggleAutoPlay();
-                } else if (Input.GetKeyDown("m"))
+                } 
+                else if (Input.GetKeyDown(KeyBindings.SetMarker))
                 {
                     Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
                     Vector3 markerPos = new Vector3(handlePos.x, handlePos.y + .08f, handlePos.z);
-                    if (sliderMarkerContainer.getSliderMarkerForLocation(markerPos) != null) 
-                    { 
-                        return;
-                    }
-                    AddMarker(markerPos, null);
-                } else if (Input.GetKeyDown(KeyCode.Delete))
+                    if (sliderMarkerContainer.getSliderMarkerForLocation(markerPos) == null) 
+                    {
+                        AddMarker(markerPos, null);
+                    }                    
+                } 
+                else if (Input.GetKeyDown(KeyBindings.DeleteMarker))
                 {
                     RemoveMarker(selectedMarker);
                 }
-
-                string[] animationTimeKeys = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
-                float[] animationTimeValues = { 0.1f, 0.5f, 1, 2, 3, 4, 5, 8, 16, 0 };
-                for (int i = 0; i < animationTimeKeys.Length; i++)
+                else if (Input.GetKeyDown(KeyBindings.IncreaseAnimationSpeed))
                 {
-                    if (Input.GetKeyDown(animationTimeKeys[i]))
-                    {
-                        evolutionRenderer.AnimationLag = animationTimeValues[i];
-                    }
+                    evolutionRenderer.AnimationLag = Mathf.Max(0.25f, evolutionRenderer.AnimationLag / 2);
+                    Debug.Log($"new animation lag is {evolutionRenderer.AnimationLag}\n");
                 }
-
+                else if (Input.GetKeyDown(KeyBindings.DecreaseAnimationSpeed))
+                {
+                    evolutionRenderer.AnimationLag = Mathf.Min(16.0f, evolutionRenderer.AnimationLag * 2);
+                    Debug.Log($"new animation lag is {evolutionRenderer.AnimationLag}\n");
+                }
             }
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (Input.GetKeyDown(KeyBindings.ToggleEvolutionCanvases))
             {
                 ToogleMode();
             }

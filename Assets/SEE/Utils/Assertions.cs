@@ -17,6 +17,7 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using SEE.GO;
 using System;
 using System.Diagnostics;
 
@@ -50,18 +51,17 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Disables the given MonoBehaviour and prints the given message, if the given
-        /// condition is <code>true</code>.
+        /// Disables the given <paramref name="monoBehaviour"/> and prints the given message, 
+        /// if the given <paramref name="condition"/> is <c>true</c>.
         /// </summary>
-        /// <param name="monoBehaviour">The MonoBehaviour to disable on condition.
-        /// </param>
+        /// <param name="monoBehaviour">The MonoBehaviour to disable on condition.</param>
         /// <param name="condition">The condition to check.</param>
         /// <param name="message">The message to print on condition.</param>
         public static void DisableOnCondition(UnityEngine.MonoBehaviour monoBehaviour, bool condition, string message)
         {
             if (condition)
             {
-                UnityEngine.Debug.LogErrorFormat("DesktopNavigationAction of game object {0}: {1}. Component will be disabled.\n", monoBehaviour.name, message);
+                UnityEngine.Debug.LogError($"{monoBehaviour.GetType().FullName} of game object {monoBehaviour.gameObject.FullName()}: {message}. Component will be disabled.\n");
                 monoBehaviour.enabled = false;
             }
         }

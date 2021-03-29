@@ -1,9 +1,9 @@
-﻿using NetworkCommsDotNet;
-using NetworkCommsDotNet.Connections;
-using NetworkCommsDotNet.Connections.TCP;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using NetworkCommsDotNet;
+using NetworkCommsDotNet.Connections;
+using NetworkCommsDotNet.Connections.TCP;
 
 namespace SEE.Net
 {
@@ -16,7 +16,7 @@ namespace SEE.Net
         /// <summary>
         /// The identifier for packets designated to the client.
         /// </summary>
-        public static readonly string PacketType = "Client";
+        public const string PacketType = "Client";
 
         /// <summary>
         /// The connecting to the server.
@@ -31,12 +31,12 @@ namespace SEE.Net
         /// <summary>
         /// The local end point of the client.
         /// </summary>
-        public static IPEndPoint LocalEndPoint { get => Connection != null ? (IPEndPoint)Connection.ConnectionInfo.LocalEndPoint : null; }
+        public static IPEndPoint LocalEndPoint => (IPEndPoint) Connection?.ConnectionInfo.LocalEndPoint;
 
         /// <summary>
         /// The remote end point of the server, this client is connected to.
         /// </summary>
-        public static IPEndPoint RemoteEndPoint { get => Connection != null ? (IPEndPoint)Connection.ConnectionInfo.RemoteEndPoint : null; }
+        public static IPEndPoint RemoteEndPoint => (IPEndPoint) Connection?.ConnectionInfo.RemoteEndPoint;
 
         /// <summary>
         /// The ID of the next incoming packet of the server. Is used to ensure the
@@ -54,8 +54,6 @@ namespace SEE.Net
         /// </summary>
         private static bool initialized = false;
 
-
-
         /// <summary>
         /// Connects to the server or switches to offline mode if not possible.
         /// </summary>
@@ -70,7 +68,7 @@ namespace SEE.Net
 
                 List<IPEndPoint> endPoints = Network.HostServer
                     ? (from connectionListener in Server.ConnectionListeners select connectionListener.LocalListenEndPoint as IPEndPoint).ToList()
-                    : new List<IPEndPoint>() { new IPEndPoint(IPAddress.Parse(Network.RemoteServerIPAddress), Network.RemoteServerPort) };
+                    : new List<IPEndPoint> { new IPEndPoint(IPAddress.Parse(Network.RemoteServerIPAddress), Network.RemoteServerPort) };
 
                 bool success = false;
                 foreach (ConnectionInfo connectionInfo in from endPoint in endPoints select new ConnectionInfo(endPoint))
@@ -79,7 +77,7 @@ namespace SEE.Net
                     {
                         Connection = TCPConnection.GetConnection(connectionInfo);
                         success = true;
-                        Logger.Log("Connection with server established: " + Connection.ToString());
+                        Logger.Log($"Connection with server established: {Connection}");
                         break;
                     }
                     catch (ConnectionSetupException) { }

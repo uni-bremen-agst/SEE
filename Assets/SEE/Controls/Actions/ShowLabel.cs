@@ -188,9 +188,11 @@ namespace SEE.Controls.Actions
         /// <param name="city">the code city holding the attributes for showing labels</param>
         /// <param name="isLeaf">whether this node is a leaf</param>
         /// <returns>true iff labels are enabled for this kind of node</returns>
-        private bool LabelsEnabled(AbstractSEECity city, bool isLeaf)
+        private static bool LabelsEnabled(AbstractSEECity city, bool isLeaf)
         {
-            return isLeaf && city.LeafLabelSettings.Show || !isLeaf && city.InnerNodeLabelSettings.Show;
+            // For leaves, we don't want to display labels if code is already shown for the node.
+            return isLeaf && city.LeafLabelSettings.Show && !ActionState.Is(ActionStateType.ShowCode) 
+                   || !isLeaf && city.InnerNodeLabelSettings.Show;
         }
 
         /// <summary>
@@ -207,7 +209,7 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            bool isLeaf = SceneQueries.IsLeaf(gameObject);
+            bool isLeaf = gameObject.IsLeaf();
             if (!LabelsEnabled(city, isLeaf))
             {
                 return; // If labels are disabled, we don't need to do anything
@@ -266,7 +268,7 @@ namespace SEE.Controls.Actions
         {
             // On the HoloLens, we want to make the text a bit easier to read by making it bolder.
             // We do this by adding a slight outline.
-            bool enableOutline = PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.HoloLens;
+            bool enableOutline = PlayerSettings.GetInputType() == PlayerInputType.HoloLensPlayer;
             // However, when developing on a PC/Emulator, the background will be black, so we add a white outline.
             Color outlineColor = Debug.isDebugBuild ? Color.white : Color.black;
             if (nodeLabel.TryGetComponent(out TextMeshPro tm))
