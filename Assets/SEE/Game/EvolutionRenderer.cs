@@ -30,6 +30,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
+using System.Runtime.CompilerServices;
 
 namespace SEE.Game
 {
@@ -258,17 +259,17 @@ namespace SEE.Game
         /// <summary>
         /// List for saving the copied nodes. Is used for animation.
         /// </summary>
-        private List<GameObject> animationNodes = new List<GameObject>();
+        private readonly IList<GameObject> animationNodes = new List<GameObject>();
 
         /// <summary>
         /// List for saving the deactivated nodes. Is used for animation.
         /// </summary>
-        private List<GameObject> currentNodes = new List<GameObject>();
+        private readonly IList<GameObject> currentNodes = new List<GameObject>();
 
         /// <summary>
-        /// List to add markers to the animated nodes afterwards
+        /// List to add markers to the animated nodes afterwards.
         /// </summary>
-        private List<(GameObject, MarkerType)> animationMarker = new List<(GameObject, MarkerType)>();
+        private readonly IList<(GameObject, MarkerType)> animationMarker = new List<(GameObject, MarkerType)>();
 
         /// <summary>
         /// Allows the comparison of two instances of <see cref="Edge"/> from different graphs.
@@ -766,13 +767,13 @@ namespace SEE.Game
                 animationMarker.Add((currentGameNode, MarkerType.Born));
                 difference = Difference.Added;
 
-                // Set the layout for the copied node
+                // Set the layout for the copied node.
                 animationNode.transform.localScale = layoutNode.LocalScale;
                 animationNode.transform.position = layoutNode.CenterPosition;
             }
             else
             {
-                // node existed before
+                // Node existed before.
                 if (diff.AreDifferent(formerGraphNode, graphNode))
                 {
                     difference = Difference.Changed;
@@ -782,7 +783,7 @@ namespace SEE.Game
                 {
                     difference = Difference.None;
                 }
-                // Set the layout for the copied node
+                // Set the layout for the copied node.
                 animationNode.transform.localScale = new Vector3(currentGameNode.transform.localScale.x, 0.0001f, currentGameNode.transform.localScale.z);
                 animationNode.transform.position = currentGameNode.transform.position;
             }
@@ -800,10 +801,7 @@ namespace SEE.Game
         /// <param name="gameObject">game object to be destroyed</param>
         private void OnRemovedNodeFinishedAnimation(object gameObject)
         {
-            if (gameObject != null && gameObject is GameObject)
-            {
-                Destroy((GameObject)gameObject);
-            }
+            DestroyGameObject(gameObject);
         }
 
         /// <summary>
@@ -814,8 +812,17 @@ namespace SEE.Game
         /// <param name="gameObject">game object to be destroyed</param>
         private void OnAnimationNodeAnimationFinished(object gameObject)
         {
-            
-            if (gameObject != null && gameObject is GameObject)
+            DestroyGameObject(gameObject);
+        }
+
+        /// <summary>
+        /// Destroys <paramref name="gameObject"/> if it is an instance of <see cref="GameObject"/>.
+        /// </summary>
+        /// <param name="gameObject">object to be destroyed</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void DestroyGameObject(object gameObject)
+        {
+            if (gameObject is GameObject)
             {
                 Destroy((GameObject)gameObject);
             }
