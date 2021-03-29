@@ -8,10 +8,10 @@ namespace SEE.Utils
     /// A class for animating objects (tweening).
     /// </summary>
     internal class Tweens : MonoBehaviour
-    {
-        
+    {        
         /// <summary>
-        /// Moves a GameObject to a specific position over a given duration. And makes a callback if this is not null
+        /// Moves a GameObject to a specific position over a given duration
+        /// and makes a <paramref name="callback"/> if this is not null.
         /// </summary>
         /// <param name="gameObject">
         /// A <see cref="GameObject"/> to be the target of the animation.
@@ -38,7 +38,8 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Randomly shakes a GameObject's rotation by a diminishing amount over time with. And makes a callback if this is not null
+        /// Randomly shakes a GameObject's rotation by a diminishing amount over time with
+        /// and makes a <paramref name="callback"/> if this is not null.
         /// </summary>
         /// <param name="gameObject">
         /// A <see cref="GameObject"/> to be the target of the animation.
@@ -61,12 +62,12 @@ namespace SEE.Utils
             else
             {
                 gameObject.transform.DOShakeRotation(MaxAnimationTime, vector);
-            }
-            
+            }            
         }
 
         /// <summary>
-        /// Changes a GameObject's scale over time. And makes a callback if this is not null
+        /// Changes a GameObject's scale over time and makes a <paramref name="callback"/> 
+        /// if this is not null.
         /// </summary>
         /// <param name="gameObject">
         /// A <see cref="GameObject"/> to be the target of the animation.
@@ -89,8 +90,7 @@ namespace SEE.Utils
             else
             {
                 gameObject.transform.DOScale(localScale, MaxAnimationTime);
-            }
-            
+            }            
         }
     }
 }
