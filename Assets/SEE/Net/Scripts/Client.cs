@@ -54,8 +54,6 @@ namespace SEE.Net
         /// </summary>
         private static bool initialized = false;
 
-
-
         /// <summary>
         /// Connects to the server or switches to offline mode if not possible.
         /// </summary>
@@ -79,7 +77,7 @@ namespace SEE.Net
                     {
                         Connection = TCPConnection.GetConnection(connectionInfo);
                         success = true;
-                        Logger.Log("Connection with server established: " + Connection);
+                        Logger.Log($"Connection with server established: {Connection}");
                         break;
                     }
                     catch (ConnectionSetupException) { }
