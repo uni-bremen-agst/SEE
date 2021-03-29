@@ -269,29 +269,29 @@ namespace SEE.DataModel.DG
         {
             if (ReferenceEquals(edge, null))
             {
-                throw new Exception("edge must not be null");
+                throw new Exception("Edge must not be null.");
             }
 
             if (ReferenceEquals(edge.Source, null) || ReferenceEquals(edge.Target, null))
             {
-                throw new Exception("source/target of this node is null");
+                throw new Exception("Source/target of this edge is null.");
             }
 
             if (ReferenceEquals(edge.ItsGraph, null))
             {
                 if (edge.Source.ItsGraph != this)
                 {
-                    throw new Exception("source node " + edge.Source + " is not in the graph");
+                    throw new Exception($"Source node {edge.Source} is not in the graph.");
                 }
 
                 if (edge.Target.ItsGraph != this)
                 {
-                    throw new Exception("target node " + edge.Target + " is not in the graph");
+                    throw new Exception($"Target node {edge.Target} is not in the graph.");
                 }
 
                 if (edges.ContainsKey(edge.ID))
                 {
-                    throw new Exception("There is already an edge with the ID " + edge.ID);
+                    throw new Exception($"There is already an edge with the ID {edge.ID}.");
                 }
 
                 edge.ItsGraph = this;
@@ -301,7 +301,7 @@ namespace SEE.DataModel.DG
             }
             else
             {
-                throw new Exception("edge " + edge + " is already in a graph " + edge.ItsGraph.Name);
+                throw new Exception($"Edge {edge} is already in a graph {edge.ItsGraph.Name}.");
             }
         }
 
