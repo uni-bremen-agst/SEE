@@ -26,6 +26,16 @@ using UnityEngine;
 
 namespace SEE.DataModel
 {
+    /// <summary>
+    /// Thrown if the input contains a malformed statement.
+    /// </summary>
+    public class MalformedStatement : Exception
+    {
+        public MalformedStatement(string message) : base(message)
+        {
+        }
+    }
+
     [Serializable]
     public class ParsedJLG
     {
@@ -33,19 +43,21 @@ namespace SEE.DataModel
         /// Contains a list with all paths to all java classes of the logged programm.
         /// </summary>
         [SerializeField]
-        private List<string> filesOfProject;
+        private IList<string> filesOfProject;
 
         /// <summary>
-        /// Lookuptable for the location of a JavaStatement. The number saved in the location of a JavaStatement equals the index in this table of its location.
+        /// Look-up table for the location of a JavaStatement. The number saved in the location of a 
+        /// JavaStatement equals the index in this table of its location.
         /// </summary>   
         [SerializeField]
-        private List<string> locationLookupTable;
+        private IList<string> locationLookupTable;
 
         /// <summary>
-        /// Lookuptable for the names of all fields in the parsed javalog. The number used to identify a field is the index of its name in the lookuptable.
+        /// Look-up table for the names of all fields in the parsed javalog. The number used to identify 
+        /// a field is the index of its name in the lookuptable.
         /// </summary>
         [SerializeField]
-        private List<string> fieldLookupTable;
+        private IList<string> fieldLookupTable;
 
         /// <summary>
         /// List containing all parsed JavaStatements.
@@ -54,7 +66,8 @@ namespace SEE.DataModel
         private List<JavaStatement> allStatements;
 
         /// <summary>
-        /// This Stack contains all return Values, until the current Point in the Visualization. It is filled and used, when a ParsedJLG object is being visualized by a JLGVisualizer script.
+        /// This Stack contains all return Values, until the current Point in the Visualization. It is 
+        /// filled and used, when a ParsedJLG object is being visualized by a JLGVisualizer script.
         /// </summary>
         [SerializeField]
         private Stack<String> returnValues = new Stack<string>();
@@ -62,30 +75,47 @@ namespace SEE.DataModel
         /// <summary>
         /// Constructs a new ParsedJLG.
         /// </summary>
-        /// <param name="filesOfProject"></param>
-        /// <param name="locationLookupTable"></param>
-        /// <param name="fieldLookupTable"></param>
-        /// <param name="allStatements"></param>
-        public ParsedJLG(List<string> filesOfProject, List<string> locationLookupTable, List<string> fieldLookupTable, List<JavaStatement> allStatements)
+        /// <param name="filesOfProject">the source files of the project</param>
+        /// <param name="locationLookupTable">look-up table for the location of a JavaStatement</param>
+        /// <param name="fieldLookupTable">look-up table for the names of all fields</param>
+        /// <param name="allStatements">all parsed JavaStatements</param>
+        public ParsedJLG(List<string> filesOfProject, IList<string> locationLookupTable, IList<string> fieldLookupTable, List<JavaStatement> allStatements)
         {
             this.filesOfProject = filesOfProject;
             this.locationLookupTable = locationLookupTable;
             this.fieldLookupTable = fieldLookupTable;
             this.allStatements = allStatements;
+            DumpStatistics();
         }
 
-        public ParsedJLG() { }
+        private void DumpStatistics()
+        {
+            Debug.Log($"[JLG] Number of files: {filesOfProject.Count}\n");
+            Debug.Log($"[JLG] Number of fields: {fieldLookupTable.Count}\n");
+            Debug.Log($"[JLG] Number of static statements: {locationLookupTable.Count}\n");
+            Debug.Log($"[JLG] Number of executed statements: {allStatements.Count}\n");
+        }
 
         /// <summary>
-        /// This Method returns the Location for a given Index in the list.
+        /// This method returns the location for a given <paramref name="stmtIndex"/> in the list.
         /// </summary>
-        /// <param name="i">index of the Java statement in List allStatements</param>
-        /// <returns>The Location String from LocationLookupTable</returns>
-        public string GetStatementLocationString(int i) {
-            string location = locationLookupTable[int.Parse(allStatements[i].Location)];
+        /// <param name="stmtIndex">index of the Java statement in list <see cref="allStatements"/></param>
+        /// <returns>The location string from <see cref="locationLookupTable"/></returns>
+        /// <exception cref="MalformedStatement">thrown if a malformed statement is encountered</exception>
+        public string GetStatementLocationString(int stmtIndex)
+        {
+            string location = locationLookupTable[int.Parse(allStatements[stmtIndex].Location)];
             int l = location.IndexOf('(');
+            if (l < 0)
+            {
+                throw new MalformedStatement($"Malformed statement '{locationLookupTable[int.Parse(allStatements[stmtIndex].Location)]}' at statement index {stmtIndex}: '(' expected.");
+            }
             location = location.Substring(0, l + 1);
             l = location.LastIndexOf('.');
+            if (l < 0)
+            {
+                throw new MalformedStatement($"Malformed statement '{locationLookupTable[int.Parse(allStatements[stmtIndex].Location)]}' at statement index {stmtIndex}: '.' expected.");
+            }
             location = location.Substring(0, l);
             return location;
         }
@@ -95,17 +125,18 @@ namespace SEE.DataModel
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        private string LookupFieldLocation(string s) {
+        private string LookupFieldLocation(string s)
+        {
             int i = s.IndexOf('=');
-            return fieldLookupTable[int.Parse(s.Substring(0, i))] + s.Substring(i); 
+            return fieldLookupTable[int.Parse(s.Substring(0, i))] + s.Substring(i);
         }
 
         /// <summary>
         /// getter for the fields of a ParsedJLG
         /// </summary>
-        public List<string> FilesOfProject { get => filesOfProject; }
-        public List<string> LocationLookupTable { get => locationLookupTable; }
-        public List<string> FieldLookupTable { get => fieldLookupTable; }
+        public IList<string> FilesOfProject { get => filesOfProject; }
+        public IList<string> LocationLookupTable { get => locationLookupTable; }
+        public IList<string> FieldLookupTable { get => fieldLookupTable; }
         public List<JavaStatement> AllStatements { get => allStatements; }
         public Stack<string> ReturnValues { get => returnValues; set => returnValues = value; }
 
@@ -149,10 +180,10 @@ namespace SEE.DataModel
             //Add the return value of this statement (and its method) to the info string
             if (js.ReturnValue != null)
             {
-                info = info + Environment.NewLine+ locationLookupTable[int.Parse(js.Location)] + " returns: "+ js.ReturnValue;
+                info = info + Environment.NewLine + locationLookupTable[int.Parse(js.Location)] + " returns: " + js.ReturnValue;
                 if (AddReturnValueToStack)
                 {
-                    returnValues.Push(locationLookupTable[int.Parse(js.Location)] +  " returned "+js.ReturnValue);
+                    returnValues.Push(locationLookupTable[int.Parse(js.Location)] + " returned " + js.ReturnValue);
                 }
             }
             return info;

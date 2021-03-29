@@ -1,5 +1,6 @@
 ﻿/// Code from http://wiki.unity3d.com/index.php?title=CameraFacingBillboard
 /// Credits go to Neil Carter (NCarter)
+using SEE.Utils;
 using UnityEngine;
 
 /// <summary>
@@ -12,12 +13,7 @@ public class ScrollableTextWindowFaceCamera : MonoBehaviour
 
     private void Start()
     {
-        if (Camera.allCamerasCount > 1)
-        {
-            Debug.LogWarning("There is more than one camera in the scene.\n");
-        }
-        mainCamera = Camera.main.transform;
-        Debug.LogFormat("ScrollableTextWindows will be facing camera in {0}.\n", mainCamera.name);
+        mainCamera = MainCamera.Camera.transform;
     }
 
     void LateUpdate()
