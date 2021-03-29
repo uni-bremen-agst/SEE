@@ -26,19 +26,39 @@ namespace SEE.Controls
         public static void PrepareForInteraction(GameObject gameObject)
         {
             gameObject.isStatic = false; // we want to move the object during the game
-            Interactable interactable = gameObject.AddComponent<Interactable>(); // enable interactions
+            Interactable interactable = gameObject.AddComponentIfNecessary<Interactable>();           
             interactable.highlightOnHover = false;
-            gameObject.AddComponent<InteractableObject>();
+            gameObject.AddComponentIfNecessary<InteractableObject>();
             // The following additions of components must come after the addition of InteractableObject
             // because they require the presence of an InteractableObject.
-            gameObject.AddComponent<ShowHovering>();
-            gameObject.AddComponent<ShowSelection>();
-            gameObject.AddComponent<ShowGrabbing>();
+            gameObject.AddComponentIfNecessary<ShowHovering>();
+            gameObject.AddComponentIfNecessary<ShowSelection>();
+            gameObject.AddComponentIfNecessary<ShowGrabbing>();
             if (gameObject.HasNodeRef())
             {
-                gameObject.AddComponent<GameNodeScaler>();
-                gameObject.AddComponent<ShowLabel>();
-                gameObject.AddComponent<EyeGazeHandler>();
+                gameObject.AddComponentIfNecessary<GameNodeScaler>();
+                gameObject.AddComponentIfNecessary<ShowLabel>();
+                gameObject.AddComponentIfNecessary<EyeGazeHandler>();
+            }
+        }
+
+        /// <summary>
+        /// Adds a component of type <typeparamref name="T"/> to <paramref name="gameObject"/>
+        /// if <paramref name="gameObject"/> does not have one already. The new or the
+        /// existing component, respectively, is returned.
+        /// </summary>
+        /// <typeparam name="T">component that should be part of <paramref name="gameObject"/></typeparam>
+        /// <param name="gameObject">game object that should have a component of <typeparamref name="T"/></param>
+        /// <returns>component in <paramref name="gameObject"/></returns>
+        private static T AddComponentIfNecessary<T>(this GameObject gameObject) where T : MonoBehaviour
+        {
+            if (gameObject.TryGetComponent<T>(out T component))
+            {
+                return component;
+            }
+            else
+            {
+                return gameObject.AddComponent<T>();
             }
         }
 

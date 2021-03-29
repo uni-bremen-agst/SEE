@@ -207,7 +207,7 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            bool isLeaf = SceneQueries.IsLeaf(gameObject);
+            bool isLeaf = gameObject.IsLeaf();
             if (!LabelsEnabled(city, isLeaf))
             {
                 return; // If labels are disabled, we don't need to do anything
