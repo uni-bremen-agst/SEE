@@ -600,6 +600,12 @@ MonoBehaviour:
     Root: 2
     relativePath: 
     absolutePath: 
+  BreakpointClass: classname
+  BreakpointLine: 0
+  DistanceAboveCity: 1
+  DistanceBehindCity: 0.5
+  LineWidth: 0.01
+  ShowOnlyCalls: 1
   JLGPath:
     Root: 1
     relativePath: /Data/GXL/TestProjectToDebug/CodeFacts.jlg
@@ -710,8 +716,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.84, y: 0.964, z: -1.16}
   m_LocalScale: {x: 1, y: 0.0001, z: 1}
-  m_Children:
-  - {fileID: 675734589}
+  m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1035,7 +1040,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AdditionColor: {r: 0, g: 1, b: 0, a: 1}
-  ChangeColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  ChangeColor: {r: 0, g: 0, b: 1, a: 1}
   DeletionColor: {r: 1, g: 0, b: 0, a: 1}
   Scale: {x: 0.02, y: 0.3, z: 0.02}
 --- !u!114 &551180593
@@ -1395,7 +1400,7 @@ MonoBehaviour:
   LeafObjects: 0
   InnerNodeObjects: 0
   NodeLayout: 3
-  EdgeLayout: 3
+  EdgeLayout: 0
   ZScoreScale: 0
   EdgeWidth: 0.001
   ShowErosions: 0
@@ -1406,7 +1411,7 @@ MonoBehaviour:
   TubularSegments: 50
   Radius: 0.005
   RadialSegments: 8
-  isEdgeSelectable: 1
+  isEdgeSelectable: 0
   MaxRevisionsToLoad: 500
   MarkerHeight: 0.2
   MarkerWidth: 0.01
@@ -1635,67 +1640,6 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
---- !u!1 &675734588
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 675734589}
-  - component: {fileID: 675734590}
-  m_Layer: 0
-  m_Name: JLG Visualization
-  m_TagString: JLG Visualization
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &675734589
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 675734588}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.84, y: -9640, z: 1.16}
-  m_LocalScale: {x: 1, y: 10000, z: 1}
-  m_Children: []
-  m_Father: {fileID: 155696312}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &675734590
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 675734588}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9aec9929283525040bdb89e1d9cfd8ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  serializationData:
-    SerializedFormat: 2
-    SerializedBytes: 
-    ReferencedUnityObjects: []
-    SerializedBytesString: 
-    Prefab: {fileID: 0}
-    PrefabModificationsReferencedUnityObjects: []
-    PrefabModifications: []
-    SerializationNodes:
-    - Name: parsedJLG
-      Entry: 6
-      Data: 
-  jlgFilePath: C:\Users\koschke\SEA.new\Data\GXL\TestProjectToDebug\CodeFacts.jlg
-  BreakpointClass: classname
-  BreakpointLine: 0
-  DistanceAboveCity: 0.01
-  DistanceBehindCity: 0.3
-  LineWidth: 0.01
 --- !u!1 &708170054
 GameObject:
   m_ObjectHideFlags: 0
