@@ -73,7 +73,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// True if the action history is empty.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>true if the action history is empty</returns>
         internal static bool IsEmpty()
         {
             return history.UndoCount == 0;
