@@ -283,6 +283,7 @@ namespace SEE.Controls
                     Teleport.instance.CancelTeleportHint();
                 }
             }
+            KeyBindings.PrintBindings();
         }
 
         /// <summary>
@@ -390,6 +391,10 @@ namespace SEE.Controls
                         hand.SetSkeletonRangeOfMotion(EVRSkeletalMotionRange.WithController);
                     }
                 }
+            }
+            if (Input.GetKeyDown(KeyBindings.Help))
+            {
+                KeyBindings.PrintBindings();
             }
         }
     }
