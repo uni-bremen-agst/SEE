@@ -1,6 +1,7 @@
 ﻿// Code from http://wiki.unity3d.com/index.php?title=CameraFacingBillboard
 // Credits go to Neil Carter (NCarter)
 
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.GameObjects
@@ -18,11 +19,7 @@ namespace SEE.GameObjects
 
         private void Start()
         {
-            if (Camera.allCamerasCount > 1)
-            {
-                Debug.LogWarning("There is more than one camera in the scene.\n");
-            }
-            mainCamera = Camera.main.transform;
+            mainCamera = MainCamera.Camera.transform;
         }
 
         private void LateUpdate()
