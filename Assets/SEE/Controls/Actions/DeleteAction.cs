@@ -122,7 +122,7 @@ namespace SEE.Controls.Actions
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
                 explicitlyDeletedNodesAndEdges.Add(selectedObject);
                 DeleteSelectedObject(selectedObject);               
-                DumpStatus();
+                hadAnEffect = true;
                 // the selected objects are deleted and this action is done now
                 return true; 
             }
@@ -163,17 +163,6 @@ namespace SEE.Controls.Actions
             }
             // FIXME:(Thore) NetAction is no longer up to date
             new DeleteNetAction(selectedObject.name).Execute(null);
-        }
-
-        private void DumpStatus()
-        {
-            Debug.Log($"Explicitly deleted elements: {explicitlyDeletedNodesAndEdges.Count}.\n");
-            foreach (GameObject deleted in explicitlyDeletedNodesAndEdges)
-            {
-                Debug.Log($"Explicitly deleted {deleted.name}\n");
-            }
-            Debug.Log($"Implicitly deleted nodes: {DeletedNodes.Count}.\n");
-            Debug.Log($"Implicitly deleted edges: {DeletedEdges.Count}.\n");
         }
 
         /// <summary>

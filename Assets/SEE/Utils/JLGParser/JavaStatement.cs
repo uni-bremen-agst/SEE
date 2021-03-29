@@ -28,6 +28,16 @@ using UnityEngine;
 namespace SEE.Utils
 {
     /// <summary>
+    /// The kind of statement with regard to interprocedural control flow.
+    /// </summary>
+    public enum StatementKind
+    {
+        Entry,  // call
+        Exit,   // return
+        Normal  // other type of statement
+    }
+
+    /// <summary>
     /// A JavaStatement represents a single logged executed line of Java code. It contains the location, which is a numeric value that can be looked up 
     /// in a lookuptable contained in the ParsedJLG object this object belongs to, its line number in the class,
     /// the local variables available at the line of code and field changes, if it changes a field. The location and field names are coded and can be decoded with
@@ -56,7 +66,7 @@ namespace SEE.Utils
         private List<String> localVariables = new List<String>();
 
         /// <summary>
-        /// Classfields changes executed by this statement. Can be empty.
+        /// Class-field changes executed by this statement. Can be empty.
         /// </summary>
         [SerializeField]
         private List<String> fieldChanges = new List<String>();
@@ -65,7 +75,7 @@ namespace SEE.Utils
         /// The statement type. It can enter a method, exit a method or just be a basic statement within a method.
         /// </summary>
         [SerializeField]
-        private String statementType;
+        private StatementKind statementType;
 
         /// <summary>
         /// This field contains the return value of a statement, if it has one. Otherwise it is not used and stays null.
@@ -83,7 +93,7 @@ namespace SEE.Utils
         /// </summary>
         public void SetTypeEntry()
         {
-            this.StatementType = "entry";
+            this.StatementType = StatementKind.Entry;
         }
 
         /// <summary>
@@ -91,7 +101,7 @@ namespace SEE.Utils
         /// </summary>
         public void SetTypeNormal()
         {
-            this.StatementType = "normal";
+            this.StatementType = StatementKind.Normal;
         }
 
         /// <summary>
@@ -99,13 +109,13 @@ namespace SEE.Utils
         /// </summary>
         public void SetTypeExit()
         {
-            this.StatementType = "exit";
+            this.StatementType = StatementKind.Exit;
         }
 
-        public int LineAsInt() {
+        public int LineAsInt() 
+        {
             return int.Parse(Line);
         }
-
 
         ///Getters and setters.
         public string Location { get => location; set => location = value; }
@@ -114,7 +124,7 @@ namespace SEE.Utils
 
         public List<string> LocalVariables { get => localVariables; set => localVariables = value; }
 
-        public string StatementType { get => statementType; set => statementType = value; }
+        public StatementKind StatementType { get => statementType; set => statementType = value; }
 
         public string ReturnValue { get => returnValue; set => returnValue = value; }
 

@@ -41,6 +41,39 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// True if <paramref name="gameNode"/> represents a leaf in the graph.
+        /// 
+        /// Precondition: <paramref name="gameNode"/> has a NodeRef component attached to it
+        /// that is a valid graph node reference.
+        /// </summary>
+        /// <param name="gameNode">game object representing a Node to be queried whether it is a leaf</param>
+        /// <returns>true if <paramref name="gameNode"/> represents a leaf in the graph</returns>
+        public static bool IsLeaf(this GameObject gameNode)
+        {
+            return gameNode.GetComponent<NodeRef>()?.Value?.IsLeaf() ?? false;
+        }
+
+        /// <summary>
+        /// Returns all transitive children of <paramref name="gameObject"/> tagged by 
+        /// given <paramref name="tag"/> (including <paramref name="gameObject"/> itself).
+        /// </summary>
+        /// <param name="tag">tag the ancestors must have</param>
+        /// <returns>all transitive children with <paramref name="tag"/></returns>
+        public static List<GameObject> AllAncestors(this GameObject gameObject, string tag)
+        {
+            List<GameObject> result = new List<GameObject>();
+            if (gameObject.CompareTag(tag))
+            {
+                result.Add(gameObject);
+            }
+            foreach (Transform child in gameObject.transform)
+            {
+                result.AddRange(child.gameObject.AllAncestors(tag));
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Returns the render-queue offset of given <paramref name="gameObject"/>.
         /// 
         /// Precondition: <paramref name="gameObject"/> must have a renderer attached

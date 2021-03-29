@@ -817,11 +817,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 419627336, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1611227358, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
       propertyPath: m_Pivot.x
@@ -1021,7 +1021,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &551180592
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1371,14 +1371,14 @@ MonoBehaviour:
   LeafObjects: 0
   InnerNodeObjects: 0
   NodeLayout: 3
-  EdgeLayout: 0
+  EdgeLayout: 3
   ZScoreScale: 0
-  EdgeWidth: 0.3
+  EdgeWidth: 0.001
   ShowErosions: 0
   MaxErosionWidth: 1
   EdgesAboveBlocks: 1
   Tension: 0.85
-  RDP: 0.05
+  RDP: 0.0005
   TubularSegments: 50
   Radius: 0.005
   RadialSegments: 8
@@ -1391,7 +1391,7 @@ MonoBehaviour:
   DeletionBeamColor: {r: 0, g: 0, b: 0, a: 1}
   GXLDirectory:
     Root: 1
-    relativePath: /Data/GXL/animation-clones
+    relativePath: /Data/GXL/animation-clones-log4j
     absolutePath: 
 --- !u!114 &551180596
 MonoBehaviour:
@@ -2499,7 +2499,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerInputType: 0
   PlayerOrigin: {x: 0, y: 0.5, z: -1.5}
-  FocusPlane: {fileID: 1972412193}
+  FocusPlane: {fileID: 551180596}
   Ground: {fileID: 1190604626}
   HideVRControllers: 0
   ShowControllerHints: 0
