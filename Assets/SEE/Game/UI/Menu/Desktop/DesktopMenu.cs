@@ -214,7 +214,6 @@ namespace SEE.Game.UI
         protected void RemoveDesktopButton(T entry)
         {
             Destroy(ButtonManagers.SingleOrDefault(x => x.buttonText == entry.Title)?.gameObject);
-
         }
 
         /// <summary>
