@@ -119,7 +119,8 @@ namespace SEE.Game.UI.CodeWindow
                         Destroy(Panel);
                     }
                 };
-            } else if (!Panel)
+            } 
+            else if (!Panel)
             {
                 // If no code window is initialized yet, there's nothing we can do
                 return;
