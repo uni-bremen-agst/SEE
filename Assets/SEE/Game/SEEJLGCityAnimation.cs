@@ -1,6 +1,5 @@
 ﻿using SEE.Controls;
 using SEE.DataModel;
-using SEE.DataModel.IO;
 using SEE.Game.Runtime;
 using SEE.GO;
 using SEE.Utils;
@@ -58,7 +57,7 @@ namespace SEE.Game
         /// (depending upon whether the execution is forward or backward, respectively), 
         /// that is, only interprocedural control flow will be shown.
         /// </summary>
-        public bool ShowOnlyCalls = true;
+        public bool ShowOnlyCalls = false;
 
         //-------------------------------------------------------
         // Private attributes not saved in the configuration file
