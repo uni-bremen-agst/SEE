@@ -440,11 +440,13 @@ namespace SEE.Game.Evolution
                 }
                 else if (Input.GetKeyDown(KeyBindings.IncreaseAnimationSpeed))
                 {
-                    evolutionRenderer.AnimationLag *= 2;
+                    evolutionRenderer.AnimationLag = Mathf.Max(0.25f, evolutionRenderer.AnimationLag / 2);
+                    Debug.Log($"new animation lag is {evolutionRenderer.AnimationLag}\n");
                 }
                 else if (Input.GetKeyDown(KeyBindings.DecreaseAnimationSpeed))
                 {
-                    evolutionRenderer.AnimationLag /= 2;
+                    evolutionRenderer.AnimationLag = Mathf.Min(16.0f, evolutionRenderer.AnimationLag * 2);
+                    Debug.Log($"new animation lag is {evolutionRenderer.AnimationLag}\n");
                 }
             }
             if (Input.GetKeyDown(KeyBindings.ToggleEvolutionCanvases))
