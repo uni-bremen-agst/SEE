@@ -28,7 +28,7 @@ namespace SEE.Game.UI
         /// This prefab should contain all components necessary for the UI canvas, such as an event system,
         /// a graphic raycaster, etc.
         /// </summary>
-        protected const string UI_CANVAS_PREFAB = "Prefabs/UI/UICanvas";
+        private const string UI_CANVAS_PREFAB = "Prefabs/UI/UICanvas";
 
         /// <summary>
         /// The canvas on which UI elements are placed.
@@ -40,7 +40,12 @@ namespace SEE.Game.UI
         /// <summary>
         /// The current platform.
         /// </summary>
-        private PlayerInputType platform;
+        protected PlayerInputType Platform { get; private set; }
+
+        /// <summary>
+        /// Whether the <see cref="Start"/> method of this component has already been called.
+        /// </summary>
+        protected bool HasStarted { get; private set; } = false;
 
         /// <summary>
         /// Called when the <see cref="Start()"/> method of this component is executed on the Desktop platform.
@@ -90,9 +95,11 @@ namespace SEE.Game.UI
                 Canvas.name = UI_CANVAS_NAME;
             }
             
+            HasStarted = true;
+            
             // Execute platform dependent code
-            platform = PlayerSettings.GetInputType();
-            switch (platform)
+            Platform = PlayerSettings.GetInputType();
+            switch (Platform)
             {
                 case PlayerInputType.DesktopPlayer: StartDesktop();
                     break;
@@ -109,11 +116,12 @@ namespace SEE.Game.UI
                 default: PlatformUnsupported();
                     break;
             }
+
         }
 
         protected void Update()
         {
-            switch (platform)
+            switch (Platform)
             {
                 case PlayerInputType.DesktopPlayer: UpdateDesktop();
                     break;
@@ -133,9 +141,9 @@ namespace SEE.Game.UI
         /// <summary>
         /// Logs an error with information about this platform and component and destroys this component.
         /// </summary>
-        private void PlatformUnsupported()
+        protected void PlatformUnsupported()
         {
-            Debug.LogError($"Component '{GetType().GetNiceName()}' doesn't support platform '{platform.ToString()}'."
+            Debug.LogError($"Component '{GetType().GetNiceName()}' doesn't support platform '{Platform.ToString()}'."
                            + " Component will now self-destruct.");
             Destroyer.DestroyComponent(this);
         }

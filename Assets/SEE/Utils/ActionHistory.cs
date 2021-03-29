@@ -238,12 +238,11 @@ namespace SEE.Utils
             if (RedoStack.Count > 0)
             {
                 Current?.Stop();
-
                 // the last undone action becomes the currently executed action again
                 ReversibleAction action = RedoStack.Pop();
                 UndoStack.Push(action);
                 action.Redo();
-                action.Start();                
+                action.Start();
             }
             else
             {
@@ -270,4 +269,3 @@ namespace SEE.Utils
         }
     }
 }
-

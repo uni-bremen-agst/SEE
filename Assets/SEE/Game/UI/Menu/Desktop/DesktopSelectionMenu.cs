@@ -1,4 +1,5 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using System.Collections.Generic;
+using Michsky.UI.ModernUIPack;
 using TMPro;
 
 namespace SEE.Game.UI
@@ -15,10 +16,10 @@ namespace SEE.Game.UI
         /// and this variable will be set to <see cref="GetActiveEntry"/>.
         /// </summary>
         private ToggleMenuEntry currentSelectedEntry;
-        
-        protected override void SetUpDesktopContent()
+
+        protected override void AddDesktopButtons(IEnumerable<ToggleMenuEntry> entries)
         {
-            base.SetUpDesktopContent();
+            base.AddDesktopButtons(entries);
             // Changes in comparison to the base method: 
             // 1. selecting an entry will close the menu
             // 2. the selected entry is highlighted
@@ -32,9 +33,9 @@ namespace SEE.Game.UI
         {
             base.UpdateDesktop();
             // Only change when a different entry has been selected
-            if (currentSelectedEntry != GetActiveEntry())
+            if (currentSelectedEntry != ActiveEntry)
             {
-                currentSelectedEntry = GetActiveEntry();
+                currentSelectedEntry = ActiveEntry;
                 foreach (ButtonManagerBasicWithIcon manager in ButtonManagers)
                 {
                     // Indicate selected button by typesetting it [LIKE THIS]
