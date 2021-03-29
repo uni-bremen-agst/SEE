@@ -1001,14 +1001,18 @@ namespace SEE.Game
                 Debug.LogErrorFormat("The value {0} is no valid index.\n", index);
                 return false;
             }
-            CurrentGraphIndex = index;
-
-            if (HasCurrentLaidOutGraph(out LaidOutGraph loadedGraph))
+            if (HasCurrentLaidOutGraph(out LaidOutGraph loadedGraph) && HasLaidOutGraph(index, out LaidOutGraph newGraph))
             {
-                DisplayGraphAsNew(loadedGraph);
+                CurrentGraphIndex = index;
+                TransitionToNextGraph(loadedGraph, newGraph);
                 return true;
             }
-            else
+            else if (!HasLaidOutGraph(index, out newGraph))
+            {
+                CurrentGraphIndex = index;
+                DisplayGraphAsNew(newGraph);
+                return true;
+            } else 
             {
                 Debug.LogErrorFormat("Could not retrieve a layout for graph with index {0}.\n", index);
                 return false;
