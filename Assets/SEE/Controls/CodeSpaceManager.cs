@@ -163,8 +163,7 @@ namespace SEE.Controls
 
         private void Update()
         {
-            // Show selection menu on TAB
-            if (Input.GetKeyDown(KeyCode.Tab))
+            if (Input.GetKeyDown(KeyBindings.ShowCodeWindowMenu))
             {
                 CodeWindowMenu.ToggleMenu();
             }
