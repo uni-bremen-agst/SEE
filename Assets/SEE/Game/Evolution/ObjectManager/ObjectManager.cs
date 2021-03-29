@@ -225,9 +225,12 @@ namespace SEE.Game.Evolution
             
             bool wasNodeRemoved = nodes.TryGetValue(node.ID, out gameObject);
             // Create power beam for deleted node
-            Vector3 powerBeamDimensions = gameObject.transform.position;
-            MoveScaleShakeAnimator.BeamAnimator.GetInstance().CreatePowerBeam(powerBeamDimensions, 
-                AdditionalBeamDetails.deletedBeamColor, AdditionalBeamDetails.powerBeamDimensions);
+            if (wasNodeRemoved)
+            {
+                Vector3 powerBeamDimensions = gameObject.transform.position;
+                MoveScaleShakeAnimator.BeamAnimator.GetInstance().CreatePowerBeam(powerBeamDimensions,
+                    AdditionalBeamDetails.deletedBeamColor, AdditionalBeamDetails.powerBeamDimensions);
+            }
             // Add the removed node id to the revision changes list
             NodeChangesBuffer.GetSingleton().removedNodeIDs.Add(node.ID);
 
