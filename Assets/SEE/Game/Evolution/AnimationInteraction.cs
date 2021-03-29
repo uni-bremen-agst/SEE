@@ -123,6 +123,10 @@ namespace SEE.Game.Evolution
 
         private void Init()
         {
+
+            Canvas canvas = AnimationCanvas.GetComponent<Canvas>();
+            canvas.worldCamera = MainCamera.Camera;
+
             revisionSelectionDataModel = RevisionSelectionCanvas.GetComponent<RevisionSelectionDataModel>();
             animationDataModel = AnimationCanvas.GetComponent<AnimationDataModel>();
 
@@ -330,9 +334,9 @@ namespace SEE.Game.Evolution
         {
             selectedMarker = clickedMarker;
             string commentName = clickedMarker.GetHashCode().ToString() + "-comment";
-            if (animationDataModel.Slider.transform.Find(commentName) != null)
+            if (clickedMarker.transform.Find(commentName) != null)
             {
-                GameObject comment = animationDataModel.Slider.transform.Find(commentName).gameObject;
+                GameObject comment = clickedMarker.transform.Find(commentName).gameObject;
                 comment.SetActive(!comment.activeSelf);
             }
         }
@@ -347,10 +351,10 @@ namespace SEE.Game.Evolution
         {
             string commentName = marker.GetHashCode().ToString() + "-comment";
             InputField commentField = Instantiate(animationDataModel.CommentPrefab);
-            Vector3 markerPos = marker.transform.position;
-            Vector3 commentPos = new Vector3(markerPos.x + 0.15f, markerPos.y, markerPos.z);
-            commentField.transform.SetParent(animationDataModel.Slider.transform, false);
-            commentField.transform.position = commentPos;
+            Vector3 commentPos = new Vector3(1500f, 0, 0);
+            commentField.transform.SetParent(marker.transform, false);
+            commentField.transform.localScale = new Vector3(16f, 1f, 1f);
+            commentField.transform.localPosition = commentPos;
             commentField.name = commentName;
             if (comment != null) 
             {
@@ -440,11 +444,13 @@ namespace SEE.Game.Evolution
                 }
                 else if (Input.GetKeyDown(KeyBindings.IncreaseAnimationSpeed))
                 {
-                    evolutionRenderer.AnimationLag *= 2;
+                    evolutionRenderer.AnimationLag = Mathf.Max(0.25f, evolutionRenderer.AnimationLag / 2);
+                    Debug.Log($"new animation lag is {evolutionRenderer.AnimationLag}\n");
                 }
                 else if (Input.GetKeyDown(KeyBindings.DecreaseAnimationSpeed))
                 {
-                    evolutionRenderer.AnimationLag /= 2;
+                    evolutionRenderer.AnimationLag = Mathf.Min(16.0f, evolutionRenderer.AnimationLag * 2);
+                    Debug.Log($"new animation lag is {evolutionRenderer.AnimationLag}\n");
                 }
             }
             if (Input.GetKeyDown(KeyBindings.ToggleEvolutionCanvases))

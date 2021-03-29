@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -60,22 +61,22 @@ namespace SEE.Net
         public void Initialize(uint id, IPEndPoint owner, string prefabPath)
         {
 #if UNITY_EDITOR
-            if (owner == null || owner.Address == null)
+            if (owner?.Address == null)
             {
-                throw new ArgumentNullException("owner");
+                throw new ArgumentNullException(nameof(owner));
             }
             if (views == null)
             {
-                throw new ArgumentNullException("views");
+                throw new NullReferenceException($"{nameof(views)} may not be null!");
             }
 #endif
             this.id = id;
             this.owner = owner;
             this.prefabPath = prefabPath;
             viewContainers.Add(id, this);
-            for (int i = 0; i < views.Length; i++)
+            foreach (AbstractView view in views)
             {
-                views[i].Initialize(this);
+                view.Initialize(this);
             }
         }
 
@@ -114,15 +115,7 @@ namespace SEE.Net
         /// <returns>An array containing all the end points with given owner.</returns>
         public static ViewContainer[] GetViewContainersByOwner(IPEndPoint owner)
         {
-            List<ViewContainer> result = new List<ViewContainer>();
-            foreach (ViewContainer viewContainer in viewContainers.Values)
-            {
-                if (viewContainer.owner.Equals(owner))
-                {
-                    result.Add(viewContainer);
-                }
-            }
-            return result.ToArray();
+            return viewContainers.Values.Where(viewContainer => viewContainer.owner.Equals(owner)).ToArray();
         }
 
         /// <summary>
@@ -173,12 +166,9 @@ namespace SEE.Net
 
             if (!isOwner && owner.Port == ((IPEndPoint)Client.Connection.ConnectionInfo.LocalEndPoint).Port)
             {
-                foreach (IPAddress ipAddress in Network.LookupLocalIPAddresses())
+                if (Network.LookupLocalIPAddresses().Contains(owner.Address))
                 {
-                    if (ipAddress.Equals(owner.Address))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
             return isOwner;
