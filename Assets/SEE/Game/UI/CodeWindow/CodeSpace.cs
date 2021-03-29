@@ -65,7 +65,8 @@ namespace SEE.Game.UI.CodeWindow
             else if (codeWindows.Contains(window))
             {
                 throw new ArgumentException("Given window is already open.");
-            } else if (codeWindows.Find(x => x.Title == window.Title))
+            } 
+            else if (codeWindows.Find(x => x.Title == window.Title))
             {
                 Debug.LogError("Warning: Multiple code windows with the same title are in the same space. "
                                + "This will lead to issues when syncing across the network.\n");
@@ -86,7 +87,8 @@ namespace SEE.Game.UI.CodeWindow
             if (window == null)
             {
                 throw new ArgumentNullException(nameof(window));
-            } else if (!codeWindows.Contains(window))
+            } 
+            else if (!codeWindows.Contains(window))
             {
                 throw new ArgumentException("Given window is already closed.");
             }
@@ -206,5 +208,4 @@ namespace SEE.Game.UI.CodeWindow
             }
         }
     }
-
 }
