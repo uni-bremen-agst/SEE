@@ -186,14 +186,14 @@ namespace SEE.GO.Menu
         {
             if (PlayerSettings.LocalPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu))
             {
-                // We can not use PlayerActionHistory.Current here
+                // We cannot use PlayerActionHistory.Current here
                 playerMenu.ModeMenu.ActiveEntry 
                     = playerMenu.ModeMenu.Entries.First
                          (x => x.Title.Equals(stack.Peek().GetActionStateType().Name));
             }
             foreach (ToggleMenuEntry toggleMenuEntry in playerMenu.ModeMenu.Entries)
             {
-                // Hint (can be removed after review): we can not use PlayerActionHistory.Current
+                // Hint (can be removed after review): we cannot use PlayerActionHistory.Current
                 if (toggleMenuEntry.Title.Equals(stack.Peek().GetActionStateType().Name))
                 {
                     playerMenu.ModeMenu.ActiveEntry = toggleMenuEntry;
