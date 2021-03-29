@@ -440,11 +440,11 @@ namespace SEE.Game.Evolution
                 }
                 else if (Input.GetKeyDown(KeyBindings.IncreaseAnimationSpeed))
                 {
-                    evolutionRenderer.AnimationLag *= 2;
+                    evolutionRenderer.AnimationLag /= 2;
                 }
                 else if (Input.GetKeyDown(KeyBindings.DecreaseAnimationSpeed))
                 {
-                    evolutionRenderer.AnimationLag /= 2;
+                    evolutionRenderer.AnimationLag *= 2;
                 }
             }
             if (Input.GetKeyDown(KeyBindings.ToggleEvolutionCanvases))
