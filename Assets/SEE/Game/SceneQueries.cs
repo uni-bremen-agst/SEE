@@ -10,7 +10,7 @@ namespace SEE.Game
     /// <summary>
     /// Provides queries on game objects in the current scence at run-time.
     /// </summary>
-    internal class SceneQueries
+    internal static class SceneQueries
     {
         /// <summary>
         /// Returns all game objects in the current scene tagged by Tags.Node and having
@@ -96,6 +96,11 @@ namespace SEE.Game
             return result;
         }
 
+        /// <summary>
+        /// Returns the roots of all graphs currently referenced by any of the <paramref name="nodeRefs"/>.
+        /// </summary>
+        /// <param name="nodeRefs">references to nodes in any graphs whose roots are to be returned</param>
+        /// <returns>all root nodes of the graphs containing any node referenced in <paramref name="nodeRefs"/></returns>
         public static HashSet<Node> GetRoots(ICollection<NodeRef> nodeRefs)
         {
             HashSet<Node> result = new HashSet<Node>();
@@ -131,70 +136,6 @@ namespace SEE.Game
             {
                 result.Add(go.GetComponent<NodeRef>().Value.ItsGraph);
             }
-
-            return result;
-        }
-
-        /// <summary>
-        /// True if <paramref name="gameNode"/> represents a leaf in the graph.
-        /// 
-        /// Precondition: <paramref name="gameNode"/> has a NodeRef component attached to it
-        /// that is a valid graph node reference.
-        /// </summary>
-        /// <param name="gameNode"></param>
-        /// <returns>true if <paramref name="gameNode"/> represents a leaf in the graph</returns>
-        public static bool IsLeaf(GameObject gameNode)
-        {
-            return gameNode.GetComponent<NodeRef>()?.Value?.IsLeaf() ?? false;
-        }
-
-        public static bool IsLeaf(NodeRef nodeRef)
-        {
-            return nodeRef?.Value?.IsLeaf() ?? false;
-        }
-
-        /// <summary>
-        /// True if <paramref name="gameNode"/> represents an inner node in the graph.
-        /// 
-        /// Precondition: <paramref name="gameNode"/> has a NodeRef component attached to it
-        /// that is a valid graph node reference.
-        /// </summary>
-        /// <param name="gameNode"></param>
-        /// <returns>true if <paramref name="gameNode"/> represents an inner node in the graph</returns>
-        public static bool IsInnerNode(GameObject gameNode)
-        {
-            return gameNode.GetComponent<NodeRef>()?.Value?.IsInnerNode() ?? false;
-        }
-
-        /// <summary>
-        /// Returns the Source.Name attribute of <paramref name="gameNode"/>. 
-        /// If <paramref name="gameNode"/> has no valid node reference, the name
-        /// of <paramref name="gameNode"/> is returned instead.
-        /// </summary>
-        /// <param name="gameNode"></param>
-        /// <returns>source name of <paramref name="gameNode"/></returns>
-        public static string SourceName(GameObject gameNode)
-        {
-            if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
-            {
-                if (nodeRef.Value != null)
-                {
-                    return nodeRef.Value.SourceName;
-                }
-            }
-
-            return gameNode.name;
-        }
-
-        public static string SourceName(NodeRef nodeRef)
-        {
-            string result = string.Empty;
-
-            if (nodeRef)
-            {
-                result = nodeRef.Value?.SourceName ?? nodeRef.gameObject.name;
-            }
-
             return result;
         }
 
@@ -214,7 +155,6 @@ namespace SEE.Game
                     return child.transform;
                 }
             }
-
             return null;
         }
 
@@ -231,7 +171,7 @@ namespace SEE.Game
         public static Transform GetCodeCity(Transform transform)
         {
             Transform result = transform;
-            if (PlayerSettings.GetInputType() == PlayerSettings.PlayerInputType.HoloLens)
+            if (PlayerSettings.GetInputType() == PlayerInputType.HoloLensPlayer)
             {
                 // If the MRTK is enabled, the cities will be part of a CityCollection, so we can't simply use the root.
                 // In this case, we actually have to traverse the tree up until the Tags match.
@@ -286,7 +226,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="codeCity">object representing a code city</param>
         /// <returns>the graph represented by <paramref name="codeCity"/> or null</returns>
-        public static Graph GetGraph(GameObject codeCity)
+        public static Graph GetGraph(this GameObject codeCity)
         {
             Node root = GetCityRootGraphNode(codeCity);
             return root?.ItsGraph;

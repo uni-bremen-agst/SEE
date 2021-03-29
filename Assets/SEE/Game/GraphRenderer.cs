@@ -170,8 +170,9 @@ namespace SEE.Game
         /// </summary>
         /// <param name="from">source of the new edge</param>
         /// <param name="to">target of the new edge</param>
+        /// <param name="id">id of the new edge. If it is null or empty, a new id will be generated</param>
         /// <returns>the new edge or null</returns>
-        public GameObject DrawEdge(GameObject from, GameObject to)
+        public GameObject DrawEdge(GameObject from, GameObject to, string id)
         {
             Node fromNode = from.GetNode();
             Node toNode = to.GetNode();
@@ -179,26 +180,21 @@ namespace SEE.Game
             {
                 throw new Exception($"The source {from.name} of the edge is not contained in any graph.");
             }
-
             if (toNode == null)
             {
                 throw new Exception($"The target {to.name} of the edge is not contained in any graph.");
             }
-
-            //TODO: Should this be a ReferenceEquals() or Equals() comparison?
             if (fromNode.ItsGraph != toNode.ItsGraph)
             {
                 throw new Exception($"The source {from.name} and target {to.name} of the edge are in different graphs.");
             }
 
             // Creating the edge in the underlying graph
-            Edge edge = new Edge
-            {
-                Source = fromNode,
-                Target = toNode,
-                Type = Graph.UnknownType // FIXME: We need to set the type of the edge.
-            };
-                
+            Edge edge = string.IsNullOrEmpty(id) ? new Edge() : new Edge(id);
+            edge.Source = fromNode;
+            edge.Target = toNode;
+            edge.Type = Graph.UnknownType; // FIXME: We need to set the type of the edge.
+
             Graph graph = fromNode.ItsGraph;
             graph.AddEdge(edge);
 
@@ -322,24 +318,31 @@ namespace SEE.Game
                 default:
                     throw new Exception("Unhandled edge layout " + settings.EdgeLayout);
             }
+#if UNITY_EDITOR
             Performance p = Performance.Begin("edge layout " + layout.Name);
+#endif
             EdgeFactory edgeFactory = new EdgeFactory(layout, settings.EdgeWidth, settings.TubularSegments, settings.Radius, settings.RadialSegments, settings.isEdgeSelectable);
+            // The resulting game objects representing the edges.
             ICollection<GameObject> result;
-            //Calculate only
+            // Calculate only
             if (!draw)
             {
                 result = edgeFactory.CalculateNewEdges(gameNodes.Cast<ILayoutNode>().ToList(), layoutEdges);
             }
-            //Calculate and draw edges
+            // Calculate and draw edges
             else
             {
                 result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), layoutEdges);
                 InteractionDecorator.PrepareForInteraction(result);
                 AddLOD(result);
-            }            
-            
+            }
+
+
+#if UNITY_EDITOR
             p.End();
-            Debug.LogFormat("Built \"" + settings.EdgeLayout + "\" edge layout for " + gameNodes.Count + " nodes in {0} [h:m:s:ms].\n", p.GetElapsedTime());
+            Debug.Log($"Calculated \"  {settings.EdgeLayout} \" edge layout for {gameNodes.Count}"
+                      + $" nodes and {result.Count} edges in {p.GetElapsedTime()} [h:m:s:ms].\n");
+#endif
             return result;
         }
 
@@ -874,35 +877,36 @@ namespace SEE.Game
         /// <paramref name="root"/></param>
         private void RemoveRootIfNecessary(ref Node root, Graph graph, Dictionary<Node, GameObject> nodeMap, ICollection<GameNode> layoutNodes)
         {
-            return; // FIXME: temporarily disabled because the current implementation of the 
-                    // custom shader for culling all city objects falling off the plane assumes 
-                    // that there is exactly one root node of the graph.
+            return; 
+            // FIXME: temporarily disabled because the current implementation of the 
+            // custom shader for culling all city objects falling off the plane assumes 
+            // that there is exactly one root node of the graph.
 
-            if (root is object)
-            {
-                if (layoutNodes != null)
-                {
-                    // Remove from layout
-                    GameNode toBeRemoved = null;
-                    foreach (GameNode layoutNode in layoutNodes)
-                    {
-                        if (layoutNode.ID.Equals(root.ID))
-                        {
-                            toBeRemoved = layoutNode;
-                            break;
-                        }
-                    }
-                    if (toBeRemoved != null)
-                    {
-                        layoutNodes.Remove(toBeRemoved);
-                    }
-                }
-                GameObject go = nodeMap[root];
-                nodeMap.Remove(root);
-                graph.RemoveNode(root);
-                Destroyer.DestroyGameObject(go);
-                root = null;
-            }
+            //if (root is object)
+            //{
+            //    if (layoutNodes != null)
+            //    {
+            //        // Remove from layout
+            //        GameNode toBeRemoved = null;
+            //        foreach (GameNode layoutNode in layoutNodes)
+            //        {
+            //            if (layoutNode.ID.Equals(root.ID))
+            //            {
+            //                toBeRemoved = layoutNode;
+            //                break;
+            //            }
+            //        }
+            //        if (toBeRemoved != null)
+            //        {
+            //            layoutNodes.Remove(toBeRemoved);
+            //        }
+            //    }
+            //    GameObject go = nodeMap[root];
+            //    nodeMap.Remove(root);
+            //    graph.RemoveNode(root);
+            //    Destroyer.DestroyGameObject(go);
+            //    root = null;
+            //}
         }
 
         /// <summary>

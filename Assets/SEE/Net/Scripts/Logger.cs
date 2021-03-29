@@ -7,7 +7,7 @@ namespace SEE.Net
     /// <summary>
     /// An internal logger for the networking.
     /// </summary>
-    public class Logger
+    public static class Logger
     {
         /// <summary>
         /// Calls Debug.Log with networking prefix and given message.
@@ -19,7 +19,7 @@ namespace SEE.Net
 #if UNITY_EDITOR
             if (Network.InternalLoggingEnabled)
             {
-                UnityEngine.Debug.LogFormat("<b>[SEE Net]</b> {0}\n", message);
+                UnityEngine.Debug.Log($"<b>[SEE Net]</b> {message}\n");
             }
 #endif
         }
@@ -37,11 +37,11 @@ namespace SEE.Net
             {
                 if (message != null)
                 {
-                    UnityEngine.Debug.LogErrorFormat("<b>[SEE Net]</b> Exception: {0}\n{0}\n", exception.ToString(), message);
+                    UnityEngine.Debug.LogError($"<b>[SEE Net]</b> Exception: {exception}\n{message}\n");
                 }
                 else
                 {
-                    UnityEngine.Debug.LogErrorFormat("<b>[SEE Net]</b> Exception: {0}\n", exception.ToString());
+                    UnityEngine.Debug.LogError($"<b>[SEE Net]</b> Exception: {exception}\n");
                 }
             }
 #endif
@@ -57,7 +57,7 @@ namespace SEE.Net
 #if UNITY_EDITOR
             if (Network.InternalLoggingEnabled)
             {
-                UnityEngine.Debug.LogErrorFormat("<b>[SEE Net]</b> {0}\n", message);
+                UnityEngine.Debug.LogError($"<b>[SEE Net]</b> {message}\n");
             }
 #endif
         }
@@ -72,7 +72,7 @@ namespace SEE.Net
 #if UNITY_EDITOR
             if (Network.InternalLoggingEnabled)
             {
-                UnityEngine.Debug.LogWarningFormat("<b>[SEE Net]</b> {0}\n", message);
+                UnityEngine.Debug.LogWarning($"<b>[SEE Net]</b> {message}\n");
             }
 #endif
         }
@@ -94,12 +94,10 @@ namespace SEE.Net
             High
         }
 
-
-
         /// <summary>
         /// The minimal logging severity.
         /// </summary>
-        public Severity minSeverity;
+        public readonly Severity minSeverity;
 
         /// <summary>
         /// Creates a logger with given minimal severity.
@@ -109,8 +107,6 @@ namespace SEE.Net
         {
             this.minSeverity = minSeverity;
         }
-
-
 
         /// <summary>
         /// Debug logging.
@@ -179,6 +175,7 @@ namespace SEE.Net
         /// </summary>
         public void Shutdown()
         {
+            //TODO: Why is this empty?
         }
 
         /// <summary>
@@ -205,5 +202,4 @@ namespace SEE.Net
             }
         }
     }
-
 }

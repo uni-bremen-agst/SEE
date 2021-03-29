@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿using System;
 
 namespace SEE.Controls.Actions
 {
@@ -7,6 +7,7 @@ namespace SEE.Controls.Actions
     /// A user state determines what kinds of actions are triggered for a given
     /// interaction.
     /// </summary>
+    [Obsolete("This class will disappear soon.")]
     public static class ActionState
     {
         private static ActionStateType value = ActionStateType.Move;
@@ -21,7 +22,11 @@ namespace SEE.Controls.Actions
             get => value;
             set
             {
-                if (!Equals(ActionState.value, value))
+                // Note: We will trigger the OnStateChanged even if the same
+                // kind of action is to be executed again. This way we can
+                // let the user specify points in time at which the original
+                // state when a kind of actions was started can be restored.
+                //if (!Equals(ActionState.value, value))
                 {
                     ActionState.value = value;
                     OnStateChanged?.Invoke(ActionState.value);

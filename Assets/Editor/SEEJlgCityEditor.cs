@@ -35,15 +35,40 @@ namespace SEEEditor
         [CanEditMultipleObjects]
         public class SEEJlgCityEditor : SEECityEditor
         {
-            /// <summary>
-            /// Adds the JLGPath value of SEEJlgCity to the inherited settings.
-            /// </summary>
-            protected override void Attributes()
+        /// <summary>
+        /// Whether the animation-attribute foldout should be expanded.
+        /// </summary>
+        private bool showAnimationAttributes = false;
+
+        /// <summary>
+        /// Adds the JLGPath value of SEEJlgCity to the inherited settings.
+        /// </summary>
+        protected override void Attributes()
+        {
+            base.Attributes();
+            SEEJlgCity city = target as SEEJlgCity;
+            city.JLGPath = GetDataPath("JLG file", city.JLGPath, Filenames.ExtensionWithoutPeriod(Filenames.JLGExtension));
+            AnimationAttributes();
+        }
+
+        /// <summary>
+        /// Renders the GUI for attributes of the execution animation.
+        /// </summary>
+        private void AnimationAttributes()
+        {
+            showAnimationAttributes =
+                EditorGUILayout.Foldout(showAnimationAttributes, "Attributes of the execution animation", true, EditorStyles.foldoutHeader);
+            if (showAnimationAttributes)
             {
-                base.Attributes();
                 SEEJlgCity city = target as SEEJlgCity;
-                city.JLGPath = GetDataPath("JLG file", city.JLGPath, Filenames.ExtensionWithoutPeriod(Filenames.JLGExtension));
+                city.BreakpointClass = EditorGUILayout.TextField("Breakpoint class", city.BreakpointClass);
+                city.BreakpointLine = EditorGUILayout.IntField("Breakpoint line", city.BreakpointLine);
+                city.DistanceAboveCity = EditorGUILayout.FloatField("Source viewer above city", city.DistanceAboveCity);
+                city.DistanceBehindCity = EditorGUILayout.FloatField("Source viewer behind city", city.DistanceBehindCity);
+                city.LineWidth = EditorGUILayout.FloatField("Line width to source viewer", city.LineWidth);
+                city.ShowOnlyCalls = EditorGUILayout.Toggle("Interprocedural only", city.ShowOnlyCalls);
             }
         }
     }
+}
 #endif
