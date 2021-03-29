@@ -1007,7 +1007,7 @@ namespace SEE.Game
                 TransitionToNextGraph(loadedGraph, newGraph);
                 return true;
             }
-            else if (!HasLaidOutGraph(index, out newGraph))
+            else if (HasLaidOutGraph(index, out newGraph))
             {
                 CurrentGraphIndex = index;
                 DisplayGraphAsNew(newGraph);
