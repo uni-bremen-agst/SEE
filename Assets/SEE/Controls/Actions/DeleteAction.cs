@@ -2,6 +2,7 @@
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
+using SEE.Net;
 using SEE.Utils;
 using System.Collections;
 using System.Collections.Generic;

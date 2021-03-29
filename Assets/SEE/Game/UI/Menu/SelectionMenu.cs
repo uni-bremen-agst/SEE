@@ -23,7 +23,7 @@ namespace SEE.Game.UI
         /// </summary>
         public ToggleMenuEntry ActiveEntry 
         { 
-            get => entries.FirstOrDefault(entry => entry.Active);
+            get => entries.SingleOrDefault(entry => entry.Active);
             set => entries.ForEach(entry => entry.Active = entry == value);
         }
     }
