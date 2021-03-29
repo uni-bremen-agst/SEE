@@ -79,9 +79,10 @@ namespace SEE.Controls.Actions
                 {
                     codeWindow = selectedNode.gameObject.AddComponent<CodeWindow>();
                     // Pass file name of source code file to read from it
-                    if (!selectedNode.Value.TryGetString("Source.File", out string selectedFile))
+                    string selectedFile = selectedNode.Value.Filename();
+                    if (selectedFile == null)
                     {
-                        Debug.LogError("Source.Path was set, but Source.File was not. Can't show code window.\n");
+                        Debug.LogError("Source path was set, but source filename was not. Can't show code window.\n");
                         return;
                     }
 
@@ -97,7 +98,8 @@ namespace SEE.Controls.Actions
                 }
 
                 // Pass line number to automatically scroll to it, if it exists
-                if (selectedNode.Value.TryGetInt("Source.Line", out int line))
+                int line = selectedNode.Value.SourceLine();
+                if (line != 0)
                 {
                     codeWindow.VisibleLine = line;
                 }
@@ -115,8 +117,8 @@ namespace SEE.Controls.Actions
 
         private void LocalAnySelectIn(InteractableObject interactableObject)
         {
-            if (!interactableObject.gameObject.TryGetComponent(out selectedNode) 
-                || !selectedNode.Value.TryGetString("Source.Path", out selectedPath))
+            if (!interactableObject.gameObject.TryGetComponent(out selectedNode)
+                || (selectedPath = selectedNode.Value.Path()) == null)
             {
                     selectedPath = null;
                     selectedNode = null;
