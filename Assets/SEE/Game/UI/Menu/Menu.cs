@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -89,28 +90,49 @@ namespace SEE.Game.UI
 
         /// <summary>
         /// Adds an <paramref name="entry"/> to this menu's <see cref="entries"/>.
-        /// This method must be called <i>before</i> this component's Start() method has been called.
         /// </summary>
         /// <param name="entry">The entry to add to this menu.</param>
         public void AddEntry(T entry)
         {
+            if (entries.Any(x => x.Title == entry.Title))
+            {
+                throw new InvalidOperationException($"Button with the given title '{entry.Title}' already exists!\n");
+            }
             entries.Add(entry);
+            if (HasStarted)
+            {
+                AddDesktopButtons(new []{entry});
+            }
+        }
+
+        /// <summary>
+        /// Removes the given <paramref name="entry"/> from the menu.
+        /// If the <paramref name="entry"/> is not present in the menu, nothing will happen.
+        /// </summary>
+        /// <param name="entry">The entry to remove from the menu</param>
+        public void RemoveEntry(T entry)
+        {
+            Entries.Remove(entry);
+            if (HasStarted)
+            {
+                RemoveDesktopButton(entry);
+            }
         }
 
         /// <summary>
         /// Selects the entry at <paramref name="index"/>.
         /// </summary>
-        /// <param name="index">The index in <see cref="entries"/> of the selected entry.</param>
+        /// <param name="index">The index in <see cref="Entries"/> of the selected entry.</param>
         /// <exception cref="ArgumentOutOfRangeException">When <paramref name="index"/> is above the size of
-        /// <see cref="entries"/></exception>
+        /// <see cref="Entries"/></exception>
         public void SelectEntry(int index)
         {
-            if (index >= entries.Count)
+            if (index >= Entries.Count)
             {
                 throw new ArgumentOutOfRangeException($"Entry index {index} doesn't exist in "
-                                                   + $"{entries.Count}-element array entries.");
+                                                   + $"{Entries.Count}-element array entries.");
             }
-            OnEntrySelected(entries[index]);
+            OnEntrySelected(Entries[index]);
         }
 
         /// <summary>
