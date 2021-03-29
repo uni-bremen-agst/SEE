@@ -152,49 +152,49 @@ namespace SEE.GO.Menu
                 if (Input.GetKeyDown(KeyBindings.Undo))
                 {
                     PlayerActionHistory.Undo();
-                    try
+                    if (!PlayerActionHistory.IsEmpty())
                     {
-                        SetPlayerMenu(PlayerActionHistory.GetUndoHistory());
-                        Indicator.ChangeActionState(PlayerActionHistory.Current());
+                        ActionStateType currentAction = PlayerActionHistory.Current();
+                        SetPlayerMenu(currentAction.Name);
+                        Indicator.ChangeActionState(currentAction);
                     }
-                    // This case will be reached if there is no finished action in the undo history.
-                    // Special case: The user is executing his first action after moving while running the application,
-                    // but this action is not finished yet. Then, the user executes undo. 
-                    catch (InvalidOperationException)
+                    else
                     {
+                        // This case will be reached if there is no finished action in the undo history.
+                        // Special case: The user is executing his first action after moving while running the application,
+                        // but this action is not finished yet. Then, the user executes undo. 
                         ModeMenu.ActiveEntry = ModeMenu.Entries.Single(x => x.Title == ActionStateType.Move.Name);
                         Indicator.ChangeActionState(ActionStateType.Move);
-                        Debug.LogError("empty history\n");
                     }
                 }
                 else if (Input.GetKeyDown(KeyBindings.Redo))
-                {
-                    SetPlayerMenu(PlayerActionHistory.GetRedoHistory());
+                {                    
                     PlayerActionHistory.Redo();
-                    Indicator.ChangeActionState(PlayerActionHistory.Current());
+                    ActionStateType currentAction = PlayerActionHistory.Current();
+                    SetPlayerMenu(currentAction.Name);
+                    Indicator.ChangeActionState(currentAction);
                 }
             }
             PlayerActionHistory.Update();
         }
 
         /// <summary>
-        /// Selects the last action of the <paramref name="stack"/> and sets the PlayerMenu to the
-        /// <see cref="ActionStateType"/> of this last element.
+        /// Sets the currently selected menu entry in PlayerMenu to the action with given <paramref name="actionName"/>.
         /// </summary>
-        /// <param name="stack">The stack from where the last action has to be selected</param>
-        private void SetPlayerMenu(Stack<ReversibleAction> stack)
+        /// <param name="actionName">name of the menu entry to be </param>
+        private void SetPlayerMenu(string actionName)
         {
             if (PlayerSettings.LocalPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu))
-            {
+            {                
                 // We cannot use PlayerActionHistory.Current here
                 playerMenu.ModeMenu.ActiveEntry 
                     = playerMenu.ModeMenu.Entries.First
-                         (x => x.Title.Equals(stack.Peek().GetActionStateType().Name));
+                         (x => x.Title.Equals(actionName));
             }
             foreach (ToggleMenuEntry toggleMenuEntry in playerMenu.ModeMenu.Entries)
             {
                 // Hint (can be removed after review): we cannot use PlayerActionHistory.Current
-                if (toggleMenuEntry.Title.Equals(stack.Peek().GetActionStateType().Name))
+                if (toggleMenuEntry.Title.Equals(actionName))
                 {
                     playerMenu.ModeMenu.ActiveEntry = toggleMenuEntry;
                     break;
