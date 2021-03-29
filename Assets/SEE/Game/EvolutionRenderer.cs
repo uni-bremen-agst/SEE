@@ -1006,13 +1006,7 @@ namespace SEE.Game
                 CurrentGraphIndex = index;
                 TransitionToNextGraph(loadedGraph, newGraph);
                 return true;
-            }
-            else if (HasLaidOutGraph(index, out newGraph))
-            {
-                CurrentGraphIndex = index;
-                DisplayGraphAsNew(newGraph);
-                return true;
-            } else 
+            } else
             {
                 Debug.LogErrorFormat("Could not retrieve a layout for graph with index {0}.\n", index);
                 return false;
