@@ -8,7 +8,13 @@ namespace SEE.Controls
     /// </summary>
     internal static class KeyBindings
     {
-        /// <summary>
+        // IMPORTANT NOTES:
+        // (1) Keep in mind that KeyCodes in Unity map directly to a
+        //     physical key on an keyboard with an English layout.
+        // (2) Ctrl-Z and Ctrl-Y are reserved for Undo and Redo.
+        // (3) The digits 0-9 are reserved for shortcuts for the player menu.
+
+        /// <summary>        
         /// The registered keyboard shortcuts. The value is a help message on the shortcut.
         /// </summary>
         private static Dictionary<KeyCode, string> bindings = new Dictionary<KeyCode, string>();
@@ -149,7 +155,7 @@ namespace SEE.Controls
         /// <summary>
         /// To zoom into a city.
         /// </summary>
-        internal static KeyCode ZoomInto = Register(KeyCode.Z, Scope.Browsing, "To zoom into a city."); // FIXME: Collides with Ctlr-Z in editor mode
+        internal static KeyCode ZoomInto = Register(KeyCode.G, Scope.Browsing, "To zoom into a city.");
         /// <summary>
         /// While moving the city, snaps to one of eight predefined directions.
         /// While rotating the city, rotates in 45 degree steps.
@@ -252,14 +258,14 @@ namespace SEE.Controls
         /// <summary>
         /// Executes previous statement.
         /// </summary>
-        internal static KeyCode PreviousStatement = Register(KeyCode.Less, Scope.Debugging, "Executes previous statement.");
+        internal static KeyCode PreviousStatement = Register(KeyCode.PageUp, Scope.Debugging, "Executes previous statement.");
         /// <summary>
         /// Executes next statement.
         /// </summary>
-        internal static KeyCode NextStatement = Register(KeyCode.Greater, Scope.Debugging, "Executes next statement.");
+        internal static KeyCode NextStatement = Register(KeyCode.PageDown, Scope.Debugging, "Executes next statement.");
         /// <summary>
         /// Execution is back to very first statement.
         /// </summary>
-        internal static KeyCode FirstStatement = Register(KeyCode.Hash, Scope.Debugging, "Execution is back to very first statement.");
+        internal static KeyCode FirstStatement = Register(KeyCode.Home, Scope.Debugging, "Execution is back to very first statement.");
     }
 }

@@ -77,7 +77,6 @@ namespace SEE.Controls.Actions
         {
             base.Awake();
             positions = new Vector3[0];
-            SetUpRenderer();
         }
 
         /// <summary>
@@ -106,6 +105,12 @@ namespace SEE.Controls.Actions
             {
                 if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
                 {
+                    // We create the line on demand so that there is no left-over
+                    // when the drawing action has never actually started to draw anything.
+                    if (line == null)
+                    {
+                        SetUpRenderer();
+                    }
                     // FIXME: This would needed to be adjusted to VR and AR.
                     // The position at which to continue the line.
                     Vector3 newPosition = Input.mousePosition;
