@@ -43,11 +43,6 @@ namespace SEE.Game
 
         private float executionTimer = 0.0f;
 
-        /// <summary>
-        /// Whether the animation is currently running.
-        /// </summary>
-        private bool animationIsRunning = false;
-
         private Dictionary<Node, GameObject> nodeToGameObject;
 
         /// <summary>
