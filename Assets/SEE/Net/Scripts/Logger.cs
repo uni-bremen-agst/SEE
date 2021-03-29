@@ -19,7 +19,7 @@ namespace SEE.Net
 #if UNITY_EDITOR
             if (Network.InternalLoggingEnabled)
             {
-                UnityEngine.Debug.LogFormat("<b>[SEE Net]</b> {0}\n", message);
+                UnityEngine.Debug.Log($"<b>[SEE Net]</b> {message}\n");
             }
 #endif
         }
@@ -37,11 +37,11 @@ namespace SEE.Net
             {
                 if (message != null)
                 {
-                    UnityEngine.Debug.LogErrorFormat("<b>[SEE Net]</b> Exception: {0}\n{1}\n", exception, message);
+                    UnityEngine.Debug.LogError($"<b>[SEE Net]</b> Exception: {exception}\n{message}\n");
                 }
                 else
                 {
-                    UnityEngine.Debug.LogErrorFormat("<b>[SEE Net]</b> Exception: {0}\n", exception);
+                    UnityEngine.Debug.LogError($"<b>[SEE Net]</b> Exception: {exception}\n");
                 }
             }
 #endif
@@ -57,7 +57,7 @@ namespace SEE.Net
 #if UNITY_EDITOR
             if (Network.InternalLoggingEnabled)
             {
-                UnityEngine.Debug.LogErrorFormat("<b>[SEE Net]</b> {0}\n", message);
+                UnityEngine.Debug.LogError($"<b>[SEE Net]</b> {message}\n");
             }
 #endif
         }
@@ -72,7 +72,7 @@ namespace SEE.Net
 #if UNITY_EDITOR
             if (Network.InternalLoggingEnabled)
             {
-                UnityEngine.Debug.LogWarningFormat("<b>[SEE Net]</b> {0}\n", message);
+                UnityEngine.Debug.LogWarning($"<b>[SEE Net]</b> {message}\n");
             }
 #endif
         }
@@ -94,8 +94,6 @@ namespace SEE.Net
             High
         }
 
-
-
         /// <summary>
         /// The minimal logging severity.
         /// </summary>
@@ -109,8 +107,6 @@ namespace SEE.Net
         {
             this.minSeverity = minSeverity;
         }
-
-
 
         /// <summary>
         /// Debug logging.
@@ -206,5 +202,4 @@ namespace SEE.Net
             }
         }
     }
-
 }
