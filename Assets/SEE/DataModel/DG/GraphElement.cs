@@ -102,6 +102,66 @@ namespace SEE.DataModel.DG
         /// </summary>
         public abstract string ID { set; get; }
 
+        //--------------------------------------------
+        // Information related to source-code location
+        //--------------------------------------------
+
+        /// <summary>
+        /// Returns the path of the source file for this graph element.
+        /// Note that not all graph elements may have a source file.
+        /// If the graph element does not have this attribute, null is returned.
+        /// </summary>
+        /// <returns>path of source file or null</returns>
+        public string Path()
+        {
+            TryGetString("Source.Path", out string result);
+            // If this attribute cannot be found, result will have the standard value 
+            // for strings, which is null.
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the name of the source file for this graph element.
+        /// Note that not all graph elements may have a source file.
+        /// If the graph element does not have this attribute, null is returned.
+        /// </summary>
+        /// <returns>name of source file or null</returns>
+        public string Filename()
+        {
+            TryGetString("Source.File", out string result);
+            // If this attribute cannot be found, result will have the standard value 
+            // for strings, which is null.
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the line in the source file declaring this graph element.
+        /// Note that not all graph elements may have a source location.
+        /// If the graph element does not have this attribute, 0 is returned.
+        /// </summary>
+        /// <returns>line in source file or 0</returns>
+        public int SourceLine()
+        {
+            TryGetInt("Source.Line", out int result);
+            // If this attribute cannot be found, result will have the standard value 
+            // for int, which is 0.
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the column in the source file declaring this graph element.
+        /// Note that not all graph elements may have a source location.
+        /// If the graph element does not have this attribute, 0 is returned.
+        /// </summary>
+        /// <returns>column in source file or 0</returns>
+        public int SourceColumn()
+        {
+            TryGetInt("Source.Column", out int result);
+            // If this attribute cannot be found, result will have the standard value 
+            // for int, which is 0.
+            return result;
+        }
+
         /// <summary>
         /// Returns a string representation of the graph element's type and all its attributes and
         /// their values.

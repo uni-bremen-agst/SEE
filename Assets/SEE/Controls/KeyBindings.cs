@@ -8,7 +8,13 @@ namespace SEE.Controls
     /// </summary>
     internal static class KeyBindings
     {
-        /// <summary>
+        // IMPORTANT NOTES:
+        // (1) Keep in mind that KeyCodes in Unity map directly to a
+        //     physical key on an keyboard with an English layout.
+        // (2) Ctrl-Z and Ctrl-Y are reserved for Undo and Redo.
+        // (3) The digits 0-9 are reserved for shortcuts for the player menu.
+
+        /// <summary>        
         /// The registered keyboard shortcuts. The value is a help message on the shortcut.
         /// </summary>
         private static Dictionary<KeyCode, string> bindings = new Dictionary<KeyCode, string>();
@@ -23,6 +29,7 @@ namespace SEE.Controls
             Architecture,  // use case architecture; related to architecture mapping and analysis
             Browsing,      // browsing a code city (panning, zooming, etc.)
             CameraPaths,   // recording a camera (player) path
+            CodeViewer,    // source-code viewer
             Debugging,     // use case debugging
             Evolution,     // use case evolution; observing the series of revisions of a city
             MetricCharts,  // showing metric charts
@@ -82,6 +89,16 @@ namespace SEE.Controls
         /// Turns on/off the player-action menu.
         /// </summary>
         internal static KeyCode ToggleMenu = Register(KeyCode.Space, Scope.Always, "Turns on/off the player-action menu.");
+
+        /// <summary>
+        /// Undoes the last action.
+        /// </summary>
+        internal static KeyCode Undo = Register(KeyCode.Z, Scope.CodeViewer, "Undoes the last action.");
+
+        /// <summary>
+        /// Re-does the last action.
+        /// </summary>
+        internal static KeyCode Redo = Register(KeyCode.Y, Scope.CodeViewer, "Re-does the last action.");
 
         //-----------------------------------------------------
         // Camera path recording and playing
@@ -149,7 +166,7 @@ namespace SEE.Controls
         /// <summary>
         /// To zoom into a city.
         /// </summary>
-        internal static KeyCode ZoomInto = Register(KeyCode.Z, Scope.Browsing, "To zoom into a city."); // FIXME: Collides with Ctlr-Z in editor mode
+        internal static KeyCode ZoomInto = Register(KeyCode.G, Scope.Browsing, "To zoom into a city.");
         /// <summary>
         /// While moving the city, snaps to one of eight predefined directions.
         /// While rotating the city, rotates in 45 degree steps.
@@ -252,14 +269,24 @@ namespace SEE.Controls
         /// <summary>
         /// Executes previous statement.
         /// </summary>
-        internal static KeyCode PreviousStatement = Register(KeyCode.Less, Scope.Debugging, "Executes previous statement.");
+        internal static KeyCode PreviousStatement = Register(KeyCode.PageUp, Scope.Debugging, "Executes previous statement.");
         /// <summary>
         /// Executes next statement.
         /// </summary>
-        internal static KeyCode NextStatement = Register(KeyCode.Greater, Scope.Debugging, "Executes next statement.");
+        internal static KeyCode NextStatement = Register(KeyCode.PageDown, Scope.Debugging, "Executes next statement.");
         /// <summary>
         /// Execution is back to very first statement.
         /// </summary>
-        internal static KeyCode FirstStatement = Register(KeyCode.Hash, Scope.Debugging, "Execution is back to very first statement.");
+        internal static KeyCode FirstStatement = Register(KeyCode.Home, Scope.Debugging, "Execution is back to very first statement.");
+
+        //--------------------
+        // Source-code viewer
+        //--------------------
+
+        /// <summary>
+        /// Toggles the menu of the source-code viewer.
+        /// </summary>
+        internal static KeyCode ShowCodeWindowMenu = Register(KeyCode.F1, Scope.CodeViewer, "Toggles the menu of the source-code viewer.");
+
     }
 }

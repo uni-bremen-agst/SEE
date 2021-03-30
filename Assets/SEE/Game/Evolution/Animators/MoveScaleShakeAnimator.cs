@@ -19,7 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using SEE.Layout;
 using SEE.Utils;
 using UnityEngine;
@@ -33,21 +32,30 @@ namespace SEE.Game.Evolution
     /// </summary>
     public class MoveScaleShakeAnimator : AbstractAnimator
     {
+        /// <summary>
+        /// Constructor setting the attributes for visualizing animated game objects.
+        /// 
+        /// Precondition: beamScale.x >= 0 and beamScale.y >= 0 and beamScale.z >= 0.
+        /// </summary>
+        /// <param name="beamColor">color of the marker beam for the animated game objects 
+        /// depending upon the kind of difference; if this mapping does not have a value
+        /// for particular kind of difference, no beam will be created</param>
+        /// <param name="beamScale">scale of the marker beam for the animated game objects</param>
+        public MoveScaleShakeAnimator (Dictionary<Difference, Color> beamColor, Vector3 beamScale)
+        {
+            this.beamColor = beamColor;
+            this.beamScale = beamScale;
+        }
 
         /// <summary>
-        /// Color of beams for newly added nodes
+        /// Color of the marker beam for the animated game objects.
         /// </summary>
-        private Color NewNodeBeamColor = AdditionalBeamDetails.newBeamColor;
+        public readonly Dictionary<Difference, Color> beamColor;
 
         /// <summary>
-        /// Color of beams for changed nodes
+        /// Scale of the marker beam for the animated game objects.
         /// </summary>
-        public Color ChangedNodeBeamColor = AdditionalBeamDetails.changedBeamColor;
-
-        /// <summary>
-        /// Dimensions of power beams
-        /// </summary>
-        private Vector3 NodeBeamDimensions = AdditionalBeamDetails.powerBeamDimensions;
+        private readonly Vector3 beamScale;
 
         /// <summary>
         /// Moves, scales, and then finally shakes (if <paramref name="difference"/>) the animated game object.
@@ -86,8 +94,7 @@ namespace SEE.Game.Evolution
                 // Scale the object.
                 if (mustCallBack)
                 {
-                    Tweens.Scale(gameObject, localScale, MaxAnimationTime);
-                    callback?.Invoke(gameObject);
+                    Tweens.Scale(gameObject, localScale, MaxAnimationTime, callback);
                     mustCallBack = false;
                 }
                 else
@@ -101,8 +108,7 @@ namespace SEE.Game.Evolution
                 // Move the object.
                 if (mustCallBack)
                 {
-                    Tweens.Move(gameObject, position, MaxAnimationTime);
-                    callback?.Invoke(gameObject);
+                    Tweens.Move(gameObject, position, MaxAnimationTime, callback);
                     mustCallBack = false;
                 }
                 else
@@ -110,24 +116,21 @@ namespace SEE.Game.Evolution
                     Tweens.Move(gameObject, position, MaxAnimationTime);
                 }
             }
+            
+            // Create a new power beam if requested by beamColor.
+            if (beamColor.TryGetValue(difference, out Color color))
+            {
+                BeamAnimator.GetInstance().CreatePowerBeam(position, color, beamScale);
+            }
 
             // Shake the object if it was modified.
             if (difference == Difference.Changed)
             {
                 NodeChangesBuffer.GetSingleton().changedNodeIDs.Add(gameObject.name);
-                // Changes the modified object's color to blue while animating
-                gameObject.GetComponent<Renderer>().material.color = Color.blue;
-                // Refetch values, necessary because this gets loaded before other scripts
-                NewNodeBeamColor = AdditionalBeamDetails.newBeamColor;
-                ChangedNodeBeamColor = AdditionalBeamDetails.changedBeamColor;
-                NodeBeamDimensions = AdditionalBeamDetails.powerBeamDimensions;
-                // Create a new power beam
-                BeamAnimator.GetInstance().CreatePowerBeam(position, ChangedNodeBeamColor, NodeBeamDimensions);
 
                 if (mustCallBack)
                 {
-                    Tweens.ShakeRotate(gameObject, MaxAnimationTime / 2, new Vector3(0, 10, 0));
-                    callback?.Invoke(gameObject);
+                    Tweens.ShakeRotate(gameObject, MaxAnimationTime / 2, new Vector3(0, 10, 0), callback);
                     mustCallBack = false;
                 }
                 else
@@ -159,7 +162,7 @@ namespace SEE.Game.Evolution
             /// <param name="position">Position of the parent gameObject</param>
             /// <param name="beamColor">Color of the power beam to create</param>
             /// </summary>
-            public void CreatePowerBeam(Vector3 position, Color beamColor, Vector3 NodeBeamDimensions)
+            public void CreatePowerBeam(Vector3 position, Color beamColor, Vector3 beamScale)
             {
                 // Generate power beam above updated objects
                 GameObject powerBeam = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
@@ -167,8 +170,15 @@ namespace SEE.Game.Evolution
                 GameObject.DestroyImmediate(powerBeam.GetComponent<Collider>());
                 powerBeam.tag = DataModel.Tags.PowerBeam;
                 Renderer powerBeamRenderer = powerBeam.GetComponent<Renderer>();
-                powerBeam.transform.localScale = new Vector3(NodeBeamDimensions.x, 0, NodeBeamDimensions.z);
-                BeamAnimator.GetInstance().BeamHeight = NodeBeamDimensions.y;
+                // The y co-ordinate will be increased in Update so that the beam grows continuously 
+                // until it reaches its final height.
+                powerBeam.transform.localScale = new Vector3(beamScale.x, 0, beamScale.z);
+                if (beamScale.y > 0)
+                {
+                    // Note: This assignment will changed the maximal height for all
+                    // beams because MaximalBeamHeight is static.
+                    BeamAnimator.GetInstance().MaximalBeamHeight = beamScale.y;
+                }
                 powerBeam.transform.position = position;
                 // Change power beam material color
                 powerBeamRenderer.material.color = beamColor;
@@ -182,6 +192,12 @@ namespace SEE.Game.Evolution
                 BeamAnimator.GetInstance().AddPowerBeam(powerBeam);
                 powerBeam.AddComponent<BeamAnimatorExecuter>();
             }
+
+            /// <summary>
+            /// The final height a beam should reach. The actual beam height will be continuously
+            /// increased in Update until this threshold is reached.
+            /// </summary>
+            private float MaximalBeamHeight = 0.0f;
 
             /// <summary>
             /// Singleton instance
@@ -198,14 +214,6 @@ namespace SEE.Game.Evolution
                     Instance = new BeamAnimator();
                 }
                 return Instance;
-            }
-
-            /// <summary>
-            /// Power beam height getter/setter
-            /// </summary>
-            public float BeamHeight
-            {
-                get; set;
             }
 
             /// <summary>
@@ -240,24 +248,23 @@ namespace SEE.Game.Evolution
             {
                 deletedBeams.Clear();
 
-                if (BeamHeight <= 0)
-                {
-                    BeamHeight = 3f;
-                }
                 // Animate new power beams
                 foreach (GameObject beam in powerBeams)
                 {
-                    if (beam.transform.localScale.y < BeamHeight)
+                    if (beam.transform.localScale.y < MaximalBeamHeight)
                     {
+                        // Final height is not yet reached. Increase further.
                         beam.transform.localScale = new Vector3(beam.transform.localScale.x, beam.transform.localScale.y + appearingMagicNumber, beam.transform.localScale.z);
                         beam.transform.position = new Vector3(beam.transform.position.x, beam.transform.position.y + appearingMagicNumber, beam.transform.position.z);
                     }
                     else
                     {
+                        // The final height is reached.
                         deletedBeams.Add(beam);
                     }
                 }
-                foreach (GameObject beam in deletedBeams) {
+                foreach (GameObject beam in deletedBeams) 
+                {
                     powerBeams.Remove(beam);
                 }
                 // Animate deleted power beams
@@ -279,7 +286,7 @@ namespace SEE.Game.Evolution
             }
 
             /// <summary>
-            /// Clear power beams
+            /// Clear all power beams.
             /// </summary>
             public void ClearPowerBeams()
             {
@@ -288,7 +295,7 @@ namespace SEE.Game.Evolution
             }
 
             /// <summary>
-            /// Add a new power beam
+            /// Add a new power beam.
             /// <param name="beam">Power beam to add</param>
             /// </summary>
             public void AddPowerBeam(GameObject beam)

@@ -20,7 +20,6 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using SEE.DataModel;
 using SEE.Utils;
 using System.Collections.Generic;
 using System.IO;
@@ -32,7 +31,7 @@ namespace SEE.Game
     /// Configuration of a code city for the visualization of dynamic data in
     /// traced at the level of statements.
     /// </summary>
-    public class SEEJlgCity : SEECity
+    public partial class SEEJlgCity : SEECity
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in 
@@ -62,48 +61,53 @@ namespace SEE.Game
             if (string.IsNullOrEmpty(path))
             {
                 Debug.LogError("Path to JLG source file must not be empty.\n");
+                enabled = false;
             }
             else if (!File.Exists(path))
             {
                 Debug.LogErrorFormat("Source file does not exist at that path {0}.\n", path);
+                enabled = false;
             }
-            else
-            {
-                AddJLGVisualizationIfNecessary(path);
-            }
-        }
-
-        private void AddJLGVisualizationIfNecessary(string path)
-        {
-            // do we already have a JLGVisualization child?
-            foreach (Transform child in transform)
-            {
-                if (child.name == Tags.JLGVisualization && child.CompareTag(Tags.JLGVisualization))
-                {
-                    // make sure this child has the necessary Runtime.JLGVisualizer component
-                    if (!child.TryGetComponent<Runtime.JLGVisualizer>(out Runtime.JLGVisualizer component))
-                    {
-                        component = child.gameObject.AddComponent<Runtime.JLGVisualizer>();
-                    }
-                    component.jlgFilePath = path;
-                    return;
-                }
-            }
-            // no such child exists; we need to add one
-            GameObject jlgVisualisationGameObject = new GameObject();
-            jlgVisualisationGameObject.transform.parent = transform;
-            jlgVisualisationGameObject.name = Tags.JLGVisualization;
-            jlgVisualisationGameObject.tag = Tags.JLGVisualization;
-
-            jlgVisualisationGameObject.AddComponent<Runtime.JLGVisualizer>().jlgFilePath = path;
         }
 
         //----------------------------------------------------------------------------
         // Input/output of configuration attributes
         //----------------------------------------------------------------------------
 
-        // The labels for the configuration attributes in the configuration file.
+        /// <summary>
+        /// Label for attribute <see cref="JLGPath"/> in configuration file.
+        /// </summary>
         private const string JLGPathLabel = "JLGPath";
+
+        /// <summary>
+        /// Label for attribute <see cref="BreakpointClass"/> in configuration file.
+        /// </summary>
+        private const string BreakpointClassLabel = "BreakpointClass";
+
+        /// <summary>
+        /// Label for attribute <see cref="BreakpointLine"/> in configuration file.
+        /// </summary>
+        private const string BreakpointLineLabel = "BreakpointLine";
+
+        /// <summary>
+        /// Label for attribute <see cref="DistanceAboveCity"/> in configuration file.
+        /// </summary>
+        private const string DistanceAboveCityLabel = "DistanceAboveCity";
+
+        /// <summary>
+        /// Label for attribute <see cref="DistanceBehindCity"/> in configuration file.
+        /// </summary>
+        private const string DistanceBehindCityLabel = "DistanceBehindCity";
+
+        /// <summary>
+        /// Label for attribute <see cref="LineWidth"/> in configuration file.
+        /// </summary>
+        private const string LineWidthLabel = "LineWidth";
+
+        /// <summary>
+        /// Label for attribute <see cref="ShowOnlyCalls"/> in configuration file.
+        /// </summary>
+        private const string ShowOnlyCallsLabel = "ShowOnlyCalls";
 
         /// <summary>
         /// <see cref="AbstractSEECity.Save(ConfigWriter)"/>
@@ -112,6 +116,13 @@ namespace SEE.Game
         {
             base.Save(writer);
             JLGPath.Save(writer, JLGPathLabel);
+            // Configuration attributes relating to the animation
+            writer.Save(BreakpointClass, BreakpointClassLabel);
+            writer.Save(BreakpointLine, BreakpointLineLabel);
+            writer.Save(DistanceAboveCity, DistanceAboveCityLabel);
+            writer.Save(DistanceBehindCity, DistanceBehindCityLabel);
+            writer.Save(LineWidth, LineWidthLabel);
+            writer.Save(ShowOnlyCalls, ShowOnlyCallsLabel);
         }
 
         /// <summary>
@@ -121,6 +132,13 @@ namespace SEE.Game
         {
             base.Restore(attributes);
             JLGPath.Restore(attributes, JLGPathLabel);
+            // Configuration attributes relating to the animation
+            ConfigIO.Restore(attributes, BreakpointClassLabel, ref BreakpointClass);
+            ConfigIO.Restore(attributes, BreakpointLineLabel, ref BreakpointLine);
+            ConfigIO.Restore(attributes, DistanceAboveCityLabel, ref DistanceAboveCity);
+            ConfigIO.Restore(attributes, DistanceBehindCityLabel, ref DistanceBehindCity);
+            ConfigIO.Restore(attributes, LineWidthLabel, ref LineWidth);
+            ConfigIO.Restore(attributes, ShowOnlyCallsLabel, ref ShowOnlyCalls);
         }
     }
 }
