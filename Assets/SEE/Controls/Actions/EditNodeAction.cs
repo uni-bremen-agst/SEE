@@ -35,6 +35,13 @@ namespace SEE.Controls.Actions
         private Tuple<GameObject, string, string> editedNode;
 
         /// <summary>
+        /// The information we need to (re-)edit a node.
+        /// </summary>
+        private struct EditNodeMemento
+        {
+        }
+
+        /// <summary>
         /// The new name and new type of the node, which could be undone.
         /// </summary>
         private Tuple<string, string, Node> changesToBeRedone;
@@ -42,10 +49,11 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The previous values (name and type) of the edited node.
         /// </summary>
-        private Tuple<GameObject, string, string> nodeToEdit;
+        //private Tuple<GameObject, string, string> nodeToEdit;
 
         public override void Start()
         {
+            Debug.Log("STARTED");
             if (!InitializeCanvasObject())
             {
                 Debug.LogError($"No canvas object named {nameOfCanvasObject} could be found in the scene.\n");
@@ -75,12 +83,11 @@ namespace SEE.Controls.Actions
                     }
                     // this case will be reached after editing a node for saving
                     // the previous values of this specific node.
-                    if (nodeToEdit != null)
+                    if (editedNode != null)
                     {
-                        editedNode = nodeToEdit;
-                        hadAnEffect = true;
                         result = true;
-                        nodeToEdit = null;
+                        hadAnEffect = true;
+                        editedNode = null; //WHAT - BOOl - null setzen nicht möglich
                     }
                     break;
 
@@ -91,7 +98,7 @@ namespace SEE.Controls.Actions
                         EditNodeCanvasAction editNode = generator.InstantiateEditNodeCanvas(this);
                         editNode.nodeToEdit = hoveredObject.GetComponent<NodeRef>().Value;
                         editNode.gameObjectID = hoveredObject.name;
-                        nodeToEdit = new Tuple<GameObject, string, string>
+                        editedNode = new Tuple<GameObject, string, string>
                             (hoveredObject, hoveredObject.GetComponent<NodeRef>().Value.SourceName, hoveredObject.GetComponent<NodeRef>().Value.Type);
                         changesToBeRedone = null;
                     }
@@ -101,7 +108,7 @@ namespace SEE.Controls.Actions
                     CanvasGenerator canvasGenerator = canvasObject.GetComponent<CanvasGenerator>();
                     canvasGenerator.DestroyEditNodeCanvasAction();
                     hoveredObject = null;
-                    nodeToEdit = null;
+                    editedNode = null;
                     PlayerMenu.InteractionIsForbidden = false;
                     EditProgress = ProgressState.NoNodeSelected;
                     break;
@@ -117,11 +124,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Undo()
         {
+            base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> property.
             changesToBeRedone = new Tuple<string, string, Node>
                 (editedNode.Item1.GetComponent<NodeRef>().Value.SourceName,
                 editedNode.Item1.GetComponent<NodeRef>().Value.Type,
                 editedNode.Item1.GetComponent<NodeRef>().Value);
-
             editedNode.Item1.GetComponent<NodeRef>().Value.SourceName = editedNode.Item2;
             editedNode.Item1.GetComponent<NodeRef>().Value.Type = editedNode.Item3;
         }
@@ -131,6 +138,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Redo()
         {
+            base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> property.
+            Debug.Log(changesToBeRedone.Item1);
             UpdateNode(changesToBeRedone.Item1, changesToBeRedone.Item2, changesToBeRedone.Item3);
         }
 
@@ -139,6 +148,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Stop()
         {
+            InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
+            InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
             CanvasGenerator canvasGenerator = canvasObject.GetComponent<CanvasGenerator>();
             canvasGenerator.DestroyEditNodeCanvasAction();
             hoveredObject = null;
