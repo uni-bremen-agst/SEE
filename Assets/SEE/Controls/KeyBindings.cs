@@ -90,6 +90,16 @@ namespace SEE.Controls
         /// </summary>
         internal static KeyCode ToggleMenu = Register(KeyCode.Space, Scope.Always, "Turns on/off the player-action menu.");
 
+        /// <summary>
+        /// Undoes the last action.
+        /// </summary>
+        internal static KeyCode Undo = Register(KeyCode.Z, Scope.CodeViewer, "Undoes the last action.");
+
+        /// <summary>
+        /// Re-does the last action.
+        /// </summary>
+        internal static KeyCode Redo = Register(KeyCode.Y, Scope.CodeViewer, "Re-does the last action.");
+
         //-----------------------------------------------------
         // Camera path recording and playing
         //-----------------------------------------------------
@@ -277,5 +287,6 @@ namespace SEE.Controls
         /// Toggles the menu of the source-code viewer.
         /// </summary>
         internal static KeyCode ShowCodeWindowMenu = Register(KeyCode.F1, Scope.CodeViewer, "Toggles the menu of the source-code viewer.");
+
     }
 }
