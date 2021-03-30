@@ -181,6 +181,7 @@ namespace SEE.GO.Menu
                         Indicator.ChangeActionState(currentAction);
                     }
                 }
+                PlayerActionHistory.Update();
             }
         }
 
