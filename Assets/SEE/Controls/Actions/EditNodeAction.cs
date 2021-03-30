@@ -34,6 +34,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         private Tuple<GameObject, string, string> editedNode;
 
+        private bool executed = false;
+
         /// <summary>
         /// The information we need to (re-)edit a node.
         /// </summary>
@@ -83,11 +85,11 @@ namespace SEE.Controls.Actions
                     }
                     // this case will be reached after editing a node for saving
                     // the previous values of this specific node.
-                    if (editedNode != null)
+                    if (executed)
                     {
                         result = true;
                         hadAnEffect = true;
-                        editedNode = null; //WHAT - BOOl - null setzen nicht möglich
+                        executed = false;
                     }
                     break;
 
@@ -100,7 +102,7 @@ namespace SEE.Controls.Actions
                         editNode.gameObjectID = hoveredObject.name;
                         editedNode = new Tuple<GameObject, string, string>
                             (hoveredObject, hoveredObject.GetComponent<NodeRef>().Value.SourceName, hoveredObject.GetComponent<NodeRef>().Value.Type);
-                        changesToBeRedone = null;
+                        executed = true;
                     }
                     break;
 
@@ -129,8 +131,10 @@ namespace SEE.Controls.Actions
                 (editedNode.Item1.GetComponent<NodeRef>().Value.SourceName,
                 editedNode.Item1.GetComponent<NodeRef>().Value.Type,
                 editedNode.Item1.GetComponent<NodeRef>().Value);
+
             editedNode.Item1.GetComponent<NodeRef>().Value.SourceName = editedNode.Item2;
             editedNode.Item1.GetComponent<NodeRef>().Value.Type = editedNode.Item3;
+            executed = false;
         }
 
         /// <summary>
@@ -139,7 +143,6 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> property.
-            Debug.Log(changesToBeRedone.Item1);
             UpdateNode(changesToBeRedone.Item1, changesToBeRedone.Item2, changesToBeRedone.Item3);
         }
 
