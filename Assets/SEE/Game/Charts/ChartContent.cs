@@ -23,13 +23,11 @@ using System.Collections.Generic;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.GO;
-using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
-using SEE.Game.Evolution;
 using System.Linq;
 
 namespace SEE.Game.Charts
@@ -186,26 +184,25 @@ namespace SEE.Game.Charts
         /// </summary>
         private List<string> removedNodeIDs = new List<string>();
 
-
         /// <summary>
         /// Color of added node labels
         /// </summary> 
-        private Color addedNodesLabelColor;
+        private static readonly Color addedNodesLabelColor = Color.green;
         
         /// <summary>
         /// Color of changed node labels
         /// </summary>
-        private Color changedNodesLabelColor;
+        private static readonly Color changedNodesLabelColor = Color.cyan;
 
         /// <summary>
         /// Color of removed node labels
         /// </summary>
-        private Color removedNodeLabelColor;
+        private static readonly Color removedNodeLabelColor = Color.red;
 
         /// <summary>
         /// The color the label will have when hovering over it
         /// </summary>
-        private Color hoveringOverLabelTextColor;
+        private static readonly Color hoveringOverLabelTextColor = Color.yellow;
 
         /// <summary>
         /// The hierarchy-indices of every <see cref="treeDataObjects"/>-element. Both
@@ -252,9 +249,6 @@ namespace SEE.Game.Charts
         /// </summary>
         private void Awake()
         {
-            // Load color profile for chart entries
-            FetchLabelColorProfile();
-
             Assert.IsTrue(scrollContent.transform.childCount == 0);
 
             pool = new Stack<ScrollViewEntry>(maxPanelEntryCount);
@@ -630,7 +624,7 @@ namespace SEE.Game.Charts
             listDataObjects = SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, 
                                                               ChartManager.Instance.ShowInnerNodeMetrics);
             // Detect node changes and decorate the scrollview
-            FillListsWithChanges(listDataObjects);
+            FillListsWithChanges();
 
             listDataObjects.Sort(delegate (NodeRef left, NodeRef right)
             {
@@ -986,33 +980,10 @@ namespace SEE.Game.Charts
             GetAllNumericAttributes();
         }
 
-
-        /// <summary>
-        /// Fetches the color profile selected in the ChartManager for added, edited and removed node labels
-        /// </summary>
-        private void FetchLabelColorProfile()
-        {
-            this.hoveringOverLabelTextColor = Color.yellow;
-            // Load colors used for power beams, to match the text with the visible objects
-            try
-            {
-                this.addedNodesLabelColor = new Color(AdditionalBeamDetails.newBeamColor.r, AdditionalBeamDetails.newBeamColor.g, AdditionalBeamDetails.newBeamColor.b);
-                this.changedNodesLabelColor = new Color(AdditionalBeamDetails.changedBeamColor.r, AdditionalBeamDetails.changedBeamColor.g, AdditionalBeamDetails.changedBeamColor.b);
-                this.removedNodeLabelColor = new Color(AdditionalBeamDetails.deletedBeamColor.r, AdditionalBeamDetails.deletedBeamColor.g, AdditionalBeamDetails.deletedBeamColor.b);
-            }
-            catch
-            {
-                // Set default colors: red for removed, green for added, cyan for changed
-                this.addedNodesLabelColor = Color.green;
-                this.changedNodesLabelColor = Color.cyan;
-                this.removedNodeLabelColor = Color.red;
-            }
-        }
-
         /// <summary>
         /// Fills the newNodes, changedNodes and removedNodes lists respectively
         /// </summary>
-        private void FillListsWithChanges(List<NodeRef> nodeRefs)
+        private void FillListsWithChanges()
         {
             this.newNodeIDs = NodeChangesBuffer.GetSingleton().addedNodeIDsCache;
             this.changedNodeIDs = NodeChangesBuffer.GetSingleton().changedNodeIDsCache;
