@@ -111,8 +111,7 @@ namespace SEE.Game
                 }
                 else
                 {
-                    Debug.LogErrorFormat("This EvolutionRenderer attached to {0} has no sibling component of type SEECityEvolution",
-                                         name);
+                    Debug.LogError($"This EvolutionRenderer attached to {name} has no sibling component of type SEECityEvolution\n");
                     enabled = false;
                 }
             }
@@ -1001,14 +1000,12 @@ namespace SEE.Game
                 Debug.LogErrorFormat("The value {0} is no valid index.\n", index);
                 return false;
             }
-            CurrentGraphIndex = index;
-
-            if (HasCurrentLaidOutGraph(out LaidOutGraph loadedGraph))
+            if (HasCurrentLaidOutGraph(out LaidOutGraph loadedGraph) && HasLaidOutGraph(index, out LaidOutGraph newGraph))
             {
-                DisplayGraphAsNew(loadedGraph);
+                CurrentGraphIndex = index;
+                TransitionToNextGraph(loadedGraph, newGraph);
                 return true;
-            }
-            else
+            } else
             {
                 Debug.LogErrorFormat("Could not retrieve a layout for graph with index {0}.\n", index);
                 return false;
