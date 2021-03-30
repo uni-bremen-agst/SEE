@@ -203,12 +203,12 @@ namespace SEE.Game.Evolution
         /// If a child with <paramref name="canvasGameObjectName"/> exists in <see cref="gameObject"/>,
         /// this child will be returned. If no such child exists, a new child with that name will
         /// be created under <see cref="gameObject"/> as an instantiation of the given <paramref name="canvasPrefab"/>.
-        /// If <paramref name="canvasPrefab"/> cannot be loaded, an error message will be emitted,
-        /// the component will be disabled, and an exception be thrown.
+        /// If <paramref name="canvasPrefab"/> cannot be loaded, the component will be disabled, and an exception 
+        /// be thrown.
         /// </summary>
         /// <param name="canvasGameObjectName">name of the child</param>
         /// <param name="canvasPrefab">prefab path to instantiate the child if it does not exist</param>
-        /// <returns></returns>
+        /// <returns>the resulting canvas</returns>
         private GameObject GetCanvas(string canvasGameObjectName, string canvasPrefab)
         {
             GameObject result;
@@ -228,7 +228,6 @@ namespace SEE.Game.Evolution
                 }
                 else
                 {
-                    Debug.LogError($"Prefab {canvasPrefab} not found.");
                     enabled = false;
                     throw new Exception($"Prefab {canvasPrefab} not found.");
                 }
