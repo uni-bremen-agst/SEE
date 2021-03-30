@@ -1,6 +1,6 @@
-﻿using SEE.Utils;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -22,15 +22,11 @@ namespace SEE.Net
         /// Returns all active actions of given end point.
         /// </summary>
         /// <param name="ipEndPoint">The end point to be queried.</param>
-        /// <returns>All active actions of given end point or <code>null</code>, if none
+        /// <returns>All active actions of given end point or <c>null</c>, if none
         /// was found.</returns>
         internal static List<InstantiatePrefabAction> GetActions(IPEndPoint ipEndPoint)
         {
-            bool contains = Dict.TryGetValue(ipEndPoint, out List<InstantiatePrefabAction> result);
-            if (!contains)
-            {
-                result = null;
-            }
+            Dict.TryGetValue(ipEndPoint, out List<InstantiatePrefabAction> result);
             return result;
         }
 
