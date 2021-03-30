@@ -83,7 +83,6 @@ namespace SEE.Utils
         /// </summary>
         public void Update()
         {
-            Debug.Log(Current + "current");
             if (Current != null && Current.Update())
             {
                 // We are continuing with a fresh instance of the same type as Current.
