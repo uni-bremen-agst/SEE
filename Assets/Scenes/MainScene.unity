@@ -3793,6 +3793,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 2342395875013397700, guid: 51821f11a04e1ab4d9151f06c2366bbc, type: 3}
+      propertyPath: CodeCity
+      value: 
+      objectReference: {fileID: 1972412189}
+    - target: {fileID: 2342395875013397700, guid: 51821f11a04e1ab4d9151f06c2366bbc, type: 3}
       propertyPath: clickDelay
       value: 0.5
       objectReference: {fileID: 0}
