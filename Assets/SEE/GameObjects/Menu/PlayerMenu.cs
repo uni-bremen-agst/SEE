@@ -168,7 +168,7 @@ namespace SEE.GO.Menu
                     }
                 }
                 else if (Input.GetKeyDown(KeyBindings.Redo))
-                {                    
+                {
                     PlayerActionHistory.Redo();
                     ActionStateType currentAction = PlayerActionHistory.Current();
                     SetPlayerMenu(currentAction.Name);
