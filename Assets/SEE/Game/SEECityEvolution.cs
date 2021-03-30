@@ -101,7 +101,6 @@ namespace SEE.Game
             {
                 result = gameObject.AddComponent<EvolutionRenderer>();
             }
-            //result.CityEvolution = this;
             return result;
         }
 
