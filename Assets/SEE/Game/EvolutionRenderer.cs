@@ -111,8 +111,7 @@ namespace SEE.Game
                 }
                 else
                 {
-                    Debug.LogErrorFormat("This EvolutionRenderer attached to {0} has no sibling component of type SEECityEvolution",
-                                         name);
+                    Debug.LogError($"This EvolutionRenderer attached to {name} has no sibling component of type SEECityEvolution\n");
                     enabled = false;
                 }
             }
