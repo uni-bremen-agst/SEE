@@ -1,5 +1,4 @@
 ﻿using SEE.Utils;
-using System.Collections.Generic;
 
 namespace SEE.Controls.Actions
 {
@@ -65,21 +64,12 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Returns the UndoStack of the ActionHistory.
+        /// True if the action history is empty.
         /// </summary>
-        /// <returns>the UndoStack of the ActionHistory</returns>
-        public static Stack<ReversibleAction> GetUndoHistory()
+        /// <returns>true if the action history is empty</returns>
+        internal static bool IsEmpty()
         {
-            return history.UndoStack;
-        }
-
-        /// <summary>
-        /// Returns the RedoStack of the ActionHistory.
-        /// </summary>
-        /// <returns>the RedoStack of the ActionHistory</returns>
-        public static Stack<ReversibleAction> GetRedoHistory()
-        {
-            return history.RedoStack;
+            return history.UndoCount == 0;
         }
     }
 }
