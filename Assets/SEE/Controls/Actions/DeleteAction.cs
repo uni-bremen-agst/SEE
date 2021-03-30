@@ -8,6 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls.Actions
 {
@@ -73,8 +74,19 @@ namespace SEE.Controls.Actions
         /// </summary>
         private Dictionary<GameObject, Graph> DeletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
 
+        /// <summary>
+        /// A list of ratios of the current localScal and a targetscale.
+        /// </summary>
         private Dictionary<GameObject, Vector3> shrinkFactors { get; set; } = new Dictionary<GameObject, Vector3>();
 
+        /// <summary>
+        ///  A vector for an objects localScale which fits into the garbage can          //FIXME: Currently set to an absolute value. Should be set abstract, i.e. half of the garbage can´s diameter, for instance. 
+        /// </summary>
+        private Vector3 defaultGarbageVector = new Vector3(0.1f, 0.1f, 0.1f);
+
+        /// <summary>
+        /// Amount of animations, which is used for an objects expansion, removing it from the garbage can.
+        /// </summary>
         private const float animations = 10;
 
         /// <summary>
@@ -210,6 +222,9 @@ namespace SEE.Controls.Actions
             PlayerSettings.GetPlayerSettings().StartCoroutine(this.RemoveNodeFromGarbage(new List<GameObject>(DeletedNodes.Keys)));
         }
 
+        /// <summary>
+        /// Delays the process of showing an hidden edge having been removed from the garbage can.
+        /// </summary>
         private IEnumerator delayEdges(GameObject edge)
         {
 
@@ -261,7 +276,7 @@ namespace SEE.Controls.Actions
 
             foreach (GameObject deletedNode in deletedNodes)
             {
-                Vector3 shrinkFactor = Shrink.shrinkFactor(deletedNode.transform, new Vector3(0.1f, 0.1f, 0.1f));
+                Vector3 shrinkFactor = Shrink.shrinkFactor(deletedNode.transform, defaultGarbageVector);
                 if (!shrinkFactors.ContainsKey(deletedNode))
                 {
                     shrinkFactors.Add(deletedNode, shrinkFactor);
@@ -276,19 +291,22 @@ namespace SEE.Controls.Actions
             InteractableObject.UnselectAll(true);
         }
 
-
-        private IEnumerator waitAndExpand (GameObject deletedNode)
+        /// <summary>
+        /// Coroutine that waits and expands the shrunk object which is currently beeing removed from the garbage can.
+        /// </summary>
+        /// <param name="deletedNode">The nodes to be removed from the garbage-can</param>
+        /// <returns>the waiting time between moving deleted nodes from the garbage-can and then to the city</returns>
+        private IEnumerator WaitAndExpand (GameObject deletedNode)
         {
             yield return new WaitForSeconds(TimeToWait);
             Vector3 shrinkFactor = shrinkFactors[deletedNode];
             float animationsCount = animations;
             float nThRoot = 1 / animations;
-            float expandFactorX = (float)Math.Pow(shrinkFactor.x, nThRoot);
-            float expandFactorY = (float)Math.Pow(shrinkFactor.y, nThRoot);
-            float expandFactorZ = (float)Math.Pow(shrinkFactor.z, nThRoot);
+            shrinkFactor = Util.ExponentOfVectorCoordinates(shrinkFactor, nThRoot);
 
+             
             while ((animationsCount) > 0 ) {
-                Shrink.expand(deletedNode, new Vector3(expandFactorX, expandFactorY, expandFactorZ));
+                Shrink.expand(deletedNode,shrinkFactor);
                 yield return new WaitForSeconds(0.14f);
                 animationsCount--;
             }
@@ -306,7 +324,7 @@ namespace SEE.Controls.Actions
             {
 
                 Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), TimeForAnimation);
-                PlayerSettings.GetPlayerSettings().StartCoroutine(waitAndExpand(deletedNode));
+                PlayerSettings.GetPlayerSettings().StartCoroutine(WaitAndExpand(deletedNode));
             }
        
             yield return new WaitForSeconds(TimeToWait);
