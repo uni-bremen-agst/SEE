@@ -150,7 +150,7 @@ namespace SEE.CameraPaths
         {
             string filename = Filename();
             path.Save(filename);
-            Debug.LogFormat("Saved camera path to {0}\n", filename);
+            Debug.Log($"Saved camera path to {filename}\n");
         }
     }
 }

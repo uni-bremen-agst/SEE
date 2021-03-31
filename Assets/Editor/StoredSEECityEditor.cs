@@ -66,17 +66,12 @@ namespace SEEEditor
                         {
                             allTypes = false;
                         }
-
                     }
 
-                    if (allTypes)
+                    if (allTypes && countSelected != city.CoseGraphSettings.LoadedForNodeTypes.Count)
                     {
-                        if (countSelected != city.CoseGraphSettings.LoadedForNodeTypes.Count)
-                        {
-                            allTypes = false;
-                        }
+                        allTypes = false;
                     }
-
                     ShowGraphListing = allTypes;
                 }
             }
