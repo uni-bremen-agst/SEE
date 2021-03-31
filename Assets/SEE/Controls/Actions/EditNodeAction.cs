@@ -129,7 +129,6 @@ namespace SEE.Controls.Actions
                             hoveredObject.GetComponent<NodeRef>()?.Value.Type);
 
                         editedNode = hoveredObject;
-                        executed = true;
                     }
                     break;
 
@@ -137,6 +136,7 @@ namespace SEE.Controls.Actions
                     editedNode.TryGetComponentOrLog(out NodeRef node);
                     redoEditNodeMemento = new EditNodeMemento(node.Value, NodeName, NodeType);
                     UpdateNode(redoEditNodeMemento);
+                    executed = true;
                     EditProgress = ProgressState.NoNodeSelected;
                     break;
 
