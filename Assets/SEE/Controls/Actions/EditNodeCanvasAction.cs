@@ -72,10 +72,10 @@ namespace SEE.Controls.Actions
         {
             if (EditNode)
             {
-                EditNodeAction.UpdateNode(inputname.text, inputtype.text,nodeToEdit);
-                
-                new EditNodeNetAction(nodeToEdit.SourceName, nodeToEdit.Type, gameObjectID).Execute(null);
-                editNodeAction.EditProgress = EditNodeAction.ProgressState.NoNodeSelected;
+                EditNodeAction.NodeName = inputname.text;
+                EditNodeAction.NodeType = inputtype.text;
+               
+                editNodeAction.EditProgress = EditNodeAction.ProgressState.ValuesAreGiven;
                 Finalise();
                 EditNode = false;
             }
