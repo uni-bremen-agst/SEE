@@ -108,7 +108,7 @@ namespace SEE.Game.Charts
         /// </summary>
         private void GetSettingData()
         {
-            MinimumSize = ChartManager.Instance.minimumSize;
+            MinimumSize = ChartManager.Instance.MinimumSize;
         }
 
         /// <summary>
