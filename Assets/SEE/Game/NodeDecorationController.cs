@@ -23,6 +23,77 @@ public class NodeDecorationController : MonoBehaviour
     private Vector3 nodeLocation;
 
     /// <summary>
+    /// The Height-Percentage the bottom floor should have in
+    /// contrast to the building height
+    /// </summary>
+    public float floorHightPercentage {
+        get
+        {
+            return _floorHightPercentage;
+        }
+        set
+        {
+            _floorHightPercentage = Mathf.Clamp(value, 0f, 1f);
+        }
+    }
+
+    /// <summary>
+    /// How far out the lobby should be from the building, percentage
+    /// is in contrast to the building width
+    /// </summary>
+    public float lobbySpanPercentage
+    {
+        get
+        {
+            return _lobbySpanPercentage;
+        }
+        set
+        {
+            _lobbySpanPercentage = Mathf.Clamp(value, 0f, 1f);
+        }
+    }
+
+    /// <summary>
+    /// The Height-Percentage the roof should have in contrast
+    /// to the building height
+    /// </summary>
+    public float roofHeightPercentage
+    {
+        get
+        {
+            return _roofHeightPercentage;
+        }
+        set
+        {
+            _roofHeightPercentage = Mathf.Clamp(value, 0f, 1f);
+        }
+    }
+
+    /// <summary>
+    /// How far out/in the roof should be in contast to the building, percentage
+    /// is in contrast to building width
+    /// </summary>
+    public float roofSpanPercentage
+    {
+        get
+        {
+            return _roofSpanPercentage;
+        }
+        set
+        {
+            _roofSpanPercentage = Mathf.Clamp(value, f, 1f);
+        }
+    }
+
+    /// <summary>
+    /// Contain the values of the above declared variables, limited to values between 0 and 1
+    /// </summary>
+    private float _floorHightPercentage, _lobbySpanPercentage, _roofHeightPercentage, _roofSpanPercentage;
+
+
+
+
+    /// <summary>
     /// Tile-texture used to decorate the block around it's sides
     /// </summary>
     public Texture2D blockTexture
@@ -59,18 +130,13 @@ public class NodeDecorationController : MonoBehaviour
 
     /// <summary>
     /// Renders the bottom floor of a building
-    /// <param name="floorHightPercentage">The Height-Percentage the bottom floor should have in
-    /// contrast to the building height</param>
-    /// <param name="lobbySpanPercentage">How far out the lobby should be from the building, percentage
-    /// is in contrast to the building width</param>
-    /// *** Percentages are supplied as values between 0 and 1 ***
     /// </summary>
-    private void renderLobby(float floorHightPercentage, float lobbySpanPercentage)
+    private void renderLobby()
     {
         // ========== TODO scale these when scaling gameobject ==========
-        float lobbySizeX = nodeSize.x + nodeSize.x * lobbySpanPercentage;
-        float lobbySizeZ = nodeSize.z + nodeSize.z * lobbySpanPercentage;
-        float lobbyHeight = nodeSize.y * floorHightPercentage;
+        float lobbySizeX = nodeSize.x + nodeSize.x * _lobbySpanPercentage;
+        float lobbySizeZ = nodeSize.z + nodeSize.z * _lobbySpanPercentage;
+        float lobbyHeight = nodeSize.y * _floorHightPercentage;
         // Create lobby gameObject
         GameObject lobby = GameObject.CreatePrimitive(PrimitiveType.Cube);
         lobby.transform.localScale = new Vector3(lobbySizeX, lobbyHeight, lobbySizeZ);
@@ -87,22 +153,18 @@ public class NodeDecorationController : MonoBehaviour
 
     /// <summary>
     /// Renders the tetrahedron roof of a building
-    /// <param name="roofHeightPercentage">The Height-Percentage the roof should have in contrast
-    /// to the building height</param>
-    /// <param name="roofSpanPercentage">How far out/in the roof should be in contast to the building, percentage
-    /// is in contrast to building width</param>
     /// *** Percentages are supplied as values between 0 and 1 ***
     /// </summary>
-    private void renderRoof(float roofHeightPercentage, float roofSpanPercentage)
+    private void renderRoof()
     {
         // ========== TODO scale these when scaling gameobject ==========
-        float roofSizeX = nodeSize.x + nodeSize.x * roofSpanPercentage;
-        float roofSizeZ = nodeSize.z + nodeSize.z * roofSpanPercentage;
-        float roofHeight = nodeSize.y * roofHeightPercentage;
+        float roofSizeX = nodeSize.x + nodeSize.x * _roofSpanPercentage;
+        float roofSizeZ = nodeSize.z + nodeSize.z * _roofSpanPercentage;
+        float roofHeight = nodeSize.y * _roofHeightPercentage;
         // Create roof GameObject
-        GameObject tetrahedron = createFourFacedTetrahedron(roofSizeX, roofHeight, roofSizeZ);
+     //   GameObject tetrahedron = createFourFacedTetrahedron(roofSizeX, roofHeight, roofSizeZ);
         // Move tetrahedron to top of building
-        tetrahedron.transform.position = new Vector3(nodeLocation.x, nodeSize.y + roofHeight / 2, nodeLocation.z);
+     //   tetrahedron.transform.position = new Vector3(nodeLocation.x, nodeSize.y + roofHeight / 2, nodeLocation.z);
         // TODO Render textures here
 
     }
@@ -115,7 +177,10 @@ public class NodeDecorationController : MonoBehaviour
     /// </summary>
     public GameObject createFourFacedTetrahedron(float sizeX, float height, float sizeZ)
     {
-        MeshFilter meshFilter = new MeshFilter();
+        GameObject gameObject = new GameObject("Empty");
+        gameObject.AddComponent<MeshRenderer>();
+        gameObject.AddComponent<MeshFilter>();
+        MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
         // Tetrahedron floor nodes
         Vector3 p0 = new Vector3(0, 0, 0);
         Vector3 p1 = new Vector3(sizeX, 0, 0);
@@ -146,9 +211,6 @@ public class NodeDecorationController : MonoBehaviour
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
         mesh.Optimize();
-        GameObject gameObject = new GameObject("Tetrahedron");
-        gameObject.AddComponent<MeshRenderer>();
-        gameObject.AddComponent<MeshFilter>();
         gameObject.GetComponent<MeshFilter>().mesh = mesh;
         return gameObject;
     }
@@ -174,7 +236,9 @@ public class NodeDecorationController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        fetchNodeDetails();
+        renderLobby();
+        renderRoof();
     }
 
     // Update is called once per frame
