@@ -80,6 +80,9 @@ public class NodeDecorationController : MonoBehaviour
         float lobbyGroundFloorHeight = buildingGroundFloorHeight + (lobby.transform.localScale.y / 2);
         // Move the lobby object to te correct location
         lobby.transform.position = new Vector3(nodeLocation.x, lobbyGroundFloorHeight, nodeLocation.z);
+        // TODO Render textures here
+
+
     }
 
     /// <summary>
@@ -92,7 +95,62 @@ public class NodeDecorationController : MonoBehaviour
     /// </summary>
     private void renderRoof(float roofHeightPercentage, float roofSpanPercentage)
     {
+        // ========== TODO scale these when scaling gameobject ==========
+        float roofSizeX = nodeSize.x + nodeSize.x * roofSpanPercentage;
+        float roofSizeZ = nodeSize.z + nodeSize.z * roofSpanPercentage;
+        float roofHeight = nodeSize.y * roofHeightPercentage;
+        // Create roof GameObject
+        GameObject tetrahedron = createFourFacedTetrahedron(roofSizeX, roofHeight, roofSizeZ);
+        // Move tetrahedron to top of building
+        tetrahedron.transform.position = new Vector3(nodeLocation.x, nodeSize.y + roofHeight / 2, nodeLocation.z);
+        // TODO Render textures here
 
+    }
+
+    /// <summary>
+    /// <author name="Leonard Haddad"/>
+    /// Generates a 4-faced tetrahedron at the given coordinates
+    /// Inspired by an article by <a href="https://blog.nobel-joergensen.com/2010/12/25/procedural-generated-mesh-in-unity/">Morten Nobel-Jørgensen</a>,
+    /// advanced with 12-th grade mathematics
+    /// </summary>
+    public GameObject createFourFacedTetrahedron(float sizeX, float height, float sizeZ)
+    {
+        MeshFilter meshFilter = new MeshFilter();
+        // Tetrahedron floor nodes
+        Vector3 p0 = new Vector3(0, 0, 0);
+        Vector3 p1 = new Vector3(sizeX, 0, 0);
+        Vector3 p2 = new Vector3(sizeX, 0, sizeZ);
+        Vector3 p3 = new Vector3(0, 0, sizeZ);
+        // Tetrahedron top node
+        Vector3 p4 = new Vector3(sizeX / 2, height, sizeZ / 2);
+        // Create gameObject mesh
+        Mesh mesh = meshFilter.sharedMesh;
+        mesh.Clear();
+        mesh.vertices = new Vector3[] {
+            p0,p1,p4,
+            p1,p2,p4,
+            p2,p3,p4,
+            p0,p3,p4,
+            p0,p1,p3,
+            p2,p1,p3
+        };
+        mesh.triangles = new int[]
+        {
+            0,1,2,
+            3,4,5,
+            6,7,8,
+            9,10,11,
+            12,13,14,
+            15,16,17
+        };
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+        mesh.Optimize();
+        GameObject gameObject = new GameObject("Tetrahedron");
+        gameObject.AddComponent<MeshRenderer>();
+        gameObject.AddComponent<MeshFilter>();
+        gameObject.GetComponent<MeshFilter>().mesh = mesh;
+        return gameObject;
     }
 
     /// <summary>
