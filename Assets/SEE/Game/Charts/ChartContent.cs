@@ -836,24 +836,31 @@ namespace SEE.Game.Charts
             Dictionary<Vector2, ChartMarker> anchoredPositionToChartMarkerDict = new Dictionary<Vector2, ChartMarker>(activeMarkers.Count);
 
             Rect dataRect = dataPanel.rect;
+            // If ignoreXAxis is true, we just enumerate all nodes in nodeRefsToDraw in their order
+            // therein on the x axis. The metric selected for the x axis is NODES and, hence, will
+            // not be considered. We achieve that by representing the x values as if they define
+            // a discrete value range from 1 to nodeRefsToDraw.Count() with an equidistant distance
+            // of 1 between each value, i.e., [1, 2, 3, ...nodeRefsToDraw.Count()].
             if (ignoreXAxis)
             {
                 minX = 1;
                 maxX = nodeRefsToDraw.Count();
-
             }
+
             // Note: width and height of dataRect are measured in Unity units
             float widthFactor = minX < maxX ? dataRect.width / (maxX - minX) : 0.0f;            
             float heightFactor = minY < maxY ? dataRect.height / (maxY - minY) : 0.0f;
             int positionInLayer = 0;
             int currentReusedActiveMarkerIndex = 0;
 
+            // To enumerate the x values in case ignoreXAxis is true.
             int nodeIndex = 0;
             foreach (NodeRef nodeRef in nodeRefsToDraw)
             {
                 float valueX;
                 if (!ignoreXAxis)
                 {
+                    // We retrieve the value of the metrics chosen for the x axis.
                     if (!nodeRef.Value.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out valueX))
                     {
                         Debug.LogError($"Node {nodeRef.Value.ID} does not have metric {axisDropdownX.CurrentlySelectedMetric}.\n");
@@ -861,6 +868,7 @@ namespace SEE.Game.Charts
                 }
                 else
                 {
+                    // We create the next value in our range [1, 2, 3, ...nodeRefsToDraw.Count()].
                     nodeIndex++;
                     valueX = nodeIndex;                    
                 }
