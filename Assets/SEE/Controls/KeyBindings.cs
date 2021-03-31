@@ -109,6 +109,11 @@ namespace SEE.Controls
         /// </summary>
         internal static KeyCode SavePathPosition = Register(KeyCode.P, Scope.CameraPaths, "Saves the current position when recording paths.");
 
+        /// <summary>
+        /// Starts/stops the automated path replay.
+        /// </summary>
+        internal static KeyCode TogglePathPlaying = Register(KeyCode.F2, Scope.CodeViewer, "Starts/stops the automated camera movement along a path.");
+
         //-----------------------------------------------------
         // Metric charts
         //-----------------------------------------------------
@@ -287,6 +292,5 @@ namespace SEE.Controls
         /// Toggles the menu of the source-code viewer.
         /// </summary>
         internal static KeyCode ShowCodeWindowMenu = Register(KeyCode.F1, Scope.CodeViewer, "Toggles the menu of the source-code viewer.");
-
     }
 }
