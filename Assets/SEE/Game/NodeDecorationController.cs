@@ -88,10 +88,7 @@ public class NodeDecorationController : MonoBehaviour
     /// <summary>
     /// Contain the values of the above declared variables, limited to values between 0 and 1
     /// </summary>
-    private float _floorHightPercentage, _lobbySpanPercentage, _roofHeightPercentage, _roofSpanPercentage;
-
-
-
+    [SerializeField, Range(0f, 1f)]  private float _floorHightPercentage, _lobbySpanPercentage, _roofHeightPercentage, _roofSpanPercentage;
 
     /// <summary>
     /// Tile-texture used to decorate the block around it's sides
@@ -139,6 +136,7 @@ public class NodeDecorationController : MonoBehaviour
         float lobbyHeight = nodeSize.y * _floorHightPercentage;
         // Create lobby gameObject
         GameObject lobby = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        lobby.transform.SetParent(nodeObject.transform);
         lobby.transform.localScale = new Vector3(lobbySizeX, lobbyHeight, lobbySizeZ);
         // Get the point on the Y axis at the bottom of the building
         float buildingGroundFloorHeight = nodeLocation.y - (nodeSize.y / 2);
@@ -162,9 +160,10 @@ public class NodeDecorationController : MonoBehaviour
         float roofSizeZ = nodeSize.z + nodeSize.z * _roofSpanPercentage;
         float roofHeight = nodeSize.y * _roofHeightPercentage;
         // Create roof GameObject
-     //   GameObject tetrahedron = createFourFacedTetrahedron(roofSizeX, roofHeight, roofSizeZ);
-        // Move tetrahedron to top of building
-     //   tetrahedron.transform.position = new Vector3(nodeLocation.x, nodeSize.y + roofHeight / 2, nodeLocation.z);
+        GameObject tetrahedron = createFourFacedTetrahedron(roofSizeX, roofHeight, roofSizeZ);
+        tetrahedron.transform.SetParent(nodeObject.transform);
+        // Move tetrahedron to top of building, tetrahedron is moved with the bottom left corner
+        tetrahedron.transform.position = new Vector3(nodeLocation.x - roofSizeX/2, nodeSize.y, nodeLocation.z - roofSizeZ/2);
         // TODO Render textures here
 
     }
@@ -173,14 +172,13 @@ public class NodeDecorationController : MonoBehaviour
     /// <author name="Leonard Haddad"/>
     /// Generates a 4-faced tetrahedron at the given coordinates
     /// Inspired by an article by <a href="https://blog.nobel-joergensen.com/2010/12/25/procedural-generated-mesh-in-unity/">Morten Nobel-Jørgensen</a>,
-    /// advanced with 12-th grade mathematics
     /// </summary>
     public GameObject createFourFacedTetrahedron(float sizeX, float height, float sizeZ)
     {
-        GameObject gameObject = new GameObject("Empty");
-        gameObject.AddComponent<MeshRenderer>();
-        gameObject.AddComponent<MeshFilter>();
-        MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
+        // TODO one of the tetra's bottom vertices renders opposite side up
+        GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        go.name = "Tetrahedron";
+        MeshFilter meshFilter = go.GetComponent<MeshFilter>();
         // Tetrahedron floor nodes
         Vector3 p0 = new Vector3(0, 0, 0);
         Vector3 p1 = new Vector3(sizeX, 0, 0);
@@ -189,15 +187,16 @@ public class NodeDecorationController : MonoBehaviour
         // Tetrahedron top node
         Vector3 p4 = new Vector3(sizeX / 2, height, sizeZ / 2);
         // Create gameObject mesh
-        Mesh mesh = meshFilter.sharedMesh;
+        Mesh mesh = new Mesh();
         mesh.Clear();
+        // TODO THE VERTEX ISSUE IS CAUSED BY ONE OF THESE
         mesh.vertices = new Vector3[] {
-            p0,p1,p4,
-            p1,p2,p4,
-            p2,p3,p4,
-            p0,p3,p4,
-            p0,p1,p3,
-            p2,p1,p3
+            p0,p1,p3, // Bottom vertex #1
+            p3,p2,p1, // Bottom vertex #2
+            p1,p4,p2,
+            p2,p4,p3,
+            p3,p4,p0,
+            p0,p4,p1
         };
         mesh.triangles = new int[]
         {
@@ -211,8 +210,8 @@ public class NodeDecorationController : MonoBehaviour
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
         mesh.Optimize();
-        gameObject.GetComponent<MeshFilter>().mesh = mesh;
-        return gameObject;
+        meshFilter.mesh = mesh;
+        return go;
     }
 
     /// <summary>
