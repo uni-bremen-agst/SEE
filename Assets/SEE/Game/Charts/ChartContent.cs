@@ -727,8 +727,8 @@ namespace SEE.Game.Charts
 
             // Note that we determine the minimal and maximal metric values of the two
             // axes globally, that is, over all nodes in listDataObjects and not just those
-            // shown in this particular chart. This way, the scale of all charts for the
-            // same metric is comparable.
+            // shown in this particular chart (there could be fewer nodes if a filter was
+            // applied). This way, the scale of all charts for the same metric is comparable.
             float minX = float.PositiveInfinity; // globally minimal value on X axis
             float maxX = float.NegativeInfinity; // globally maximal value on X axis
             float minY = float.PositiveInfinity; // globally minimal value on Y axis
@@ -745,7 +745,7 @@ namespace SEE.Game.Charts
                     minX = Mathf.Min(minX, valueX);
                     maxX = Mathf.Max(maxX, valueX);
                     // This node has the metric plotted on the x axis or the user selected NODES for the x axis
-                    // in which case all nodes must be considered for the x axis
+                    // in which case all nodes must be considered for the x axis.
                     inX = true;
                 }
                 // y axis
@@ -760,13 +760,14 @@ namespace SEE.Game.Charts
                 // Is this node to be shown in this chart at all?
                 if (inX && inY)
                 {
-                    // only nodes to be shown in this chart and having values for both
-                    // currently selected metrics for the axes will be added to the chart
+                    // Only nodes to be shown in this chart and having values for both
+                    // currently selected metrics for the axes (or NODES was selected for the
+                    // x axis) will be added to the chart.
                     toDraw.Add(nodeRef);
                 }
             }
 
-            // toDraw now contains all nodes to be plotted in the chart
+            // toDraw now contains all nodes to be plotted in the chart.
             if (toDraw.Count > 0)
             {
                 if (xEqY)
@@ -807,10 +808,13 @@ namespace SEE.Game.Charts
                 noDataWarning.SetActive(true);
                 foreach (ChartMarker marker in activeMarkers)
                 {
-                    Destroy(marker.gameObject);
+                    // Check for null avoids double destroy. Operator == is overloaded accordingly.
+                    if (marker != null && marker.gameObject != null)
+                    {
+                        Destroy(marker.gameObject);
+                    }
                 }
-                // FIXME: Shouldn't we call activeMarkers.Clear() here because the markers in activeMarkers
-                // are now destroyed?
+                activeMarkers.Clear();
             }
         }
 
@@ -899,7 +903,10 @@ namespace SEE.Game.Charts
 
             for (int m = currentReusedActiveMarkerIndex; m < activeMarkers.Count; m++)
             {
-                Destroy(activeMarkers[m].gameObject); // TODO(torben): these could potentially still be pooled for future rebuilds
+                if (activeMarkers[m].gameObject != null)
+                {
+                    Destroy(activeMarkers[m].gameObject); // TODO(torben): these could potentially still be pooled for future rebuilds
+                }
             }
             activeMarkers = updatedMarkers;
         }
