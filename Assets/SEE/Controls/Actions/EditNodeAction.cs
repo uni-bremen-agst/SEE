@@ -34,6 +34,9 @@ namespace SEE.Controls.Actions
         /// </summary>
         private Tuple<GameObject, string, string> editedNode;
 
+        /// <summary>
+        /// True, if the action is executed, else false.
+        /// </summary>
         private bool executed = false;
 
         /// <summary>
@@ -41,7 +44,18 @@ namespace SEE.Controls.Actions
         /// </summary>
         private struct EditNodeMemento
         {
+            public readonly GameObject node;
+            public readonly string name;
+            public readonly string type;
+            public EditNodeMemento(GameObject node, string name, string type)
+            {
+                this.node = node;
+                this.name = name;
+                this.type = type;
+            }
         }
+
+        private EditNodeMemento editedNode2;
 
         /// <summary>
         /// The new name and new type of the node, which could be undone.
@@ -55,7 +69,6 @@ namespace SEE.Controls.Actions
 
         public override void Start()
         {
-            Debug.Log("STARTED");
             if (!InitializeCanvasObject())
             {
                 Debug.LogError($"No canvas object named {nameOfCanvasObject} could be found in the scene.\n");
@@ -100,6 +113,8 @@ namespace SEE.Controls.Actions
                         EditNodeCanvasAction editNode = generator.InstantiateEditNodeCanvas(this);
                         editNode.nodeToEdit = hoveredObject.GetComponent<NodeRef>().Value;
                         editNode.gameObjectID = hoveredObject.name;
+                        EdeditedNode2 = new EditNodeMemento
+                            hoveredObject, hoveredObject.GetComponent<NodeRef>().Value.SourceName, hoveredObject.GetComponent<NodeRef>().Value.Type)
                         editedNode = new Tuple<GameObject, string, string>
                             (hoveredObject, hoveredObject.GetComponent<NodeRef>().Value.SourceName, hoveredObject.GetComponent<NodeRef>().Value.Type);
                         executed = true;
