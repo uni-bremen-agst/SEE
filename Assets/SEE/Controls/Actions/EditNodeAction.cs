@@ -21,6 +21,7 @@ namespace SEE.Controls.Actions
         {
             NoNodeSelected,  // initial state when no node is selected
             NodeSelected,    // a node is currently selected
+            ValuesAreGiven, // values are given from the input fields
             EditIsCanceled,  // the edit action is canceled
         }
 
@@ -30,9 +31,9 @@ namespace SEE.Controls.Actions
         public ProgressState EditProgress { get; set; } = ProgressState.NoNodeSelected;
 
         /// <summary>
-        /// The edited node and their previous name and type edited by this action. 
+        /// The node edited by this action. 
         /// </summary>
-        private Tuple<GameObject, string, string> editedNode;
+        private GameObject editedNode;
 
         /// <summary>
         /// True, if the action is executed, else false.
@@ -40,14 +41,24 @@ namespace SEE.Controls.Actions
         private bool executed = false;
 
         /// <summary>
+        /// The new name of the node.
+        /// </summary>
+        public static string NodeName { get; set; }
+
+        /// <summary>
+        /// The new type of the node.
+        /// </summary>
+        public static string NodeType { get; set; }
+
+        /// <summary>
         /// The information we need to (re-)edit a node.
         /// </summary>
-        private struct EditNodeMemento
+        public struct EditNodeMemento
         {
-            public readonly GameObject node;
+            public readonly Node node;
             public readonly string name;
             public readonly string type;
-            public EditNodeMemento(GameObject node, string name, string type)
+            public EditNodeMemento(Node node, string name, string type)
             {
                 this.node = node;
                 this.name = name;
@@ -55,17 +66,20 @@ namespace SEE.Controls.Actions
             }
         }
 
-        private EditNodeMemento editedNode2;
+        /// <summary>
+        /// The information needed to undo an edit process. (The previous values)
+        /// </summary>
+        private EditNodeMemento undoEditNodeMemento;
+
+        /// <summary>
+        /// The information needed to redo an edit process. (The values after editing)
+        /// </summary>
+        private EditNodeMemento redoEditNodeMemento;
 
         /// <summary>
         /// The new name and new type of the node, which could be undone.
         /// </summary>
         private Tuple<string, string, Node> changesToBeRedone;
-
-        /// <summary>
-        /// The previous values (name and type) of the edited node.
-        /// </summary>
-        //private Tuple<GameObject, string, string> nodeToEdit;
 
         public override void Start()
         {
@@ -82,6 +96,7 @@ namespace SEE.Controls.Actions
         /// The Update method's behavior depends on the edit-progress state (sequential series).
         /// NoNodeSelected: Waits until a node is selected by selecting a game node via the mouse button.
         /// NodeSelected: Instantiates the canvasObject if a gameNode is selected.
+        /// ValuesAreGiven: Saves the new values of the node in a memento and updates the specific node.
         /// EditIsCanceled: Removes the canvas and resets all values if the process is canceled.
         /// See <see cref="ReversibleAction.Update"/>.
         /// </summary>
@@ -113,12 +128,22 @@ namespace SEE.Controls.Actions
                         EditNodeCanvasAction editNode = generator.InstantiateEditNodeCanvas(this);
                         editNode.nodeToEdit = hoveredObject.GetComponent<NodeRef>().Value;
                         editNode.gameObjectID = hoveredObject.name;
-                        EdeditedNode2 = new EditNodeMemento
-                            hoveredObject, hoveredObject.GetComponent<NodeRef>().Value.SourceName, hoveredObject.GetComponent<NodeRef>().Value.Type)
-                        editedNode = new Tuple<GameObject, string, string>
-                            (hoveredObject, hoveredObject.GetComponent<NodeRef>().Value.SourceName, hoveredObject.GetComponent<NodeRef>().Value.Type);
+
+                        undoEditNodeMemento = new EditNodeMemento(
+                            hoveredObject.GetComponent<NodeRef>()?.Value,
+                            hoveredObject.GetComponent<NodeRef>()?.Value.SourceName,
+                            hoveredObject.GetComponent<NodeRef>()?.Value.Type);
+
+                        editedNode = hoveredObject;
                         executed = true;
                     }
+                    break;
+
+                case ProgressState.ValuesAreGiven:
+                    editedNode.TryGetComponentOrLog(out NodeRef node);
+                    redoEditNodeMemento = new EditNodeMemento(node.Value, NodeName, NodeType);
+                    UpdateNode(redoEditNodeMemento);
+                    EditProgress = ProgressState.NoNodeSelected;
                     break;
 
                 case ProgressState.EditIsCanceled:
@@ -142,13 +167,8 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> property.
-            changesToBeRedone = new Tuple<string, string, Node>
-                (editedNode.Item1.GetComponent<NodeRef>().Value.SourceName,
-                editedNode.Item1.GetComponent<NodeRef>().Value.Type,
-                editedNode.Item1.GetComponent<NodeRef>().Value);
-
-            editedNode.Item1.GetComponent<NodeRef>().Value.SourceName = editedNode.Item2;
-            editedNode.Item1.GetComponent<NodeRef>().Value.Type = editedNode.Item3;
+            undoEditNodeMemento.node.SourceName = undoEditNodeMemento.name;
+            undoEditNodeMemento.node.Type = undoEditNodeMemento.type;
             executed = false;
         }
 
@@ -158,7 +178,7 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> property.
-            UpdateNode(changesToBeRedone.Item1, changesToBeRedone.Item2, changesToBeRedone.Item3);
+            UpdateNode(redoEditNodeMemento);
         }
 
         /// <summary>
@@ -177,19 +197,24 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Updates the values such as nodename and nodetype of a specific <paramref name="node"/>
         /// </summary>
-        /// <param name="newName">the new name of the <paramref name="node"/></param>
-        /// <param name="newType">the new type of the <paramref name="node"/></param>
-        /// <param name="node">the node to be editing</param>
-        public static void UpdateNode(string newName, string newType, Node node)
+        /// <param name="editNodeMemento">information needed to edit a node</param>
+        public static void UpdateNode(EditNodeMemento editNodeMemento)
         {
-            if (!newName.Equals(node.SourceName))
+            Node node = editNodeMemento.node;
+
+            if (!editNodeMemento.name.Equals(node.SourceName))
             {
-                node.SourceName = newName;
+                node.SourceName = editNodeMemento.name;
             }
-            if (!newType.Equals(node.Type))
+            if (!editNodeMemento.type.Equals(node.Type))
             {
-                node.Type = newType;
+                node.Type = editNodeMemento.type;
             }
+        }
+
+        public static EditNodeMemento CreateMemento(string name, string type, Node node)
+        {
+            return new EditNodeMemento(node, name, type);
         }
 
         /// <summary>
