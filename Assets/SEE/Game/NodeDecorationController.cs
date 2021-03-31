@@ -81,7 +81,7 @@ public class NodeDecorationController : MonoBehaviour
         }
         set
         {
-            _roofSpanPercentage = Mathf.Clamp(value, f, 1f);
+            _roofSpanPercentage = Mathf.Clamp(value, 0f, 1f);
         }
     }
 
