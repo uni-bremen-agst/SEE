@@ -75,7 +75,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Start()
         {
-            Debug.Log("Wie oft");
             InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
             InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
         }
