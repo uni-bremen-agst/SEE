@@ -15,7 +15,6 @@ public class GlobalActionHistory
     {
         action,
         undo,
-        redo,
     };
 
     /// <summary>
@@ -82,7 +81,7 @@ public class GlobalActionHistory
         action.Awake();
         action.Start();
         // Whenever a new action is excuted, we consider the redo stack lost.
-        if(isRedo) DeleteRedo(key);    //RedoStack.Clear();
+        if (isRedo) DeleteRedo(key);    //RedoStack.Clear();
     }
 
     /// <summary>
@@ -117,18 +116,19 @@ public class GlobalActionHistory
     /// <param name="playerID">The player that wants to perform an undo/redo</param>
     /// <param name="type">the type of action he wants to perform</param>
     /// <returns>A tuple of the latest users action and the actions from the others that be influenced by that</returns> 
-    private Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>, List<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>>> Find(string playerID, historyType type)
+    private Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>, List<ReversibleAction>> Find(string playerID, historyType type)
     {
         int i = head - 1;
 
         //A list to persit all changes on the same GameObject
-        List<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>> results = new List<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>>();
+        //List<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>> results = new List<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>>();
+        List<ReversibleAction> results = new List<ReversibleAction>();
         Tuple<DateTime, string, historyType, ReversibleAction, List<string>> result = null;
         while (true)//FIXME: later difference whether it is an undo or redo search
         {
 
-            if ((type == historyType.undo && actionList[i].Item3 != historyType.undo)
-                || (type == historyType.redo && actionList[i].Item3 == historyType.undo)
+            if ((type == historyType.undo && actionList[i].Item3 == historyType.undo)
+                || (type == historyType.action && actionList[i].Item3 == historyType.action)
                 && actionList[i].Item2 == playerID)
             {
                 result = actionList[i]; //FIXME: Somehow these data has to be deleted from the list, but not sure then to do it 
@@ -148,7 +148,7 @@ public class GlobalActionHistory
                 //Checks if any item from list 1 is in list 2
                 if (result.Item5.Where(it => actionList[i].Item5.Contains(it)) != null) //FIXME: Could make some trouble, not sure if it works
                 {
-                    results.Add(actionList[i]);
+                    results.Add(actionList[i].Item4);
                 }
                 if (i == head - 1) break;
                 if (i < size - 1) i++;
@@ -156,7 +156,7 @@ public class GlobalActionHistory
             }
         }
 
-        return new Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>, List<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>>>(result,results);
+        return new Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>, List<ReversibleAction>>(result, results);
 
     }
 
@@ -167,9 +167,9 @@ public class GlobalActionHistory
     private void DeleteRedo(string userid) //FIXME: maybe real delte (shifting of index?)?
     {
 
-        for (int i = 0; i < size -1 ; i++)
+        for (int i = 0; i < size - 1; i++)
         {
-           if(actionList[i].Item2.Equals(userid) && actionList[i].Item3.Equals(historyType.undo)) actionList[i] = null; //FIXME changed to undo because  i think we need to delete this and not the undos which are actualy actions?
+            if (actionList[i].Item2.Equals(userid) && actionList[i].Item3.Equals(historyType.undo)) actionList[i] = null; //FIXME changed to undo because  i think we need to delete this and not the undos which are actualy actions?
         }
         isRedo = false;
     }
@@ -182,7 +182,7 @@ public class GlobalActionHistory
     /// <param name="time">the time of the action which should be deleted</param>
     private void DeleteItem(string userid, DateTime time)
     {
-        for(int i = 0; i < size -1; i++)
+        for (int i = 0; i < size - 1; i++)
         {
             if (actionList[i].Item1.Equals(time) && actionList[i].Item2.Equals(userid)) actionList[i] = null; ;
         }
@@ -195,7 +195,7 @@ public class GlobalActionHistory
     /// <param name="userid"></param>
     public void Undo(string userid) //FIXME: UNDO AND REDO NEEDS TO UPDATE ALSO THE ACTIVEACTION
     {
-        Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>,List<Tuple< DateTime, string, historyType, ReversibleAction, List<string>>>> find;
+        Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>, List<ReversibleAction>> find;
         find = Find(userid, historyType.action);    //Should be the same as getActiveAction     //With the result we need to calculate whether we can du undo or not and what changes the gameobject need
         while (!getActiveAction(userid).HadEffect())
         {
@@ -204,20 +204,18 @@ public class GlobalActionHistory
 
         }
         getActiveAction(userid).Stop();
-                                                     // find.item2 als parameter so dass die action selbst brechen kann was gemacht werden muss && undo muss ein bool sein damit danach entschieden werden kann ob es ausgeführt wird
-                                                    // in jeder revesble action muss evtl. noch eine changes list mitgeführt werden, damit eine action herrauslesen kann was die anderen verändert haben, und ob man das mergen kann oder nicht 
-        if(find.Item1.Item4.Undo())               
+        if (find.Item1.Item4.Undo(find.Item2))
         {
-            
+
             Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, userid, historyType.undo, find.Item1.Item4, find.Item1.Item5));
-           
+
             //DO the POP
             DeleteItem(find.Item1.Item2, find.Item1.Item1);
             find = Find(userid, historyType.action);
-            SetActiveAction(userid, find.Item1.Item4); 
+            SetActiveAction(userid, find.Item1.Item4);
             isRedo = true;
             getActiveAction(userid)?.Start();
-           
+
         } //Eventuell noch im else was erledigen, was muss passieren wenn das undo nicht performed werden kann
     }
 
@@ -229,18 +227,16 @@ public class GlobalActionHistory
     {
         getActiveAction(userid).Stop();
 
-        Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>, List<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>>> find;
+        Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>, List<ReversibleAction>> find;
         find = Find(userid, historyType.undo);
-        
+
         //With the result we need to calculate whether we can du undo or not and what changes the gameobject need
-        // find.item2 als parameter so dass die action selbst brechen kann was gemacht werden muss && redo muss ein bool sein damit danach entschieden werden kann ob es ausgeführt wird
-        // in jeder revesble action muss evtl. noch eine changes list mitgeführt werden, damit eine action herrauslesen kann was die anderen verändert haben, und ob man das mergen kann oder nicht 
-        if (find.Item1.Item4.Redo()) 
+        if (find.Item1.Item4.Redo(find.Item2))
         {
-            Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, userid, historyType.action, find.Item1.Item4, find.Item1.Item5)); //FIXME: Brauchen wir überhaupt ein redo state? ist es nicht das gleiche wie eine Action?
+            Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, userid, historyType.action, find.Item1.Item4, find.Item1.Item5)); 
             find.Item1.Item4.Start();
-            
-            SetActiveAction(userid, find.Item1.Item4); //FIXME: MUSS HIER WIRKLICH EINFACH DIE SELBE ACTION GEPUSHT WERDEN?
+
+            SetActiveAction(userid, find.Item1.Item4); //FIXME: IST die action hier richtig
             DeleteItem(find.Item1.Item2, find.Item1.Item1);
         } //FIXME Was passiert wenn das redo nicht erfolgreich wird
     }
@@ -263,7 +259,7 @@ public class GlobalActionHistory
     /// <param name="action">the new active action</param>
     private void SetActiveAction(string player, ReversibleAction action)
     {
-        if(activeAction[player] == null)
+        if (activeAction[player] == null)
         {
             activeAction.Add(player, action);
         }
