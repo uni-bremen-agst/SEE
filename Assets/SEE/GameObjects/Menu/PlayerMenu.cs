@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.Game.UI;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
@@ -134,7 +138,7 @@ namespace SEE.GO.Menu
             }
 
             // space bar toggles menu            
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyBindings.ToggleMenu))
             {
                 ModeMenu.ToggleMenu();
             }
@@ -145,18 +149,57 @@ namespace SEE.GO.Menu
             if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
 #endif
             {
-                if (Input.GetKeyDown(KeyCode.Z))
+                if (Input.GetKeyDown(KeyBindings.Undo))
                 {
                     PlayerActionHistory.Undo();
-                    Indicator.ChangeActionState(PlayerActionHistory.Current());
+                    if (!PlayerActionHistory.IsEmpty())
+                    {
+                        ActionStateType currentAction = PlayerActionHistory.Current();
+                        SetPlayerMenu(currentAction.Name);
+                        Indicator.ChangeActionState(currentAction);
+                    }
+                    else
+                    {
+                        // This case will be reached if there is no finished action in the undo history.
+                        // Special case: The user is executing his first action after moving while running the application,
+                        // but this action is not finished yet. Then, the user executes undo. 
+                        ModeMenu.ActiveEntry = ModeMenu.Entries.Single(x => x.Title == ActionStateType.Move.Name);
+                        Indicator.ChangeActionState(ActionStateType.Move);
+                    }
                 }
-                else if (Input.GetKeyDown(KeyCode.Y))
+                else if (Input.GetKeyDown(KeyBindings.Redo))
                 {
                     PlayerActionHistory.Redo();
-                    Indicator.ChangeActionState(PlayerActionHistory.Current());
+                    ActionStateType currentAction = PlayerActionHistory.Current();
+                    SetPlayerMenu(currentAction.Name);
+                    Indicator.ChangeActionState(currentAction);
                 }
             }
             PlayerActionHistory.Update();
+        }
+
+        /// <summary>
+        /// Sets the currently selected menu entry in PlayerMenu to the action with given <paramref name="actionName"/>.
+        /// </summary>
+        /// <param name="actionName">name of the menu entry to be </param>
+        private void SetPlayerMenu(string actionName)
+        {
+            if (PlayerSettings.LocalPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu))
+            {                
+                // We cannot use PlayerActionHistory.Current here
+                playerMenu.ModeMenu.ActiveEntry 
+                    = playerMenu.ModeMenu.Entries.First
+                         (x => x.Title.Equals(actionName));
+            }
+            foreach (ToggleMenuEntry toggleMenuEntry in playerMenu.ModeMenu.Entries)
+            {
+                // Hint (can be removed after review): we cannot use PlayerActionHistory.Current
+                if (toggleMenuEntry.Title.Equals(actionName))
+                {
+                    playerMenu.ModeMenu.ActiveEntry = toggleMenuEntry;
+                    break;
+                }
+            }
         }
     }
 }
