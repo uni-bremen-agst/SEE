@@ -229,7 +229,6 @@ namespace SEE.Controls.Actions
                     break;
 
                 case ProgressState.AddingIsCanceled:
-                    PlayerMenu.InteractionIsForbidden = false;
                     city = null;
                     Progress = ProgressState.NoCitySelected;
                     PlayerMenu.InteractionIsForbidden = false;
@@ -275,7 +274,7 @@ namespace SEE.Controls.Actions
             nodesLoaded = false;
             if (hoveredObject != null && Input.GetMouseButtonDown(0))
             {
-                //Gets the SEECity from the hoveredObject
+                // Gets the SEECity from the hoveredObject
                 SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject.TryGetComponent<SEECity>(out city);
 
                 foreach (GameObject root in listOfRoots)

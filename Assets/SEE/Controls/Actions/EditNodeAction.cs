@@ -3,7 +3,6 @@ using SEE.GO;
 using SEE.GO.Menu;
 using SEE.Utils;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -75,11 +74,6 @@ namespace SEE.Controls.Actions
         /// The information needed to redo an edit process. (The values after editing)
         /// </summary>
         private EditNodeMemento redoEditNodeMemento;
-
-        /// <summary>
-        /// The new name and new type of the node, which could be undone.
-        /// </summary>
-        private Tuple<string, string, Node> changesToBeRedone;
 
         public override void Start()
         {
@@ -188,8 +182,11 @@ namespace SEE.Controls.Actions
         {
             InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
             InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
-            CanvasGenerator canvasGenerator = canvasObject.GetComponent<CanvasGenerator>();
-            canvasGenerator.DestroyEditNodeCanvasAction();
+
+            if (canvasObject.TryGetComponent(out CanvasGenerator canvasGenerator))
+            {
+                canvasGenerator.DestroyEditNodeCanvasAction();
+            }
             hoveredObject = null;
             EditProgress = ProgressState.NoNodeSelected;
         }
@@ -210,11 +207,6 @@ namespace SEE.Controls.Actions
             {
                 node.Type = editNodeMemento.type;
             }
-        }
-
-        public static EditNodeMemento CreateMemento(string name, string type, Node node)
-        {
-            return new EditNodeMemento(node, name, type);
         }
 
         /// <summary>

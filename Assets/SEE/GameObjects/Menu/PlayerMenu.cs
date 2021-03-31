@@ -142,13 +142,12 @@ namespace SEE.GO.Menu
                         break;
                     }
                 }
-
-                // space bar toggles menu            
+                // space bar toggles menu 
                 if (Input.GetKeyDown(KeyBindings.ToggleMenu))
                 {
                     ModeMenu.ToggleMenu();
                 }
-
+                
                 // trigger Undo or Redo if requested by keyboard shortcuts
 #if UNITY_EDITOR == false
             // Ctrl keys are not available when running the game in the editor

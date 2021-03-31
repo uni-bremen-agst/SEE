@@ -43,6 +43,7 @@ namespace SEE.Controls.Actions
             if (NextState)
             {
                 addNodeAction.Progress = AddNodeAction.ProgressState.CanvasIsClosed;
+                canvasObject.GetComponent<AddingNodeCanvasAction>().GetNodeValues();
                 Finalise();
                 NextState = false;
             }
@@ -95,7 +96,6 @@ namespace SEE.Controls.Actions
         public void Finalise()
         {
             CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
-            canvasObject.GetComponent<AddingNodeCanvasAction>().GetNodeValues();
             generator.DestroyAddNodeCanvasAction();
             PlayerMenu.InteractionIsForbidden = false;
             InteractableObject.UnselectAll(true);
