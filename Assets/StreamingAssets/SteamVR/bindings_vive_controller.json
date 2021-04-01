@@ -134,7 +134,7 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/default/in/interactui"
+                     "output" : "/actions/default/in/opensettingsmenu"
                   }
                },
                "mode" : "button",

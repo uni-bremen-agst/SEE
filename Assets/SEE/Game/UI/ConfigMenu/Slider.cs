@@ -14,7 +14,7 @@ namespace SEE.Game.UI.ConfigMenu
 
     public class Slider : DynamicUIBehaviour
     {
-        public String label;
+        public string label;
         public (float Min, float Max) range = (0f, 10f);
         public SliderMode sliderMode = SliderMode.Float;
 
@@ -54,7 +54,7 @@ namespace SEE.Game.UI.ConfigMenu
         public Action<float> OnValueChange { get; set; }
     }
 
-    public class SliderBuilder : BaseUiBuilder<Slider>
+    public class SliderBuilder : UiBuilder<Slider>
     {
         protected override string PrefabPath => "Assets/Prefabs/UI/Input Group - Slider.prefab";
 

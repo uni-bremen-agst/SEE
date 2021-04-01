@@ -5,14 +5,14 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 namespace SEE.Game.UI.ConfigMenu
 {
-    public abstract class BaseUiBuilder<T> where T : Component
+    public abstract class UiBuilder<T> where T : Component
     {
-        protected abstract String PrefabPath { get; }
+        protected abstract string PrefabPath { get; }
 
         private GameObject _prefab;
         protected T Instance;
 
-        protected BaseUiBuilder(Transform parent)
+        protected UiBuilder(Transform parent)
         {
             GameObject instanceHost =
                 Object.Instantiate(GetPrefab(), parent);
@@ -22,7 +22,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         public T Build() => Instance;
 
-        protected GameObject GetPrefab()
+        private GameObject GetPrefab()
         {
             if (_prefab == null)
             {

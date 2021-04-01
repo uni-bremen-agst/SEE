@@ -65,7 +65,7 @@ namespace SEE.Game.UI.ConfigMenu
         }
     }
 
-    public class ColorPickerBuilder : BaseUiBuilder<ColorPicker>
+    public class ColorPickerBuilder : UiBuilder<ColorPicker>
     {
         protected override string PrefabPath => "Assets/Prefabs/UI/Input Group - Color Picker.prefab";
 
