@@ -57,6 +57,8 @@ namespace Valve.VR
         
         private static SteamVR_Action_Boolean p_default_RGrip;
         
+        private static SteamVR_Action_Boolean p_default_OpenSettingsMenu;
+        
         private static SteamVR_Action_Vibration p_default_Haptic;
         
         public static SteamVR_Action_Boolean default_GrabPinch
@@ -219,6 +221,14 @@ namespace Valve.VR
             }
         }
         
+        public static SteamVR_Action_Boolean default_OpenSettingsMenu
+        {
+            get
+            {
+                return SteamVR_Actions.p_default_OpenSettingsMenu.GetCopy<SteamVR_Action_Boolean>();
+            }
+        }
+        
         public static SteamVR_Action_Vibration default_Haptic
         {
             get
@@ -250,6 +260,7 @@ namespace Valve.VR
                     SteamVR_Actions.default_CreateChart,
                     SteamVR_Actions.default_LGrip,
                     SteamVR_Actions.default_RGrip,
+                    SteamVR_Actions.default_OpenSettingsMenu,
                     SteamVR_Actions.default_Haptic};
             Valve.VR.SteamVR_Input.actionsIn = new Valve.VR.ISteamVR_Action_In[] {
                     SteamVR_Actions.default_GrabPinch,
@@ -271,7 +282,8 @@ namespace Valve.VR
                     SteamVR_Actions.default_ResetCharts,
                     SteamVR_Actions.default_CreateChart,
                     SteamVR_Actions.default_LGrip,
-                    SteamVR_Actions.default_RGrip};
+                    SteamVR_Actions.default_RGrip,
+                    SteamVR_Actions.default_OpenSettingsMenu};
             Valve.VR.SteamVR_Input.actionsOut = new Valve.VR.ISteamVR_Action_Out[] {
                     SteamVR_Actions.default_Haptic};
             Valve.VR.SteamVR_Input.actionsVibration = new Valve.VR.SteamVR_Action_Vibration[] {
@@ -290,7 +302,8 @@ namespace Valve.VR
                     SteamVR_Actions.default_ResetCharts,
                     SteamVR_Actions.default_CreateChart,
                     SteamVR_Actions.default_LGrip,
-                    SteamVR_Actions.default_RGrip};
+                    SteamVR_Actions.default_RGrip,
+                    SteamVR_Actions.default_OpenSettingsMenu};
             Valve.VR.SteamVR_Input.actionsSingle = new Valve.VR.SteamVR_Action_Single[] {
                     SteamVR_Actions.default_Squeeze,
                     SteamVR_Actions.default_Throttle,
@@ -319,7 +332,8 @@ namespace Valve.VR
                     SteamVR_Actions.default_ResetCharts,
                     SteamVR_Actions.default_CreateChart,
                     SteamVR_Actions.default_LGrip,
-                    SteamVR_Actions.default_RGrip};
+                    SteamVR_Actions.default_RGrip,
+                    SteamVR_Actions.default_OpenSettingsMenu};
         }
         
         private static void PreInitActions()
@@ -344,6 +358,7 @@ namespace Valve.VR
             SteamVR_Actions.p_default_CreateChart = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/default/in/CreateChart")));
             SteamVR_Actions.p_default_LGrip = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/default/in/LGrip")));
             SteamVR_Actions.p_default_RGrip = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/default/in/RGrip")));
+            SteamVR_Actions.p_default_OpenSettingsMenu = ((SteamVR_Action_Boolean)(SteamVR_Action.Create<SteamVR_Action_Boolean>("/actions/default/in/OpenSettingsMenu")));
             SteamVR_Actions.p_default_Haptic = ((SteamVR_Action_Vibration)(SteamVR_Action.Create<SteamVR_Action_Vibration>("/actions/default/out/Haptic")));
         }
     }

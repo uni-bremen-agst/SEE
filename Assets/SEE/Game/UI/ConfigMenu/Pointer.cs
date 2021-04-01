@@ -41,11 +41,11 @@ public class Pointer : MonoBehaviour
         _lineRenderer.SetPosition(1, endPosition);
     }
 
-    private RaycastHit CreateRaycast()
+    private RaycastHit CreateRaycast(float length)
     {
         RaycastHit hit;
         Ray ray = new Ray(transform.position, transform.forward);
-        Physics.Raycast(ray, out hit, DefaultLength);
+        Physics.Raycast(ray, out hit, length);
 
         return hit;
     }

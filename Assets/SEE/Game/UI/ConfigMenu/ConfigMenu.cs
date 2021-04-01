@@ -22,11 +22,17 @@ namespace SEE.Game.UI.ConfigMenu
 
     public class ConfigMenu : DynamicUIBehaviour
     {
-        private static List<string> _numericAttributes =
+        private static readonly List<string> _numericAttributes =
             Enum.GetValues(typeof(NumericAttributeNames))
                 .Cast<NumericAttributeNames>()
                 .Select(x => x.Name())
                 .ToList();
+        private static readonly List<EditableInstance> EditableInstances =
+            new List<EditableInstance>
+            {
+                EditableInstance.Architecture,
+                EditableInstance.Implementation
+            };
 
         private const string PagePrefabPath = "Assets/Prefabs/UI/Page.prefab";
         private const string TabButtonPrefabPath = "Assets/Prefabs/UI/TabButton.prefab";
@@ -44,20 +50,21 @@ namespace SEE.Game.UI.ConfigMenu
         private SEECity _city;
         private ColorPickerControl _colorPickerControl;
         private ButtonManager _cityLoadButton;
+        private Canvas _canvas;
+        private HorizontalSelector _editingInstanceSelector;
+
+        public UnityEvent<EditableInstance> OnInstanceChangeRequest =
+            new UnityEvent<EditableInstance>();
+        public EditableInstance CurrentlyEditing = EditableInstance.Implementation;
 
         private void Start()
         {
-            GameObject.Find("Implementation")?.MustGetComponent(out _city);
-            if (!_city)
-            {
-                Debug.LogError("Did not find a city instance.");
-                return;
-            }
-
+            SetupCity(CurrentlyEditing);
             MustGetChild("Canvas/TabNavigation/TabOutlet", out _tabOutlet);
             MustGetChild("Canvas/TabNavigation/Sidebar/TabButtons", out _tabButtons);
             MustGetChild("Canvas/Actions", out _actions);
 
+            MustGetComponentInChild("Canvas", out _canvas);
             MustGetComponentInChild("Canvas/Picker 2.0", out _colorPickerControl);
             _colorPickerControl.gameObject.SetActive(false);
 
@@ -75,13 +82,42 @@ namespace SEE.Game.UI.ConfigMenu
             });
 
 
-            SetupCanvas();
+            SetupInstanceSwitch();
+            SetupEnvironment();
             LoadPrefabs();
             SetupActions();
             SetupPages();
         }
 
-        private void SetupCanvas()
+        private void SetupCity(EditableInstance instanceToEdit)
+        {
+            GameObject.Find(instanceToEdit.GameObjectName)?.MustGetComponent(out _city);
+            if (!_city)
+            {
+                Debug.LogError("Did not find a city instance.");
+            }
+        }
+
+        private void SetupInstanceSwitch()
+        {
+            MustGetComponentInChild("Canvas/TabNavigation/Sidebar/CitySwitch",
+                                    out _editingInstanceSelector);
+            _editingInstanceSelector.itemList.Clear();
+            EditableInstances.ForEach(instance =>
+                                          _editingInstanceSelector.CreateNewItem(
+                                              instance.DisplayValue));
+            _editingInstanceSelector.defaultIndex = EditableInstances.IndexOf(CurrentlyEditing);
+            _editingInstanceSelector.SetupSelector();
+            _editingInstanceSelector.selectorEvent.AddListener(index =>
+            {
+                string displayValue = _editingInstanceSelector.itemList[index].itemTitle;
+                EditableInstance newInstance =
+                    EditableInstances.Find(instance => instance.DisplayValue == displayValue);
+                OnInstanceChangeRequest.Invoke(newInstance);
+            });
+        }
+
+        private void SetupEnvironment()
         {
             if (PlayerSettings.GetInputType() == PlayerInputType.VRPlayer)
             {
@@ -99,12 +135,15 @@ namespace SEE.Game.UI.ConfigMenu
                 vrInputModule.PointerCamera = pointerCamera;
                 pointer.GetComponent<Pointer>().InputModule = vrInputModule;
 
-                MustGetComponentInChild("Canvas", out Canvas canvas);
                 MustGetComponentInChild("Canvas", out RectTransform rectTransform);
-                canvas.renderMode = RenderMode.WorldSpace;
-                canvas.worldCamera = pointerCamera;
+                _canvas.renderMode = RenderMode.WorldSpace;
+                _canvas.worldCamera = pointerCamera;
                 rectTransform.anchoredPosition3D = Vector3.zero;
                 rectTransform.localScale = Vector3.one;
+
+                _colorPickerControl.gameObject.transform.Rotate(0f, 45f, 0f);
+
+                gameObject.transform.position = new Vector3(-0.36f, 1.692f, -0.634f);
             }
         }
 
@@ -127,7 +166,7 @@ namespace SEE.Game.UI.ConfigMenu
             CreateActionButton("Draw", () =>
             {
                 _city.DrawGraph();
-                gameObject.SetActive(false);
+                Toggle();
             });
             CreateActionButton("Re-Draw", _city.ReDrawGraph);
             CreateActionButton("Save layout", _city.SaveLayout);
@@ -416,7 +455,34 @@ namespace SEE.Game.UI.ConfigMenu
         private void SetupMiscellaneousPage()
         {
             CreateAndInsertTabButton("Miscellaneous");
-            CreateAndInsertPage("Miscellaneous");
+            GameObject page = CreateAndInsertPage("Miscellaneous");
+            Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
+
+            // Settings file
+            FilePickerBuilder.Init(controls.transform)
+                .SetLabel("Settings file")
+                .SetPathInstance(_city.CityPath)
+                .Build();
+
+            // LOD culling
+            SliderBuilder.Init(controls.transform)
+                .SetLabel("LOD culling")
+                .SetMode(SliderMode.Float)
+                .SetRange((0f, 1f))
+                .SetDefaultValue(_city.LODCulling)
+                .SetOnChangeHandler(f => _city.LODCulling = f);
+
+            // GXL file
+            FilePickerBuilder.Init(controls.transform)
+                .SetLabel("GXL file")
+                .SetPathInstance(_city.GXLPath)
+                .Build();
+
+            // Metric file
+            FilePickerBuilder.Init(controls.transform)
+                .SetLabel("Metric file")
+                .SetPathInstance(_city.CSVPath)
+                .Build();
         }
 
         private GameObject CreateAndInsertPage(string headline)
@@ -431,6 +497,7 @@ namespace SEE.Game.UI.ConfigMenu
                                               TabButtonState initialState = TabButtonState.Inactive)
         {
             GameObject tabButton = Instantiate(_tabButtonPrefab, _tabButtons.transform, false);
+            tabButton.name = $"{label}Button";
             tabButton.MustGetComponent(out TabButton button);
             button.buttonText = label;
             if (initialState == TabButtonState.InitialActive)
@@ -445,6 +512,11 @@ namespace SEE.Game.UI.ConfigMenu
                 .Cast<EnumType>()
                 .Select(v => v.ToString())
                 .ToList();
+        }
+
+        public void Toggle()
+        {
+            _canvas.gameObject.SetActive(!_canvas.gameObject.activeSelf);
         }
     }
 }

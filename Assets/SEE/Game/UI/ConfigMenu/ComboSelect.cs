@@ -19,8 +19,8 @@ namespace SEE.Game.UI.ConfigMenu
         private TMP_InputField _customInput;
         private TextMeshProUGUI _labelText;
 
-        private Queue<List<string>> _valuesUpdates = new Queue<List<string>>();
-        private Queue<string> _valueUpdates = new Queue<string>();
+        private readonly Queue<List<string>> _valuesUpdates = new Queue<List<string>>();
+        private readonly Queue<string> _valueUpdates = new Queue<string>();
 
         public string label;
         public Action<string> OnValueChange;
@@ -125,7 +125,7 @@ namespace SEE.Game.UI.ConfigMenu
         }
     }
 
-    public class ComboSelectBuilder : BaseUiBuilder<ComboSelect>
+    public class ComboSelectBuilder : UiBuilder<ComboSelect>
     {
         protected override string PrefabPath => "Assets/Prefabs/UI/Input Group - Dropdown.prefab";
 
@@ -150,13 +150,13 @@ namespace SEE.Game.UI.ConfigMenu
             return this;
         }
 
-        public ComboSelectBuilder SetAllowedValues(List<String> allowedValues)
+        public ComboSelectBuilder SetAllowedValues(List<string> allowedValues)
         {
             Instance.Values = allowedValues;
             return this;
         }
 
-        public ComboSelectBuilder SetDefaultValue(String defaultValue)
+        public ComboSelectBuilder SetDefaultValue(string defaultValue)
         {
             Instance.Value = defaultValue;
             return this;

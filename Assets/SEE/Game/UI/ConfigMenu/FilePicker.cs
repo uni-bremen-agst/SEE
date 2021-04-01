@@ -129,7 +129,7 @@ namespace SEE.Game.UI.ConfigMenu
         }
     }
 
-    public class FilePickerBuilder : BaseUiBuilder<FilePicker>
+    public class FilePickerBuilder : UiBuilder<FilePicker>
     {
         protected override string PrefabPath =>
             "Assets/Prefabs/UI/Input Group - File Picker.prefab";

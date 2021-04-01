@@ -8,7 +8,7 @@ namespace SEE.Game.UI.ConfigMenu
 {
     public class Switch : DynamicUIBehaviour
     {
-        public String label;
+        public string label;
 
         private TextMeshProUGUI _label;
         private SwitchManager _switchManager;
@@ -46,7 +46,7 @@ namespace SEE.Game.UI.ConfigMenu
         public Action<bool> OnValueChange { get; set; }
     }
 
-    public class SwitchBuilder : BaseUiBuilder<Switch>
+    public class SwitchBuilder : UiBuilder<Switch>
     {
         protected override string PrefabPath => "Assets/Prefabs/UI/Input Group - Switch.prefab";
 
