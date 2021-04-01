@@ -26,7 +26,8 @@ namespace SEE.GO.Menu
 
         /// <summary>
         /// Responsible for the permission to interact with the PlayerMenu. It should be true, if no interaction
-        /// should be possible e.g. the user will insert an input to an input-field.
+        /// should be possible, e.g. while the user writes text somewhere, in which case keystrokes
+        /// shouldn't be registered by the PlayerMenu.
         /// </summary>
         public static bool InteractionIsForbidden = false;
 
