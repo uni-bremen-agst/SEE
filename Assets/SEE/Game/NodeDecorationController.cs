@@ -175,7 +175,6 @@ public class NodeDecorationController : MonoBehaviour
     /// </summary>
     public GameObject createFourFacedTetrahedron(float sizeX, float height, float sizeZ)
     {
-        // TODO one of the tetra's bottom vertices renders opposite side up
         GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
         go.name = "Tetrahedron";
         MeshFilter meshFilter = go.GetComponent<MeshFilter>();
@@ -189,10 +188,9 @@ public class NodeDecorationController : MonoBehaviour
         // Create gameObject mesh
         Mesh mesh = new Mesh();
         mesh.Clear();
-        // TODO THE VERTEX ISSUE IS CAUSED BY ONE OF THESE
         mesh.vertices = new Vector3[] {
             p0,p1,p3, // Bottom vertex #1
-            p3,p2,p1, // Bottom vertex #2
+            p2,p3,p1, // Bottom vertex #2
             p1,p4,p2,
             p2,p4,p3,
             p3,p4,p0,
