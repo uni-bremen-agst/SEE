@@ -225,7 +225,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Delays the process of showing an hidden edge having been removed from the garbage can.
         /// </summary>
-        private IEnumerator delayEdges(GameObject edge)
+        private IEnumerator DelayEdges(GameObject edge)
         {
 
             yield return new WaitForSeconds(TimeForAnimation + TimeToWait);
