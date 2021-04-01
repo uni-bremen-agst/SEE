@@ -75,7 +75,7 @@ namespace SEE.Controls.Actions
         private Dictionary<GameObject, Graph> DeletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
 
         /// <summary>
-        /// A list of ratios of the current localScal and a targetscale.
+        /// A list of ratios of the current localScale and a targetscale.
         /// </summary>
         private Dictionary<GameObject, Vector3> shrinkFactors { get; set; } = new Dictionary<GameObject, Vector3>();
 
