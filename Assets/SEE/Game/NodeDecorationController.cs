@@ -136,8 +136,11 @@ public class NodeDecorationController : MonoBehaviour
         float lobbyHeight = nodeSize.y * _floorHightPercentage;
         // Create lobby gameObject
         GameObject lobby = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        lobby.transform.SetParent(nodeObject.transform);
+        lobby.name = "Lobby";
         lobby.transform.localScale = new Vector3(lobbySizeX, lobbyHeight, lobbySizeZ);
+        // *** Note: setting the lobby as a child object needs to be done after the transform, otherwise the size
+        //     is relative to the parent object ***
+        lobby.transform.SetParent(nodeObject.transform);
         // Get the point on the Y axis at the bottom of the building
         float buildingGroundFloorHeight = nodeLocation.y - (nodeSize.y / 2);
         // Set the lobby to be at buildingGroundFloorHeight + half the height of the lobby (so its floor touches the building floor)
@@ -241,6 +244,17 @@ public class NodeDecorationController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (nodeObject.transform.localScale != nodeSize)
+        {
+            // TODO remove this after testing
+            Debug.Log("Node size changed, reloading data...");
+            for (int i=0; i<nodeObject.transform.childCount; ++i)
+            {
+                Destroy(nodeObject.transform.GetChild(i).gameObject);
+            }
+            fetchNodeDetails();
+            renderLobby();
+            renderRoof();
+        }
     }
 }
