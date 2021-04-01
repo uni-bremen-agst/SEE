@@ -121,12 +121,14 @@ namespace SEE.Game.UI.ConfigMenu
         {
             if (PlayerSettings.GetInputType() == PlayerInputType.VRPlayer)
             {
+                // Attach the pointer to the appropriate hand.
                 Transform attachmentPoint = GameObject
                     .Find("VRPlayer/SteamVRObjects/RightHand/ObjectAttachmentPoint").transform;
                 GameObject pointer =
                     Instantiate(MustLoadPrefabAtPath(PointerPrefabPath), attachmentPoint);
                 Camera pointerCamera = pointer.GetComponent<Camera>();
 
+                // Replace the default input system with our VR input system.
                 GameObject vrEventSystem =
                     GameObject.FindWithTag("VREventSystem");
                 vrEventSystem.GetComponent<StandaloneInputModule>().enabled = false;
@@ -135,14 +137,17 @@ namespace SEE.Game.UI.ConfigMenu
                 vrInputModule.PointerCamera = pointerCamera;
                 pointer.GetComponent<Pointer>().InputModule = vrInputModule;
 
+                // Set the canvas to world space and adjust its positition.
                 MustGetComponentInChild("Canvas", out RectTransform rectTransform);
                 _canvas.renderMode = RenderMode.WorldSpace;
                 _canvas.worldCamera = pointerCamera;
                 rectTransform.anchoredPosition3D = Vector3.zero;
                 rectTransform.localScale = Vector3.one;
 
+                // Make the color picker slightly rotated towards the user.
                 _colorPickerControl.gameObject.transform.Rotate(0f, 45f, 0f);
 
+                // Place the menu as a whole in front of the 'table'.
                 gameObject.transform.position = new Vector3(-0.36f, 1.692f, -0.634f);
             }
         }
