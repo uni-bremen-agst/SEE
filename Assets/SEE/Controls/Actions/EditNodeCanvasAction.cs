@@ -66,7 +66,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Gets the values of the canvas input fields after pushing the edit button and removes the
         /// canvas gameObject. Saves them in the EditNodeAction. If the editing of the node is canceled,
-        /// the EditNodeAction will be instructed and the process ist canceled.
+        /// the EditNodeAction will be instructed and the process is canceled.
         /// </summary>
         void Update()
         {
