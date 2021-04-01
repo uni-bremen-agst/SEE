@@ -133,11 +133,13 @@ namespace SEE.Controls.Actions
                     break;
 
                 case ProgressState.ValuesAreGiven:
-                    editedNode.TryGetComponentOrLog(out NodeRef node);
-                    redoEditNodeMemento = new EditNodeMemento(node.Value, NodeName, NodeType);
-                    UpdateNode(redoEditNodeMemento);
-                    executed = true;
-                    EditProgress = ProgressState.NoNodeSelected;
+                    if (editedNode.TryGetComponentOrLog(out NodeRef node))
+                    {
+                        redoEditNodeMemento = new EditNodeMemento(node.Value, NodeName, NodeType);
+                        UpdateNode(redoEditNodeMemento);
+                        executed = true;
+                        EditProgress = ProgressState.NoNodeSelected;
+                    }
                     break;
 
                 case ProgressState.EditIsCanceled:
@@ -237,4 +239,3 @@ namespace SEE.Controls.Actions
         }
     }
 }
-
