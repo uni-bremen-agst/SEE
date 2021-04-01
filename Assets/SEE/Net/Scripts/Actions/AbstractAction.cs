@@ -126,7 +126,7 @@ namespace SEE.Net
         /// <summary>
         /// Executes this action for the server and every client.
         /// 
-        /// The action will be sent to the server and from there broadcasted to every
+        /// The action will be sent to the server and from there broadcast to every
         /// client. The Server executes <see cref="ExecuteOnServer"/> and each Client
         /// executes <see cref="ExecuteOnClient"/> locally.
         /// 
@@ -137,7 +137,7 @@ namespace SEE.Net
         /// this actions will be executed everywhere.</param>
         /// </summary>
         /// 
-        /// <param name="recipients">The recipients of the actions.dadawawdaddWADAWDAWD</param>
+        /// <param name="recipients">The recipients of the actions.</param>
         public void Execute(IPEndPoint[] recipients = null)
         {
             if (Network.UseInOfflineMode)
@@ -172,7 +172,7 @@ namespace SEE.Net
 
         /// Executes the action on the server locally. This function is only called by
         /// <see cref="ExecuteActionPacket"/> or by <see cref="Execute"/> directly in
-        /// offline mode directly. It must not be called otherwise!
+        /// offline mode. It must not be called otherwise!
         internal void ExecuteOnServerBase()
         {
             try
@@ -235,10 +235,10 @@ namespace SEE.Net
                 JsonUtility.ToJson(this);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Debug.LogError("This action can not be serialized into json! This class probably contains GameObjects or other components. Consider removing some members of '" + GetType().ToString() + "'!");
-                throw e;
+                Debug.LogError("This action can not be serialized into json! This class probably contains GameObjects or other components. Consider removing some members of '" + GetType() + "'!");
+                throw;
             }
         }
 #endif
@@ -266,7 +266,7 @@ namespace SEE.Net
         /// <returns>The deserialized action.</returns>
         internal static AbstractAction Deserialize(string data)
         {
-            string[] tokens = data.Split(new char[] { ';' }, 2, StringSplitOptions.None);
+            string[] tokens = data.Split(new[] { ';' }, 2, StringSplitOptions.None);
             AbstractAction result = (AbstractAction)JsonUtility.FromJson(tokens[1], Type.GetType(tokens[0]));
             if (result.RecipientsIPAddresses.Length == 0)
             {

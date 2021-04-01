@@ -1,5 +1,5 @@
-﻿using NetworkCommsDotNet.Connections;
-using System;
+﻿using System;
+using NetworkCommsDotNet.Connections;
 
 namespace SEE.Net
 {
@@ -72,7 +72,7 @@ namespace SEE.Net
         /// <returns>the deserialized packet.</returns>
         internal static AbstractPacket Deserialize(string serializedPacket)
         {
-            string[] tokens = serializedPacket.Split(new char[] { ';' }, 2, StringSplitOptions.None);
+            string[] tokens = serializedPacket.Split(new[] { ';' }, 2, StringSplitOptions.None);
             Type type = Type.GetType(tokens[0]);
             AbstractPacket result = (AbstractPacket)Activator.CreateInstance(type);
             result.Deserialize(tokens[1]);

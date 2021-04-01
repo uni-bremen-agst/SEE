@@ -1,6 +1,5 @@
 ﻿using SEE.Controls;
 using SEE.DataModel;
-using SEE.DataModel.IO;
 using SEE.Game.Runtime;
 using SEE.GO;
 using SEE.Utils;
@@ -58,7 +57,7 @@ namespace SEE.Game
         /// (depending upon whether the execution is forward or backward, respectively), 
         /// that is, only interprocedural control flow will be shown.
         /// </summary>
-        public bool ShowOnlyCalls = true;
+        public bool ShowOnlyCalls = false;
 
         //-------------------------------------------------------
         // Private attributes not saved in the configuration file
@@ -133,7 +132,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// This Field saves the text, that is displayed when a button is hit is saved.
+        /// This field saves the text that is displayed when a interaction key is hit.
         /// </summary>
         private string labelText = "";
 
@@ -150,7 +149,7 @@ namespace SEE.Game
         private float showLabelUntil = 0f;
 
         /// <summary>
-        /// Seconds per statement.
+        /// Time in seconds until the next statement is to be shown.
         /// </summary>
         private float updateIntervall = 1.0f;
 
@@ -1189,7 +1188,7 @@ namespace SEE.Game
             if (updateIntervall < 8)
             {
                 nextUpdateTime = nextUpdateTime - updateIntervall + (updateIntervall * 2);
-                updateIntervall = updateIntervall * 2;
+                updateIntervall *= 2;
             }
         }
 

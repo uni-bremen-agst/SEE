@@ -178,6 +178,13 @@
         "com.unity.xr.legacyinputhelpers": "2.1.4"
       }
     },
+    "com.yasirkula.dynamicpanels": {
+      "version": "https://github.com/yasirkula/UnityDynamicPanels.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "054bac15c9fe9c464a202843146355ed2c0845e1"
+    },
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,

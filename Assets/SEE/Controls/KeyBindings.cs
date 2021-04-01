@@ -29,6 +29,7 @@ namespace SEE.Controls
             Architecture,  // use case architecture; related to architecture mapping and analysis
             Browsing,      // browsing a code city (panning, zooming, etc.)
             CameraPaths,   // recording a camera (player) path
+            CodeViewer,    // source-code viewer
             Debugging,     // use case debugging
             Evolution,     // use case evolution; observing the series of revisions of a city
             MetricCharts,  // showing metric charts
@@ -88,6 +89,16 @@ namespace SEE.Controls
         /// Turns on/off the player-action menu.
         /// </summary>
         internal static KeyCode ToggleMenu = Register(KeyCode.Space, Scope.Always, "Turns on/off the player-action menu.");
+
+        /// <summary>
+        /// Undoes the last action.
+        /// </summary>
+        internal static KeyCode Undo = Register(KeyCode.Z, Scope.CodeViewer, "Undoes the last action.");
+
+        /// <summary>
+        /// Re-does the last action.
+        /// </summary>
+        internal static KeyCode Redo = Register(KeyCode.Y, Scope.CodeViewer, "Re-does the last action.");
 
         //-----------------------------------------------------
         // Camera path recording and playing
@@ -267,5 +278,15 @@ namespace SEE.Controls
         /// Execution is back to very first statement.
         /// </summary>
         internal static KeyCode FirstStatement = Register(KeyCode.Home, Scope.Debugging, "Execution is back to very first statement.");
+
+        //--------------------
+        // Source-code viewer
+        //--------------------
+
+        /// <summary>
+        /// Toggles the menu of the source-code viewer.
+        /// </summary>
+        internal static KeyCode ShowCodeWindowMenu = Register(KeyCode.F1, Scope.CodeViewer, "Toggles the menu of the source-code viewer.");
+
     }
 }

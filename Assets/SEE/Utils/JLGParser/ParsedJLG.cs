@@ -24,7 +24,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.DataModel
+namespace SEE.Utils
 {
     /// <summary>
     /// Thrown if the input contains a malformed statement.

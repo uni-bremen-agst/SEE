@@ -26,7 +26,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace SEE.DataModel.IO
+namespace SEE.Utils
 {
     public class JLGParser
     {
