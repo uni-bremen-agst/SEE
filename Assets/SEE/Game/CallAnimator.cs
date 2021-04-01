@@ -33,7 +33,7 @@ namespace SEE.Game
         /// The time between animated calls in seconds.
         /// </summary>
         [Tooltip("The time between animated calls in seconds.")]
-        public float CallDuration = 0.5f;
+        public float CallDuration = 1.0f;
 
         /// <summary>
         /// The name (unique ID) of the node at which to start the execution.
@@ -86,7 +86,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Initially alls edges are hidden.
+        /// Initially all edges are hidden.
         /// </summary>
         private void Start()
         {
@@ -106,12 +106,12 @@ namespace SEE.Game
             }
             if (Input.GetKeyDown(KeyBindings.IncreaseAnimationSpeed))
             {
-                CallDuration *= 0.75f;
+                CallDuration = Mathf.Max(0.25f, CallDuration / 2.0f);
                 Debug.Log($"execution duration set to {CallDuration}.\n");
             }
             if (Input.GetKeyDown(KeyBindings.DecreaseAnimationSpeed))
             {
-                CallDuration *= 1.25f;
+                CallDuration = Mathf.Max(4.0f, CallDuration * 2.0f);
                 Debug.Log($"execution duration set to {CallDuration}.\n");
             }
             if (!isPaused)
@@ -144,7 +144,7 @@ namespace SEE.Game
             callGraphRoot = CodeCity.LoadedGraph.GetNode(RootName);
             if (callGraphRoot == null)
             {
-                Debug.LogError("Graph has no node with name '{RootName}'\n");
+                Debug.LogError($"Graph has no node with name '{RootName}'\n");
                 enabled = false;
             }
             else
@@ -424,7 +424,7 @@ namespace SEE.Game
                 this.root = root;
                 if (root.Outgoings.Count == 0)
                 {
-                    throw new System.Exception("Root should have at least one successor.");
+                    throw new Exception("Root should have at least one successor.");
                 }
             }
 
