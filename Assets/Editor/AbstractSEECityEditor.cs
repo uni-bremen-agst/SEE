@@ -132,7 +132,7 @@ namespace SEEEditor
         /// <param name="extension">the extension the selected file should have (used as filter in file panel)</param>
         /// <param name="fileDialogue">if true, a file panel is opened; otherwise a directory panel</param>
         /// <returns>the resulting data specified as selected  by the user</returns>
-        protected DataPath GetDataPath(string label, DataPath dataPath, string extension = "", bool fileDialogue = true)
+        protected static DataPath GetDataPath(string label, DataPath dataPath, string extension = "", bool fileDialogue = true)
         {
             GUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(label);
@@ -254,9 +254,9 @@ namespace SEEEditor
             showNodeLayout = EditorGUILayout.Foldout(showNodeLayout, "Nodes and node layout", true, EditorStyles.foldoutHeader);
             if (showNodeLayout)
             {
-                city.LeafObjects = (SEECity.LeafNodeKinds) EditorGUILayout.EnumPopup("Leaf nodes", city.LeafObjects);
+                city.LeafObjects = (AbstractSEECity.LeafNodeKinds) EditorGUILayout.EnumPopup("Leaf nodes", city.LeafObjects);
                 city.NodeLayout = (NodeLayoutKind) EditorGUILayout.EnumPopup("Node layout", city.NodeLayout);
-                city.LayoutPath = GetDataPath("Layout file", city.LayoutPath, "");
+                city.LayoutPath = GetDataPath("Layout file", city.LayoutPath, "gvl");
 
                 GUILayout.BeginHorizontal();
                 EditorGUILayout.PrefixLabel("Inner nodes");

@@ -25,7 +25,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-namespace SEE.DataModel
+namespace SEE.Utils
 {
     /// <summary>
     /// The kind of statement with regard to interprocedural control flow.

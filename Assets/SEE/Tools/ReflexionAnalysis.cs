@@ -1901,55 +1901,27 @@ namespace SEE.Tools
         // Helper methods for debugging
         //------------------------------------------------------------------
 
-        private const string File_Name_Attribute = "Source.File";
-        private const string Line_Number_Attribute = "Source.Line";
-        private const string Object_Name_Attribute = "Source.Name";
-
-        /// <summary>
-        /// Returns the attribute value of the given attribute of the given attributable.
-        /// If the attributable does not have this attribute, the empty string is returned.
-        /// </summary>
-        /// <param name="attributable">attributable element</param>
-        /// <param name="attribute">attribute name</param>
-        /// <returns>attribute value or empty string</returns>
-        private static string GetStringAttribute(Attributable attributable, string attribute)
-        {
-            if (attributable.TryGetString(attribute, out string result))
-            {
-                return result;
-            }
-            else
-            {
-                return "";
-            }
-        }
-
         /// <summary>
         /// Returns the Source.File attribute of the given attributable if it exists, otherwise
         /// the empty string.
         /// </summary>
-        /// <param name="attributable">attributable element</param>
+        /// <param name="graphElement">attributable element</param>
         /// <returns>Source.File attribute or empty string</returns>
-        private static string Get_Filename(Attributable attributable)
+        private static string Get_Filename(GraphElement graphElement)
         {
-            return GetStringAttribute(attributable, File_Name_Attribute);
+            string result = graphElement.Filename();
+            return result == null ? string.Empty : result;
         }
 
         /// <summary>
         /// Returns the Source.Line attribute as a string if it exists; otherwise the empty string.
         /// </summary>
-        /// <param name="attributable">attributable element</param>
+        /// <param name="graphElement">attributable element</param>
         /// <returns>Source.Line attribute or empty string</returns>
-        private static string Get_Source_Line(Attributable attributable)
+        private static string Get_Source_Line(GraphElement graphElement)
         {
-            if (attributable.TryGetInt(Line_Number_Attribute, out int result))
-            {
-                return result.ToString();
-            }
-            else
-            {
-                return "";
-            }
+            int result = graphElement.SourceLine();
+            return result == 0 ? string.Empty : result.ToString();
         }
 
         /// <summary>

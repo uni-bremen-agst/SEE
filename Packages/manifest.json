@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.yasirkula.dynamicpanels": "https://github.com/yasirkula/UnityDynamicPanels.git",
     "com.microsoft.mixedreality.toolkit.extensions": "file:MixedReality/com.microsoft.mixedreality.toolkit.extensions-2.5.4.tgz",
     "com.microsoft.mixedreality.toolkit.foundation": "file:MixedReality/com.microsoft.mixedreality.toolkit.foundation-2.5.4.tgz",
     "com.microsoft.mixedreality.toolkit.standardassets": "file:MixedReality/com.microsoft.mixedreality.toolkit.standardassets-2.5.4.tgz",

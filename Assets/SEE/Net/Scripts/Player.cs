@@ -23,7 +23,11 @@ namespace SEE.Net
         {
             if (GetComponent<ViewContainer>().IsOwner())
             {
-                cameraTransform = MainCamera.Camera.transform ?? throw new System.ArgumentNullException("Main camera must not be null!");
+                if (MainCamera.Camera.transform == null)
+                {
+                    throw new System.NullReferenceException("Main camera must not be null!");
+                }
+                cameraTransform = MainCamera.Camera.transform;
                 for (int i = 0; i < transform.childCount; i++)
                 {
                     transform.GetChild(i).gameObject.SetActive(false);
