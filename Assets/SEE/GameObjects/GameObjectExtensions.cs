@@ -34,7 +34,6 @@ namespace SEE.GO
                     return edgeRef.edge.ID;
                 }
             }
-
             return nodeRef.Value.ID;
         }
 
