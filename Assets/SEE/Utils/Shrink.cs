@@ -23,7 +23,14 @@ namespace SEE.Utils
             Vector3 Shrinkfactor = new Vector3(xLocalScale, yLocalScale, zLocalScale);
             return Shrinkfactor;
         }
-
+        /// <summary>
+        /// Shrinks a given object to a certain targetscale. 
+        /// The targetscale is a result of iterations and the specific <param name="shrinkFactor">.
+        /// </summary>
+        /// <param name="objectToShrink">The object which shall be shrunk</param>
+        /// <param name="iterations">the amount of iterations that are proceeded while shrinking</param>
+        ///  <param name="shrinkFactor"> the specific factor, the localscale of the given object is multiplied in order to shrink</param>
+        /// <returns> a vector with the ratios of current - and targetscale </returns>
         public static void shrink(GameObject objectToShrink, float iterations, Vector3  shrinkFactor)
         {    
             while (iterations > 0 ) { 
@@ -32,6 +39,13 @@ namespace SEE.Utils
             }
         }
 
+        /// <summary>
+        /// Expands a given object to a certain targetscale. 
+        /// The targetscale is a result of iterations and the specific <param name="shrinkFactor">.
+        /// </summary>
+        /// <param name="objectToExpand">The object which shall be expandedk</param>
+        ///  <param name="shrinkFactor"> the specific factor, the localscale of the given object is multiplied in order to shrink</param>
+        /// <returns> a vector with the ratios of current - and targetscale </returns>
         public static void expand(GameObject objectToExpand, Vector3 shrinkFactor)
         {
                 objectToExpand.transform.localScale = new Vector3(objectToExpand.transform.localScale.x / shrinkFactor.x, objectToExpand.transform.localScale.y / shrinkFactor.y, objectToExpand.transform.localScale.z / shrinkFactor.z);    
