@@ -79,7 +79,7 @@ namespace SEE.Controls.Actions
                 Finalise();
                 EditNode = false;
             }
-            if(Canceled)
+            if (Canceled)
             {
                 editNodeAction.EditProgress = EditNodeAction.ProgressState.EditIsCanceled;
                 Finalise();
