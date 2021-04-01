@@ -201,14 +201,8 @@ namespace SEE.Controls.Actions
         {
             Node node = editNodeMemento.node;
 
-            if (!editNodeMemento.name.Equals(node.SourceName))
-            {
-                node.SourceName = editNodeMemento.name;
-            }
-            if (!editNodeMemento.type.Equals(node.Type))
-            {
-                node.Type = editNodeMemento.type;
-            }
+            node.SourceName = editNodeMemento.name;
+            node.Type = editNodeMemento.type;
         }
 
         /// <summary>
