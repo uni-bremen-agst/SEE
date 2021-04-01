@@ -30,6 +30,7 @@ namespace SEE.GO.Menu
         /// shouldn't be registered by the PlayerMenu.
         /// </summary>
         public static bool InteractionIsForbidden = false;
+        // TODO: Replace with proper keybinding management.
 
         /// <summary>
         /// This creates and returns the mode menu, with which you can select the active game mode.
