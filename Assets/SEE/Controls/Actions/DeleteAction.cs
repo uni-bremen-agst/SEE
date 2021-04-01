@@ -215,7 +215,7 @@ namespace SEE.Controls.Actions
                 if (edgeGraphPair.Key.TryGetComponentOrLog(out EdgeRef edgeReference))
                 {
                     edgeGraphPair.Value.AddEdge(edgeReference.edge);
-                    PlayerSettings.GetPlayerSettings().StartCoroutine(delayEdges(edgeGraphPair.Key));
+                    PlayerSettings.GetPlayerSettings().StartCoroutine(DelayEdges(edgeGraphPair.Key));
 
                 }
             }
@@ -223,7 +223,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Delays the process of showing an hidden edge having been removed from the garbage can.
+        /// Delays the process of showing a hidden edge having been removed from the garbage can.
         /// </summary>
         private IEnumerator DelayEdges(GameObject edge)
         {
