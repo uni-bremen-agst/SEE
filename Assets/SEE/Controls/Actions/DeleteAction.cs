@@ -137,14 +137,10 @@ namespace SEE.Controls.Actions
             if (selectedObject != null && !isRunning)
             {
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
-                explicitlyDeletedNodesAndEdges.Add(selectedObject);
-<<<<<<< HEAD
-                DeleteSelectedObject(selectedObject);
-                DumpStatus();
-=======
+                explicitlyDeletedNodesAndEdges.Add(selectedObject);  
                 DeleteSelectedObject(selectedObject);               
                 hadAnEffect = true;
->>>>>>> master
+
                 // the selected objects are deleted and this action is done now
                 return true;
             }
@@ -276,12 +272,10 @@ namespace SEE.Controls.Actions
                 {
                     shrinkFactors.Add(deletedNode, shrinkFactor);
                 }
-                Shrink.shrink(deletedNode, 1, shrinkFactor);
+                Shrink.ShrinkAnObject(deletedNode, 1, shrinkFactor);
                 Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), TimeForAnimation);
             }
-
             yield return new WaitForSeconds(TimeToWait);
-            hadAnEffect = true;
             isRunning = false;
             InteractableObject.UnselectAll(true);
         }
@@ -301,7 +295,7 @@ namespace SEE.Controls.Actions
 
              
             while ((animationsCount) > 0 ) {
-                Shrink.expand(deletedNode,shrinkFactor);
+                Shrink.Expand(deletedNode,shrinkFactor);
                 yield return new WaitForSeconds(0.14f);
                 animationsCount--;
             }
