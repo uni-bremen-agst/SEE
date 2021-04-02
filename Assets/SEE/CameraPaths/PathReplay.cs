@@ -149,7 +149,7 @@ namespace SEE.CameraPaths
             }
             catch (Exception e)
             {
-                Debug.LogError($"PathReplay: Could not read path from file {Filename}: {e.Message}\n");
+                Debug.LogError($"PathReplay: Could not read path from file {Filename} for {MovedObject.name}: {e.Message}\n");
                 enabled = false;
                 return;
             }
