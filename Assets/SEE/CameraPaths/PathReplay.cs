@@ -141,7 +141,7 @@ namespace SEE.CameraPaths
             try
             {
                 path = CameraPath.ReadPath(Filename);                
-                Debug.LogFormat("Read path from {0}\n", Filename);
+                Debug.Log($"Read path for {MovedObject.name} from {Filename}\n");
                 if (ShowPath)
                 {
                     path.Draw();
@@ -149,7 +149,7 @@ namespace SEE.CameraPaths
             }
             catch (Exception e)
             {
-                Debug.LogError($"PathReplay: Could not read path from file {Filename}: {e.ToString()}\n");
+                Debug.LogError($"PathReplay: Could not read path from file {Filename}: {e.Message}\n");
                 enabled = false;
                 return;
             }
