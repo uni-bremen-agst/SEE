@@ -7,8 +7,8 @@ namespace SEE.CameraPaths
 {
     /// <summary>
     /// This scripts logs the position, rotation, and time in seconds since game start
-    /// (rounded to integer) of the main camera at any point in time when the user presses
-    /// the key KeyBindings.SavePathPosition.
+    /// (rounded to integer) of a user-selected tracked object at any point in time when
+    ///  the user presses the key KeyBindings.SavePathPosition or periodically.
     /// </summary>
     public class CameraRecorder : MonoBehaviour
     {        
@@ -47,9 +47,11 @@ namespace SEE.CameraPaths
         public bool Interactive = false;
 
         /// <summary>
-        /// This is Main Camera in the Scene.
+        /// This is the object to be tracked in the scene.
+        /// If none is assigned, the main camera will be used.
         /// </summary>
-        private Camera mainCamera;
+        [Tooltip("Object to be tracked in the scene. If none is assigned, the main camera will be used.")]
+        public GameObject trackedObject;
 
         /// <summary>
         /// The recorded path.
@@ -98,8 +100,11 @@ namespace SEE.CameraPaths
 
         private void Start()
         {
-            // This gets the Main Camera from the Scene
-            mainCamera = MainCamera.Camera;
+            if (trackedObject == null)
+            {
+                // This gets the Main Camera from the Scene
+                trackedObject = MainCamera.Camera.gameObject;
+            }
             path = new CameraPath();
             if (string.IsNullOrEmpty(Directory))
             {
@@ -115,12 +120,12 @@ namespace SEE.CameraPaths
                 accumulatedTime = 0.0f;
             }
 
-            // Press the P key to save position on user demand. If the period has
+            // Press the KeyBindings.SavePathPosition key to save position on user demand. If the period has
             // been completed, the position is saved, too, if recording is not interactive.
             if (Input.GetKeyDown(KeyBindings.SavePathPosition) || (!Interactive && accumulatedTime == 0.0f))
             {
-                Vector3 position = mainCamera.transform.position;
-                Quaternion rotation = mainCamera.transform.rotation;
+                Vector3 position = trackedObject.transform.position;
+                Quaternion rotation = trackedObject.transform.rotation;
                 path.Add(position, rotation, Interactive ? Mathf.RoundToInt(Time.realtimeSinceStartup) : Time.realtimeSinceStartup);
             }
         }
@@ -135,7 +140,7 @@ namespace SEE.CameraPaths
         {
             if (path == null || path.Count == 0)
             {
-                Debug.Log("Empty camera path is not stored.\n");
+                Debug.Log("Empty path is not stored.\n");
             }
             else
             {
@@ -146,11 +151,11 @@ namespace SEE.CameraPaths
         /// <summary>
         /// Saves the content of data in a file.
         /// </summary>
-        public void SaveFile()
+        private void SaveFile()
         {
             string filename = Filename();
             path.Save(filename);
-            Debug.Log($"Saved camera path to {filename}\n");
+            Debug.Log($"Saved path to {filename}\n");
         }
     }
 }
