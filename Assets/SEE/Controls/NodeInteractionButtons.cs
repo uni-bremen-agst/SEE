@@ -5,6 +5,8 @@ using SEE.Controls.Actions;
 namespace SEE.Controls
 {
     /// <summary>
+    /// This component is attached to the prefabs Resources/Prefabs/NewNode.prefab
+    /// and Resources/Prefabs/EditNode.prefab and 
     /// This component is added to the button of the adding-node canvas and the edit-node canvas.
     /// FIXME: What is the purpose of this component?
     /// </summary>
@@ -33,7 +35,7 @@ namespace SEE.Controls
         /// <summary>
         /// Adds a listener to the button which calls a method when the button is pushed.
         /// </summary>   
-        void Start()
+        private void Start()
         {
             AddingButton?.onClick?.AddListener(SetNextAddingNodeStep);
             EditNodeCancel?.onClick?.AddListener(EditIsCanceled);
@@ -42,18 +44,26 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Increases the progress enum in the <see cref="AddNodeAction"/> instance. 
         /// This results in the next step of addingNode.
+        /// This method is registered as a callback listening to the <see cref="AddingButton"/>.
         /// </summary>
-        public void SetNextAddingNodeStep()
+        private void SetNextAddingNodeStep()
         {
-            AddingNodeCanvasAction.NextState = true;
+            AddingNodeCanvasAction.AddNode = true;
+        }
+
+        /// <summary>
+        /// Marks the action to add a new node as being canceled.
+        /// </summary>
+        private void AddingIsCanceled()
+        {
+            AddingNodeCanvasAction.Canceled = true;
         }
 
         /// <summary>
         /// Marks the action to edit an existing node as being canceled.
         /// </summary>
-        public void EditIsCanceled()
+        private void EditIsCanceled()
         {
             EditNodeCanvasAction.Canceled = true;
         }
@@ -62,17 +72,9 @@ namespace SEE.Controls
         /// Sets <see cref="EditNodeCanvasAction.EditNode"/> to true, which starts the edit process 
         /// and evaluation of the inputFields.
         /// </summary>
-        public void EditNode()
+        private void EditNode()
         {
             EditNodeCanvasAction.EditNode = true;
-        }
-
-        /// <summary>
-        /// Marks the action to add a new node as being canceled.
-        /// </summary>
-        public void AddingIsCanceled()
-        {
-            AddingNodeCanvasAction.Canceled = true;
         }
     }
 }

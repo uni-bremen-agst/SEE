@@ -5,7 +5,7 @@ using UnityEngine.UI;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Creates a clone of a canvas-prefab for adding a new node. Extracts these values from the canvas 
+    /// Creates a clone of a canvas prefab for adding a new node. Extracts these values from the canvas 
     /// after closing it.
     /// </summary>
     public class AddingNodeCanvasAction : NodeCanvasAction
@@ -16,14 +16,14 @@ namespace SEE.Controls.Actions
         private static readonly string prefabPath = "Prefabs/NewNodeCanvas";
 
         /// <summary>
-        /// True if the add node process is canceled, else false.
+        /// True if the add-node process is canceled, else false.
         /// </summary>
         public static bool Canceled { get; set; } = false;
 
         /// <summary>
         /// True if the user adds a new node by pushing the "add" button, else false.
         /// </summary>
-        public static bool NextState { get; set; } = false;
+        public static bool AddNode { get; set; } = false;
 
         /// <summary>
         /// The addNodeAction instance where the progress state has to be set.
@@ -40,17 +40,17 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
-            if (NextState)
+            if (AddNode)
             {
                 addNodeAction.Progress = AddNodeAction.ProgressState.CanvasIsClosed;
                 canvasObject.GetComponent<AddingNodeCanvasAction>().GetNodeValues();
-                Finalise();
-                NextState = false;
+                Finalize();
+                AddNode = false;
             }
             if (Canceled)
             {
                 addNodeAction.Progress = AddNodeAction.ProgressState.AddingIsCanceled;
-                Finalise();
+                Finalize();
                 Canceled = false;
             }
         }
@@ -93,7 +93,7 @@ namespace SEE.Controls.Actions
         /// Destroys the AddingNodeCanvasAction and deselects the selected object. Re-allows the
         /// interaction with the menu.
         /// </summary>
-        public void Finalise()
+        public void Finalize()
         {
             CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
             generator.DestroyAddNodeCanvasAction();
