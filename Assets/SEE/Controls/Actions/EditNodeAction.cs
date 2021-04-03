@@ -12,7 +12,6 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class EditNodeAction : AbstractPlayerAction
     {
-
         /// <summary>
         /// The life cycle of this edit action.
         /// </summary>
@@ -20,7 +19,7 @@ namespace SEE.Controls.Actions
         {
             NoNodeSelected,  // initial state when no node is selected
             NodeSelected,    // a node is currently selected
-            ValuesAreGiven, // values are given from the input fields
+            ValuesAreGiven,  // values are given from the input fields
             EditIsCanceled,  // the edit action is canceled
         }
 
@@ -35,12 +34,13 @@ namespace SEE.Controls.Actions
         private GameObject editedNode;
 
         /// <summary>
-        /// True, if the action is executed, else false.
+        /// True, if the action has started to be executed, that is, something
+        /// has already happened, else false.
         /// </summary>
         private bool executed = false;
 
         /// <summary>
-        /// The new name of the node.
+        /// The new source name of the node.
         /// </summary>
         public static string NodeName { get; set; }
 
@@ -52,11 +52,27 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The information we need to (re-)edit a node.
         /// </summary>
-        public struct EditNodeMemento
+        private struct EditNodeMemento
         {
+            /// <summary>
+            /// Node whose state is represented here.
+            /// </summary>
             public readonly Node node;
+            /// <summary>
+            /// The source name of the node that should be used when the state is to be restored.
+            /// </summary>
             public readonly string name;
+            /// <summary>
+            /// The type of the node that should be used when the state is to be restored.
+            /// </summary>
             public readonly string type;
+            /// <summary>
+            /// Constructor setting the information necessary to re-set an edited node to
+            /// its original state.
+            /// </summary>
+            /// <param name="node">the node that was edited</param>
+            /// <param name="name">the source name of the node that should be used when the state is to be restored</param>
+            /// <param name="type">the type of the node that should be used when the state is to be restored</param>
             public EditNodeMemento(Node node, string name, string type)
             {
                 this.node = node;
@@ -75,6 +91,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         private EditNodeMemento redoEditNodeMemento;
 
+        /// <summary>
+        /// Initializes the canvas and register the action at <see cref="InteractableObject"/>
+        /// for hovering events.
+        /// See <see cref="ReversibleAction.Start"/>.
+        /// </summary>
         public override void Start()
         {
             if (!InitializeCanvasObject())
@@ -105,7 +126,7 @@ namespace SEE.Controls.Actions
                     {
                         EditProgress = ProgressState.NodeSelected;
                     }
-                    // this case will be reached after editing a node for saving
+                    // This case will be reached after editing a node for saving
                     // the previous values of this specific node.
                     if (executed)
                     {
@@ -120,15 +141,15 @@ namespace SEE.Controls.Actions
                     {
                         CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
                         EditNodeCanvasAction editNode = generator.InstantiateEditNodeCanvas(this);
-                        editNode.nodeToEdit = hoveredObject.GetComponent<NodeRef>().Value;
-                        editNode.gameObjectID = hoveredObject.name;
+                        if (hoveredObject.TryGetComponent(out NodeRef nodeRef))
+                        {
+                            editNode.nodeToEdit = nodeRef.Value;
+                            editNode.gameObjectID = hoveredObject.name;
 
-                        undoEditNodeMemento = new EditNodeMemento(
-                            hoveredObject.GetComponent<NodeRef>()?.Value,
-                            hoveredObject.GetComponent<NodeRef>()?.Value.SourceName,
-                            hoveredObject.GetComponent<NodeRef>()?.Value.Type);
-
-                        editedNode = hoveredObject;
+                            undoEditNodeMemento 
+                                = new EditNodeMemento(nodeRef.Value, nodeRef.Value.SourceName, nodeRef.Value.Type);
+                            editedNode = hoveredObject;
+                        }
                     }
                     break;
 
@@ -152,13 +173,13 @@ namespace SEE.Controls.Actions
                     break;
 
                 default:
-                    throw new System.NotImplementedException("Unhandled case.");
+                    throw new NotImplementedException("Unhandled case.");
             }
             return result;
         }
 
         /// <summary>
-        /// Undoes this EditNodeAction
+        /// Undoes this EditNodeAction.
         /// </summary>
         public override void Undo()
         {
@@ -169,7 +190,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Redoes this DeleteAction
+        /// Redoes this EditNodeAction.
         /// </summary>
         public override void Redo()
         {
@@ -178,7 +199,9 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Is called when a new action is started at the end of this action
+        /// Unregisters the action at <see cref="InteractableObject"/> for hovering events.
+        /// <see cref="ReversibleAction.Stop"/>. Destroys the canvas.
+        /// Is called when a new action is started at the end of this action.
         /// </summary>
         public override void Stop()
         {
@@ -194,13 +217,13 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Updates the values such as nodename and nodetype of a specific <paramref name="node"/>
+        /// Sets the source name and node type given in <paramref name="editNodeMemento"/>
+        /// for the node given in <paramref name="editNodeMemento"/>.
         /// </summary>
         /// <param name="editNodeMemento">information needed to edit a node</param>
-        public static void UpdateNode(EditNodeMemento editNodeMemento)
+        private static void UpdateNode(EditNodeMemento editNodeMemento)
         {
             Node node = editNodeMemento.node;
-
             node.SourceName = editNodeMemento.name;
             node.Type = editNodeMemento.type;
         }
