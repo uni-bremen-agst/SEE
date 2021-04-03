@@ -27,7 +27,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public static void Undo()
         {
-            if (history.UndoCount > 1)
+            if (history.UndoCount > 0)
             {
                 history.Undo();
             }
