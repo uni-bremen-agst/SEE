@@ -23,14 +23,13 @@ using System.Collections.Generic;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.GO;
-using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
-using SEE.Game.Evolution;
 using System.Linq;
+using SEE.DataModel;
 
 namespace SEE.Game.Charts
 {
@@ -156,17 +155,17 @@ namespace SEE.Game.Charts
         [SerializeField] private RectTransform scrollViewRectTransform;
 
         /// <summary>
-        /// All game-node objects to be listed in the chart for the list-view.
+        /// All game-node objects to be listed in the chart for the list view.
         /// 
-        /// Invariant: all game objects in dataObjects are game objects tagged by
+        /// Invariant: all game objects in listDataObjects are game objects tagged by
         /// Tags.Node and having a valid graph-node reference.
         /// </summary>
         private List<NodeRef> listDataObjects;
 
         /// <summary>
-        /// All game-node objects to be listed in the chart for the tree-view.
+        /// All game-node objects to be listed in the chart for the tree view.
         /// 
-        /// Invariant: all game objects in dataObjects are game objects tagged by
+        /// Invariant: all game objects in treeDataObjects are game objects tagged by
         /// Tags.Node and having a valid graph-node reference.
         /// </summary>
         private List<NodeRef> treeDataObjects;
@@ -186,26 +185,25 @@ namespace SEE.Game.Charts
         /// </summary>
         private List<string> removedNodeIDs = new List<string>();
 
-
         /// <summary>
         /// Color of added node labels
         /// </summary> 
-        private Color addedNodesLabelColor;
+        private static readonly Color addedNodesLabelColor = Color.green;
         
         /// <summary>
         /// Color of changed node labels
         /// </summary>
-        private Color changedNodesLabelColor;
+        private static readonly Color changedNodesLabelColor = Color.cyan;
 
         /// <summary>
         /// Color of removed node labels
         /// </summary>
-        private Color removedNodeLabelColor;
+        private static readonly Color removedNodeLabelColor = Color.red;
 
         /// <summary>
         /// The color the label will have when hovering over it
         /// </summary>
-        private Color hoveringOverLabelTextColor;
+        private static readonly Color hoveringOverLabelTextColor = Color.yellow;
 
         /// <summary>
         /// The hierarchy-indices of every <see cref="treeDataObjects"/>-element. Both
@@ -252,9 +250,6 @@ namespace SEE.Game.Charts
         /// </summary>
         private void Awake()
         {
-            // Load color profile for chart entries
-            FetchLabelColorProfile();
-
             Assert.IsTrue(scrollContent.transform.childCount == 0);
 
             pool = new Stack<ScrollViewEntry>(maxPanelEntryCount);
@@ -622,15 +617,50 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Fills a List with all <see cref="Node"/>s that will be in the chart.
+        /// Returns all relevant nodes to be shown in the metric chart. 
+        /// If ChartManager.Instance.CodeCity is defined, we retrieve only the
+        /// nodes contained in this city; otherwise all nodes in the scene
+        /// are retrieved. If ChartManager.Instance.ShowLeafMetrics is true,
+        /// all leaf nodes will be in this set. If ChartManager.Instance.ShowInnerNodeMetrics
+        /// is true, all inner nodes will be present. Those two conditions are
+        /// not mutually exclusive.
+        /// </summary>
+        /// <returns>the nodes to be shown in the chart</returns>
+        private List<NodeRef> RelevantNodes()
+        {
+            if (ChartManager.Instance.CodeCity == null)
+            {
+                return SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics,
+                                                       ChartManager.Instance.ShowInnerNodeMetrics);
+            }
+            else
+            {
+                List<NodeRef> result = new List<NodeRef>();
+                foreach (GameObject gameNode in ChartManager.Instance.CodeCity.AllAncestors(Tags.Node))
+                {
+                    if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+                    {
+                        if ((nodeRef.Value.IsLeaf() && ChartManager.Instance.ShowLeafMetrics)
+                            || (nodeRef.Value.IsInnerNode() && ChartManager.Instance.ShowInnerNodeMetrics))
+                        {
+                            result.Add(nodeRef);
+                        }
+                    }                    
+                }
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// Fills a list with all <see cref="Node"/>s that will be in the chart.
         /// </summary>
         private void FindDataObjects()
         {
             // list
-            listDataObjects = SceneQueries.AllNodeRefsInScene(ChartManager.Instance.ShowLeafMetrics, 
-                                                              ChartManager.Instance.ShowInnerNodeMetrics);
+            listDataObjects = RelevantNodes();            
+
             // Detect node changes and decorate the scrollview
-            FillListsWithChanges(listDataObjects);
+            FillListsWithChanges();
 
             listDataObjects.Sort(delegate (NodeRef left, NodeRef right)
             {
@@ -689,47 +719,60 @@ namespace SEE.Game.Charts
 
             noDataWarning.SetActive(false);
 
-            bool xIsNodeEnum = axisDropdownX.CurrentlySelectedMetric.Equals(NodeEnumeration);
-            bool xEqY = axisDropdownX.CurrentlySelectedMetric.Equals(axisDropdownY.CurrentlySelectedMetric);
+            // Whether the user selected "NODES" on the x axis. That means the x axis
+            // is just a list of nodes, not a real metric.
+            bool xIsNodeEnum = axisDropdownX.CurrentlySelectedMetric == NodeEnumeration;
+            // Whether the x and y axes represent the same metric.
+            bool xEqY = axisDropdownX.CurrentlySelectedMetric == axisDropdownY.CurrentlySelectedMetric;
 
             // Note that we determine the minimal and maximal metric values of the two
-            // axes globally, that is, over all nodes in the scene and not just those
-            // shown in this particular chart. This way, the scale of all charts for the
-            // same metric is comparable.
+            // axes globally, that is, over all nodes in listDataObjects and not just those
+            // shown in this particular chart (there could be fewer nodes if a filter was
+            // applied). This way, the scale of all charts for the same metric is comparable.
             float minX = float.PositiveInfinity; // globally minimal value on X axis
             float maxX = float.NegativeInfinity; // globally maximal value on X axis
             float minY = float.PositiveInfinity; // globally minimal value on Y axis
             float maxY = float.NegativeInfinity; // globally maximal value on Y axis
-            List<NodeRef> toDraw = new List<NodeRef>(activeMarkers.Count); // nodes to be drawn in the chart
+            List<NodeRef> toDraw = new List<NodeRef>(listDataObjects.Count); // nodes to be drawn in the chart
             foreach (NodeRef nodeRef in listDataObjects)
             {
+                // x axis
                 bool inX = false;
                 if (nodeRef.Value.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX) || xIsNodeEnum)
                 {
+                    // Note: if the node does not have the currently selected metric but the user selected
+                    // NODES for the x axis, valueX will be 0 because that is the default for float.
                     minX = Mathf.Min(minX, valueX);
                     maxX = Mathf.Max(maxX, valueX);
+                    // This node has the metric plotted on the x axis or the user selected NODES for the x axis
+                    // in which case all nodes must be considered for the x axis.
                     inX = true;
                 }
+                // y axis
                 bool inY = false;
                 if (nodeRef.Value.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY))
                 {
                     minY = Mathf.Min(minY, valueY);
                     maxY = Mathf.Max(maxY, valueY);
+                    // This node has the metric plotted on the y axis.
                     inY = true;
                 }
-                // Is this node shown in this chart at all?
+                // Is this node to be shown in this chart at all?
                 if (inX && inY)
                 {
-                    // only nodes to be shown in this chart and having values for both
-                    // currently selected metrics for the axes will be added to the chart
+                    // Only nodes to be shown in this chart and having values for both
+                    // currently selected metrics for the axes (or NODES was selected for the
+                    // x axis) will be added to the chart.
                     toDraw.Add(nodeRef);
                 }
             }
 
+            // toDraw now contains all nodes to be plotted in the chart.
             if (toDraw.Count > 0)
             {
                 if (xEqY)
                 {
+                    // If both axes show the same metric, we simply sort the values for this metric.
                     toDraw.Sort(delegate (NodeRef nodeRef0, NodeRef nodeRef1)
                     {
                         nodeRef0.Value.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float value1);
@@ -738,12 +781,14 @@ namespace SEE.Game.Charts
                     });
                 }
 
-                bool xEqual = minX.Equals(maxX);
-                bool yEqual = minY.Equals(maxY);
+                // Note: If the user chose NODES for the x axis, minX == maxX == 0 holds (see above).
+                bool xEqual = minX == maxX;
+                bool yEqual = minY == maxY;
                 if (xEqual || yEqual)
                 {
-                    (float min, float max) = minX.Equals(maxX) ? (minY, maxY) : (minX, maxX);
-                    AddMarkers(toDraw, min, max, min, max);
+                    // If the user chose NODES for the x axis, we will definitely arrive here.
+                    (float min, float max) = minX == maxX ? (minY, maxY) : (minX, maxX);
+                    AddMarkers(toDraw, xIsNodeEnum, min, max, min, max);
                     minXText.text = xEqual ? "0" : minX.ToString("N0");
                     maxXText.text = xEqual ? toDraw.Count.ToString() : maxX.ToString("N0");
                     minYText.text = yEqual ? "0" : minY.ToString("N0");
@@ -751,7 +796,7 @@ namespace SEE.Game.Charts
                 }
                 else
                 {
-                    AddMarkers(toDraw, minX, maxX, minY, maxY);
+                    AddMarkers(toDraw, false, minX, maxX, minY, maxY);
                     minXText.text = minX.ToString("N0");
                     maxXText.text = maxX.ToString("N0");
                     minYText.text = minY.ToString("N0");
@@ -760,12 +805,16 @@ namespace SEE.Game.Charts
             }
             else
             {
+                noDataWarning.SetActive(true);
                 foreach (ChartMarker marker in activeMarkers)
                 {
-                    Destroy(marker.gameObject);
+                    // Check for null avoids double destroy. Operator == is overloaded accordingly.
+                    if (marker != null && marker.gameObject != null)
+                    {
+                        Destroy(marker.gameObject);
+                    }
                 }
-
-                noDataWarning.SetActive(true);
+                activeMarkers.Clear();
             }
         }
 
@@ -773,11 +822,13 @@ namespace SEE.Game.Charts
         /// Adds new markers to the chart and removes the old ones.
         /// </summary>
         /// <param name="nodeRefsToDraw">The markers to add to the chart.</param>
+        /// <param name="ignoreXAxis">if true, the nodes will be enumerated on the x axis in the order of <paramref name="nodeRefsToDraw"/>;
+        /// their actual value for the metric put on the x axis will be ignored</param>
         /// <param name="minX">The minimum value on the x-axis.</param>
         /// <param name="maxX">The maximum value on the x-axis.</param>
         /// <param name="minY">The minimum value on the y-axis.</param>
         /// <param name="maxY">The maximum value on the y-axis.</param>
-        private void AddMarkers(IEnumerable<NodeRef> nodeRefsToDraw, float minX, float maxX, float minY, float maxY)
+        private void AddMarkers(IEnumerable<NodeRef> nodeRefsToDraw, bool ignoreXAxis, float minX, float maxX, float minY, float maxY)
         {
             callbackFnDict.Clear();
 
@@ -785,16 +836,44 @@ namespace SEE.Game.Charts
             Dictionary<Vector2, ChartMarker> anchoredPositionToChartMarkerDict = new Dictionary<Vector2, ChartMarker>(activeMarkers.Count);
 
             Rect dataRect = dataPanel.rect;
-            float width = minX < maxX ? dataRect.width / (maxX - minX) : 0.0f;
-            float height = minY < maxY ? dataRect.height / (maxY - minY) : 0.0f;
+            // If ignoreXAxis is true, we just enumerate all nodes in nodeRefsToDraw in their order
+            // therein on the x axis. The metric selected for the x axis is NODES and, hence, will
+            // not be considered. We achieve that by representing the x values as if they define
+            // a discrete value range from 1 to nodeRefsToDraw.Count() with an equidistant distance
+            // of 1 between each value, i.e., [1, 2, 3, ...nodeRefsToDraw.Count()].
+            if (ignoreXAxis)
+            {
+                minX = 1;
+                maxX = nodeRefsToDraw.Count();
+            }
+
+            // Note: width and height of dataRect are measured in Unity units
+            float widthFactor = minX < maxX ? dataRect.width / (maxX - minX) : 0.0f;            
+            float heightFactor = minY < maxY ? dataRect.height / (maxY - minY) : 0.0f;
             int positionInLayer = 0;
             int currentReusedActiveMarkerIndex = 0;
 
+            // To enumerate the x values in case ignoreXAxis is true.
+            int nodeIndex = 0;
             foreach (NodeRef nodeRef in nodeRefsToDraw)
             {
-                nodeRef.Value.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX);
+                float valueX;
+                if (!ignoreXAxis)
+                {
+                    // We retrieve the value of the metrics chosen for the x axis.
+                    if (!nodeRef.Value.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out valueX))
+                    {
+                        Debug.LogError($"Node {nodeRef.Value.ID} does not have metric {axisDropdownX.CurrentlySelectedMetric}.\n");
+                    }
+                }
+                else
+                {
+                    // We create the next value in our range [1, 2, 3, ...nodeRefsToDraw.Count()].
+                    nodeIndex++;
+                    valueX = nodeIndex;                    
+                }
                 nodeRef.Value.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY);
-                Vector2 anchoredPosition = new Vector2((valueX - minX) * width, (valueY - minY) * height);
+                Vector2 anchoredPosition = new Vector2((valueX - minX) * widthFactor, (valueY - minY) * heightFactor);
 
                 if (!anchoredPositionToChartMarkerDict.TryGetValue(anchoredPosition, out ChartMarker chartMarker))
                 {
@@ -830,9 +909,12 @@ namespace SEE.Game.Charts
                 chartMarker.PushInteractableObject(nodeRef.GetComponent<InteractableObject>(), infoText);
             }
 
-            for (int i = currentReusedActiveMarkerIndex; i < activeMarkers.Count; i++)
+            for (int m = currentReusedActiveMarkerIndex; m < activeMarkers.Count; m++)
             {
-                Destroy(activeMarkers[i].gameObject); // TODO(torben): these could potentially still be pooled for future rebuilds
+                if (activeMarkers[m].gameObject != null)
+                {
+                    Destroy(activeMarkers[m].gameObject); // TODO(torben): these could potentially still be pooled for future rebuilds
+                }
             }
             activeMarkers = updatedMarkers;
         }
@@ -986,33 +1068,10 @@ namespace SEE.Game.Charts
             GetAllNumericAttributes();
         }
 
-
-        /// <summary>
-        /// Fetches the color profile selected in the ChartManager for added, edited and removed node labels
-        /// </summary>
-        private void FetchLabelColorProfile()
-        {
-            this.hoveringOverLabelTextColor = Color.yellow;
-            // Load colors used for power beams, to match the text with the visible objects
-            try
-            {
-                this.addedNodesLabelColor = new Color(AdditionalBeamDetails.newBeamColor.r, AdditionalBeamDetails.newBeamColor.g, AdditionalBeamDetails.newBeamColor.b);
-                this.changedNodesLabelColor = new Color(AdditionalBeamDetails.changedBeamColor.r, AdditionalBeamDetails.changedBeamColor.g, AdditionalBeamDetails.changedBeamColor.b);
-                this.removedNodeLabelColor = new Color(AdditionalBeamDetails.deletedBeamColor.r, AdditionalBeamDetails.deletedBeamColor.g, AdditionalBeamDetails.deletedBeamColor.b);
-            }
-            catch
-            {
-                // Set default colors: red for removed, green for added, cyan for changed
-                this.addedNodesLabelColor = Color.green;
-                this.changedNodesLabelColor = Color.cyan;
-                this.removedNodeLabelColor = Color.red;
-            }
-        }
-
         /// <summary>
         /// Fills the newNodes, changedNodes and removedNodes lists respectively
         /// </summary>
-        private void FillListsWithChanges(List<NodeRef> nodeRefs)
+        private void FillListsWithChanges()
         {
             this.newNodeIDs = NodeChangesBuffer.GetSingleton().addedNodeIDsCache;
             this.changedNodeIDs = NodeChangesBuffer.GetSingleton().changedNodeIDsCache;

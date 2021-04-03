@@ -20,6 +20,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Controls;
+using SEE.DataModel;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -35,11 +36,6 @@ namespace SEE.Game.Charts
         /// The prefix of the name of a metric shown in a chart.
         /// </summary>
         public const string MetricPrefix = "Metric.";
-
-        /// <summary>
-        /// Tag of a game object having a ChartManager as a component.
-        /// </summary>
-        private const string ChartManagerTag = "ChartManager";
 
         /// <summary>
         /// The instance of the <see cref="ChartManager" />, to ensure there will be only one.
@@ -60,20 +56,20 @@ namespace SEE.Game.Charts
             {
                 if (_instance == null)
                 {
-                    GameObject[] chartManagers = GameObject.FindGameObjectsWithTag(ChartManagerTag);
+                    GameObject[] chartManagers = GameObject.FindGameObjectsWithTag(Tags.ChartManager);
                     if (chartManagers.Length == 0)
                     {
-                        Debug.LogErrorFormat("There is no chart manager tagged by {0} in the scene.\n", ChartManagerTag);
+                        Debug.LogError($"There is no chart manager tagged by {Tags.ChartManager} in the scene.\n");
                         throw new System.Exception("No chart manager in the scene");
                     }
                     else if (chartManagers.Length > 1)
                     {
-                        Debug.LogErrorFormat("There are multiple chart managers named {0} in the scene.\n", ChartManagerTag);
+                        Debug.LogError($"There are multiple chart managers named {Tags.ChartManager} in the scene.\n");
                     }
                     _instance = chartManagers[0].GetComponent<ChartManager>();
                     if (_instance == null)
                     {
-                        Debug.LogWarningFormat("The game object named {0} does not have a ChartManager component. Will be added.\n", ChartManagerTag);
+                        Debug.LogWarning($"The game object named {Tags.ChartManager} does not have a ChartManager component. Will be added.\n");
                         _instance = chartManagers[0].AddComponent<ChartManager>();
                     }
                 }
@@ -84,26 +80,38 @@ namespace SEE.Game.Charts
         [Header("Metric Settings")]
 
         /// <summary>
+        /// The code city whose nodes should be shown in the charts. If null, all nodes
+        /// in the scene will be shown.
+        /// </summary>
+        [Tooltip("The code city whose nodes should be shown in the charts. If null, all nodes"
+                  + " in the scene will be shown.")]
+        public GameObject CodeCity = null;
+
+        /// <summary>
         /// Whether metrics of leave nodes should be shown in the charts.
         /// </summary>
-        [Tooltip("Whether the metrics of leaf nodes should be shown in the charts")]
+        [Tooltip("Whether the metrics of leaf nodes should be shown in the charts.")]
         public bool ShowLeafMetrics = true;
 
         /// <summary>
         /// Whether metrics of inner nodes should be shown in the charts.
         /// </summary>
-        [Tooltip("Whether the metrics of inner nodes should be shown in the charts")]
+        [Tooltip("Whether the metrics of inner nodes should be shown in the charts.")]
         public bool ShowInnerNodeMetrics = false;
 
         /// <summary>
         /// The minimum size a chart can have for width and height.
         /// </summary>
-        public int minimumSize = 400;
+        [Tooltip("The minimum size a chart can have for width and height in pixels.")]
+        [Range(50, 4096)]
+        public int MinimumSize = 400;
 
         /// <summary>
         /// The minimum time for a drag to be recognized as a drag and not a click.
         /// </summary>
-        [Range(0.1f, 1f)] public float dragDelay = 0.2f;
+        [Tooltip("The minimum time for a drag to be recognized as a drag and not a click (in seconds).")]
+        [Range(0.1f, 1f)] 
+        public float DragDelay = 0.2f;
 
         /// <summary>
         /// Determines if the scene is being played in VR or not.
@@ -113,20 +121,26 @@ namespace SEE.Game.Charts
         [Header("Virtual Reality")]
 
         /// <summary>
-        /// The length of the pointer attached to the controller.
+        /// The length of the laser pointer attached to the controller.
         /// </summary>
-        public float pointerLength = 5.0f;
+        [Tooltip("The length of the laser pointer attached to the controller.")]
+        [Range(0.01f, 10f)] 
+        public float PointerLength = 5.0f;
 
         /// <summary>
         /// The speed at which charts will be moved in or out when the player scrolls.
         /// </summary>
-        public float chartScrollSpeed = 10.0f;
+        [Tooltip("The speed at which charts will be moved in or out when the player scrolls.")]
+        [Range(0.1f, 50f)]
+        public float ChartScrollSpeed = 10.0f;
 
         /// <summary>
         /// The minimum distance between the players head and the <see cref="GameObject" /> the charts are
         /// attached to to trigger it to follow the players head.
         /// </summary>
-        public float distanceThreshold = 1.0f;
+        [Tooltip("The minimum distance between the players head and the charts to the trigger the chart's movement.")]
+        [Range(0.1f, 3f)]
+        public float DistanceThreshold = 1.0f;
 
         [Header("Prefabs")]
 

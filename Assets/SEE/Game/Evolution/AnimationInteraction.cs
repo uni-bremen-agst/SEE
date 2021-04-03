@@ -17,6 +17,7 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -54,7 +55,7 @@ namespace SEE.Game.Evolution
         /// of revisions and the auto-play toggle. If the ESC key is hit, the
         /// RevisionSelectionCanvas is shown again.
         /// </summary>
-        public GameObject AnimationCanvas; // serialized by Unity
+        private GameObject AnimationCanvas; // serialized by Unity
 
         /// <summary>
         /// The user-data model for AnimationCanvas.
@@ -67,7 +68,7 @@ namespace SEE.Game.Evolution
         /// menu, it also contains a close button. If this button is pressed, the
         /// AnimationCanvas is shown again.
         /// </summary>
-        public GameObject RevisionSelectionCanvas; // serialized by Unity
+        private GameObject RevisionSelectionCanvas; // serialized by Unity
 
         /// <summary>
         /// The time in between two revisions in auto-play mode.
@@ -121,8 +122,30 @@ namespace SEE.Game.Evolution
             }
         }
 
+        /// <summary>
+        /// Path to the prefab of the AnimationCanvas excluding the file extension ".prefab".
+        /// </summary>
+        private const string AnimationCanvasPrefab = "Prefabs/Animation/AnimationCanvas";
+
+        /// <summary>
+        /// The name of the game object instantiated via <see cref="AnimationCanvasPrefab"/>.
+        /// </summary>
+        private const string AnimationCanvasGameObjectName = "AnimationCanvas";
+
+        /// <summary>
+        /// Path to the prefab of the AnimationCanvas excluding the file extension ".prefab".
+        /// </summary>
+        private const string RevisionSelectionCanvasPrefab = "Prefabs/Animation/RevisionSelectionCanvas";
+
+        /// <summary>
+        /// The name of the game object instantiated via <see cref="RevisionSelectionCanvasPrefab"/>.
+        /// </summary>
+        private const string RevisionSelectionCanvasGameObjectName = "RevisionSelectionCanvas";
+
         private void Init()
         {
+            AnimationCanvas = GetCanvas(AnimationCanvasGameObjectName, AnimationCanvasPrefab);
+            RevisionSelectionCanvas = GetCanvas(RevisionSelectionCanvasGameObjectName, RevisionSelectionCanvasPrefab);
 
             Canvas canvas = AnimationCanvas.GetComponent<Canvas>();
             canvas.worldCamera = MainCamera.Camera;
@@ -177,6 +200,42 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
+        /// If a child with <paramref name="canvasGameObjectName"/> exists in <see cref="gameObject"/>,
+        /// this child will be returned. If no such child exists, a new child with that name will
+        /// be created under <see cref="gameObject"/> as an instantiation of the given <paramref name="canvasPrefab"/>.
+        /// If <paramref name="canvasPrefab"/> cannot be loaded, the component will be disabled, and an exception 
+        /// be thrown.
+        /// </summary>
+        /// <param name="canvasGameObjectName">name of the child</param>
+        /// <param name="canvasPrefab">prefab path to instantiate the child if it does not exist</param>
+        /// <returns>the resulting canvas</returns>
+        private GameObject GetCanvas(string canvasGameObjectName, string canvasPrefab)
+        {
+            GameObject result;
+            Transform canvasTransform = gameObject.transform.Find(canvasGameObjectName);
+            if (canvasTransform != null)
+            {
+                result = canvasTransform.gameObject;
+            }
+            else
+            {
+                GameObject prefab = Resources.Load<GameObject>(canvasPrefab);
+                if (prefab != null)
+                {
+                    result = Instantiate(prefab);
+                    result.name = canvasGameObjectName;
+                    result.transform.SetParent(gameObject.transform);
+                }
+                else
+                {
+                    enabled = false;
+                    throw new Exception($"Prefab {canvasPrefab} not found.");
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Saves the marker data on application quit
         /// </summary>
         void OnApplicationQuit()
@@ -187,7 +246,7 @@ namespace SEE.Game.Evolution
                 sliderMarker.SetComment(p.Value.text);
             }
           
-            sliderMarkerContainer.Save(Path.Combine(Application.persistentDataPath, "sliderMarkers.xml"));
+            sliderMarkerContainer?.Save(Path.Combine(Application.persistentDataPath, "sliderMarkers.xml"));
         }
 
 
