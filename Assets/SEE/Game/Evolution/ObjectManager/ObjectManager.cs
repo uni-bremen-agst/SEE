@@ -67,12 +67,26 @@ namespace SEE.Game.Evolution
         /// <param name="renderer">the graph renderer used to create the game objects</param>
         /// <param name="city">the game object representing the city; its position and scale determines
         /// the position and scaling of the city elements visualized by the renderer</param>
-        public ObjectManager(GraphRenderer renderer, GameObject city)
+        /// <param name="deletedNodeBeamColor">color of the beams for deleted nodes</param>
+        /// <param name="deletedNodeBeamScale">scale of the beams for deleted nodes</param>
+        public ObjectManager(GraphRenderer renderer, GameObject city, Color deletedNodeBeamColor, Vector3 deletedNodeBeamScale)
         {
             renderer.AssertNotNull("renderer");
             _graphRenderer = renderer;
             this.city = city;
+            this.deletedNodeBeamColor = deletedNodeBeamColor;
+            this.deletedNodeBeamScale = deletedNodeBeamScale;
         }
+
+        /// <summary>
+        /// The color of the beams for deleted nodes.
+        /// </summary>
+        private readonly Color deletedNodeBeamColor;
+
+        /// <summary>
+        /// The scale of the beams for deleted nodes.
+        /// </summary>
+        private readonly Vector3 deletedNodeBeamScale;
 
         /// <summary>
         /// Returns all created GameObjects till now.
@@ -227,9 +241,10 @@ namespace SEE.Game.Evolution
             // Create power beam for deleted node
             if (wasNodeRemoved)
             {
-                Vector3 powerBeamDimensions = gameObject.transform.position;
-                MoveScaleShakeAnimator.BeamAnimator.GetInstance().CreatePowerBeam(powerBeamDimensions,
-                    AdditionalBeamDetails.deletedBeamColor, AdditionalBeamDetails.powerBeamDimensions);
+                MoveScaleShakeAnimator.BeamAnimator.GetInstance().CreatePowerBeam
+                                                                    (gameObject.transform.position,
+                                                                     deletedNodeBeamColor, 
+                                                                     deletedNodeBeamScale);
             }
             // Add the removed node id to the revision changes list
             NodeChangesBuffer.GetSingleton().removedNodeIDs.Add(node.ID);
