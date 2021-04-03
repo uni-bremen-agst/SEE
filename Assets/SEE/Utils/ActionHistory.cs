@@ -199,7 +199,7 @@ namespace SEE.Utils
                 while (!current.HadEffect())
                 {
                     current.Stop();
-                    if (UndoStack.Count > 1)
+                    if (UndoStack.Count > 0)
                     {
                         // continue with next action until we find one that has had an effect
                         current = UndoStack.Pop();
