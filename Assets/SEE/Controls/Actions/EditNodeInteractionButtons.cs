@@ -1,7 +1,6 @@
-﻿using SEE.Controls.Actions;
-using System;
+﻿using System;
 
-namespace SEE.Controls
+namespace SEE.Controls.Actions
 {
     /// <summary>
     /// This component is attached to the prefab Resources/Prefabs/EditNode.prefab and 
