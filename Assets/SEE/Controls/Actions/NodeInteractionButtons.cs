@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace SEE.Controls
+namespace SEE.Controls.Actions
 {
     /// <summary>
     /// This component is the common abstract super class of components 
