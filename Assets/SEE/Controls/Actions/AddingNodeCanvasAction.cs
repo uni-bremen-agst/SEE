@@ -44,17 +44,16 @@ namespace SEE.Controls.Actions
             {
                 addNodeAction.Progress = AddNodeAction.ProgressState.CanvasIsClosed;
                 canvasObject.GetComponent<AddingNodeCanvasAction>().GetNodeValues();
-                Finalize();
+                Finish();
                 AddNode = false;
             }
             if (Canceled)
             {
                 addNodeAction.Progress = AddNodeAction.ProgressState.AddingIsCanceled;
-                Finalize();
+                Finish();
                 Canceled = false;
             }
         }
-
 
         /// <summary>
         /// Extracts the given node name, the node type and whether it is an inner node or a leaf from the canvas.
@@ -93,7 +92,7 @@ namespace SEE.Controls.Actions
         /// Destroys the AddingNodeCanvasAction and deselects the selected object. Re-allows the
         /// interaction with the menu.
         /// </summary>
-        public void Finalize()
+        public void Finish()
         {
             CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
             generator.DestroyAddNodeCanvasAction();
