@@ -26,7 +26,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Sets <see cref="EditNodeCanvasAction.Canceled"/> to true.
+        /// Sets <see cref="AddingNodeCanvasAction.Canceled"/> to true.
         /// This method is registered as a callback listening to the <see cref="CancelButton"/>
         /// and is called when the Cancel button is pressed.
         /// </summary>
