@@ -1,80 +1,47 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using SEE.Controls.Actions;
 
 namespace SEE.Controls
 {
     /// <summary>
-    /// This component is attached to the prefabs Resources/Prefabs/NewNode.prefab
-    /// and Resources/Prefabs/EditNode.prefab and 
-    /// This component is added to the button of the adding-node canvas and the edit-node canvas.
-    /// FIXME: What is the purpose of this component?
+    /// This component is the common abstract super class of components 
+    /// reacting to the OK and Cancel buttons for dialogs editing/adding
+    /// nodes. Concrete subclasses will be added to prefabs defining
+    /// the actual buttons.
     /// </summary>
-    public class NodeInteractionButtons : MonoBehaviour
+    public abstract class NodeInteractionButtons : MonoBehaviour
     {
         /// <summary>
-        /// The button on the adding-node canvas that is finishing the addition of a new node.
+        /// The button on the canvas that is finalizing the interaction.
+        /// This button is connected in the prefab. It must be public.
         /// </summary>
-        public Button AddingButton;
+        public Button OKButton;
 
         /// <summary>
-        /// The button on the addNode canvas that is canceling the addition of a new node.
+        /// The button on the canvas that is canceling the interaction.
+        /// This button is connected in the prefab. It must be public.
         /// </summary>
-        public Button AddNodeCancel;
+        public Button CancelButton;
 
         /// <summary>
-        /// The button on the editNode canvas that is canceling the editNode process.
-        /// </summary>
-        public Button EditNodeCancel;
-
-        /// <summary>
-        /// The button on the editNode canvas that is finishing the editNode process.
-        /// </summary>
-        public Button EditNodeButton;
-
-        /// <summary>
-        /// Adds a listener to the button which calls a method when the button is pushed.
+        /// Adds listeners to the OK and Cancel buttons to react when the buttons are pressed.
         /// </summary>   
         private void Start()
         {
-            AddingButton?.onClick?.AddListener(SetNextAddingNodeStep);
-            EditNodeCancel?.onClick?.AddListener(EditIsCanceled);
-            EditNodeButton?.onClick?.AddListener(EditNode);
-            AddNodeCancel?.onClick?.AddListener(AddingIsCanceled);
+            OKButton?.onClick?.AddListener(OKButtonPressed);
+            CancelButton?.onClick?.AddListener(CancelButtonPressed);
         }
 
         /// <summary>
-        /// This results in the next step of addingNode.
-        /// This method is registered as a callback listening to the <see cref="AddingButton"/>.
+        /// This method is registered as a callback listening to the <see cref="OKButton"/>
+        /// and is called when the OK button is pressed.
         /// </summary>
-        private void SetNextAddingNodeStep()
-        {
-            AddingNodeCanvasAction.AddNode = true;
-        }
+        protected abstract void OKButtonPressed();
 
         /// <summary>
-        /// Marks the action to add a new node as being canceled.
+        /// This method is registered as a callback listening to the <see cref="CancelButton"/>
+        /// and is called when the Cancel button is pressed.
         /// </summary>
-        private void AddingIsCanceled()
-        {
-            AddingNodeCanvasAction.Canceled = true;
-        }
-
-        /// <summary>
-        /// Marks the action to edit an existing node as being canceled.
-        /// </summary>
-        private void EditIsCanceled()
-        {
-            EditNodeCanvasAction.Canceled = true;
-        }
-
-        /// <summary>
-        /// Sets <see cref="EditNodeCanvasAction.EditNode"/> to true, which starts the edit process 
-        /// and evaluation of the inputFields.
-        /// </summary>
-        private void EditNode()
-        {
-            EditNodeCanvasAction.EditNode = true;
-        }
+        protected abstract void CancelButtonPressed();
     }
 }
