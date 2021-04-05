@@ -12,10 +12,8 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Action to hide/show the currently selected game object (edge or node).
     /// </summary>
-    internal class HideAction : MonoBehaviour
+    internal class HideAction : AbstractPlayerAction
     {
-        private readonly ActionStateType ThisActionState = ActionStateType.Hide;
-
         /// <summary>
         /// The currently selected object (a node or edge).
         /// </summary>
@@ -23,60 +21,49 @@ namespace SEE.Controls.Actions
 
         private List<List<GameObject>> hiddenObjects;
 
-        // Start is called before the first frame update
-        private void Start()
+
+        /// <summary>
+        /// Returns a new instance of <see cref="HideAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public static ReversibleAction CreateReversibleAction()
         {
+            return new HideAction();
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="HideAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
+        }
+
+        // Start is called before the first frame update
+        public override void Start()
+        {
+            base.Stop();
+            Debug.Log("Start\n");
             hiddenObjects = new List<List<GameObject>>();
-            // An anonymous delegate is registered for the event <see cref="ActionState.OnStateChanged"/>.
-            // This delegate will be called from <see cref="ActionState"/> upon every
-            // state changed where the passed parameter is the newly entered state.
-            ActionState.OnStateChanged += newState =>
-            {
-                
-                // Is this our action state where we need to do something?
-                if (Equals(newState, ThisActionState))
-                {
-                    // The MonoBehaviour is enabled and Update() will be called by Unity.
-                    enabled = true;
-                    InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
-                    InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
-                }
-                else
-                {
-                    // The MonoBehaviour is disabled and Update() no longer be called by Unity.
-                    enabled = false;
-                    InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
-                    InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
-                }
-            };
-            enabled = ActionState.Is(ThisActionState);
+            InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
+            InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
+        }
+
+        public override void Stop()
+        {
+            base.Stop();
+            Debug.Log("Stop\n");
+            InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
+            InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
         }
 
         // Update is called once per frame
-        private void Update()
+        public override bool Update()
         {
-            // This script should be disabled, if the action state is not this action's type
-            if (!ActionState.Is(ThisActionState))
+           if (selectedObject != null)
             {
-                // The MonoBehaviour is disabled and Update() no longer be called by Unity.
-                enabled = false;
-                InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
-                InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
-                return;
-            }
-
-            if(Input.GetKeyDown(KeyCode.Backspace))
-            {
-                List<GameObject> lastHidden = hiddenObjects[hiddenObjects.Count - 1];
-                foreach (GameObject g in lastHidden){
-                    GameObjectExtensions.SetVisibility(g, true, false);
-                }
-                hiddenObjects.Remove(lastHidden);
-                return;
-            }
-
-            if (selectedObject != null) // Input.GetMouseButtonDown(0) && 
-            {
+                Debug.Log(selectedObject);
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
                 if (selectedObject.CompareTag(Tags.Edge))
                 {
@@ -96,16 +83,32 @@ namespace SEE.Controls.Actions
                             if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                             {
                                 hiddenList.Add(edge);
-                                GameObjectExtensions.SetVisibility(edge, false, false);
+                                GameObjectExtensions.SetVisibility(edge, false, true);
                             }
                         }
                     }
                     hiddenList.Add(selectedObject);
-                    GameObjectExtensions.SetVisibility(selectedObject, false, false);
+                    GameObjectExtensions.SetVisibility(selectedObject, false, true);
                     selectedObject = null;
                     hiddenObjects.Add(hiddenList);
                 }
+                return true;
             }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        public override void Undo()
+        {
+            List<GameObject> lastHidden = hiddenObjects[hiddenObjects.Count - 1];
+            foreach (GameObject g in lastHidden)
+            {
+                GameObjectExtensions.SetVisibility(g, true, false);
+            }
+            hiddenObjects.Remove(lastHidden);
         }
 
         private void UnhideAll()
@@ -155,6 +158,15 @@ namespace SEE.Controls.Actions
             // We need to further investigate this issue.
             // Assert.IsTrue(selectedObject == interactableObject.gameObject);
             selectedObject = null;
+        }
+
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this action.
+        /// </summary>
+        /// <returns><see cref="ActionStateType.Hide"/></returns>
+        public override ActionStateType GetActionStateType()
+        {
+            return ActionStateType.Hide;
         }
     }
 }
