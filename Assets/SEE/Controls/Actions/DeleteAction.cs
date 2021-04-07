@@ -281,7 +281,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Coroutine that waits and expands the shrunk object which is currently beeing removed from the garbage can.
+        /// Coroutine that waits and expands the shrunk object which is currently being removed from the garbage can.
         /// </summary>
         /// <param name="deletedNode">The nodes to be removed from the garbage-can</param>
         /// <returns>the waiting time between moving deleted nodes from the garbage-can and then to the city</returns>
