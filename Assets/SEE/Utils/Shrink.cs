@@ -8,7 +8,7 @@ namespace SEE.Utils
 
 
         /// <summary>
-        /// Calculates a ration between the current localScale and a targetscale of a given vector3.
+        /// Calculates a ration between the current localScale and a targetscale of a given vector.
         /// </summary>
         /// <param name="transform">The transform attached to an object which shall be shrunk</param>
         /// <param name="targetscale"> the targetscale, the object is goint to be ShrinkAnObject to</param>
@@ -23,7 +23,7 @@ namespace SEE.Utils
         }
         /// <summary>
         /// Shrinks a given object to a certain targetscale. 
-        /// The targetscale is a result of iterations and the specific <param name="shrinkFactor">.
+        /// The targetscale is a result of an amount of iterations and the specific <param name="shrinkFactor">.
         /// </summary>
         /// <param name="objectToShrink">The object which shall be shrunk</param>
         /// <param name="iterations">the amount of iterations that are proceeded while shrinking</param>
