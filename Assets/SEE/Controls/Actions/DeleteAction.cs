@@ -269,12 +269,12 @@ namespace SEE.Controls.Actions
 
             foreach (GameObject deletedNode in deletedNodes)
             {
-                Vector3 shrinkFactor = Shrink.shrinkFactor(deletedNode.transform, defaultGarbageVector);
+                Vector3 shrinkFactor = VectorOperations.DivideVectors(deletedNode.transform.localScale, defaultGarbageVector);
                 if (!shrinkFactors.ContainsKey(deletedNode))
                 {
                     shrinkFactors.Add(deletedNode, shrinkFactor);
                 }
-                Shrink.ShrinkAnObject(deletedNode, 1, shrinkFactor);
+                VectorOperations.VectorMultiplication(deletedNode, 1, shrinkFactor);
                 Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), TimeForAnimation);
             }
             yield return new WaitForSeconds(TimeToWait);
@@ -296,7 +296,7 @@ namespace SEE.Controls.Actions
             shrinkFactor = Util.ExponentOfVectorCoordinates(shrinkFactor, exponent);
 
             while ((animationsCount) > 0 ) {
-                Shrink.Expand(deletedNode,shrinkFactor);
+               deletedNode.transform.localScale = VectorOperations.DivideVectors(shrinkFactor, deletedNode.transform.localScale);
                 yield return new WaitForSeconds(0.14f);
                 animationsCount--;
             }
