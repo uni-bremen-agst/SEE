@@ -181,9 +181,9 @@ namespace SEE.GO.Menu
                         SetPlayerMenu(currentAction.Name);
                         Indicator.ChangeActionState(currentAction);
                     }
-                }
-                PlayerActionHistory.Update();
+                }                
             }
+            PlayerActionHistory.Update();
         }
 
         /// <summary>
