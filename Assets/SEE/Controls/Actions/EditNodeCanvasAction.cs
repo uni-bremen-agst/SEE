@@ -72,17 +72,17 @@ namespace SEE.Controls.Actions
         {
             if (EditNode)
             {
-                EditNodeAction.NodeName = inputname.text;
-                EditNodeAction.NodeType = inputtype.text;
+                editNodeAction.NodeName = inputname.text;
+                editNodeAction.NodeType = inputtype.text;
                
                 editNodeAction.EditProgress = EditNodeAction.ProgressState.ValuesAreGiven;
-                Finalise();
+                Finish();
                 EditNode = false;
             }
             if (Canceled)
             {
                 editNodeAction.EditProgress = EditNodeAction.ProgressState.EditIsCanceled;
-                Finalise();
+                Finish();
                 Canceled = false;
             }
         }
@@ -91,7 +91,7 @@ namespace SEE.Controls.Actions
         /// Destroys the EditNodeCanvasAction and deselects the selected object. Re-allows the
         /// interaction with the menu.
         /// </summary>
-        private void Finalise()
+        private void Finish()
         {
             CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
             generator.DestroyEditNodeCanvasAction();

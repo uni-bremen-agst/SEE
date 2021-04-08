@@ -51,7 +51,7 @@ namespace SEE.Controls.Actions
         public Vector3 Scale;
 
         /// <summary>
-        /// /Whether the the node should be placed or moved.
+        /// Whether the the node should be placed or moved.
         /// true = place | false = dont place
         /// </summary>
         public bool Place;
@@ -128,16 +128,12 @@ namespace SEE.Controls.Actions
                     SceneQueries.GetCodeCity(GameObject.Find(GameObjectID).transform)?.gameObject.TryGetComponent(out City);
                     if (City != null)
                     {
-                        //Just a gameObject to attatch the newNodeScript on
-                        GameObject dummy = new GameObject();
-                        // dummy.AddComponent<AddNodeAction>();
-                        dummy.GetComponent<AddNodeAction>().Network = true;
-                        dummy.GetComponent<AddNodeAction>().NodeID = NewNodeID;
-                        dummy.GetComponent<AddNodeAction>().City = City;
-                        AddNodeAction.IsInnerNode = IsInnerNode;
-                        dummy.GetComponent<AddNodeAction>().NewNode();
-                        dummy.name = dummyName;
-
+                        AddNodeAction addNodeAction = new AddNodeAction();
+                        addNodeAction.Network = true;
+                        addNodeAction.NodeID = NewNodeID;
+                        addNodeAction.City = City;
+                        addNodeAction.IsInnerNode = IsInnerNode;
+                        addNodeAction.NewGameNode(AddNodeAction.NewGraphNode());
                     }
                 }
                 // Manages the placement of the new node on each client.

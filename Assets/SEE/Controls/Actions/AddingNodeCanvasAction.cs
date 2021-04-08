@@ -43,7 +43,8 @@ namespace SEE.Controls.Actions
             if (AddNode)
             {
                 addNodeAction.Progress = AddNodeAction.ProgressState.CanvasIsClosed;
-                canvasObject.GetComponent<AddingNodeCanvasAction>().GetNodeValues();
+                GetNodeValues();
+                //canvasObject.GetComponent<AddingNodeCanvasAction>().GetNodeValues();
                 Finish();
                 AddNode = false;
             }
@@ -74,18 +75,18 @@ namespace SEE.Controls.Actions
 
             if (toggles[0].isOn)
             {
-                AddNodeAction.IsInnerNode = true;
+                addNodeAction.IsInnerNode = true;
             }
             if (toggles[1].isOn)
             {
-                AddNodeAction.IsInnerNode = false;
+                addNodeAction.IsInnerNode = false;
             }
             string inputNodename = inputname.text;
             string inputNodetype = inputtype.text;
             // until here 
 
-            AddNodeAction.NodeName = inputNodename;
-            AddNodeAction.NodeType = inputNodetype;
+            addNodeAction.NodeName = inputNodename;
+            addNodeAction.NodeType = inputNodetype;
         }
 
         /// <summary>
