@@ -34,7 +34,8 @@ namespace SEE.Controls
             }
             else
             {
-                Debug.LogErrorFormat("Player {0} has no focus object assigned.\n", name);
+                cameraState.freeMode = true;
+                Debug.Log($"Player {name} has no focus object assigned.\n");
             }
             cameraState.distance = 2.0f;
             cameraState.yaw = 0.0f;
