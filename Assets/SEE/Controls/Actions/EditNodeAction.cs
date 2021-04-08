@@ -10,7 +10,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Action to edit an existing node.
     /// </summary>
-    public class EditNodeAction : AbstractPlayerAction
+    public class EditNodeAction : ManipulateNodeAction
     {
         /// <summary>
         /// The life cycle of this edit action.
@@ -38,16 +38,6 @@ namespace SEE.Controls.Actions
         /// has already happened, else false.
         /// </summary>
         private bool executed = false;
-
-        /// <summary>
-        /// The new source name of the node.
-        /// </summary>
-        public static string NodeName { get; set; }
-
-        /// <summary>
-        /// The new type of the node.
-        /// </summary>
-        public static string NodeType { get; set; }
 
         /// <summary>
         /// The information we need to (re-)edit a node.

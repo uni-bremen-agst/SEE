@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Game;
+using SEE.Game.UI.PropertyDialog;
 using SEE.GO;
 using SEE.GO.Menu;
 using SEE.Utils;
@@ -14,14 +15,8 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Action to create a new node for a selected city.
     /// </summary>
-    public class AddNodeAction : AbstractPlayerAction
+    public class AddNodeAction : ManipulateNodeAction
     {
-        private SEECity city;
-        /// <summary>
-        /// The Code City in which the node should be placed.
-        /// </summary>
-        public SEECity City { get => city; set => city = value; }
-
         /// <summary>
         /// The new GameObject which contains the new node.
         /// </summary>
@@ -30,17 +25,17 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// True if the node to be created is an inner node.
         /// </summary>
-        public static bool IsInnerNode { get; set; } = false;
+        public bool IsInnerNode { get; set; } = false;
 
         /// <summary>
-        /// The name of a new node given in the input field.
+        /// The Code City in which the node should be placed.
         /// </summary>
-        public static string NodeName { get; set; }
+        public SEECity City { get; set; }
 
         /// <summary>
-        /// The type of a new node given in the input field.
+        /// The node ID of the new node.
         /// </summary>
-        public static string NodeType { get; set; }
+        public string NodeID { get; set; }
 
         /// <summary>
         /// Colour the hovered city is dyed when hovered or selected, set green by default 
@@ -52,11 +47,6 @@ namespace SEE.Controls.Actions
         /// set black by default
         /// </summary>
         public Color AlternativeHoverCityColor { get; set; } = Color.black;
-
-        /// <summary>
-        /// The node id of the new node.
-        /// </summary>
-        public string NodeID { get; set; }
 
         /// <summary>
         /// A list of the hovered gameObjects.
@@ -97,7 +87,7 @@ namespace SEE.Controls.Actions
         private IList<GameObject> listOfRoots;
 
         /// <summary>
-        /// True, if allNodesOfScene() is called, else false.
+        /// True, if <see cref="GetNodesOfScene()"/> was called, else false.
         /// </summary>
         private bool nodesLoaded = false;
 
@@ -119,6 +109,13 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// True, if a method is called from network, else false.
+        /// 
+        /// FIXME: This property should be removed. We need a clear separation of concerns.
+        /// There are three different concerns when it comes to actions:
+        /// (1) The actual effect that is be achieved by an action (here: creating and placing a node).
+        /// (2) The action to be put into the action history handling the Undo and Redo dealing with all 
+        ///     the necessary user interactions.
+        /// (3) The network action that is used to propagate the effect to all clients.
         /// </summary>
         public bool Network { get; set; } = false;
 
@@ -127,12 +124,27 @@ namespace SEE.Controls.Actions
         /// </summary>
         public enum ProgressState
         {
-            NoCitySelected,
-            CityIsSelected,
-            WaitingForValues,
-            CanvasIsClosed,
-            ValuesAreGiven,
-            AddingIsCanceled
+            NoCitySelected,    // initial state, no city selected yet
+            CityIsSelected,    // the user has selected a city in which the node is to be created
+            WaitingForValues,  // we are currently waiting the user dialog for the node attributes to be finished
+            CanvasIsClosed,    // FIXME remove
+            ValuesAreGiven,    // the dialog is closed; the node attributes have been set
+            AddingIsCanceled   // the dialog is canceled; the node attributes have not been set
+        }
+
+        /// <summary>
+        /// The graph node to be added to the city.
+        /// </summary>
+        private readonly Node node = NewGraphNode();
+
+        public static Node NewGraphNode()
+        {
+            return new Node()
+            {
+                ID = RandomStrings.Get(),
+                SourceName = string.Empty,
+                Type = Graph.UnknownType
+            };
         }
 
         /// <summary>
@@ -148,7 +160,6 @@ namespace SEE.Controls.Actions
                 Debug.LogError($"No canvas object named {nameOfCanvasObject} could be found in the scene.\n");
                 return;
             }
-
             InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
             InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
         }
@@ -164,6 +175,8 @@ namespace SEE.Controls.Actions
                 canvasGenerator.DestroyAddNodeCanvasAction();
             }
             Undye();
+            InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
+            InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
         }
 
         /// <summary>
@@ -181,11 +194,12 @@ namespace SEE.Controls.Actions
         {
             bool result = false;
 
+            Debug.Log($"{Progress}\n");
             switch (Progress)
             {
                 case ProgressState.NoCitySelected:
                     SelectCity();
-                    if (city != null && !Network)
+                    if (City != null && !Network)
                     {
                         Progress = ProgressState.CityIsSelected;
                     }
@@ -198,6 +212,7 @@ namespace SEE.Controls.Actions
                     break;
 
                 case ProgressState.WaitingForValues:
+                    // Nothing to be done. We need to wait until the node-attribute dialog is closed.
                     break;
 
                 case ProgressState.CanvasIsClosed:
@@ -206,19 +221,25 @@ namespace SEE.Controls.Actions
                     break;
 
                 case ProgressState.ValuesAreGiven:
+                    Debug.Log($"Node values are given {node}\n");
+                    PlayerMenu.InteractionIsForbidden = false;
                     if (GONode == null)
                     {
-                        NodeID = RandomStrings.Get();
-                        NewNode();
-                        new AddNodeNetAction(rndObjectInCity.name, IsInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, true, false).Execute();
+                        // The game node does not exist yet.
+                        GONode = NewGameNode(node);
+                        new AddNodeNetAction(rndObjectInCity.name, IsInnerNode, node.ID, GONode.transform.position, GONode.transform.lossyScale, "", 
+                                             place: false, create: true, illegalPlace: false).Execute();
                         nodesLoaded = false;
                         GameNodeMover.MoveTo(GONode);
-                        new AddNodeNetAction(rndObjectInCity.name, IsInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false, false).Execute();
+                        new AddNodeNetAction(rndObjectInCity.name, IsInnerNode, node.ID, GONode.transform.position, GONode.transform.lossyScale, "",
+                                             place: false, create: false, illegalPlace: false).Execute();
                     }
                     else
                     {
+                        // The game node already exists and must be moved until it reaches its final destination.
                         GameNodeMover.MoveTo(GONode);
-                        new AddNodeNetAction(rndObjectInCity.name, IsInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, "", false, false, false).Execute();
+                        new AddNodeNetAction(rndObjectInCity.name, IsInnerNode, node.ID, GONode.transform.position, GONode.transform.lossyScale, "", 
+                                             place: false, create: false, illegalPlace: false).Execute();
                         if (Input.GetMouseButtonDown(0))
                         {
                             Place();
@@ -229,13 +250,14 @@ namespace SEE.Controls.Actions
                     break;
 
                 case ProgressState.AddingIsCanceled:
-                    city = null;
+                    Debug.Log("Adding was canceled.\n");
+                    City = null;
                     Progress = ProgressState.NoCitySelected;
                     PlayerMenu.InteractionIsForbidden = false;
                     break;
 
                 default:
-                    throw new NotImplementedException("Unhandled case.");
+                    throw new NotImplementedException($"Unhandled case {Progress}.");
             }
             return result;
         }
@@ -275,11 +297,15 @@ namespace SEE.Controls.Actions
             if (hoveredObject != null && Input.GetMouseButtonDown(0))
             {
                 // Gets the SEECity from the hoveredObject
-                SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject.TryGetComponent<SEECity>(out city);
+                Transform codeCityObject = SceneQueries.GetCodeCity(hoveredObject.transform);
+                if (codeCityObject != null && codeCityObject.gameObject.TryGetComponent(out SEECity city))
+                {
+                    City = city;
+                }
 
                 foreach (GameObject root in listOfRoots)
                 {
-                    if (root.GetComponent<NodeRef>().Value.ItsGraph == city.LoadedGraph)
+                    if (root.GetComponent<NodeRef>().Value.ItsGraph == City.LoadedGraph)
                     {
                         ChangeColor(root);
                     }
@@ -291,10 +317,21 @@ namespace SEE.Controls.Actions
         /// Opens a dialog canvas where the user can insert some node metrics. Therefore, a CanvasGenerator-script component 
         /// will be added to this gameObject which contains the canvas as a gameObject instance of a prefab.
         /// </summary>
-        public void OpenDialog()
+        private void OpenDialog()
         {
-            canvasObject.GetComponent<CanvasGenerator>().InstantiateAddingNodeCanvas(this);
+            //canvasObject.GetComponent<CanvasGenerator>().InstantiateAddingNodeCanvas(this);
+            NodePropertyDialog dialog = new NodePropertyDialog(node);
+            dialog.OnConfirm.AddListener(() => OnOK());
+            dialog.OnCancel.AddListener(() => Progress = ProgressState.AddingIsCanceled);
+            dialog.Open();
+
+            void OnOK()
+            {
+                Progress = ProgressState.ValuesAreGiven;
+                Debug.Log($"OK button has been clicked. Node value: {node}. Next state: {Progress}\n");
+            }
         }
+
 
         /// <summary>
         /// Undyes the current color of the object, i.e., changes its color to its original color.
@@ -335,18 +372,24 @@ namespace SEE.Controls.Actions
         /// ID is not unique.
         /// </summary>
         /// <param name="node">The node to add to the graph</param>
-        private void AddNode(Node node)
+        private static void AddNode(Graph graph, Node node)
         {
-            try
+            if (graph != null)
             {
-                Graph loadedGraph = city.LoadedGraph;
-                loadedGraph.AddNode(node);
-                loadedGraph.FinalizeNodeHierarchy();
+                try
+                {
+                    graph.AddNode(node);
+                    graph.FinalizeNodeHierarchy();
+                }
+                catch (Exception)
+                {
+                    node.ID = RandomStrings.Get();
+                    AddNode(graph, node);
+                }
             }
-            catch (Exception)
+            else
             {
-                node.ID = RandomStrings.Get();
-                AddNode(node);
+                Debug.LogError($"Node {node.ID} could not be added to the graph.\n");
             }
         }
 
@@ -355,35 +398,31 @@ namespace SEE.Controls.Actions
         /// by the user if they are given. Sets this node in the hierarchy of the graph. 
         /// It is important to set the id, city and isInnerNode first.
         /// </summary>
-        public void NewNode()
+        public GameObject NewGameNode(Node node)
         {
-            Node node = new Node
-            {
-                ID = NodeID,
-                SourceName = NodeID,
-                Type = Graph.UnknownType
-            };
-            AddNode(node);
+            AddNode(City.LoadedGraph, node);
 
+            GameObject result;
             if (IsInnerNode)
             {
-                GONode = city.Renderer.NewInnerNode(node);
-                GONode.transform.localScale = medianOfInnerNodes;
-                GONode.gameObject.GetComponent<Renderer>().material.color = innerNodeColor;
+                result = City.Renderer.NewInnerNode(node);
+                result.transform.localScale = medianOfInnerNodes;
+                result.gameObject.GetComponent<Renderer>().material.color = innerNodeColor;
             }
             else
             {
-                GONode = city.Renderer.NewLeafNode(node);
-                GONode.transform.localScale = medianOfLeaves;
-                GONode.gameObject.GetComponent<Renderer>().material.color = leafColor;
+                result = City.Renderer.NewLeafNode(node);
+                result.transform.localScale = medianOfLeaves;
+                result.gameObject.GetComponent<Renderer>().material.color = leafColor;
             }
 
-            GONode.transform.position = rootPosition;
-            GONode.gameObject.GetComponent<Collider>().enabled = false;
-            GameNodeMover.MoveTo(GONode);
+            result.transform.position = rootPosition;
+            result.gameObject.GetComponent<Collider>().enabled = false;
+            GameNodeMover.MoveTo(result);
 
-            InteractableObject inter = GONode.GetComponent<InteractableObject>();
+            InteractableObject inter = result.GetComponent<InteractableObject>();
             inter.SetGrab(true, true);
+            return result;
         }
 
         /// <summary>
@@ -393,36 +432,25 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void Place()
         {
-            Node node = GONode.GetComponent<NodeRef>().Value;
-
-            if (NodeName.Trim().Length > 0)
-            {
-                node.SourceName = NodeName;
-            }
-            if (NodeType.Trim().Length > 0)
-            {
-                node.Type = NodeType;
-            }
-
-            // Is the currently hovered object is part of the preselected city?
+            // Is the currently hovered object part of the preselected city?
             GameObject codeCity = SceneQueries.GetCodeCity(hoveredObject.transform)?.gameObject;
             if (codeCity != null && codeCity.TryGetComponent(out AbstractSEECity hoveredCity))
             {
-                if (city.Equals(hoveredCity))
+                if (City.Equals(hoveredCity))
                 {
                     GONode.gameObject.GetComponent<Collider>().enabled = true;
                     GameNodeMover.FinalizePosition(GONode, GONode.transform.position);
                     new EditNodeNetAction(node.SourceName, node.Type, GONode.name).Execute();
-                    new AddNodeNetAction(rndObjectInCity.name, IsInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, true, false, false).Execute();
+                    new AddNodeNetAction(rndObjectInCity.name, IsInnerNode, node.ID, GONode.transform.position, GONode.transform.lossyScale, GONode.transform.parent.gameObject.name, true, false, false).Execute();
                 }
                 else
                 {
-                    new AddNodeNetAction(rndObjectInCity.name, IsInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, "", true, false, true).Execute();
+                    new AddNodeNetAction(rndObjectInCity.name, IsInnerNode, node.ID, GONode.transform.position, GONode.transform.lossyScale, "", true, false, true).Execute();
                     Destroyer.DestroyGameObject(GONode);
                 }
                 Progress = ProgressState.NoCitySelected;
                 GONode = null;
-                city = null;
+                City = null;
                 nodesLoaded = false;
                 cityToDye = null;
             }
