@@ -406,11 +406,11 @@ namespace Valve.VR.InteractionSystem
 			return vClosestPoint;
 		}
 
-		public static Vector3 ExponentOfVectorCoordinates(Vector3 vector , float nThRoot)
+		public static Vector3 ExponentOfVectorCoordinates(Vector3 vector , float exponent)
         {
-			vector.x = (float)Math.Pow(vector.x, nThRoot);
-			vector.y = (float)Math.Pow(vector.y, nThRoot);
-			vector.z = (float)Math.Pow(vector.z, nThRoot);
+			vector.x = (float)Math.Pow(vector.x, exponent);
+			vector.y = (float)Math.Pow(vector.y, exponent);
+			vector.z = (float)Math.Pow(vector.z, exponent);
 			return vector;
 		}
 

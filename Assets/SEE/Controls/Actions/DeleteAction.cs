@@ -76,17 +76,17 @@ namespace SEE.Controls.Actions
         private Dictionary<GameObject, Graph> DeletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
 
         /// <summary>
-        /// A list of ratios of the current localScale and a targetscale.
+        /// A list of ratios of the current localScale and a target scale.
         /// </summary>
         private Dictionary<GameObject, Vector3> shrinkFactors { get; set; } = new Dictionary<GameObject, Vector3>();
 
         /// <summary>
-        ///  A vector for an objects localScale which fits into the garbage can          //FIXME: Currently set to an absolute value. Should be set abstract, i.e. half of the garbage can´s diameter, for instance. 
+        ///  A vector for an objects localScale which fits into the garbage can          //TODO: Currently set to an absolute value. Should be set abstract, i.e. half of the garbage can´s diameter, for instance. 
         /// </summary>
         private Vector3 defaultGarbageVector = new Vector3(0.1f, 0.1f, 0.1f);
 
         /// <summary>
-        /// Amount of animations, which is used for an objects expansion, removing it from the garbage can.
+        /// Number of animations which is used for an object´s expansion, removing it from the garbage can.
         /// </summary>
         private const float animations = 10;
 
@@ -135,9 +135,9 @@ namespace SEE.Controls.Actions
         {
             // Delete a gameobject and all its children and incoming and outgoing edges.
             if (selectedObject != null && !isRunning)
-            {
+            {   
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
-                explicitlyDeletedNodesAndEdges.Add(selectedObject);  
+                explicitlyDeletedNodesAndEdges.Add(selectedObject);
                 DeleteSelectedObject(selectedObject);               
                 hadAnEffect = true;
 
@@ -166,6 +166,7 @@ namespace SEE.Controls.Actions
             }
             else if (selectedObject.CompareTag(Tags.Node))
             {
+                Debug.Log("deleteNode");
                 if (selectedObject.GetNode().IsRoot())
                 {
                     Debug.LogError("A root shall not be deleted.\n");
@@ -178,7 +179,9 @@ namespace SEE.Controls.Actions
                     // FIXME: Shouldn't the edges be moved to the garbage bin, too?
                     PlayerSettings.GetPlayerSettings().StartCoroutine(this.MoveNodeToGarbage(selectedObject.AllAncestors()));
                 }
-            }
+            } 
+                
+            
             // FIXME:(Thore) NetAction is no longer up to date
             new DeleteNetAction(selectedObject.name).Execute(null);
         }
@@ -218,7 +221,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         private IEnumerator DelayEdges(GameObject edge)
         {
-
             yield return new WaitForSeconds(TimeForAnimation + TimeToWait);
             edge.SetVisibility(true, true);
         }
@@ -290,10 +292,9 @@ namespace SEE.Controls.Actions
             yield return new WaitForSeconds(TimeToWait);
             Vector3 shrinkFactor = shrinkFactors[deletedNode];
             float animationsCount = animations;
-            float nThRoot = 1 / animations;
-            shrinkFactor = Util.ExponentOfVectorCoordinates(shrinkFactor, nThRoot);
+            float exponent = 1 / animations;
+            shrinkFactor = Util.ExponentOfVectorCoordinates(shrinkFactor, exponent);
 
-             
             while ((animationsCount) > 0 ) {
                 Shrink.Expand(deletedNode,shrinkFactor);
                 yield return new WaitForSeconds(0.14f);
