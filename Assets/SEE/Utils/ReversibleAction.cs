@@ -88,7 +88,7 @@ namespace SEE.Utils
         /// <returns>If the undo was succsesfull</returns>
 
 
-        bool Undo(List<ReversibleAction> object2Check);
+        void Undo();
 
         /// <summary>
         /// Called when the action was previously reversed by <see cref="Undo"/>
@@ -98,7 +98,7 @@ namespace SEE.Utils
         /// <param name="object2Check">The other ReversibleActions that changed the 
         /// same Object after the Action and need to be checked befor the redo </param>
         /// <returns>If the redo was succsesfull</returns>
-        bool Redo(List<ReversibleAction> object2Check);
+        void Redo();
 
         /// <summary>
         /// True if this action has had an effect that may need to be undone. Actions may
@@ -113,7 +113,7 @@ namespace SEE.Utils
         /// Provides a list with the changedGameobjectIDs 
         /// </summary>
         /// <returns>A List of all GameObjects that be changed by the active action</returns>
-        List<String> ChangedObjects();
+        List<String> GetChangedObjects();
 
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
