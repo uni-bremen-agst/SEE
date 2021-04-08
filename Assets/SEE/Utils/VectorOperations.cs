@@ -12,7 +12,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="denominator">The vector by which the counter¥s coordinated are divided by</param>
         /// <param name="counter"> The counter vector - which is divided by the denominatorﬂs coordinates</param>
-        /// <returns> The result of the component-wise division between the transform's local scale and the given targetScale. </returns>
+        /// <returns> The result of the component-wise division between the counter and denominator. </returns>
         public static Vector3 DivideVectors(Vector3 denominator, Vector3 counter)
         {        
             float xLocalScale = counter.x / denominator.x;
@@ -26,7 +26,7 @@ namespace SEE.Utils
         /// The target scale is a result of an amount of iterations and the specific <paramref name="factor">
         /// </summary>
         /// <param name="product">The object which shall be shrunk</param>
-        /// <param name="iterations">How often the objectToShrink¥s scale shall be multiplied with the shrinkFactor</param>
+        /// <param name="iterations">How often the product is multiplied with the given factor</param>
         ///  <paramref name="factor"> the factor the localScale of the given objectToShrink is multiplied with</param>
         public static void VectorMultiplication(GameObject product, float iterations, Vector3 factor)
         {    
