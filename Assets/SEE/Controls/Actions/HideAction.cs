@@ -80,6 +80,7 @@ namespace SEE.Controls.Actions
 
                         foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
                         {
+                            
                             if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                             {
                                 hiddenList.Add(edge);
@@ -92,6 +93,7 @@ namespace SEE.Controls.Actions
                     selectedObject = null;
                     hiddenObjects.Add(hiddenList);
                 }
+                hadAnEffect = true;
                 return true;
             }
             else
@@ -103,12 +105,18 @@ namespace SEE.Controls.Actions
 
         public override void Undo()
         {
+            Debug.Log("undo");
             List<GameObject> lastHidden = hiddenObjects[hiddenObjects.Count - 1];
             foreach (GameObject g in lastHidden)
             {
                 GameObjectExtensions.SetVisibility(g, true, false);
             }
             hiddenObjects.Remove(lastHidden);
+        }
+
+        public override void Redo()
+        {
+            base.Redo();
         }
 
         private void UnhideAll()
