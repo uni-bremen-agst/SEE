@@ -23,7 +23,7 @@ namespace SEE.Utils
 
         /// <summary>
         /// Multiplies two given vectors pairwise. 
-        /// The target scale is a result of an amount of iterations and the specific <paramref name="factor">.
+        /// The target scale is a result of an amount of iterations and the specific <paramref name="factor">
         /// </summary>
         /// <param name="product">The object which shall be shrunk</param>
         /// <param name="iterations">How often the objectToShrink´s scale shall be multiplied with the shrinkFactor</param>
