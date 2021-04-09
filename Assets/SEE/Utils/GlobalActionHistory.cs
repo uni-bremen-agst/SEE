@@ -30,6 +30,12 @@ public class GlobalActionHistory
     /// </summary>
     private int size = 0;
 
+
+    /// <summary>
+    /// Numbers of elements in the Buffer
+    /// </summary>
+    private int count = 0;
+
     /// <summary>
     /// indicates wether the tail should move or not
     /// </summary>
@@ -113,6 +119,7 @@ public class GlobalActionHistory
     private void Push(Tuple<DateTime, string, historyType, ReversibleAction, List<string>> data)
     {
         actionList[head] = data;
+        count++;
         if (head < size - 1) head++;
         else
         {
@@ -159,7 +166,7 @@ public class GlobalActionHistory
             while (true)
             {
                 //Checks if any item from list 1 is in list 2
-                if (result.Item5.Where(it => actionList[i].Item5.Contains(it)) != null) //FIXME: Could make some trouble, not sure if it works
+                if (count > 1 && result.Item5.Where(it => actionList[i].Item5.Contains(it)) != null) //FIXME: Could make some trouble, not sure if it works
                 {
                     //results.Add(actionList[i].Item4);
                     return new Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>, bool>(result, true); //Delete this return if you want to give all actions to the caller 
@@ -183,9 +190,13 @@ public class GlobalActionHistory
 
         for (int i = 0; i < size - 1; i++)
         {
-            if (actionList[i].Item2.Equals(userid) && actionList[i].Item3.Equals(historyType.undo)) actionList[i] = null; //FIXME changed to undo because  i think we need to delete this and not the undos which are actualy actions?
+            if (actionList[i].Item2.Equals(userid) && actionList[i].Item3.Equals(historyType.undo))
+            {
+                actionList[i] = null; //FIXME changed to undo because  i think we need to delete this and not the undos which are actualy actions?}
+                count--;
+            }
+            isRedo = false;
         }
-        isRedo = false;
     }
 
 
@@ -198,7 +209,11 @@ public class GlobalActionHistory
     {
         for (int i = 0; i < size - 1; i++)
         {
-            if (actionList[i].Item1.Equals(time) && actionList[i].Item2.Equals(userid)) actionList[i] = null; ;
+            if (actionList[i].Item1.Equals(time) && actionList[i].Item2.Equals(userid))
+            {
+                actionList[i] = null;
+                count--;
+            }
         }
     }
 
