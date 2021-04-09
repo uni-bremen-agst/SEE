@@ -73,8 +73,8 @@ public class GlobalActionHistory
     /// <param name="action">the action to be executed</param>
     public void Execute(ReversibleAction action, string key)
     {
-        activeAction[key]?.Stop();
-        Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, key, historyType.action, action, action.GetChangedObjects()));       //UndoStack.Push(action);
+        getActiveAction(key)?.Stop();
+        Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, key, historyType.action, action, null));       //UndoStack.Push(action);
         SetActiveAction(key, action);
         action.Awake();
         action.Start();
@@ -87,7 +87,22 @@ public class GlobalActionHistory
     /// </summary>
     public void Update() //FIXME: in der Action history wird das etwas anders gemacht
     {
-        activeAction.ForEach(y => { if (y.Value != null && y.Value.Update()) Execute(y.Value.NewInstance(), y.Key); });
+        activeAction.ForEach(y =>
+        {
+            if (y.Value != null && y.Value.Update())
+            {
+
+
+                if (y.Value.HadEffect())
+                {
+                    Tuple<DateTime, string, historyType, ReversibleAction, List<string>> found = Find(y.Key, historyType.action).Item1;
+                    DeleteItem(y.Key, found.Item1);
+                    found = new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, found.Item2, found.Item3, found.Item4, y.Value.GetChangedObjects());
+                    Push(found);
+                }
+                Execute(y.Value.NewInstance(), y.Key);
+            }
+        });
     }
 
 
@@ -242,10 +257,18 @@ public class GlobalActionHistory
     /// Returns the Active Action for the Player
     /// </summary>
     /// <param name="player">The Player that performs an Action</param>
-    /// <returns>The active action</returns>
+    /// <returns>The active action || null if key not in dictionary</returns>
     public ReversibleAction getActiveAction(string player)
     {
-        return activeAction[player];
+        try
+        {
+            return activeAction[player];
+        }
+        catch (KeyNotFoundException)
+        {
+            return null;
+        }
+
     }
 
 
@@ -256,13 +279,13 @@ public class GlobalActionHistory
     /// <param name="action">the new active action</param>
     private void SetActiveAction(string player, ReversibleAction action)
     {
-        if (activeAction[player] == null)
-        {
-            activeAction.Add(player, action);
-        }
-        else
+        try
         {
             activeAction[player] = action;
+        }
+        catch (KeyNotFoundException)
+        {
+            activeAction.Add(player, action);
         }
     }
 
