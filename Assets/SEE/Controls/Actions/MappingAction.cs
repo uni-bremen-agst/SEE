@@ -156,17 +156,19 @@ namespace SEE.Controls.Actions
 
         public void Awake()
         {
-            // TODO(torben): take from master. also below
+            // TODO(torben): fix!
+            return;
+
             //if (!Assertions.DisableOnCondition(this, Architecture == null, "No architecture city was specified for architectural mapping."))
-            //{
-            //    archGraph = SceneQueries.GetGraph(Architecture);
-            //    Assertions.DisableOnCondition(this, archGraph == null, "The architecture city has no associated graph.");
-            //}
+            {
+                archGraph = SceneQueries.GetGraph(Architecture);
+                //Assertions.DisableOnCondition(this, archGraph == null, "The architecture city has no associated graph.");
+            }
             //if (!Assertions.DisableOnCondition(this, Implementation == null, "No implementation city was specified for architectural mapping."))
-            //{
-            //    implGraph = SceneQueries.GetGraph(Implementation);
-            //    Assertions.DisableOnCondition(this, implGraph == null, "The implementation city has no associated graph.");
-            //}
+            {
+                implGraph = SceneQueries.GetGraph(Implementation);
+                //Assertions.DisableOnCondition(this, implGraph == null, "The implementation city has no associated graph.");
+            }
 
             if (string.IsNullOrEmpty(MappingFile))
             {
