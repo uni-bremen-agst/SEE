@@ -11,7 +11,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The history of actions.
         /// </summary>
-        private static ActionHistory history = new ActionHistory();
+        private static GlobalActionHistory history = new GlobalActionHistory(20);
 
         /// <summary>
         /// Executes the currently active action (if there is any).
@@ -27,10 +27,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         public static void Undo()
         {
-            if (history.UndoCount > 0)
-            {
-                history.Undo();
-            }
+           // if (history.UndoCount > 0)
+            //{
+                history.Undo("1"); //FIXME: USE THE PLAYERS IP FOR THAT
+            //}
         }
 
         /// <summary>
@@ -38,10 +38,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         public static void Redo()
         {
-            if (history.RedoCount > 0)
-            {
-                history.Redo();
-            }
+            //if (history.RedoCount > 0)
+           // {
+                history.Redo("1"); //FIXME: USE THE PLAYERS IP FOR THAT
+                                   // }
         }
 
         /// <summary>
@@ -50,14 +50,14 @@ namespace SEE.Controls.Actions
         /// <param name="actionType">kind of action to be executed</param>
         public static void Execute(ActionStateType actionType)
         {
-            history.Execute(actionType.CreateReversible());
+            history.Execute(actionType.CreateReversible(),"1"); //FIXME: USE THE PLAYERS IP FOR THAT
 
             // FIXME: This looks like a hack and should be removed later.
             // The PlayerActionHistory should not need to know anything about its actions.
-            if (actionType.Equals(ActionStateType.NewNode) || actionType.Equals(ActionStateType.EditNode))
-            {
-                NodeInteractionButtons.addOrEditNode = history.Current;
-            }
+            //if (actionType.Equals(ActionStateType.NewNode) || actionType.Equals(ActionStateType.EditNode))
+            //{
+           //     NodeInteractionButtons.addOrEditNode = history.Current;
+          //  }
         }
 
         /// <summary>
@@ -67,16 +67,16 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType"/> of the currently executed action or null</returns>
         public static ActionStateType Current()
         {
-            return history.Current?.GetActionStateType();
+            return history.getActiveAction("1")?.GetActionStateType(); //FIXME: USE THE PLAYERS IP FOR THAT
         }
 
         /// <summary>
         /// True if the action history is empty.
         /// </summary>
         /// <returns>true if the action history is empty</returns>
-        internal static bool IsEmpty()
+        internal static bool IsEmpty() //FIXME WITH CORTRECT RETURN
         {
-            return history.UndoCount == 0;
+            return false;//history.UndoCount == 0;
         }
     }
 }
