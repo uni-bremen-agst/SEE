@@ -182,7 +182,7 @@ namespace SEE.DataModel.DG
         public override string ID
         {
             get => id;
-            set => throw new NotImplementedException();
+            set => throw new InvalidOperationException(); // ID must not be changed
         }
 
         public static implicit operator bool(Edge edge)

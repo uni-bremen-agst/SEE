@@ -105,7 +105,7 @@ namespace SEE.Game.Charts
         /// </summary>
         protected virtual void GetSettingData()
         {
-            _dragDelay = ChartManager.Instance.dragDelay;
+            _dragDelay = ChartManager.Instance.DragDelay;
             _maximizedSprite = ChartManager.Instance.MaximizedSprite;
             _minimizedSprite = ChartManager.Instance.MinimizedSprite;
         }

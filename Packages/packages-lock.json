@@ -63,6 +63,31 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
+    "com.unity.postprocessing": {
+      "version": "2.2.2",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.render-pipelines.core": {
+      "version": "10.3.2",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.ugui": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.shadergraph": {
+      "version": "5.7.2",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.render-pipelines.core": "5.7.2"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.subsystemregistration": {
       "version": "1.0.6",
       "depth": 1,
@@ -143,6 +168,13 @@
         "com.unity.ugui": "1.0.0",
         "com.unity.xr.legacyinputhelpers": "2.1.4"
       }
+    },
+    "com.yasirkula.dynamicpanels": {
+      "version": "https://github.com/yasirkula/UnityDynamicPanels.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "054bac15c9fe9c464a202843146355ed2c0845e1"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",
