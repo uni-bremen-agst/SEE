@@ -211,8 +211,8 @@ namespace SEE.Controls.Actions
         {
             List<string> changedObjects = new List<string>();
 
-            changedObjects.Add(from.name);
-            changedObjects.Add(to.name);
+            changedObjects.Add(edgeMemento.from.name);
+            changedObjects.Add(edgeMemento.to.name);
             changedObjects.Add(createdEdge.name);
 
             return changedObjects;
