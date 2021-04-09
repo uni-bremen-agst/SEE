@@ -21,6 +21,12 @@ namespace SEE.Controls.Actions
 
         private List<List<GameObject>> hiddenObjects;
 
+        enum EdgeSelector
+        {
+            Incomming,
+            Outgoing
+        }
+
 
         /// <summary>
         /// Returns a new instance of <see cref="HideAction"/>.
@@ -58,6 +64,11 @@ namespace SEE.Controls.Actions
             InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
         }
 
+        private void Hide(GameObject g)
+        {
+            
+        }
+
         // Update is called once per frame
         public override bool Update()
         {
@@ -67,7 +78,7 @@ namespace SEE.Controls.Actions
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
                 if (selectedObject.CompareTag(Tags.Edge))
                 {
-                    //hiddenObjects.Add(selectedObject);
+                    hiddenObjects.Add(selectedObject);
                     selectedObject.SetActive(false);
                     selectedObject = null;
                 }
@@ -103,6 +114,64 @@ namespace SEE.Controls.Actions
 
         }
 
+
+
+        private Lbool HideOutgoingEdges(GameObject node)
+        {
+            List<GameObject> hiddenList = new List<GameObject>();
+            if (node.TryGetComponent(out NodeRef nodeRef))
+            {
+
+                HashSet<String> edgeIDs = new HashSet<string>();
+                foreach (Edge edge in nodeRef.Value.Outgoings)
+                {
+                    edgeIDs.Add(edge.ID);
+                }
+
+                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
+                {
+                            
+                    if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
+                    {
+                        hiddenList.Add(edge);
+                        GameObjectExtensions.SetVisibility(edge, false, true);
+                    }
+                }
+                selectedObject = null;
+                hiddenObjects.Add(hiddenList);
+                return true;
+                }
+            return false;   
+        }
+
+        private bool HideIncommingEdges(GameObject node)
+        {
+            List<GameObject> hiddenList = new List<GameObject>();
+            if (node.TryGetComponent(out NodeRef nodeRef))
+            {
+
+                HashSet<String> edgeIDs = new HashSet<string>();
+                foreach (Edge edge in nodeRef.Value.Incomings)
+                {
+                    edgeIDs.Add(edge.ID);
+                }
+
+                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
+                {
+                            
+                    if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
+                    {
+                        hiddenList.Add(edge);
+                        GameObjectExtensions.SetVisibility(edge, false, true);
+                    }
+                }
+                selectedObject = null;
+                hiddenObjects.Add(hiddenList);
+                return true;
+                }
+            return false;         
+        }
+
         public override void Undo()
         {
             Debug.Log("undo");
@@ -129,6 +198,8 @@ namespace SEE.Controls.Actions
             }
             hiddenObjects.Clear();
         }
+
+        
 
 
         /// <summary>
