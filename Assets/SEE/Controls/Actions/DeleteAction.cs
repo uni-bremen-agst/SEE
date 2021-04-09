@@ -9,7 +9,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls.Actions
 {
@@ -106,6 +105,8 @@ namespace SEE.Controls.Actions
         /// Avoids multiple calls of coroutine.
         /// </summary>
         private bool isRunning = false;
+
+        private bool added = false; 
 
         public override void Awake()
         {
@@ -210,7 +211,6 @@ namespace SEE.Controls.Actions
                 {
                     edgeGraphPair.Value.AddEdge(edgeReference.edge);
                     PlayerSettings.GetPlayerSettings().StartCoroutine(DelayEdges(edgeGraphPair.Key));
-
                 }
             }
             PlayerSettings.GetPlayerSettings().StartCoroutine(this.RemoveNodeFromGarbage(new List<GameObject>(DeletedNodes.Keys)));
@@ -270,11 +270,12 @@ namespace SEE.Controls.Actions
             foreach (GameObject deletedNode in deletedNodes)
             {
                 Vector3 shrinkFactor = VectorOperations.DivideVectors(deletedNode.transform.localScale, defaultGarbageVector);
+                Debug.Log(shrinkFactor);
                 if (!shrinkFactors.ContainsKey(deletedNode))
                 {
                     shrinkFactors.Add(deletedNode, shrinkFactor);
                 }
-                VectorOperations.VectorMultiplication(deletedNode, 1, shrinkFactor);
+               deletedNode.transform.localScale =  VectorOperations.VectorMultiplication(deletedNode.transform.localScale,shrinkFactor);
                 Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), TimeForAnimation);
             }
             yield return new WaitForSeconds(TimeToWait);
@@ -293,7 +294,7 @@ namespace SEE.Controls.Actions
             Vector3 shrinkFactor = shrinkFactors[deletedNode];
             float animationsCount = animations;
             float exponent = 1 / animations;
-            shrinkFactor = Util.ExponentOfVectorCoordinates(shrinkFactor, exponent);
+            shrinkFactor = VectorOperations.ExponentOfVectorCoordinates(shrinkFactor, exponent);
 
             while ((animationsCount) > 0 ) {
                deletedNode.transform.localScale = VectorOperations.DivideVectors(shrinkFactor, deletedNode.transform.localScale);
@@ -419,6 +420,7 @@ namespace SEE.Controls.Actions
                 Graph graph = edgeRef.edge.ItsGraph;
                 DeletedEdges[gameEdge] = graph;
                 graph.RemoveEdge(edgeRef.edge);
+                
             }
         }
 

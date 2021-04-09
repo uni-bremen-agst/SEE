@@ -406,14 +406,7 @@ namespace Valve.VR.InteractionSystem
 			return vClosestPoint;
 		}
 
-		public static Vector3 ExponentOfVectorCoordinates(Vector3 vector , float exponent)
-        {
-			vector.x = (float)Math.Pow(vector.x, exponent);
-			vector.y = (float)Math.Pow(vector.y, exponent);
-			vector.z = (float)Math.Pow(vector.z, exponent);
-			return vector;
-		}
-
+		
 		//-------------------------------------------------
 		public static void AfterTimer( GameObject go, float _time, System.Action callback, bool trigger_if_destroyed_early = false )
 		{

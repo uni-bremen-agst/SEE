@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace SEE.Utils
@@ -11,7 +12,7 @@ namespace SEE.Utils
         /// Calculates the ration between two given vectors.
         /// </summary>
         /// <param name="denominator">The vector by which the counter¥s coordinated are divided by</param>
-        /// <param name="counter"> The counter vector - which is divided by the denominatorﬂs coordinates</param>
+        /// <param name="counter"> The counter vector - which is divided by the denominator¥s coordinates</param>
         /// <returns> The result of the component-wise division between the counter and denominator. </returns>
         public static Vector3 DivideVectors(Vector3 denominator, Vector3 counter)
         {        
@@ -22,18 +23,27 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Multiplies two given vectors pairwise. 
-        /// The target scale is a result of an amount of iterations and the specific <paramref name="factor">
+        /// Exposes mathematically the coordinates of a given vector.
         /// </summary>
-        /// <param name="product">The object which shall be shrunk</param>
-        /// <param name="iterations">How often the product is multiplied with the given factor</param>
-        ///  <paramref name="factor"> the factor the localScale of the given objectToShrink is multiplied with</param>
-        public static void VectorMultiplication(GameObject product, float iterations, Vector3 factor)
+        /// <param name="vector">The given vector</param>
+        /// <param name="exponent"> The exponent</param>
+        /// <returns> The result vector of vector to the power of exponent</returns>
+        public static Vector3 ExponentOfVectorCoordinates(Vector3 vector, float exponent)
+        {
+            vector.x = (float)Math.Pow(vector.x, exponent);
+            vector.y = (float)Math.Pow(vector.y, exponent);
+            vector.z = (float)Math.Pow(vector.z, exponent);
+            return vector;
+        }
+
+        /// <summary>
+        /// Multiplies two given vectors component-wise. 
+        /// </summary>
+        /// <param name="product">The first vector, in that case a multiplicand </param>
+        ///  <paramref name="factor"> the second vector as a multiplicand</param>
+        public static Vector3 VectorMultiplication(Vector3 product, Vector3 factor)
         {    
-            while (iterations > 0 ) { 
-                product.transform.localScale = new Vector3(product.transform.localScale.x * factor.x,product.transform.localScale.y * factor.y, product.transform.localScale.z * factor.z);
-                iterations--;
-            }
+          return  new Vector3(product.x * factor.x,product.y * factor.y, product.z * factor.z);     
         }
     }
 }
