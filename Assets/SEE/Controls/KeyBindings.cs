@@ -171,7 +171,9 @@ namespace SEE.Controls
         /// While moving the city, snaps to one of eight predefined directions.
         /// While rotating the city, rotates in 45 degree steps.
         /// </summary>
-        internal static KeyCode Snap = Register(KeyCode.LeftControl, Scope.Browsing, "Snap move/rotate city.");
+        internal static KeyCode Snap = Register(KeyCode.LeftAlt, Scope.Browsing, "Snap move/rotate city.");
+
+        internal static KeyCode Drag = Register(KeyCode.LeftControl, Scope.Browsing, "Drag city element.");
         /// <summary>
         /// Toggles between the locked and free camera mode.
         /// </summary>

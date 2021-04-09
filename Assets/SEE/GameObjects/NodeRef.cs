@@ -64,5 +64,23 @@ namespace SEE.GO
             }
             return result;
         }
+
+        /// <summary>
+        /// Returns the IDs of all incoming and outgoing edges for this NodeRef.
+        /// </summary>
+        /// <returns>IDs of all incoming and outgoing edges</returns>
+        public ISet<string> GetEdgeIds()
+        {
+            HashSet<string> edgeIDs = new HashSet<string>();
+            foreach (Edge edge in Value.Outgoings)
+            {
+                edgeIDs.Add(edge.ID);
+            }
+            foreach (Edge edge in Value.Incomings)
+            {
+                edgeIDs.Add(edge.ID);
+            }
+            return edgeIDs;
+        }
     }
 }

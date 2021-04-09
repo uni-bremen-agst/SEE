@@ -107,7 +107,19 @@ namespace SEE.Controls.Actions
         /// <returns>new instance of <see cref="MappingAction"/></returns>
         internal static ReversibleAction CreateReversibleAction()
         {
-            return new MappingAction();
+            MappingAction result = new MappingAction();
+            SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
+            if (!result.Implementation)
+            {
+                Debug.LogWarning("Implementation city not set. Trying to find it...");
+                result.Implementation = SceneQueries.FindImplementation().gameObject;
+            }
+            if (!result.Architecture)
+            {
+                Debug.LogWarning("Architecture city not set. Trying to find it...");
+                result.Architecture = SceneQueries.FindArchitecture().gameObject;
+            }
+            return result;
         }
 
         /// <summary>
@@ -134,11 +146,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         public Reflexion Reflexion { get; private set; }
 
-        /// <summary>
-        /// Used for the visualization and decoration of reflexion edges.
-        /// </summary>
-        private ReflexionDecorator decorator;
-
         private readonly List<Tuple<uint, uint, LineRenderer>> activeHoverEdges = new List<Tuple<uint, uint, LineRenderer>>();
         private _MoveState moveState;
         private _ActionState actionState;
@@ -147,18 +154,19 @@ namespace SEE.Controls.Actions
         private readonly Dictionary<Edge, LineRenderer> edgeToFinalizedMappingEdges = new Dictionary<Edge, LineRenderer>();
         private readonly Dictionary<Edge, LineRenderer> edgeToStateEdges = new Dictionary<Edge, LineRenderer>();
 
-        private void Start()
+        public void Awake()
         {
-            if (!Assertions.DisableOnCondition(this, Architecture == null, "No architecture city was specified for architectural mapping."))
-            {
-                archGraph = SceneQueries.GetGraph(Architecture);
-                Assertions.DisableOnCondition(this, archGraph == null, "The architecture city has no associated graph.");
-            }
-            if (!Assertions.DisableOnCondition(this, Implementation == null, "No implementation city was specified for architectural mapping."))
-            {
-                implGraph = SceneQueries.GetGraph(Implementation);
-                Assertions.DisableOnCondition(this, implGraph == null, "The implementation city has no associated graph.");
-            }
+            // TODO(torben): take from master. also below
+            //if (!Assertions.DisableOnCondition(this, Architecture == null, "No architecture city was specified for architectural mapping."))
+            //{
+            //    archGraph = SceneQueries.GetGraph(Architecture);
+            //    Assertions.DisableOnCondition(this, archGraph == null, "The architecture city has no associated graph.");
+            //}
+            //if (!Assertions.DisableOnCondition(this, Implementation == null, "No implementation city was specified for architectural mapping."))
+            //{
+            //    implGraph = SceneQueries.GetGraph(Implementation);
+            //    Assertions.DisableOnCondition(this, implGraph == null, "The implementation city has no associated graph.");
+            //}
 
             if (string.IsNullOrEmpty(MappingFile))
             {
@@ -179,22 +187,18 @@ namespace SEE.Controls.Actions
                 }
             }
 
-            Assertions.DisableOnCondition(this, AbsencePrefab == null, "No material assigned for absences.");
-            Assertions.DisableOnCondition(this, ConvergencePrefab == null, "No material assigned for convergences.");
-            Assertions.DisableOnCondition(this, DivergencePrefab == null, "No material assigned for divergences.");
+            //Assertions.DisableOnCondition(this, AbsencePrefab == null, "No material assigned for absences.");
+            //Assertions.DisableOnCondition(this, ConvergencePrefab == null, "No material assigned for convergences.");
+            //Assertions.DisableOnCondition(this, DivergencePrefab == null, "No material assigned for divergences.");
 
-            if (!Assertions.DisableOnCondition(this, !Architecture.TryGetComponent(out SEECity city), "The object representing the architecture has no SEECity component attached to it."))
+            //if (!Assertions.DisableOnCondition(this, !Architecture.TryGetComponent(out SEECity city), "The object representing the architecture //has no SEECity component attached to it."))
+            //{
+            //    architectureGraphRenderer = city.Renderer;
+            //    Assertions.DisableOnCondition(this, architectureGraphRenderer == null, "The SEECity component attached to the object /representing /the architecture has no graph renderer.");
+            //}
+
+            //if (enabled)
             {
-                architectureGraphRenderer = city.Renderer;
-                Assertions.DisableOnCondition(this, architectureGraphRenderer == null, "The SEECity component attached to the object representing the architecture has no graph renderer.");
-            }
-
-            if (enabled)
-            {
-                // Setup reflexion decorator
-                Portal.GetDimensions(Architecture, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
-                decorator = new ReflexionDecorator(AbsencePrefab, ConvergencePrefab, DivergencePrefab, leftFrontCorner, rightBackCorner);
-
                 // Setup reflexion
                 Reflexion = new Reflexion(implGraph, archGraph, mapping);
                 Reflexion.Register(this);
@@ -202,8 +206,8 @@ namespace SEE.Controls.Actions
                 Reflexion.Run();
             }
 
-            ActionState.OnStateChanged += OnStateChanged;
-            if (!Assertions.DisableOnCondition(this, !Equals(ActionState.Value, ActionStateType.Map)))
+            //ActionState.OnStateChanged += OnStateChanged;
+            //if (!Assertions.DisableOnCondition(this, !Equals(ActionState.Value, ActionStateType.Map)))
             {
                 InteractableObject.AnyHoverIn += TryCreateOnHoverEdgesTo;
                 InteractableObject.AnyHoverOut += TryDestroyOnHoverEdgesTo;
@@ -214,7 +218,7 @@ namespace SEE.Controls.Actions
             moveState.additionalDraggedObjs = new List<_MoveState.AdditionalDraggedObject>();
         }
 
-        private void Update()
+        public bool Update()
         {
             Assert.IsTrue(ActionState.Is(ActionStateType.Map));
 
@@ -227,6 +231,8 @@ namespace SEE.Controls.Actions
             actionState.startShowDiff |= Input.GetKeyDown(KeyCode.M);
             actionState.showDiff = Input.GetKey(KeyCode.M);
             actionState.stopShowDiff |= Input.GetKeyUp(KeyCode.M);
+
+            return true;
         }
 
         private void FixedUpdate()
@@ -350,10 +356,10 @@ namespace SEE.Controls.Actions
                 //    moveState.moveVelocity = Vector3.zero; // TODO(torben): do we want to apply velocity to individually moved buildings or keep it like this?
                 //}
 
-                Destroy(moveState.mainDraggedObj);
+                UnityEngine.Object.Destroy(moveState.mainDraggedObj);
                 foreach (_MoveState.AdditionalDraggedObject o in moveState.additionalDraggedObjs)
                 {
-                    Destroy(o.go);
+                    UnityEngine.Object.Destroy(o.go);
                 }
 
                 moveState.mainDraggedObj = null;
@@ -382,8 +388,6 @@ namespace SEE.Controls.Actions
 
             #endregion
 
-            #region ColorEdges
-
             if (actionState.startShowDiff)
             {
                 if (!actionState.stopShowDiff)
@@ -400,6 +404,9 @@ namespace SEE.Controls.Actions
                         r.enabled = true;
                     }
                 }
+            }
+        }
+
         /// <summary>
         /// See <see cref="ReversibleAction.Start"/>.
         /// </summary>
@@ -430,50 +437,6 @@ namespace SEE.Controls.Actions
         public void Redo()
         {
             Debug.Log("REDO MAPPING");
-        }
-
-        private void OnStateChanged(ActionStateType value)
-        {
-            if (Equals(value, ActionStateType.Map))
-            {
-                InteractableObject.AnySelectIn += AnySelectIn;
-                InteractableObject.AnySelectOut += AnySelectOut;
->>>>>>> master
-            }
-            else if (actionState.stopShowDiff)
-            {
-                foreach (Edge edge in archGraph.Edges())
-                {
-                    if (EdgeRef.TryGet(edge, out EdgeRef edgeRef))
-                    {
-                        edgeRef.GetComponent<LineRenderer>().enabled = true;
-                    }
-                }
-                foreach (LineRenderer r in edgeToStateEdges.Values)
-                {
-                    r.enabled = false;
-                }
-            }
-
-            #endregion
-
-            #region ResetActionState
-
-            actionState.startDrag = false;
-            actionState.cancel = false;
-            actionState.startShowDiff = false;
-            actionState.stopShowDiff = false;
-
-            #endregion
-
-            #region Synchronize
-
-            if (synchronize)
-            {
-                // TODO(torben): synchronize new edges. also sync edge color animations
-            }
-
-            #endregion
         }
 
         /// <summary>
@@ -693,7 +656,7 @@ namespace SEE.Controls.Actions
         {
             Tuple<uint, uint, LineRenderer> _RegenerateTuple(Tuple<uint, uint, LineRenderer> tuple)
             {
-                Destroy(tuple.Item3.gameObject);
+                UnityEngine.Object.Destroy(tuple.Item3.gameObject);
                 Node from = InteractableObject.Get(tuple.Item1).GetNode();
                 Node to = InteractableObject.Get(tuple.Item2).GetNode();
                 LineRenderer lineRenderer = CreateFinalizedHoverEdge(from.ID, to.ID);
@@ -767,7 +730,7 @@ namespace SEE.Controls.Actions
                     if (o.TryGetNodeRef(out NodeRef nodeRef) && _EdgeConnectsObjOrChild(edge, nodeRef))
                     {
                         // TODO(torben): animation might be active
-                        Destroy(lineRenderer.gameObject);
+                        UnityEngine.Object.Destroy(lineRenderer.gameObject);
                         changes.Add(new Tuple<Edge, LineRenderer>(edge, CreateFinalizedHoverEdge(edge.Source.ID, edge.Target.ID)));
                         break;
                     }
@@ -782,36 +745,6 @@ namespace SEE.Controls.Actions
         //----------------------------------------------------------------
         // Events
         //----------------------------------------------------------------
-
-        private void OnStateChanged(ActionStateType value)
-        {
-            if (Equals(value, ActionStateType.Map))
-            {
-                Assert.IsTrue(activeHoverEdges.Count == 0);
-
-                TryCreateOnHoverEdgesTo(InteractableObject.HoveredObject, true);
-
-                InteractableObject.AnyHoverIn += TryCreateOnHoverEdgesTo;
-                InteractableObject.AnyHoverOut += TryDestroyOnHoverEdgesTo;
-                InteractableObject.AnySelectIn += TryCreateHoverEdgeFrom;
-                InteractableObject.AnySelectOut += TryDestroyHoverEdgeFrom;
-                enabled = true;
-            }
-            else
-            {
-                foreach (Tuple<uint, uint, LineRenderer> tuple in activeHoverEdges)
-                {
-                    Destroy(tuple.Item3.gameObject);
-                }
-                activeHoverEdges.Clear();
-
-                InteractableObject.AnyHoverIn -= TryCreateOnHoverEdgesTo;
-                InteractableObject.AnyHoverOut -= TryDestroyOnHoverEdgesTo;
-                InteractableObject.AnySelectIn -= TryCreateHoverEdgeFrom;
-                InteractableObject.AnySelectOut -= TryDestroyHoverEdgeFrom;
-                enabled = false;
-            }
-        }
 
         private void TryCreateOnHoverEdgesTo(InteractableObject toObj, bool isOwner)
         {
@@ -838,7 +771,7 @@ namespace SEE.Controls.Actions
                 Tuple<uint, uint, LineRenderer> tuple = activeHoverEdges[i];
                 if (tuple.Item2 == toObj.ID)
                 {
-                    Destroy(tuple.Item3.gameObject);
+                    UnityEngine.Object.Destroy(tuple.Item3.gameObject);
                     activeHoverEdges.RemoveAt(i);
                 }
             }
@@ -864,7 +797,7 @@ namespace SEE.Controls.Actions
                     Tuple<uint, uint, LineRenderer> tuple = activeHoverEdges[i];
                     if (tuple.Item1 == fromObj.ID)
                     {
-                        Destroy(tuple.Item3.gameObject);
+                        UnityEngine.Object.Destroy(tuple.Item3.gameObject);
                         activeHoverEdges.RemoveAt(i);
                         break; // Note: There can only ever be ONE edge coming from a given object.
                     }
@@ -1069,7 +1002,7 @@ namespace SEE.Controls.Actions
             Edge edge = mapsToEdgeRemoved.mapsToEdge;
             LineRenderer r = edgeToFinalizedMappingEdges[edge];
             edgeToFinalizedMappingEdges.Remove(edge);
-            Destroy(r.gameObject);
+            UnityEngine.Object.Destroy(r.gameObject);
         }
 
         /// <summary>
