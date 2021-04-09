@@ -93,12 +93,24 @@ public class GlobalActionHistory
     /// </summary>
     public void Update() //FIXME: in der Action history wird das etwas anders gemacht
     {
-        activeAction.ForEach(y =>
+        for(int i = 0; i < activeAction.Count; i++)
+        {
+            if (activeAction.ElementAt(i).Value != null && activeAction.ElementAt(i).Value.Update())
+            {
+                if (activeAction.ElementAt(i).Value.HadEffect())
+                {
+                    Tuple<DateTime, string, historyType, ReversibleAction, List<string>> found = Find(activeAction.ElementAt(i).Key, historyType.action).Item1;
+                    DeleteItem(activeAction.ElementAt(i).Key, found.Item1);
+                    found = new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, found.Item2, found.Item3, found.Item4, activeAction.ElementAt(i).Value.GetChangedObjects());
+                    Push(found);
+                }
+                Execute(activeAction.ElementAt(i).Value.NewInstance(), activeAction.ElementAt(i).Key);
+            }
+        }
+      /*  activeAction.ForEach(y =>
         {
             if (y.Value != null && y.Value.Update())
             {
-
-
                 if (y.Value.HadEffect())
                 {
                     Tuple<DateTime, string, historyType, ReversibleAction, List<string>> found = Find(y.Key, historyType.action).Item1;
@@ -108,7 +120,7 @@ public class GlobalActionHistory
                 }
                 Execute(y.Value.NewInstance(), y.Key);
             }
-        });
+        }); */
     }
 
 
