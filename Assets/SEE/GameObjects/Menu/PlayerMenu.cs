@@ -127,6 +127,8 @@ namespace SEE.GO.Menu
         /// </summary>
         private void Update()
         {
+            Debug.Log(Input.GetKeyDown(KeyBindings.Undo));
+            Debug.Log("Test2");
             // Select action state via numbers on the keyboard
             for (int i = 0; i < ModeMenu.Entries.Count; i++)
             {
@@ -149,6 +151,7 @@ namespace SEE.GO.Menu
             if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
 #endif
             {
+                Debug.Log(Input.GetKeyDown(KeyBindings.Undo));
                 if (Input.GetKeyDown(KeyBindings.Undo))
                 {
                     PlayerActionHistory.Undo();
