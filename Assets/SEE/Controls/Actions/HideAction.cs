@@ -64,11 +64,6 @@ namespace SEE.Controls.Actions
             InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
         }
 
-        private void Hide(GameObject g)
-        {
-            
-        }
-
         // Update is called once per frame
         public override bool Update()
         {
@@ -78,7 +73,7 @@ namespace SEE.Controls.Actions
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
                 if (selectedObject.CompareTag(Tags.Edge))
                 {
-                    hiddenObjects.Add(selectedObject);
+                    //hiddenObjects.Add(selectedObject);
                     selectedObject.SetActive(false);
                     selectedObject = null;
                 }
@@ -116,7 +111,7 @@ namespace SEE.Controls.Actions
 
 
 
-        private Lbool HideOutgoingEdges(GameObject node)
+        private bool HideOutgoingEdges(GameObject node)
         {
             List<GameObject> hiddenList = new List<GameObject>();
             if (node.TryGetComponent(out NodeRef nodeRef))
