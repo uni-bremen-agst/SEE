@@ -155,10 +155,11 @@ namespace SEE.Controls.Actions
                 // feel responsive!
                 actionState.drag = Input.GetMouseButton(2);
                 actionState.startDrag |= !isMouseOverGUI && Input.GetMouseButtonDown(2);
-                actionState.dragHoveredOnly = Input.GetKey(KeyCode.LeftControl);
-                actionState.cancel |= Input.GetKeyDown(KeyCode.Escape);
+                actionState.dragHoveredOnly = Input.GetKey(KeyBindings.Snap);
+                actionState.cancel |= Input.GetKeyDown(KeyBindings.Cancel);
                 actionState.snap = Input.GetKey(KeyCode.LeftAlt);
-                actionState.reset |= (actionState.drag || !isMouseOverGUI) && Input.GetKeyDown(KeyCode.R);
+                actionState.reset |= (actionState.drag || !isMouseOverGUI) && Input.GetKeyDown(KeyBindings.Reset);
+                actionState.mousePosition = Input.mousePosition;
 
                 // FIXME: The selection of graph elements below will executed only if the 
                 // ray hits the clipping area. If the player looks at the city from aside,
@@ -332,7 +333,7 @@ namespace SEE.Controls.Actions
 
             #endregion
 
-            #region Rotate
+            #region Rotate Action
 
             else if (Equals(ActionState.Value, ActionStateType.Rotate))
             {

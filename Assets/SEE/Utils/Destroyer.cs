@@ -75,25 +75,6 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Returns the IDs of all incoming and outgoing edges for <paramref name="nodeRef"/>.
-        /// </summary>
-        /// <param name="nodeRef">node whose incoming and outgoing edges are requested</param>
-        /// <returns>IDs of all incoming and outgoing edges</returns>
-        private static HashSet<string> GetEdgeIds(NodeRef nodeRef)
-        {
-            HashSet<String> edgeIDs = new HashSet<string>();
-            foreach (Edge edge in nodeRef.Value.Outgoings)
-            {
-                edgeIDs.Add(edge.ID);
-            }
-            foreach (Edge edge in nodeRef.Value.Incomings)
-            {
-                edgeIDs.Add(edge.ID);
-            }
-            return edgeIDs;
-        }
-
-        /// <summary>
         /// Searches through all children of given <paramref name="gameObject"/>
         /// and deletes all edges attached to given childs.
         /// 
@@ -107,7 +88,7 @@ namespace SEE.Utils
         {
             if (gameObject.TryGetComponent(out NodeRef nodeRef))
             {
-                HashSet<String> edgeIDs = GetEdgeIds(nodeRef);
+                ISet<String> edgeIDs = nodeRef.GetEdgeIds();
 
                 foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
                 {

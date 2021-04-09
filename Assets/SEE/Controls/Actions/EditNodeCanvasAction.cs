@@ -46,6 +46,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         private const string prefabPath = "Prefabs/EditNodeCanvas";
 
+        /// <summary>
+        /// The editNodeAction instance where the progress state has to be set.
+        /// </summary>
+        public EditNodeAction editNodeAction;
+
         void Start()
         {
             InstantiatePrefab(prefabPath);
@@ -77,9 +82,7 @@ namespace SEE.Controls.Actions
                 CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
                 generator.DestroyEditNodeCanvasAction();
                 new EditNodeNetAction(nodeToEdit.SourceName, nodeToEdit.Type, gameObjectID).Execute(null);
-                GameObject player = PlayerSettings.LocalPlayer;
-                EditNodeAction current = player.GetComponent<EditNodeAction>();
-                current.EditProgress = EditNodeAction.ProgressState.NoNodeSelected;
+                editNodeAction.EditProgress = EditNodeAction.ProgressState.NoNodeSelected;
                 InteractableObject.UnselectAll(true);
                 editNode = false;
             }

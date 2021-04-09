@@ -19,7 +19,7 @@ namespace SEE.Controls.Actions
     /// This action assumes that it is attached to a game object representing
     /// the reflexion analysis during the game. 
     /// </summary>
-    public class MappingAction : CityAction, Observer
+    public class MappingAction : Observer, ReversibleAction
     {
         /// <summary>
         /// Which kind of city we are currently focusing on.
@@ -100,6 +100,24 @@ namespace SEE.Controls.Actions
         /// The graph containing the mapping from implementation onto architecture entities.
         /// </summary>
         private Graph mapping;
+
+        /// <summary>
+        /// Returns a new instance of <see cref="MappingAction"/>.
+        /// </summary>
+        /// <returns>new instance of <see cref="MappingAction"/></returns>
+        internal static ReversibleAction CreateReversibleAction()
+        {
+            return new MappingAction();
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="MappingAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
+        }
 
         /// <summary>
         /// The graph containing the architecture.
@@ -382,6 +400,45 @@ namespace SEE.Controls.Actions
                         r.enabled = true;
                     }
                 }
+        /// <summary>
+        /// See <see cref="ReversibleAction.Start"/>.
+        /// </summary>
+        public void Start()
+        {
+            // Intentionally left blank.
+        }
+
+        /// <summary>
+        /// See <see cref="ReversibleAction.Stop"/>.
+        /// </summary>
+        public void Stop()
+        {
+            // Intentionally left blank.
+        }
+
+        /// <summary>
+        /// See <see cref="ReversibleAction.Undo"/>.
+        /// </summary>
+        public void Undo()
+        {
+            Debug.Log("UNDO MAPPING");
+        }
+
+        /// <summary>
+        /// See <see cref="ReversibleAction.Redo"/>.
+        /// </summary>
+        public void Redo()
+        {
+            Debug.Log("REDO MAPPING");
+        }
+
+        private void OnStateChanged(ActionStateType value)
+        {
+            if (Equals(value, ActionStateType.Map))
+            {
+                InteractableObject.AnySelectIn += AnySelectIn;
+                InteractableObject.AnySelectOut += AnySelectOut;
+>>>>>>> master
             }
             else if (actionState.stopShowDiff)
             {
@@ -819,6 +876,7 @@ namespace SEE.Controls.Actions
         /// Called by incremental reflexion for every change in the reflexion model
         /// by way of the observer protocol as a callback. Dispatches the event to
         /// the appropriate handling function.
+        /// 
         /// </summary>
         /// <param name="changeEvent">additional information about the change in the reflexion model</param>
         public void Update(ChangeEvent changeEvent)
@@ -844,6 +902,15 @@ namespace SEE.Controls.Actions
                     Debug.LogErrorFormat("UNHANDLED CALLBACK: {0}\n", changeEvent);
                     break;
             }
+        }
+
+        /// <summary>
+        /// <see cref="ReversibleAction.HadEffect"/>
+        /// </summary>
+        /// <returns>true if this action has had already some effect that would need to be undone</returns>
+        public bool HadEffect()
+        {
+            return false; // FIXME
         }
 
         /// <summary>
@@ -1003,6 +1070,15 @@ namespace SEE.Controls.Actions
             LineRenderer r = edgeToFinalizedMappingEdges[edge];
             edgeToFinalizedMappingEdges.Remove(edge);
             Destroy(r.gameObject);
+        }
+
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this action.
+        /// </summary>
+        /// <returns>the <see cref="ActionStateType"/> of this action</returns>
+        public ActionStateType GetActionStateType()
+        {
+            return ActionStateType.Map;
         }
     }
 }

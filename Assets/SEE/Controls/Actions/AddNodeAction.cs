@@ -15,21 +15,6 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class AddNodeAction : AbstractPlayerAction
     {
-        /// <summary>
-        /// Start() will register an anonymous delegate of type 
-        /// <see cref="ActionState.OnStateChangedFn"/> on the event
-        /// <see cref="ActionState.OnStateChanged"/> to be called upon every
-        /// change of the action state, where the newly entered state will
-        /// be passed as a parameter. The anonymous delegate will compare whether
-        /// this state equals <see cref="ThisActionState"/> and if so, execute
-        /// what needs to be done for this action here. If that parameter is
-        /// different from <see cref="ThisActionState"/>, this action will
-        /// put itself to sleep. 
-        /// Thus, this action will be executed only if the new state is 
-        /// <see cref="ThisActionState"/>.
-        /// </summary>
-        private readonly ActionStateType ThisActionState = ActionStateType.NewNode;
-
         private SEECity city;
         /// <summary>
         /// The Code City in which the node should be placed.
@@ -154,67 +139,47 @@ namespace SEE.Controls.Actions
         /// </summary>
         public ProgressState Progress { get; set; } = ProgressState.NoCitySelected;
 
-        public void Start()
+        public override void Start()
         {
             listOfRoots = new List<GameObject>();
             if (!InitializeCanvasObject())
             {
                 Debug.LogError($"No canvas object named {nameOfCanvasObject} could be found in the scene.\n");
-                enabled = false;
                 return;
             }
-            // An anonymous delegate is registered for the event <see cref="ActionState.OnStateChanged"/>.
-            // This delegate will be called from <see cref="ActionState"/> upon every
-            // state changed where the passed parameter is the newly entered state.
-            ActionState.OnStateChanged += newState =>
-            {
-                // Is this our action state where we need to do something?
-                if (Equals(newState, ThisActionState))
-                {
-                    // The MonoBehaviour is enabled and Update() will be called by Unity.
-                    if (!Network)
-                    {
-                        enabled = true;
-                    }
-                    InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
-                    InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
-                    if (!instantiated)
-                    {
-                        instantiated = true;
-                    }
-                }
-                else
-                {
-                    if (!Network)
-                    {
-                        // The monobehaviour is diabled and Update() no longer be called by Unity.
-                        enabled = false;
-                    }
-                    if (canvasObject.TryGetComponent(out CanvasGenerator canvasGenerator))
-                    {
-                        canvasGenerator.DestroyAddNodeCanvasAction();
-                    }
-                    Undye();
-                    instantiated = false;
-                    InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
-                    InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
-                    hoveredObject = null;
-                }
-            };
-            enabled = ActionState.Is(ThisActionState);
+
+            InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
+            InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
         }
 
         /// <summary>
-        /// The update-method interacts in dependency of the progress-state. (sequencial series)
+        /// Operations to do when the action is finished, more specifically, if another action 
+        /// is started. Destroys the canvas object if it exists and undyes the chosen city.
+        /// </summary>
+        public override void Stop()
+        {
+            if (canvasObject.TryGetComponent(out CanvasGenerator canvasGenerator))
+            {
+                canvasGenerator.DestroyAddNodeCanvasAction();
+            }
+            Undye();
+        }
+
+        /// <summary>
+        /// The Update method interacts in dependency of the progress state (sequential series).
         /// NoCitySelected: Searching for a selected city, where a node can be added
         /// CityIsSelected: Opens a canvas-object where values for the node can be added
         /// WaitingForValues: This State is active while the canvas is open, but the button "AddNode" on it is not pushed
         /// CanvasIsClosed: Closes the canvas-object after extracting the values for the creation of a node. This state is reached by pushing the "AddNode"-Button
         /// ValuesAreGiven: Moves the node and waits for a mouseInput to place the node, if its inside of the previous chosen city
         /// AddingIsCanceled: Removes all attributes and states and resets the progress-state to noCitySelected
+        /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
-        public void Update()
+        /// <returns>true if completed</returns> 
+        public override bool Update()
         {
+            bool result = false;
+
             // Removes the canvasObject and extracts the inserted values from it for the new node to be created in next state.
             void RemoveCanvas()
             {
@@ -262,6 +227,8 @@ namespace SEE.Controls.Actions
                         if (Input.GetMouseButtonDown(0))
                         {
                             Place();
+                            // the new node has reached its final destination; we are done
+                            result = true;
                         }
                     }
                     break;
@@ -270,12 +237,12 @@ namespace SEE.Controls.Actions
                     RemoveCanvas();
                     city = null;
                     Progress = ProgressState.NoCitySelected;
-                    instantiated = false;
                     break;
 
                 default:
                     throw new NotImplementedException("Unhandled case.");
             }
+            return result;
         }
 
         /// <summary>
@@ -326,8 +293,8 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Opens a dialog-canvas where the user can insert some node-metrics. Therefore, a CanvasGenerator-script-component 
-        /// will be added to this gameObject which contains the canvas as a gameObject-instance of a prefab.
+        /// Opens a dialog canvas where the user can insert some node metrics. Therefore, a CanvasGenerator-script component 
+        /// will be added to this gameObject which contains the canvas as a gameObject instance of a prefab.
         /// </summary>
         public void OpenDialog()
         {
@@ -335,7 +302,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Undyes the current color of the object, i.e., changes the color of to its original color.
+        /// Undyes the current color of the object, i.e., changes its color to its original color.
         /// </summary>
         public void Undye()
         {
@@ -394,7 +361,7 @@ namespace SEE.Controls.Actions
         /// It is important to set the id, city and isInnerNode first.
         /// </summary>
         public void NewNode()
-        {            
+        {
             Node node = new Node
             {
                 ID = NodeID,
@@ -402,13 +369,13 @@ namespace SEE.Controls.Actions
                 Type = Graph.UnknownType
             };
             AddNode(node);
-            
+
             if (IsInnerNode)
             {
                 GONode = city.Renderer.NewInnerNode(node);
                 GONode.transform.localScale = medianOfInnerNodes;
                 GONode.gameObject.GetComponent<Renderer>().material.color = innerNodeColor;
-            } 
+            }
             else
             {
                 GONode = city.Renderer.NewLeafNode(node);
@@ -456,7 +423,7 @@ namespace SEE.Controls.Actions
                 else
                 {
                     new AddNodeNetAction(rndObjectInCity.name, IsInnerNode, NodeID, GONode.transform.position, GONode.transform.lossyScale, "", true, false, true).Execute();
-                    Destroy(GONode);
+                    Destroyer.DestroyGameObject(GONode);
                 }
                 Progress = ProgressState.NoCitySelected;
                 GONode = null;
@@ -589,6 +556,49 @@ namespace SEE.Controls.Actions
             GameNodeMover.NetworkFinalizeNodePosition(GONode, parentID, position);
             GONode.gameObject.GetComponent<Collider>().enabled = true;
             GONode = null;
+        }
+
+        /// <summary>
+        /// Undoes this AddNodeAction.
+        /// </summary>
+        public override void Undo()
+        {
+            Debug.Log("Undo AddNode");
+        }
+
+        /// <summary>
+        /// Redoes this AddNodeAction.
+        /// </summary>
+        public override void Redo()
+        {
+            Debug.Log("Redo AddNode");
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="AddNodeAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public static ReversibleAction CreateReversibleAction()
+        {
+            return new AddNodeAction();
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="AddNodeAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
+        }
+
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this action.
+        /// </summary>
+        /// <returns><see cref="ActionStateType.NewNode"/></returns>
+        public override ActionStateType GetActionStateType()
+        {
+            return ActionStateType.NewNode;
         }
     }
 }
