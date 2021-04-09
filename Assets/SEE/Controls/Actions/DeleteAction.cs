@@ -391,5 +391,10 @@ namespace SEE.Controls.Actions
         {
             return ActionStateType.Delete;
         }
+
+        public override List<string> GetChangedObjects()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

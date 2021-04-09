@@ -1,4 +1,5 @@
 ﻿using SEE.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -184,5 +185,11 @@ namespace SEE.Controls.Actions
         {
             return hadAnEffect;
         }
+
+        /// <summary>
+        /// Returns the id´s of all gameObjects manipulated by the specific action.
+        /// </summary>
+        /// <returns>All id´s of manipulated gameObjects</returns>
+        public abstract List<string> GetChangedObjects();
     }
 }

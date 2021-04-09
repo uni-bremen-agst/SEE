@@ -1,4 +1,5 @@
 ﻿using SEE.Utils;
+using System.Collections.Generic;
 
 namespace SEE.Controls.Actions
 {
@@ -26,6 +27,11 @@ namespace SEE.Controls.Actions
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.Rotate;
+        }
+
+        public override List<string> GetChangedObjects()
+        {
+            throw new System.NotImplementedException();
         }
 
         /// <summary>

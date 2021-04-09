@@ -1,6 +1,7 @@
 ﻿using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -581,6 +582,11 @@ namespace SEE.Controls.Actions
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.ScaleNode;
+        }
+
+        public override List<string> GetChangedObjects()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using SEE.GO;
 using SEE.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -133,6 +134,11 @@ namespace SEE.Controls.Actions
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.EditNode;
+        }
+
+        public override List<string> GetChangedObjects()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

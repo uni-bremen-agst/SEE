@@ -839,5 +839,10 @@ namespace SEE.Controls.Actions
         {
             return ActionStateType.Map;
         }
+
+        public List<string> GetChangedObjects()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

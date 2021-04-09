@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using SEE.Game;
 using SEE.GO;
 using SEE.Net;
@@ -204,6 +205,17 @@ namespace SEE.Controls.Actions
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.NewEdge;
+        }
+
+        public override List<string> GetChangedObjects()
+        {
+            List<string> changedObjects = new List<string>();
+
+            changedObjects.Add(from.name);
+            changedObjects.Add(to.name);
+            changedObjects.Add(createdEdge.name);
+
+            return changedObjects;
         }
     }
 }
