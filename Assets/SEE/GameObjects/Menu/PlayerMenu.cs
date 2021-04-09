@@ -151,7 +151,6 @@ namespace SEE.GO.Menu
             {
                 if (Input.GetKeyDown(KeyBindings.Undo))
                 {
-                    Debug.Log("UNDO PLAYER");
                     PlayerActionHistory.Undo();
                     if (!PlayerActionHistory.IsEmpty())
                     {
@@ -176,7 +175,6 @@ namespace SEE.GO.Menu
                     Indicator.ChangeActionState(currentAction);
                 }
             }
-            Debug.Log("Update");
             PlayerActionHistory.Update();
         }
 
