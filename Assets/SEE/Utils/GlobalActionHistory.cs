@@ -9,27 +9,16 @@ public class GlobalActionHistory
     /// <summary>
     /// An enum which sets the type of an Action in the History
     /// </summary>
-    public enum historyType
+    public enum HistoryType
     {
         action,
         undo,
     };
 
     /// <summary>
-    /// the start of the ringbuffer
-    /// </summary>
-    private int head = 0;
-
-    /// <summary>
-    /// The end of the Ringbuffer
-    /// </summary>
-    private int tail = 0;
-
-    /// <summary>
     /// The size of the ActionList
     /// </summary>
-    private int size = 0;
-
+    private readonly int size = 100;
 
     /// <summary>
     /// Numbers of elements in the Buffer
@@ -37,31 +26,20 @@ public class GlobalActionHistory
     private int count = 0;
 
     /// <summary>
-    /// indicates wether the tail should move or not
+    /// 
     /// </summary>
-    private bool full = false;
-
-
     private bool isRedo = false;
+
     /// <summary>
     /// The actionList it has an Tupel of the time as it was performed, Player ID, The type of the Action (Undo Redo Action), the ReversibleAction, and the list with the ids of the GameObjects
     /// A ringbuffer
     /// </summary>
-    private Tuple<DateTime, string, historyType, ReversibleAction, List<string>>[] actionList; //FIXME: GameObject ID muss eine LISTE sein
+    private List<Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>>> actionList; //FIXME: GameObject ID muss eine LISTE sein
 
     /// <summary>
     /// Contains the Active Action from each Player needs to be updated with each undo/redo/action
     /// </summary>
-    private Dictionary<String, ReversibleAction> activeAction = new Dictionary<string, ReversibleAction>();
-    /// <summary>
-    /// Constructs a new Global Action History and sets the Size of the Shared ActionList
-    /// </summary>
-    /// <param name="bufferSize">The Size of the shared ActionList Standard is 100</param>
-    public GlobalActionHistory(int bufferSize = 100)
-    {
-        actionList = new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>[bufferSize];
-        this.size = bufferSize;
-    }
+    private Dictionary<string, ReversibleAction> activeAction = new Dictionary<string, ReversibleAction>();
 
     /// <summary>
     /// Let C be the currently executed action (if there is any) in this action history. 
@@ -79,8 +57,8 @@ public class GlobalActionHistory
     /// <param name="action">the action to be executed</param>
     public void Execute(ReversibleAction action, string key)
     {
-        getActiveAction(key)?.Stop();
-        Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, key, historyType.action, action, null));       //UndoStack.Push(action);
+        GetActiveAction(key)?.Stop();
+        Push(new Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>>(DateTime.Now, key, HistoryType.action, action, null));       //UndoStack.Push(action);
         SetActiveAction(key, action);
         action.Awake();
         action.Start();
@@ -99,28 +77,14 @@ public class GlobalActionHistory
             {
                 if (activeAction.ElementAt(i).Value.HadEffect())
                 {
-                    Tuple<DateTime, string, historyType, ReversibleAction, List<string>> found = Find(activeAction.ElementAt(i).Key, historyType.action).Item1;
+                    Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>> found = Find(activeAction.ElementAt(i).Key, HistoryType.action).Item1;
                     DeleteItem(activeAction.ElementAt(i).Key, found.Item1);
-                    found = new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, found.Item2, found.Item3, found.Item4, activeAction.ElementAt(i).Value.GetChangedObjects());
+                    found = new Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>>(DateTime.Now, found.Item2, found.Item3, found.Item4, activeAction.ElementAt(i).Value.GetChangedObjects());
                     Push(found);
                 }
                 Execute(activeAction.ElementAt(i).Value.NewInstance(), activeAction.ElementAt(i).Key);
             }
         }
-      /*  activeAction.ForEach(y =>
-        {
-            if (y.Value != null && y.Value.Update())
-            {
-                if (y.Value.HadEffect())
-                {
-                    Tuple<DateTime, string, historyType, ReversibleAction, List<string>> found = Find(y.Key, historyType.action).Item1;
-                    DeleteItem(y.Key, found.Item1);
-                    found = new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, found.Item2, found.Item3, found.Item4, y.Value.GetChangedObjects());
-                    Push(found);
-                }
-                Execute(y.Value.NewInstance(), y.Key);
-            }
-        }); */
     }
 
 
@@ -128,18 +92,11 @@ public class GlobalActionHistory
     /// Appends data to the Ringbuffer
     /// </summary>
     /// <param name="data"></param>
-    private void Push(Tuple<DateTime, string, historyType, ReversibleAction, List<string>> data)
+    private void Push(Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>> data)
     {
-        actionList[head] = data;
+        actionList.Add(data);
         count++;
-        if (head < size - 1) head++;
-        else
-        {
-            head = 0;
-            full = true;
-        }
-        if (full && tail < size - 1) tail++;
-        else tail = 0;
+        // Fixme: Max size..?
     }
 
     /// <summary>
@@ -148,19 +105,19 @@ public class GlobalActionHistory
     /// <param name="playerID">The player that wants to perform an undo/redo</param>
     /// <param name="type">the type of action he wants to perform</param>
     /// <returns>A tuple of the latest users action and if any later done action blocks the undo (True if some action is blocking || false if not)</returns>  // Returns as second in the tuple that so each action could check it on its own >> List<ReversibleAction>>
-    private Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>, bool> Find(string playerID, historyType type)
+    private Tuple<Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>>, bool> Find(string playerID, HistoryType type)
     {
         int i = head - 1;
 
         //A list to persit all changes on the same GameObject
         //List<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>> results = new List<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>>();
         //List<ReversibleAction> results = new List<ReversibleAction>(); //Only Needed if you want to give all newer actions to the caller 
-        Tuple<DateTime, string, historyType, ReversibleAction, List<string>> result = null;
+        Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>> result = null;
         while (true)//FIXME: later difference whether it is an undo or redo search
         {
 
-            if ((type == historyType.undo && actionList[i].Item3 == historyType.undo)
-                || (type == historyType.action && actionList[i].Item3 == historyType.action)
+            if ((type == HistoryType.undo && actionList[i].Item3 == HistoryType.undo)
+                || (type == HistoryType.action && actionList[i].Item3 == HistoryType.action)
                 && actionList[i].Item2 == playerID)
             {
                 result = actionList[i]; //FIXME: Somehow these data has to be deleted from the list, but not sure then to do it 
@@ -181,7 +138,7 @@ public class GlobalActionHistory
                 if (count > 1 && result.Item5?.Where(it => actionList[i].Item5.Contains(it)) != null) //FIXME: Could make some trouble, not sure if it works
                 {
                     //results.Add(actionList[i].Item4);
-                    return new Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>, bool>(result, true); //Delete this return if you want to give all actions to the caller 
+                    return new Tuple<Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>>, bool>(result, true); //Delete this return if you want to give all actions to the caller 
                 }
                 if (i == head - 1) break;
                 if (i < size - 1) i++;
@@ -189,7 +146,7 @@ public class GlobalActionHistory
             }
         }
 
-        return new Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>, bool>(result, false);
+        return new Tuple<Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>>, bool>(result, false);
 
     }
 
@@ -202,7 +159,7 @@ public class GlobalActionHistory
 
         for (int i = 0; i < size - 1; i++)
         {
-            if (actionList[i] != null && actionList[i].Item2.Equals(userid) && actionList[i].Item3.Equals(historyType.undo))
+            if (actionList[i] != null && actionList[i].Item2.Equals(userid) && actionList[i].Item3.Equals(HistoryType.undo))
             {
                 actionList[i] = null; //FIXME changed to undo because  i think we need to delete this and not the undos which are actualy actions?}
                 count--;
@@ -223,7 +180,7 @@ public class GlobalActionHistory
         {
             if (actionList[i]!= null && actionList[i].Item1.Equals(time) && actionList[i].Item2.Equals(userid))
             {
-                actionList[i] = null;
+                actionList.RemoveAt(i);
                 count--;
                 return;
             }
@@ -237,25 +194,24 @@ public class GlobalActionHistory
     /// <param name="userid"></param>
     public void Undo(string userid) //FIXME: UNDO AND REDO NEEDS TO UPDATE ALSO THE ACTIVEACTION
     {
-        Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>, bool> find;
-        find = Find(userid, historyType.action);    //Should be the same as getActiveAction     //With the result we need to calculate whether we can du undo or not and what changes the gameobject need
-        while (!getActiveAction(userid).HadEffect())
+        Tuple<Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>>, bool> find;
+        find = Find(userid, HistoryType.action);    //Should be the same as getActiveAction     //With the result we need to calculate whether we can du undo or not and what changes the gameobject need
+        while (!GetActiveAction(userid).HadEffect())
         {
-            getActiveAction(userid).Stop();
+            GetActiveAction(userid).Stop();
             //undo stack > 0 ? pop : return //muss ich die action wirklich löschen
-
         }
-        getActiveAction(userid).Stop();
+        GetActiveAction(userid).Stop();
         find.Item1.Item4.Undo();
 
-        Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, userid, historyType.undo, find.Item1.Item4, find.Item1.Item5));
+        Push(new Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>>(DateTime.Now, userid, HistoryType.undo, find.Item1.Item4, find.Item1.Item5));
 
         //DO the POP
         DeleteItem(find.Item1.Item2, find.Item1.Item1);
-        find = Find(userid, historyType.action);
+        find = Find(userid, HistoryType.action);
         SetActiveAction(userid, find.Item1.Item4);
         isRedo = true;
-        getActiveAction(userid)?.Start();
+        GetActiveAction(userid)?.Start();
 
         //Eventuell noch im else was erledigen, was muss passieren wenn das undo nicht performed werden kann
     }
@@ -266,14 +222,13 @@ public class GlobalActionHistory
     /// <param name="userid">The player that wants the redo </param>
     public void Redo(string userid)
     {
-        getActiveAction(userid).Stop();
+        GetActiveAction(userid)?.Stop();
 
-        Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>, bool> find;
-        find = Find(userid, historyType.undo);
+        Tuple<Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>>, bool> find = Find(userid, HistoryType.undo);
 
-        //With the result we need to calculate whether we can du undo or not and what changes the gameobject need
+        // With the result we need to calculate whether we can du undo or not and what changes the gameobject need
         find.Item1.Item4.Redo();
-        Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, userid, historyType.action, find.Item1.Item4, find.Item1.Item5));
+        Push(new Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>>(DateTime.Now, userid, HistoryType.action, find.Item1.Item4, find.Item1.Item5));
         find.Item1.Item4.Start();
 
         SetActiveAction(userid, find.Item1.Item4); //FIXME: IST die action hier richtig
@@ -286,7 +241,7 @@ public class GlobalActionHistory
     /// </summary>
     /// <param name="player">The Player that performs an Action</param>
     /// <returns>The active action || null if key not in dictionary</returns>
-    public ReversibleAction getActiveAction(string player)
+    public ReversibleAction GetActiveAction(string player)
     {
         try
         {
@@ -296,7 +251,6 @@ public class GlobalActionHistory
         {
             return null;
         }
-
     }
 
 

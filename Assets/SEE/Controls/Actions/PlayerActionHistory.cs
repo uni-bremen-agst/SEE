@@ -67,7 +67,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType"/> of the currently executed action or null</returns>
         public static ActionStateType Current()
         {
-            return history.getActiveAction("1")?.GetActionStateType(); //FIXME: USE THE PLAYERS IP FOR THAT
+            return history.GetActiveAction("1")?.GetActionStateType(); //FIXME: USE THE PLAYERS IP FOR THAT
         }
 
         /// <summary>
