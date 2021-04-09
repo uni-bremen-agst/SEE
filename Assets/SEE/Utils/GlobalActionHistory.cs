@@ -79,7 +79,7 @@ public class GlobalActionHistory
                 {
                     Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>> found = Find(activeAction.ElementAt(i).Key, HistoryType.action).Item1;
                     DeleteItem(activeAction.ElementAt(i).Key, found.Item1);
-                    found = new Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>>(DateTime.Now, found.Item2, found.Item3, found.Item4, activeAction.ElementAt(i).Value.GetChangedObjects());
+                    found = new Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>>(DateTime.Now, found.Item2, found.Item3, activeAction.ElementAt(i).Value, activeAction.ElementAt(i).Value.GetChangedObjects());
                     Push(found);
                 }
                 Execute(activeAction.ElementAt(i).Value.NewInstance(), activeAction.ElementAt(i).Key);
@@ -113,29 +113,30 @@ public class GlobalActionHistory
         //List<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>> results = new List<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>>();
         //List<ReversibleAction> results = new List<ReversibleAction>(); //Only Needed if you want to give all newer actions to the caller 
         Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>> result = null;
-        while (true)//FIXME: later difference whether it is an undo or redo search
+        while (true)
         {
-
-            if ((type == HistoryType.undo && actionList[i].Item3 == HistoryType.undo)
-                || (type == HistoryType.action && actionList[i].Item3 == HistoryType.action)
-                && actionList[i].Item2 == playerID)
+            if (actionList[i] != null)
             {
-                result = actionList[i]; //FIXME: Somehow these data has to be deleted from the list, but not sure then to do it 
-                break;
+                if ((type == HistoryType.undo && actionList[i].Item3 == HistoryType.undo)
+                    || (type == HistoryType.action && actionList[i].Item3 == HistoryType.action)
+                    && actionList[i].Item2 == playerID)
+                {
+                    result = actionList[i]; //FIXME: Somehow these data has to be deleted from the list, but not sure then to do it 
+                    break;
+                }
             }
-
 
             if (i == tail) break;
             if (i > 0) i--;
             else i = size - 1;
         }
         //Find all newer changes that could be a problem to the undo
-        if (result != null) //IF Result == NULL no undo could be performed
+        if (count > 1 && result != null ) //IF Result == NULL no undo could be performed
         {
             while (true)
             {
                 //Checks if any item from list 1 is in list 2
-                if (count > 1 && result.Item5?.Where(it => actionList[i].Item5.Contains(it)) != null) //FIXME: Could make some trouble, not sure if it works
+                if ( result.Item5?.Where(it => actionList[i].Item5.Contains(it)) != null) //FIXME: Could make some trouble, not sure if it works
                 {
                     //results.Add(actionList[i].Item4);
                     return new Tuple<Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>>, bool>(result, true); //Delete this return if you want to give all actions to the caller 
@@ -194,12 +195,25 @@ public class GlobalActionHistory
     /// <param name="userid"></param>
     public void Undo(string userid) //FIXME: UNDO AND REDO NEEDS TO UPDATE ALSO THE ACTIVEACTION
     {
+<<<<<<< HEAD
         Tuple<Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>>, bool> find;
         find = Find(userid, HistoryType.action);    //Should be the same as getActiveAction     //With the result we need to calculate whether we can du undo or not and what changes the gameobject need
+        SetActiveAction(userid, find.Item1.Item4);
         while (!GetActiveAction(userid).HadEffect())
         {
             GetActiveAction(userid).Stop();
-            //undo stack > 0 ? pop : return //muss ich die action wirklich löschen
+            if (count > 1)
+            {
+                //POP
+                DeleteItem(find.Item1.Item2, find.Item1.Item1);
+                find = Find(userid, HistoryType.action);
+                SetActiveAction(userid, find.Item1.Item4);
+            }
+            else
+            {
+                // Fixme: Eventuell noch im else was erledigen, was muss passieren wenn das undo nicht performed werden kann
+                return;
+            }
         }
         GetActiveAction(userid).Stop();
         find.Item1.Item4.Undo();
@@ -210,10 +224,9 @@ public class GlobalActionHistory
         DeleteItem(find.Item1.Item2, find.Item1.Item1);
         find = Find(userid, HistoryType.action);
         SetActiveAction(userid, find.Item1.Item4);
+        
         isRedo = true;
         GetActiveAction(userid)?.Start();
-
-        //Eventuell noch im else was erledigen, was muss passieren wenn das undo nicht performed werden kann
     }
 
     /// <summary>
