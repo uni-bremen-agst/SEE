@@ -173,12 +173,13 @@ public class GlobalActionHistory
             else i = size - 1;
         }
         //Find all newer changes that could be a problem to the undo
-        if (result != null) //IF Result == NULL no undo could be performed
+        if (count > 1 && result != null ) //IF Result == NULL no undo could be performed
         {
             while (true)
             {
+                UnityEngine.Debug.Log("WIHLE FOUND");
                 //Checks if any item from list 1 is in list 2
-                if (count > 1 && result.Item5?.Where(it => actionList[i].Item5.Contains(it)) != null) //FIXME: Could make some trouble, not sure if it works
+                if ( result.Item5?.Where(it => actionList[i].Item5.Contains(it)) != null) //FIXME: Could make some trouble, not sure if it works
                 {
                     //results.Add(actionList[i].Item4);
                     return new Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>, bool>(result, true); //Delete this return if you want to give all actions to the caller 
@@ -237,16 +238,21 @@ public class GlobalActionHistory
     /// <param name="userid"></param>
     public void Undo(string userid) //FIXME: UNDO AND REDO NEEDS TO UPDATE ALSO THE ACTIVEACTION
     {
+        UnityEngine.Debug.Log("UNDO Start");
         Tuple<Tuple<DateTime, string, historyType, ReversibleAction, List<string>>, bool> find;
         find = Find(userid, historyType.action);    //Should be the same as getActiveAction     //With the result we need to calculate whether we can du undo or not and what changes the gameobject need
+        UnityEngine.Debug.Log(" FOUND");
         while (!getActiveAction(userid).HadEffect())
         {
+            UnityEngine.Debug.Log("WIHLE UNDO");
             getActiveAction(userid).Stop();
             //undo stack > 0 ? pop : return //muss ich die action wirklich löschen
 
         }
+        UnityEngine.Debug.Log(" after while");
         getActiveAction(userid).Stop();
         find.Item1.Item4.Undo();
+
 
         Push(new Tuple<DateTime, string, historyType, ReversibleAction, List<string>>(DateTime.Now, userid, historyType.undo, find.Item1.Item4, find.Item1.Item5));
 
