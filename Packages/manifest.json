@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "com.yasirkula.dynamicpanels": "https://github.com/yasirkula/UnityDynamicPanels.git",
     "com.microsoft.mixedreality.toolkit.extensions": "file:MixedReality/com.microsoft.mixedreality.toolkit.extensions-2.5.4.tgz",
     "com.microsoft.mixedreality.toolkit.foundation": "file:MixedReality/com.microsoft.mixedreality.toolkit.foundation-2.5.4.tgz",
     "com.microsoft.mixedreality.toolkit.standardassets": "file:MixedReality/com.microsoft.mixedreality.toolkit.standardassets-2.5.4.tgz",
@@ -10,12 +9,13 @@
     "com.unity.ide.vscode": "1.2.3",
     "com.unity.postprocessing": "3.1.0",
     "com.unity.shadergraph": "11.0.0",
-    "com.unity.test-framework": "1.1.22",
+    "com.unity.test-framework": "1.1.24",
     "com.unity.textmeshpro": "3.0.4",
     "com.unity.timeline": "1.5.2",
     "com.unity.ugui": "1.0.0",
     "com.unity.xr.management": "4.0.1",
     "com.valvesoftware.unity.openvr": "file:../Assets/SteamVR/OpenVRUnityXRPackage/Editor/com.valvesoftware.unity.openvr-1.1.4.tgz",
+    "com.yasirkula.dynamicpanels": "https://github.com/yasirkula/UnityDynamicPanels.git",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
