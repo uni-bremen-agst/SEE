@@ -27,8 +27,9 @@ namespace SEE.Controls.Actions
         /// </summary>
         public static void Undo()
         {
-           // if (history.UndoCount > 0)
+            // if (history.UndoCount > 0)
             //{
+            UnityEngine.Debug.Log("UNDO STRART");
                 history.Undo("1"); //FIXME: USE THE PLAYERS IP FOR THAT
             //}
         }
@@ -41,7 +42,7 @@ namespace SEE.Controls.Actions
             //if (history.RedoCount > 0)
            // {
                 history.Redo("1"); //FIXME: USE THE PLAYERS IP FOR THAT
-                                   // }
+           // }
         }
 
         /// <summary>
