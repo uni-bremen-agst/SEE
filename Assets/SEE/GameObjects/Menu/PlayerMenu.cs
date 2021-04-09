@@ -176,6 +176,7 @@ namespace SEE.GO.Menu
                     Indicator.ChangeActionState(currentAction);
                 }
             }
+            Debug.Log("Update");
             PlayerActionHistory.Update();
         }
 

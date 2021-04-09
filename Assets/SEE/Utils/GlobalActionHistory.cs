@@ -247,6 +247,10 @@ public class GlobalActionHistory
             UnityEngine.Debug.Log("WIHLE UNDO");
             getActiveAction(userid).Stop();
             //undo stack > 0 ? pop : return //muss ich die action wirklich löschen
+            //POP
+            DeleteItem(find.Item1.Item2, find.Item1.Item1);
+            find = Find(userid, historyType.action);
+            SetActiveAction(userid, find.Item1.Item4);
 
         }
         UnityEngine.Debug.Log(" after while");
