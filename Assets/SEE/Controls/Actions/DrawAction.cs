@@ -2,6 +2,7 @@
 using SEE.GO;
 using SEE.Utils;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -173,6 +174,11 @@ namespace SEE.Controls.Actions
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.Draw;
+        }
+
+        public override List<string> GetChangedObjects()
+        {
+            return new List<string>();
         }
     }
 }

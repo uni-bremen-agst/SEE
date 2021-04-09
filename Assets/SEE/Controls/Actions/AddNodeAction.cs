@@ -600,5 +600,10 @@ namespace SEE.Controls.Actions
         {
             return ActionStateType.NewNode;
         }
+
+        public override List<string> GetChangedObjects()
+        {
+            return new List<string>();
+        }
     }
 }
