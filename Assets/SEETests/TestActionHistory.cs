@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using SEE.Controls.Actions;
 using SEE.Utils;
+using System.Collections.Generic;
 
 namespace SEETests
 {
@@ -23,6 +24,7 @@ namespace SEETests
 
             private int UndoCalls = 0;
             private int RedoCalls = 0;
+
 
             public void Awake()
             {
@@ -104,6 +106,11 @@ namespace SEETests
             /// </summary>
             /// <returns>the <see cref="ActionStateType"/> of this action</returns>
             public ActionStateType GetActionStateType()
+            {
+                throw new System.NotImplementedException();
+            }
+
+            public List<string> GetChangedObjects()
             {
                 throw new System.NotImplementedException();
             }
@@ -408,6 +415,11 @@ namespace SEETests
             public abstract bool Update();
 
             public ActionStateType GetActionStateType()
+            {
+                throw new System.NotImplementedException();
+            }
+
+            public List<string> GetChangedObjects()
             {
                 throw new System.NotImplementedException();
             }
