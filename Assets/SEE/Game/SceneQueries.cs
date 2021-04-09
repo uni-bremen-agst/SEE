@@ -4,6 +4,7 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.GO;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Game
 {
@@ -270,6 +271,54 @@ namespace SEE.Game
         {
             Node root = GetCityRootGraphNode(codeCity);
             return root?.ItsGraph;
+        }
+
+        /// <summary>
+        /// Finds the implementation city in the scene.
+        /// </summary>
+        /// <returns>The implementation city of the scene.</returns>
+        public static SEECity FindImplementation()
+        {
+            SEECity result = null;
+            SEECity[] cities = Object.FindObjectsOfType<SEECity>();
+            foreach (SEECity city in cities)
+            {
+                if (city.gameObject.name.Equals("Implementation"))
+                {
+#if UNITY_EDITOR
+                    Assert.IsNull(result, "There must be exactly one implementation city!");
+#endif
+                    result = city;
+#if !UNITY_EDITOR
+                    break;
+#endif
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Finds the architecture city in the scene.
+        /// </summary>
+        /// <returns>The architecture city of the scene.</returns>
+        public static SEECity FindArchitecture()
+        {
+            SEECity result = null;
+            SEECity[] cities = Object.FindObjectsOfType<SEECity>();
+            foreach (SEECity city in cities)
+            {
+                if (city.gameObject.name.Equals("Architecture"))
+                {
+#if UNITY_EDITOR
+                    Assert.IsNull(result, "There must be exactly one architecture city!");
+#endif
+                    result = city;
+#if !UNITY_EDITOR
+                    break;
+#endif
+                }
+            }
+            return result;
         }
     }
 }

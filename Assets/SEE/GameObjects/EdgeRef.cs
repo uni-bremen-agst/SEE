@@ -40,6 +40,16 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// The unique ID of the source node of the edge referenced.
+        /// </summary>
+        public string SourceNodeID { get; internal set; }
+
+        /// <summary>
+        /// The unique ID of the target node of the edge referenced.
+        /// </summary>
+        public string TargetNodeID { get; internal set; }
+
+        /// <summary>
         /// Returns the EdgeRef referring to <paramref name="edge"/>.
         /// </summary>
         /// <param name="edge">edge whose EdgeRef is requested</param>

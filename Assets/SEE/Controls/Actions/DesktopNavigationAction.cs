@@ -71,9 +71,6 @@ namespace SEE.Controls.Actions
             internal bool zoomToggleToObject;
         }
 
-        [Tooltip("The city this action controls")]
-        [SerializeField] private SEECity city;
-
         /// <summary>
         /// The cursor visually represents the center of all selected objects and is used
         /// for the center of rotations.
@@ -155,11 +152,10 @@ namespace SEE.Controls.Actions
                 // feel responsive!
                 actionState.drag = Input.GetMouseButton(2);
                 actionState.startDrag |= !isMouseOverGUI && Input.GetMouseButtonDown(2);
-                actionState.dragHoveredOnly = Input.GetKey(KeyBindings.Snap);
+                actionState.dragHoveredOnly = Input.GetKey(KeyBindings.Drag);
                 actionState.cancel |= Input.GetKeyDown(KeyBindings.Cancel);
-                actionState.snap = Input.GetKey(KeyCode.LeftAlt);
+                actionState.snap = Input.GetKey(KeyBindings.Snap);
                 actionState.reset |= (actionState.drag || !isMouseOverGUI) && Input.GetKeyDown(KeyBindings.Reset);
-                actionState.mousePosition = Input.mousePosition;
 
                 // FIXME: The selection of graph elements below will executed only if the 
                 // ray hits the clipping area. If the player looks at the city from aside,
@@ -183,7 +179,7 @@ namespace SEE.Controls.Actions
                 // TODO(torben): extract zoom and/or disable this script if latter conditions are false
                 if (!actionState.drag && (ActionState.Value == ActionStateType.Move || ActionState.Value == ActionStateType.Rotate))
                 {
-                    actionState.zoomToggleToObject |= Input.GetKeyDown(KeyCode.F);
+                    actionState.zoomToggleToObject |= Input.GetKeyDown(KeyBindings.ZoomInto);
                 }
 
                 if (Equals(ActionState.Value, ActionStateType.Rotate) && cursor.E.HasFocus())
@@ -244,7 +240,11 @@ namespace SEE.Controls.Actions
                     }
                     else
                     {
-                        InteractableObject.UnselectAllInGraph(city.LoadedGraph, true);
+                        InteractableObject o = InteractableObject.HoveredObject;
+                        if (o)
+                        {
+                            InteractableObject.UnselectAllInGraph(o.ItsGraph(), true);
+                        }
                     }
                 }
                 else if (actionState.drag && hitPlane) // start or continue movement
@@ -256,7 +256,7 @@ namespace SEE.Controls.Actions
                             if (actionState.dragHoveredOnly)
                             {
                                 InteractableObject o = InteractableObject.HoveredObject;
-                                if (o != null && o.GraphElemRef.elem.ItsGraph.Equals(city.LoadedGraph))
+                                if (o)
                                 {
                                     movingOrRotating = true;
                                     moveState.draggedTransform = o.transform;
@@ -365,7 +365,7 @@ namespace SEE.Controls.Actions
                     }
                     else
                     {
-                        InteractableObject.UnselectAllInGraph(city.LoadedGraph, true);
+                        InteractableObject.UnselectAllInGraph(moveState.draggedTransform.GetComponent<GraphElement>().ItsGraph, true);
                     }
                 }
                 else if (actionState.drag && hitPlane && cursor.E.HasFocus()) // start or continue rotation
