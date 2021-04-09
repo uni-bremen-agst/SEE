@@ -166,7 +166,7 @@ public class NodeDecorationController : MonoBehaviour
         GameObject tetrahedron = createFourFacedTetrahedron(roofSizeX, roofHeight, roofSizeZ);
         tetrahedron.transform.SetParent(nodeObject.transform);
         // Move tetrahedron to top of building, tetrahedron is moved with the bottom left corner
-        tetrahedron.transform.position = new Vector3(nodeLocation.x - roofSizeX/2, nodeSize.y, nodeLocation.z - roofSizeZ/2);
+        tetrahedron.transform.position = new Vector3(nodeLocation.x - roofSizeX/2, nodeSize.y/2 + nodeLocation.y, nodeLocation.z - roofSizeZ/2);
         // TODO Render textures here
 
     }
