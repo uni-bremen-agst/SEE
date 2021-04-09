@@ -40,10 +40,10 @@ namespace SEE.Utils
         /// Multiplies two given vectors component-wise. 
         /// </summary>
         /// <param name="product">The first vector, in that case a multiplicand </param>
-        ///  <paramref name="factor"> the second vector as a multiplicand</param>
+        ///  <param name="factor"> the second vector as a multiplicand</param>
         public static Vector3 VectorMultiplication(Vector3 product, Vector3 factor)
         {    
-          return  new Vector3(product.x * factor.x,product.y * factor.y, product.z * factor.z);     
+          return new Vector3(product.x * factor.x,product.y * factor.y, product.z * factor.z);     
         }
     }
 }
