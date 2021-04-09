@@ -80,14 +80,8 @@ namespace SEE.Utils
         void Stop();
 
         /// <summary>
-        /// 
         /// Called when the effect of the action is to be reversed.
         /// </summary>
-        /// <param name="object2Check">The other ReversibleActions that changed the 
-        /// same Object after the Action and need to be checked befor the undo </param>
-        /// <returns>If the undo was succsesfull</returns>
-
-
         void Undo();
 
         /// <summary>
@@ -95,9 +89,6 @@ namespace SEE.Utils
         /// to re-establish the effect that was undone.
         /// Precondition: <see cref="Undo"/> was called before.
         /// </summary>
-        /// <param name="object2Check">The other ReversibleActions that changed the 
-        /// same Object after the Action and need to be checked befor the redo </param>
-        /// <returns>If the redo was succsesfull</returns>
         void Redo();
 
         /// <summary>
