@@ -112,6 +112,7 @@ namespace SEE.Controls.Actions
             }
 
             base.Awake();
+            cursor = GetComponent<CityCursor>();
 
             ActionState.OnStateChanged += OnStateChanged;
         }
@@ -343,7 +344,14 @@ namespace SEE.Controls.Actions
                     {
                         movingOrRotating = false;
 
-                        Array.ForEach(cursor.E.GetFocusses(), e => e.GetComponent<InteractableObject>().SetGrab(false, true));
+                        foreach (Transform t in cursor.E.GetFocusses())
+                        {
+                            InteractableObject o = t.GetComponent<InteractableObject>();
+                            if (o.IsGrabbed)
+                            {
+                                o.SetGrab(false, true);
+                            }
+                        }
                         rotateState.rotateGizmo.gameObject.SetActive(false);
 
                         CityTransform.RotateAround(rotateState.rotateGizmo.Center, Vector3.up, -CityTransform.rotation.eulerAngles.y);
