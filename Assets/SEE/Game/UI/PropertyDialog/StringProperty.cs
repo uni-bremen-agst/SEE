@@ -45,8 +45,17 @@ namespace SEE.Game.UI.PropertyDialog
             }
             inputField.gameObject.name = Name;
             SetLabel(inputField);
+            SetInitialInput(inputField, savedValue);
             textField = GetTextField(inputField);
             textField.text = savedValue;
+
+            void SetInitialInput(GameObject inputField, string value)
+            {
+                if (!string.IsNullOrEmpty(value) && inputField.TryGetComponent(out TMP_InputField tmPro))
+                {
+                    tmPro.text = value;
+                }
+            }
 
             void SetLabel(GameObject inputField)
             {
