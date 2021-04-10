@@ -34,7 +34,7 @@ namespace SEE.GO
                 }
                 else
                 {
-                    return edgeRef.edge.ID;
+                    return edgeRef.Value.ID;
                 }
             }
             return nodeRef.Value.ID;
@@ -242,7 +242,7 @@ namespace SEE.GO
         /// component attached to it</returns>
         public static bool HasNodeRef(this GameObject gameObject)
         {
-            return gameObject.TryGetComponent<NodeRef>(out NodeRef _);
+            return gameObject.TryGetComponent(out NodeRef _);
         }
 
         /// <summary>
@@ -256,7 +256,7 @@ namespace SEE.GO
         /// component attached to it</returns>
         public static bool TryGetNodeRef(this GameObject gameObject, out NodeRef nodeRef)
         {
-            return gameObject.TryGetComponent<NodeRef>(out nodeRef);
+            return gameObject.TryGetComponent(out nodeRef);
         }
 
         /// <summary>
@@ -265,13 +265,13 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">the game object whose NodeRef is checked</param>
         /// <param name="node">the node referenced by the attached NodeRef; defined only if this method
-        /// retursn true</param>
+        /// returns true</param>
         /// <returns>true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
         /// component attached to it that is not null</returns>
         public static bool TryGetNode(this GameObject gameObject, out Node node)
         {
             node = null;
-            if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+            if (gameObject.TryGetComponent(out NodeRef nodeRef))
             {
                 node = nodeRef.Value;
             }
@@ -321,7 +321,26 @@ namespace SEE.GO
         /// component attached to it</returns>
         public static bool HasEdgeRef(this GameObject gameObject)
         {
-            return gameObject.TryGetComponent<EdgeRef>(out EdgeRef _);
+            return gameObject.TryGetComponent(out EdgeRef _);
+        }
+
+        /// <summary>
+        /// Returns true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
+        /// component attached to it that is not null.
+        /// </summary>
+        /// <param name="gameObject">the game object whose EdgeRef is checked</param>
+        /// <param name="edge">the edge referenced by the attached EdgeRef; defined only if this method
+        /// returns true</param>
+        /// <returns>true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
+        /// component attached to it that is not null</returns>
+        public static bool TryGetEdge(this GameObject gameObject, out Edge edge)
+        {
+            edge = null;
+            if (gameObject.TryGetComponent(out EdgeRef edgeRef))
+            {
+                edge = edgeRef.Value;
+            }
+            return edge != null;
         }
 
         /// <summary>
