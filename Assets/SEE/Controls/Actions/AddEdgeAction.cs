@@ -1,4 +1,5 @@
 ﻿using System;
+using Assets.SEE.Game;
 using SEE.Game;
 using SEE.GO;
 using SEE.Net;
@@ -44,29 +45,43 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The information we need to (re-)create an edge.
         /// </summary>
-        private struct EdgeMemento
+        private struct Memento
         {
+            /// <summary>
+            /// The source of the edge.
+            /// </summary>
             public readonly GameObject from;
+            /// <summary>
+            /// The target of the edge.
+            /// </summary>
             public readonly GameObject to;
+            /// <summary>
+            /// The unique ID of the edge.
+            /// </summary>
             public string edgeID;
-            public EdgeMemento(GameObject from, GameObject to, string edgeID)
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            /// <param name="from">the source of the edge</param>
+            /// <param name="to">the target of the edge</param>
+            public Memento(GameObject from, GameObject to)
             {
                 this.from = from;
                 this.to = to;
-                this.edgeID = edgeID;
+                this.edgeID = null;
             }
         }
 
         /// <summary>
         /// The information needed to re-create the edge.
         /// </summary>
-        private EdgeMemento edgeMemento;
+        private Memento memento;
 
         /// <summary>
         /// The edge created by this action. Can be null if no edge has been created yet
         /// or whether an Undo was called. The created edge is stored only to delete
         /// it again if Undo is called. All information to create the edge is kept in
-        /// <see cref="edgeMemento"/>.
+        /// <see cref="memento"/>.
         /// </summary>
         private GameObject createdEdge;
 
@@ -100,28 +115,30 @@ namespace SEE.Controls.Actions
             // Assigning the game objects to be connected.
             // Checking whether the two game objects are not null and whether they are 
             // actually nodes.
-            if (hoveredObject != null && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI())
+            // FIXME: We need an interaction for VR, too.
+            if (hoveredObject != null && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI() && hoveredObject.HasNodeRef())
             {
-                Assert.IsTrue(hoveredObject.HasNodeRef());
                 if (from == null)
                 {
+                    // No source selected yet; this interaction is meant to set the source.
                     from = hoveredObject;
                 }
                 else if (to == null)
                 {
+                    // Source is already set; this interaction is meant to set the target.
                     to = hoveredObject;
                 }
             }
             // Note: from == to may be possible.
             if (from != null && to != null)
             {
-                // We do not have an edge ID yet, so we pass null to let the
-                // graph renderer create a unique ID.
-                edgeMemento = new EdgeMemento(from, to, null);
-                createdEdge = CreateEdge(edgeMemento);
+                // We do not have an edge ID yet, so we let the graph renderer create a unique ID.
+                memento = new Memento(from, to);
+                createdEdge = CreateEdge(memento);
                 if (createdEdge != null)
                 {
-                    edgeMemento.edgeID = createdEdge.ID();
+                    // The edge ID was created by the graph renderer.
+                    memento.edgeID = createdEdge.ID();
                     from = null;
                     to = null;
                     // action is completed (successfully or not; it does not matter)
@@ -144,9 +161,8 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            DeleteAction deleteAction = new DeleteAction();
-            deleteAction.DeleteSelectedObject(createdEdge);
-            Destroyer.DestroyGameObject(createdEdge);
+            GameEdgeAdder.Remove(createdEdge);
+            new DeleteNetAction(createdEdge.name).Execute();
             createdEdge = null;
         }
 
@@ -156,7 +172,7 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            createdEdge = CreateEdge(edgeMemento);
+            createdEdge = CreateEdge(memento);
         }
 
         /// <summary>
@@ -165,35 +181,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="edgeMemento">information needed to create the edge</param>
         /// <returns>a new edge or null</returns>
-        private static GameObject CreateEdge(EdgeMemento edgeMemento)
+        private static GameObject CreateEdge(Memento edgeMemento)
         {
-            GameObject result = null;
-            Transform cityObject = SceneQueries.GetCodeCity(edgeMemento.from.transform);
-            if (cityObject != null)
-            {
-                // FIXME: This will work only for SEECity but not other subclasses of AbstractSEECity.
-                if (cityObject.TryGetComponent(out SEECity city))
-                {
-                    try
-                    {
-                        result = city.Renderer.DrawEdge(edgeMemento.from, edgeMemento.to, edgeMemento.edgeID);
-                        // Note that we need to result.name as edge ID because edgeMemento.edgeID could be null.
-                        new AddEdgeNetAction(edgeMemento.from.name, edgeMemento.to.name, result.name).Execute();
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError($"The new edge from {edgeMemento.from.name} to {edgeMemento.to.name} could not be created: {e.Message}.\n");
-                    }
-                }
-                else
-                {
-                    Debug.LogError($"The code city for the new edge from {edgeMemento.from.name} to {edgeMemento.to.name} has no .\n");
-                }
-            }
-            else
-            {
-                Debug.LogError($"Could not determine the code city for the new edge from {edgeMemento.from.name} to {edgeMemento.to.name}.\n");
-            }
+            GameObject result = GameEdgeAdder.Add(edgeMemento.from, edgeMemento.to, edgeMemento.edgeID);
+            // Note that we need to use result.name as edge ID because edgeMemento.edgeID could be null.
+            new AddEdgeNetAction(edgeMemento.from.name, edgeMemento.to.name, result.name).Execute();
             return result;
         }
 
