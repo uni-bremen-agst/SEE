@@ -210,7 +210,7 @@ namespace SEE.Game
         {
             if (gameEdge.TryGetComponent<EdgeRef>(out EdgeRef edgeRef))
             {
-                return edgeRef.edge;
+                return edgeRef.Value;
             }
             else
             {
@@ -256,7 +256,7 @@ namespace SEE.Game
                 GameObject childGO = child.gameObject;
                 if (childGO.CompareTag(Tags.Edge))
                 {
-                    if (childGO.TryGetComponent(out EdgeRef edgeRef) && edgeRef.edge != null)
+                    if (childGO.TryGetComponent(out EdgeRef edgeRef) && edgeRef.Value != null)
                     {
                         edges.Add(childGO);
                     }

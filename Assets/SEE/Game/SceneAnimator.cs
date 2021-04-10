@@ -205,7 +205,7 @@ namespace SEE.Game
             List<GameObject> edges = new List<GameObject>();
             foreach (GameObject go in GameObject.FindGameObjectsWithTag(Tags.Edge))
             {
-                if (go.TryGetComponent<EdgeRef>(out EdgeRef edgeRef) && edgeRef.edge != null)
+                if (go.TryGetComponent<EdgeRef>(out EdgeRef edgeRef) && edgeRef.Value != null)
                 {
                     edges.Add(go);
                 }
@@ -221,7 +221,7 @@ namespace SEE.Game
         {
             if (gameEdge.TryGetComponent<EdgeRef>(out EdgeRef edgeRef))
             {
-                return edgeRef.edge;
+                return edgeRef.Value;
             }
             else
             {

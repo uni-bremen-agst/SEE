@@ -16,7 +16,7 @@ namespace SEE.GO
 		/// by both Unity and Odin.
         /// </summary>
         [NonSerialized]
-        public Edge edge;
+        public Edge Value;
 
         /// <summary>
         /// The unique ID of the source node of the edge referenced.

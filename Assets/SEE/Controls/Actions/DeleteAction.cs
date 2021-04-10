@@ -195,7 +195,7 @@ namespace SEE.Controls.Actions
             {
                 if (edgeGraphPair.Key.TryGetComponentOrLog(out EdgeRef edgeReference))
                 {
-                    edgeGraphPair.Value.AddEdge(edgeReference.edge);
+                    edgeGraphPair.Value.AddEdge(edgeReference.Value);
                     edgeGraphPair.Key.SetVisibility(true, false);
                 }
             }            
@@ -368,9 +368,9 @@ namespace SEE.Controls.Actions
             if (gameEdge.TryGetComponentOrLog(out EdgeRef edgeRef))
             {
                 gameEdge.SetVisibility(false, true);
-                Graph graph = edgeRef.edge.ItsGraph;
+                Graph graph = edgeRef.Value.ItsGraph;
                 DeletedEdges[gameEdge] = graph;
-                graph.RemoveEdge(edgeRef.edge);
+                graph.RemoveEdge(edgeRef.Value);
             }
         }
 
