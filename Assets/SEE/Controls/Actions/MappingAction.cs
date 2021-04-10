@@ -309,7 +309,7 @@ namespace SEE.Controls.Actions
             {
                 case Tags.Edge when rootGameObject.TryGetComponent(out EdgeRef edgeRef):
                 {
-                    Edge edge = edgeRef.edge;
+                    Edge edge = edgeRef.Value;
                     if (edge != null)
                     {
                         edges[edge.ID] = rootGameObject;
