@@ -158,7 +158,6 @@ namespace SEE.Controls.Actions
                     canvasGenerator.DestroyEditNodeCanvasAction();
                     hoveredObject = null;
                     editedNode = null;
-                    PlayerMenu.InteractionIsForbidden = false;
                     EditProgress = ProgressState.NoNodeSelected;
                     break;
 
@@ -186,6 +185,7 @@ namespace SEE.Controls.Actions
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> property.
             UpdateNode(redoEditNodeMemento);
+            executed = true;
         }
 
         /// <summary>
@@ -244,5 +244,18 @@ namespace SEE.Controls.Actions
         {
             return ActionStateType.EditNode;
         }
+
+        /// <summary>
+        /// Opens a dialog where the user can enter the node name and type.
+        /// </summary>
+        //private void OpenDialog()
+        //{
+        //    NodePropertyDialog dialog = new NodePropertyDialog(node);
+        //    // If the OK button is pressed, we continue with ProgressState.ValuesAreGiven.
+        //    dialog.OnConfirm.AddListener(() => Progress = ProgressState.ValuesAreGiven);
+        //    // If the Cancel button is pressed, we continue with ProgressState.AddingIsCanceled.
+        //    dialog.OnCancel.AddListener(() => Progress = ProgressState.AddingIsCanceled);
+        //    dialog.Open();
+        //}
     }
 }

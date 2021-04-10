@@ -25,14 +25,6 @@ namespace SEE.GO.Menu
         private ActionStateIndicator Indicator;
 
         /// <summary>
-        /// Responsible for the permission to interact with the PlayerMenu. It should be true, if no interaction
-        /// should be possible, e.g. while the user writes text somewhere, in which case keystrokes
-        /// shouldn't be registered by the PlayerMenu.
-        /// </summary>
-        public static bool InteractionIsForbidden = false;
-        // TODO: Replace with proper keybinding management.
-
-        /// <summary>
         /// This creates and returns the mode menu, with which you can select the active game mode.
         /// 
         /// Available modes can be found in <see cref="ActionStateType"/>.
@@ -133,55 +125,52 @@ namespace SEE.GO.Menu
         /// </summary>
         private void Update()
         {
-            if (!InteractionIsForbidden)
+            // Select action state via numbers on the keyboard
+            for (int i = 0; i < ModeMenu.Entries.Count; i++)
             {
-                // Select action state via numbers on the keyboard
-                for (int i = 0; i < ModeMenu.Entries.Count; i++)
+                if (Input.GetKeyDown(KeyCode.Alpha1 + i))
                 {
-                    if (Input.GetKeyDown(KeyCode.Alpha1 + i))
-                    {
-                        ModeMenu.SelectEntry(i);
-                        break;
-                    }
+                    ModeMenu.SelectEntry(i);
+                    break;
                 }
-                // space bar toggles menu 
-                if (Input.GetKeyDown(KeyBindings.ToggleMenu))
-                {
-                    ModeMenu.ToggleMenu();
-                }
-                
-                // trigger Undo or Redo if requested by keyboard shortcuts
+            }
+            // space bar toggles menu 
+            if (Input.GetKeyDown(KeyBindings.ToggleMenu))
+            {
+                ModeMenu.ToggleMenu();
+            }
+
+            // trigger Undo or Redo if requested by keyboard shortcuts
 #if UNITY_EDITOR == false
             // Ctrl keys are not available when running the game in the editor
             if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
 #endif
+            {
+                if (Input.GetKeyDown(KeyBindings.Undo))
                 {
-                    if (Input.GetKeyDown(KeyBindings.Undo))
+                    PlayerActionHistory.Undo();
+                    if (!PlayerActionHistory.IsEmpty())
                     {
-                        PlayerActionHistory.Undo();
-                        if (!PlayerActionHistory.IsEmpty())
-                        {
-                            ActionStateType currentAction = PlayerActionHistory.Current();
-                            SetPlayerMenu(currentAction.Name);
-                            Indicator.ChangeActionState(currentAction);
-                        }
-                        else
-                        {
-                            // This case will be reached if there is no finished action in the undo history.
-                            // Special case: The user is executing his first action after moving while running the application,
-                            // but this action is not finished yet. Then, the user executes undo. 
-                            ModeMenu.ActiveEntry = ModeMenu.Entries.Single(x => x.Title == ActionStateType.Move.Name);
-                            Indicator.ChangeActionState(ActionStateType.Move);
-                        }
-                    }
-                    else if (Input.GetKeyDown(KeyBindings.Redo))
-                    {
-                        PlayerActionHistory.Redo();
                         ActionStateType currentAction = PlayerActionHistory.Current();
                         SetPlayerMenu(currentAction.Name);
                         Indicator.ChangeActionState(currentAction);
                     }
-                }                
+                    else
+                    {
+                        // This case will be reached if there is no finished action in the undo history.
+                        // Special case: The user is executing his first action after moving while running the application,
+                        // but this action is not finished yet. Then, the user executes undo. 
+                        ModeMenu.ActiveEntry = ModeMenu.Entries.Single(x => x.Title == ActionStateType.Move.Name);
+                        Indicator.ChangeActionState(ActionStateType.Move);
+                    }
+                }
+                else if (Input.GetKeyDown(KeyBindings.Redo))
+                {
+                    PlayerActionHistory.Redo();
+                    ActionStateType currentAction = PlayerActionHistory.Current();
+                    SetPlayerMenu(currentAction.Name);
+                    Indicator.ChangeActionState(currentAction);
+                }
             }
             PlayerActionHistory.Update();
         }
