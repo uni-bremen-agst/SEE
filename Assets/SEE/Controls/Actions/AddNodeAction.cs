@@ -115,7 +115,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Undo()
         {
-            base.Undo(); // to reset hadAnEffect
+            base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> property.
             if (addedGameNode != null)
             {
                 new DeleteNetAction(addedGameNode.name).Execute();
@@ -129,7 +129,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Redo()
         {
-            base.Redo(); // to reset hadAnEffect
+            base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> property.
             addedGameNode = GameNodeAdder.NewGameNode(memento.Parent, position: memento.Position, worldSpaceScale: memento.Scale);
             if (addedGameNode != null)
             {
