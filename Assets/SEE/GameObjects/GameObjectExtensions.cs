@@ -246,15 +246,36 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
+        /// Returns true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
         /// component attached to it.
         /// </summary>
-        /// <param name="gameObject">the game object whose EdgeRef is checked</param>
-        /// <returns>true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
+        /// <param name="gameObject">the game object whose NodeRef is checked</param>
+        /// <param name="nodeRef">the attached NodeRef; defined only if this method
+        /// retursn true</param>
+        /// <returns>true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
         /// component attached to it</returns>
-        public static bool HasEdgeRef(this GameObject gameObject)
+        public static bool TryGetNodeRef(this GameObject gameObject, out NodeRef nodeRef)
         {
-            return gameObject.TryGetComponent<EdgeRef>(out EdgeRef _);
+            return gameObject.TryGetComponent<NodeRef>(out nodeRef);
+        }
+
+        /// <summary>
+        /// Returns true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
+        /// component attached to it that is not null.
+        /// </summary>
+        /// <param name="gameObject">the game object whose NodeRef is checked</param>
+        /// <param name="node">the node referenced by the attached NodeRef; defined only if this method
+        /// retursn true</param>
+        /// <returns>true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
+        /// component attached to it that is not null</returns>
+        public static bool TryGetNode(this GameObject gameObject, out Node node)
+        {
+            node = null;
+            if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+            {
+                node = nodeRef.Value;
+            }
+            return node != null;
         }
 
         /// <summary>
@@ -289,6 +310,18 @@ namespace SEE.GO
             {
                 throw new Exception($"Game object {gameObject.name} has no NodeRef.");
             }
+        }
+
+        /// <summary>
+        /// Returns true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
+        /// component attached to it.
+        /// </summary>
+        /// <param name="gameObject">the game object whose EdgeRef is checked</param>
+        /// <returns>true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
+        /// component attached to it</returns>
+        public static bool HasEdgeRef(this GameObject gameObject)
+        {
+            return gameObject.TryGetComponent<EdgeRef>(out EdgeRef _);
         }
 
         /// <summary>
