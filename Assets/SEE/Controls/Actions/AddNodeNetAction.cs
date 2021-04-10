@@ -15,25 +15,9 @@ namespace SEE.Controls.Actions
         // for the network transfer.
 
         /// <summary>
-        /// The city where the new node has to be placed.
-        /// </summary>
-        public SEECity City = null;
-
-        /// <summary>
-        /// The ID of the creators Game-Node object needed to find the city to place the new node in.
-        /// Just one random object inside the code city from the new node.
-        /// </summary>
-        public string GameObjectID;
-
-        /// <summary>
         /// The ID of the parent gameObject of the new GameObject.
         /// </summary>
         public string ParentID;
-
-        /// <summary>
-        /// true, if the new node is an inner node, false if it is a leaf.
-        /// </summary>
-        public bool IsInnerNode;
 
         /// <summary>
         /// The id of the new node.
@@ -51,59 +35,23 @@ namespace SEE.Controls.Actions
         public Vector3 Scale;
 
         /// <summary>
-        /// Whether the the node should be placed or moved.
-        /// true = place | false = dont place
+        /// Constructor.
         /// </summary>
-        public bool Place;
-
-        /// <summary>
-        /// Whether a new node should be created.
-        /// true = create new one | false = dont create new one
-        /// </summary>
-        public bool Create;
-
-        /// <summary>
-        /// True if a node was placed where it should not be placed. 
-        /// It then needs to be destroyed in the network.
-        /// </summary>
-        public bool IllegalPlace;
-
-        /// <summary>
-        /// The name of the dummy object on which the AddNodeAction for network purpose is added.
-        /// </summary>
-        private static readonly string dummyName = "tmpNetNewNode";
-
-        /// <summary>
-        /// Creates a new NewNodeNetAction
-        /// </summary>
-        /// <param name="gameObjectID">the GameObject the city is attached to for the new node</param>
-        /// <param name="isInnerNode">whether the new node should be an inner node</param>
+        /// <param name="parentID">unique ID of the parent in which to add the new node</param>
         /// <param name="newNodeID">id for the new node</param>
         /// <param name="position">the position for the new node</param>
-        /// <param name="place">whether the new node is in moving or in placing state</param>
-        /// <param name="create">in the first method call a new node needs to be created, but only once (FIXME: meaning is unclear)</param>
-        /// <param name="illegalPlace">whether the placement is illegal</param>
+        /// <param name="scale">the scale of the new node in world space</param>
         public AddNodeNetAction
-            (string gameObjectID,
-             bool isInnerNode,
+            (string parentID,
              string newNodeID,
              Vector3 position,
-             Vector3 scale,
-             string parentID,
-             bool place,
-             bool create,
-             bool illegalPlace)
+             Vector3 scale)
             : base()
         {
-            this.GameObjectID = gameObjectID;
             this.ParentID = parentID;
-            this.IsInnerNode = isInnerNode;
             this.NewNodeID = newNodeID;
             this.Position = position;
             this.Scale = scale;
-            this.Place = place;
-            this.Create = create;
-            this.IllegalPlace = illegalPlace;
         }
 
         /// <summary>
@@ -122,41 +70,12 @@ namespace SEE.Controls.Actions
         {
             if (!IsRequester())
             {
-                // Manages the creation of a new node on each client.
-                if (Create)
+                GameObject parent = GameObject.Find(ParentID);
+                if (parent == null)
                 {
-                    SceneQueries.GetCodeCity(GameObject.Find(GameObjectID).transform)?.gameObject.TryGetComponent(out City);
-                    if (City != null)
-                    {
-                        AddNodeAction addNodeAction = new AddNodeAction();
-                        addNodeAction.Network = true;
-                        addNodeAction.NodeID = NewNodeID;
-                        addNodeAction.City = City;
-                        addNodeAction.IsInnerNode = IsInnerNode;
-                        addNodeAction.NewGameNode(AddNodeAction.NewGraphNode());
-                    }
+                    throw new System.Exception($"There is no node with the ID {ParentID}");
                 }
-                // Manages the placement of the new node on each client.
-                else if (Place)
-                {
-                    if (IllegalPlace)
-                    {
-                        Object.Destroy(GameObject.Find(dummyName).GetComponent<AddNodeAction>().GONode);
-                    }
-                    else
-                    {
-                        GameObject.Find(dummyName).GetComponent<AddNodeAction>().NetworkPlaceNode(Position, Scale, ParentID);
-                    }
-                    //  Object.Destroy(GameObject.Find(dummyName).GetComponent<AddNodeAction>());
-                    Object.Destroy(GameObject.Find(dummyName));
-                }
-                // Let the new node move with the cursor of the master.
-                else
-                {
-                    GameObject dummyGameNode = GameObject.Find(dummyName).GetComponent<AddNodeAction>().GONode;
-                    dummyGameNode.transform.position = Position;
-                    dummyGameNode.SetScale(Scale);
-                }
+                GameNodeAdder.NewGameNode(parent, Position, Scale, NewNodeID);
             }
         }
     }
