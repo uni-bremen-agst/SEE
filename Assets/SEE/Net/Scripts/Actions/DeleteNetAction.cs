@@ -1,4 +1,5 @@
-﻿using SEE.Game;
+﻿using Assets.SEE.Game;
+using SEE.Game;
 using SEE.GO;
 using UnityEngine;
 
@@ -49,12 +50,11 @@ namespace SEE.Net
                 {
                     if (gameObject.HasNodeRef())
                     {
-                        GameNodeAdder.RemoveGameNode(gameObject);
+                        GameNodeAdder.Remove(gameObject);
                     }
                     else if (gameObject.HasEdgeRef())
                     {
-                        // FIXME: Implement deletion of edge
-                        throw new System.NotImplementedException("Deletion of edge not yet implemented.");
+                        GameEdgeAdder.Remove(gameObject);
                     }
                 }
                 else
