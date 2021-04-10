@@ -9,17 +9,6 @@ namespace SEE.Controls.Actions
     public class CanvasGenerator : MonoBehaviour
     {
         /// <summary>
-        /// Instantiates the AddingNodeCanvasScript and adds it to the CanvasObject gameObject.
-        /// </summary>
-        /// <returns>the added AddingNodeCanvasScript</returns>
-        public AddingNodeCanvasAction InstantiateAddingNodeCanvas(AddNodeAction addNodeAction)
-        {
-            AddingNodeCanvasAction result = gameObject.AddComponent<AddingNodeCanvasAction>();
-            result.addNodeAction = addNodeAction;
-            return result;
-        }
-
-        /// <summary>
         /// Instantiates the EditNodeCanvasScript and adds it to the CanvasObject gameObject.
         /// </summary>
         /// <returns>the added EditNodeCanvasScript</returns>
@@ -28,18 +17,6 @@ namespace SEE.Controls.Actions
             EditNodeCanvasAction result = gameObject.AddComponent<EditNodeCanvasAction>();
             result.editNodeAction = editNodeAction;
             return result;
-        }
-
-        /// <summary>
-        /// Destroys the component <see cref="AddingNodeCanvasAction"/> if it is
-        /// attached to the gameObject.
-        /// </summary>
-        public void DestroyAddNodeCanvasAction()
-        {
-            if (gameObject.TryGetComponent(out AddingNodeCanvasAction action))
-            {
-                NodeCanvasAction.DestroyInstance(action);
-            }
         }
 
         /// <summary>
