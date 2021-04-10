@@ -31,9 +31,11 @@ namespace SEE.Controls.Actions
                 Vector3 position = raycastHit.point;
                 memento = new Memento(parent, position: position, scale: FindSize(parent, position));
                 addedGameNode = GameNodeAdder.Add(memento.Parent, position: memento.Position, worldSpaceScale: memento.Scale);
+                // The name of the node is now available.
+                memento.NodeID = addedGameNode.name;
                 if (addedGameNode != null)
                 {
-                    new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: addedGameNode.name, memento.Position, memento.Scale).Execute();
+                    new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
                     result = true;
                     hadAnEffect = true;
                 }
@@ -69,6 +71,11 @@ namespace SEE.Controls.Actions
             /// The scale of the new node in world space.
             /// </summary>
             public readonly Vector3 Scale;
+            /// <summary>
+            /// The node ID for the added node. It must be kept to re-use the
+            /// original name of the node in Redo().
+            /// </summary>
+            public string NodeID;
 
             /// <summary>
             /// Constructor setting the information necessary to re-do this action.
@@ -81,6 +88,7 @@ namespace SEE.Controls.Actions
                 Parent = parent;
                 Position = position;
                 Scale = scale;
+                NodeID = null;
             }
         }
 
@@ -120,7 +128,7 @@ namespace SEE.Controls.Actions
             {
                 new DeleteNetAction(addedGameNode.name).Execute();
                 GameNodeAdder.Remove(addedGameNode);
-                addedGameNode = null;                
+                addedGameNode = null;
             }
         }
 
@@ -130,10 +138,10 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> property.
-            addedGameNode = GameNodeAdder.Add(memento.Parent, position: memento.Position, worldSpaceScale: memento.Scale);
+            addedGameNode = GameNodeAdder.Add(memento.Parent, position: memento.Position, worldSpaceScale: memento.Scale, nodeID: memento.NodeID);
             if (addedGameNode != null)
             {
-                new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: addedGameNode.name, memento.Position, memento.Scale).Execute();
+                new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
             }
         }
 

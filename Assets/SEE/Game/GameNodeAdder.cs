@@ -21,7 +21,7 @@ namespace SEE.Game
         /// <returns>new graph node</returns>
         private static Node NewGraphNode(string nodeID)
         {
-            string ID = string.IsNullOrEmpty(nodeID) ? RandomStrings.Get() : string.Empty;
+            string ID = string.IsNullOrEmpty(nodeID) ? RandomStrings.Get() : nodeID;
             return new Node()
             {
                 ID = ID,
@@ -44,7 +44,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="parent">The node that should be the parent of <paramref name="node"/></param>
         /// <param name="node">The node to add to the graph</param>
-        private static void AddNode(Node parent, Node node)
+        private static void AddNodeToGraph(Node parent, Node node)
         {
             if (parent == null)
             {
@@ -87,15 +87,15 @@ namespace SEE.Game
         /// <param name="node">the graph node that is represented by the new node</param>
         /// <param name="position">the position in world space for the center point of the new game node</param>
         /// <param name="worldSpaceScale">the scale in world space of the new game node</param>
-        /// <param name="newNodeID">the unique ID of the new node; if null or empty, a random ID will be used</param>
+        /// <param name="nodeID">the unique ID of the new node; if null or empty, a random ID will be used</param>
         /// <returns>new child game node or null if none could be created</returns>
-        public static GameObject Add(GameObject parent, Vector3 position, Vector3 worldSpaceScale, string newNodeID = null)
+        public static GameObject Add(GameObject parent, Vector3 position, Vector3 worldSpaceScale, string nodeID = null)
         {
             SEECity city = parent.ContainingCity();
             if (city != null)
             {
-                Node node = NewGraphNode(newNodeID);
-                AddNode(parent.GetNode(), node);
+                Node node = NewGraphNode(nodeID);
+                AddNodeToGraph(parent.GetNode(), node);
                 GameObject result = city.Renderer.NewLeafNode(node);
                 result.transform.localScale = worldSpaceScale;
                 result.transform.position = position;
