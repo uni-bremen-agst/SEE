@@ -1,4 +1,5 @@
-﻿using SEE.DataModel.DG;
+﻿using SEE.Controls;
+using SEE.DataModel.DG;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -84,6 +85,7 @@ namespace SEE.Game.UI.PropertyDialog
             propertyDialog.OnConfirm.AddListener(() => OKButtonPressed());
             propertyDialog.OnCancel.AddListener(() => CancelButtonPressed());
 
+            SEEInput.KeyboardShortcutsEnabled = false;
             // Go online
             propertyDialog.DialogShouldBeShown = true;
         }
@@ -94,6 +96,7 @@ namespace SEE.Game.UI.PropertyDialog
         private void CancelButtonPressed()
         {
             OnCancel.Invoke();
+            SEEInput.KeyboardShortcutsEnabled = true;
             Close();
         }
 
@@ -106,6 +109,7 @@ namespace SEE.Game.UI.PropertyDialog
             node.SourceName = nodeName.Value.Trim();
             node.Type = nodeType.Value.Trim();
             OnConfirm.Invoke();
+            SEEInput.KeyboardShortcutsEnabled = true;
             Close();
         }
 

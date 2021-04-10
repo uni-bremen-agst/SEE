@@ -104,17 +104,17 @@ namespace SEE.Game
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyBindings.ToggleAutomaticManualMode))
+            if (SEEInput.ToggleAutomaticManualMode())
             {
                 isPaused = !isPaused;
                 Debug.Log($"execution pause set to {isPaused}.\n");
             }
-            if (Input.GetKeyDown(KeyBindings.IncreaseAnimationSpeed))
+            if (SEEInput.IncreaseAnimationSpeed())
             {
                 CallDuration *= 0.75f;
                 Debug.Log($"execution duration set to {CallDuration}.\n");
             }
-            if (Input.GetKeyDown(KeyBindings.DecreaseAnimationSpeed))
+            if (SEEInput.DecreaseAnimationSpeed())
             {
                 CallDuration *= 1.25f;
                 Debug.Log($"execution duration set to {CallDuration}.\n");

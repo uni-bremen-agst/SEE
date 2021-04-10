@@ -389,7 +389,7 @@ namespace SEE.Controls
                     }
                 }
             }
-            if (Input.GetKeyDown(KeyBindings.Help))
+            if (SEEInput.Help())
             {
                 KeyBindings.PrintBindings();
             }
