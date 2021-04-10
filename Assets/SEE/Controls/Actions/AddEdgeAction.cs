@@ -158,8 +158,8 @@ namespace SEE.Controls.Actions
                     hadAnEffect = true;
                 }
             }
-            // Adding the key to forget the selected GameObjects.
-            if (Input.GetKeyDown(KeyBindings.Unselect))
+            // Forget from and to upon user request.
+            if (SEEInput.Unselect())
             {
                 from = null;
                 to = null;

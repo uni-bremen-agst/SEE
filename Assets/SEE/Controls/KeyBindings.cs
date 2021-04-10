@@ -6,7 +6,7 @@ namespace SEE.Controls
     /// <summary>
     /// Defines the key codes for all interaction based on the keyboard in SEE.
     /// </summary>
-    internal static class KeyBindings
+    static class KeyBindings
     {
         // IMPORTANT NOTES:
         // (1) Keep in mind that KeyCodes in Unity map directly to a
@@ -93,12 +93,12 @@ namespace SEE.Controls
         /// <summary>
         /// Undoes the last action.
         /// </summary>
-        internal static KeyCode Undo = Register(KeyCode.Z, Scope.CodeViewer, "Undoes the last action.");
+        internal static KeyCode Undo = Register(KeyCode.Z, Scope.Always, "Undoes the last action.");
 
         /// <summary>
         /// Re-does the last action.
         /// </summary>
-        internal static KeyCode Redo = Register(KeyCode.Y, Scope.CodeViewer, "Re-does the last action.");
+        internal static KeyCode Redo = Register(KeyCode.Y, Scope.Always, "Re-does the last action.");
 
         //-----------------------------------------------------
         // Camera path recording and playing
@@ -176,14 +176,14 @@ namespace SEE.Controls
         /// Toggles between the locked and free camera mode.
         /// </summary>
         internal static KeyCode ToggleCameraLock = Register(KeyCode.L, Scope.Browsing, "Toggles between the locked and free camera mode.");
-        /// <summary>
-        /// Boosts the speed of the player movement. While pressed, movement is faster.
-        /// </summary>        
-        internal static KeyCode BoostCameraSpeed = Register(KeyCode.LeftShift, Scope.Browsing, "Boosts the speed of the player movement. While pressed, movement is faster.");
 
         //-----------------------------------------------------
         // Player (camera) movements.
         //-----------------------------------------------------
+        /// <summary>
+        /// Boosts the speed of the player movement. While pressed, movement is faster.
+        /// </summary>        
+        internal static KeyCode BoostCameraSpeed = Register(KeyCode.LeftShift, Scope.Browsing, "Boosts the speed of the player movement. While pressed, movement is faster.");
         /// <summary>
         /// Move camera (player) forward.
         /// </summary>
