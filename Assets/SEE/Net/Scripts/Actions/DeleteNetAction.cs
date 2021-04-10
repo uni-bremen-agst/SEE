@@ -1,7 +1,11 @@
-﻿namespace SEE.Net
+﻿using SEE.Game;
+using SEE.GO;
+using UnityEngine;
+
+namespace SEE.Net
 {
     /// <summary>
-    /// This class is responsible for deleting a node via network from one client to all others and 
+    /// This class is responsible for deleting a node or edge via network from one client to all others and 
     /// to the server. 
     /// </summary>
     public class DeleteNetAction : AbstractAction
@@ -34,16 +38,29 @@
         }
 
         /// <summary>
-        /// Deletes given GameObject on each client.
+        /// Deletes the game object identified by <see cref="GameObjectID"/> on each client.
         /// </summary>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
-            {           
-                // Fixme(Thore): Network-DeleteAction has to be fixed in #204
-            	// GameObject playerDesktop = PlayerSettings.LocalPlayer;
-            	//playerDesktop.TryGetComponent(out DeleteAction deleteAction);
-            	//deleteAction.DeleteSelectedObject(GameObject.Find(GameObjectID))
+            {
+                GameObject gameObject = GameObject.Find(GameObjectID);
+                if (gameObject != null)
+                {
+                    if (gameObject.HasNodeRef())
+                    {
+                        GameNodeAdder.RemoveGameNode(gameObject);
+                    }
+                    else if (gameObject.HasEdgeRef())
+                    {
+                        // FIXME: Implement deletion of edge
+                        throw new System.NotImplementedException("Deletion of edge not yet implemented.");
+                    }
+                }
+                else
+                {
+                    throw new System.Exception($"There is no game object with the ID {GameObjectID}");
+                }
             }
         }
     }
