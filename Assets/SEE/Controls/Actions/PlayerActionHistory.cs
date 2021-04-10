@@ -1,6 +1,4 @@
-﻿using SEE.Utils;
-
-namespace SEE.Controls.Actions
+﻿namespace SEE.Controls.Actions
 {
     /// <summary>
     /// This class manages the history of actions triggered by the player and that
@@ -11,7 +9,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The history of actions.
         /// </summary>
-        private static GlobalActionHistory history = new GlobalActionHistory(20);
+        private static GlobalActionHistory history = new GlobalActionHistory();
 
         /// <summary>
         /// Executes the currently active action (if there is any).
