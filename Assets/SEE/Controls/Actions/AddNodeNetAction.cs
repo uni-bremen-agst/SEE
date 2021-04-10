@@ -75,7 +75,7 @@ namespace SEE.Controls.Actions
                 {
                     throw new System.Exception($"There is no node with the ID {ParentID}");
                 }
-                GameNodeAdder.NewGameNode(parent, Position, Scale, NewNodeID);
+                GameNodeAdder.Add(parent, Position, Scale, NewNodeID);
             }
         }
     }
