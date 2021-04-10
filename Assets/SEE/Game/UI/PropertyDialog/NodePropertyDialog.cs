@@ -65,7 +65,7 @@ namespace SEE.Game.UI.PropertyDialog
             // Type of the node
             nodeType = dialog.AddComponent<StringProperty>();
             nodeType.Name = "Node type";
-            nodeName.Value = node.Type;
+            nodeType.Value = node.Type;
             nodeType.Description = "Type of the node";
 
             // Group for node name and type
