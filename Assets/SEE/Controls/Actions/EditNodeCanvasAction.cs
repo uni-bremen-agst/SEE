@@ -53,7 +53,6 @@ namespace SEE.Controls.Actions
 
         void Start()
         {
-            PlayerMenu.InteractionIsForbidden = true;
             InstantiatePrefab(prefabPath);
             Canvas.transform.SetParent(gameObject.transform);
             Component[] c = Canvas.GetComponentsInChildren<InputField>();
@@ -95,7 +94,6 @@ namespace SEE.Controls.Actions
         {
             CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
             generator.DestroyEditNodeCanvasAction();
-            PlayerMenu.InteractionIsForbidden = false;
             InteractableObject.UnselectAll(true);
         }
     }
