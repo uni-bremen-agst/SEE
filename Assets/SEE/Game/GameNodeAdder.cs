@@ -89,7 +89,7 @@ namespace SEE.Game
         /// <param name="worldSpaceScale">the scale in world space of the new game node</param>
         /// <param name="newNodeID">the unique ID of the new node; if null or empty, a random ID will be used</param>
         /// <returns>new child game node or null if none could be created</returns>
-        public static GameObject NewGameNode(GameObject parent, Vector3 position, Vector3 worldSpaceScale, string newNodeID = null)
+        public static GameObject Add(GameObject parent, Vector3 position, Vector3 worldSpaceScale, string newNodeID = null)
         {
             SEECity city = parent.ContainingCity();
             if (city != null)
@@ -109,7 +109,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Inverse operation of <see cref="NewGameNode(GameObject, Vector3, Vector3, string)"/>.
+        /// Inverse operation of <see cref="Add(GameObject, Vector3, Vector3, string)"/>.
         /// Removes the given <paramref name="gameNode"/> from the scene and its associated 
         /// graph node from its graph. <paramref name="gameNode"/> is destroyed afterwards.
         /// 
@@ -119,7 +119,7 @@ namespace SEE.Game
         /// an exception will be thrown.
         /// </summary>
         /// <param name="gameNode">game node to be removed</param>
-        public static void RemoveGameNode(GameObject gameNode)
+        public static void Remove(GameObject gameNode)
         {
             Node node = gameNode.GetNode();
             Graph graph = node.ItsGraph;
