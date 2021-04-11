@@ -15,7 +15,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The life cycle of this edit action.
         /// </summary>
-        public enum ProgressState
+        private enum ProgressState
         {
             NoNodeSelected,  // initial state when no node is selected
             WaitingForInput, // a node is currently selected, the dialog is opened, and we wait for input
