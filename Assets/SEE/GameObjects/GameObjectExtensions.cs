@@ -41,7 +41,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// If <paramref name="gameObject"/> represent a graph node or edge, the city this 
+        /// If <paramref name="gameObject"/> represents a graph node or edge, the city this 
         /// object is contained in will be returned. Otherwise null is returned.
         /// </summary>
         /// <param name="gameObject">graph node or edge whose containing city is requested</param>
