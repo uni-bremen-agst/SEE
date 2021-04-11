@@ -32,7 +32,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// <summary>
         /// The input fields for the properties in this property group.
         /// </summary>
-        protected IList<Property> Properties = new List<Property>();
+        protected readonly IList<Property> Properties = new List<Property>();
 
         /// <summary>
         /// The path of the prefab for a PropertyGroup.
