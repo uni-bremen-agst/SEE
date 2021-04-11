@@ -251,7 +251,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">the game object whose NodeRef is checked</param>
         /// <param name="nodeRef">the attached NodeRef; defined only if this method
-        /// retursn true</param>
+        /// returns true</param>
         /// <returns>true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
         /// component attached to it</returns>
         public static bool TryGetNodeRef(this GameObject gameObject, out NodeRef nodeRef)
