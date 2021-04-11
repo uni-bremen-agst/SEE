@@ -10,7 +10,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Action to edit an existing node's attributes.
     /// </summary>
-    public class EditNodeAction : ManipulateNodeAction
+    public class EditNodeAction : AbstractPlayerAction
     {
         /// <summary>
         /// The life cycle of this edit action.
