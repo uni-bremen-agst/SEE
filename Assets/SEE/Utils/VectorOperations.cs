@@ -15,7 +15,7 @@ namespace SEE.Utils
         /// <param name="counter"> The counter vector - which is divided by the denominator´s coordinates</param>
         /// <returns> The result of the component-wise division between the counter and denominator. </returns>
         public static Vector3 DivideVectors(Vector3 denominator, Vector3 counter)
-        {        
+        {
             float xLocalScale = counter.x / denominator.x;
             float yLocalScale = counter.y / denominator.y;
             float zLocalScale = counter.z / denominator.z;
@@ -42,8 +42,8 @@ namespace SEE.Utils
         /// <param name="product">The first vector, in that case a multiplicand </param>
         ///  <param name="factor"> the second vector as a multiplicand</param>
         public static Vector3 VectorMultiplication(Vector3 product, Vector3 factor)
-        {    
-          return new Vector3(product.x * factor.x,product.y * factor.y, product.z * factor.z);     
+        {
+            return new Vector3(product.x * factor.x, product.y * factor.y, product.z * factor.z);
         }
     }
 }
