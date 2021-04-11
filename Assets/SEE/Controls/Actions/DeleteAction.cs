@@ -106,8 +106,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         private bool isRunning = false;
 
-        private bool added = false; 
-
         public override void Awake()
         {
             garbageCan = GameObject.Find(GarbageCanName);
@@ -136,10 +134,10 @@ namespace SEE.Controls.Actions
         {
             // Delete a gameobject and all its children and incoming and outgoing edges.
             if (selectedObject != null && !isRunning)
-            {   
+            {
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
                 explicitlyDeletedNodesAndEdges.Add(selectedObject);
-                DeleteSelectedObject(selectedObject);               
+                DeleteSelectedObject(selectedObject);
                 hadAnEffect = true;
 
                 // the selected objects are deleted and this action is done now
@@ -180,9 +178,8 @@ namespace SEE.Controls.Actions
                     // FIXME: Shouldn't the edges be moved to the garbage bin, too?
                     PlayerSettings.GetPlayerSettings().StartCoroutine(this.MoveNodeToGarbage(selectedObject.AllAncestors()));
                 }
-            } 
-                
-            
+            }
+
             // FIXME:(Thore) NetAction is no longer up to date
             new DeleteNetAction(selectedObject.name).Execute(null);
         }
@@ -270,12 +267,11 @@ namespace SEE.Controls.Actions
             foreach (GameObject deletedNode in deletedNodes)
             {
                 Vector3 shrinkFactor = VectorOperations.DivideVectors(deletedNode.transform.localScale, defaultGarbageVector);
-                Debug.Log(shrinkFactor);
                 if (!shrinkFactors.ContainsKey(deletedNode))
                 {
                     shrinkFactors.Add(deletedNode, shrinkFactor);
                 }
-                deletedNode.transform.localScale =  VectorOperations.VectorMultiplication(deletedNode.transform.localScale, shrinkFactor);
+                deletedNode.transform.localScale = VectorOperations.VectorMultiplication(deletedNode.transform.localScale, shrinkFactor);
                 Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), TimeForAnimation);
             }
             yield return new WaitForSeconds(TimeToWait);
@@ -288,7 +284,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="deletedNode">The nodes to be removed from the garbage-can</param>
         /// <returns>the waiting time between moving deleted nodes from the garbage-can and then to the city</returns>
-        private IEnumerator WaitAndExpand (GameObject deletedNode)
+        private IEnumerator WaitAndExpand(GameObject deletedNode)
         {
             yield return new WaitForSeconds(TimeToWait);
             Vector3 shrinkFactor = shrinkFactors[deletedNode];
@@ -296,8 +292,9 @@ namespace SEE.Controls.Actions
             float exponent = 1 / animations;
             shrinkFactor = VectorOperations.ExponentOfVectorCoordinates(shrinkFactor, exponent);
 
-            while ((animationsCount) > 0 ) {
-               deletedNode.transform.localScale = VectorOperations.DivideVectors(shrinkFactor, deletedNode.transform.localScale);
+            while ((animationsCount) > 0)
+            {
+                deletedNode.transform.localScale = VectorOperations.DivideVectors(shrinkFactor, deletedNode.transform.localScale);
                 yield return new WaitForSeconds(0.14f);
                 animationsCount--;
             }
@@ -313,11 +310,10 @@ namespace SEE.Controls.Actions
             // up, out of the garbage can
             foreach (GameObject deletedNode in deletedNodes)
             {
-
                 Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), TimeForAnimation);
                 PlayerSettings.GetPlayerSettings().StartCoroutine(WaitAndExpand(deletedNode));
             }
-       
+
             yield return new WaitForSeconds(TimeToWait);
 
             // back to the original position
@@ -420,7 +416,6 @@ namespace SEE.Controls.Actions
                 Graph graph = edgeRef.edge.ItsGraph;
                 DeletedEdges[gameEdge] = graph;
                 graph.RemoveEdge(edgeRef.edge);
-                
             }
         }
 
