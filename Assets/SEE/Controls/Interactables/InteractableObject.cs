@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.MixedReality.Toolkit.Input;
+using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls
@@ -26,7 +28,9 @@ namespace SEE.Controls
     /// <summary>
     /// Super class of the behaviours of game objects the player interacts with.
     /// </summary>
-    [RequireComponent(typeof(Interactable))]
+    //[RequireComponent(typeof(GraphElement))]
+    //[RequireComponent(typeof(Interactable))]
+    // TODO(torben): for some reason, with these enabled, unity can not attach this component, even though the required components exist... (InteractableDecorator.cs)
     public sealed class InteractableObject : MonoBehaviour, IMixedRealityFocusHandler
     {
         // Tutorial on grabbing objects:
@@ -61,6 +65,11 @@ namespace SEE.Controls
         public static readonly HashSet<InteractableObject> HoveredObjects = new HashSet<InteractableObject>();
 
         /// <summary>
+        /// The object, that is currently hovered by this player.
+        /// </summary>
+        public static InteractableObject HoveredObject { get; private set; } = null;
+
+        /// <summary>
         /// The selected objects.
         /// </summary>
         public static readonly HashSet<InteractableObject> SelectedObjects = new HashSet<InteractableObject>();
@@ -71,9 +80,72 @@ namespace SEE.Controls
         public static readonly HashSet<InteractableObject> GrabbedObjects = new HashSet<InteractableObject>();
 
         /// <summary>
+        /// The selected objects per graph.
+        /// </summary>
+        private static readonly Dictionary<Graph, HashSet<InteractableObject>> graphToSelectedIOs = new Dictionary<Graph, HashSet<InteractableObject>>();
+
+        /// <summary>
         /// The unique id of the interactable object.
         /// </summary>
         public uint ID { get; private set; }
+
+        /// <summary>
+        /// The graph element, this interactable object is attached to.
+        /// </summary>
+        public GraphElementRef GraphElemRef { get; private set; }
+
+        public bool TryGetNodeRef(out NodeRef nodeRef)
+        {
+            bool result = false;
+            nodeRef = null;
+            if (GraphElemRef is NodeRef)
+            {
+                result = true;
+                nodeRef = (NodeRef)GraphElemRef;
+            }
+            return result;
+        }
+
+        public bool TryGetEdgeRef(out EdgeRef edgeRef)
+        {
+            bool result = false;
+            edgeRef = null;
+            if (GraphElemRef is EdgeRef)
+            {
+                result = true;
+                edgeRef = (EdgeRef)GraphElemRef;
+            }
+            return result;
+        }
+
+        public NodeRef GetNodeRef()
+        {
+            Assert.IsTrue(GraphElemRef is NodeRef);
+            return (NodeRef)GraphElemRef;
+        }
+
+        public EdgeRef GetEdgeRef()
+        {
+            Assert.IsTrue(GraphElemRef is EdgeRef);
+            return (EdgeRef)GraphElemRef;
+        }
+
+        public Node GetNode()
+        {
+            Assert.IsTrue(GraphElemRef is NodeRef);
+            return (Node)GraphElemRef.elem;
+        }
+
+        public Edge GetEdge()
+        {
+            Assert.IsTrue(GraphElemRef is EdgeRef);
+            return (Edge)GraphElemRef.elem;
+        }
+
+        public Graph ItsGraph()
+        {
+            return GraphElemRef.elem.ItsGraph;
+        }
 
         /// <summary>
         /// A bit vector for hovering flags. Each flag is a bit as defined in <see cref="HoverFlag"/>.
@@ -132,6 +204,7 @@ namespace SEE.Controls
             ID = nextID++;
             idToInteractableObjectDict.Add(ID, this);
             gameObject.TryGetComponentOrLog(out interactable);
+            GraphElemRef = GetComponent<GraphElementRef>();
         }
 
         /// <summary>
@@ -149,7 +222,22 @@ namespace SEE.Controls
             return result;
         }
 
-        #region Interaction
+        /// <summary>
+        /// Returns the currently selected objects of given graph.
+        /// </summary>
+        /// <param name="graph">The graph, that the selected objects must be contained
+        /// by.</param>
+        /// <returns>The currently selected objects of given graph.</returns>
+        public static HashSet<InteractableObject> GetSelectedObjectsOfGraph(Graph graph)
+        {
+            if (!graphToSelectedIOs.ContainsKey(graph))
+            {
+                graphToSelectedIOs[graph] = new HashSet<InteractableObject>();
+            }
+            return graphToSelectedIOs[graph];
+        }
+            
+  #region Interaction
 
         /// <summary>
         /// Sets <see cref="HoverFlags"/> to given <paramref name="hoverFlags"/>. Then if 
@@ -173,6 +261,8 @@ namespace SEE.Controls
         /// <param name="isOwner">Whether this client is initiating the hovering action.</param>
         public void SetHoverFlags(uint hoverFlags, bool isOwner)
         {
+            Assert.IsTrue(HoverFlags != hoverFlags);
+
             HoverFlags = hoverFlags;
 
             if (IsHovered)
@@ -187,6 +277,7 @@ namespace SEE.Controls
                     LocalAnyHoverIn?.Invoke(this);
                 }
                 HoveredObjects.Add(this);
+                HoveredObject = this;
             }
             else
             {
@@ -200,6 +291,7 @@ namespace SEE.Controls
                     LocalAnyHoverOut?.Invoke(this);
                 }
                 HoveredObjects.Remove(this);
+                HoveredObject = null;
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
@@ -239,6 +331,10 @@ namespace SEE.Controls
             SetHoverFlags(hoverFlags, isOwner);
         }
 
+        /// <summary>
+        /// Unhovers all objects.
+        /// </summary>
+        /// <param name="isOwner">Whether this client is initiating the grabbing action.</param>
         public static void UnhoverAll(bool isOwner)
         {
             while (HoveredObjects.Count != 0)
@@ -255,17 +351,24 @@ namespace SEE.Controls
         /// <param name="isOwner">Whether this client is initiating the selection action.</param>
         public void SetSelect(bool select, bool isOwner)
         {
-            IsSelected = select;
+            Assert.IsTrue(IsSelected != select);
 
-            if (!IsGrabbed && !IsSelected && IsHovered)
-            {
-                // Hovering is a continuous operation, that is why we call it here
-                // when the object is in the focus but neither grabbed nor selected.
-                SetHoverFlag(HoverFlag.None, true, isOwner); // TODO(torben): is this really necessary? a hover event is invoked, even though nothing changes. these events also create unnecessary performance overhead. also: @DoubleHoverEventPerformance
-            }
+            IsSelected = select;
 
             if (select)
             {
+                // Update all selected object list
+                SelectedObjects.Add(this);
+
+                // Update all selected object list per graph
+                Graph g = GraphElemRef.elem.ItsGraph;
+                if (!graphToSelectedIOs.ContainsKey(g))
+                {
+                    graphToSelectedIOs[g] = new HashSet<InteractableObject>();
+                }
+                graphToSelectedIOs[g].Add(this);
+
+                // Invoke events
                 SelectIn?.Invoke(this, isOwner);
                 AnySelectIn?.Invoke(this, isOwner);
                 if (isOwner)
@@ -275,10 +378,16 @@ namespace SEE.Controls
                     LocalSelectIn?.Invoke(this);
                     LocalAnySelectIn?.Invoke(this);
                 }
-                SelectedObjects.Add(this);
             }
             else
             {
+                // Update all selected object list
+                SelectedObjects.Remove(this);
+
+                // Update all selected object list per graph
+                graphToSelectedIOs[GraphElemRef.elem.ItsGraph].Remove(this);
+
+                // Invoke events
                 SelectOut?.Invoke(this, isOwner);
                 AnySelectOut?.Invoke(this, isOwner);
                 if (isOwner)
@@ -288,7 +397,6 @@ namespace SEE.Controls
                     LocalSelectOut?.Invoke(this);
                     LocalAnySelectOut?.Invoke(this);
                 }
-                SelectedObjects.Remove(this);
             }
 
             if (!Net.Network.UseInOfflineMode && isOwner)
@@ -300,7 +408,7 @@ namespace SEE.Controls
         /// <summary>
         /// Deselects all currently selected interactable objects.
         /// </summary>
-        /// <param name="isOwner">Whether this client is initiating the selection action.
+        /// <param name="isOwner">Whether this client is initiating the action.</param>
         public static void UnselectAll(bool isOwner)
         {
             while (SelectedObjects.Count != 0)
@@ -310,13 +418,34 @@ namespace SEE.Controls
         }
 
         /// <summary>
+        /// Deselects all currently selected interactable objects within given
+        /// <paramref name="graph"/>.
+        /// </summary>
+        /// <param name="graph">The graph of which the objects are to be deselected.</param>
+        /// <param name="isOwner">Whether this client is initiating the action.</param>
+        public static void UnselectAllInGraph(Graph graph, bool isOwner)
+        {
+            if (graphToSelectedIOs.TryGetValue(graph, out HashSet<InteractableObject> s))
+            {
+                HashSet<InteractableObject>.Enumerator e;
+                while (s.Count != 0)
+                {
+                    e = s.GetEnumerator();
+                    e.MoveNext();
+                    e.Current.SetSelect(false, isOwner);
+                }
+            }
+        }
+
+        /// <summary>
         /// Visually emphasizes this object for grabbing.
         /// </summary>
         /// <param name="grab">Whether this object should be grabbed.</param>
-        /// <param name="isOwner">Whether this client is initiating the grabbing action.
-        /// </param>
+        /// <param name="isOwner">Whether this client is initiating the grabbing action.</param>
         public void SetGrab(bool grab, bool isOwner)
         {
+            Assert.IsTrue(IsGrabbed != grab);
+
             IsGrabbed = grab;
 
             if (grab)
@@ -343,17 +472,6 @@ namespace SEE.Controls
                     LocalGrabOut?.Invoke(this);
                     LocalAnyGrabOut?.Invoke(this);
                 }
-
-                // Hovering and selection are continuous operations, that is why we call them here
-                // when the object is in the focus but not grabbed any longer.
-                if (IsSelected)
-                {
-                    SetSelect(true, isOwner); // See: @DoubleHoverEventPerformance
-                }
-                else if (IsHovered)
-                {
-                    SetHoverFlag(HoverFlag.None, true, isOwner); // See: @DoubleHoverEventPerformance
-                }
                 GrabbedObjects.Remove(this);
             }
 
@@ -372,6 +490,10 @@ namespace SEE.Controls
             }
         }
 
+        /// <summary>
+        /// Ungrabs all objects.
+        /// </summary>
+        /// <param name="isOwner">Whether this client is initiating the grabbing action.</param>
         public static void UngrabAll(bool isOwner)
         {
             while (GrabbedObjects.Count != 0)
@@ -629,7 +751,6 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseEnter()
         {
-            // FIXME: For an unknown reason, this method will be called twice per frame.
             // Debug.LogFormat("{0}.OnMouseEnter({1}) @ {2}\n", this.GetType().FullName, gameObject.name, Time.time);
             if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer && !Raycasting.IsMouseOverGUI())
             {
@@ -662,8 +783,6 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseExit()
         {
-            // FIXME: For an unknown reason, this method will be called twice per frame.
-            // Debug.LogFormat("{0}.OnMouseExit({1}) @ {2}\n", this.GetType().FullName, gameObject.name, Time.time.ToString("F20"));
             if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer && !Raycasting.IsMouseOverGUI())
             {
                 SetHoverFlag(HoverFlag.World, setFlag: false, isOwner: true);

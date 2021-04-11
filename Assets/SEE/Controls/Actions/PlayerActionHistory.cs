@@ -50,6 +50,7 @@ namespace SEE.Controls.Actions
         /// <param name="actionType">kind of action to be executed</param>
         public static void Execute(ActionStateType actionType)
         {
+            ActionState.Value = actionType;
             history.Execute(actionType.CreateReversible());
         }
 

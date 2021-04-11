@@ -1,4 +1,6 @@
 ﻿using OdinSerializer;
+using SEE.DataModel.DG;
+using System;
 
 namespace SEE.GO
 {
@@ -8,5 +10,6 @@ namespace SEE.GO
     /// </summary>
     public abstract class GraphElementRef : SerializedMonoBehaviour
     {
+        [NonSerialized] public GraphElement elem;
     }
 }

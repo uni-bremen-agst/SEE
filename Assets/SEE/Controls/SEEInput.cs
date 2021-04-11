@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Controls
 {
@@ -164,6 +163,11 @@ namespace SEE.Controls
         internal static bool Snap()
         {
             return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.Snap);
+        }
+
+        internal static bool Drag()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.Drag);
         }
 
         //-----------------------------------------------------
