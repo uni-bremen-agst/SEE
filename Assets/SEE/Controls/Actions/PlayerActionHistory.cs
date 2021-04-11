@@ -48,7 +48,7 @@
         /// <param name="actionType">kind of action to be executed</param>
         public static void Execute(ActionStateType actionType)
         {
-            history.Execute(actionType.CreateReversible(),"1"); //FIXME: USE THE PLAYERS IP FOR THAT
+            history.Execute(actionType.CreateReversible(),"1" ); //FIXME: USE THE PLAYERS IP FOR THAT
 
             // FIXME: This looks like a hack and should be removed later.
             // The PlayerActionHistory should not need to know anything about its actions.

@@ -23,7 +23,8 @@ public class GlobalActionHistory
     /// <summary>
     /// 
     /// </summary>
-    private bool isRedo = false;
+    private bool isRedo = false; //FIXME: IF we want to implement this we need an dictionary for each player otherwise it will destroy the funtion in multiplayer 
+
 
     /// <summary>
     /// The actionList it has an Tupel of the time as it was performed, Player ID, The type of the Action (Undo Redo Action), the ReversibleAction, and the list with the ids of the GameObjects
@@ -189,9 +190,10 @@ public class GlobalActionHistory
     /// <param name="userid"></param>
     public void Undo(string userid) //FIXME: UNDO AND REDO NEEDS TO UPDATE ALSO THE ACTIVEACTION
     {
-        Tuple<Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>>, bool> find;
-        find = Find(userid, HistoryType.action);    //Should be the same as getActiveAction     //With the result we need to calculate whether we can du undo or not and what changes the gameobject need
-        SetActiveAction(userid, find.Item1.Item4);
+       Tuple<Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>>, bool> find;
+            find = Find(userid, HistoryType.action);    //Should be the same as getActiveAction     //With the result we need to calculate whether we can du undo or not and what changes the gameobject need
+            //SetActiveAction(userid, find.Item1.Item4);
+        
         while (!GetActiveAction(userid).HadEffect())
         {
             Debug.Log(GetActiveAction(userid));
@@ -199,7 +201,9 @@ public class GlobalActionHistory
             if (actionList.Count > 1)
             {
                 // POP
-                DeleteItem(find.Item1.Item2, find.Item1.Item1);
+                Debug.Log("had effect active action");
+                Debug.Log(find.Item1.Item4.HadEffect());
+                DeleteItem(find.Item1.Item2, find.Item1.Item1); //hier ist nicht sicher gestellt das es das GetActiveAction gleiche ist
                 find = Find(userid, HistoryType.action);
                 SetActiveAction(userid, find.Item1.Item4);
             }
