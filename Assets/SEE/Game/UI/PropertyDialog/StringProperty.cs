@@ -49,26 +49,26 @@ namespace SEE.Game.UI.PropertyDialog
             textField = GetTextField(inputField);
             textField.text = savedValue;
 
-            void SetInitialInput(GameObject inputField, string value)
+            void SetInitialInput(GameObject field, string value)
             {
-                if (!string.IsNullOrEmpty(value) && inputField.TryGetComponent(out TMP_InputField tmPro))
+                if (!string.IsNullOrEmpty(value) && field.TryGetComponent(out TMP_InputField tmPro))
                 {
                     tmPro.text = value;
                 }
             }
 
-            void SetLabel(GameObject inputField)
+            void SetLabel(GameObject field)
             {
-                Transform placeHolder = inputField.transform.Find("Placeholder");
+                Transform placeHolder = field.transform.Find("Placeholder");
                 if (placeHolder.gameObject.TryGetComponentOrLog(out TextMeshProUGUI text))
                 {
                     text.text = Name;
                 }
             }
 
-            TextMeshProUGUI GetTextField(GameObject inputField)
+            TextMeshProUGUI GetTextField(GameObject field)
             {
-                Transform result = inputField.transform.Find("Text Area/Text");                
+                Transform result = field.transform.Find("Text Area/Text");                
                 if (result != null && result.gameObject.TryGetComponentOrLog(out TextMeshProUGUI text))
                 {
                     return text;
