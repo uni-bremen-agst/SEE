@@ -98,8 +98,9 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="parent">parent in which to fit the rectangle</param>
         /// <param name="position">center position of the rectangle</param>
-        /// <returns></returns>
-        private Vector3 FindSize(GameObject parent, Vector3 position)
+        /// <returns>the scale of a square (actually a cube, but with a very small height)
+        /// with center <see cref="position"/> that fits into the ground area of <paramref name="parent"/></returns>
+        private static Vector3 FindSize(GameObject parent, Vector3 position)
         {
             // TODO: We might want to implement something smarter
             // than that, see for instance:
