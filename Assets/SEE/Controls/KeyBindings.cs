@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -300,6 +301,7 @@ namespace SEE.Controls
         /// <summary>
         /// Toggles the source-code viewer.
         /// </summary>
+        [Obsolete("This keybinding is needed only for the video trailer and will soon disappear again.")]
         internal static KeyCode ShowCodeWindow = Register(KeyCode.F2, Scope.CodeViewer, "Toggles the source-code viewer.");
     }
 }
