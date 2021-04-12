@@ -29,7 +29,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// <summary>
         /// The list of cohesive groups of properties of the dialog. The properties of
         /// a group should be shown together because they are semantically related.
-        /// A group could be, for instance, be shown as a foldout or tab. The exact
+        /// A group could, for instance, be shown as a foldout or tab. The exact
         /// visual representation depends on the implementation.
         /// </summary>
         protected List<PropertyGroup> groups = new List<PropertyGroup>();
