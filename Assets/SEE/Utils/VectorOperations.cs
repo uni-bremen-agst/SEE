@@ -9,11 +9,11 @@ namespace SEE.Utils
     public class VectorOperations : MonoBehaviour
     {
         /// <summary>
-        /// Calculates the ration between two given vectors.
+        /// Calculates the ratio between two given vectors.
         /// </summary>
-        /// <param name="denominator">The vector by which the counter´s coordinated are divided by</param>
-        /// <param name="counter"> The counter vector - which is divided by the denominator´s coordinates</param>
-        /// <returns> The result of the component-wise division between the counter and denominator. </returns>
+        /// <param name="denominator">The vector by which the counter's coordinates are divided by</param>
+        /// <param name="counter">The counter vector - which is divided by the denominator's coordinates</param>
+        /// <returns>The result of the component-wise division between the counter and denominator.</returns>
         public static Vector3 DivideVectors(Vector3 denominator, Vector3 counter)
         {
             float xLocalScale = counter.x / denominator.x;
@@ -23,11 +23,11 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Exposes mathematically the coordinates of a given vector.
+        /// Returns the component-wise exponentials of the given <paramref name="vector"/>.
         /// </summary>
         /// <param name="vector">The given vector</param>
         /// <param name="exponent">The exponent</param>
-        /// <returns> The result vector of vector to the power of exponent</returns>
+        /// <returns>The component-wise exponentials of the given <paramref name="vector"/></returns>
         public static Vector3 ExponentOfVectorCoordinates(Vector3 vector, float exponent)
         {
             vector.x = (float)Math.Pow(vector.x, exponent);
@@ -39,11 +39,12 @@ namespace SEE.Utils
         /// <summary>
         /// Multiplies two given vectors component-wise. 
         /// </summary>
-        /// <param name="product">The first vector, in that case the multiplicand </param>
-        ///  <param name="factor">The second vector as a multiplicand</param>
-        public static Vector3 VectorMultiplication(Vector3 product, Vector3 factor)
+        /// <param name="left">The first vector, in that case the multiplicand </param>
+        /// <param name="right">The second vector as a multiplicand</param>
+        /// <returns>Component-wise multiplication of the two vectors</returns>
+        public static Vector3 VectorMultiplication(Vector3 left, Vector3 right)
         {
-            return new Vector3(product.x * factor.x, product.y * factor.y, product.z * factor.z);
+            return new Vector3(left.x * right.x, left.y * right.y, left.z * right.z);
         }
     }
 }
