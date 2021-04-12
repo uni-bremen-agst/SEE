@@ -32,7 +32,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// A group could, for instance, be shown as a foldout or tab. The exact
         /// visual representation depends on the implementation.
         /// </summary>
-        protected List<PropertyGroup> groups = new List<PropertyGroup>();
+        protected readonly List<PropertyGroup> groups = new List<PropertyGroup>();
 
         /// <summary>
         /// A read-only wrapper around the list of groups for this dialog.
