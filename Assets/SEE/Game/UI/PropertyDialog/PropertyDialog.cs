@@ -66,7 +66,7 @@ namespace SEE.Game.UI.PropertyDialog
 
         /// <summary>
         /// Event triggered when the user presses the OK button. Clients can
-        /// register on this event to receive a notifaction when this happens.
+        /// register on this event to receive a notification when this happens.
         /// </summary>
         public UnityEvent OnConfirm = new UnityEvent();
         /// <summary>
