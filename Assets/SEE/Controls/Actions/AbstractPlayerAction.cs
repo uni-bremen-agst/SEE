@@ -10,16 +10,6 @@ namespace SEE.Controls.Actions
     public abstract class AbstractPlayerAction : ReversibleAction
     {
         /// <summary>
-        /// The current name of the gameObject that contains the canvas operations and components.
-        /// </summary>
-        protected const string nameOfCanvasObject = "CanvasObject";
-
-        /// <summary>
-        /// The gameObject that contains the CanvasGenerator and the actual CanvasObject.
-        /// </summary>
-        protected GameObject canvasObject;
-
-        /// <summary>
         /// The object that the cursor hovers over.
         /// </summary>
         protected GameObject hoveredObject = null;
@@ -30,17 +20,6 @@ namespace SEE.Controls.Actions
         /// <see cref="Redo"/>, too.
         /// </summary>
         protected bool hadAnEffect = false;
-
-        /// <summary>
-        /// Finds the GameObject that contains the CanvasOperations and components
-        /// and saves it in the <see cref="canvasObject"/>.
-        /// </summary>
-        /// <returns>true if the <see cref="canvasObject"/> could be found</returns>
-        protected bool InitializeCanvasObject()
-        {
-            canvasObject = GameObject.Find(nameOfCanvasObject);
-            return canvasObject != null;
-        }
 
         /// <summary>
         /// The undo operation which has to be implemented specifically by subclasses

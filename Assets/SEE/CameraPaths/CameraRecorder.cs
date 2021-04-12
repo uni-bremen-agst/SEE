@@ -176,7 +176,7 @@ namespace SEE.CameraPaths
 
             // Press the KeyBindings.SavePathPosition key to save position on user demand. If the period has
             // been completed, the position is saved, too, if recording is not interactive.
-            if (Input.GetKeyDown(KeyBindings.SavePathPosition) || (!Interactive && accumulatedTime == 0.0f))
+            if (SEEInput.SavePathPosition() || (!Interactive && accumulatedTime == 0.0f))
             {
                 float trackingTime = Interactive ? Mathf.RoundToInt(Time.realtimeSinceStartup) : Time.realtimeSinceStartup;
                 for (int i = 0; i < trackedObjects.Length; i++)

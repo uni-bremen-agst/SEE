@@ -927,7 +927,7 @@ namespace SEE.Game.Charts
         /// <param name="max">The max value of the bounds.</param>
         public virtual void AreaHover(Vector2 min, Vector2 max)
         {
-            bool toggleHover = Input.GetKey(KeyBindings.ToggleMetricHoveringSelection);
+            bool toggleHover = SEEInput.ToggleMetricHoveringSelection();
             foreach (ChartMarker marker in activeMarkers)
             {
                 Vector2 markerPos = marker.transform.position;
@@ -966,7 +966,7 @@ namespace SEE.Game.Charts
         /// <param name="max">The max value of the bounds.</param>
         public virtual void AreaSelection(Vector2 min, Vector2 max)
         {
-            bool toggleSelect = Input.GetKey(KeyBindings.ToggleMetricHoveringSelection);
+            bool toggleSelect = SEEInput.ToggleMetricHoveringSelection();
             foreach (ChartMarker marker in activeMarkers)
             {
                 Vector2 markerPos = marker.transform.position;
