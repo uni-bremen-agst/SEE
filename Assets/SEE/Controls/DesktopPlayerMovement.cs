@@ -34,7 +34,8 @@ namespace SEE.Controls
             }
             else
             {
-                Debug.LogErrorFormat("Player {0} has no focus object assigned.\n", name);
+                cameraState.freeMode = true;
+                Debug.Log($"Player {name} has no focus object assigned.\n");
             }
             cameraState.distance = 2.0f;
             cameraState.yaw = 0.0f;
@@ -46,7 +47,7 @@ namespace SEE.Controls
         private void Update()
         {
             Camera mainCamera = MainCamera.Camera;
-            if (Input.GetKeyDown(KeyBindings.ToggleCameraLock))
+            if (SEEInput.ToggleCameraLock())
             {
                 if (cameraState.freeMode)
                 {
@@ -61,7 +62,7 @@ namespace SEE.Controls
             }
 
             float speed = Speed * Time.deltaTime;
-            if (Input.GetKey(KeyBindings.BoostCameraSpeed))
+            if (SEEInput.BoostCameraSpeed())
             {
                 speed *= BoostFactor;
             }
@@ -69,11 +70,11 @@ namespace SEE.Controls
             if (!cameraState.freeMode)
             {
                 float d = 0.0f;
-                if (Input.GetKey(KeyBindings.MoveForward))
+                if (SEEInput.MoveForward())
                 {
                     d += speed;
                 }
-                if (Input.GetKey(KeyBindings.MoveBackward))
+                if (SEEInput.MoveBackward())
                 {
                     d -= speed;
                 }
@@ -93,27 +94,27 @@ namespace SEE.Controls
             else // cameraState.freeMode == true
             {
                 Vector3 v = Vector3.zero;
-                if (Input.GetKey(KeyBindings.MoveForward))
+                if (SEEInput.MoveForward())
                 {
                     v += mainCamera.transform.forward;
                 }
-                if (Input.GetKey(KeyBindings.MoveBackward))
+                if (SEEInput.MoveBackward())
                 {
                     v -= mainCamera.transform.forward;
                 }
-                if (Input.GetKey(KeyBindings.MoveRight))
+                if (SEEInput.MoveRight())
                 {
                     v += mainCamera.transform.right;
                 }
-                if (Input.GetKey(KeyBindings.MoveLeft))
+                if (SEEInput.MoveLeft())
                 {
                     v -= mainCamera.transform.right;
                 }
-                if (Input.GetKey(KeyBindings.MoveUp))
+                if (SEEInput.MoveUp())
                 {
                     v += Vector3.up;
                 }
-                if (Input.GetKey(KeyBindings.MoveDown))
+                if (SEEInput.MoveDown())
                 {
                     v += Vector3.down;
                 }

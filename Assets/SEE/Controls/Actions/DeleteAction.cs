@@ -106,26 +106,35 @@ namespace SEE.Controls.Actions
         /// </summary>
         private bool isRunning = false;
 
+        /// <summary>
+        /// Sets <see cref="garbageCan"/> by retrieving it by name <see cref="GarbageCanName"/>
+        /// from the scene.
+        /// </summary>
         public override void Awake()
         {
             garbageCan = GameObject.Find(GarbageCanName);
         }
 
+        /// <summary>
+        /// Registers this action at <see cref="InteractableObject"/>.
+        /// </summary>
         public override void Start()
         {
             base.Stop();
-            Debug.Log("Start\n");
             InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
             InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
         }
 
+        /// <summary>
+        /// Unregisters this action at <see cref="InteractableObject"/>.
+        /// </summary>
         public override void Stop()
         {
             base.Stop();
-            Debug.Log("Stop\n");
             InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
             InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
         }
+
         /// <summary>
         /// See <see cref="ReversibleAction.Update"/>.
         /// </summary>
@@ -206,7 +215,7 @@ namespace SEE.Controls.Actions
 
                 if (edgeGraphPair.Key.TryGetComponentOrLog(out EdgeRef edgeReference))
                 {
-                    edgeGraphPair.Value.AddEdge(edgeReference.edge);
+                    edgeGraphPair.Value.AddEdge(edgeReference.Value);
                     PlayerSettings.GetPlayerSettings().StartCoroutine(DelayEdges(edgeGraphPair.Key));
                 }
             }
@@ -413,9 +422,9 @@ namespace SEE.Controls.Actions
             if (gameEdge.TryGetComponentOrLog(out EdgeRef edgeRef))
             {
                 gameEdge.SetVisibility(false, true);
-                Graph graph = edgeRef.edge.ItsGraph;
+                Graph graph = edgeRef.Value.ItsGraph;
                 DeletedEdges[gameEdge] = graph;
-                graph.RemoveEdge(edgeRef.edge);
+                graph.RemoveEdge(edgeRef.Value);
             }
         }
 
