@@ -500,6 +500,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player1RightHand
       objectReference: {fileID: 0}
+    - target: {fileID: 1000010304998954, guid: 6def53d002137b747aec0b29551e0e25, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4000012125075130, guid: 6def53d002137b747aec0b29551e0e25, type: 3}
       propertyPath: m_RootOrder
       value: 16
@@ -3075,7 +3079,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1000013348574242, guid: 638779290bce1af49b356f33dcc6fccf, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4000013303659494, guid: 638779290bce1af49b356f33dcc6fccf, type: 3}
       propertyPath: m_RootOrder
@@ -3667,7 +3671,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1000013597184258, guid: 057574477c20401448aba7c848873712, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4000013477813392, guid: 057574477c20401448aba7c848873712, type: 3}
       propertyPath: m_RootOrder
@@ -17446,6 +17450,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   portalPlane: {fileID: 428063745}
   id: 4
+  cursor: {fileID: 0}
 --- !u!114 &428063745
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18742,13 +18747,25 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 1
+      Data: 2
     - Name: 
       Entry: 7
       Data: 
     - Name: $k
       Entry: 1
-      Data: Cluster
+      Data: File
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Directory
     - Name: $v
       Entry: 5
       Data: true
@@ -19052,6 +19069,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   portalPlane: {fileID: 461367512}
   id: 3
+  cursor: {fileID: 0}
 --- !u!65 &461367515
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -23764,7 +23782,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1131995435672909074, guid: 0cfb877532fdaec40901708c5df3b9f5, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1131995435672909077, guid: 0cfb877532fdaec40901708c5df3b9f5, type: 3}
       propertyPath: m_RootOrder
@@ -28579,7 +28597,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1131995435672909074, guid: 28ab7e8ce80ea4d408ea905a1b651689, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1131995435672909077, guid: 28ab7e8ce80ea4d408ea905a1b651689, type: 3}
       propertyPath: m_RootOrder
@@ -33314,6 +33332,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   portalPlane: {fileID: 816506529}
   id: 5
+  cursor: {fileID: 0}
 --- !u!114 &816506529
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -54971,6 +54990,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   portalPlane: {fileID: 1409350047}
   id: 0
+  cursor: {fileID: 0}
 --- !u!114 &1409350047
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -68611,7 +68631,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1000010184414672, guid: 5dc81ef5cae96304586abbc6e4b5beb8, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4000011683143748, guid: 5dc81ef5cae96304586abbc6e4b5beb8, type: 3}
       propertyPath: m_RootOrder
