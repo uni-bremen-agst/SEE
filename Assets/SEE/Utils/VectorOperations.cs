@@ -26,7 +26,7 @@ namespace SEE.Utils
         /// Exposes mathematically the coordinates of a given vector.
         /// </summary>
         /// <param name="vector">The given vector</param>
-        /// <param name="exponent"> The exponent</param>
+        /// <param name="exponent">The exponent</param>
         /// <returns> The result vector of vector to the power of exponent</returns>
         public static Vector3 ExponentOfVectorCoordinates(Vector3 vector, float exponent)
         {
@@ -39,8 +39,8 @@ namespace SEE.Utils
         /// <summary>
         /// Multiplies two given vectors component-wise. 
         /// </summary>
-        /// <param name="product">The first vector, in that case a multiplicand </param>
-        ///  <param name="factor"> the second vector as a multiplicand</param>
+        /// <param name="product">The first vector, in that case the multiplicand </param>
+        ///  <param name="factor">The second vector as a multiplicand</param>
         public static Vector3 VectorMultiplication(Vector3 product, Vector3 factor)
         {
             return new Vector3(product.x * factor.x, product.y * factor.y, product.z * factor.z);
