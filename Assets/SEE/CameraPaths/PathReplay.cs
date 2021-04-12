@@ -140,7 +140,7 @@ namespace SEE.CameraPaths
             }
             try
             {
-                path = CameraPath.ReadPath(Filename);                
+                path = CameraPath.ReadPath(Filename);
                 Debug.Log($"Read path for {MovedObject.name} from {Filename}\n");
                 if (ShowPath)
                 {
