@@ -18,11 +18,11 @@ namespace SEEEditor
             EdgeRef edgeRef = target as EdgeRef;
 
             GUILayout.Label("Edge attributes", EditorStyles.boldLabel);
-            if (edgeRef.edge != null)
+            if (edgeRef.Value != null)
             {
-                EditorGUILayout.TextField("Source node", edgeRef.edge.Source.ID);
-                EditorGUILayout.TextField("Target node", edgeRef.edge.Target.ID);
-                ShowTypeAndAttributes(edgeRef.edge);
+                EditorGUILayout.TextField("Source node", edgeRef.Value.Source.ID);
+                EditorGUILayout.TextField("Target node", edgeRef.Value.Target.ID);
+                ShowTypeAndAttributes(edgeRef.Value);
             }
             else
             {

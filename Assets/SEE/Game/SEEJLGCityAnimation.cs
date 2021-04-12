@@ -262,7 +262,7 @@ namespace SEE.Game
             }
 
             // Controls
-            if (Input.GetKeyDown(KeyBindings.ToggleAutomaticManualMode))
+            if (SEEInput.ToggleAutomaticManualMode())
             {
                 // Toggling automatic/manual execution mode.
                 inAutomaticMode = !inAutomaticMode;
@@ -293,7 +293,7 @@ namespace SEE.Game
                     ActivateNodeTextWindow(clickedGO);
                 }
             }
-            if (Input.GetKeyDown(KeyBindings.ToggleExecutionOrder))
+            if (SEEInput.ToggleExecutionOrder())
             {
                 // Reversing the order of execution.
                 updateIntervall = 1;                
@@ -318,13 +318,13 @@ namespace SEE.Game
             if (inAutomaticMode)
             {
                 // automatic mode
-                if (Input.GetKeyDown(KeyBindings.IncreaseAnimationSpeed))
+                if (SEEInput.IncreaseAnimationSpeed())
                 {
                     SpeedUp();
                     showLabelUntil = Time.time + 1f;
                     labelText = "Speed x" + 1f / updateIntervall;
                 }
-                if (Input.GetKeyDown(KeyBindings.DecreaseAnimationSpeed))
+                if (SEEInput.DecreaseAnimationSpeed())
                 {
                     SlowDown();
                     showLabelUntil = Time.time + 1f;
@@ -334,7 +334,7 @@ namespace SEE.Game
             else
             {
                 // manual mode
-                if (Input.GetKeyDown(KeyBindings.ExecuteToBreakpoint))
+                if (SEEInput.ExecuteToBreakpoint())
                 {
                     showLabelUntil = Time.time + 1f;
                     labelText = "Jumping to Breakpoint...";
@@ -349,17 +349,17 @@ namespace SEE.Game
                         labelText = "Could not find Breakpoint";
                     }
                 }
-                if (Input.GetKeyDown(KeyBindings.PreviousStatement))
+                if (SEEInput.PreviousStatement())
                 {
                     OneStep(false);
                     lastDirectionWasForward = false;
                 }
-                if (Input.GetKeyDown(KeyBindings.NextStatement))
+                if (SEEInput.NextStatement())
                 {
                     OneStep(true);
                     lastDirectionWasForward = true;
                 }
-                if (Input.GetKeyDown(KeyBindings.FirstStatement))
+                if (SEEInput.FirstStatement())
                 {
                     ResetComplete();
                 }

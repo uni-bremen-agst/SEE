@@ -163,7 +163,7 @@ namespace SEE.Controls
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyBindings.ShowCodeWindowMenu))
+            if (SEEInput.ShowCodeWindowMenu())
             {
                 CodeWindowMenu.ToggleMenu();
             }

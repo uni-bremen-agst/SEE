@@ -99,17 +99,17 @@ namespace SEE.Game
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyBindings.ToggleAutomaticManualMode))
+            if (SEEInput.ToggleAutomaticManualMode())
             {
                 isPaused = !isPaused;
                 Debug.Log($"execution pause set to {isPaused}.\n");
             }
-            if (Input.GetKeyDown(KeyBindings.IncreaseAnimationSpeed))
+            if (SEEInput.IncreaseAnimationSpeed())
             {
                 CallDuration = Mathf.Max(0.25f, CallDuration / 2.0f);
                 Debug.Log($"execution duration set to {CallDuration}.\n");
             }
-            if (Input.GetKeyDown(KeyBindings.DecreaseAnimationSpeed))
+            if (SEEInput.DecreaseAnimationSpeed())
             {
                 CallDuration = Mathf.Max(4.0f, CallDuration * 2.0f);
                 Debug.Log($"execution duration set to {CallDuration}.\n");
@@ -205,7 +205,7 @@ namespace SEE.Game
         {
             if (gameEdge.TryGetComponent<EdgeRef>(out EdgeRef edgeRef))
             {
-                return edgeRef.edge;
+                return edgeRef.Value;
             }
             else
             {
@@ -251,7 +251,7 @@ namespace SEE.Game
                 GameObject childGO = child.gameObject;
                 if (childGO.CompareTag(Tags.Edge))
                 {
-                    if (childGO.TryGetComponent(out EdgeRef edgeRef) && edgeRef.edge != null)
+                    if (childGO.TryGetComponent(out EdgeRef edgeRef) && edgeRef.Value != null)
                     {
                         edges.Add(childGO);
                     }

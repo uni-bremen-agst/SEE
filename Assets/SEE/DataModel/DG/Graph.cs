@@ -384,6 +384,11 @@ namespace SEE.DataModel.DG
             return edges.Values.ToList();
         }
 
+        public bool ContainsNode(string ID)
+        {
+            return nodes.ContainsKey(ID);
+        }
+
         /// <summary>
         /// Returns the node with the given unique ID. If there is no
         /// such node, node will be null and false will be returned; otherwise
@@ -1073,6 +1078,11 @@ namespace SEE.DataModel.DG
                 }
             }
             return result.ToList();
+        }
+
+        public static implicit operator bool(Graph graph)
+        {
+            return graph != null;
         }
     }
 }
