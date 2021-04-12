@@ -4,7 +4,7 @@ using UnityEngine;
 namespace SEE.Utils
 {
     /// <summary>
-    /// Contains simple mathematical vector operations .
+    /// Contains simple mathematical vector operations.
     /// </summary>
     public class VectorOperations : MonoBehaviour
     {
