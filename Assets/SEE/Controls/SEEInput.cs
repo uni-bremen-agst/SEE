@@ -44,7 +44,7 @@ namespace SEE.Controls
         /// True if KeyboardShortcutsEnabled and the key for the given <paramref name="digit"/>
         /// was pressed. Used as shortcuts for the menu entries.
         /// 
-        /// Precondition: 0 <= <paramref name="digit"/> <= 9.
+        /// Precondition: 0 &lt;= <paramref name="digit"/> &lt;= 9.
         /// </summary>
         /// <param name="digit">the checked digit</param>
         /// <returns>true if KeyboardShortcutsEnabled and the key for the given <paramref name="digit"/>
