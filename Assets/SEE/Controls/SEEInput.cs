@@ -5,7 +5,7 @@ namespace SEE.Controls
     /// <summary>
     /// Provides a logical abstraction of raw Unity inputs by the user.
     /// </summary>
-    internal class SEEInput
+    internal static class SEEInput
     {
         internal static bool KeyboardShortcutsEnabled = true;
 
