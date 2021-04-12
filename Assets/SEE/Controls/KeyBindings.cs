@@ -164,7 +164,7 @@ namespace SEE.Controls
         /// </summary>
         internal static KeyCode Reset = Register(KeyCode.R, Scope.Browsing, "Cancels an action.");
         /// <summary>
-        /// To zoom into a city.
+        /// Zooms into a city.
         /// </summary>
         internal static KeyCode ZoomInto = Register(KeyCode.G, Scope.Browsing, "To zoom into a city.");
         /// <summary>
@@ -263,7 +263,7 @@ namespace SEE.Controls
         /// </summary>
         internal static KeyCode ToggleAutomaticManualMode = Register(KeyCode.I, Scope.Debugging, "Toggles automatic/manual execution mode.");
         /// <summary>
-        /// Toggles execution order (foward/backward).
+        /// Toggles execution order (forward/backward).
         /// </summary>
         internal static KeyCode ToggleExecutionOrder = Register(KeyCode.O, Scope.Debugging, "Toggles execution order (foward/backward).");
         /// <summary>
