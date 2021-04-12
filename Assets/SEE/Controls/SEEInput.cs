@@ -48,7 +48,7 @@ namespace SEE.Controls
         /// </summary>
         /// <param name="digit">the checked digit</param>
         /// <returns>true if KeyboardShortcutsEnabled and the key for the given <paramref name="digit"/>
-        /// was pressed./returns>
+        /// was pressed.</returns>
         internal static bool DigitKeyPressed(int digit)
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyCode.Alpha1 + digit);
@@ -156,7 +156,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// To zoom into a city.
+        /// Zooms into a city.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         internal static bool ZoomInto()
@@ -325,7 +325,7 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleAutomaticManualMode);
         }
         /// <summary>
-        /// Toggles execution order (foward/backward).
+        /// Toggles execution order (forward/backward).
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         internal static bool ToggleExecutionOrder()
