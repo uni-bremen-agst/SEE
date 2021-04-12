@@ -135,7 +135,7 @@ namespace SEE.Controls.Actions
         /// <param name="node">node whose changes should be propagated</param>
         private static void NotifyClients(Node node)
         {
-            new EditNodeNetAction(node.ID, node.SourceName, node.Type);
+            new EditNodeNetAction(node.ID, node.SourceName, node.Type).Execute();
         }
 
         /// <summary>
