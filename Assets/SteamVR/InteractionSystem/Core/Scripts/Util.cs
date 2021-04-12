@@ -406,7 +406,7 @@ namespace Valve.VR.InteractionSystem
 			return vClosestPoint;
 		}
 
-		
+
 		//-------------------------------------------------
 		public static void AfterTimer( GameObject go, float _time, System.Action callback, bool trigger_if_destroyed_early = false )
 		{
