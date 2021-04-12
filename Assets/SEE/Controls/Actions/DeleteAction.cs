@@ -35,11 +35,6 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// The currently selected object (a node or edge) to be deleted.
-        /// </summary>
-        private GameObject selectedObject;
-
-        /// <summary>
         /// The waiting time of the animation for moving a node into a garbage can from over the garbage can.
         /// </summary>
         private const float TimeToWait = 1f;
@@ -111,7 +106,7 @@ namespace SEE.Controls.Actions
         /// True, if the moving process of a node to the garbage can is running, else false.
         /// Avoids multiple calls of coroutine.
         /// </summary>
-        private bool isRunning = false;
+        private bool animationIsRunning = false;
 
         /// <summary>
         /// Sets <see cref="garbageCan"/> by retrieving it by name <see cref="GarbageCanName"/>
@@ -123,41 +118,23 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Registers this action at <see cref="InteractableObject"/>.
-        /// </summary>
-        public override void Start()
-        {
-            base.Stop();
-            InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
-            InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
-        }
-
-        /// <summary>
-        /// Unregisters this action at <see cref="InteractableObject"/>.
-        /// </summary>
-        public override void Stop()
-        {
-            base.Stop();
-            InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
-            InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
-        }
-
-        /// <summary>
         /// See <see cref="ReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            // Delete a gameobject and all its children and incoming and outgoing edges.
-            if (selectedObject != null && !isRunning)
+            // FIXME: Needs adaptation for VR where no mouse is available.
+            if (!animationIsRunning
+                && Input.GetMouseButtonDown(0)
+                && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.None)
             {
-                Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
-                explicitlyDeletedNodesAndEdges.Add(selectedObject);
-                DeleteSelectedObject(selectedObject);
-                hadAnEffect = true;
-
-                // the selected objects are deleted and this action is done now
-                return true;
+                // the hit object is the parent in which to create the new node
+                GameObject hitGraphElement = raycastHit.collider.gameObject;
+                Assert.IsTrue(hitGraphElement.HasNodeRef() || hitGraphElement.HasEdgeRef());
+                explicitlyDeletedNodesAndEdges.Add(hitGraphElement);
+                bool result = Delete(hitGraphElement);
+                hadAnEffect = result;  
+                return result; // the selected objects are deleted and this action is done now
             }
             else
             {
@@ -170,21 +147,22 @@ namespace SEE.Controls.Actions
         /// edge or node. If it represents a node, the incoming and outgoing edges and
         /// its ancestors will be removed, too. For the possibility of an undo, the deleted objects will be saved. 
         /// 
-        /// Precondition: <paramref name="selectedObject"/> != null.
+        /// Precondition: <paramref name="deletedObject"/> != null.
         /// </summary>
-        /// <param GameObject="selectedObject">selected GameObject that along with its children should be removed</param>
-        public void DeleteSelectedObject(GameObject selectedObject)
+        /// <param GameObject="deletedObject">selected GameObject that along with its children should be removed</param>
+        /// <returns>true if <paramref name="deletedObject"/> was actually deleted</returns>
+        private bool Delete(GameObject deletedObject)
         {
-            if (selectedObject.CompareTag(Tags.Edge))
+            if (deletedObject.CompareTag(Tags.Edge))
             {
-                DeleteEdge(selectedObject);
+                DeleteEdge(deletedObject);
             }
-            else if (selectedObject.CompareTag(Tags.Node))
+            else if (deletedObject.CompareTag(Tags.Node))
             {
-                Debug.Log("deleteNode");
-                if (selectedObject.GetNode().IsRoot())
+                if (deletedObject.GetNode().IsRoot())
                 {
                     Debug.LogError("A root shall not be deleted.\n");
+                    return false;
                 }
                 else
                 {
@@ -192,12 +170,11 @@ namespace SEE.Controls.Actions
                     // will run an animation that moves them into a garbage bin. Only when they arrive there,
                     // we will actually delete them.
                     // FIXME: Shouldn't the edges be moved to the garbage bin, too?
-                    PlayerSettings.GetPlayerSettings().StartCoroutine(this.MoveNodeToGarbage(selectedObject.AllAncestors()));
+                    PlayerSettings.GetPlayerSettings().StartCoroutine(this.MoveNodeToGarbage(deletedObject.AllAncestors()));
                 }
             }
-
-            // FIXME:(Thore) NetAction is no longer up to date
-            new DeleteNetAction(selectedObject.name).Execute(null);
+            new DeleteNetAction(deletedObject.name).Execute();
+            return true;
         }
 
         /// <summary>
@@ -244,7 +221,7 @@ namespace SEE.Controls.Actions
         {
             foreach (GameObject gameObject in explicitlyDeletedNodesAndEdges)
             {
-                DeleteSelectedObject(gameObject);
+                Delete(gameObject);
             }
         }
 
@@ -260,7 +237,7 @@ namespace SEE.Controls.Actions
         /// <returns>the waiting time between moving deleted nodes over the garbage can and then into the garbage can</returns>
         private IEnumerator MoveNodeToGarbage(IList<GameObject> deletedNodes)
         {
-            isRunning = true;
+            animationIsRunning = true;
             // We need to reset the portal of all all deletedNodes so that we can move
             // them to the garbage bin. Otherwise they will become invisible if they 
             // leave their portal.
@@ -291,7 +268,7 @@ namespace SEE.Controls.Actions
                 Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), TimeForAnimation);
             }
             yield return new WaitForSeconds(TimeToWait);
-            isRunning = false;
+            animationIsRunning = false;
             InteractableObject.UnselectAll(true);
         }
 
@@ -322,7 +299,7 @@ namespace SEE.Controls.Actions
         /// <returns>the waiting time between moving deleted nodes from the garbage-can and then to the city</returns>
         private IEnumerator RemoveNodeFromGarbage(IList<GameObject> deletedNodes)
         {
-            isRunning = true;
+            animationIsRunning = true;
             // up, out of the garbage can
             foreach (GameObject deletedNode in deletedNodes)
             {
@@ -342,7 +319,7 @@ namespace SEE.Controls.Actions
             OldPositions.Clear();
             DeletedNodes.Clear();
             DeletedEdges.Clear();
-            isRunning = false;
+            animationIsRunning = false;
             InteractableObject.UnselectAll(true);
         }
 
@@ -393,7 +370,6 @@ namespace SEE.Controls.Actions
             {
                 DeleteNode(deletedGameNode);
             }
-            selectedObject = null;
         }
 
         /// <summary>
@@ -433,24 +409,6 @@ namespace SEE.Controls.Actions
                 DeletedEdges[gameEdge] = graph;
                 graph.RemoveEdge(edgeRef.Value);
             }
-        }
-
-        private void LocalAnySelectIn(InteractableObject interactableObject)
-        {
-            // FIXME: For an unknown reason, the mouse events in InteractableObject will be
-            // triggered twice per frame, which causes this method to be called twice.
-            // We need to further investigate this issue.
-            // Assert.IsNull(selectedObject);
-            selectedObject = interactableObject.gameObject;
-        }
-
-        private void LocalAnySelectOut(InteractableObject interactableObject)
-        {
-            // FIXME: For an unknown reason, the mouse events in InteractableObject will be
-            // triggered twice per frame, which causes this method to be called twice.
-            // We need to further investigate this issue.
-            // Assert.IsTrue(selectedObject == interactableObject.gameObject);
-            selectedObject = null;
         }
 
         /// <summary>
