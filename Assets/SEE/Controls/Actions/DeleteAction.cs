@@ -47,8 +47,8 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Contains all nodes and edges deleted as explicitly requested by the user.
         /// As a consequence of deleting a node, its ancestores along with their incoming and outgoing
-        /// edges may be deleted implicitly, too. All of these are kept in <see cref="DeletedNodes"/>
-        /// and <see cref="DeletedEdges"/>. Yet, if we need to redo a deletion, we need to remember
+        /// edges may be deleted implicitly, too. All of these are kept in <see cref="deletedNodes"/>
+        /// and <see cref="deletedEdges"/>. Yet, if we need to redo a deletion, we need to remember
         /// the explicitly deleted objects.
         /// </summary>
         private ISet<GameObject> explicitlyDeletedNodesAndEdges = new HashSet<GameObject>();
@@ -56,17 +56,17 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// A history of all nodes and the graph where they were attached to, deleted by this action.
         /// </summary>
-        private Dictionary<GameObject, Graph> DeletedNodes { get; set; } = new Dictionary<GameObject, Graph>();
+        private Dictionary<GameObject, Graph> deletedNodes { get; set; } = new Dictionary<GameObject, Graph>();
 
         /// <summary>
         /// A history of the old positions of the nodes deleted by this action.
         /// </summary>
-        private Dictionary<GameObject, Vector3> OldPositions = new Dictionary<GameObject, Vector3>();
+        private Dictionary<GameObject, Vector3> oldPositions = new Dictionary<GameObject, Vector3>();
 
         /// <summary>
         /// A history of all edges and the graph where they were attached to, deleted by this action.
         /// </summary>
-        private Dictionary<GameObject, Graph> DeletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
+        private Dictionary<GameObject, Graph> deletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
 
         /// <summary>
         /// A list of ratios of the current localScale and a target scale.
@@ -183,7 +183,7 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             // Re-add all nodes to their graphs.
-            foreach (KeyValuePair<GameObject, Graph> nodeGraphPair in DeletedNodes)
+            foreach (KeyValuePair<GameObject, Graph> nodeGraphPair in deletedNodes)
             {
                 if (nodeGraphPair.Key.TryGetComponentOrLog(out NodeRef nodeRef))
                 {
@@ -194,7 +194,7 @@ namespace SEE.Controls.Actions
                 }
             }
             // Re-add all edges to their graphs.
-            foreach (KeyValuePair<GameObject, Graph> edgeGraphPair in DeletedEdges)
+            foreach (KeyValuePair<GameObject, Graph> edgeGraphPair in deletedEdges)
             {
 
                 if (edgeGraphPair.Key.TryGetComponentOrLog(out EdgeRef edgeReference))
@@ -203,7 +203,7 @@ namespace SEE.Controls.Actions
                     PlayerSettings.GetPlayerSettings().StartCoroutine(DelayEdges(edgeGraphPair.Key));
                 }
             }
-            PlayerSettings.GetPlayerSettings().StartCoroutine(this.RemoveNodeFromGarbage(new List<GameObject>(DeletedNodes.Keys)));
+            PlayerSettings.GetPlayerSettings().StartCoroutine(this.RemoveNodeFromGarbage(new List<GameObject>(deletedNodes.Keys)));
         }
 
         /// <summary>
@@ -243,8 +243,8 @@ namespace SEE.Controls.Actions
             // leave their portal.
             foreach (GameObject deletedNode in deletedNodes)
             {
-                OldPositions[deletedNode] = deletedNode.transform.position;
-                if (!DeletedNodes.ContainsKey(deletedNode))
+                oldPositions[deletedNode] = deletedNode.transform.position;
+                if (!this.deletedNodes.ContainsKey(deletedNode))
                 {
                     Portal.SetInfinitePortal(deletedNode);
                 }
@@ -312,13 +312,13 @@ namespace SEE.Controls.Actions
             // back to the original position
             foreach (GameObject node in deletedNodes)
             {
-                Tweens.Move(node, OldPositions[node], TimeForAnimation);
+                Tweens.Move(node, oldPositions[node], TimeForAnimation);
             }
 
             yield return new WaitForSeconds(TimeToWait);
-            OldPositions.Clear();
-            DeletedNodes.Clear();
-            DeletedEdges.Clear();
+            oldPositions.Clear();
+            this.deletedNodes.Clear();
+            deletedEdges.Clear();
             animationIsRunning = false;
             InteractableObject.UnselectAll(true);
         }
@@ -387,7 +387,7 @@ namespace SEE.Controls.Actions
             if (gameNode.TryGetComponentOrLog(out NodeRef nodeRef))
             {
                 Graph graph = nodeRef.Value.ItsGraph;
-                DeletedNodes[gameNode] = graph;
+                deletedNodes[gameNode] = graph;
                 graph.RemoveNode(nodeRef.Value);
             }
         }
@@ -406,7 +406,7 @@ namespace SEE.Controls.Actions
             {
                 gameEdge.SetVisibility(false, true);
                 Graph graph = edgeRef.Value.ItsGraph;
-                DeletedEdges[gameEdge] = graph;
+                deletedEdges[gameEdge] = graph;
                 graph.RemoveEdge(edgeRef.Value);
             }
         }
