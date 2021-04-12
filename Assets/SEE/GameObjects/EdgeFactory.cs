@@ -92,7 +92,7 @@ namespace SEE.GO
                 name = layoutEdge.ItsEdge.ID
             };
             EdgeRef edgeRef = gameEdge.AddComponent<EdgeRef>();
-            edgeRef.edge = layoutEdge.ItsEdge;
+            edgeRef.Value = layoutEdge.ItsEdge;
             edgeRef.SourceNodeID = layoutEdge.Source.ID;
             edgeRef.TargetNodeID = layoutEdge.Source.ID;
             return gameEdge;

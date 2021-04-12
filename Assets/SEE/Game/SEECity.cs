@@ -225,8 +225,8 @@ namespace SEE.Game
                 }
                 else if (child.TryGetComponent(out EdgeRef edgeRef))
                 {
-                    edgeRef.edge = graph.GetEdge(child.name);
-                    if (edgeRef.edge == null)
+                    edgeRef.Value = graph.GetEdge(child.name);
+                    if (edgeRef.Value == null)
                     {
                         Debug.LogWarningFormat("Could not resolve edge reference {0}.\n", child.name);          
                     }
