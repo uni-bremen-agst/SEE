@@ -198,7 +198,7 @@ namespace SEE.CameraPaths
         /// </summary>
         private void Update()
         {
-            if (Input.GetKeyDown(KeyBindings.TogglePathPlaying))
+            if (SEEInput.TogglePathPlaying())
             {
                 isRunning = !isRunning;
             }
