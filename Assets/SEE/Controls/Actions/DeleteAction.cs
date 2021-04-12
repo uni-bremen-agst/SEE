@@ -81,15 +81,15 @@ namespace SEE.Controls.Actions
         private readonly Vector3 defaultGarbageVector = new Vector3(0.1f, 0.1f, 0.1f);
 
         /// <summary>
-        /// Number of animations which is used for an object's expansion, removing it from the garbage can.
+        /// Number of animations used for an object's expansion, removing it from the garbage can.
         /// </summary>
-        private const float animations = 10;
+        private const float stepsOfExpansionAnimation = 10;
 
         /// <summary>
         /// The time (in seconds) between animations of expanding a node that is being restored
         /// from the garbage can.
         /// </summary>
-        private const float TimeBetweenExpansionAnimation = 0.14f;
+        private const float timeBetweenExpansionAnimation = 0.14f;
 
         /// <summary>
         /// The name of the garbage can gameObject.
@@ -281,14 +281,14 @@ namespace SEE.Controls.Actions
         {
             yield return new WaitForSeconds(TimeToWait);
             Vector3 shrinkFactor = shrinkFactors[deletedNode];
-            float animationsCount = animations;
-            float exponent = 1 / animations;
+            float animationsCount = stepsOfExpansionAnimation;
+            float exponent = 1 / stepsOfExpansionAnimation;
             shrinkFactor = VectorOperations.ExponentOfVectorCoordinates(shrinkFactor, exponent);
 
             while (animationsCount > 0)
             {
                 deletedNode.transform.localScale = VectorOperations.DivideVectors(shrinkFactor, deletedNode.transform.localScale);
-                yield return new WaitForSeconds(TimeBetweenExpansionAnimation);
+                yield return new WaitForSeconds(timeBetweenExpansionAnimation);
                 animationsCount--;
             }
         }
