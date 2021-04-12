@@ -1,5 +1,8 @@
-﻿using SEE.GO;
+﻿using SEE.Controls;
+using SEE.DataModel.DG;
+using SEE.GO;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 
 namespace SEE.Utils
@@ -55,6 +58,33 @@ namespace SEE.Utils
                 {
                     result = HitGraphElement.Edge;
                     elementRef = edgeRef;
+                }
+            }
+            return result;
+        }
+
+        public static HitGraphElement RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject obj)
+        {
+            HitGraphElement result = HitGraphElement.None;
+
+            raycastHit = new RaycastHit();
+            obj = null;
+            Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
+            if (!IsMouseOverGUI() && Physics.Raycast(ray, out RaycastHit hit))
+            {
+                raycastHit = hit;
+                if (hit.transform.TryGetComponent(out InteractableObject io))
+                {
+                    if (io.GraphElemRef.elem is Node)
+                    {
+                        result = HitGraphElement.Node;
+                    }
+                    else
+                    {
+                        Assert.IsTrue(io.GraphElemRef.elem is Edge);
+                        result = HitGraphElement.Edge;
+                    }
+                    obj = io;
                 }
             }
             return result;

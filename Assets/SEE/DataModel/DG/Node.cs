@@ -635,5 +635,10 @@ namespace SEE.DataModel.DG
             }
             return false;
         }
+
+        public static implicit operator bool(Node node)
+        {
+            return node != null;
+        }
     }
 }

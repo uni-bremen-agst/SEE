@@ -14,7 +14,7 @@ namespace SEE.Game.UI3D
         public static readonly Color DefaultColorTertiary = new Color(1.0f, 0.0f, 0.5f, DefaultAlpha);
     }
 
-    internal class Cursor : MonoBehaviour
+    internal class Cursor3D : MonoBehaviour
     {
         private const string OutlineShaderName = "Unlit/CursorOutlineShader";
         private const string PlainColorShaderName = "Unlit/PlainColorShader";
@@ -32,7 +32,7 @@ namespace SEE.Game.UI3D
 
         private bool hasRunThisFrame;
 
-        private Cursor()
+        private Cursor3D()
         {
         }
 
@@ -52,10 +52,10 @@ namespace SEE.Game.UI3D
             }
         }
 
-        internal static Cursor Create()
+        internal static Cursor3D Create()
         {
             GameObject go = new GameObject("Cursor");
-            Cursor c = go.AddComponent<Cursor>();
+            Cursor3D c = go.AddComponent<Cursor3D>();
 
             c.focusses = new List<Transform>();
 
