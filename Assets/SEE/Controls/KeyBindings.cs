@@ -6,7 +6,7 @@ namespace SEE.Controls
     /// <summary>
     /// Defines the key codes for all interaction based on the keyboard in SEE.
     /// </summary>
-    static class KeyBindings
+    internal static class KeyBindings
     {
         // IMPORTANT NOTES:
         // (1) Keep in mind that KeyCodes in Unity map directly to a
