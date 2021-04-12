@@ -4,7 +4,6 @@ using SEE.Game;
 using SEE.GO;
 using SEE.Net;
 using SEE.Utils;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -80,14 +79,22 @@ namespace SEE.Controls.Actions
         private Dictionary<GameObject, Vector3> shrinkFactors { get; set; } = new Dictionary<GameObject, Vector3>();
 
         /// <summary>
-        ///  A vector for an objects localScale which fits into the garbage can          //TODO: Currently set to an absolute value. Should be set abstract, i.e. half of the garbage can´s diameter, for instance. 
+        ///  A vector for an objects localScale which fits into the garbage can.
+        ///  TODO: Currently set to an absolute value. Should be set abstract, e.g., half of the 
+        ///  garbage can's diameter. 
         /// </summary>
-        private Vector3 defaultGarbageVector = new Vector3(0.1f, 0.1f, 0.1f);
+        private readonly Vector3 defaultGarbageVector = new Vector3(0.1f, 0.1f, 0.1f);
 
         /// <summary>
-        /// Number of animations which is used for an object´s expansion, removing it from the garbage can.
+        /// Number of animations which is used for an object's expansion, removing it from the garbage can.
         /// </summary>
         private const float animations = 10;
+
+        /// <summary>
+        /// The time (in seconds) between animations of expanding a node that is being restored
+        /// from the garbage can.
+        /// </summary>
+        private const float TimeBetweenExpansionAnimation = 0.14f;
 
         /// <summary>
         /// The name of the garbage can gameObject.
@@ -301,10 +308,10 @@ namespace SEE.Controls.Actions
             float exponent = 1 / animations;
             shrinkFactor = VectorOperations.ExponentOfVectorCoordinates(shrinkFactor, exponent);
 
-            while ((animationsCount) > 0)
+            while (animationsCount > 0)
             {
                 deletedNode.transform.localScale = VectorOperations.DivideVectors(shrinkFactor, deletedNode.transform.localScale);
-                yield return new WaitForSeconds(0.14f);
+                yield return new WaitForSeconds(TimeBetweenExpansionAnimation);
                 animationsCount--;
             }
         }
