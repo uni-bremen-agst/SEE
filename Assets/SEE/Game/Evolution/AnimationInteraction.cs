@@ -476,19 +476,19 @@ namespace SEE.Game.Evolution
         {
             if (!IsRevisionSelectionOpen)
             {
-                if (Input.GetKeyDown(KeyBindings.PreviousRevision))
+                if (SEEInput.PreviousRevision())
                 {
                     evolutionRenderer.ShowPreviousGraph();
                 }
-                else if (Input.GetKeyDown(KeyBindings.NextRevision))
+                else if (SEEInput.NextRevision())
                 {
                     evolutionRenderer.ShowNextGraph();
                 }
-                else if (Input.GetKeyDown(KeyBindings.ToggleAutoPlay))
+                else if (SEEInput.ToggleAutoPlay())
                 {
                     evolutionRenderer.ToggleAutoPlay();
                 } 
-                else if (Input.GetKeyDown(KeyBindings.SetMarker))
+                else if (SEEInput.SetMarker())
                 {
                     Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
                     Vector3 markerPos = new Vector3(handlePos.x, handlePos.y + .08f, handlePos.z);
@@ -497,22 +497,22 @@ namespace SEE.Game.Evolution
                         AddMarker(markerPos, null);
                     }                    
                 } 
-                else if (Input.GetKeyDown(KeyBindings.DeleteMarker))
+                else if (SEEInput.DeleteMarker())
                 {
                     RemoveMarker(selectedMarker);
                 }
-                else if (Input.GetKeyDown(KeyBindings.IncreaseAnimationSpeed))
+                else if (SEEInput.IncreaseAnimationSpeed())
                 {
                     evolutionRenderer.AnimationLag = Mathf.Max(0.25f, evolutionRenderer.AnimationLag / 2);
                     Debug.Log($"new animation lag is {evolutionRenderer.AnimationLag}\n");
                 }
-                else if (Input.GetKeyDown(KeyBindings.DecreaseAnimationSpeed))
+                else if (SEEInput.DecreaseAnimationSpeed())
                 {
                     evolutionRenderer.AnimationLag = Mathf.Min(16.0f, evolutionRenderer.AnimationLag * 2);
                     Debug.Log($"new animation lag is {evolutionRenderer.AnimationLag}\n");
                 }
             }
-            if (Input.GetKeyDown(KeyBindings.ToggleEvolutionCanvases))
+            if (SEEInput.ToggleEvolutionCanvases())
             {
                 ToogleMode();
             }

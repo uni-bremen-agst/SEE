@@ -658,7 +658,7 @@ namespace SEE.Game
                 {                    
                     if (oldEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef oldEdgeRef) 
                         && newEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef newEdgeRef)
-                        && oldEdgeRef.edge.Equals(newEdgeRef.edge))
+                        && oldEdgeRef.Value.Equals(newEdgeRef.Value))
                     {
                         result.Add((oldEdgeGameObject, newEdgeGameObject));
                     }

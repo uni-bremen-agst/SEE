@@ -93,12 +93,12 @@ namespace SEE.Controls
         /// <summary>
         /// Undoes the last action.
         /// </summary>
-        internal static KeyCode Undo = Register(KeyCode.Z, Scope.CodeViewer, "Undoes the last action.");
+        internal static KeyCode Undo = Register(KeyCode.Z, Scope.Always, "Undoes the last action.");
 
         /// <summary>
         /// Re-does the last action.
         /// </summary>
-        internal static KeyCode Redo = Register(KeyCode.Y, Scope.CodeViewer, "Re-does the last action.");
+        internal static KeyCode Redo = Register(KeyCode.Y, Scope.Always, "Re-does the last action.");
 
         //-----------------------------------------------------
         // Camera path recording and playing
@@ -164,26 +164,30 @@ namespace SEE.Controls
         /// </summary>
         internal static KeyCode Reset = Register(KeyCode.R, Scope.Browsing, "Cancels an action.");
         /// <summary>
-        /// To zoom into a city.
+        /// Zooms into a city.
         /// </summary>
         internal static KeyCode ZoomInto = Register(KeyCode.G, Scope.Browsing, "To zoom into a city.");
         /// <summary>
         /// While moving the city, snaps to one of eight predefined directions.
         /// While rotating the city, rotates in 45 degree steps.
         /// </summary>
-        internal static KeyCode Snap = Register(KeyCode.LeftControl, Scope.Browsing, "Snap move/rotate city.");
+        internal static KeyCode Snap = Register(KeyCode.LeftAlt, Scope.Browsing, "Snap move/rotate city.");
+        /// <summary>
+        /// The user drags the city as a whole on the plane.
+        /// </summary>
+        internal static KeyCode Drag = Register(KeyCode.LeftControl, Scope.Browsing, "Drag city element.");
         /// <summary>
         /// Toggles between the locked and free camera mode.
         /// </summary>
         internal static KeyCode ToggleCameraLock = Register(KeyCode.L, Scope.Browsing, "Toggles between the locked and free camera mode.");
-        /// <summary>
-        /// Boosts the speed of the player movement. While pressed, movement is faster.
-        /// </summary>        
-        internal static KeyCode BoostCameraSpeed = Register(KeyCode.LeftShift, Scope.Browsing, "Boosts the speed of the player movement. While pressed, movement is faster.");
 
         //-----------------------------------------------------
         // Player (camera) movements.
         //-----------------------------------------------------
+        /// <summary>
+        /// Boosts the speed of the player movement. While pressed, movement is faster.
+        /// </summary>        
+        internal static KeyCode BoostCameraSpeed = Register(KeyCode.LeftShift, Scope.Browsing, "Boosts the speed of the player movement. While pressed, movement is faster.");
         /// <summary>
         /// Move camera (player) forward.
         /// </summary>
@@ -259,7 +263,7 @@ namespace SEE.Controls
         /// </summary>
         internal static KeyCode ToggleAutomaticManualMode = Register(KeyCode.I, Scope.Debugging, "Toggles automatic/manual execution mode.");
         /// <summary>
-        /// Toggles execution order (foward/backward).
+        /// Toggles execution order (forward/backward).
         /// </summary>
         internal static KeyCode ToggleExecutionOrder = Register(KeyCode.O, Scope.Debugging, "Toggles execution order (foward/backward).");
         /// <summary>
