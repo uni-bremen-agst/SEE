@@ -7,6 +7,7 @@ using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace SEE.Game.UI
@@ -176,7 +177,8 @@ namespace SEE.Game.UI
                 if (!button.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager) ||
                     !button.TryGetComponentOrLog(out Image buttonImage) ||
                     !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro) ||
-                    !icon.TryGetComponentOrLog(out Image iconImage))
+                    !icon.TryGetComponentOrLog(out Image iconImage) ||
+                    !button.TryGetComponentOrLog(out EventTrigger triggerComponent))
                 {
                     return;
                 }
@@ -184,7 +186,14 @@ namespace SEE.Game.UI
                 buttonManager.buttonText = entry.Title;
                 buttonManager.buttonIcon = entry.Icon;
                 buttonManager.hoverEvent.AddListener(() => ShowTooltip(entry.Description));
-                buttonManager.hoverExitEvent.AddListener(HideTooltip);
+                if (triggerComponent.triggers.Count != 1)
+                {
+                    Debug.LogError("The 'Event Trigger' component may only contain one trigger for the "
+                                   + "'PointerExit' event, not more and not less.\n");
+                    return;
+                }
+                EventTrigger.Entry trigger = triggerComponent.triggers.Single();
+                trigger.callback.AddListener(_ => HideTooltip());
                 if (entry.Enabled)
                 {
                     buttonManager.clickEvent.AddListener(() => OnEntrySelected(entry));
