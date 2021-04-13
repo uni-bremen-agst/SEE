@@ -35,16 +35,5 @@ namespace SEE.Utils
             vector.z = (float)Math.Pow(vector.z, exponent);
             return vector;
         }
-
-        /// <summary>
-        /// Multiplies two given vectors component-wise. 
-        /// </summary>
-        /// <param name="left">The first vector, in that case the multiplicand </param>
-        /// <param name="right">The second vector as a multiplicand</param>
-        /// <returns>Component-wise multiplication of the two vectors</returns>
-        public static Vector3 VectorMultiplication(Vector3 left, Vector3 right)
-        {
-            return new Vector3(left.x * right.x, left.y * right.y, left.z * right.z);
-        }
     }
 }

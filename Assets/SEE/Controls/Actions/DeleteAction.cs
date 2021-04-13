@@ -264,7 +264,7 @@ namespace SEE.Controls.Actions
                 {
                     shrinkFactors.Add(deletedNode, shrinkFactor);
                 }
-                deletedNode.transform.localScale = VectorOperations.VectorMultiplication(deletedNode.transform.localScale, shrinkFactor);
+                deletedNode.transform.localScale = Vector3.Scale(deletedNode.transform.localScale, shrinkFactor);
                 Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), TimeForAnimation);
             }
             yield return new WaitForSeconds(TimeToWait);
