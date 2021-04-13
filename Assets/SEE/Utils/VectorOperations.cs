@@ -6,7 +6,7 @@ namespace SEE.Utils
     /// <summary>
     /// Contains simple mathematical vector operations.
     /// </summary>
-    public class VectorOperations : MonoBehaviour
+    public static class VectorOperations
     {
         /// <summary>
         /// Calculates the ratio between two given vectors.
