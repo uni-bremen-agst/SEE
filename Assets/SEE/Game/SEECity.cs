@@ -264,7 +264,7 @@ namespace SEE.Game
             int numberOfErrors = MetricImporter.Load(LoadedGraph, filename);
             if (numberOfErrors > 0)
             {
-                Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", filename, numberOfErrors);
+                Debug.LogWarning($"CSV file {filename} has {numberOfErrors} many errors.\n");
             }
             p.End();
         }
