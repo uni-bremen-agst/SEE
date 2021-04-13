@@ -93,7 +93,7 @@ namespace SEE.Game.UI
                 // Create it from prefab if it doesn't exist yet
                 Object menuPrefab = Resources.Load<GameObject>(MENU_PREFAB);
                 MenuGameObject = Instantiate(menuPrefab, Canvas.transform, false) as GameObject;
-                UnityEngine.Assertions.Assert.IsNotNull(MenuGameObject);
+                Assert.IsNotNull(MenuGameObject);
                 MenuGameObject.name = Title;
                 MenuGameObject.TryGetComponentOrLog(out Manager);
             }
@@ -154,13 +154,13 @@ namespace SEE.Game.UI
         }
 
         /// <summary>
-        /// Adds the given <paramref name="entries"/> as buttons to the Desktop menu.
+        /// Adds the given <paramref name="buttonEntries"/> as buttons to the Desktop menu.
         /// </summary>
-        /// <param name="entries">The entries to add to the menu.</param>
-        protected virtual void AddDesktopButtons(IEnumerable<T> entries)
+        /// <param name="buttonEntries">The entries to add to the menu.</param>
+        protected virtual void AddDesktopButtons(IEnumerable<T> buttonEntries)
         {
             Object buttonPrefab = Resources.Load<GameObject>(BUTTON_PREFAB);
-            foreach (T entry in entries)
+            foreach (T entry in buttonEntries)
             {
                 GameObject button = Instantiate(buttonPrefab, EntryList.transform, false) as GameObject;
                 Assert.IsNotNull(button);
@@ -184,7 +184,7 @@ namespace SEE.Game.UI
                 buttonManager.buttonText = entry.Title;
                 buttonManager.buttonIcon = entry.Icon;
                 buttonManager.hoverEvent.AddListener(() => ShowTooltip(entry.Description));
-                buttonManager.hoverExitEvent.AddListener(() => HideTooltip());
+                buttonManager.hoverExitEvent.AddListener(HideTooltip);
                 if (entry.Enabled)
                 {
                     buttonManager.clickEvent.AddListener(() => OnEntrySelected(entry));
