@@ -1,5 +1,6 @@
-﻿using NetworkCommsDotNet.Connections;
+﻿using System.Linq;
 using System.Net;
+using NetworkCommsDotNet.Connections;
 using UnityEngine.Assertions;
 
 namespace SEE.Net
@@ -67,13 +68,10 @@ namespace SEE.Net
             {
                 foreach (Connection c in Server.Connections)
                 {
-                    foreach (IPEndPoint recipient in recipients) // TODO(torben): we might want to have a hashmap for IPEndPoint => connection
+                    // TODO(torben): we might want to have a hashmap for IPEndPoint => connection
+                    if (recipients.Any(recipient => c.ConnectionInfo.RemoteEndPoint.Equals(recipient)))
                     {
-                        if (c.ConnectionInfo.RemoteEndPoint.Equals(recipient))
-                        {
-                            Network.SubmitPacket(c, this);
-                            break;
-                        }
+                        Network.SubmitPacket(c, this);
                     }
                 }
             }
@@ -84,8 +82,8 @@ namespace SEE.Net
         /// <summary>
         /// Executes the action of this packet as a client.
         /// </summary>
-        /// <param name="connection">The connecting of the packet.</param>
-        /// <returns><code>true</code>.</returns>
+        /// <param name="connection">The connection of the packet.</param>
+        /// <returns><c>true</c>.</returns>
         internal override bool ExecuteOnClient(Connection connection)
         {
             Assert.IsNotNull(connection);

@@ -17,9 +17,11 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using SEE.Controls;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
@@ -53,7 +55,7 @@ namespace SEE.Game.Evolution
         /// of revisions and the auto-play toggle. If the ESC key is hit, the
         /// RevisionSelectionCanvas is shown again.
         /// </summary>
-        public GameObject AnimationCanvas; // serialized by Unity
+        private GameObject AnimationCanvas; // serialized by Unity
 
         /// <summary>
         /// The user-data model for AnimationCanvas.
@@ -66,7 +68,7 @@ namespace SEE.Game.Evolution
         /// menu, it also contains a close button. If this button is pressed, the
         /// AnimationCanvas is shown again.
         /// </summary>
-        public GameObject RevisionSelectionCanvas; // serialized by Unity
+        private GameObject RevisionSelectionCanvas; // serialized by Unity
 
         /// <summary>
         /// The time in between two revisions in auto-play mode.
@@ -120,8 +122,34 @@ namespace SEE.Game.Evolution
             }
         }
 
+        /// <summary>
+        /// Path to the prefab of the AnimationCanvas excluding the file extension ".prefab".
+        /// </summary>
+        private const string AnimationCanvasPrefab = "Prefabs/Animation/AnimationCanvas";
+
+        /// <summary>
+        /// The name of the game object instantiated via <see cref="AnimationCanvasPrefab"/>.
+        /// </summary>
+        private const string AnimationCanvasGameObjectName = "AnimationCanvas";
+
+        /// <summary>
+        /// Path to the prefab of the AnimationCanvas excluding the file extension ".prefab".
+        /// </summary>
+        private const string RevisionSelectionCanvasPrefab = "Prefabs/Animation/RevisionSelectionCanvas";
+
+        /// <summary>
+        /// The name of the game object instantiated via <see cref="RevisionSelectionCanvasPrefab"/>.
+        /// </summary>
+        private const string RevisionSelectionCanvasGameObjectName = "RevisionSelectionCanvas";
+
         private void Init()
         {
+            AnimationCanvas = GetCanvas(AnimationCanvasGameObjectName, AnimationCanvasPrefab);
+            RevisionSelectionCanvas = GetCanvas(RevisionSelectionCanvasGameObjectName, RevisionSelectionCanvasPrefab);
+
+            Canvas canvas = AnimationCanvas.GetComponent<Canvas>();
+            canvas.worldCamera = MainCamera.Camera;
+
             revisionSelectionDataModel = RevisionSelectionCanvas.GetComponent<RevisionSelectionDataModel>();
             animationDataModel = AnimationCanvas.GetComponent<AnimationDataModel>();
 
@@ -166,9 +194,45 @@ namespace SEE.Game.Evolution
                 AddMarker(markerPos, comment);
             }
 
-            SetMode(true);
+            SetMode(false);
             OnShownGraphHasChanged();
             evolutionRenderer.Register(OnShownGraphHasChanged);
+        }
+
+        /// <summary>
+        /// If a child with <paramref name="canvasGameObjectName"/> exists in <see cref="gameObject"/>,
+        /// this child will be returned. If no such child exists, a new child with that name will
+        /// be created under <see cref="gameObject"/> as an instantiation of the given <paramref name="canvasPrefab"/>.
+        /// If <paramref name="canvasPrefab"/> cannot be loaded, the component will be disabled, and an exception 
+        /// be thrown.
+        /// </summary>
+        /// <param name="canvasGameObjectName">name of the child</param>
+        /// <param name="canvasPrefab">prefab path to instantiate the child if it does not exist</param>
+        /// <returns>the resulting canvas</returns>
+        private GameObject GetCanvas(string canvasGameObjectName, string canvasPrefab)
+        {
+            GameObject result;
+            Transform canvasTransform = gameObject.transform.Find(canvasGameObjectName);
+            if (canvasTransform != null)
+            {
+                result = canvasTransform.gameObject;
+            }
+            else
+            {
+                GameObject prefab = Resources.Load<GameObject>(canvasPrefab);
+                if (prefab != null)
+                {
+                    result = Instantiate(prefab);
+                    result.name = canvasGameObjectName;
+                    result.transform.SetParent(gameObject.transform);
+                }
+                else
+                {
+                    enabled = false;
+                    throw new Exception($"Prefab {canvasPrefab} not found.");
+                }
+            }
+            return result;
         }
 
         /// <summary>
@@ -182,7 +246,7 @@ namespace SEE.Game.Evolution
                 sliderMarker.SetComment(p.Value.text);
             }
           
-            sliderMarkerContainer.Save(Path.Combine(Application.persistentDataPath, "sliderMarkers.xml"));
+            sliderMarkerContainer?.Save(Path.Combine(Application.persistentDataPath, "sliderMarkers.xml"));
         }
 
 
@@ -329,9 +393,9 @@ namespace SEE.Game.Evolution
         {
             selectedMarker = clickedMarker;
             string commentName = clickedMarker.GetHashCode().ToString() + "-comment";
-            if (animationDataModel.Slider.transform.Find(commentName) != null)
+            if (clickedMarker.transform.Find(commentName) != null)
             {
-                GameObject comment = animationDataModel.Slider.transform.Find(commentName).gameObject;
+                GameObject comment = clickedMarker.transform.Find(commentName).gameObject;
                 comment.SetActive(!comment.activeSelf);
             }
         }
@@ -346,10 +410,10 @@ namespace SEE.Game.Evolution
         {
             string commentName = marker.GetHashCode().ToString() + "-comment";
             InputField commentField = Instantiate(animationDataModel.CommentPrefab);
-            Vector3 markerPos = marker.transform.position;
-            Vector3 commentPos = new Vector3(markerPos.x + 0.15f, markerPos.y, markerPos.z);
-            commentField.transform.SetParent(animationDataModel.Slider.transform, false);
-            commentField.transform.position = commentPos;
+            Vector3 commentPos = new Vector3(1500f, 0, 0);
+            commentField.transform.SetParent(marker.transform, false);
+            commentField.transform.localScale = new Vector3(16f, 1f, 1f);
+            commentField.transform.localPosition = commentPos;
             commentField.name = commentName;
             if (comment != null) 
             {
@@ -399,55 +463,56 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// Handles the user input as follows:
-        ///   k   => previous graph revision is shown
-        ///   l   => next graph revision is shown
-        ///   m   => create new marker
-        ///   tab => auto-play mode is toggled
-        ///   del => delete selected marker
-        ///   0-9 => the time in between two revisions in auto-play mode is adjusted
+        ///   KeyBindings.PreviousRevision => previous graph revision is shown
+        ///   KeyBindings.NextRevision     => next graph revision is shown
+        ///   KeyBindings.SetMarker        => create new marker
+        ///   KeyBindings.ToggleAutoPlay   => auto-play mode is toggled
+        ///   KeyBindings.DeleteMarker     => delete selected marker
+        ///   KeyBindings.IncreaseAnimationSpeed => double animation speed
+        ///   KeyBindings.DecreaseAnimationSpeed => halve animation speed
         ///   ESC => toggle between the two canvases AnimationCanvas and RevisionSelectionCanvas
         /// </summary>
         private void Update()
         {
             if (!IsRevisionSelectionOpen)
             {
-                if (Input.GetKeyDown("k"))
+                if (SEEInput.PreviousRevision())
                 {
                     evolutionRenderer.ShowPreviousGraph();
                 }
-                else if (Input.GetKeyDown("l"))
+                else if (SEEInput.NextRevision())
                 {
                     evolutionRenderer.ShowNextGraph();
                 }
-                else if (Input.GetKeyDown(KeyCode.Tab))
+                else if (SEEInput.ToggleAutoPlay())
                 {
                     evolutionRenderer.ToggleAutoPlay();
-                } else if (Input.GetKeyDown("m"))
+                } 
+                else if (SEEInput.SetMarker())
                 {
                     Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
                     Vector3 markerPos = new Vector3(handlePos.x, handlePos.y + .08f, handlePos.z);
-                    if (sliderMarkerContainer.getSliderMarkerForLocation(markerPos) != null) 
-                    { 
-                        return;
-                    }
-                    AddMarker(markerPos, null);
-                } else if (Input.GetKeyDown(KeyCode.Delete))
+                    if (sliderMarkerContainer.getSliderMarkerForLocation(markerPos) == null) 
+                    {
+                        AddMarker(markerPos, null);
+                    }                    
+                } 
+                else if (SEEInput.DeleteMarker())
                 {
                     RemoveMarker(selectedMarker);
                 }
-
-                string[] animationTimeKeys = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
-                float[] animationTimeValues = { 0.1f, 0.5f, 1, 2, 3, 4, 5, 8, 16, 0 };
-                for (int i = 0; i < animationTimeKeys.Length; i++)
+                else if (SEEInput.IncreaseAnimationSpeed())
                 {
-                    if (Input.GetKeyDown(animationTimeKeys[i]))
-                    {
-                        evolutionRenderer.AnimationLag = animationTimeValues[i];
-                    }
+                    evolutionRenderer.AnimationLag = Mathf.Max(0.25f, evolutionRenderer.AnimationLag / 2);
+                    Debug.Log($"new animation lag is {evolutionRenderer.AnimationLag}\n");
                 }
-
+                else if (SEEInput.DecreaseAnimationSpeed())
+                {
+                    evolutionRenderer.AnimationLag = Mathf.Min(16.0f, evolutionRenderer.AnimationLag * 2);
+                    Debug.Log($"new animation lag is {evolutionRenderer.AnimationLag}\n");
+                }
             }
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (SEEInput.ToggleEvolutionCanvases())
             {
                 ToogleMode();
             }

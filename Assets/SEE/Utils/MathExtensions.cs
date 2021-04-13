@@ -290,6 +290,62 @@
         public static Vector2 YZ(this Vector3 a) => new Vector2(a.y, a.z);
 
         /// <summary>
+        /// Creates and returns a copy of the x, y- and z-components of given 4d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 3d-vector.</returns>
+        public static Vector3 XYZ(this Vector4 a) => new Vector3(a.x, a.y, a.z);
+
+        /// <summary>
+        /// Creates and returns a copy of the y, z- and w-components of given 4d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 3d-vector.</returns>
+        public static Vector3 YZW(this Vector4 a) => new Vector3(a.y, a.z, a.w);
+
+        /// <summary>
+        /// Creates and returns a copy of the x- and y-components of given 4d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 2d-vector.</returns>
+        public static Vector2 XY(this Vector4 a) => new Vector2(a.x, a.y);
+
+        /// <summary>
+        /// Creates and returns a copy of the x- and z-components of given 4d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 2d-vector.</returns>
+        public static Vector2 XZ(this Vector4 a) => new Vector2(a.x, a.z);
+
+        /// <summary>
+        /// Creates and returns a copy of the x- and w-components of given 4d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 2d-vector.</returns>
+        public static Vector2 XW(this Vector4 a) => new Vector2(a.x, a.w);
+
+        /// <summary>
+        /// Creates and returns a copy of the y- and z-components of given 4d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 2d-vector.</returns>
+        public static Vector2 YZ(this Vector4 a) => new Vector2(a.y, a.z);
+
+        /// <summary>
+        /// Creates and returns a copy of the y- and w-components of given 4d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 2d-vector.</returns>
+        public static Vector2 YW(this Vector4 a) => new Vector2(a.y, a.w);
+
+        /// <summary>
+        /// Creates and returns a copy of the z- and w-components of given 4d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 2d-vector.</returns>
+        public static Vector2 ZW(this Vector4 a) => new Vector2(a.z, a.w);
+
+        /// <summary>
         /// Performs a collision test between a point and a circle. The distance and a
         /// normal pointing from the point towards to the surface of the circle are
         /// returned. If the point lies inside of the AABB, the distance is negative. If

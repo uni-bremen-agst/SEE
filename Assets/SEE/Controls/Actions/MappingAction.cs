@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game;
 using SEE.GO;
+using SEE.Layout;
+using SEE.Layout.EdgeLayouts;
 using SEE.Tools;
 using SEE.Utils;
 using UnityEngine;
@@ -16,14 +19,54 @@ namespace SEE.Controls.Actions
     /// This action assumes that it is attached to a game object representing
     /// the reflexion analysis during the game. 
     /// </summary>
-    public class MappingAction : CityAction, Observer
+    public class MappingAction : Observer, ReversibleAction
     {
-        private const float SelectedAlpha = 0.8f;
+        /// <summary>
+        /// Which kind of city we are currently focusing on.
+        /// </summary>
+        private enum HitCity
+        {
+            None,
+            Architecture,
+            Implementation
+        }
 
-        private const KeyCode SaveKey = KeyCode.S;
-        private const KeyCode CopyKey = KeyCode.C;
-        private const KeyCode PasteKey = KeyCode.V;
-        private const KeyCode ClearKey = KeyCode.X;
+        private struct _MoveState
+        {
+            internal struct AdditionalDraggedObject
+            {
+                internal GameObject go;  // The object to be dragged
+                internal Vector3 offset; // The offset to the main dragged transform, that must is to be maintained at all times
+            }
+
+            internal Vector3 dragStartTransformPosition;
+            internal Vector3 dragStartOffset;
+            internal Vector3 dragCanonicalOffset;
+            internal Vector3 moveVelocity;
+
+            internal GameObject mainDraggedObj;
+            internal List<AdditionalDraggedObject> additionalDraggedObjs;
+        }
+
+        private struct _ActionState
+        {
+            internal bool startDrag;
+            internal bool dragHoveredOnly; // true, if only the element, that is hovered by the mouse should be moved instead of whole city
+            internal bool drag;
+            internal bool cancel;
+            internal bool startShowDiff;
+            internal bool showDiff;
+            internal bool stopShowDiff;
+        }
+
+        private struct MappingEdge
+        {
+            internal LineRenderer lineRenderer;
+            internal uint from;
+            internal uint to;
+        }
+
+        const float AlphaCoefficient = 4.0f;
 
         [Tooltip("The game object representing the architecture.")]
         public GameObject Architecture;
@@ -33,6 +76,18 @@ namespace SEE.Controls.Actions
 
         [Tooltip("The GXL file containing the mapping from implementation onto architecture entities.")]
         public string MappingFile;
+
+        [Obsolete("This is currently not used for decoration")]
+        [Tooltip("Prefab for absences")]
+        public GameObject AbsencePrefab;
+
+        [Obsolete("This is currently not used for decoration")]
+        [Tooltip("Prefab for convergences")]
+        public GameObject ConvergencePrefab;
+
+        [Obsolete("This is currently not used for decoration")]
+        [Tooltip("Prefab for divergences")]
+        public GameObject DivergencePrefab;
 
         /// <summary>
         /// The graph renderer used to draw the city. There must be a component
@@ -47,104 +102,77 @@ namespace SEE.Controls.Actions
         private Graph mapping;
 
         /// <summary>
+        /// Returns a new instance of <see cref="MappingAction"/>.
+        /// </summary>
+        /// <returns>new instance of <see cref="MappingAction"/></returns>
+        internal static ReversibleAction CreateReversibleAction()
+        {
+            MappingAction result = new MappingAction();
+            SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
+            if (!result.Implementation)
+            {
+                Debug.LogWarning("Implementation city not set. Trying to find it...");
+                result.Implementation = SceneQueries.FindImplementation().gameObject;
+            }
+            if (!result.Architecture)
+            {
+                Debug.LogWarning("Architecture city not set. Trying to find it...");
+                result.Architecture = SceneQueries.FindArchitecture().gameObject;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="MappingAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
+        }
+
+        /// <summary>
         /// The graph containing the architecture.
         /// </summary>
-        private Graph architecture;
+        private Graph archGraph;
 
         /// <summary>
         /// The graph containing the impementation.
         /// </summary>
-        private Graph implementation;
+        private Graph implGraph;
 
         /// <summary>
         /// For the reflexion analysis.
         /// </summary>
         public Reflexion Reflexion { get; private set; }
 
-        /// <summary>
-        /// Materials for the decoration of reflexion edges.
-        /// </summary>
-        [Tooltip("Prefab for absences")]
-        public GameObject AbsencePrefab;
-        [Tooltip("Prefab for convergences")]
-        public GameObject ConvergencePrefab;
-        [Tooltip("Prefab for divergences")]
-        public GameObject DivergencePrefab;
-
-        private struct Selection
-        {
-            internal NodeRef nodeRef;
-            internal InteractableObject interactableObject; // TODO(torben): it is time to combine NodeRefs and InteractableObjects or at least have some dictionary for them...
-            // Rainer: note that gameObjects with an EdgeRef instead of NodeRef now may also have a InteractableObject component.
-        }
-
-        /// <summary>
-        /// The current selection of a game object and its associated graph node.
-        /// </summary>
-        private Selection selection;
-
-        /// <summary>
-        /// Which kind of city we are currently focusing on.
-        /// </summary>
-        private enum HitCity
-        {
-            None,
-            Architecture,
-            Implementation
-        }
-
-        private struct _ActionState
-        {
-            internal bool copy;              // copy selected object (i.e., start mapping)
-            internal bool paste;             // paste (map) copied object
-            internal bool clearClipboard;    // whether the clipboard of copied nodes has been cleared
-            internal bool save;              // whether the current mapping should be stored
-            internal HitCity hitCity;        // which city we are currently focusing on
-        }
-
+        private readonly List<Tuple<uint, uint, LineRenderer>> activeHoverEdges = new List<Tuple<uint, uint, LineRenderer>>();
+        private _MoveState moveState;
         private _ActionState actionState;
+        private bool moving = false;
 
-        /// <summary>
-        /// The game objects that have been copied to the clipboard via Ctrl-C.
-        /// </summary>
-        private readonly HashSet<Selection> objectsInClipboard = new HashSet<Selection>();
+        private readonly Dictionary<Edge, LineRenderer> edgeToFinalizedMappingEdges = new Dictionary<Edge, LineRenderer>();
+        private readonly Dictionary<Edge, LineRenderer> edgeToStateEdges = new Dictionary<Edge, LineRenderer>();
 
-        // Use this for initialization
-        private void Start()
+        public void Awake()
         {
-            if (Architecture == null)
-            {
-                Debug.LogWarning("No architecture city was specified for architectural mapping.\n");
-                enabled = false;
-            }
-            else
-            {
-                architecture = SceneQueries.GetGraph(Architecture);
-                if (architecture == null)
-                {
-                    Debug.LogWarning("The architecture city has no associated graph.\n");
-                    enabled = false;
-                }
-            }
+            // TODO(torben): fix!
+            return;
 
-            if (Implementation == null)
+            //if (!Assertions.DisableOnCondition(this, Architecture == null, "No architecture city was specified for architectural mapping."))
             {
-                Debug.LogWarning("No implementation city was specified for architectural mapping.\n");
-                enabled = false;
+                archGraph = SceneQueries.GetGraph(Architecture);
+                //Assertions.DisableOnCondition(this, archGraph == null, "The architecture city has no associated graph.");
             }
-            else
+            //if (!Assertions.DisableOnCondition(this, Implementation == null, "No implementation city was specified for architectural mapping."))
             {
-                implementation = SceneQueries.GetGraph(Implementation);
-                if (implementation == null)
-                {
-                    Debug.LogWarning("The implementation city has no associated graph.\n");
-                    enabled = false;
-                }
+                implGraph = SceneQueries.GetGraph(Implementation);
+                //Assertions.DisableOnCondition(this, implGraph == null, "The implementation city has no associated graph.");
             }
 
             if (string.IsNullOrEmpty(MappingFile))
             {
-                Debug.LogWarning("A filename for the architectural mapping should be set. Continuing with an empty mapping. Mapping cannot be saved.\n");
+                Debug.LogWarning("A filename for the architectural mapping should be set. Continuing with an empty mapping. Mapping cannot be saved.");
                 mapping = new Graph();
             }
             else
@@ -152,8 +180,7 @@ namespace SEE.Controls.Actions
                 mapping = LoadMapping(MappingFile);
                 if (mapping == null)
                 {
-                    Debug.LogErrorFormat("A GXL containing the mapping could not be loaded from {0}. We are using an empty mapping instead.\n",
-                                         MappingFile);
+                    Debug.LogErrorFormat("A GXL containing the mapping could not be loaded from {0}. We are using an empty mapping instead.", MappingFile);
                     mapping = new Graph();
                 }
                 else
@@ -162,99 +189,256 @@ namespace SEE.Controls.Actions
                 }
             }
 
-            if (AbsencePrefab == null)
+            //Assertions.DisableOnCondition(this, AbsencePrefab == null, "No material assigned for absences.");
+            //Assertions.DisableOnCondition(this, ConvergencePrefab == null, "No material assigned for convergences.");
+            //Assertions.DisableOnCondition(this, DivergencePrefab == null, "No material assigned for divergences.");
+
+            //if (!Assertions.DisableOnCondition(this, !Architecture.TryGetComponent(out SEECity city), "The object representing the architecture //has no SEECity component attached to it."))
+            //{
+            //    architectureGraphRenderer = city.Renderer;
+            //    Assertions.DisableOnCondition(this, architectureGraphRenderer == null, "The SEECity component attached to the object /representing /the architecture has no graph renderer.");
+            //}
+
+            //if (enabled)
             {
-                Debug.LogErrorFormat("No material assigned for absences.\n");
-                enabled = false;
+                // Setup reflexion
+                Reflexion = new Reflexion(implGraph, archGraph, mapping);
+                Reflexion.Register(this);
+                // An initial run is necessary to set up the necessary data structures.
+                Reflexion.Run();
             }
-            if (ConvergencePrefab == null)
+
+            //ActionState.OnStateChanged += OnStateChanged;
+            //if (!Assertions.DisableOnCondition(this, !Equals(ActionState.Value, ActionStateType.Map)))
             {
-                Debug.LogErrorFormat("No material assigned for convergences.\n");
-                enabled = false;
+                InteractableObject.AnyHoverIn += TryCreateOnHoverEdgesTo;
+                InteractableObject.AnyHoverOut += TryDestroyOnHoverEdgesTo;
+                InteractableObject.AnySelectIn += TryCreateHoverEdgeFrom;
+                InteractableObject.AnySelectOut += TryDestroyHoverEdgeFrom;
             }
-            if (DivergencePrefab == null)
+
+            moveState.additionalDraggedObjs = new List<_MoveState.AdditionalDraggedObject>();
+        }
+
+        public bool Update()
+        {
+            Assert.IsTrue(ActionState.Is(ActionStateType.Map));
+
+            bool isMouseOverGUI = Raycasting.IsMouseOverGUI();
+
+            actionState.drag = Input.GetMouseButton(2);
+            actionState.startDrag |= !isMouseOverGUI && Input.GetMouseButtonDown(2);
+            actionState.dragHoveredOnly = Input.GetKey(KeyCode.LeftControl);
+            actionState.cancel |= Input.GetKeyDown(KeyCode.Escape);
+            actionState.startShowDiff |= Input.GetKeyDown(KeyCode.M);
+            actionState.showDiff = Input.GetKey(KeyCode.M);
+            actionState.stopShowDiff |= Input.GetKeyUp(KeyCode.M);
+
+            return true;
+        }
+
+        private void FixedUpdate()
+        {
+            bool synchronize = false;
+
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Physics.Raycast(ray, out RaycastHit raycastHit);
+            Vector3 hit = raycastHit.point;
+
+            #region Mapping
+
+            if (actionState.cancel) // cancel movement
             {
-                Debug.LogErrorFormat("No material assigned for divergences.\n");
-                enabled = false;
-            }
-            if (Architecture.TryGetComponent(out SEECity city))
-            {
-                architectureGraphRenderer = city.Renderer;
-                if (architectureGraphRenderer == null)
+                if (moving)
                 {
-                    Debug.LogErrorFormat("The SEECity component attached to the object representing the architecture has no graph renderer.\n");
-                    enabled = false;
+                    moving = false;
+
+                    //moveState.draggedTransform.GetComponent<InteractableObject>().SetGrab(false, true);
+
+                    moveState.moveVelocity = Vector3.zero;
+                    Vector3 p = moveState.dragStartTransformPosition + moveState.dragStartOffset
+                        - Vector3.Scale(moveState.dragCanonicalOffset, moveState.mainDraggedObj.transform.localScale);
+                    moveState.mainDraggedObj.transform.position = p;
+                    foreach (_MoveState.AdditionalDraggedObject o in moveState.additionalDraggedObjs)
+                    {
+                        o.go.transform.position = p + o.offset;
+                    }
+                    moveState.mainDraggedObj = null;
+                    moveState.additionalDraggedObjs.Clear();
+                    synchronize = true;
+                }
+                else
+                {
+                    InteractableObject o = InteractableObject.HoveredObject;
+                    if (o)
+                    {
+                        InteractableObject.UnselectAllInGraph(o.ItsGraph(), true);
+                    }
                 }
             }
-            else
+            else if (actionState.drag) // start or continue movement
             {
-                Debug.LogErrorFormat("The object representing the architecture has no SEECity component attached to it.\n");
-                enabled = false;
+                if (actionState.startDrag) // start movement
+                {
+                    if (actionState.dragHoveredOnly)
+                    {
+                        InteractableObject o = InteractableObject.HoveredObject;
+                        if (IsValidSource(o))
+                        {
+                            moving = true;
+                            moveState.mainDraggedObj = CreateGhost(o);
+                            //o.SetGrab(true, true);
+                        }
+                    }
+                    else
+                    {
+                        HashSet<InteractableObject> objs = InteractableObject.GetSelectedObjectsOfGraph(implGraph);
+                        if (objs.Count > 0)
+                        {
+                            moving = true;
+                            HashSet<InteractableObject>.Enumerator e = objs.GetEnumerator();
+                            e.MoveNext();
+                            moveState.mainDraggedObj = CreateGhost(e.Current);
+                            //e.Current.SetGrab(true, true);
+                            while (e.MoveNext())
+                            {
+                                _MoveState.AdditionalDraggedObject t = new _MoveState.AdditionalDraggedObject()
+                                {
+                                    go = CreateGhost(e.Current),
+                                    offset = e.Current.transform.position - moveState.mainDraggedObj.transform.position
+                                };
+                                moveState.additionalDraggedObjs.Add(t);
+                                //e.Current.SetGrab(true, true);
+                            }
+                        }
+                    }
+
+                    if (moving)
+                    {
+                        moveState.dragStartTransformPosition = moveState.mainDraggedObj.transform.position;
+                        moveState.dragStartOffset = hit - moveState.mainDraggedObj.transform.position;
+                        moveState.dragCanonicalOffset = moveState.dragStartOffset.DividePairwise(moveState.mainDraggedObj.transform.localScale);
+                        moveState.moveVelocity = Vector3.zero;
+                    }
+                }
+
+                if (moving) // continue movement
+                {
+                    Vector3 totalDragOffsetFromStart = hit - (moveState.dragStartTransformPosition + moveState.dragStartOffset);
+
+                    Vector3 oldPosition = moveState.mainDraggedObj.transform.position;
+                    Vector3 newPosition = moveState.dragStartTransformPosition + totalDragOffsetFromStart;
+
+                    moveState.moveVelocity = (newPosition - oldPosition) / Time.fixedDeltaTime; // TODO(torben): it might be possible to determine velocity only on release (this todo comes from DesktopNavigationAction)
+                    moveState.mainDraggedObj.transform.position = newPosition;
+                    foreach (_MoveState.AdditionalDraggedObject o in moveState.additionalDraggedObjs)
+                    {
+                        o.go.transform.position = newPosition + o.offset;
+                    }
+                    synchronize = true;
+                }
             }
-            if (enabled)
+            else if (moving) // finalize movement
             {
-                Usage();
-                SetupReflexionDecorator();
-                SetupGameObjectMappings();
-                SetupReflexion();
+                //if (moveState.mainDraggedObj.transform != CityTransform) // only reparent non-root nodes
+                //{
+                //    Transform movingObject = moveState.mainDraggedObj.transform;
+                //    Vector3 originalPosition = moveState.dragStartTransformPosition + moveState.dragStartOffset
+                //            - Vector3.Scale(moveState.dragCanonicalOffset, movingObject.localScale);
+                //
+                //    GameNodeMover.FinalizePosition(movingObject.gameObject, originalPosition);
+                //    synchronize = true;
+                //}
+
+                moving = false;
+
+                //moveState.mainDraggedObj.transform.GetComponent<InteractableObject>().SetGrab(false, true);
+                //if (moveState.mainDraggedObj.transform != CityTransform)
+                //{
+                //    moveState.moveVelocity = Vector3.zero; // TODO(torben): do we want to apply velocity to individually moved buildings or keep it like this?
+                //}
+
+                UnityEngine.Object.Destroy(moveState.mainDraggedObj);
+                foreach (_MoveState.AdditionalDraggedObject o in moveState.additionalDraggedObjs)
+                {
+                    UnityEngine.Object.Destroy(o.go);
+                }
+
+                moveState.mainDraggedObj = null;
+                moveState.additionalDraggedObjs.Clear();
+
+                if (IsValidTarget(InteractableObject.HoveredObject))
+                {
+                    Node to = InteractableObject.HoveredObject.GetNode();
+                    foreach (InteractableObject o in InteractableObject.GetSelectedObjectsOfGraph(implGraph))
+                    {
+                        if (IsValidSource(o))
+                        {
+                            Node from = o.GetNode();
+                            if (Reflexion.Is_Explicitly_Mapped(from))
+                            {
+                                Node mapped = Reflexion.Get_Mapping().GetNode(from.ID);
+                                Assert.IsTrue(mapped.Outgoings.Count == 1);
+                                //edgeToMappingEdges.Remove(mapped.Outgoings[0]);
+                                Reflexion.Delete_From_Mapping(mapped.Outgoings[0]);
+                            }
+                            Reflexion.Add_To_Mapping(from, to);
+                        }
+                    }
+                }
             }
 
-            ActionState.OnStateChanged += OnStateChanged;
-            if (Equals(ActionState.Value, ActionStateType.Map))
+            #endregion
+
+            if (actionState.startShowDiff)
             {
-                InteractableObject.AnySelectIn += AnySelectIn;
-                InteractableObject.AnySelectOut += AnySelectOut;
-            }
-            else
-            {
-                enabled = false;
+                if (!actionState.stopShowDiff)
+                {
+                    foreach (Edge edge in archGraph.Edges())
+                    {
+                        if (EdgeRef.TryGet(edge, out EdgeRef edgeRef))
+                        {
+                            edgeRef.GetComponent<LineRenderer>().enabled = false;
+                        }
+                    }
+                    foreach (LineRenderer r in edgeToStateEdges.Values)
+                    {
+                        r.enabled = true;
+                    }
+                }
             }
         }
 
-        private void OnStateChanged(ActionStateType value)
+        /// <summary>
+        /// See <see cref="ReversibleAction.Start"/>.
+        /// </summary>
+        public void Start()
         {
-            if (Equals(value, ActionStateType.Map))
-            {
-                InteractableObject.AnySelectIn += AnySelectIn;
-                InteractableObject.AnySelectOut += AnySelectOut;
-                enabled = true;
-            }
-            else
-            {
-                InteractableObject.AnySelectIn -= AnySelectIn;
-                InteractableObject.AnySelectOut -= AnySelectOut;
-                enabled = false; // We don't want to waste CPU time, if Update() doesn't do anything
-            }
+            // Intentionally left blank.
         }
 
         /// <summary>
-        /// Used for the visualization and decoration of reflexion edges.
+        /// See <see cref="ReversibleAction.Stop"/>.
         /// </summary>
-        private ReflexionDecorator decorator;
-
-        /// <summary>
-        /// Sets up the reflexion decorator.
-        /// </summary>
-        private void SetupReflexionDecorator()
+        public void Stop()
         {
-            Portal.GetDimensions(Architecture, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
-            decorator = new ReflexionDecorator(AbsencePrefab, ConvergencePrefab, DivergencePrefab,
-                                               leftFrontCorner, rightBackCorner);
+            // Intentionally left blank.
         }
 
         /// <summary>
-        /// Mapping of edge IDs onto game objects representing these edges in the architecture code city.
+        /// See <see cref="ReversibleAction.Undo"/>.
         /// </summary>
-        private readonly Dictionary<string, GameObject> architectureEdges = new Dictionary<string, GameObject>();
+        public void Undo()
+        {
+            Debug.Log("UNDO MAPPING");
+        }
 
         /// <summary>
-        /// Mapping of node IDs onto game objects representing these nodes in the architecture code city.
+        /// See <see cref="ReversibleAction.Redo"/>.
         /// </summary>
-        private readonly Dictionary<string, GameObject> architectureNodes = new Dictionary<string, GameObject>();
-
-        private void SetupGameObjectMappings()
+        public void Redo()
         {
-            GatherNodesAndEdges(Architecture, architectureNodes, architectureEdges);
+            Debug.Log("REDO MAPPING");
         }
 
         /// <summary>
@@ -271,39 +455,40 @@ namespace SEE.Controls.Actions
             switch (rootGameObject.tag)
             {
                 case Tags.Edge when rootGameObject.TryGetComponent(out EdgeRef edgeRef):
-                {
-                    Edge edge = edgeRef.edge;
-                    if (edge != null)
                     {
-                        edges[edge.ID] = rootGameObject;
-                    }
-                    else
-                    {
-                        Debug.LogErrorFormat("Game-object edge {0} without an invalid graph edge reference.\n", rootGameObject.name);
-                    }
+                        Edge edge = edgeRef.Value;
+                        if (edge != null)
+                        {
+                            edges[edge.ID] = rootGameObject;
+                        }
+                        else
+                        {
+                            Debug.LogErrorFormat("Game-object edge {0} without an invalid graph edge reference.\n", rootGameObject.name);
+                        }
 
-                    break;
-                }
+                        break;
+                    }
                 case Tags.Edge:
-                {
-                    Debug.LogErrorFormat("Game-object edge {0} without graph edge reference.\n", rootGameObject.name);
-                    break;
-                }
+                    {
+                        Debug.LogErrorFormat("Game-object edge {0} without graph edge reference.\n", rootGameObject.name);
+                        break;
+                    }
                 case Tags.Node when rootGameObject.TryGetComponent(out NodeRef nodeRef):
-                {
-                    Node node = nodeRef.Value;
-                    if (node != null)
                     {
-                        nodes[node.ID] = rootGameObject;
-                    }
-                    else
-                    {
-                        Debug.LogErrorFormat("Game-object node {0} without an invalid graph node reference.\n", rootGameObject.name);
-                    }
+                        Node node = nodeRef.Value;
+                        if (node != null)
+                        {
+                            nodes[node.ID] = rootGameObject;
+                        }
+                        else
+                        {
+                            Debug.LogErrorFormat("Game-object node {0} without an invalid graph node reference.\n", rootGameObject.name);
+                        }
 
-                    break;
-                }
-                case Tags.Node: Debug.LogErrorFormat("Game-object node {0} without graph node reference.\n", rootGameObject.name);
+                        break;
+                    }
+                case Tags.Node:
+                    Debug.LogErrorFormat("Game-object node {0} without graph node reference.\n", rootGameObject.name);
                     break;
             }
 
@@ -311,18 +496,6 @@ namespace SEE.Controls.Actions
             {
                 GatherNodesAndEdges(child.gameObject, nodes, edges);
             }
-        }
-
-        /// <summary>
-        /// Prints the keys for all actions.
-        /// </summary>
-        private static void Usage()
-        {
-            Debug.Log("Keys for architectural mapping:\n");
-            Debug.LogFormat(" copy/remove selected implementation node to/from clipboard: Ctrl-{0}\n", CopyKey);
-            Debug.LogFormat(" map nodes in clipboard onto selected architecture node: Ctrl-{0}\n", PasteKey);
-            Debug.LogFormat(" clear clipboard: Ctrl-{0}\n", ClearKey);
-            Debug.LogFormat(" save mapping to GXL file: Ctrl-{0}\n", SaveKey);
         }
 
         /// <summary>
@@ -347,12 +520,12 @@ namespace SEE.Controls.Actions
                     Debug.LogWarningFormat("Unexpected edge type {0} in mapping for edge {1}.\n", edge.Type, edge);
                     edgesToBeRemoved.Add(edge);
                 }
-                if (implementation.GetNode(edge.Source.ID) == null)
+                if (implGraph.GetNode(edge.Source.ID) == null)
                 {
                     Debug.LogWarning($"The mapping contains an implementation node {edge.Source.ID} (source) that is not in the implementation graph for maps-to edge {edge}.\n");
                     nodesToBeRemoved.Add(edge.Source);
                 }
-                if (architecture.GetNode(edge.Target.ID) == null)
+                if (archGraph.GetNode(edge.Target.ID) == null)
                 {
                     Debug.LogWarning($"The mapping contains an architecture node {edge.Target.ID} (target) that is not in the architecture graph for maps-to edge {edge}.\n");
                     nodesToBeRemoved.Add(edge.Target);
@@ -383,267 +556,296 @@ namespace SEE.Controls.Actions
             }
         }
 
-        private struct SpinningCube
+        private LineRenderer CreateHoverEdge(string fromID, string toID)
         {
-            internal GameObject gameObject;
-            internal MeshRenderer meshRenderer;
-            internal float timer;
-            internal Color c0;
-            internal Color c1;
+            LineRenderer result = null;
+
+            Node from = implGraph.GetNode(fromID);
+            Node to = archGraph.GetNode(toID);
+
+            // TODO(torben): This is way to inefficient to create an edge!!!
+            NodeRef nr0 = NodeRef.Get(from);
+            NodeRef nr1 = NodeRef.Get(to);
+            AbstractSEECity settings = Implementation.GetComponent<SEECity>().Renderer.GetSettings();
+            float minimalEdgeLevelDistance = 2.5f * settings.EdgeWidth;
+
+            IEdgeLayout edgeLayout = new SplineEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance, settings.RDP);
+            NodeFactory nodeFactory = new CubeFactory(Materials.ShaderType.Opaque, new ColorRange(Color.white, Color.white, 1));
+            EdgeFactory factory = new EdgeFactory(edgeLayout, settings.EdgeWidth, settings.TubularSegments, settings.Radius, settings.RadialSegments, settings.isEdgeSelectable);
+
+            Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
+            ILayoutNode fromLayoutNode = new GameNode(to_layout_node, nr0.gameObject, nodeFactory);
+            ILayoutNode toLayoutNode = new GameNode(to_layout_node, nr1.gameObject, nodeFactory);
+            LayoutEdge layoutEdge = new LayoutEdge(fromLayoutNode, toLayoutNode, new Edge(from, to));
+
+            ICollection<ILayoutNode> nodes = new List<ILayoutNode> { fromLayoutNode, toLayoutNode };
+            ICollection<LayoutEdge> edges = new List<LayoutEdge> { layoutEdge };
+
+            IEnumerator<GameObject> enumerator = factory.DrawEdges(nodes, edges).GetEnumerator();
+            enumerator.MoveNext();
+            result = enumerator.Current.GetComponent<LineRenderer>();
+            LineFactory.SetColor(result, new Color(1.0f, 1.0f, 1.0f, 0.2f));
+
+            return result;
         }
 
-        SpinningCube spinningCube;
-
-        // Update is called once per frame
-        private void Update()
+        private LineRenderer CreateFinalizedHoverEdge(string fromID, string toID)
         {
-            // This script should be disabled, if the action state is not 'Map'
-            if (!ActionState.Is(ActionStateType.Map))
+            LineRenderer result = CreateHoverEdge(fromID, toID);
+            Color initialColor = result.startColor;
+            Color highlightColor = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Min(1.0f, AlphaCoefficient * initialColor.a));
+            Color finalColor = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Max(0.05f, initialColor.a / AlphaCoefficient));
+            EdgeAnimator.Create(result.gameObject, initialColor, highlightColor, finalColor, 0.3f, 4.0f);
+            return result;
+        }
+
+        private LineRenderer CreateStateEdge(Node from, Node to)
+        {
+            LineRenderer result = null;
+
+            // TODO(torben): This is way to inefficient to create an edge!!!
+            NodeRef nr0 = NodeRef.Get(from);
+            NodeRef nr1 = NodeRef.Get(to);
+            AbstractSEECity settings = Implementation.GetComponent<SEECity>().Renderer.GetSettings();
+            float minimalEdgeLevelDistance = 2.5f * settings.EdgeWidth;
+
+            IEdgeLayout edgeLayout = new SplineEdgeLayout(settings.EdgesAboveBlocks, minimalEdgeLevelDistance, settings.RDP);
+            NodeFactory nodeFactory = new CubeFactory(Materials.ShaderType.Opaque, new ColorRange(Color.white, Color.white, 1));
+            EdgeFactory factory = new EdgeFactory(edgeLayout, settings.EdgeWidth, settings.TubularSegments, settings.Radius, settings.RadialSegments, settings.isEdgeSelectable);
+
+            Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
+            ILayoutNode fromLayoutNode = new GameNode(to_layout_node, nr0.gameObject, nodeFactory);
+            ILayoutNode toLayoutNode = new GameNode(to_layout_node, nr1.gameObject, nodeFactory);
+            LayoutEdge layoutEdge = new LayoutEdge(fromLayoutNode, toLayoutNode, new Edge(from, to));
+
+            ICollection<ILayoutNode> nodes = new List<ILayoutNode> { fromLayoutNode, toLayoutNode };
+            ICollection<LayoutEdge> edges = new List<LayoutEdge> { layoutEdge };
+
+            IEnumerator<GameObject> enumerator = factory.DrawEdges(nodes, edges).GetEnumerator();
+            enumerator.MoveNext();
+            result = enumerator.Current.GetComponent<LineRenderer>();
+            LineFactory.SetColor(result, new Color(1.0f, 0.0f, 1.0f, 0.3f));
+
+            result.enabled = actionState.showDiff;
+
+            return result;
+        }
+
+        private GameObject CreateGhost(InteractableObject o)
+        {
+            Material m = o.GetComponent<MeshRenderer>().material;
+            Color c = m.color;
+            CubeFactory f = new CubeFactory(Materials.ShaderType.Transparent, new ColorRange(new Color(c.r, c.g, c.b, c.a / AlphaCoefficient)));
+            GameObject result = f.NewBlock(0, 0);
+            result.GetComponent<MeshRenderer>().material.renderQueue = m.renderQueue;
+            result.transform.position = o.transform.position;
+            result.transform.localScale = o.transform.lossyScale;
+            result.layer = 2; // Note: This will make raycasting ignore this object. Physics.IgnoreRaycastLayer contains the wrong value (water mask)!
+            return result;
+        }
+
+        private bool IsValidSource(InteractableObject o)
+        {
+            return o != null && o.GraphElemRef is NodeRef && o.GraphElemRef.elem.ItsGraph.Equals(implGraph);
+        }
+
+        private bool IsValidTarget(InteractableObject o)
+        {
+            return o != null && o.GraphElemRef is NodeRef && o.GraphElemRef.elem.ItsGraph.Equals(archGraph);
+        }
+
+        public void UpdateGrabbed()
+        {
+            Tuple<uint, uint, LineRenderer> _RegenerateTuple(Tuple<uint, uint, LineRenderer> tuple)
             {
-                enabled = false;
-                InteractableObject.AnySelectIn -= AnySelectIn;
-                InteractableObject.AnySelectOut -= AnySelectOut;
-                return;
+                UnityEngine.Object.Destroy(tuple.Item3.gameObject);
+                Node from = InteractableObject.Get(tuple.Item1).GetNode();
+                Node to = InteractableObject.Get(tuple.Item2).GetNode();
+                LineRenderer lineRenderer = CreateFinalizedHoverEdge(from.ID, to.ID);
+                return new Tuple<uint, uint, LineRenderer>(tuple.Item1, tuple.Item2, lineRenderer);
             }
 
-            //------------------------------------------------------------------------
-            // ARCHITECTURAL MAPPING
-            //------------------------------------------------------------------------
-
-            if (Input.GetMouseButtonDown(0)) // Left mouse button
+            foreach (InteractableObject o in InteractableObject.GrabbedObjects)
             {
-                if (Raycasting.RaycastGraphElement(out RaycastHit _, out GraphElementRef elementRef) == HitGraphElement.Node) 
+                if (IsValidSource(o))
                 {
-                    // Select, replace or map
-                    NodeRef nodeRef = elementRef as NodeRef;
-
-                    Assert.IsNotNull(nodeRef);
-                    Assert.IsNotNull(nodeRef.Value);
-
-                    if (nodeRef.Value.ItsGraph == implementation) // Set or replace implementation node
+                    InteractableObject fromObj = o;
+                    for (int i = activeHoverEdges.Count - 1; i >= 0; i--)
                     {
-                        if (selection.interactableObject != null)
+                        Tuple<uint, uint, LineRenderer> tuple = activeHoverEdges[i];
+                        if (tuple.Item1 == fromObj.ID)
                         {
-                            selection.interactableObject.SetSelect(false, true);
+                            activeHoverEdges[i] = _RegenerateTuple(tuple);
                         }
-                        nodeRef.GetComponent<InteractableObject>().SetSelect(true, true);
                     }
-                    else if (selection.nodeRef != null) // Create mapping
+                }
+                else if (IsValidTarget(o))
+                {
+                    InteractableObject toObj = o;
+                    for (int i = activeHoverEdges.Count - 1; i >= 0; i--)
                     {
-                        Node n0 = selection.nodeRef.Value;
-                        Node n1 = nodeRef.Value;
-                        if (Reflexion.Is_Explicitly_Mapped(n0))
+                        Tuple<uint, uint, LineRenderer> tuple = activeHoverEdges[i];
+                        if (tuple.Item2 == toObj.ID)
                         {
-                            Node mapped = Reflexion.Get_Mapping().GetNode(n0.ID);
-                            Assert.IsTrue(mapped.Outgoings.Count == 1);
-                            Reflexion.Delete_From_Mapping(mapped.Outgoings[0]);
+                            activeHoverEdges[i] = _RegenerateTuple(tuple);
                         }
-                        Reflexion.Add_To_Mapping(n0, n1);
-                        selection.interactableObject.SetSelect(false, true);
                     }
                 }
-                else // Deselect
+            }
+
+            bool _EdgeConnectsObjOrChild(Edge edge, NodeRef nodeRef)
+            {
+                bool result = false;
+
+                string id = nodeRef.Value.ID;
+                if (id.Equals(edge.Source.ID) || id.Equals(edge.Target.ID))
                 {
-                    selection.interactableObject?.SetSelect(false, true);
+                    result = true;
+                }
+
+                if (!result)
+                {
+                    Transform t = nodeRef.transform;
+                    for (int i = 0; i < t.childCount; i++)
+                    {
+                        NodeRef child = t.GetChild(i).GetComponent<NodeRef>();
+                        if (child && _EdgeConnectsObjOrChild(edge, child))
+                        {
+                            result = true;
+                            break;
+                        }
+                    }
+                }
+
+                return result;
+            }
+
+            // TODO(torben): This may become slow, if many edges are mapped (O(n^2))
+            List<Tuple<Edge, LineRenderer>> changes = new List<Tuple<Edge, LineRenderer>>();
+            foreach (KeyValuePair<Edge, LineRenderer> pair in edgeToFinalizedMappingEdges)
+            {
+                Edge edge = pair.Key;
+                LineRenderer lineRenderer = pair.Value;
+
+                foreach (InteractableObject o in InteractableObject.GrabbedObjects)
+                {
+                    if (o.TryGetNodeRef(out NodeRef nodeRef) && _EdgeConnectsObjOrChild(edge, nodeRef))
+                    {
+                        // TODO(torben): animation might be active
+                        UnityEngine.Object.Destroy(lineRenderer.gameObject);
+                        changes.Add(new Tuple<Edge, LineRenderer>(edge, CreateFinalizedHoverEdge(edge.Source.ID, edge.Target.ID)));
+                        break;
+                    }
                 }
             }
-
-            if (spinningCube.gameObject != null)
+            foreach (Tuple<Edge, LineRenderer> change in changes)
             {
-                const float PERIOD = 4.0f;
-                spinningCube.timer += Time.deltaTime;
-                while (spinningCube.timer > PERIOD)
-                {
-                    spinningCube.timer -= PERIOD;
-                }
-                float tPos = Mathf.Sin(2.0f * Mathf.PI * spinningCube.timer / PERIOD * 2.0f) * 0.5f + 0.5f; // y-range: [0.0, 1.0]
-                float gr = 0.5f * MathExtensions.GoldenRatio;
-                float ls = spinningCube.gameObject.transform.localScale.x;
-
-                //TODO: Camera.main should be cached for Update(),
-                // as it has CPU overhead comparable to GameObject.GetComponent
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                Physics.Raycast(ray, out RaycastHit hit);
-
-                spinningCube.gameObject.transform.position = hit.point + new Vector3(0.0f, gr * ls + tPos * gr * ls, 0.0f);
-                spinningCube.gameObject.transform.rotation = Quaternion.AngleAxis(spinningCube.timer / PERIOD * 180.0f, Vector3.up);
-
-                float tCol = Mathf.Sin(2.0f * Mathf.PI * spinningCube.timer / PERIOD) * 0.5f + 0.5f;
-                spinningCube.meshRenderer.material.color = (1.0f - tCol) * spinningCube.c0 + tCol * spinningCube.c1;
+                edgeToFinalizedMappingEdges[change.Item1] = change.Item2;
             }
+        }
 
-#if false
-            bool leftControl = LeftControlPressed();
+        //----------------------------------------------------------------
+        // Events
+        //----------------------------------------------------------------
 
-            actionState.save = leftControl && Input.GetKeyDown(SaveKey);
-            actionState.copy = leftControl && Input.GetKeyDown(CopyKey);
-            actionState.paste = leftControl && Input.GetKeyDown(PasteKey);
-            actionState.clearClipboard = leftControl && Input.GetKeyDown(ClearKey);
+        private void TryCreateOnHoverEdgesTo(InteractableObject toObj, bool isOwner)
+        {
+            Assert.IsTrue(activeHoverEdges.Count == 0);
 
-            // We can copy only from the implementation city and if there is a selected object.
-            if (actionState.copy && actionState.hitCity == HitCity.Implementation && selection.go != null)
+            if (IsValidTarget(toObj))
             {
-                if (objectsInClipboard.Contains(selection))
+                Node toNode = toObj.GetNode();
+                foreach (InteractableObject fromObj in InteractableObject.GetSelectedObjectsOfGraph(implGraph))
                 {
-                    Debug.LogFormat("Removing node {0} from clipboard\n", selection.go.name);
-                    objectsInClipboard.Remove(selection);
-                }
-                else
-                {
-                    Debug.LogFormat("Copying node {0} to clipboard\n", selection.go.name);
-                    objectsInClipboard.Add(selection);
+                    if (IsValidSource(fromObj))
+                    {
+                        Node fromNode = fromObj.GetNode();
+                        activeHoverEdges.Add(new Tuple<uint, uint, LineRenderer>(fromObj.ID, toObj.ID, CreateHoverEdge(fromNode.ID, toNode.ID)));
+                    }
                 }
             }
-            if (actionState.clearClipboard)
-            {
-                Debug.Log("Node clipboard has been cleared.\n");
-                objectsInClipboard.Clear();
-            }
-            // We can paste only into the architecture city and if we have a selected object as a target
-            if (actionState.paste && actionState.hitCity == HitCity.Architecture && selection.go != null)
-            {
-                MapClipboardContent(selection);
-            }
-            // Save the mapping if requested.
-            if (actionState.save && (actionState.hitCity == HitCity.Implementation || actionState.hitCity == HitCity.Implementation))
-            {
-                SaveMapping(mapping, MappingFile);
-            }
-#endif
         }
 
-        /// <summary>
-        /// Maps all nodes in <code>objectsInClipboard</code> <onto <paramref name="target"/>.
-        /// Assumption: all nodes in objectsInClipboard are implementation nodes.
-        /// </summary>
-        /// <param name="target">architecture node to be mapped on</param>
-        private void MapClipboardContent(Selection target)
+        private void TryDestroyOnHoverEdgesTo(InteractableObject toObj, bool isOwner)
         {
-            foreach (Selection implementation in objectsInClipboard)
+            for (int i = activeHoverEdges.Count - 1; i >= 0; i--)
             {
-                if (!Reflexion.Is_Explicitly_Mapped(implementation.nodeRef.Value))
+                Tuple<uint, uint, LineRenderer> tuple = activeHoverEdges[i];
+                if (tuple.Item2 == toObj.ID)
                 {
-                    Debug.LogFormat("Mapping {0} -> {1}.\n", implementation.nodeRef.name, target.nodeRef.name);
-                    Reflexion.Add_To_Mapping(from: implementation.nodeRef.Value, to: target.nodeRef.Value);
-                }
-                else
-                {
-                    Debug.LogWarningFormat("Node {0} is already explicitly mapped.\n", implementation.nodeRef.name);
+                    UnityEngine.Object.Destroy(tuple.Item3.gameObject);
+                    activeHoverEdges.RemoveAt(i);
                 }
             }
-            objectsInClipboard.Clear();
         }
 
-        /// <summary>
-        /// Whether the left control key was pressed.
-        /// </summary>
-        /// <returns>true if the left control key was pressed</returns>
-        private static bool LeftControlPressed()
+        private void TryCreateHoverEdgeFrom(InteractableObject fromObj, bool isOwner)
         {
-            // Control key capturing does not really work well in the editor.
-            bool leftControl = false;
-#if UNITY_EDITOR
-            leftControl = true;
-#else
-            if (Input.GetKeyDown(KeyCode.LeftControl))
+            InteractableObject toObj = InteractableObject.HoveredObject;
+            if (IsValidSource(fromObj) && IsValidTarget(toObj))
             {
-                leftControl = true;
+                Node fromNode = fromObj.GetNode();
+                Node toNode = toObj.GetNode();
+                activeHoverEdges.Add(new Tuple<uint, uint, LineRenderer>(fromObj.ID, toObj.ID, CreateHoverEdge(fromNode.ID, toNode.ID)));
             }
-            if (Input.GetKeyUp(KeyCode.LeftControl))
+        }
+
+        private void TryDestroyHoverEdgeFrom(InteractableObject fromObj, bool isOwner)
+        {
+            if (IsValidSource(fromObj))
             {
-                leftControl = false;
+                for (int i = activeHoverEdges.Count - 1; i >= 0; i--)
+                {
+                    Tuple<uint, uint, LineRenderer> tuple = activeHoverEdges[i];
+                    if (tuple.Item1 == fromObj.ID)
+                    {
+                        UnityEngine.Object.Destroy(tuple.Item3.gameObject);
+                        activeHoverEdges.RemoveAt(i);
+                        break; // Note: There can only ever be ONE edge coming from a given object.
+                    }
+                }
             }
-#endif
-            return leftControl;
-        }
-
-        private void SetupReflexion()
-        {
-            Reflexion = new Reflexion(implementation, architecture, mapping);
-            Reflexion.Register(this);
-            // An initial run is necessary to set up the necessary data structures.
-            Reflexion.Run();
-        }
-
-        private void AnySelectIn(InteractableObject interactableObject, bool isOwner)
-        {
-            Assert.IsNull(selection.nodeRef);
-            Assert.IsNull(selection.interactableObject);
-
-            spinningCube.gameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            spinningCube.gameObject.name = "MappingAction.spinningCube";
-            // Note: This will make raycasting ignore this object. Physics.IgnoreRaycastLayer contains the wrong value (water mask)!
-            spinningCube.gameObject.layer = 2;
-            float scale = 0.1f * Implementation.GetComponent<GO.Plane>().MinLengthXZ;
-            spinningCube.gameObject.transform.localScale = new Vector3(scale, scale, scale);
-
-            spinningCube.meshRenderer = spinningCube.gameObject.GetComponent<MeshRenderer>();
-            spinningCube.meshRenderer.material = new Material(interactableObject.GetComponent<MeshRenderer>().material);
-            spinningCube.meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            spinningCube.meshRenderer.material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Overlay;
-            Portal.SetInfinitePortal(spinningCube.gameObject);
-
-            spinningCube.timer = -Time.deltaTime;
-
-            spinningCube.c0 = spinningCube.meshRenderer.material.color;
-            spinningCube.c0.a = SelectedAlpha;
-            spinningCube.c1 = spinningCube.c0 + new Color(0.2f, 0.2f, 0.2f, 0.0f);
-
-            selection.nodeRef = interactableObject.GetComponent<NodeRef>();
-            selection.interactableObject = interactableObject;
-            SetAlpha(selection.nodeRef, SelectedAlpha);
-        }
-
-        private void AnySelectOut(InteractableObject interactableObject, bool isOwner)
-        {
-            Assert.IsNotNull(selection.nodeRef);
-            Assert.IsNotNull(selection.interactableObject);
-
-            Destroy(spinningCube.gameObject);
-#if UNITY_EDITOR
-            spinningCube.gameObject = null;
-            spinningCube.meshRenderer = null;
-            spinningCube.timer = 0.0f;
-            spinningCube.c0 = new Color();
-            spinningCube.c1 = new Color();
-#endif
-
-            SetAlpha(selection.nodeRef, 1.0f);
-            selection.interactableObject = null;
-            selection.nodeRef = null;
-        }
-
-        private void SetAlpha(NodeRef nodeRef, float alpha)
-        {
-            MeshRenderer meshRenderer = nodeRef.GetComponent<MeshRenderer>();
-            Color color = meshRenderer.material.color;
-            color.a = alpha;
-            meshRenderer.material.color = color;
         }
 
         /// <summary>
         /// Called by incremental reflexion for every change in the reflexion model
         /// by way of the observer protocol as a callback. Dispatches the event to
         /// the appropriate handling function.
+        /// 
         /// </summary>
         /// <param name="changeEvent">additional information about the change in the reflexion model</param>
         public void Update(ChangeEvent changeEvent)
         {
             switch (changeEvent)
             {
-                case EdgeChange changedEvent: HandleEdgeChange(changedEvent);
+                case EdgeChange changedEvent:
+                    HandleEdgeChange(changedEvent);
                     break;
-                case PropagatedEdgeAdded changedEvent: HandlePropagatedEdgeAdded(changedEvent);
+                case PropagatedEdgeAdded changedEvent:
+                    HandlePropagatedEdgeAdded(changedEvent);
                     break;
-                case PropagatedEdgeRemoved changedEvent: HandlePropagatedEdgeRemoved(changedEvent);
+                case PropagatedEdgeRemoved changedEvent:
+                    HandlePropagatedEdgeRemoved(changedEvent);
                     break;
-                case MapsToEdgeAdded changedEvent: HandleMapsToEdgeAdded(changedEvent);
+                case MapsToEdgeAdded changedEvent:
+                    HandleMapsToEdgeAdded(changedEvent);
                     break;
-                case MapsToEdgeRemoved changedEvent: HandleMapsToEdgeRemoved(changedEvent);
+                case MapsToEdgeRemoved changedEvent:
+                    HandleMapsToEdgeRemoved(changedEvent);
                     break;
-                default: Debug.LogErrorFormat("UNHANDLED CALLBACK: {0}\n", changeEvent);
+                default:
+                    Debug.LogErrorFormat("UNHANDLED CALLBACK: {0}\n", changeEvent);
                     break;
             }
+        }
+
+        /// <summary>
+        /// <see cref="ReversibleAction.HadEffect"/>
+        /// </summary>
+        /// <returns>true if this action has had already some effect that would need to be undone</returns>
+        public bool HadEffect()
+        {
+            return false; // FIXME
         }
 
         /// <summary>
@@ -652,10 +854,35 @@ namespace SEE.Controls.Actions
         /// <param name="edgeChange"></param>
         private void HandleEdgeChange(EdgeChange edgeChange)
         {
+            Color c = new Color(0.0f, 0.0f, 0.0f, 0.0f);
+            switch (edgeChange.newState)
+            {
+                case State.divergent:
+                    c = new Color(1.0f, 0.0f, 0.0f, 1.0f);
+                    break;
+                case State.absent:
+                    c = new Color(1.0f, 1.0f, 0.0f, 1.0f);
+                    break;
+                case State.convergent:
+                    c = new Color(0.0f, 1.0f, 0.0f, 1.0f);
+                    break;
+            }
+
+            if (c.a != 0.0f)
+            {
+                if (!edgeToStateEdges.TryGetValue(edgeChange.edge, out LineRenderer r))
+                {
+                    r = CreateStateEdge(edgeChange.edge.Source, edgeChange.edge.Target);
+                    edgeToStateEdges[edgeChange.edge] = r;
+                }
+                LineFactory.SetColor(r, c);
+            }
+
             Debug.LogFormat("edge of type {0} from {1} to {2} changed its state from {3} to {4}.\n",
                             edgeChange.edge.Type, edgeChange.edge.Source.ID, edgeChange.edge.Target.ID,
                             edgeChange.oldState, edgeChange.newState);
 
+#if false // TODO(torben): we might want to still use some of these decorations
             // Possible edge changes:
             //  for specified architecture dependencies
             //    specified          => {absent, allowed_absent, convergent}
@@ -748,6 +975,7 @@ namespace SEE.Controls.Actions
             {
                 Debug.LogErrorFormat("Edge {0} is unknown.\n", edgeChange.edge.ID);
             }
+#endif
         }
 
         private void HandlePropagatedEdgeRemoved(PropagatedEdgeRemoved propagatedEdgeRemoved)
@@ -758,23 +986,34 @@ namespace SEE.Controls.Actions
         private void HandlePropagatedEdgeAdded(PropagatedEdgeAdded propagatedEdgeAdded)
         {
             Debug.Log(propagatedEdgeAdded.ToString());
-
-            Edge edge = propagatedEdgeAdded.propagatedEdge;
-            GameObject source = architectureNodes[edge.Source.ID];
-            GameObject target = architectureNodes[edge.Target.ID];
-            List<GameObject> nodes = new List<GameObject> { source, target };
-            // FIXME: Continue here.
-            //ICollection<GameObject> edges = architectureGraphRenderer.EdgeLayout(nodes);
         }
 
         private void HandleMapsToEdgeAdded(MapsToEdgeAdded mapsToEdgeAdded)
         {
             Debug.Log(mapsToEdgeAdded.ToString());
+
+            Edge edge = mapsToEdgeAdded.mapsToEdge;
+            LineRenderer lineRenderer = CreateFinalizedHoverEdge(edge.Source.ID, edge.Target.ID);
+            edgeToFinalizedMappingEdges[edge] = lineRenderer;
         }
 
         private void HandleMapsToEdgeRemoved(MapsToEdgeRemoved mapsToEdgeRemoved)
         {
             Debug.Log(mapsToEdgeRemoved.ToString());
+
+            Edge edge = mapsToEdgeRemoved.mapsToEdge;
+            LineRenderer r = edgeToFinalizedMappingEdges[edge];
+            edgeToFinalizedMappingEdges.Remove(edge);
+            UnityEngine.Object.Destroy(r.gameObject);
+        }
+
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this action.
+        /// </summary>
+        /// <returns>the <see cref="ActionStateType"/> of this action</returns>
+        public ActionStateType GetActionStateType()
+        {
+            return ActionStateType.Map;
         }
     }
 }

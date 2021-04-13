@@ -9,8 +9,8 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// The abstract navigation action handles generic interactions with the city.
     /// </summary>
-    [RequireComponent(typeof(Plane))]
-    public abstract class NavigationAction : CityAction
+    [RequireComponent(typeof(GO.Plane))]
+    public abstract class NavigationAction : MonoBehaviour
     {
         /// <summary>
         /// Zoom commands hold data about zooming into or out of the city.

@@ -29,6 +29,18 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// Constructor. A random ID will be used for this edge.
+        /// </summary>
+        /// <param name="source">source of the edge</param>
+        /// <param name="target">target of the edge</param>
+        public Edge(Node source, Node target)
+        {
+            this.source = source;
+            this.target = target;
+            id = Utils.RandomStrings.Get(); // TODO(torben): This could potentially not be unique
+        }
+
+        /// <summary>
         /// Constructor. Source, target, and type of the edge remain undefined.
         /// </summary>
         /// <param name="ID">unique ID of edge</param>
@@ -43,7 +55,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         public Edge()
         {
-            id = Utils.RandomStrings.Get();
+            id = Utils.RandomStrings.Get(); // TODO(torben): This could potentially not be unique
         }
 
         /// <summary>
@@ -170,7 +182,12 @@ namespace SEE.DataModel.DG
         public override string ID
         {
             get => id;
-            set => throw new NotImplementedException();
+            set => throw new InvalidOperationException(); // ID must not be changed
+        }
+
+        public static implicit operator bool(Edge edge)
+        {
+            return edge != null;
         }
     }
 }

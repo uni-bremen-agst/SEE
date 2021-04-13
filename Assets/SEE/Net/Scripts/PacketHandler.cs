@@ -1,8 +1,8 @@
-﻿using NetworkCommsDotNet;
-using NetworkCommsDotNet.Connections;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using NetworkCommsDotNet;
+using NetworkCommsDotNet.Connections;
 using UnityEngine.Assertions;
 
 namespace SEE.Net
@@ -43,7 +43,7 @@ namespace SEE.Net
 
 
         /// <summary>
-        /// Whether this is a packet hander of a server or a client.
+        /// Whether this is a packet handler of a server or a client.
         /// </summary>
         private readonly bool isServer;
 
@@ -84,7 +84,7 @@ namespace SEE.Net
             lock (serializedPendingPackets)
             {
                 serializedPendingPackets.Add(
-                    new SerializedPendingPacket()
+                    new SerializedPendingPacket
                     {
                         packetHeader = packetHeader,
                         connection = connection,
@@ -108,7 +108,7 @@ namespace SEE.Net
                 {
                     PacketSequencePacket packet = (PacketSequencePacket)PacketSerializer.Deserialize(serializedPendingPacket.serializedPacket);
                     translatedPendingPackets.Add(
-                        new TranslatedPendingPacket()
+                        new TranslatedPendingPacket
                         {
                             packetHeader = serializedPendingPacket.packetHeader,
                             connection = serializedPendingPacket.connection,

@@ -98,7 +98,7 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Removes the given node from the graph. Its incoming and outgoing edges are removed,
+        /// Removes the given node from the graph. Its incoming and outgoing edges are removed
         /// along with it.
         /// 
         /// Precondition: node must not be null and must be contained in this graph.
@@ -269,29 +269,29 @@ namespace SEE.DataModel.DG
         {
             if (ReferenceEquals(edge, null))
             {
-                throw new Exception("edge must not be null");
+                throw new Exception("Edge must not be null.");
             }
 
             if (ReferenceEquals(edge.Source, null) || ReferenceEquals(edge.Target, null))
             {
-                throw new Exception("source/target of this node is null");
+                throw new Exception("Source/target of this edge is null.");
             }
 
             if (ReferenceEquals(edge.ItsGraph, null))
             {
                 if (edge.Source.ItsGraph != this)
                 {
-                    throw new Exception("source node " + edge.Source + " is not in the graph");
+                    throw new Exception($"Source node {edge.Source} is not in the graph.");
                 }
 
                 if (edge.Target.ItsGraph != this)
                 {
-                    throw new Exception("target node " + edge.Target + " is not in the graph");
+                    throw new Exception($"Target node {edge.Target} is not in the graph.");
                 }
 
                 if (edges.ContainsKey(edge.ID))
                 {
-                    throw new Exception("There is already an edge with the ID " + edge.ID);
+                    throw new Exception($"There is already an edge with the ID {edge.ID}.");
                 }
 
                 edge.ItsGraph = this;
@@ -301,7 +301,7 @@ namespace SEE.DataModel.DG
             }
             else
             {
-                throw new Exception("edge " + edge + " is already in a graph " + edge.ItsGraph.Name);
+                throw new Exception($"Edge {edge} is already in a graph {edge.ItsGraph.Name}.");
             }
         }
 
@@ -382,6 +382,11 @@ namespace SEE.DataModel.DG
         public List<Edge> Edges()
         {
             return edges.Values.ToList();
+        }
+
+        public bool ContainsNode(string ID)
+        {
+            return nodes.ContainsKey(ID);
         }
 
         /// <summary>
@@ -512,7 +517,7 @@ namespace SEE.DataModel.DG
         /// <param name="nodes">nodes for which to determine the depth</param>
         /// <param name="currentDepth">the current depth of the given <paramref name="nodes"/></param>
         /// <returns></returns>
-        private int CalcMaxDepth(List<Node> nodes, int currentDepth)
+        private int CalcMaxDepth(IList<Node> nodes, int currentDepth)
         {
             int max = currentDepth + 1;
             for (int i = 0; i < nodes.Count; i++)
@@ -569,7 +574,25 @@ namespace SEE.DataModel.DG
         public void FinalizeNodeHierarchy()
         {
             CalculateLevels();
+            SetLevelMetric();
             maxDepth = CalcMaxDepth(GetRoots(), -1);
+        }
+
+        /// <summary>
+        /// The name of a node metric that reflects the node's depth within the node hierarchy.
+        /// It is equivalent to the node attribute <see cref="Level"/>.
+        /// </summary>
+        public const string MetricLevel = "Metric.Level";
+
+        /// <summary>
+        /// Sets the metric <see cref="MetricLevel"/> of each node to its Level.
+        /// </summary>
+        private void SetLevelMetric()
+        {
+            foreach (Node node in nodes.Values)
+            {
+                node.SetInt(MetricLevel, node.Level);
+            }
         }
 
         /// <summary>
@@ -1073,6 +1096,11 @@ namespace SEE.DataModel.DG
                 }
             }
             return result.ToList();
+        }
+
+        public static implicit operator bool(Graph graph)
+        {
+            return graph != null;
         }
     }
 }

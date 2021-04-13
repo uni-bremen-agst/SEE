@@ -400,7 +400,7 @@ namespace SEE.Game.Charts
             }
         }
 
-        public void Init(ChartContent chartContent, ref ScrollViewEntryData data, string label)
+        public void Init(ChartContent chartContent, ScrollViewEntryData data, string label)
         {
             this.chartContent = chartContent;
             index = data.index;

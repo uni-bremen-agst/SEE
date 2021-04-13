@@ -3,6 +3,9 @@ using SEE.Utils;
 using System;
 using OdinSerializer.Utilities;
 using UnityEngine;
+using System.Collections.Generic;
+using SEE.DataModel;
+using SEE.Game;
 
 namespace SEE.GO
 {
@@ -31,10 +34,69 @@ namespace SEE.GO
                 }
                 else
                 {
-                    return edgeRef.edge.ID;
+                    return edgeRef.Value.ID;
                 }
             }
             return nodeRef.Value.ID;
+        }
+
+        /// <summary>
+        /// If <paramref name="gameObject"/> represents a graph node or edge, the city this 
+        /// object is contained in will be returned. Otherwise null is returned.
+        /// </summary>
+        /// <param name="gameObject">graph node or edge whose containing city is requested</param>
+        /// <returns>the containing city of <paramref name="gameObject"/> or null</returns>
+        public static SEECity ContainingCity(this GameObject gameObject)
+        {
+            if (gameObject == null || (!gameObject.HasNodeRef() && !gameObject.HasEdgeRef()))
+            {
+                return null;
+            }
+            else
+            {
+                Transform codeCityObject = SceneQueries.GetCodeCity(gameObject.transform);
+                if (codeCityObject != null && codeCityObject.gameObject.TryGetComponent(out SEECity city))
+                {
+                    return city;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// True if <paramref name="gameNode"/> represents a leaf in the graph.
+        /// 
+        /// Precondition: <paramref name="gameNode"/> has a NodeRef component attached to it
+        /// that is a valid graph node reference.
+        /// </summary>
+        /// <param name="gameNode">game object representing a Node to be queried whether it is a leaf</param>
+        /// <returns>true if <paramref name="gameNode"/> represents a leaf in the graph</returns>
+        public static bool IsLeaf(this GameObject gameNode)
+        {
+            return gameNode.GetComponent<NodeRef>()?.Value?.IsLeaf() ?? false;
+        }
+
+        /// <summary>
+        /// Returns all transitive children of <paramref name="gameObject"/> tagged by 
+        /// given <paramref name="tag"/> (including <paramref name="gameObject"/> itself).
+        /// </summary>
+        /// <param name="tag">tag the ancestors must have</param>
+        /// <returns>all transitive children with <paramref name="tag"/></returns>
+        public static List<GameObject> AllAncestors(this GameObject gameObject, string tag)
+        {
+            List<GameObject> result = new List<GameObject>();
+            if (gameObject.CompareTag(tag))
+            {
+                result.Add(gameObject);
+            }
+            foreach (Transform child in gameObject.transform)
+            {
+                result.AddRange(child.gameObject.AllAncestors(tag));
+            }
+            return result;
         }
 
         /// <summary>
@@ -90,7 +152,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Sets the visibility of this <paramref name="gameObject"/> to <paramref name="show"/>.
+        /// Sets the visibility and the collider of this <paramref name="gameObject"/> to <paramref name="show"/>.
         /// If <paramref name="show"/> is false, the object becomes invisible. If it is true
         /// instead, it becomes visible. 
         /// 
@@ -111,6 +173,10 @@ namespace SEE.GO
             if (gameObject.TryGetComponent(out Renderer renderer))
             {
                 renderer.enabled = show;
+            }
+            if (gameObject.TryGetComponent(out Collider collider))
+            {
+                collider.enabled = show;
             }
             if (includingChildren)
             {
@@ -176,7 +242,74 @@ namespace SEE.GO
         /// component attached to it</returns>
         public static bool HasNodeRef(this GameObject gameObject)
         {
-            return gameObject.TryGetComponent<NodeRef>(out NodeRef _);
+            return gameObject.TryGetComponent(out NodeRef _);
+        }
+
+        /// <summary>
+        /// Returns true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
+        /// component attached to it.
+        /// </summary>
+        /// <param name="gameObject">the game object whose NodeRef is checked</param>
+        /// <param name="nodeRef">the attached NodeRef; defined only if this method
+        /// returns true</param>
+        /// <returns>true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
+        /// component attached to it</returns>
+        public static bool TryGetNodeRef(this GameObject gameObject, out NodeRef nodeRef)
+        {
+            return gameObject.TryGetComponent(out nodeRef);
+        }
+
+        /// <summary>
+        /// Returns true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
+        /// component attached to it that is not null.
+        /// </summary>
+        /// <param name="gameObject">the game object whose NodeRef is checked</param>
+        /// <param name="node">the node referenced by the attached NodeRef; defined only if this method
+        /// returns true</param>
+        /// <returns>true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
+        /// component attached to it that is not null</returns>
+        public static bool TryGetNode(this GameObject gameObject, out Node node)
+        {
+            node = null;
+            if (gameObject.TryGetComponent(out NodeRef nodeRef))
+            {
+                node = nodeRef.Value;
+            }
+            return node != null;
+        }
+
+        /// <summary>
+        /// Returns the graph node represented by this <paramref name="gameObject"/>.
+        /// 
+        /// Precondition: <paramref name="gameObject"/> must have a <see cref="NodeRef"/>
+        /// attached to it referring to a valid node; if not, an exception is raised.
+        /// </summary>
+        /// <param name="gameObject">the game object whose Node is requested</param>
+        /// <returns>the correponding graph node (will never be null)</returns>
+        public static Node GetNode(this GameObject gameObject)
+        {
+            if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+            {
+                if (nodeRef != null)
+                {
+                    if (nodeRef.Value != null)
+                    {
+                        return nodeRef.Value;
+                    }
+                    else
+                    {
+                        throw new Exception($"Node referenced by game object {gameObject.name} is null.");
+                    }
+                }
+                else
+                {
+                    throw new Exception($"Node reference of game object {gameObject.name} is null.");
+                }
+            }
+            else
+            {
+                throw new Exception($"Game object {gameObject.name} has no NodeRef.");
+            }
         }
 
         /// <summary>
@@ -188,36 +321,41 @@ namespace SEE.GO
         /// component attached to it</returns>
         public static bool HasEdgeRef(this GameObject gameObject)
         {
-            return gameObject.TryGetComponent<EdgeRef>(out EdgeRef _);
+            return gameObject.TryGetComponent(out EdgeRef _);
         }
 
         /// <summary>
-        /// Returns the graph node represented by this <paramref name="gameObject"/>.
+        /// Returns true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
+        /// component attached to it that is not null.
+        /// </summary>
+        /// <param name="gameObject">the game object whose EdgeRef is checked</param>
+        /// <param name="edge">the edge referenced by the attached EdgeRef; defined only if this method
+        /// returns true</param>
+        /// <returns>true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
+        /// component attached to it that is not null</returns>
+        public static bool TryGetEdge(this GameObject gameObject, out Edge edge)
+        {
+            edge = null;
+            if (gameObject.TryGetComponent(out EdgeRef edgeRef))
+            {
+                edge = edgeRef.Value;
+            }
+            return edge != null;
+        }
+
+        /// <summary>
+        /// Returns the graph containing the node represented by this <paramref name="gameObject"/>.
         /// 
         /// Precondition: <paramref name="gameObject"/> must have a <see cref="NodeRef"/>
         /// attached to it referring to a valid node; if not, an exception is raised.
         /// </summary>
-        /// <param name="gameObject">the game object whose Node is requested</param>
-        /// <returns>the correponding graph node</returns>
-        public static Node GetNode(this GameObject gameObject)
+        /// <param name="gameObject">the game object whose graph is requested</param>
+        /// <returns>the correponding graph</returns>
+        public static Graph ItsGraph(this GameObject gameObject)
         {
-            if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
-            {
-                if (nodeRef != null)
-                {
-                    return nodeRef.Value;
-                }
-                else
-                {
-                    throw new Exception($"Node reference of game object {gameObject.name} is null");
-                }
-            }
-            else
-            {
-                throw new Exception($"Game object {gameObject.name} has no NodeRef");
-            }
+            return gameObject.GetNode().ItsGraph;
         }
-        
+
         /// <summary>
         /// Enables/disables the renderers of <paramref name="gameObject"/> and all its
         /// descendants so that they become visible/invisible.
@@ -231,6 +369,131 @@ namespace SEE.GO
             {
                 SetVisible(child.gameObject, isVisible);
             }
+        }
+
+        /// <summary>
+        /// Returns the full name of given <paramref name="gameObject"/>.
+        /// The full name is the concatenation of all names of the ancestors of <paramref name="gameObject"/>
+        /// separated by a period. E.g., if <paramref name="gameObject"/> has name C and its parent
+        /// has name B and the parent's parent has name A, then the result will be A.B.C.        
+        /// </summary>
+        /// <param name="gameObject">the gameObject whose full name is to be retrieved</param>
+        /// <returns>full name</returns>
+        public static string FullName(this GameObject gameObject)
+        {
+            if (gameObject == null)
+            {
+                return "";
+            }
+            else
+            {
+                Transform parent = gameObject.transform.parent;
+                if (parent != null)
+                {
+                    return FullName(parent.gameObject) + "." + gameObject.name;
+                }
+                else
+                {
+                    return gameObject.name;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns all ancestors of given <paramref name="rootNode"/> tagged by <see cref="Tags.Node"/>
+        /// including <paramref name="rootNode"/> itself.
+        /// </summary>
+        /// <param name="rootNode">the root of the node hierarchy to be collected</param>
+        /// <returns>all ancestors of <paramref name="rootNode"/> including <paramref name="rootNode"/></returns>
+        public static IList<GameObject> AllAncestors(this GameObject rootNode)
+        {
+            IList<GameObject> result = new List<GameObject>() { rootNode };
+            AllAncestors(rootNode, result);
+            return result;
+        }
+
+        /// <summary>
+        /// Adds all ancestors of <paramref name="root"/> to <paramref name="result"/>
+        /// (only if tagged by <see cref="Tags.Node"/>).
+        /// 
+        /// Note: <paramref name="root"/> is assumed to be contained in <paramref name="result"/>
+        /// already.
+        /// </summary>
+        /// <param name="root">the root of the game-object hierarchy to be collected</param>
+        /// <param name="result">where to add the ancestors</param>
+        private static void AllAncestors(GameObject root, IList<GameObject> result)
+        {
+            foreach (Transform child in root.transform)
+            {
+                if (child.gameObject.CompareTag(Tags.Node))
+                {
+                    result.Add(child.gameObject);
+                    AllAncestors(child.gameObject, result);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the source node of the given <paramref name="gameObject"/>.
+        /// The <paramref name="gameObject"/> is assumed to represent an edge, that is,
+        /// is tagged by <see cref="Tags.Edge"/> and has an <see cref="EdgeRef"/>.
+        /// If this is not the case, an exception is thrown. If the source node
+        /// of this edge does not exist, an exception is thrown, too.
+        /// </summary>
+        /// <param name="gameObject">game object representing an edge</param>
+        /// <returns>the game object representing the source of this edge</returns>
+        public static GameObject Source(this GameObject gameObject)
+        {
+            if (gameObject.CompareTag(Tags.Edge) && gameObject.TryGetComponent(out EdgeRef edgeRef))
+            {
+                return RetrieveNode(edgeRef.SourceNodeID);
+            }
+            else
+            {
+                throw new Exception($"Game object {gameObject.name} is not an edge. It has no source node.");
+            }
+        }
+
+        /// <summary>
+        /// Returns the target node of the given <paramref name="gameObject"/>.
+        /// The <paramref name="gameObject"/> is assumed to represent an edge, that is,
+        /// is tagged by <see cref="Tags.Edge"/> and has an <see cref="EdgeRef"/>.
+        /// If this is not the case, an exception is thrown. If the target node
+        /// of this edge does not exist, an exception is thrown, too.
+        /// </summary>
+        /// <param name="gameObject">game object representing an edge</param>
+        /// <returns>the game object representing the target of this edge</returns>
+        public static GameObject Target(this GameObject gameObject)
+        {
+            if (gameObject.CompareTag(Tags.Edge) && gameObject.TryGetComponent(out EdgeRef edgeRef))
+            {
+                return RetrieveNode(edgeRef.SourceNodeID);
+            }
+            else
+            {
+                throw new Exception($"Game object {gameObject.name} is not an edge. It has no target node.");
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the game object representing a node with the given <paramref name="nodeID"/>.
+        /// 
+        /// Note: This is an expensive operation as it traverses all objects in the scene.
+        /// FIXME: We may need to cache all this information in look up tables for better
+        /// performance.
+        /// </summary>
+        /// <param name="nodeID">the unique ID of the node to be retrieved</param>
+        /// <returns>the node with the given <paramref name="nodeID"/></returns>
+        private static GameObject RetrieveNode(string nodeID)
+        {
+            foreach (GameObject gameNode in SceneQueries.AllGameNodesInScene(true, true))
+            {
+                if (gameNode.name == nodeID)
+                {
+                    return gameNode;
+                }
+            }
+            throw new Exception($"Node named {nodeID} not found.");
         }
     }
 }

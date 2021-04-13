@@ -30,9 +30,10 @@ namespace SEE.Game.Charts.VR
     public class ChartPositionVr : MonoBehaviour
     {
         /// <summary>
-        /// Contains position data of the assigned camera.
+        /// Contains position data of the assigned camera. This information is needed
+        /// so that the charts can be moved along with the camera.
         /// </summary>
-        [SerializeField] public Transform cameraTransform;
+        [SerializeField] public Transform CameraTransform;
 
         /// <summary>
         /// The minimum distance between the players head and the <see cref="GameObject" /> the charts are
@@ -60,7 +61,7 @@ namespace SEE.Game.Charts.VR
         /// </summary>
         private void GetSettingData()
         {
-            _distanceThreshold = ChartManager.Instance.distanceThreshold;
+            _distanceThreshold = ChartManager.Instance.DistanceThreshold;
         }
 
         /// <summary>
@@ -69,7 +70,7 @@ namespace SEE.Game.Charts.VR
         /// </summary>
         private void Update()
         {
-            if (Vector3.Distance(transform.position, cameraTransform.position) <=
+            if (Vector3.Distance(transform.position, CameraTransform.position) <=
                 _distanceThreshold)
             {
                 return;
@@ -93,7 +94,7 @@ namespace SEE.Game.Charts.VR
             Vector3 startPosition = transform.position;
             for (float time = 0f; time < 1f; time += Time.deltaTime * ChartSpeed)
             {
-                transform.position = Vector3.Lerp(startPosition, cameraTransform.position, time);
+                transform.position = Vector3.Lerp(startPosition, CameraTransform.position, time);
                 yield return new WaitForEndOfFrame();
             }
 
