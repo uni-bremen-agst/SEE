@@ -230,11 +230,16 @@ namespace SEE.Game.UI
         /// Displays a tooltip with the given <paramref name="text"/>.
         /// </summary>
         /// <param name="text">The text to display in the tooltip.</param>
-        protected void ShowTooltip(string text)
+        private void ShowTooltip(string text)
         {
+            //FIXME: Scrolling doesn't work while tooltip is active
             TooltipManager.allowUpdating = true;
+            
+            // Move tooltip to front of layer hierarchy
+            TooltipManager.gameObject.transform.SetAsLastSibling();
             // tooltipObject only has 1 child, and will never have more than that
-            if (TooltipManager.tooltipObject.gameObject.transform.GetChild(0).gameObject.TryGetComponentOrLog(out CanvasGroup canvasGroup))
+            //TODO: A path specifier may still be better
+            if (TooltipManager.tooltipObject.transform.GetChild(0).gameObject.TryGetComponentOrLog(out CanvasGroup canvasGroup))
             {
                 // Change text
                 TextMeshProUGUI[] texts = TooltipManager.tooltipContent.GetComponentsInChildren<TextMeshProUGUI>();
@@ -254,7 +259,7 @@ namespace SEE.Game.UI
         /// <summary>
         /// Hides the tooltip previously displayed
         /// </summary>
-        protected void HideTooltip()
+        private void HideTooltip()
         {
             TooltipManager.allowUpdating = true;
             if (TooltipManager.tooltipObject.gameObject.transform.GetChild(0).gameObject.TryGetComponentOrLog(out CanvasGroup canvasGroup))
