@@ -183,7 +183,7 @@ namespace SEE.CameraPaths
         /// </summary>
         /// <param name="parent">root of the game-object tree</param>
         /// <param name="activate">whether the game objects should be activated or deactivated</param>
-        private void Activate(GameObject parent, bool activate)
+        private static void Activate(GameObject parent, bool activate)
         {
             parent.SetActive(activate);
             foreach (Transform child in parent.transform)
