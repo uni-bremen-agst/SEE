@@ -230,21 +230,25 @@ namespace SEE.Controls.Actions
             }
             currentlyDestroying = false;
 
-
             Node node = nodeRef.Value;
+            string shownText;
             if (node == null)
             {
-                Debug.LogErrorFormat("Game node {0} has no valid node reference.\n", name);
-                return;
+                Debug.LogWarning($"Game node {name} has no valid node reference.\n");
+                shownText = name;
+            }
+            else
+            {
+                shownText = node.SourceName;
             }
 
             // Now we create the label
             // We define starting and ending positions for the animation
             Vector3 startLabelPosition = gameObject.transform.position;
-            nodeLabel = TextFactory.GetTextWithSize(node.SourceName, startLabelPosition,
+            nodeLabel = TextFactory.GetTextWithSize(shownText, startLabelPosition,
                                                     (isLeaf ? city.LeafLabelSettings : city.InnerNodeLabelSettings).FontSize, 
                                                     textColor: Color.black.ColorWithAlpha(0f));
-            nodeLabel.name = $"Label {node.SourceName}";
+            nodeLabel.name = $"Label {shownText}";
             nodeLabel.transform.SetParent(gameObject.transform);
             
             SetOutline();
