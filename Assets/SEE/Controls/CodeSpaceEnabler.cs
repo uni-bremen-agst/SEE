@@ -8,7 +8,7 @@ namespace SEE.Controls
     /// source-code viewer.
     /// </summary>
     [Obsolete("This class is used only for capturing videos.")]
-    class CodeSpaceEnabler : MonoBehaviour
+    internal class CodeSpaceEnabler : MonoBehaviour
     {
         private const string CodeSpaceName = "CodeSpace";
         private bool showCodeWindow = true;
