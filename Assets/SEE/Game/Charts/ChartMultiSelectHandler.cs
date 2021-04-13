@@ -65,7 +65,7 @@ namespace SEE.Game.Charts
             selectionRect.position = eventData.pressPosition;
             startingPos = selectionRect.position;
             selectionRect.sizeDelta = new Vector2(0.0f, 0.0f);
-            if (!Input.GetKey(KeyCode.LeftControl))
+            if (!SEEInput.ToggleMetricHoveringSelection())
             {
                 InteractableObject.UnhoverAll(true);
                 InteractableObject.UnselectAll(true);

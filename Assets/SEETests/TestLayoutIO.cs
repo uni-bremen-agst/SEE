@@ -276,7 +276,7 @@ namespace SEE.Layout
         private ICollection<GameObject> GetGameObjects(GameObject go)
         {
             List<GameObject> result = new List<GameObject>();
-            if (go.tag == Tags.Node)
+            if (go.CompareTag(Tags.Node))
             {
                 result.Add(go);
             }

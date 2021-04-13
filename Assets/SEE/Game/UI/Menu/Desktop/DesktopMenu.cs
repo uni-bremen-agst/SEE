@@ -6,6 +6,7 @@ using SEE.GO;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.UI;
 
 namespace SEE.Game.UI
@@ -24,7 +25,7 @@ namespace SEE.Game.UI
 
         /// <summary>
         /// The path to the prefab for the menu game object.
-        /// Will be added for each menu entry in <see cref="Entries"/>.
+        /// Will be added for each menu entry in <see cref="entries"/>.
         /// </summary>
         private const string BUTTON_PREFAB = "Prefabs/UI/Button";
         
@@ -61,6 +62,11 @@ namespace SEE.Game.UI
         /// are needed, more GameObjects with TooltipManagers need to be created.
         /// </summary>
         protected TooltipManager TooltipManager;
+
+        /// <summary>
+        /// UI game object containing the entries as buttons.
+        /// </summary>
+        protected GameObject EntryList;
 
         /// <summary>
         /// List of all button managers for the buttons used in this menu.
@@ -109,7 +115,7 @@ namespace SEE.Game.UI
                 // Create new tooltip GameObject
                 Object tooltipPrefab = Resources.Load<GameObject>(TOOLTIP_PREFAB);
                 GameObject tooltip = Instantiate(tooltipPrefab, Canvas.transform, false) as GameObject;
-                UnityEngine.Assertions.Assert.IsNotNull(tooltip);
+                Assert.IsNotNull(tooltip);
                 tooltip.TryGetComponentOrLog(out TooltipManager);
             }
             
@@ -127,36 +133,47 @@ namespace SEE.Game.UI
         /// </summary>
         protected virtual void SetUpDesktopContent()
         {
-            GameObject List = MenuContent.transform.Find("Menu Entries/Scroll Area/List")?.gameObject;
-            if (List == null)
+            EntryList = MenuContent.transform.Find("Menu Entries/Scroll Area/List")?.gameObject;
+            if (EntryList == null)
             {
                 // Create menu entry list if it doesn't exist yet
                 Object listPrefab = Resources.Load<GameObject>(LIST_PREFAB);
-                List = Instantiate(listPrefab, MenuContent.transform, false) as GameObject;
-                if (List == null)
+                EntryList = Instantiate(listPrefab, MenuContent.transform, false) as GameObject;
+                if (EntryList == null)
                 {
                     Debug.LogError("Couldn't instantiate List object.");
                     return;
                 }
-                List.name = "Menu Entries";
+                EntryList.name = "Menu Entries";
                 // List should actually be the list, not the entry object
-                List = List.transform.Find("Scroll Area/List").gameObject;
+                EntryList = EntryList.transform.Find("Scroll Area/List").gameObject;
             }
 
             // Then, add all entries as buttons
+            AddDesktopButtons(Entries);
+        }
+
+        /// <summary>
+        /// Adds the given <paramref name="entries"/> as buttons to the Desktop menu.
+        /// </summary>
+        /// <param name="entries">The entries to add to the menu.</param>
+        protected virtual void AddDesktopButtons(IEnumerable<T> entries)
+        {
             Object buttonPrefab = Resources.Load<GameObject>(BUTTON_PREFAB);
-            foreach (T entry in Entries)
+            foreach (T entry in entries)
             {
-                GameObject button = Instantiate(buttonPrefab, List.transform, false) as GameObject;
-                GameObject text = button?.transform.Find("Text").gameObject;
-                GameObject icon = button?.transform.Find("Icon").gameObject;
+                GameObject button = Instantiate(buttonPrefab, EntryList.transform, false) as GameObject;
+                Assert.IsNotNull(button);
+                GameObject text = button.transform.Find("Text").gameObject;
+                GameObject icon = button.transform.Find("Icon").gameObject;
                 if (button == null || text == null || icon == null)
                 {
-                    Debug.LogError("Couldn't instantiate button for MenuEntry correctly.");
+                    Debug.LogError("Couldn't instantiate button for MenuEntry correctly.\n");
                     return;
                 }
+
                 button.name = entry.Title;
-                if (!button.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager) || 
+                if (!button.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager) ||
                     !button.TryGetComponentOrLog(out Image buttonImage) ||
                     !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro) ||
                     !icon.TryGetComponentOrLog(out Image iconImage))
@@ -170,7 +187,7 @@ namespace SEE.Game.UI
                 buttonManager.hoverExitEvent.AddListener(() => HideTooltip());
                 if (entry.Enabled)
                 {
-                    buttonManager.clickEvent.AddListener(entry.DoAction);
+                    buttonManager.clickEvent.AddListener(() => OnEntrySelected(entry));
                     buttonImage.color = entry.EntryColor;
                     textMeshPro.color = entry.EntryColor.IdealTextColor();
                     iconImage.color = entry.EntryColor.IdealTextColor();
@@ -182,8 +199,22 @@ namespace SEE.Game.UI
                     textMeshPro.color = entry.DisabledColor.IdealTextColor();
                     iconImage.color = entry.DisabledColor.IdealTextColor();
                 }
+
                 ButtonManagers.Add(buttonManager);
             }
+        }
+
+        /// <summary>
+        /// Destroys the button with the same text as the given <paramref name="entry"/>.
+        /// If no such button exists, nothing will happen.
+        /// If more than one such button exists, an InvalidOperationException will be thrown.
+        /// </summary>
+        /// <param name="entry">The entry whose button shall be destroyed.</param>
+        /// <exception cref="InvalidOperationException">If more than one button with the same text as
+        /// <paramref name="entry"/> exists.</exception>
+        protected void RemoveDesktopButton(T entry)
+        {
+            Destroy(ButtonManagers.SingleOrDefault(x => x.buttonText == entry.Title)?.gameObject);
         }
 
         /// <summary>
@@ -230,6 +261,9 @@ namespace SEE.Game.UI
             {
                 if (MenuShown)
                 {
+                    // Move window to the top of the hierarchy (which, confusingly, is actually at the bottom)
+                    // so that this menu is rendered over any other potentially existing menu on the UI canvas
+                    MenuGameObject.transform.SetAsLastSibling();
                     Manager?.OpenWindow();
                 }
                 else

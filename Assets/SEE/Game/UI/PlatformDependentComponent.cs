@@ -1,5 +1,6 @@
 ﻿using OdinSerializer.Utilities;
 using SEE.Controls;
+using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 
@@ -27,7 +28,7 @@ namespace SEE.Game.UI
         /// This prefab should contain all components necessary for the UI canvas, such as an event system,
         /// a graphic raycaster, etc.
         /// </summary>
-        protected const string UI_CANVAS_PREFAB = "Prefabs/UI/UICanvas";
+        private const string UI_CANVAS_PREFAB = "Prefabs/UI/UICanvas";
 
         /// <summary>
         /// The canvas on which UI elements are placed.
@@ -39,7 +40,12 @@ namespace SEE.Game.UI
         /// <summary>
         /// The current platform.
         /// </summary>
-        private PlayerSettings.PlayerInputType platform;
+        protected PlayerInputType Platform { get; private set; }
+
+        /// <summary>
+        /// Whether the <see cref="Start"/> method of this component has already been called.
+        /// </summary>
+        protected bool HasStarted { get; private set; } = false;
 
         /// <summary>
         /// Called when the <see cref="Start()"/> method of this component is executed on the Desktop platform.
@@ -89,40 +95,43 @@ namespace SEE.Game.UI
                 Canvas.name = UI_CANVAS_NAME;
             }
             
+            HasStarted = true;
+            
             // Execute platform dependent code
-            platform = PlayerSettings.GetInputType();
-            switch (platform)
+            Platform = PlayerSettings.GetInputType();
+            switch (Platform)
             {
-                case PlayerSettings.PlayerInputType.Desktop: StartDesktop();
+                case PlayerInputType.DesktopPlayer: StartDesktop();
                     break;
-                case PlayerSettings.PlayerInputType.TouchGamepad: StartTouchGamepad();
+                case PlayerInputType.TouchGamepadPlayer: StartTouchGamepad();
                     break;
-                case PlayerSettings.PlayerInputType.VR: StartVR();
+                case PlayerInputType.VRPlayer: StartVR();
                     //TODO: Apply CurvedUI to canvas
                     break;
-                case PlayerSettings.PlayerInputType.HoloLens: StartHoloLens();
+                case PlayerInputType.HoloLensPlayer: StartHoloLens();
                     //TODO: Convert to MRTK Canvas and add NearInteractionTouchableUnityUI, as recommended 
                     break;
-                case PlayerSettings.PlayerInputType.None: // no UI has to be rendered
+                case PlayerInputType.None: // no UI has to be rendered
                     break;  
                 default: PlatformUnsupported();
                     break;
             }
+
         }
 
         protected void Update()
         {
-            switch (platform)
+            switch (Platform)
             {
-                case PlayerSettings.PlayerInputType.Desktop: UpdateDesktop();
+                case PlayerInputType.DesktopPlayer: UpdateDesktop();
                     break;
-                case PlayerSettings.PlayerInputType.TouchGamepad: UpdateTouchGamepad();
+                case PlayerInputType.TouchGamepadPlayer: UpdateTouchGamepad();
                     break;
-                case PlayerSettings.PlayerInputType.VR: UpdateVR();
+                case PlayerInputType.VRPlayer: UpdateVR();
                     break;
-                case PlayerSettings.PlayerInputType.HoloLens: UpdateHoloLens();
+                case PlayerInputType.HoloLensPlayer: UpdateHoloLens();
                     break;
-                case PlayerSettings.PlayerInputType.None: // no UI has to be rendered
+                case PlayerInputType.None: // no UI has to be rendered
                     break;  
                 default: PlatformUnsupported();
                     break;
@@ -132,9 +141,9 @@ namespace SEE.Game.UI
         /// <summary>
         /// Logs an error with information about this platform and component and destroys this component.
         /// </summary>
-        private void PlatformUnsupported()
+        protected void PlatformUnsupported()
         {
-            Debug.LogError($"Component '{GetType().GetNiceName()}' doesn't support platform '{platform.ToString()}'."
+            Debug.LogError($"Component '{GetType().GetNiceName()}' doesn't support platform '{Platform.ToString()}'."
                            + " Component will now self-destruct.");
             Destroyer.DestroyComponent(this);
         }

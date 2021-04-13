@@ -113,7 +113,7 @@ namespace SEE.Layout.EdgeLayouts
         /// <param name="epsilon">Used to evaluate which points should be removed from
         /// <paramref name="polyLine"/>. Values less than 0 are mapped to 0.</param>
         /// <returns>A similar polyline with the same amount or fewer points.</returns>
-        protected Vector3[] Simplify(Vector3[] polyLine, float epsilon)
+        protected static Vector3[] Simplify(Vector3[] polyLine, float epsilon)
         {
             epsilon = Mathf.Max(0, epsilon);
             // Unity already includes a suitable implemantation of the rdp algroithm.

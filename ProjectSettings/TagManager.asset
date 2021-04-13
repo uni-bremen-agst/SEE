@@ -23,6 +23,8 @@ TagManager:
   - UI
   - JLG Visualization
   - Function Call
+  - Runtime
+  - Path
   layers:
   - Default
   - TransparentFX

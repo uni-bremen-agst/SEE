@@ -16,7 +16,7 @@ namespace SEE.Net
         public const float UpdateTimeStartDelay = 1.0f;
 
         /// <summary>
-        /// The repeat reate of updating via network in seconds.
+        /// The repeat rate of updating via network in seconds.
         /// </summary>
         public const float UpdateRepeatRate = 0.1f;
 
@@ -64,22 +64,22 @@ namespace SEE.Net
         /// <summary>
         /// The transform to synchronize.
         /// </summary>
-        public Transform TransformToSynchronize { get => transformToSynchronize; }
+        public Transform TransformToSynchronize => transformToSynchronize;
 
         /// <summary>
         /// Whether the position should be synchronized.
         /// </summary>
-        public bool SynchronizingPosition { get => synchronizePosition; }
+        public bool SynchronizingPosition => synchronizePosition;
 
         /// <summary>
         /// Whether the rotation should be synchronized.
         /// </summary>
-        public bool SynchronizingRotation { get => synchronizeRotation; }
+        public bool SynchronizingRotation => synchronizeRotation;
 
         /// <summary>
         /// Whether the scale should be synchronized.
         /// </summary>
-        public bool SynchronizingScale { get => synchronizeScale; }
+        public bool SynchronizingScale => synchronizeScale;
 
 
 
@@ -148,15 +148,15 @@ namespace SEE.Net
             {
                 if (synchronizePosition)
                 {
-                    InvokeRepeating("SynchronizePosition", UpdateTimeStartDelay, UpdateRepeatRate);
+                    InvokeRepeating(nameof(SynchronizePosition), UpdateTimeStartDelay, UpdateRepeatRate);
                 }
                 if (synchronizeRotation)
                 {
-                    InvokeRepeating("SynchronizeRotation", UpdateTimeStartDelay, UpdateRepeatRate);
+                    InvokeRepeating(nameof(SynchronizeRotation), UpdateTimeStartDelay, UpdateRepeatRate);
                 }
                 if (synchronizeScale)
                 {
-                    InvokeRepeating("SynchronizeScale", UpdateTimeStartDelay, UpdateRepeatRate);
+                    InvokeRepeating(nameof(SynchronizeScale), UpdateTimeStartDelay, UpdateRepeatRate);
                 }
             }
             teleportMinDistanceSquared = teleportMinDistance * teleportMinDistance;

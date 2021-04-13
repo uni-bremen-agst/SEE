@@ -88,7 +88,7 @@ namespace SEE.Game.Runtime
                             gameObjectsWithTag[j].GetComponentInChildren<MeshRenderer>().material.color = Color.black;
                             if (gameObjects.ContainsKey(linkname))
                             {
-                                Debug.LogWarning("Contains '" + nodeRef.Value + "' already!");
+                                Debug.LogWarning($"Contains '{nodeRef.Value.ID}' already!");
                             }
                             else
                             {
@@ -97,7 +97,7 @@ namespace SEE.Game.Runtime
                         }
                         else
                         {
-                            Debug.LogWarningFormat("Node with ID {0} has no linkname.\n", nodeRef.Value.ID);
+                            Debug.LogWarning($"Node with ID {nodeRef.Value.ID} has no linkname.\n");
                         }
                     }
                 }
