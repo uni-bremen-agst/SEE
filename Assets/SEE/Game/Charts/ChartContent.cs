@@ -640,8 +640,9 @@ namespace SEE.Game.Charts
                 {
                     if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
                     {
-                        if ((nodeRef.Value.IsLeaf() && ChartManager.Instance.ShowLeafMetrics)
-                            || (nodeRef.Value.IsInnerNode() && ChartManager.Instance.ShowInnerNodeMetrics))
+                        if (nodeRef.Value != null
+                            && ((nodeRef.Value.IsLeaf() && ChartManager.Instance.ShowLeafMetrics)
+                                 || (nodeRef.Value.IsInnerNode() && ChartManager.Instance.ShowInnerNodeMetrics)))
                         {
                             result.Add(nodeRef);
                         }
