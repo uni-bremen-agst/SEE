@@ -39,7 +39,7 @@ namespace SEE.CameraPaths
         public bool ActivateOnStart = false;
 
         /// <summary>
-        /// If true, the path is replayed otherwise stopped.
+        /// If true, the path is replayed, otherwise stopped.
         /// </summary>
         private bool isRunning = true;
 
