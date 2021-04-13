@@ -517,7 +517,7 @@ namespace SEE.DataModel.DG
         /// <param name="nodes">nodes for which to determine the depth</param>
         /// <param name="currentDepth">the current depth of the given <paramref name="nodes"/></param>
         /// <returns></returns>
-        private int CalcMaxDepth(List<Node> nodes, int currentDepth)
+        private int CalcMaxDepth(IList<Node> nodes, int currentDepth)
         {
             int max = currentDepth + 1;
             for (int i = 0; i < nodes.Count; i++)
@@ -574,7 +574,25 @@ namespace SEE.DataModel.DG
         public void FinalizeNodeHierarchy()
         {
             CalculateLevels();
+            SetLevelMetric();
             maxDepth = CalcMaxDepth(GetRoots(), -1);
+        }
+
+        /// <summary>
+        /// The name of a node metric that reflects the node's depth within the node hierarchy.
+        /// It is equivalent to the node attribute <see cref="Level"/>.
+        /// </summary>
+        public const string MetricLevel = "Metric.Level";
+
+        /// <summary>
+        /// Sets the metric <see cref="MetricLevel"/> of each node to its Level.
+        /// </summary>
+        private void SetLevelMetric()
+        {
+            foreach (Node node in nodes.Values)
+            {
+                node.SetInt(MetricLevel, node.Level);
+            }
         }
 
         /// <summary>

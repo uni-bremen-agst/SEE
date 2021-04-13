@@ -60,12 +60,6 @@ namespace SEE.DataModel.DG
         private int level = 0;
 
         /// <summary>
-        /// The name of a node metric that reflects the node's depth within the node hierarchy.
-        /// It is equivalent to attribute <see cref="Level"/>.
-        /// </summary>
-        public const string MetricLevel = "Metric.Level";
-
-        /// <summary>
         /// The level of a node in the hierarchy. The level of a root node is 0.
         /// For all other nodes, the level is the level of its parent + 1.
         /// </summary>
@@ -75,7 +69,6 @@ namespace SEE.DataModel.DG
             set
             {
                 level = value;
-                SetInt(MetricLevel, value);
             }
         }
 
