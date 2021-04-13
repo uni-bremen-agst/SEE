@@ -147,11 +147,11 @@ namespace SEE.Game
             {
                 ReflexionEdgesVisible = !ReflexionEdgesVisible;
             }
-            if (Input.GetKeyDown(KeyCode.F9))
+            if (Input.GetKeyDown(KeyCode.F11))
             {
                 ImplementationNodesVisible = !ImplementationNodesVisible;
             }
-            if (Input.GetKeyDown(KeyCode.F10))
+            if (Input.GetKeyDown(KeyCode.F12))
             {
                 ArchitectureNodesVisible = !ArchitectureNodesVisible;
             }

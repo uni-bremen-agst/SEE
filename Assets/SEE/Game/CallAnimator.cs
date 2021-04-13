@@ -33,7 +33,7 @@ namespace SEE.Game
         /// The time between animated calls in seconds.
         /// </summary>
         [Tooltip("The time between animated calls in seconds.")]
-        public float CallDuration = 0.5f;
+        public float CallDuration = 1.0f;
 
         /// <summary>
         /// The name (unique ID) of the node at which to start the execution.
@@ -42,11 +42,6 @@ namespace SEE.Game
         public string RootName = "R global:SEE:Game:GraphRenderer@C:/Users/raine/develop/SEECity/Temp/bin/Debug/SEE.dll^:!16+67!:Draw(!0+6!UnityEngine:GameObject@C:/Program Files/Unity/Hub/Editor/2019.4.12f1/Editor/Data/Managed/UnityEngine/UnityEngine.CoreModule.dll^)_s->!0+6!System:Void@C:!130+14! (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.7.1/mscorlib.dll";
 
         private float executionTimer = 0.0f;
-
-        /// <summary>
-        /// Whether the animation is currently running.
-        /// </summary>
-        private bool animationIsRunning = false;
 
         private Dictionary<Node, GameObject> nodeToGameObject;
 
@@ -91,7 +86,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Initially alls edges are hidden.
+        /// Initially all edges are hidden.
         /// </summary>
         private void Start()
         {
@@ -111,12 +106,12 @@ namespace SEE.Game
             }
             if (SEEInput.IncreaseAnimationSpeed())
             {
-                CallDuration *= 0.75f;
+                CallDuration = Mathf.Max(0.25f, CallDuration / 2.0f);
                 Debug.Log($"execution duration set to {CallDuration}.\n");
             }
             if (SEEInput.DecreaseAnimationSpeed())
             {
-                CallDuration *= 1.25f;
+                CallDuration = Mathf.Max(4.0f, CallDuration * 2.0f);
                 Debug.Log($"execution duration set to {CallDuration}.\n");
             }
             if (!isPaused)
@@ -149,7 +144,7 @@ namespace SEE.Game
             callGraphRoot = CodeCity.LoadedGraph.GetNode(RootName);
             if (callGraphRoot == null)
             {
-                Debug.LogError("Graph has no node with name '{RootName}'\n");
+                Debug.LogError($"Graph has no node with name '{RootName}'\n");
                 enabled = false;
             }
             else
@@ -429,7 +424,7 @@ namespace SEE.Game
                 this.root = root;
                 if (root.Outgoings.Count == 0)
                 {
-                    throw new System.Exception("Root should have at least one successor.");
+                    throw new Exception("Root should have at least one successor.");
                 }
             }
 

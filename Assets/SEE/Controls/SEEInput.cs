@@ -93,6 +93,15 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.SavePathPosition);
         }
 
+        /// <summary>
+        /// Toggles automatic path playing.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        internal static bool TogglePathPlaying()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.TogglePathPlaying);
+        }
+
         //-----------------------------------------------------
         // Metric charts
         //-----------------------------------------------------
