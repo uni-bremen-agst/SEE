@@ -48,11 +48,45 @@ namespace SEE.Game
     {
         /// <summary>
         /// Constructors for MonoBehaviours are meaningless. We need to initialize everything
-        /// at Start() time.
+        /// at Awake() time.
         /// </summary>
-        public void Start()
+        private void Awake()
         {
-            RegisterAllAnimators(animators);
+            if (gameObject.TryGetComponent<SEECityEvolution>(out SEECityEvolution cityEvolution))
+            {
+                // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
+                // So we cannot make the following assignment in the constructor. Neither
+                // can we assign this value at the declaration of graphRenderer because
+                // we need the city argument, which comes only later. Anyhow, whenever we
+                // assign a new city, we also need a new graph renderer for that city.
+                // So in fact this is the perfect place to assign graphRenderer.
+                graphRenderer = new GraphRenderer(cityEvolution, null);
+                Assert.IsNotNull(graphRenderer);
+                diff = new NumericAttributeDiff(cityEvolution.AllMetricAttributes());
+                Vector3 beamScale = new Vector3(cityEvolution.MarkerWidth, cityEvolution.MarkerHeight, cityEvolution.MarkerWidth);
+                Dictionary<Difference, Color> beamColor = new Dictionary<Difference, Color>
+                {
+                    { Difference.Added, cityEvolution.AdditionBeamColor },
+                    { Difference.Changed, cityEvolution.ChangeBeamColor },
+                    { Difference.Deleted, cityEvolution.DeletionBeamColor },
+                };
+
+                moveScaleShakeAnimator = new MoveScaleShakeAnimator(beamColor, beamScale);
+                objectManager = new ObjectManager(graphRenderer, gameObject, cityEvolution.DeletionBeamColor, beamScale);
+                marker = new Marker(graphRenderer,
+                                    markerWidth: cityEvolution.MarkerWidth,
+                                    markerHeight: cityEvolution.MarkerHeight,
+                                    additionColor: cityEvolution.AdditionBeamColor,
+                                    changeColor: cityEvolution.ChangeBeamColor,
+                                    deletionColor: cityEvolution.DeletionBeamColor,
+                                    duration: AnimationLag);
+                RegisterAllAnimators(animators);
+            }
+            else
+            {
+                Debug.LogError($"This EvolutionRenderer attached to {name} has no sibling component of type {nameof(SEECityEvolution)}.\n");
+                enabled = false;
+            }            
         }
 
         /// <summary>
@@ -85,38 +119,38 @@ namespace SEE.Game
         /// <summary>
         /// The city evolution to be drawn by this renderer.
         /// </summary>
-        public SEECityEvolution CityEvolution
-        {
-            set
-            {
-                // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
-                // So we cannot make the following assignment in the constructor. Neither
-                // can we assign this value at the declaration of graphRenderer because
-                // we need the city argument, which comes only later. Anyhow, whenever we
-                // assign a new city, we also need a new graph renderer for that city.
-                // So in fact this is the perfect place to assign graphRenderer.
-                graphRenderer = new GraphRenderer(value, null);
-                Assert.IsNotNull(graphRenderer);
-                diff = new NumericAttributeDiff(value.AllMetricAttributes());
-                objectManager = new ObjectManager(graphRenderer, gameObject);
-                if (gameObject.TryGetComponent<SEECityEvolution>(out SEECityEvolution cityEvolution))
-                {
-                    marker = new Marker(graphRenderer,
-                                        markerWidth: cityEvolution.MarkerWidth,
-                                        markerHeight: cityEvolution.MarkerHeight,
-                                        additionColor: cityEvolution.AdditionBeamColor,
-                                        changeColor: cityEvolution.ChangeBeamColor,
-                                        deletionColor: cityEvolution.DeletionBeamColor,
-                                        duration: AnimationLag);
-                }
-                else
-                {
-                    Debug.LogErrorFormat("This EvolutionRenderer attached to {0} has no sibling component of type SEECityEvolution",
-                                         name);
-                    enabled = false;
-                }
-            }
-        }
+        //public SEECityEvolution CityEvolution
+        //{
+        //    set
+        //    {
+        //        if (gameObject.TryGetComponent<SEECityEvolution>(out SEECityEvolution cityEvolution))
+        //        {
+        //            // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
+        //            // So we cannot make the following assignment in the constructor. Neither
+        //            // can we assign this value at the declaration of graphRenderer because
+        //            // we need the city argument, which comes only later. Anyhow, whenever we
+        //            // assign a new city, we also need a new graph renderer for that city.
+        //            // So in fact this is the perfect place to assign graphRenderer.
+        //            graphRenderer = new GraphRenderer(value, null);
+        //            Assert.IsNotNull(graphRenderer);
+        //            diff = new NumericAttributeDiff(value.AllMetricAttributes());
+        //            Vector3 beamScale = new Vector3(cityEvolution.MarkerWidth, cityEvolution.MarkerHeight, cityEvolution.MarkerWidth);
+        //            objectManager = new ObjectManager(graphRenderer, gameObject, cityEvolution.DeletionBeamColor, beamScale);
+        //            marker = new Marker(graphRenderer,
+        //                                markerWidth: cityEvolution.MarkerWidth,
+        //                                markerHeight: cityEvolution.MarkerHeight,
+        //                                additionColor: cityEvolution.AdditionBeamColor,
+        //                                changeColor: cityEvolution.ChangeBeamColor,
+        //                                deletionColor: cityEvolution.DeletionBeamColor,
+        //                                duration: AnimationLag);
+        //        }
+        //        else
+        //        {
+        //            Debug.LogError($"This EvolutionRenderer attached to {name} has no sibling component of type {nameof(SEECityEvolution)}.\n");
+        //            enabled = false;
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// Shortest time period in which an animation can be run in seconds.
@@ -154,9 +188,9 @@ namespace SEE.Game
         protected readonly AbstractAnimator moveAnimator = new MoveAnimator();
 
         /// <summary>
-        /// An animator used for all other occasions.
+        /// An animator used for all other occasions. Will be set in Start().
         /// </summary>
-        protected readonly AbstractAnimator moveScaleShakeAnimator = new MoveScaleShakeAnimator();
+        protected AbstractAnimator moveScaleShakeAnimator;
 
         /// <summary>
         /// Whether the animation is still ongoing.
@@ -624,7 +658,7 @@ namespace SEE.Game
                 {                    
                     if (oldEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef oldEdgeRef) 
                         && newEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef newEdgeRef)
-                        && oldEdgeRef.edge.Equals(newEdgeRef.edge))
+                        && oldEdgeRef.Value.Equals(newEdgeRef.Value))
                     {
                         result.Add((oldEdgeGameObject, newEdgeGameObject));
                     }
@@ -949,14 +983,24 @@ namespace SEE.Game
             }
         }
 
-
         /// <summary>
-        /// Initiates the visualization of the evolving series of <paramref name="graphs"/>.
+        /// Sets the evolving series of <paramref name="graphs"/> to be visualized.
+        /// The actual visualization is triggered by <see cref="ShowGraphEvolution"/>
+        /// that can be called next.
         /// </summary>
         /// <param name="graphs">series of graphs to be visualized</param>
-        public void ShowGraphEvolution(List<Graph> graphs)
+        public void SetGraphEvolution(List<Graph> graphs)
         {
             this.graphs = graphs;
+        }
+
+        /// <summary>
+        /// Initiates the visualization of the evolving series of graphs
+        /// provided earlier by <see cref="SetGraphEvolution(List{Graph})"/>
+        /// (the latter function must have been called before).
+        /// </summary>
+        public void ShowGraphEvolution()
+        {
             CurrentGraphIndex = 0;
             _currentCity = null;
             _nextCity = null;
@@ -1001,14 +1045,12 @@ namespace SEE.Game
                 Debug.LogErrorFormat("The value {0} is no valid index.\n", index);
                 return false;
             }
-            CurrentGraphIndex = index;
-
-            if (HasCurrentLaidOutGraph(out LaidOutGraph loadedGraph))
+            if (HasCurrentLaidOutGraph(out LaidOutGraph loadedGraph) && HasLaidOutGraph(index, out LaidOutGraph newGraph))
             {
-                DisplayGraphAsNew(loadedGraph);
+                CurrentGraphIndex = index;
+                TransitionToNextGraph(loadedGraph, newGraph);
                 return true;
-            }
-            else
+            } else
             {
                 Debug.LogErrorFormat("Could not retrieve a layout for graph with index {0}.\n", index);
                 return false;
