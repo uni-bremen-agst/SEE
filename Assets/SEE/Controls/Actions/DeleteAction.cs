@@ -149,7 +149,7 @@ namespace SEE.Controls.Actions
         /// 
         /// Precondition: <paramref name="deletedObject"/> != null.
         /// </summary>
-        /// <param GameObject="deletedObject">selected GameObject that along with its children should be removed</param>
+        /// <param name="deletedObject">selected GameObject that along with its children should be removed</param>
         /// <returns>true if <paramref name="deletedObject"/> was actually deleted</returns>
         private bool Delete(GameObject deletedObject)
         {
