@@ -46,7 +46,7 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Contains all nodes and edges deleted as explicitly requested by the user.
-        /// As a consequence of deleting a node, its ancestores along with their incoming and outgoing
+        /// As a consequence of deleting a node, its ancestors along with their incoming and outgoing
         /// edges may be deleted implicitly, too. All of these are kept in <see cref="deletedNodes"/>
         /// and <see cref="deletedEdges"/>. Yet, if we need to redo a deletion, we need to remember
         /// the explicitly deleted objects.
