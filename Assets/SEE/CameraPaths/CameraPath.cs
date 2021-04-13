@@ -53,7 +53,7 @@ namespace SEE.CameraPaths
         /// <summary>
         /// The line width for drawing paths.
         /// </summary>
-        private const float lineWidth = 0.4f;
+        private const float lineWidth = 0.1f;
 
         /// <summary>
         /// This factor is one of the parameters for the size of the spheres we draw for

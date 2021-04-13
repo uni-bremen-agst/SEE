@@ -213,7 +213,7 @@ namespace SEE.Game.Charts
             {
                 // TODO(torben): the action state could be global for some cases. the line below exists in DesktopNavigationAction.cs and could somewhat be shared
                 //actionState.selectToggle = Input.GetKey(KeyBindings.ToggleMetricHover);
-                if (!Input.GetKey(KeyBindings.ToggleMetricHoveringSelection))
+                if (!SEEInput.ToggleMetricHoveringSelection())
                 {
                     InteractableObject.UnhoverAll(true);
                     InteractableObject.UnselectAll(true);
