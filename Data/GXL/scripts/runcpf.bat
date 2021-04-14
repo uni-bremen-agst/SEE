@@ -32,7 +32,10 @@ if "%LANG%"=="c" (
 cpf.exe -m 100 -c clones.cpf -s clones.csv -a %INC% .
 cpfcsv2rfg clones.cpf clones.csv clones.rfg
 rfgexport -o Clones -f GXL clones.rfg clones.gxl
+@echo off
 
-@del clones.cpf clones.csv clones.rfg tokens.files tokens.tok
+echo Result was saved to clones.gxl
+
+del clones.cpf clones.csv clones.rfg tokens.files tokens.tok
 
 :EXIT
