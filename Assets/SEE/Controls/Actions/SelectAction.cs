@@ -12,14 +12,15 @@ namespace SEE.Controls.Actions
     public class SelectAction : MonoBehaviour
     {
         /// <summary>
-        /// Deselects all currently selected interactable objects if the user requests.
-        /// If the left mouse button is pressed and no GUI is in the way:
-        /// if a graph element (node or edge) is hit, it will be 
-        /// 
-        /// 
-        /// Selects a particular object that is currently being hovered over if the
-        /// user presses the left mouse button and no GUI is in the way. Unselects
-        /// it will be selected.
+        /// Deselects all currently selected interactable objects if the user requests
+        /// us to do so.
+        /// Additionally, if the left mouse button is pressed and no GUI is in the way
+        /// (let O be the currently hovered graph element at this point):
+        /// either
+        ///   1) if the user wants us to toggle, O will be selected if it was not
+        ///      selected or unselected if it was
+        /// or
+        ///   2) all currently selected objects are unselected and O becomes selected.
         /// </summary>
         private void Update()
         {
