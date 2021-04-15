@@ -79,13 +79,7 @@ namespace SEE.Controls
                 }
                 cameraState.distance -= d;
 
-                if (SEEInput.RotateCamera())
-                {
-                    float x = Input.GetAxis("mouse x");
-                    float y = Input.GetAxis("mouse y");
-                    cameraState.yaw += x;
-                    cameraState.pitch -= y;
-                }
+                HandleRotation();
                 mainCamera.transform.position = focusedObject.CenterTop;
                 mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
                 mainCamera.transform.position -= mainCamera.transform.forward * cameraState.distance;
@@ -121,15 +115,40 @@ namespace SEE.Controls
                 v *= speed;
                 mainCamera.transform.position += v;
 
-                if (SEEInput.RotateCamera())
-                {
-                    float x = Input.GetAxis("mouse x");
-                    float y = Input.GetAxis("mouse y");
-                    cameraState.yaw += x;
-                    cameraState.pitch -= y;
-                }
+                HandleRotation();
                 mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
             }
+        }
+
+        /// <summary>
+        /// The mouse position of the last frame.
+        /// </summary>
+        private Vector2 lastAxis = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+
+        /// <summary>
+        /// If the user wants us, we rotate the camera according to mouse input.
+        /// Modifies <see cref="cameraState.yaw"/> and <see cref="cameraState.pitch"/>.
+        /// 
+        /// Note: This is a workaround of issues with the correct mouse position
+        /// in a remote-desktop session.
+        /// </summary>
+        private void HandleRotation()
+        {
+            if (SEEInput.RotateCamera())
+            {
+                float x = -(lastAxis.x - Input.mousePosition.x) * 0.1f;
+                float y = -(lastAxis.y - Input.mousePosition.y) * 0.1f;
+
+                // These were the original statements which, however, do not work in
+                // a remote-desktop session (RDP).
+                // float x = Input.GetAxis("Mouse X");
+                // float y = Input.GetAxis("Mouse Y");
+
+                cameraState.yaw += x;
+                cameraState.pitch -= y;
+            }
+            lastAxis.x = Input.mousePosition.x;
+            lastAxis.y = Input.mousePosition.y;
         }
     }
 }
