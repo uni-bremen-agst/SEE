@@ -19,8 +19,7 @@ namespace SEE.Controls
             internal bool freeMode;
         }
 
-        private CameraState cameraState;
-        private const int RightMouseButton = 1;
+        private CameraState cameraState;        
 
         [Tooltip("The code city which the player is focusing on.")]
         public GO.Plane focusedObject;
@@ -80,7 +79,7 @@ namespace SEE.Controls
                 }
                 cameraState.distance -= d;
 
-                if (Input.GetMouseButton(RightMouseButton))
+                if (SEEInput.RotateCamera())
                 {
                     float x = Input.GetAxis("mouse x");
                     float y = Input.GetAxis("mouse y");
@@ -122,7 +121,7 @@ namespace SEE.Controls
                 v *= speed;
                 mainCamera.transform.position += v;
 
-                if (Input.GetMouseButton(RightMouseButton))
+                if (SEEInput.RotateCamera())
                 {
                     float x = Input.GetAxis("mouse x");
                     float y = Input.GetAxis("mouse y");

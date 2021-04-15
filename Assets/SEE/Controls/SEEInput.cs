@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SEE.Controls
 {
@@ -183,6 +184,10 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.Snap);
         }
 
+        /// <summary>
+        /// The user wants to drag the city on its plane.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         internal static bool Drag()
         {
             return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.Drag);
@@ -247,6 +252,26 @@ namespace SEE.Controls
         internal static bool MoveDown()
         {
             return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.MoveDown);
+        }
+
+        /// <summary>
+        /// Index of the left mouse button.
+        /// </summary>
+        private const int LeftMouseButton = 0;
+
+        /// <summary>
+        /// Index of the right mouse button.
+        /// </summary>
+        private const int RightMouseButton = 1;
+
+        /// <summary>
+        /// Rotates the camera.
+        /// </summary>
+        /// <returns>true if the user requests this action</returns>
+        internal static bool RotateCamera()
+        {
+            return Input.GetMouseButton(RightMouseButton) 
+                || (Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButton(LeftMouseButton));
         }
 
         //--------------------------
