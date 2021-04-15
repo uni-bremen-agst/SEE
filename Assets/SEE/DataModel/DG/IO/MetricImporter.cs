@@ -119,7 +119,7 @@ namespace SEE.DataModel.DG.IO
                                 }
                                 else
                                 {
-                                    Debug.LogErrorFormat("Unknown node {0} in file {1} at line {2}.\n", values[0], filename, lineCount);
+                                    Debug.LogWarningFormat("Unknown node {0} in file {1} at line {2}.\n", values[0], filename, lineCount);
                                     numberOfErrors++;
                                 }
                                 lineCount++;

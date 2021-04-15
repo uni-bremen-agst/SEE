@@ -147,11 +147,11 @@ namespace SEE.Game
             {
                 ReflexionEdgesVisible = !ReflexionEdgesVisible;
             }
-            if (Input.GetKeyDown(KeyCode.F9))
+            if (Input.GetKeyDown(KeyCode.F11))
             {
                 ImplementationNodesVisible = !ImplementationNodesVisible;
             }
-            if (Input.GetKeyDown(KeyCode.F10))
+            if (Input.GetKeyDown(KeyCode.F12))
             {
                 ArchitectureNodesVisible = !ArchitectureNodesVisible;
             }
@@ -279,7 +279,7 @@ namespace SEE.Game
                 GameObject childGO = child.gameObject;
                 if (childGO.CompareTag(Tags.Edge))
                 {
-                    if (childGO.TryGetComponent(out EdgeRef edgeRef) && edgeRef.edge != null)
+                    if (childGO.TryGetComponent(out EdgeRef edgeRef) && edgeRef.Value != null)
                     {
                         edges.Add(childGO);
                     }
@@ -305,7 +305,7 @@ namespace SEE.Game
         {
             if (gameEdge.TryGetComponent(out EdgeRef edgeRef))
             {
-                return edgeRef.edge;
+                return edgeRef.Value;
             }
             else
             {

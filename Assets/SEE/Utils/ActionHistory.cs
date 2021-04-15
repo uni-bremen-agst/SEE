@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
@@ -86,72 +86,9 @@ namespace SEE.Utils
             if (Current != null && Current.Update())
             {
                 // We are continuing with a fresh instance of the same type as Current.
-                Execute(Current.NewInstance());
+                Execute(Current.NewInstance());                
             }
-            // Dump();
-        }
-
-        /// <summary>
-        /// A memory of the previously emitted debugging output.
-        /// </summary>
-        private string previousMessage = "";
-        /// <summary>
-        /// Emits the current UndoStack and RedoStack as debugging output.
-        /// If the output would be the same a in the previous call, nothing
-        /// is emitted.
-        /// </summary>
-        private void Dump()
-        {
-            string newMessage = $"Current: {ToString(Current)} Undo: {ToString(UndoStack)} Redo: {ToString(RedoStack)}\n";
-            if (previousMessage != newMessage)
-            {
-                previousMessage = newMessage; 
-                Debug.Log(previousMessage);
-            }            
-        }
-
-        /// <summary>
-        /// Returns a human readable representation of the given <paramref name="stack"/>.
-        /// The top element comes first. Used for debugging.
-        /// </summary>
-        /// <param name="stack">stack whose content is to be emitted</param>
-        /// <returns>human readable representation</returns>
-        private object ToString(Stack<ReversibleAction> stack)
-        {
-            if (stack.Count == 0)
-            {
-                return "[]";
-            }
-            else
-            {
-                StringBuilder sb = new StringBuilder("[");
-                foreach (ReversibleAction action in stack)
-                {
-                    sb.Append(ToString(action));
-                    sb.Append(" ");
-                }
-                sb.Length--; // remove last blank 
-                sb.Append("]");
-                return sb.ToString();
-            }
-        }
-
-        /// <summary>
-        /// Returns a human readable representation of the given <paramref name="action"/>.
-        /// Used for debugging.
-        /// </summary>
-        /// <param name="action">action to be emitted</param>
-        /// <returns>human readable representation</returns>
-        private object ToString(ReversibleAction action)
-        {
-            if (action == null)
-            {
-                return "NULL";
-            }
-            else
-            {
-                return action + "@" + action.GetType().Name;
-            }
+            //Dump();
         }
 
         /// <summary>
@@ -266,6 +203,74 @@ namespace SEE.Utils
         public int RedoCount
         {
             get => RedoStack.Count;
+        }
+
+        //---------------------------
+        // For debugging
+        //---------------------------
+
+        /// <summary>
+        /// A memory of the previously emitted debugging output.
+        /// </summary>
+        private string previousMessage = "";
+
+        /// <summary>
+        /// Emits the current UndoStack and RedoStack as debugging output.
+        /// If the output would be the same a in the previous call, nothing
+        /// is emitted.
+        /// </summary>
+        private void Dump()
+        {
+            string newMessage = $"Current: {ToString(Current)} Undo: {ToString(UndoStack)} Redo: {ToString(RedoStack)}\n";
+            if (previousMessage != newMessage)
+            {
+                previousMessage = newMessage;
+                Debug.Log(previousMessage);
+            }
+        }
+
+        /// <summary>
+        /// Returns a human readable representation of the given <paramref name="stack"/>.
+        /// The top element comes first. Used for debugging.
+        /// </summary>
+        /// <param name="stack">stack whose content is to be emitted</param>
+        /// <returns>human readable representation</returns>
+        private object ToString(Stack<ReversibleAction> stack)
+        {
+            if (stack.Count == 0)
+            {
+                return "[]";
+            }
+            else
+            {
+                StringBuilder sb = new StringBuilder("[");
+                foreach (ReversibleAction action in stack)
+                {
+                    sb.Append(ToString(action));
+                    sb.Append(" ");
+                }
+                sb.Length--; // remove last blank 
+                sb.Append("]");
+                return sb.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Returns a human readable representation of the given <paramref name="action"/>.
+        /// Used for debugging.
+        /// </summary>
+        /// <param name="action">action to be emitted</param>
+        /// <returns>human readable representation</returns>
+        private object ToString(ReversibleAction action)
+        {
+            if (action == null)
+            {
+                return "NULL";
+            }
+            else
+            {
+                return action + "@" + action.GetType().Name;
+            }
         }
     }
 }
