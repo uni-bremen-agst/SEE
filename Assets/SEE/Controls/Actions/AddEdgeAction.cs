@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using SEE.Game;
+﻿using System.Collections.Generic;
 ﻿using Assets.SEE.Game;
 using SEE.GO;
 using SEE.Net;
