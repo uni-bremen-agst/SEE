@@ -54,6 +54,13 @@ public class GlobalActionHistory
     public void Execute(ReversibleAction action, string key)
     {
         GetActiveAction(key)?.Stop();
+        foreach(Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>> act in actionList)
+        {
+            ReversibleAction acti = act.Item4;
+            Debug.Log("Wichtig:" + acti.HadEffect() + acti.GetActionStateType());
+        }
+
+        Debug.Log("Effekt:" + action.HadEffect() + action.GetActionStateType());
         Push(new Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>>(DateTime.Now, key, HistoryType.action, action, null));
         SetActiveAction(key, action);
         action.Awake();
@@ -69,6 +76,7 @@ public class GlobalActionHistory
     /// </summary>
     public void Update()
     {
+        Debug.Log("Aktiv: " + activeAction.ElementAt(0).Value);
         for (int i = 0; i < activeAction.Count; i++)
         {
             Debug.Log(actionList.Count);
@@ -196,13 +204,10 @@ public class GlobalActionHistory
         
         while (!GetActiveAction(userid).HadEffect())
         {
-            Debug.Log(GetActiveAction(userid));
             GetActiveAction(userid).Stop();
             if (actionList.Count > 1)
             {
                 // POP
-                Debug.Log("had effect active action");
-                Debug.Log(find.Item1.Item4.HadEffect());
                 DeleteItem(find.Item1.Item2, find.Item1.Item1); //hier ist nicht sicher gestellt das es das GetActiveAction gleiche ist
                 find = Find(userid, HistoryType.action);
                 SetActiveAction(userid, find.Item1.Item4);
@@ -214,16 +219,18 @@ public class GlobalActionHistory
                 return;
             }
         }
-        Debug.Log("Vorm undo:" +actionList.Count);
         GetActiveAction(userid).Stop();
         GetActiveAction(userid).Undo();
         DeleteItem(find.Item1.Item2, find.Item1.Item1);
         Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>> test = new Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>>(DateTime.Now, userid, HistoryType.undo, find.Item1.Item4, find.Item1.Item5);
+        Debug.Log("PRE:" + actionList.Count);
         Push(test);
-
+        Debug.Log("FIND:" + find);
+        Debug.Log("TEST:" + test);
         // Fixme: This doesnt work - find is sometimes null
         find = Find(userid, HistoryType.action);
         SetActiveAction(userid, find.Item1.Item4);
+        Debug.Log("PAST:" + actionList.Count);
 
         isRedo = true;
         GetActiveAction(userid)?.Start();
