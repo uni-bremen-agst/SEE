@@ -22,22 +22,21 @@ namespace SEE.GO
         /// It will not be serialized to prevent duplicating and endless serialization
         /// by both Unity and Odin.
         /// </summary>
-        [NonSerialized] private Node node;
         public Node Value
         {
-            get => node;
+            get => (Node)elem;
             set
             {
-                if (node != value)
+                if (elem != value)
                 {
-                    if (node != null)
+                    if (elem != null)
                     {
-                        nodeToNodeRefDict.Remove(node);
+                        nodeToNodeRefDict.Remove((Node)elem);
                     }
-                    node = value;
-                    if (node != null)
+                    elem = value;
+                    if (elem != null)
                     {
-                        nodeToNodeRefDict[node] = this;
+                        nodeToNodeRefDict[(Node)elem] = this;
                     }
                 }
             }
@@ -54,13 +53,25 @@ namespace SEE.GO
             return nodeToNodeRefDict[node];
         }
 
+        public static bool TryGet(Node node, out NodeRef nodeRef)
+        {
+            bool result = false;
+            nodeRef = null;
+            if (nodeToNodeRefDict.TryGetValue(node, out NodeRef v))
+            {
+                result = true;
+                nodeRef = v;
+            }
+            return result;
+        }
+
         /// <summary>
         /// Returns the IDs of all incoming and outgoing edges for this NodeRef.
         /// </summary>
         /// <returns>IDs of all incoming and outgoing edges</returns>
         public ISet<string> GetEdgeIds()
         {
-            HashSet<String> edgeIDs = new HashSet<string>();
+            HashSet<string> edgeIDs = new HashSet<string>();
             foreach (Edge edge in Value.Outgoings)
             {
                 edgeIDs.Add(edge.ID);
