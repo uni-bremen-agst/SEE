@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.Game.UI
+namespace SEE.Game.UI.Menu
 {
     /// <summary>
     /// Represents a menu of various actions the user can choose from.

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Valve.VR.InteractionSystem;
 
-namespace SEE.Game.UI
+namespace SEE.Game.UI.StateIndicator
 {
     /// <summary>
     /// Indicates some kind of state with which a text and a color is associated.

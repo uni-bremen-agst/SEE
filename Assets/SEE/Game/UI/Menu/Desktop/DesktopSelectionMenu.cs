@@ -2,7 +2,7 @@
 using Michsky.UI.ModernUIPack;
 using TMPro;
 
-namespace SEE.Game.UI
+namespace SEE.Game.UI.Menu
 {
     /// <summary>
     /// Implements Desktop UI for selection menus.
