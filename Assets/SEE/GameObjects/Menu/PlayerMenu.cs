@@ -3,6 +3,8 @@ using System.Linq;
 using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.Game.UI;
+using SEE.Game.UI.Menu;
+using SEE.Game.UI.StateIndicator;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
@@ -89,7 +91,7 @@ namespace SEE.GO.Menu
         }
 
         /// <summary>
-        /// This creates and returns the <see cref="ActionStateIndicator"/>, which displays the current mode.
+        /// This creates and returns the <see cref="StateIndicator.ActionStateIndicator"/>, which displays the current mode.
         /// The indicator will either be attached to the given GameObject or to a new GameObject if
         /// <paramref name="attachTo"/> is null.
         /// </summary>
