@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using SEE.GO;
 using SEE.Utils;
@@ -35,12 +34,6 @@ namespace SEE.Game.UI.Menu
         /// Will be added as a child to the <see cref="MenuGameObject"/>.
         /// </summary>
         private const string LIST_PREFAB = "Prefabs/UI/MenuEntries";
-        
-        /// <summary>
-        /// The path to the prefab for the tooltip game object.
-        /// Will be added as a child to the <see cref="Canvas"/>.
-        /// </summary>
-        private const string TOOLTIP_PREFAB = "Prefabs/UI/Tooltip";
 
         /// <summary>
         /// The GameObject which contains the actual content of the menu, i.e. its entries.
@@ -56,18 +49,16 @@ namespace SEE.Game.UI.Menu
         /// The modal window manager which contains the actual menu.
         /// </summary>
         protected ModalWindowManager Manager;
-        
-        /// <summary>
-        /// The tooltip manager, which can (as its name implies) control tooltips.
-        /// Note that this manager controls a single tooltip whose text can be changed. If multiple tooltips
-        /// are needed, more GameObjects with TooltipManagers need to be created.
-        /// </summary>
-        protected TooltipManager TooltipManager;
 
         /// <summary>
         /// UI game object containing the entries as buttons.
         /// </summary>
         protected GameObject EntryList;
+
+        /// <summary>
+        /// The tooltip in which the description is displayed.
+        /// </summary>
+        protected Tooltip.Tooltip Tooltip;
 
         /// <summary>
         /// List of all button managers for the buttons used in this menu.
@@ -108,17 +99,9 @@ namespace SEE.Game.UI.Menu
             Manager.descriptionText = Description;
             Manager.icon = Icon;
             Manager.onConfirm.AddListener(() => ShowMenu(false));
-            
-            // Add tooltip
-            TooltipManager = MenuGameObject.GetComponentInChildren<TooltipManager>();
-            if (TooltipManager == null)
-            {
-                // Create new tooltip GameObject
-                Object tooltipPrefab = Resources.Load<GameObject>(TOOLTIP_PREFAB);
-                GameObject tooltip = Instantiate(tooltipPrefab, Canvas.transform, false) as GameObject;
-                Assert.IsNotNull(tooltip);
-                tooltip.TryGetComponentOrLog(out TooltipManager);
-            }
+
+            // Create tooltip
+            Tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
             
             // Find content GameObject for menu entries.
             MenuContent = MenuGameObject.transform.Find("Main Content/Content Mask/Content")?.gameObject;
@@ -167,11 +150,6 @@ namespace SEE.Game.UI.Menu
                 Assert.IsNotNull(button);
                 GameObject text = button.transform.Find("Text").gameObject;
                 GameObject icon = button.transform.Find("Icon").gameObject;
-                if (button == null || text == null || icon == null)
-                {
-                    Debug.LogError("Couldn't instantiate button for MenuEntry correctly.\n");
-                    return;
-                }
 
                 button.name = entry.Title;
                 if (!button.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager) ||
@@ -185,15 +163,15 @@ namespace SEE.Game.UI.Menu
 
                 buttonManager.buttonText = entry.Title;
                 buttonManager.buttonIcon = entry.Icon;
-                buttonManager.hoverEvent.AddListener(() => ShowTooltip(entry.Description));
+                buttonManager.hoverEvent.AddListener(() => Tooltip.Show(entry.Description));
                 if (triggerComponent.triggers.Count != 1)
                 {
                     Debug.LogError("The 'Event Trigger' component may only contain one trigger for the "
-                                   + "'PointerExit' event, not more and not less.\n");
+                                   + "'PointerExit' event, not more and not fewer.\n");
                     return;
                 }
                 EventTrigger.Entry trigger = triggerComponent.triggers.Single();
-                trigger.callback.AddListener(_ => HideTooltip());
+                trigger.callback.AddListener(_ => Tooltip.Hide());
                 if (entry.Enabled)
                 {
                     buttonManager.clickEvent.AddListener(() => OnEntrySelected(entry));
@@ -219,54 +197,11 @@ namespace SEE.Game.UI.Menu
         /// If more than one such button exists, an InvalidOperationException will be thrown.
         /// </summary>
         /// <param name="entry">The entry whose button shall be destroyed.</param>
-        /// <exception cref="InvalidOperationException">If more than one button with the same text as
+        /// <exception cref="System.InvalidOperationException">If more than one button with the same text as
         /// <paramref name="entry"/> exists.</exception>
         protected void RemoveDesktopButton(T entry)
         {
             Destroy(ButtonManagers.SingleOrDefault(x => x.buttonText == entry.Title)?.gameObject);
-        }
-
-        /// <summary>
-        /// Displays a tooltip with the given <paramref name="text"/>.
-        /// </summary>
-        /// <param name="text">The text to display in the tooltip.</param>
-        private void ShowTooltip(string text)
-        {
-            //FIXME: Scrolling doesn't work while tooltip is active
-            TooltipManager.allowUpdating = true;
-            
-            // Move tooltip to front of layer hierarchy
-            TooltipManager.gameObject.transform.SetAsLastSibling();
-            // tooltipObject only has 1 child, and will never have more than that
-            //TODO: A path specifier may still be better
-            if (TooltipManager.tooltipObject.transform.GetChild(0).gameObject.TryGetComponentOrLog(out CanvasGroup canvasGroup))
-            {
-                // Change text
-                TextMeshProUGUI[] texts = TooltipManager.tooltipContent.GetComponentsInChildren<TextMeshProUGUI>();
-                TextMeshProUGUI textComp = texts.FirstOrDefault(x => x.name == "Description");
-                if (textComp == null)
-                {
-                    Debug.LogError("Couldn't find Description text component for tooltip.");
-                    return;
-                }
-                textComp.text = text;
-                
-                // Fade in 
-                DOTween.To(() => canvasGroup.alpha, a => canvasGroup.alpha = a, 1f, 0.5f);
-            }
-        }
-
-        /// <summary>
-        /// Hides the tooltip previously displayed
-        /// </summary>
-        private void HideTooltip()
-        {
-            TooltipManager.allowUpdating = true;
-            if (TooltipManager.tooltipObject.gameObject.transform.GetChild(0).gameObject.TryGetComponentOrLog(out CanvasGroup canvasGroup))
-            {
-                // Fade out
-                DOTween.To(() => canvasGroup.alpha, a => canvasGroup.alpha = a, 0f, 0.5f);
-            }
         }
 
         protected override void UpdateDesktop()
