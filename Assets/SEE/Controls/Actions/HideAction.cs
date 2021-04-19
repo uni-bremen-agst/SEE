@@ -175,22 +175,24 @@ namespace SEE.Controls.Actions
 
         public override void Undo()
         {
+            base.Undo();
             foreach (GameObject g in hiddenObjects)
             {
                 GameObjectExtensions.SetVisibility(g, true, false);
+                undoneList.Add(g);
             }
             hiddenObjects.Clear();
-            base.Undo();
         }
 
         public override void Redo()
         {
+            base.Redo();
             foreach (GameObject g in undoneList)
             {
                 GameObjectExtensions.SetVisibility(g, false, false);
+                hiddenObjects.Add(g);
             }
             undoneList.Clear();
-            base.Redo();
         }
 
         /// <summary>
