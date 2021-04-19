@@ -46,7 +46,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// A delegate to be called upon a change of the action state. 
+        /// A delegate to be called upon a change of the action state.
         /// </summary>
         /// <param name="value">the new action state</param>
         public delegate void OnStateChangedFn(ActionStateType value);
