@@ -19,9 +19,14 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject selectedObject;
 
-        private List<GameObject> hiddenObjects;
+        //private List<GameObject> hiddenObjects;
 
-        private List<GameObject> undoneList;
+        private ISet<GameObject> hiddenObjects = new HashSet<GameObject>();
+
+        private ISet<GameObject> undoneList = new HashSet<GameObject>();
+
+
+        //private List<GameObject> undoneList;
 
         enum EdgeSelector
         {
@@ -53,8 +58,6 @@ namespace SEE.Controls.Actions
         {
             base.Stop();
             Debug.Log("Start\n");
-            hiddenObjects = new List<GameObject>();
-            undoneList = new List<GameObject>();
             InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
             InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
         }
@@ -175,6 +178,8 @@ namespace SEE.Controls.Actions
 
         public override void Undo()
         {
+            Debug.Log(hiddenObjects.Count);
+
             base.Undo();
             foreach (GameObject g in hiddenObjects)
             {
