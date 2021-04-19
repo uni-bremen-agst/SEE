@@ -1,4 +1,4 @@
-﻿using System;
+﻿using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -410,6 +410,29 @@ namespace SEE.Controls
         internal static bool ShowCodeWindowMenu()
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ShowCodeWindowMenu);
+        }
+
+        //-------------------
+        // Selection
+        //-------------------
+
+        /// <summary>
+        /// If true, selection is enabled. Selection can be disabled by action directly 
+        /// determining whether anything is selected; for instance, the <see cref="DeleteAction"/>
+        /// listens to a selection interaction to determine the graph element to be deleted.
+        /// This selection interaction should not interfere with the general <see cref="SelectAction"/>.
+        /// </summary>
+        internal static bool SelectionEnabled = true;
+
+        /// <summary>
+        /// True if the user selects a game object (in a desktop environment, the user
+        /// presses the left mouse but while the mouse cursor is not over a GUI element).
+        /// Selection is enabled only if <see cref="SelectionEnabled"/>.
+        /// </summary>
+        /// <returns>true if the user selects a game object and <see cref="SelectionEnabled"/></returns>
+        internal static bool Select()
+        {
+            return SelectionEnabled && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI();
         }
     }
 }
