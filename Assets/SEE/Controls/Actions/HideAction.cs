@@ -19,7 +19,9 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject selectedObject;
 
-        private List<List<GameObject>> hiddenObjects;
+        private List<GameObject> hiddenObjects;
+
+        private List<GameObject> undoneList;
 
         enum EdgeSelector
         {
@@ -51,7 +53,8 @@ namespace SEE.Controls.Actions
         {
             base.Stop();
             Debug.Log("Start\n");
-            hiddenObjects = new List<List<GameObject>>();
+            hiddenObjects = new List<GameObject>();
+            undoneList = new List<GameObject>();
             InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
             InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
         }
@@ -73,8 +76,8 @@ namespace SEE.Controls.Actions
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
                 if (selectedObject.CompareTag(Tags.Edge))
                 {
-                    //hiddenObjects.Add(selectedObject);
-                    selectedObject.SetActive(false);
+                    hiddenObjects.Add(selectedObject);
+                    GameObjectExtensions.SetVisibility(selectedObject, false, true);
                     selectedObject = null;
                 }
                 else if (selectedObject.CompareTag(Tags.Node))
@@ -86,18 +89,21 @@ namespace SEE.Controls.Actions
 
                         foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
                         {
-                            
-                            if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
+                            bool rendered = false;
+                            if (edge.TryGetComponent(out Renderer renderer))
                             {
-                                hiddenList.Add(edge);
+                                rendered = renderer.enabled;
+                            }
+                            if (edge.activeInHierarchy && edgeIDs.Contains(edge.name) && rendered)
+                            {
+                                hiddenObjects.Add(edge);
                                 GameObjectExtensions.SetVisibility(edge, false, true);
                             }
                         }
                     }
-                    hiddenList.Add(selectedObject);
+                    hiddenObjects.Add(selectedObject);
                     GameObjectExtensions.SetVisibility(selectedObject, false, true);
                     selectedObject = null;
-                    hiddenObjects.Add(hiddenList);
                 }
                 hadAnEffect = true;
                 return true;
@@ -133,7 +139,7 @@ namespace SEE.Controls.Actions
                     }
                 }
                 selectedObject = null;
-                hiddenObjects.Add(hiddenList);
+                //hiddenObjects.Add(hiddenList);
                 return true;
                 }
             return false;   
@@ -161,7 +167,7 @@ namespace SEE.Controls.Actions
                     }
                 }
                 selectedObject = null;
-                hiddenObjects.Add(hiddenList);
+                //hiddenObjects.Add(hiddenList);
                 return true;
                 }
             return false;         
@@ -169,33 +175,23 @@ namespace SEE.Controls.Actions
 
         public override void Undo()
         {
-            Debug.Log("undo");
-            List<GameObject> lastHidden = hiddenObjects[hiddenObjects.Count - 1];
-            foreach (GameObject g in lastHidden)
+            foreach (GameObject g in hiddenObjects)
             {
                 GameObjectExtensions.SetVisibility(g, true, false);
             }
-            hiddenObjects.Remove(lastHidden);
+            hiddenObjects.Clear();
+            base.Undo();
         }
 
         public override void Redo()
         {
+            foreach (GameObject g in undoneList)
+            {
+                GameObjectExtensions.SetVisibility(g, false, false);
+            }
+            undoneList.Clear();
             base.Redo();
         }
-
-        private void UnhideAll()
-        {
-            foreach(List<GameObject> l in hiddenObjects)
-            {
-                foreach(GameObject g in l){
-                    GameObjectExtensions.SetVisibility(g, true, false);
-                }
-            }
-            hiddenObjects.Clear();
-        }
-
-        
-
 
         /// <summary>
         /// Returns the IDs of all incoming and outgoing edges for <paramref name="nodeRef"/>.
