@@ -16,6 +16,15 @@ namespace SEE.DataModel.DG
         // The clone will appear as a node without parent and children at level 0.
         // Neither will its incoming and outgoing edges be copied.
 
+        [Flags]
+        public enum Flags : byte
+        {
+            None           = 0x0,
+            Implementation = 0x1,
+            Architecture   = 0x2,
+            Mapping        = 0x4,
+        }
+
         /// <summary>
         /// The attribute name for unique identifiers (within a graph).
         /// </summary>
@@ -32,6 +41,8 @@ namespace SEE.DataModel.DG
         /// to a graph, however, setting this property is safe.
         /// </summary>
         public override string ID { get; set; } = "";
+
+        public Flags flags = Flags.None;
 
         /// <summary>
         /// The attribute name for the name of nodes. They may or may not be unique.
