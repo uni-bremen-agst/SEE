@@ -153,10 +153,10 @@ namespace SEE.Controls.Actions
                 // feel responsive!
                 actionState.drag = Input.GetMouseButton(2);
                 actionState.startDrag |= !isMouseOverGUI && Input.GetMouseButtonDown(2);
-                actionState.dragHoveredOnly = Input.GetKey(KeyBindings.Drag);
-                actionState.cancel |= Input.GetKeyDown(KeyBindings.Cancel);
-                actionState.snap = Input.GetKey(KeyBindings.Snap);
-                actionState.reset |= (actionState.drag || !isMouseOverGUI) && Input.GetKeyDown(KeyBindings.Reset);
+                actionState.dragHoveredOnly = SEEInput.Drag();
+                actionState.cancel |= SEEInput.Cancel();
+                actionState.snap = SEEInput.Snap();
+                actionState.reset |= (actionState.drag || !isMouseOverGUI) && SEEInput.Reset();
 
                 // FIXME: The selection of graph elements below will executed only if the 
                 // ray hits the clipping area. If the player looks at the city from aside,
@@ -180,7 +180,7 @@ namespace SEE.Controls.Actions
                 // TODO(torben): extract zoom and/or disable this script if latter conditions are false
                 if (!actionState.drag && (ActionState.Value == ActionStateType.Move || ActionState.Value == ActionStateType.Rotate))
                 {
-                    actionState.zoomToggleToObject |= Input.GetKeyDown(KeyBindings.ZoomInto);
+                    actionState.zoomToggleToObject |= SEEInput.ZoomInto();
                 }
 
                 if (Equals(ActionState.Value, ActionStateType.Rotate) && cursor.E.HasFocus())

@@ -171,12 +171,9 @@ namespace SEE.Controls
                 case PlayerInputType.DesktopPlayer:
                     if (FocusPlane == null)
                     {
-                        throw new Exception("No focus plane set for the desktop player. Set this value in the inspector.");
+                       Debug.LogError("No focus plane set for the desktop player. Set this value in the inspector.\n");
                     }
-                    else
-                    {
-                        player = PlayerFactory.CreateDesktopPlayer(FocusPlane);
-                    }
+                    player = PlayerFactory.CreateDesktopPlayer(FocusPlane);
                     break;
                 case PlayerInputType.VRPlayer:
                     {
@@ -392,7 +389,7 @@ namespace SEE.Controls
                     }
                 }
             }
-            if (Input.GetKeyDown(KeyBindings.Help))
+            if (SEEInput.Help())
             {
                 KeyBindings.PrintBindings();
             }

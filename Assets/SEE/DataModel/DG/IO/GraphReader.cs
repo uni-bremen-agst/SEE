@@ -52,12 +52,11 @@ namespace SEE.DataModel.DG.IO
                 List<Node> roots = graph.GetRoots();
                 if (roots.Count == 0)
                 {
-                    Debug.LogWarningFormat("Graph stored in {0} is empty.\n", filename);
+                    Debug.LogWarning($"Graph stored in {filename} is empty.\n");
                 }
                 else if (roots.Count > 1)
                 {
-                    Debug.LogWarningFormat("Graph stored in {0} has multiple roots. Adding an artificial single root {1}.\n",
-                                           filename, rootName);
+                    Debug.LogWarning($"Graph stored in {filename} has multiple roots. Adding an artificial single root {rootName}.\n");
                     Node singleRoot = new Node
                     {
                         Type = Graph.UnknownType,

@@ -20,15 +20,20 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Game.Charts;
-using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
+    /// <summary>
+    /// Handles the toggling of metric charts.
+    /// </summary>
     public class DesktopChartAction : ChartAction
     {
+        /// <summary>
+        /// Toggles the metric charts on the user's request.
+        /// </summary>
         private void Update()
         {
-            if (Input.GetKeyDown(KeyBindings.ToggleCharts))
+            if (SEEInput.ToggleMetricCharts())
             {
                 ChartManager.Instance.ToggleCharts();
             }

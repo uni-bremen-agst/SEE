@@ -20,7 +20,8 @@ namespace SEEEditor
             GUILayout.Label("Node attributes", EditorStyles.boldLabel);
             if (nodeRef.Value != null)
             {
-                ShowTypeAndAttributes(nodeRef.Value);
+                EditorGUILayout.TextField("Level", nodeRef.Value.Level.ToString());
+                ShowTypeAndAttributes(nodeRef.Value);                
             }
             else
             {
