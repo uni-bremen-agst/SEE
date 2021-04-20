@@ -41,6 +41,7 @@ namespace SEE.Controls
             cameraState.pitch = 45.0f;
             mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
             mainCamera.transform.position -= mainCamera.transform.forward * cameraState.distance;
+            lastAxis = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
         }
 
         private void Update()
@@ -123,7 +124,7 @@ namespace SEE.Controls
         /// <summary>
         /// The mouse position of the last frame.
         /// </summary>
-        private Vector2 lastAxis = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+        private Vector2 lastAxis;
 
         /// <summary>
         /// If the user wants us, we rotate the camera according to mouse input.
