@@ -1,5 +1,5 @@
-﻿using SEE.GO;
-using System;
+﻿using System;
+using SEE.GO;
 using TMPro;
 using UnityEngine;
 
@@ -48,6 +48,8 @@ namespace SEE.Game.UI.PropertyDialog
             SetInitialInput(inputField, savedValue);
             textField = GetTextField(inputField);
             textField.text = savedValue;
+            
+            #region Local Methods
 
             void SetInitialInput(GameObject field, string value)
             {
@@ -78,6 +80,8 @@ namespace SEE.Game.UI.PropertyDialog
                     throw new Exception($"Prefab {StringInputFieldPrefab} does not have a TextMeshProUGUI component at child 'Text Area/Text'");
                 }
             }
+            
+            #endregion
         }
 
         /// <summary>

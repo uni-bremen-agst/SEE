@@ -81,7 +81,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// </summary>
         private void OnDestroy()
         {
-            GameObject.Destroy(dialog);
+            Destroy(dialog);
         }
 
         /// <summary>
