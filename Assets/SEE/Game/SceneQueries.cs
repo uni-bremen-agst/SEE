@@ -15,10 +15,13 @@ namespace SEE.Game
     {
         private const string ArchGOName = "Architecture";
         private const string ImplGOName = "Implementation";
+        private const string mappGOName = "Mapping";
 
         private static SEECity arch = null;
         private static SEECity impl = null;
+        private static SEECity mapp = null;
 
+        // TODO(torben): these are very similar to FindImplementation() etc. below @SuperSimilarQuery
         public static SEECity GetArch()
         {
             if (!arch)
@@ -51,6 +54,23 @@ namespace SEE.Game
                 }
             }
             return impl;
+        }
+
+        public static SEECity GetMapp()
+        {
+            if (!mapp)
+            {
+                SEECity[] cities = Object.FindObjectsOfType<SEECity>();
+                foreach (SEECity city in cities)
+                {
+                    if (city.gameObject.name.Equals(mappGOName))
+                    {
+                        mapp = city;
+                        break;
+                    }
+                }
+            }
+            return mapp;
         }
 
         /// <summary>
@@ -277,7 +297,7 @@ namespace SEE.Game
         /// Finds the implementation city in the scene.
         /// </summary>
         /// <returns>The implementation city of the scene.</returns>
-        public static SEECity FindImplementation()
+        public static SEECity FindImplementation() // @SuperSimilarQuery
         {
             SEECity result = null;
             SEECity[] cities = Object.FindObjectsOfType<SEECity>();
@@ -301,7 +321,7 @@ namespace SEE.Game
         /// Finds the architecture city in the scene.
         /// </summary>
         /// <returns>The architecture city of the scene.</returns>
-        public static SEECity FindArchitecture()
+        public static SEECity FindArchitecture() // @SuperSimilarQuery
         {
             SEECity result = null;
             SEECity[] cities = Object.FindObjectsOfType<SEECity>();
