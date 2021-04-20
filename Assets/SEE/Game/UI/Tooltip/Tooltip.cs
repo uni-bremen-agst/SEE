@@ -20,7 +20,7 @@ namespace SEE.Game.UI.Tooltip
         /// <summary>
         /// Contains the text which shall be shown in the tooltip if <see cref="Show"/> has been called before Start.
         /// </summary>
-        private string textBeforeStart = null;
+        private string textBeforeStart;
         
         /// <summary>
         /// The path to the prefab for the tooltip game object.
