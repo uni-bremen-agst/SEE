@@ -164,13 +164,7 @@ namespace SEE.Game.UI.Menu
                 buttonManager.buttonText = entry.Title;
                 buttonManager.buttonIcon = entry.Icon;
                 buttonManager.hoverEvent.AddListener(() => Tooltip.Show(entry.Description));
-                if (triggerComponent.triggers.Count != 1)
-                {
-                    Debug.LogError("The 'Event Trigger' component may only contain one trigger for the "
-                                   + "'PointerExit' event, not more and not fewer.\n");
-                    return;
-                }
-                EventTrigger.Entry trigger = triggerComponent.triggers.Single();
+                EventTrigger.Entry trigger = triggerComponent.triggers.Single(x => x.eventID == EventTriggerType.PointerExit);
                 trigger.callback.AddListener(_ => Tooltip.Hide());
                 if (entry.Enabled)
                 {
