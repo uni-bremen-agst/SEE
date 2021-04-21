@@ -21,7 +21,7 @@ namespace SEE.Game.UI
         /// Name of the canvas on which UI elements are placed.
         /// Note that for HoloLens, the canvas will be converted to an MRTK canvas.
         /// </summary>
-        protected const string UI_CANVAS_NAME = "UI Canvas";
+        private const string UI_CANVAS_NAME = "UI Canvas";
         
         /// <summary>
         /// Path to where the UI Canvas prefab is stored.

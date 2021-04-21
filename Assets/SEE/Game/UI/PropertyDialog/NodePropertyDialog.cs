@@ -33,7 +33,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// <summary>
         /// The graph node to be manipulated by this dialog.
         /// </summary>
-        private Node node;
+        private readonly Node node;
 
         /// <summary>
         /// The dialog used to manipulate the node.
@@ -118,7 +118,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// </summary>
         private void Close()
         {
-            GameObject.Destroy(dialog);
+            Object.Destroy(dialog);
             dialog = null;
         }
     }

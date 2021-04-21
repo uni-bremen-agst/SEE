@@ -51,7 +51,7 @@ namespace SEE.Game.UI.Menu
         /// If this does not match <see cref="MenuShown"/>,
         /// the <see cref="Update"/> method will update the UI accordingly.
         /// </summary>
-        private bool CurrentMenuShown = false;
+        private bool CurrentMenuShown;
 
         /// <summary>
         /// This event will be called whenever an entry in the menu is chosen.
