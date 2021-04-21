@@ -118,6 +118,26 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Disables the general selection provided by <see cref="SEEInput.Select"/>.
+        /// We need to avoid that the selection of graph elements to be deleted 
+        /// interferes with the general <see cref="SelectAction"/>.
+        /// </summary>
+        public override void Start()
+        {
+            base.Start();
+            SEEInput.SelectionEnabled = false;
+        }
+
+        /// <summary>
+        /// Re-enables the general selection provided by <see cref="SEEInput.Select"/>.
+        /// </summary>
+        public override void Stop()
+        {
+            base.Stop();
+            SEEInput.SelectionEnabled = true;
+        }
+
+        /// <summary>
         /// See <see cref="ReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
@@ -152,9 +172,10 @@ namespace SEE.Controls.Actions
         /// <param name="deletedObject">selected GameObject that along with its children should be removed</param>
         /// <returns>true if <paramref name="deletedObject"/> was actually deleted</returns>
         private bool Delete(GameObject deletedObject)
-        {
+        {            
             if (deletedObject.CompareTag(Tags.Edge))
             {
+                InteractableObject.UnselectAll(true);
                 DeleteEdge(deletedObject);
             }
             else if (deletedObject.CompareTag(Tags.Node))
@@ -166,6 +187,7 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
+                    InteractableObject.UnselectAll(true);
                     // The selectedObject (a node) and its ancestors are not deleted immediately. Instead we
                     // will run an animation that moves them into a garbage bin. Only when they arrive there,
                     // we will actually delete them.
@@ -269,7 +291,6 @@ namespace SEE.Controls.Actions
             }
             yield return new WaitForSeconds(TimeToWait);
             animationIsRunning = false;
-            InteractableObject.UnselectAll(true);
         }
 
         /// <summary>
