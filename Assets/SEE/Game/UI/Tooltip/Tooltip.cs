@@ -63,6 +63,11 @@ namespace SEE.Game.UI.Tooltip
         private Sequence fadeIn;
 
         /// <summary>
+        /// The GameObject which contains the Tooltip UI element.
+        /// </summary>
+        private GameObject tooltipGameObject;
+
+        /// <summary>
         /// Displays the tooltip with the given <paramref name="text"/> after the given <paramref name="delay"/>.
         /// By default, the <paramref name="delay"/> will be set to twice the <see cref="FADE_IN_DURATION"/>.
         /// </summary>
@@ -75,7 +80,7 @@ namespace SEE.Game.UI.Tooltip
             {
                 throw new ArgumentException($"{nameof(delay)} must be a positive number!");
             }
-            //FIXME: Scrolling doesn't work while tooltip is active
+            
             if (HasStarted)
             {
                 fadeIn = DOTween.Sequence();
@@ -123,8 +128,8 @@ namespace SEE.Game.UI.Tooltip
         protected override void StartDesktop()
         {
             // Create new tooltip GameObject
-            GameObject tooltip = PrefabInstantiator.InstantiatePrefab(TOOLTIP_PREFAB, Canvas.transform, false);
-            if (tooltip.TryGetComponentOrLog(out TooltipManager))
+            tooltipGameObject = PrefabInstantiator.InstantiatePrefab(TOOLTIP_PREFAB, Canvas.transform, false);
+            if (tooltipGameObject.TryGetComponentOrLog(out TooltipManager))
             {
                 TooltipManager.allowUpdating = true;
                 // Move tooltip to front of layer hierarchy
@@ -145,6 +150,21 @@ namespace SEE.Game.UI.Tooltip
                     }
                 }
             }
+        }
+        
+        private void OnDestroy()
+        {
+            Destroy(tooltipGameObject);
+        }
+
+        private void OnDisable()
+        {
+            tooltipGameObject.SetActive(false);
+        }
+
+        private void OnEnable()
+        {
+            tooltipGameObject.SetActive(true);
         }
 
         protected override void StartHoloLens()

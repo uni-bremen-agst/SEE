@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Linq;
 using SEE.GO;
+using SEE.Utils;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace SEE.Game.UI.PropertyDialog
 {
@@ -46,7 +45,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// </summary>
         protected override void StartDesktop()
         {
-            inputField = Utils.PrefabInstantiator.InstantiatePrefab(StringInputFieldPrefab, instantiateInWorldSpace: false);
+            inputField = PrefabInstantiator.InstantiatePrefab(StringInputFieldPrefab, instantiateInWorldSpace: false);
             if (parentOfInputField != null)
             {
                 SetParent(parentOfInputField);
@@ -63,15 +62,17 @@ namespace SEE.Game.UI.PropertyDialog
             void SetupTooltip(GameObject field)
             {
                 tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
-                if (field.TryGetComponentOrLog(out EventTrigger triggerComponent))
+                if (field.TryGetComponentOrLog(out PointerHelper pointerHelper))
                 {
                     // Register listeners on entry and exit events, respectively
-                    EventTrigger.Entry entryTrigger = triggerComponent
-                                                      .triggers.Single(x => x.eventID == EventTriggerType.PointerEnter);
-                    EventTrigger.Entry exitTrigger = triggerComponent
-                                                     .triggers.Single(x => x.eventID == EventTriggerType.PointerExit);
-                    entryTrigger.callback.AddListener(_ => tooltip.Show(Description));
-                    exitTrigger.callback.AddListener(_ => tooltip.Hide());
+                    pointerHelper.EnterEvent.AddListener(() => tooltip.Show(Description));
+                    pointerHelper.ExitEvent.AddListener(tooltip.Hide);
+                    // FIXME scrolling doesn't work while hovering above the field, because
+                    // the Modern UI Pack uses an Event Trigger (see Utils/PointerHelper for an explanation.)
+                    // It is unclear how to resolve this without either abstaining from using the Modern UI Pack
+                    // in this instance or without modifying the Modern UI Pack, which would complicate 
+                    // updates greatly. Perhaps the author of the Modern UI Pack (or Unity developers?) should
+                    // be contacted about this.
                 }
             }
 
@@ -94,7 +95,7 @@ namespace SEE.Game.UI.PropertyDialog
                 }
             }
 
-            TextMeshProUGUI GetTextField(GameObject field)
+            static TextMeshProUGUI GetTextField(GameObject field)
             {
                 Transform result = field.transform.Find("Text Area/Text");                
                 if (result != null && result.gameObject.TryGetComponentOrLog(out TextMeshProUGUI text))
