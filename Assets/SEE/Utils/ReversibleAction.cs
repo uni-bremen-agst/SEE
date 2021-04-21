@@ -91,6 +91,8 @@ namespace SEE.Utils
         /// </summary>
         void Redo();
 
+        string Id();
+
         /// <summary>
         /// True if this action has had an effect that may need to be undone. Actions may
         /// have been started but may not have had any effect yet because they were

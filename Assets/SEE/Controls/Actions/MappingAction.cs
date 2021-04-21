@@ -1020,5 +1020,10 @@ namespace SEE.Controls.Actions
         {
             throw new System.NotImplementedException();
         }
+
+        public string Id()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
