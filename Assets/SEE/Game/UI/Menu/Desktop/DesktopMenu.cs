@@ -6,7 +6,6 @@ using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace SEE.Game.UI.Menu
@@ -38,27 +37,27 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// The GameObject which contains the actual content of the menu, i.e. its entries.
         /// </summary>
-        protected GameObject MenuContent;
+        private GameObject MenuContent;
         
         /// <summary>
         /// The GameObject which has the <see cref="ModalWindowManager"/> component attached.
         /// </summary>
-        protected GameObject MenuGameObject;
+        private GameObject MenuGameObject;
 
         /// <summary>
         /// The modal window manager which contains the actual menu.
         /// </summary>
-        protected ModalWindowManager Manager;
+        private ModalWindowManager Manager;
 
         /// <summary>
         /// UI game object containing the entries as buttons.
         /// </summary>
-        protected GameObject EntryList;
+        private GameObject EntryList;
 
         /// <summary>
         /// The tooltip in which the description is displayed.
         /// </summary>
-        protected Tooltip.Tooltip Tooltip;
+        private Tooltip.Tooltip Tooltip;
 
         /// <summary>
         /// List of all button managers for the buttons used in this menu.
@@ -156,16 +155,15 @@ namespace SEE.Game.UI.Menu
                     !button.TryGetComponentOrLog(out Image buttonImage) ||
                     !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro) ||
                     !icon.TryGetComponentOrLog(out Image iconImage) ||
-                    !button.TryGetComponentOrLog(out EventTrigger triggerComponent))
+                    !button.TryGetComponentOrLog(out PointerHelper pointerHelper))
                 {
                     return;
                 }
 
                 buttonManager.buttonText = entry.Title;
                 buttonManager.buttonIcon = entry.Icon;
-                buttonManager.hoverEvent.AddListener(() => Tooltip.Show(entry.Description));
-                EventTrigger.Entry trigger = triggerComponent.triggers.Single(x => x.eventID == EventTriggerType.PointerExit);
-                trigger.callback.AddListener(_ => Tooltip.Hide());
+                pointerHelper.EnterEvent.AddListener(() => Tooltip.Show(entry.Description));
+                pointerHelper.ExitEvent.AddListener(Tooltip.Hide);
                 if (entry.Enabled)
                 {
                     buttonManager.clickEvent.AddListener(() => OnEntrySelected(entry));
@@ -193,7 +191,7 @@ namespace SEE.Game.UI.Menu
         /// <param name="entry">The entry whose button shall be destroyed.</param>
         /// <exception cref="System.InvalidOperationException">If more than one button with the same text as
         /// <paramref name="entry"/> exists.</exception>
-        protected void RemoveDesktopButton(T entry)
+        private void RemoveDesktopButton(T entry)
         {
             Destroy(ButtonManagers.SingleOrDefault(x => x.buttonText == entry.Title)?.gameObject);
         }
