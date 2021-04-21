@@ -28,7 +28,7 @@ namespace SEE.Controls.Actions
             {
                 InteractableObject.UnselectAll(true);
             }
-            else if (Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI())
+            else if (SEEInput.Select())
             {
                 InteractableObject obj = null;
                 if (Raycasting.RaycastInteractableObject(out _, out InteractableObject o) != HitGraphElement.None)

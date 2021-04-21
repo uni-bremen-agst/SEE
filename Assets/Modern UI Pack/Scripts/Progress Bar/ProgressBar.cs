@@ -56,7 +56,11 @@ namespace Michsky.UI.ModernUIPack
         public void UpdateUI()
         {
             loadingBar.fillAmount = currentPercent / maxValue;
-            textPercent.text = ((int)currentPercent).ToString("F0") + "%";
+          
+            if (isPercent == true)
+                textPercent.text = ((int)currentPercent).ToString("F0") + "%";
+            else
+                textPercent.text = ((int)currentPercent).ToString("F0");
         }
     }
 }
