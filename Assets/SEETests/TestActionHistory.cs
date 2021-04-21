@@ -114,6 +114,11 @@ namespace SEETests
             {
                 throw new System.NotImplementedException();
             }
+
+            public string Id()
+            {
+                throw new System.NotImplementedException();
+            }
         }
 
         /// <summary>
@@ -420,6 +425,11 @@ namespace SEETests
             }
 
             public List<string> GetChangedObjects()
+            {
+                throw new System.NotImplementedException();
+            }
+
+            public string Id()
             {
                 throw new System.NotImplementedException();
             }
