@@ -705,7 +705,7 @@ namespace SEE.Game
                         //Approximates the length of the edge over the control points to save computing power.
                         for (int i = 0; i < nP.controlPoints.Count() -1; i++)
                         {
-                            dist =+ Vector3.Distance(nP.controlPoints[i], nP.controlPoints[i + 1]);
+                            dist += Vector3.Distance(nP.controlPoints[i], nP.controlPoints[i + 1]);
                         }
 
                         //The AdjustedSamplerate is determined by the performance of the last animation
