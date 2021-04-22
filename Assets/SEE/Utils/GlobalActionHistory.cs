@@ -181,8 +181,8 @@ public class GlobalActionHistory
     {
         Tuple<bool, HistoryType, ReversibleAction, List<string>> lastAction = FindLastActionOfPlayer(true, HistoryType.action);
         if(lastAction == null) return;
-      
-        while (activeAction.HadEffect())
+        Debug.Log(activeAction.HadEffect());
+        while (!activeAction.HadEffect())
         {
             activeAction.Stop();
             if (allActionsList.Count > 1) //FIXME: Maybe obsolet becaus not multiplayer compatible, should be replaced by lastaction == null -> return
@@ -191,6 +191,7 @@ public class GlobalActionHistory
                 lastAction = FindLastActionOfPlayer(true, HistoryType.action);
                 if (lastAction == null) return;
                 activeAction = lastAction.Item3;
+                Debug.Log(activeAction.HadEffect());
             }
             else
             {
@@ -198,6 +199,7 @@ public class GlobalActionHistory
                 return;
             }
         }
+        Debug.Log(activeAction);
         activeAction?.Stop();
         activeAction?.Undo();
         DeleteItem(lastAction.Item3.GetId());
