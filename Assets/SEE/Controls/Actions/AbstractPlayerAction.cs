@@ -12,8 +12,10 @@ namespace SEE.Controls.Actions
     {
 
         private readonly string id = RandomStrings.Get(30);
-
-        public string Id => id;
+        string ReversibleAction.Id()
+        {
+            return id;
+        }
 
         /// <summary>
         /// The object that the cursor hovers over.
@@ -175,10 +177,5 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <returns>All id´s of manipulated gameObjects</returns>
         public abstract List<string> GetChangedObjects();
-
-        string ReversibleAction.Id()
-        {
-            return id;
-        }
     }
 }
