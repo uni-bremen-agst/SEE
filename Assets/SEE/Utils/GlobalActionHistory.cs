@@ -16,7 +16,7 @@ public class GlobalActionHistory
     };
 
     /// <summary>
-    /// 
+    /// If a user has done a undo
     /// </summary>
     private bool isRedo = false;
 
@@ -54,7 +54,11 @@ public class GlobalActionHistory
         action.Start();
 
         // Whenever a new action is excuted, we consider the redo stack lost.
-        if (isRedo) DeleteAllRedos(key);
+        if (isRedo)
+        {
+            Debug.Log("DELETE REDOS");
+            DeleteAllRedos(key);
+        }
     }
 
     /// <summary>
@@ -200,6 +204,7 @@ public class GlobalActionHistory
 
         SetActiveAction(userid, lastAction.Item1.Item3);
         GetActiveAction(userid)?.Start();
+        isRedo = true;
     }
 
     /// <summary>
