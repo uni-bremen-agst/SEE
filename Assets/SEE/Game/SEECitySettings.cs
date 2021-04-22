@@ -59,7 +59,7 @@ namespace SEE
         /// If the game node uses less than this percentage it will be culled.
         /// </summary>
         [Range(0.0f, 1.0f)]
-        public float lodCulling = 0.1f;
+        public float lodCulling = 0.01f;
 
         /// <summary>
         /// The path for the layout file containing the node layout information.
@@ -136,10 +136,10 @@ namespace SEE
         /// is used to identify and remove points based on their distances to the line
         /// drawn between their neighbors.
         /// </summary>
-        public float             rdp              = 0.05f;
-        public int               tubularSegments  = 50;     // Number of segments along the tubular.
-        public float             radius           = 0.005f; // Radius of the tubular.
-        public int               radialSegments   = 8;      // Number of segments around the tubular.
-        public bool              isEdgeSelectable = true;   // Whether the edges are selectable or not.
+        public float             rdp              = 0.0001f;
+        public int               tubularSegments  = 50;      // Number of segments along the tubular.
+        public float             radius           = 0.005f;  // Radius of the tubular.
+        public int               radialSegments   = 8;       // Number of segments around the tubular.
+        public bool              isEdgeSelectable = true;    // Whether the edges are selectable or not.
     }
 }
