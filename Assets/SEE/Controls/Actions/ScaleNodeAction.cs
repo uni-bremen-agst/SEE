@@ -133,7 +133,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// A copy of the objectToScale, temporary saved for undo operation
         /// </summary>
-        private GameObject dummy;
+        private GameObject temporaryCopy;
 
         /// <summary>
         /// A copy of the scale in order to set the scale to its original after a redo operation
@@ -214,7 +214,7 @@ namespace SEE.Controls.Actions
             if (Input.GetMouseButtonDown(0) && objectToScale == null)
             {
                 objectToScale = hoveredObject;
-                dummy = hoveredObject;
+                temporaryCopy = hoveredObject;
             }
             if (scalingGizmosAreDrawn && Input.GetMouseButton(0))
             {
@@ -562,8 +562,8 @@ namespace SEE.Controls.Actions
         {
             base.Undo();
             Destroyer.DestroyGameObject(objectToScale);
-            dummy.transform.position = originalPosition;
-            dummy.SetScale(originalScale);
+            temporaryCopy.transform.position = originalPosition;
+            temporaryCopy.SetScale(originalScale);
         }
 
         /// <summary>
@@ -572,7 +572,7 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            dummy.SetScale(scaleCopy);
+            temporaryCopy.SetScale(scaleCopy);
         }
 
         /// <summary>
