@@ -131,7 +131,7 @@ namespace SEE.Controls.Actions
         private GameObject objectToScale;
 
         /// <summary>
-        /// A copy of the objectToScale, temporary saved for undo operation
+        /// A copy of the objectToScale, temporarily saved for undo operation
         /// </summary>
         private GameObject temporaryCopy;
 
