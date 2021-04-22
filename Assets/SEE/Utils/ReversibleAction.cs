@@ -91,6 +91,10 @@ namespace SEE.Utils
         /// </summary>
         void Redo();
 
+        /// <summary>
+        /// Getter for the ID of the specific action.
+        /// </summary>
+        /// <returns></returns>
         string Id();
 
         /// <summary>
