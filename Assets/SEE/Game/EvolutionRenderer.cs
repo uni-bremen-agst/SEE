@@ -213,6 +213,16 @@ namespace SEE.Game
         private float timer = 0f;
 
         /// <summary>
+        /// Evaluates the performance of the edge animation
+        /// </summary>
+        int edgeAnimationPerfScore = 10;
+
+        /// <summary>
+        /// Saves how many edges were moved during the last animation
+        /// </summary>
+        int lastMovedEdgesCount = 0;
+
+        /// <summary>
         /// True if animation is still ongoing.
         /// </summary>
         public bool IsStillAnimating
@@ -666,6 +676,8 @@ namespace SEE.Game
             }
             return result;
         }
+
+        
         
         /// <summary>
         /// Calculates the control points of the edges of the next graph and generates their actual line points from them. 
@@ -679,7 +691,7 @@ namespace SEE.Game
                 IList<GameObject> oldEdges = objectManager.GetEdges().ToList();
                 
                 // Searches for pairs between old and new edges
-                matchedEdges =  EdgeMatcher(oldEdges,newEdges);              
+                matchedEdges =  EdgeMatcher(oldEdges,newEdges);
                 // Case distinction in case the layout does not need sample points
                 if(!graphRenderer.GetSettings().EdgeLayout.Equals(SEE.Layout.EdgeLayouts.EdgeLayoutKind.Straight))
                 {
@@ -688,11 +700,34 @@ namespace SEE.Game
                         oldEdge.TryGetComponent<Points>(out Points oP);
                         newEdge.TryGetComponent<Points>(out Points nP);
 
-                        uint sampleRate = (uint)Math.Max(oP.linePoints.Count(),nP.linePoints.Count());
+                        float dist = 0;
+
+                        //Approximates the length of the edge over the control points to save computing power.
+                        for (int i = 0; i < nP.controlPoints.Count() -1; i++)
+                        {
+                            dist =+ Vector3.Distance(nP.controlPoints[i], nP.controlPoints[i + 1]);
+                        }
+
+                        //The AdjustedSamplerate is determined by the performance of the last animation
+                        //and tries to achieve a balance between performance and aesthetics
+                        //by giving all edges a number of points according to their length,
+                        //the total number of edges and the performance of the last animation.  
+                        double adjustedSampleRate = Math.Floor(edgeAnimationPerfScore * dist * 10 * lastMovedEdgesCount / matchedEdges.Count());
+
+                        lastMovedEdgesCount = matchedEdges.Count();
+
+                        //In order to use DynamicSampleRateReduction, all edges should have a number of points that is divisible by two.
+                        if (adjustedSampleRate % 2 != 0)
+                        { 
+                            adjustedSampleRate +=  1;
+                        }
+
+                        //No edge should have more than 75, or less than 2 points.
+                        adjustedSampleRate = Math.Min(Math.Max(adjustedSampleRate, 2), 75);
 
                         // Creates new line points from the control points 
-                        oP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(oP.controlPoints, sampleRate);
-                        nP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(nP.controlPoints, sampleRate);
+                        oP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(oP.controlPoints, (uint)adjustedSampleRate);
+                        nP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(nP.controlPoints, (uint)adjustedSampleRate);
 
                         // Saves the new line points to the LineRenderer
                         oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
@@ -704,11 +739,47 @@ namespace SEE.Game
                     timer = 0f;
                     // Starts the animation of the edges
                     moveEdges = true;
+                    //Resets the edgeAnimationPerfScore
+                    edgeAnimationPerfScore = 10;
             }
             catch (ArgumentNullException)
             {
                 moveEdges = false;
             }
+        }
+
+        /// <summary>
+        /// Reduces the number of points on the edge by half to improve performance in particularly complex cases.
+        /// </summary>
+        /// <returns>Whether the reduction was successful.</returns>
+        private bool DynamicSampleRateReduction()
+        {
+            try
+            {
+                //Copies every second point
+                foreach ((GameObject oldEdge, GameObject newEdge) in matchedEdges)
+                {
+                    oldEdge.TryGetComponent<Points>(out Points oP);
+                    newEdge.TryGetComponent<Points>(out Points nP);
+
+                    if (oP.linePoints.Count() <= 2) return true;
+
+                    Vector3[] oldLinePointsHalf = oP.linePoints.Where((value, index) => index % 2 == 0).ToArray();
+                    Vector3[] newLinePointsHalf = nP.linePoints.Where((value, index) => index % 2 == 0).ToArray();
+                    nP.linePoints = newLinePointsHalf;
+
+                    // Saves the new line points to the LineRenderer
+                    oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
+                    lineRenderer.positionCount = oP.linePoints.Count() / 2;
+                    lineRenderer.SetPositions(oldLinePointsHalf);
+                }
+                return true;
+            }
+            catch(IndexOutOfRangeException)
+            {
+                return false;
+            }
+
         }
         
         /// <summary>
@@ -719,6 +790,23 @@ namespace SEE.Game
             if (moveEdges) 
             {
                 timer += Time.deltaTime;
+
+                //We try to keep the animation between 30 and 60 FPS, so we adjust the PerformanceScore at each iteration
+                if (Time.deltaTime > 0.033f)
+                {
+                    edgeAnimationPerfScore -= 2;
+                }
+                else if(Time.deltaTime < 0.016f)
+                {
+                    edgeAnimationPerfScore += 1;
+                }
+
+                //If the performance drops too much, we halve the number of points to be drawn by half.
+                if (edgeAnimationPerfScore < -200)
+                {
+                    DynamicSampleRateReduction();
+                    
+                }
                  foreach ((GameObject oldEdge, GameObject newEdge) in matchedEdges)
                  {
                     if (oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer)
