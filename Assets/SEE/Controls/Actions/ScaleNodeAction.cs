@@ -130,6 +130,16 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject objectToScale;
 
+        /// <summary>
+        /// A copy of the objectToScale, temporary saved for undo operation
+        /// </summary>
+        private GameObject dummy;
+
+        /// <summary>
+        /// A copy of the scale in order to set the scale to its original after a redo operation
+        /// </summary>
+        private Vector3 scaleCopy;
+
         public override void Start()
         {
             InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
@@ -204,6 +214,7 @@ namespace SEE.Controls.Actions
             if (Input.GetMouseButtonDown(0) && objectToScale == null)
             {
                 objectToScale = hoveredObject;
+                dummy = hoveredObject;
             }
             if (scalingGizmosAreDrawn && Input.GetMouseButton(0))
             {
@@ -270,7 +281,7 @@ namespace SEE.Controls.Actions
                 {
                     GameNodeMover.MoveToLockAxes(draggedSphere, false, true, false);
                 }
-                else if (draggedSphere == firstCornerSphere || draggedSphere == secondCornerSphere 
+                else if (draggedSphere == firstCornerSphere || draggedSphere == secondCornerSphere
                          || draggedSphere == thirdCornerSphere || draggedSphere == forthCornerSphere)
                 {
                     GameNodeMover.MoveToLockAxes(draggedSphere, true, false, true);
@@ -293,7 +304,7 @@ namespace SEE.Controls.Actions
                     ScaleNode();
                     SetOnRoof();
                     SetOnSide();
-                }                
+                }
             }
             else
             {
@@ -352,7 +363,7 @@ namespace SEE.Controls.Actions
             // Move the gameObject so the user thinks she/he scaled only in one direction
             Vector3 position = objectToScale.transform.position;
             position.y += scale.y * 0.5f;
-           
+
             // Setting the old positions
             topOldSpherePos = topSphere.transform.position;
             firstCornerOldSpherePos = firstCornerSphere.transform.position;
@@ -384,6 +395,9 @@ namespace SEE.Controls.Actions
             // Transform the new position and scale
             objectToScale.transform.position = position;
             objectToScale.SetScale(scale);
+            scaleCopy = scale;
+            //  scaledObjectTransform = objectToScale.transform;
+            hadAnEffect = true;
             new ScaleNodeNetAction(objectToScale.name, scale, position).Execute();
         }
 
@@ -516,6 +530,7 @@ namespace SEE.Controls.Actions
                 objectToScale.SetScale(originalScale);
                 objectToScale.transform.position = originalPosition;
                 new ScaleNodeNetAction(objectToScale.name, originalScale, originalPosition).Execute();
+                hadAnEffect = true;
                 RemoveSpheres();
             }
         }
@@ -545,15 +560,19 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Undo()
         {
-            Debug.Log("Undo ScaleNode");
+            base.Undo();
+            Destroyer.DestroyGameObject(objectToScale);
+            dummy.transform.position = originalPosition;
+            dummy.SetScale(originalScale);
         }
 
         /// <summary>
-        /// Redoes this DeleteAction
+        /// Redoes this ScaleNodeAction
         /// </summary>
         public override void Redo()
         {
-            Debug.Log("Redo ScaleNode");
+            base.Redo();
+            dummy.SetScale(scaleCopy);
         }
 
         /// <summary>
