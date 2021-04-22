@@ -1,6 +1,4 @@
 ﻿using SEE.Game;
-using SEE.Layout.EdgeLayouts;
-using SEE.Layout.NodeLayouts;
 using System;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -76,8 +74,8 @@ namespace SEE.Net
         public float MinimalBlockLength;
         public float MaximalBlockLength;
 
-        public AbstractSEECity.LeafNodeKinds LeafObjects;
-        public AbstractSEECity.InnerNodeKinds InnerNodeObjects;
+        public LeafNodeKinds LeafObjects;
+        public InnerNodeKinds InnerNodeObjects;
 
         public NodeLayoutKind NodeLayout;
         public EdgeLayoutKind EdgeLayout;
@@ -138,10 +136,10 @@ namespace SEE.Net
             rotation = city.transform.rotation;
             scale = city.transform.lossyScale;
 
-            WidthMetric = city.WidthMetric;
-            HeightMetric = city.HeightMetric;
-            DepthMetric = city.DepthMetric;
-            LeafStyleMetric = city.LeafStyleMetric;
+            WidthMetric = city.leafNodeAttributes.widthMetric;
+            HeightMetric = city.leafNodeAttributes.heightMetric;
+            DepthMetric = city.leafNodeAttributes.depthMetric;
+            LeafStyleMetric = city.leafNodeAttributes.styleMetric;
 
             ArchitectureIssue = city.ArchitectureIssue;
             CloneIssue = city.CloneIssue;
@@ -161,28 +159,28 @@ namespace SEE.Net
 
             InnerDonutMetric = city.InnerDonutMetric;
 
-            InnerNodeStyleMetric = city.InnerNodeStyleMetric;
+            InnerNodeStyleMetric = city.innerNodeAttributes.styleMetric;
 
             MinimalBlockLength = city.MinimalBlockLength;
             MaximalBlockLength = city.MaximalBlockLength;
 
-            LeafObjects = city.LeafObjects;
-            InnerNodeObjects = city.InnerNodeObjects;
+            LeafObjects = city.nodeLayout.leafKind;
+            InnerNodeObjects = city.nodeLayout.innerKind;
 
-            NodeLayout = city.NodeLayout;
-            EdgeLayout = city.EdgeLayout;
-            ZScoreScale = city.ZScoreScale;
-            EdgeWidth = city.EdgeWidth;
-            ShowErosions = city.ShowErosions;
-            MaxErosionWidth = city.MaxErosionWidth;
-            EdgesAboveBlocks = city.EdgesAboveBlocks;
-            Tension = city.Tension;
-            RDP = city.RDP;
+            NodeLayout = city.nodeLayout.kind;
+            EdgeLayout = city.edgeLayout.kind;
+            ZScoreScale = city.nodeLayout.zScoreScale;
+            EdgeWidth = city.edgeLayout.edgeWidth;
+            ShowErosions = city.nodeLayout.showErosions;
+            MaxErosionWidth = city.nodeLayout.maxErosionWidth;
+            EdgesAboveBlocks = city.edgeLayout.edgesAboveBlocks;
+            Tension = city.edgeLayout.tension;
+            RDP = city.edgeLayout.rdp;
 
-            TubularSegments = city.TubularSegments;
-            Radius = city.Radius;
-            RadialSegments = city.RadialSegments;
-            isEdgeSelectable = city.isEdgeSelectable;
+            TubularSegments = city.edgeLayout.tubularSegments;
+            Radius = city.edgeLayout.radius;
+            RadialSegments = city.edgeLayout.radialSegments;
+            isEdgeSelectable = city.edgeLayout.isEdgeSelectable;
 
 
             if (city.GetType() == typeof(SEECity))
@@ -268,10 +266,10 @@ namespace SEE.Net
 
             Assert.IsNotNull(city);
 
-            city.WidthMetric = WidthMetric;
-            city.HeightMetric = HeightMetric;
-            city.DepthMetric = DepthMetric;
-            city.LeafStyleMetric = LeafStyleMetric;
+            city.leafNodeAttributes.widthMetric = WidthMetric;
+            city.leafNodeAttributes.heightMetric = HeightMetric;
+            city.leafNodeAttributes.depthMetric = DepthMetric;
+            city.leafNodeAttributes.styleMetric = LeafStyleMetric;
 
             city.ArchitectureIssue = ArchitectureIssue;
             city.CloneIssue = CloneIssue;
@@ -291,28 +289,28 @@ namespace SEE.Net
 
             city.InnerDonutMetric = InnerDonutMetric;
 
-            city.InnerNodeStyleMetric = InnerNodeStyleMetric;
+            city.innerNodeAttributes.styleMetric = InnerNodeStyleMetric;
 
             city.MinimalBlockLength = MinimalBlockLength;
             city.MaximalBlockLength = MaximalBlockLength;
 
-            city.LeafObjects = LeafObjects;
-            city.InnerNodeObjects = InnerNodeObjects;
+            city.nodeLayout.leafKind = LeafObjects;
+            city.nodeLayout.innerKind = InnerNodeObjects;
 
-            city.NodeLayout = NodeLayout;
-            city.EdgeLayout = EdgeLayout;
-            city.ZScoreScale = ZScoreScale;
-            city.EdgeWidth = EdgeWidth;
-            city.ShowErosions = ShowErosions;
-            city.MaxErosionWidth = MaxErosionWidth;
-            city.EdgesAboveBlocks = EdgesAboveBlocks;
-            city.Tension = Tension;
-            city.RDP = RDP;
+            city.nodeLayout.kind = NodeLayout;
+            city.edgeLayout.kind = EdgeLayout;
+            city.nodeLayout.zScoreScale = ZScoreScale;
+            city.edgeLayout.edgeWidth = EdgeWidth;
+            city.nodeLayout.showErosions = ShowErosions;
+            city.nodeLayout.maxErosionWidth = MaxErosionWidth;
+            city.edgeLayout.edgesAboveBlocks = EdgesAboveBlocks;
+            city.edgeLayout.tension = Tension;
+            city.edgeLayout.rdp = RDP;
 
-            city.TubularSegments = TubularSegments;
-            city.Radius = Radius;
-            city.RadialSegments = RadialSegments;
-            city.isEdgeSelectable = isEdgeSelectable;
+            city.edgeLayout.tubularSegments = TubularSegments;
+            city.edgeLayout.radius = Radius;
+            city.edgeLayout.radialSegments = RadialSegments;
+            city.edgeLayout.isEdgeSelectable = isEdgeSelectable;
 
             if (t == typeof(SEECity))
             {

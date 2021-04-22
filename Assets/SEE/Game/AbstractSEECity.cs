@@ -7,8 +7,6 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.GO;
-using SEE.Layout.EdgeLayouts;
-using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
 using UnityEngine;
@@ -26,10 +24,17 @@ namespace SEE.Game
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in 
-        /// <see cref="AbstractSEECity.Save(ConfigWriter)"/> and 
-        /// <see cref="AbstractSEECity.Restore(Dictionary{string, object})"/>, 
+        /// <see cref="Save(ConfigWriter)"/> and 
+        /// <see cref="Restore(Dictionary{string, object})"/>, 
         /// respectively (both declared in AbstractSEECityIO). You should also
         /// extend the test cases in TestConfigIO.
+
+        public GlobalCityAttributes    globalAttributes    = new GlobalCityAttributes();
+        public LeafNodeAttributes      leafNodeAttributes  = new LeafNodeAttributes();
+        public InnerNodeAttributes     innerNodeAttributes = new InnerNodeAttributes();
+        public NodeLayoutSettings      nodeLayout          = new NodeLayoutSettings();
+        public EdgeLayoutSettings      edgeLayout          = new EdgeLayoutSettings();
+        public CoseGraphSettings       coseGraphSettings   = new CoseGraphSettings(); // TODO(torben): put into CitySettings.cs
 
         /// <summary>
         /// Saves the settings of this code city to <see cref="CityPath"/>.
@@ -70,22 +75,6 @@ namespace SEE.Game
                 Restore(stream.Read());
             }
         }
-
-        /// <summary>
-        /// The screen relative height to use for the culling a game node [0-1].
-        /// If the game node uses less than this percentage it will be culled.
-        /// </summary>
-        public float LODCulling = 0.01f;
-
-        /// <summary>
-        /// The path for the layout file containing the node layout information.
-        /// If the file extension is <see cref="Filenames.GVLExtension"/>, the layout is expected
-        /// to be stored in Axivion's Gravis layout (GVL) with 2D co-ordinates. 
-        /// Otherwise is our own layout format SDL is expected, which saves the complete Transform 
-        /// data of a game object.
-        /// </summary>
-        [OdinSerialize]
-        public DataPath LayoutPath = new DataPath();
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
@@ -280,43 +269,6 @@ namespace SEE.Game
             }
         }
 
-        //---------------------------------
-        // Color range of leaf nodes
-        //---------------------------------
-        public ColorRange LeafNodeColorRange = new ColorRange(Color.white, Color.red, 10);
-
-        //---------------------------------
-        // Color range of inner nodes
-        //---------------------------------
-        public ColorRange InnerNodeColorRange = new ColorRange(Color.white, Color.yellow, 10);
-
-        //---------------------------------
-        // Visual attributes of a leaf node
-        //---------------------------------
-        /// <summary>
-        /// The attribute name of the metric to be used for the width of a building (x co-ordinate).
-        /// </summary>
-        public string WidthMetric = NumericAttributeNames.Number_Of_Tokens.Name(); // serialized by Unity
-        /// <summary>
-        /// The attribute name of the metric to be used for the height of a building (y co-ordinate).
-        /// </summary>
-        public string HeightMetric = NumericAttributeNames.Clone_Rate.Name(); // serialized by Unity
-        /// <summary>
-        /// The attribute name of the metric to be used for the breadth of a building (y co-ordinate).
-        /// </summary>
-        public string DepthMetric = NumericAttributeNames.LOC.Name(); // serialized by Unity
-        /// <summary>
-        /// The attribute name of the metric to be used for determining the style of leaf nodes.
-        /// </summary>
-        public string LeafStyleMetric = NumericAttributeNames.Complexity.Name(); // serialized by Unity
-
-        //----------------------------------
-        // Attributes of a leaf node's label
-        //----------------------------------
-        [OdinSerialize]
-        public LabelSettings LeafLabelSettings = new LabelSettings();
-
-
         /// <summary>
         /// All metrics used for visual attributes of a leaf node (WidthMetric, HeightMetric,
         /// DepthMetric, and LeafStyleMetric). 
@@ -325,7 +277,12 @@ namespace SEE.Game
         /// <returns>all metrics used for visual attributes of a leaf node</returns>
         public ICollection<string> AllLeafMetrics()
         {
-            return new HashSet<string> { WidthMetric, HeightMetric, DepthMetric, LeafStyleMetric };
+            return new List<string> {
+                leafNodeAttributes.widthMetric,
+                leafNodeAttributes.heightMetric,
+                leafNodeAttributes.depthMetric,
+                leafNodeAttributes.styleMetric
+            };
         }
 
         //--------------------------------------------------------
@@ -481,24 +438,6 @@ namespace SEE.Game
             };
             return result;
         }
-        //-----------------------------------
-        // Visual attributes of an inner node
-        //-----------------------------------
-
-        /// <summary>
-        /// The attribute name of the metric to be used for determining the height of inner nodes.
-        /// </summary>
-        public string InnerNodeHeightMetric = "";
-        /// <summary>
-        /// The attribute name of the metric to be used for determining the style of inner nodes.
-        /// </summary>
-        public string InnerNodeStyleMetric = NumericAttributeNames.IssuesTotal.Name(); // serialized by Unity
-
-        //-----------------------------------
-        // Visual attributes of an inner node
-        //-----------------------------------
-        [OdinSerialize]
-        public LabelSettings InnerNodeLabelSettings = new LabelSettings();
 
         /// <summary>
         /// All metrics used for visual attributes of inner nodes (InnerNodeStyleMetric
@@ -508,7 +447,7 @@ namespace SEE.Game
         /// <returns>all metrics used for visual attributes of an inner node</returns>
         public ICollection<string> AllInnerNodeMetrics()
         {
-            return new HashSet<string> { InnerNodeStyleMetric, InnerNodeHeightMetric };
+            return new List<string> { innerNodeAttributes.styleMetric, innerNodeAttributes.heightMetric };
         }
 
         //--------------------------------------
@@ -525,121 +464,6 @@ namespace SEE.Game
         /// representing a graph node visually. Must not be smaller than MinimalBlockLength.
         /// </summary>
         public float MaximalBlockLength = 100.0f; // serialized by Unity
-
-        /// <summary>
-        /// How leaf graph nodes should be depicted.
-        /// </summary>
-        public enum LeafNodeKinds
-        {
-            Blocks,
-        }
-
-        /// <summary>
-        /// How inner graph nodes should be depicted.
-        /// </summary>
-        public enum InnerNodeKinds
-        {
-            Blocks,
-            Rectangles,
-            Donuts,
-            Circles,
-            Empty,
-            Cylinders,
-        }
-
-        /// <summary>
-        /// What kinds of game objects are to be created for leaf nodes in the graph.
-        /// </summary>
-        public LeafNodeKinds LeafObjects; // serialized by Unity
-
-        /// <summary>
-        /// What kinds of game objects are to be created for inner graph nodes.
-        /// </summary>
-        public InnerNodeKinds InnerNodeObjects; // serialized by Unity
-
-        /// <summary>
-        /// The layout that should be used for nodes.
-        /// </summary>
-        public NodeLayoutKind NodeLayout; // serialized by Unity
-
-        /// <summary>
-        /// The layout that should be used for edges.
-        /// </summary>
-        public EdgeLayoutKind EdgeLayout; // serialized by Unity
-
-        /// <summary>
-        /// Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
-        /// for range [0, max-value] is used, where max-value is the maximum value of a metric.
-        /// </summary>
-        public bool ZScoreScale = true; // serialized by Unity
-
-        /// <summary>
-        /// The width of the line representing edges in world space.
-        /// </summary>
-        public float EdgeWidth = 0.1f; // serialized by Unity
-
-        /// <summary>
-        /// Whether erosions should be visible above blocks.
-        /// </summary>
-        public bool ShowErosions = false; // serialized by Unity
-
-        /// <summary>
-        /// The maximal absolute width of a sprite representing an erosion in world-space Unity units.
-        /// </summary>
-        public float MaxErosionWidth = 1.0f; // serialized by Unity
-
-
-        /// <summary>
-        /// Orientation of the edges; 
-        /// if false, the edges are drawn below the houses;
-        /// if true, the edges are drawn above the houses;
-        /// </summary>
-        public bool EdgesAboveBlocks = true; // serialized by Unity
-
-        /// <summary>
-        /// Determines the strength of the tension for bundling edges. This value may
-        /// range from 0.0 (straight lines) to 1.0 (maximal bundling along the spline).
-        /// 0.85 is the value recommended by Holten
-        /// </summary>
-        [Tooltip("Tension for bundling edges: 0 means no bundling at all; the maximal value"
-            + " of 1 means maximal bundling. Recommended value: 0.85.")]
-        public float Tension = 0.85f; // serialized by Unity
-
-        /// <summary>
-        /// Determines to which extent the polylines of the generated splines are
-        /// simplified. Range: [0.0, inf] (0.0 means no simplification). More precisely,
-        /// stores the epsilon parameter of the Ramer–Douglas–Peucker algorithm which
-        /// is used to identify and remove points based on their distances to the line
-        /// drawn between their neighbors.
-        /// </summary>
-        [Tooltip("Tolerance for spline simplification (Ramer–Douglas–Peucker algorithm):"
-            + " line points whose distances fall below that threshold are merged. A value <= 0 means "
-            + " no simplification. Recommended value: 0.05.")]
-        public float RDP = 0.05f;
-
-        /// <summary>
-        /// Determines the amount of segments along the tubular.
-        /// </summary>
-        [Tooltip("The amount of segments along the tubular. Recommended: 50")]
-        public int TubularSegments = 50;
-
-        /// <summary>
-        /// Determines the radius of the tubular. 
-        /// </summary>
-        [Tooltip("The radius of the tubular. Recommended: 0.005")]
-        public float Radius = 0.005f;
-
-        /// <summary>
-        /// Determines the amount of segments around the tubular.
-        /// </summary>
-        [Tooltip("The amount of segments around the tubular. Recommended: 8")]
-        public int RadialSegments = 8;
-
-        /// <summary>
-        /// Determines wether the edges are selectable or not.
-        /// </summary>
-        [Tooltip("Are the Edges selectable? Default: True")]
-        public bool isEdgeSelectable = true;
 
         /// <summary>
         /// Loads and returns the graph data from the GXL file with given <paramref name="filename"/>.
@@ -675,19 +499,14 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Cosegraph settings
-        /// </summary>
-        public CoseGraphSettings CoseGraphSettings = new CoseGraphSettings();
-
-        /// <summary>
         /// Saves all data needed for the listing of the dirs in gui in cosegraphSettings
         /// </summary>
         /// <param name="graph"></param>
         public void LoadDataForGraphListing(Graph graph)
         {
-            if (NodeLayout == NodeLayoutKind.CompoundSpringEmbedder)
+            if (nodeLayout.kind == NodeLayoutKind.CompoundSpringEmbedder)
             {
-                Dictionary<string, bool> dirs = CoseGraphSettings.ListInnerNodeToggle;
+                Dictionary<string, bool> dirs = coseGraphSettings.ListInnerNodeToggle;
                 // die neuen dirs 
                 Dictionary<string, bool> dirsLocal = new Dictionary<string, bool>();
 
@@ -698,9 +517,9 @@ namespace SEE.Game
                 {
                     if (!node.IsLeaf())
                     {
-                        dirsShape.Add(node.ID, InnerNodeObjects);
+                        dirsShape.Add(node.ID, nodeLayout.innerKind);
                         dirsLocal.Add(node.ID, false);
-                        dirsLayout.Add(node.ID, NodeLayout);
+                        dirsLayout.Add(node.ID, nodeLayout.kind);
                     }
                 }
 
@@ -716,12 +535,12 @@ namespace SEE.Game
                 }
                 else
                 {
-                    CoseGraphSettings.InnerNodeShape = dirsShape;
-                    CoseGraphSettings.InnerNodeLayout = dirsLayout;
-                    CoseGraphSettings.ListInnerNodeToggle = dirsLocal;
+                    coseGraphSettings.InnerNodeShape = dirsShape;
+                    coseGraphSettings.InnerNodeLayout = dirsLayout;
+                    coseGraphSettings.ListInnerNodeToggle = dirsLocal;
                 }
 
-                CoseGraphSettings.LoadedForNodeTypes = SelectedNodeTypes.Where(type => type.Value)
+                coseGraphSettings.LoadedForNodeTypes = SelectedNodeTypes.Where(type => type.Value)
                                                                         .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             }
         }

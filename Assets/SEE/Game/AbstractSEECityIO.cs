@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using SEE.Utils;
-using SEE.Layout.NodeLayouts;
-using SEE.Layout.EdgeLayouts;
 
 namespace SEE.Game
 {
@@ -76,19 +74,19 @@ namespace SEE.Game
         /// <param name="writer">writer for the configuration file</param>
         protected virtual void Save(ConfigWriter writer)
         {
-            writer.Save(LODCulling, LODCullingLabel);
-            LayoutPath.Save(writer, LayoutPathLabel);
+            writer.Save(globalAttributes.lodCulling, LODCullingLabel);
+            globalAttributes.layoutPath.Save(writer, LayoutPathLabel);
             writer.Save(HierarchicalEdges.ToList<string>(), HierarchicalEdgesLabel);
             writer.Save(SelectedNodeTypes, NodeTypesLabel);
             CityPath.Save(writer, CityPathLabel);
-            LeafNodeColorRange.Save(writer, LeafNodeColorRangeLabel);
-            InnerNodeColorRange.Save(writer, InnerNodeColorRangeLabel);
-            writer.Save(WidthMetric, WidthMetricLabel);
-            writer.Save(HeightMetric, HeightMetricLabel);
-            writer.Save(DepthMetric, DepthMetricLabel);
-            writer.Save(LeafStyleMetric, LeafStyleMetricLabel);
-            LeafLabelSettings.Save(writer, LeafLabelSettingsLabel);
-            InnerNodeLabelSettings.Save(writer, InnerNodeLabelSettingsLabel);
+            leafNodeAttributes.colorRange.Save(writer, LeafNodeColorRangeLabel);
+            innerNodeAttributes.colorRange.Save(writer, InnerNodeColorRangeLabel);
+            writer.Save(leafNodeAttributes.widthMetric, WidthMetricLabel);
+            writer.Save(leafNodeAttributes.heightMetric, HeightMetricLabel);
+            writer.Save(leafNodeAttributes.depthMetric, DepthMetricLabel);
+            writer.Save(leafNodeAttributes.styleMetric, LeafStyleMetricLabel);
+            leafNodeAttributes.labelSettings.Save(writer, LeafLabelSettingsLabel);
+            innerNodeAttributes.labelSettings.Save(writer, InnerNodeLabelSettingsLabel);
 
             writer.Save(StyleIssue, StyleIssueLabel);
             writer.Save(UniversalIssue, UniversalIssueLabel);
@@ -107,27 +105,27 @@ namespace SEE.Game
             writer.Save(ArchitectureIssue_SUM, ArchitectureIssue_SUMLabel);
 
             writer.Save(InnerDonutMetric, InnerDonutMetricLabel);
-            writer.Save(InnerNodeHeightMetric, InnerNodeHeightMetricLabel);
-            writer.Save(InnerNodeStyleMetric, InnerNodeStyleMetricLabel);
+            writer.Save(innerNodeAttributes.heightMetric, InnerNodeHeightMetricLabel);
+            writer.Save(innerNodeAttributes.styleMetric, InnerNodeStyleMetricLabel);
 
             writer.Save(MinimalBlockLength, MinimalBlockLengthLabel);
             writer.Save(MaximalBlockLength, MaximalBlockLengthLabel);
 
-            writer.Save(LeafObjects.ToString(), LeafObjectsLabel);
-            writer.Save(InnerNodeObjects.ToString(), InnerNodeObjectsLabel);
+            writer.Save(nodeLayout.leafKind.ToString(), LeafObjectsLabel);
+            writer.Save(nodeLayout.innerKind.ToString(), InnerNodeObjectsLabel);
 
-            writer.Save(NodeLayout.ToString(), NodeLayoutLabel);
-            writer.Save(EdgeLayout.ToString(), EdgeLayoutLabel);
+            writer.Save(nodeLayout.kind.ToString(), NodeLayoutLabel);
+            writer.Save(edgeLayout.kind.ToString(), EdgeLayoutLabel);
 
-            writer.Save(ZScoreScale, ZScoreScaleLabel);
-            writer.Save(EdgeWidth, EdgeWidthLabel);
-            writer.Save(ShowErosions, ShowErosionsLabel);
-            writer.Save(MaxErosionWidth, MaxErosionWidthLabel);
-            writer.Save(EdgesAboveBlocks, EdgesAboveBlocksLabel);
-            writer.Save(Tension, TensionLabel);
-            writer.Save(RDP, RDPLabel);
+            writer.Save(nodeLayout.zScoreScale, ZScoreScaleLabel);
+            writer.Save(edgeLayout.edgeWidth, EdgeWidthLabel);
+            writer.Save(nodeLayout.showErosions, ShowErosionsLabel);
+            writer.Save(nodeLayout.maxErosionWidth, MaxErosionWidthLabel);
+            writer.Save(edgeLayout.edgesAboveBlocks, EdgesAboveBlocksLabel);
+            writer.Save(edgeLayout.tension, TensionLabel);
+            writer.Save(edgeLayout.rdp, RDPLabel);
 
-            CoseGraphSettings.Save(writer, CoseGraphSettingsLabel);
+            coseGraphSettings.Save(writer, CoseGraphSettingsLabel);
         }
 
         /// <summary>
@@ -136,19 +134,19 @@ namespace SEE.Game
         /// <param name="attributes">dictionary containing the attributes (key = attribute label, value = attribute value)</param>
         protected virtual void Restore(Dictionary<string, object> attributes)
         {
-            ConfigIO.Restore<float>(attributes, LODCullingLabel, ref LODCulling);
-            LayoutPath.Restore(attributes, LayoutPathLabel);
+            ConfigIO.Restore(attributes, LODCullingLabel, ref globalAttributes.lodCulling);
+            globalAttributes.layoutPath.Restore(attributes, LayoutPathLabel);
             ConfigIO.Restore(attributes, HierarchicalEdgesLabel, ref HierarchicalEdges);
             ConfigIO.Restore(attributes, NodeTypesLabel, ref SelectedNodeTypes);
             CityPath.Restore(attributes, CityPathLabel);
-            LeafNodeColorRange.Restore(attributes, LeafNodeColorRangeLabel);
-            InnerNodeColorRange.Restore(attributes, InnerNodeColorRangeLabel);
-            ConfigIO.Restore(attributes, WidthMetricLabel, ref WidthMetric);
-            ConfigIO.Restore(attributes, HeightMetricLabel, ref HeightMetric);
-            ConfigIO.Restore(attributes, DepthMetricLabel, ref DepthMetric);
-            ConfigIO.Restore(attributes, LeafStyleMetricLabel, ref LeafStyleMetric);
-            LeafLabelSettings.Restore(attributes, LeafLabelSettingsLabel);
-            InnerNodeLabelSettings.Restore(attributes, InnerNodeLabelSettingsLabel);
+            leafNodeAttributes.colorRange.Restore(attributes, LeafNodeColorRangeLabel);
+            innerNodeAttributes.colorRange.Restore(attributes, InnerNodeColorRangeLabel);
+            ConfigIO.Restore(attributes, WidthMetricLabel, ref leafNodeAttributes.widthMetric);
+            ConfigIO.Restore(attributes, HeightMetricLabel, ref leafNodeAttributes.heightMetric);
+            ConfigIO.Restore(attributes, DepthMetricLabel, ref leafNodeAttributes.depthMetric);
+            ConfigIO.Restore(attributes, LeafStyleMetricLabel, ref leafNodeAttributes.styleMetric);
+            leafNodeAttributes.labelSettings.Restore(attributes, LeafLabelSettingsLabel);
+            innerNodeAttributes.labelSettings.Restore(attributes, InnerNodeLabelSettingsLabel);
 
             ConfigIO.Restore(attributes, StyleIssueLabel, ref StyleIssue);
             ConfigIO.Restore(attributes, UniversalIssueLabel, ref UniversalIssue);
@@ -167,27 +165,27 @@ namespace SEE.Game
             ConfigIO.Restore(attributes, ArchitectureIssue_SUMLabel, ref ArchitectureIssue_SUM);
 
             ConfigIO.Restore(attributes, InnerDonutMetricLabel, ref InnerDonutMetric);
-            ConfigIO.Restore(attributes, InnerNodeHeightMetricLabel, ref InnerNodeHeightMetric);
-            ConfigIO.Restore(attributes, InnerNodeStyleMetricLabel, ref InnerNodeStyleMetric);
+            ConfigIO.Restore(attributes, InnerNodeHeightMetricLabel, ref innerNodeAttributes.heightMetric);
+            ConfigIO.Restore(attributes, InnerNodeStyleMetricLabel, ref innerNodeAttributes.styleMetric);
 
             ConfigIO.Restore(attributes, MinimalBlockLengthLabel, ref MinimalBlockLength);
             ConfigIO.Restore(attributes, MaximalBlockLengthLabel, ref MaximalBlockLength);
 
-            ConfigIO.RestoreEnum<LeafNodeKinds>(attributes, LeafObjectsLabel, ref LeafObjects);
-            ConfigIO.RestoreEnum<InnerNodeKinds>(attributes, InnerNodeObjectsLabel, ref InnerNodeObjects);
+            ConfigIO.RestoreEnum(attributes, LeafObjectsLabel, ref nodeLayout.leafKind);
+            ConfigIO.RestoreEnum(attributes, InnerNodeObjectsLabel, ref nodeLayout.innerKind);
 
-            ConfigIO.RestoreEnum<NodeLayoutKind>(attributes, NodeLayoutLabel, ref NodeLayout);
-            ConfigIO.RestoreEnum<EdgeLayoutKind>(attributes, EdgeLayoutLabel, ref EdgeLayout);
+            ConfigIO.RestoreEnum(attributes, NodeLayoutLabel, ref nodeLayout.kind);
+            ConfigIO.RestoreEnum(attributes, EdgeLayoutLabel, ref edgeLayout.kind);
 
-            ConfigIO.Restore(attributes, ZScoreScaleLabel, ref ZScoreScale);
-            ConfigIO.Restore(attributes, EdgeWidthLabel, ref EdgeWidth);
-            ConfigIO.Restore(attributes, ShowErosionsLabel, ref ShowErosions);
-            ConfigIO.Restore(attributes, MaxErosionWidthLabel, ref MaxErosionWidth);
-            ConfigIO.Restore(attributes, EdgesAboveBlocksLabel, ref EdgesAboveBlocks);
-            ConfigIO.Restore(attributes, TensionLabel, ref Tension);
-            ConfigIO.Restore(attributes, RDPLabel, ref RDP);
+            ConfigIO.Restore(attributes, ZScoreScaleLabel, ref nodeLayout.zScoreScale);
+            ConfigIO.Restore(attributes, EdgeWidthLabel, ref edgeLayout.edgeWidth);
+            ConfigIO.Restore(attributes, ShowErosionsLabel, ref nodeLayout.showErosions);
+            ConfigIO.Restore(attributes, MaxErosionWidthLabel, ref nodeLayout.maxErosionWidth);
+            ConfigIO.Restore(attributes, EdgesAboveBlocksLabel, ref edgeLayout.edgesAboveBlocks);
+            ConfigIO.Restore(attributes, TensionLabel, ref edgeLayout.tension);
+            ConfigIO.Restore(attributes, RDPLabel, ref edgeLayout.rdp);
 
-            CoseGraphSettings.Restore(attributes, CoseGraphSettingsLabel);
+            coseGraphSettings.Restore(attributes, CoseGraphSettingsLabel);
         }
     }
 }
