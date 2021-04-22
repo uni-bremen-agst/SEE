@@ -69,7 +69,7 @@ public class GlobalActionHistory
             {
                 // Overwrites the running action with finished reversibleAction - necessary for listing all manipulated gameObjects. 
                 Tuple<string, HistoryType, ReversibleAction, List<string>> lastAction = FindLastActionOfPlayer(allActiveActions.ElementAt(i).Key, HistoryType.action).Item1;
-                DeleteItem(allActiveActions.ElementAt(i).Value.Id());
+                DeleteItem(allActiveActions.ElementAt(i).Value.GetId());
                 lastAction = new Tuple<string, HistoryType, ReversibleAction, List<string>>(lastAction.Item1, lastAction.Item2, allActiveActions.ElementAt(i).Value, allActiveActions.ElementAt(i).Value.GetChangedObjects());
                 Push(lastAction);
                 Execute(allActiveActions.ElementAt(i).Value.NewInstance(), allActiveActions.ElementAt(i).Key);
@@ -156,7 +156,7 @@ public class GlobalActionHistory
     {
         for (int i = 0; i < allActionsList.Count; i++)
         {
-            if (allActionsList[i].Item3.Id().Equals(id))
+            if (allActionsList[i].Item3.GetId().Equals(id))
             {
                 allActionsList.RemoveAt(i);
                 return;
@@ -177,7 +177,7 @@ public class GlobalActionHistory
             GetActiveAction(userid).Stop();
             if (allActionsList.Count > 1)
             {
-                DeleteItem(lastAction.Item1.Item3.Id());
+                DeleteItem(lastAction.Item1.Item3.GetId());
                 lastAction = FindLastActionOfPlayer(userid, HistoryType.action);
                 SetActiveAction(userid, lastAction.Item1.Item3);
             }
@@ -189,7 +189,7 @@ public class GlobalActionHistory
         }
         GetActiveAction(userid).Stop();
         GetActiveAction(userid).Undo();
-        DeleteItem(lastAction.Item1.Item3.Id());
+        DeleteItem(lastAction.Item1.Item3.GetId());
         Tuple<string, HistoryType, ReversibleAction, List<string>> undoneAction = new Tuple<string, HistoryType, ReversibleAction, List<string>>
             (userid, HistoryType.undoneAction, lastAction.Item1.Item3, lastAction.Item1.Item4);
         Push(undoneAction);
@@ -215,10 +215,10 @@ public class GlobalActionHistory
         lastUndoneAction.Item1.Item3.Start();
 
         // I think this doesnt work so far, sometimes, active action will not be set new.
-        Debug.Log(allActiveActions.ElementAt(0).Value.Id());
+        Debug.Log(allActiveActions.ElementAt(0).Value.GetId());
         SetActiveAction(userid, lastUndoneAction.Item1.Item3);
-        Debug.Log(allActiveActions.ElementAt(0).Value.Id());
-        DeleteItem(lastUndoneAction.Item1.Item3.Id());
+        Debug.Log(allActiveActions.ElementAt(0).Value.GetId());
+        DeleteItem(lastUndoneAction.Item1.Item3.GetId());
     }
 
     /// <summary>

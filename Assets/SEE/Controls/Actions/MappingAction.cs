@@ -1021,7 +1021,7 @@ namespace SEE.Controls.Actions
             throw new System.NotImplementedException();
         }
 
-        public string Id()
+        public string GetId()
         {
             throw new NotImplementedException();
         }
