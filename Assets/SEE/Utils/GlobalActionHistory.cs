@@ -58,7 +58,6 @@ public class GlobalActionHistory
         // Whenever a new action is excuted, we consider the redo stack lost.
         if (isRedo)
         {
-            Debug.Log("DELETE REDOS");
             DeleteAllRedos();
         }
     }
@@ -181,7 +180,6 @@ public class GlobalActionHistory
     {
         Tuple<bool, HistoryType, ReversibleAction, List<string>> lastAction = FindLastActionOfPlayer(true, HistoryType.action);
         if(lastAction == null) return;
-        Debug.Log(activeAction.HadEffect());
         while (!activeAction.HadEffect())
         {
             activeAction.Stop();
@@ -191,7 +189,6 @@ public class GlobalActionHistory
                 lastAction = FindLastActionOfPlayer(true, HistoryType.action);
                 if (lastAction == null) return;
                 activeAction = lastAction.Item3;
-                Debug.Log(activeAction.HadEffect());
             }
             else
             {
@@ -199,7 +196,6 @@ public class GlobalActionHistory
                 return;
             }
         }
-        Debug.Log(activeAction);
         activeAction?.Stop();
         activeAction?.Undo();
         DeleteItem(lastAction.Item3.GetId());
