@@ -23,7 +23,7 @@ namespace SEE.Controls.Actions
             bool result = false;
 
             // FIXME: Needs adaptation for VR where no mouse is available.
-            if (Input.GetMouseButtonDown(0) 
+            if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
             {
                 // the hit object is the parent in which to create the new node
@@ -118,7 +118,7 @@ namespace SEE.Controls.Actions
             }
             result.y = 0.01f;
             return result;
-        }       
+        }
 
         /// <summary>
         /// Undoes this AddNodeAction.
@@ -176,7 +176,13 @@ namespace SEE.Controls.Actions
 
         public override List<string> GetChangedObjects()
         {
-            return new List<string>();
+            List<string> changedObjects = new List<string>
+            {
+                memento.Parent.name,
+                memento.NodeID
+            };
+
+            return changedObjects;
         }
     }
 }

@@ -224,11 +224,12 @@ namespace SEE.Controls.Actions
 
         public override List<string> GetChangedObjects()
         {
-            List<string> changedObjects = new List<string>();
-
-            changedObjects.Add(memento.from.name);
-            changedObjects.Add(memento.to.name);
-            changedObjects.Add(createdEdge.name);
+            List<string> changedObjects = new List<string>
+            {
+                memento.from.name,
+                memento.to.name,
+                createdEdge.name
+            };
 
             return changedObjects;
         }

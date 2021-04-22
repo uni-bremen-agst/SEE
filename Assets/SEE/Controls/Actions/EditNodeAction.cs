@@ -190,7 +190,12 @@ namespace SEE.Controls.Actions
 
         public override List<string> GetChangedObjects()
         {
-            throw new System.NotImplementedException();
+            List<string> changedObjects = new List<string>
+            {
+                memento.node.ID
+            };
+
+            return changedObjects;
         }
 
         /// <summary>

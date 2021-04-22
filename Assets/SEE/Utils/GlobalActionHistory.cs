@@ -62,7 +62,6 @@ public class GlobalActionHistory
     /// </summary>
     public void Update()
     {
-        Debug.Log(allActionsList.Count);
         for (int i = 0; i < allActiveActions.Count; i++)
         {
             if (allActiveActions.ElementAt(i).Value.Update() && allActiveActions.ElementAt(i).Value.HadEffect())
@@ -215,9 +214,7 @@ public class GlobalActionHistory
         lastUndoneAction.Item1.Item3.Start();
 
         // I think this doesnt work so far, sometimes, active action will not be set new.
-        Debug.Log(allActiveActions.ElementAt(0).Value.GetId());
         SetActiveAction(userid, lastUndoneAction.Item1.Item3);
-        Debug.Log(allActiveActions.ElementAt(0).Value.GetId());
         DeleteItem(lastUndoneAction.Item1.Item3.GetId());
     }
 

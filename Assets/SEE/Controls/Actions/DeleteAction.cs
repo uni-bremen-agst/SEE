@@ -6,6 +6,7 @@ using SEE.Net;
 using SEE.Utils;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -443,7 +444,21 @@ namespace SEE.Controls.Actions
 
         public override List<string> GetChangedObjects()
         {
-            throw new System.NotImplementedException();
+            List<string> changedObjects = new List<string>();
+            foreach(GameObject deletedNode in deletedNodes.Keys)
+            {
+                changedObjects.Add(deletedNode.name);
+            }
+            foreach (GameObject deletedEdge in deletedEdges.Keys)
+            {
+                changedObjects.Add(deletedEdge.name);
+            }
+            foreach (GameObject deletedObject in explicitlyDeletedNodesAndEdges)
+            {
+                changedObjects.Add(deletedObject.name);
+            }
+
+            return changedObjects.Distinct().ToList();
         }
     }
 }
