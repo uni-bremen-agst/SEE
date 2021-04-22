@@ -1025,9 +1025,8 @@ GameObject:
   - component: {fileID: 551180598}
   - component: {fileID: 551180597}
   - component: {fileID: 551180596}
-  - component: {fileID: 551180595}
-  - component: {fileID: 551180593}
   - component: {fileID: 551180592}
+  - component: {fileID: 551180593}
   m_Layer: 0
   m_Name: SEECity Evolution
   m_TagString: Code City
@@ -1056,7 +1055,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 551180591}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 253abae38e5d8014abb73913836a3d5f, type: 3}
+  m_Script: {fileID: 11500000, guid: df55a01401a3f0c409a28477c4a418c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   serializationData:
@@ -1195,13 +1194,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.5821022
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.9086448
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.9716981
     - Name: 
       Entry: 4
       Data: 1
@@ -1213,13 +1212,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
       Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0.921568632
-    - Name: 
-      Entry: 4
-      Data: 0.0156862754
     - Name: 
       Entry: 4
       Data: 1
@@ -1381,369 +1380,6 @@ MonoBehaviour:
     relativePath: 
     absolutePath: 
   WidthMetric: Metric.Number_of_Tokens
-  HeightMetric: Metric.Clone_Rate
-  DepthMetric: Metric.LOC
-  LeafStyleMetric: Metric.Complexity
-  ArchitectureIssue: Metric.Architecture_Violations
-  CloneIssue: Metric.Clone
-  CycleIssue: Metric.Cycle
-  Dead_CodeIssue: Metric.Dead_Code
-  MetricIssue: Metric.Metric
-  StyleIssue: Metric.Style
-  UniversalIssue: Metric.Universal
-  ArchitectureIssue_SUM: Metric.Architecture_Violations_SUM
-  CloneIssue_SUM: Metric.Clone_SUM
-  CycleIssue_SUM: Metric.Cycle_SUM
-  Dead_CodeIssue_SUM: Metric.Dead_Code_SUM
-  MetricIssue_SUM: Metric.Metric_SUM
-  StyleIssue_SUM: Metric.Style_SUM
-  UniversalIssue_SUM: Metric.Universal_SUM
-  InnerDonutMetric: Metric.IssuesTotal
-  InnerNodeHeightMetric: 
-  InnerNodeStyleMetric: Metric.IssuesTotal
-  MinimalBlockLength: 0.1
-  MaximalBlockLength: 100
-  LeafObjects: 0
-  InnerNodeObjects: 0
-  NodeLayout: 0
-  EdgeLayout: 0
-  ZScoreScale: 1
-  EdgeWidth: 0.1
-  ShowErosions: 0
-  MaxErosionWidth: 1
-  EdgesAboveBlocks: 1
-  Tension: 0.85
-  RDP: 0.05
-  TubularSegments: 50
-  Radius: 0.005
-  RadialSegments: 8
-  isEdgeSelectable: 1
-  GXLPath:
-    Root: 2
-    relativePath: 
-    absolutePath: 
-  CSVPath:
-    Root: 2
-    relativePath: 
-    absolutePath: 
---- !u!114 &551180595
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 551180591}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df55a01401a3f0c409a28477c4a418c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  serializationData:
-    SerializedFormat: 2
-    SerializedBytes: 
-    ReferencedUnityObjects: []
-    SerializedBytesString: 
-    Prefab: {fileID: 0}
-    PrefabModificationsReferencedUnityObjects: []
-    PrefabModifications: []
-    SerializationNodes:
-    - Name: LayoutPath
-      Entry: 7
-      Data: 0|SEE.Game.DataPath, SEE
-    - Name: Root
-      Entry: 3
-      Data: 2
-    - Name: relativePath
-      Entry: 1
-      Data: 
-    - Name: absolutePath
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: HierarchicalEdges
-      Entry: 7
-      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
-    - Name: 
-      Entry: 12
-      Data: 4
-    - Name: 
-      Entry: 1
-      Data: Enclosing
-    - Name: 
-      Entry: 1
-      Data: Belongs_To
-    - Name: 
-      Entry: 1
-      Data: Part_Of
-    - Name: 
-      Entry: 1
-      Data: Defined_In
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: SelectedNodeTypes
-      Entry: 7
-      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Directory
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: File
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: 
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: CityPath
-      Entry: 7
-      Data: 4|SEE.Game.DataPath, SEE
-    - Name: Root
-      Entry: 3
-      Data: 1
-    - Name: relativePath
-      Entry: 1
-      Data: 
-    - Name: absolutePath
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LeafNodeColorRange
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 15
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: InnerNodeColorRange
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.392156869
-    - Name: 
-      Entry: 4
-      Data: 0.392156869
-    - Name: 
-      Entry: 4
-      Data: 0.392156869
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LeafLabelSettings
-      Entry: 7
-      Data: 5|SEE.Game.LabelSettings, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationDuration
-      Entry: 4
-      Data: 0.5
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: InnerNodeLabelSettings
-      Entry: 7
-      Data: 6|SEE.Game.LabelSettings, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationDuration
-      Entry: 4
-      Data: 0.5
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: CoseGraphSettings
-      Entry: 7
-      Data: 7|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
-    - Name: EdgeLength
-      Entry: 3
-      Data: 20
-    - Name: UseSmartIdealEdgeCalculation
-      Entry: 5
-      Data: false
-    - Name: UseSmartMultilevelScaling
-      Entry: 5
-      Data: false
-    - Name: PerLevelIdealEdgeLengthFactor
-      Entry: 4
-      Data: 0.1
-    - Name: UseSmartRepulsionRangeCalculation
-      Entry: 5
-      Data: false
-    - Name: GravityStrength
-      Entry: 4
-      Data: 0.8
-    - Name: CompoundGravityStrength
-      Entry: 4
-      Data: 1.5
-    - Name: RepulsionStrength
-      Entry: 4
-      Data: 50
-    - Name: MultiLevelScaling
-      Entry: 5
-      Data: false
-    - Name: ListInnerNodeToggle
-      Entry: 6
-      Data: 
-    - Name: InnerNodeLayout
-      Entry: 6
-      Data: 
-    - Name: InnerNodeShape
-      Entry: 6
-      Data: 
-    - Name: LoadedForNodeTypes
-      Entry: 6
-      Data: 
-    - Name: UseCalculationParameter
-      Entry: 5
-      Data: false
-    - Name: UseIterativeCalculation
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-  LODCulling: 0.01
-  LayoutPath:
-    Root: 2
-    relativePath: 
-    absolutePath: 
-  CityPath:
-    Root: 1
-    relativePath: 
-    absolutePath: 
-  WidthMetric: Metric.Number_of_Tokens
   HeightMetric: Metric.LOC
   DepthMetric: Metric.Number_of_Tokens
   LeafStyleMetric: Metric.Clone_Rate
@@ -1762,7 +1398,7 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
-  InnerNodeHeightMetric: 0.1
+  InnerNodeHeightMetric: 0.001
   InnerNodeStyleMetric: Metric.Level
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
@@ -1776,7 +1412,7 @@ MonoBehaviour:
   MaxErosionWidth: 1
   EdgesAboveBlocks: 1
   Tension: 0.85
-  RDP: 0.0005
+  RDP: 0.05
   TubularSegments: 50
   Radius: 0.005
   RadialSegments: 8
@@ -1784,13 +1420,13 @@ MonoBehaviour:
   MaxRevisionsToLoad: 500
   GXLDirectory:
     Root: 1
-    relativePath: /Data/GXL/animation-clones-log4j
+    relativePath: /Data/GXL/animation-clones-SEE
     absolutePath: 
   MarkerHeight: 0.2
   MarkerWidth: 0.01
   AdditionBeamColor: {r: 0, g: 1, b: 0, a: 1}
   ChangeBeamColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  DeletionBeamColor: {r: 1, g: 0, b: 0, a: 1}
+  DeletionBeamColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!114 &551180596
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3511,11 +3147,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68cd993404524eb45918638d10b68356, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useInOfflineMode: 1
-  hostServer: 0
-  remoteServerIPAddress: 
+  useInOfflineMode: 0
+  hostServer: 1
+  remoteServerIPAddress: 192.168.178.120
   localServerPort: 55555
-  remoteServerPort: 0
+  remoteServerPort: 55555
   loadCityOnStart: 0
   networkCommsLoggingEnabled: 0
   internalLoggingEnabled: 1
