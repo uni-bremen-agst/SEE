@@ -191,8 +191,8 @@ namespace SEE.Controls.Actions
         private static bool LabelsEnabled(AbstractSEECity city, bool isLeaf)
         {
             // For leaves, we don't want to display labels if code is already shown for the node.
-            return isLeaf && city.LeafLabelSettings.Show && !ActionState.Is(ActionStateType.ShowCode) 
-                   || !isLeaf && city.InnerNodeLabelSettings.Show;
+            return isLeaf && city.leafNodeAttributes.labelSettings.Show && !ActionState.Is(ActionStateType.ShowCode) 
+                   || !isLeaf && city.innerNodeAttributes.labelSettings.Show;
         }
 
         /// <summary>
@@ -246,7 +246,7 @@ namespace SEE.Controls.Actions
             // We define starting and ending positions for the animation
             Vector3 startLabelPosition = gameObject.transform.position;
             nodeLabel = TextFactory.GetTextWithSize(shownText, startLabelPosition,
-                                                    (isLeaf ? city.LeafLabelSettings : city.InnerNodeLabelSettings).FontSize, 
+                                                    (isLeaf ? city.leafNodeAttributes.labelSettings : city.innerNodeAttributes.labelSettings).FontSize, 
                                                     textColor: Color.black.ColorWithAlpha(0f));
             nodeLabel.name = $"Label {shownText}";
             nodeLabel.transform.SetParent(gameObject.transform);
@@ -300,7 +300,7 @@ namespace SEE.Controls.Actions
             const float endAlpha = 1f;  // Alpha value the text and line will have at the end of the animation.
             const float lineStartAlpha = endAlpha * 0.5f;  // Alpha value the start of the line should have.
             Vector3 endLabelPosition = nodeLabel.transform.position;
-            endLabelPosition.y += (isLeaf ? city.LeafLabelSettings : city.InnerNodeLabelSettings).Distance;
+            endLabelPosition.y += (isLeaf ? city.leafNodeAttributes.labelSettings : city.innerNodeAttributes.labelSettings).Distance;
             // Due to the line not using world space, we need to transform its position accordingly
             Vector3 endLinePosition = edge.transform.InverseTransformPoint(endLabelPosition);
             float nodeTopPosition = nodeLabel.GetComponent<TextMeshPro>().textBounds.extents.y;
@@ -412,7 +412,7 @@ namespace SEE.Controls.Actions
         private float AnimationDuration(bool isLeaf, AbstractSEECity city = null)
         {
             city = city ?? City();
-            return (isLeaf ? city.LeafLabelSettings : city.InnerNodeLabelSettings).AnimationDuration;
+            return (isLeaf ? city.leafNodeAttributes.labelSettings : city.innerNodeAttributes.labelSettings).AnimationDuration;
         }
 
         /// <summary>

@@ -681,7 +681,7 @@ namespace SEE.Game
                 // Searches for pairs between old and new edges
                 matchedEdges =  EdgeMatcher(oldEdges,newEdges);              
                 // Case distinction in case the layout does not need sample points
-                if(!graphRenderer.GetSettings().EdgeLayout.Equals(SEE.Layout.EdgeLayouts.EdgeLayoutKind.Straight))
+                if(!graphRenderer.GetSettings().edgeLayout.kind.Equals(EdgeLayoutKind.Straight))
                 {
                     foreach((GameObject oldEdge, GameObject newEdge) in matchedEdges)
                     {
