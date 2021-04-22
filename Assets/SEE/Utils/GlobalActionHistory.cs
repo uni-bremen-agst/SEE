@@ -52,8 +52,8 @@ public class GlobalActionHistory
         SetActiveAction(key, action);
         action.Awake();
         action.Start();
-        // Whenever a new action is excuted, we consider the redo stack lost.
 
+        // Whenever a new action is excuted, we consider the redo stack lost.
         if (isRedo) DeleteAllRedos(key);
     }
 
@@ -62,15 +62,12 @@ public class GlobalActionHistory
     /// </summary>
     public void Update()
     {
-        //Debug.Log(activeAction.Count);
-        //Debug.Log(actionList.Count);
         for (int i = 0; i < allActiveActions.Count; i++)
         {
             if (allActiveActions.ElementAt(i).Value.Update() && allActiveActions.ElementAt(i).Value.HadEffect())
             {
                 // Overwrites the running action with finished reversibleAction - necessary for listing all manipulated gameObjects. 
                 Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>, string> lastAction = FindLastActionOfPlayer(allActiveActions.ElementAt(i).Key, HistoryType.action).Item1;
-                // Question: Timestamp not unique enough ?
                 DeleteItem(allActiveActions.ElementAt(i).Key, lastAction.Item6);
                 lastAction = new Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>, string>(DateTime.Now, lastAction.Item2, lastAction.Item3, allActiveActions.ElementAt(i).Value, allActiveActions.ElementAt(i).Value.GetChangedObjects(), allActiveActions.ElementAt(i).Value.Id());
                 Push(lastAction);
@@ -83,12 +80,10 @@ public class GlobalActionHistory
     /// <summary>
     /// Pushes new actions to the <see cref="allActionsList"/>
     /// </summary>
-    /// <param name="action"></param>
+    /// <param name="action">The action and all of its specific values which are needed for the history</param>
     private void Push(Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>, string> action)
     {
         allActionsList.Add(action);
-        // Fixme: Count Undo-Stack for redo
-        // Fixme: Max size..?
     }
 
     /// <summary>
@@ -96,27 +91,25 @@ public class GlobalActionHistory
     /// </summary>
     /// <param name="playerID">The player that wants to perform an undo/redo</param>
     /// <param name="type">the type of action he wants to perform</param>
-    /// <returns>A tuple of the latest users action and if any later done action blocks the undo (True if some action is blocking || false if not)</returns>  // Returns as second in the tuple that so each action could check it on its own >> List<ReversibleAction>>
+    /// <returns>A tuple of the latest users action and if any later done action blocks the undo (True if some action is blocking || false if not)</returns>  
+    /// Returns as second in the tuple that so each action could check it on its own >> List<ReversibleAction>>
     private Tuple<Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>, string>, bool> FindLastActionOfPlayer(string playerID, HistoryType type)
     {
         Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>, string> result = null;
 
         for (int i = allActionsList.Count - 1; i > 0; i--)
         {
-            //Debug.Log("AnzahlDurchläufe");
             if ((type == HistoryType.undoneAction && allActionsList[i].Item3 == HistoryType.undoneAction)
                 || (type == HistoryType.action && allActionsList[i].Item3 == HistoryType.action)
                 && allActionsList[i].Item2 == playerID)
             {
-                result = allActionsList[i]; //FIXME: Somehow these data has to be deleted from the list, but not sure then to do it 
-                //Debug.Log(result);
+                result = allActionsList[i];
                 break;
             }
         }
         if (result == null)
         {
-            // PROBLEM: DIESER PART WIRD ERREICHT WENN DIE LETZTE ACTION UNDONE WIRD
-            Debug.Log("problem");
+            // Should´nt be reached.
             result = allActionsList[0];
         }
         // Fixme: Outsourcing to another function
@@ -160,7 +153,7 @@ public class GlobalActionHistory
     /// Deletes an Item from the Action list depending on Time and Userid
     /// </summary>
     /// <param name="userid">the user for the action that should be deleted</param>
-    /// <param name="time">the time of the action which should be deleted</param>
+    /// <param name="id">the id of the action which should be deleted</param>
     private void DeleteItem(string userid, string id)
     {
         for (int i = 0; i < allActionsList.Count; i++)
@@ -186,17 +179,13 @@ public class GlobalActionHistory
             i++;
             Debug.Log(i + test.Item4.ToString() + test.Item3 + "  " +  test.Item6);
         }
-        Tuple<Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>, string>, bool> lastAction;
-        //Should be the same as getActiveAction - test ?
-        lastAction = FindLastActionOfPlayer(userid, HistoryType.action);
-        //Debug.Log("vorher" + allActionsList.Count);
+        Tuple<Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>, string>, bool> lastAction = FindLastActionOfPlayer(userid, HistoryType.action);
+
         while (!GetActiveAction(userid).HadEffect())
         {
-            //Debug.Log(allActionsList.Count);
             GetActiveAction(userid).Stop();
             if (allActionsList.Count > 1)
             {
-                // DELETION OF ALL REDO?
                 DeleteItem(userid, lastAction.Item1.Item6);
                 lastAction = FindLastActionOfPlayer(userid, HistoryType.action);
                 SetActiveAction(userid, lastAction.Item1.Item4);
@@ -214,10 +203,8 @@ public class GlobalActionHistory
             (DateTime.Now, userid, HistoryType.undoneAction, lastAction.Item1.Item4, lastAction.Item1.Item5, lastAction.Item1.Item4.Id());
         Push(undoneAction);
         lastAction = FindLastActionOfPlayer(userid, HistoryType.action);
-        // Problem: If there are the last action and the move-state - setActiveAction sets to move instead of last action. Thats the reason why
-        // last undo doesnt work.
+
         SetActiveAction(userid, lastAction.Item1.Item4);
-        // isRedo = true;
         GetActiveAction(userid)?.Start();
     }
 
@@ -231,13 +218,12 @@ public class GlobalActionHistory
 
         Tuple<Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>, string>, bool> lastUndoneAction = FindLastActionOfPlayer(userid, HistoryType.undoneAction);
 
-        // With the result we need to calculate whether we can du undo or not and what changes the gameobject need
         lastUndoneAction.Item1.Item4.Redo();
         Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>, string> redoneAction = new Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>, string>(DateTime.Now, userid, HistoryType.action, lastUndoneAction.Item1.Item4, lastUndoneAction.Item1.Item5, lastUndoneAction.Item1.Item4.Id());
         Push(redoneAction);
         lastUndoneAction.Item1.Item4.Start();
 
-        SetActiveAction(userid, lastUndoneAction.Item1.Item4); // Fixme: Is action right here?
+        SetActiveAction(userid, lastUndoneAction.Item1.Item4);
         DeleteItem(userid, lastUndoneAction.Item1.Item6);
     }
 
@@ -266,11 +252,9 @@ public class GlobalActionHistory
     /// <param name="action">the new active action</param>
     private void SetActiveAction(string player, ReversibleAction action)
     {
-        // Hint: In case of not existing key, the dictionary adds a new keyvaluepair to activeAction automatically (No exception was thrown).
         try
         {
             allActiveActions[player] = action;
-            //Debug.Log(action.ToString());
         }
         catch (KeyNotFoundException)
         {
