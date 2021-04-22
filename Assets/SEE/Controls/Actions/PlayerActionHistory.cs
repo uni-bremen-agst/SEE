@@ -25,10 +25,9 @@
         /// </summary>
         public static void Undo()
         {
-            if (!history.NoActionsLeft())
-            {
+
                 history.Undo(); 
-            }
+
         }
 
         /// <summary>
@@ -36,10 +35,9 @@
         /// </summary>
         public static void Redo()
         {
-            if (!history.NoUndoneActionsLeft())
-            {
+
                 history.Redo(); 
-            }
+
         }
 
         /// <summary>
