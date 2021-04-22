@@ -94,8 +94,8 @@ namespace SEE.Utils
         /// <summary>
         /// Getter for the ID of the specific action.
         /// </summary>
-        /// <returns></returns>
-        string Id();
+        /// <returns>the id of a specific action</returns>
+        string GetId();
 
         /// <summary>
         /// True if this action has had an effect that may need to be undone. Actions may

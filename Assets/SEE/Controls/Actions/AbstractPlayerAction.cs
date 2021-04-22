@@ -10,12 +10,10 @@ namespace SEE.Controls.Actions
     /// </summary>
     public abstract class AbstractPlayerAction : ReversibleAction
     {
-
+        /// <summary>
+        /// The unique id of an action.
+        /// </summary>
         private readonly string id = RandomStrings.Get(30);
-        string ReversibleAction.Id()
-        {
-            return id;
-        }
 
         /// <summary>
         /// The object that the cursor hovers over.
@@ -177,5 +175,14 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <returns>All id´s of manipulated gameObjects</returns>
         public abstract List<string> GetChangedObjects();
+
+        /// <summary>
+        /// A getter for the id of a specific action.
+        /// </summary>
+        /// <returns></returns>
+        string ReversibleAction.GetId()
+        {
+            return id;
+        }
     }
 }

@@ -115,7 +115,7 @@ namespace SEETests
                 throw new System.NotImplementedException();
             }
 
-            public string Id()
+            public string GetId()
             {
                 throw new System.NotImplementedException();
             }
@@ -429,7 +429,7 @@ namespace SEETests
                 throw new System.NotImplementedException();
             }
 
-            public string Id()
+            public string GetId()
             {
                 throw new System.NotImplementedException();
             }
