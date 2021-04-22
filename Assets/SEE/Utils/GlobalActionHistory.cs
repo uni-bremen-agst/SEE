@@ -21,16 +21,16 @@ public class GlobalActionHistory
     private bool isRedo = false;
 
     /// <summary>
-    /// The actionList it has an Tupel of the Player ID, The type of the Action (Undo Redo Action), the ReversibleAction, the list with the ids of the manipulated GameObjects.
+    /// The actionList it has an Tupel of a bool Isowner, The type of the Action (Undo Redo Action), the ReversibleAction, the list with the ids of the manipulated GameObjects.
     /// A ringbuffer
     /// </summary>
-    private List<Tuple<string, HistoryType, ReversibleAction, List<string>>> allActionsList = new List<Tuple<string, HistoryType, ReversibleAction, List<string>>>();
+    private List<Tuple<bool, HistoryType, ReversibleAction, List<string>>> allActionsList = new List<Tuple<bool, HistoryType, ReversibleAction, List<string>>>();
 
     /// <summary>
     /// Contains the Active Action from each Player needs to be updated with each undo/redo/action
     /// </summary>
-    private Dictionary<string, ReversibleAction> allActiveActions = new Dictionary<string, ReversibleAction>();
- 
+    //private Dictionary<string, ReversibleAction> allActiveActions = new Dictionary<string, ReversibleAction>();
+    private ReversibleAction activeAction = null;
     /// <summary>
     /// Let C be the currently executed action (if there is any) in this action history. 
     /// Then <see cref="ReversibleAction.Stop"/> will be called for C. After that 
@@ -45,11 +45,13 @@ public class GlobalActionHistory
     /// Precondition: <paramref name="action"/> is not already present in the action history.
     /// </summary>
     /// <param name="action">the action to be executed</param>
-    public void Execute(ReversibleAction action, string key)
+    public void Execute(ReversibleAction action)
     {
-        GetActiveAction(key)?.Stop();
-        Push(new Tuple<string, HistoryType, ReversibleAction, List<string>>(key, HistoryType.action, action, null));
-        SetActiveAction(key, action);
+        //GetActiveAction(key)?.Stop();
+        activeAction?.Stop();
+        Push(new Tuple<bool, HistoryType, ReversibleAction, List<string>>(true, HistoryType.action, action, null));
+        //SetActiveAction(key, action);
+        activeAction = action;
         action.Awake();
         action.Start();
 
@@ -57,7 +59,7 @@ public class GlobalActionHistory
         if (isRedo)
         {
             Debug.Log("DELETE REDOS");
-            DeleteAllRedos(key);
+            DeleteAllRedos();
         }
     }
 
@@ -66,7 +68,7 @@ public class GlobalActionHistory
     /// </summary>
     public void Update()
     {
-        for (int i = 0; i < allActiveActions.Count; i++)
+        /*for (int i = 0; i < allActiveActions.Count; i++)
         {
             if (allActiveActions.ElementAt(i).Value.Update() && allActiveActions.ElementAt(i).Value.HadEffect())
             {
@@ -78,6 +80,16 @@ public class GlobalActionHistory
                 Push(lastAction);
                 Execute(allActiveActions.ElementAt(i).Value.NewInstance(), allActiveActions.ElementAt(i).Key);
             }
+        }*/
+
+        if(activeAction.Update() && activeAction.HadEffect())
+        {
+            Tuple<bool, HistoryType, ReversibleAction, List<string>> lastAction = FindLastActionOfPlayer(true, HistoryType.action);
+            if (lastAction == null) return;
+            DeleteItem(activeAction.GetId());
+            lastAction = new Tuple<bool, HistoryType, ReversibleAction, List<string>>(lastAction.Item1, lastAction.Item2, activeAction, activeAction.GetChangedObjects());
+            Push(lastAction);
+            Execute(activeAction.NewInstance());
         }
     }
 
@@ -85,7 +97,7 @@ public class GlobalActionHistory
     /// Pushes new actions to the <see cref="allActionsList"/>
     /// </summary>
     /// <param name="action">The action and all of its specific values which are needed for the history</param>
-    private void Push(Tuple<string, HistoryType, ReversibleAction, List<string>> action)
+    private void Push(Tuple<bool, HistoryType, ReversibleAction, List<string>> action)
     {
         allActionsList.Add(action);
     }
@@ -97,24 +109,19 @@ public class GlobalActionHistory
     /// <param name="type">the type of action he wants to perform</param>
     /// <returns>A tuple of the latest users action and if any later done action blocks the undo (True if some action is blocking || false if not)</returns>  
     /// Returns as second in the tuple that so each action could check it on its own >> List<ReversibleAction>> Returns Null if no action was found
-    private Tuple<Tuple<string, HistoryType, ReversibleAction, List<string>>, bool> FindLastActionOfPlayer(string playerID, HistoryType type)
+    private Tuple<bool, HistoryType, ReversibleAction, List<string>> FindLastActionOfPlayer(bool isOwner, HistoryType type)
     {
-        Tuple<string, HistoryType, ReversibleAction, List<string>> result = null;
+        Tuple<bool, HistoryType, ReversibleAction, List<string>> result = null;
 
         for (int i = allActionsList.Count - 1; i >= 0; i--)
         {
             if ((type == HistoryType.undoneAction && allActionsList[i].Item2 == HistoryType.undoneAction)
                 || (type == HistoryType.action && allActionsList[i].Item2 == HistoryType.action)
-                && allActionsList[i].Item1 == playerID)
+                && allActionsList[i].Item1 == true)
             {
                 result = allActionsList[i];
                 break;
             }
-        }
-        if (result == null)
-        {
-            // Should´nt be reached.
-            return null;
         }
         // Fixme: Outsourcing to another function
         //Find all newer changes that could be a problem to the undo
@@ -132,18 +139,17 @@ public class GlobalActionHistory
         //        if (i < count) i++;
         //    }
         //}
-        return new Tuple<Tuple<string, HistoryType, ReversibleAction, List<string>>, bool>(result, false);
+        return result;
     }
 
     /// <summary>
     /// Deletes all redos of a user
     /// </summary>
-    /// <param name="userid">the user that does the new action</param>
-    private void DeleteAllRedos(string userid)
+    private void DeleteAllRedos()
     {
         for (int i = 0; i < allActionsList.Count; i++)
         {
-            if (allActionsList[i].Item1.Equals(userid) && allActionsList[i].Item2.Equals(HistoryType.undoneAction))
+            if (allActionsList[i].Item1.Equals(true) && allActionsList[i].Item2.Equals(HistoryType.undoneAction))
             {
                 allActionsList.RemoveAt(i);
                 i--;
@@ -171,21 +177,20 @@ public class GlobalActionHistory
     /// <summary>
     /// Undoes the last action with an effect of a specific player.
     /// </summary>
-    /// <param name="userid"></param>
-    public void Undo(string userid)
+    public void Undo()
     {
-        Tuple<Tuple<string, HistoryType, ReversibleAction, List<string>>, bool> lastAction = FindLastActionOfPlayer(userid, HistoryType.action);
+        Tuple<bool, HistoryType, ReversibleAction, List<string>> lastAction = FindLastActionOfPlayer(true, HistoryType.action);
         if(lastAction == null) return;
       
-        while (!GetActiveAction(userid).HadEffect())
+        while (activeAction.HadEffect())
         {
-            GetActiveAction(userid).Stop();
+            activeAction.Stop();
             if (allActionsList.Count > 1) //FIXME: Maybe obsolet becaus not multiplayer compatible, should be replaced by lastaction == null -> return
             {
-                DeleteItem(lastAction.Item1.Item3.GetId());
-                lastAction = FindLastActionOfPlayer(userid, HistoryType.action);
+                DeleteItem(lastAction.Item3.GetId());
+                lastAction = FindLastActionOfPlayer(true, HistoryType.action);
                 if (lastAction == null) return;
-                SetActiveAction(userid, lastAction.Item1.Item3);
+                activeAction = lastAction.Item3;
             }
             else
             {
@@ -193,39 +198,65 @@ public class GlobalActionHistory
                 return;
             }
         }
-        GetActiveAction(userid).Stop();
-        GetActiveAction(userid).Undo();
-        DeleteItem(lastAction.Item1.Item3.GetId());
-        Tuple<string, HistoryType, ReversibleAction, List<string>> undoneAction = new Tuple<string, HistoryType, ReversibleAction, List<string>>
-            (userid, HistoryType.undoneAction, lastAction.Item1.Item3, lastAction.Item1.Item4);
+        activeAction?.Stop();
+        activeAction?.Undo();
+        DeleteItem(lastAction.Item3.GetId());
+        Tuple<bool, HistoryType, ReversibleAction, List<string>> undoneAction = new Tuple<bool, HistoryType, ReversibleAction, List<string>>
+            (true, HistoryType.undoneAction, lastAction.Item3, lastAction.Item4);
+        
         Push(undoneAction);
-        lastAction = FindLastActionOfPlayer(userid, HistoryType.action);
+        lastAction = FindLastActionOfPlayer(true, HistoryType.action);
         if (lastAction == null) return;
-
-        SetActiveAction(userid, lastAction.Item1.Item3);
-        GetActiveAction(userid)?.Start();
+        activeAction = lastAction.Item3;
+        activeAction?.Start();
         isRedo = true;
     }
 
     /// <summary>
     /// Redoes the last undone action of a specific player.
     /// </summary>
-    /// <param name="userid">The player who wants to execute the redo </param>
-    public void Redo(string userid)
+    public void Redo()
     {
-        GetActiveAction(userid)?.Stop();
+        activeAction?.Stop();
 
-        Tuple<Tuple<string, HistoryType, ReversibleAction, List<string>>, bool> lastUndoneAction = FindLastActionOfPlayer(userid, HistoryType.undoneAction);
+        Tuple<bool, HistoryType, ReversibleAction, List<string>> lastUndoneAction = FindLastActionOfPlayer(true, HistoryType.undoneAction);
         if (lastUndoneAction == null) return;
 
-        lastUndoneAction.Item1.Item3.Redo();
-        Tuple<string, HistoryType, ReversibleAction, List<string>> redoneAction = new Tuple<string, HistoryType, ReversibleAction, List<string>>(userid, HistoryType.action, lastUndoneAction.Item1.Item3, lastUndoneAction.Item1.Item4);
+        lastUndoneAction.Item3.Redo();
+        Tuple<bool, HistoryType, ReversibleAction, List<string>> redoneAction = new Tuple<bool, HistoryType, ReversibleAction, List<string>>(true, HistoryType.action, lastUndoneAction.Item3, lastUndoneAction.Item4);
         Push(redoneAction);
-        lastUndoneAction.Item1.Item3.Start();
+        lastUndoneAction.Item3.Start();
 
-        // I think this doesnt work so far, sometimes, active action will not be set new.
-        SetActiveAction(userid, lastUndoneAction.Item1.Item3);
-        DeleteItem(lastUndoneAction.Item1.Item3.GetId());
+        // I think this doesnt work so far, sometimes, active action will not be set new. FI`XME: WHY DO YOU THINK THAT?
+        activeAction = lastUndoneAction.Item3;
+        DeleteItem(lastUndoneAction.Item3.GetId());
+    }
+
+    /// <summary>
+    /// Returns the active action of a player
+    /// </summary>
+    /// <returns>The active action of a player</returns>
+    public ReversibleAction getActiveAction()
+    {
+        return activeAction;
+    }
+
+    /// <summary>
+    /// Returns wether a player has no Actions left to be undone
+    /// </summary>
+    /// <returns>True if no action left</returns>
+    public bool NoActionsLeft()
+    {
+       return FindLastActionOfPlayer(true, HistoryType.action) == null;
+    }
+
+    /// <summary>
+    /// Returns wether a player has some undone actions left
+    /// </summary>
+    /// <returns>True if none undone actions left</returns>
+    public bool NoUndoneActionsLeft()
+    {
+        return FindLastActionOfPlayer(true, HistoryType.undoneAction) == null;
     }
 
     /// <summary>
@@ -233,7 +264,7 @@ public class GlobalActionHistory
     /// </summary>
     /// <param name="player">The Player that performs an Action</param>
     /// <returns>The active action || null if key not in dictionary</returns>
-    public ReversibleAction GetActiveAction(string player)
+    /*public ReversibleAction GetActiveAction(string player)
     {
         try
         {
@@ -243,7 +274,7 @@ public class GlobalActionHistory
         {
             return null;
         }
-    }
+    } 
 
     /// <summary>
     /// Sets the active <paramref name="action"/> of a specific <paramref name="player"/>. 
@@ -260,6 +291,6 @@ public class GlobalActionHistory
         {
             allActiveActions.Add(player, action);
         }
-    }
+    } */
 
 }
