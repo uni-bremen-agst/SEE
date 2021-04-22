@@ -101,7 +101,7 @@ public class GlobalActionHistory
     {
         Tuple<string, HistoryType, ReversibleAction, List<string>> result = null;
 
-        for (int i = allActionsList.Count - 1; i > 0; i--)
+        for (int i = allActionsList.Count - 1; i >= 0; i--)
         {
             if ((type == HistoryType.undoneAction && allActionsList[i].Item2 == HistoryType.undoneAction)
                 || (type == HistoryType.action && allActionsList[i].Item2 == HistoryType.action)
