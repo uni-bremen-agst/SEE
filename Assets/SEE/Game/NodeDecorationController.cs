@@ -23,6 +23,20 @@ public class NodeDecorationController : MonoBehaviour
     private Vector3 nodeLocation;
 
     /// <summary>
+    /// Roof type dropdown menu items
+    /// </summary>
+    public enum RoofType {
+        Rectangular,
+        Tetrahedron,
+        Dome
+    }
+
+    /// <summary>
+    /// Roof dropdown menu selector (inspector)
+    /// </summary>
+    public RoofType selectedRoofType;
+
+    /// <summary>
     /// The Height-Percentage the bottom floor should have in
     /// contrast to the building height
     /// </summary>
@@ -147,9 +161,6 @@ public class NodeDecorationController : MonoBehaviour
         float lobbyGroundFloorHeight = buildingGroundFloorHeight + (lobby.transform.localScale.y / 2);
         // Move the lobby object to te correct location
         lobby.transform.position = new Vector3(nodeLocation.x, lobbyGroundFloorHeight, nodeLocation.z);
-        // TODO Render textures here
-
-
     }
 
     /// <summary>
@@ -163,12 +174,55 @@ public class NodeDecorationController : MonoBehaviour
         float roofSizeZ = nodeSize.z + nodeSize.z * _roofSpanPercentage;
         float roofHeight = nodeSize.y * _roofHeightPercentage;
         // Create roof GameObject
-        GameObject tetrahedron = createFourFacedTetrahedron(roofSizeX, roofHeight, roofSizeZ);
-        tetrahedron.transform.SetParent(nodeObject.transform);
-        // Move tetrahedron to top of building, tetrahedron is moved with the bottom left corner
-        tetrahedron.transform.position = new Vector3(nodeLocation.x - roofSizeX/2, nodeSize.y/2 + nodeLocation.y, nodeLocation.z - roofSizeZ/2);
-        // TODO Render textures here
+        switch (selectedRoofType)
+        {
+            case RoofType.Tetrahedron:
+                GameObject tetrahedron = createFourFacedTetrahedron(roofSizeX, roofHeight, roofSizeZ);
+                tetrahedron.transform.SetParent(nodeObject.transform);
+                // Move tetrahedron to top of building, tetrahedron is moved with the bottom left corner
+                tetrahedron.transform.position = new Vector3(nodeLocation.x - roofSizeX / 2, nodeSize.y / 2 + nodeLocation.y, nodeLocation.z - roofSizeZ / 2);
+                break;
+            case RoofType.Rectangular:
+                renderRectangularRoof(roofSizeX,roofHeight,roofSizeZ);
+                break;
+            case RoofType.Dome:
+                renderDomeRoof(roofSizeX, roofHeight, roofSizeZ);
+                break;
+            default:
+                break;
+        }
+    }
 
+    /// <summary>
+    /// Renders a rectangular roof for the node object
+    /// <param name="roofSizeX">The roof's size on the X-axis</param>
+    /// <param name="roofHeight">The roof's height on the Y-axis</param>
+    /// <param name="roofSizeZ">The roof's size on the Z-axis</param>
+    /// </summary>
+    private void renderRectangularRoof(float roofSizeX, float roofHeight, float roofSizeZ)
+    {
+        GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        go.name = "RectangularRoof";
+        go.transform.localScale = new Vector3(roofSizeX, roofHeight, roofSizeZ);
+        float nodeRoofHeight = nodeObject.transform.position.y + nodeSize.y / 2;
+        go.transform.position = new Vector3(nodeLocation.x, nodeRoofHeight, nodeLocation.z);
+        go.transform.SetParent(nodeObject.transform);
+    }
+
+    /// <summary>
+    /// Renders a dome roof for the node object
+    /// <param name="roofSizeX">The roof's size on the X-axis</param>
+    /// <param name="roofHeight">The roof's height on the Y-axis</param>
+    /// <param name="roofSizeZ">The roof's size on the Z-axis</param>
+    /// </summary>
+    private void renderDomeRoof(float roofSizeX, float roofHeight, float roofSizeZ)
+    {
+        GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        go.name = "SphericalRoof";
+        go.transform.localScale = new Vector3(roofSizeX, roofHeight, roofSizeZ);
+        float nodeRoofHeight = nodeObject.transform.position.y + nodeSize.y / 2;
+        go.transform.position = new Vector3(nodeLocation.x, nodeRoofHeight, nodeLocation.z);
+        go.transform.SetParent(nodeObject.transform);
     }
 
     /// <summary>
