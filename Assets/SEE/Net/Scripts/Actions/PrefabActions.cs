@@ -162,7 +162,7 @@ namespace SEE.Net
         private void Initialize(IPEndPoint owner, string prefabPath, Vector3 position, Quaternion rotation, Vector3 scale)
         {
             ownerIpAddress = owner?.Address.ToString();
-            ownerPort = owner == null ? -1 : owner.Port;
+            ownerPort = owner?.Port ?? -1;
             this.prefabPath = prefabPath;
             this.position = position;
             this.rotation = rotation;
@@ -171,7 +171,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Assignes a unique ID for the view container.
+        /// Assigns a unique ID for the view container.
         /// </summary>
         protected override void ExecuteOnServer()
         {
@@ -191,23 +191,10 @@ namespace SEE.Net
         /// </summary>
         protected override void ExecuteOnClient()
         {
-            GameObject prefab = Resources.Load<GameObject>(prefabPath);
-            if (!prefab)
-            {
-                Assertions.InvalidCodePath("Prefab of path '" + prefabPath + "' could not be found!");
-            }
-
+            GameObject go = PrefabInstantiator.InstantiatePrefab(prefabPath);
+            
             IPEndPoint ipEndPoint = new IPEndPoint(IPAddress.Parse(ownerIpAddress), ownerPort);
-
-            GameObject go = Object.Instantiate(prefab, null, true);
-            if (go)
-            {
-                go.name = prefab.name + " - " + ipEndPoint.ToString();
-            }
-            else
-            {
-                Assertions.InvalidCodePath("Object could not be instantiated with prefab '" + prefab + "'!");
-            }
+            go.name += " - " + ipEndPoint;
 
             if (!Network.UseInOfflineMode)
             {

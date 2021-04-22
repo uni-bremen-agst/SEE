@@ -5,7 +5,6 @@ using SEE.GO;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.UI;
 
 namespace SEE.Game.UI.Menu
@@ -82,9 +81,7 @@ namespace SEE.Game.UI.Menu
             if (Manager == null)
             {
                 // Create it from prefab if it doesn't exist yet
-                Object menuPrefab = Resources.Load<GameObject>(MENU_PREFAB);
-                MenuGameObject = Instantiate(menuPrefab, Canvas.transform, false) as GameObject;
-                Assert.IsNotNull(MenuGameObject);
+                MenuGameObject = PrefabInstantiator.InstantiatePrefab(MENU_PREFAB, Canvas.transform, false);
                 MenuGameObject.name = Title;
                 MenuGameObject.TryGetComponentOrLog(out Manager);
             }
@@ -120,13 +117,7 @@ namespace SEE.Game.UI.Menu
             if (EntryList == null)
             {
                 // Create menu entry list if it doesn't exist yet
-                Object listPrefab = Resources.Load<GameObject>(LIST_PREFAB);
-                EntryList = Instantiate(listPrefab, MenuContent.transform, false) as GameObject;
-                if (EntryList == null)
-                {
-                    Debug.LogError("Couldn't instantiate List object.");
-                    return;
-                }
+                EntryList = PrefabInstantiator.InstantiatePrefab(LIST_PREFAB, MenuContent.transform, false);
                 EntryList.name = "Menu Entries";
                 // List should actually be the list, not the entry object
                 EntryList = EntryList.transform.Find("Scroll Area/List").gameObject;
@@ -142,11 +133,9 @@ namespace SEE.Game.UI.Menu
         /// <param name="buttonEntries">The entries to add to the menu.</param>
         protected virtual void AddDesktopButtons(IEnumerable<T> buttonEntries)
         {
-            Object buttonPrefab = Resources.Load<GameObject>(BUTTON_PREFAB);
             foreach (T entry in buttonEntries)
             {
-                GameObject button = Instantiate(buttonPrefab, EntryList.transform, false) as GameObject;
-                Assert.IsNotNull(button);
+                GameObject button = PrefabInstantiator.InstantiatePrefab(BUTTON_PREFAB, EntryList.transform, false);
                 GameObject text = button.transform.Find("Text").gameObject;
                 GameObject icon = button.transform.Find("Icon").gameObject;
 

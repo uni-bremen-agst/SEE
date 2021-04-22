@@ -2,6 +2,7 @@
 using System.Linq;
 using DynamicPanels;
 using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game.UI.CodeWindow
@@ -28,8 +29,7 @@ namespace SEE.Game.UI.CodeWindow
             space = Canvas.transform.Find(CodeSpaceName)?.gameObject;
             if (!space)
             {
-                GameObject spacePrefab = Resources.Load<GameObject>(CODE_SPACE_PREFAB);
-                space = Instantiate(spacePrefab, Canvas.transform, false);
+                space = PrefabInstantiator.InstantiatePrefab(CODE_SPACE_PREFAB, Canvas.transform, false);
                 space.name = CodeSpaceName;
             }
             space.SetActive(true);

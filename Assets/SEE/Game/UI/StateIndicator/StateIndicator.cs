@@ -1,4 +1,5 @@
 ﻿using SEE.GO;
+using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -74,13 +75,7 @@ namespace SEE.Game.UI.StateIndicator
         /// </summary>
         protected override void StartDesktop()
         {
-            Object indicatorPrefab = Resources.Load<GameObject>(MODE_PANEL_PREFAB);
-            GameObject indicator = Instantiate(indicatorPrefab, Canvas.transform, false) as GameObject;
-            if (indicator == null)
-            {
-                Debug.LogError("Couldn't instantiate ModePanel prefab\n");
-                return;
-            }
+            GameObject indicator = PrefabInstantiator.InstantiatePrefab(MODE_PANEL_PREFAB, Canvas.transform, false);
             indicator.name = Title;
 
             RectTransform rectTransform = (RectTransform) indicator.transform;

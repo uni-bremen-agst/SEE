@@ -89,9 +89,7 @@ namespace SEE.Game.UI
             if (Canvas == null)
             {
                 // Create Canvas from prefab if it doesn't exist yet
-                Object canvasPrefab = Resources.Load<GameObject>(UI_CANVAS_PREFAB);
-                Canvas = Instantiate(canvasPrefab) as GameObject;
-                UnityEngine.Assertions.Assert.IsNotNull(Canvas);
+                Canvas = PrefabInstantiator.InstantiatePrefab(UI_CANVAS_PREFAB);
                 Canvas.name = UI_CANVAS_NAME;
             }
             
