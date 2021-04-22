@@ -25,10 +25,10 @@
         /// </summary>
         public static void Undo()
         {
-            // if (history.UndoCount > 0)
-            //{
-                history.Undo("1"); //FIXME: USE THE PLAYERS IP FOR THAT
-            //}
+            if (!history.NoActionsLeft())
+            {
+                history.Undo(); 
+            }
         }
 
         /// <summary>
@@ -36,10 +36,10 @@
         /// </summary>
         public static void Redo()
         {
-            //if (history.RedoCount > 0)
-           // {
-                history.Redo("1"); //FIXME: USE THE PLAYERS IP FOR THAT
-           // }
+            if (!history.NoUndoneActionsLeft())
+            {
+                history.Redo(); 
+            }
         }
 
         /// <summary>
@@ -49,7 +49,7 @@
         public static void Execute(ActionStateType actionType)
         {
             ActionState.Value = actionType;
-            history.Execute(actionType.CreateReversible(),"1");
+            history.Execute(actionType.CreateReversible());
         }
 
         /// <summary>
@@ -59,7 +59,7 @@
         /// <returns><see cref="ActionStateType"/> of the currently executed action or null</returns>
         public static ActionStateType Current()
         {
-            return history.GetActiveAction("1")?.GetActionStateType(); //FIXME: USE THE PLAYERS IP FOR THAT
+            return history.getActiveAction()?.GetActionStateType(); 
         }
 
         /// <summary>
@@ -68,7 +68,7 @@
         /// <returns>true if the action history is empty</returns>
         public static bool IsEmpty()
         {
-            return false;//history.UndoCount == 0;
+            return history.NoActionsLeft();
         }
     }
 }
