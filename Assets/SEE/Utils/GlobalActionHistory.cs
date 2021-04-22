@@ -30,7 +30,7 @@ public class GlobalActionHistory
     /// Contains the Active Action from each Player needs to be updated with each undo/redo/action
     /// </summary>
     private Dictionary<string, ReversibleAction> allActiveActions = new Dictionary<string, ReversibleAction>();
-
+ 
     /// <summary>
     /// Let C be the currently executed action (if there is any) in this action history. 
     /// Then <see cref="ReversibleAction.Stop"/> will be called for C. After that 
@@ -69,6 +69,7 @@ public class GlobalActionHistory
             {
                 // Overwrites the running action with finished reversibleAction - necessary for listing all manipulated gameObjects. 
                 Tuple<string, HistoryType, ReversibleAction, List<string>> lastAction = FindLastActionOfPlayer(allActiveActions.ElementAt(i).Key, HistoryType.action).Item1;
+                if (lastAction == null) return;
                 DeleteItem(allActiveActions.ElementAt(i).Value.GetId());
                 lastAction = new Tuple<string, HistoryType, ReversibleAction, List<string>>(lastAction.Item1, lastAction.Item2, allActiveActions.ElementAt(i).Value, allActiveActions.ElementAt(i).Value.GetChangedObjects());
                 Push(lastAction);
@@ -92,7 +93,7 @@ public class GlobalActionHistory
     /// <param name="playerID">The player that wants to perform an undo/redo</param>
     /// <param name="type">the type of action he wants to perform</param>
     /// <returns>A tuple of the latest users action and if any later done action blocks the undo (True if some action is blocking || false if not)</returns>  
-    /// Returns as second in the tuple that so each action could check it on its own >> List<ReversibleAction>>
+    /// Returns as second in the tuple that so each action could check it on its own >> List<ReversibleAction>> Returns Null if no action was found
     private Tuple<Tuple<string, HistoryType, ReversibleAction, List<string>>, bool> FindLastActionOfPlayer(string playerID, HistoryType type)
     {
         Tuple<string, HistoryType, ReversibleAction, List<string>> result = null;
@@ -110,7 +111,7 @@ public class GlobalActionHistory
         if (result == null)
         {
             // Should´nt be reached.
-            result = allActionsList[0];
+            return null;
         }
         // Fixme: Outsourcing to another function
         //Find all newer changes that could be a problem to the undo
@@ -171,14 +172,16 @@ public class GlobalActionHistory
     public void Undo(string userid)
     {
         Tuple<Tuple<string, HistoryType, ReversibleAction, List<string>>, bool> lastAction = FindLastActionOfPlayer(userid, HistoryType.action);
-
+        if(lastAction == null) return;
+      
         while (!GetActiveAction(userid).HadEffect())
         {
             GetActiveAction(userid).Stop();
-            if (allActionsList.Count > 1)
+            if (allActionsList.Count > 1) //FIXME: Maybe obsolet becaus not multiplayer compatible, should be replaced by lastaction == null -> return
             {
                 DeleteItem(lastAction.Item1.Item3.GetId());
                 lastAction = FindLastActionOfPlayer(userid, HistoryType.action);
+                if (lastAction == null) return;
                 SetActiveAction(userid, lastAction.Item1.Item3);
             }
             else
@@ -194,6 +197,7 @@ public class GlobalActionHistory
             (userid, HistoryType.undoneAction, lastAction.Item1.Item3, lastAction.Item1.Item4);
         Push(undoneAction);
         lastAction = FindLastActionOfPlayer(userid, HistoryType.action);
+        if (lastAction == null) return;
 
         SetActiveAction(userid, lastAction.Item1.Item3);
         GetActiveAction(userid)?.Start();
@@ -208,6 +212,7 @@ public class GlobalActionHistory
         GetActiveAction(userid)?.Stop();
 
         Tuple<Tuple<string, HistoryType, ReversibleAction, List<string>>, bool> lastUndoneAction = FindLastActionOfPlayer(userid, HistoryType.undoneAction);
+        if (lastUndoneAction == null) return;
 
         lastUndoneAction.Item1.Item3.Redo();
         Tuple<string, HistoryType, ReversibleAction, List<string>> redoneAction = new Tuple<string, HistoryType, ReversibleAction, List<string>>(userid, HistoryType.action, lastUndoneAction.Item1.Item3, lastUndoneAction.Item1.Item4);
