@@ -4,9 +4,10 @@ using UnityEngine;
 
 namespace Michsky.UI.ModernUIPack
 {
+    [AddComponentMenu("Modern UI Pack/Notification/Notification Stacking")]
     public class NotificationStacking : MonoBehaviour
     {
-      public List<NotificationManager> notifications = new List<NotificationManager>();
+        public List<NotificationManager> notifications = new List<NotificationManager>();
         [HideInInspector] public bool enableUpdating = false;
 
         [Header("SETTINGS")]

@@ -3,9 +3,10 @@ using UnityEngine.EventSystems;
 
 namespace Michsky.UI.ModernUIPack
 {
+    [RequireComponent(typeof(Animator))]
     public class WindowManagerButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        public Animator buttonAnimator;
+        [HideInInspector] public Animator buttonAnimator;
 
         void OnEnable()
         {
