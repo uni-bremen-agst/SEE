@@ -10,7 +10,6 @@ using SEE.DataModel;
 using SEE.Game;
 using SEE.Game.Charts.VR;
 using SEE.GO;
-using SEE.Utils;
 using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
@@ -290,7 +289,8 @@ namespace SEE.Controls
         private void SetupMixedReality()
         {
 
-            GameObject.Destroy(UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects().SingleOrDefault(x => x.name == "MixedRealityPlayspace"));
+            Destroy(UnityEngine.SceneManagement.SceneManager.GetActiveScene()
+                               .GetRootGameObjects().SingleOrDefault(x => x.name == "MixedRealityPlayspace"));
             
             // Add a MixedRealityToolkit to the scene
             UnityEngine.Object mrtkPrefab = Resources.Load<GameObject>("Prefabs/MixedRealityToolkit");
@@ -326,7 +326,7 @@ namespace SEE.Controls
 
                         GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
 
-                        GameObject[] citiesWithContainer= cities.Select(cityWithoutContainer => AddCodeCityContainer(cityWithoutContainer)).ToArray();
+                        GameObject[] citiesWithContainer = cities.Select(AddCodeCityContainer).ToArray();
 
                         foreach (GameObject city in citiesWithContainer)
                         {
@@ -343,7 +343,7 @@ namespace SEE.Controls
 
             #region Local Methods
             //Scales the city by factor and pretend it to collection 
-            void SetCityScale(GameObject cityWitchContainer, Transform cityCollectionTransform, float cityScaleFactor)
+            static void SetCityScale(GameObject cityWitchContainer, Transform cityCollectionTransform, float cityScaleFactor)
             {
                 cityWitchContainer.transform.localScale *= cityScaleFactor;
                 // City needs to be parented to collection to be organized by it
@@ -351,7 +351,7 @@ namespace SEE.Controls
             }
 
             //Sets the width of the Grid containing the cities
-            void SetGridCellWidth(GridObjectCollection grid, IEnumerable<GameObject> cities)
+            static void SetGridCellWidth(GridObjectCollection grid, IEnumerable<GameObject> cities)
             {
                 // To avoid overlaps, set cell width to maximum length of code cities
                 grid.CellWidth = cities.Max(x => x.transform.localScale.MaxComponent());
@@ -359,13 +359,13 @@ namespace SEE.Controls
             }
 
             // Adds AppBar and ObjectManipulator components to City
-            void AddInteractions(GameObject city)
+            static void AddInteractions(GameObject city)
             {
                 city.AddComponent<AppBarInteractableObject>();
                 city.AddComponent<ObjectManipulator>();
             }
 
-            void AppBarCityConfiguration(GameObject city)
+            static void AppBarCityConfiguration(GameObject city)
             {
                 BoundsControl boundsControl = city.AddComponent<BoundsControl>();
                 boundsControl.BoundsControlActivation = Microsoft.MixedReality.Toolkit.UI.BoundsControlTypes
@@ -373,30 +373,12 @@ namespace SEE.Controls
             }
 
 
-            //Creats a Container GameObject for Cities 
-            GameObject AddCodeCityContainer(GameObject city)
+            // Creates a Container GameObject for Cities 
+            static GameObject AddCodeCityContainer(GameObject city)
             {
-
-                GameObject cityContainer = new GameObject();
-                Bounds bounds;
-
-                cityContainer.name = city.name + "Container";
+                GameObject cityContainer = new GameObject {name = city.name + "Container"};
                 cityContainer.transform.position = city.transform.position;
-
-                Vector3 citySize = city.Size();
-                Vector3 cityCenter = city.GetComponent<Renderer>().bounds.center;
-
-                if (citySize.y < 0.1f)
-                {
-                    bounds = new Bounds(cityCenter, new Vector3(citySize.x, 0.1f, citySize.z));
-                }
-                else
-                {
-                    bounds = new Bounds(cityCenter, citySize);
-                }
-
                 city.transform.SetParent(cityContainer.transform);
-
                 return cityContainer;
             }
 
