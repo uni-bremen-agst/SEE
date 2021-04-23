@@ -372,7 +372,7 @@ namespace SEE.Controls.Actions
 
             // Move the gameObject so the user thinks she/he scaled only in one direction
             Vector3 position = objectToScale.transform.position;
-            position.y += scale.y * 0.5f;
+            position.y += scale.y / 2;
 
             // Setting the old positions
             topOldSpherePos = topSphere.transform.position;
@@ -532,24 +532,27 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// The minimal scale a scaling sphere may have in world space.
+        /// </summary>
+        private const float minimalSphereScale = 0.01f;
+
+        /// <summary>
+        /// The size of the scaling spheres will be relative to the game object to be scaled.
+        /// This factor determines that scale. It will be multiplied by the x or z scale of
+        /// <see cref="objectToScale"/> (the smaller of the two). If that value is shorter
+        /// than <see cref="minimalSphereScale"/>, <see cref="minimalSphereScale"/> will
+        /// be used instead.
+        /// </summary>
+        private const float relativeSphereScale = 0.1f;
+
+        /// <summary>
         /// Sets the radius of a sphere dependent on the X and Z scale of <paramref name="sphere"/>
-        ///  that is to be scaled.</summary>
+        /// that is to be scaled.</summary>
         /// <param name="sphere">the sphere to be scaled</param>
         private void SphereRadius(GameObject sphere)
         {
             Vector3 goScale = objectToScale.transform.lossyScale;
-            if (goScale.x > goScale.z && goScale.z > 0.1f)
-            {
-                sphere.transform.localScale = new Vector3(goScale.z, goScale.z, goScale.z) * 0.1f;
-            }
-            else if (goScale.x > 0.1f)
-            {
-                sphere.transform.localScale = new Vector3(goScale.x, goScale.x, goScale.x) * 0.1f;
-            }
-            else
-            {
-                sphere.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
-            }
+            sphere.transform.localScale = Vector3.one * Mathf.Max(Mathf.Min(goScale.x, goScale.z) * relativeSphereScale, minimalSphereScale);
         }
 
         /// <summary>
