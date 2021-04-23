@@ -85,7 +85,7 @@ namespace SEE.Game.Charts
         /// </summary>
         [Tooltip("The code city whose nodes should be shown in the charts. If null, all nodes"
                   + " in the scene will be shown.")]
-        public GameObject CodeCity = null;
+        public GameObject CodeCity;
 
         /// <summary>
         /// Whether metrics of leave nodes should be shown in the charts.
@@ -147,7 +147,7 @@ namespace SEE.Game.Charts
         /// <summary>
         /// The canvas setup for charts that is used in non VR.
         /// </summary>
-        [SerializeField]private GameObject chartsPrefab;
+        [SerializeField] private GameObject chartsPrefab;
 
         /// <summary>
         /// The prefab of a new chart when in VR.

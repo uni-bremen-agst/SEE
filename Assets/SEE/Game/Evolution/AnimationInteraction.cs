@@ -39,14 +39,9 @@ namespace SEE.Game.Evolution
         //public FlyCamera FlyCamera; // serialized by Unity (it is a MonoBehaviour)
 
         /// <summary>
-        /// As to whether the UI for selecting revisions is currently shown.
+        /// Whether the UI for selecting revisions is currently shown.
         /// </summary>
-        private bool isRevisionSelectionOpen = false;
-
-        /// <summary>
-        /// Returns true if RevisionSelectionCanvas is currently shown.
-        /// </summary>
-        public bool IsRevisionSelectionOpen => isRevisionSelectionOpen; // serialized by Unity
+        public bool IsRevisionSelectionOpen { get; private set; } = false;
 
         /// <summary>
         /// The in-game animation canvas shown while viewing the animations. It contains
@@ -98,7 +93,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// A dictionary linking markers and comments, needed for saving the comments on application quit and deleting the comments
         /// </summary>
-        private Dictionary<Button, InputField> markerDictionary = new Dictionary<Button, InputField>();
+        private readonly Dictionary<Button, InputField> markerDictionary = new Dictionary<Button, InputField>();
 
         /// <summary>
         /// Specifies whether the animation is currently being fast-forwarded
@@ -156,7 +151,7 @@ namespace SEE.Game.Evolution
             revisionSelectionDataModel.AssertNotNull("revisionSelectionDataModel");
             animationDataModel.AssertNotNull("animationDataModel");
 
-            revisionSelectionDataModel.CloseViewButton.onClick.AddListener(ToogleMode);
+            revisionSelectionDataModel.CloseViewButton.onClick.AddListener(ToggleMode);
             revisionSelectionDataModel.RevisionDropdown.onValueChanged.AddListener(OnDropDownChanged);
 
             animationDataModel.Slider.minValue = 1;
@@ -168,8 +163,7 @@ namespace SEE.Game.Evolution
             animationDataModel.ReverseButton.onClick.AddListener(TaskOnClickReverseButton);
             animationDataModel.FastBackwardButton.onClick.AddListener(TaskOnClickFastBackwardButton);
 
-            SliderDrag sliderDrag;
-            if (animationDataModel.Slider.TryGetComponent<SliderDrag>(out sliderDrag))
+            if (animationDataModel.Slider.TryGetComponent(out SliderDrag sliderDrag))
             {
                 sliderDrag.EvolutionRenderer = evolutionRenderer;
             }
@@ -222,9 +216,8 @@ namespace SEE.Game.Evolution
                 GameObject prefab = Resources.Load<GameObject>(canvasPrefab);
                 if (prefab != null)
                 {
-                    result = Instantiate(prefab);
+                    result = Instantiate(prefab, gameObject.transform, true);
                     result.name = canvasGameObjectName;
-                    result.transform.SetParent(gameObject.transform);
                 }
                 else
                 {
@@ -238,7 +231,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Saves the marker data on application quit
         /// </summary>
-        void OnApplicationQuit()
+        private void OnApplicationQuit()
         {
             foreach (KeyValuePair<Button, InputField> p in markerDictionary)
             {
@@ -324,24 +317,26 @@ namespace SEE.Game.Evolution
                 isFastBackward = false;
                 animationDataModel.FastBackwardButtonText.text = "◄◄";
             }
-            if (animationTimeValue == 2)
+            switch (animationTimeValue)
             {
-                isFastForward = true;
-                animationTimeValue = 1;
-                evolutionRenderer.AnimationLag = animationTimeValue;
-                animationDataModel.FastFowardButtonText.text = "►►2x";
-            } else if (animationTimeValue == 1)
-            {
-                isFastForward = true;
-                animationTimeValue = 0.5f;
-                evolutionRenderer.AnimationLag = animationTimeValue;
-                animationDataModel.FastFowardButtonText.text = "►►4x";
-            } else if (animationTimeValue == 0.5f)
-            {
-                isFastForward = false;
-                animationTimeValue = 2;
-                evolutionRenderer.AnimationLag = animationTimeValue;
-                animationDataModel.FastFowardButtonText.text = "►►";
+                case 2:
+                    isFastForward = true;
+                    animationTimeValue = 1;
+                    evolutionRenderer.AnimationLag = animationTimeValue;
+                    animationDataModel.FastFowardButtonText.text = "►►2x";
+                    break;
+                case 1:
+                    isFastForward = true;
+                    animationTimeValue = 0.5f;
+                    evolutionRenderer.AnimationLag = animationTimeValue;
+                    animationDataModel.FastFowardButtonText.text = "►►4x";
+                    break;
+                case 0.5f:
+                    isFastForward = false;
+                    animationTimeValue = 2;
+                    evolutionRenderer.AnimationLag = animationTimeValue;
+                    animationDataModel.FastFowardButtonText.text = "►►";
+                    break;
             }
         }
 
@@ -362,26 +357,26 @@ namespace SEE.Game.Evolution
                 isFastForward = false;
                 animationDataModel.FastFowardButtonText.text = "►►";
             }
-            if (animationTimeValue == 2)
+            switch (animationTimeValue)
             {
-                isFastBackward = true;
-                animationTimeValue = 1;
-                evolutionRenderer.AnimationLag = animationTimeValue;
-                animationDataModel.FastBackwardButtonText.text = "◄◄2x";
-            }
-            else if (animationTimeValue == 1)
-            {
-                isFastBackward = true;
-                animationTimeValue = 0.5f;
-                evolutionRenderer.AnimationLag = animationTimeValue;
-                animationDataModel.FastBackwardButtonText.text = "◄◄4x";
-            }
-            else if (animationTimeValue == 0.5f)
-            {
-                isFastBackward = false;
-                animationTimeValue = 2;
-                evolutionRenderer.AnimationLag = animationTimeValue;
-                animationDataModel.FastBackwardButtonText.text = "◄◄";
+                case 2:
+                    isFastBackward = true;
+                    animationTimeValue = 1;
+                    evolutionRenderer.AnimationLag = animationTimeValue;
+                    animationDataModel.FastBackwardButtonText.text = "◄◄2x";
+                    break;
+                case 1:
+                    isFastBackward = true;
+                    animationTimeValue = 0.5f;
+                    evolutionRenderer.AnimationLag = animationTimeValue;
+                    animationDataModel.FastBackwardButtonText.text = "◄◄4x";
+                    break;
+                case 0.5f:
+                    isFastBackward = false;
+                    animationTimeValue = 2;
+                    evolutionRenderer.AnimationLag = animationTimeValue;
+                    animationDataModel.FastBackwardButtonText.text = "◄◄";
+                    break;
             }
         }
 
@@ -392,7 +387,7 @@ namespace SEE.Game.Evolution
         private void TaskOnClickMarker(Button clickedMarker)
         {
             selectedMarker = clickedMarker;
-            string commentName = clickedMarker.GetHashCode().ToString() + "-comment";
+            string commentName = clickedMarker.GetHashCode() + "-comment";
             if (clickedMarker.transform.Find(commentName) != null)
             {
                 GameObject comment = clickedMarker.transform.Find(commentName).gameObject;
@@ -408,10 +403,9 @@ namespace SEE.Game.Evolution
         /// <returns> Created InputField </returns>
         private InputField AddCommentToMarker(Button marker, string comment = null)
         {
-            string commentName = marker.GetHashCode().ToString() + "-comment";
-            InputField commentField = Instantiate(animationDataModel.CommentPrefab);
+            string commentName = marker.GetHashCode() + "-comment";
+            InputField commentField = Instantiate(animationDataModel.CommentPrefab, marker.transform, false);
             Vector3 commentPos = new Vector3(1500f, 0, 0);
-            commentField.transform.SetParent(marker.transform, false);
             commentField.transform.localScale = new Vector3(16f, 1f, 1f);
             commentField.transform.localPosition = commentPos;
             commentField.name = commentName;
@@ -431,8 +425,7 @@ namespace SEE.Game.Evolution
         /// <param name="comment"> Comment to be added to the marker, optional </param>
         private void AddMarker(Vector3 markerPos, string comment = null)
         {
-            Button newMarker = Instantiate(animationDataModel.MarkerPrefab);
-            newMarker.transform.SetParent(animationDataModel.Slider.transform, false);
+            Button newMarker = Instantiate(animationDataModel.MarkerPrefab, animationDataModel.Slider.transform, false);
             newMarker.transform.position = markerPos;
             newMarker.onClick.AddListener(() => TaskOnClickMarker(newMarker));
             if (sliderMarkerContainer.getSliderMarkerForLocation(markerPos) == null)
@@ -457,8 +450,8 @@ namespace SEE.Game.Evolution
             sliderMarkerContainer.SliderMarkers.Remove(sliderMarker);
             InputField comment = markerDictionary[marker];
             markerDictionary.Remove(marker);
-            GameObject.Destroy(comment.gameObject);
-            GameObject.Destroy(marker.gameObject);
+            Destroy(comment.gameObject);
+            Destroy(marker.gameObject);
         }
 
         /// <summary>
@@ -514,7 +507,7 @@ namespace SEE.Game.Evolution
             }
             if (SEEInput.ToggleEvolutionCanvases())
             {
-                ToogleMode();
+                ToggleMode();
             }
         }
 
@@ -527,9 +520,9 @@ namespace SEE.Game.Evolution
         /// In the revision-selection mode, the user can select the revision to be shown
         /// through the RevisionSelectionCanvas. No movement is possible in that mode.
         /// </summary>
-        private void ToogleMode()
+        private void ToggleMode()
         {
-            SetMode(!isRevisionSelectionOpen);
+            SetMode(!IsRevisionSelectionOpen);
         }
 
         /// <summary>
@@ -552,17 +545,17 @@ namespace SEE.Game.Evolution
         /// animation-interaction mode is turned on</param>
         private void SetMode(bool enabled)
         {
-            isRevisionSelectionOpen = enabled;
+            IsRevisionSelectionOpen = enabled;
 
-            AnimationCanvas.SetActive(!isRevisionSelectionOpen);
-            RevisionSelectionCanvas.SetActive(isRevisionSelectionOpen);
+            AnimationCanvas.SetActive(!IsRevisionSelectionOpen);
+            RevisionSelectionCanvas.SetActive(IsRevisionSelectionOpen);
             evolutionRenderer.SetAutoPlay(false);
-            if (isRevisionSelectionOpen)
+            if (IsRevisionSelectionOpen)
             {
                 // if revision-selection mode is enabled, we re-fill the drop-down
                 // selection menu with all available graph indices.
                 revisionSelectionDataModel.RevisionDropdown.ClearOptions();
-                System.Collections.Generic.List<Dropdown.OptionData> options = Enumerable
+                List<Dropdown.OptionData> options = Enumerable
                     .Range(1, evolutionRenderer.GraphCount)
                     .Select(i => new Dropdown.OptionData(i.ToString()))
                     .ToList();
