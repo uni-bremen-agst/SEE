@@ -218,12 +218,16 @@ namespace SEE.GO
         /// <returns>size of given <paramref name="gameObject"/></returns>
         public static Vector3 WorldSpaceScale(this GameObject gameObject)
         {
+            // For some objects, such as capsules, lossyScale gives wrong results.
+            // The more reliable option to determine the size is using the 
+            // object's renderer if it has one.
             if (gameObject.TryGetComponent(out Renderer renderer))
             {
                 return renderer.bounds.size;
             }
             else
             {
+                // No renderer, so we use lossyScale as a fallback.
                 return gameObject.transform.lossyScale;
             }
         }
