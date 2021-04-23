@@ -2,7 +2,8 @@
 using System.Linq;
 using SEE.Controls;
 using SEE.Controls.Actions;
-using SEE.Game.UI;
+using SEE.Game.UI.Menu;
+using SEE.Game.UI.StateIndicator;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
@@ -54,6 +55,8 @@ namespace SEE.GO.Menu
                 //FIXME This is a bad hack and should be replaced with something proper for non-reversible actions.
                 // This currently just attaches the ShowCodeAction to the menu and registers entry/exitActions which
                 // will enable/disable the component. It should be replaced with something more generalizable.
+                // The current behavior also has a bug which doesn't properly leave an action when switching
+                // to the code action.
                 if (Equals(type, ActionStateType.ShowCode))
                 {
                     // Attach ShowCodeAction 
@@ -89,7 +92,7 @@ namespace SEE.GO.Menu
         }
 
         /// <summary>
-        /// This creates and returns the <see cref="ActionStateIndicator"/>, which displays the current mode.
+        /// This creates and returns the <see cref="StateIndicator.ActionStateIndicator"/>, which displays the current mode.
         /// The indicator will either be attached to the given GameObject or to a new GameObject if
         /// <paramref name="attachTo"/> is null.
         /// </summary>

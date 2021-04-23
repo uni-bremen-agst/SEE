@@ -25,30 +25,17 @@ namespace SEE.Utils
         /// The history of actions that have been executed (and have not yet been undone). The currently
         /// executed action is the top element of this stack.
         /// </summary>
-        private Stack<ReversibleAction> UndoStack { get; set; } = new Stack<ReversibleAction>();
+        private Stack<ReversibleAction> UndoStack { get; } = new Stack<ReversibleAction>();
 
         /// <summary>
         /// The history of actions that have been undone.
         /// </summary>
-        private Stack<ReversibleAction> RedoStack { get; set; } = new Stack<ReversibleAction>();
+        private Stack<ReversibleAction> RedoStack { get; } = new Stack<ReversibleAction>();
 
         /// <summary>
         /// The currently executed action. May be null if there is no current action running.
         /// </summary>
-        public ReversibleAction Current
-        {
-            get
-            {
-                if (UndoStack.Count > 0)
-                {
-                    return UndoStack.Peek();
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
+        public ReversibleAction Current => UndoStack.Count > 0 ? UndoStack.Peek() : null;
 
         /// <summary>
         /// Let C be the currently executed action (if there is any) in this action history. 

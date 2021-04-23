@@ -1,5 +1,6 @@
-﻿using SEE.GO;
-using System;
+﻿using System;
+using SEE.GO;
+using SEE.Utils;
 using TMPro;
 using UnityEngine;
 
@@ -33,12 +34,18 @@ namespace SEE.Game.UI.PropertyDialog
         private GameObject parentOfInputField;
 
         /// <summary>
+        /// The tooltip containing the <see cref="Description"/> of this <see cref="Property"/>, which will
+        /// be displayed when hovering above it.
+        /// </summary>
+        private Tooltip.Tooltip tooltip;
+
+        /// <summary>
         /// Sets <see cref="inputField"/> as an instantiation of prefab <see cref="StringInputFieldPrefab"/>.
         /// Sets the label and value of the field.
         /// </summary>
         protected override void StartDesktop()
         {
-            inputField = Utils.PrefabInstantiator.InstantiatePrefab(StringInputFieldPrefab, instantiateInWorldSpace: false);
+            inputField = PrefabInstantiator.InstantiatePrefab(StringInputFieldPrefab, instantiateInWorldSpace: false);
             if (parentOfInputField != null)
             {
                 SetParent(parentOfInputField);
@@ -48,25 +55,47 @@ namespace SEE.Game.UI.PropertyDialog
             SetInitialInput(inputField, savedValue);
             textField = GetTextField(inputField);
             textField.text = savedValue;
+            SetupTooltip(inputField);
+
+            #region Local Methods
+
+            void SetupTooltip(GameObject field)
+            {
+                tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
+                if (field.TryGetComponentOrLog(out PointerHelper pointerHelper))
+                {
+                    // Register listeners on entry and exit events, respectively
+                    pointerHelper.EnterEvent.AddListener(() => tooltip.Show(Description));
+                    pointerHelper.ExitEvent.AddListener(tooltip.Hide);
+                    // FIXME scrolling doesn't work while hovering above the field, because
+                    // the Modern UI Pack uses an Event Trigger (see Utils/PointerHelper for an explanation.)
+                    // It is unclear how to resolve this without either abstaining from using the Modern UI Pack
+                    // in this instance or without modifying the Modern UI Pack, which would complicate 
+                    // updates greatly. Perhaps the author of the Modern UI Pack (or Unity developers?) should
+                    // be contacted about this.
+                }
+            }
 
             void SetInitialInput(GameObject field, string value)
             {
                 if (!string.IsNullOrEmpty(value) && field.TryGetComponent(out TMP_InputField tmPro))
                 {
                     tmPro.text = value;
+                    // Hide tooltip when any text is entered so as not to obscure the text
+                    tmPro.onValueChanged.AddListener(_ => tooltip.Hide());
                 }
             }
 
             void SetLabel(GameObject field)
             {
                 Transform placeHolder = field.transform.Find("Placeholder");
-                if (placeHolder.gameObject.TryGetComponentOrLog(out TextMeshProUGUI text))
+                placeHolder.gameObject.TryGetComponentOrLog(out TextMeshProUGUI nameTextMeshPro);
                 {
-                    text.text = Name;
+                    nameTextMeshPro.text = Name;
                 }
             }
 
-            TextMeshProUGUI GetTextField(GameObject field)
+            static TextMeshProUGUI GetTextField(GameObject field)
             {
                 Transform result = field.transform.Find("Text Area/Text");                
                 if (result != null && result.gameObject.TryGetComponentOrLog(out TextMeshProUGUI text))
@@ -78,6 +107,8 @@ namespace SEE.Game.UI.PropertyDialog
                     throw new Exception($"Prefab {StringInputFieldPrefab} does not have a TextMeshProUGUI component at child 'Text Area/Text'");
                 }
             }
+            
+            #endregion
         }
 
         /// <summary>
