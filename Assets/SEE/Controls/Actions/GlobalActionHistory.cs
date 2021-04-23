@@ -1,15 +1,20 @@
-﻿namespace SEE.Controls.Actions
+﻿using Assets.SEE.Utils;
+using System;
+using System.Collections.Generic;
+using static Assets.SEE.Utils.ActionHistory;
+
+namespace SEE.Controls.Actions
 {
     /// <summary>
     /// This class manages the history of actions triggered by the player and that
     /// can be undone and re-done.
     /// </summary>
-    public static class PlayerActionHistory
+    public static class GlobalActionHistory
     {
         /// <summary>
         /// The history of actions.
         /// </summary>
-        public static GlobalActionHistory history = new GlobalActionHistory();
+        private static ActionHistory history = new ActionHistory();
 
         /// <summary>
         /// Executes the currently active action (if there is any).
@@ -44,6 +49,24 @@
         {
             ActionState.Value = actionType;
             history.Execute(actionType.CreateReversible());
+        }
+
+        /// <summary>
+        /// Pushes new actions to the <see cref="allActionsList"/>
+        /// </summary>
+        /// <param name="action">The action and all of its specific values which are needed for the history</param>
+        public static void Push(Tuple<bool, HistoryType, string, List<string>> action)
+        {
+            history.Push(action);
+        }
+
+        /// <summary>
+        /// Deletes an item from the action list depending on its id.
+        /// </summary>
+        /// <param name="id">the id of the action which should be deleted</param>
+        public static void DeleteItem(string id, bool isOwner)
+        {
+            history.DeleteItem(id, isOwner);
         }
 
         /// <summary>

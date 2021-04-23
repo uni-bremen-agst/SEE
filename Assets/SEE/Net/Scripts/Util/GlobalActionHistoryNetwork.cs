@@ -1,4 +1,5 @@
 using Assets.SEE.Game;
+using Assets.SEE.Utils;
 using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.GO;
@@ -21,7 +22,7 @@ namespace SEE.Net
         /// <summary>
         /// 
         /// </summary>
-        private GlobalActionHistory.HistoryType type;
+        private ActionHistory.HistoryType type;
         /// <summary>
         /// 
         /// </summary>
@@ -42,7 +43,7 @@ namespace SEE.Net
         /// <param name="type"></param>
         /// <param name="actionId"></param>
         /// <param name="changedObjects"></param>
-        public GlobalActionHistoryNetwork(bool isOwner, GlobalActionHistory.HistoryType type, string actionId, List<string> changedObjects, bool push)
+        public GlobalActionHistoryNetwork(bool isOwner, ActionHistory.HistoryType type, string actionId, List<string> changedObjects, bool push)
         {
             this.isOwner = isOwner;
             this.type = type;
@@ -66,8 +67,8 @@ namespace SEE.Net
             if (!IsRequester())
             {
 
-                if (push) PlayerActionHistory.history.Push(new Tuple<bool, GlobalActionHistory.HistoryType, string, List<string>>(!isOwner, type, actionId, changedObjects));
-                else PlayerActionHistory.history.DeleteItem(actionId, false);
+                if (push) GlobalActionHistory.Push(new Tuple<bool, ActionHistory.HistoryType, string, List<string>>(!isOwner, type, actionId, changedObjects));
+                else GlobalActionHistory.DeleteItem(actionId, false);
 
             }
         }
