@@ -10,6 +10,7 @@ using SEE.DataModel;
 using SEE.Game;
 using SEE.Game.Charts.VR;
 using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
@@ -218,11 +219,7 @@ namespace SEE.Controls
             {
                 {
                     // Create Teleporting game object
-                    UnityEngine.Object teleportingPrefab = Resources.Load<GameObject>("Prefabs/Players/Teleporting");
-                    UnityEngine.Assertions.Assert.IsNotNull(teleportingPrefab);
-                    GameObject teleporting = Instantiate(teleportingPrefab) as GameObject;
-                    UnityEngine.Assertions.Assert.IsNotNull(teleporting);
-                    teleporting.name = "Teleporting";
+                    PrefabInstantiator.InstantiatePrefab("Prefabs/Players/Teleporting").name = "Teleporting";
                 }
                 {
                     // Attach TeleportArea to floor
@@ -289,21 +286,13 @@ namespace SEE.Controls
         private void SetupMixedReality()
         {
             // Add a MixedRealityToolkit to the scene
-            UnityEngine.Object mrtkPrefab = Resources.Load<GameObject>("Prefabs/MixedRealityToolkit");
-            GameObject mrtk = Instantiate(mrtkPrefab) as GameObject;
-            UnityEngine.Assertions.Assert.IsNotNull(mrtk);
-            mrtk.name = MixedRealityToolkitName;
+            PrefabInstantiator.InstantiatePrefab("Prefabs/MixedRealityToolkit").name = MixedRealityToolkitName;
 
             // Create HoloLensAppBar from prefab
-            UnityEngine.Object appBarPrefab = Resources.Load<GameObject>("Prefabs/HoloLensAppBar");
-            GameObject appBar = Instantiate(appBarPrefab) as GameObject;
-            UnityEngine.Assertions.Assert.IsNotNull(appBar);
-            appBar.name = AppBarName;
+            PrefabInstantiator.InstantiatePrefab("Prefabs/HoloLensAppBar").name = AppBarName;
 
             // Add a city collection
-            UnityEngine.Object cityCollectionPrefab = Resources.Load<GameObject>("Prefabs/CityCollection");
-            GameObject cityCollection = Instantiate(cityCollectionPrefab) as GameObject;
-            UnityEngine.Assertions.Assert.IsNotNull(cityCollection);
+            GameObject cityCollection = PrefabInstantiator.InstantiatePrefab("Prefabs/CityCollection");
             cityCollection.name = CityCollectionName;
 
             // Hide all decoration to improve performance
