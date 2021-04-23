@@ -2,11 +2,12 @@
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Action to scale an existing node.
+    /// Action to scale a node.
     /// </summary>
     public class ScaleNodeAction : AbstractPlayerAction
     {
@@ -56,16 +57,6 @@ namespace SEE.Controls.Actions
         private Vector3 forthSideOldSpherePos;
 
         /// <summary>
-        /// The scale at the start so the user can reset the changes made during scaling.
-        /// </summary>
-        private Vector3 originalScale;
-
-        /// <summary>
-        /// The position at the start so the user can reset the changes made during scaling.
-        /// </summary>
-        private Vector3 originalPosition;
-
-        /// <summary>
         /// The sphere on top of the gameObject to scale.
         /// </summary>
         private GameObject topSphere;
@@ -111,17 +102,18 @@ namespace SEE.Controls.Actions
         private GameObject forthSideSphere; //x0 y1
 
         /// <summary>
-        /// The gameObject which will end the scaling and start the save process.
+        /// The gizmo to be selected to finalize the scaling.
         /// </summary>
         private GameObject endWithSave;
 
         /// <summary>
-        /// The gameObject which will end the scaling process and start the discard changes process.
+        /// The gizmo to be selected to cancel the scaling.
         /// </summary>
         private GameObject endWithOutSave;
 
         /// <summary>
-        /// The gameObject in which will be saved which sphere was dragged.
+        /// The scaling gizmo selected by the user to scale <see cref="objectToScale"/>.
+        /// Will be null if none was selected yet.
         /// </summary>
         private GameObject draggedSphere;
 
@@ -131,34 +123,91 @@ namespace SEE.Controls.Actions
         private GameObject objectToScale;
 
         /// <summary>
-        /// A copy of <see cref="objectToScale"/>, temporarily saved for undo.
+        /// A memento of the position and scale of <see cref="objectToScale"/> before
+        /// or after, respectively, it was scaled.
         /// </summary>
-        private GameObject temporaryCopy;
-
-        /// <summary>
-        /// A copy of the scale in order to set the scale to its original after a redo operation.
-        /// </summary>
-        private Vector3 scaleCopy;
-
-        /// <summary>
-        /// Registers for local hovering.
-        /// </summary>
-        public override void Start()
+        private class Memento
         {
-            InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
-            InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
+            /// <summary>
+            /// The scale at the point in time when the memento was created (in world space).
+            /// </summary>
+            public readonly Vector3 Scale;
+
+            /// <summary>
+            /// The position  at the point in time when the memento was created.
+            /// </summary>
+            public readonly Vector3 Position;
+
+            /// <summary>
+            /// Constructor taking a snapshot of the position and scale of <paramref name="gameObject"/>.
+            /// </summary>
+            /// <param name="gameObject">object whose position and scale are to be captured</param>
+            public Memento(GameObject gameObject) 
+            {
+                Position = gameObject.transform.position;
+                Scale = gameObject.transform.lossyScale;
+            }
+
+            /// <summary>
+            /// Reverts the position and scale of <paramref name="gameObject"/> to
+            /// <see cref="Position"/> and <see cref="Scale"/>.
+            /// </summary>
+            /// <param name="gameObject">object whose position and scale are to be restored</param>
+            public void Revert(GameObject gameObject)
+            {
+                gameObject.SetScale(Scale);
+                gameObject.transform.position = Position;
+            }
         }
 
         /// <summary>
-        /// Unregisters from local hovering.
-        /// Removes the scaling spheres after finishing the action or more
-        /// explicitly canceling the action and switch to another.
+        /// The memento for <see cref="objectToScale"/> before the action begun,
+        /// that is, the original values. This memento is needed for <see cref="Undo"/>.
+        /// </summary>
+        private Memento beforeAction;
+
+        /// <summary>
+        /// The memento for <see cref="objectToScale"/> after the action was completed,
+        /// that is, the values after the scaling. This memento is needed for <see cref="Redo"/>.
+        /// </summary>
+        private Memento afterAction;
+
+        /// <summary>
+        /// Re-enables the general selection provided by <see cref="SEEInput.Select"/>.
+        /// It was disabled in <see cref="Update"/> when <see cref="objectToScale"/> was
+        /// selected. Removes all scaling gizmos.
         /// </summary>
         public override void Stop()
         {
-            InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
-            InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
+            base.Stop();
+            SEEInput.SelectionEnabled = true;
             RemoveSpheres();
+        }
+
+        /// <summary>
+        /// Undoes this ScaleNodeAction
+        /// </summary>
+        public override void Undo()
+        {
+            base.Undo();
+            beforeAction.Revert(objectToScale);
+            new ScaleNodeNetAction(objectToScale.name, beforeAction.Scale, beforeAction.Position).Execute();
+        }
+
+        /// <summary>
+        /// Redoes this ScaleNodeAction
+        /// </summary>
+        public override void Redo()
+        {
+            if (afterAction != null)
+            {
+                // The user might have canceled the operation without scaling the
+                // object at all, in which case afterAction will be null. Only if
+                // something has actually changed, we need to re-do the action.
+                base.Redo();
+                afterAction.Revert(objectToScale);
+                new ScaleNodeNetAction(objectToScale.name, beforeAction.Scale, beforeAction.Position).Execute();
+            }
         }
 
         /// <summary>
@@ -175,12 +224,21 @@ namespace SEE.Controls.Actions
         {
             bool result = false;
 
+            // Is a new node selected?
+            if (objectToScale == null
+                && SEEInput.Select()
+                && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
+            {
+                // Disable general selection until action is complete.
+                SEEInput.SelectionEnabled = false;
+                objectToScale = raycastHit.collider.gameObject;
+                Assert.IsTrue(objectToScale.HasNodeRef());
+                // The action has started. An object has been selected.
+                beforeAction = new Memento(objectToScale);
+            }
             if (objectToScale != null && !scalingGizmosAreDrawn)
             {
                 // We draw the gizmos that allow a user to scale the object in all three dimensions.
-
-                originalScale = objectToScale.transform.lossyScale;
-                originalPosition = objectToScale.transform.position;
 
                 // Top sphere
                 topSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -226,15 +284,13 @@ namespace SEE.Controls.Actions
                 SetOnSide();
                 scalingGizmosAreDrawn = true;
             }
-            if (Input.GetMouseButtonDown(0) && objectToScale == null)
-            {
-                objectToScale = hoveredObject;
-                temporaryCopy = hoveredObject;
-            }
+            // Let's see whether the user selected a scaling gizmo.
             if (scalingGizmosAreDrawn && Input.GetMouseButton(0))
-            {
+            {                
                 if (draggedSphere == null)
                 {
+                    // No scaling gizmo has been selected yet.
+                    // FIXME: This works only for desktop environments with a mouse.
                     Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
 
                     // Casts the ray and get the first game object hit
@@ -282,16 +338,20 @@ namespace SEE.Controls.Actions
                     //End Scaling
                     else if (hit.collider == endWithSave.GetComponent<Collider>())
                     {
-                        EndScale(true);
                         // scaling is finalized
+                        afterAction = new Memento(objectToScale);
                         result = true;
                     }
                     else if (hit.collider == endWithOutSave.GetComponent<Collider>())
                     {
-                        EndScale(false);
+                        // We need to revert the scaling.
+                        Undo();
+                        RemoveSpheres();
                     }
                 }
 
+                // Move the draggedSphere along its axis according to the user's request.
+                // Each gizmo is locked to one particular axis.
                 if (draggedSphere == topSphere)
                 {
                     GameNodeMover.MoveToLockAxes(draggedSphere, false, true, false);
@@ -316,36 +376,34 @@ namespace SEE.Controls.Actions
 
                 if (objectToScale != null)
                 {
+                    // Scale objectToScale and re-draw the scaling gizmos. 
                     ScaleNode();
                     SetOnRoof();
                     SetOnSide();
                 }
             }
-            else
+            else if (objectToScale != null && scalingGizmosAreDrawn)
             {
-                if (objectToScale != null && scalingGizmosAreDrawn)
-                {
-                    draggedSphere = null;
-                    // Adjust the size of the scaling elements
-                    SphereRadius(topSphere);
-                    SphereRadius(firstSideSphere);
-                    SphereRadius(secondSideSphere);
-                    SphereRadius(thirdSideSphere);
-                    SphereRadius(forthSideSphere);
-                    SphereRadius(firstCornerSphere);
-                    SphereRadius(secondCornerSphere);
-                    SphereRadius(thirdCornerSphere);
-                    SphereRadius(forthCornerSphere);
+                draggedSphere = null;
+                // Adjust the size of the scaling elements
+                SphereRadius(topSphere);
+                SphereRadius(firstSideSphere);
+                SphereRadius(secondSideSphere);
+                SphereRadius(thirdSideSphere);
+                SphereRadius(forthSideSphere);
+                SphereRadius(firstCornerSphere);
+                SphereRadius(secondCornerSphere);
+                SphereRadius(thirdCornerSphere);
+                SphereRadius(forthCornerSphere);
 
-                    SphereRadius(endWithOutSave);
-                    SphereRadius(endWithSave);
-                }
+                SphereRadius(endWithOutSave);
+                SphereRadius(endWithSave);
             }
             return result;
         }
 
         /// <summary>
-        /// Sets the new scale of a node based on the sphere elements.
+        /// Sets the new scale of <see cref="objectToScale"/> based on the scaling gizmos.
         /// </summary>
         private void ScaleNode()
         {
@@ -405,8 +463,6 @@ namespace SEE.Controls.Actions
             // Transform the new position and scale
             objectToScale.transform.position = position;
             objectToScale.SetScale(scale);
-            scaleCopy = scale;
-            //  scaledObjectTransform = objectToScale.transform;
             hadAnEffect = true;
             new ScaleNodeNetAction(objectToScale.name, scale, position).Execute();
         }
@@ -556,29 +612,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// This will end the scaling action the user can choose between save and discard.
-        /// </summary>
-        /// <param name="save">Whether the changes should be saved</param>
-        public void EndScale(bool save)
-        {
-            if (save)
-            {
-                // FIXME: Currently, the changes will not be saved after closing the game. 
-                // SAVE THE CHANGES
-                RemoveSpheres();
-            }
-            else
-            {
-                objectToScale.SetScale(originalScale);
-                objectToScale.transform.position = originalPosition;
-                new ScaleNodeNetAction(objectToScale.name, originalScale, originalPosition).Execute();
-                hadAnEffect = true;
-                RemoveSpheres();
-            }
-        }
-
-        /// <summary>
-        /// Resets all attributes from the gameObject.
+        /// Destroys all scaling gizmos.
         /// </summary>
         public void RemoveSpheres()
         {
@@ -593,28 +627,7 @@ namespace SEE.Controls.Actions
             Destroyer.DestroyGameObject(forthSideSphere);
             Destroyer.DestroyGameObject(endWithSave);
             Destroyer.DestroyGameObject(endWithOutSave);
-            objectToScale = null;
             scalingGizmosAreDrawn = false;
-        }
-
-        /// <summary>
-        /// Undoes this ScaleNodeAction
-        /// </summary>
-        public override void Undo()
-        {
-            base.Undo();
-            Destroyer.DestroyGameObject(objectToScale);
-            temporaryCopy.transform.position = originalPosition;
-            temporaryCopy.SetScale(originalScale);
-        }
-
-        /// <summary>
-        /// Redoes this ScaleNodeAction
-        /// </summary>
-        public override void Redo()
-        {
-            base.Redo();
-            temporaryCopy.SetScale(scaleCopy);
         }
 
         /// <summary>
