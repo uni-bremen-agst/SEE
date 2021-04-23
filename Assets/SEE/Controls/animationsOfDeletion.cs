@@ -98,7 +98,7 @@ namespace SEE.Controls
 
             foreach (GameObject deletedNode in deletedNodes)
             {
-                Vector3 shrinkFactor = Utils.VectorOperations.DivideVectors(deletedNode.transform.localScale, defaultGarbageVector);
+                Vector3 shrinkFactor = VectorOperations.DivideVectors(deletedNode.transform.localScale, defaultGarbageVector);
                 if (!shrinkFactors.ContainsKey(deletedNode))
                 {
                     shrinkFactors.Add(deletedNode, shrinkFactor);
