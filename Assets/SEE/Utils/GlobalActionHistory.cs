@@ -83,7 +83,7 @@ public class GlobalActionHistory
             }
         }*/
 
-        if(activeAction.Update() && activeAction.HadEffect())
+        if (activeAction.Update() && activeAction.HadEffect())
         {
             Tuple<bool, HistoryType, string, List<string>> lastAction = FindLastActionOfPlayer(true, HistoryType.action);
             if (lastAction == null) return;
@@ -111,7 +111,7 @@ public class GlobalActionHistory
     /// <returns>the action</returns>
     private ReversibleAction FindById(string id)
     {
-        foreach(ReversibleAction it in OwnActions) if(it.GetId().Equals(id)) return it;
+        foreach (ReversibleAction it in OwnActions) if (it.GetId().Equals(id)) return it;
         return null;
     }
     /// <summary>
@@ -183,7 +183,7 @@ public class GlobalActionHistory
             if (allActionsList[i].Item3.Equals(id))
             {
                 allActionsList.RemoveAt(i);
-                if(isOwner) OwnActions.Remove(FindById(id)); //FIXME: is that unique and works?
+                if (isOwner) OwnActions.Remove(FindById(id)); //FIXME: is that unique and works?
                 return;
             }
         }
@@ -195,29 +195,21 @@ public class GlobalActionHistory
     public void Undo()
     {
         Tuple<bool, HistoryType, string, List<string>> lastAction = FindLastActionOfPlayer(true, HistoryType.action);
-        if(lastAction == null) return;
+        if (lastAction == null) return;
         while (!activeAction.HadEffect())
         {
             activeAction.Stop();
-            if (allActionsList.Count > 1) //FIXME: Maybe obsolet becaus not multiplayer compatible, should be replaced by lastaction == null -> return
-            {
-                DeleteItem(lastAction.Item3, lastAction.Item1);
-                lastAction = FindLastActionOfPlayer(true, HistoryType.action);
-                if (lastAction == null) return;
-                activeAction = FindById(lastAction.Item3);
-            }
-            else
-            {
-                // Fixme: What should we do, if undo is not possible?
-                return;
-            }
+            DeleteItem(lastAction.Item3, lastAction.Item1);
+            lastAction = FindLastActionOfPlayer(true, HistoryType.action);
+            if (lastAction == null) return;
+            activeAction = FindById(lastAction.Item3);
         }
         activeAction?.Stop();
         activeAction?.Undo();
         DeleteItem(lastAction.Item3, lastAction.Item1);
         Tuple<bool, HistoryType, string, List<string>> undoneAction = new Tuple<bool, HistoryType, string, List<string>>
             (true, HistoryType.undoneAction, lastAction.Item3, lastAction.Item4);
-        
+
         Push(undoneAction);
         OwnActions.Add(activeAction);
         lastAction = FindLastActionOfPlayer(true, HistoryType.action);
@@ -261,7 +253,7 @@ public class GlobalActionHistory
     /// <returns>True if no action left</returns>
     public bool NoActionsLeft()
     {
-       return FindLastActionOfPlayer(true, HistoryType.action) == null;
+        return FindLastActionOfPlayer(true, HistoryType.action) == null;
     }
 
     /// <summary>
