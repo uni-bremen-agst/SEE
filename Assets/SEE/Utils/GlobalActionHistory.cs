@@ -1,3 +1,4 @@
+using SEE.Net;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ public class GlobalActionHistory
     /// <summary>
     /// An enum which sets the type of an action in the history.
     /// </summary>
-    private enum HistoryType
+    public enum HistoryType
     {
         action,
         undoneAction,
@@ -53,6 +54,7 @@ public class GlobalActionHistory
         //GetActiveAction(key)?.Stop();
         activeAction?.Stop();
         Push(new Tuple<bool, HistoryType, string, List<string>>(true, HistoryType.action, action.GetId(), null));
+        new GlobalActionHistoryNetwork(true,HistoryType.action, action.GetId(),null, true).Execute(null);
         ownActions.Add(action);
         //SetActiveAction(key, action);
         activeAction = action;
@@ -71,28 +73,16 @@ public class GlobalActionHistory
     /// </summary>
     public void Update()
     {
-        /*for (int i = 0; i < allActiveActions.Count; i++)
-        {
-            if (allActiveActions.ElementAt(i).Value.Update() && allActiveActions.ElementAt(i).Value.HadEffect())
-            {
-                // Overwrites the running action with finished reversibleAction - necessary for listing all manipulated gameObjects. 
-                Tuple<string, HistoryType, ReversibleAction, List<string>> lastAction = FindLastActionOfPlayer(allActiveActions.ElementAt(i).Key, HistoryType.action).Item1;
-                if (lastAction == null) return;
-                DeleteItem(allActiveActions.ElementAt(i).Value.GetId());
-                lastAction = new Tuple<string, HistoryType, ReversibleAction, List<string>>(lastAction.Item1, lastAction.Item2, allActiveActions.ElementAt(i).Value, allActiveActions.ElementAt(i).Value.GetChangedObjects());
-                Push(lastAction);
-                Execute(allActiveActions.ElementAt(i).Value.NewInstance(), allActiveActions.ElementAt(i).Key);
-            }
-        }*/
-
         if (activeAction.Update() && activeAction.HadEffect())
         {
             Tuple<bool, HistoryType, string, List<string>> lastAction = FindLastActionOfPlayer(true, HistoryType.action);
             if (lastAction == null) return;
             DeleteItem(activeAction.GetId(), true);
+            new GlobalActionHistoryNetwork(true, HistoryType.action, activeAction.GetId(), null, false).Execute(null);
             lastAction = new Tuple<bool, HistoryType, string, List<string>>(lastAction.Item1, lastAction.Item2, activeAction.GetId(), activeAction.GetChangedObjects());
             Push(lastAction);
             ownActions.Add(activeAction);
+            new GlobalActionHistoryNetwork(lastAction.Item1, lastAction.Item2, lastAction.Item3, lastAction.Item4, true).Execute(null);
             Execute(activeAction.NewInstance());
         }
     }
@@ -101,7 +91,7 @@ public class GlobalActionHistory
     /// Pushes new actions to the <see cref="allActionsList"/>
     /// </summary>
     /// <param name="action">The action and all of its specific values which are needed for the history</param>
-    private void Push(Tuple<bool, HistoryType, string, List<string>> action)
+    public void Push(Tuple<bool, HistoryType, string, List<string>> action)
     {
         allActionsList.Add(action);
     }
@@ -184,7 +174,7 @@ public class GlobalActionHistory
     /// Deletes an item from the action list depending on its id.
     /// </summary>
     /// <param name="id">the id of the action which should be deleted</param>
-    private void DeleteItem(string id, bool isOwner)
+    public void DeleteItem(string id, bool isOwner)
     {
         for (int i = 0; i < allActionsList.Count; i++)
         {
@@ -208,6 +198,7 @@ public class GlobalActionHistory
         {
             activeAction.Stop();
             DeleteItem(lastAction.Item3, lastAction.Item1);
+            new GlobalActionHistoryNetwork(lastAction.Item1, HistoryType.action, lastAction.Item3, null, false).Execute(null);
             lastAction = FindLastActionOfPlayer(true, HistoryType.action);
             if (lastAction == null) return;
             activeAction = FindById(lastAction.Item3);
@@ -222,11 +213,15 @@ public class GlobalActionHistory
             activeAction?.Stop();
             activeAction?.Undo();
             DeleteItem(lastAction.Item3, lastAction.Item1);
+            new GlobalActionHistoryNetwork(true, HistoryType.action, lastAction.Item3, null, false).Execute(null);
             Tuple<bool, HistoryType, string, List<string>> undoneAction = new Tuple<bool, HistoryType, string, List<string>>
                 (true, HistoryType.undoneAction, lastAction.Item3, lastAction.Item4);
 
             Push(undoneAction);
+
             ownActions.Add(activeAction);
+            new GlobalActionHistoryNetwork(undoneAction.Item1, undoneAction.Item2, undoneAction.Item3, undoneAction.Item4, true).Execute(null);
+
             lastAction = FindLastActionOfPlayer(true, HistoryType.action);
             if (lastAction == null) return;
             activeAction = FindById(lastAction.Item3);
@@ -244,7 +239,6 @@ public class GlobalActionHistory
 
         Tuple<bool, HistoryType, string, List<string>> lastUndoneAction = FindLastActionOfPlayer(true, HistoryType.undoneAction);
         if (lastUndoneAction == null) return;
-        if (lastUndoneAction == null) return;
 
         // Fixme: Right place ?
         if (ActionHasConflicts(lastUndoneAction.Item4))
@@ -256,9 +250,12 @@ public class GlobalActionHistory
         temp.Start();
         Tuple<bool, HistoryType, string, List<string>> redoneAction = new Tuple<bool, HistoryType, string, List<string>>(true, HistoryType.action, lastUndoneAction.Item3, lastUndoneAction.Item4);
         Push(redoneAction);
+        new GlobalActionHistoryNetwork(redoneAction.Item1, redoneAction.Item2, redoneAction.Item3, redoneAction.Item4, true).Execute(null);
         activeAction = temp;
         DeleteItem(lastUndoneAction.Item3, lastUndoneAction.Item1);
+
         ownActions.Add(temp);
+        new GlobalActionHistoryNetwork(true, HistoryType.action, lastUndoneAction.Item3, null, false).Execute(null);
     }
 
     /// <summary>
@@ -287,39 +284,4 @@ public class GlobalActionHistory
     {
         return FindLastActionOfPlayer(true, HistoryType.undoneAction) == null;
     }
-
-    /// <summary>
-    /// Returns the Active Action for the Player
-    /// </summary>
-    /// <param name="player">The Player that performs an Action</param>
-    /// <returns>The active action || null if key not in dictionary</returns>
-    /*public ReversibleAction GetActiveAction(string player)
-    {
-        try
-        {
-            return allActiveActions[player];
-        }
-        catch (KeyNotFoundException)
-        {
-            return null;
-        }
-    } 
-
-    /// <summary>
-    /// Sets the active <paramref name="action"/> of a specific <paramref name="player"/>. 
-    /// </summary>
-    /// <param name="player">The player to set the active action</param>
-    /// <param name="action">the new active action</param>
-    private void SetActiveAction(string player, ReversibleAction action)
-    {
-        try
-        {
-            allActiveActions[player] = action;
-        }
-        catch (KeyNotFoundException)
-        {
-            allActiveActions.Add(player, action);
-        }
-    } */
-
 }
