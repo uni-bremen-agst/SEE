@@ -89,7 +89,6 @@ namespace SEE.Controls
                     Portal.SetInfinitePortal(deletedNode);
                 }
             }
-           /// deleteAction.MarkAsDeleted(deletedNodes);           ///
             foreach (GameObject deletedNode in deletedNodes)
             {
                 Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), TimeForAnimation);
