@@ -9,7 +9,7 @@
         /// <summary>
         /// The history of actions.
         /// </summary>
-        private static GlobalActionHistory history = new GlobalActionHistory();
+        public static GlobalActionHistory history = new GlobalActionHistory();
 
         /// <summary>
         /// Executes the currently active action (if there is any).
@@ -25,9 +25,7 @@
         /// </summary>
         public static void Undo()
         {
-
-                history.Undo(); 
-
+            history.Undo();
         }
 
         /// <summary>
@@ -35,9 +33,7 @@
         /// </summary>
         public static void Redo()
         {
-
-                history.Redo(); 
-
+            history.Redo();
         }
 
         /// <summary>
@@ -57,7 +53,7 @@
         /// <returns><see cref="ActionStateType"/> of the currently executed action or null</returns>
         public static ActionStateType Current()
         {
-            return history.GetActiveAction()?.GetActionStateType(); 
+            return history.GetActiveAction()?.GetActionStateType();
         }
 
         /// <summary>
