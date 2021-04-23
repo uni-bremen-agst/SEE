@@ -25,12 +25,15 @@ public class GlobalActionHistory
     /// </summary>
     private List<Tuple<bool, HistoryType, string, List<string>>> allActionsList = new List<Tuple<bool, HistoryType, string, List<string>>>();
 
-    private List<ReversibleAction> OwnActions = new List<ReversibleAction>();
+    private List<ReversibleAction> ownActions = new List<ReversibleAction>();
+
     /// <summary>
     /// Contains the Active Action from each Player needs to be updated with each undo/redo/action
     /// </summary>
     //private Dictionary<string, ReversibleAction> allActiveActions = new Dictionary<string, ReversibleAction>();
+
     private ReversibleAction activeAction = null;
+
     /// <summary>
     /// Let C be the currently executed action (if there is any) in this action history. 
     /// Then <see cref="ReversibleAction.Stop"/> will be called for C. After that 
@@ -50,7 +53,7 @@ public class GlobalActionHistory
         //GetActiveAction(key)?.Stop();
         activeAction?.Stop();
         Push(new Tuple<bool, HistoryType, string, List<string>>(true, HistoryType.action, action.GetId(), null));
-        OwnActions.Add(action);
+        ownActions.Add(action);
         //SetActiveAction(key, action);
         activeAction = action;
         action.Awake();
@@ -89,7 +92,7 @@ public class GlobalActionHistory
             DeleteItem(activeAction.GetId(), true);
             lastAction = new Tuple<bool, HistoryType, string, List<string>>(lastAction.Item1, lastAction.Item2, activeAction.GetId(), activeAction.GetChangedObjects());
             Push(lastAction);
-            OwnActions.Add(activeAction);
+            ownActions.Add(activeAction);
             Execute(activeAction.NewInstance());
         }
     }
@@ -110,9 +113,10 @@ public class GlobalActionHistory
     /// <returns>the action</returns>
     private ReversibleAction FindById(string id)
     {
-        foreach (ReversibleAction it in OwnActions) if (it.GetId().Equals(id)) return it;
+        foreach (ReversibleAction it in ownActions) if (it.GetId().Equals(id)) return it;
         return null;
     }
+
     /// <summary>
     /// Finds the last executed action of a specific player.
     /// </summary>
@@ -139,7 +143,22 @@ public class GlobalActionHistory
 
     private bool ActionHasConflicts(List<string> affectedGameObjects)
     {
-        //Find all newer changes that could be a problem to the undo
+        foreach(Tuple<bool, HistoryType, string, List<string>> affectedObject in allActionsList)
+        {
+            foreach (string s in affectedGameObjects)
+            {
+                if (affectedObject.Item4 != null)
+                {
+                    if (affectedObject.Item4.Contains(s) && affectedObject.Item1 == false)
+                    {
+                        // Fixme: Currently, if a user1 is editing a node and another user2 is adding an edge to this node, 
+                        // user 1 cannot undo his action.
+                        // Fixme: GetChangedObjects has to be fixed - why is adding an edge in conflict with editing on of the target-nodes?
+                        return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 
@@ -152,7 +171,7 @@ public class GlobalActionHistory
         {
             if (allActionsList[i].Item1.Equals(true) && allActionsList[i].Item2.Equals(HistoryType.undoneAction))
             {
-                OwnActions.Remove(FindById(allActionsList[i].Item3)); //FIXME: is that uniqe and works?
+                ownActions.Remove(FindById(allActionsList[i].Item3)); //FIXME: is that uniqe and works?
                 allActionsList.RemoveAt(i);
 
                 i--;
@@ -172,7 +191,7 @@ public class GlobalActionHistory
             if (allActionsList[i].Item3.Equals(id))
             {
                 allActionsList.RemoveAt(i);
-                if (isOwner) OwnActions.Remove(FindById(id)); //FIXME: is that unique and works?
+                if (isOwner) ownActions.Remove(FindById(id)); //FIXME: is that unique and works?
                 return;
             }
         }
@@ -207,7 +226,7 @@ public class GlobalActionHistory
                 (true, HistoryType.undoneAction, lastAction.Item3, lastAction.Item4);
 
             Push(undoneAction);
-            OwnActions.Add(activeAction);
+            ownActions.Add(activeAction);
             lastAction = FindLastActionOfPlayer(true, HistoryType.action);
             if (lastAction == null) return;
             activeAction = FindById(lastAction.Item3);
@@ -239,7 +258,7 @@ public class GlobalActionHistory
         Push(redoneAction);
         activeAction = temp;
         DeleteItem(lastUndoneAction.Item3, lastUndoneAction.Item1);
-        OwnActions.Add(temp);
+        ownActions.Add(temp);
     }
 
     /// <summary>
