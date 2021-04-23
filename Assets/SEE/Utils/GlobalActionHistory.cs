@@ -244,6 +244,9 @@ public class GlobalActionHistory
         if (ActionHasConflicts(lastUndoneAction.Item4))
         {
             // Fixme: Error
+            //NEED to delete the ownAction
+            //Set the owner of the action to false, dont delete from allactions
+            //notify the user
         }
         ReversibleAction temp = FindById(lastUndoneAction.Item3);
         temp.Redo();

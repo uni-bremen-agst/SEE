@@ -12,7 +12,7 @@ namespace SEE.Net
     /// <summary>
     /// Sync the actionhistory through the network on each client.
     /// </summary>
-    public class GlobalActionHistoryNetwork : AbstractAction
+    public  class GlobalActionHistoryNetwork : AbstractAction
     {
         /// <summary>
         /// 
