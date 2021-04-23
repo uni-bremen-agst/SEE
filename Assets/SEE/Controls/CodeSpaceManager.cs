@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using SEE.Game.UI;
 using SEE.Game.UI.CodeWindow;
+using SEE.Game.UI.Menu;
+using SEE.Game.UI.StateIndicator;
 using UnityEngine;
 using UnityEngine.Events;
 

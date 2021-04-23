@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SEE.GO
 {
-    [RequireComponent(typeof(SEECity))]
+    // [RequireComponent(typeof(SEECity))] // FIXME: We cannot simply request that a SEECity exists. There are also other kinds of AbstractSEECity classes.
     public class CityCursor : MonoBehaviour
     {
         private Graph graph;
