@@ -11,139 +11,154 @@ namespace SEE.Controls.Actions
     public class ScaleNodeAction : AbstractPlayerAction
     {
         /// <summary>
-        /// The old position of the top sphere
+        /// The old position of the top sphere.
         /// </summary>
         private Vector3 topOldSpherePos;
 
         /// <summary>
-        /// The old position of the first corner sphere
+        /// The old position of the first corner sphere.
         /// </summary>
         private Vector3 firstCornerOldSpherePos;
 
         /// <summary>
-        /// The old position of the second corner sphere
+        /// The old position of the second corner sphere.
         /// </summary>
         private Vector3 secondCornerOldSpherePos;
 
         /// <summary>
-        /// The old position of the third corner sphere
+        /// The old position of the third corner sphere.
         /// </summary>
         private Vector3 thirdCornerOldSpherePos;
 
         /// <summary>
-        /// The old position of the forth corner sphere
+        /// The old position of the forth corner sphere.
         /// </summary>
         private Vector3 forthCornerOldSpherePos;
 
         /// <summary>
-        /// The old position of the first side sphere
+        /// The old position of the first side sphere.
         /// </summary>
         private Vector3 firstSideOldSpherePos;
 
         /// <summary>
-        /// The old position of the second side sphere
+        /// The old position of the second side sphere.
         /// </summary>
         private Vector3 secondSideOldSpherePos;
 
         /// <summary>
-        /// The old position of the third side sphere
+        /// The old position of the third side sphere.
         /// </summary>
         private Vector3 thirdSideOldSpherePos;
 
         /// <summary>
-        /// The old position of the forth side sphere
+        /// The old position of the forth side sphere.
         /// </summary>
         private Vector3 forthSideOldSpherePos;
 
         /// <summary>
-        /// The scale at the start so the user can reset the changes made during scaling
+        /// The scale at the start so the user can reset the changes made during scaling.
         /// </summary>
         private Vector3 originalScale;
 
         /// <summary>
-        /// The position at the start so the user can reset the changes made during scaling
+        /// The position at the start so the user can reset the changes made during scaling.
         /// </summary>
         private Vector3 originalPosition;
 
         /// <summary>
-        /// The sphere on top of the gameObject to scale
+        /// The sphere on top of the gameObject to scale.
         /// </summary>
         private GameObject topSphere;
 
         /// <summary>
-        /// The sphere on the first corner of the gameObject to scale
+        /// The sphere on the first corner of the gameObject to scale.
         /// </summary>
         private GameObject firstCornerSphere; //x0 y0
 
         /// <summary>
-        /// The sphere on the second corner of the gameObject to scale
+        /// The sphere on the second corner of the gameObject to scale.
         /// </summary>
         private GameObject secondCornerSphere; //x1 y0
 
         /// <summary>
-        /// The sphere on the third corner of the gameObject to scale
+        /// The sphere on the third corner of the gameObject to scale.
         /// </summary>
         private GameObject thirdCornerSphere; //x1 y1
 
         /// <summary>
-        /// The sphere on the forth corner of the gameObject to scale
+        /// The sphere on the forth corner of the gameObject to scale.
         /// </summary>
         private GameObject forthCornerSphere; //x0 y1
 
         /// <summary>
-        /// The sphere on the first side of the gameObject to scale
+        /// The sphere on the first side of the gameObject to scale.
         /// </summary>
         private GameObject firstSideSphere; //x0 y0
 
         /// <summary>
-        /// The sphere on the second side of the gameObject to scale
+        /// The sphere on the second side of the gameObject to scale.
         /// </summary>
         private GameObject secondSideSphere; //x1 y0
 
         /// <summary>
-        /// The sphere on the third side of the gameObject to scale
+        /// The sphere on the third side of the gameObject to scale.
         /// </summary>
         private GameObject thirdSideSphere; //x1 y1
 
         /// <summary>
-        /// The sphere on the forth side of the gameObject to scale
+        /// The sphere on the forth side of the gameObject to scale.
         /// </summary>
         private GameObject forthSideSphere; //x0 y1
 
         /// <summary>
-        /// The gameObject which will end the scaling and start the save process
+        /// The gameObject which will end the scaling and start the save process.
         /// </summary>
         private GameObject endWithSave;
 
         /// <summary>
-        /// The gameObject which will end the scaling process and start the discard changes process
+        /// The gameObject which will end the scaling process and start the discard changes process.
         /// </summary>
         private GameObject endWithOutSave;
 
         /// <summary>
-        /// The gameObject in which will be saved which sphere was dragged
+        /// The gameObject in which will be saved which sphere was dragged.
         /// </summary>
         private GameObject draggedSphere;
 
         /// <summary>
-        /// The gameObject which should be scaled
+        /// The gameObject which should be scaled.
         /// </summary>
         private GameObject objectToScale;
 
         /// <summary>
-        /// A copy of the objectToScale, temporarily saved for undo operation
+        /// A copy of <see cref="objectToScale"/>, temporarily saved for undo.
         /// </summary>
         private GameObject temporaryCopy;
 
         /// <summary>
-        /// A copy of the scale in order to set the scale to its original after a redo operation
+        /// A copy of the scale in order to set the scale to its original after a redo operation.
         /// </summary>
         private Vector3 scaleCopy;
 
+        /// <summary>
+        /// Registers for local hovering.
+        /// </summary>
         public override void Start()
         {
             InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
             InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
+        }
+
+        /// <summary>
+        /// Unregisters from local hovering.
+        /// Removes the scaling spheres after finishing the action or more
+        /// explicitly canceling the action and switch to another.
+        /// </summary>
+        public override void Stop()
+        {
+            InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
+            InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
+            RemoveSpheres();
         }
 
         /// <summary>
@@ -330,15 +345,6 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Remove the spheres after finishing the action or more explicitly canceling the
-        /// action and switch to another.
-        /// </summary>
-        public override void Stop()
-        {
-            RemoveSpheres();
-        }
-
-        /// <summary>
         /// Sets the new scale of a node based on the sphere elements.
         /// </summary>
         private void ScaleNode()
@@ -352,10 +358,14 @@ namespace SEE.Controls.Actions
 
             // Corner scaling
             float scaleCorner = 0;
-            scaleCorner -= firstCornerSphere.transform.position.x - firstCornerOldSpherePos.x + (firstCornerSphere.transform.position.z - firstCornerOldSpherePos.z); //* 0.5f;
-            scaleCorner += secondCornerSphere.transform.position.x - secondCornerOldSpherePos.x - (secondCornerSphere.transform.position.z - secondCornerOldSpherePos.z); //* 0.5f;
-            scaleCorner += thirdCornerSphere.transform.position.x - thirdCornerOldSpherePos.x + (thirdCornerSphere.transform.position.z - thirdCornerOldSpherePos.z);// * 0.5f;
-            scaleCorner -= forthCornerSphere.transform.position.x - forthCornerOldSpherePos.x - (forthCornerSphere.transform.position.z - forthCornerOldSpherePos.z);// * 0.5f;
+            scaleCorner -= firstCornerSphere.transform.position.x - firstCornerOldSpherePos.x 
+                + (firstCornerSphere.transform.position.z - firstCornerOldSpherePos.z);
+            scaleCorner += secondCornerSphere.transform.position.x - secondCornerOldSpherePos.x 
+                - (secondCornerSphere.transform.position.z - secondCornerOldSpherePos.z);
+            scaleCorner += thirdCornerSphere.transform.position.x - thirdCornerOldSpherePos.x 
+                + (thirdCornerSphere.transform.position.z - thirdCornerOldSpherePos.z);
+            scaleCorner -= forthCornerSphere.transform.position.x - forthCornerOldSpherePos.x 
+                - (forthCornerSphere.transform.position.z - forthCornerOldSpherePos.z);
 
             scale.x += scaleCorner;
             scale.z += scaleCorner;
@@ -404,20 +414,45 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Sets the top sphere at the top of <see cref="objectToScale"/> and
         /// the Save (<see cref="endWithSave"/>) and Discard (<see cref="endWithOutSave"/>)
-        /// objects.
+        /// gizmos.
         /// </summary>
         private void SetOnRoof()
         {
             Vector3 pos = objectToScale.transform.position;
-            pos.y = objectToScale.GetRoof() + 0.01f;
+            // The scaling sphere is just above the center of the roof of objectToScale.
+            pos.y = objectToScale.GetRoof() + ScalingSphereRadius();
             topSphere.transform.position = pos;
-
             topOldSpherePos = topSphere.transform.position;
-            pos.y += 0.2f;
-            pos.x += 0.1f;
+
+            // The two gizmos to confirm or cancel the scaling are just above the 
+            // roof of objectToScale. We are assuming endWithSave and endWithOutSave
+            // have the same height.
+            pos.y = objectToScale.GetRoof() + endWithSave.WorldSpaceScale().y / 2;
+            // The two gizmos are left and right, respectively, from it. We want
+            // them in the middle between respective objectToScale's edge and the
+            // centered scaling sphere (which is at the center of objectToScale's
+            // roof). We need to divide objectToScale.transform.lossyScale by 2
+            // to obtain the extent, then once more divide by 2 to obtain half
+            // that distance.
+            float distance = objectToScale.transform.lossyScale.x / 4;
+            pos.x += distance;
             endWithSave.transform.position = pos;
-            pos.x -= 0.2f;
+            pos.x -= 2 * distance; // multiplied by two to revert the above setting of pos.x
             endWithOutSave.transform.position = pos;
+        }
+
+        /// <summary>
+        /// Returns the radius of the sphere used to visualize the
+        /// handle (gizmo) to scale the object.
+        /// </summary>
+        /// <returns></returns>
+        private float ScalingSphereRadius()
+        {
+            // Assumptions: We assume firstCornerSphere has the same scale as every
+            // other scaling sphere and that it is actually a sphere (more precisely,
+            // that its width and depth are the same so that we can use the x scale
+            // or the z scale; it does not matter).
+            return firstCornerSphere.transform.lossyScale.x / 2.0f;
         }
 
         /// <summary>
@@ -426,70 +461,74 @@ namespace SEE.Controls.Actions
         private void SetOnSide()
         {
             Transform trns = objectToScale.transform;
+            float sphereRadius = ScalingSphereRadius();
+            float xOffset = trns.lossyScale.x / 2 + sphereRadius;
+            float zOffset = trns.lossyScale.z / 2 + sphereRadius;
 
-            // first corner
-            Vector3 pos = objectToScale.transform.position;
-            pos.y = objectToScale.GetRoof();
-            pos.x -= trns.lossyScale.x / 2 + 0.02f;
-            pos.z -= trns.lossyScale.z / 2 + 0.02f;
-            firstCornerSphere.transform.position = pos;
-            firstCornerOldSpherePos = pos;
+            Vector3 Corner(float xOffset, float zOffset)
+            {
+                Vector3 result = trns.position;
+                result.y = objectToScale.GetRoof();
+                result.x += xOffset;
+                result.z += zOffset;
+                return result;
+            }
 
-            // second corner
-            pos = objectToScale.transform.position;
-            pos.y = objectToScale.GetRoof();
-            pos.x += trns.lossyScale.x / 2 + 0.02f;
-            pos.z -= trns.lossyScale.z / 2 + 0.02f;
-            secondCornerSphere.transform.position = pos;
-            secondCornerOldSpherePos = pos;
+            // Calulate the positions of the scaling handles at the four corners of the roof.
+            {
+                // south-west corner
+                {
+                    Vector3 pos = Corner(-xOffset, -zOffset);
+                    firstCornerSphere.transform.position = pos;
+                    firstCornerOldSpherePos = pos;
+                }
+                // south-east corner 
+                {
+                    Vector3 pos = Corner(xOffset, -zOffset);
+                    secondCornerSphere.transform.position = pos;
+                    secondCornerOldSpherePos = pos;
+                }
+                // north-east corner
+                {
+                    Vector3 pos = Corner(xOffset, zOffset);
+                    thirdCornerSphere.transform.position = pos;
+                    thirdCornerOldSpherePos = pos;
+                }
+                // north-west corner
+                {
+                    Vector3 pos = Corner(-xOffset, zOffset);
+                    forthCornerSphere.transform.position = pos;
+                    forthCornerOldSpherePos = pos;
+                }
+            }
 
-            // third corner
-            pos = objectToScale.transform.position;
-            pos.y = objectToScale.GetRoof();
-            pos.x += trns.lossyScale.x / 2 + 0.02f;
-            pos.z += trns.lossyScale.z / 2 + 0.02f;
-            thirdCornerSphere.transform.position = pos;
-            thirdCornerOldSpherePos = pos;
-
-            // forth corner
-            pos = objectToScale.transform.position;
-            pos.y = objectToScale.GetRoof();
-            pos.x -= trns.lossyScale.x / 2 + 0.02f;
-            pos.z += trns.lossyScale.z / 2 + 0.02f;
-            forthCornerSphere.transform.position = pos;
-            forthCornerOldSpherePos = pos;
-
-            // first side
-            pos = objectToScale.transform.position;
-            pos.y = objectToScale.GetRoof();
-            pos.x -= trns.lossyScale.x / 2 + 0.01f;
-
-            firstSideSphere.transform.position = pos;
-            firstSideOldSpherePos = pos;
-
-            // second side
-            pos = objectToScale.transform.position;
-            pos.y = objectToScale.GetRoof();
-            pos.x += trns.lossyScale.x / 2 + 0.01f;
-
-            secondSideSphere.transform.position = pos;
-            secondSideOldSpherePos = pos;
-
-            // third side
-            pos = objectToScale.transform.position;
-            pos.y = objectToScale.GetRoof();
-
-            pos.z -= trns.lossyScale.z / 2 + 0.01f;
-            thirdSideSphere.transform.position = pos;
-            thirdSideOldSpherePos = pos;
-
-            // forth side
-            pos = objectToScale.transform.position;
-            pos.y = objectToScale.GetRoof();
-
-            pos.z += trns.lossyScale.z / 2 + 0.01f;
-            forthSideSphere.transform.position = pos;
-            forthSideOldSpherePos = pos;
+            // Calulate the positions of the scaling handles at the four sides of the roof.
+            {
+                // west side
+                {
+                    Vector3 pos = Corner(-xOffset, 0);
+                    firstSideSphere.transform.position = pos;
+                    firstSideOldSpherePos = pos;
+                }
+                // east side
+                {
+                    Vector3 pos = Corner(xOffset, 0);
+                    secondSideSphere.transform.position = pos;
+                    secondSideOldSpherePos = pos;
+                }
+                // south side
+                {
+                    Vector3 pos = Corner(0, -zOffset);
+                    thirdSideSphere.transform.position = pos;
+                    thirdSideOldSpherePos = pos;
+                }
+                // north side
+                {
+                    Vector3 pos = Corner(0, zOffset);
+                    forthSideSphere.transform.position = pos;
+                    forthSideOldSpherePos = pos;
+                }
+            }
         }
 
         /// <summary>
@@ -501,7 +540,7 @@ namespace SEE.Controls.Actions
             Vector3 goScale = objectToScale.transform.lossyScale;
             if (goScale.x > goScale.z && goScale.z > 0.1f)
             {
-                sphere.transform.localScale = new Vector3(goScale.z, goScale.z, goScale.z) * 0.1f; ;
+                sphere.transform.localScale = new Vector3(goScale.z, goScale.z, goScale.z) * 0.1f;
             }
             else if (goScale.x > 0.1f)
             {
