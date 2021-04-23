@@ -57,7 +57,7 @@
         /// <returns><see cref="ActionStateType"/> of the currently executed action or null</returns>
         public static ActionStateType Current()
         {
-            return history.getActiveAction()?.GetActionStateType(); 
+            return history.GetActiveAction()?.GetActionStateType(); 
         }
 
         /// <summary>

@@ -80,7 +80,7 @@ public class GlobalActionHistory
             }
         }*/
 
-        if(activeAction.Update() && activeAction.HadEffect())
+        if (activeAction.Update() && activeAction.HadEffect())
         {
             Tuple<bool, HistoryType, ReversibleAction, List<string>> lastAction = FindLastActionOfPlayer(true, HistoryType.action);
             if (lastAction == null) return;
@@ -121,23 +121,13 @@ public class GlobalActionHistory
                 break;
             }
         }
-        // Fixme: Outsourcing to another function
-        //Find all newer changes that could be a problem to the undo
-        //if (count > 1 && result != null) //IF Result == NULL no undo could be performed
-        //{
-        //    while (true)
-        //    {
-        //        //Checks if any item from list 1 is in list 2
-        //        if (result.Item5?.Where(it => actionList[count].Item5.Contains(it)) != null) //FIXME: Could make some trouble, not sure if it works
-        //        {
-        //            //results.Add(actionList[i].Item4);
-        //            return new Tuple<Tuple<DateTime, string, HistoryType, ReversibleAction, List<string>>, bool>(result, true); //Delete this return if you want to give all actions to the caller 
-        //        }
-        //        if (i == count) break;
-        //        if (i < count) i++;
-        //    }
-        //}
         return result;
+    }
+
+    private bool ActionHasConflicts(List<string> affectedGameObjects)
+    {
+        //Find all newer changes that could be a problem to the undo
+        return false;
     }
 
     /// <summary>
@@ -178,7 +168,7 @@ public class GlobalActionHistory
     public void Undo()
     {
         Tuple<bool, HistoryType, ReversibleAction, List<string>> lastAction = FindLastActionOfPlayer(true, HistoryType.action);
-        if(lastAction == null) return;
+        if (lastAction == null) return;
         while (!activeAction.HadEffect())
         {
             activeAction.Stop();
@@ -195,18 +185,27 @@ public class GlobalActionHistory
                 return;
             }
         }
-        activeAction?.Stop();
-        activeAction?.Undo();
-        DeleteItem(lastAction.Item3.GetId());
-        Tuple<bool, HistoryType, ReversibleAction, List<string>> undoneAction = new Tuple<bool, HistoryType, ReversibleAction, List<string>>
-            (true, HistoryType.undoneAction, lastAction.Item3, lastAction.Item4);
-        
-        Push(undoneAction);
-        lastAction = FindLastActionOfPlayer(true, HistoryType.action);
-        if (lastAction == null) return;
-        activeAction = lastAction.Item3;
-        activeAction?.Start();
-        isRedo = true;
+
+        // Fixme: Right place ?
+        if (ActionHasConflicts(activeAction.GetChangedObjects()))
+        {
+            // Fixme: Error
+        }
+        else
+        {
+            activeAction?.Stop();
+            activeAction?.Undo();
+            DeleteItem(lastAction.Item3.GetId());
+            Tuple<bool, HistoryType, ReversibleAction, List<string>> undoneAction = new Tuple<bool, HistoryType, ReversibleAction, List<string>>
+                (true, HistoryType.undoneAction, lastAction.Item3, lastAction.Item4);
+
+            Push(undoneAction);
+            lastAction = FindLastActionOfPlayer(true, HistoryType.action);
+            if (lastAction == null) return;
+            activeAction = lastAction.Item3;
+            activeAction?.Start();
+            isRedo = true;
+        }
     }
 
     /// <summary>
@@ -215,9 +214,14 @@ public class GlobalActionHistory
     public void Redo()
     {
         activeAction?.Stop();
-
         Tuple<bool, HistoryType, ReversibleAction, List<string>> lastUndoneAction = FindLastActionOfPlayer(true, HistoryType.undoneAction);
         if (lastUndoneAction == null) return;
+
+        // Fixme: Right place ?
+        if (ActionHasConflicts(lastUndoneAction.Item4))
+        {
+            // Fixme: Error
+        }
 
         lastUndoneAction.Item3.Redo();
         Tuple<bool, HistoryType, ReversibleAction, List<string>> redoneAction = new Tuple<bool, HistoryType, ReversibleAction, List<string>>(true, HistoryType.action, lastUndoneAction.Item3, lastUndoneAction.Item4);
@@ -232,7 +236,7 @@ public class GlobalActionHistory
     /// Returns the active action of a player
     /// </summary>
     /// <returns>The active action of a player</returns>
-    public ReversibleAction getActiveAction()
+    public ReversibleAction GetActiveAction()
     {
         return activeAction;
     }
@@ -243,7 +247,7 @@ public class GlobalActionHistory
     /// <returns>True if no action left</returns>
     public bool NoActionsLeft()
     {
-       return FindLastActionOfPlayer(true, HistoryType.action) == null;
+        return FindLastActionOfPlayer(true, HistoryType.action) == null;
     }
 
     /// <summary>
