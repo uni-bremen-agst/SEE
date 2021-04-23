@@ -31,6 +31,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
 using System.Runtime.CompilerServices;
+using System.Collections;
 
 namespace SEE.Game
 {
@@ -659,9 +660,10 @@ namespace SEE.Game
         /// <param name="oldEdges">List of currently drawn edges</param>
         /// <param name="newEdges">List of new edges to be drawn</param>
         /// <returns>List of related edges</returns>
-        protected virtual IList<(GameObject, GameObject)> EdgeMatcher(IList<GameObject> oldEdges, IList<GameObject> newEdges)
+        protected virtual IEnumerator EdgeMatcher(IList<GameObject> oldEdges, IList<GameObject> newEdges)
         {
-            IList<(GameObject, GameObject)> result = new List<(GameObject, GameObject)>();
+
+            matchedEdges = new List<(GameObject, GameObject)>();
             foreach (GameObject oldEdgeGameObject in oldEdges)
             {
                 foreach (GameObject newEdgeGameObject in newEdges)
@@ -670,11 +672,13 @@ namespace SEE.Game
                         && newEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef newEdgeRef)
                         && oldEdgeRef.Value.Equals(newEdgeRef.Value))
                     {
-                        result.Add((oldEdgeGameObject, newEdgeGameObject));
+                        //result.Add((oldEdgeGameObject, newEdgeGameObject));
+                        matchedEdges.Add((oldEdgeGameObject, newEdgeGameObject));
                     }
                 }
+                yield return null;
             }
-            return result;
+            yield return null;
         }
 
         
@@ -691,7 +695,8 @@ namespace SEE.Game
                 IList<GameObject> oldEdges = objectManager.GetEdges().ToList();
                 
                 // Searches for pairs between old and new edges
-                matchedEdges =  EdgeMatcher(oldEdges,newEdges);
+                //matchedEdges =  EdgeMatcher(oldEdges,newEdges);
+                StartCoroutine(EdgeMatcher(oldEdges, newEdges));
                 // Case distinction in case the layout does not need sample points
                 if(!graphRenderer.GetSettings().EdgeLayout.Equals(SEE.Layout.EdgeLayouts.EdgeLayoutKind.Straight))
                 {
