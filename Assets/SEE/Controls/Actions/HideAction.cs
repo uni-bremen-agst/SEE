@@ -1,5 +1,6 @@
 ﻿using SEE.DataModel;
 using SEE.DataModel.DG;
+using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
 using System;
@@ -19,14 +20,14 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject selectedObject;
 
-        //private List<GameObject> hiddenObjects;
-
         private ISet<GameObject> hiddenObjects = new HashSet<GameObject>();
 
         private ISet<GameObject> undoneList = new HashSet<GameObject>();
 
-
-        //private List<GameObject> undoneList;
+        /// <summary>
+        /// The code city to perform actions on, only necessary for 
+        /// </summary>
+        SEECity CodeCity;
 
         enum EdgeSelector
         {
@@ -79,34 +80,11 @@ namespace SEE.Controls.Actions
                 Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
                 if (selectedObject.CompareTag(Tags.Edge))
                 {
-                    hiddenObjects.Add(selectedObject);
-                    GameObjectExtensions.SetVisibility(selectedObject, false, true);
-                    selectedObject = null;
+                    HideEdge(selectedObject);
                 }
                 else if (selectedObject.CompareTag(Tags.Node))
                 {
-                    List<GameObject> hiddenList = new List<GameObject>();
-                    if (selectedObject.TryGetComponent(out NodeRef nodeRef))
-                    {
-                        HashSet<String> edgeIDs = GetEdgeIds(nodeRef);
-
-                        foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
-                        {
-                            bool rendered = false;
-                            if (edge.TryGetComponent(out Renderer renderer))
-                            {
-                                rendered = renderer.enabled;
-                            }
-                            if (edge.activeInHierarchy && edgeIDs.Contains(edge.name) && rendered)
-                            {
-                                hiddenObjects.Add(edge);
-                                GameObjectExtensions.SetVisibility(edge, false, true);
-                            }
-                        }
-                    }
-                    hiddenObjects.Add(selectedObject);
-                    GameObjectExtensions.SetVisibility(selectedObject, false, true);
-                    selectedObject = null;
+                    HideNodeIncludingConnectedEdges(selectedObject);
                 }
                 hadAnEffect = true;
                 return true;
@@ -118,7 +96,73 @@ namespace SEE.Controls.Actions
 
         }
 
+        private bool HideEdge(GameObject edge)
+        {
+            hiddenObjects.Add(edge);
+            GameObjectExtensions.SetVisibility(edge, false, true);
+            edge = null;
+            return true;
+        }
 
+        private bool HideNodeIncludingConnectedEdges(GameObject node)
+        {
+            if (node.TryGetComponent(out NodeRef nodeRef))
+            {
+                HashSet<String> edgeIDs = GetEdgeIds(nodeRef);
+
+                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
+                {
+                    bool rendered = false;
+                    if (edge.TryGetComponent(out Renderer renderer))
+                    {
+                        rendered = renderer.enabled;
+                    }
+                    if (edge.activeInHierarchy && edgeIDs.Contains(edge.name) && rendered)
+                    {
+                        hiddenObjects.Add(edge);
+                        GameObjectExtensions.SetVisibility(edge, false, true);
+                    }
+                }
+            }
+            hiddenObjects.Add(node);
+            GameObjectExtensions.SetVisibility(node, false, true);
+            node = null;
+            return true;
+        }
+
+        private bool HideAll()
+        {
+            GameObject city = selectedObject;
+            while (!city.CompareTag(Tags.CodeCity))
+            {
+                city = city.transform.parent.gameObject;
+            }
+
+            List<GameObject> nodesEdgesDecorations = GetAllChildrenRecursively(city.transform, new List<GameObject>());
+            
+            foreach (GameObject g in nodesEdgesDecorations)
+            {
+                GameObjectExtensions.SetVisibility(g, false, true);
+                hiddenObjects.Add(g);
+            }
+            return true;
+        }
+
+        private List<GameObject> GetAllChildrenRecursively(Transform transform, List<GameObject> objectList)
+        {
+            foreach (Transform child in transform)
+            {
+                if (child.CompareTag(Tags.Node) || child.CompareTag(Tags.Edge) || child.CompareTag(Tags.Decoration))
+                {
+                    objectList.Add(child.gameObject);
+                }
+                if(child.childCount > 0)
+                {
+                    GetAllChildrenRecursively(child, objectList);
+                }
+            }
+            return objectList;
+        }
 
         private bool HideOutgoingEdges(GameObject node)
         {
