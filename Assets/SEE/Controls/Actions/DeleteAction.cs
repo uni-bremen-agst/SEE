@@ -34,16 +34,7 @@ namespace SEE.Controls.Actions
             return CreateReversibleAction();
         }
 
-        /// <summary>
-        /// The waiting time of the animation for moving a node into a garbage can from over the garbage can.
-        /// </summary>
-        private const float TimeToWait = 1f;
-
-        /// <summary>
-        /// The animation time of the animation of moving a node to the top of the garbage can.
-        /// </summary>
-        private const float TimeForAnimation = 1f;
-
+       
         /// <summary>
         /// Contains all nodes and edges deleted as explicitly requested by the user.
         /// As a consequence of deleting a node, its ancestors along with their incoming and outgoing
@@ -56,40 +47,15 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// A history of all nodes and the graph where they were attached to, deleted by this action.
         /// </summary>
-        private Dictionary<GameObject, Graph> deletedNodes { get; set; } = new Dictionary<GameObject, Graph>();
+        public Dictionary<GameObject, Graph> deletedNodes { get; set; } = new Dictionary<GameObject, Graph>();
 
-        /// <summary>
-        /// A history of the old positions of the nodes deleted by this action.
-        /// </summary>
-        private Dictionary<GameObject, Vector3> oldPositions = new Dictionary<GameObject, Vector3>();
+        
 
         /// <summary>
         /// A history of all edges and the graph where they were attached to, deleted by this action.
         /// </summary>
         private Dictionary<GameObject, Graph> deletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
 
-        /// <summary>
-        /// A list of ratios of the current localScale and a target scale.
-        /// </summary>
-        private Dictionary<GameObject, Vector3> shrinkFactors { get; set; } = new Dictionary<GameObject, Vector3>();
-
-        /// <summary>
-        ///  A vector for an objects localScale which fits into the garbage can.
-        ///  TODO: Currently set to an absolute value. Should be set abstract, e.g., half of the 
-        ///  garbage can's diameter. 
-        /// </summary>
-        private readonly Vector3 defaultGarbageVector = new Vector3(0.1f, 0.1f, 0.1f);
-
-        /// <summary>
-        /// Number of animations used for an object's expansion, removing it from the garbage can.
-        /// </summary>
-        private const float stepsOfExpansionAnimation = 10;
-
-        /// <summary>
-        /// The time (in seconds) between animations of expanding a node that is being restored
-        /// from the garbage can.
-        /// </summary>
-        private const float timeBetweenExpansionAnimation = 0.14f;
 
         /// <summary>
         /// The name of the garbage can gameObject.
@@ -192,7 +158,10 @@ namespace SEE.Controls.Actions
                     // will run an animation that moves them into a garbage bin. Only when they arrive there,
                     // we will actually delete them.
                     // FIXME: Shouldn't the edges be moved to the garbage bin, too?
-                    PlayerSettings.GetPlayerSettings().StartCoroutine(this.MoveNodeToGarbage(deletedObject.AllAncestors()));
+                    //  PlayerSettings.GetPlayerSettings().StartCoroutine(this.MoveNodeToGarbage(deletedObject.AllAncestors()));
+                    PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.MoveNodeToGarbage(deletedObject.AllAncestors(), garbageCan));
+                    Portal.SetInfinitePortal(deletedObject);
+                    MarkAsDeleted(deletedObject.AllAncestors());
                 }
             }
             new DeleteNetAction(deletedObject.name).Execute();
@@ -222,20 +191,13 @@ namespace SEE.Controls.Actions
                 if (edgeGraphPair.Key.TryGetComponentOrLog(out EdgeRef edgeReference))
                 {
                     edgeGraphPair.Value.AddEdge(edgeReference.Value);
-                    PlayerSettings.GetPlayerSettings().StartCoroutine(DelayEdges(edgeGraphPair.Key));
+                    PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.DelayEdges(edgeGraphPair.Key));
                 }
             }
-            PlayerSettings.GetPlayerSettings().StartCoroutine(this.RemoveNodeFromGarbage(new List<GameObject>(deletedNodes.Keys)));
+            //PlayerSettings.GetPlayerSettings().StartCoroutine(this.RemoveNodeFromGarbage(new List<GameObject>(deletedNodes.Keys)));
+            PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(deletedNodes.Keys)));
         }
 
-        /// <summary>
-        /// Delays the process of showing a hidden edge having been removed from the garbage can.
-        /// </summary>
-        private IEnumerator DelayEdges(GameObject edge)
-        {
-            yield return new WaitForSeconds(TimeForAnimation + TimeToWait);
-            edge.SetVisibility(true, true);
-        }
         /// <summary>
         /// Redoes this DeleteAction.
         /// </summary>
@@ -245,103 +207,6 @@ namespace SEE.Controls.Actions
             {
                 Delete(gameObject);
             }
-        }
-
-        /// <summary>
-        /// Moves all nodes in <paramref name="deletedNodes"/> to the garbage can
-        /// using an animation. When they finally arrive there, they will be 
-        /// deleted. 
-        /// 
-        /// Assumption: <paramref name="deletedNodes"/> contains all nodes in a subtree
-        /// of the game-node hierarchy. All of them represent graph nodes.
-        /// </summary>
-        /// <param name="deletedNodes">the deleted nodes which will be moved to the garbage can.</param>
-        /// <returns>the waiting time between moving deleted nodes over the garbage can and then into the garbage can</returns>
-        private IEnumerator MoveNodeToGarbage(IList<GameObject> deletedNodes)
-        {
-            animationIsRunning = true;
-            // We need to reset the portal of all all deletedNodes so that we can move
-            // them to the garbage bin. Otherwise they will become invisible if they 
-            // leave their portal.
-            foreach (GameObject deletedNode in deletedNodes)
-            {
-                oldPositions[deletedNode] = deletedNode.transform.position;
-                if (!this.deletedNodes.ContainsKey(deletedNode))
-                {
-                    Portal.SetInfinitePortal(deletedNode);
-                }
-            }
-            MarkAsDeleted(deletedNodes);
-            foreach (GameObject deletedNode in deletedNodes)
-            {
-                Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), TimeForAnimation);
-            }
-
-            yield return new WaitForSeconds(TimeToWait);
-
-            foreach (GameObject deletedNode in deletedNodes)
-            {
-                Vector3 shrinkFactor = VectorOperations.DivideVectors(deletedNode.transform.localScale, defaultGarbageVector);
-                if (!shrinkFactors.ContainsKey(deletedNode))
-                {
-                    shrinkFactors.Add(deletedNode, shrinkFactor);
-                }
-                deletedNode.transform.localScale = Vector3.Scale(deletedNode.transform.localScale, shrinkFactor);
-                Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), TimeForAnimation);
-            }
-            yield return new WaitForSeconds(TimeToWait);
-            animationIsRunning = false;
-        }
-
-        /// <summary>
-        /// Coroutine that waits and expands the shrunk object which is currently being removed from the garbage can.
-        /// </summary>
-        /// <param name="deletedNode">The nodes to be removed from the garbage-can</param>
-        /// <returns>the waiting time between moving deleted nodes from the garbage-can and then to the city</returns>
-        private IEnumerator WaitAndExpand(GameObject deletedNode)
-        {
-            yield return new WaitForSeconds(TimeToWait);
-            Vector3 shrinkFactor = shrinkFactors[deletedNode];
-            float animationsCount = stepsOfExpansionAnimation;
-            float exponent = 1 / stepsOfExpansionAnimation;
-            shrinkFactor = VectorOperations.ExponentOfVectorCoordinates(shrinkFactor, exponent);
-
-            while (animationsCount > 0)
-            {
-                deletedNode.transform.localScale = VectorOperations.DivideVectors(shrinkFactor, deletedNode.transform.localScale);
-                yield return new WaitForSeconds(timeBetweenExpansionAnimation);
-                animationsCount--;
-            }
-        }
-        /// <summary>
-        /// Removes all given nodes from the garbage can and back into the city.
-        /// </summary>
-        /// <param name="deletedNode">The nodes to be removed from the garbage-can</param>
-        /// <returns>the waiting time between moving deleted nodes from the garbage-can and then to the city</returns>
-        private IEnumerator RemoveNodeFromGarbage(IList<GameObject> deletedNodes)
-        {
-            animationIsRunning = true;
-            // up, out of the garbage can
-            foreach (GameObject deletedNode in deletedNodes)
-            {
-                Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), TimeForAnimation);
-                PlayerSettings.GetPlayerSettings().StartCoroutine(WaitAndExpand(deletedNode));
-            }
-
-            yield return new WaitForSeconds(TimeToWait);
-
-            // back to the original position
-            foreach (GameObject node in deletedNodes)
-            {
-                Tweens.Move(node, oldPositions[node], TimeForAnimation);
-            }
-
-            yield return new WaitForSeconds(TimeToWait);
-            oldPositions.Clear();
-            this.deletedNodes.Clear();
-            deletedEdges.Clear();
-            animationIsRunning = false;
-            InteractableObject.UnselectAll(true);
         }
 
         /// <summary>
@@ -355,7 +220,7 @@ namespace SEE.Controls.Actions
         /// of the game-node hierarchy. All of them represent graph nodes.
         /// </summary>
         /// <param name="gameNodesToDelete">all deleted objects of the last operation</param>
-        private void MarkAsDeleted(IList<GameObject> gameNodesToDelete)
+        public void MarkAsDeleted(IList<GameObject> gameNodesToDelete)
         {
             ISet<GameObject> edgesInScene = new HashSet<GameObject>(GameObject.FindGameObjectsWithTag(Tags.Edge));
 
