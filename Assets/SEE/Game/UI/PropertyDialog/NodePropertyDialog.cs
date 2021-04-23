@@ -8,7 +8,7 @@ namespace SEE.Game.UI.PropertyDialog
     /// <summary>
     /// A dialog to enter the source name and type of a graph node.
     /// </summary>
-    class NodePropertyDialog
+    public class NodePropertyDialog
     {
         /// <summary>
         /// Constructor.
@@ -21,19 +21,19 @@ namespace SEE.Game.UI.PropertyDialog
 
         /// <summary>
         /// Event triggered when the user presses the OK button. Clients can
-        /// register on this event to receive a notifaction when this happens.
+        /// register on this event to receive a notification when this happens.
         /// </summary>
-        public UnityEvent OnConfirm = new UnityEvent();
+        public readonly UnityEvent OnConfirm = new UnityEvent();
         /// <summary>
         /// Event triggered when the user presses the Cancel button. Clients can
-        /// register on this event to receive a notifaction when this happens.
+        /// register on this event to receive a notification when this happens.
         /// </summary>
-        public UnityEvent OnCancel = new UnityEvent();
+        public readonly UnityEvent OnCancel = new UnityEvent();
 
         /// <summary>
         /// The graph node to be manipulated by this dialog.
         /// </summary>
-        private Node node;
+        private readonly Node node;
 
         /// <summary>
         /// The dialog used to manipulate the node.
@@ -82,8 +82,8 @@ namespace SEE.Game.UI.PropertyDialog
             propertyDialog.AddGroup(group);
 
             // Register listeners
-            propertyDialog.OnConfirm.AddListener(() => OKButtonPressed());
-            propertyDialog.OnCancel.AddListener(() => CancelButtonPressed());
+            propertyDialog.OnConfirm.AddListener(OKButtonPressed);
+            propertyDialog.OnCancel.AddListener(CancelButtonPressed);
 
             SEEInput.KeyboardShortcutsEnabled = false;
             // Go online
@@ -118,7 +118,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// </summary>
         private void Close()
         {
-            GameObject.Destroy(dialog);
+            Object.Destroy(dialog);
             dialog = null;
         }
     }

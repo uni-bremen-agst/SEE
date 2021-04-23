@@ -40,6 +40,9 @@ namespace Michsky.UI.ModernUIPack
         public bool centered = false;
         bool isPointerOn;
 
+        // Hover exit. This field was introduced by project SEE.
+        public UnityEvent hoverExitEvent;
+
         void Start()
         {
             if (buttonVar == null)
@@ -122,6 +125,8 @@ namespace Michsky.UI.ModernUIPack
         public void OnPointerExit(PointerEventData eventData)
         {
             isPointerOn = false;
+            // Trigger hover exit event. This code was introduced by project SEE.
+            hoverExitEvent?.Invoke();
         }
     }
 }
