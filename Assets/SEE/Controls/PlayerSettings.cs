@@ -18,7 +18,7 @@ namespace SEE.Controls
 {
     /// <summary>
     /// Allows a user to select the kind of environment in which the game
-    /// runs: (1) desktop with keyboard and mouse input, (2) touch devices 
+    /// runs: (1) desktop with keyboard and mouse input, (2) touch devices
     /// or gamepads using InControl, (3) virtual reality, or (4) augmented
     /// reality.
     /// </summary>
@@ -82,9 +82,9 @@ namespace SEE.Controls
         [Tooltip("Whether hints should be shown for controllers.")]
         public bool ShowControllerHints = false;
 
-        [Header("HoloLens specific settings (relevant only for HoloLens players)")] 
+        [Header("HoloLens specific settings (relevant only for HoloLens players)")]
         [Tooltip("Which scale shall be used for HoloLens players.")]
-        public ExperienceScale experienceScale = ExperienceScale.Seated;
+        public ExperienceScale ExperienceScale = ExperienceScale.Seated;
 
         [Tooltip("The factor by which code cities should be scaled on startup."), OdinSerialize, Min(0.01f)]
         public float CityScalingFactor = 1f;
@@ -97,14 +97,10 @@ namespace SEE.Controls
         public float EyeStareDelay = 1;
 
         /// <summary>
-        /// The game object representing the active local player, that is, the player 
+        /// The game object representing the active local player, that is, the player
         /// executing on this local instance of Unity.
         /// </summary>
-        public static GameObject LocalPlayer
-        {
-            get;
-            private set;
-        }
+        public static GameObject LocalPlayer { get; private set; }
 
         /// <summary>
         /// The cached player settings within this local instance of Unity.
@@ -288,37 +284,36 @@ namespace SEE.Controls
         /// </summary>
         private void SetupMixedReality()
         {
-
             Destroy(UnityEngine.SceneManagement.SceneManager.GetActiveScene()
                                .GetRootGameObjects().SingleOrDefault(x => x.name == "MixedRealityPlayspace"));
             
-            // Add a MixedRealityToolkit to the scene
+            // Add a MixedRealityToolkit to the scene.
             UnityEngine.Object mrtkPrefab = Resources.Load<GameObject>("Prefabs/MixedRealityToolkit");
             GameObject mrtk = Instantiate(mrtkPrefab) as GameObject;
             UnityEngine.Assertions.Assert.IsNotNull(mrtk);
             mrtk.name = MixedRealityToolkitName;
 
-            // Create HoloLensAppBar from prefab
+            // Create HoloLensAppBar from prefab.
             UnityEngine.Object appBarPrefab = Resources.Load<GameObject>("Prefabs/HoloLensAppBar");
             GameObject appBar = Instantiate(appBarPrefab) as GameObject;
             UnityEngine.Assertions.Assert.IsNotNull(appBar);
             appBar.name = AppBarName;
 
-            // Add a city collection
+            // Add a city collection.
             UnityEngine.Object cityCollectionPrefab = Resources.Load<GameObject>("Prefabs/CityCollection");
             GameObject cityCollection = Instantiate(cityCollectionPrefab) as GameObject;
             UnityEngine.Assertions.Assert.IsNotNull(cityCollection);
             cityCollection.name = CityCollectionName;
 
-            // Hide all decoration to improve performance
+            // Hide all decoration to improve performance.
             GameObject.FindGameObjectsWithTag(Tags.Decoration).ForEach(go => go.SetActive(false));
 
             {
-                // Set selected experience scale 
-                MixedRealityToolkit.Instance.ActiveProfile.TargetExperienceScale = experienceScale;
-                
-                Debug.Log($"Current HoloLens scale: {experienceScale}\n");
-                if (experienceScale == ExperienceScale.Seated || experienceScale == ExperienceScale.OrientationOnly)
+                // Set selected experience scale.
+                MixedRealityToolkit.Instance.ActiveProfile.TargetExperienceScale = ExperienceScale;
+
+                Debug.Log($"Current HoloLens scale: {ExperienceScale}\n");
+                if (ExperienceScale == ExperienceScale.Seated || ExperienceScale == ExperienceScale.OrientationOnly)
                 {
                     // Position and scale planes and CodeCities accordingly using CityCollection grid
                     if (cityCollection.TryGetComponentOrLog(out GridObjectCollection grid))
