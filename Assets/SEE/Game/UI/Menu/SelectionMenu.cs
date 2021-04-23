@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace SEE.Game.UI
+namespace SEE.Game.UI.Menu
 {
     /// <summary>
     /// A menu in which the user can choose one active selection out of a menu.

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using SEE.Game.UI;
+using SEE.Game.UI.Menu;
 using UnityEngine;
 using UnityEngine.Events;
 

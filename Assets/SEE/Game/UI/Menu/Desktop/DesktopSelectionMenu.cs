@@ -2,7 +2,7 @@
 using Michsky.UI.ModernUIPack;
 using TMPro;
 
-namespace SEE.Game.UI
+namespace SEE.Game.UI.Menu
 {
     /// <summary>
     /// Implements Desktop UI for selection menus.
@@ -17,9 +17,9 @@ namespace SEE.Game.UI
         /// </summary>
         private ToggleMenuEntry currentSelectedEntry;
 
-        protected override void AddDesktopButtons(IEnumerable<ToggleMenuEntry> entries)
+        protected override void AddDesktopButtons(IEnumerable<ToggleMenuEntry> menuEntries)
         {
-            base.AddDesktopButtons(entries);
+            base.AddDesktopButtons(menuEntries);
             // Changes in comparison to the base method: 
             // 1. selecting an entry will close the menu
             // 2. the selected entry is highlighted
