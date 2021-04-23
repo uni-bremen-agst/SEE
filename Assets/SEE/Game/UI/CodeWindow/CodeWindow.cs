@@ -56,7 +56,7 @@ namespace SEE.Game.UI.CodeWindow
         /// The line we're scrolling towards at the moment.
         /// Will be 0 if we're not scrolling towards anything.
         /// </summary>
-        private int ScrollingTo = 0;
+        private int ScrollingTo;
 
         /// <summary>
         /// The line currently at the top of the window.

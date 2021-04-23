@@ -10,6 +10,7 @@ using SEE.DataModel;
 using SEE.Game;
 using SEE.Game.Charts.VR;
 using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
@@ -214,11 +215,7 @@ namespace SEE.Controls
             {
                 {
                     // Create Teleporting game object
-                    UnityEngine.Object teleportingPrefab = Resources.Load<GameObject>("Prefabs/Players/Teleporting");
-                    UnityEngine.Assertions.Assert.IsNotNull(teleportingPrefab);
-                    GameObject teleporting = Instantiate(teleportingPrefab) as GameObject;
-                    UnityEngine.Assertions.Assert.IsNotNull(teleporting);
-                    teleporting.name = "Teleporting";
+                    PrefabInstantiator.InstantiatePrefab("Prefabs/Players/Teleporting").name = "Teleporting";
                 }
                 {
                     // Attach TeleportArea to floor
@@ -286,23 +283,15 @@ namespace SEE.Controls
         {
             Destroy(UnityEngine.SceneManagement.SceneManager.GetActiveScene()
                                .GetRootGameObjects().SingleOrDefault(x => x.name == "MixedRealityPlayspace"));
-            
-            // Add a MixedRealityToolkit to the scene.
-            UnityEngine.Object mrtkPrefab = Resources.Load<GameObject>("Prefabs/MixedRealityToolkit");
-            GameObject mrtk = Instantiate(mrtkPrefab) as GameObject;
-            UnityEngine.Assertions.Assert.IsNotNull(mrtk);
-            mrtk.name = MixedRealityToolkitName;
 
-            // Create HoloLensAppBar from prefab.
-            UnityEngine.Object appBarPrefab = Resources.Load<GameObject>("Prefabs/HoloLensAppBar");
-            GameObject appBar = Instantiate(appBarPrefab) as GameObject;
-            UnityEngine.Assertions.Assert.IsNotNull(appBar);
-            appBar.name = AppBarName;
+            // Add a MixedRealityToolkit to the scene
+            PrefabInstantiator.InstantiatePrefab("Prefabs/MixedRealityToolkit").name = MixedRealityToolkitName;
 
-            // Add a city collection.
-            UnityEngine.Object cityCollectionPrefab = Resources.Load<GameObject>("Prefabs/CityCollection");
-            GameObject cityCollection = Instantiate(cityCollectionPrefab) as GameObject;
-            UnityEngine.Assertions.Assert.IsNotNull(cityCollection);
+            // Create HoloLensAppBar from prefab
+            PrefabInstantiator.InstantiatePrefab("Prefabs/HoloLensAppBar").name = AppBarName;
+
+            // Add a city collection
+            GameObject cityCollection = PrefabInstantiator.InstantiatePrefab("Prefabs/CityCollection");
             cityCollection.name = CityCollectionName;
 
             // Hide all decoration to improve performance.
@@ -318,7 +307,6 @@ namespace SEE.Controls
                     // Position and scale planes and CodeCities accordingly using CityCollection grid
                     if (cityCollection.TryGetComponentOrLog(out GridObjectCollection grid))
                     {
-
                         GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
 
                         GameObject[] citiesWithContainer = cities.Select(AddCodeCityContainer).ToArray();
@@ -326,7 +314,6 @@ namespace SEE.Controls
                         foreach (GameObject city in citiesWithContainer)
                         {
                             SetCityScale(city, cityCollection.transform, CityScalingFactor);
-
                             AddInteractions(city);
                             AppBarCityConfiguration(city);
                         }

@@ -1,4 +1,4 @@
-﻿namespace SEE.Game.UI
+﻿namespace SEE.Game.UI.Menu
 {
     /// <summary>
     /// Implements HoloLens UI for selection menus.
