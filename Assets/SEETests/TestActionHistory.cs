@@ -564,6 +564,6 @@ namespace SEETests
             Assert.AreEqual(1, Counter.Value);
             Assert.AreEqual(3, hist.UndoCount);
             Assert.AreEqual(0, hist.RedoCount);
-        }
-    } */
+        } */
+    } 
 }
