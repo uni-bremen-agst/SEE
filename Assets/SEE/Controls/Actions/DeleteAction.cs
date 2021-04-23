@@ -34,7 +34,6 @@ namespace SEE.Controls.Actions
             return CreateReversibleAction();
         }
 
-       
         /// <summary>
         /// Contains all nodes and edges deleted as explicitly requested by the user.
         /// As a consequence of deleting a node, its ancestors along with their incoming and outgoing
@@ -49,13 +48,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         public Dictionary<GameObject, Graph> deletedNodes { get; set; } = new Dictionary<GameObject, Graph>();
 
-        
-
         /// <summary>
         /// A history of all edges and the graph where they were attached to, deleted by this action.
         /// </summary>
         private Dictionary<GameObject, Graph> deletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
-
 
         /// <summary>
         /// The name of the garbage can gameObject.
