@@ -214,11 +214,18 @@ namespace SEE.GO
         /// <summary>
         /// Returns the size of the given <paramref name="gameObject"/> in world space.
         /// </summary>
-        /// <param name="gameObject"></param>
+        /// <param name="gameObject">object whose size is requested</param>
         /// <returns>size of given <paramref name="gameObject"/></returns>
         public static Vector3 WorldSpaceScale(this GameObject gameObject)
         {
-            return gameObject.transform.lossyScale;
+            if (gameObject.TryGetComponent(out Renderer renderer))
+            {
+                return renderer.bounds.size;
+            }
+            else
+            {
+                return gameObject.transform.lossyScale;
+            }
         }
 
         /// <summary>
