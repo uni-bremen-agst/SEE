@@ -75,9 +75,10 @@ namespace SEE.Controls
         /// </summary>
         /// <param name="deletedNodes">the deleted nodes which will be moved to the garbage can.</param>
         /// <returns>the waiting time between moving deleted nodes over the garbage can and then into the garbage can</returns>
-        public static IEnumerator MoveNodeToGarbage(IList<GameObject> deletedNodes, GameObject garbagecan)
+        public static IEnumerator MoveNodeToGarbage(IList<GameObject> deletedNodes)
         {
-            garbageCan = garbagecan;
+           
+            garbageCan = GameObject.Find("GarbageCan");
             // We need to reset the portal of all all deletedNodes so that we can move
             // them to the garbage bin. Otherwise they will become invisible if they 
             // leave their portal.
@@ -93,7 +94,6 @@ namespace SEE.Controls
             {
                 Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), TimeForAnimation);
             }
-
             yield return new WaitForSeconds(TimeToWait);
 
             foreach (GameObject deletedNode in deletedNodes)
@@ -169,6 +169,12 @@ namespace SEE.Controls
             yield return new WaitForSeconds(TimeForAnimation + TimeToWait);
             edge.SetVisibility(true, true);
         }
+
+        // FIX ME  : 
+        // Hiding edges for DelelteAction and DeleteNetAction 
+        // public static hideEdges (){
+        // }
+        //
     }
 
 }

@@ -1,4 +1,5 @@
-﻿using SEE.DataModel.DG;
+﻿using SEE.Controls;
+using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
 using System;
@@ -121,11 +122,13 @@ namespace SEE.Game
         /// <param name="gameNode">game node to be removed</param>
         public static void Remove(GameObject gameNode)
         {
+           
             Node node = gameNode.GetNode();
             Graph graph = node.ItsGraph;
             graph.RemoveNode(node);
             graph.FinalizeNodeHierarchy();
-            GameObject.Destroy(gameNode);
+            // GameObject.Destroy(gameNode);
+            
         }
     }
 }

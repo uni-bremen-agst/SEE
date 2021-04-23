@@ -155,7 +155,7 @@ namespace SEE.Controls.Actions
                     // we will actually delete them.
                     // FIXME: Shouldn't the edges be moved to the garbage bin, too?
                     //  PlayerSettings.GetPlayerSettings().StartCoroutine(this.MoveNodeToGarbage(deletedObject.AllAncestors()));
-                    PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.MoveNodeToGarbage(deletedObject.AllAncestors(), garbageCan));
+                    PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.MoveNodeToGarbage(deletedObject.AllAncestors()));
                     Portal.SetInfinitePortal(deletedObject);
                     MarkAsDeleted(deletedObject.AllAncestors());
                 }

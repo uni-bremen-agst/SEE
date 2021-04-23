@@ -1,4 +1,6 @@
 ﻿using Assets.SEE.Game;
+using SEE.Controls;
+using SEE.Controls.Actions;
 using SEE.Game;
 using SEE.GO;
 using UnityEngine;
@@ -19,6 +21,8 @@ namespace SEE.Net
         /// </summary>
         public string GameObjectID;
 
+        public GameObject garbageCan;
+
         /// <summary>
         /// Creates a new DeleteNetAction.
         /// </summary>
@@ -27,6 +31,7 @@ namespace SEE.Net
         public DeleteNetAction(string gameObjectID)
         {
             this.GameObjectID = gameObjectID;
+            garbageCan = GameObject.Find("garbageCan");
         }
 
         /// <summary>
@@ -46,14 +51,20 @@ namespace SEE.Net
             if (!IsRequester())
             {
                 GameObject gameObject = GameObject.Find(GameObjectID);
+                DeleteAction del = new DeleteAction();
                 if (gameObject != null)
                 {
                     if (gameObject.HasNodeRef())
                     {
                         GameNodeAdder.Remove(gameObject);
+                        PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.MoveNodeToGarbage(gameObject.AllAncestors()));
+                        del.MarkAsDeleted(gameObject.AllAncestors());
+                        Portal.SetInfinitePortal(gameObject);
                     }
                     else if (gameObject.HasEdgeRef())
                     {
+                        Debug.Log("hasedgeRef");
+                        del.MarkAsDeleted(gameObject.AllAncestors());
                         GameEdgeAdder.Remove(gameObject);
                     }
                 }
