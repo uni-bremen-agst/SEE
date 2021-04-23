@@ -145,6 +145,7 @@ namespace SEE.Controls.Actions
                 // We do not have an edge ID yet, so we let the graph renderer create a unique ID.
                 memento = new Memento(from, to);
                 createdEdge = CreateEdge(ref memento);
+
                 if (createdEdge != null)
                 {
                     // The edge ID was created by the graph renderer.
