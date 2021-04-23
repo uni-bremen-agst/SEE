@@ -208,7 +208,17 @@ namespace SEE.GO
         /// <returns>The height of the Roof from this <paramref name="node"/></returns>
         public static float GetRoof(this GameObject node)
         {
-            return node.transform.position.y + node.Size().y / 2.0f;
+            return node.transform.position.y + node.WorldSpaceScale().y / 2.0f;
+        }
+
+        /// <summary>
+        /// Returns the size of the given <paramref name="gameObject"/> in world space.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <returns>size of given <paramref name="gameObject"/></returns>
+        public static Vector3 WorldSpaceScale(this GameObject gameObject)
+        {
+            return gameObject.transform.lossyScale;
         }
 
         /// <summary>

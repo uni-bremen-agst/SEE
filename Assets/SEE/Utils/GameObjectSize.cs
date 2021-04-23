@@ -8,14 +8,13 @@ namespace SEE.Utils
     public static class GameObjectSize
     {
         /// <summary>
-        /// Returns the size of the given <paramref name="gameObject"/>.
+        /// Returns the size of the given <paramref name="gameObject"/> in world space.
         /// </summary>
         /// <param name="gameObject"></param>
         /// <returns>size of given <paramref name="gameObject"/></returns>
-        public static Vector3 Size(this GameObject gameObject)
+        public static Vector3 WorldSpaceScale(this GameObject gameObject)
         {
-            Renderer renderer = gameObject.GetComponent<Renderer>();
-            return renderer.bounds.size;
+            return gameObject.transform.lossyScale;
         }
     }
 }
