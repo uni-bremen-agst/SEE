@@ -1,4 +1,5 @@
 ﻿using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,7 +14,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The unique id of an action.
         /// </summary>
-        private readonly string id = RandomStrings.Get(30);
+        private readonly Guid id = Guid.NewGuid();
 
         /// <summary>
         /// The object that the cursor hovers over.
@@ -182,7 +183,7 @@ namespace SEE.Controls.Actions
         /// <returns></returns>
         string ReversibleAction.GetId()
         {
-            return id;
+            return id.ToString();
         }
     }
 }

@@ -1,7 +1,6 @@
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class GlobalActionHistory
@@ -225,7 +224,6 @@ public class GlobalActionHistory
         Push(redoneAction);
         lastUndoneAction.Item3.Start();
 
-        // I think this doesnt work so far, sometimes, active action will not be set new. FI`XME: WHY DO YOU THINK THAT?
         activeAction = lastUndoneAction.Item3;
         DeleteItem(lastUndoneAction.Item3.GetId());
     }
