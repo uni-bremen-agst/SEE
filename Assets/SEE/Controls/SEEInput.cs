@@ -204,7 +204,7 @@ namespace SEE.Controls
         /// The user wants to drag the city on its plane.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        internal static bool Drag()
+        internal static bool DragCity()
         {
             return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.Drag);
         }
@@ -449,6 +449,16 @@ namespace SEE.Controls
         internal static bool Select()
         {
             return SelectionEnabled && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI();
+        }
+
+        /// <summary>
+        /// True if the user wants to drag an object (in a desktop environment, the user
+        /// holds the left mouse pressed while the mouse cursor is not over a GUI element).
+        /// </summary>
+        /// <returns>true if the wants to drag</returns>
+        internal static bool Drag()
+        {
+            return Input.GetMouseButton(0) && !Raycasting.IsMouseOverGUI();
         }
     }
 }
