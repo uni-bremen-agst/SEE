@@ -122,3 +122,12 @@ PacketHandlerErrorGlobal*.txt
 LinuxPlayer_s.debug
 UnityPlayer_s.debug
 .idea
+
+# For Odin Inspector: Ignore the auto-generated AOT compatibility dll.
+/Assets/Plugins/Sirenix/Assemblies/AOT/*
+
+# For Odin Inspector:  Ignore all unpacked demos.
+/Assets/Plugins/Sirenix/Demos/*
+
+# For Odin Inspector:  But keep the demo packages themselves.
+!/Assets/Plugins/Sirenix/Demos/*.unitypackage 
