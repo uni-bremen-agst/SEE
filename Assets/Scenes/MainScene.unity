@@ -848,7 +848,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &305828934
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1016,13 +1016,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 4
       Data: 1
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.91678524
     - Name: 
       Entry: 4
       Data: 1
@@ -1034,13 +1034,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0.6945014
+    - Name: 
+      Entry: 4
       Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
     - Name: 
       Entry: 4
       Data: 1
@@ -1097,13 +1097,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.6968789
     - Name: 
       Entry: 4
       Data: 1
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.561994553
     - Name: 
       Entry: 4
       Data: 1
@@ -1115,10 +1115,10 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.474158525
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 4
       Data: 0
@@ -1181,10 +1181,10 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.646900237
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.646900237
     - Name: 
       Entry: 4
       Data: 1
@@ -1325,10 +1325,10 @@ MonoBehaviour:
       Data: 0
     - Name: kind
       Entry: 3
-      Data: 1
+      Data: 4
     - Name: innerKind
       Entry: 3
-      Data: 2
+      Data: 5
     - Name: zScoreScale
       Entry: 5
       Data: true

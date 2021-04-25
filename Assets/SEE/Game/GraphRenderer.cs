@@ -399,6 +399,7 @@ namespace SEE.Game
             }
             // game objects for the leaves
             Dictionary<Node, GameObject> nodeMap = CreateBlocks(nodes);
+            AdjustScaleBetweenNodeKinds(nodeMap);
             // the layout to be applied
             NodeLayout nodeLayout = GetLayout();
 
@@ -1174,6 +1175,7 @@ namespace SEE.Game
         /// <param name="gameNodes">game nodes whose source name is to be added</param>
         /// <param name="innerNodeFactory">inner node factory</param>
         /// <returns>the game objects created for the text labels</returns>
+        /// <returns>the game objects created for the text labels</returns>
         private void AddLabels(ICollection<GameObject> gameNodes, NodeFactory innerNodeFactory)
         {
             foreach (GameObject node in gameNodes)
@@ -1544,9 +1546,11 @@ namespace SEE.Game
         /// <returns>requested absolute scale in world space</returns>
         private Vector3 GetScale(Node node)
         {
-            return new Vector3(GetMetricValue(node, settings.leafNodeAttributesPerKind[0].widthMetric),
-                               GetMetricValue(node, settings.leafNodeAttributesPerKind[0].heightMetric),
-                               GetMetricValue(node, settings.leafNodeAttributesPerKind[0].depthMetric));
+            int index = (int)node.kind;
+            LeafNodeAttributes attribs = settings.leafNodeAttributesPerKind[index];
+            return new Vector3(GetMetricValue(node, attribs.widthMetric),
+                               GetMetricValue(node, attribs.heightMetric),
+                               GetMetricValue(node, attribs.depthMetric));
         }
 
         /// <summary>
@@ -1565,6 +1569,36 @@ namespace SEE.Game
             }
 
             return scaler.GetNormalizedValue(metricName, node);
+        }
+
+        /// <summary>
+        /// Adjusts the scale of every node of every kind of node, such that the max extend of each
+        /// node is one.
+        /// </summary>
+        /// <param name="nodeMap">The nodes to scale.</param>
+        private void AdjustScaleBetweenNodeKinds(Dictionary<Node, GameObject> nodeMap)
+        {
+            for (int i = 0; i < (int)Node.Kind.Count; i++)
+            {
+                Vector3 denominator = Vector3.negativeInfinity;
+                foreach (KeyValuePair<Node, GameObject> pair in nodeMap)
+                {
+                    if ((int)pair.Key.kind == i)
+                    {
+                        Vector3 scale = pair.Value.transform.localScale;
+                        denominator = Vector3.Max(denominator, scale);
+                    }
+
+                }
+                foreach (KeyValuePair<Node, GameObject> pair in nodeMap)
+                {
+                    if ((int)pair.Key.kind == i)
+                    {
+                        pair.Value.transform.localScale = pair.Value.transform.localScale.DividePairwise(denominator);
+                    }
+
+                }
+            }
         }
 
         /// <summary>

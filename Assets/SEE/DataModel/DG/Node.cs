@@ -42,7 +42,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         public override string ID { get; set; } = "";
 
-        public Kind flags = Kind.Unspecified;
+        public Kind kind = Kind.Unspecified;
 
         /// <summary>
         /// The attribute name for the name of nodes. They may or may not be unique.
