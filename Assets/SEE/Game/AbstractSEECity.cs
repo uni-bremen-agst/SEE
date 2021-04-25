@@ -144,6 +144,7 @@ namespace SEE.Game
             // we really need to collect all children first and only then can destroy each.
             foreach (GameObject child in AllNodesEdgesDecorationChildren())
             {
+                child.transform.parent = null;
                 Destroyer.DestroyGameObject(child);
             }
         }

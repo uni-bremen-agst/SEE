@@ -295,7 +295,7 @@ namespace SEEEditor
                 for (int i = 0; i < (int)Node.Kind.Count; i++)
                 {
                     string label = "Type: " + ((Node.Kind)i).ToString();
-                    showLeafAttributesAtIndex[i] = EditorGUILayout.Foldout(showLeafAttributesAtIndex[i], label, EditorStyles.foldoutHeader);
+                    showLeafAttributesAtIndex[i] = EditorGUILayout.Foldout(showLeafAttributesAtIndex[i], label, EditorStyles.foldout);
                     if (showLeafAttributesAtIndex[i])
                     {
                         LeafNodeAttributes settings = city.leafNodeAttributesPerKind[i];
