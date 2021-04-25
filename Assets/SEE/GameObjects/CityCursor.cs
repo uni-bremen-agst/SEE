@@ -9,12 +9,10 @@ namespace SEE.GO
     [RequireComponent(typeof(SEECity))]
     public class CityCursor : MonoBehaviour
     {
-        private Graph graph;
         internal Cursor3D E { get; private set; }
 
         private void Start()
         {
-            graph = GetComponent<SEECity>().LoadedGraph;
             E = Cursor3D.Create();
 
             InteractableObject.AnySelectIn += AnySelectIn;
@@ -31,7 +29,9 @@ namespace SEE.GO
 
         private void AnySelectIn(InteractableObject interactableObject, bool isOwner)
         {
-            if (interactableObject.GraphElemRef.elem.ItsGraph.Equals(graph))
+            Graph thisGraph = GetComponent<SEECity>().LoadedGraph;
+            Graph selectedGraph = interactableObject.GraphElemRef.elem.ItsGraph;
+            if (selectedGraph.Equals(thisGraph))
             {
                 E.AddFocus(interactableObject.transform);
             }
@@ -39,7 +39,9 @@ namespace SEE.GO
 
         private void AnySelectOut(InteractableObject interactableObject, bool isOwner)
         {
-            if (interactableObject.GraphElemRef.elem.ItsGraph.Equals(graph))
+            Graph thisGraph = GetComponent<SEECity>().LoadedGraph;
+            Graph selectedGraph = interactableObject.GraphElemRef.elem.ItsGraph;
+            if (selectedGraph.Equals(thisGraph))
             {
                 E.RemoveFocus(interactableObject.transform);
             }

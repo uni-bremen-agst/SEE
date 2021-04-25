@@ -66,10 +66,12 @@ namespace SEE.Controls
         /// </summary>
         internal static void PrintBindings()
         {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder("Key Bindings:\n");
             foreach (var binding in bindings)
             {
-                Debug.Log($"Key {binding.Key}: {binding.Value}\n");
+                sb.Append($"Key {binding.Key}: {binding.Value}\n");
             }
+            Debug.Log(sb.ToString());
         }
 
         //-----------------------------------------------------

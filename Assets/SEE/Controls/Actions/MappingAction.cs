@@ -24,6 +24,7 @@ namespace SEE.Controls.Actions
         #region Fields
 
         private Graph mapping;
+        private InteractableObject lastSelection;
         //private Reflexion reflexion;
 
         #endregion
@@ -70,11 +71,14 @@ namespace SEE.Controls.Actions
                 }
             }
             _AddNodesToMappingRecursively(mappingRoot);
+
+            lastSelection = null;
         }
 
         private MappingAction(MappingAction mappingAction)
         {
             mapping = (Graph)mappingAction.mapping.Clone();
+            lastSelection = mappingAction.lastSelection;
         }
 
         #endregion
@@ -110,10 +114,6 @@ namespace SEE.Controls.Actions
             // An initial run is necessary to set up the necessary data structures.
             Reflexion.Run();
 #endif
-            InteractableObject.AnyHoverIn += AnyHoverIn;
-            InteractableObject.AnyHoverOut += AnyHoverOut;
-            InteractableObject.AnySelectIn += AnySelectIn;
-            InteractableObject.AnySelectOut += AnySelectOut;
         }
 
         public bool Update()
@@ -307,7 +307,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public void Start()
         {
-            // Intentionally left blank.
+            InteractableObject.AnySelectIn += AnySelectIn;
         }
 
         /// <summary>
@@ -315,7 +315,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public void Stop()
         {
-            // Intentionally left blank.
+            InteractableObject.AnySelectIn -= AnySelectIn;
         }
 
         /// <summary>
@@ -338,20 +338,20 @@ namespace SEE.Controls.Actions
         // Events
         //----------------------------------------------------------------
 
-        private void AnyHoverIn(InteractableObject toObj, bool isOwner)
+        private void AnySelectIn(InteractableObject interactableObject, bool isOwner)
         {
-        }
-
-        private void AnyHoverOut(InteractableObject toObj, bool isOwner)
-        {
-        }
-
-        private void AnySelectIn(InteractableObject fromObj, bool isOwner)
-        {
-        }
-
-        private void AnySelectOut(InteractableObject fromObj, bool isOwner)
-        {
+            Node node = interactableObject.GetNode();
+            if (node.kind == Node.Kind.Architecture && lastSelection != null)
+            {
+                Node from = mapping.GetNode(lastSelection.GetNode().ID);
+                Node to = mapping.GetNode(node.ID);
+                from.Reparent(to);
+                mapping.FinalizeNodeHierarchy();
+                SEECity city = SceneQueries.GetMapp();
+                city.LoadedGraph = mapping;
+                city.ReDrawGraph();
+            }
+            lastSelection = interactableObject;
         }
 
         /// <summary>
