@@ -44,7 +44,7 @@ namespace SEEEditor
         {
             EditorGUILayout.Separator();
 
-            if (city.nodeLayout.kind == NodeLayoutKind.CompoundSpringEmbedder)
+            if (city.nodeLayoutSettings.kind == NodeLayoutKind.CompoundSpringEmbedder)
             {
                 Graph graph = city.LoadedGraph;
 

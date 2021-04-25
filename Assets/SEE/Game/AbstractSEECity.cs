@@ -29,12 +29,12 @@ namespace SEE.Game
         /// respectively (both declared in AbstractSEECityIO). You should also
         /// extend the test cases in TestConfigIO.
 
-        public GlobalCityAttributes    globalAttributes    = new GlobalCityAttributes();
-        public LeafNodeAttributes      leafNodeAttributes  = new LeafNodeAttributes();
-        public InnerNodeAttributes     innerNodeAttributes = new InnerNodeAttributes();
-        public NodeLayoutSettings      nodeLayout          = new NodeLayoutSettings();
-        public EdgeLayoutSettings      edgeLayout          = new EdgeLayoutSettings();
-        public CoseGraphSettings       coseGraphSettings   = new CoseGraphSettings(); // TODO(torben): put into CitySettings.cs
+        public GlobalCityAttributes    globalCityAttributes         = new GlobalCityAttributes();
+        public LeafNodeAttributes[]    leafNodeAttributesPerKind    = Enumerable.Repeat(new LeafNodeAttributes(), (int)Node.Kind.Count).ToArray();
+        public InnerNodeAttributes     innerNodeAttributes          = new InnerNodeAttributes();
+        public NodeLayoutSettings      nodeLayoutSettings           = new NodeLayoutSettings();
+        public EdgeLayoutSettings      edgeLayoutSettings           = new EdgeLayoutSettings();
+        public CoseGraphSettings       coseGraphSettings            = new CoseGraphSettings(); // TODO(torben): put into CitySettings.cs
 
         /// <summary>
         /// Saves the settings of this code city to <see cref="CityPath"/>.
@@ -277,12 +277,15 @@ namespace SEE.Game
         /// <returns>all metrics used for visual attributes of a leaf node</returns>
         public ICollection<string> AllLeafMetrics()
         {
-            return new List<string> {
-                leafNodeAttributes.widthMetric,
-                leafNodeAttributes.heightMetric,
-                leafNodeAttributes.depthMetric,
-                leafNodeAttributes.styleMetric
-            };
+            List<string> result = new List<string>(leafNodeAttributesPerKind.Length * 4);
+            foreach (LeafNodeAttributes leafNodeAttributes in leafNodeAttributesPerKind)
+            {
+                result.Add(leafNodeAttributes.widthMetric);
+                result.Add(leafNodeAttributes.heightMetric);
+                result.Add(leafNodeAttributes.depthMetric);
+                result.Add(leafNodeAttributes.styleMetric);
+            }
+            return result;
         }
 
         //--------------------------------------------------------
@@ -504,7 +507,7 @@ namespace SEE.Game
         /// <param name="graph"></param>
         public void LoadDataForGraphListing(Graph graph)
         {
-            if (nodeLayout.kind == NodeLayoutKind.CompoundSpringEmbedder)
+            if (nodeLayoutSettings.kind == NodeLayoutKind.CompoundSpringEmbedder)
             {
                 Dictionary<string, bool> dirs = coseGraphSettings.ListInnerNodeToggle;
                 // die neuen dirs 
@@ -517,9 +520,9 @@ namespace SEE.Game
                 {
                     if (!node.IsLeaf())
                     {
-                        dirsShape.Add(node.ID, nodeLayout.innerKind);
+                        dirsShape.Add(node.ID, nodeLayoutSettings.innerKind);
                         dirsLocal.Add(node.ID, false);
-                        dirsLayout.Add(node.ID, nodeLayout.kind);
+                        dirsLayout.Add(node.ID, nodeLayoutSettings.kind);
                     }
                 }
 

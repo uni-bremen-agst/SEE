@@ -32,16 +32,15 @@ namespace SEE.Game
         public GraphRenderer(AbstractSEECity settings, Graph graph)
         {
             this.settings = settings;
-            ShaderType = Materials.ShaderType.Transparent;
-            switch (this.settings.nodeLayout.leafKind)
+            switch (this.settings.nodeLayoutSettings.leafKind)
             {
                 case LeafNodeKinds.Blocks:
-                    leafNodeFactory = new CubeFactory(ShaderType, this.settings.leafNodeAttributes.colorRange);
+                    leafNodeFactory = new CubeFactory(ShaderType, this.settings.leafNodeAttributesPerKind[0].colorRange);
                     break;
                 default:
                     throw new Exception("Unhandled GraphSettings.LeafNodeKinds");
             }
-            innerNodeFactory = GetInnerNodeFactory(this.settings.nodeLayout.innerKind);
+            innerNodeFactory = GetInnerNodeFactory(this.settings.nodeLayoutSettings.innerKind);
             this.graph = graph;
             if (this.graph != null)
             {
@@ -50,12 +49,17 @@ namespace SEE.Game
             }
         }
 
-        public readonly Materials.ShaderType ShaderType;
+        private const Materials.ShaderType ShaderType = Materials.ShaderType.Transparent;
 
         /// <summary>
         /// The distance between two stacked game objects (parent/child).
         /// </summary>
         private const float LevelDistance = 0.001f;
+
+        /// <summary>
+        /// the groundlevel of the nodes
+        /// </summary>
+        private const float GroundLevel = 0.0f;
 
         /// <summary>
         /// Returns the Factory for the inner nodes
@@ -64,19 +68,20 @@ namespace SEE.Game
         /// <returns>inner node factory</returns>
         private InnerNodeFactory GetInnerNodeFactory(InnerNodeKinds innerNodeKinds)
         {
+            ColorRange colorRange = settings.innerNodeAttributes.colorRange;
             switch (innerNodeKinds)
             {
                 case InnerNodeKinds.Empty:
                 case InnerNodeKinds.Donuts:
-                    return new VanillaFactory(ShaderType, settings.innerNodeAttributes.colorRange);
+                    return new VanillaFactory(ShaderType, colorRange);
                 case InnerNodeKinds.Circles:
-                    return new CircleFactory(settings.innerNodeAttributes.colorRange, leafNodeFactory.Unit);
+                    return new CircleFactory(colorRange, leafNodeFactory.Unit);
                 case InnerNodeKinds.Cylinders:
-                    return new CylinderFactory(ShaderType, settings.innerNodeAttributes.colorRange);
+                    return new CylinderFactory(ShaderType, colorRange);
                 case InnerNodeKinds.Rectangles:
-                    return new RectangleFactory(settings.innerNodeAttributes.colorRange, leafNodeFactory.Unit);
+                    return new RectangleFactory(colorRange, leafNodeFactory.Unit);
                 case InnerNodeKinds.Blocks:
-                    return new CubeFactory(ShaderType, settings.innerNodeAttributes.colorRange);
+                    return new CubeFactory(ShaderType, colorRange);
                 default:
                     throw new Exception("Unhandled GraphSettings.InnerNodeKinds");
             }
@@ -90,16 +95,7 @@ namespace SEE.Game
         /// <summary>
         /// Settings for the visualization.
         /// </summary>
-        private readonly AbstractSEECity settings;
-
-        /// <summary>
-        /// Returns the settings for the visualization.
-        /// </summary>
-        /// <returns>settings for the visualization</returns>
-        public AbstractSEECity GetSettings()
-        {
-            return settings;
-        }
+        public readonly AbstractSEECity settings;
 
         /// <summary>
         /// The factory used to create blocks for leaves.
@@ -122,11 +118,6 @@ namespace SEE.Game
         private readonly Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
 
         /// <summary>
-        /// the groundlevel of the nodes
-        /// </summary>
-        private readonly float groundLevel = 0.0f;
-
-        /// <summary>
         /// Sets the scaler to be used to map metric values onto graphical attributes
         /// (e.g., width, height, depth, style) across all given <paramref name="graphs"/>
         /// based on the user's choice (settings).
@@ -136,7 +127,7 @@ namespace SEE.Game
         {
             List<string> nodeMetrics = settings.AllMetricAttributes();
 
-            if (settings.nodeLayout.zScoreScale)
+            if (settings.nodeLayoutSettings.zScoreScale)
             {
                 scaler = new ZScoreScale(graphs, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics, true);
             }
@@ -197,7 +188,7 @@ namespace SEE.Game
             Graph graph = fromNode.ItsGraph;
             graph.AddEdge(edge);
 
-            if (settings.edgeLayout.kind == EdgeLayoutKind.None)
+            if (settings.edgeLayoutSettings.kind == EdgeLayoutKind.None)
             {
                 Debug.LogWarning($"An edge {edge.ID} from {fromNode.ID} to {toNode.ID} was added to the graph, but no edge layout was chosen.\n");
                 return null;
@@ -298,35 +289,37 @@ namespace SEE.Game
         /// <returns>all game objects created to represent the edges; may be empty</returns>
         private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes, ICollection<LayoutEdge> layoutEdges, bool draw = true)
         {
-            float minimalEdgeLevelDistance = 2.5f * settings.edgeLayout.edgeWidth;
+            float minimalEdgeLevelDistance = 2.5f * settings.edgeLayoutSettings.edgeWidth;
+            bool edgesAboveBlocks = settings.edgeLayoutSettings.edgesAboveBlocks;
+            float rdp = settings.edgeLayoutSettings.rdp;
             IEdgeLayout layout;
-            switch (settings.edgeLayout.kind)
+            switch (settings.edgeLayoutSettings.kind)
             {
                 case EdgeLayoutKind.Straight:
-                    layout = new StraightEdgeLayout(settings.edgeLayout.edgesAboveBlocks, minimalEdgeLevelDistance);
+                    layout = new StraightEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance);
                     break;
                 case EdgeLayoutKind.Spline:
-                    layout = new SplineEdgeLayout(settings.edgeLayout.edgesAboveBlocks, minimalEdgeLevelDistance, settings.edgeLayout.rdp);
+                    layout = new SplineEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance, rdp);
                     break;
                 case EdgeLayoutKind.Bundling:
-                    layout = new BundledEdgeLayout(settings.edgeLayout.edgesAboveBlocks, minimalEdgeLevelDistance, settings.edgeLayout.tension, settings.edgeLayout.rdp);
+                    layout = new BundledEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance, settings.edgeLayoutSettings.tension, rdp);
                     break;
                 case EdgeLayoutKind.None:
                     // nothing to be done
                     return new List<GameObject>();
                 default:
-                    throw new Exception("Unhandled edge layout " + settings.edgeLayout.kind);
+                    throw new Exception("Unhandled edge layout " + settings.edgeLayoutSettings.kind);
             }
 #if UNITY_EDITOR
             Performance p = Performance.Begin("edge layout " + layout.Name);
 #endif
             EdgeFactory edgeFactory = new EdgeFactory(
                 layout,
-                settings.edgeLayout.edgeWidth,
-                settings.edgeLayout.tubularSegments,
-                settings.edgeLayout.radius,
-                settings.edgeLayout.radialSegments,
-                settings.edgeLayout.isEdgeSelectable);
+                settings.edgeLayoutSettings.edgeWidth,
+                settings.edgeLayoutSettings.tubularSegments,
+                settings.edgeLayoutSettings.radius,
+                settings.edgeLayoutSettings.radialSegments,
+                settings.edgeLayoutSettings.isEdgeSelectable);
             // The resulting game objects representing the edges.
             ICollection<GameObject> result;
             // Calculate only
@@ -345,7 +338,7 @@ namespace SEE.Game
 
 #if UNITY_EDITOR
             p.End();
-            Debug.Log($"Calculated \"  {settings.edgeLayout.kind} \" edge layout for {gameNodes.Count}"
+            Debug.Log($"Calculated \"  {settings.edgeLayoutSettings.kind} \" edge layout for {gameNodes.Count}"
                       + $" nodes and {result.Count} edges in {p.GetElapsedTime()} [h:m:s:ms].\n");
 #endif
             return result;
@@ -418,7 +411,7 @@ namespace SEE.Game
             GameObject plane;
 
             Performance p;
-            if (settings.nodeLayout.kind.GetModel().CanApplySublayouts && nodeLayout.IsHierarchical())
+            if (settings.nodeLayoutSettings.kind.GetModel().CanApplySublayouts && nodeLayout.IsHierarchical())
             {
                 try
                 {
@@ -430,11 +423,11 @@ namespace SEE.Game
                     List<SublayoutLayoutNode> sublayoutLayoutNodes = ConvertSublayoutToLayoutNodes(sublayoutNodes.ToList());
                     foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
                     {
-                        Sublayout sublayout = new Sublayout(layoutNode, groundLevel, leafNodeFactory, graph, settings);
+                        Sublayout sublayout = new Sublayout(layoutNode, GroundLevel, leafNodeFactory, graph, settings);
                         sublayout.Layout();
                     }
 
-                    p = Performance.Begin("node layout " + settings.nodeLayout.kind + " (with sublayouts)");
+                    p = Performance.Begin("node layout " + settings.nodeLayoutSettings.kind + " (with sublayouts)");
                     // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
                     // (GameNode implements ILayoutNode).
                     ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
@@ -499,13 +492,13 @@ namespace SEE.Game
                     RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, gameNodes);
 
                     // 1) Calculate the layout
-                    p = Performance.Begin("node layout " + settings.nodeLayout.kind + " for " + gameNodes.Count + " nodes");
+                    p = Performance.Begin("node layout " + settings.nodeLayoutSettings.kind + " for " + gameNodes.Count + " nodes");
                     // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
                     // (GameNode implements ILayoutNode).
                     ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
                     nodeLayout.Apply(layoutNodes);
                     p.End();
-                    Debug.LogFormat("Built \"" + settings.nodeLayout.kind + "\" node layout for " + gameNodes.Count + " nodes in {0} [h:m:s:ms].\n", p.GetElapsedTime());
+                    Debug.LogFormat("Built \"" + settings.nodeLayoutSettings.kind + "\" node layout for " + gameNodes.Count + " nodes in {0} [h:m:s:ms].\n", p.GetElapsedTime());
 
                     // 2) Apply the calculated layout to the game objects
 
@@ -812,7 +805,6 @@ namespace SEE.Game
             return sublayoutLayoutNodes;
         }
 
-
         /// <summary>
         /// Calculates a list with all children for a specific node
         /// </summary>
@@ -924,26 +916,26 @@ namespace SEE.Game
         /// <returns>node layout selected</returns>
         public NodeLayout GetLayout()
         {
-            switch (settings.nodeLayout.kind)
+            switch (settings.nodeLayoutSettings.kind)
             {
                 case NodeLayoutKind.Manhattan:
-                    return new ManhattanLayout(groundLevel, leafNodeFactory.Unit);
+                    return new ManhattanLayout(GroundLevel, leafNodeFactory.Unit);
                 case NodeLayoutKind.RectanglePacking:
-                    return new RectanglePackingNodeLayout(groundLevel, leafNodeFactory.Unit);
+                    return new RectanglePackingNodeLayout(GroundLevel, leafNodeFactory.Unit);
                 case NodeLayoutKind.EvoStreets:
-                    return new EvoStreetsNodeLayout(groundLevel, leafNodeFactory.Unit);
+                    return new EvoStreetsNodeLayout(GroundLevel, leafNodeFactory.Unit);
                 case NodeLayoutKind.Treemap:
-                    return new TreemapLayout(groundLevel, 1000.0f * Unit(), 1000.0f * Unit());
+                    return new TreemapLayout(GroundLevel, 1000.0f * Unit(), 1000.0f * Unit());
                 case NodeLayoutKind.Balloon:
-                    return new BalloonNodeLayout(groundLevel);
+                    return new BalloonNodeLayout(GroundLevel);
                 case NodeLayoutKind.CirclePacking:
-                    return new CirclePackingNodeLayout(groundLevel);
+                    return new CirclePackingNodeLayout(GroundLevel);
                 case NodeLayoutKind.CompoundSpringEmbedder:
-                    return new CoseLayout(groundLevel, settings);
+                    return new CoseLayout(GroundLevel, settings);
                 case NodeLayoutKind.FromFile:
-                    return new LoadedNodeLayout(groundLevel, settings.globalAttributes.layoutPath.Path);
+                    return new LoadedNodeLayout(GroundLevel, settings.globalCityAttributes.layoutPath.Path);
                 default:
-                    throw new Exception("Unhandled node layout " + settings.nodeLayout.kind);
+                    throw new Exception("Unhandled node layout " + settings.nodeLayoutSettings.kind);
             }
         }
 
@@ -1039,7 +1031,7 @@ namespace SEE.Game
         /// <param name="gameNodes">a list with gamenode objects</param>
         protected void AddDecorations(ICollection<GameObject> gameNodes)
         {
-            AddDecorations(gameNodes, settings.nodeLayout.innerKind, settings.nodeLayout.kind);
+            AddDecorations(gameNodes, settings.nodeLayoutSettings.innerKind, settings.nodeLayoutSettings.kind);
         }
 
         /// <summary>
@@ -1054,9 +1046,9 @@ namespace SEE.Game
             InnerNodeFactory innerNodeFactory = GetInnerNodeFactory(innerNodeKinds);
 
             // Add software erosion decorators for all leaf nodes if requested.
-            if (settings.nodeLayout.showErosions)
+            if (settings.nodeLayoutSettings.showErosions)
             {
-                ErosionIssues issueDecorator = new ErosionIssues(settings.LeafIssueMap(), leafNodeFactory, scaler, settings.nodeLayout.maxErosionWidth);
+                ErosionIssues issueDecorator = new ErosionIssues(settings.LeafIssueMap(), leafNodeFactory, scaler, settings.nodeLayoutSettings.maxErosionWidth);
                 issueDecorator.Add(LeafNodes(gameNodes));
             }
 
@@ -1104,7 +1096,7 @@ namespace SEE.Game
                     // TODO
                     break;
                 default:
-                    throw new Exception("Unhandled GraphSettings.InnerNodeKinds " + settings.nodeLayout.innerKind);
+                    throw new Exception("Unhandled GraphSettings.InnerNodeKinds " + settings.nodeLayoutSettings.innerKind);
             }
         }
 
@@ -1315,7 +1307,7 @@ namespace SEE.Game
             LOD[] lods = new LOD[1];
             Renderer[] renderers = new Renderer[1];
             renderers[0] = gameObject.GetComponent<Renderer>();
-            lods[0] = new LOD(settings.globalAttributes.lodCulling, renderers);
+            lods[0] = new LOD(settings.globalCityAttributes.lodCulling, renderers);
             lodGroup.SetLODs(lods);
             lodGroup.RecalculateBounds();
         }
@@ -1351,7 +1343,7 @@ namespace SEE.Game
         private int SelectStyle(Node node, InnerNodeFactory innerNodeFactory)
         {
             bool isLeaf = node.IsLeaf();
-            string styleMetric = isLeaf ? settings.leafNodeAttributes.styleMetric : settings.innerNodeAttributes.styleMetric;
+            string styleMetric = isLeaf ? settings.leafNodeAttributesPerKind[0].styleMetric : settings.innerNodeAttributes.styleMetric;
             uint numberOfStyles = isLeaf ? leafNodeFactory.NumberOfStyles() : innerNodeFactory.NumberOfStyles();
             float metricMaximum;
 
@@ -1523,7 +1515,7 @@ namespace SEE.Game
                 Vector3 scale = GetScale(node);
 
                 // Scale according to the metrics.
-                if (settings.nodeLayout.kind == NodeLayoutKind.Treemap)
+                if (settings.nodeLayoutSettings.kind == NodeLayoutKind.Treemap)
                 {
                     // FIXME: This is ugly. The graph renderer should not need to care what
                     // kind of layout was applied.
@@ -1552,9 +1544,9 @@ namespace SEE.Game
         /// <returns>requested absolute scale in world space</returns>
         private Vector3 GetScale(Node node)
         {
-            return new Vector3(GetMetricValue(node, settings.leafNodeAttributes.widthMetric),
-                               GetMetricValue(node, settings.leafNodeAttributes.heightMetric),
-                               GetMetricValue(node, settings.leafNodeAttributes.depthMetric));
+            return new Vector3(GetMetricValue(node, settings.leafNodeAttributesPerKind[0].widthMetric),
+                               GetMetricValue(node, settings.leafNodeAttributesPerKind[0].heightMetric),
+                               GetMetricValue(node, settings.leafNodeAttributesPerKind[0].depthMetric));
         }
 
         /// <summary>

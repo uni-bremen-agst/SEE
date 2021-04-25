@@ -26,6 +26,7 @@ namespace SEE.Controls
 
         private void Start()
         {
+            lastAxis = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
             Camera mainCamera = MainCamera.Camera;
             if (focusedObject != null)
             {                
@@ -123,7 +124,7 @@ namespace SEE.Controls
         /// <summary>
         /// The mouse position of the last frame.
         /// </summary>
-        private Vector2 lastAxis = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+        private Vector2 lastAxis;
 
         /// <summary>
         /// If the user wants us, we rotate the camera according to mouse input.

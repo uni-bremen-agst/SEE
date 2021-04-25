@@ -403,7 +403,7 @@ namespace SEE.Game
         /// </summary>
         public void SaveLayout()
         {
-            string path = globalAttributes.layoutPath.Path;
+            string path = globalCityAttributes.layoutPath.Path;
             Debug.LogFormat("Saving layout data to {0}.\n", path);            
             if (Filenames.HasExtension(path, Filenames.GVLExtension))
             {
