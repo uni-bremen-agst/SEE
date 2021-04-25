@@ -29,12 +29,12 @@ namespace SEE.Game
         /// respectively (both declared in AbstractSEECityIO). You should also
         /// extend the test cases in TestConfigIO.
 
-        public GlobalCityAttributes    globalCityAttributes         = new GlobalCityAttributes();
-        public LeafNodeAttributes[]    leafNodeAttributesPerKind    = Enumerable.Repeat(new LeafNodeAttributes(), (int)Node.Kind.Count).ToArray();
-        public InnerNodeAttributes     innerNodeAttributes          = new InnerNodeAttributes();
-        public NodeLayoutSettings      nodeLayoutSettings           = new NodeLayoutSettings();
-        public EdgeLayoutSettings      edgeLayoutSettings           = new EdgeLayoutSettings();
-        public CoseGraphSettings       coseGraphSettings            = new CoseGraphSettings(); // TODO(torben): put into CitySettings.cs
+        public GlobalCityAttributes    globalCityAttributes      = new GlobalCityAttributes();
+        public LeafNodeAttributes[]    leafNodeAttributesPerKind = ArrayUtils.New((int)Node.Kind.Count, (int _) => new LeafNodeAttributes());
+        public InnerNodeAttributes     innerNodeAttributes       = new InnerNodeAttributes();
+        public NodeLayoutSettings      nodeLayoutSettings        = new NodeLayoutSettings();
+        public EdgeLayoutSettings      edgeLayoutSettings        = new EdgeLayoutSettings();
+        public CoseGraphSettings       coseGraphSettings         = new CoseGraphSettings(); // TODO(torben): put into CitySettings.cs
 
         /// <summary>
         /// Saves the settings of this code city to <see cref="CityPath"/>.

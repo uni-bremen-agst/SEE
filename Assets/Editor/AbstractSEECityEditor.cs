@@ -1,6 +1,5 @@
 ﻿#if UNITY_EDITOR
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using SEE;
@@ -35,9 +34,7 @@ namespace SEEEditor
         /// </summary>
         private bool showLeafAttributes = true;
 
-        private int numSpecifiedNodeKinds = 1;
-        private bool[] showLeafAttributesAtIndex = Enumerable.Repeat(true, (int)Node.Kind.Count).ToArray();
-        private Node.Kind[] editorIndexToNodeKindIndex = Enumerable.Repeat(Node.Kind.Unspecified, (int)Node.Kind.Count).ToArray();
+        private bool[] showLeafAttributesAtIndex = Enumerable.Repeat(false, (int)Node.Kind.Count).ToArray();
 
         /// <summary>
         /// Whether the inner node attribute foldout should be expanded.
@@ -294,43 +291,27 @@ namespace SEEEditor
             showLeafAttributes = EditorGUILayout.Foldout(showLeafAttributes, "Attributes of leaf nodes", true, EditorStyles.foldoutHeader);
             if (showLeafAttributes)
             {
-                numSpecifiedNodeKinds = Mathf.Min((int)Node.Kind.Count, EditorGUILayout.DelayedIntField("Number of leaf node types", numSpecifiedNodeKinds));
-
-                for (int i = 0; i < numSpecifiedNodeKinds; i++)
+                EditorGUI.indentLevel++;
+                for (int i = 0; i < (int)Node.Kind.Count; i++)
                 {
-                    showLeafAttributesAtIndex[i] = EditorGUILayout.Foldout(showLeafAttributesAtIndex[i], "#" + i, EditorStyles.foldout);
+                    string label = "Type: " + ((Node.Kind)i).ToString();
+                    showLeafAttributesAtIndex[i] = EditorGUILayout.Foldout(showLeafAttributesAtIndex[i], label, EditorStyles.foldoutHeader);
                     if (showLeafAttributesAtIndex[i])
                     {
-                        editorIndexToNodeKindIndex[i] = (Node.Kind)EditorGUILayout.EnumPopup("Node Type", editorIndexToNodeKindIndex[i]);
+                        LeafNodeAttributes settings = city.leafNodeAttributesPerKind[i];
+                        Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
 
-                        // Show warning, if node type was specified before
-                        bool showWarning = false;
-                        for (int j = 0; j < i; j++)
-                        {
-                            if (editorIndexToNodeKindIndex[i] == editorIndexToNodeKindIndex[j])
-                            {
-                                showWarning = true;
-                                EditorGUILayout.HelpBox("This node type was specified before!", MessageType.Warning);
-                                break;
-                            }
-                        }
-
-                        if (!showWarning)
-                        {
-                            LeafNodeAttributes settings = city.leafNodeAttributesPerKind[(int)editorIndexToNodeKindIndex[i]];
-                            Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
-
-                            settings.widthMetric = EditorGUILayout.TextField("Width", settings.widthMetric);
-                            settings.heightMetric = EditorGUILayout.TextField("Height", settings.heightMetric);
-                            settings.depthMetric = EditorGUILayout.TextField("Depth", settings.depthMetric);
-                            settings.styleMetric = EditorGUILayout.TextField("Style", settings.styleMetric);
-                            settings.colorRange.lower = EditorGUILayout.ColorField("Lower color", settings.colorRange.lower);
-                            settings.colorRange.upper = EditorGUILayout.ColorField("Upper color", settings.colorRange.upper);
-                            settings.colorRange.NumberOfColors = (uint) EditorGUILayout.IntSlider("# Colors", (int) settings.colorRange.NumberOfColors, 1, 15);
-                            LabelSettings(ref settings.labelSettings);
-                        }
+                        settings.widthMetric = EditorGUILayout.TextField("Width", settings.widthMetric);
+                        settings.heightMetric = EditorGUILayout.TextField("Height", settings.heightMetric);
+                        settings.depthMetric = EditorGUILayout.TextField("Depth", settings.depthMetric);
+                        settings.styleMetric = EditorGUILayout.TextField("Style", settings.styleMetric);
+                        settings.colorRange.lower = EditorGUILayout.ColorField("Lower color", settings.colorRange.lower);
+                        settings.colorRange.upper = EditorGUILayout.ColorField("Upper color", settings.colorRange.upper);
+                        settings.colorRange.NumberOfColors = (uint) EditorGUILayout.IntSlider("# Colors", (int) settings.colorRange.NumberOfColors, 1, 15);
+                        LabelSettings(ref settings.labelSettings);
                     }
                 }
+                EditorGUI.indentLevel--;
             }
         }
 
