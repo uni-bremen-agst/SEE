@@ -32,13 +32,16 @@ namespace SEE.Game
         public GraphRenderer(AbstractSEECity settings, Graph graph)
         {
             this.settings = settings;
-            switch (this.settings.nodeLayoutSettings.leafKind)
+            for (int i = 0; i < (int)Node.Kind.Count; i++)
             {
-                case LeafNodeKinds.Blocks:
-                    leafNodeFactory = new CubeFactory(ShaderType, this.settings.leafNodeAttributesPerKind[0].colorRange);
-                    break;
-                default:
-                    throw new Exception("Unhandled GraphSettings.LeafNodeKinds");
+                switch (this.settings.nodeLayoutSettings.leafKind)
+                {
+                    case LeafNodeKinds.Blocks:
+                        leafNodeFactories[i] = new CubeFactory(ShaderType, this.settings.leafNodeAttributesPerKind[i].colorRange);
+                        break;
+                    default:
+                        throw new Exception("Unhandled GraphSettings.LeafNodeKinds");
+                }
             }
             innerNodeFactory = GetInnerNodeFactory(this.settings.nodeLayoutSettings.innerKind);
             this.graph = graph;
@@ -75,11 +78,11 @@ namespace SEE.Game
                 case InnerNodeKinds.Donuts:
                     return new VanillaFactory(ShaderType, colorRange);
                 case InnerNodeKinds.Circles:
-                    return new CircleFactory(colorRange, leafNodeFactory.Unit);
+                    return new CircleFactory(colorRange);
                 case InnerNodeKinds.Cylinders:
                     return new CylinderFactory(ShaderType, colorRange);
                 case InnerNodeKinds.Rectangles:
-                    return new RectangleFactory(colorRange, leafNodeFactory.Unit);
+                    return new RectangleFactory(colorRange);
                 case InnerNodeKinds.Blocks:
                     return new CubeFactory(ShaderType, colorRange);
                 default:
@@ -100,7 +103,7 @@ namespace SEE.Game
         /// <summary>
         /// The factory used to create blocks for leaves.
         /// </summary>
-        private readonly NodeFactory leafNodeFactory;
+        private readonly NodeFactory[] leafNodeFactories = new NodeFactory[(int)Node.Kind.Count];
 
         /// <summary>
         /// The factory used to create game nodes for inner graph nodes.
@@ -204,7 +207,7 @@ namespace SEE.Game
             AddAscendants(to, gameNodes);
             Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
             // The layout nodes corresponding to those game nodes.
-            ICollection<GameNode> layoutNodes = ToLayoutNodes(gameNodes, leafNodeFactory, innerNodeFactory, to_layout_node);
+            ICollection<GameNode> layoutNodes = ToLayoutNodes(gameNodes, leafNodeFactories, innerNodeFactory, to_layout_node);
 
             GameNode fromLayoutNode = null; // layout node in layoutNodes corresponding to source node
             GameNode toLayoutNode = null;   // layout node in layoutNodes corresponding to target node
@@ -424,7 +427,7 @@ namespace SEE.Game
                     List<SublayoutLayoutNode> sublayoutLayoutNodes = ConvertSublayoutToLayoutNodes(sublayoutNodes.ToList());
                     foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
                     {
-                        Sublayout sublayout = new Sublayout(layoutNode, GroundLevel, leafNodeFactory, graph, settings);
+                        Sublayout sublayout = new Sublayout(layoutNode, GroundLevel, graph, settings);
                         sublayout.Layout();
                     }
 
@@ -566,6 +569,7 @@ namespace SEE.Game
 
             if (node.IsLeaf())
             {
+                NodeFactory leafNodeFactory = leafNodeFactories[(int)node.kind];
                 // Leaf nodes were created as blocks by leaveNodeFactory.
                 // We need to first scale the game node and only afterwards set its
                 // position because transform.scale refers to the center position.
@@ -622,15 +626,6 @@ namespace SEE.Game
 
             light.range = 3.0f * Mathf.Sqrt(bbw * bbw + bbh * bbh);
             light.type = LightType.Point;
-
-            Color lightColor = 0.5f * (innerNodeFactory.Materials.Lower + innerNodeFactory.Materials.Higher);
-            if (leafNodeFactory is InnerNodeFactory)
-            {
-                lightColor = 0.5f * lightColor + 0.25f * (
-                    ((InnerNodeFactory)leafNodeFactory).Materials.Lower +
-                    ((InnerNodeFactory)leafNodeFactory).Materials.Higher);
-            }
-
             light.intensity = 1.0f;
         }
 
@@ -920,13 +915,13 @@ namespace SEE.Game
             switch (settings.nodeLayoutSettings.kind)
             {
                 case NodeLayoutKind.Manhattan:
-                    return new ManhattanLayout(GroundLevel, leafNodeFactory.Unit);
+                    return new ManhattanLayout(GroundLevel, NodeFactory.Unit);
                 case NodeLayoutKind.RectanglePacking:
-                    return new RectanglePackingNodeLayout(GroundLevel, leafNodeFactory.Unit);
+                    return new RectanglePackingNodeLayout(GroundLevel, NodeFactory.Unit);
                 case NodeLayoutKind.EvoStreets:
-                    return new EvoStreetsNodeLayout(GroundLevel, leafNodeFactory.Unit);
+                    return new EvoStreetsNodeLayout(GroundLevel, NodeFactory.Unit);
                 case NodeLayoutKind.Treemap:
-                    return new TreemapLayout(GroundLevel, 1000.0f * Unit(), 1000.0f * Unit());
+                    return new TreemapLayout(GroundLevel, 1000.0f * NodeFactory.Unit, 1000.0f * NodeFactory.Unit);
                 case NodeLayoutKind.Balloon:
                     return new BalloonNodeLayout(GroundLevel);
                 case NodeLayoutKind.CirclePacking:
@@ -1049,7 +1044,7 @@ namespace SEE.Game
             // Add software erosion decorators for all leaf nodes if requested.
             if (settings.nodeLayoutSettings.showErosions)
             {
-                ErosionIssues issueDecorator = new ErosionIssues(settings.LeafIssueMap(), leafNodeFactory, scaler, settings.nodeLayoutSettings.maxErosionWidth);
+                ErosionIssues issueDecorator = new ErosionIssues(settings.LeafIssueMap(), leafNodeFactories[0], scaler, settings.nodeLayoutSettings.maxErosionWidth);
                 issueDecorator.Add(LeafNodes(gameNodes));
             }
 
@@ -1109,7 +1104,7 @@ namespace SEE.Game
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
         public ICollection<GameNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
         {
-            return ToLayoutNodes(gameObjects, leafNodeFactory, innerNodeFactory, to_layout_node);
+            return ToLayoutNodes(gameObjects, leafNodeFactories, innerNodeFactory, to_layout_node);
         }
 
         /// <summary>
@@ -1127,11 +1122,11 @@ namespace SEE.Game
             {
                 ICollection<GameObject> gameObjects = new List<GameObject>();
                 sublayoutNode.Nodes.ForEach(node => gameObjects.Add(nodeMap[node]));
-                layoutNodes.AddRange(ToLayoutNodes(gameObjects, leafNodeFactory, GetInnerNodeFactory(sublayoutNode.InnerNodeKind), to_layout_node));
+                layoutNodes.AddRange(ToLayoutNodes(gameObjects, leafNodeFactories, GetInnerNodeFactory(sublayoutNode.InnerNodeKind), to_layout_node));
                 remainingGameobjects.RemoveAll(gameObject => gameObjects.Contains(gameObject));
             }
 
-            layoutNodes.AddRange(ToLayoutNodes(remainingGameobjects, leafNodeFactory, innerNodeFactory, to_layout_node));
+            layoutNodes.AddRange(ToLayoutNodes(remainingGameobjects, leafNodeFactories, innerNodeFactory, to_layout_node));
 
             return layoutNodes;
         }
@@ -1147,7 +1142,7 @@ namespace SEE.Game
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
         private static ICollection<GameNode> ToLayoutNodes
             (ICollection<GameObject> gameNodes,
-            NodeFactory leafNodeFactory,
+            NodeFactory[] leafNodeFactories,
             NodeFactory innerNodeFactory,
             Dictionary<Node, ILayoutNode> to_layout_node)
         {
@@ -1158,7 +1153,7 @@ namespace SEE.Game
                 Node node = gameObject.GetComponent<NodeRef>().Value;
                 if (node.IsLeaf())
                 {
-                    result.Add(new GameNode(to_layout_node, gameObject, leafNodeFactory));
+                    result.Add(new GameNode(to_layout_node, gameObject, leafNodeFactories[(int)node.kind]));
                 }
                 else
                 {
@@ -1229,22 +1224,12 @@ namespace SEE.Game
             Node node = gameNode.GetComponent<NodeRef>().Value;
             if (node.IsLeaf())
             {
-                leafNodeFactory.Rotate(gameNode, degree);
+                leafNodeFactories[(int)node.kind].Rotate(gameNode, degree);
             }
             else
             {
                 innerNodeFactory.Rotate(gameNode, degree);
             }
-        }
-
-        /// <summary>
-        /// Returns the unit of the world helpful for scaling. This unit depends upon the
-        /// kind of blocks we are using to represent nodes.
-        /// </summary>
-        /// <returns>unit of the world</returns>
-        public float Unit()
-        {
-            return leafNodeFactory.Unit;
         }
 
         /// <summary>
@@ -1286,7 +1271,7 @@ namespace SEE.Game
             // render queue should be. We are assuming that the nodes are stacked on each
             // other according to the node hierarchy. Leaves are on top of all other nodes.
             // That is why we put them at the highest necessary rendering queue offset.
-            GameObject block = leafNodeFactory.NewBlock(SelectStyle(node, innerNodeFactory), node.ItsGraph.MaxDepth);
+            GameObject block = leafNodeFactories[(int)node.kind].NewBlock(SelectStyle(node, innerNodeFactory), node.ItsGraph.MaxDepth);
             block.name = node.ID;
             block.AddComponent<NodeRef>().Value = node;
             AdjustScaleOfLeaf(block);
@@ -1345,8 +1330,8 @@ namespace SEE.Game
         private int SelectStyle(Node node, InnerNodeFactory innerNodeFactory)
         {
             bool isLeaf = node.IsLeaf();
-            string styleMetric = isLeaf ? settings.leafNodeAttributesPerKind[0].styleMetric : settings.innerNodeAttributes.styleMetric;
-            uint numberOfStyles = isLeaf ? leafNodeFactory.NumberOfStyles() : innerNodeFactory.NumberOfStyles();
+            string styleMetric = isLeaf ? settings.leafNodeAttributesPerKind[(int)node.kind].styleMetric : settings.innerNodeAttributes.styleMetric;
+            uint numberOfStyles = isLeaf ? leafNodeFactories[(int)node.kind].NumberOfStyles() : innerNodeFactory.NumberOfStyles();
             float metricMaximum;
 
             if (TryGetFloat(styleMetric, out float value))
@@ -1406,7 +1391,7 @@ namespace SEE.Game
             Node node = noderef.Value;
             if (node.IsLeaf())
             {
-                return leafNodeFactory.Roof(gameNode);
+                return leafNodeFactories[(int)node.kind].Roof(gameNode);
             }
             else
             {
@@ -1431,7 +1416,7 @@ namespace SEE.Game
             Node node = noderef.Value;
             if (node.IsLeaf())
             {
-                return leafNodeFactory.GetSize(gameNode);
+                return leafNodeFactories[(int)node.kind].GetSize(gameNode);
             }
             else
             {
@@ -1484,7 +1469,7 @@ namespace SEE.Game
             int style = SelectStyle(node, innerNodeFactory);
             if (node.IsLeaf())
             {
-                leafNodeFactory.SetStyle(gameNode, style);
+                leafNodeFactories[(int)node.kind].SetStyle(gameNode, style);
             }
             else
             {
@@ -1523,13 +1508,13 @@ namespace SEE.Game
                     // kind of layout was applied.
                     // In case of treemaps, the width metric is mapped on the ground area.
                     float widthOfSquare = Mathf.Sqrt(scale.x);
-                    leafNodeFactory.SetWidth(gameNode, leafNodeFactory.Unit * widthOfSquare);
-                    leafNodeFactory.SetDepth(gameNode, leafNodeFactory.Unit * widthOfSquare);
-                    leafNodeFactory.SetHeight(gameNode, leafNodeFactory.Unit * scale.y);
+                    leafNodeFactories[(int)node.kind].SetWidth(gameNode, NodeFactory.Unit * widthOfSquare);
+                    leafNodeFactories[(int)node.kind].SetDepth(gameNode, NodeFactory.Unit * widthOfSquare);
+                    leafNodeFactories[(int)node.kind].SetHeight(gameNode, NodeFactory.Unit * scale.y);
                 }
                 else
                 {
-                    gameNode.transform.localScale = leafNodeFactory.Unit * scale;
+                    gameNode.transform.localScale = NodeFactory.Unit * scale;
                 }
             }
             else
@@ -1678,9 +1663,9 @@ namespace SEE.Game
                 {
                     Node node = go.GetComponent<NodeRef>().Value;
 
-                    Vector3 extent = node.IsLeaf() ? leafNodeFactory.GetSize(go) / 2.0f : innerNodeFactory.GetSize(go) / 2.0f;
+                    Vector3 extent = node.IsLeaf() ? leafNodeFactories[(int)node.kind].GetSize(go) / 2.0f : innerNodeFactory.GetSize(go) / 2.0f;
                     // Note: position denotes the center of the object
-                    Vector3 position = node.IsLeaf() ? leafNodeFactory.GetCenterPosition(go) : innerNodeFactory.GetCenterPosition(go);
+                    Vector3 position = node.IsLeaf() ? leafNodeFactories[(int)node.kind].GetCenterPosition(go) : innerNodeFactory.GetCenterPosition(go);
                     {
                         // x co-ordinate of lower left corner
                         float x = position.x - extent.x;
