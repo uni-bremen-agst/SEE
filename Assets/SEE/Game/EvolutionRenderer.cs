@@ -681,7 +681,7 @@ namespace SEE.Game
                 // Searches for pairs between old and new edges
                 matchedEdges =  EdgeMatcher(oldEdges,newEdges);              
                 // Case distinction in case the layout does not need sample points
-                if(!graphRenderer.GetSettings().edgeLayout.kind.Equals(EdgeLayoutKind.Straight))
+                if(!graphRenderer.settings.edgeLayoutSettings.kind.Equals(EdgeLayoutKind.Straight))
                 {
                     foreach((GameObject oldEdge, GameObject newEdge) in matchedEdges)
                     {
@@ -700,10 +700,10 @@ namespace SEE.Game
                         lineRenderer.SetPositions(oP.linePoints);
                     }
                 }
-                    // Sets the timer for the animation to zero
-                    timer = 0f;
-                    // Starts the animation of the edges
-                    moveEdges = true;
+                // Sets the timer for the animation to zero
+                timer = 0f;
+                // Starts the animation of the edges
+                moveEdges = true;
             }
             catch (ArgumentNullException)
             {

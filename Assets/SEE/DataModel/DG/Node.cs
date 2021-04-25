@@ -16,13 +16,13 @@ namespace SEE.DataModel.DG
         // The clone will appear as a node without parent and children at level 0.
         // Neither will its incoming and outgoing edges be copied.
 
-        [Flags]
-        public enum Flags : byte
+        public enum Kind : byte
         {
-            None           = 0x0,
-            Implementation = 0x1,
-            Architecture   = 0x2,
-            Mapping        = 0x4,
+            Unspecified,
+            Implementation,
+            Architecture,
+            Mapping,
+            Count
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         public override string ID { get; set; } = "";
 
-        public Flags flags = Flags.None;
+        public Kind flags = Kind.Unspecified;
 
         /// <summary>
         /// The attribute name for the name of nodes. They may or may not be unique.

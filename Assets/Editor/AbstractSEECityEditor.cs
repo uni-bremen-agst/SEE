@@ -1,8 +1,10 @@
 ﻿#if UNITY_EDITOR
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SEE;
+using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Utils;
 using UnityEditor;
@@ -32,6 +34,10 @@ namespace SEEEditor
         /// Whether the leaf node attribute foldout should be expanded.
         /// </summary>
         private bool showLeafAttributes = true;
+
+        private int numSpecifiedNodeKinds = 1;
+        private bool[] showLeafAttributesAtIndex = Enumerable.Repeat(true, (int)Node.Kind.Count).ToArray();
+        private Node.Kind[] editorIndexToNodeKindIndex = Enumerable.Repeat(Node.Kind.Unspecified, (int)Node.Kind.Count).ToArray();
 
         /// <summary>
         /// Whether the inner node attribute foldout should be expanded.
@@ -78,7 +84,7 @@ namespace SEEEditor
 
             EditorGUILayout.Separator();
 
-            if (city.nodeLayout.kind == NodeLayoutKind.CompoundSpringEmbedder)
+            if (city.nodeLayoutSettings.kind == NodeLayoutKind.CompoundSpringEmbedder)
             {
                 CompoundSpringEmbedderAttributes();
                 EditorGUILayout.Separator();
@@ -113,7 +119,7 @@ namespace SEEEditor
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("LOD Culling");
-                city.globalAttributes.lodCulling = EditorGUILayout.Slider(city.globalAttributes.lodCulling, 0.0f, 1.0f);
+                city.globalCityAttributes.lodCulling = EditorGUILayout.Slider(city.globalCityAttributes.lodCulling, 0.0f, 1.0f);
                 GUILayout.EndHorizontal();
             }
 
@@ -188,7 +194,7 @@ namespace SEEEditor
                 city.coseGraphSettings.UseIterativeCalculation = EditorGUILayout.Toggle("Find parameters iteratively", city.coseGraphSettings.UseIterativeCalculation);
                 if (city.coseGraphSettings.UseCalculationParameter || city.coseGraphSettings.UseIterativeCalculation)
                 {
-                    city.nodeLayout.zScoreScale = true;
+                    city.nodeLayoutSettings.zScoreScale = true;
 
                     city.coseGraphSettings.MultiLevelScaling = false;
                     city.coseGraphSettings.UseSmartMultilevelScaling = false;
@@ -206,7 +212,7 @@ namespace SEEEditor
             showEdgeLayout = EditorGUILayout.Foldout(showEdgeLayout, "Edges and edge layout", true, EditorStyles.foldoutHeader);
             if (showEdgeLayout)
             {
-                EdgeLayoutSettings settings = city.edgeLayout;
+                EdgeLayoutSettings settings = city.edgeLayoutSettings;
                 Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
 
                 settings.kind = (EdgeLayoutKind)EditorGUILayout.EnumPopup("Edge layout", settings.kind);
@@ -232,12 +238,12 @@ namespace SEEEditor
             showNodeLayout = EditorGUILayout.Foldout(showNodeLayout, "Nodes and node layout", true, EditorStyles.foldoutHeader);
             if (showNodeLayout)
             {
-                NodeLayoutSettings settings = city.nodeLayout;
+                NodeLayoutSettings settings = city.nodeLayoutSettings;
                 Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
 
                 settings.leafKind = (LeafNodeKinds) EditorGUILayout.EnumPopup("Leaf nodes", settings.leafKind);
                 settings.kind = (NodeLayoutKind)EditorGUILayout.EnumPopup("Node layout", settings.kind);
-                city.globalAttributes.layoutPath = GetDataPath("Layout file", city.globalAttributes.layoutPath, "gvl");
+                city.globalCityAttributes.layoutPath = GetDataPath("Layout file", city.globalCityAttributes.layoutPath, "gvl");
 
                 GUILayout.BeginHorizontal();
                 EditorGUILayout.PrefixLabel("Inner nodes");
@@ -288,17 +294,43 @@ namespace SEEEditor
             showLeafAttributes = EditorGUILayout.Foldout(showLeafAttributes, "Attributes of leaf nodes", true, EditorStyles.foldoutHeader);
             if (showLeafAttributes)
             {
-                LeafNodeAttributes settings = city.leafNodeAttributes;
-                Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
+                numSpecifiedNodeKinds = Mathf.Min((int)Node.Kind.Count, EditorGUILayout.DelayedIntField("Number of leaf node types", numSpecifiedNodeKinds));
 
-                settings.widthMetric = EditorGUILayout.TextField("Width", settings.widthMetric);
-                settings.heightMetric = EditorGUILayout.TextField("Height", settings.heightMetric);
-                settings.depthMetric = EditorGUILayout.TextField("Depth", settings.depthMetric);
-                settings.styleMetric = EditorGUILayout.TextField("Style", settings.styleMetric);
-                settings.colorRange.lower = EditorGUILayout.ColorField("Lower color", settings.colorRange.lower);
-                settings.colorRange.upper = EditorGUILayout.ColorField("Upper color", settings.colorRange.upper);
-                settings.colorRange.NumberOfColors = (uint) EditorGUILayout.IntSlider("# Colors", (int) settings.colorRange.NumberOfColors, 1, 15);
-                LabelSettings(ref settings.labelSettings);
+                for (int i = 0; i < numSpecifiedNodeKinds; i++)
+                {
+                    showLeafAttributesAtIndex[i] = EditorGUILayout.Foldout(showLeafAttributesAtIndex[i], "#" + i, EditorStyles.foldout);
+                    if (showLeafAttributesAtIndex[i])
+                    {
+                        editorIndexToNodeKindIndex[i] = (Node.Kind)EditorGUILayout.EnumPopup("Node Type", editorIndexToNodeKindIndex[i]);
+
+                        // Show warning, if node type was specified before
+                        bool showWarning = false;
+                        for (int j = 0; j < i; j++)
+                        {
+                            if (editorIndexToNodeKindIndex[i] == editorIndexToNodeKindIndex[j])
+                            {
+                                showWarning = true;
+                                EditorGUILayout.HelpBox("This node type was specified before!", MessageType.Warning);
+                                break;
+                            }
+                        }
+
+                        if (!showWarning)
+                        {
+                            LeafNodeAttributes settings = city.leafNodeAttributesPerKind[(int)editorIndexToNodeKindIndex[i]];
+                            Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
+
+                            settings.widthMetric = EditorGUILayout.TextField("Width", settings.widthMetric);
+                            settings.heightMetric = EditorGUILayout.TextField("Height", settings.heightMetric);
+                            settings.depthMetric = EditorGUILayout.TextField("Depth", settings.depthMetric);
+                            settings.styleMetric = EditorGUILayout.TextField("Style", settings.styleMetric);
+                            settings.colorRange.lower = EditorGUILayout.ColorField("Lower color", settings.colorRange.lower);
+                            settings.colorRange.upper = EditorGUILayout.ColorField("Upper color", settings.colorRange.upper);
+                            settings.colorRange.NumberOfColors = (uint) EditorGUILayout.IntSlider("# Colors", (int) settings.colorRange.NumberOfColors, 1, 15);
+                            LabelSettings(ref settings.labelSettings);
+                        }
+                    }
+                }
             }
         }
 

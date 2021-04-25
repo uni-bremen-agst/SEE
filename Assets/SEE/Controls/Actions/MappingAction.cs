@@ -39,16 +39,16 @@ namespace SEE.Controls.Actions
             mapping.Name = mappingName;
             foreach (Node n in impl.Nodes())
             {
-                n.flags |= Node.Flags.Implementation;
+                n.flags |= Node.Kind.Implementation;
             }
             foreach (Node n in arch.Nodes())
             {
-                n.flags |= Node.Flags.Architecture;
+                n.flags |= Node.Kind.Architecture;
             }
             Node mappingRoot = new Node
             {
                 ID = mappingName,
-                flags = Node.Flags.Mapping,
+                flags = Node.Kind.Mapping,
                 Type = "Mapping",
                 Parent = null
             };
