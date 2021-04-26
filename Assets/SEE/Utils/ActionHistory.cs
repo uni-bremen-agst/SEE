@@ -142,8 +142,8 @@ namespace Assets.SEE.Utils
         /// <returns>true, if there are conflicts, else false</returns>
         private bool ActionHasConflicts(List<string> affectedGameObjects)
         {
-            int countOfNewerActions = GetCountOfNewerAction(activeAction.GetId());
-            for (int i = countOfNewerActions; countOfNewerActions > 0; i--)
+            int index = GetCountOfNewerAction(activeAction.GetId());
+            for (int i = index; index < allActionsList.Count; i++)
             {
                 foreach (string s in affectedGameObjects)
                 {
@@ -290,16 +290,22 @@ namespace Assets.SEE.Utils
         /// <returns>the number of newer actions than that with the id <paramref name="idOfAction"/>, which are not executed by the owner.</returns>
         private int GetCountOfNewerAction(string idOfAction)
         {
-            int newerActionsCount = 0;
-            int sizeOfActionsList = allActionsList.Count-1;
-            while (!allActionsList[sizeOfActionsList].Item3.Equals(idOfAction) && sizeOfActionsList >= 0)
-            {
-                newerActionsCount++;
-                sizeOfActionsList--;
-            }
 
-            Debug.Log(newerActionsCount);
-            return newerActionsCount;
+            for(int i = allActionsList.Count-1; i >= 0; i--)
+            {
+                if (allActionsList[i].Item3.Equals(idOfAction)) return allActionsList.Count - 1 - i;
+            }
+            return -1; //If not fouind the action
+            //int neweractionscount = 0;
+            //int sizeofactionslist = allactionslist.count - 1;
+            //while (!allactionslist[sizeofactionslist].item3.equals(idofaction) && sizeofactionslist >= 0)
+            //{
+            //    neweractionscount++;
+            //    sizeofactionslist--;
+            //}
+
+            //debug.log(neweractionscount);
+            //return neweractionscount;
         }
 
         /// <summary>
