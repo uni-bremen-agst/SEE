@@ -38,44 +38,53 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Specifies whether all objects of selected city should be hidden.
         /// </summary>
-        private Boolean hideAll;
+        private bool hideAll;
 
         /// <summary>
         /// Specifies whether selected objects should be hidden.
         /// </summary>
-        private Boolean hideSelected;
+        private bool hideSelected;
 
         /// <summary>
         /// Specifies whether unselected objects should be hidden.
         /// </summary>
-        private Boolean hideUnselected;
+        private bool hideUnselected;
 
         /// <summary>
         /// Specifies whether incoming edges of selected node (including connected nodes) should be hidden.
         /// </summary>
-        private Boolean hideIncoming;
+        private bool hideIncoming;
 
         /// <summary>
         /// Specifies whether outgoing edges of selected node (including connected nodes) should be hidden.
         /// </summary>
-        private Boolean hideOutgoing;
+        private bool hideOutgoing;
 
         /// <summary>
         /// Specifies whether all edges of selected node (including connected nodes) should be hidden.
         /// </summary>
-        private Boolean hideAllEdgesOfSelected;
+        private bool hideAllEdgesOfSelected;
 
         /// <summary>
-        /// The code city to perform actions on, only necessary for 
+        /// Specifies whether the forward transitive closure of the graph should be hidden.
         /// </summary>
-        SEECity CodeCity;
+        private bool hideForwardTransitiveClosure;
+
+        /// <summary>
+        /// Specifies whether the backward transitive closure of the graph should be hidden.
+        /// </summary>
+        private bool hideBackwardTransitiveClosure;
+
+        /// <summary>
+        /// Specifies whether the transitive closure of the graph should be hidden.
+        /// </summary>
+        private bool hideAllTransitiveClosure;
 
         enum EdgeSelector
         {
             Incomming,
             Outgoing
         }
-
 
         /// <summary>
         /// Returns a new instance of <see cref="HideAction"/>.
@@ -153,6 +162,27 @@ namespace SEE.Controls.Actions
             } else if (hideAllEdgesOfSelected)
             {
                 if (HideAllConnectedEdges())
+                {
+                    hadAnEffect = true;
+                    return true;
+                }
+            } else if (hideForwardTransitiveClosure)
+            {
+                if (HideFowardTransitive())
+                {
+                    hadAnEffect = true;
+                    return true;
+                }
+            } else if (hideBackwardTransitiveClosure)
+            {
+                if (HideBackwardTransitive())
+                {
+                    hadAnEffect = true;
+                    return true;
+                }
+            } else if (hideAllTransitiveClosure)
+            {
+                if (HideAllTransitive())
                 {
                     hadAnEffect = true;
                     return true;
@@ -268,7 +298,7 @@ namespace SEE.Controls.Actions
         {
             if (node.TryGetComponent(out NodeRef nodeRef))
             {
-                HashSet<String> edgeIDs = GetEdgeIds(nodeRef);
+                HashSet<string> edgeIDs = GetEdgeIds(nodeRef);
 
                 foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
                 {
@@ -342,8 +372,8 @@ namespace SEE.Controls.Actions
             if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
             {
 
-                HashSet<String> edgeIDs = new HashSet<string>();
-                HashSet<String> nodeIDs = new HashSet<string>();
+                HashSet<string> edgeIDs = new HashSet<string>();
+                HashSet<string> nodeIDs = new HashSet<string>();
 
                 foreach (Edge edge in nodeRef.Value.Outgoings)
                 {
@@ -382,8 +412,8 @@ namespace SEE.Controls.Actions
             if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
             {
 
-                HashSet<String> edgeIDs = new HashSet<string>();
-                HashSet<String> nodeIDs = new HashSet<string>();
+                HashSet<string> edgeIDs = new HashSet<string>();
+                HashSet<string> nodeIDs = new HashSet<string>();
 
                 foreach (Edge edge in nodeRef.Value.Incomings)
                 {
@@ -453,6 +483,116 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Hide the forward transitive closure (all nodes reachable from the selected node by going forwards)
+        /// </summary>
+        private bool HideFowardTransitive()
+        {
+            if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
+            {
+
+                (HashSet <string> edgeIDs, HashSet <string> nodeIDs) = ForwardTransitiveRecursive(nodeRef.Value, new HashSet<string>(), new HashSet<string>());
+
+                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
+                {
+                    if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
+                    {
+                        hiddenObjects.Add(edge);
+                        GameObjectExtensions.SetVisibility(edge, false, true);
+                    }
+                }
+                foreach (GameObject node in GameObject.FindGameObjectsWithTag(Tags.Node))
+                {
+                    if (node.activeInHierarchy && nodeIDs.Contains(node.name) && !node.name.Equals(nodeRef.Value.ID))
+                    {
+                        HideNodeIncludingConnectedEdges(node);
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Recursive function for finding the forward transitive closure of a given node.
+        /// </summary>
+        /// <param name="node"> node to calculate  the forward transitive closure for</param>
+        /// <param name="edgeIDs"> list of IDs of edges reachable from the node</param>
+        /// <param name="nodeIDs"> list of IDs of nodes reachable from the node</param>
+        /// <returns> a tuple of two hashsets of strings containing the edge IDs and the node IDs </returns>
+        private (HashSet<string>, HashSet<string>) ForwardTransitiveRecursive(Node node, HashSet<string> edgeIDs, HashSet<string> nodeIDs)
+        {
+            nodeIDs.Add(node.ID);
+            foreach (Edge edge in node.Outgoings)
+            {
+                edgeIDs.Add(edge.ID);
+                if (!nodeIDs.Contains(edge.Target.ID))
+                {
+                    ForwardTransitiveRecursive(edge.Target, edgeIDs, nodeIDs);
+                }
+            }
+            return (edgeIDs, nodeIDs);
+        }
+
+        /// <summary>
+        /// Hide the backward transitive closure (all nodes reachable from the selected node by going backwards)
+        /// </summary>
+        private bool HideBackwardTransitive()
+        {
+            if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
+            {
+
+                (HashSet<string> edgeIDs, HashSet<string> nodeIDs) = BackwardTransitiveRecursive(nodeRef.Value, new HashSet<string>(), new HashSet<string>());
+
+                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
+                {
+                    if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
+                    {
+                        hiddenObjects.Add(edge);
+                        GameObjectExtensions.SetVisibility(edge, false, true);
+                    }
+                }
+                foreach (GameObject node in GameObject.FindGameObjectsWithTag(Tags.Node))
+                {
+                    if (node.activeInHierarchy && nodeIDs.Contains(node.name) && !node.name.Equals(nodeRef.Value.ID))
+                    {
+                        HideNodeIncludingConnectedEdges(node);
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Recursive function for finding the backward transitive closure of a given node.
+        /// </summary>
+        /// <param name="node"> node to calculate the backward transitive closure for</param>
+        /// <param name="edgeIDs"> list of IDs of edges reachable from the node</param>
+        /// <param name="nodeIDs"> list of IDs of nodes reachable from the node</param>
+        /// <returns> a tuple of two hashsets of strings containing the edge IDs and the node IDs </returns>
+        private (HashSet<string>, HashSet<string>) BackwardTransitiveRecursive(Node node, HashSet<string> edgeIDs, HashSet<string> nodeIDs)
+        {
+            nodeIDs.Add(node.ID);
+            foreach (Edge edge in node.Incomings)
+            {
+                edgeIDs.Add(edge.ID);
+                if (!nodeIDs.Contains(edge.Source.ID))
+                {
+                    BackwardTransitiveRecursive(edge.Source, edgeIDs, nodeIDs);
+                }
+            }
+            return (edgeIDs, nodeIDs);
+        }
+
+        /// <summary>
+        /// Hide the transitive closure (all nodes reachable from the selected node)
+        /// </summary>
+        private bool HideAllTransitive()
+        {
+            return HideFowardTransitive() && HideBackwardTransitive();
+        }
+
+        /// <summary>
         /// Selects source and target node of edge.
         /// </summary>
         /// <param name="edge"> edge to select source and target node of </param>
@@ -516,7 +656,7 @@ namespace SEE.Controls.Actions
         /// <returns>IDs of all incoming and outgoing edges</returns>
         private static HashSet<string> GetEdgeIds(NodeRef nodeRef)
         {
-            HashSet<String> edgeIDs = new HashSet<string>();
+            HashSet<string> edgeIDs = new HashSet<string>();
             foreach (Edge edge in nodeRef.Value.Outgoings)
             {
                 edgeIDs.Add(edge.ID);
