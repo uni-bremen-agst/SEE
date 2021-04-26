@@ -41,7 +41,6 @@
 
 			playerActions.Jump.AddDefaultBinding( Key.Space );
 			playerActions.Jump.AddDefaultBinding( InputControlType.Action3 );
-			playerActions.Jump.AddDefaultBinding( InputControlType.Back );
 
 			playerActions.Up.AddDefaultBinding( Key.UpArrow );
 			playerActions.Down.AddDefaultBinding( Key.DownArrow );
@@ -83,7 +82,16 @@
 				return true;
 			};
 
-			playerActions.ListenOptions.OnBindingAdded += ( action, binding ) => { Debug.Log( "Binding added... " + binding.DeviceName + ": " + binding.Name ); };
+			playerActions.ListenOptions.OnBindingAdded += ( action, binding ) =>
+			{
+				Debug.Log( "Binding added... " + binding.DeviceName + ": " + binding.Name );
+
+				// if (binding.BindingSourceType == BindingSourceType.DeviceBindingSource)
+				// {
+				// 	var control = ((DeviceBindingSource) binding).Control;
+				// 	Debug.Log( control );
+				// }
+			};
 
 			playerActions.ListenOptions.OnBindingRejected += ( action, binding, reason ) => { Debug.Log( "Binding rejected... " + reason ); };
 

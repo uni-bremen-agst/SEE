@@ -7,7 +7,6 @@ using UnityEngine.Assertions;
 
 namespace SEE.Net
 {
-
     /// <summary>
     /// Handles incoming packets for server and/or client.
     /// </summary>
@@ -40,8 +39,6 @@ namespace SEE.Net
             }
         }
 
-
-
         /// <summary>
         /// Whether this is a packet handler of a server or a client.
         /// </summary>
@@ -57,8 +54,6 @@ namespace SEE.Net
         /// </summary>
         private readonly List<TranslatedPendingPacket> translatedPendingPackets = new List<TranslatedPendingPacket>();
 
-
-
         /// <summary>
         /// Creates a new packet handler for either the server of the client.
         /// </summary>
@@ -68,8 +63,6 @@ namespace SEE.Net
         {
             this.isServer = isServer;
         }
-
-
 
         /// <summary>
         /// Pushed a serialized packets for handling. Packets arrive via different
@@ -137,5 +130,4 @@ namespace SEE.Net
             }
         }
     }
-
 }

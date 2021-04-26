@@ -47,12 +47,6 @@ namespace InControl.NativeDeviceProfiles
 			{
 				new InputControlMapping
 				{
-					Name = "Square",
-					Target = InputControlType.Action3,
-					Source = Button( 0 ),
-				},
-				new InputControlMapping
-				{
 					Name = "Cross",
 					Target = InputControlType.Action1,
 					Source = Button( 1 ),
@@ -62,6 +56,12 @@ namespace InControl.NativeDeviceProfiles
 					Name = "Circle",
 					Target = InputControlType.Action2,
 					Source = Button( 2 ),
+				},
+				new InputControlMapping
+				{
+					Name = "Square",
+					Target = InputControlType.Action3,
+					Source = Button( 0 ),
 				},
 				new InputControlMapping
 				{
@@ -187,17 +187,17 @@ namespace InControl.NativeDeviceProfiles
 				},
 				new InputControlMapping
 				{
-					Name = "Right Trigger",
-					Target = InputControlType.RightTrigger,
-					Source = Analog( 4 ),
+					Name = "Left Trigger",
+					Target = InputControlType.LeftTrigger,
+					Source = Analog( 5 ),
 					SourceRange = InputRangeType.MinusOneToOne,
 					TargetRange = InputRangeType.ZeroToOne,
 				},
 				new InputControlMapping
 				{
-					Name = "Left Trigger",
-					Target = InputControlType.LeftTrigger,
-					Source = Analog( 5 ),
+					Name = "Right Trigger",
+					Target = InputControlType.RightTrigger,
+					Source = Analog( 4 ),
 					SourceRange = InputRangeType.MinusOneToOne,
 					TargetRange = InputRangeType.ZeroToOne,
 				},

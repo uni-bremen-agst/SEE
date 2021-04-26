@@ -1,4 +1,4 @@
-﻿using System;
+﻿using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -64,8 +64,16 @@ namespace SEE.Controls
 #if UNITY_EDITOR == false
             // Ctrl keys are not available when running the game in the editor
             if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
+            {
 #endif
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Undo);
+#if UNITY_EDITOR == false
+            } 
+            else
+            {
+                return false;
+            }
+#endif
         }
 
         /// <summary>
@@ -77,8 +85,16 @@ namespace SEE.Controls
 #if UNITY_EDITOR == false
             // Ctrl keys are not available when running the game in the editor
             if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
+            {
 #endif
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Redo);
+#if UNITY_EDITOR == false
+            } 
+            else
+            {
+                return false;
+            }
+#endif
         }
 
         //-----------------------------------------------------
@@ -188,7 +204,7 @@ namespace SEE.Controls
         /// The user wants to drag the city on its plane.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        internal static bool Drag()
+        internal static bool DragCity()
         {
             return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.Drag);
         }
@@ -410,6 +426,39 @@ namespace SEE.Controls
         internal static bool ShowCodeWindowMenu()
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ShowCodeWindowMenu);
+        }
+
+        //-------------------
+        // Selection
+        //-------------------
+
+        /// <summary>
+        /// If true, selection is enabled. Selection can be disabled by action directly 
+        /// determining whether anything is selected; for instance, the <see cref="DeleteAction"/>
+        /// listens to a selection interaction to determine the graph element to be deleted.
+        /// This selection interaction should not interfere with the general <see cref="SelectAction"/>.
+        /// </summary>
+        internal static bool SelectionEnabled = true;
+
+        /// <summary>
+        /// True if the user selects a game object (in a desktop environment, the user
+        /// presses the left mouse but while the mouse cursor is not over a GUI element).
+        /// Selection is enabled only if <see cref="SelectionEnabled"/>.
+        /// </summary>
+        /// <returns>true if the user selects a game object and <see cref="SelectionEnabled"/></returns>
+        internal static bool Select()
+        {
+            return SelectionEnabled && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI();
+        }
+
+        /// <summary>
+        /// True if the user wants to drag an object (in a desktop environment, the user
+        /// holds the left mouse pressed while the mouse cursor is not over a GUI element).
+        /// </summary>
+        /// <returns>true if the wants to drag</returns>
+        internal static bool Drag()
+        {
+            return Input.GetMouseButton(0) && !Raycasting.IsMouseOverGUI();
         }
     }
 }

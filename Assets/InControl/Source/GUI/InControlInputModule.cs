@@ -77,17 +77,19 @@ namespace InControl
 		public override void UpdateModule()
 		{
 			lastMousePosition = thisMousePosition;
-			thisMousePosition = Input.mousePosition;
+			thisMousePosition = InputManager.MouseProvider.GetPosition();
 		}
 
 
 		public override bool IsModuleSupported()
 		{
-			#if UNITY_WII || UNITY_PS3 || UNITY_PS4 || UNITY_XBOX360 || UNITY_XBOXONE || UNITY_SWITCH
+			#if UNITY_WII || UNITY_PS3 || UNITY_PS4 || UNITY_PS5 || UNITY_XBOX360 || UNITY_XBOXONE || UNITY_GAMECORE || UNITY_SWITCH || UNITY_STADIA
 			return true;
 			#else
 
-			if (forceModuleActive || Input.mousePresent || Input.touchSupported)
+			if (forceModuleActive ||
+			    InputManager.MouseProvider.HasMousePresent() ||
+			    Input.touchSupported)
 			{
 				return true;
 			}
@@ -122,7 +124,7 @@ namespace InControl
 			if (allowMouseInput)
 			{
 				shouldActivate |= MouseHasMoved;
-				shouldActivate |= MouseButtonIsPressed;
+				shouldActivate |= MouseButtonWasPressed;
 			}
 			#endif
 
@@ -139,8 +141,8 @@ namespace InControl
 		{
 			base.ActivateModule();
 
-			thisMousePosition = Input.mousePosition;
-			lastMousePosition = Input.mousePosition;
+			thisMousePosition = InputManager.MouseProvider.GetPosition();
+			lastMousePosition = thisMousePosition;
 
 			var selectObject = eventSystem.currentSelectedGameObject;
 
@@ -414,9 +416,9 @@ namespace InControl
 		}
 
 
-		bool MouseButtonIsPressed
+		static bool MouseButtonWasPressed
 		{
-			get { return Input.GetMouseButtonDown( 0 ); }
+			get { return InputManager.MouseProvider.GetButtonWasPressed( Mouse.LeftButton ); }
 		}
 
 

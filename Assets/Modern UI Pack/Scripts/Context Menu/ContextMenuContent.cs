@@ -8,6 +8,7 @@ using TMPro;
 
 namespace Michsky.UI.ModernUIPack
 {
+    [AddComponentMenu("Modern UI Pack/Context Menu/Context Menu Content")]
     public class ContextMenuContent : MonoBehaviour, IPointerClickHandler
     {
         [Header("RESOURCES")]

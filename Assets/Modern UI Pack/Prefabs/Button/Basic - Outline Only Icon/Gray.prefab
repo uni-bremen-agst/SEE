@@ -495,8 +495,8 @@ MonoBehaviour:
   useClickSound: 1
   useRipple: 1
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
-  speed: 1
-  maxSize: 4
+  speed: 2.4
+  maxSize: 6
   startColor: {r: 1, g: 1, b: 1, a: 0.15686275}
   transitionColor: {r: 1, g: 1, b: 1, a: 0}
   renderOnTop: 1

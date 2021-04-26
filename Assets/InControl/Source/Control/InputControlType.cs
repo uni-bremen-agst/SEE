@@ -51,7 +51,7 @@ namespace InControl
 		Action12,
 
 		// Command buttons.
-		// When adding to this list, update InputDevice.AnyCommandControlIsPressed() accordingly.
+		// When adding to this list, update InputDevice.Commit() accordingly.
 		Back = 100,
 		Start,
 		Select,
@@ -67,6 +67,8 @@ namespace InControl
 		Assistant,
 		Plus,
 		Minus,
+		Create,
+		Mute,
 
 		// Steering controls.
 		PedalLeft = 150,
@@ -117,6 +119,8 @@ namespace InControl
 		RightStickY,
 		DPadX,
 		DPadY,
+		LeftCommand,
+		RightCommand,
 
 		// Generic controls (usually assigned to unknown devices).
 		//

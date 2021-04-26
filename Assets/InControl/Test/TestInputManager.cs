@@ -44,7 +44,7 @@ namespace InControl
 			// Debug.Log( JsonUtility.ToJson( InputDeviceProfile.CreateInstanceOfType( typeof(UnityDeviceProfiles.Xbox360MacUnityProfile) ), true ) );
 			// Debug.Log( VersionInfo.UnityVersion() );
 
-#if UNITY_TVOS
+			#if UNITY_TVOS
 			// This turns off the A button being interpreted as Menu on controllers.
 			// See also:
 			// https://docs.unity3d.com/Manual/tvOS.html
@@ -78,7 +78,7 @@ namespace InControl
 					inputDevice.LeftStick.StateThreshold = 0.5f; // Default is usually 0.0f
 				}
 			};
-#endif
+			#endif
 		}
 
 
@@ -114,6 +114,9 @@ namespace InControl
 			{
 				var inputDevice = InputManager.Devices[i];
 				inputDevice.Vibrate( inputDevice.LeftTrigger, inputDevice.RightTrigger );
+
+				var color = Color.HSVToRGB( Mathf.Repeat( Time.realtimeSinceStartup, 1.0f ), 1.0f, 1.0f );
+				inputDevice.SetLightColor( color.r, color.g, color.b );
 			}
 		}
 
@@ -125,9 +128,9 @@ namespace InControl
 
 			//Debug.Log( "IntPtr.Size = " + IntPtr.Size );
 
-#if UNITY_IOS || UNITY_TVOS
+			#if UNITY_IOS || UNITY_TVOS
 			ICadeDeviceManager.Active = true;
-#endif
+			#endif
 		}
 
 
@@ -250,17 +253,8 @@ namespace InControl
 				{
 					if (control != null && !Utility.TargetIsAlias( control.Target ))
 					{
-						string controlName;
-
-						if (inputDevice.IsKnown)
-						{
-							controlName = string.Format( "{0} ({1})", control.Target, control.Handle );
-						}
-						else
-						{
-							controlName = control.Handle;
-						}
-
+						var glyphName = inputDevice.IsKnown && nativeDevice != null ? nativeDevice.GetAppleGlyphNameForControl( control.Target ) : "";
+						var controlName = inputDevice.IsKnown ? string.Format( "{0} ({1}) {2}", control.Target, control.Handle, glyphName ) : control.Handle;
 						SetColor( control.State ? Color.green : color );
 						var label = string.Format( "{0} {1}", controlName, control.State ? "= " + control.Value : "" );
 						GUI.Label( new Rect( x, y, x + w, y + 10 ), label, style );
@@ -276,6 +270,20 @@ namespace InControl
 					var control = inputDevice.Command;
 					SetColor( control.State ? Color.green : color );
 					var label = string.Format( "{0} {1}", "Command", control.State ? "= " + control.Value : "" );
+					GUI.Label( new Rect( x, y, x + w, y + 10 ), label, style );
+					y += lineHeight;
+
+					control = inputDevice.LeftCommand;
+					SetColor( control.State ? Color.green : color );
+					var controlName = inputDevice.IsKnown ? string.Format( "{0} ({1})", control.Target, control.Handle ) : control.Handle;
+					label = string.Format( "{0} {1}", controlName, control.State ? "= " + control.Value : "" );
+					GUI.Label( new Rect( x, y, x + w, y + 10 ), label, style );
+					y += lineHeight;
+
+					control = inputDevice.RightCommand;
+					SetColor( control.State ? Color.green : color );
+					controlName = inputDevice.IsKnown ? string.Format( "{0} ({1})", control.Target, control.Handle ) : control.Handle;
+					label = string.Format( "{0} {1}", controlName, control.State ? "= " + control.Value : "" );
 					GUI.Label( new Rect( x, y, x + w, y + 10 ), label, style );
 					y += lineHeight;
 

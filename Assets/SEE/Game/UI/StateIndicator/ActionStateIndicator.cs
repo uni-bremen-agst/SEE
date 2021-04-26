@@ -1,7 +1,7 @@
 ﻿using SEE.Controls.Actions;
 using Valve.VR.InteractionSystem;
 
-namespace SEE.Game.UI
+namespace SEE.Game.UI.StateIndicator
 {
     /// <summary>
     /// Represents an indicator which displays the current <see cref="ActionStateType"/>.

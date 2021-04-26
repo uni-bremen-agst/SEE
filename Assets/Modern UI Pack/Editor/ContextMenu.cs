@@ -1093,6 +1093,12 @@ namespace Michsky.UI.ModernUIPack
             CreateButton("Button/Rounded - Outline Gradient/Red");
         }
 
+        [MenuItem("GameObject/Modern UI Pack/Charts/Pie Chart", false, 0)]
+        static void CPC()
+        {
+            CreateObject("Charts/Pie Chart");
+        }
+
         [MenuItem("GameObject/Modern UI Pack/Context Menu/Standard", false, 0)]
         static void CTXM()
         {

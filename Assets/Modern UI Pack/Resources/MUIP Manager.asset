@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enableDynamicUpdate: 1
   enableExtendedColorPicker: 0
-  editorHints: 1
+  editorHints: 0
   changeRootFolder: 1
   rootFolder: Modern UI Pack/Prefabs/
   animatedIconColor: {r: 1, g: 1, b: 1, a: 1}

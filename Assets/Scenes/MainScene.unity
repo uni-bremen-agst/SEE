@@ -1025,8 +1025,8 @@ GameObject:
   - component: {fileID: 551180598}
   - component: {fileID: 551180597}
   - component: {fileID: 551180596}
+  - component: {fileID: 551180595}
   - component: {fileID: 551180592}
-  - component: {fileID: 551180593}
   m_Layer: 0
   m_Name: SEECity Evolution
   m_TagString: Code City
@@ -1046,7 +1046,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7623b0249cfceff40b25a7b4ea3b89f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &551180593
+--- !u!114 &551180595
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1119,7 +1119,43 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 3
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Directory
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: File
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: 
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -1131,7 +1167,7 @@ MonoBehaviour:
       Data: 4|SEE.Game.DataPath, SEE
     - Name: Root
       Entry: 3
-      Data: 2
+      Data: 1
     - Name: relativePath
       Entry: 1
       Data: 
@@ -1182,7 +1218,7 @@ MonoBehaviour:
       Data: 
     - Name: NumberOfColors
       Entry: 3
-      Data: 10
+      Data: 15
     - Name: 
       Entry: 8
       Data: 
@@ -1194,13 +1230,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.5821022
+      Data: 0.392156869
     - Name: 
       Entry: 4
-      Data: 0.9086448
+      Data: 0.392156869
     - Name: 
       Entry: 4
-      Data: 0.9716981
+      Data: 0.392156869
     - Name: 
       Entry: 4
       Data: 1
@@ -1218,7 +1254,7 @@ MonoBehaviour:
       Data: 0
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 4
       Data: 1
@@ -1298,72 +1334,20 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: ListInnerNodeToggle
-      Entry: 7
-      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 3
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
+      Entry: 6
       Data: 
     - Name: InnerNodeLayout
-      Entry: 7
-      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Layout.NodeLayouts.NodeLayoutKind,
-        SEE]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 3
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
+      Entry: 6
       Data: 
     - Name: InnerNodeShape
-      Entry: 7
-      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.AbstractSEECity+InnerNodeKinds,
-        SEE]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 3
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
+      Entry: 6
       Data: 
     - Name: LoadedForNodeTypes
-      Entry: 7
-      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 3
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
+      Entry: 6
       Data: 
     - Name: UseCalculationParameter
       Entry: 5
-      Data: true
+      Data: false
     - Name: UseIterativeCalculation
       Entry: 5
       Data: false
@@ -1376,7 +1360,7 @@ MonoBehaviour:
     relativePath: 
     absolutePath: 
   CityPath:
-    Root: 2
+    Root: 1
     relativePath: 
     absolutePath: 
   WidthMetric: Metric.Number_of_Tokens
@@ -1398,7 +1382,7 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
-  InnerNodeHeightMetric: 0.001
+  InnerNodeHeightMetric: 0.1
   InnerNodeStyleMetric: Metric.Level
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
@@ -1412,7 +1396,7 @@ MonoBehaviour:
   MaxErosionWidth: 1
   EdgesAboveBlocks: 1
   Tension: 0.85
-  RDP: 0.05
+  RDP: 0.0005
   TubularSegments: 50
   Radius: 0.005
   RadialSegments: 8
@@ -1420,13 +1404,13 @@ MonoBehaviour:
   MaxRevisionsToLoad: 500
   GXLDirectory:
     Root: 1
-    relativePath: /Data/GXL/animation-clones-SEE
+    relativePath: /Data/GXL/animation-clones-log4j
     absolutePath: 
   MarkerHeight: 0.2
   MarkerWidth: 0.01
   AdditionBeamColor: {r: 0, g: 1, b: 0, a: 1}
   ChangeBeamColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  DeletionBeamColor: {r: 0, g: 0, b: 0, a: 1}
+  DeletionBeamColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &551180596
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3147,11 +3131,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68cd993404524eb45918638d10b68356, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useInOfflineMode: 0
-  hostServer: 1
-  remoteServerIPAddress: 192.168.178.120
+  useInOfflineMode: 1
+  hostServer: 0
+  remoteServerIPAddress: 
   localServerPort: 55555
-  remoteServerPort: 55555
+  remoteServerPort: 0
   loadCityOnStart: 0
   networkCommsLoggingEnabled: 0
   internalLoggingEnabled: 1

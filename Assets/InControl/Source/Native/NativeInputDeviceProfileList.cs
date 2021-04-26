@@ -151,6 +151,8 @@ namespace InControl
 			"InControl.NativeDeviceProfiles.PlayStation3MacNativeProfile",
 			"InControl.NativeDeviceProfiles.PlayStation4MacNativeProfile",
 			"InControl.NativeDeviceProfiles.PlayStation4WindowsNativeProfile",
+			"InControl.NativeDeviceProfiles.PlayStation5MacNativeProfile",
+			"InControl.NativeDeviceProfiles.PlayStation5WindowsNativeProfile",
 			"InControl.NativeDeviceProfiles.PowerAAirflowControllerMacNativeProfile",
 			"InControl.NativeDeviceProfiles.POWERAFUS1ONTournamentControllerMacNativeProfile",
 			"InControl.NativeDeviceProfiles.PowerAMiniControllerMacNativeProfile",
