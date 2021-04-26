@@ -110,27 +110,7 @@ namespace SEE.Controls.Actions
         // Update is called once per frame
         public override bool Update()
         {
-            if (Input.GetKeyDown(KeyCode.H))
-            {
-                hideAll = true;
-                hideSelected = false;
-                hideUnselected = false;
-                Debug.Log("hideAll");
-            }
-            else if (Input.GetKeyDown(KeyCode.J))
-            {
-                hideAll = false;
-                hideSelected = true;
-                hideUnselected = false;
-                Debug.Log("hideSelected");
-            }
-            else if (Input.GetKeyDown(KeyCode.K))
-            {
-                hideAll = false;
-                hideSelected = false;
-                hideUnselected = true;
-                Debug.Log("hideUnselected");
-            }
+            hideIncoming = true;
             if (hideAll)
             {
                 if (HideAll())
@@ -148,6 +128,20 @@ namespace SEE.Controls.Actions
             } else if (hideUnselected)
             {
                 if (HideUnselected())
+                {
+                    hadAnEffect = true;
+                    return true;
+                }
+            } else if (hideOutgoing)
+            {
+                if (HideOutgoingEdges())
+                {
+                    hadAnEffect = true;
+                    return true;
+                }
+            } else if (hideIncoming)
+            {
+                if (HideIncommingEdges())
                 {
                     hadAnEffect = true;
                     return true;
@@ -334,16 +328,22 @@ namespace SEE.Controls.Actions
             return objectList;
         }
 
-        private bool HideOutgoingEdges(GameObject node)
+        /// <summary>
+        /// Hides outgoing edges of currently selected node including the connected nodes.
+        /// </summary>
+        /// <returns> true if outgoing edges of currently selected node including the connected nodes could be hidden </returns>
+        private bool HideOutgoingEdges()
         {
-            List<GameObject> hiddenList = new List<GameObject>();
-            if (node.TryGetComponent(out NodeRef nodeRef))
+            if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
             {
 
                 HashSet<String> edgeIDs = new HashSet<string>();
+                HashSet<String> nodeIDs = new HashSet<string>();
+
                 foreach (Edge edge in nodeRef.Value.Outgoings)
                 {
                     edgeIDs.Add(edge.ID);
+                    nodeIDs.Add(edge.Target.ID);
                 }
 
                 foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
@@ -351,27 +351,40 @@ namespace SEE.Controls.Actions
                             
                     if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                     {
-                        hiddenList.Add(edge);
+                        hiddenObjects.Add(edge);
                         GameObjectExtensions.SetVisibility(edge, false, true);
                     }
                 }
-                selectedObject = null;
-                //hiddenObjects.Add(hiddenList);
+                foreach (GameObject node in GameObject.FindGameObjectsWithTag(Tags.Node))
+                {
+
+                    if (node.activeInHierarchy && nodeIDs.Contains(node.name))
+                    {
+                        HideNodeIncludingConnectedEdges(node);
+                    }
+                }
                 return true;
                 }
             return false;   
         }
 
-        private bool HideIncommingEdges(GameObject node)
+        /// <summary>
+        /// Hides incoming edges of currently selected node including the connected nodes.
+        /// </summary>
+        /// <returns> true if incoming edges of currently selected node including the connected nodes could be hidden </returns>
+        private bool HideIncommingEdges()
         {
-            List<GameObject> hiddenList = new List<GameObject>();
-            if (node.TryGetComponent(out NodeRef nodeRef))
+            if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
             {
 
                 HashSet<String> edgeIDs = new HashSet<string>();
+                HashSet<String> nodeIDs = new HashSet<string>();
+
                 foreach (Edge edge in nodeRef.Value.Incomings)
                 {
                     edgeIDs.Add(edge.ID);
+                    nodeIDs.Add(edge.Source.ID);
+
                 }
 
                 foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
@@ -379,12 +392,18 @@ namespace SEE.Controls.Actions
                             
                     if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                     {
-                        hiddenList.Add(edge);
+                        hiddenObjects.Add(edge);
                         GameObjectExtensions.SetVisibility(edge, false, true);
                     }
                 }
-                selectedObject = null;
-                //hiddenObjects.Add(hiddenList);
+                foreach (GameObject node in GameObject.FindGameObjectsWithTag(Tags.Node))
+                {
+
+                    if (node.activeInHierarchy && nodeIDs.Contains(node.name))
+                    {
+                        HideNodeIncludingConnectedEdges(node);
+                    }
+                }
                 return true;
                 }
             return false;         
