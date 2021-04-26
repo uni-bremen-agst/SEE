@@ -144,14 +144,14 @@ namespace Assets.SEE.Utils
         {
             int index = GetCountOfNewerAction(activeAction.GetId());
             if (index == -1) return false;
-            for (int i = index; index < allActionsList.Count; i++)
+            for (int i = index ; index < allActionsList.Count; i++)
             {
                 Debug.LogWarning(index);
                 foreach (string s in affectedGameObjects)
                 {
                     if (allActionsList[i].Item4 != null)
                     {
-                        if (allActionsList[i].Item4.Contains(s) && allActionsList[i].Item1 == false)
+                        if (allActionsList[i].Item4.Contains(s))
                         {
                             return true;
                         }
@@ -293,9 +293,9 @@ namespace Assets.SEE.Utils
         private int GetCountOfNewerAction(string idOfAction)
         {
 
-            for(int i = allActionsList.Count-1; i >= 0; i--)
+            for(int i = allActionsList.Count; i >= 0; i--)
             {
-                if (allActionsList[i].Item3.Equals(idOfAction)) return allActionsList.Count - 1 - i;
+                if (allActionsList[i].Item3.Equals(idOfAction)) return  i;
             }
             return -1; //If not fouind the action
             //int neweractionscount = 0;
