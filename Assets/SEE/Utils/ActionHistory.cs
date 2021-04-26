@@ -292,11 +292,13 @@ namespace Assets.SEE.Utils
         {
             int newerActionsCount = 0;
             int sizeOfActionsList = allActionsList.Count-1;
-            while (!allActionsList[sizeOfActionsList].Item3.Equals(idOfAction) && newerActionsCount < sizeOfActionsList && !allActionsList[sizeOfActionsList].Item1)
+            while (!allActionsList[sizeOfActionsList].Item3.Equals(idOfAction) && sizeOfActionsList >= 0)
             {
                 newerActionsCount++;
+                sizeOfActionsList--;
             }
 
+            Debug.Log(newerActionsCount);
             return newerActionsCount;
         }
 
