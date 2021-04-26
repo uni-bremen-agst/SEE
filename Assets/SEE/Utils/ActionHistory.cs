@@ -144,6 +144,8 @@ namespace Assets.SEE.Utils
         {
             int index = GetCountOfNewerAction(activeAction.GetId());
             if (index == -1) return false;
+            index = index + 1;
+            if (index >= allActionsList.Count) return false;
             for (int i = index ; index < allActionsList.Count; i++)
             {
                 Debug.LogWarning(index);
@@ -293,7 +295,7 @@ namespace Assets.SEE.Utils
         private int GetCountOfNewerAction(string idOfAction)
         {
 
-            for(int i = allActionsList.Count; i >= 0; i--)
+            for(int i = allActionsList.Count -1; i >= 0; i--)
             {
                 if (allActionsList[i].Item3.Equals(idOfAction)) return  i;
             }
