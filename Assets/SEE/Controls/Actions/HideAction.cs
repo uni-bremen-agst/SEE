@@ -20,6 +20,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject selectedObject;
 
+        HashSet<InteractableObject> selectedObjects;
+
         private ISet<GameObject> hiddenObjects = new HashSet<GameObject>();
 
         private ISet<GameObject> undoneList = new HashSet<GameObject>();
@@ -58,7 +60,7 @@ namespace SEE.Controls.Actions
         public override void Start()
         {
             base.Stop();
-            Debug.Log("Start\n");
+            selectedObjects = new HashSet<InteractableObject>();
             InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
             InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
         }
@@ -66,7 +68,7 @@ namespace SEE.Controls.Actions
         public override void Stop()
         {
             base.Stop();
-            Debug.Log("Stop\n");
+            selectedObjects = null;
             InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
             InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
         }
@@ -74,18 +76,21 @@ namespace SEE.Controls.Actions
         // Update is called once per frame
         public override bool Update()
         {
-           if (selectedObject != null)
+            if (selectedObjects != null && selectedObjects.Count > 0 && Input.GetKey(KeyCode.Return))
             {
-                Debug.Log(selectedObject);
-                Assert.IsTrue(selectedObject.HasNodeRef() || selectedObject.HasEdgeRef());
-                if (selectedObject.CompareTag(Tags.Edge))
+                foreach(InteractableObject o in selectedObjects)
                 {
-                    HideEdge(selectedObject);
-                }
-                else if (selectedObject.CompareTag(Tags.Node))
-                {
-                    HideNodeIncludingConnectedEdges(selectedObject);
-                }
+                    GameObject g = o.gameObject;
+                    Assert.IsTrue(g.HasNodeRef() || g.HasEdgeRef());
+                    if (g.CompareTag(Tags.Edge))
+                    {
+                        HideEdge(g);
+                    }
+                    else if (g.CompareTag(Tags.Node))
+                    {
+                        HideNodeIncludingConnectedEdges(g);
+                    }
+                }                
                 hadAnEffect = true;
                 return true;
             }
@@ -93,14 +98,13 @@ namespace SEE.Controls.Actions
             {
                 return false;
             }
-
         }
+
 
         private bool HideEdge(GameObject edge)
         {
             hiddenObjects.Add(edge);
             GameObjectExtensions.SetVisibility(edge, false, true);
-            edge = null;
             return true;
         }
 
@@ -265,20 +269,18 @@ namespace SEE.Controls.Actions
 
         private void LocalAnySelectIn(InteractableObject interactableObject)
         {
-            // FIXME: For an unknown reason, the mouse events in InteractableObject will be
-            // triggered twice per frame, which causes this method to be called twice.
-            // We need to further investigate this issue.
-            // Assert.IsNull(selectedObject);
-            selectedObject = interactableObject.gameObject;
+            if (interactableObject != null)
+            {
+                selectedObjects.Add(interactableObject);
+            }
         }
 
         private void LocalAnySelectOut(InteractableObject interactableObject)
         {
-            // FIXME: For an unknown reason, the mouse events in InteractableObject will be
-            // triggered twice per frame, which causes this method to be called twice.
-            // We need to further investigate this issue.
-            // Assert.IsTrue(selectedObject == interactableObject.gameObject);
-            selectedObject = null;
+            if (selectedObjects.Contains(interactableObject))
+            {
+                selectedObjects.Remove(interactableObject);
+            }
         }
 
         /// <summary>
