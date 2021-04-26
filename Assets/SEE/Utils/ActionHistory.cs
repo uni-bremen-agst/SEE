@@ -214,6 +214,8 @@ namespace Assets.SEE.Utils
             if (ActionHasConflicts(activeAction.GetChangedObjects()))
             {
                 // Fixme: Error
+                Debug.Log("Undo");
+                return;
             }
             else
             {
@@ -256,6 +258,7 @@ namespace Assets.SEE.Utils
                 //NEED to delete the ownAction
                 //Set the owner of the action to false, dont delete from allactions
                 //notify the user
+                Debug.Log("Redo");
                 return;
             }
             ReversibleAction temp = FindById(lastUndoneAction.Item3);
