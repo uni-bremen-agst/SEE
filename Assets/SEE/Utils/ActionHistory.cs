@@ -133,19 +133,17 @@ namespace Assets.SEE.Utils
             return result;
         }
 
-        private bool ActionHasConflicts(List<string> affectedGameObjects)
+        private bool ActionHasConflicts(List<string> affectedGameObjects, ReversibleAction action)
         {
-            foreach (Tuple<bool, HistoryType, string, List<string>> affectedObject in allActionsList)
+            int countOfNewerActions = GetCountOfNewerAction(activeAction.GetId());
+            for (int i = countOfNewerActions; countOfNewerActions > 0; i--)
             {
                 foreach (string s in affectedGameObjects)
                 {
-                    if (affectedObject.Item4 != null)
+                    if (allActionsList[i].Item4 != null)
                     {
-                        if (affectedObject.Item4.Contains(s) && affectedObject.Item1 == false)
+                        if (allActionsList[i].Item4.Contains(s) && allActionsList[i].Item1 == false)
                         {
-                            // Fixme: Currently, if a user1 is editing a node and another user2 is adding an edge to this node, 
-                            // user 1 cannot undo his action.
-                            // Fixme: GetChangedObjects has to be fixed - why is adding an edge in conflict with editing on of the target-nodes?
                             return true;
                         }
                     }
@@ -206,7 +204,8 @@ namespace Assets.SEE.Utils
                 activeAction = FindById(lastAction.Item3);
             }
             // Fixme: Right place ?
-            if (ActionHasConflicts(activeAction.GetChangedObjects()))
+            Debug.Log("CALL?");
+            if (ActionHasConflicts(activeAction.GetChangedObjects(), activeAction))
             {
                 // Fixme: Error
             }
@@ -243,14 +242,14 @@ namespace Assets.SEE.Utils
             if (lastUndoneAction == null) return;
 
             // Fixme: Right place ?
-            if (ActionHasConflicts(lastUndoneAction.Item4))
+            ReversibleAction temp = FindById(lastUndoneAction.Item3);
+            if (ActionHasConflicts(lastUndoneAction.Item4, temp))
             {
                 // Fixme: Error
                 //NEED to delete the ownAction
                 //Set the owner of the action to false, dont delete from allactions
                 //notify the user
             }
-            ReversibleAction temp = FindById(lastUndoneAction.Item3);
             temp.Redo();
             temp.Start();
             Tuple<bool, HistoryType, string, List<string>> redoneAction = new Tuple<bool, HistoryType, string, List<string>>(true, HistoryType.action, lastUndoneAction.Item3, lastUndoneAction.Item4);
@@ -276,9 +275,17 @@ namespace Assets.SEE.Utils
         /// 
         /// </summary>
         /// <returns></returns>
-        private int GetCountOfNewerAction()
+        private int GetCountOfNewerAction(string idOfAction)
         {
+            int newerActionsCount = 0;
+            int sizeOfActionsList = allActionsList.Count-1;
+            while (!allActionsList[sizeOfActionsList].Item3.Equals(idOfAction) && newerActionsCount < sizeOfActionsList && !allActionsList[sizeOfActionsList].Item1)
+            {
+                newerActionsCount++;
+            }
+            Debug.Log(newerActionsCount);
 
+            return newerActionsCount;
         }
 
         /// <summary>
