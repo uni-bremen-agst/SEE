@@ -14,11 +14,19 @@ namespace SEE.GO
 
         private void Start()
         {
-            graph = GetComponent<SEECity>().LoadedGraph;
-            E = Cursor3D.Create();
+            if (TryGetComponent(out SEECity city))
+            {
+                graph = city.LoadedGraph;
+                E = Cursor3D.Create();
 
-            InteractableObject.AnySelectIn += AnySelectIn;
-            InteractableObject.AnySelectOut += AnySelectOut;
+                InteractableObject.AnySelectIn += AnySelectIn;
+                InteractableObject.AnySelectOut += AnySelectOut;
+            }
+            else
+            {
+                Debug.LogError($"{name} has no SEECity component attached to it. CityCursor will be disabled.\n");
+                enabled = false;
+            }
         }
 
         private void OnDestroy()
