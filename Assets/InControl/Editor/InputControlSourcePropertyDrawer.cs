@@ -27,6 +27,8 @@ namespace InControl
 			var sourceType = (InputControlSourceType) sourceTypeProperty.enumValueIndex;
 			switch (sourceType)
 			{
+				case InputControlSourceType.None:
+					break;
 				case InputControlSourceType.KeyCode:
 					indexProperty.intValue = (int) (KeyCode) EditorGUI.EnumPopup( indexRect, (KeyCode) indexProperty.intValue );
 					break;

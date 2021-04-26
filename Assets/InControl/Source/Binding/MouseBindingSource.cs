@@ -2,15 +2,28 @@
 {
 	using System;
 	using System.IO;
+	using System.Runtime.CompilerServices;
 	using UnityEngine;
 
 
 	public class MouseBindingSource : BindingSource
 	{
 		public Mouse Control { get; protected set; }
+
+		// ReSharper disable once ConvertToConstant.Global
+		// ReSharper disable once FieldCanBeMadeReadOnly.Global
 		public static float ScaleX = 0.05f;
+
+		// ReSharper disable once ConvertToConstant.Global
+		// ReSharper disable once FieldCanBeMadeReadOnly.Global
 		public static float ScaleY = 0.05f;
+
+		// ReSharper disable once ConvertToConstant.Global
+		// ReSharper disable once FieldCanBeMadeReadOnly.Global
 		public static float ScaleZ = 0.05f;
+
+		// ReSharper disable once ConvertToConstant.Global
+		// ReSharper disable once FieldCanBeMadeReadOnly.Global
 		public static float JitterThreshold = 0.05f;
 
 
@@ -23,80 +36,61 @@
 		}
 
 
-		// Unity doesn't allow mouse buttons above certain numbers on
-		// some platforms. For example, the limit on Windows 7 appears
-		// to be 6.
-		internal static bool SafeGetMouseButton( int button )
-		{
-			try
-			{
-				return Input.GetMouseButton( button );
-			}
-			catch (ArgumentException) {}
-
-			return false;
-		}
-
-
-		// This is necessary to maintain backward compatibility. :(
-		readonly static int[] buttonTable = new[]
-		{
-			-1, 0, 1, 2, -1, -1, -1, -1, -1, -1, 3, 4, 5, 6, 7, 8
-		};
-
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
 		internal static bool ButtonIsPressed( Mouse control )
 		{
-			var button = buttonTable[(int) control];
-			if (button >= 0)
-			{
-				return SafeGetMouseButton( button );
-			}
-
-			return false;
+			return InputManager.MouseProvider.GetButtonIsPressed( control );
 		}
 
 
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
 		internal static bool NegativeScrollWheelIsActive( float threshold )
 		{
-			var value = Mathf.Min( Input.GetAxisRaw( "mouse z" ) * ScaleZ, 0.0f );
+			var value = Mathf.Min( InputManager.MouseProvider.GetDeltaScroll() * ScaleZ, 0.0f );
 			return value < -threshold;
 		}
 
 
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
 		internal static bool PositiveScrollWheelIsActive( float threshold )
 		{
-			var value = Mathf.Max( 0.0f, Input.GetAxisRaw( "mouse z" ) * ScaleZ );
+			var value = Mathf.Max( 0.0f, InputManager.MouseProvider.GetDeltaScroll() * ScaleZ );
 			return value > threshold;
 		}
 
 
+		// static readonly int[] buttonTable = new[]
+		// {
+		// 	-1, 0, 1, 2, -1, -1, -1, -1, -1, -1, 3, 4, 5, 6, 7, 8
+		// };
+
+
 		internal static float GetValue( Mouse mouseControl )
 		{
-			var button = buttonTable[(int) mouseControl];
-			if (button >= 0)
-			{
-				return SafeGetMouseButton( button ) ? 1.0f : 0.0f;
-			}
-
+			// ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
 			switch (mouseControl)
 			{
+				case Mouse.None:
+					return 0.0f;
+
 				case Mouse.NegativeX:
-					return -Mathf.Min( Input.GetAxisRaw( "mouse x" ) * ScaleX, 0.0f );
+					return -Mathf.Min( InputManager.MouseProvider.GetDeltaX() * ScaleX, 0.0f );
 				case Mouse.PositiveX:
-					return Mathf.Max( 0.0f, Input.GetAxisRaw( "mouse x" ) * ScaleX );
+					return Mathf.Max( 0.0f, InputManager.MouseProvider.GetDeltaX() * ScaleX );
 
 				case Mouse.NegativeY:
-					return -Mathf.Min( Input.GetAxisRaw( "mouse y" ) * ScaleY, 0.0f );
+					return -Mathf.Min( InputManager.MouseProvider.GetDeltaY() * ScaleY, 0.0f );
 				case Mouse.PositiveY:
-					return Mathf.Max( 0.0f, Input.GetAxisRaw( "mouse y" ) * ScaleY );
+					return Mathf.Max( 0.0f, InputManager.MouseProvider.GetDeltaY() * ScaleY );
 
 				case Mouse.NegativeScrollWheel:
-					return -Mathf.Min( Input.GetAxisRaw( "mouse z" ) * ScaleZ, 0.0f );
+					return -Mathf.Min( InputManager.MouseProvider.GetDeltaScroll() * ScaleZ, 0.0f );
 				case Mouse.PositiveScrollWheel:
-					return Mathf.Max( 0.0f, Input.GetAxisRaw( "mouse z" ) * ScaleZ );
-			}
+					return Mathf.Max( 0.0f, InputManager.MouseProvider.GetDeltaScroll() * ScaleZ );
 
-			return 0.0f;
+				default:
+					return InputManager.MouseProvider.GetButtonIsPressed( mouseControl ) ? 1.0f : 0.0f;
+			}
 		}
 
 
