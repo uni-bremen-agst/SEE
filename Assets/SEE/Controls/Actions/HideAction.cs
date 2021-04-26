@@ -51,14 +51,19 @@ namespace SEE.Controls.Actions
         private Boolean hideUnselected;
 
         /// <summary>
-        /// Specifies whether incoming edges of selected node should be hidden.
+        /// Specifies whether incoming edges of selected node (including connected nodes) should be hidden.
         /// </summary>
         private Boolean hideIncoming;
 
         /// <summary>
-        /// Specifies whether outgoing edges of selected node should be hidden.
+        /// Specifies whether outgoing edges of selected node (including connected nodes) should be hidden.
         /// </summary>
         private Boolean hideOutgoing;
+
+        /// <summary>
+        /// Specifies whether all edges of selected node (including connected nodes) should be hidden.
+        /// </summary>
+        private Boolean hideAllEdgesOfSelected;
 
         /// <summary>
         /// The code city to perform actions on, only necessary for 
@@ -145,8 +150,14 @@ namespace SEE.Controls.Actions
                     hadAnEffect = true;
                     return true;
                 }
+            } else if (hideAllEdgesOfSelected)
+            {
+                if (HideAllConnectedEdges())
+                {
+                    hadAnEffect = true;
+                    return true;
+                }
             }
-
             return false;
         }
 
@@ -228,7 +239,7 @@ namespace SEE.Controls.Actions
         /// Hides an edge.
         /// </summary>
         /// <param name="edge"> edge to hide </param>
-        /// <returns> true if edge could be hidden </returns>
+        /// <returns> true if edge was hidden </returns>
         private bool HideEdge(GameObject edge)
         {
             bool rendered = false;
@@ -252,7 +263,7 @@ namespace SEE.Controls.Actions
         /// Hides a node including all the connected edges.
         /// </summary>
         /// <param name="node"> Node to hide </param>
-        /// <returns> true if node could be hidden successfully </returns>
+        /// <returns> true if node was hidden successfully </returns>
         private bool HideNodeIncludingConnectedEdges(GameObject node)
         {
             if (node.TryGetComponent(out NodeRef nodeRef))
@@ -325,7 +336,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Hides outgoing edges of currently selected node including the connected nodes.
         /// </summary>
-        /// <returns> true if outgoing edges of currently selected node including the connected nodes could be hidden </returns>
+        /// <returns> true if outgoing edges of currently selected node including the connected nodes were hidden </returns>
         private bool HideOutgoingEdges()
         {
             if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
@@ -365,7 +376,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Hides incoming edges of currently selected node including the connected nodes.
         /// </summary>
-        /// <returns> true if incoming edges of currently selected node including the connected nodes could be hidden </returns>
+        /// <returns> true if incoming edges of currently selected node including the connected nodes were hidden</returns>
         private bool HideIncommingEdges()
         {
             if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
@@ -404,6 +415,16 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Hides incoming edges of currently selected node including the connected nodes.
+        /// </summary>
+        /// <returns> true if incoming edges of currently selected node including the connected nodes were hidden </returns>
+        private bool HideAllConnectedEdges()
+        {
+            return HideIncommingEdges() && HideOutgoingEdges();
+        }
+
+
+        /// <summary>
         /// Undoes the action.
         /// </summary>
         public override void Undo()
@@ -435,7 +456,7 @@ namespace SEE.Controls.Actions
         /// Selects source and target node of edge.
         /// </summary>
         /// <param name="edge"> edge to select source and target node of </param>
-        private void selectSourceAndTargetOfEdge(GameObject edge)
+        private void SelectSourceAndTargetOfEdge(GameObject edge)
         {
             if(edge.TryGetComponent(out EdgeRef edgeRef))
             {
@@ -463,7 +484,7 @@ namespace SEE.Controls.Actions
         }
 
 
-        private void selectEdgesBetweenSubsetOfNodes(HashSet<GameObject> subset)
+        private void SelectEdgesBetweenSubsetOfNodes(HashSet<GameObject> subset)
         { 
             if(subset != null && subset.Count > 0)
             {
