@@ -128,180 +128,6 @@ namespace SEE.Controls.Actions
             return true;
         }
 
-        private void FixedUpdate()
-        {
-#if false
-            bool synchronize = false;
-
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            Physics.Raycast(ray, out RaycastHit raycastHit);
-            Vector3 hit = raycastHit.point;
-
-#region Mapping
-
-            if (actionState.cancel) // cancel movement
-            {
-                if (moving)
-                {
-                    moving = false;
-
-                    //moveState.draggedTransform.GetComponent<InteractableObject>().SetGrab(false, true);
-
-                    moveState.moveVelocity = Vector3.zero;
-                    Vector3 p = moveState.dragStartTransformPosition + moveState.dragStartOffset
-                        - Vector3.Scale(moveState.dragCanonicalOffset, moveState.mainDraggedObj.transform.localScale);
-                    moveState.mainDraggedObj.transform.position = p;
-                    foreach (_MoveState.AdditionalDraggedObject o in moveState.additionalDraggedObjs)
-                    {
-                        o.go.transform.position = p + o.offset;
-                    }
-                    moveState.mainDraggedObj = null;
-                    moveState.additionalDraggedObjs.Clear();
-                    synchronize = true;
-                }
-                else
-                {
-                    InteractableObject o = InteractableObject.HoveredObject;
-                    if (o)
-                    {
-                        InteractableObject.UnselectAllInGraph(o.ItsGraph(), true);
-                    }
-                }
-            }
-            else if (actionState.drag) // start or continue movement
-            {
-                if (actionState.startDrag) // start movement
-                {
-                    if (actionState.dragHoveredOnly)
-                    {
-                        InteractableObject o = InteractableObject.HoveredObject;
-                        if (IsValidSource(o))
-                        {
-                            moving = true;
-                            moveState.mainDraggedObj = CreateGhost(o);
-                            //o.SetGrab(true, true);
-                        }
-                    }
-                    else
-                    {
-                        HashSet<InteractableObject> objs = InteractableObject.GetSelectedObjectsOfGraph(implGraph);
-                        if (objs.Count > 0)
-                        {
-                            moving = true;
-                            HashSet<InteractableObject>.Enumerator e = objs.GetEnumerator();
-                            e.MoveNext();
-                            moveState.mainDraggedObj = CreateGhost(e.Current);
-                            //e.Current.SetGrab(true, true);
-                            while (e.MoveNext())
-                            {
-                                _MoveState.AdditionalDraggedObject t = new _MoveState.AdditionalDraggedObject()
-                                {
-                                    go = CreateGhost(e.Current),
-                                    offset = e.Current.transform.position - moveState.mainDraggedObj.transform.position
-                                };
-                                moveState.additionalDraggedObjs.Add(t);
-                                //e.Current.SetGrab(true, true);
-                            }
-                        }
-                    }
-
-                    if (moving)
-                    {
-                        moveState.dragStartTransformPosition = moveState.mainDraggedObj.transform.position;
-                        moveState.dragStartOffset = hit - moveState.mainDraggedObj.transform.position;
-                        moveState.dragCanonicalOffset = moveState.dragStartOffset.DividePairwise(moveState.mainDraggedObj.transform.localScale);
-                        moveState.moveVelocity = Vector3.zero;
-                    }
-                }
-
-                if (moving) // continue movement
-                {
-                    Vector3 totalDragOffsetFromStart = hit - (moveState.dragStartTransformPosition + moveState.dragStartOffset);
-
-                    Vector3 oldPosition = moveState.mainDraggedObj.transform.position;
-                    Vector3 newPosition = moveState.dragStartTransformPosition + totalDragOffsetFromStart;
-
-                    moveState.moveVelocity = (newPosition - oldPosition) / Time.fixedDeltaTime; // TODO(torben): it might be possible to determine velocity only on release (this todo comes from DesktopNavigationAction)
-                    moveState.mainDraggedObj.transform.position = newPosition;
-                    foreach (_MoveState.AdditionalDraggedObject o in moveState.additionalDraggedObjs)
-                    {
-                        o.go.transform.position = newPosition + o.offset;
-                    }
-                    synchronize = true;
-                }
-            }
-            else if (moving) // finalize movement
-            {
-                //if (moveState.mainDraggedObj.transform != CityTransform) // only reparent non-root nodes
-                //{
-                //    Transform movingObject = moveState.mainDraggedObj.transform;
-                //    Vector3 originalPosition = moveState.dragStartTransformPosition + moveState.dragStartOffset
-                //            - Vector3.Scale(moveState.dragCanonicalOffset, movingObject.localScale);
-                //
-                //    GameNodeMover.FinalizePosition(movingObject.gameObject, originalPosition);
-                //    synchronize = true;
-                //}
-
-                moving = false;
-
-                //moveState.mainDraggedObj.transform.GetComponent<InteractableObject>().SetGrab(false, true);
-                //if (moveState.mainDraggedObj.transform != CityTransform)
-                //{
-                //    moveState.moveVelocity = Vector3.zero; // TODO(torben): do we want to apply velocity to individually moved buildings or keep it like this?
-                //}
-
-                UnityEngine.Object.Destroy(moveState.mainDraggedObj);
-                foreach (_MoveState.AdditionalDraggedObject o in moveState.additionalDraggedObjs)
-                {
-                    UnityEngine.Object.Destroy(o.go);
-                }
-
-                moveState.mainDraggedObj = null;
-                moveState.additionalDraggedObjs.Clear();
-
-                if (IsValidTarget(InteractableObject.HoveredObject))
-                {
-                    Node to = InteractableObject.HoveredObject.GetNode();
-                    foreach (InteractableObject o in InteractableObject.GetSelectedObjectsOfGraph(implGraph))
-                    {
-                        if (IsValidSource(o))
-                        {
-                            Node from = o.GetNode();
-                            if (Reflexion.Is_Explicitly_Mapped(from))
-                            {
-                                Node mapped = Reflexion.Get_Mapping().GetNode(from.ID);
-                                Assert.IsTrue(mapped.Outgoings.Count == 1);
-                                //edgeToMappingEdges.Remove(mapped.Outgoings[0]);
-                                Reflexion.Delete_From_Mapping(mapped.Outgoings[0]);
-                            }
-                            Reflexion.Add_To_Mapping(from, to);
-                        }
-                    }
-                }
-            }
-
-#endregion
-
-            if (actionState.startShowDiff)
-            {
-                if (!actionState.stopShowDiff)
-                {
-                    foreach (Edge edge in archGraph.Edges())
-                    {
-                        if (EdgeRef.TryGet(edge, out EdgeRef edgeRef))
-                        {
-                            edgeRef.GetComponent<LineRenderer>().enabled = false;
-                        }
-                    }
-                    foreach (LineRenderer r in edgeToStateEdges.Values)
-                    {
-                        r.enabled = true;
-                    }
-                }
-            }
-#endif
-        }
-
         /// <summary>
         /// See <see cref="ReversibleAction.Start"/>.
         /// </summary>
@@ -340,18 +166,24 @@ namespace SEE.Controls.Actions
 
         private void AnySelectIn(InteractableObject interactableObject, bool isOwner)
         {
-            Node node = interactableObject.GetNode();
-            if (node.kind == Node.Kind.Architecture && lastSelection != null)
+            if (interactableObject.TryGetNode(out Node node))
             {
-                Node from = mapping.GetNode(lastSelection.GetNode().ID);
-                Node to = mapping.GetNode(node.ID);
-                from.Reparent(to);
-                mapping.FinalizeNodeHierarchy();
-                SEECity city = SceneQueries.GetMapp();
-                city.LoadedGraph = mapping;
-                city.ReDrawGraph();
+                if (node.kind == Node.Kind.Architecture && lastSelection != null && lastSelection.GetNode().kind == Node.Kind.Implementation)
+                {
+                    Node from = mapping.GetNode(lastSelection.GetNode().ID);
+                    Node to = mapping.GetNode(node.ID);
+                    from.Reparent(to);
+                    mapping.FinalizeNodeHierarchy();
+                    SEECity city = SceneQueries.GetMapp();
+                    city.LoadedGraph = mapping;
+                    city.ReDrawGraph();
+                }
+                lastSelection = interactableObject;
             }
-            lastSelection = interactableObject;
+            else
+            {
+                lastSelection = null;
+            }
         }
 
         /// <summary>

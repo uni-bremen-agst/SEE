@@ -118,6 +118,30 @@ namespace SEE.Controls
             return result;
         }
 
+        public bool TryGetNode(out Node node)
+        {
+            bool result = false;
+            node = null;
+            if (GraphElemRef is NodeRef nodeRef)
+            {
+                node = nodeRef.Value;
+                result = node != null;
+            }
+            return result;
+        }
+
+        public bool TryGetEdge(out Edge edge)
+        {
+            bool result = false;
+            edge = null;
+            if (GraphElemRef is EdgeRef edgeRef)
+            {
+                edge = edgeRef.Value;
+                result = edge != null;
+            }
+            return result;
+        }
+
         public NodeRef GetNodeRef()
         {
             Assert.IsTrue(GraphElemRef is NodeRef);

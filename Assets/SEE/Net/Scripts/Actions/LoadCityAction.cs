@@ -130,6 +130,8 @@ namespace SEE.Net
         /// <param name="city">The city to load.</param>
         public LoadCityAction(AbstractSEECity city)
         {
+            // TODO(torben): fix
+
             gameObjectName = city.name;
             type = city.GetType().ToString();
             position = city.transform.position;
@@ -159,7 +161,7 @@ namespace SEE.Net
 
             InnerDonutMetric = city.InnerDonutMetric;
 
-            InnerNodeStyleMetric = city.innerNodeAttributes.styleMetric;
+            //InnerNodeStyleMetric = city.innerNodeAttributes.styleMetric;
 
             MinimalBlockLength = city.MinimalBlockLength;
             MaximalBlockLength = city.MaximalBlockLength;
@@ -289,7 +291,7 @@ namespace SEE.Net
 
             city.InnerDonutMetric = InnerDonutMetric;
 
-            city.innerNodeAttributes.styleMetric = InnerNodeStyleMetric;
+            //city.innerNodeAttributes.styleMetric = InnerNodeStyleMetric;
 
             city.MinimalBlockLength = MinimalBlockLength;
             city.MaximalBlockLength = MaximalBlockLength;
