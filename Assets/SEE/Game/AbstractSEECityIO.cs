@@ -14,6 +14,7 @@ namespace SEE.Game
         /// The attribute labels for all attributes in the stored configuration file.
         /// </summary>
         private const string LeafNodeAttributesCountLabel = "LeafNodeAttributesCount";
+        private const string InnerNodeAttributesCountLabel = "InnerNodeAttributesCount";
 
         private const string LODCullingLabel = "LODCulling";
         private const string LayoutPathLabel = "LayoutPath";
@@ -78,6 +79,7 @@ namespace SEE.Game
         protected virtual void Save(ConfigWriter writer)
         {
             writer.Save(leafNodeAttributesPerKind.Length, LeafNodeAttributesCountLabel);
+            writer.Save(innerNodeAttributesPerKind.Length, InnerNodeAttributesCountLabel);
 
             writer.Save(globalCityAttributes.lodCulling, LODCullingLabel);
             globalCityAttributes.layoutPath.Save(writer, LayoutPathLabel);
@@ -94,8 +96,13 @@ namespace SEE.Game
                 writer.Save(leafNodeAttributesPerKind[i].styleMetric, LeafStyleMetricLabel + postfix);
                 leafNodeAttributesPerKind[i].labelSettings.Save(writer, LeafLabelSettingsLabel + postfix);
             }
-            innerNodeAttributes.colorRange.Save(writer, InnerNodeColorRangeLabel);
-            innerNodeAttributes.labelSettings.Save(writer, InnerNodeLabelSettingsLabel);
+            for (int i = 0; i < innerNodeAttributesPerKind.Length; i++)
+            {
+                innerNodeAttributesPerKind[i].colorRange.Save(writer, InnerNodeColorRangeLabel);
+                writer.Save(innerNodeAttributesPerKind[i].heightMetric, InnerNodeHeightMetricLabel);
+                writer.Save(innerNodeAttributesPerKind[i].styleMetric, InnerNodeStyleMetricLabel);
+                innerNodeAttributesPerKind[i].labelSettings.Save(writer, InnerNodeLabelSettingsLabel);
+            }
 
             writer.Save(StyleIssue, StyleIssueLabel);
             writer.Save(UniversalIssue, UniversalIssueLabel);
@@ -114,8 +121,6 @@ namespace SEE.Game
             writer.Save(ArchitectureIssue_SUM, ArchitectureIssue_SUMLabel);
 
             writer.Save(InnerDonutMetric, InnerDonutMetricLabel);
-            writer.Save(innerNodeAttributes.heightMetric, InnerNodeHeightMetricLabel);
-            writer.Save(innerNodeAttributes.styleMetric, InnerNodeStyleMetricLabel);
 
             writer.Save(MinimalBlockLength, MinimalBlockLengthLabel);
             writer.Save(MaximalBlockLength, MaximalBlockLengthLabel);
@@ -148,6 +153,11 @@ namespace SEE.Game
             Assert.IsNotNull(leafNodeAttributesPerKind);
             Assert.IsTrue(leafNodeAttributesPerKind.Length == leafNodeAttributesCount);
 
+            int innerNodeAttributesCount = 0;
+            ConfigIO.Restore(attributes, InnerNodeAttributesCountLabel, ref innerNodeAttributesCount);
+            Assert.IsNotNull(innerNodeAttributesPerKind);
+            Assert.IsTrue(innerNodeAttributesPerKind.Length == innerNodeAttributesCount);
+
             ConfigIO.Restore(attributes, LODCullingLabel, ref globalCityAttributes.lodCulling);
             globalCityAttributes.layoutPath.Restore(attributes, LayoutPathLabel);
             ConfigIO.Restore(attributes, HierarchicalEdgesLabel, ref HierarchicalEdges);
@@ -162,8 +172,13 @@ namespace SEE.Game
                 ConfigIO.Restore(attributes, LeafStyleMetricLabel, ref leafNodeAttributesPerKind[i].styleMetric);
                 leafNodeAttributesPerKind[i].labelSettings.Restore(attributes, LeafLabelSettingsLabel);
             }
-            innerNodeAttributes.colorRange.Restore(attributes, InnerNodeColorRangeLabel);
-            innerNodeAttributes.labelSettings.Restore(attributes, InnerNodeLabelSettingsLabel);
+            for (int i = 0; i < innerNodeAttributesCount; i++)
+            {
+                innerNodeAttributesPerKind[i].colorRange.Restore(attributes, InnerNodeColorRangeLabel);
+                ConfigIO.Restore(attributes, InnerNodeHeightMetricLabel, ref innerNodeAttributesPerKind[i].heightMetric);
+                ConfigIO.Restore(attributes, InnerNodeStyleMetricLabel, ref innerNodeAttributesPerKind[i].styleMetric);
+                innerNodeAttributesPerKind[i].labelSettings.Restore(attributes, InnerNodeLabelSettingsLabel);
+            }
 
             ConfigIO.Restore(attributes, StyleIssueLabel, ref StyleIssue);
             ConfigIO.Restore(attributes, UniversalIssueLabel, ref UniversalIssue);
@@ -182,8 +197,6 @@ namespace SEE.Game
             ConfigIO.Restore(attributes, ArchitectureIssue_SUMLabel, ref ArchitectureIssue_SUM);
 
             ConfigIO.Restore(attributes, InnerDonutMetricLabel, ref InnerDonutMetric);
-            ConfigIO.Restore(attributes, InnerNodeHeightMetricLabel, ref innerNodeAttributes.heightMetric);
-            ConfigIO.Restore(attributes, InnerNodeStyleMetricLabel, ref innerNodeAttributes.styleMetric);
 
             ConfigIO.Restore(attributes, MinimalBlockLengthLabel, ref MinimalBlockLength);
             ConfigIO.Restore(attributes, MaximalBlockLengthLabel, ref MaximalBlockLength);

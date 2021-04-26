@@ -41,6 +41,8 @@ namespace SEEEditor
         /// </summary>
         private bool showInnerAttributes = true;
 
+        private bool[] showInnerAttributesAtIndex = Enumerable.Repeat(false, (int)Node.Kind.Count).ToArray();
+
         /// <summary>
         /// Whether the "nodes and node layout" foldout should be expanded.
         /// </summary>
@@ -271,15 +273,25 @@ namespace SEEEditor
             showInnerAttributes = EditorGUILayout.Foldout(showInnerAttributes, "Attributes of inner nodes", true, EditorStyles.foldoutHeader);
             if (showInnerAttributes)
             {
-                InnerNodeAttributes settings = city.innerNodeAttributes;
-                Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
+                EditorGUI.indentLevel++;
+                for (int i = 0; i < (int)Node.Kind.Count; i++)
+                {
+                    string label = "Type: " + ((Node.Kind)i).ToString();
+                    showInnerAttributesAtIndex[i] = EditorGUILayout.Foldout(showInnerAttributesAtIndex[i], label, EditorStyles.foldout);
+                    if (showInnerAttributesAtIndex[i])
+                    {
+                        InnerNodeAttributes settings = city.innerNodeAttributesPerKind[i];
+                        Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
 
-                settings.heightMetric = EditorGUILayout.TextField("Height", settings.heightMetric);
-                settings.styleMetric = EditorGUILayout.TextField("Style", settings.styleMetric);
-                settings.colorRange.lower = EditorGUILayout.ColorField("Lower color", settings.colorRange.lower);
-                settings.colorRange.upper = EditorGUILayout.ColorField("Upper color", settings.colorRange.upper);
-                settings.colorRange.NumberOfColors = (uint) EditorGUILayout.IntSlider("# Colors", (int)settings.colorRange.NumberOfColors, 1, 15);
-                LabelSettings(ref settings.labelSettings);
+                        settings.heightMetric = EditorGUILayout.TextField("Height", settings.heightMetric);
+                        settings.styleMetric = EditorGUILayout.TextField("Style", settings.styleMetric);
+                        settings.colorRange.lower = EditorGUILayout.ColorField("Lower color", settings.colorRange.lower);
+                        settings.colorRange.upper = EditorGUILayout.ColorField("Upper color", settings.colorRange.upper);
+                        settings.colorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.colorRange.NumberOfColors, 1, 15);
+                        LabelSettings(ref settings.labelSettings);
+                    }
+                }
+                EditorGUI.indentLevel--;
             }
         }
 

@@ -34,16 +34,39 @@ namespace SEE.Game
             this.settings = settings;
             for (int i = 0; i < (int)Node.Kind.Count; i++)
             {
+                ColorRange leafColorRange = this.settings.leafNodeAttributesPerKind[i].colorRange;
                 switch (this.settings.nodeLayoutSettings.leafKind)
                 {
                     case LeafNodeKinds.Blocks:
-                        leafNodeFactories[i] = new CubeFactory(ShaderType, this.settings.leafNodeAttributesPerKind[i].colorRange);
+                        leafNodeFactories[i] = new CubeFactory(ShaderType, leafColorRange);
                         break;
                     default:
                         throw new Exception("Unhandled GraphSettings.LeafNodeKinds");
                 }
+
+                ColorRange innerColorRange = this.settings.innerNodeAttributesPerKind[i].colorRange;
+                switch (this.settings.nodeLayoutSettings.innerKind)
+                {
+                    case InnerNodeKinds.Empty:
+                    case InnerNodeKinds.Donuts:
+                        innerNodeFactories[i] = new VanillaFactory(ShaderType, innerColorRange);
+                        break;
+                    case InnerNodeKinds.Circles:
+                        innerNodeFactories[i] = new CircleFactory(innerColorRange);
+                        break;
+                    case InnerNodeKinds.Cylinders:
+                        innerNodeFactories[i] = new CylinderFactory(ShaderType, innerColorRange);
+                        break;
+                    case InnerNodeKinds.Rectangles:
+                        innerNodeFactories[i] = new RectangleFactory(innerColorRange);
+                        break;
+                    case InnerNodeKinds.Blocks:
+                        innerNodeFactories[i] = new CubeFactory(ShaderType, innerColorRange);
+                        break;
+                    default:
+                        throw new Exception("Unhandled GraphSettings.InnerNodeKinds");
+                }
             }
-            innerNodeFactory = GetInnerNodeFactory(this.settings.nodeLayoutSettings.innerKind);
             this.graph = graph;
             if (this.graph != null)
             {
@@ -65,32 +88,6 @@ namespace SEE.Game
         private const float GroundLevel = 0.0f;
 
         /// <summary>
-        /// Returns the Factory for the inner nodes
-        /// </summary>
-        /// <param name="innerNodeKinds">the kind of the inner nodes</param>
-        /// <returns>inner node factory</returns>
-        private InnerNodeFactory GetInnerNodeFactory(InnerNodeKinds innerNodeKinds)
-        {
-            ColorRange colorRange = settings.innerNodeAttributes.colorRange;
-            switch (innerNodeKinds)
-            {
-                case InnerNodeKinds.Empty:
-                case InnerNodeKinds.Donuts:
-                    return new VanillaFactory(ShaderType, colorRange);
-                case InnerNodeKinds.Circles:
-                    return new CircleFactory(colorRange);
-                case InnerNodeKinds.Cylinders:
-                    return new CylinderFactory(ShaderType, colorRange);
-                case InnerNodeKinds.Rectangles:
-                    return new RectangleFactory(colorRange);
-                case InnerNodeKinds.Blocks:
-                    return new CubeFactory(ShaderType, colorRange);
-                default:
-                    throw new Exception("Unhandled GraphSettings.InnerNodeKinds");
-            }
-        }
-
-        /// <summary>
         /// The graph to be rendered.
         /// </summary>
         private readonly Graph graph;
@@ -108,7 +105,7 @@ namespace SEE.Game
         /// <summary>
         /// The factory used to create game nodes for inner graph nodes.
         /// </summary>
-        private readonly InnerNodeFactory innerNodeFactory;
+        private readonly InnerNodeFactory[] innerNodeFactories = new InnerNodeFactory[(int)Node.Kind.Count];
 
         /// <summary>
         /// The scale used to normalize the metrics determining the lengths of the blocks.
@@ -207,7 +204,7 @@ namespace SEE.Game
             AddAscendants(to, gameNodes);
             Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
             // The layout nodes corresponding to those game nodes.
-            ICollection<GameNode> layoutNodes = ToLayoutNodes(gameNodes, leafNodeFactories, innerNodeFactory, to_layout_node);
+            ICollection<GameNode> layoutNodes = ToLayoutNodes(gameNodes, leafNodeFactories, innerNodeFactories, to_layout_node);
 
             GameNode fromLayoutNode = null; // layout node in layoutNodes corresponding to source node
             GameNode toLayoutNode = null;   // layout node in layoutNodes corresponding to target node
@@ -580,9 +577,9 @@ namespace SEE.Game
             else
             {
                 // Inner nodes were created by innerNodeFactory.
-                innerNodeFactory.SetSize(gameNode, layout.LocalScale);
+                innerNodeFactories[(int)node.kind].SetSize(gameNode, layout.LocalScale);
                 // FIXME: Must adjust layout.CenterPosition.y
-                innerNodeFactory.SetGroundPosition(gameNode, layout.CenterPosition);
+                innerNodeFactories[(int)node.kind].SetGroundPosition(gameNode, layout.CenterPosition);
             }
             // Rotate the game object.
             Rotate(gameNode, layout.Rotation);
@@ -722,7 +719,7 @@ namespace SEE.Game
                 List<Node> remainingNodes = new List<Node>(nodes);
                 foreach (SublayoutNode sublayoutNode in coseSublayoutNodes)
                 {
-                    AddInnerNodes(nodeMap, sublayoutNode.Nodes, GetInnerNodeFactory(sublayoutNode.InnerNodeKind));
+                    AddInnerNodes(nodeMap, sublayoutNode.Nodes);
                     remainingNodes.RemoveAll(node => sublayoutNode.Nodes.Contains(node));
                 }
                 AddInnerNodes(nodeMap, remainingNodes);
@@ -1039,7 +1036,7 @@ namespace SEE.Game
         /// <returns>the game objects added for the decorations; may be an empty collection</returns>
         private void AddDecorations(ICollection<GameObject> gameNodes, InnerNodeKinds innerNodeKinds, NodeLayoutKind nodeLayout)
         {
-            InnerNodeFactory innerNodeFactory = GetInnerNodeFactory(innerNodeKinds);
+            InnerNodeFactory innerNodeFactory = innerNodeFactories[0];
 
             // Add software erosion decorators for all leaf nodes if requested.
             if (settings.nodeLayoutSettings.showErosions)
@@ -1104,7 +1101,7 @@ namespace SEE.Game
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
         public ICollection<GameNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
         {
-            return ToLayoutNodes(gameObjects, leafNodeFactories, innerNodeFactory, to_layout_node);
+            return ToLayoutNodes(gameObjects, leafNodeFactories, innerNodeFactories, to_layout_node);
         }
 
         /// <summary>
@@ -1122,11 +1119,11 @@ namespace SEE.Game
             {
                 ICollection<GameObject> gameObjects = new List<GameObject>();
                 sublayoutNode.Nodes.ForEach(node => gameObjects.Add(nodeMap[node]));
-                layoutNodes.AddRange(ToLayoutNodes(gameObjects, leafNodeFactories, GetInnerNodeFactory(sublayoutNode.InnerNodeKind), to_layout_node));
+                layoutNodes.AddRange(ToLayoutNodes(gameObjects, leafNodeFactories, innerNodeFactories, to_layout_node));
                 remainingGameobjects.RemoveAll(gameObject => gameObjects.Contains(gameObject));
             }
 
-            layoutNodes.AddRange(ToLayoutNodes(remainingGameobjects, leafNodeFactories, innerNodeFactory, to_layout_node));
+            layoutNodes.AddRange(ToLayoutNodes(remainingGameobjects, leafNodeFactories, innerNodeFactories, to_layout_node));
 
             return layoutNodes;
         }
@@ -1143,7 +1140,7 @@ namespace SEE.Game
         private static ICollection<GameNode> ToLayoutNodes
             (ICollection<GameObject> gameNodes,
             NodeFactory[] leafNodeFactories,
-            NodeFactory innerNodeFactory,
+            NodeFactory[] innerNodeFactories,
             Dictionary<Node, ILayoutNode> to_layout_node)
         {
             IList<GameNode> result = new List<GameNode>(gameNodes.Count);
@@ -1157,7 +1154,7 @@ namespace SEE.Game
                 }
                 else
                 {
-                    result.Add(new GameNode(to_layout_node, gameObject, innerNodeFactory));
+                    result.Add(new GameNode(to_layout_node, gameObject, innerNodeFactories[(int)node.kind]));
                 }
             }
             LayoutNodes.SetLevels(result.Cast<ILayoutNode>().ToList());
@@ -1228,7 +1225,7 @@ namespace SEE.Game
             }
             else
             {
-                innerNodeFactory.Rotate(gameNode, degree);
+                innerNodeFactories[(int)node.kind].Rotate(gameNode, degree);
             }
         }
 
@@ -1271,7 +1268,7 @@ namespace SEE.Game
             // render queue should be. We are assuming that the nodes are stacked on each
             // other according to the node hierarchy. Leaves are on top of all other nodes.
             // That is why we put them at the highest necessary rendering queue offset.
-            GameObject block = leafNodeFactories[(int)node.kind].NewBlock(SelectStyle(node, innerNodeFactory), node.ItsGraph.MaxDepth);
+            GameObject block = leafNodeFactories[(int)node.kind].NewBlock(SelectStyle(node, innerNodeFactories[(int)node.kind]), node.ItsGraph.MaxDepth);
             block.name = node.ID;
             block.AddComponent<NodeRef>().Value = node;
             AdjustScaleOfLeaf(block);
@@ -1330,7 +1327,7 @@ namespace SEE.Game
         private int SelectStyle(Node node, InnerNodeFactory innerNodeFactory)
         {
             bool isLeaf = node.IsLeaf();
-            string styleMetric = isLeaf ? settings.leafNodeAttributesPerKind[(int)node.kind].styleMetric : settings.innerNodeAttributes.styleMetric;
+            string styleMetric = isLeaf ? settings.leafNodeAttributesPerKind[(int)node.kind].styleMetric : settings.innerNodeAttributesPerKind[(int)node.kind].styleMetric;
             uint numberOfStyles = isLeaf ? leafNodeFactories[(int)node.kind].NumberOfStyles() : innerNodeFactory.NumberOfStyles();
             float metricMaximum;
 
@@ -1395,7 +1392,7 @@ namespace SEE.Game
             }
             else
             {
-                return innerNodeFactory.Roof(gameNode);
+                return innerNodeFactories[(int)node.kind].Roof(gameNode);
             }
         }
 
@@ -1420,7 +1417,7 @@ namespace SEE.Game
             }
             else
             {
-                return innerNodeFactory.GetSize(gameNode);
+                return innerNodeFactories[(int)node.kind].GetSize(gameNode);
             }
         }
 
@@ -1441,8 +1438,9 @@ namespace SEE.Game
             }
             else
             {
-                float value = GetMetricValue(noderef.Value, settings.innerNodeAttributes.heightMetric);
-                innerNodeFactory.SetHeight(gameNode, value);
+                Node node = noderef.Value;
+                float value = GetMetricValue(noderef.Value, settings.innerNodeAttributesPerKind[(int)node.kind].heightMetric);
+                innerNodeFactories[(int)node.kind].SetHeight(gameNode, value);
             }
         }
 
@@ -1456,7 +1454,8 @@ namespace SEE.Game
         {
             if (innerNodeFactory == null)
             {
-                innerNodeFactory = this.innerNodeFactory;
+                Debug.LogWarning("Using the default inner node factory!");
+                innerNodeFactory = innerNodeFactories[0];
             }
 
             NodeRef noderef = gameNode.GetComponent<NodeRef>();
@@ -1604,7 +1603,8 @@ namespace SEE.Game
         {
             if (innerNodeFactory == null)
             {
-                innerNodeFactory = this.innerNodeFactory;
+                Debug.LogWarning("Using the default inner node factory!");
+                innerNodeFactory = innerNodeFactories[0];
             }
             // The deeper the node in the node hierarchy (quantified by a node's level), the
             // later it should be drawn, or in other words, the higher its offset in the
@@ -1614,7 +1614,7 @@ namespace SEE.Game
             innerGameObject.name = node.ID;
             innerGameObject.tag = Tags.Node;
             innerGameObject.AddComponent<NodeRef>().Value = node;
-            AdjustStyle(innerGameObject);
+            AdjustStyle(innerGameObject, innerNodeFactory);
             AdjustHeightOfInnerNode(innerGameObject);
             AddLOD(innerGameObject);
             InteractionDecorator.PrepareForInteraction(innerGameObject);
@@ -1627,15 +1627,14 @@ namespace SEE.Game
         /// </summary>
         /// <param name="nodeMap">nodeMap to which the game objects are to be added</param>
         /// <param name="nodes">list of nodes for which to create blocks</param>
-        /// <param name="innerNodeFactory">the node factory for the inner nodes</param>
-        protected void AddInnerNodes(Dictionary<Node, GameObject> nodeMap, IList<Node> nodes, InnerNodeFactory innerNodeFactory = null)
+        protected void AddInnerNodes(Dictionary<Node, GameObject> nodeMap, IList<Node> nodes)
         {
             for (int i = 0; i < nodes.Count; i++)
             {
                 // We add only inner nodes.
                 if (!nodes[i].IsLeaf())
                 {
-                    GameObject innerGameObject = NewInnerNode(nodes[i], innerNodeFactory);
+                    GameObject innerGameObject = NewInnerNode(nodes[i], innerNodeFactories[(int)nodes[i].kind]);
                     nodeMap[nodes[i]] = innerGameObject;
                 }
             }
@@ -1663,9 +1662,9 @@ namespace SEE.Game
                 {
                     Node node = go.GetComponent<NodeRef>().Value;
 
-                    Vector3 extent = node.IsLeaf() ? leafNodeFactories[(int)node.kind].GetSize(go) / 2.0f : innerNodeFactory.GetSize(go) / 2.0f;
+                    Vector3 extent = node.IsLeaf() ? leafNodeFactories[(int)node.kind].GetSize(go) / 2.0f : innerNodeFactories[(int)node.kind].GetSize(go) / 2.0f;
                     // Note: position denotes the center of the object
-                    Vector3 position = node.IsLeaf() ? leafNodeFactories[(int)node.kind].GetCenterPosition(go) : innerNodeFactory.GetCenterPosition(go);
+                    Vector3 position = node.IsLeaf() ? leafNodeFactories[(int)node.kind].GetCenterPosition(go) : innerNodeFactories[(int)node.kind].GetCenterPosition(go);
                     {
                         // x co-ordinate of lower left corner
                         float x = position.x - extent.x;

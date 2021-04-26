@@ -29,12 +29,12 @@ namespace SEE.Game
         /// respectively (both declared in AbstractSEECityIO). You should also
         /// extend the test cases in TestConfigIO.
 
-        public GlobalCityAttributes    globalCityAttributes      = new GlobalCityAttributes();
-        public LeafNodeAttributes[]    leafNodeAttributesPerKind = ArrayUtils.New((int)Node.Kind.Count, (int _) => new LeafNodeAttributes());
-        public InnerNodeAttributes     innerNodeAttributes       = new InnerNodeAttributes();
-        public NodeLayoutSettings      nodeLayoutSettings        = new NodeLayoutSettings();
-        public EdgeLayoutSettings      edgeLayoutSettings        = new EdgeLayoutSettings();
-        public CoseGraphSettings       coseGraphSettings         = new CoseGraphSettings(); // TODO(torben): put into CitySettings.cs
+        public GlobalCityAttributes     globalCityAttributes       = new GlobalCityAttributes();
+        public LeafNodeAttributes[]     leafNodeAttributesPerKind  = ArrayUtils.New((int)Node.Kind.Count, (int _) => new LeafNodeAttributes());
+        public InnerNodeAttributes[]    innerNodeAttributesPerKind = ArrayUtils.New((int)Node.Kind.Count, (int _) => new InnerNodeAttributes());
+        public NodeLayoutSettings       nodeLayoutSettings         = new NodeLayoutSettings();
+        public EdgeLayoutSettings       edgeLayoutSettings         = new EdgeLayoutSettings();
+        public CoseGraphSettings        coseGraphSettings          = new CoseGraphSettings(); // TODO(torben): put into CitySettings.cs
 
         /// <summary>
         /// Saves the settings of this code city to <see cref="CityPath"/>.
@@ -451,7 +451,13 @@ namespace SEE.Game
         /// <returns>all metrics used for visual attributes of an inner node</returns>
         public ICollection<string> AllInnerNodeMetrics()
         {
-            return new List<string> { innerNodeAttributes.styleMetric, innerNodeAttributes.heightMetric };
+            List<string> result = new List<string>(leafNodeAttributesPerKind.Length * 2);
+            foreach (InnerNodeAttributes innerNodeAttributes in innerNodeAttributesPerKind)
+            {
+                result.Add(innerNodeAttributes.styleMetric);
+                result.Add(innerNodeAttributes.heightMetric);
+            }
+            return result;
         }
 
         //--------------------------------------
