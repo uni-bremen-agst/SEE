@@ -273,6 +273,15 @@ namespace Assets.SEE.Utils
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private int GetCountOfNewerAction()
+        {
+
+        }
+
+        /// <summary>
         /// Returns wether a player has no Actions left to be undone
         /// </summary>
         /// <returns>True if no action left</returns>

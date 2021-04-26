@@ -75,6 +75,11 @@ namespace SEE.Controls.Actions
         private Memento memento;
 
         /// <summary>
+        /// The id of the gameObject node to be edited.
+        /// </summary>
+        private string gameObjectID;
+
+        /// <summary>
         /// The Update method's behavior depends on the edit-progress state (sequential series).
         /// NoNodeSelected: Waits until a node is selected by selecting a game node via the mouse button.
         /// NodeSelected: Instantiates the canvasObject if a gameNode is selected.
@@ -95,6 +100,7 @@ namespace SEE.Controls.Actions
                     {
                         // the hit object is the node to be edited
                         GameObject editedNode = raycastHit.collider.gameObject;
+                        gameObjectID = editedNode.name;
                         if (editedNode.TryGetNode(out Node node))
                         {
                             progress = ProgressState.WaitingForInput;
@@ -192,7 +198,7 @@ namespace SEE.Controls.Actions
         {
             List<string> changedObjects = new List<string>
             {
-                memento.node.ID
+                gameObjectID
             };
 
             return changedObjects;
