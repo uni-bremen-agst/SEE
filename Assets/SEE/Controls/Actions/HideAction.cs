@@ -110,14 +110,6 @@ namespace SEE.Controls.Actions
         // Update is called once per frame
         public override bool Update()
         {
-
-            if (selectedObject != null && selectedObject.CompareTag(Tags.Edge))
-            {
-                selectSourceAndTargetOfEdge(selectedObject);
-                hideSelected = true;
-            }
-            
-
             if (hideAll)
             {
                 if (HideAll())
@@ -464,6 +456,32 @@ namespace SEE.Controls.Actions
                         if (node.TryGetComponent(out InteractableObject interactable))
                         {
                             interactable.SetSelect(true, true);
+                        }
+                    }
+                }
+            }
+        }
+
+
+        private void selectEdgesBetweenSubsetOfNodes(HashSet<GameObject> subset)
+        { 
+            if(subset != null && subset.Count > 0)
+            {
+                List<string> subsetNames = new List<string>();
+                foreach (GameObject g in subset)
+                {
+                    subsetNames.Add(g.name);
+                }
+                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
+                {
+                    if (edge.TryGetComponent(out EdgeRef edgeRef))
+                    {
+                        if (subsetNames.Contains(edgeRef.edge.Source.ID) && subsetNames.Contains(edgeRef.edge.Target.ID))
+                        {
+                            if (edge.TryGetComponent(out InteractableObject interactable))
+                            {
+                                interactable.SetSelect(true, true);
+                            }
                         }
                     }
                 }
