@@ -20,11 +20,45 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject selectedObject;
 
-        HashSet<InteractableObject> selectedObjects;
+        /// <summary>
+        /// The list of currently selected objects.
+        /// </summary>
+        private HashSet<GameObject> selectedObjects;
 
+        /// <summary>
+        /// The list of currently hidden objects.
+        /// </summary>
         private ISet<GameObject> hiddenObjects = new HashSet<GameObject>();
 
+        /// <summary>
+        /// The list of objects whose visibility was changed in recent undo (needed for redo).
+        /// </summary>
         private ISet<GameObject> undoneList = new HashSet<GameObject>();
+
+        /// <summary>
+        /// Specifies whether all objects of selected city should be hidden.
+        /// </summary>
+        private Boolean hideAll;
+
+        /// <summary>
+        /// Specifies whether selected objects should be hidden.
+        /// </summary>
+        private Boolean hideSelected;
+
+        /// <summary>
+        /// Specifies whether unselected objects should be hidden.
+        /// </summary>
+        private Boolean hideUnselected;
+
+        /// <summary>
+        /// Specifies whether incoming edges of selected node should be hidden.
+        /// </summary>
+        private Boolean hideIncoming;
+
+        /// <summary>
+        /// Specifies whether outgoing edges of selected node should be hidden.
+        /// </summary>
+        private Boolean hideOutgoing;
 
         /// <summary>
         /// The code city to perform actions on, only necessary for 
@@ -60,7 +94,7 @@ namespace SEE.Controls.Actions
         public override void Start()
         {
             base.Stop();
-            selectedObjects = new HashSet<InteractableObject>();
+            selectedObjects = new HashSet<GameObject>();
             InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
             InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
         }
@@ -76,11 +110,63 @@ namespace SEE.Controls.Actions
         // Update is called once per frame
         public override bool Update()
         {
+            if (Input.GetKeyDown(KeyCode.H))
+            {
+                hideAll = true;
+                hideSelected = false;
+                hideUnselected = false;
+                Debug.Log("hideAll");
+            }
+            else if (Input.GetKeyDown(KeyCode.J))
+            {
+                hideAll = false;
+                hideSelected = true;
+                hideUnselected = false;
+                Debug.Log("hideSelected");
+            }
+            else if (Input.GetKeyDown(KeyCode.K))
+            {
+                hideAll = false;
+                hideSelected = false;
+                hideUnselected = true;
+                Debug.Log("hideUnselected");
+            }
+            if (hideAll)
+            {
+                if (HideAll())
+                {
+                    hadAnEffect = true;
+                    return true;
+                }
+            } else if (hideSelected)
+            {
+                if (HideSelected())
+                {
+                    hadAnEffect = true;
+                    return true;
+                }
+            } else if (hideUnselected)
+            {
+                if (HideUnselected())
+                {
+                    hadAnEffect = true;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Hides all selected objects when the enter key is pressed.
+        /// </summary>
+        /// <returns> true if all selected objects could be successfully hidden </returns>
+        private bool HideSelected()
+        {
             if (selectedObjects != null && selectedObjects.Count > 0 && Input.GetKey(KeyCode.Return))
             {
-                foreach(InteractableObject o in selectedObjects)
+                foreach (GameObject g in selectedObjects)
                 {
-                    GameObject g = o.gameObject;
                     Assert.IsTrue(g.HasNodeRef() || g.HasEdgeRef());
                     if (g.CompareTag(Tags.Edge))
                     {
@@ -90,8 +176,7 @@ namespace SEE.Controls.Actions
                     {
                         HideNodeIncludingConnectedEdges(g);
                     }
-                }                
-                hadAnEffect = true;
+                }
                 return true;
             }
             else
@@ -100,14 +185,86 @@ namespace SEE.Controls.Actions
             }
         }
 
-
-        private bool HideEdge(GameObject edge)
+        /// <summary>
+        /// Hides all unselected objects when the enter key is pressed.
+        /// </summary>
+        /// <returns> true if all unselected objects could be successfully hidden </returns>
+        private bool HideUnselected()
         {
-            hiddenObjects.Add(edge);
-            GameObjectExtensions.SetVisibility(edge, false, true);
-            return true;
+            if (selectedObjects != null && selectedObjects.Count > 0 && selectedObject != null && Input.GetKey(KeyCode.Return))
+            {
+                GameObject city = selectedObject;
+                while (!city.CompareTag(Tags.CodeCity))
+                {
+                    city = city.transform.parent.gameObject;
+                }
+
+                List<GameObject> nodesEdges = GetAllChildrenRecursively(city.transform, new List<GameObject>());
+
+                List<GameObject> unselectedObjects = new List<GameObject>();
+
+                foreach (GameObject g in nodesEdges)
+                {
+                    if (!selectedObjects.Contains(g) && !g.name.Equals("implementation"))
+                    {
+                        unselectedObjects.Add(g);
+                    }
+                    else
+                    {
+                        Debug.Log(g.name);
+                    }
+                }
+
+                foreach (GameObject g in unselectedObjects)
+                {
+                    Debug.Log(g.name);
+                    Assert.IsTrue(g.HasNodeRef() || g.HasEdgeRef());
+                    if (g.CompareTag(Tags.Edge))
+                    {
+                        HideEdge(g);
+                    }
+                    else if (g.CompareTag(Tags.Node))
+                    {
+                        HideNodeIncludingConnectedEdges(g);
+                    }
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
+        /// <summary>
+        /// Hides an edge.
+        /// </summary>
+        /// <param name="edge"> edge to hide </param>
+        /// <returns> true if edge could be hidden </returns>
+        private bool HideEdge(GameObject edge)
+        {
+            bool rendered = false;
+            if (edge.TryGetComponent(out Renderer renderer))
+            {
+                rendered = renderer.enabled;
+            }
+            if (rendered)
+            {
+                hiddenObjects.Add(edge);
+                GameObjectExtensions.SetVisibility(edge, false, true);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Hides a node including all the connected edges.
+        /// </summary>
+        /// <param name="node"> Node to hide </param>
+        /// <returns> true if node could be hidden successfully </returns>
         private bool HideNodeIncludingConnectedEdges(GameObject node)
         {
             if (node.TryGetComponent(out NodeRef nodeRef))
@@ -130,10 +287,13 @@ namespace SEE.Controls.Actions
             }
             hiddenObjects.Add(node);
             GameObjectExtensions.SetVisibility(node, false, true);
-            node = null;
             return true;
         }
 
+        /// <summary>
+        /// Hides all nodes and edges of the selected city.
+        /// </summary>
+        /// <returns> true if all nodes and edges could be successfully hidden </returns>
         private bool HideAll()
         {
             GameObject city = selectedObject;
@@ -142,9 +302,9 @@ namespace SEE.Controls.Actions
                 city = city.transform.parent.gameObject;
             }
 
-            List<GameObject> nodesEdgesDecorations = GetAllChildrenRecursively(city.transform, new List<GameObject>());
+            List<GameObject> nodesEdges = GetAllChildrenRecursively(city.transform, new List<GameObject>());
             
-            foreach (GameObject g in nodesEdgesDecorations)
+            foreach (GameObject g in nodesEdges)
             {
                 GameObjectExtensions.SetVisibility(g, false, true);
                 hiddenObjects.Add(g);
@@ -152,11 +312,17 @@ namespace SEE.Controls.Actions
             return true;
         }
 
+        /// <summary>
+        /// Recursive function to get all node and edge children of a game object.
+        /// </summary>
+        /// <param name="transform"> Transform of the game object </param>
+        /// <param name="objectList"> Current list of all node and edge children </param>
+        /// <returns> list of all node and edge children of a game object </returns>
         private List<GameObject> GetAllChildrenRecursively(Transform transform, List<GameObject> objectList)
         {
             foreach (Transform child in transform)
             {
-                if (child.CompareTag(Tags.Node) || child.CompareTag(Tags.Edge) || child.CompareTag(Tags.Decoration))
+                if (child.CompareTag(Tags.Node) || child.CompareTag(Tags.Edge))
                 {
                     objectList.Add(child.gameObject);
                 }
@@ -224,6 +390,9 @@ namespace SEE.Controls.Actions
             return false;         
         }
 
+        /// <summary>
+        /// Undoes the action.
+        /// </summary>
         public override void Undo()
         {
             Debug.Log(hiddenObjects.Count);
@@ -237,6 +406,9 @@ namespace SEE.Controls.Actions
             hiddenObjects.Clear();
         }
 
+        /// <summary>
+        /// Redoes the action.
+        /// </summary>
         public override void Redo()
         {
             base.Redo();
@@ -271,15 +443,17 @@ namespace SEE.Controls.Actions
         {
             if (interactableObject != null)
             {
-                selectedObjects.Add(interactableObject);
+                selectedObject = interactableObject.gameObject;
+                selectedObjects.Add(interactableObject.gameObject);
             }
         }
 
         private void LocalAnySelectOut(InteractableObject interactableObject)
         {
-            if (selectedObjects.Contains(interactableObject))
+            if (selectedObjects.Contains(interactableObject.gameObject))
             {
-                selectedObjects.Remove(interactableObject);
+                selectedObject = null;
+                selectedObjects.Remove(interactableObject.gameObject);
             }
         }
 
