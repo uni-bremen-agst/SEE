@@ -110,7 +110,14 @@ namespace SEE.Controls.Actions
         // Update is called once per frame
         public override bool Update()
         {
-            hideIncoming = true;
+
+            if (selectedObject != null && selectedObject.CompareTag(Tags.Edge))
+            {
+                selectSourceAndTargetOfEdge(selectedObject);
+                hideSelected = true;
+            }
+            
+
             if (hideAll)
             {
                 if (HideAll())
@@ -203,15 +210,10 @@ namespace SEE.Controls.Actions
                     {
                         unselectedObjects.Add(g);
                     }
-                    else
-                    {
-                        Debug.Log(g.name);
-                    }
                 }
 
                 foreach (GameObject g in unselectedObjects)
                 {
-                    Debug.Log(g.name);
                     Assert.IsTrue(g.HasNodeRef() || g.HasEdgeRef());
                     if (g.CompareTag(Tags.Edge))
                     {
@@ -414,8 +416,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Undo()
         {
-            Debug.Log(hiddenObjects.Count);
-
             base.Undo();
             foreach (GameObject g in hiddenObjects)
             {
@@ -437,6 +437,37 @@ namespace SEE.Controls.Actions
                 hiddenObjects.Add(g);
             }
             undoneList.Clear();
+        }
+
+        /// <summary>
+        /// Selects source and target node of edge.
+        /// </summary>
+        /// <param name="edge"> edge to select source and target node of </param>
+        private void selectSourceAndTargetOfEdge(GameObject edge)
+        {
+            if(edge.TryGetComponent(out EdgeRef edgeRef))
+            {
+                string sourceID = edgeRef.edge.Source.ID;
+                string targetID = edgeRef.edge.Target.ID;
+
+                foreach (GameObject node in GameObject.FindGameObjectsWithTag(Tags.Node))
+                {
+                    if (node.name.Equals(sourceID))
+                    {
+                        if (node.TryGetComponent(out InteractableObject interactable))
+                        {
+                            interactable.SetSelect(true, true);
+                        }
+                    }
+                    else if (node.name.Equals(targetID))
+                    {
+                        if (node.TryGetComponent(out InteractableObject interactable))
+                        {
+                            interactable.SetSelect(true, true);
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -484,5 +515,6 @@ namespace SEE.Controls.Actions
         {
             return ActionStateType.Hide;
         }
+
     }
 }
