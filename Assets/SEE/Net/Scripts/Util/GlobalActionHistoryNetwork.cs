@@ -75,6 +75,11 @@ namespace SEE.Net
 
         private List<string> StringToList(string s)
         {
+            if (s == null)
+            {
+                Debug.LogWarning("NULLLLLL");
+                return null;
+            }
             List<string> result = new List<string>();
             string[] arr = new string[s.Split(',').Length];
             arr = s.Split(',');
