@@ -231,6 +231,7 @@ namespace SEE.Controls.Actions
                 progress = ProgressState.ValuesAreGiven;
                 memento.newName = memento.node.SourceName;
                 memento.newType = memento.node.Type;
+                InteractableObject.UnselectAll(true);
             }
         }
     }

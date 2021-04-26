@@ -53,7 +53,8 @@ namespace Assets.SEE.Utils
         /// Precondition: <paramref name="action"/> is not already present in the action history.
         /// </summary>
         /// <param name="action">the action to be executed</param>
-        public void Execute(ReversibleAction action)
+        /// <param name="ignoreRedoDeletion">Run with out deltetion of redos</param>
+        public void Execute(ReversibleAction action, bool ignoreRedoDeletion = false)
         {
             activeAction?.Stop();
             Push(new Tuple<bool, HistoryType, string, List<string>>(true, HistoryType.action, action.GetId(), null));
@@ -64,7 +65,7 @@ namespace Assets.SEE.Utils
             action.Start();
 
             // Whenever a new action is excuted, we consider the redo stack lost.
-            if (isRedo)
+            if (!ignoreRedoDeletion && isRedo)
             {
                 DeleteAllRedos();
             }
@@ -231,8 +232,11 @@ namespace Assets.SEE.Utils
                 lastAction = FindLastActionOfPlayer(true, HistoryType.action);
                 if (lastAction == null) return;
                 activeAction = FindById(lastAction.Item3);
-                activeAction?.Start();
+                
+                Execute(activeAction.NewInstance(), true);
+                //activeAction?.Start();
                 isRedo = true;
+
             }
         }
 
@@ -256,7 +260,7 @@ namespace Assets.SEE.Utils
             }
             ReversibleAction temp = FindById(lastUndoneAction.Item3);
             temp.Redo();
-            temp.Start();
+           
             Tuple<bool, HistoryType, string, List<string>> redoneAction = new Tuple<bool, HistoryType, string, List<string>>(true, HistoryType.action, lastUndoneAction.Item3, lastUndoneAction.Item4);
             DeleteItem(lastUndoneAction.Item3, lastUndoneAction.Item1);
             new GlobalActionHistoryNetwork(true, HistoryType.action, lastUndoneAction.Item3, null, false).Execute(null);
@@ -264,7 +268,8 @@ namespace Assets.SEE.Utils
             new GlobalActionHistoryNetwork(redoneAction.Item1, redoneAction.Item2, redoneAction.Item3, redoneAction.Item4, true).Execute(null);
             activeAction = temp;
             ownActions.Add(temp);
-            
+            Execute(activeAction.NewInstance(), true);
+
         }
 
         /// <summary>
