@@ -43,12 +43,12 @@ namespace SEE.Net
         /// <param name="type"></param>
         /// <param name="actionId"></param>
         /// <param name="changedObjects"></param>
-        public GlobalActionHistoryNetwork(bool isOwner, ActionHistory.HistoryType type, string actionId, List<string> changedObjects, bool push)
+        public GlobalActionHistoryNetwork(bool isOwner, ActionHistory.HistoryType type, string actionId, string changedObjects, bool push)
         {
             this.isOwner = isOwner;
             this.type = type;
             this.actionId = actionId;
-            this.changedObjects = changedObjects;
+            this.changedObjects = StringToList(changedObjects);
         }
 
         /// <summary>
@@ -71,6 +71,14 @@ namespace SEE.Net
                 else GlobalActionHistory.DeleteItem(actionId, false);
 
             }
+        }
+
+        private List<string> StringToList(string s)
+        {
+            List<string> result = new List<string>();
+            string[] arr =  s.Split(',');
+            foreach (string elm in arr) result.Add(elm);
+            return result;
         }
     }
 }
