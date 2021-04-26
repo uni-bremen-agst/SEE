@@ -2,6 +2,7 @@
 using System.Linq;
 using DynamicPanels;
 using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game.UI.CodeWindow
@@ -28,8 +29,7 @@ namespace SEE.Game.UI.CodeWindow
             space = Canvas.transform.Find(CodeSpaceName)?.gameObject;
             if (!space)
             {
-                GameObject spacePrefab = Resources.Load<GameObject>(CODE_SPACE_PREFAB);
-                space = Instantiate(spacePrefab, Canvas.transform, false);
+                space = PrefabInstantiator.InstantiatePrefab(CODE_SPACE_PREFAB, Canvas.transform, false);
                 space.name = CodeSpaceName;
             }
             space.SetActive(true);
@@ -73,13 +73,19 @@ namespace SEE.Game.UI.CodeWindow
                         throw new InvalidOperationException();
                     }
                     ActiveCodeWindow = currentActiveCodeWindow;
-                    UpdateActiveTab();  // recursive call: ActiveCodeWindow has now been changed
+                    // Note: This is a tail-recursion, which would be great if C# had tail call optimization, 
+                    // which it doesn't. Your IDE may recommend to then use an iterative construct instead of the 
+                    // recursive one to be more efficient, but this will just "improve" an O(1) space complexity to
+                    // O(1) space complexity, because the recursion will at most happen once per call.
+                    // Additionally, the readability of the iterative version is (in my opinion) much worse, this is
+                    // why I have left it the way it is.
+                    UpdateActiveTab();
                     return;
                 }
                 Panel.ActiveTab = Panel.GetTabIndex((RectTransform) ActiveCodeWindow.codeWindow.transform);
             }
         }
-        
+
         protected override void UpdateDesktop()
         {
             if (Panel && !codeWindows.Any())

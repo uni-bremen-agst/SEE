@@ -21,7 +21,7 @@ namespace SEE.Game.UI
         /// Name of the canvas on which UI elements are placed.
         /// Note that for HoloLens, the canvas will be converted to an MRTK canvas.
         /// </summary>
-        protected const string UI_CANVAS_NAME = "UI Canvas";
+        private const string UI_CANVAS_NAME = "UI Canvas";
         
         /// <summary>
         /// Path to where the UI Canvas prefab is stored.
@@ -89,9 +89,7 @@ namespace SEE.Game.UI
             if (Canvas == null)
             {
                 // Create Canvas from prefab if it doesn't exist yet
-                Object canvasPrefab = Resources.Load<GameObject>(UI_CANVAS_PREFAB);
-                Canvas = Instantiate(canvasPrefab) as GameObject;
-                UnityEngine.Assertions.Assert.IsNotNull(Canvas);
+                Canvas = PrefabInstantiator.InstantiatePrefab(UI_CANVAS_PREFAB);
                 Canvas.name = UI_CANVAS_NAME;
             }
             
