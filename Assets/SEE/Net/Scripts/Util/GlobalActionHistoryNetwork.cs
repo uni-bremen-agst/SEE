@@ -76,7 +76,8 @@ namespace SEE.Net
         private List<string> StringToList(string s)
         {
             List<string> result = new List<string>();
-            string[] arr =  s.Split(',');
+            string[] arr = new string[s.Split(',').Length];
+            arr = s.Split(',');
             foreach (string elm in arr) result.Add(elm);
             return result;
         }
