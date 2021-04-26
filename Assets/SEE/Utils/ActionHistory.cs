@@ -76,7 +76,7 @@ namespace Assets.SEE.Utils
         /// </summary>
         public void Update()
         {
-            foreach (ReversibleAction r in ownActions) { Debug.Log(r); }
+            Debug.Log(allActionsList.Count); 
             if (activeAction.Update() && activeAction.HadEffect())
             {
                 Tuple<bool, HistoryType, string, List<string>> lastAction = FindLastActionOfPlayer(true, HistoryType.action);
@@ -86,7 +86,7 @@ namespace Assets.SEE.Utils
                 lastAction = new Tuple<bool, HistoryType, string, List<string>>(lastAction.Item1, lastAction.Item2, activeAction.GetId(), activeAction.GetChangedObjects());
                 Push(lastAction);
                 ownActions.Add(activeAction);
-                new GlobalActionHistoryNetwork(lastAction.Item1, lastAction.Item2, lastAction.Item3, lastAction.Item4, true).Execute(null);
+                new GlobalActionHistoryNetwork(lastAction.Item1, lastAction.Item2, lastAction.Item3, ListToString(lastAction.Item4), true).Execute(null);
                 Execute(activeAction.NewInstance());
             }
         }
@@ -145,7 +145,6 @@ namespace Assets.SEE.Utils
             int index = GetCountOfNewerAction(activeAction.GetId());
             if (index == -1) return false;
             index = index + 1;
-            if (index >= allActionsList.Count) return false;
             for (int i = index ; index < allActionsList.Count; i++)
             {
                 Debug.LogWarning(index);
@@ -233,7 +232,7 @@ namespace Assets.SEE.Utils
                 Push(undoneAction);
 
                 ownActions.Add(activeAction);
-                new GlobalActionHistoryNetwork(undoneAction.Item1, undoneAction.Item2, undoneAction.Item3, undoneAction.Item4, true).Execute(null);
+                new GlobalActionHistoryNetwork(undoneAction.Item1, undoneAction.Item2, undoneAction.Item3, ListToString(undoneAction.Item4), true).Execute(null);
 
                 lastAction = FindLastActionOfPlayer(true, HistoryType.action);
                 if (lastAction == null) return;
@@ -272,7 +271,7 @@ namespace Assets.SEE.Utils
             DeleteItem(lastUndoneAction.Item3, lastUndoneAction.Item1);
             new GlobalActionHistoryNetwork(true, HistoryType.action, lastUndoneAction.Item3, null, false).Execute(null);
             Push(redoneAction);
-            new GlobalActionHistoryNetwork(redoneAction.Item1, redoneAction.Item2, redoneAction.Item3, redoneAction.Item4, true).Execute(null);
+            new GlobalActionHistoryNetwork(redoneAction.Item1, redoneAction.Item2, redoneAction.Item3, ListToString(redoneAction.Item4), true).Execute(null);
             activeAction = temp;
             ownActions.Add(temp);
             Execute(activeAction.NewInstance(), true);
@@ -328,6 +327,17 @@ namespace Assets.SEE.Utils
         public bool NoUndoneActionsLeft()
         {
             return FindLastActionOfPlayer(true, HistoryType.undoneAction) == null;
+        }
+
+        private string ListToString(List<string> ids)
+        {
+            string result = "";
+            foreach(string s in ids)
+            {
+                result += s + ",";
+            }
+
+            return result.Substring(0, result.Length - 1);
         }
     }
 }
