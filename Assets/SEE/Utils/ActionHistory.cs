@@ -2,6 +2,7 @@ using SEE.Net;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Assets.SEE.Utils
 {
@@ -74,6 +75,7 @@ namespace Assets.SEE.Utils
         /// </summary>
         public void Update()
         {
+            foreach (ReversibleAction r in ownActions) { Debug.Log(r); }
             if (activeAction.Update() && activeAction.HadEffect())
             {
                 Tuple<bool, HistoryType, string, List<string>> lastAction = FindLastActionOfPlayer(true, HistoryType.action);
@@ -250,18 +252,19 @@ namespace Assets.SEE.Utils
                 //NEED to delete the ownAction
                 //Set the owner of the action to false, dont delete from allactions
                 //notify the user
+                return;
             }
             ReversibleAction temp = FindById(lastUndoneAction.Item3);
             temp.Redo();
             temp.Start();
             Tuple<bool, HistoryType, string, List<string>> redoneAction = new Tuple<bool, HistoryType, string, List<string>>(true, HistoryType.action, lastUndoneAction.Item3, lastUndoneAction.Item4);
+            DeleteItem(lastUndoneAction.Item3, lastUndoneAction.Item1);
+            new GlobalActionHistoryNetwork(true, HistoryType.action, lastUndoneAction.Item3, null, false).Execute(null);
             Push(redoneAction);
             new GlobalActionHistoryNetwork(redoneAction.Item1, redoneAction.Item2, redoneAction.Item3, redoneAction.Item4, true).Execute(null);
             activeAction = temp;
-            DeleteItem(lastUndoneAction.Item3, lastUndoneAction.Item1);
-
             ownActions.Add(temp);
-            new GlobalActionHistoryNetwork(true, HistoryType.action, lastUndoneAction.Item3, null, false).Execute(null);
+            
         }
 
         /// <summary>
