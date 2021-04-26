@@ -153,7 +153,7 @@ namespace SEE.Controls.Actions
                 // feel responsive!
                 actionState.drag = Input.GetMouseButton(2);
                 actionState.startDrag |= !isMouseOverGUI && Input.GetMouseButtonDown(2);
-                actionState.dragHoveredOnly = SEEInput.Drag();
+                actionState.dragHoveredOnly = SEEInput.DragCity();
                 actionState.cancel |= SEEInput.Cancel();
                 actionState.snap = SEEInput.Snap();
                 actionState.reset |= (actionState.drag || !isMouseOverGUI) && SEEInput.Reset();

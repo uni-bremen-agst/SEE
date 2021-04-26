@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 
 namespace Michsky.UI.ModernUIPack
 {
+    [RequireComponent(typeof(Button))]
     public class ButtonManagerBasicWithIcon : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
     {
         // Content
@@ -15,7 +16,7 @@ namespace Michsky.UI.ModernUIPack
         public UnityEvent hoverEvent;
         public AudioClip hoverSound;
         public AudioClip clickSound;
-        Button buttonVar;
+        public Button buttonVar;
 
         // Resources
         public Image normalImage;
@@ -40,26 +41,15 @@ namespace Michsky.UI.ModernUIPack
         public bool centered = false;
         bool isPointerOn;
 
-        // Hover exit. This field was introduced by project SEE.
-        public UnityEvent hoverExitEvent;
-
         void Start()
         {
             if (buttonVar == null)
                 buttonVar = gameObject.GetComponent<Button>();
 
-            buttonVar.onClick.AddListener(delegate
-            {
-                clickEvent.Invoke();
-            });
+            buttonVar.onClick.AddListener(delegate { clickEvent.Invoke(); });
 
             if (enableButtonSounds == true && useClickSound == true)
-            {
-                buttonVar.onClick.AddListener(delegate
-                {
-                    soundSource.PlayOneShot(clickSound);
-                });
-            }
+                buttonVar.onClick.AddListener(delegate { soundSource.PlayOneShot(clickSound); });
 
             if (useCustomContent == false)
                 UpdateUI();
@@ -125,8 +115,6 @@ namespace Michsky.UI.ModernUIPack
         public void OnPointerExit(PointerEventData eventData)
         {
             isPointerOn = false;
-            // Trigger hover exit event. This code was introduced by project SEE.
-            hoverExitEvent?.Invoke();
         }
     }
 }

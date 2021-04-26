@@ -18,12 +18,12 @@ namespace Michsky.UI.ModernUIPack
 
             float newValue = input;
             
-            if (wholeNumbers)
+            if (wholeNumbers == true)
                 newValue = Mathf.Round(newValue);
-           
+
             if (newValue >= maxSlider.realValue && maxSlider.realValue != maxSlider.minValue)
                 return;
-            
+
             if (label != null)
                 label.text = newValue.ToString(numberFormat);
             

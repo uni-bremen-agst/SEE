@@ -9,7 +9,7 @@ namespace Michsky.UI.ModernUIPack
 	public class PieChart : MaskableGraphic
 	{
 		// Chart Items
-		[SerializeField] List<PieChartDataNode> chartData = new List<PieChartDataNode>();
+		[SerializeField] public List<PieChartDataNode> chartData = new List<PieChartDataNode>();
 
 		// Settings
 		[Range(-75, 150)] public float borderThickness = 5;

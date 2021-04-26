@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
@@ -307,3 +308,4 @@ namespace Michsky.UI.ModernUIPack
         }
     }
 }
+#endif

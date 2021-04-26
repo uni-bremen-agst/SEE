@@ -6,6 +6,7 @@ namespace InControl
 
 	public enum InputControlSourceType
 	{
+		None,
 		Button,
 		Analog,
 		KeyCode,
@@ -40,6 +41,8 @@ namespace InControl
 		{
 			switch (SourceType)
 			{
+				case InputControlSourceType.None:
+					return 0.0f;
 				case InputControlSourceType.Button:
 					return GetState( inputDevice ) ? 1.0f : 0.0f;
 				case InputControlSourceType.Analog:
@@ -56,6 +59,8 @@ namespace InControl
 		{
 			switch (SourceType)
 			{
+				case InputControlSourceType.None:
+					return false;
 				case InputControlSourceType.Button:
 					return inputDevice.ReadRawButtonState( Index );
 				case InputControlSourceType.Analog:

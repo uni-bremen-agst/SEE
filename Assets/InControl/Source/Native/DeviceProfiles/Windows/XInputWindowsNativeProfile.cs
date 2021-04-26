@@ -109,14 +109,14 @@ namespace InControl.NativeDeviceProfiles
 				},
 				new InputControlMapping
 				{
-					Name = "Back",
-					Target = InputControlType.Back,
+					Name = "View",
+					Target = InputControlType.View,
 					Source = Button( 5 )
 				},
 				new InputControlMapping
 				{
-					Name = "Start",
-					Target = InputControlType.Start,
+					Name = "Menu",
+					Target = InputControlType.Menu,
 					Source = Button( 4 )
 				},
 				// new InputControlMapping {

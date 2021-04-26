@@ -3,6 +3,7 @@ using UnityEditor;
 
 namespace Michsky.UI.ModernUIPack
 {
+    [CanEditMultipleObjects]
     [CustomEditor(typeof(ButtonManagerBasicWithIcon))]
     public class ButtonManagerBasicWithIconEditor : Editor
     {
