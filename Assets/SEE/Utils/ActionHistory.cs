@@ -143,8 +143,10 @@ namespace Assets.SEE.Utils
         private bool ActionHasConflicts(List<string> affectedGameObjects)
         {
             int index = GetCountOfNewerAction(activeAction.GetId());
+            if (index == -1) return false;
             for (int i = index; index < allActionsList.Count; i++)
             {
+                Debug.LogWarning(index);
                 foreach (string s in affectedGameObjects)
                 {
                     if (allActionsList[i].Item4 != null)
