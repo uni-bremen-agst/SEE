@@ -897,8 +897,9 @@ namespace Michsky.UI.ModernUIPack
                 GUILayout.EndHorizontal();
                 GUILayout.Space(2);
                 EditorGUI.indentLevel = 0;
-                EditorGUILayout.HelpBox("Only use this option if you're moving Modern UI Pack folder. " +
-                    "Make sure to hit apply after changing the root.", MessageType.Warning);
+                EditorGUILayout.HelpBox("Use this option only if you're moving Modern UI Pack folder. " +
+                    "Make sure to hit apply after changing the root. " +
+                    "Example: Parent Folders/Modern UI Pack/Prefabs.", MessageType.Warning);
             }
 
             GUILayout.EndVertical();

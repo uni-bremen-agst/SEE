@@ -3,7 +3,8 @@ using UnityEditor;
 
 namespace Michsky.UI.ModernUIPack
 {
-    [CustomEditor(typeof(ButtonManagerBasic))]
+    [CanEditMultipleObjects]
+    [CustomEditor(typeof(ButtonManagerBasic))] 
     public class ButtonManagerBasicEditor : Editor
     {
         private ButtonManagerBasic bTarget;

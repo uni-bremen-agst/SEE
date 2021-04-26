@@ -15,7 +15,7 @@ MonoBehaviour:
   enableDynamicUpdate: 1
   enableExtendedColorPicker: 0
   editorHints: 0
-  changeRootFolder: 0
+  changeRootFolder: 1
   rootFolder: Modern UI Pack/Prefabs/
   animatedIconColor: {r: 1, g: 1, b: 1, a: 1}
   contextBackgroundColor: {r: 0.21568628, g: 0.29411766, b: 0.37254903, a: 1}
