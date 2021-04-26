@@ -2,7 +2,6 @@ using SEE.Net;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Assets.SEE.Utils
 {
@@ -28,12 +27,14 @@ namespace Assets.SEE.Utils
         /// </summary>
         private List<Tuple<bool, HistoryType, string, List<string>>> allActionsList = new List<Tuple<bool, HistoryType, string, List<string>>>();
 
+        /// <summary>
+        /// Contains all actions executed by the player.
+        /// </summary>
         private List<ReversibleAction> ownActions = new List<ReversibleAction>();
 
         /// <summary>
         /// Contains the Active Action from each Player needs to be updated with each undo/redo/action
         /// </summary>
-        //private Dictionary<string, ReversibleAction> allActiveActions = new Dictionary<string, ReversibleAction>();
 
         private ReversibleAction activeAction = null;
 
@@ -53,12 +54,10 @@ namespace Assets.SEE.Utils
         /// <param name="action">the action to be executed</param>
         public void Execute(ReversibleAction action)
         {
-            //GetActiveAction(key)?.Stop();
             activeAction?.Stop();
             Push(new Tuple<bool, HistoryType, string, List<string>>(true, HistoryType.action, action.GetId(), null));
             new GlobalActionHistoryNetwork(true, HistoryType.action, action.GetId(), null, true).Execute(null);
             ownActions.Add(action);
-            //SetActiveAction(key, action);
             activeAction = action;
             action.Awake();
             action.Start();
@@ -133,7 +132,12 @@ namespace Assets.SEE.Utils
             return result;
         }
 
-        private bool ActionHasConflicts(List<string> affectedGameObjects, ReversibleAction action)
+        /// <summary>
+        /// Checks whether the action to be executed has conflicts to another action.
+        /// </summary>
+        /// <param name="affectedGameObjects">the gameObjects affected by the action to be undone/redone.</param>
+        /// <returns>true, if there are conflicts, else false</returns>
+        private bool ActionHasConflicts(List<string> affectedGameObjects)
         {
             int countOfNewerActions = GetCountOfNewerAction(activeAction.GetId());
             for (int i = countOfNewerActions; countOfNewerActions > 0; i--)
@@ -204,8 +208,7 @@ namespace Assets.SEE.Utils
                 activeAction = FindById(lastAction.Item3);
             }
             // Fixme: Right place ?
-            Debug.Log("CALL?");
-            if (ActionHasConflicts(activeAction.GetChangedObjects(), activeAction))
+            if (ActionHasConflicts(activeAction.GetChangedObjects()))
             {
                 // Fixme: Error
             }
@@ -241,15 +244,14 @@ namespace Assets.SEE.Utils
             Tuple<bool, HistoryType, string, List<string>> lastUndoneAction = FindLastActionOfPlayer(true, HistoryType.undoneAction);
             if (lastUndoneAction == null) return;
 
-            // Fixme: Right place ?
-            ReversibleAction temp = FindById(lastUndoneAction.Item3);
-            if (ActionHasConflicts(lastUndoneAction.Item4, temp))
+            if (ActionHasConflicts(lastUndoneAction.Item4))
             {
                 // Fixme: Error
                 //NEED to delete the ownAction
                 //Set the owner of the action to false, dont delete from allactions
                 //notify the user
             }
+            ReversibleAction temp = FindById(lastUndoneAction.Item3);
             temp.Redo();
             temp.Start();
             Tuple<bool, HistoryType, string, List<string>> redoneAction = new Tuple<bool, HistoryType, string, List<string>>(true, HistoryType.action, lastUndoneAction.Item3, lastUndoneAction.Item4);
@@ -272,9 +274,9 @@ namespace Assets.SEE.Utils
         }
 
         /// <summary>
-        /// 
+        /// Gets the number of all actions which are executed by other users after the action with the id <paramref name="idOfAction"/>.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the number of newer actions than that with the id <paramref name="idOfAction"/>, which are not executed by the owner.</returns>
         private int GetCountOfNewerAction(string idOfAction)
         {
             int newerActionsCount = 0;
@@ -283,7 +285,6 @@ namespace Assets.SEE.Utils
             {
                 newerActionsCount++;
             }
-            Debug.Log(newerActionsCount);
 
             return newerActionsCount;
         }
