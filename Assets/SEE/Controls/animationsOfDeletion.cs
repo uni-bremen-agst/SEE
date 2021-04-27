@@ -170,6 +170,11 @@ namespace SEE.Controls
             edge.SetVisibility(true, true);
         }
 
+
+        public static void HideEdges (GameObject gameEdge)
+        {
+            gameEdge.SetVisibility(false, true);
+        }
         // FIX ME  : 
         // Hiding edges for DelelteAction and DeleteNetAction 
         // public static hideEdges (){
