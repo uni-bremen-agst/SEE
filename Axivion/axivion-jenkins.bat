@@ -1,33 +1,28 @@
 REM This batch file sets the various environment variables needed to 
 REM run the Axivion Suite tools and then executes the command line parameters
 REM passed to this batch file. If there are none, only the variables are
-REM set. For instance, to run the Axivion CI you can execute this script
-REM with parameter axivion_ci with an Axivion command prompt.
+REM set.
 
 REM Because this batch script is called by Jenkins, we apparently need to
 REM call this first to avoid failing with an error because of the error
 REM "The system cannot find the path specified.":
 cmd.exe /c
 
-REM user workspace (generally the home directory or the Jenkins workspace)
-set "USERWORKSPACE=%userprofile%"
-
 REM Python
 REM set "PATH=C:\Users\SWT\AppData\Local\Programs\Python\Python38;%PATH%"
 REM set "BAUHAUS_PYTHON=C:\Users\SWT\AppData\Local\Programs\Python\Python38\python.exe"
-REM set "BAUHAUS_PYTHON=python.exe"
 
 REM include Bauhaus bin in exectuable path
 set "PATH=C:\Program Files (x86)\Bauhaus\bin;%PATH%"
 
-REM SEE project directory
-set "SEEDIRECTORY=%USERWORKSPACE%\SEE"
+REM SEE project directory (generally the Jenkins workspace)
+set "SEEDIRECTORY=%WORKSPACE%"
 
 REM where the Axivion configuration resides within SEE
 set "BAUHAUS_CONFIG=%SEEDIRECTORY%\Axivion"
 
 REM where the Axivion dashserver configuration resides
-set "AXIVION_DASHBOARD_CONFIG=%USERWORKSPACE%\Axivion"
+set "AXIVION_DASHBOARD_CONFIG=C:\Users\koschke\Axivion"
 set "AXIVION_DATABASES_DIR=%AXIVION_DASHBOARD_CONFIG%"
 set "REQUESTS_CA_BUNDLE=%AXIVION_DASHBOARD_CONFIG%\cert\auto.crt"
 
@@ -40,6 +35,9 @@ REM If the dashserver is installed as a Windows service, you can
 REM start and stop it as follows:
 REM   net (start|stop) "axivion_dashboard_service"
 REM or use the Windows Services Console (services.msc).
+
+REM The Visual Studio .csproj files need to be created before we can start the build.
+"C:\Program Files\Unity\Hub\Editor\2020.3.5f1\Editor\Unity.exe" -batchmode -nographics -logFile - -executeMethod UnityEditor.SyncVS.SyncSolution -projectPath . -quit
 
 REM Count the number of command-line parameters
 setlocal enabledelayedexpansion
@@ -61,7 +59,3 @@ IF %argCount% == 0 (
   REM %*
   %~1
 )
-
-REM Exit with error code of last executed command (echo if no parameters were given;
-REM and otherwise the result of the executed command-line parameters).
-exit /b %ERRORLEVEL%
