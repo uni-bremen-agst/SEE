@@ -29,12 +29,37 @@ namespace SEE.Game
         /// respectively (both declared in AbstractSEECityIO). You should also
         /// extend the test cases in TestConfigIO.
 
-        public GlobalCityAttributes     globalCityAttributes       = new GlobalCityAttributes();
-        public LeafNodeAttributes[]     leafNodeAttributesPerKind  = ArrayUtils.New((int)Node.Kind.Count, (int _) => new LeafNodeAttributes());
-        public InnerNodeAttributes[]    innerNodeAttributesPerKind = ArrayUtils.New((int)Node.Kind.Count, (int _) => new InnerNodeAttributes());
-        public NodeLayoutSettings       nodeLayoutSettings         = new NodeLayoutSettings();
-        public EdgeLayoutSettings       edgeLayoutSettings         = new EdgeLayoutSettings();
-        public CoseGraphSettings        coseGraphSettings          = new CoseGraphSettings(); // TODO(torben): put into CitySettings.cs
+        /// <summary>
+        /// The global attributes.
+        /// </summary>
+        public GlobalCityAttributes globalCityAttributes = new GlobalCityAttributes();
+
+        /// <summary>
+        /// The attributes of the leaf nodes per kind. They are indexed by <see cref="Node.Kind"/>
+        /// casted to an integer.
+        /// </summary>
+        public LeafNodeAttributes[] leafNodeAttributesPerKind = ArrayUtils.New((int)Node.Kind.Count, (int _) => new LeafNodeAttributes());
+
+        /// <summary>
+        /// The attributes of the inner nodes per kind. They are indexed by <see cref="Node.Kind"/>
+        /// casted to an integer.
+        /// </summary>
+        public InnerNodeAttributes[] innerNodeAttributesPerKind = ArrayUtils.New((int)Node.Kind.Count, (int _) => new InnerNodeAttributes());
+
+        /// <summary>
+        /// The node layout settings.
+        /// </summary>
+        public NodeLayoutSettings nodeLayoutSettings = new NodeLayoutSettings();
+
+        /// <summary>
+        /// The edge layout settings.
+        /// </summary>
+        public EdgeLayoutSettings edgeLayoutSettings = new EdgeLayoutSettings();
+
+        /// <summary>
+        /// The cose graph settings.
+        /// </summary>
+        public CoseGraphSettings coseGraphSettings = new CoseGraphSettings(); // TODO(torben): put into CitySettings.cs
 
         /// <summary>
         /// Saves the settings of this code city to <see cref="CityPath"/>.

@@ -52,6 +52,9 @@ namespace SEE
         Cylinders
     }
 
+    /// <summary>
+    /// Global attributes, that every city defines.
+    /// </summary>
     public class GlobalCityAttributes
     {
         /// <summary>
@@ -72,6 +75,9 @@ namespace SEE
         public DataPath layoutPath = new DataPath();
     }
 
+    /// <summary>
+    /// The settings of leaf nodes of a specific kind. They may be unique per <see cref="Node.Kind"/>.
+    /// </summary>
     public class LeafNodeAttributes
     {
         public LeafNodeKinds    kind          = LeafNodeKinds.Blocks;
@@ -84,6 +90,9 @@ namespace SEE
         public LabelSettings    labelSettings = new LabelSettings();
     }
 
+    /// <summary>
+    /// The setting for inner nodes of a specific kind. They may be unique per <see cref="Node.Kind"/>.
+    /// </summary>
     public class InnerNodeAttributes
     {
         public InnerNodeKinds    kind          = InnerNodeKinds.Blocks;
@@ -94,6 +103,9 @@ namespace SEE
         public LabelSettings     labelSettings = new LabelSettings();
     }
 
+    /// <summary>
+    /// The settings for the layout of the nodes.
+    /// </summary>
     public class NodeLayoutSettings
     {
         public NodeLayoutKind    kind            = NodeLayoutKind.Balloon;
@@ -108,6 +120,9 @@ namespace SEE
         public float             maxErosionWidth = 1.0f;
     }
 
+    /// <summary>
+    /// The settings for the layout of the edges.
+    /// </summary>
     public class EdgeLayoutSettings
     {
         public EdgeLayoutKind    kind             = EdgeLayoutKind.Bundling;
