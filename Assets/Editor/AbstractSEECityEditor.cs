@@ -34,6 +34,9 @@ namespace SEEEditor
         /// </summary>
         private bool showLeafAttributes = true;
 
+        /// <summary>
+        /// Whether the leaf node attributes for a given <see cref="Node.Kind"/> should be expanded.
+        /// </summary>
         private bool[] showLeafAttributesAtIndex = Enumerable.Repeat(false, (int)Node.Kind.Count).ToArray();
 
         /// <summary>
@@ -41,6 +44,9 @@ namespace SEEEditor
         /// </summary>
         private bool showInnerAttributes = true;
 
+        /// <summary>
+        /// Whether the inner node attributes for a given <see cref="Node.Kind"/> should be expanded.
+        /// </summary>
         private bool[] showInnerAttributesAtIndex = Enumerable.Repeat(false, (int)Node.Kind.Count).ToArray();
 
         /// <summary>

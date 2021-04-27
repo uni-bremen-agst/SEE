@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SEE.DataModel;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
 using SEE.Game;
-using SEE.GO;
-using SEE.Layout;
-using SEE.Layout.EdgeLayouts;
 using SEE.Tools;
 using SEE.Utils;
 using UnityEngine;
@@ -23,7 +18,11 @@ namespace SEE.Controls.Actions
     {
         #region Fields
 
-        private Graph mapping;
+        /// <summary>
+        /// The mapping graph, which may be modified during gameplay.
+        /// </summary>
+        private readonly Graph mapping;
+
         private InteractableObject lastSelection;
         //private Reflexion reflexion;
 
