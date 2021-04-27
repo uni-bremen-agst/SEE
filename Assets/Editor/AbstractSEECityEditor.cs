@@ -240,25 +240,8 @@ namespace SEEEditor
                 NodeLayoutSettings settings = city.nodeLayoutSettings;
                 Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
 
-                settings.leafKind = (LeafNodeKinds) EditorGUILayout.EnumPopup("Leaf nodes", settings.leafKind);
                 settings.kind = (NodeLayoutKind)EditorGUILayout.EnumPopup("Node layout", settings.kind);
                 city.globalCityAttributes.layoutPath = GetDataPath("Layout file", city.globalCityAttributes.layoutPath, "gvl");
-
-                GUILayout.BeginHorizontal();
-                EditorGUILayout.PrefixLabel("Inner nodes");
-                Dictionary<InnerNodeKinds, string> shapeKinds = settings.kind.GetInnerNodeKinds().ToDictionary(kind => kind, kind => kind.ToString());
-
-                if (shapeKinds.ContainsKey(settings.innerKind))
-                {
-                    settings.innerKind = shapeKinds.ElementAt(EditorGUILayout.Popup(shapeKinds.Keys.ToList().IndexOf(settings.innerKind), shapeKinds.Values.ToArray())).Key;
-                }
-                else
-                {
-                    settings.innerKind = shapeKinds.ElementAt(EditorGUILayout.Popup(shapeKinds.Keys.ToList().IndexOf(shapeKinds.First().Key), shapeKinds.Values.ToArray())).Key;
-                }
-
-                GUILayout.EndHorizontal();
-
                 settings.zScoreScale = EditorGUILayout.Toggle("Z-score scaling", settings.zScoreScale);
                 settings.showErosions = EditorGUILayout.Toggle("Show erosions", settings.showErosions);
                 settings.maxErosionWidth = EditorGUILayout.FloatField("Max. width of erosion icon", settings.maxErosionWidth);
@@ -283,6 +266,7 @@ namespace SEEEditor
                         InnerNodeAttributes settings = city.innerNodeAttributesPerKind[i];
                         Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
 
+                        settings.kind = (InnerNodeKinds)EditorGUILayout.EnumPopup("Type", settings.kind);
                         settings.heightMetric = EditorGUILayout.TextField("Height", settings.heightMetric);
                         settings.styleMetric = EditorGUILayout.TextField("Style", settings.styleMetric);
                         settings.colorRange.lower = EditorGUILayout.ColorField("Lower color", settings.colorRange.lower);
@@ -313,6 +297,7 @@ namespace SEEEditor
                         LeafNodeAttributes settings = city.leafNodeAttributesPerKind[i];
                         Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
 
+                        settings.kind = (LeafNodeKinds)EditorGUILayout.EnumPopup("Type", settings.kind);
                         settings.widthMetric = EditorGUILayout.TextField("Width", settings.widthMetric);
                         settings.heightMetric = EditorGUILayout.TextField("Height", settings.heightMetric);
                         settings.depthMetric = EditorGUILayout.TextField("Depth", settings.depthMetric);

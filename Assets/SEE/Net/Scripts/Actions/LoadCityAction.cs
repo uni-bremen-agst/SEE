@@ -166,8 +166,8 @@ namespace SEE.Net
             MinimalBlockLength = city.MinimalBlockLength;
             MaximalBlockLength = city.MaximalBlockLength;
 
-            LeafObjects = city.nodeLayoutSettings.leafKind;
-            InnerNodeObjects = city.nodeLayoutSettings.innerKind;
+            //LeafObjects = city.nodeLayoutSettings.leafKind;
+            //InnerNodeObjects = city.nodeLayoutSettings.innerKind;
 
             NodeLayout = city.nodeLayoutSettings.kind;
             EdgeLayout = city.edgeLayoutSettings.kind;
@@ -296,8 +296,8 @@ namespace SEE.Net
             city.MinimalBlockLength = MinimalBlockLength;
             city.MaximalBlockLength = MaximalBlockLength;
 
-            city.nodeLayoutSettings.leafKind = LeafObjects;
-            city.nodeLayoutSettings.innerKind = InnerNodeObjects;
+            //city.nodeLayoutSettings.leafKind = LeafObjects;
+            //city.nodeLayoutSettings.innerKind = InnerNodeObjects;
 
             city.nodeLayoutSettings.kind = NodeLayout;
             city.edgeLayoutSettings.kind = EdgeLayout;

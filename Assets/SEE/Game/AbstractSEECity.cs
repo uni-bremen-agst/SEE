@@ -527,7 +527,7 @@ namespace SEE.Game
                 {
                     if (!node.IsLeaf())
                     {
-                        dirsShape.Add(node.ID, nodeLayoutSettings.innerKind);
+                        dirsShape.Add(node.ID, innerNodeAttributesPerKind[(int)node.kind].kind);
                         dirsLocal.Add(node.ID, false);
                         dirsLayout.Add(node.ID, nodeLayoutSettings.kind);
                     }
