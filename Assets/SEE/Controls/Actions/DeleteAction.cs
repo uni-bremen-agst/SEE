@@ -70,6 +70,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         private bool animationIsRunning = false;
 
+        // <summary>
+        /// A history of the old positions of the nodes deleted by this action.
+        /// </summary>
+        private static Dictionary<GameObject, Vector3> oldPositions = new Dictionary<GameObject, Vector3>();
+
         /// <summary>
         /// Sets <see cref="garbageCan"/> by retrieving it by name <see cref="GarbageCanName"/>
         /// from the scene.
@@ -154,13 +159,13 @@ namespace SEE.Controls.Actions
                     // will run an animation that moves them into a garbage bin. Only when they arrive there,
                     // we will actually delete them.
                     // FIXME: Shouldn't the edges be moved to the garbage bin, too?
-                    //  PlayerSettings.GetPlayerSettings().StartCoroutine(this.MoveNodeToGarbage(deletedObject.AllAncestors()));
                     PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.MoveNodeToGarbage(deletedObject.AllAncestors()));
                     Portal.SetInfinitePortal(deletedObject);
                     MarkAsDeleted(deletedObject.AllAncestors());
                 }
             }
             new DeleteNetAction(deletedObject.name).Execute();
+            hadAnEffect = true;
             return true;
         }
 
@@ -190,7 +195,6 @@ namespace SEE.Controls.Actions
                     PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.DelayEdges(edgeGraphPair.Key));
                 }
             }
-            //PlayerSettings.GetPlayerSettings().StartCoroutine(this.RemoveNodeFromGarbage(new List<GameObject>(deletedNodes.Keys)));
             PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(deletedNodes.Keys)));
         }
 
@@ -252,6 +256,7 @@ namespace SEE.Controls.Actions
             {
                 DeleteNode(deletedGameNode);
             }
+            hadAnEffect = true;
         }
 
         /// <summary>
@@ -286,7 +291,7 @@ namespace SEE.Controls.Actions
         {
             if (gameEdge.TryGetComponentOrLog(out EdgeRef edgeRef))
             {
-                gameEdge.SetVisibility(false, true);
+                AnimationsOfDeletion.HideEdges(gameEdge);
                 Graph graph = edgeRef.Value.ItsGraph;
                 deletedEdges[gameEdge] = graph;
                 graph.RemoveEdge(edgeRef.Value);
