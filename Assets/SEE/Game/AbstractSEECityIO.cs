@@ -89,6 +89,7 @@ namespace SEE.Game
             for (int i = 0; i < leafNodeAttributesPerKind.Length; i++)
             {
                 string postfix = '#' + i.ToString();
+                writer.Save(leafNodeAttributesPerKind[i].kind.ToString(), LeafObjectsLabel + postfix);
                 leafNodeAttributesPerKind[i].colorRange.Save(writer, LeafNodeColorRangeLabel + postfix);
                 writer.Save(leafNodeAttributesPerKind[i].widthMetric, WidthMetricLabel + postfix);
                 writer.Save(leafNodeAttributesPerKind[i].heightMetric, HeightMetricLabel + postfix);
@@ -98,10 +99,12 @@ namespace SEE.Game
             }
             for (int i = 0; i < innerNodeAttributesPerKind.Length; i++)
             {
-                innerNodeAttributesPerKind[i].colorRange.Save(writer, InnerNodeColorRangeLabel);
-                writer.Save(innerNodeAttributesPerKind[i].heightMetric, InnerNodeHeightMetricLabel);
-                writer.Save(innerNodeAttributesPerKind[i].styleMetric, InnerNodeStyleMetricLabel);
-                innerNodeAttributesPerKind[i].labelSettings.Save(writer, InnerNodeLabelSettingsLabel);
+                string postfix = '#' + i.ToString();
+                writer.Save(innerNodeAttributesPerKind[i].kind.ToString(), InnerNodeObjectsLabel + postfix);
+                innerNodeAttributesPerKind[i].colorRange.Save(writer, InnerNodeColorRangeLabel + postfix);
+                writer.Save(innerNodeAttributesPerKind[i].heightMetric, InnerNodeHeightMetricLabel + postfix);
+                writer.Save(innerNodeAttributesPerKind[i].styleMetric, InnerNodeStyleMetricLabel + postfix);
+                innerNodeAttributesPerKind[i].labelSettings.Save(writer, InnerNodeLabelSettingsLabel + postfix);
             }
 
             writer.Save(StyleIssue, StyleIssueLabel);
@@ -124,9 +127,6 @@ namespace SEE.Game
 
             writer.Save(MinimalBlockLength, MinimalBlockLengthLabel);
             writer.Save(MaximalBlockLength, MaximalBlockLengthLabel);
-
-            writer.Save(nodeLayoutSettings.leafKind.ToString(), LeafObjectsLabel);
-            writer.Save(nodeLayoutSettings.innerKind.ToString(), InnerNodeObjectsLabel);
 
             writer.Save(nodeLayoutSettings.kind.ToString(), NodeLayoutLabel);
             writer.Save(edgeLayoutSettings.kind.ToString(), EdgeLayoutLabel);
@@ -165,19 +165,23 @@ namespace SEE.Game
             CityPath.Restore(attributes, CityPathLabel);
             for (int i = 0; i < leafNodeAttributesCount; i++)
             {
-                leafNodeAttributesPerKind[i].colorRange.Restore(attributes, LeafNodeColorRangeLabel);
-                ConfigIO.Restore(attributes, WidthMetricLabel, ref leafNodeAttributesPerKind[i].widthMetric);
-                ConfigIO.Restore(attributes, HeightMetricLabel, ref leafNodeAttributesPerKind[i].heightMetric);
-                ConfigIO.Restore(attributes, DepthMetricLabel, ref leafNodeAttributesPerKind[i].depthMetric);
-                ConfigIO.Restore(attributes, LeafStyleMetricLabel, ref leafNodeAttributesPerKind[i].styleMetric);
-                leafNodeAttributesPerKind[i].labelSettings.Restore(attributes, LeafLabelSettingsLabel);
+                string postfix = '#' + i.ToString();
+                ConfigIO.RestoreEnum(attributes, LeafObjectsLabel + postfix, ref leafNodeAttributesPerKind[i].kind);
+                leafNodeAttributesPerKind[i].colorRange.Restore(attributes, LeafNodeColorRangeLabel + postfix);
+                ConfigIO.Restore(attributes, WidthMetricLabel + postfix, ref leafNodeAttributesPerKind[i].widthMetric);
+                ConfigIO.Restore(attributes, HeightMetricLabel + postfix, ref leafNodeAttributesPerKind[i].heightMetric);
+                ConfigIO.Restore(attributes, DepthMetricLabel + postfix, ref leafNodeAttributesPerKind[i].depthMetric);
+                ConfigIO.Restore(attributes, LeafStyleMetricLabel + postfix, ref leafNodeAttributesPerKind[i].styleMetric);
+                leafNodeAttributesPerKind[i].labelSettings.Restore(attributes, LeafLabelSettingsLabel + postfix);
             }
             for (int i = 0; i < innerNodeAttributesCount; i++)
             {
-                innerNodeAttributesPerKind[i].colorRange.Restore(attributes, InnerNodeColorRangeLabel);
-                ConfigIO.Restore(attributes, InnerNodeHeightMetricLabel, ref innerNodeAttributesPerKind[i].heightMetric);
-                ConfigIO.Restore(attributes, InnerNodeStyleMetricLabel, ref innerNodeAttributesPerKind[i].styleMetric);
-                innerNodeAttributesPerKind[i].labelSettings.Restore(attributes, InnerNodeLabelSettingsLabel);
+                string postfix = '#' + i.ToString();
+                ConfigIO.RestoreEnum(attributes, InnerNodeObjectsLabel + postfix, ref innerNodeAttributesPerKind[i].kind);
+                innerNodeAttributesPerKind[i].colorRange.Restore(attributes, InnerNodeColorRangeLabel + postfix);
+                ConfigIO.Restore(attributes, InnerNodeHeightMetricLabel + postfix, ref innerNodeAttributesPerKind[i].heightMetric);
+                ConfigIO.Restore(attributes, InnerNodeStyleMetricLabel + postfix, ref innerNodeAttributesPerKind[i].styleMetric);
+                innerNodeAttributesPerKind[i].labelSettings.Restore(attributes, InnerNodeLabelSettingsLabel + postfix);
             }
 
             ConfigIO.Restore(attributes, StyleIssueLabel, ref StyleIssue);
@@ -200,9 +204,6 @@ namespace SEE.Game
 
             ConfigIO.Restore(attributes, MinimalBlockLengthLabel, ref MinimalBlockLength);
             ConfigIO.Restore(attributes, MaximalBlockLengthLabel, ref MaximalBlockLength);
-
-            ConfigIO.RestoreEnum(attributes, LeafObjectsLabel, ref nodeLayoutSettings.leafKind);
-            ConfigIO.RestoreEnum(attributes, InnerNodeObjectsLabel, ref nodeLayoutSettings.innerKind);
 
             ConfigIO.RestoreEnum(attributes, NodeLayoutLabel, ref nodeLayoutSettings.kind);
             ConfigIO.RestoreEnum(attributes, EdgeLayoutLabel, ref edgeLayoutSettings.kind);

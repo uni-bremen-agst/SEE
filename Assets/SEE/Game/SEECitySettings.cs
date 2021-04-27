@@ -74,6 +74,7 @@ namespace SEE
 
     public class LeafNodeAttributes
     {
+        public LeafNodeKinds    kind          = LeafNodeKinds.Blocks;
         public string           widthMetric   = NumericAttributeNames.Number_Of_Tokens.Name();
         public string           heightMetric  = NumericAttributeNames.Clone_Rate.Name();
         public string           depthMetric   = NumericAttributeNames.LOC.Name();
@@ -85,27 +86,26 @@ namespace SEE
 
     public class InnerNodeAttributes
     {
-        public string           heightMetric  = "";
-        public string           styleMetric   = NumericAttributeNames.IssuesTotal.Name();
-        public ColorRange       colorRange    = new ColorRange(Color.white, Color.yellow, 10);
+        public InnerNodeKinds    kind          = InnerNodeKinds.Blocks;
+        public string            heightMetric  = "";
+        public string            styleMetric   = NumericAttributeNames.IssuesTotal.Name();
+        public ColorRange        colorRange    = new ColorRange(Color.white, Color.yellow, 10);
         [OdinSerialize]
-        public LabelSettings    labelSettings = new LabelSettings();
+        public LabelSettings     labelSettings = new LabelSettings();
     }
 
     public class NodeLayoutSettings
     {
-        public LeafNodeKinds           leafKind        = LeafNodeKinds.Blocks;
-        public NodeLayoutKind          kind            = NodeLayoutKind.Balloon;
-        public InnerNodeKinds          innerKind       = InnerNodeKinds.Blocks;
+        public NodeLayoutKind    kind            = NodeLayoutKind.Balloon;
 
         /// <summary>
         /// Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
         /// for range [0, max-value] is used, where max-value is the maximum value of a metric.
         /// </summary>
-        public bool                    zScoreScale     = true;
-        public bool                    showErosions    = false; // Whether erosions should be visible above blocks.
+        public bool              zScoreScale     = true;
+        public bool              showErosions    = false; // Whether erosions should be visible above blocks.
         [Range(0.0f, float.MaxValue)]
-        public float                   maxErosionWidth = 1.0f;
+        public float             maxErosionWidth = 1.0f;
     }
 
     public class EdgeLayoutSettings

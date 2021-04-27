@@ -35,7 +35,7 @@ namespace SEE.Game
             for (int i = 0; i < (int)Node.Kind.Count; i++)
             {
                 ColorRange leafColorRange = this.settings.leafNodeAttributesPerKind[i].colorRange;
-                switch (this.settings.nodeLayoutSettings.leafKind)
+                switch (this.settings.leafNodeAttributesPerKind[i].kind)
                 {
                     case LeafNodeKinds.Blocks:
                         leafNodeFactories[i] = new CubeFactory(ShaderType, leafColorRange);
@@ -45,7 +45,7 @@ namespace SEE.Game
                 }
 
                 ColorRange innerColorRange = this.settings.innerNodeAttributesPerKind[i].colorRange;
-                switch (this.settings.nodeLayoutSettings.innerKind)
+                switch (this.settings.innerNodeAttributesPerKind[i].kind)
                 {
                     case InnerNodeKinds.Empty:
                     case InnerNodeKinds.Donuts:
@@ -1024,7 +1024,8 @@ namespace SEE.Game
         /// <param name="gameNodes">a list with gamenode objects</param>
         protected void AddDecorations(ICollection<GameObject> gameNodes)
         {
-            AddDecorations(gameNodes, settings.nodeLayoutSettings.innerKind, settings.nodeLayoutSettings.kind);
+            // TODO(torben): the index 0 may be wrong!
+            AddDecorations(gameNodes, settings.innerNodeAttributesPerKind[0].kind, settings.nodeLayoutSettings.kind);
         }
 
         /// <summary>
@@ -1089,7 +1090,7 @@ namespace SEE.Game
                     // TODO
                     break;
                 default:
-                    throw new Exception("Unhandled GraphSettings.InnerNodeKinds " + settings.nodeLayoutSettings.innerKind);
+                    throw new Exception("Unhandled GraphSettings.InnerNodeKinds " + settings.innerNodeAttributesPerKind[0].kind);
             }
         }
 
