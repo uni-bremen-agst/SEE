@@ -16,7 +16,7 @@ namespace SEE.GO
         {
             if (TryGetComponent(out SEECity city))
             {
-                graph = city.LoadedGraph;
+                this.city = city;
                 E = Cursor3D.Create();
 
                 InteractableObject.AnySelectIn += AnySelectIn;
