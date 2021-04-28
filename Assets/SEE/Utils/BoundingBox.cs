@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SEE.GO;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Utils
@@ -31,7 +32,7 @@ namespace SEE.Utils
 
                 foreach (GameObject go in gameObjects)
                 {
-                    Vector3 extent = go.Size() / 2.0f;
+                    Vector3 extent = go.WorldSpaceScale() / 2.0f;
                     // Note: position denotes the center of the object
                     Vector3 position = go.transform.position;
                     {
@@ -81,7 +82,7 @@ namespace SEE.Utils
             {
                 if (gameObject.transform.position.y > result)
                 {
-                    result = gameObject.transform.position.y + gameObject.Size().y / 2.0f;
+                    result = gameObject.transform.position.y + gameObject.WorldSpaceScale().y / 2.0f;
                 }
             }
             return result;

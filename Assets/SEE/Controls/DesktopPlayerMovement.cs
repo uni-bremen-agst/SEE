@@ -42,6 +42,7 @@ namespace SEE.Controls
             cameraState.pitch = 45.0f;
             mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
             mainCamera.transform.position -= mainCamera.transform.forward * cameraState.distance;
+            lastAxis = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
         }
 
         private void Update()
