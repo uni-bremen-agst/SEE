@@ -663,8 +663,10 @@ namespace SEE.Controls.Actions
 
         public override List<string> GetChangedObjects()
         {
-            return new List<string>();
-            // throw new System.NotImplementedException();
+            return new List<string>()
+            {
+                objectToScale.name
+            };
         }
     }
 }
