@@ -180,6 +180,7 @@ namespace SEE.Controls.Actions
             if (synchronize)
             {
                 // TODO(torben): synchronize!
+                //new Net.SyncCitiesAction(this).Execute();
             }
 
             return true;
