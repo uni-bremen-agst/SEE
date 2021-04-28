@@ -127,7 +127,7 @@ namespace SEE
     {
         public EdgeLayoutKind    kind             = EdgeLayoutKind.Bundling;
         [Range(0.0f, float.MaxValue)]
-        public float             edgeWidth        = 0.1f;
+        public float             edgeWidth        = 0.01f;
 
         /// <summary>
         /// Orientation of the edges; 
