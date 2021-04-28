@@ -1,11 +1,12 @@
-﻿using SEE.Controls;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using SEE.Controls;
 using SEE.DataModel;
 using SEE.Game.Runtime;
 using SEE.GO;
 using SEE.Utils;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,7 +19,7 @@ namespace SEE.Game
     /// 
     /// This part contains the animation code.
     /// </summary>
-    public partial class SEEJlgCity : SEECity
+    public partial class SEEJlgCity
     {
         //------------------------------------
         // Public configuration attributes
@@ -151,26 +152,26 @@ namespace SEE.Game
         /// <summary>
         /// Time in seconds until the next statement is to be shown.
         /// </summary>
-        private float updateIntervall = 1.0f;
+        private float updateInterval = 1.0f;
 
         /// <summary>
-        /// True is visualisation is running in automatic modde; false if in manual mode.
+        /// True is visualisation is running in automatic mode; false if in manual mode.
         /// In automatic mode, the execution is played automatically at a particular
         /// period. In manual mode, the user needs to press keys to move to the next
         /// or previous statement to be visualized.
         /// </summary>
-        private Boolean inAutomaticMode = false;
+        private bool inAutomaticMode = false;
 
         /// <summary>
         /// Describes the direction, in which the visualisation is running. True for forward, false for backwards.
         /// </summary>
-        private Boolean playingForward = true;
+        private bool playingForward = true;
 
         /// <summary>
         /// This saves the direction in which the statement executed last was visualized.
         /// True means forward, false means backward.
         /// </summary>
-        private Boolean lastDirectionWasForward = true;
+        private bool lastDirectionWasForward = true;
 
         /// <summary>
         /// The GameObject that represents the class the current statement belongs to. 
@@ -183,7 +184,7 @@ namespace SEE.Game
         private Dictionary<string, GameObject> nodesGOs;
 
         /// <summary>
-        /// Stack of all existing FileContent Textwindows.
+        /// Stack of all existing FileContent text windows.
         /// </summary>
         private Stack<GameObject> textWindows = new Stack<GameObject>();
 
@@ -193,7 +194,7 @@ namespace SEE.Game
         private Stack<GameObject> functionCalls = new Stack<GameObject>();
 
         /// Start is called before the first frame update
-        void Start()
+        private void Start()
         {
             JLGParser jlgParser = new JLGParser(JLGPath.Path);
             parsedJLG = jlgParser.Parse();
@@ -213,7 +214,7 @@ namespace SEE.Game
                 statementCounter = new StatementCounter(0, (uint)(parsedJLG.AllStatements.Count - 1));
                 nodesGOs = GetNodes();
                 Debug.Log($"[JLG] Number of nodes contained in {gameObject.name} is {nodesGOs.Count}\n");
-                // Sets the currentGO to be the node representing the Class of the first Statement in preperation.
+                // Sets the currentGO to be the node representing the Class of the first Statement in preparation.
                 if (nodesGOs.Count == 0)
                 {
                     enabled = false;
@@ -249,7 +250,7 @@ namespace SEE.Game
         }
 
         /// Update is called once per frame
-        void Update()
+        private void Update()
         {
             // Update Visualisation every 'interval' seconds.
             if (Time.time >= nextUpdateTime)
@@ -258,7 +259,7 @@ namespace SEE.Game
                 {
                     UpdateVisualization();
                 }
-                nextUpdateTime += updateIntervall;
+                nextUpdateTime += updateInterval;
             }
 
             // Controls
@@ -296,21 +297,23 @@ namespace SEE.Game
             if (SEEInput.ToggleExecutionOrder())
             {
                 // Reversing the order of execution.
-                updateIntervall = 1;                
+                updateInterval = 1;                
                 showLabelUntil = Time.time + 1f;
 
                 playingForward = !playingForward;
                 if (playingForward)
                 {
                     lastDirectionWasForward = true;
-                    statementCounter.Increase(); // This need to be called because the statementcounter was increased/decreased in the last UpdateVisualization call already. This prevents bugs.
+                    statementCounter.Increase(); // This need to be called because the statement counter
+                                                 // was increased/decreased in the last UpdateVisualization call already.
+                                                 // This prevents bugs.
                     MoveForwardToNextStatement();
                     labelText = "Forward";
                 }
                 else
                 {
                     lastDirectionWasForward = false;
-                    statementCounter.Decrease();  // Dito.
+                    statementCounter.Decrease();  // Ditto.
                     MoveBackwardToPreviousStatement();
                     labelText = "Rewind";
                 }
@@ -322,13 +325,13 @@ namespace SEE.Game
                 {
                     SpeedUp();
                     showLabelUntil = Time.time + 1f;
-                    labelText = "Speed x" + 1f / updateIntervall;
+                    labelText = "Speed x" + 1f / updateInterval;
                 }
                 if (SEEInput.DecreaseAnimationSpeed())
                 {
                     SlowDown();
                     showLabelUntil = Time.time + 1f;
-                    labelText = "Speed x" + 1f / updateIntervall;
+                    labelText = "Speed x" + 1f / updateInterval;
                 }
             }
             else
@@ -454,36 +457,28 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Activates the FileContent Gameobject of a given node and disables all others.
+        /// Activates the FileContent game object of a given node and disables all others.
         /// </summary>
-        /// <param name="gameObject"></param>
-        private void ActivateNodeTextWindow(GameObject gameObject)
+        /// <param name="nodeGameObject"></param>
+        private void ActivateNodeTextWindow(GameObject nodeGameObject)
         {
             if (textWindows.Count != 0)
             {
                 foreach (GameObject go in textWindows)
                 {
-                    if (go.name == gameObject.name + FileContentNamePostfix)
-                    {
-                        go.SetActive(true);
-                    }
-                    else
-                    {
-                        go.SetActive(false);
-                    }
+                    go.SetActive(go.name == nodeGameObject.name + FileContentNamePostfix);
                 }
             }
         }
 
         /// <summary>
-        /// Checks if a mouse click hit a Node Gameobject. Returns GameObject or Null if no object was hit.
+        /// Checks if a mouse click hit a Node game object. Returns GameObject or Null if no object was hit.
         /// </summary>
-        /// <returns>hit gameobject</returns>
+        /// <returns>hit game object</returns>
         private GameObject MouseClickHitActiveNode()
         {
-            RaycastHit hit;
-            Ray camerMouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(camerMouseRay, out hit))
+            Ray cameraMouseRay = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(cameraMouseRay, out RaycastHit hit))
             {
                 if (hit.transform && TextWindowForNodeExists(hit.transform.gameObject))
                 {
@@ -511,25 +506,13 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Checks, if there is an exisiting scrollable Textwindow for a given GameObject.
+        /// Checks, if there is an existing scrollable text window for a given GameObject.
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
         private bool TextWindowForNodeExists(GameObject node)
         {
-            bool exists = false;
-            if (textWindows.Count != 0)
-            {
-                foreach (GameObject go in textWindows)
-                {
-                    if (go.name.Equals(node.name + FileContentNamePostfix))
-                    {
-                        exists = true;
-                        break;
-                    }
-                }
-            }
-            return exists;
+            return textWindows.Count != 0 && textWindows.Any(go => go.name.Equals(node.name + FileContentNamePostfix));
         }
 
         /// <summary>
@@ -567,8 +550,7 @@ namespace SEE.Game
             ///add line between Class and FileContentWindow
             LineRenderer line = new GameObject(currentGO.name + "FileContentConnector").AddComponent<LineRenderer>();
             line.positionCount = 2;
-            line.material = new Material(Shader.Find("Sprites/Default"));
-            line.material.color = new Color(0.219f, 0.329f, 0.556f, 1f);
+            line.material = new Material(Shader.Find("Sprites/Default")) {color = new Color(0.219f, 0.329f, 0.556f, 1f)};
             line.startWidth = LineWidth;
             line.endWidth = LineWidth;
             line.useWorldSpace = true;
@@ -581,9 +563,9 @@ namespace SEE.Game
             line.gameObject.transform.parent = textWindow.transform;
         }
 
-        private float GetWindowHeight(GameObject textWindow)
+        private static float GetWindowHeight(GameObject textWindow)
         {
-            if (textWindow.TryGetComponent<RectTransform>(out RectTransform rectTransform))
+            if (textWindow.TryGetComponent(out RectTransform rectTransform))
             {
                 // Each corner provides its world space value. The returned array of 4 vertices 
                 // is clockwise. It starts bottom left and rotates to top left, then top right,
@@ -601,7 +583,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Returns the transform of the plane underlying the game objects forming the code city
-        /// if it exists; otherwise the tranform of the code-city object is returned.
+        /// if it exists; otherwise the transform of the code-city object is returned.
         /// 
         /// Assumption: The plane is an immediate child of the code-city object, named "Plane"
         /// and tagged by Tags.Decoration.
@@ -631,7 +613,7 @@ namespace SEE.Game
             string classname = go.name;
             if (classname.Contains("."))
             {
-                classname = classname.Substring(classname.LastIndexOf(".") + 1);
+                classname = classname.Substring(classname.LastIndexOf(".", StringComparison.Ordinal) + 1);
             }
             classname += ".java";
             foreach (string p in parsedJLG.FilesOfProject)
@@ -644,7 +626,7 @@ namespace SEE.Game
                         string output = "";
                         foreach (string lineContent in File.ReadLines(p))
                         {
-                            output += lineNumber.ToString() + ". " + lineContent + Environment.NewLine;
+                            output += lineNumber + ". " + lineContent + Environment.NewLine;
                             lineNumber++;
                         }
                         return output;
@@ -670,31 +652,17 @@ namespace SEE.Game
         private GameObject GetNodeForStatement(int index)
         {
             string searchedName = parsedJLG.GetStatementLocationString(index);
-            if (nodesGOs.TryGetValue(searchedName, out GameObject result))
-            {
-                return result;
-            }
-            else
-            {
-                return null;
-            }
+            return nodesGOs.TryGetValue(searchedName, out GameObject result) ? result : null;
         }
 
         /// <summary>
-        /// Gets the FileContent GameObject of a given Node, if it exists in textwindows. Otherwise returns null.
+        /// Gets the FileContent GameObject of a given Node, if it exists in text windows. Otherwise returns null.
         /// </summary>
         /// <param name="classGO">given node</param>
         /// <returns>FileContent for node</returns>
         private GameObject GetFileContentGOForNode(GameObject classGO)
         {
-            foreach (GameObject fc in textWindows)
-            {
-                if (fc.name.Equals(classGO.name + FileContentNamePostfix))
-                {
-                    return fc;
-                }
-            }
-            return null;
+            return textWindows.FirstOrDefault(fc => fc.name.Equals(classGO.name + FileContentNamePostfix));
         }
 
         /// <summary>
@@ -704,7 +672,7 @@ namespace SEE.Game
         /// <param name="stmtIndex">index of the Java statement in parsedJLGs JavaStatement list</param>
         /// <param name="go">the GameObject</param>
         /// <returns>whether <paramref name="go"/> represent the class at given <paramref name="stmtIndex"/></returns>
-        private Boolean NodeRepresentsStatementLocation(int stmtIndex, GameObject go)
+        private bool NodeRepresentsStatementLocation(int stmtIndex, GameObject go)
         {
             return parsedJLG.GetStatementLocationString(stmtIndex) == go.name && go.CompareTag(Tags.Node);
         }
@@ -716,7 +684,7 @@ namespace SEE.Game
         {
             HighlightCurrentLineFadePrevious();
 
-            // Generate the info text in the smaller textwindow for the currentstatement. The info text is built
+            // Generate the info text in the smaller text window for the current statement. The info text is built
             // in the parsedJLG object and then returned to the TMPro text component.
             GameObject fileContent = GetFileContentGOForNode(currentGO);
             fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text
@@ -741,8 +709,8 @@ namespace SEE.Game
         {
             HighlightCurrentLineFadePreviousReverse();
 
-            // Generate the info text in the smaller textwindow for the currentstatement.
-            // The info text is builz in the parsedJLG object and then returned to the
+            // Generate the info text in the smaller text window for the current statement.
+            // The info text is built in the parsedJLG object and then returned to the
             // TMPro text component.
             GameObject fileContent = GetFileContentGOForNode(currentGO);
             fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text 
@@ -809,28 +777,21 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Activates the Textwindow of the currentGO and disables all other.
+        /// Activates the text window of the currentGO and disables all other.
         /// </summary>
         private void ToggleTextWindows()
         {
             foreach (GameObject go in textWindows)
             {
-                // Textwindow of currentGO is always active
-                if (go.name == currentGO.name + FileContentNamePostfix)
-                {
-                    go.SetActive(true);
-                }
-                else
-                {
-                    go.SetActive(false);
-                }
+                // text window of currentGO is always active
+                go.SetActive(go.name == currentGO.name + FileContentNamePostfix);
             }
         }
 
         /// <summary>
-        /// This method updates all stacks that are need for the visualization, depending on the playdirection.
+        /// This method updates all stacks that are need for the visualization, depending on the play direction.
         /// The stacks modified here are: functionCalls and parsedJLG.ReturnValues.
-        /// The returnValues stack is filled inside the parsedJLG Object when playdirection is true/Forward.
+        /// The returnValues stack is filled inside the parsedJLG Object when play direction is true/Forward.
         /// </summary>
         private void UpdateStacks()
         {
@@ -854,7 +815,7 @@ namespace SEE.Game
                         if (functionCall != null)
                         {
                             functionCall.SetActive(false); // only disable, so it can be enabled when the visualization is running backwards
-                            nodeForPreviousStatement.GetComponentInChildren<MeshRenderer>().material.color = new Color(1f, 0f, 0f, 1f);
+                            nodeForPreviousStatement.GetComponentInChildren<MeshRenderer>().material.color = Color.red;
                         }
                     }
                 }
@@ -873,14 +834,14 @@ namespace SEE.Game
                 if (exitingCalledFunction && currentGO != nodeForNextStatement && nodeForNextStatement != null)
                 {
                     GameObject functionCall = FindFunctionCallForGameObjects(currentGO, nodeForNextStatement, false);
-                    //Check for null because sometimes, this can break if the playdirection is changed a lot in a short time.
+                    //Check for null because sometimes, this can break if the play direction is changed a lot in a short time.
                     if (functionCall != null)
                     {
                         functionCall.SetActive(true);
                     }
                 }
-                // If previous statement entered a class, metaphorically remove the class from the callstack by destroying its textwindow and its FunctionCallSimulator.
-                // Looking for an at statementCounter+1 "entrystatement", because the visualisation is running backwards.
+                // If previous statement entered a class, metaphorically remove the class from the callstack by destroying its text window and its FunctionCallSimulator.
+                // Looking for an at statementCounter+1 "entry statement", because the visualisation is running backwards.
                 else if (statementCounter.Value < parsedJLG.AllStatements.Count - 1
                     && parsedJLG.AllStatements[statementCounter.Value + 1].StatementType == StatementKind.Entry
                     && currentGO != nodeForNextStatement)
@@ -889,7 +850,7 @@ namespace SEE.Game
                     if (functionCalls.Count > 0 &&
                         functionCalls.Peek().name.Equals("FunctionCall: " + currentGO.name + " call " + nodeForNextStatement.name))
                     {
-                        GameObject.Destroy(functionCalls.Pop());
+                        Destroy(functionCalls.Pop());
                     }
                 }
             }
@@ -905,20 +866,14 @@ namespace SEE.Game
         private GameObject FindFunctionCallForGameObjects(GameObject dstGO, GameObject srcGO, bool active)
         {
             // The enumerator of a stack iterates from the top element to the very first element added to the stack.
-            foreach (GameObject go in functionCalls)
-            {
-                if (go.activeSelf == active && go.GetComponent<FunctionCallSimulator>().src == srcGO
-                    && go.GetComponent<FunctionCallSimulator>().dst == dstGO)
-                {
-                    return go;
-                }
-            }
-            return null;
+            return functionCalls.FirstOrDefault(go => go.activeSelf == active && 
+                                                      go.GetComponent<FunctionCallSimulator>().src == srcGO && 
+                                                      go.GetComponent<FunctionCallSimulator>().dst == dstGO);
         }
 
         /// <summary>
-        /// Highlights the currentline and fades the previous five lines bit by bit back to white.
-        /// This is called when playdirection is forward/true.
+        /// Highlights the current line and fades the previous five lines bit by bit back to white.
+        /// This is called when play direction is forward/true.
         /// </summary>
         private void HighlightCurrentLineFadePrevious()
         {
@@ -931,7 +886,7 @@ namespace SEE.Game
             }
 
             string fileContent = currentFileContentGO.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text;
-            string[] lines = fileContent.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            string[] lines = fileContent.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
 
             lines = FadePreviousLines(lines);
 
@@ -956,13 +911,13 @@ namespace SEE.Game
                 currentFileContentGO.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = fileContent;
 
                 ///Scroll the Scroll rect so the current line is visible. This is not optimal yet, since sometimes it shows the current line right at the top of the Textwindow and not in the middle.
-                currentFileContentGO.transform.GetChild(0).GetComponent<ScrollRect>().verticalNormalizedPosition = 1 - ((float)parsedJLG.AllStatements[statementCounter.Value].LineAsInt() / (float)lines.Length);
+                currentFileContentGO.transform.GetChild(0).GetComponent<ScrollRect>().verticalNormalizedPosition = 1 - parsedJLG.AllStatements[statementCounter.Value].LineAsInt() / (float)lines.Length;
             }
         }
 
         /// <summary>
-        /// Highlights the currentline and unfades previously faded lines back to white. Can only actively highlight the current line.
-        /// This is called when playdirection is backwards/false.
+        /// Highlights the current line and unfades previously faded lines back to white. Can only actively highlight the current line.
+        /// This is called when play direction is backwards/false.
         /// </summary>
         private void HighlightCurrentLineFadePreviousReverse()
         {
@@ -975,7 +930,7 @@ namespace SEE.Game
             }
 
             string fileContent = currentFileContentGO.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text;
-            string[] lines = fileContent.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            string[] lines = fileContent.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
 
             lines = UnfadePreviousLines(lines);
 
@@ -987,7 +942,7 @@ namespace SEE.Game
                 fileContent = string.Join(Environment.NewLine, lines);
                 currentFileContentGO.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = fileContent;
 
-                currentFileContentGO.transform.GetChild(0).GetComponent<ScrollRect>().verticalNormalizedPosition = 1 - ((float)parsedJLG.AllStatements[statementCounter.Value].LineAsInt() / (float)lines.Length);
+                currentFileContentGO.transform.GetChild(0).GetComponent<ScrollRect>().verticalNormalizedPosition = 1 - parsedJLG.AllStatements[statementCounter.Value].LineAsInt() / (float)lines.Length;
             }
         }
 
@@ -996,7 +951,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="lines"></param>
         /// <returns></returns>
-        private string[] UnfadePreviousLines(string[] lines)
+        private static string[] UnfadePreviousLines(string[] lines)
         {
             for (int i = 0; i < lines.Length; i++)
             {
@@ -1037,7 +992,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="lines"></param>
         /// <returns></returns>
-        private string[] FadePreviousLines(string[] lines)
+        private static string[] FadePreviousLines(string[] lines)
         {
             for (int i = 0; i < lines.Length; i++)
             {
@@ -1074,7 +1029,7 @@ namespace SEE.Game
         /// than 200 Statements ahead, it only visualizes the last 150 steps.
         /// </summary>
         /// <returns></returns>
-        private Boolean JumpToNextBreakpointHit()
+        private bool JumpToNextBreakpointHit()
         {
             playingForward = true;
             if (BreakpointLine <= 0)
@@ -1088,7 +1043,7 @@ namespace SEE.Game
             JavaStatement js = parsedJLG.AllStatements[statementCounter.Value];
             int currentStatementCounter = statementCounter.Value;
             // Search for the next breakpoint.
-            while (!((js.LineAsInt() == BreakpointLine) && parsedJLG.GetStatementLocationString(currentStatementCounter).Contains(BreakpointClass)))
+            while (!(js.LineAsInt() == BreakpointLine && parsedJLG.GetStatementLocationString(currentStatementCounter).Contains(BreakpointClass)))
             {
                 currentStatementCounter++;
                 if (currentStatementCounter < parsedJLG.AllStatements.Count)
@@ -1173,10 +1128,10 @@ namespace SEE.Game
         /// </summary>
         private void SpeedUp()
         {
-            if (updateIntervall > 0.03125)
+            if (updateInterval > 0.03125)
             {
-                nextUpdateTime = nextUpdateTime - updateIntervall + (updateIntervall / 2);
-                updateIntervall /= 2;
+                nextUpdateTime = nextUpdateTime - updateInterval + (updateInterval / 2);
+                updateInterval /= 2;
             }
         }
 
@@ -1185,26 +1140,26 @@ namespace SEE.Game
         /// </summary>
         private void SlowDown()
         {
-            if (updateIntervall < 8)
+            if (updateInterval < 8)
             {
-                nextUpdateTime = nextUpdateTime - updateIntervall + (updateIntervall * 2);
-                updateIntervall *= 2;
+                nextUpdateTime = nextUpdateTime - updateInterval + (updateInterval * 2);
+                updateInterval *= 2;
             }
         }
 
         /// <summary>
-        /// This method resets the visualization by destroying all Textwindows and functionCalls and setting the StatementCounter to 0.
+        /// This method resets the visualization by destroying all text windows and functionCalls and setting the StatementCounter to 0.
         /// </summary>
         private void ResetVisualization()
         {
             foreach (GameObject go in textWindows)
             {
-                GameObject.Destroy(go);
+                Destroy(go);
             }
             textWindows = new Stack<GameObject>();
             foreach (GameObject go in functionCalls)
             {
-                GameObject.Destroy(go);
+                Destroy(go);
             }
             functionCalls = new Stack<GameObject>();
             statementCounter.Value = 0;
@@ -1219,7 +1174,7 @@ namespace SEE.Game
             Start();
             foreach (GameObject go in nodesGOs.Values)
             {
-                go.GetComponentInChildren<MeshRenderer>().material.color = new Color(1f, 0f, 0f, 1f);
+                go.GetComponentInChildren<MeshRenderer>().material.color = Color.red;
             }
         }
     }

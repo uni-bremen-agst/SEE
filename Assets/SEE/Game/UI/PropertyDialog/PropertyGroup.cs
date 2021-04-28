@@ -1,7 +1,7 @@
-﻿using SEE.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game.UI.PropertyDialog
@@ -18,6 +18,7 @@ namespace SEE.Game.UI.PropertyDialog
         public string Name;
         /// <summary>
         /// Icon for the property group.
+        /// TODO: This is unused.
         /// </summary>
         public Sprite Icon;
 
@@ -32,7 +33,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// <summary>
         /// The input fields for the properties in this property group.
         /// </summary>
-        protected readonly IList<Property> Properties = new List<Property>();
+        private readonly IList<Property> Properties = new List<Property>();
 
         /// <summary>
         /// The path of the prefab for a PropertyGroup.

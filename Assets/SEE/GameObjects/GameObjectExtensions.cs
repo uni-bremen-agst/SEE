@@ -208,7 +208,28 @@ namespace SEE.GO
         /// <returns>The height of the Roof from this <paramref name="node"/></returns>
         public static float GetRoof(this GameObject node)
         {
-            return node.transform.position.y + node.Size().y / 2.0f;
+            return node.transform.position.y + node.WorldSpaceScale().y / 2.0f;
+        }
+
+        /// <summary>
+        /// Returns the size of the given <paramref name="gameObject"/> in world space.
+        /// </summary>
+        /// <param name="gameObject">object whose size is requested</param>
+        /// <returns>size of given <paramref name="gameObject"/></returns>
+        public static Vector3 WorldSpaceScale(this GameObject gameObject)
+        {
+            // For some objects, such as capsules, lossyScale gives wrong results.
+            // The more reliable option to determine the size is using the 
+            // object's renderer if it has one.
+            if (gameObject.TryGetComponent(out Renderer renderer))
+            {
+                return renderer.bounds.size;
+            }
+            else
+            {
+                // No renderer, so we use lossyScale as a fallback.
+                return gameObject.transform.lossyScale;
+            }
         }
 
         /// <summary>

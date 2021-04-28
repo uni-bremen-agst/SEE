@@ -90,7 +90,7 @@ namespace SEE.Net
     /// <summary>
     /// !!! IMPORTANT !!!
     ///   See <see cref="AbstractAction"/> before modifying this class!
-    ///   
+    ///
     /// Synchronizes rotations between Clients.
     /// </summary>
     public class TransformViewRotationAction : AbstractAction
