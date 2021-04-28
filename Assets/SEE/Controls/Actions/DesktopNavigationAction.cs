@@ -183,112 +183,7 @@ namespace SEE.Controls.Actions
             }
 
             bool synchronize = false;
-            RaycastClippingPlane(out bool hitPlane, out bool insideClippingArea, out Vector3 planeHitPoint);
-
-            if (Equals(ActionState.Value, ActionStateType.Move) && false)
-            {
-            }
-
-            #region Rotate Action
-
-            else if (Equals(ActionState.Value, ActionStateType.Rotate) && false)
-            {
-                if (actionState.reset) // reset rotation to identity();
-                {
-                    if ((insideClippingArea && !(actionState.drag ^ movingOrRotating)) || (actionState.drag && movingOrRotating))
-                    {
-                        movingOrRotating = false;
-
-                        foreach (Transform t in cursor.E.GetFocusses())
-                        {
-                            InteractableObject o = t.GetComponent<InteractableObject>();
-                            if (o.IsGrabbed)
-                            {
-                                o.SetGrab(false, true);
-                            }
-                        }
-                        rotateState.rotateGizmo.gameObject.SetActive(false);
-
-                        CityTransform.RotateAround(rotateState.rotateGizmo.Center, Vector3.up, -CityTransform.rotation.eulerAngles.y);
-                        synchronize = true;
-                    }
-                }
-                else if (actionState.cancel) // cancel rotation
-                {
-                    if (movingOrRotating)
-                    {
-                        movingOrRotating = false;
-
-                        Array.ForEach(cursor.E.GetFocusses(), e => e.GetComponent<InteractableObject>().SetGrab(false, true));
-                        rotateState.rotateGizmo.gameObject.SetActive(false);
-
-                        CityTransform.rotation = Quaternion.Euler(0.0f, rotateState.originalEulerAngleY, 0.0f);
-                        CityTransform.position = rotateState.originalPosition;
-                        synchronize = true;
-                    }
-                    else
-                    {
-                        InteractableObject.UnselectAllInGraph(moveState.draggedTransform.GetComponent<GraphElement>().ItsGraph, true);
-                    }
-                }
-                else if (actionState.drag && hitPlane && cursor.E.HasFocus()) // start or continue rotation
-                {
-                    Vector2 toHit = planeHitPoint.XZ() - rotateState.rotateGizmo.Center.XZ();
-                    float toHitAngle = toHit.Angle360();
-
-                    if (actionState.startDrag) // start rotation
-                    {
-                        movingOrRotating = true;
-
-                        Array.ForEach(cursor.E.GetFocusses(), e => e.GetComponent<InteractableObject>().SetGrab(true, true));
-                        rotateState.rotateGizmo.gameObject.SetActive(true);
-
-                        rotateState.originalEulerAngleY = CityTransform.rotation.eulerAngles.y;
-                        rotateState.originalPosition = CityTransform.position;
-                        rotateState.startAngle = AngleMod(CityTransform.rotation.eulerAngles.y - toHitAngle);
-                        rotateState.rotateGizmo.SetMinAngle(Mathf.Deg2Rad * toHitAngle);
-                        rotateState.rotateGizmo.SetMaxAngle(Mathf.Deg2Rad * toHitAngle);
-                    }
-
-                    if (movingOrRotating) // continue rotation
-                    {
-                        float angle = AngleMod(rotateState.startAngle + toHitAngle);
-                        if (actionState.snap)
-                        {
-                            angle = AngleMod(Mathf.Round(angle / _RotateState.SnapStepAngle) * _RotateState.SnapStepAngle);
-                        }
-                        CityTransform.RotateAround(cursor.E.GetPosition(), Vector3.up, angle - CityTransform.rotation.eulerAngles.y);
-
-                        float prevAngle = Mathf.Rad2Deg * rotateState.rotateGizmo.GetMaxAngle();
-                        float currAngle = toHitAngle;
-
-                        while (Mathf.Abs(currAngle + 360.0f - prevAngle) < Mathf.Abs(currAngle - prevAngle))
-                        {
-                            currAngle += 360.0f;
-                        }
-                        while (Mathf.Abs(currAngle - 360.0f - prevAngle) < Mathf.Abs(currAngle - prevAngle))
-                        {
-                            currAngle -= 360.0f;
-                        }
-                        if (actionState.snap)
-                        {
-                            currAngle = Mathf.Round((currAngle + rotateState.startAngle) / (_RotateState.SnapStepAngle)) * (_RotateState.SnapStepAngle) - rotateState.startAngle;
-                        }
-
-                        rotateState.rotateGizmo.SetMaxAngle(Mathf.Deg2Rad * currAngle);
-                        synchronize = true;
-                    }
-                }
-                else if (movingOrRotating) // finalize rotation
-                {
-                    movingOrRotating = false;
-
-                    Array.ForEach(cursor.E.GetFocusses(), e => e.GetComponent<InteractableObject>().SetGrab(false, true));
-                    rotateState.rotateGizmo.gameObject.SetActive(false);
-                }
-            }
-
-            #endregion
+            RaycastClippingPlane(out _, out bool insideClippingArea, out Vector3 planeHitPoint);
 
             #region Zoom
 
@@ -332,25 +227,6 @@ namespace SEE.Controls.Actions
             if (UpdateZoom())
             {
                 synchronize = true;
-            }
-
-            #endregion
-
-            #region ApplyConstraints
-
-            // Keep city constrained to table
-            float radius = 0.5f * CityTransform.lossyScale.x;
-            MathExtensions.TestCircleAABB(CityTransform.position.XZ(),
-                                          0.9f * radius,
-                                          portalPlane.LeftFrontCorner,
-                                          portalPlane.RightBackCorner,
-                                          out float distance,
-                                          out Vector2 normalizedFromCircleToSurfaceDirection);
-
-            if (distance > 0.0f)
-            {
-                Vector2 toSurfaceDirection = distance * normalizedFromCircleToSurfaceDirection;
-                CityTransform.position += new Vector3(toSurfaceDirection.x, 0.0f, toSurfaceDirection.y);
             }
 
             #endregion

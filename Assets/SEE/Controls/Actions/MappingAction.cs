@@ -395,6 +395,6 @@ namespace SEE.Controls.Actions
             return ActionStateType.Map;
         }
 
-#endregion
+        #endregion
     }
 }

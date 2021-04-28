@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using SEE.GO;
 using SEE.Utils;
+using SEE.Controls;
 
 namespace SEE.Game.UI3D
 {
@@ -22,7 +23,7 @@ namespace SEE.Game.UI3D
         /// <summary>
         /// The list of Transforms currently in the focus.
         /// </summary>
-        private List<Transform> focusses;
+        private List<InteractableObject> focusses;
 
         private GameObject outline;
         private Material outlineMaterial;
@@ -57,7 +58,7 @@ namespace SEE.Game.UI3D
             GameObject go = new GameObject("Cursor");
             Cursor3D c = go.AddComponent<Cursor3D>();
 
-            c.focusses = new List<Transform>();
+            c.focusses = new List<InteractableObject>();
 
             c.outline = GameObject.CreatePrimitive(PrimitiveType.Quad);
             Destroy(c.outline.GetComponent<MeshCollider>());
@@ -117,15 +118,15 @@ namespace SEE.Game.UI3D
             return focusses.Count != 0;
         }
 
-        public Transform[] GetFocusses()
+        public InteractableObject[] GetFocusses()
         {
             RemoveDestroyedTransforms();
-            Transform[] result = new Transform[focusses.Count];
+            InteractableObject[] result = new InteractableObject[focusses.Count];
             focusses.CopyTo(result);
             return result;
         }
 
-        public void AddFocus(Transform focus)
+        public void AddFocus(InteractableObject focus)
         {
             if (focus && !focusses.Contains(focus))
             {
@@ -134,7 +135,7 @@ namespace SEE.Game.UI3D
             }
         }
 
-        public void RemoveFocus(Transform focus)
+        public void RemoveFocus(InteractableObject focus)
         {
             if (focus)
             {
@@ -143,7 +144,7 @@ namespace SEE.Game.UI3D
             }
         }
 
-        public void ReplaceFocusses(List<Transform> focusses)
+        public void ReplaceFocusses(List<InteractableObject> focusses)
         {
             if (focusses != null && focusses.Count != 0)
             {
@@ -157,7 +158,7 @@ namespace SEE.Game.UI3D
             }
         }
 
-        public void ReplaceFocus(Transform focus)
+        public void ReplaceFocus(InteractableObject focus)
         {
             if (focus != null)
             {
@@ -180,7 +181,7 @@ namespace SEE.Game.UI3D
 
             if (focusses.Count == 1)
             {
-                result = focusses[0].position;
+                result = focusses[0].transform.position;
             }
             else
             {
@@ -199,7 +200,7 @@ namespace SEE.Game.UI3D
 
             if (focusses.Count == 1)
             {
-                result = focusses[0].lossyScale.x;
+                result = focusses[0].transform.lossyScale.x;
             }
             else
             {
@@ -231,8 +232,8 @@ namespace SEE.Game.UI3D
                     // identical and x or z are the diameter of the circle, which is
                     // obviously not true for rectangular layouts!
 
-                    Transform foc0 = focusses[i];
-                    Transform foc1 = focusses[j];
+                    Transform foc0 = focusses[i].transform;
+                    Transform foc1 = focusses[j].transform;
                     float rad0 = 0.5f * foc0.lossyScale.x;
                     float rad1 = 0.5f * foc1.lossyScale.x;
                     float d01 = (foc1.position.XZ() - foc0.position.XZ()).magnitude;

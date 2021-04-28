@@ -97,14 +97,13 @@ namespace SEE.Controls.Actions
                 {
                     hit.root.position = originalPosition;
                     hit.root.rotation = Quaternion.Euler(0.0f, originalEulerAngleY, 0.0f);
-                    Array.ForEach(hit.cursor.E.GetFocusses(), e =>
+                    foreach (InteractableObject o in hit.cursor.E.GetFocusses())
                     {
-                        InteractableObject o = e.GetComponent<InteractableObject>();
                         if (o.IsGrabbed)
                         {
                             o.SetGrab(false, true);
                         }
-                    });
+                    }
                     gizmo.gameObject.SetActive(false);
 
                     rotating = false;
@@ -128,7 +127,7 @@ namespace SEE.Controls.Actions
                         hit.cursor = cursor;
                         hit.plane = plane;
 
-                        Array.ForEach(hit.cursor.E.GetFocusses(), e => e.GetComponent<InteractableObject>().SetGrab(true, true));
+                        Array.ForEach(hit.cursor.E.GetFocusses(), e => e.SetGrab(true, true));
                         gizmo.gameObject.SetActive(true);
                         gizmo.Center = cursor.E.HasFocus() ? hit.cursor.E.GetPosition() : hit.root.position;
 
@@ -178,9 +177,8 @@ namespace SEE.Controls.Actions
             {
                 if (obj && !rotating)
                 {
-                    foreach (Transform t in cursor.E.GetFocusses())
+                    foreach (InteractableObject o in cursor.E.GetFocusses())
                     {
-                        InteractableObject o = t.GetComponent<InteractableObject>();
                         if (o.IsGrabbed)
                         {
                             o.SetGrab(false, true);
@@ -196,7 +194,7 @@ namespace SEE.Controls.Actions
             {
                 rotating = false;
 
-                Array.ForEach(hit.cursor.E.GetFocusses(), e => e.GetComponent<InteractableObject>().SetGrab(false, true));
+                Array.ForEach(hit.cursor.E.GetFocusses(), e => e.SetGrab(false, true));
                 gizmo.gameObject.SetActive(false);
             }
 
