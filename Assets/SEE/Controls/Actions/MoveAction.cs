@@ -48,9 +48,9 @@ namespace SEE.Controls.Actions
             {
                 moving = false,
                 hit = new Hit(),
-                dragStartTransformPosition = Vector3.zero,
-                dragStartOffset = Vector3.zero,
-                dragCanonicalOffset = Vector3.zero
+                dragStartTransformPosition = Vector3.positiveInfinity,
+                dragStartOffset = Vector3.positiveInfinity,
+                dragCanonicalOffset = Vector3.positiveInfinity
             };
             return result;
         }

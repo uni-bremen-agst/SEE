@@ -184,6 +184,7 @@ namespace SEE.Game.UI3D
             }
             else
             {
+                Assert.IsTrue(focusses.Count == 2);
                 GetMostDistantFocussesXZ(out Transform _, out Transform _, out float _, out float _, out float _, out result);
             }
 
@@ -367,13 +368,13 @@ namespace SEE.Game.UI3D
         private float minAngle;
         private float maxAngle;
 
-        internal static RotateGizmo Create(GO.Plane cullingPlane, int textureResolution)
+        internal static RotateGizmo Create(int textureResolution)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Quad);
             Destroy(go.GetComponent<MeshCollider>());
             go.name = "RotatePivot";
             go.transform.rotation = Quaternion.Euler(90.0f, 0.0f, 0.0f);
-            go.transform.position = cullingPlane.CenterTop;
+            go.transform.position = Vector3.zero;
 
             RotateGizmo p = go.AddComponent<RotateGizmo>();
 
