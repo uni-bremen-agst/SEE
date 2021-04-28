@@ -41,7 +41,7 @@ namespace Assets.SEE.Utils
         /// <summary>
         /// The maximal size of the action history.
         /// </summary>
-        private const int historySize = 100;
+        private const int historySize = 4;
 
         /// <summary>
         /// Let C be the currently executed action (if there is any) in this action history. 
@@ -80,7 +80,6 @@ namespace Assets.SEE.Utils
         /// </summary>
         public void Update()
         {
-            Debug.Log(allActionsList.Count); 
             if (activeAction.Update() && activeAction.HadEffect())
             {
                 Tuple<bool, HistoryType, string, List<string>> lastAction = FindLastActionOfPlayer(true, HistoryType.action);
@@ -101,10 +100,10 @@ namespace Assets.SEE.Utils
         /// <param name="action">The action and all of its specific values which are needed for the history</param>
         public void Push(Tuple<bool, HistoryType, string, List<string>> action)
         {
-            if (allActionsList.Count >= historySize) //Fixme: OffByOne..?
-            {
-                allActionsList.RemoveAt(0);
-            }
+            //if (allActionsList.Count >= historySize) //Fixme: OffByOne..?
+            //{
+            //    allActionsList.RemoveAt(0);
+            //}
             allActionsList.Add(action);
         }
 
