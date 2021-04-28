@@ -282,9 +282,23 @@ public class NodeDecorationController : MonoBehaviour
     /// <summary>
     /// Decorates the block
     /// </summary>
-    private void decorateBlock()
+    private void decoratePackedBlock(List<GameObject> hiddenObjects, GameObject parent)
     {
+        for (int i = 0; i < hiddenObjects.Count; i++)
+        {
+            GameObject clone = new GameObject();
+            clone.transform.position.Set(hiddenObjects[i].transform.position.x, parent.transform.localScale.y, hiddenObjects[i].transform.position.z);
+            clone.transform.localScale.Set(hiddenObjects[i].transform.localScale.x, 0.00000001f, hiddenObjects[i].transform.localScale.z);
+        }
+        decoratePackedBlockWall();
+    }
 
+    /// <summary>
+    /// Decorates the wall of the block
+    /// </summary>
+    private void decoratePackedBlockWall()
+    {
+      
     }
 
     // Start is called before the first frame update
