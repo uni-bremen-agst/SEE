@@ -329,10 +329,15 @@ namespace Assets.SEE.Utils
             return FindLastActionOfPlayer(true, HistoryType.undoneAction) == null;
         }
 
-        private string ListToString(List<string> ids)
+        /// <summary>
+        /// Converts a List of gameObjectIds to a single comma seperated string for sending it to other clients.
+        /// </summary>
+        /// <param name="gameObjectIds">the gameObjectIds</param>
+        /// <returns>a single comma seperated string of all gameObjectIds.</returns>
+        private string ListToString(List<string> gameObjectIds)
         {
             string result = "";
-            foreach(string s in ids)
+            foreach(string s in gameObjectIds)
             {
                 result += s + ",";
             }

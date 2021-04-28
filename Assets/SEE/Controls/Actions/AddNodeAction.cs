@@ -174,6 +174,10 @@ namespace SEE.Controls.Actions
             return ActionStateType.NewNode;
         }
 
+        /// <summary>
+        /// Returns all Ids of gameObjects manipulated by this action.
+        /// </summary>
+        /// <returns>all Ids of gameObjects manipulated by this action</returns>
         public override List<string> GetChangedObjects()
         {
             List<string> changedObjects = new List<string>

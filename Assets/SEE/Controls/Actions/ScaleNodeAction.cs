@@ -661,6 +661,10 @@ namespace SEE.Controls.Actions
             }
         }
 
+        /// <summary>
+        /// Returns all Ids of gameObjects manipulated by this action.
+        /// </summary>
+        /// <returns>all Ids of gameObjects manipulated by this action</returns>
         public override List<string> GetChangedObjects()
         {
             return new List<string>()
