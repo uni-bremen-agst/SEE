@@ -438,12 +438,31 @@ namespace SEE.Controls
         /// <param name="isOwner">Whether this client is initiating the action.</param>
         public static void UnselectAll(bool isOwner)
         {
+            List<InteractableObject> replaced = SelectedObjects.ToList();
+            List<InteractableObject> by = new List<InteractableObject>();
             // Note: This is no endless loop because SetSelect will remove this 
             // InteractableObject from SelectedObjects.
             while (SelectedObjects.Count != 0)
             {
                 SelectedObjects.ElementAt(SelectedObjects.Count - 1).SetSelect(false, isOwner);
             }
+            ReplaceSelect?.Invoke(replaced, by, isOwner);
+        }
+
+        public static void ReplaceSelection(InteractableObject interactableObject, bool isOwner)
+        {
+            List<InteractableObject> replaced = SelectedObjects.ToList();
+            List<InteractableObject> by = new List<InteractableObject>();
+            if (interactableObject)
+            {
+                by.Add(interactableObject);
+            }
+            UnselectAll(isOwner);
+            if (interactableObject)
+            {
+                interactableObject.SetSelect(true, isOwner);
+            }
+            ReplaceSelect?.Invoke(replaced, by, isOwner);
         }
 
         /// <summary>
@@ -649,6 +668,9 @@ namespace SEE.Controls
         /// <param name="interactableObject">the object being selected</param>
         /// <param name="isOwner">true if a local user initiated this call</param>
         public delegate void MultiPlayerSelectAction(InteractableObject interactableObject, bool isOwner);
+
+        public delegate void MulitPlayerReplaceSelectAction(List<InteractableObject> replaced, List<InteractableObject> by, bool isOwner);
+
         /// <summary>
         /// A delegate to be called when a selection event has happened (selecting
         /// or deselecting the game object). Intended for actions of a local player only.
@@ -677,6 +699,8 @@ namespace SEE.Controls
         /// Intended for multiplayer actions.
         /// </summary>
         public static event MultiPlayerSelectAction AnySelectOut;
+
+        public static event MulitPlayerReplaceSelectAction ReplaceSelect;
 
         /// <summary>
         /// Event to be triggered when this particular <see cref="InteractableObject"/> is being selected.

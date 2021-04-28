@@ -22,36 +22,6 @@ namespace SEE.Controls.Actions
     public class DesktopNavigationAction : NavigationAction
     {
         /// <summary>
-        /// The state for moving the city or parts of the city.
-        /// </summary>
-        private struct _MoveState
-        {
-            internal const float SnapStepCount = 8;
-            internal const float SnapStepAngle = 360.0f / SnapStepCount;
-
-            internal MoveGizmo moveGizmo;
-            internal Bounds cityBounds;
-            internal Vector3 dragStartTransformPosition;
-            internal Vector3 dragStartOffset;
-            internal Vector3 dragCanonicalOffset;
-            internal Transform draggedTransform;
-        }
-
-        /// <summary>
-        /// The state for rotating the city.
-        /// </summary>
-        private struct _RotateState
-        {
-            internal const float SnapStepCount = 8;
-            internal const float SnapStepAngle = 360.0f / SnapStepCount;
-
-            internal RotateGizmo rotateGizmo;
-            internal float originalEulerAngleY;
-            internal Vector3 originalPosition;
-            internal float startAngle;
-        }
-
-        /// <summary>
         /// The actions, that are currently active. This is initially set by
         /// <see cref="Update"/> and used and partly reset in <see cref="FixedUpdate"/>.
         /// </summary>
@@ -80,21 +50,6 @@ namespace SEE.Controls.Actions
         private UnityEngine.Plane raycastPlane;
 
         /// <summary>
-        /// Whether the city is currently moved or rotated by the player.
-        /// </summary>
-        private bool movingOrRotating;
-
-        /// <summary>
-        /// The current move state.
-        /// </summary>
-        private _MoveState moveState;
-
-        /// <summary>
-        /// The current rotate state.
-        /// </summary>
-        private _RotateState rotateState;
-
-        /// <summary>
         /// The current action state.
         /// </summary>
         private _ActionState actionState;
@@ -114,18 +69,6 @@ namespace SEE.Controls.Actions
         protected sealed override void OnCityAvailable()
         {
             raycastPlane = new UnityEngine.Plane(Vector3.up, CityTransform.position);
-            movingOrRotating = false;
-
-            moveState.moveGizmo = MoveGizmo.Create();
-            moveState.cityBounds = CityTransform.GetComponent<Collider>().bounds;
-            moveState.dragStartTransformPosition = Vector3.zero;
-            moveState.dragStartOffset = Vector3.zero;
-            moveState.dragCanonicalOffset = Vector3.zero;
-
-            rotateState.rotateGizmo = RotateGizmo.Create(1024);
-            rotateState.originalEulerAngleY = 0.0f;
-            rotateState.originalPosition = Vector3.zero;
-            rotateState.startAngle = 0.0f;
         }
 
         public sealed override void Update()
@@ -166,11 +109,6 @@ namespace SEE.Controls.Actions
                 }
 
                 actionState.zoomToggleToObject = !actionState.drag && (actionState.zoomToggleToObject || SEEInput.ZoomInto());
-                if (cursor.E != null && cursor.E.HasFocus())
-                {
-                    rotateState.rotateGizmo.Center = cursor.E.GetPosition();
-                    rotateState.rotateGizmo.Radius = 0.2f * (MainCamera.Camera.transform.position - rotateState.rotateGizmo.Center).magnitude;
-                }
             }
         }
 
@@ -248,25 +186,6 @@ namespace SEE.Controls.Actions
             }
             
             #endregion
-        }
-
-        private void OnStateChanged(ActionStateType value)
-        {
-            movingOrRotating = false;
-            if (Equals(value, ActionStateType.Move))
-            {
-                rotateState.rotateGizmo?.gameObject.SetActive(false);
-                enabled = true;
-            }
-            else if (Equals(value, ActionStateType.Rotate))
-            {
-                moveState.moveGizmo?.gameObject.SetActive(false);
-                enabled = true;
-            }
-            else
-            {
-                enabled = false;
-            }
         }
 
         /// <summary>
