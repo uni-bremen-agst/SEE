@@ -1,11 +1,8 @@
-using Assets.SEE.Game;
 using Assets.SEE.Utils;
-using SEE.Controls;
 using SEE.Controls.Actions;
-using SEE.GO;
-using SEE.GO.Menu;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Net
@@ -18,7 +15,7 @@ namespace SEE.Net
         /// <summary>
         /// 
         /// </summary>
-        private bool isOwner;
+        private readonly bool isOwner;
         /// <summary>
         /// 
         /// </summary>
@@ -26,7 +23,7 @@ namespace SEE.Net
         /// <summary>
         /// 
         /// </summary>
-        private string actionId;
+        private readonly string actionId;
         /// <summary>
         /// 
         /// </summary>
@@ -69,21 +66,24 @@ namespace SEE.Net
 
                 if (push) GlobalActionHistory.Push(new Tuple<bool, ActionHistory.HistoryType, string, List<string>>(!isOwner, type, actionId, changedObjects));
                 else GlobalActionHistory.DeleteItem(actionId, false);
-
             }
         }
 
-        private List<string> StringToList(string s)
+        /// <summary>
+        /// Parses a comma-seperated string of changedObjects and returns them as single elements in a list.
+        /// </summary>
+        /// <param name="changedObjectsToParse">the changed objects which has to be parsed</param>
+        /// <returns>a list of names of changed gameObjects</returns>
+        private List<string> StringToList(string changedObjectsToParse)
         {
-            if (s == null)
+            if (changedObjectsToParse == null)
             {
-                Debug.LogWarning("NULLLLLL");
+                Debug.LogWarning("ChangedObjects are null \n");
                 return null;
             }
-            List<string> result = new List<string>();
-            string[] arr = new string[s.Split(',').Length];
-            arr = s.Split(',');
-            foreach (string elm in arr) result.Add(elm);
+            string[] changedObjectsAsArray = new string[changedObjectsToParse.Split(',').Length];
+            changedObjectsAsArray = changedObjectsToParse.Split(',');
+            List<string> result = changedObjectsAsArray.ToList();
             return result;
         }
     }
