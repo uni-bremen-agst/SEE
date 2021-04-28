@@ -36,8 +36,12 @@ namespace Assets.SEE.Utils
         /// <summary>
         /// Contains the Active Action from each Player needs to be updated with each undo/redo/action
         /// </summary>
-
         private ReversibleAction activeAction = null;
+
+        /// <summary>
+        /// The maximal size of the action history.
+        /// </summary>
+        private const int historySize = 100;
 
         /// <summary>
         /// Let C be the currently executed action (if there is any) in this action history. 
@@ -97,6 +101,10 @@ namespace Assets.SEE.Utils
         /// <param name="action">The action and all of its specific values which are needed for the history</param>
         public void Push(Tuple<bool, HistoryType, string, List<string>> action)
         {
+            if (allActionsList.Count >= historySize) //Fixme: OffByOne..?
+            {
+                allActionsList.RemoveAt(0);
+            }
             allActionsList.Add(action);
         }
 
@@ -144,7 +152,7 @@ namespace Assets.SEE.Utils
         {
             int index = GetCountOfNewerAction(activeAction.GetId());
             if (index == -1) return false;
-            index = index + 1;
+            index++;
             for (int i = index ; index < allActionsList.Count; i++)
             {
                 Debug.LogWarning(index);
@@ -213,7 +221,6 @@ namespace Assets.SEE.Utils
                 if (lastAction == null) return;
                 activeAction = FindById(lastAction.Item3);
             }
-            // Fixme: Right place ?
             if (ActionHasConflicts(activeAction.GetChangedObjects()))
             {
                 // Fixme: Error
@@ -239,7 +246,6 @@ namespace Assets.SEE.Utils
                 activeAction = FindById(lastAction.Item3);
                 
                 Execute(activeAction.NewInstance(), true);
-                //activeAction?.Start();
                 isRedo = true;
 
             }
@@ -293,22 +299,11 @@ namespace Assets.SEE.Utils
         /// <returns>the number of newer actions than that with the id <paramref name="idOfAction"/>, which are not executed by the owner.</returns>
         private int GetCountOfNewerAction(string idOfAction)
         {
-
             for(int i = allActionsList.Count -1; i >= 0; i--)
             {
                 if (allActionsList[i].Item3.Equals(idOfAction)) return  i;
             }
-            return -1; //If not fouind the action
-            //int neweractionscount = 0;
-            //int sizeofactionslist = allactionslist.count - 1;
-            //while (!allactionslist[sizeofactionslist].item3.equals(idofaction) && sizeofactionslist >= 0)
-            //{
-            //    neweractionscount++;
-            //    sizeofactionslist--;
-            //}
-
-            //debug.log(neweractionscount);
-            //return neweractionscount;
+            return -1;
         }
 
         /// <summary>

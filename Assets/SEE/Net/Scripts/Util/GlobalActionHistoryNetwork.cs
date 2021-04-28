@@ -16,14 +16,17 @@ namespace SEE.Net
         /// 
         /// </summary>
         private readonly bool isOwner;
+
         /// <summary>
         /// 
         /// </summary>
         private ActionHistory.HistoryType type;
+
         /// <summary>
         /// 
         /// </summary>
         private readonly string actionId;
+
         /// <summary>
         /// 
         /// </summary>
@@ -33,6 +36,7 @@ namespace SEE.Net
         /// Wether a object should be pushed or removed
         /// </summary>
         private bool push = false;
+
         /// <summary>
         /// 
         /// </summary>
@@ -63,7 +67,6 @@ namespace SEE.Net
         {
             if (!IsRequester())
             {
-
                 if (push) GlobalActionHistory.Push(new Tuple<bool, ActionHistory.HistoryType, string, List<string>>(!isOwner, type, actionId, changedObjects));
                 else GlobalActionHistory.DeleteItem(actionId, false);
             }
