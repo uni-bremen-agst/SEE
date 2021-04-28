@@ -45,11 +45,7 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    InteractableObject.UnselectAll(true);
-                    if (obj != null)
-                    {
-                        obj.SetSelect(true, true);
-                    }
+                    InteractableObject.ReplaceSelection(obj, true);
                 }
             }
         }

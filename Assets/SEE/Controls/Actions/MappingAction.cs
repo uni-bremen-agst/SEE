@@ -132,7 +132,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public void Start()
         {
-            InteractableObject.AnySelectIn += AnySelectIn;
+            InteractableObject.ReplaceSelect += ReplaceSelect;
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public void Stop()
         {
-            InteractableObject.AnySelectIn -= AnySelectIn;
+            InteractableObject.ReplaceSelect -= ReplaceSelect;
         }
 
         /// <summary>
@@ -163,25 +163,30 @@ namespace SEE.Controls.Actions
         // Events
         //----------------------------------------------------------------
 
-        private void AnySelectIn(InteractableObject interactableObject, bool isOwner)
+        private void ReplaceSelect(List<InteractableObject> replaced, List<InteractableObject> by, bool isOwner)
         {
-            if (interactableObject.TryGetNode(out Node node))
+            // TODO(torben): for now!
+            Assert.IsTrue(replaced.Count <= 1);
+            Assert.IsTrue(by.Count <= 1);
+
+            if (replaced.Count == 1 && by.Count == 1)
             {
-                if (node.kind == Node.Kind.Architecture && lastSelection != null && lastSelection.GetNode().kind == Node.Kind.Implementation)
+                if (replaced[0].TryGetNode(out Node srcNode) && by[0].TryGetNode(out Node dstNode))
                 {
-                    Node from = mapping.GetNode(lastSelection.GetNode().ID);
-                    Node to = mapping.GetNode(node.ID);
-                    from.Reparent(to);
-                    mapping.FinalizeNodeHierarchy();
-                    SEECity city = SceneQueries.GetMapp();
-                    city.LoadedGraph = mapping;
-                    city.ReDrawGraph();
+                    Node.Kind srcKind = srcNode.kind;
+                    Node.Kind dstKind = dstNode.kind;
+                    // Note: Arch elems should not be moved into impl elems
+                    if (!srcNode.ID.Equals(dstNode.ID) && !(srcKind == Node.Kind.Architecture && dstKind == Node.Kind.Implementation) && !srcNode.IsRoot())
+                    {
+                        Node src = mapping.GetNode(srcNode.ID);
+                        Node dst = mapping.GetNode(dstNode.ID);
+                        src.Reparent(dst);
+                        mapping.FinalizeNodeHierarchy();
+                        SEECity city = SceneQueries.GetMapp();
+                        city.LoadedGraph = mapping;
+                        city.ReDrawGraph();
+                    }
                 }
-                lastSelection = interactableObject;
-            }
-            else
-            {
-                lastSelection = null;
             }
         }
 
