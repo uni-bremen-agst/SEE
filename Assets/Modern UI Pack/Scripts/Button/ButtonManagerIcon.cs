@@ -1,10 +1,12 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 namespace Michsky.UI.ModernUIPack
 {
+    [RequireComponent(typeof(Button))]
     public class ButtonManagerIcon : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
     {
         // Content
@@ -13,7 +15,7 @@ namespace Michsky.UI.ModernUIPack
         public UnityEvent hoverEvent;
         public AudioClip hoverSound;
         public AudioClip clickSound;
-        Button buttonVar;
+        public Button buttonVar;
 
         // Resources
         public Image normalIcon;
@@ -22,6 +24,8 @@ namespace Michsky.UI.ModernUIPack
         public GameObject rippleParent;
 
         // Settings
+        public AnimationSolution animationSolution = AnimationSolution.SCRIPT;
+        [Range(0.25f, 15)] public float fadingMultiplier = 8;
         public bool useCustomContent = false;
         public bool enableButtonSounds = false;
         public bool useHoverSound = true;
@@ -38,23 +42,35 @@ namespace Michsky.UI.ModernUIPack
         public bool centered = false;
         bool isPointerOn;
 
+        CanvasGroup normalCG;
+        CanvasGroup highlightedCG;
+        float currentNormalValue;
+        float currenthighlightedValue;
+
+        public enum AnimationSolution
+        {
+            ANIMATOR,
+            SCRIPT
+        }
+
         void Start()
         {
+            if (animationSolution == AnimationSolution.SCRIPT)
+            {
+                normalCG = transform.Find("Normal").GetComponent<CanvasGroup>();
+                highlightedCG = transform.Find("Highlighted").GetComponent<CanvasGroup>();
+
+                Animator tempAnimator = this.GetComponent<Animator>();
+                Destroy(tempAnimator);
+            }
+
             if (buttonVar == null)
                 buttonVar = gameObject.GetComponent<Button>();
 
-            buttonVar.onClick.AddListener(delegate
-            {
-                clickEvent.Invoke();
-            });
+            buttonVar.onClick.AddListener(delegate { clickEvent.Invoke(); });
 
             if (enableButtonSounds == true && useClickSound == true)
-            {
-                buttonVar.onClick.AddListener(delegate
-                {
-                    soundSource.PlayOneShot(clickSound);
-                });
-            }
+                buttonVar.onClick.AddListener(delegate { soundSource.PlayOneShot(clickSound); });
 
             if (useCustomContent == false)
                 UpdateUI();
@@ -115,11 +131,59 @@ namespace Michsky.UI.ModernUIPack
 
             hoverEvent.Invoke();
             isPointerOn = true;
+
+            if (animationSolution == AnimationSolution.SCRIPT && buttonVar.interactable == true)
+                StartCoroutine("FadeIn");
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
             isPointerOn = false;
+
+            if (animationSolution == AnimationSolution.SCRIPT && buttonVar.interactable == true)
+                StartCoroutine("FadeOut");
+        }
+
+        IEnumerator FadeIn()
+        {
+            StopCoroutine("FadeOut");
+            currentNormalValue = normalCG.alpha;
+            currenthighlightedValue = highlightedCG.alpha;
+
+            while (currenthighlightedValue <= 1)
+            {
+                currentNormalValue -= Time.deltaTime * fadingMultiplier;
+                normalCG.alpha = currentNormalValue;
+
+                currenthighlightedValue += Time.deltaTime * fadingMultiplier;
+                highlightedCG.alpha = currenthighlightedValue;
+
+                if (normalCG.alpha >= 1)
+                    StopCoroutine("FadeIn");
+
+                yield return null;
+            }
+        }
+
+        IEnumerator FadeOut()
+        {
+            StopCoroutine("FadeIn");
+            currentNormalValue = normalCG.alpha;
+            currenthighlightedValue = highlightedCG.alpha;
+
+            while (currentNormalValue >= 0)
+            {
+                currentNormalValue += Time.deltaTime * fadingMultiplier;
+                normalCG.alpha = currentNormalValue;
+
+                currenthighlightedValue -= Time.deltaTime * fadingMultiplier;
+                highlightedCG.alpha = currenthighlightedValue;
+
+                if (highlightedCG.alpha <= 0)
+                    StopCoroutine("FadeOut");
+
+                yield return null;
+            }
         }
     }
 }

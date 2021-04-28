@@ -17,20 +17,22 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.DataModel.DG;
-using SEE.Game.Evolution;
-using SEE.Game.Charts;
-using SEE.GO;
-using SEE.Layout;
-using SEE.Layout.NodeLayouts;
-using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using SEE.DataModel.DG;
+using SEE.Game.Charts;
+using SEE.Game.Evolution;
+using SEE.GO;
+using SEE.Layout;
+using SEE.Layout.EdgeLayouts;
+using SEE.Layout.NodeLayouts;
+using SEE.Layout.Utils;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
-using System.Runtime.CompilerServices;
 
 namespace SEE.Game
 {
@@ -52,7 +54,7 @@ namespace SEE.Game
         /// </summary>
         private void Awake()
         {
-            if (gameObject.TryGetComponent<SEECityEvolution>(out SEECityEvolution cityEvolution))
+            if (gameObject.TryGetComponent(out SEECityEvolution cityEvolution))
             {
                 // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
                 // So we cannot make the following assignment in the constructor. Neither
@@ -155,7 +157,7 @@ namespace SEE.Game
         /// <summary>
         /// Shortest time period in which an animation can be run in seconds.
         /// </summary>
-        private readonly float MinimalWaitTimeForNextRevision = 0.1f;
+        private const float MinimalWaitTimeForNextRevision = 0.1f;
 
         /// <summary>
         /// Registers <paramref name="action"/> to be called back when the shown
@@ -180,7 +182,7 @@ namespace SEE.Game
         /// <summary>
         /// Used to store whether a node has been born or changed.
         /// </summary>
-        private enum MarkerType {Changed, Born};
+        private enum MarkerType {Changed, Born}
 
         /// <summary>
         /// The animator used when an inner node is removed from the scene.
@@ -193,14 +195,9 @@ namespace SEE.Game
         protected AbstractAnimator moveScaleShakeAnimator;
 
         /// <summary>
-        /// Whether the animation is still ongoing.
-        /// </summary>
-        private bool _isStillAnimating = false;  // serialized by Unity
-
-        /// <summary>
         /// Whether the edge animation is ongoing.
         /// </summary>
-        private bool moveEdges = false;
+        private bool moveEdges;
 
         /// <summary>
         /// Saves pairs of old and new edges.
@@ -210,16 +207,12 @@ namespace SEE.Game
         /// <summary>
         /// Timer for edge animation
         /// </summary>
-        private float timer = 0f;
+        private float timer;
 
         /// <summary>
         /// True if animation is still ongoing.
         /// </summary>
-        public bool IsStillAnimating
-        {
-            get => _isStillAnimating;
-            set => _isStillAnimating = value;
-        }
+        public bool IsStillAnimating { get; private set; }
 
         /// <summary>
         /// The collection of registered <see cref="AbstractAnimator"/> to be updated
@@ -364,25 +357,22 @@ namespace SEE.Game
 
             // Gather all nodes for the layout.
             ignoreInnerNodes = !nodeLayout.IsHierarchical();
-            foreach (Node node in graph.Nodes())
+            foreach (Node node in graph.Nodes().Where(node => !ignoreInnerNodes || node.IsLeaf()))
             {
-                if (!ignoreInnerNodes || node.IsLeaf())
+                // All layouts (flat and hierarchical ones) must be able to handle leaves; 
+                // hence, leaves can be added at any rate. For a hierarchical layout, we 
+                // need to add the game objects for inner nodes, too. To put it differently,
+                // inner nodes are added only if we apply a hierarchical layout.
+                objectManager.GetNode(node, out GameObject gameNode);
+                // Now after having attached the new node to the game object,
+                // we must adjust the scale of it according to the newly attached node so 
+                // that the layouter has these. We need to adjust the scale only for leaves, 
+                // however, because the layouter will select the scale for inner nodes.
+                if (node.IsLeaf())
                 {
-                    // All layouts (flat and hierarchical ones) must be able to handle leaves; 
-                    // hence, leaves can be added at any rate. For a hierarchical layout, we 
-                    // need to add the game objects for inner nodes, too. To put it differently,
-                    // inner nodes are added only if we apply a hierarchical layout.
-                    objectManager.GetNode(node, out GameObject gameNode);
-                    // Now after having attached the new node to the game object,
-                    // we must adjust the scale of it according to the newly attached node so 
-                    // that the layouter has these. We need to adjust the scale only for leaves, 
-                    // however, because the layouter will select the scale for inner nodes.
-                    if (node.IsLeaf())
-                    {
-                        graphRenderer.AdjustScaleOfLeaf(gameNode);
-                    }
-                    gameObjects.Add(gameNode);
+                    graphRenderer.AdjustScaleOfLeaf(gameNode);
                 }
+                gameObjects.Add(gameNode);
             }
 
             // Calculate and apply the node layout
@@ -561,7 +551,7 @@ namespace SEE.Game
         /// <summary>
         /// Current graph revision counter
         /// </summary>
-        private int currentGraphRevisionCounter = 0;
+        private int currentGraphRevisionCounter;
 
         /// <summary>
         /// Event function triggered when all animations are finished. Animates the transition of the edges 
@@ -656,8 +646,8 @@ namespace SEE.Game
             {
                 foreach (GameObject newEdgeGameObject in newEdges)
                 {                    
-                    if (oldEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef oldEdgeRef) 
-                        && newEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef newEdgeRef)
+                    if (oldEdgeGameObject.TryGetComponent(out EdgeRef oldEdgeRef) 
+                        && newEdgeGameObject.TryGetComponent(out EdgeRef newEdgeRef)
                         && oldEdgeRef.Value.Equals(newEdgeRef.Value))
                     {
                         result.Add((oldEdgeGameObject, newEdgeGameObject));
@@ -685,17 +675,17 @@ namespace SEE.Game
                 {
                     foreach((GameObject oldEdge, GameObject newEdge) in matchedEdges)
                     {
-                        oldEdge.TryGetComponent<Points>(out Points oP);
-                        newEdge.TryGetComponent<Points>(out Points nP);
+                        oldEdge.TryGetComponent(out Points oP);
+                        newEdge.TryGetComponent(out Points nP);
 
                         uint sampleRate = (uint)Math.Max(oP.linePoints.Count(),nP.linePoints.Count());
 
                         // Creates new line points from the control points 
-                        oP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(oP.controlPoints, sampleRate);
-                        nP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(nP.controlPoints, sampleRate);
+                        oP.linePoints = LinePoints.BSplineLinePointsSampleRate(oP.controlPoints, sampleRate);
+                        nP.linePoints = LinePoints.BSplineLinePointsSampleRate(nP.controlPoints, sampleRate);
 
                         // Saves the new line points to the LineRenderer
-                        oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
+                        oldEdge.TryGetComponent(out LineRenderer lineRenderer);
                         lineRenderer.positionCount = oP.linePoints.Count();
                         lineRenderer.SetPositions(oP.linePoints);
                     }
@@ -714,15 +704,15 @@ namespace SEE.Game
         /// <summary>
         /// Interpolates the points of the old edges with those of the new edges over time.
         /// </summary>
-        void Update()
+        private void Update()
         {
             if (moveEdges) 
             {
                 timer += Time.deltaTime;
                  foreach ((GameObject oldEdge, GameObject newEdge) in matchedEdges)
                  {
-                    if (oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer)
-                        && newEdge.TryGetComponent<Points>(out Points newLinePoints))
+                    if (oldEdge.TryGetComponent(out LineRenderer lineRenderer)
+                        && newEdge.TryGetComponent(out Points newLinePoints))
                     {
                         for (int i = 0; i < lineRenderer.positionCount; i++)
                         {
@@ -746,9 +736,9 @@ namespace SEE.Game
         /// <param name="gameNode">game node object that was just modified by the animation</param>
         public void OnRenderNodeFinishedAnimation(object gameNode)
         {
-            if (gameNode is GameObject)
+            if (gameNode is GameObject node)
             {
-                graphRenderer.AdjustStyle(gameNode as GameObject);
+                graphRenderer.AdjustStyle(node);
             }
         }
 
@@ -856,9 +846,9 @@ namespace SEE.Game
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void DestroyGameObject(object gameObject)
         {
-            if (gameObject is GameObject)
+            if (gameObject is GameObject go)
             {
-                Destroy((GameObject)gameObject);
+                Destroy(go);
             }
         }
 
@@ -927,7 +917,7 @@ namespace SEE.Game
         /// <summary>
         /// The index of the currently visualized graph.
         /// </summary>
-        private int currentGraphIndex = 0;  // not serialized by Unity
+        private int currentGraphIndex;  // not serialized by Unity
 
         /// <summary>
         /// Returns the index of the currently shown graph.
@@ -943,19 +933,19 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// An event fired when the viewn graph has changed.
+        /// An event fired when the view graph has changed.
         /// </summary>
         private readonly UnityEvent shownGraphHasChangedEvent = new UnityEvent();
 
         /// <summary>
         /// Whether the user has selected auto-play mode.
         /// </summary>
-        private bool _isAutoplay = false;  // not serialized by Unity
+        private bool _isAutoplay;  // not serialized by Unity
 
         /// <summary>
         /// Whether the user has selected reverse auto-play mode.
         /// </summary>
-        private bool _isAutoplayReverse = false;  // not serialized by Unity
+        private bool _isAutoplayReverse;  // not serialized by Unity
 
         /// <summary>
         /// Returns true if automatic animations are active.
@@ -1016,7 +1006,7 @@ namespace SEE.Game
             }
             else
             {
-                Debug.LogError("Evolution renderer could not show the inital graph.\n");
+                Debug.LogError("Evolution renderer could not show the initial graph.\n");
             }
         }
 
@@ -1114,7 +1104,6 @@ namespace SEE.Game
             if (!ShowNextIfPossible())
             {
                 Debug.Log("This is already the last graph revision.\n");
-                return;
             }
         }
 
@@ -1195,7 +1184,6 @@ namespace SEE.Game
             if (!ShowPreviousIfPossible())
             {
                 Debug.Log("This is already the first graph revision.\n");
-                return;
             }
         }
 
@@ -1302,35 +1290,21 @@ namespace SEE.Game
         /// <summary>
         /// An implementation of ILayoutNode that is used for animation purposes only.
         /// The only features it supports are the position and scale of node.
-        /// That is what is currenly needed by the animators.
+        /// That is what is currently needed by the animators.
         /// </summary>
         private class AnimationNode : ILayoutNode
         {
-            private Vector3 centerPosition;
-            private Vector3 scale;
-
             public AnimationNode(Vector3 centerPosition, Vector3 scale)
             {
-                this.centerPosition = centerPosition;
-                this.scale = scale;
+                this.CenterPosition = centerPosition;
+                this.LocalScale = scale;
             }
 
-            public Vector3 LocalScale
-            {
-                get => scale;
-                set => scale = value;
-            }
+            public Vector3 LocalScale { get; set; }
 
-            public Vector3 AbsoluteScale
-            {
-                get => scale;
-            }
+            public Vector3 AbsoluteScale => LocalScale;
 
-            public Vector3 CenterPosition
-            {
-                get => centerPosition;
-                set => centerPosition = value;
-            }
+            public Vector3 CenterPosition { get; set; }
 
             public void ScaleBy(float factor)
             {

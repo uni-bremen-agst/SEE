@@ -1,5 +1,6 @@
 using System.Linq;
 using SEE.GO;
+using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -37,13 +38,7 @@ namespace SEE.Game.UI.CodeWindow
                 return;
             }
 
-            Object codeWindowPrefab = Resources.Load<GameObject>(CODE_WINDOW_PREFAB);
-            codeWindow = Instantiate(codeWindowPrefab, Canvas.transform, false) as GameObject;
-            if (!codeWindow)
-            {
-                Debug.LogError("Couldn't instantiate codeWindow.\n");
-                return;
-            }
+            codeWindow = PrefabInstantiator.InstantiatePrefab(CODE_WINDOW_PREFAB, Canvas.transform, false);
 
             // Set resolution to preferred values
             if (codeWindow.TryGetComponentOrLog(out RectTransform rect))

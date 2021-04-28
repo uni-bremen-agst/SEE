@@ -1,12 +1,22 @@
 {
-    "name": "InControl",
-    "references": [],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": []
+  "name": "InControl",
+  "rootNamespace": "",
+  "references": [
+    "GUID:75469ad4d38634e559750d17036d5f7c"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [
+    {
+      "name": "com.unity.inputsystem",
+      "expression": "0.0.0",
+      "define": "INCONTROL_USE_NEW_UNITY_INPUT"
+    }
+  ],
+  "noEngineReferences": false
 }

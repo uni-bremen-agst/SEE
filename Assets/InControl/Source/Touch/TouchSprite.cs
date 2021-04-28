@@ -49,9 +49,7 @@
 		public bool Ready { get; set; }
 
 
-		public TouchSprite()
-		{
-		}
+		public TouchSprite() {}
 
 
 		public TouchSprite( float size )
@@ -135,13 +133,25 @@
 		}
 
 
+		static Shader spriteRendererShader;
+		static Material spriteRendererMaterial;
+		static int spriteRendererPixelSnapId;
+
+
 		SpriteRenderer CreateSpriteRenderer( GameObject spriteGameObject, Sprite sprite, int sortingOrder )
 		{
+			if (!spriteRendererMaterial)
+			{
+				spriteRendererShader = Shader.Find( "Sprites/Default" );
+				spriteRendererMaterial = new Material( spriteRendererShader );
+				spriteRendererPixelSnapId = Shader.PropertyToID( "PixelSnap" );
+			}
+
 			var spriteRenderer = spriteGameObject.AddComponent<SpriteRenderer>();
 			spriteRenderer.sprite = sprite;
 			spriteRenderer.sortingOrder = sortingOrder;
-			spriteRenderer.sharedMaterial = new Material( Shader.Find( "Sprites/Default" ) );
-			spriteRenderer.sharedMaterial.SetFloat( "PixelSnap", 1.0f );
+			spriteRenderer.sharedMaterial = spriteRendererMaterial;
+			spriteRenderer.sharedMaterial.SetFloat( spriteRendererPixelSnapId, 1.0f );
 			return spriteRenderer;
 		}
 
@@ -410,4 +420,3 @@
 		}
 	}
 }
-

@@ -18,7 +18,7 @@ namespace SEE.Controls.Actions
     /// </summary>
     [RequireComponent(typeof(CityCursor))]
     [RequireComponent(typeof(Collider))]
-    [RequireComponent(typeof(SEECity))]
+    //[RequireComponent(typeof(SEECity))] // FIXME: We cannot simply request that a SEECity exists. There are also other kinds of AbstractSEECity classes.
     public class DesktopNavigationAction : NavigationAction
     {
         /// <summary>

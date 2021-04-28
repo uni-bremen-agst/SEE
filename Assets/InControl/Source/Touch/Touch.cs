@@ -98,7 +98,7 @@ namespace InControl
 			tapCount = touch.tapCount;
 			mouseButton = 0;
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2
+			#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2
 			type = TouchType.Direct;
 			altitudeAngle = Mathf.PI / 2.0f;
 			azimuthAngle = Mathf.PI / 2.0f;
@@ -106,14 +106,14 @@ namespace InControl
 			pressure = 1.0f;
 			radius = 1.0f;
 			radiusVariance = 0.0f;
-#else
+			#else
 			altitudeAngle = touch.altitudeAngle;
 			azimuthAngle = touch.azimuthAngle;
 			maximumPossiblePressure = touch.maximumPossiblePressure;
 			pressure = touch.pressure;
 			radius = touch.radius;
 			radiusVariance = touch.radiusVariance;
-#endif
+			#endif
 
 			var touchPosition = touch.position;
 			touchPosition.x = Mathf.Clamp( touchPosition.x, 0.0f, Screen.width );
@@ -152,9 +152,17 @@ namespace InControl
 				return false;
 			}
 
-			var mousePosition = new Vector2( Mathf.Round( Input.mousePosition.x ), Mathf.Round( Input.mousePosition.y ) );
+			if (button < 0 || button > 2)
+			{
+				return false;
+			}
 
-			if (Input.GetMouseButtonDown( button ))
+			var inputMousePosition = InputManager.MouseProvider.GetPosition();
+			var mousePosition = new Vector2( Mathf.Round( inputMousePosition.x ), Mathf.Round( inputMousePosition.y ) );
+
+			var mouseControl = Mouse.LeftButton + button;
+
+			if (InputManager.MouseProvider.GetButtonWasPressed( mouseControl ))
 			{
 				phase = TouchPhase.Began;
 				pressure = 1.0f;
@@ -175,7 +183,7 @@ namespace InControl
 				return true;
 			}
 
-			if (Input.GetMouseButtonUp( button ))
+			if (InputManager.MouseProvider.GetButtonWasReleased( mouseControl ))
 			{
 				phase = TouchPhase.Ended;
 				pressure = 0.0f;
@@ -195,7 +203,7 @@ namespace InControl
 				return true;
 			}
 
-			if (Input.GetMouseButton( button ))
+			if (InputManager.MouseProvider.GetButtonIsPressed( mouseControl ))
 			{
 				phase = TouchPhase.Moved;
 				pressure = 1.0f;
