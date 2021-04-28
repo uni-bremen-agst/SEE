@@ -122,7 +122,7 @@ namespace SEE.Controls.Actions
             moveState.dragStartOffset = Vector3.zero;
             moveState.dragCanonicalOffset = Vector3.zero;
 
-            rotateState.rotateGizmo = RotateGizmo.Create(portalPlane, 1024);
+            rotateState.rotateGizmo = RotateGizmo.Create(1024);
             rotateState.originalEulerAngleY = 0.0f;
             rotateState.originalPosition = Vector3.zero;
             rotateState.startAngle = 0.0f;
@@ -185,134 +185,13 @@ namespace SEE.Controls.Actions
             bool synchronize = false;
             RaycastClippingPlane(out bool hitPlane, out bool insideClippingArea, out Vector3 planeHitPoint);
 
-            #region Move City
-
             if (Equals(ActionState.Value, ActionStateType.Move) && false)
             {
-                if (actionState.reset) // reset to center of table
-                {
-                    if ((insideClippingArea && !(actionState.drag ^ movingOrRotating)) || (actionState.drag && movingOrRotating))
-                    {
-                        movingOrRotating = false;
-
-                        if (moveState.draggedTransform)
-                        {
-                            moveState.draggedTransform.GetComponent<InteractableObject>().SetGrab(false, true);
-                            moveState.draggedTransform = null;
-                        }
-                        moveState.moveGizmo.gameObject.SetActive(false);
-
-                        CityTransform.position = portalPlane.CenterTop;
-                        synchronize = true;
-                    }
-                }
-                else if (actionState.cancel) // cancel movement
-                {
-                    if (movingOrRotating)
-                    {
-                        movingOrRotating = false;
-
-                        moveState.draggedTransform.GetComponent<InteractableObject>().SetGrab(false, true);
-                        moveState.moveGizmo.gameObject.SetActive(false);
-
-                        moveState.draggedTransform.position =
-                            moveState.dragStartTransformPosition + moveState.dragStartOffset
-                            - Vector3.Scale(moveState.dragCanonicalOffset, moveState.draggedTransform.localScale);
-                        moveState.draggedTransform = null;
-                        synchronize = true;
-                    }
-                    else
-                    {
-                        InteractableObject o = InteractableObject.HoveredObject;
-                        if (o)
-                        {
-                            InteractableObject.UnselectAllInGraph(o.ItsGraph(), true);
-                        }
-                    }
-                }
-                else if (actionState.drag && hitPlane) // start or continue movement
-                {
-                    if (actionState.startDrag) // start movement
-                    {
-                        if (insideClippingArea)
-                        {
-                            if (actionState.dragHoveredOnly)
-                            {
-                                InteractableObject o = InteractableObject.HoveredObject;
-                                if (o)
-                                {
-                                    movingOrRotating = true;
-                                    moveState.draggedTransform = o.transform;
-                                }
-                            }
-                            else
-                            {
-                                movingOrRotating = true;
-                                moveState.draggedTransform = CityTransform;
-                            }
-
-                            if (movingOrRotating)
-                            {
-                                moveState.draggedTransform.GetComponent<InteractableObject>().SetGrab(true, true);
-                                moveState.moveGizmo.gameObject.SetActive(true);
-
-                                moveState.dragStartTransformPosition = moveState.draggedTransform.position;
-                                moveState.dragStartOffset = planeHitPoint - moveState.draggedTransform.position;
-                                moveState.dragCanonicalOffset = moveState.dragStartOffset.DividePairwise(moveState.draggedTransform.localScale);
-                            }
-                        }
-                    }
-
-                    if (movingOrRotating) // continue movement
-                    {
-                        Vector3 totalDragOffsetFromStart = planeHitPoint - (moveState.dragStartTransformPosition + moveState.dragStartOffset);
-
-                        if (actionState.snap)
-                        {
-                            Vector2 point2 = new Vector2(totalDragOffsetFromStart.x, totalDragOffsetFromStart.z);
-                            float angleDeg = point2.Angle360();
-                            float snappedAngleDeg = Mathf.Round(angleDeg / _MoveState.SnapStepAngle) * _MoveState.SnapStepAngle;
-                            float snappedAngleRad = Mathf.Deg2Rad * snappedAngleDeg;
-                            Vector2 dir = new Vector2(Mathf.Cos(snappedAngleRad), Mathf.Sin(-snappedAngleRad));
-                            Vector2 proj = dir * Vector2.Dot(point2, dir);
-                            totalDragOffsetFromStart = new Vector3(proj.x, totalDragOffsetFromStart.y, proj.y);
-                        }
-
-                        Vector3 oldPosition = moveState.draggedTransform.position;
-                        Vector3 newPosition = moveState.dragStartTransformPosition + totalDragOffsetFromStart;
-
-                        moveState.draggedTransform.position = newPosition;
-                        moveState.moveGizmo.SetPositions(
-                            moveState.dragStartTransformPosition + moveState.dragStartOffset,
-                            moveState.draggedTransform.position + Vector3.Scale(moveState.dragCanonicalOffset, moveState.draggedTransform.localScale));
-                        synchronize = true;
-                    }
-                }
-                else if (movingOrRotating) // finalize movement
-                {
-                    if (moveState.draggedTransform != CityTransform) // only reparent non-root nodes
-                    {
-                        Transform movingObject = moveState.draggedTransform;
-                        Vector3 originalPosition = moveState.dragStartTransformPosition + moveState.dragStartOffset
-                                - Vector3.Scale(moveState.dragCanonicalOffset, movingObject.localScale);
-
-                        GameNodeMover.FinalizePosition(movingObject.gameObject, originalPosition);
-                        synchronize = true;
-                    }
-
-                    movingOrRotating = false;
-
-                    moveState.draggedTransform.GetComponent<InteractableObject>().SetGrab(false, true);
-                    moveState.draggedTransform = null;
-                    moveState.moveGizmo.gameObject.SetActive(false);
-                }
             }
-
-            #endregion
 
             #region Rotate Action
 
-            else if (Equals(ActionState.Value, ActionStateType.Rotate))
+            else if (Equals(ActionState.Value, ActionStateType.Rotate) && false)
             {
                 if (actionState.reset) // reset rotation to identity();
                 {
