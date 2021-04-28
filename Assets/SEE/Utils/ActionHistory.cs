@@ -336,8 +336,11 @@ namespace Assets.SEE.Utils
             {
                 result += s + ",";
             }
-
-            return result.Substring(0, result.Length - 1);
+            if (result != "")
+            {
+                return result.Substring(0, result.Length - 1);
+            }
+            else return null;
         }
     }
 }
