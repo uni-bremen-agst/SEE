@@ -105,6 +105,7 @@ namespace SEE.Controls.Actions
             // FIXME: For an unknown reason, the mouse events in InteractableObject will be
             // triggered twice per frame, which causes this method to be called twice.
             // We need to further investigate this issue.
+            // THIS ISSUE WAS FIXED
             //Debug.LogFormat("{0}.LocalAnyHoverIn({1})\n",
             //                this.GetType().FullName, 
             //                interactableObject == null ? "NULL" : interactableObject.name);
@@ -137,6 +138,7 @@ namespace SEE.Controls.Actions
             // FIXME: For an unknown reason, the mouse events in InteractableObject will be
             // triggered twice per frame, which causes this method to be called twice.
             // We need to further investigate this issue.
+            // THIS ISSUE WAS FIXED
             //Debug.LogFormat("{0}.LocalAnyHoverOut({1})\n",
             //                this.GetType().FullName,
             //                interactableObject == null ? "NULL" : interactableObject.name);

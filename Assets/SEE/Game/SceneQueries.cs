@@ -219,6 +219,16 @@ namespace SEE.Game
             return null;
         }
 
+        public static Transform GetCityRootTransformUpwards(Transform cityChildTransform)
+        {
+            Transform result = cityChildTransform;
+            while (result.parent.CompareTag(Tags.Node))
+            {
+                result = result.parent;
+            }
+            return result;
+        }
+
         /// <summary>
         /// Returns the root game object that represents a code city as a whole
         /// along with the settings (layout information etc.). In other words,

@@ -49,12 +49,25 @@ namespace SEE.Controls.Actions
         /// <param name="isOwner">true if a local user initiated this call</param>
         protected override void Off(InteractableObject interactableObject, bool isOwner)
         {
-            if (!interactable.IsSelected && !interactable.IsGrabbed)
+            if (!interactable.IsSelected && !interactable.IsGrabbed && TryGetComponent(out Outline outline))
             {
-                if (TryGetComponent(out Outline outline))
-                {
-                    DestroyImmediate(outline);
-                }
+                DestroyImmediate(outline);
+            }
+        }
+
+        protected override void SelectOff(InteractableObject interactableObject, bool isOwner)
+        {
+            if (interactable.IsHovered && !interactable.IsGrabbed)
+            {
+                GetComponent<Outline>().SetColor(isOwner ? LocalHoverColor : RemoteHoverColor);
+            }
+        }
+
+        protected override void GrabOff(InteractableObject interactableObject, bool isOwner)
+        {
+            if (interactable.IsHovered && !interactable.IsSelected)
+            {
+                GetComponent<Outline>().SetColor(isOwner ? LocalHoverColor : RemoteHoverColor);
             }
         }
     }

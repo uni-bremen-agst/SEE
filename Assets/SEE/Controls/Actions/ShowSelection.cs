@@ -46,9 +46,22 @@ namespace SEE.Controls.Actions
         /// <param name="isOwner">true if a local user initiated this call</param>
         protected override void Off(InteractableObject interactableObject, bool isOwner)
         {
-            if (!interactable.IsGrabbed && !interactable.IsHovered && TryGetComponent(out Outline outline))
+            if (!interactable.IsHovered && !interactable.IsGrabbed && TryGetComponent(out Outline outline))
             {
                 DestroyImmediate(outline);
+            }
+        }
+
+        /// <summary>
+        /// If the object is no longer grabbed, but selected, the outline color is changed.
+        /// </summary>
+        /// <param name="interactableObject">The ungrabbed object.</param>
+        /// <param name="isOwner">true if a local user initiated this call</param>
+        protected override void GrabOff(InteractableObject interactableObject, bool isOwner)
+        {
+            if (interactable.IsSelected)
+            {
+                GetComponent<Outline>().SetColor(isOwner ? LocalSelectColor : RemoteSelectColor);
             }
         }
     }

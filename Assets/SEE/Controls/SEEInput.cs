@@ -185,12 +185,30 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// The user wants to drag the city on its plane.
+        /// The user wants to drag the hovered element of the city on its plane.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        internal static bool DragHovered()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.DragHovered);
+        }
+
+        /// <summary>
+        /// The user wants to start dragging the city in it's entirety or parts of it.
+        /// </summary>
+        /// <returns>true if the user requests this action</returns>
+        internal static bool StartDrag()
+        {
+            return Input.GetMouseButtonDown(2);
+        }
+
+        /// <summary>
+        /// The user wants to drag the city in it's entirety or parts of it.
+        /// </summary>
+        /// <returns>true if the user requests this action</returns>
         internal static bool Drag()
         {
-            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.Drag);
+            return Input.GetMouseButton(2);
         }
 
         //-----------------------------------------------------

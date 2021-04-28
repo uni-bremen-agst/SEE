@@ -26,9 +26,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         private struct _MoveState
         {
-            internal const float MaxVelocity = 10.0f;                        // This is only used, if the city was moved as a whole
-            internal const float MaxSqrVelocity = MaxVelocity * MaxVelocity;
-            internal const float DragFrictionCoefficient = 32.0f;
             internal const float SnapStepCount = 8;
             internal const float SnapStepAngle = 360.0f / SnapStepCount;
 
@@ -37,7 +34,6 @@ namespace SEE.Controls.Actions
             internal Vector3 dragStartTransformPosition;
             internal Vector3 dragStartOffset;
             internal Vector3 dragCanonicalOffset;
-            internal Vector3 moveVelocity;
             internal Transform draggedTransform;
         }
 
@@ -113,8 +109,6 @@ namespace SEE.Controls.Actions
 
             base.Awake();
             cursor = GetComponent<CityCursor>();
-
-            ActionState.OnStateChanged += OnStateChanged;
         }
 
         protected sealed override void OnCityAvailable()
@@ -122,22 +116,16 @@ namespace SEE.Controls.Actions
             raycastPlane = new UnityEngine.Plane(Vector3.up, CityTransform.position);
             movingOrRotating = false;
 
-            moveState.moveGizmo = MoveGizmo.Create(0.008f * portalPlane.MinLengthXZ);
+            moveState.moveGizmo = MoveGizmo.Create();
             moveState.cityBounds = CityTransform.GetComponent<Collider>().bounds;
             moveState.dragStartTransformPosition = Vector3.zero;
             moveState.dragStartOffset = Vector3.zero;
             moveState.dragCanonicalOffset = Vector3.zero;
-            moveState.moveVelocity = Vector3.zero;
 
             rotateState.rotateGizmo = RotateGizmo.Create(portalPlane, 1024);
             rotateState.originalEulerAngleY = 0.0f;
             rotateState.originalPosition = Vector3.zero;
             rotateState.startAngle = 0.0f;
-        }
-
-        private void OnDestroy()
-        {
-            ActionState.OnStateChanged -= OnStateChanged;
         }
 
         public sealed override void Update()
@@ -153,7 +141,7 @@ namespace SEE.Controls.Actions
                 // feel responsive!
                 actionState.drag = Input.GetMouseButton(2);
                 actionState.startDrag |= !isMouseOverGUI && Input.GetMouseButtonDown(2);
-                actionState.dragHoveredOnly = SEEInput.Drag();
+                actionState.dragHoveredOnly = SEEInput.DragHovered();
                 actionState.cancel |= SEEInput.Cancel();
                 actionState.snap = SEEInput.Snap();
                 actionState.reset |= (actionState.drag || !isMouseOverGUI) && SEEInput.Reset();
@@ -177,13 +165,8 @@ namespace SEE.Controls.Actions
                     }
                 }
 
-                // TODO(torben): extract zoom and/or disable this script if latter conditions are false
-                if (!actionState.drag && (ActionState.Value == ActionStateType.Move || ActionState.Value == ActionStateType.Rotate))
-                {
-                    actionState.zoomToggleToObject |= SEEInput.ZoomInto();
-                }
-
-                if (Equals(ActionState.Value, ActionStateType.Rotate) && cursor.E.HasFocus())
+                actionState.zoomToggleToObject = !actionState.drag && (actionState.zoomToggleToObject || SEEInput.ZoomInto());
+                if (cursor.E != null && cursor.E.HasFocus())
                 {
                     rotateState.rotateGizmo.Center = cursor.E.GetPosition();
                     rotateState.rotateGizmo.Radius = 0.2f * (MainCamera.Camera.transform.position - rotateState.rotateGizmo.Center).magnitude;
@@ -204,7 +187,7 @@ namespace SEE.Controls.Actions
 
             #region Move City
 
-            if (Equals(ActionState.Value, ActionStateType.Move))
+            if (Equals(ActionState.Value, ActionStateType.Move) && false)
             {
                 if (actionState.reset) // reset to center of table
                 {
@@ -232,7 +215,6 @@ namespace SEE.Controls.Actions
                         moveState.draggedTransform.GetComponent<InteractableObject>().SetGrab(false, true);
                         moveState.moveGizmo.gameObject.SetActive(false);
 
-                        moveState.moveVelocity = Vector3.zero;
                         moveState.draggedTransform.position =
                             moveState.dragStartTransformPosition + moveState.dragStartOffset
                             - Vector3.Scale(moveState.dragCanonicalOffset, moveState.draggedTransform.localScale);
@@ -277,7 +259,6 @@ namespace SEE.Controls.Actions
                                 moveState.dragStartTransformPosition = moveState.draggedTransform.position;
                                 moveState.dragStartOffset = planeHitPoint - moveState.draggedTransform.position;
                                 moveState.dragCanonicalOffset = moveState.dragStartOffset.DividePairwise(moveState.draggedTransform.localScale);
-                                moveState.moveVelocity = Vector3.zero;
                             }
                         }
                     }
@@ -300,7 +281,6 @@ namespace SEE.Controls.Actions
                         Vector3 oldPosition = moveState.draggedTransform.position;
                         Vector3 newPosition = moveState.dragStartTransformPosition + totalDragOffsetFromStart;
 
-                        moveState.moveVelocity = (newPosition - oldPosition) / Time.fixedDeltaTime; // TODO(torben): it might be possible to determine velocity only on release
                         moveState.draggedTransform.position = newPosition;
                         moveState.moveGizmo.SetPositions(
                             moveState.dragStartTransformPosition + moveState.dragStartOffset,
@@ -323,10 +303,6 @@ namespace SEE.Controls.Actions
                     movingOrRotating = false;
 
                     moveState.draggedTransform.GetComponent<InteractableObject>().SetGrab(false, true);
-                    if (moveState.draggedTransform != CityTransform)
-                    {
-                        moveState.moveVelocity = Vector3.zero; // TODO(torben): do we want to apply velocity to individually moved buildings or keep it like this?
-                    }
                     moveState.draggedTransform = null;
                     moveState.moveGizmo.gameObject.SetActive(false);
                 }
@@ -481,24 +457,7 @@ namespace SEE.Controls.Actions
 
             #endregion
 
-            #region ApplyVelocityAndConstraints
-
-            if (!movingOrRotating)
-            {
-                // Clamp velocity
-                moveState.moveVelocity = PhysicsUtil.ClampVelocity(moveState.moveVelocity, _MoveState.MaxVelocity);
-
-                // Apply velocity to city position
-                if (moveState.moveVelocity.sqrMagnitude != 0.0f)
-                {
-                    CityTransform.position += moveState.moveVelocity * Time.fixedDeltaTime;
-                    synchronize = true;
-                }
-
-                // Apply friction to velocity
-                Vector3 acceleration = PhysicsUtil.Friction(moveState.moveVelocity, _MoveState.DragFrictionCoefficient);
-                moveState.moveVelocity += acceleration * Time.fixedDeltaTime;
-            }
+            #region ApplyConstraints
 
             // Keep city constrained to table
             float radius = 0.5f * CityTransform.lossyScale.x;

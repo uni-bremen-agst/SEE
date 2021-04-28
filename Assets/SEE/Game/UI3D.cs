@@ -284,7 +284,6 @@ namespace SEE.Game.UI3D
     {
         private const string PlainColorShaderName = "Unlit/PlainColorShader";
 
-        private float scale;
         private Vector3 start;
         private Vector3 end;
 
@@ -292,12 +291,11 @@ namespace SEE.Game.UI3D
         private Material axisMaterial;
         private Material lineMaterial;
 
-        internal static MoveGizmo Create(float scale)
+        internal static MoveGizmo Create()
         {
             GameObject go = new GameObject("MovePivot");
             MoveGizmo p = go.AddComponent<MoveGizmo>();
 
-            p.scale = scale;
             p.start = Vector3.zero;
             p.end = Vector3.zero;
 
