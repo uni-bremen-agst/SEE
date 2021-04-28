@@ -1,3 +1,16 @@
+### v1.8.4
+* Added `InputControlType.LeftCommand` and `InputControlType.RightCommand` aliases. Where possible, for devices with a correct `DeviceStyle`, it will map appropriately to the command buttons based on location, for example: `Back` and `Right` for Xbox 360, `View` and `Menu` for Xbox One, `Share` and `Options` for Dual Shock 4, etc.
+* Added support for querying control glyph names for controllers using Apple's Game Controller framework exposed through the native input module. To use, cast the device to `NativeInputDevice` and call the `GetAppleGlyphNameForControl()` method. Note: some controls may have no glyph name, but primary controls generally do.
+* Added beta support for using new Unity input system as a backend for gamepad, keyboard and mouse input (touch input coming later). This will be enabled when the Input System package (com.unity.inputsystem >= 1.0.0) is installed in Package Manager. You will also need to set Project Settings > Player > Active Input Handling to Both.
+* Added LED color support for compatible (Dual Shock 4) controllers using Apple's Game Controller framework exposed through the native input module.
+* Added PlayStation 5 controller support for native module (no rumble or LED features yet).
+* Added "BindingsMenu" example demonstrating how to use the bindings API with Unity UI.
+* Made `Device.RequestActivation()` public.
+* Fixed error that can happen on application quit.
+* Fixed duplicate device with Switch Pro Controller on newer macOS versions.
+* Properly enable Unity UI `InControlInputModule` on PS5, GameCore and Stadia.
+* Changed `TouchSprite.CreateSpriteRenderer()` to use a shared material for potential drawcall reduction.
+
 ### v1.8.3
 * Fixed crash in native plugin for devices that declare an unusually high number of buttons.
 * Fixed crash in native plugin for Windows x86 IL2CPP builds.
@@ -34,14 +47,13 @@
 * Removed deprecated `InputDeviceProfile.SupportedPlatforms` (use `IncludePlatforms` instead).
 * Significant refactoring of `InputDeviceProfile` subclasses to unify how profiles definitions work between Unity profiles and Native profiles, and move toward serializable profiles in the future.
 
-
 ### v1.7.4
 * Added support for a few common controller/browser combinations in WebGL:
-  * WebGL Chrome (Mac): Xbox 360, Xbox One, PlayStation 4 and Nintendo Switch Pro controllers.
-  * WebGL FireFox (Mac): Xbox 360, Xbox One and PlayStation 4 controllers.
-  * WebGL Safari (Mac): Xbox 360 and Xbox One controllers.
-  * WebGL Chrome (Windows): Xbox (XInput), PlayStation 4 and Nintendo Switch Pro controllers.
-  * WebGL FireFox (Windows): Xbox (XInput) and PlayStation 4 controllers.
+* WebGL Chrome (Mac): Xbox 360, Xbox One, PlayStation 4 and Nintendo Switch Pro controllers.
+* WebGL FireFox (Mac): Xbox 360, Xbox One and PlayStation 4 controllers.
+* WebGL Safari (Mac): Xbox 360 and Xbox One controllers.
+* WebGL Chrome (Windows): Xbox (XInput), PlayStation 4 and Nintendo Switch Pro controllers.
+* WebGL FireFox (Windows): Xbox (XInput) and PlayStation 4 controllers.
 * Added additional controllers supported by 360Controller 1.0.0-alpha.3 on Mac.
 * Added `Preserve` attribute to profiles to prevent IL2CPP max stripping from removing them.
 * Added 8bitdo SF30 Pro Windows native input profile.
@@ -49,7 +61,6 @@
 * Fixed touch control animations to use `Time.unscaledDeltaTime` to work consistently when games are paused.
 * Fixed deprecated references to `UnityEngine.Apple.TV`.
 * Fixed error that can happen in Unity Editor on first launch after Library folder is deleted.
-
 
 ### v1.7.3
 * Added SteelSeries Nimbus native profile on Mac (but d-pad doesn't work).
@@ -335,7 +346,7 @@
 * Fixed compilation error for webplayer build target on Windows.
 
 ### v1.5.10
-* Added [iCade](/pages/incontrol-icade) support (iOS only).
+* Added iCade support (iOS only).
 * Added `MouseBindingSource.ScaleX`, `.ScaleY` and `.ScaleZ` to control mouse axis sensitivity.
 * Added Nexus Player Mac profile.
 * Fixed Xbox One profile mappings on Windows 10.
@@ -439,6 +450,5 @@
 * Fixed several issues that occurred after `InputManager` reset (usually after scene changes).
 
 ### v1.5.0
-* User bindings are now supported! See `PlayerActionSet`, `PlayerAction` and the Bindings example.
-  Note: while custom profiles will still work, they will be deprecated soon in lieu of using `PlayerActionSet` to accomplish the same thing more elegantly.
+* User bindings are now supported! See `PlayerActionSet`, `PlayerAction` and the Bindings example. Note: while custom profiles will still work, they will be deprecated soon in lieu of using `PlayerActionSet` to accomplish the same thing more elegantly.
 

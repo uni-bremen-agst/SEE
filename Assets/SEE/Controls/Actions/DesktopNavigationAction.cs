@@ -18,7 +18,7 @@ namespace SEE.Controls.Actions
     /// </summary>
     [RequireComponent(typeof(CityCursor))]
     [RequireComponent(typeof(Collider))]
-    [RequireComponent(typeof(SEECity))]
+    //[RequireComponent(typeof(SEECity))] // FIXME: We cannot simply request that a SEECity exists. There are also other kinds of AbstractSEECity classes.
     public class DesktopNavigationAction : NavigationAction
     {
         /// <summary>
@@ -153,7 +153,7 @@ namespace SEE.Controls.Actions
                 // feel responsive!
                 actionState.drag = Input.GetMouseButton(2);
                 actionState.startDrag |= !isMouseOverGUI && Input.GetMouseButtonDown(2);
-                actionState.dragHoveredOnly = SEEInput.Drag();
+                actionState.dragHoveredOnly = SEEInput.DragCity();
                 actionState.cancel |= SEEInput.Cancel();
                 actionState.snap = SEEInput.Snap();
                 actionState.reset |= (actionState.drag || !isMouseOverGUI) && SEEInput.Reset();

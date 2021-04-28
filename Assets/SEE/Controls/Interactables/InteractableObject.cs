@@ -346,6 +346,9 @@ namespace SEE.Controls
         /// <summary>
         /// Marks the game object this <see cref="InteractableObject"/> is attached to for selection
         /// and triggers the necessary events accordingly.
+        /// 
+        /// As a side effect, this <see cref="InteractableObject"/> will be added or removed, 
+        /// respectively, to <see cref="SelectedObjects"/> depending upon <paramref name="select"/>.
         /// </summary>
         /// <param name="select">Whether this object should be selected.</param>
         /// <param name="isOwner">Whether this client is initiating the selection action.</param>
@@ -361,12 +364,12 @@ namespace SEE.Controls
                 SelectedObjects.Add(this);
 
                 // Update all selected object list per graph
-                Graph g = GraphElemRef.elem.ItsGraph;
-                if (!graphToSelectedIOs.ContainsKey(g))
+                Graph graph = GraphElemRef.elem.ItsGraph;
+                if (!graphToSelectedIOs.ContainsKey(graph))
                 {
-                    graphToSelectedIOs[g] = new HashSet<InteractableObject>();
+                    graphToSelectedIOs[graph] = new HashSet<InteractableObject>();
                 }
-                graphToSelectedIOs[g].Add(this);
+                graphToSelectedIOs[graph].Add(this);
 
                 // Invoke events
                 SelectIn?.Invoke(this, isOwner);
@@ -411,6 +414,8 @@ namespace SEE.Controls
         /// <param name="isOwner">Whether this client is initiating the action.</param>
         public static void UnselectAll(bool isOwner)
         {
+            // Note: This is no endless loop because SetSelect will remove this 
+            // InteractableObject from SelectedObjects.
             while (SelectedObjects.Count != 0)
             {
                 SelectedObjects.ElementAt(SelectedObjects.Count - 1).SetSelect(false, isOwner);

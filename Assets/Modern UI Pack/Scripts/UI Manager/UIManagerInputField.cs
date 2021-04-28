@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_EDITOR
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -64,3 +65,4 @@ namespace Michsky.UI.ModernUIPack
         }
     }
 }
+#endif

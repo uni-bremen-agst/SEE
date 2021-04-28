@@ -14,24 +14,19 @@ namespace Michsky.UI.ModernUIPack
         protected override void Set(float input, bool sendCallback)
         {
             if (maxSlider == null)
-            {
                 maxSlider = transform.parent.Find("Max Slider").GetComponent<RangeMaxSlider>();
-            }
 
             float newValue = input;
-            if (wholeNumbers)
-            {
+            
+            if (wholeNumbers == true)
                 newValue = Mathf.Round(newValue);
-            }
+
             if (newValue >= maxSlider.realValue && maxSlider.realValue != maxSlider.minValue)
-            {
-                // invalid
                 return;
-            }
+
             if (label != null)
-            {
                 label.text = newValue.ToString(numberFormat);
-            }
+            
             base.Set(input, sendCallback);
         }
 

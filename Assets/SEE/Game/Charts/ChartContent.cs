@@ -20,7 +20,9 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
+using System.Linq;
 using SEE.Controls;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.GO;
 using TMPro;
@@ -28,8 +30,6 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
-using System.Linq;
-using SEE.DataModel;
 
 namespace SEE.Game.Charts
 {
@@ -234,9 +234,9 @@ namespace SEE.Game.Charts
         private int maxPanelEntryCount = 0;
         private int leafCount = 0;
 
-        private ScrollViewEntry[] scrollViewEntries = null;
-        private ScrollViewEntryData[] scrollViewEntryDatas = null;
-        private Stack<ScrollViewEntry> pool = null;
+        private ScrollViewEntry[] scrollViewEntries;
+        private ScrollViewEntryData[] scrollViewEntryData;
+        private Stack<ScrollViewEntry> pool;
 
         private int previousFirst = 0;
         private int previousOnePastLast = 0;
@@ -382,7 +382,7 @@ namespace SEE.Game.Charts
 
         public ref ScrollViewEntryData GetScrollViewEntryData(int index)
         {
-            ref ScrollViewEntryData result = ref scrollViewEntryDatas[index];
+            ref ScrollViewEntryData result = ref scrollViewEntryData[index];
             return ref result;
         }
 
@@ -439,11 +439,11 @@ namespace SEE.Game.Charts
             RetrieveScrollViewEntry(ref entry, ref go);
 
             go.name = "ScrollViewEntry: " + label;
-            float x = ScrollViewEntryIndentation * (float)hierarchy;
-            float y = -ScrollViewEntryHeight * (float)index;
+            float x = ScrollViewEntryIndentation * hierarchy;
+            float y = -ScrollViewEntryHeight * index;
             go.transform.localPosition = scrollEntryOffset + new Vector2(x, y);
 
-            entry.Init(this, scrollViewEntryDatas[index], label);
+            entry.Init(this, scrollViewEntryData[index], label);
 
             return entry;
         }
@@ -463,14 +463,14 @@ namespace SEE.Game.Charts
                 SetShowInChart(listDataObjects[i].GetComponent<InteractableObject>(), true);
             }
 
-            for (int i = 0; i < scrollViewEntryDatas.Length; i++)
+            for (int i = 0; i < scrollViewEntryData.Length; i++)
             {
-                if (scrollViewEntryDatas[i].interactableObject)
+                if (scrollViewEntryData[i].interactableObject)
                 {
                     // Note(torben): This only unsubscribes from events from the
                     // interactable object and thus can be inside of this if-statement
                     // for better performance
-                    scrollViewEntryDatas[i].OnDestroy();
+                    scrollViewEntryData[i].OnDestroy();
                 }
             }
 
@@ -515,7 +515,7 @@ namespace SEE.Game.Charts
                     }
 
                     InteractableObject o = treeDataObjects[i].GetComponent<InteractableObject>();
-                    scrollViewEntryDatas[i] = new ScrollViewEntryData(i, this, o, parentIndexStack.Peek(), childCount);
+                    scrollViewEntryData[i] = new ScrollViewEntryData(i, this, o, parentIndexStack.Peek(), childCount);
 
                     // fill child indices
                     childCount = 0;
@@ -528,7 +528,7 @@ namespace SEE.Game.Charts
                         }
                         if (h == hierarchy + 1)
                         {
-                            scrollViewEntryDatas[i].childIndices[childCount] = j;
+                            scrollViewEntryData[i].childIndices[childCount] = j;
                             childCount++;
                         }
                     }
@@ -541,34 +541,34 @@ namespace SEE.Game.Charts
                 int idx = 0;
                 int dataObjectIdx = 0;
 
-                scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, null, ScrollViewEntryData.NoParentIndex, leafCount);
+                scrollViewEntryData[idx] = new ScrollViewEntryData(idx, this, null, ScrollViewEntryData.NoParentIndex, leafCount);
                 idx++;
 
                 for (int i = 0; i < leafCount; i++)
                 {
                     InteractableObject o = listDataObjects[dataObjectIdx++].GetComponent<InteractableObject>();
-                    scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, o, 0, 0);
-                    scrollViewEntryDatas[0].childIndices[i] = idx;
+                    scrollViewEntryData[idx] = new ScrollViewEntryData(idx, this, o, 0, 0);
+                    scrollViewEntryData[0].childIndices[i] = idx;
                     idx++;
                 }
 
                 int innerCount = listDataObjects.Count - leafCount;
                 int innerNodeIdx = idx;
-                scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, null, ScrollViewEntryData.NoParentIndex, innerCount);
+                scrollViewEntryData[idx] = new ScrollViewEntryData(idx, this, null, ScrollViewEntryData.NoParentIndex, innerCount);
                 idx++;
 
                 for (int i = 0; i < innerCount; i++)
                 {
                     InteractableObject o = listDataObjects[dataObjectIdx++].GetComponent<InteractableObject>();
-                    scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, o, innerNodeIdx, 0);
-                    scrollViewEntryDatas[innerNodeIdx].childIndices[i] = idx;
+                    scrollViewEntryData[idx] = new ScrollViewEntryData(idx, this, o, innerNodeIdx, 0);
+                    scrollViewEntryData[innerNodeIdx].childIndices[i] = idx;
                     idx++;
                 }
 
                 // Add removed nodes
                 foreach (string s in removedNodeIDs)
                 {
-                    scrollViewEntryDatas[idx] = new ScrollViewEntryData(idx, this, null, ScrollViewEntryData.NoParentIndex, 0);
+                    scrollViewEntryData[idx] = new ScrollViewEntryData(idx, this, null, ScrollViewEntryData.NoParentIndex, 0);
                     idx++;
                 }
             }
@@ -601,12 +601,9 @@ namespace SEE.Game.Charts
                 Debug.LogWarning("There are no nodes for showing metrics.\n");
             }
 #endif
-            foreach (string name in Attributable.NumericAttributeNames)
+            foreach (string cname in Attributable.NumericAttributeNames.Where(cname => cname.StartsWith(ChartManager.MetricPrefix)))
             {
-                if (name.StartsWith(ChartManager.MetricPrefix))
-                {
-                    allMetricNames.Add(name);
-                }
+                allMetricNames.Add(cname);
             }
 #if UNITY_EDITOR
             if (allMetricNames.Count == 0)
@@ -638,10 +635,11 @@ namespace SEE.Game.Charts
                 List<NodeRef> result = new List<NodeRef>();
                 foreach (GameObject gameNode in ChartManager.Instance.CodeCity.AllAncestors(Tags.Node))
                 {
-                    if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+                    if (gameNode.TryGetComponent(out NodeRef nodeRef))
                     {
-                        if ((nodeRef.Value.IsLeaf() && ChartManager.Instance.ShowLeafMetrics)
-                            || (nodeRef.Value.IsInnerNode() && ChartManager.Instance.ShowInnerNodeMetrics))
+                        if (nodeRef.Value != null
+                            && ((nodeRef.Value.IsLeaf() && ChartManager.Instance.ShowLeafMetrics)
+                                 || (nodeRef.Value.IsInnerNode() && ChartManager.Instance.ShowInnerNodeMetrics)))
                         {
                             result.Add(nodeRef);
                         }
@@ -700,12 +698,9 @@ namespace SEE.Game.Charts
                 }
                 hierarchy--;
             }
-            foreach (Node root in SceneQueries.GetRoots(listDataObjects))
+            foreach (Node root in SceneQueries.GetRoots(listDataObjects).Where(root => !removedNodeIDs.Contains(root.ID)))
             {
-                if (!removedNodeIDs.Contains(root.ID))
-                {
-                    _FindForTree(root);
-                }
+                _FindForTree(root);
             }
         }
 
@@ -782,6 +777,7 @@ namespace SEE.Game.Charts
                 }
 
                 // Note: If the user chose NODES for the x axis, minX == maxX == 0 holds (see above).
+                //FIXME: Equality comparison of floating point numbers may incur loss of precision.
                 bool xEqual = minX == maxX;
                 bool yEqual = minY == maxY;
                 if (xEqual || yEqual)
@@ -806,13 +802,10 @@ namespace SEE.Game.Charts
             else
             {
                 noDataWarning.SetActive(true);
-                foreach (ChartMarker marker in activeMarkers)
+                // Check for null avoids double destroy. Operator == is overloaded accordingly.
+                foreach (ChartMarker marker in activeMarkers.Where(marker => marker != null && marker.gameObject != null))
                 {
-                    // Check for null avoids double destroy. Operator == is overloaded accordingly.
-                    if (marker != null && marker.gameObject != null)
-                    {
-                        Destroy(marker.gameObject);
-                    }
+                    Destroy(marker.gameObject);
                 }
                 activeMarkers.Clear();
             }
@@ -934,25 +927,17 @@ namespace SEE.Game.Charts
                 if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                 {
                     List<uint> ids = marker.ids;
-                    for (int i = 0; i < ids.Count; i++)
+                    foreach (InteractableObject o in ids.Select(InteractableObject.Get).Where(o => !o.IsHoverFlagSet(HoverFlag.ChartMultiSelect)))
                     {
-                        InteractableObject o = InteractableObject.Get(ids[i]);
-                        if (!o.IsHoverFlagSet(HoverFlag.ChartMultiSelect))
-                        {
-                            o.SetHoverFlag(HoverFlag.ChartMultiSelect, true, true);
-                        }
+                        o.SetHoverFlag(HoverFlag.ChartMultiSelect, true, true);
                     }
                 }
                 else if (!toggleHover)
                 {
                     List<uint> ids = marker.ids;
-                    for (int i = 0; i < ids.Count; i++)
+                    foreach (InteractableObject o in ids.Select(InteractableObject.Get).Where(o => o.IsHoverFlagSet(HoverFlag.ChartMultiSelect)))
                     {
-                        InteractableObject o = InteractableObject.Get(ids[i]);
-                        if (o.IsHoverFlagSet(HoverFlag.ChartMultiSelect))
-                        {
-                            o.SetHoverFlag(HoverFlag.ChartMultiSelect, false, true);
-                        }
+                        o.SetHoverFlag(HoverFlag.ChartMultiSelect, false, true);
                     }
                 }
             }
@@ -973,25 +958,17 @@ namespace SEE.Game.Charts
                 if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                 {
                     List<uint> ids = marker.ids;
-                    foreach (uint id in ids)
+                    foreach (InteractableObject o in ids.Select(InteractableObject.Get).Where(o => !o.IsSelected))
                     {
-                        InteractableObject o = InteractableObject.Get(id);
-                        if (!o.IsSelected)
-                        {
-                            o.SetSelect(true, true);
-                        }
+                        o.SetSelect(true, true);
                     }
                 }
                 else if (!toggleSelect)
                 {
                     List<uint> ids = marker.ids;
-                    foreach (uint id in ids)
+                    foreach (InteractableObject o in ids.Select(InteractableObject.Get).Where(o => o.IsSelected))
                     {
-                        InteractableObject o = InteractableObject.Get(id);
-                        if (o.IsSelected)
-                        {
-                            o.SetSelect(false, true);
-                        }
+                        o.SetSelect(false, true);
                     }
                 }
             }
@@ -1030,16 +1007,16 @@ namespace SEE.Game.Charts
         /// </summary>
         private void ReloadData()
         {
-            if (scrollViewEntryDatas != null && scrollViewEntryDatas.Length > 0)
+            if (scrollViewEntryData != null && scrollViewEntryData.Length > 0)
             {
-                for (int i = 0; i < scrollViewEntryDatas.Length; i++)
+                for (int i = 0; i < scrollViewEntryData.Length; i++)
                 {
-                    if (scrollViewEntryDatas[i].interactableObject)
+                    if (scrollViewEntryData[i].interactableObject)
                     {
                         // Note(torben): This only unsubscribes from events from the
                         // interactable object and thus can be inside of this if-statement
                         // for better performance
-                        scrollViewEntryDatas[i].OnDestroy();
+                        scrollViewEntryData[i].OnDestroy();
                     }
                 }
             }
@@ -1051,12 +1028,12 @@ namespace SEE.Game.Charts
             // nodes, so this here is the capacity.
             // Note(Leo): removedNodeIDs Count needs to be added, otherwise removed nodes won't show
             int totalEntryCount2 = 2 + listDataObjects.Count + removedNodeIDs.Count;
-            totalHeight = (float)totalEntryCount2 * ScrollViewEntryHeight;
+            totalHeight = totalEntryCount2 * ScrollViewEntryHeight;
 
             leafCount = listDataObjects.Count(nodeRef => nodeRef.Value.IsLeaf());
 
             scrollViewEntries = new ScrollViewEntry[totalEntryCount2];
-            scrollViewEntryDatas = new ScrollViewEntryData[totalEntryCount2];
+            scrollViewEntryData = new ScrollViewEntryData[totalEntryCount2];
 
             RectTransform scrollContentRect = scrollContent.GetComponent<RectTransform>();
             scrollContentRect.sizeDelta = new Vector2(scrollContentRect.sizeDelta.x, totalHeight + 40);
@@ -1073,9 +1050,9 @@ namespace SEE.Game.Charts
         /// </summary>
         private void FillListsWithChanges()
         {
-            this.newNodeIDs = NodeChangesBuffer.GetSingleton().addedNodeIDsCache;
-            this.changedNodeIDs = NodeChangesBuffer.GetSingleton().changedNodeIDsCache;
-            this.removedNodeIDs = NodeChangesBuffer.GetSingleton().removedNodeIDsCache;
+            newNodeIDs = NodeChangesBuffer.GetSingleton().addedNodeIDsCache;
+            changedNodeIDs = NodeChangesBuffer.GetSingleton().changedNodeIDsCache;
+            removedNodeIDs = NodeChangesBuffer.GetSingleton().removedNodeIDsCache;
         }
 
         /// <summary>
@@ -1088,7 +1065,7 @@ namespace SEE.Game.Charts
             TextMeshProUGUI textMesh = scrollViewEntry.GetComponent<TextMeshProUGUI>();
             ColorBlock colors = parent.GetComponent<Toggle>().colors;
 
-            if (this.removedNodeIDs.Contains(textMesh.text))
+            if (removedNodeIDs.Contains(textMesh.text))
             {
                 textMesh.color = removedNodeLabelColor;
                 colors.normalColor = removedNodeLabelColor;
@@ -1096,7 +1073,7 @@ namespace SEE.Game.Charts
                 colors.pressedColor = changedNodesLabelColor;
                 colors.disabledColor = changedNodesLabelColor;
             }
-            else if (this.changedNodeIDs.Contains(textMesh.text))
+            else if (changedNodeIDs.Contains(textMesh.text))
             {
                 textMesh.color = changedNodesLabelColor;
                 colors.normalColor = changedNodesLabelColor;
@@ -1104,7 +1081,7 @@ namespace SEE.Game.Charts
                 colors.pressedColor = changedNodesLabelColor;
                 colors.disabledColor = changedNodesLabelColor;
             }
-            else if (this.newNodeIDs.Contains(textMesh.text))
+            else if (newNodeIDs.Contains(textMesh.text))
             {
                 textMesh.color = addedNodesLabelColor;
                 colors.normalColor = addedNodesLabelColor;
@@ -1127,18 +1104,14 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Singleton
         /// </summary>
-        private static NodeChangesBuffer singleton = null;
+        private static NodeChangesBuffer singleton;
 
         /// <summary>
         /// Get singleton instance
         /// </summary>
         public static NodeChangesBuffer GetSingleton()
         {
-            if (singleton == null)
-            {
-                singleton = new NodeChangesBuffer();
-            }
-            return singleton;
+            return singleton ??= new NodeChangesBuffer();
         }
 
         /// <summary>

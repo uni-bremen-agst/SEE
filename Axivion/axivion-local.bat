@@ -1,7 +1,8 @@
 REM This batch file sets the various environment variables needed to 
 REM run the Axivion Suite tools and then executes the command line parameters
 REM passed to this batch file. If there are none, only the variables are
-REM set.
+REM set. For instance, to run the Axivion CI you can execute this script
+REM with parameter axivion_ci with an Axivion command prompt.
 
 REM Because this batch script is called by Jenkins, we apparently need to
 REM call this first to avoid failing with an error because of the error
@@ -32,7 +33,8 @@ set "REQUESTS_CA_BUNDLE=%AXIVION_DASHBOARD_CONFIG%\cert\auto.crt"
 
 REM URL of the dashserver
 REM set "AXIVION_DASHBOARD_URL=https://localhost:9443/axivion/"
-set "AXIVION_DASHBOARD_URL=https://swt-jenkins.informatik.uni-bremen.de:9443/axivion/"
+REM set "AXIVION_DASHBOARD_URL=https://swt-jenkins.informatik.uni-bremen.de:9443/axivion/"
+set "AXIVION_DASHBOARD_URL=https://stvive.informatik.uni-bremen.de:9443/axivion/"
 
 REM If the dashserver is installed as a Windows service, you can
 REM start and stop it as follows:

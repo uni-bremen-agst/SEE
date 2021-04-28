@@ -5,11 +5,11 @@ namespace InControl
 	using UnityEngine;
 
 
-#if NETFX_CORE
+	#if NETFX_CORE
 	using Windows.Storage;
 	using Windows.Storage.Streams;
 	using System.Threading.Tasks;
-#endif
+	#endif
 
 
 	public static class Utility
@@ -227,11 +227,11 @@ namespace InControl
 
 		internal static bool TargetIsAlias( InputControlType target )
 		{
-			return target >= InputControlType.Command && target <= InputControlType.DPadY;
+			return target >= InputControlType.Command && target <= InputControlType.RightCommand;
 		}
 
 
-#if NETFX_CORE
+		#if NETFX_CORE
 		public static async Task<string> Async_ReadFromFile( string path )
 		{
 			string name = Path.GetFileName( path );
@@ -249,32 +249,32 @@ namespace InControl
 			StorageFile file = await folder.CreateFileAsync( name, CreationCollisionOption.ReplaceExisting );
 		    await FileIO.WriteTextAsync( file, data );
 		}
-#endif
+		#endif
 
 
 		public static string ReadFromFile( string path )
 		{
-#if NETFX_CORE
+			#if NETFX_CORE
 			return Async_ReadFromFile( path ).Result;
-#else
+			#else
 			var streamReader = new StreamReader( path );
 			var data = streamReader.ReadToEnd();
 			streamReader.Close();
 			return data;
-#endif
+			#endif
 		}
 
 
 		public static void WriteToFile( string path, string data )
 		{
-#if NETFX_CORE
+			#if NETFX_CORE
 			Async_WriteToFile( path, data ).Wait();
-#else
+			#else
 			var streamWriter = new StreamWriter( path );
 			streamWriter.Write( data );
 			streamWriter.Flush();
 			streamWriter.Close();
-#endif
+			#endif
 		}
 
 
@@ -487,9 +487,9 @@ namespace InControl
 
 		public static string GetPlatformName( bool uppercase = true )
 		{
-#if (UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN) && !NETFX_CORE && !UNITY_WEBPLAYER && !UNITY_WEBGL && !UNITY_EDITOR_OSX
+			#if (UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN) && !NETFX_CORE && !UNITY_WEBPLAYER && !UNITY_WEBGL && !UNITY_EDITOR_OSX
 			var platformName = GetWindowsVersion();
-#elif UNITY_WEBGL && !UNITY_EDITOR_OSX
+			#elif UNITY_WEBGL && !UNITY_EDITOR_OSX
 			// MAC OS X 10_14_6 CHROME 76
 			// MAC OS X 10.14 FIREFOX 68
 			// MAC OS X 10_14_6 SAFARI 12.1
@@ -530,14 +530,14 @@ namespace InControl
 			}
 
 			var platformName = operatingSystem + " " + browser;
-#else
+			#else
 			var platformName = SystemInfo.operatingSystem + " " + SystemInfo.deviceModel;
-#endif
+			#endif
 			return uppercase ? platformName.ToUpper() : platformName;
 		}
 
 
-#if !NETFX_CORE && !UNITY_WEBPLAYER && !UNITY_EDITOR_OSX && (UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN)
+		#if !NETFX_CORE && !UNITY_WEBPLAYER && !UNITY_EDITOR_OSX && (UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN)
 		static string GetHumanUnderstandableWindowsVersion()
 		{
 			var version = Environment.OSVersion.Version;
@@ -587,33 +587,33 @@ namespace InControl
 		{
 			return Environment.OSVersion.Version.Build;
 		}
-#else
+		#else
 		public static int GetSystemBuildNumber()
 		{
 			return 0;
 		}
-#endif
+		#endif
 
 
 		public static void LoadScene( string sceneName )
 		{
-#if UNITY_4_6 || UNITY_4_7 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2
+			#if UNITY_4_6 || UNITY_4_7 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2
 			Application.LoadLevel( sceneName );
-#else
+			#else
 			UnityEngine.SceneManagement.SceneManager.LoadScene( sceneName );
-#endif
+			#endif
 		}
 
 
 		internal static string PluginFileExtension()
 		{
-#if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
+			#if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
 			return ".bundle";
-#elif UNITY_EDITOR_LINUX || UNITY_STANDALONE_LINUX
+			#elif UNITY_EDITOR_LINUX || UNITY_STANDALONE_LINUX
 			return ".dylib";
-#else
+			#else
 			return ".dll";
-#endif
+			#endif
 		}
 	}
 }
