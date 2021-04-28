@@ -127,7 +127,10 @@ namespace SEE.Controls.Actions
                         hit.cursor = cursor;
                         hit.plane = plane;
 
-                        Array.ForEach(hit.cursor.E.GetFocusses(), e => e.SetGrab(true, true));
+                        foreach (InteractableObject o in hit.cursor.E.GetFocusses())
+                        {
+                            o.SetGrab(true, true);
+                        }
                         gizmo.gameObject.SetActive(true);
                         gizmo.Center = cursor.E.HasFocus() ? hit.cursor.E.GetPosition() : hit.root.position;
 
@@ -194,13 +197,17 @@ namespace SEE.Controls.Actions
             {
                 rotating = false;
 
-                Array.ForEach(hit.cursor.E.GetFocusses(), e => e.SetGrab(false, true));
+                foreach (InteractableObject o in hit.cursor.E.GetFocusses())
+                {
+                    o.SetGrab(false, true);
+                }
                 gizmo.gameObject.SetActive(false);
             }
 
             if (synchronize)
             {
                 // TODO(torben): synchronize
+                //new Net.SyncCitiesAction(this).Execute();
             }
 
             return true;
