@@ -183,7 +183,7 @@ namespace SEE.Controls
         /// <summary>
         /// The user drags the city as a whole on the plane.
         /// </summary>
-        internal static KeyCode Drag = Register(KeyCode.LeftControl, Scope.Browsing, "Drag city element.");
+        internal static KeyCode DragHovered = Register(KeyCode.LeftControl, Scope.Browsing, "Drag city element.");
         /// <summary>
         /// Toggles between the locked and free camera mode.
         /// </summary>

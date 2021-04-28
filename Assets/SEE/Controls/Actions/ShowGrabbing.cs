@@ -28,7 +28,7 @@ namespace SEE.Controls.Actions
 
         protected override void Off(InteractableObject interactableObject, bool isOwner)
         {
-            if (!interactable.IsSelected && !interactable.IsHovered && TryGetComponent(out Outline outline))
+            if (!interactable.IsHovered && !interactable.IsSelected && TryGetComponent(out Outline outline))
             {
                 DestroyImmediate(outline);
             }

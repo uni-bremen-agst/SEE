@@ -100,5 +100,27 @@ namespace SEE.Utils
         {
             return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
         }
+
+        /// <summary>
+        /// Raycasts against the given plane.
+        /// </summary>
+        /// <param name="plane">The plane to raycast against.</param>
+        /// <param name="hit">The hit point of the plane or <see cref="Vector3.positiveInfinity"/>,
+        /// if ray and plane are parallel.</param>
+        /// <returns>Whether the plane was hit.</returns>
+        public static bool RaycastPlane(UnityEngine.Plane plane, out Vector3 hit)
+        {
+            Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
+            bool result = plane.Raycast(ray, out float enter);
+            if (result)
+            {
+                hit = ray.GetPoint(enter);
+            }
+            else
+            {
+                hit = Vector3.positiveInfinity;
+            }
+            return result;
+        }
     }
 }

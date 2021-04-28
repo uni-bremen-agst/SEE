@@ -17,6 +17,7 @@ namespace SEE.Controls.Actions
             {
                 interactable.SelectIn += On;
                 interactable.SelectOut += Off;
+                interactable.GrabOut += GrabOff;
             }
             else
             {
@@ -33,6 +34,7 @@ namespace SEE.Controls.Actions
             {
                 interactable.SelectIn -= On;
                 interactable.SelectOut -= Off;
+                interactable.GrabOut -= GrabOff;
             }
             else
             {
@@ -53,5 +55,12 @@ namespace SEE.Controls.Actions
         /// <param name="interactableObject">the object being selected</param>
         /// <param name="isOwner">true if a local user initiated this call</param>
         protected abstract void Off(InteractableObject interactableObject, bool isOwner);
+
+        /// <summary>
+        /// Called when the object is no longer grabbed.
+        /// </summary>
+        /// <param name="interactableObject">the object being grabbed</param>
+        /// <param name="isOwner">true if a local user initiated this call</param>
+        protected abstract void GrabOff(InteractableObject interactableObject, bool isOwner);
     }
 }
