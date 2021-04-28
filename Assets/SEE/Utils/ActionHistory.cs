@@ -150,11 +150,14 @@ namespace Assets.SEE.Utils
         private bool ActionHasConflicts(List<string> affectedGameObjects)
         {
             int index = GetCountOfNewerAction(activeAction.GetId());
-            if (index == -1) return false;
-            index++;
-            for (int i = index ; index < allActionsList.Count; i++)
+            if (index == -1)
             {
-                Debug.LogWarning(index);
+                Debug.Log("ERROR IN GETCOUNT");
+                return false;
+            }
+            index++;
+            for (int i = allActionsList.Count - 1; index > 0; index--)
+            {
                 foreach (string s in affectedGameObjects)
                 {
                     if (allActionsList[i].Item4 != null)
@@ -298,9 +301,9 @@ namespace Assets.SEE.Utils
         /// <returns>the number of newer actions than that with the id <paramref name="idOfAction"/>, which are not executed by the owner.</returns>
         private int GetCountOfNewerAction(string idOfAction)
         {
-            for(int i = allActionsList.Count -1; i >= 0; i--)
+            for(int i = allActionsList.Count-1; i >= 0; i--)
             {
-                if (allActionsList[i].Item3.Equals(idOfAction)) return  i;
+                if (allActionsList[i].Item3.Equals(idOfAction)) return  allActionsList.Count-1- i;
             }
             return -1;
         }
