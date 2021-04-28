@@ -10,9 +10,11 @@ namespace SEE.GO
     public class CityCursor : MonoBehaviour
     {
         internal Cursor3D E { get; private set; }
+        private SEECity city;
 
         private void Start()
         {
+            city = GetComponent<SEECity>();
             E = Cursor3D.Create();
 
             InteractableObject.AnySelectIn += AnySelectIn;
@@ -29,21 +31,19 @@ namespace SEE.GO
 
         private void AnySelectIn(InteractableObject interactableObject, bool isOwner)
         {
-            Graph thisGraph = GetComponent<SEECity>().LoadedGraph;
             Graph selectedGraph = interactableObject.GraphElemRef.elem.ItsGraph;
-            if (selectedGraph.Equals(thisGraph))
+            if (selectedGraph.Equals(city.LoadedGraph))
             {
-                E.AddFocus(interactableObject.transform);
+                E.AddFocus(interactableObject);
             }
         }
 
         private void AnySelectOut(InteractableObject interactableObject, bool isOwner)
         {
-            Graph thisGraph = GetComponent<SEECity>().LoadedGraph;
             Graph selectedGraph = interactableObject.GraphElemRef.elem.ItsGraph;
-            if (selectedGraph.Equals(thisGraph))
+            if (selectedGraph.Equals(city.LoadedGraph))
             {
-                E.RemoveFocus(interactableObject.transform);
+                E.RemoveFocus(interactableObject);
             }
         }
     }
