@@ -71,6 +71,8 @@ namespace SEE.Net
                 Debug.LogWarning("NETWORK ActionID " + actionId);
                 if (push) GlobalActionHistory.Push(new Tuple<bool, ActionHistory.HistoryType, string, List<string>>(!isOwner, type, actionId, changedObjects));
                 else GlobalActionHistory.DeleteItem(actionId, !isOwner);
+
+                if (push) Debug.LogWarning("COUNT OF NET CHANGE " + changedObjects.Count);
             }
         }
 
