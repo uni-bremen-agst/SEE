@@ -81,6 +81,7 @@ namespace Assets.SEE.Utils
         /// </summary>
         public void Update()
         {
+            Debug.Log("HISTORY SIZE" + allActionsList.Count);
             if (activeAction.Update() && activeAction.HadEffect())
             {
                 Tuple<bool, HistoryType, string, List<string>> lastAction = FindLastActionOfPlayer(true, HistoryType.action);

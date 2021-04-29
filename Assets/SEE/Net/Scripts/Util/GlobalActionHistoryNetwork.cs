@@ -68,7 +68,7 @@ namespace SEE.Net
         {
             if (!IsRequester())
             {
-               
+                Debug.LogWarning("NETWORK ActionID " + actionId);
                 if (push) GlobalActionHistory.Push(new Tuple<bool, ActionHistory.HistoryType, string, List<string>>(!isOwner, type, actionId, changedObjects));
                 else GlobalActionHistory.DeleteItem(actionId, !isOwner);
             }
@@ -82,7 +82,7 @@ namespace SEE.Net
             this.actionId = actionId;
             this.changedObjects = StringToList(changedObjects);
 
-            Debug.LogWarning("PUSH ActionID " + actionId);
+           
            // Debug.LogWarning(changedObjects);
             Execute(null);    
         }
@@ -91,7 +91,6 @@ namespace SEE.Net
         {
             this.isOwner = isOwner;
             this.actionId = actionId;
-            Debug.LogWarning("DELTE ACTION ID " + actionId);
             push = false;
             Execute(null);
         }
