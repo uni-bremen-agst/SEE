@@ -121,7 +121,7 @@ namespace SEE.Layout.NodeLayouts
                 // the children we just packed. By necessity, the objects whose children we are
                 // currently processing is a composed object represented by a circle, otherwise
                 // we would not have any children here.
-                CirclePacker.Pack(circles, out float out_outer_radius);
+                CirclePacker.Pack(0.1f, circles, out float out_outer_radius);
 
                 foreach (Circle circle in circles)
                 {
