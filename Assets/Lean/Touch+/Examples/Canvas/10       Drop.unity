@@ -268,8 +268,9 @@ MonoBehaviour:
   prefab: {fileID: 1270808321}
   rotateTo: 0
   dragAfterSpawn: 1
-  selectOnSpawn: 0
+  selectOnSpawn: 1
   selectWith: {fileID: 0}
+  deselectOnUp: 1
   ScreenDepth:
     Conversion: 0
     Camera: {fileID: 0}
@@ -577,8 +578,9 @@ MonoBehaviour:
   prefab: {fileID: 685151108}
   rotateTo: 0
   dragAfterSpawn: 1
-  selectOnSpawn: 0
+  selectOnSpawn: 1
   selectWith: {fileID: 0}
+  deselectOnUp: 1
   ScreenDepth:
     Conversion: 0
     Camera: {fileID: 0}
@@ -1402,8 +1404,9 @@ MonoBehaviour:
   prefab: {fileID: 1114847286}
   rotateTo: 0
   dragAfterSpawn: 1
-  selectOnSpawn: 0
+  selectOnSpawn: 1
   selectWith: {fileID: 0}
+  deselectOnUp: 1
   ScreenDepth:
     Conversion: 0
     Camera: {fileID: 0}
