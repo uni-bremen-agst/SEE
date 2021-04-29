@@ -348,7 +348,7 @@ namespace Assets.SEE.Utils
             {
                 result += s + ",";
             }
-            if (result != "")
+            if (result != "" && result != null)
             {
                 return result.Substring(0, result.Length - 1);
             }
