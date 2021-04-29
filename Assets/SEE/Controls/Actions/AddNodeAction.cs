@@ -29,15 +29,19 @@ namespace SEE.Controls.Actions
                 GameObject parent = raycastHit.collider.gameObject;
                 // The position at which the parent was hit will be the center point of the new node
                 Vector3 position = raycastHit.point;
-                memento = new Memento(parent, position: position, scale: FindSize(parent, position));
-                addedGameNode = GameNodeAdder.Add(memento.Parent, position: memento.Position, worldSpaceScale: memento.Scale);
-                // The name of the node is now available.
-                memento.NodeID = addedGameNode.name;
+                Vector3 scale = FindSize(parent, position);
+                addedGameNode = GameNodeAdder.Add(parent, position: position, worldSpaceScale: scale);
                 if (addedGameNode != null)
                 {
+                    memento = new Memento(parent, position: position, scale: scale);
+                    memento.NodeID = addedGameNode.name;
                     new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
                     result = true;
-                    hadAnEffect = true;
+                    currentState = ReversibleAction.Progress.Completed;
+                }
+                else
+                {
+                    Debug.LogError($"New node could not be created.\n");
                 }
             }
             return result;
