@@ -15,27 +15,27 @@ namespace SEE.Net
         /// <summary>
         /// 
         /// </summary>
-        private  bool isOwner;
+        public  bool isOwner;
 
         /// <summary>
         /// 
         /// </summary>
-        private ActionHistory.HistoryType type;
+        public ActionHistory.HistoryType type;
 
         /// <summary>
         /// 
         /// </summary>
-        private string actionId;
+        public string actionId;
 
         /// <summary>
         /// 
         /// </summary>
-        private List<string> changedObjects;
+        public List<string> changedObjects;
 
         /// <summary>
         /// Wether a object should be pushed or removed
         /// </summary>
-        private bool push = false;
+        public bool push = false;
 
         /// <summary>
         /// 
