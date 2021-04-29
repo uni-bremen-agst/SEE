@@ -275,6 +275,7 @@ namespace SEEEditor
                         settings.kind = (InnerNodeKinds)EditorGUILayout.EnumPopup("Type", settings.kind);
                         settings.heightMetric = EditorGUILayout.TextField("Height", settings.heightMetric);
                         settings.styleMetric = EditorGUILayout.TextField("Style", settings.styleMetric);
+                        settings.randomizeColor = EditorGUILayout.Toggle("Randomize Color", settings.randomizeColor);
                         settings.colorRange.lower = EditorGUILayout.ColorField("Lower color", settings.colorRange.lower);
                         settings.colorRange.upper = EditorGUILayout.ColorField("Upper color", settings.colorRange.upper);
                         settings.colorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.colorRange.NumberOfColors, 1, 15);
@@ -308,6 +309,7 @@ namespace SEEEditor
                         settings.heightMetric = EditorGUILayout.TextField("Height", settings.heightMetric);
                         settings.depthMetric = EditorGUILayout.TextField("Depth", settings.depthMetric);
                         settings.styleMetric = EditorGUILayout.TextField("Style", settings.styleMetric);
+                        settings.randomizeColor = EditorGUILayout.Toggle("Randomize Color", settings.randomizeColor);
                         settings.colorRange.lower = EditorGUILayout.ColorField("Lower color", settings.colorRange.lower);
                         settings.colorRange.upper = EditorGUILayout.ColorField("Upper color", settings.colorRange.upper);
                         settings.colorRange.NumberOfColors = (uint) EditorGUILayout.IntSlider("# Colors", (int) settings.colorRange.NumberOfColors, 1, 15);

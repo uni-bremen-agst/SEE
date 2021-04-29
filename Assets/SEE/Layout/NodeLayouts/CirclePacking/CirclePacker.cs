@@ -91,24 +91,24 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
         /// 
         /// Important note: the order of circles may have changed afterward.
         /// </summary>
-        /// <param name="relativeMinDistance">The minimal relative distance between circles as a percentage of the radius of the circles, respecively.</param>
+        /// <param name="relMinDist">The minimal relative distance between circles as a percentage of the radius of the circles, respecively.</param>
         /// <param name="circles">The circles to be packed.</param>
         /// <param name="outOuterRadius">The radius of the appoximated minimal enclosing circle.</param>
-        internal static void Pack(float relativeMinDistance, List<Circle> circles, out float outOuterRadius)
+        internal static void Pack(float relMinDist, List<Circle> circles, out float outOuterRadius)
         {
             outOuterRadius = 0.0f;
 
 #if UNITY_EDITOR
-            if (relativeMinDistance < 0.0f)
+            if (relMinDist < 0.0f)
             {
                 Debug.LogWarning("Relative min distance is negative and will be treated as zero!");
             }
 #endif
-            if (relativeMinDistance > 0.0f)
+            if (relMinDist > 0.0f)
             {
                 for (int i = 0; i < circles.Count; i++)
                 {
-                    circles[i].radius *= 1.0f + relativeMinDistance;
+                    circles[i].radius *= 1.0f + relMinDist;
                 }
             }
 
@@ -173,14 +173,14 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
                 lastOutRadius = outOuterRadius;
             }
 
-            if (relativeMinDistance > 0.0f)
+            if (relMinDist > 0.0f)
             {
                 for (int i = 0; i < circles.Count; i++)
                 {
-                    circles[i].radius *= 1.0f / (1.0f + relativeMinDistance);
+                    circles[i].radius *= 1.0f / (1.0f + relMinDist);
                 }
                 SmallestEnclosingCircle(circles, out center, out outOuterRadius);
-                outOuterRadius *= 1.0f + relativeMinDistance;
+                outOuterRadius *= 1.0f + relMinDist;
             }
 
             // Clients of CirclePacker assume that all co-ordinates of children are relative to Vector3.zero.

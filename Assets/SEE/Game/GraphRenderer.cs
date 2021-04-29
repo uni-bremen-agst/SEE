@@ -1269,14 +1269,22 @@ namespace SEE.Game
             // render queue should be. We are assuming that the nodes are stacked on each
             // other according to the node hierarchy. Leaves are on top of all other nodes.
             // That is why we put them at the highest necessary rendering queue offset.
-            GameObject block = leafNodeFactories[(int)node.kind].NewBlock(SelectStyle(node, innerNodeFactories[(int)node.kind]), node.ItsGraph.MaxDepth);
-            block.name = node.ID;
-            block.AddComponent<NodeRef>().Value = node;
-            AdjustScaleOfLeaf(block);
-            AddLOD(block);
-            Portal.SetInfinitePortal(block);
-            InteractionDecorator.PrepareForInteraction(block);
-            return block;
+            GameObject result = leafNodeFactories[(int)node.kind].NewBlock(SelectStyle(node, innerNodeFactories[(int)node.kind]), node.ItsGraph.MaxDepth);
+            if (settings.leafNodeAttributesPerKind[(int)node.kind].randomizeColor)
+            {
+                float r = UnityEngine.Random.Range(0.5f, 1.0f);
+                float g = UnityEngine.Random.Range(0.5f, 1.0f);
+                float b = UnityEngine.Random.Range(0.5f, 1.0f);
+                Color randomColor = new Color(r, g, b);
+                result.GetComponent<MeshRenderer>().material = Materials.New(ShaderType, randomColor, node.ItsGraph.MaxDepth);
+            }
+            result.name = node.ID;
+            result.AddComponent<NodeRef>().Value = node;
+            AdjustScaleOfLeaf(result);
+            AddLOD(result);
+            Portal.SetInfinitePortal(result);
+            InteractionDecorator.PrepareForInteraction(result);
+            return result;
         }
 
         /// <summary>
@@ -1611,15 +1619,23 @@ namespace SEE.Game
             // later it should be drawn, or in other words, the higher its offset in the
             // render queue should be. We are assuming that the nodes are stacked on each
             // other according to the node hierarchy. Leaves are on top of all other nodes.
-            GameObject innerGameObject = innerNodeFactory.NewBlock(0, node.Level);
-            innerGameObject.name = node.ID;
-            innerGameObject.tag = Tags.Node;
-            innerGameObject.AddComponent<NodeRef>().Value = node;
-            AdjustStyle(innerGameObject, innerNodeFactory);
-            AdjustHeightOfInnerNode(innerGameObject);
-            AddLOD(innerGameObject);
-            InteractionDecorator.PrepareForInteraction(innerGameObject);
-            return innerGameObject;
+            GameObject result = innerNodeFactory.NewBlock(0, node.Level);
+            result.name = node.ID;
+            result.tag = Tags.Node;
+            result.AddComponent<NodeRef>().Value = node;
+            AdjustStyle(result, innerNodeFactory); // TODO(torben): could the style just be selected beforehand at NewBlock?
+            if (settings.innerNodeAttributesPerKind[(int)node.kind].randomizeColor)
+            {
+                float r = UnityEngine.Random.Range(0.5f, 1.0f);
+                float g = UnityEngine.Random.Range(0.5f, 1.0f);
+                float b = UnityEngine.Random.Range(0.5f, 1.0f);
+                Color randomColor = new Color(r, g, b);
+                result.GetComponent<MeshRenderer>().material = Materials.New(ShaderType, randomColor, node.Level);
+            }
+            AdjustHeightOfInnerNode(result);
+            AddLOD(result);
+            InteractionDecorator.PrepareForInteraction(result);
+            return result;
         }
 
         /// <summary>
