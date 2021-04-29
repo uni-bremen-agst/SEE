@@ -15,7 +15,7 @@ namespace SEE.Net
         /// <summary>
         /// 
         /// </summary>
-        private readonly bool isOwner;
+        private  bool isOwner;
 
         /// <summary>
         /// 
@@ -25,7 +25,7 @@ namespace SEE.Net
         /// <summary>
         /// 
         /// </summary>
-        private readonly string actionId;
+        private string actionId;
 
         /// <summary>
         /// 
@@ -44,12 +44,13 @@ namespace SEE.Net
         /// <param name="type"></param>
         /// <param name="actionId"></param>
         /// <param name="changedObjects"></param>
-        public GlobalActionHistoryNetwork(bool isOwner, ActionHistory.HistoryType type, string actionId, string changedObjects, bool push)
+        public GlobalActionHistoryNetwork()
         {
-            this.isOwner = isOwner;
-            this.type = type;
-            this.actionId = actionId;
-            this.changedObjects = StringToList(changedObjects);
+           // this.isOwner = isOwner;
+           // this.type = type;
+           // this.actionId = actionId;
+            //this.changedObjects = StringToList(changedObjects);
+            
         }
 
         /// <summary>
@@ -67,9 +68,32 @@ namespace SEE.Net
         {
             if (!IsRequester())
             {
+               
                 if (push) GlobalActionHistory.Push(new Tuple<bool, ActionHistory.HistoryType, string, List<string>>(!isOwner, type, actionId, changedObjects));
-                else GlobalActionHistory.DeleteItem(actionId, false);
+                else GlobalActionHistory.DeleteItem(actionId, !isOwner);
             }
+        }
+
+        public void Push(bool isOwner, ActionHistory.HistoryType type, string actionId, string changedObjects)
+        {
+            push = true;
+            this.isOwner = isOwner;
+            this.type = type;
+            this.actionId = actionId;
+            this.changedObjects = StringToList(changedObjects);
+
+            Debug.LogWarning("PUSH ActionID " + actionId);
+           // Debug.LogWarning(changedObjects);
+            Execute(null);    
+        }
+
+        public void Delete(bool isOwner ,string actionId)
+        {
+            this.isOwner = isOwner;
+            this.actionId = actionId;
+            Debug.LogWarning("DELTE ACTION ID " + actionId);
+            push = false;
+            Execute(null);
         }
 
         /// <summary>
