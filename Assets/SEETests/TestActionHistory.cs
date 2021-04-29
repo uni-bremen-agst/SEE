@@ -93,10 +93,10 @@ namespace SEETests
             /// <summary>
             /// This action has always had an effect.
             /// </summary>
-            /// <returns></returns>
-            public bool HadEffect()
+            /// <returns>ReversibleAction.Progress.Completed</returns>
+            public ReversibleAction.Progress CurrentProgress()
             {
-                return true;
+                return ReversibleAction.Progress.Completed;
             }
 
             /// <summary>
@@ -396,8 +396,9 @@ namespace SEETests
                 // nothing to be done
             }
 
-            protected bool hadEffect = false;
-            public bool HadEffect()
+            protected ReversibleAction.Progress hadEffect = ReversibleAction.Progress.NoEffect;
+
+            public ReversibleAction.Progress CurrentProgress()
             {
                 return hadEffect;
             }
@@ -435,7 +436,7 @@ namespace SEETests
 
             public override bool Update()
             {
-                hadEffect = true;
+                hadEffect = ReversibleAction.Progress.Completed;
                 counter++;
                 return true;
             }
@@ -463,7 +464,7 @@ namespace SEETests
 
             public override bool Update()
             {
-                hadEffect = true;
+                hadEffect = ReversibleAction.Progress.Completed;
                 counter--;
                 return true;
             }
