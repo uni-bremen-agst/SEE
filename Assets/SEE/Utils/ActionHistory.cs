@@ -307,7 +307,7 @@ namespace Assets.SEE.Utils
         {
             for(int i = allActionsList.Count-1; i >= 0; i--)
             {
-                if (allActionsList[i].Item3.Equals(idOfAction)) return  allActionsList.Count-1- i;
+                if (allActionsList[i].Item3.Equals(idOfAction)) return  i;
             }
             return -1;
         }
