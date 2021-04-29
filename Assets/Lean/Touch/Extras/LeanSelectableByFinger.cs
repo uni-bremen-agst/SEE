@@ -23,6 +23,7 @@ namespace Lean.Touch
 			OnlySelectingFingers,
 			IgnoreSelectingFingers
 		}
+
 		[System.Serializable] public class LeanFingerEvent : UnityEvent<LeanFinger> {}
 
 		/// <summary>This allows you to control which fingers will be used by components that require this selectable.</summary>
@@ -249,6 +250,11 @@ namespace Lean.Touch.Editor
 			if (showUnusedEvents == true || Any(tgts, t => t.OnSelectedFinger.GetPersistentEventCount() > 0))
 			{
 				Draw("onSelectedFinger");
+			}
+
+			if (showUnusedEvents == true || Any(tgts, t => t.OnSelectedFingerUp.GetPersistentEventCount() > 0))
+			{
+				Draw("onSelectedFingerUp");
 			}
 		}
 	}
