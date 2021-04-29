@@ -49,7 +49,6 @@ namespace SEE.Net
             this.isOwner = isOwner;
             this.type = type;
             this.actionId = actionId;
-            Debug.Log(changedObjects);
             this.changedObjects = StringToList(changedObjects);
         }
 
@@ -82,7 +81,6 @@ namespace SEE.Net
         {
             if (changedObjectsToParse == null)
             {
-                Debug.LogWarning("ChangedObjects are null \n");
                 return null;
             }
             string[] changedObjectsAsArray = new string[changedObjectsToParse.Split(',').Length];
