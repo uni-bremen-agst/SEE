@@ -161,7 +161,7 @@ namespace Assets.SEE.Utils
                 return false;
             }
             index++;
-            for (int i = allActionsList.Count - 1; index > 0; index--)
+            for (int i = index ; i < allActionsList.Count; i++)
             {
                 foreach (string s in affectedGameObjects)
                 {
