@@ -13,22 +13,22 @@ namespace SEE.Net
     public  class GlobalActionHistoryNetwork : AbstractAction
     {
         /// <summary>
-        /// 
+        /// is the user the owner of the action
         /// </summary>
         public  bool isOwner;
 
         /// <summary>
-        /// 
+        /// which type of action (action, undoneAction) 
         /// </summary>
         public ActionHistory.HistoryType type;
 
         /// <summary>
-        /// 
+        /// The id of the action
         /// </summary>
         public string actionId;
 
         /// <summary>
-        /// 
+        /// all ids from the objects that the action has changed
         /// </summary>
         public List<string> changedObjects;
 
@@ -38,20 +38,13 @@ namespace SEE.Net
         public bool push = false;
 
         /// <summary>
-        /// 
+        /// Syncs the ActionHistory between the Clients
         /// </summary>
-        /// <param name="isOwner"></param>
-        /// <param name="type"></param>
-        /// <param name="actionId"></param>
-        /// <param name="changedObjects"></param>
-        public GlobalActionHistoryNetwork()
+        public GlobalActionHistoryNetwork() 
         {
-           // this.isOwner = isOwner;
-           // this.type = type;
-           // this.actionId = actionId;
-            //this.changedObjects = StringToList(changedObjects);
-            
+            // Intentionally left blank.
         }
+
 
         /// <summary>
         /// Stuff to execute on the Server. Nothing to be done here.
@@ -68,14 +61,19 @@ namespace SEE.Net
         {
             if (!IsRequester())
             {
-                Debug.LogWarning("NETWORK ActionID " + actionId);
                 if (push) GlobalActionHistory.Push(new Tuple<bool, ActionHistory.HistoryType, string, List<string>>(!isOwner, type, actionId, changedObjects));
                 else GlobalActionHistory.DeleteItem(actionId, !isOwner);
-
-                if (push) Debug.LogWarning("COUNT OF NET CHANGE " + changedObjects.Count);
             }
         }
 
+
+        /// <summary>
+        /// Initiats the push of an action on each client
+        /// </summary>
+        /// <param name="isOwner">Is the user the owner of the action</param>
+        /// <param name="type">Which type is the action (action, undoneAction)</param>
+        /// <param name="actionId">The id of the action</param>
+        /// <param name="changedObjects">The ids of the objects which are edited from the action</param>
         public void Push(bool isOwner, ActionHistory.HistoryType type, string actionId, string changedObjects)
         {
             push = true;
@@ -83,12 +81,14 @@ namespace SEE.Net
             this.type = type;
             this.actionId = actionId;
             this.changedObjects = StringToList(changedObjects);
-
-           
-           // Debug.LogWarning(changedObjects);
             Execute(null);    
         }
 
+        /// <summary>
+        /// Initiats the Deletion process on each Client
+        /// </summary>
+        /// <param name="isOwner">Is the user the owner of the action</param>
+        /// <param name="actionId">The id of the action</param>
         public void Delete(bool isOwner ,string actionId)
         {
             this.isOwner = isOwner;
