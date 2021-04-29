@@ -263,12 +263,15 @@ namespace SEE.Game.Evolution
         /// </summary>
         private ICollection<GameObject> newEdges;
 
+        Dictionary<string, GameObject> bNodes = new Dictionary<string, GameObject>();
+
         /// <summary>
         /// Renders all edges for the nodes in the node cache according to the settings.
         /// If edges for these nodes existed already, their game objects are destroyed first.
         /// </summary>
         public void RenderEdges()
         {
+            //bNodes = nodes;
             ClearAllEdges();
             // FIXME: Provide meaningful values for scaleFactor.
             edges = _graphRenderer.EdgeLayout(nodes.Values);
@@ -283,6 +286,16 @@ namespace SEE.Game.Evolution
             return edges;
         }
 
+        public void MakeNodeBackup()
+        {
+            bNodes = nodes;
+        }
+
+        private readonly Dictionary<string, GameObject> nodesbackup;
+
+        public List<string> neglectableNodes;
+        public List<string> negEdges;
+
         /// <summary>
         /// Calculates the edges of the next graph
         /// </summary>
@@ -290,6 +303,34 @@ namespace SEE.Game.Evolution
         public ICollection<GameObject> CalculateNewEdgeControlPoints()
         {
             ClearNewEdges();
+            //Debug.Log("Name: " + nodesPos +"Pos: " + nodes.Values.First().transform.position + "Count: " + nodes.Values.First());
+
+            /* foreach(KeyValuePair<string,GameObject> nodePos in bNodes)
+             {
+                 Debug.Log("Old Name: " + nodePos.Key + "\nPos: " + nodePos.Value.transform.position);
+             }
+             foreach (KeyValuePair<string, GameObject> nodePos in nodes)
+             {
+                 Debug.Log("New Name: " + nodePos.Key + "\nPos: " + nodePos.Value.transform.position);
+             }*/
+
+            foreach(GameObject g in nodes.Values)
+            {
+                string target = g.Target().name;
+                string source = g.Source().name;
+                if(neglectableNodes.Contains(target) && neglectableNodes.Contains(source))
+                {
+                    negEdges.Add(g.name);
+                }
+            }
+            Dictionary<string, GameObject> newNodes;
+            foreach (var s in nodes)
+            {
+                Debug.Log("Test: " + s.Key);
+            }
+
+
+            
             newEdges = _graphRenderer.EdgeLayout(nodes.Values, false);
             return newEdges;
         }

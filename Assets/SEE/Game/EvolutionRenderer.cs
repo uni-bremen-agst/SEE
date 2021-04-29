@@ -30,9 +30,11 @@ using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.Utils;
 using SEE.Utils;
+using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
+using Unity.Collections;
 
 namespace SEE.Game
 {
@@ -600,6 +602,7 @@ namespace SEE.Game
             // Destroy all previous edges and draw all edges of next graph. This can only
             // be done when nodes have reached their final position, that is, at the end
             // of the animation cycle.
+            objectManager.MakeNodeBackup();
             objectManager.RenderEdges();
 
             // Stops the edge animation
@@ -643,35 +646,35 @@ namespace SEE.Game
             }
         }
 
+
+        protected virtual bool FindIdenticalGameEdges(GameObject firstEdge, GameObject secondEdge)
+        {
+            return firstEdge.TryGetComponent(out EdgeRef oldEdgeRef)
+                && secondEdge.TryGetComponent(out EdgeRef newEdgeRef)
+                && oldEdgeRef.Value.Equals(newEdgeRef.Value);
+        }
+
         /// <summary>
         /// Combines the edges of the old and the new graph by their ID. Called by the MoveEdges method
         /// </summary>
         /// <param name="oldEdges">List of currently drawn edges</param>
         /// <param name="newEdges">List of new edges to be drawn</param>
         /// <returns>List of related edges</returns>
-        protected virtual IEnumerator EdgeMatcher(IList<GameObject> oldEdges, IList<GameObject> newEdges)
+        protected virtual void EdgeMatcher(IList<GameObject> oldEdges, IList<GameObject> newEdges)
         {
-
+            Debug.Log("New Edge Coun: " + newEdges.Count());
             matchedEdges = new List<(GameObject, GameObject)>();
-            foreach (GameObject oldEdgeGameObject in oldEdges)
+            foreach(GameObject newEdge in newEdges)
             {
-                foreach (GameObject newEdgeGameObject in newEdges)
-                {                    
-                    if (oldEdgeGameObject.TryGetComponent(out EdgeRef oldEdgeRef) 
-                        && newEdgeGameObject.TryGetComponent(out EdgeRef newEdgeRef)
-                        && oldEdgeRef.Value.Equals(newEdgeRef.Value))
-                    {
-                        //result.Add((oldEdgeGameObject, newEdgeGameObject));
-                        matchedEdges.Add((oldEdgeGameObject, newEdgeGameObject));
-                    }
+                GameObject temp = oldEdges.ToList().Find(i => FindIdenticalGameEdges(i, newEdge));
+                if(temp != null)
+                {
+                    matchedEdges.Add((temp, newEdge));
                 }
-                yield return null;
             }
-            yield return null;
         }
 
-        
-        
+
         /// <summary>
         /// Calculates the control points of the edges of the next graph and generates their actual line points from them. 
         /// </summary>
@@ -682,25 +685,28 @@ namespace SEE.Game
                 // Calculates the edges for the next graph
                 IList<GameObject> newEdges = objectManager.CalculateNewEdgeControlPoints().ToList();
                 IList<GameObject> oldEdges = objectManager.GetEdges().ToList();
-                
+
                 // Searches for pairs between old and new edges
                 //matchedEdges =  EdgeMatcher(oldEdges,newEdges);
-                StartCoroutine(EdgeMatcher(oldEdges, newEdges));
+                foreach ((GameObject, MarkerType) nodeMarker in animationMarker)
+                {
+                    if (nodeMarker.Item2.Equals(MarkerType.Changed)){
+                        //Debug.Log(nodeMarker.Item1.name);
+                    }
+                }
+                EdgeMatcher(oldEdges, newEdges);
+                //matchedEdges = new List<(GameObject, GameObject)>();
+                
                 // Case distinction in case the layout does not need sample points
-                if(!graphRenderer.GetSettings().EdgeLayout.Equals(EdgeLayoutKind.Straight))
+                if (!graphRenderer.GetSettings().EdgeLayout.Equals(EdgeLayoutKind.Straight))
                 {
                     foreach((GameObject oldEdge, GameObject newEdge) in matchedEdges)
                     {
                         oldEdge.TryGetComponent(out Points oP);
                         newEdge.TryGetComponent(out Points nP);
 
-                        float dist = 0;
-
                         //Approximates the length of the edge over the control points to save computing power.
-                        for (int i = 0; i < nP.controlPoints.Count() -1; i++)
-                        {
-                            dist += Vector3.Distance(nP.controlPoints[i], nP.controlPoints[i + 1]);
-                        }
+                        float dist = Vector3.Distance(nP.controlPoints[0], nP.controlPoints[nP.controlPoints.Count() - 1]);
 
                         //The AdjustedSamplerate is determined by the performance of the last animation
                         //and tries to achieve a balance between performance and aesthetics
@@ -720,8 +726,8 @@ namespace SEE.Game
                         adjustedSampleRate = Math.Min(Math.Max(adjustedSampleRate, 2), 75);
 
                         // Creates new line points from the control points 
-                        oP.linePoints = LinePoints.BSplineLinePointsSampleRate(oP.controlPoints, sampleRate);
-                        nP.linePoints = LinePoints.BSplineLinePointsSampleRate(nP.controlPoints, sampleRate);
+                        oP.linePoints = LinePoints.BSplineLinePointsSampleRate(oP.controlPoints, (uint) adjustedSampleRate);
+                        nP.linePoints = LinePoints.BSplineLinePointsSampleRate(nP.controlPoints, (uint) adjustedSampleRate);
 
                         // Saves the new line points to the LineRenderer
                         oldEdge.TryGetComponent(out LineRenderer lineRenderer);
@@ -843,6 +849,22 @@ namespace SEE.Game
             // intentionally left blank
         }
 
+        bool posDif(Vector3 v1, Vector3 v2)
+        {
+            double x1, z1, x2, z2;
+
+            x1 = Math.Round(v1.x,2);
+            z1 = Math.Round(v1.z,2);
+            x2 = Math.Round(v2.x,2);
+            z2 = Math.Round(v2.z,2);
+
+
+            return x1 == x2 && z1 == z2;
+        }
+
+        List<String> neglectableNodes = new List<string>();
+
+
         /// <summary>
         /// Renders the game object corresponding to the given <paramref name="graphNode"/>
         /// by creating a copy of the GameObject that is used during the animation.
@@ -854,6 +876,20 @@ namespace SEE.Game
             ILayoutNode layoutNode = NextLayoutToBeShown[graphNode.ID];
             // The game node representing the graphNode if there is any; null if there is none
             Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject currentGameNode);
+
+            if(posDif(layoutNode.CenterPosition, currentGameNode.transform.position))
+            {
+                neglectableNodes.Add(currentGameNode.name);
+                Debug.Log(currentGameNode.name +"didnt change its position, edge adjustment can be neglected");
+            }
+
+
+            /*if (layoutNode.CenterPosition.x == currentGameNode.transform.position.x && layoutNode.CenterPosition.y == currentGameNode.transform.position.y && layoutNode.CenterPosition.z == currentGameNode.transform.position.z)
+            {
+                Debug.Log("Pos is Different\nLayountNodePos: " + layoutNode.CenterPosition + "\nCurrentGameNodePos: " + currentGameNode.transform.position); ;
+            }
+            Debug.Log("Pos is Different\nLayountNodePos: " + layoutNode.CenterPosition + "\nCurrentGameNodePos: " + currentGameNode.transform.position); ;*/
+
 
             // Copy of the currentGameNode. This copy will be used during the animation on behalf of currentGameNode.
             GameObject animationNode = Instantiate(currentGameNode);
@@ -888,6 +924,7 @@ namespace SEE.Game
             else
             {
                 // Node existed before.
+                
                 if (diff.AreDifferent(formerGraphNode, graphNode))
                 {
                     difference = Difference.Changed;
