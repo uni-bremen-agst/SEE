@@ -4,6 +4,7 @@ using SEE.Layout.NodeLayouts.Cose;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Layout.NodeLayouts
 {
@@ -27,11 +28,11 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// The node layout we compute as a result.
         /// </summary>
-        private Dictionary<ILayoutNode, NodeTransform> layout_result;
+        private Dictionary<ILayoutNode, NodeTransform> layoutResult;
 
         public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes)
         {
-            layout_result = new Dictionary<ILayoutNode, NodeTransform>();
+            layoutResult = new Dictionary<ILayoutNode, NodeTransform>();
 
             ICollection<ILayoutNode> roots = LayoutNodes.GetRoots(layoutNodes);
             if (roots.Count == 0)
@@ -46,12 +47,12 @@ namespace SEE.Layout.NodeLayouts
             {
                 // exactly one root
                 ILayoutNode root = roots.FirstOrDefault();
-                float out_radius = PlaceNodes(root);
+                float outRadius = PlaceNodes(root);
                 Vector3 position = new Vector3(0.0f, groundLevel, 0.0f);
-                layout_result[root] = new NodeTransform(position,
-                                                        GetScale(root, out_radius));
-                MakeGlobal(layout_result, position, root.Children());
-                return layout_result;
+                layoutResult[root] = new NodeTransform(position,
+                                                        GetScale(root, outRadius));
+                MakeGlobal(layoutResult, position, root.Children());
+                return layoutResult;
             }
         }
 
@@ -61,17 +62,17 @@ namespace SEE.Layout.NodeLayouts
         /// function adjusts the co-ordinates of all nodes to the world's co-ordinates.
         /// We also adjust the ground level of each inner node by its level lift.
         /// </summary>
-        /// <param name="layout_result">the layout to be adjusted</param>
+        /// <param name="layoutResult">the layout to be adjusted</param>
         /// <param name="position">the position of the parent of all children</param>
         /// <param name="children">the children to be laid out</param>
         private static void MakeGlobal
-            (Dictionary<ILayoutNode, NodeTransform> layout_result,
+            (Dictionary<ILayoutNode, NodeTransform> layoutResult,
              Vector3 position,
              ICollection<ILayoutNode> children)
         {
             foreach (ILayoutNode child in children)
             {
-                NodeTransform childTransform = layout_result[child];
+                NodeTransform childTransform = layoutResult[child];
                 if (!child.IsLeaf)
                 {
                     // The inner nodes will be slightly lifted along the y axis according to their
@@ -79,8 +80,8 @@ namespace SEE.Layout.NodeLayouts
                     position.y += LevelLift(child);
                 }
                 childTransform.position += position;
-                layout_result[child] = childTransform;
-                MakeGlobal(layout_result, childTransform.position, child.Children());
+                layoutResult[child] = childTransform;
+                MakeGlobal(layoutResult, childTransform.position, child.Children());
             }
         }
 
@@ -99,7 +100,6 @@ namespace SEE.Layout.NodeLayouts
                 // No scaling for leaves because they are already scaled.
                 // Position Vector3.zero because they are located relative to their parent.
                 // This position may be overridden later in the context of parent's parent.
-                //layout[to_game_node[parent]] = new NodeTransform(Vector3.zero, Vector3.one);
                 return LeafRadius(parent);
             }
             else
@@ -117,21 +117,26 @@ namespace SEE.Layout.NodeLayouts
                 }
 
                 // The co-ordinates returned in circles are local, that is, relative to the zero center.
-                // The resulting center and out_outer_radius relate to the circle object comprising
+                // The resulting center and outOuterRadius relate to the circle object comprising
                 // the children we just packed. By necessity, the objects whose children we are
                 // currently processing is a composed object represented by a circle, otherwise
                 // we would not have any children here.
-                CirclePacker.Pack(0.1f, circles, out float out_outer_radius);
+                CirclePacker.Pack(0.1f, circles, out float outOuterRadius);
+
+                if (children.Count == 1 && !children.ElementAt(0).IsLeaf)
+                {
+                    outOuterRadius *= 1.2f;
+                }
 
                 foreach (Circle circle in circles)
                 {
                     // Note: The position of the transform is currently only local, relative to the zero center
                     // within the parent node. The co-ordinates will later be adjusted to the world scope.
-                    layout_result[circle.gameObject]
+                    layoutResult[circle.gameObject]
                          = new NodeTransform(new Vector3(circle.center.x, groundLevel, circle.center.y),
                                              GetScale(circle.gameObject, circle.radius));
                 }
-                return out_outer_radius;
+                return outOuterRadius;
             }
         }
 
