@@ -41,7 +41,7 @@ namespace Assets.SEE.Utils
         /// <summary>
         /// The maximal size of the action history.
         /// </summary>
-        private const int historySize = 20;
+        private const int historySize = 100;
 
         /// <summary>
         /// Let C be the currently executed action (if there is any) in this action history. 
@@ -62,8 +62,7 @@ namespace Assets.SEE.Utils
         {
             activeAction?.Stop();
             Push(new Tuple<bool, HistoryType, string, List<string>>(true, HistoryType.action, action.GetId(), null));
-            new GlobalActionHistoryNetwork().Push(true, HistoryType.action, action.GetId(), null);
-            Debug.LogWarning("ACTIONID LOCAL" + action.GetId());
+            new GlobalActionHistoryNetwork().Push(HistoryType.action, action.GetId(), null);
             ownActions.Add(action);
             activeAction = action;
             action.Awake();
@@ -81,18 +80,16 @@ namespace Assets.SEE.Utils
         /// </summary>
         public void Update()
         {
-            Debug.Log("HISTORY SIZE" + allActionsList.Count);
             if (activeAction.Update() && activeAction.HadEffect())
             {
                 Tuple<bool, HistoryType, string, List<string>> lastAction = FindLastActionOfPlayer(true, HistoryType.action);
                 if (lastAction == null) return;
                 DeleteItem(activeAction.GetId(), true);
-                new GlobalActionHistoryNetwork().Delete(lastAction.Item1,activeAction.GetId());
+                new GlobalActionHistoryNetwork().Delete(activeAction.GetId());
                 lastAction = new Tuple<bool, HistoryType, string, List<string>>(lastAction.Item1, lastAction.Item2, activeAction.GetId(), activeAction.GetChangedObjects());
                 Push(lastAction);
                 ownActions.Add(activeAction);
-                new GlobalActionHistoryNetwork().Push(lastAction.Item1, lastAction.Item2, lastAction.Item3, ListToString(lastAction.Item4));
-                Debug.LogWarning("UPDATE ACTION ID" + lastAction.Item3);
+                new GlobalActionHistoryNetwork().Push(lastAction.Item2, lastAction.Item3, ListToString(lastAction.Item4));
                 Execute(activeAction.NewInstance());
             }
         }
@@ -105,7 +102,6 @@ namespace Assets.SEE.Utils
         {
             if (allActionsList.Count >= historySize)
             {
-                Debug.Log(allActionsList[0]);
                 allActionsList.RemoveAt(0);
                 ownActions.Remove(FindById(allActionsList[0].Item3));
             }
@@ -180,14 +176,14 @@ namespace Assets.SEE.Utils
         /// <summary>
         /// Deletes all redos of a user
         /// </summary>
-        private void DeleteAllRedos() //FIXME Muss auch die andere liste pflegen
+        private void DeleteAllRedos()
         {
             for (int i = 0; i < allActionsList.Count; i++)
             {
                 if (allActionsList[i].Item1.Equals(true) && allActionsList[i].Item2.Equals(HistoryType.undoneAction))
                 {
-                    ownActions.Remove(FindById(allActionsList[i].Item3)); //FIXME: is that uniqe and works?
-                    new GlobalActionHistoryNetwork().Delete(allActionsList[i].Item1, allActionsList[i].Item3);
+                    ownActions.Remove(FindById(allActionsList[i].Item3));
+                    new GlobalActionHistoryNetwork().Delete(allActionsList[i].Item3);
                     allActionsList.RemoveAt(i);
                     i--;
                 }
@@ -199,14 +195,14 @@ namespace Assets.SEE.Utils
         /// Deletes an item from the action list depending on its id.
         /// </summary>
         /// <param name="id">the id of the action which should be deleted</param>
-        public void DeleteItem(string id, bool isOwner) //FIXME: if size is to big how we ashure the network delete works right
+        public void DeleteItem(string id, bool isOwner)
         {
             for (int i = 0; i < allActionsList.Count; i++)
             {
                 if (allActionsList[i].Item3.Equals(id))
                 {
                     allActionsList.RemoveAt(i);
-                    if (isOwner) ownActions.Remove(FindById(id)); //FIXME: is that unique and works?
+                    if (isOwner) ownActions.Remove(FindById(id));
                     return;
                 }
             }
@@ -223,15 +219,24 @@ namespace Assets.SEE.Utils
             {
                 activeAction.Stop();
                 DeleteItem(lastAction.Item3, lastAction.Item1);
-                new GlobalActionHistoryNetwork().Delete(lastAction.Item1, lastAction.Item3);
+                new GlobalActionHistoryNetwork().Delete(lastAction.Item3);
                 lastAction = FindLastActionOfPlayer(true, HistoryType.action);
                 if (lastAction == null) return;
                 activeAction = FindById(lastAction.Item3);
             }
             if (ActionHasConflicts(activeAction.GetChangedObjects()))
             {
-                // Fixme: Error
-                Debug.Log("Undo");
+                
+
+                Debug.LogWarning("Redo not possible, someone else had made a change on the same object!");
+                Tuple<bool, HistoryType, string, List<string>> lockedAction = new Tuple<bool, HistoryType, string, List<string>>
+                    (false, HistoryType.undoneAction, lastAction.Item3, lastAction.Item4);
+
+                DeleteItem(lastAction.Item3, lastAction.Item1);
+                new GlobalActionHistoryNetwork().Delete( lastAction.Item3);
+                Push(lockedAction);
+                new GlobalActionHistoryNetwork().Push(lockedAction.Item2, lockedAction.Item3, ListToString(lockedAction.Item4));
+
                 return;
             }
             else
@@ -239,13 +244,13 @@ namespace Assets.SEE.Utils
                 activeAction?.Stop();
                 activeAction?.Undo();
                 DeleteItem(lastAction.Item3, lastAction.Item1);
-                new GlobalActionHistoryNetwork().Delete(lastAction.Item1, lastAction.Item3);
+                new GlobalActionHistoryNetwork().Delete(lastAction.Item3);
                 Tuple<bool, HistoryType, string, List<string>> undoneAction = new Tuple<bool, HistoryType, string, List<string>>
                     (true, HistoryType.undoneAction, lastAction.Item3, lastAction.Item4);
 
                 Push(undoneAction);
                 ownActions.Add(activeAction);
-                new GlobalActionHistoryNetwork().Push(undoneAction.Item1, undoneAction.Item2, undoneAction.Item3, ListToString(undoneAction.Item4));
+                new GlobalActionHistoryNetwork().Push(undoneAction.Item2, undoneAction.Item3, ListToString(undoneAction.Item4));
 
                 lastAction = FindLastActionOfPlayer(true, HistoryType.action);
                 if (lastAction == null) return;
@@ -261,29 +266,30 @@ namespace Assets.SEE.Utils
         /// Redoes the last undone action of a specific player.
         /// </summary>
         public void Redo()
-        {
-            activeAction?.Stop();
-
+        { 
             Tuple<bool, HistoryType, string, List<string>> lastUndoneAction = FindLastActionOfPlayer(true, HistoryType.undoneAction);
             if (lastUndoneAction == null) return;
 
             if (ActionHasConflicts(lastUndoneAction.Item4))
             {
-                // Fixme: Error
-                //NEED to delete the ownAction
-                //Set the owner of the action to false, dont delete from allactions
-                //notify the user
-                Debug.Log("Redo");
+                Tuple<bool, HistoryType, string, List<string>> lockedAction = new Tuple<bool, HistoryType, string, List<string>>(false, HistoryType.undoneAction, lastUndoneAction.Item3, lastUndoneAction.Item4);
+                DeleteItem(lastUndoneAction.Item3, lastUndoneAction.Item1);
+                new GlobalActionHistoryNetwork().Delete(lastUndoneAction.Item3);
+                Push(lockedAction);
+                new GlobalActionHistoryNetwork().Push(lockedAction.Item2, lockedAction.Item3, ListToString(lockedAction.Item4));
+                Debug.LogWarning("Redo not possible, someone else had made a change on the same object!");
                 return;
             }
+
+            activeAction?.Stop();
             ReversibleAction temp = FindById(lastUndoneAction.Item3);
             temp.Redo();
            
             Tuple<bool, HistoryType, string, List<string>> redoneAction = new Tuple<bool, HistoryType, string, List<string>>(true, HistoryType.action, lastUndoneAction.Item3, lastUndoneAction.Item4);
             DeleteItem(lastUndoneAction.Item3, lastUndoneAction.Item1);
-            new GlobalActionHistoryNetwork().Delete(lastUndoneAction.Item1,lastUndoneAction.Item3);
+            new GlobalActionHistoryNetwork().Delete(lastUndoneAction.Item3);
             Push(redoneAction);
-            new GlobalActionHistoryNetwork().Push(redoneAction.Item1, redoneAction.Item2, redoneAction.Item3, ListToString(redoneAction.Item4));
+            new GlobalActionHistoryNetwork().Push(redoneAction.Item2, redoneAction.Item3, ListToString(redoneAction.Item4));
             activeAction = temp;
             ownActions.Add(temp);
             Execute(activeAction.NewInstance(), true);
