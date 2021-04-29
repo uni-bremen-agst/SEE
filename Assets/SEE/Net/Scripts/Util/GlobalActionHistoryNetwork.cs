@@ -11,12 +11,7 @@ namespace SEE.Net
     /// Sync the actionhistory through the network on each client.
     /// </summary>
     public  class GlobalActionHistoryNetwork : AbstractAction
-    {
-        /// <summary>
-        /// is the user the owner of the action
-        /// </summary>
-        public  bool isOwner;
-
+    { 
         /// <summary>
         /// which type of action (action, undoneAction) 
         /// </summary>
@@ -45,7 +40,6 @@ namespace SEE.Net
             // Intentionally left blank.
         }
 
-
         /// <summary>
         /// Stuff to execute on the Server. Nothing to be done here.
         /// </summary>
@@ -65,7 +59,6 @@ namespace SEE.Net
                 else GlobalActionHistory.DeleteItem(actionId, false);
             }
         }
-
 
         /// <summary>
         /// Initiats the push of an action on each client
