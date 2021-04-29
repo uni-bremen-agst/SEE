@@ -224,11 +224,10 @@ namespace Assets.SEE.Utils
                 if (lastAction == null) return;
                 activeAction = FindById(lastAction.Item3);
             }
+            activeAction?.Stop();
             if (ActionHasConflicts(activeAction.GetChangedObjects()))
             {
-                
-
-                Debug.LogWarning("Redo not possible, someone else had made a change on the same object!");
+                Debug.LogWarning("Undo not possible, someone else had made a change on the same object!");
                 Tuple<bool, HistoryType, string, List<string>> lockedAction = new Tuple<bool, HistoryType, string, List<string>>
                     (false, HistoryType.undoneAction, lastAction.Item3, lastAction.Item4);
 
@@ -236,12 +235,12 @@ namespace Assets.SEE.Utils
                 new GlobalActionHistoryNetwork().Delete( lastAction.Item3);
                 Push(lockedAction);
                 new GlobalActionHistoryNetwork().Push(lockedAction.Item2, lockedAction.Item3, ListToString(lockedAction.Item4));
-
+                activeAction = FindById(FindLastActionOfPlayer(true,HistoryType.action).Item3);
+                activeAction?.Start();
                 return;
             }
             else
             {
-                activeAction?.Stop();
                 activeAction?.Undo();
                 DeleteItem(lastAction.Item3, lastAction.Item1);
                 new GlobalActionHistoryNetwork().Delete(lastAction.Item3);
@@ -269,7 +268,7 @@ namespace Assets.SEE.Utils
         { 
             Tuple<bool, HistoryType, string, List<string>> lastUndoneAction = FindLastActionOfPlayer(true, HistoryType.undoneAction);
             if (lastUndoneAction == null) return;
-
+            activeAction?.Stop();
             if (ActionHasConflicts(lastUndoneAction.Item4))
             {
                 Tuple<bool, HistoryType, string, List<string>> lockedAction = new Tuple<bool, HistoryType, string, List<string>>(false, HistoryType.undoneAction, lastUndoneAction.Item3, lastUndoneAction.Item4);
@@ -278,10 +277,10 @@ namespace Assets.SEE.Utils
                 Push(lockedAction);
                 new GlobalActionHistoryNetwork().Push(lockedAction.Item2, lockedAction.Item3, ListToString(lockedAction.Item4));
                 Debug.LogWarning("Redo not possible, someone else had made a change on the same object!");
+                activeAction = FindById(FindLastActionOfPlayer(true, HistoryType.action).Item3);
+                activeAction?.Start();
                 return;
             }
-
-            activeAction?.Stop();
             ReversibleAction temp = FindById(lastUndoneAction.Item3);
             temp.Redo();
            
@@ -344,6 +343,7 @@ namespace Assets.SEE.Utils
         private string ListToString(List<string> gameObjectIds)
         {
             string result = "";
+            if (gameObjectIds == null) return null;
             foreach(string s in gameObjectIds)
             {
                 result += s + ",";
