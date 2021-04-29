@@ -61,8 +61,8 @@ namespace SEE.Net
         {
             if (!IsRequester())
             {
-                if (push) GlobalActionHistory.Push(new Tuple<bool, ActionHistory.HistoryType, string, List<string>>(!isOwner, type, actionId, changedObjects));
-                else GlobalActionHistory.DeleteItem(actionId, !isOwner);
+                if (push) GlobalActionHistory.Push(new Tuple<bool, ActionHistory.HistoryType, string, List<string>>(false, type, actionId, changedObjects));
+                else GlobalActionHistory.DeleteItem(actionId, false);
             }
         }
 
@@ -70,14 +70,12 @@ namespace SEE.Net
         /// <summary>
         /// Initiats the push of an action on each client
         /// </summary>
-        /// <param name="isOwner">Is the user the owner of the action</param>
         /// <param name="type">Which type is the action (action, undoneAction)</param>
         /// <param name="actionId">The id of the action</param>
         /// <param name="changedObjects">The ids of the objects which are edited from the action</param>
-        public void Push(bool isOwner, ActionHistory.HistoryType type, string actionId, string changedObjects)
-        {
+        public void Push( ActionHistory.HistoryType type, string actionId, string changedObjects)
+        { 
             push = true;
-            this.isOwner = isOwner;
             this.type = type;
             this.actionId = actionId;
             this.changedObjects = StringToList(changedObjects);
@@ -87,11 +85,9 @@ namespace SEE.Net
         /// <summary>
         /// Initiats the Deletion process on each Client
         /// </summary>
-        /// <param name="isOwner">Is the user the owner of the action</param>
         /// <param name="actionId">The id of the action</param>
-        public void Delete(bool isOwner ,string actionId)
+        public void Delete(string actionId) 
         {
-            this.isOwner = isOwner;
             this.actionId = actionId;
             push = false;
             Execute(null);
