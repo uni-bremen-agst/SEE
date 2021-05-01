@@ -27,6 +27,8 @@ namespace SEE.Game
 
         private const string LeafLabelSettingsLabel = "LeafLabelSettings";
         private const string InnerNodeLabelSettingsLabel = "InnerNodeLabelSettings";
+        private const string LeafNodeColoringKindLabel = "LeafNodeColoringKind";
+        private const string InnerNodeColoringKindLabel = "InnerNodeColoringKind";
         private const string LeafNodeColorRangeLabel = "LeafNodeColorRange";
         private const string InnerNodeColorRangeLabel = "InnerNodeColorRange";
         private const string HierarchicalEdgesLabel = "HierarchicalEdges";
@@ -90,6 +92,7 @@ namespace SEE.Game
             {
                 string postfix = '#' + i.ToString();
                 writer.Save(leafNodeAttributesPerKind[i].kind.ToString(), LeafObjectsLabel + postfix);
+                writer.Save(leafNodeAttributesPerKind[i].coloringKind.ToString(), LeafNodeColoringKindLabel + postfix); // TODO(torben): ToString() could be replaced by cast to int for performance
                 leafNodeAttributesPerKind[i].colorRange.Save(writer, LeafNodeColorRangeLabel + postfix);
                 writer.Save(leafNodeAttributesPerKind[i].widthMetric, WidthMetricLabel + postfix);
                 writer.Save(leafNodeAttributesPerKind[i].heightMetric, HeightMetricLabel + postfix);
@@ -101,6 +104,7 @@ namespace SEE.Game
             {
                 string postfix = '#' + i.ToString();
                 writer.Save(innerNodeAttributesPerKind[i].kind.ToString(), InnerNodeObjectsLabel + postfix);
+                writer.Save(innerNodeAttributesPerKind[i].coloringKind.ToString(), InnerNodeColoringKindLabel + postfix);
                 innerNodeAttributesPerKind[i].colorRange.Save(writer, InnerNodeColorRangeLabel + postfix);
                 writer.Save(innerNodeAttributesPerKind[i].heightMetric, InnerNodeHeightMetricLabel + postfix);
                 writer.Save(innerNodeAttributesPerKind[i].styleMetric, InnerNodeStyleMetricLabel + postfix);
@@ -167,6 +171,7 @@ namespace SEE.Game
             {
                 string postfix = '#' + i.ToString();
                 ConfigIO.RestoreEnum(attributes, LeafObjectsLabel + postfix, ref leafNodeAttributesPerKind[i].kind);
+                ConfigIO.RestoreEnum(attributes, LeafNodeColoringKindLabel + postfix, ref leafNodeAttributesPerKind[i].coloringKind);
                 leafNodeAttributesPerKind[i].colorRange.Restore(attributes, LeafNodeColorRangeLabel + postfix);
                 ConfigIO.Restore(attributes, WidthMetricLabel + postfix, ref leafNodeAttributesPerKind[i].widthMetric);
                 ConfigIO.Restore(attributes, HeightMetricLabel + postfix, ref leafNodeAttributesPerKind[i].heightMetric);
@@ -178,6 +183,7 @@ namespace SEE.Game
             {
                 string postfix = '#' + i.ToString();
                 ConfigIO.RestoreEnum(attributes, InnerNodeObjectsLabel + postfix, ref innerNodeAttributesPerKind[i].kind);
+                ConfigIO.RestoreEnum(attributes, InnerNodeColoringKindLabel + postfix, ref innerNodeAttributesPerKind[i].coloringKind);
                 innerNodeAttributesPerKind[i].colorRange.Restore(attributes, InnerNodeColorRangeLabel + postfix);
                 ConfigIO.Restore(attributes, InnerNodeHeightMetricLabel + postfix, ref innerNodeAttributesPerKind[i].heightMetric);
                 ConfigIO.Restore(attributes, InnerNodeStyleMetricLabel + postfix, ref innerNodeAttributesPerKind[i].styleMetric);

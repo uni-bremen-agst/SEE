@@ -228,6 +228,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: 0
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -312,6 +315,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.McCabe_Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -396,6 +402,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.Number_of_Clusters
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -480,6 +489,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.Number_of_Clusters
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -570,6 +582,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: 0
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -648,6 +663,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -726,6 +744,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -804,6 +825,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -1357,6 +1381,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -1441,6 +1468,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -1525,6 +1555,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -1609,6 +1642,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -1699,6 +1735,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -1777,6 +1816,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -1855,6 +1897,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -1933,6 +1978,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -2837,6 +2885,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -2921,6 +2972,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -3005,6 +3059,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -3089,6 +3146,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -3179,6 +3239,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -3257,6 +3320,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -3335,6 +3401,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -3413,6 +3482,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -4890,6 +4962,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -4974,6 +5049,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -5058,6 +5136,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -5142,6 +5223,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -5232,6 +5316,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -5310,6 +5397,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -5388,6 +5478,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -5466,6 +5559,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -6186,6 +6282,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.Number_of_Clusters
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -6260,16 +6359,19 @@ MonoBehaviour:
       Data: 0
     - Name: widthMetric
       Entry: 1
-      Data: Metric.Number_of_Tokens
+      Data: 
     - Name: heightMetric
       Entry: 1
-      Data: Metric.Clone_Rate
+      Data: 
     - Name: depthMetric
       Entry: 1
-      Data: Metric.LOC
+      Data: 
     - Name: styleMetric
       Entry: 1
-      Data: Metric.Complexity
+      Data: 
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -6299,10 +6401,10 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 4
       Data: 1
@@ -6311,7 +6413,7 @@ MonoBehaviour:
       Data: 
     - Name: NumberOfColors
       Entry: 3
-      Data: 10
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -6320,16 +6422,16 @@ MonoBehaviour:
       Data: 6|SEE.Game.LabelSettings, SEE
     - Name: Show
       Entry: 5
-      Data: true
+      Data: false
     - Name: Distance
       Entry: 4
-      Data: 0.2
+      Data: 0
     - Name: FontSize
       Entry: 4
-      Data: 0.4
+      Data: 0
     - Name: AnimationDuration
       Entry: 4
-      Data: 0.5
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -6344,16 +6446,19 @@ MonoBehaviour:
       Data: 0
     - Name: widthMetric
       Entry: 1
-      Data: Metric.Number_of_Tokens
+      Data: 
     - Name: heightMetric
       Entry: 1
-      Data: Metric.Clone_Rate
+      Data: 
     - Name: depthMetric
       Entry: 1
-      Data: Metric.LOC
+      Data: 
     - Name: styleMetric
       Entry: 1
-      Data: Metric.Complexity
+      Data: 
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -6383,10 +6488,10 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 4
       Data: 1
@@ -6395,7 +6500,7 @@ MonoBehaviour:
       Data: 
     - Name: NumberOfColors
       Entry: 3
-      Data: 10
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -6404,16 +6509,16 @@ MonoBehaviour:
       Data: 8|SEE.Game.LabelSettings, SEE
     - Name: Show
       Entry: 5
-      Data: true
+      Data: false
     - Name: Distance
       Entry: 4
-      Data: 0.2
+      Data: 0
     - Name: FontSize
       Entry: 4
-      Data: 0.4
+      Data: 0
     - Name: AnimationDuration
       Entry: 4
-      Data: 0.5
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -6428,16 +6533,19 @@ MonoBehaviour:
       Data: 0
     - Name: widthMetric
       Entry: 1
-      Data: Metric.Number_of_Tokens
+      Data: 
     - Name: heightMetric
       Entry: 1
-      Data: Metric.Clone_Rate
+      Data: 
     - Name: depthMetric
       Entry: 1
-      Data: Metric.LOC
+      Data: 
     - Name: styleMetric
       Entry: 1
-      Data: Metric.Complexity
+      Data: 
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -6467,10 +6575,10 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 4
       Data: 1
@@ -6479,7 +6587,7 @@ MonoBehaviour:
       Data: 
     - Name: NumberOfColors
       Entry: 3
-      Data: 10
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -6488,16 +6596,16 @@ MonoBehaviour:
       Data: 10|SEE.Game.LabelSettings, SEE
     - Name: Show
       Entry: 5
-      Data: true
+      Data: false
     - Name: Distance
       Entry: 4
-      Data: 0.2
+      Data: 0
     - Name: FontSize
       Entry: 4
-      Data: 0.4
+      Data: 0
     - Name: AnimationDuration
       Entry: 4
-      Data: 0.5
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -6528,6 +6636,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -6605,7 +6716,10 @@ MonoBehaviour:
       Data: 
     - Name: styleMetric
       Entry: 1
-      Data: Metric.IssuesTotal
+      Data: 
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -6635,10 +6749,10 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 4
-      Data: 0.921568632
+      Data: 1
     - Name: 
       Entry: 4
-      Data: 0.0156862754
+      Data: 1
     - Name: 
       Entry: 4
       Data: 1
@@ -6647,7 +6761,7 @@ MonoBehaviour:
       Data: 
     - Name: NumberOfColors
       Entry: 3
-      Data: 10
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -6656,16 +6770,16 @@ MonoBehaviour:
       Data: 15|SEE.Game.LabelSettings, SEE
     - Name: Show
       Entry: 5
-      Data: true
+      Data: false
     - Name: Distance
       Entry: 4
-      Data: 0.2
+      Data: 0
     - Name: FontSize
       Entry: 4
-      Data: 0.4
+      Data: 0
     - Name: AnimationDuration
       Entry: 4
-      Data: 0.5
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -6683,7 +6797,10 @@ MonoBehaviour:
       Data: 
     - Name: styleMetric
       Entry: 1
-      Data: Metric.IssuesTotal
+      Data: 
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -6713,10 +6830,10 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 4
-      Data: 0.921568632
+      Data: 1
     - Name: 
       Entry: 4
-      Data: 0.0156862754
+      Data: 1
     - Name: 
       Entry: 4
       Data: 1
@@ -6725,7 +6842,7 @@ MonoBehaviour:
       Data: 
     - Name: NumberOfColors
       Entry: 3
-      Data: 10
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -6734,16 +6851,16 @@ MonoBehaviour:
       Data: 17|SEE.Game.LabelSettings, SEE
     - Name: Show
       Entry: 5
-      Data: true
+      Data: false
     - Name: Distance
       Entry: 4
-      Data: 0.2
+      Data: 0
     - Name: FontSize
       Entry: 4
-      Data: 0.4
+      Data: 0
     - Name: AnimationDuration
       Entry: 4
-      Data: 0.5
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -6761,7 +6878,10 @@ MonoBehaviour:
       Data: 
     - Name: styleMetric
       Entry: 1
-      Data: Metric.IssuesTotal
+      Data: 
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -6791,10 +6911,10 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 4
-      Data: 0.921568632
+      Data: 1
     - Name: 
       Entry: 4
-      Data: 0.0156862754
+      Data: 1
     - Name: 
       Entry: 4
       Data: 1
@@ -6803,7 +6923,7 @@ MonoBehaviour:
       Data: 
     - Name: NumberOfColors
       Entry: 3
-      Data: 10
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -6812,16 +6932,16 @@ MonoBehaviour:
       Data: 19|SEE.Game.LabelSettings, SEE
     - Name: Show
       Entry: 5
-      Data: true
+      Data: false
     - Name: Distance
       Entry: 4
-      Data: 0.2
+      Data: 0
     - Name: FontSize
       Entry: 4
-      Data: 0.4
+      Data: 0
     - Name: AnimationDuration
       Entry: 4
-      Data: 0.5
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -7645,6 +7765,9 @@ MonoBehaviour:
     - Name: styleMetric
       Entry: 1
       Data: Metric.McCabe_Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -7719,16 +7842,19 @@ MonoBehaviour:
       Data: 0
     - Name: widthMetric
       Entry: 1
-      Data: Metric.Number_of_Tokens
+      Data: 
     - Name: heightMetric
       Entry: 1
-      Data: Metric.Clone_Rate
+      Data: 
     - Name: depthMetric
       Entry: 1
-      Data: Metric.LOC
+      Data: 
     - Name: styleMetric
       Entry: 1
-      Data: Metric.Complexity
+      Data: 
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -7758,10 +7884,10 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 4
       Data: 1
@@ -7770,7 +7896,7 @@ MonoBehaviour:
       Data: 
     - Name: NumberOfColors
       Entry: 3
-      Data: 10
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -7779,16 +7905,16 @@ MonoBehaviour:
       Data: 6|SEE.Game.LabelSettings, SEE
     - Name: Show
       Entry: 5
-      Data: true
+      Data: false
     - Name: Distance
       Entry: 4
-      Data: 0.2
+      Data: 0
     - Name: FontSize
       Entry: 4
-      Data: 0.4
+      Data: 0
     - Name: AnimationDuration
       Entry: 4
-      Data: 0.5
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -7803,16 +7929,19 @@ MonoBehaviour:
       Data: 0
     - Name: widthMetric
       Entry: 1
-      Data: Metric.Number_of_Tokens
+      Data: 
     - Name: heightMetric
       Entry: 1
-      Data: Metric.Clone_Rate
+      Data: 
     - Name: depthMetric
       Entry: 1
-      Data: Metric.LOC
+      Data: 
     - Name: styleMetric
       Entry: 1
-      Data: Metric.Complexity
+      Data: 
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -7842,10 +7971,10 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 4
       Data: 1
@@ -7854,7 +7983,7 @@ MonoBehaviour:
       Data: 
     - Name: NumberOfColors
       Entry: 3
-      Data: 10
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -7863,16 +7992,16 @@ MonoBehaviour:
       Data: 8|SEE.Game.LabelSettings, SEE
     - Name: Show
       Entry: 5
-      Data: true
+      Data: false
     - Name: Distance
       Entry: 4
-      Data: 0.2
+      Data: 0
     - Name: FontSize
       Entry: 4
-      Data: 0.4
+      Data: 0
     - Name: AnimationDuration
       Entry: 4
-      Data: 0.5
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -7887,16 +8016,19 @@ MonoBehaviour:
       Data: 0
     - Name: widthMetric
       Entry: 1
-      Data: Metric.Number_of_Tokens
+      Data: 
     - Name: heightMetric
       Entry: 1
-      Data: Metric.Clone_Rate
+      Data: 
     - Name: depthMetric
       Entry: 1
-      Data: Metric.LOC
+      Data: 
     - Name: styleMetric
       Entry: 1
       Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -7926,10 +8058,10 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 4
       Data: 1
@@ -7938,7 +8070,7 @@ MonoBehaviour:
       Data: 
     - Name: NumberOfColors
       Entry: 3
-      Data: 10
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -7947,16 +8079,16 @@ MonoBehaviour:
       Data: 10|SEE.Game.LabelSettings, SEE
     - Name: Show
       Entry: 5
-      Data: true
+      Data: false
     - Name: Distance
       Entry: 4
-      Data: 0.2
+      Data: 0
     - Name: FontSize
       Entry: 4
-      Data: 0.4
+      Data: 0
     - Name: AnimationDuration
       Entry: 4
-      Data: 0.5
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -7980,13 +8112,16 @@ MonoBehaviour:
       Data: 12|SEE.InnerNodeAttributes, SEE
     - Name: kind
       Entry: 3
-      Data: 0
+      Data: 5
     - Name: heightMetric
       Entry: 1
       Data: 
     - Name: styleMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -8064,7 +8199,10 @@ MonoBehaviour:
       Data: 
     - Name: styleMetric
       Entry: 1
-      Data: Metric.IssuesTotal
+      Data: 
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -8094,10 +8232,10 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 4
-      Data: 0.921568632
+      Data: 1
     - Name: 
       Entry: 4
-      Data: 0.0156862754
+      Data: 1
     - Name: 
       Entry: 4
       Data: 1
@@ -8106,7 +8244,7 @@ MonoBehaviour:
       Data: 
     - Name: NumberOfColors
       Entry: 3
-      Data: 10
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -8115,16 +8253,16 @@ MonoBehaviour:
       Data: 15|SEE.Game.LabelSettings, SEE
     - Name: Show
       Entry: 5
-      Data: true
+      Data: false
     - Name: Distance
       Entry: 4
-      Data: 0.2
+      Data: 0
     - Name: FontSize
       Entry: 4
-      Data: 0.4
+      Data: 0
     - Name: AnimationDuration
       Entry: 4
-      Data: 0.5
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -8142,7 +8280,10 @@ MonoBehaviour:
       Data: 
     - Name: styleMetric
       Entry: 1
-      Data: Metric.IssuesTotal
+      Data: 
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -8172,10 +8313,10 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 4
-      Data: 0.921568632
+      Data: 1
     - Name: 
       Entry: 4
-      Data: 0.0156862754
+      Data: 1
     - Name: 
       Entry: 4
       Data: 1
@@ -8184,7 +8325,7 @@ MonoBehaviour:
       Data: 
     - Name: NumberOfColors
       Entry: 3
-      Data: 10
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -8193,16 +8334,16 @@ MonoBehaviour:
       Data: 17|SEE.Game.LabelSettings, SEE
     - Name: Show
       Entry: 5
-      Data: true
+      Data: false
     - Name: Distance
       Entry: 4
-      Data: 0.2
+      Data: 0
     - Name: FontSize
       Entry: 4
-      Data: 0.4
+      Data: 0
     - Name: AnimationDuration
       Entry: 4
-      Data: 0.5
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -8220,7 +8361,10 @@ MonoBehaviour:
       Data: 
     - Name: styleMetric
       Entry: 1
-      Data: Metric.IssuesTotal
+      Data: 
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -8250,10 +8394,10 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 4
-      Data: 0.921568632
+      Data: 1
     - Name: 
       Entry: 4
-      Data: 0.0156862754
+      Data: 1
     - Name: 
       Entry: 4
       Data: 1
@@ -8262,7 +8406,7 @@ MonoBehaviour:
       Data: 
     - Name: NumberOfColors
       Entry: 3
-      Data: 10
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -8271,16 +8415,16 @@ MonoBehaviour:
       Data: 19|SEE.Game.LabelSettings, SEE
     - Name: Show
       Entry: 5
-      Data: true
+      Data: false
     - Name: Distance
       Entry: 4
-      Data: 0.2
+      Data: 0
     - Name: FontSize
       Entry: 4
-      Data: 0.4
+      Data: 0
     - Name: AnimationDuration
       Entry: 4
-      Data: 0.5
+      Data: 0
     - Name: 
       Entry: 8
       Data: 
@@ -8316,7 +8460,7 @@ MonoBehaviour:
       Data: 21|SEE.EdgeLayoutSettings, SEE
     - Name: kind
       Entry: 3
-      Data: 3
+      Data: 0
     - Name: edgeWidth
       Entry: 4
       Data: 0.01
@@ -8494,7 +8638,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Class
+      Data: File
     - Name: $v
       Entry: 5
       Data: true
@@ -8506,7 +8650,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Package
+      Data: Directory
     - Name: $v
       Entry: 5
       Data: true
@@ -8556,13 +8700,13 @@ MonoBehaviour:
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
   GXLPath:
-    Root: 3
+    Root: 0
     relativePath: /mini/CodeFacts.gxl
-    absolutePath: 
+    absolutePath: C:\dev\SEE\Data\GXL\linux-clones\fs\CodeFacts.gxl
   CSVPath:
-    Root: 3
+    Root: 0
     relativePath: /mini/CodeFacts.csv
-    absolutePath: 
+    absolutePath: C:\dev\SEE\Data\GXL\linux-clones\fs\CodeFacts.csv
 --- !u!114 &1972412191
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8605,7 +8749,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.005133927
+  HeightOffset: 0.0031023026
 --- !u!65 &1972412194
 BoxCollider:
   m_ObjectHideFlags: 0
