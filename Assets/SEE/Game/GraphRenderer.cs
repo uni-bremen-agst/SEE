@@ -1269,8 +1269,18 @@ namespace SEE.Game
             // render queue should be. We are assuming that the nodes are stacked on each
             // other according to the node hierarchy. Leaves are on top of all other nodes.
             // That is why we put them at the highest necessary rendering queue offset.
-            GameObject result = leafNodeFactories[(int)node.kind].NewBlock(SelectStyle(node, innerNodeFactories[(int)node.kind]), node.ItsGraph.MaxDepth);
-            if (settings.leafNodeAttributesPerKind[(int)node.kind].randomizeColor)
+            int style;
+            ColoringKind coloringKind = settings.leafNodeAttributesPerKind[(int)node.kind].coloringKind;
+            if (coloringKind == ColoringKind.RandomRange)
+            {
+                style = UnityEngine.Random.Range(0, (int)leafNodeFactories[(int)node.kind].NumberOfStyles());
+            }
+            else
+            {
+                style = SelectStyle(node, innerNodeFactories[(int)node.kind]);
+            }
+            GameObject result = leafNodeFactories[(int)node.kind].NewBlock(style, node.ItsGraph.MaxDepth);
+            if (coloringKind == ColoringKind.Random)
             {
                 float r = UnityEngine.Random.Range(0.5f, 1.0f);
                 float g = UnityEngine.Random.Range(0.5f, 1.0f);
@@ -1623,9 +1633,20 @@ namespace SEE.Game
             result.name = node.ID;
             result.tag = Tags.Node;
             result.AddComponent<NodeRef>().Value = node;
-            AdjustStyle(result, innerNodeFactory); // TODO(torben): could the style just be selected beforehand at NewBlock?
-            if (settings.innerNodeAttributesPerKind[(int)node.kind].randomizeColor)
+            ColoringKind coloringKind = settings.innerNodeAttributesPerKind[(int)node.kind].coloringKind;
+            if (coloringKind == ColoringKind.Metric)
             {
+                // TODO(torben): could the style just be selected beforehand at NewBlock?
+                AdjustStyle(result, innerNodeFactory);
+            }
+            else if (coloringKind == ColoringKind.RandomRange)
+            {
+                int style = UnityEngine.Random.Range(0, (int)innerNodeFactories[(int)node.kind].NumberOfStyles());
+                innerNodeFactory.SetStyle(result, style);
+            }
+            else
+            {
+                Assert.IsTrue(coloringKind == ColoringKind.Random);
                 float r = UnityEngine.Random.Range(0.5f, 1.0f);
                 float g = UnityEngine.Random.Range(0.5f, 1.0f);
                 float b = UnityEngine.Random.Range(0.5f, 1.0f);

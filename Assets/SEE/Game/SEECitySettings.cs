@@ -32,6 +32,16 @@ namespace SEE
     }
 
     /// <summary>
+    /// The kind of coloring of objects.
+    /// </summary>
+    public enum ColoringKind : byte
+    {
+        Metric,
+        RandomRange,
+        Random
+    }
+
+    /// <summary>
     /// How leaf graph nodes should be depicted.
     /// </summary>
     public enum LeafNodeKinds : byte
@@ -80,15 +90,15 @@ namespace SEE
     /// </summary>
     public class LeafNodeAttributes
     {
-        public LeafNodeKinds    kind           = LeafNodeKinds.Blocks;
-        public string           widthMetric    = NumericAttributeNames.Number_Of_Tokens.Name();
-        public string           heightMetric   = NumericAttributeNames.Clone_Rate.Name();
-        public string           depthMetric    = NumericAttributeNames.LOC.Name();
-        public string           styleMetric    = NumericAttributeNames.Complexity.Name();
-        public bool             randomizeColor = false;
-        public ColorRange       colorRange     = new ColorRange(Color.white, Color.red, 10);
+        public LeafNodeKinds    kind          = LeafNodeKinds.Blocks;
+        public string           widthMetric   = NumericAttributeNames.Number_Of_Tokens.Name();
+        public string           heightMetric  = NumericAttributeNames.Clone_Rate.Name();
+        public string           depthMetric   = NumericAttributeNames.LOC.Name();
+        public string           styleMetric   = NumericAttributeNames.Complexity.Name();
+        public ColoringKind     coloringKind  = ColoringKind.Metric;
+        public ColorRange       colorRange    = new ColorRange(Color.white, Color.red, 10);
         [OdinSerialize]
-        public LabelSettings    labelSettings  = new LabelSettings();
+        public LabelSettings    labelSettings = new LabelSettings();
     }
 
     /// <summary>
@@ -96,13 +106,13 @@ namespace SEE
     /// </summary>
     public class InnerNodeAttributes
     {
-        public InnerNodeKinds    kind           = InnerNodeKinds.Blocks;
-        public string            heightMetric   = "";
-        public string            styleMetric    = NumericAttributeNames.IssuesTotal.Name();
-        public bool              randomizeColor = false;
-        public ColorRange        colorRange     = new ColorRange(Color.white, Color.yellow, 10);
+        public InnerNodeKinds    kind          = InnerNodeKinds.Blocks;
+        public string            heightMetric  = "";
+        public string            styleMetric   = NumericAttributeNames.IssuesTotal.Name();
+        public ColoringKind      coloringKind  = ColoringKind.Metric;
+        public ColorRange        colorRange    = new ColorRange(Color.white, Color.yellow, 10);
         [OdinSerialize]
-        public LabelSettings     labelSettings  = new LabelSettings();
+        public LabelSettings     labelSettings = new LabelSettings();
     }
 
     /// <summary>
