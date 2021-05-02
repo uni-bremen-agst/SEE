@@ -109,7 +109,11 @@ namespace SEE.Game.UI.PropertyDialog
         /// <param name="value">whether enabling or disabling is requested</param>
         private void Enable(bool value)
         {
-            dialog?.SetActive(value);
+            if (dialog != null)
+            {
+                dialog.SetActive(value);
+            }
+
             foreach (PropertyGroup group in groups)
             {
                 group.enabled = value;
