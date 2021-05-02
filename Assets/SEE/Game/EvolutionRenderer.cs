@@ -719,7 +719,7 @@ namespace SEE.Game
                         //In order to use DynamicSampleRateReduction, all edges should have a number of points that is divisible by two.
                         if (adjustedSampleRate % 2 != 0)
                         {
-                            adjustedSampleRate += 1;
+                            adjustedSampleRate++;
                         }
 
                         //No edge should have more than 75, or less than 2 points.
