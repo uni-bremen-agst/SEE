@@ -852,7 +852,7 @@ namespace SEE.Game
         /// <param name="v1">First vector</param>
         /// <param name="v2">Second vector</param>
         /// <returns>true if the x and z co-ordindates of the two vectors are approximately equal</returns>
-        private bool DifPosV3(Vector3 v1, Vector3 v2)
+        private bool XZAreEqual(Vector3 v1, Vector3 v2)
         {
             double x1, z1, x2, z2;
 
@@ -920,7 +920,7 @@ namespace SEE.Game
             else
             {
                 // Edge was not moved
-                if (DifPosV3(layoutNode.CenterPosition, currentGameNode.transform.position))
+                if (XZAreEqual(layoutNode.CenterPosition, currentGameNode.transform.position))
                 {
                     negligibleNodes.Add(currentGameNode.name);
                 }
