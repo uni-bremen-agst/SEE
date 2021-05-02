@@ -296,7 +296,7 @@ namespace SEE.Game
         /// <summary>
         /// Saves edges that were not moved during iteration
         /// </summary>
-        List<string> negligibleNodes = new List<string>();
+        private List<string> negligibleNodes = new List<string>();
 
         /// <summary>
         /// List for saving the copied nodes. Is used for animation.
