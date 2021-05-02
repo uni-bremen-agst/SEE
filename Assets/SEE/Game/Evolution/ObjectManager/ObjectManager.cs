@@ -320,7 +320,7 @@ namespace SEE.Game.Evolution
                 }
             }
 
-            if (remainingNodes.Count()  != 0)
+            if (remainingNodes.Count() != 0)
             {
                 newEdges = _graphRenderer.EdgeLayout(remainingNodes.Values, false);
             }
