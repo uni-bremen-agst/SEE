@@ -847,11 +847,11 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Checks whether two Vector3 have the same X and Z position
+        /// Returns true if the x and z co-ordindates of the two vectors are approximately equal.
         /// </summary>
         /// <param name="v1">First vector</param>
         /// <param name="v2">Second vector</param>
-        /// <returns></returns>
+        /// <returns>true if the x and z co-ordindates of the two vectors are approximately equal</returns>
         private bool DifPosV3(Vector3 v1, Vector3 v2)
         {
             double x1, z1, x2, z2;
