@@ -306,7 +306,7 @@ namespace SEE.Game.Evolution
 
             foreach (var node in nodes)
             {
-                foreach(Edge edge in node.Value.GetNode().Outgoings)
+                foreach (Edge edge in node.Value.GetNode().Outgoings)
                 {
                     string id = edge.Target.ID;
                     if (NegligibleNodes.Contains(id))
