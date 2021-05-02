@@ -9,7 +9,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// The abstract navigation action handles generic interactions with the city.
     /// </summary>
-    [RequireComponent(typeof(Plane))]
+    [RequireComponent(typeof(GO.Plane))]
     public abstract class NavigationAction : MonoBehaviour
     {
         /// <summary>

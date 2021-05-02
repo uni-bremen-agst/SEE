@@ -156,6 +156,7 @@ namespace InControl
 		void OnApplicationFocus( bool focusState )
 		{
 			if (IsNotTheSingleton) return;
+			if (applicationHasQuit) return;
 			InputManager.OnApplicationFocus( focusState );
 		}
 
@@ -163,6 +164,7 @@ namespace InControl
 		void OnApplicationPause( bool pauseState )
 		{
 			if (IsNotTheSingleton) return;
+			if (applicationHasQuit) return;
 			InputManager.OnApplicationPause( pauseState );
 		}
 
@@ -170,6 +172,7 @@ namespace InControl
 		void OnApplicationQuit()
 		{
 			if (IsNotTheSingleton) return;
+			if (applicationHasQuit) return;
 			InputManager.OnApplicationQuit();
 			applicationHasQuit = true;
 		}
@@ -179,6 +182,7 @@ namespace InControl
 		void OnSceneWasLoaded( Scene scene, LoadSceneMode loadSceneMode )
 		{
 			if (IsNotTheSingleton) return;
+			if (applicationHasQuit) return;
 			if (loadSceneMode == LoadSceneMode.Single)
 			{
 				InputManager.OnLevelWasLoaded();
@@ -188,6 +192,7 @@ namespace InControl
 		void OnLevelWasLoaded( int level )
 		{
 			if (IsNotTheSingleton) return;
+			if (applicationHasQuit) return;
 			InputManager.OnLevelWasLoaded();
 		}
 		#endif
@@ -212,3 +217,4 @@ namespace InControl
 		}
 	}
 }
+

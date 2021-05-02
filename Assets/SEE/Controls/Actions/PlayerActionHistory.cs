@@ -50,14 +50,8 @@ namespace SEE.Controls.Actions
         /// <param name="actionType">kind of action to be executed</param>
         public static void Execute(ActionStateType actionType)
         {
+            ActionState.Value = actionType;
             history.Execute(actionType.CreateReversible());
-
-            // FIXME: This looks like a hack and should be removed later.
-            // The PlayerActionHistory should not need to know anything about its actions.
-            if (actionType.Equals(ActionStateType.NewNode) || actionType.Equals(ActionStateType.EditNode))
-            {
-                NodeInteractionButtons.addOrEditNode = history.Current;
-            }
         }
 
         /// <summary>
@@ -68,6 +62,15 @@ namespace SEE.Controls.Actions
         public static ActionStateType Current()
         {
             return history.Current?.GetActionStateType();
+        }
+
+        /// <summary>
+        /// True if the action history is empty.
+        /// </summary>
+        /// <returns>true if the action history is empty</returns>
+        public static bool IsEmpty()
+        {
+            return history.UndoCount == 0;
         }
     }
 }

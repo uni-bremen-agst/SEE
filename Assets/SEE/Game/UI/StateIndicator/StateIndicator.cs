@@ -1,10 +1,11 @@
 ﻿using SEE.GO;
+using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Valve.VR.InteractionSystem;
 
-namespace SEE.Game.UI
+namespace SEE.Game.UI.StateIndicator
 {
     /// <summary>
     /// Indicates some kind of state with which a text and a color is associated.
@@ -61,12 +62,18 @@ namespace SEE.Game.UI
 
         private void OnDisable()
         {
-            ModePanelImage?.gameObject.SetActive(false);
+            if (ModePanelImage != null)
+            {
+                ModePanelImage.gameObject.SetActive(false);
+            }
         }
 
         private void OnEnable()
         {
-            ModePanelImage?.gameObject.SetActive(true);
+            if (ModePanelImage != null)
+            {
+                ModePanelImage.gameObject.SetActive(true);
+            }
         }
 
         /// <summary>
@@ -74,13 +81,7 @@ namespace SEE.Game.UI
         /// </summary>
         protected override void StartDesktop()
         {
-            Object indicatorPrefab = Resources.Load<GameObject>(MODE_PANEL_PREFAB);
-            GameObject indicator = Instantiate(indicatorPrefab, Canvas.transform, false) as GameObject;
-            if (indicator == null)
-            {
-                Debug.LogError("Couldn't instantiate ModePanel prefab\n");
-                return;
-            }
+            GameObject indicator = PrefabInstantiator.InstantiatePrefab(MODE_PANEL_PREFAB, Canvas.transform, false);
             indicator.name = Title;
 
             RectTransform rectTransform = (RectTransform) indicator.transform;

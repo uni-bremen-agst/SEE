@@ -19,8 +19,7 @@ namespace SEE.Controls
             internal bool freeMode;
         }
 
-        private CameraState cameraState;
-        private const int RightMouseButton = 1;
+        private CameraState cameraState;        
 
         [Tooltip("The code city which the player is focusing on.")]
         public GO.Plane focusedObject;
@@ -34,19 +33,21 @@ namespace SEE.Controls
             }
             else
             {
-                Debug.LogErrorFormat("Player {0} has no focus object assigned.\n", name);
+                cameraState.freeMode = true;
+                Debug.Log($"Player {name} has no focus object assigned.\n");
             }
             cameraState.distance = 2.0f;
             cameraState.yaw = 0.0f;
             cameraState.pitch = 45.0f;
             mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
             mainCamera.transform.position -= mainCamera.transform.forward * cameraState.distance;
+            lastAxis = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
         }
 
         private void Update()
         {
             Camera mainCamera = MainCamera.Camera;
-            if (Input.GetKeyDown(KeyBindings.ToggleCameraLock))
+            if (SEEInput.ToggleCameraLock())
             {
                 if (cameraState.freeMode)
                 {
@@ -61,7 +62,7 @@ namespace SEE.Controls
             }
 
             float speed = Speed * Time.deltaTime;
-            if (Input.GetKey(KeyBindings.BoostCameraSpeed))
+            if (SEEInput.BoostCameraSpeed())
             {
                 speed *= BoostFactor;
             }
@@ -69,23 +70,17 @@ namespace SEE.Controls
             if (!cameraState.freeMode)
             {
                 float d = 0.0f;
-                if (Input.GetKey(KeyBindings.MoveForward))
+                if (SEEInput.MoveForward())
                 {
                     d += speed;
                 }
-                if (Input.GetKey(KeyBindings.MoveBackward))
+                if (SEEInput.MoveBackward())
                 {
                     d -= speed;
                 }
                 cameraState.distance -= d;
 
-                if (Input.GetMouseButton(RightMouseButton))
-                {
-                    float x = Input.GetAxis("mouse x");
-                    float y = Input.GetAxis("mouse y");
-                    cameraState.yaw += x;
-                    cameraState.pitch -= y;
-                }
+                HandleRotation();
                 mainCamera.transform.position = focusedObject.CenterTop;
                 mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
                 mainCamera.transform.position -= mainCamera.transform.forward * cameraState.distance;
@@ -93,27 +88,27 @@ namespace SEE.Controls
             else // cameraState.freeMode == true
             {
                 Vector3 v = Vector3.zero;
-                if (Input.GetKey(KeyBindings.MoveForward))
+                if (SEEInput.MoveForward())
                 {
                     v += mainCamera.transform.forward;
                 }
-                if (Input.GetKey(KeyBindings.MoveBackward))
+                if (SEEInput.MoveBackward())
                 {
                     v -= mainCamera.transform.forward;
                 }
-                if (Input.GetKey(KeyBindings.MoveRight))
+                if (SEEInput.MoveRight())
                 {
                     v += mainCamera.transform.right;
                 }
-                if (Input.GetKey(KeyBindings.MoveLeft))
+                if (SEEInput.MoveLeft())
                 {
                     v -= mainCamera.transform.right;
                 }
-                if (Input.GetKey(KeyBindings.MoveUp))
+                if (SEEInput.MoveUp())
                 {
                     v += Vector3.up;
                 }
-                if (Input.GetKey(KeyBindings.MoveDown))
+                if (SEEInput.MoveDown())
                 {
                     v += Vector3.down;
                 }
@@ -121,15 +116,40 @@ namespace SEE.Controls
                 v *= speed;
                 mainCamera.transform.position += v;
 
-                if (Input.GetMouseButton(RightMouseButton))
-                {
-                    float x = Input.GetAxis("mouse x");
-                    float y = Input.GetAxis("mouse y");
-                    cameraState.yaw += x;
-                    cameraState.pitch -= y;
-                }
+                HandleRotation();
                 mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
             }
+        }
+
+        /// <summary>
+        /// The mouse position of the last frame.
+        /// </summary>
+        private Vector2 lastAxis;
+
+        /// <summary>
+        /// If the user wants us, we rotate the camera according to mouse input.
+        /// Modifies <see cref="cameraState.yaw"/> and <see cref="cameraState.pitch"/>.
+        /// 
+        /// Note: This is a workaround of issues with the correct mouse position
+        /// in a remote-desktop session.
+        /// </summary>
+        private void HandleRotation()
+        {
+            if (SEEInput.RotateCamera())
+            {
+                float x = -(lastAxis.x - Input.mousePosition.x) * 0.1f;
+                float y = -(lastAxis.y - Input.mousePosition.y) * 0.1f;
+
+                // These were the original statements which, however, do not work in
+                // a remote-desktop session (RDP).
+                // float x = Input.GetAxis("Mouse X");
+                // float y = Input.GetAxis("Mouse Y");
+
+                cameraState.yaw += x;
+                cameraState.pitch -= y;
+            }
+            lastAxis.x = Input.mousePosition.x;
+            lastAxis.y = Input.mousePosition.y;
         }
     }
 }

@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 
 namespace Michsky.UI.ModernUIPack
 {
+    [RequireComponent(typeof(Button))]
     public class ButtonManagerBasic : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
     {
         // Content
@@ -14,7 +15,7 @@ namespace Michsky.UI.ModernUIPack
         public UnityEvent hoverEvent;
         public AudioClip hoverSound;
         public AudioClip clickSound;
-        Button buttonVar;
+        public Button buttonVar;
 
         // Resources
         public TextMeshProUGUI normalText;
@@ -43,18 +44,10 @@ namespace Michsky.UI.ModernUIPack
             if (buttonVar == null)
                 buttonVar = gameObject.GetComponent<Button>();
 
-            buttonVar.onClick.AddListener(delegate
-            {
-                clickEvent.Invoke();
-            });
+            buttonVar.onClick.AddListener(delegate { clickEvent.Invoke(); });
 
             if (enableButtonSounds == true && useClickSound == true)
-            {
-                buttonVar.onClick.AddListener(delegate
-                {
-                    soundSource.PlayOneShot(clickSound);
-                });
-            }
+                buttonVar.onClick.AddListener(delegate { soundSource.PlayOneShot(clickSound); });
 
             if (useCustomContent == false)
                 UpdateUI();

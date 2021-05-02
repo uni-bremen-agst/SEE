@@ -6,7 +6,8 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// This class is responsible for the edit-node process via network from one client to all others and to the server. 
+    /// This class is responsible for the edit-node process via network from one client 
+    /// to all others and to the server. 
     /// </summary>
     public class EditNodeNetAction : AbstractAction
     {
@@ -22,21 +23,21 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// The unique name of the GameNode object that has to be edited.
-        /// It can't be changed after the node creation.
+        /// It cannot be changed after the node creation.
         /// </summary>
-        public string UniqueNodeName;
+        public string NodeID;
 
         /// <summary>
         /// Constructs an EditNodeNetAction object.
         /// </summary>
+        /// <param name="nodeID">the unique name of the gameobject the node belongs to</param>
         /// <param name="sourceName">The new source name</param>
         /// <param name="type">the new node type</param>
-        /// <param name="uniqueNodeName">the unique name of the gameobject the node belongs to</param>
-        public EditNodeNetAction(string sourceName, string type, string uniqueNodeName) : base()
+        public EditNodeNetAction(string nodeID, string sourceName, string type) : base()
         {
-            SourceName = sourceName;
+            this.SourceName = sourceName;
             this.NodeType = type;
-            this.UniqueNodeName = uniqueNodeName;
+            this.NodeID = nodeID;
         }
 
         /// <summary>
@@ -54,7 +55,7 @@ namespace SEE.Controls.Actions
         {
             if (!IsRequester())
             {
-                Node node = GameObject.Find(UniqueNodeName)?.GetNode();
+                Node node = GameObject.Find(NodeID)?.GetNode();
                 if (node != null)
                 {
                     node.SourceName = SourceName;
@@ -62,7 +63,7 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    Debug.LogError($"Found no gameObject: {UniqueNodeName}.\n");
+                    Debug.LogError($"Found no gameObject: {NodeID}.\n");
                 }
             }
         }

@@ -32,6 +32,14 @@ namespace InControl
 		public TwoAxisInputControl RightStick { get; private set; }
 		public TwoAxisInputControl DPad { get; private set; }
 
+		bool hasLeftCommandControl;
+		InputControl leftCommandSource;
+		public InputControlType LeftCommandControl { get; private set; }
+
+		bool hasRightCommandControl;
+		InputControl rightCommandSource;
+		public InputControlType RightCommandControl { get; private set; }
+
 		/// <summary>
 		/// When a device is passive, it will never be considered an active device.
 		/// This may be useful if you want a device to be accessible, but not
@@ -46,6 +54,7 @@ namespace InControl
 			public float value;
 			public float maxValue;
 			public float minValue;
+
 
 			public void TrackMinMaxValue( float currentValue )
 			{
@@ -123,11 +132,27 @@ namespace InControl
 				AddControl( InputControlType.DPadX, "DPad X" );
 				AddControl( InputControlType.DPadY, "DPad Y" );
 
-#if UNITY_PS4
+				#if UNITY_PS4
 				AddControl( InputControlType.Command, "OPTIONS button" );
-#else
+				#else
 				AddControl( InputControlType.Command, "Command" );
-#endif
+				#endif
+
+				LeftCommandControl = DeviceStyle.LeftCommandControl();
+				leftCommandSource = GetControl( LeftCommandControl );
+				hasLeftCommandControl = !leftCommandSource.IsNullControl;
+				if (hasLeftCommandControl)
+				{
+					AddControl( InputControlType.LeftCommand, leftCommandSource.Handle );
+				}
+
+				RightCommandControl = DeviceStyle.RightCommandControl();
+				rightCommandSource = GetControl( RightCommandControl );
+				hasRightCommandControl = !rightCommandSource.IsNullControl;
+				if (hasRightCommandControl)
+				{
+					AddControl( InputControlType.RightCommand, rightCommandSource.Handle );
+				}
 
 				ExpireControlCache();
 			}
@@ -147,6 +172,14 @@ namespace InControl
 			RemoveControl( InputControlType.DPadX );
 			RemoveControl( InputControlType.DPadY );
 			RemoveControl( InputControlType.Command );
+			RemoveControl( InputControlType.LeftCommand );
+			RemoveControl( InputControlType.RightCommand );
+
+			leftCommandSource = null;
+			hasLeftCommandControl = false;
+
+			rightCommandSource = null;
+			hasRightCommandControl = false;
 
 			ExpireControlCache();
 		}
@@ -491,7 +524,7 @@ namespace InControl
 			{
 				var passive = true;
 				var pressed = false;
-				for (var i = (int) InputControlType.Back; i <= (int) InputControlType.Minus; i++)
+				for (var i = (int) InputControlType.Back; i <= (int) InputControlType.Mute; i++)
 				{
 					var control = ControlsByTarget[i];
 					if (control != null && control.IsPressed)
@@ -506,6 +539,18 @@ namespace InControl
 
 				Command.Passive = passive;
 				Command.CommitWithState( pressed, updateTick, deltaTime );
+
+				if (hasLeftCommandControl)
+				{
+					LeftCommand.Passive = leftCommandSource.Passive;
+					LeftCommand.CommitWithState( leftCommandSource.IsPressed, updateTick, deltaTime );
+				}
+
+				if (hasRightCommandControl)
+				{
+					RightCommand.Passive = rightCommandSource.Passive;
+					RightCommand.CommitWithState( rightCommandSource.IsPressed, updateTick, deltaTime );
+				}
 			}
 
 			// If any non-passive controls provide input, flag the device active.
@@ -528,7 +573,7 @@ namespace InControl
 		}
 
 
-		internal void RequestActivation()
+		public void RequestActivation()
 		{
 			LastInputTick = InputManager.CurrentTick;
 			IsActive = true;
@@ -738,6 +783,8 @@ namespace InControl
 		InputControl cachedDPadX;
 		InputControl cachedDPadY;
 		InputControl cachedCommand;
+		InputControl cachedLeftCommand;
+		InputControl cachedRightCommand;
 
 
 		public InputControl LeftStickUp
@@ -886,6 +933,18 @@ namespace InControl
 		}
 
 
+		public InputControl LeftCommand
+		{
+			get { return cachedLeftCommand ?? (cachedLeftCommand = GetControl( InputControlType.LeftCommand )); }
+		}
+
+
+		public InputControl RightCommand
+		{
+			get { return cachedRightCommand ?? (cachedRightCommand = GetControl( InputControlType.RightCommand )); }
+		}
+
+
 		void ExpireControlCache()
 		{
 			cachedLeftStickUp = null;
@@ -1023,3 +1082,4 @@ namespace InControl
 		#endregion
 	}
 }
+

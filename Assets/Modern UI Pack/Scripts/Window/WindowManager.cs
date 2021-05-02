@@ -17,6 +17,7 @@ namespace Michsky.UI.ModernUIPack
         public string windowFadeOut = "Panel Out";
         public string buttonFadeIn = "Normal to Pressed";
         public string buttonFadeOut = "Pressed to Dissolve";
+        [HideInInspector] public bool editMode = false;
         bool isFirstTime = true;
 
         private GameObject currentWindow;

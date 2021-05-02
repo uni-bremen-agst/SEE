@@ -5,6 +5,8 @@ using UnityEngine.EventSystems;
 
 namespace Michsky.UI.ModernUIPack
 {
+    [RequireComponent(typeof(Animator))]
+    [RequireComponent(typeof(Button))]
     public class SwitchManager : MonoBehaviour, IPointerEnterHandler
     {
         // Events
@@ -33,29 +35,21 @@ namespace Michsky.UI.ModernUIPack
 
         void Start()
         {
-            try
-            {
-                if (switchAnimator == null)
-                    switchAnimator = gameObject.GetComponent<Animator>();
+            if (switchAnimator == null)
+                switchAnimator = gameObject.GetComponent<Animator>();
 
-                if (switchButton == null)
+            if (switchButton == null)
+            {
+                switchButton = gameObject.GetComponent<Button>();
+                switchButton.onClick.AddListener(AnimateSwitch);
+
+                if (enableSwitchSounds == true && useClickSound == true)
                 {
-                    switchButton = gameObject.GetComponent<Button>();
-                    switchButton.onClick.AddListener(AnimateSwitch);
-
-                    if (enableSwitchSounds == true && useClickSound == true)
+                    switchButton.onClick.AddListener(delegate
                     {
-                        switchButton.onClick.AddListener(delegate
-                        {
-                            soundSource.PlayOneShot(clickSound);
-                        });
-                    }
+                        soundSource.PlayOneShot(clickSound);
+                    });
                 }
-            }
-
-            catch
-            {
-                Debug.LogError("Switch - Cannot initalize the switch due to missing variables.", this);
             }
 
             if (saveValue == true)
@@ -114,7 +108,7 @@ namespace Michsky.UI.ModernUIPack
         void OnEnable()
         {
             if (switchAnimator == null)
-                switchAnimator = gameObject.GetComponent<Animator>();
+                return;
 
             if (saveValue == true)
             {
@@ -184,6 +178,21 @@ namespace Michsky.UI.ModernUIPack
 
                 if (saveValue == true)
                     PlayerPrefs.SetString(switchTag + "Switch", "true");
+            }
+        }
+
+        public void UpdateUI()
+        {
+            if (isOn == true && switchAnimator != null && switchAnimator.gameObject.activeInHierarchy == true)
+            {
+                isOn = true;
+                switchAnimator.Play("Switch On");
+            }
+
+            else if (isOn == false && switchAnimator != null && switchAnimator.gameObject.activeInHierarchy == true)
+            {
+                isOn = false;
+                switchAnimator.Play("Switch Off");
             }
         }
 

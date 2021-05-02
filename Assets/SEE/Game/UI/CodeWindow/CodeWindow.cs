@@ -56,7 +56,7 @@ namespace SEE.Game.UI.CodeWindow
         /// The line we're scrolling towards at the moment.
         /// Will be 0 if we're not scrolling towards anything.
         /// </summary>
-        private int ScrollingTo = 0;
+        private int ScrollingTo;
 
         /// <summary>
         /// The line currently at the top of the window.
@@ -89,7 +89,12 @@ namespace SEE.Game.UI.CodeWindow
                     DOTween.Sequence().Append(DOTween.To(() => visibleLine, f => visibleLine = f, value-1, 1f))
                            .AppendCallback(() => ScrollingTo = 0);
                     
-                    MarkLine(value);
+                    // FIXME: TMP bug: Large files cause issues with highlighting text. This is just a workaround.
+                    // See https://github.com/uni-bremen-agst/SEE/issues/250#issuecomment-819653373
+                    if (Text.Length < 16382)
+                    {
+                        MarkLine(value);
+                    }
                     ScrollEvent.Invoke();
                 }
             }

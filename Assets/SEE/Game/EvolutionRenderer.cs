@@ -17,20 +17,22 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.DataModel.DG;
-using SEE.Game.Evolution;
-using SEE.Game.Charts;
-using SEE.GO;
-using SEE.Layout;
-using SEE.Layout.NodeLayouts;
-using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using SEE.DataModel.DG;
+using SEE.Game.Charts;
+using SEE.Game.Evolution;
+using SEE.GO;
+using SEE.Layout;
+using SEE.Layout.EdgeLayouts;
+using SEE.Layout.NodeLayouts;
+using SEE.Layout.Utils;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
-using System.Runtime.CompilerServices;
 
 namespace SEE.Game
 {
@@ -48,11 +50,45 @@ namespace SEE.Game
     {
         /// <summary>
         /// Constructors for MonoBehaviours are meaningless. We need to initialize everything
-        /// at Start() time.
+        /// at Awake() time.
         /// </summary>
-        public void Start()
+        private void Awake()
         {
-            RegisterAllAnimators(animators);
+            if (gameObject.TryGetComponent(out SEECityEvolution cityEvolution))
+            {
+                // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
+                // So we cannot make the following assignment in the constructor. Neither
+                // can we assign this value at the declaration of graphRenderer because
+                // we need the city argument, which comes only later. Anyhow, whenever we
+                // assign a new city, we also need a new graph renderer for that city.
+                // So in fact this is the perfect place to assign graphRenderer.
+                graphRenderer = new GraphRenderer(cityEvolution, null);
+                Assert.IsNotNull(graphRenderer);
+                diff = new NumericAttributeDiff(cityEvolution.AllMetricAttributes());
+                Vector3 beamScale = new Vector3(cityEvolution.MarkerWidth, cityEvolution.MarkerHeight, cityEvolution.MarkerWidth);
+                Dictionary<Difference, Color> beamColor = new Dictionary<Difference, Color>
+                {
+                    { Difference.Added, cityEvolution.AdditionBeamColor },
+                    { Difference.Changed, cityEvolution.ChangeBeamColor },
+                    { Difference.Deleted, cityEvolution.DeletionBeamColor },
+                };
+
+                moveScaleShakeAnimator = new MoveScaleShakeAnimator(beamColor, beamScale);
+                objectManager = new ObjectManager(graphRenderer, gameObject, cityEvolution.DeletionBeamColor, beamScale);
+                marker = new Marker(graphRenderer,
+                                    markerWidth: cityEvolution.MarkerWidth,
+                                    markerHeight: cityEvolution.MarkerHeight,
+                                    additionColor: cityEvolution.AdditionBeamColor,
+                                    changeColor: cityEvolution.ChangeBeamColor,
+                                    deletionColor: cityEvolution.DeletionBeamColor,
+                                    duration: AnimationLag);
+                RegisterAllAnimators(animators);
+            }
+            else
+            {
+                Debug.LogError($"This EvolutionRenderer attached to {name} has no sibling component of type {nameof(SEECityEvolution)}.\n");
+                enabled = false;
+            }            
         }
 
         /// <summary>
@@ -85,43 +121,43 @@ namespace SEE.Game
         /// <summary>
         /// The city evolution to be drawn by this renderer.
         /// </summary>
-        public SEECityEvolution CityEvolution
-        {
-            set
-            {
-                // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
-                // So we cannot make the following assignment in the constructor. Neither
-                // can we assign this value at the declaration of graphRenderer because
-                // we need the city argument, which comes only later. Anyhow, whenever we
-                // assign a new city, we also need a new graph renderer for that city.
-                // So in fact this is the perfect place to assign graphRenderer.
-                graphRenderer = new GraphRenderer(value, null);
-                Assert.IsNotNull(graphRenderer);
-                diff = new NumericAttributeDiff(value.AllMetricAttributes());
-                objectManager = new ObjectManager(graphRenderer, gameObject);
-                if (gameObject.TryGetComponent<SEECityEvolution>(out SEECityEvolution cityEvolution))
-                {
-                    marker = new Marker(graphRenderer,
-                                        markerWidth: cityEvolution.MarkerWidth,
-                                        markerHeight: cityEvolution.MarkerHeight,
-                                        additionColor: cityEvolution.AdditionBeamColor,
-                                        changeColor: cityEvolution.ChangeBeamColor,
-                                        deletionColor: cityEvolution.DeletionBeamColor,
-                                        duration: AnimationLag);
-                }
-                else
-                {
-                    Debug.LogErrorFormat("This EvolutionRenderer attached to {0} has no sibling component of type SEECityEvolution",
-                                         name);
-                    enabled = false;
-                }
-            }
-        }
+        //public SEECityEvolution CityEvolution
+        //{
+        //    set
+        //    {
+        //        if (gameObject.TryGetComponent<SEECityEvolution>(out SEECityEvolution cityEvolution))
+        //        {
+        //            // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
+        //            // So we cannot make the following assignment in the constructor. Neither
+        //            // can we assign this value at the declaration of graphRenderer because
+        //            // we need the city argument, which comes only later. Anyhow, whenever we
+        //            // assign a new city, we also need a new graph renderer for that city.
+        //            // So in fact this is the perfect place to assign graphRenderer.
+        //            graphRenderer = new GraphRenderer(value, null);
+        //            Assert.IsNotNull(graphRenderer);
+        //            diff = new NumericAttributeDiff(value.AllMetricAttributes());
+        //            Vector3 beamScale = new Vector3(cityEvolution.MarkerWidth, cityEvolution.MarkerHeight, cityEvolution.MarkerWidth);
+        //            objectManager = new ObjectManager(graphRenderer, gameObject, cityEvolution.DeletionBeamColor, beamScale);
+        //            marker = new Marker(graphRenderer,
+        //                                markerWidth: cityEvolution.MarkerWidth,
+        //                                markerHeight: cityEvolution.MarkerHeight,
+        //                                additionColor: cityEvolution.AdditionBeamColor,
+        //                                changeColor: cityEvolution.ChangeBeamColor,
+        //                                deletionColor: cityEvolution.DeletionBeamColor,
+        //                                duration: AnimationLag);
+        //        }
+        //        else
+        //        {
+        //            Debug.LogError($"This EvolutionRenderer attached to {name} has no sibling component of type {nameof(SEECityEvolution)}.\n");
+        //            enabled = false;
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// Shortest time period in which an animation can be run in seconds.
         /// </summary>
-        private readonly float MinimalWaitTimeForNextRevision = 0.1f;
+        private const float MinimalWaitTimeForNextRevision = 0.1f;
 
         /// <summary>
         /// Registers <paramref name="action"/> to be called back when the shown
@@ -146,7 +182,7 @@ namespace SEE.Game
         /// <summary>
         /// Used to store whether a node has been born or changed.
         /// </summary>
-        private enum MarkerType {Changed, Born};
+        private enum MarkerType {Changed, Born}
 
         /// <summary>
         /// The animator used when an inner node is removed from the scene.
@@ -154,19 +190,14 @@ namespace SEE.Game
         protected readonly AbstractAnimator moveAnimator = new MoveAnimator();
 
         /// <summary>
-        /// An animator used for all other occasions.
+        /// An animator used for all other occasions. Will be set in Start().
         /// </summary>
-        protected readonly AbstractAnimator moveScaleShakeAnimator = new MoveScaleShakeAnimator();
-
-        /// <summary>
-        /// Whether the animation is still ongoing.
-        /// </summary>
-        private bool _isStillAnimating = false;  // serialized by Unity
+        protected AbstractAnimator moveScaleShakeAnimator;
 
         /// <summary>
         /// Whether the edge animation is ongoing.
         /// </summary>
-        private bool moveEdges = false;
+        private bool moveEdges;
 
         /// <summary>
         /// Saves pairs of old and new edges.
@@ -176,16 +207,12 @@ namespace SEE.Game
         /// <summary>
         /// Timer for edge animation
         /// </summary>
-        private float timer = 0f;
+        private float timer;
 
         /// <summary>
         /// True if animation is still ongoing.
         /// </summary>
-        public bool IsStillAnimating
-        {
-            get => _isStillAnimating;
-            set => _isStillAnimating = value;
-        }
+        public bool IsStillAnimating { get; private set; }
 
         /// <summary>
         /// The collection of registered <see cref="AbstractAnimator"/> to be updated
@@ -330,25 +357,22 @@ namespace SEE.Game
 
             // Gather all nodes for the layout.
             ignoreInnerNodes = !nodeLayout.IsHierarchical();
-            foreach (Node node in graph.Nodes())
+            foreach (Node node in graph.Nodes().Where(node => !ignoreInnerNodes || node.IsLeaf()))
             {
-                if (!ignoreInnerNodes || node.IsLeaf())
+                // All layouts (flat and hierarchical ones) must be able to handle leaves; 
+                // hence, leaves can be added at any rate. For a hierarchical layout, we 
+                // need to add the game objects for inner nodes, too. To put it differently,
+                // inner nodes are added only if we apply a hierarchical layout.
+                objectManager.GetNode(node, out GameObject gameNode);
+                // Now after having attached the new node to the game object,
+                // we must adjust the scale of it according to the newly attached node so 
+                // that the layouter has these. We need to adjust the scale only for leaves, 
+                // however, because the layouter will select the scale for inner nodes.
+                if (node.IsLeaf())
                 {
-                    // All layouts (flat and hierarchical ones) must be able to handle leaves; 
-                    // hence, leaves can be added at any rate. For a hierarchical layout, we 
-                    // need to add the game objects for inner nodes, too. To put it differently,
-                    // inner nodes are added only if we apply a hierarchical layout.
-                    objectManager.GetNode(node, out GameObject gameNode);
-                    // Now after having attached the new node to the game object,
-                    // we must adjust the scale of it according to the newly attached node so 
-                    // that the layouter has these. We need to adjust the scale only for leaves, 
-                    // however, because the layouter will select the scale for inner nodes.
-                    if (node.IsLeaf())
-                    {
-                        graphRenderer.AdjustScaleOfLeaf(gameNode);
-                    }
-                    gameObjects.Add(gameNode);
+                    graphRenderer.AdjustScaleOfLeaf(gameNode);
                 }
+                gameObjects.Add(gameNode);
             }
 
             // Calculate and apply the node layout
@@ -527,7 +551,7 @@ namespace SEE.Game
         /// <summary>
         /// Current graph revision counter
         /// </summary>
-        private int currentGraphRevisionCounter = 0;
+        private int currentGraphRevisionCounter;
 
         /// <summary>
         /// Event function triggered when all animations are finished. Animates the transition of the edges 
@@ -622,9 +646,9 @@ namespace SEE.Game
             {
                 foreach (GameObject newEdgeGameObject in newEdges)
                 {                    
-                    if (oldEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef oldEdgeRef) 
-                        && newEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef newEdgeRef)
-                        && oldEdgeRef.edge.Equals(newEdgeRef.edge))
+                    if (oldEdgeGameObject.TryGetComponent(out EdgeRef oldEdgeRef) 
+                        && newEdgeGameObject.TryGetComponent(out EdgeRef newEdgeRef)
+                        && oldEdgeRef.Value.Equals(newEdgeRef.Value))
                     {
                         result.Add((oldEdgeGameObject, newEdgeGameObject));
                     }
@@ -647,21 +671,21 @@ namespace SEE.Game
                 // Searches for pairs between old and new edges
                 matchedEdges =  EdgeMatcher(oldEdges,newEdges);              
                 // Case distinction in case the layout does not need sample points
-                if(!graphRenderer.GetSettings().EdgeLayout.Equals(SEE.Layout.EdgeLayouts.EdgeLayoutKind.Straight))
+                if(!graphRenderer.GetSettings().EdgeLayout.Equals(EdgeLayoutKind.Straight))
                 {
                     foreach((GameObject oldEdge, GameObject newEdge) in matchedEdges)
                     {
-                        oldEdge.TryGetComponent<Points>(out Points oP);
-                        newEdge.TryGetComponent<Points>(out Points nP);
+                        oldEdge.TryGetComponent(out Points oP);
+                        newEdge.TryGetComponent(out Points nP);
 
                         uint sampleRate = (uint)Math.Max(oP.linePoints.Count(),nP.linePoints.Count());
 
                         // Creates new line points from the control points 
-                        oP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(oP.controlPoints, sampleRate);
-                        nP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(nP.controlPoints, sampleRate);
+                        oP.linePoints = LinePoints.BSplineLinePointsSampleRate(oP.controlPoints, sampleRate);
+                        nP.linePoints = LinePoints.BSplineLinePointsSampleRate(nP.controlPoints, sampleRate);
 
                         // Saves the new line points to the LineRenderer
-                        oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
+                        oldEdge.TryGetComponent(out LineRenderer lineRenderer);
                         lineRenderer.positionCount = oP.linePoints.Count();
                         lineRenderer.SetPositions(oP.linePoints);
                     }
@@ -670,25 +694,25 @@ namespace SEE.Game
                     timer = 0f;
                     // Starts the animation of the edges
                     moveEdges = true;
-            }
-            catch (ArgumentNullException)
-            {
-                moveEdges = false;
-            }
+           }
+           catch (ArgumentNullException)
+           {
+               moveEdges = false;
+           }
         }
         
         /// <summary>
         /// Interpolates the points of the old edges with those of the new edges over time.
         /// </summary>
-        void Update()
+        private void Update()
         {
             if (moveEdges) 
             {
                 timer += Time.deltaTime;
                  foreach ((GameObject oldEdge, GameObject newEdge) in matchedEdges)
                  {
-                    if (oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer)
-                        && newEdge.TryGetComponent<Points>(out Points newLinePoints))
+                    if (oldEdge.TryGetComponent(out LineRenderer lineRenderer)
+                        && newEdge.TryGetComponent(out Points newLinePoints))
                     {
                         for (int i = 0; i < lineRenderer.positionCount; i++)
                         {
@@ -712,9 +736,9 @@ namespace SEE.Game
         /// <param name="gameNode">game node object that was just modified by the animation</param>
         public void OnRenderNodeFinishedAnimation(object gameNode)
         {
-            if (gameNode is GameObject)
+            if (gameNode is GameObject node)
             {
-                graphRenderer.AdjustStyle(gameNode as GameObject);
+                graphRenderer.AdjustStyle(node);
             }
         }
 
@@ -822,9 +846,9 @@ namespace SEE.Game
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void DestroyGameObject(object gameObject)
         {
-            if (gameObject is GameObject)
+            if (gameObject is GameObject go)
             {
-                Destroy((GameObject)gameObject);
+                Destroy(go);
             }
         }
 
@@ -893,7 +917,7 @@ namespace SEE.Game
         /// <summary>
         /// The index of the currently visualized graph.
         /// </summary>
-        private int currentGraphIndex = 0;  // not serialized by Unity
+        private int currentGraphIndex;  // not serialized by Unity
 
         /// <summary>
         /// Returns the index of the currently shown graph.
@@ -909,19 +933,19 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// An event fired when the viewn graph has changed.
+        /// An event fired when the view graph has changed.
         /// </summary>
         private readonly UnityEvent shownGraphHasChangedEvent = new UnityEvent();
 
         /// <summary>
         /// Whether the user has selected auto-play mode.
         /// </summary>
-        private bool _isAutoplay = false;  // not serialized by Unity
+        private bool _isAutoplay;  // not serialized by Unity
 
         /// <summary>
         /// Whether the user has selected reverse auto-play mode.
         /// </summary>
-        private bool _isAutoplayReverse = false;  // not serialized by Unity
+        private bool _isAutoplayReverse;  // not serialized by Unity
 
         /// <summary>
         /// Returns true if automatic animations are active.
@@ -949,14 +973,24 @@ namespace SEE.Game
             }
         }
 
-
         /// <summary>
-        /// Initiates the visualization of the evolving series of <paramref name="graphs"/>.
+        /// Sets the evolving series of <paramref name="graphs"/> to be visualized.
+        /// The actual visualization is triggered by <see cref="ShowGraphEvolution"/>
+        /// that can be called next.
         /// </summary>
         /// <param name="graphs">series of graphs to be visualized</param>
-        public void ShowGraphEvolution(List<Graph> graphs)
+        public void SetGraphEvolution(List<Graph> graphs)
         {
             this.graphs = graphs;
+        }
+
+        /// <summary>
+        /// Initiates the visualization of the evolving series of graphs
+        /// provided earlier by <see cref="SetGraphEvolution(List{Graph})"/>
+        /// (the latter function must have been called before).
+        /// </summary>
+        public void ShowGraphEvolution()
+        {
             CurrentGraphIndex = 0;
             _currentCity = null;
             _nextCity = null;
@@ -972,7 +1006,7 @@ namespace SEE.Game
             }
             else
             {
-                Debug.LogError("Evolution renderer could not show the inital graph.\n");
+                Debug.LogError("Evolution renderer could not show the initial graph.\n");
             }
         }
 
@@ -1001,14 +1035,12 @@ namespace SEE.Game
                 Debug.LogErrorFormat("The value {0} is no valid index.\n", index);
                 return false;
             }
-            CurrentGraphIndex = index;
-
-            if (HasCurrentLaidOutGraph(out LaidOutGraph loadedGraph))
+            if (HasCurrentLaidOutGraph(out LaidOutGraph loadedGraph) && HasLaidOutGraph(index, out LaidOutGraph newGraph))
             {
-                DisplayGraphAsNew(loadedGraph);
+                CurrentGraphIndex = index;
+                TransitionToNextGraph(loadedGraph, newGraph);
                 return true;
-            }
-            else
+            } else
             {
                 Debug.LogErrorFormat("Could not retrieve a layout for graph with index {0}.\n", index);
                 return false;
@@ -1072,7 +1104,6 @@ namespace SEE.Game
             if (!ShowNextIfPossible())
             {
                 Debug.Log("This is already the last graph revision.\n");
-                return;
             }
         }
 
@@ -1153,7 +1184,6 @@ namespace SEE.Game
             if (!ShowPreviousIfPossible())
             {
                 Debug.Log("This is already the first graph revision.\n");
-                return;
             }
         }
 
@@ -1260,35 +1290,21 @@ namespace SEE.Game
         /// <summary>
         /// An implementation of ILayoutNode that is used for animation purposes only.
         /// The only features it supports are the position and scale of node.
-        /// That is what is currenly needed by the animators.
+        /// That is what is currently needed by the animators.
         /// </summary>
         private class AnimationNode : ILayoutNode
         {
-            private Vector3 centerPosition;
-            private Vector3 scale;
-
             public AnimationNode(Vector3 centerPosition, Vector3 scale)
             {
-                this.centerPosition = centerPosition;
-                this.scale = scale;
+                this.CenterPosition = centerPosition;
+                this.LocalScale = scale;
             }
 
-            public Vector3 LocalScale
-            {
-                get => scale;
-                set => scale = value;
-            }
+            public Vector3 LocalScale { get; set; }
 
-            public Vector3 AbsoluteScale
-            {
-                get => scale;
-            }
+            public Vector3 AbsoluteScale => LocalScale;
 
-            public Vector3 CenterPosition
-            {
-                get => centerPosition;
-                set => centerPosition = value;
-            }
+            public Vector3 CenterPosition { get; set; }
 
             public void ScaleBy(float factor)
             {
