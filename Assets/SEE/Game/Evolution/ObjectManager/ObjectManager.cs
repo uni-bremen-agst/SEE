@@ -24,7 +24,6 @@ using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 using SEE.Game.Charts;
-using System;
 
 namespace SEE.Game.Evolution
 {
@@ -55,9 +54,9 @@ namespace SEE.Game.Evolution
         private GameObject currentPlane;
 
         /// <summary>
-        /// Nodes that do not need to be calculated when animating
+        /// The names of the game objects representing nodes that do not need to be considered when animating.
         /// </summary>
-        private List<string> negligibleNodes;
+        public HashSet<string> NegligibleNodes { get; set; }
 
         /// <summary>
         /// A dictionary containing all created nodes that are currently in use. The set of
@@ -307,14 +306,15 @@ namespace SEE.Game.Evolution
 
             foreach (var node in nodes)
             {
-                foreach(var edge in node.Value.GetNode().Outgoings)
+                foreach(Edge edge in node.Value.GetNode().Outgoings)
                 {
-                    if (negligibleNodes.Contains(edge.Target.Path()))
+                    string id = edge.Target.ID;
+                    if (NegligibleNodes.Contains(id))
                     {
-                        remainingNodes.Remove(edge.Target.Path());
+                        remainingNodes.Remove(id);
                     }
                 }
-                if (negligibleNodes.Contains(node.Key))
+                if (NegligibleNodes.Contains(node.Key))
                 {
                     remainingNodes.Remove(node.Key);
                 }
@@ -326,11 +326,6 @@ namespace SEE.Game.Evolution
             }
             
             return newEdges;
-        }
-
-        public void setNegligibleNodes(List<string> negligibleNodes)
-        {
-            this.negligibleNodes = negligibleNodes;
         }
 
         /// <summary>

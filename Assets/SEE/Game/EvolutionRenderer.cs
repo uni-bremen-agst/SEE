@@ -294,9 +294,9 @@ namespace SEE.Game
         private readonly NodeEqualityComparer nodeEqualityComparer = new NodeEqualityComparer();
 
         /// <summary>
-        /// Saves edges that were not moved during iteration
+        /// Saves the names of the game objects representing nodes that were not moved during an iteration.
         /// </summary>
-        private List<string> negligibleNodes = new List<string>();
+        private HashSet<string> negligibleNodes = new HashSet<string>();
 
         /// <summary>
         /// List for saving the copied nodes. Is used for animation.
@@ -516,7 +516,7 @@ namespace SEE.Game
         /// <param name="next">the new graph to be shown, in which to migrate the current graph; must not be null</param>
         private void RenderGraph(LaidOutGraph current, LaidOutGraph next)
         {
-            negligibleNodes = new List<string>();
+            negligibleNodes.Clear();
             next.AssertNotNull("next");
             IsStillAnimating = true;
             // First remove all markings of the previous animation cycle.
@@ -556,7 +556,7 @@ namespace SEE.Game
                 next.Graph.Traverse(RenderNode, RenderNode, RenderNode);
             }
 
-            objectManager.setNegligibleNodes(negligibleNodes);
+            objectManager.NegligibleNodes = negligibleNodes;
             // FOR ANIMATION: next.Graph.Edges().ForEach(RenderEdge);
 
             // We have made the transition to the next graph.
