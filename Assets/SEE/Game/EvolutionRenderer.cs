@@ -769,9 +769,11 @@ namespace SEE.Game
                     nP.linePoints = newLinePointsHalf;
 
                     // Saves the new line points to the LineRenderer
-                    oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
-                    lineRenderer.positionCount = oP.linePoints.Count() / 2;
-                    lineRenderer.SetPositions(oldLinePointsHalf);
+                    if (oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer)) 
+                    {
+                        lineRenderer.positionCount = oP.linePoints.Count() / 2;
+                        lineRenderer.SetPositions(oldLinePointsHalf);
+                    }
                 }
                 return true;
             }
