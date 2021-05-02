@@ -21,14 +21,37 @@ namespace SEE.Utils
     /// </summary>
     public class ActionHistory
     {
+        // Implementation note: This ActionHistory is a bit more complicated than
+        // action histories in other contexts because we do not have atomic actions
+        // that are either executed or not. Our <see cref="ReversibleAction> have
+        // a life cycle described by <see cref="ReversibleAction.Progress"/>.
+        // They start and receive Update calls until they are completely done.
+        // If an action was completely done, the execution continues with a new instance
+        // of the same action kind. If an action is undone while in progress state
+        // <see cref="ReversibleAction.Progress.InProgress"/>, it has already had
+        // some effect that needs to be undone.
+
         /// <summary>
         /// The history of actions that have been executed (and have not yet been undone). The currently
         /// executed action is the top element of this stack.
+        /// Note: At the top of <see cref="UndoStack"/> there could be (at most) one action
+        /// with progress state <see cref="ReversibleAction.Progress.NoEffect"/>. Whenever
+        /// Update returns true for the currently executed action, that action is considered
+        /// complete and the execution resumes with a fresh instance of the same kind
+        /// (created via Current.NewInstance()), that is, that fresh instance is added
+        /// to the UndoStack with the progress state <see cref="ReversibleAction.Progress.NoEffect"/>.
+        /// The action with this progress state will be popped off again whenever a new
+        /// action is added via Execute or an undone action on the RedoStack is redone via Redo.
         /// </summary>
         private Stack<ReversibleAction> UndoStack { get; } = new Stack<ReversibleAction>();
 
         /// <summary>
         /// The history of actions that have been undone.
+        /// 
+        /// Invariant: all actions on <see cref="RedoStack"/> will have progress state
+        /// <see cref="ReversibleAction.Progress.InProgress"/> or 
+        /// <see cref="ReversibleAction.Progress.Completed"/> but never
+        /// <see cref="ReversibleAction.Progress.NoEffect"/>.
         /// </summary>
         private Stack<ReversibleAction> RedoStack { get; } = new Stack<ReversibleAction>();
 
@@ -53,12 +76,40 @@ namespace SEE.Utils
         /// <param name="action">the action to be executed</param>
         public void Execute(ReversibleAction action)
         {
+            AssertAtMostOneActionWithNoEffect();
             Current?.Stop();
+            // There may be an action that has not had any effect yet.
+            // It needs to be popped off the UndoStack.
+            LastActionWithEffect();
             UndoStack.Push(action);
             action.Awake();
             action.Start();
             // Whenever a new action is excuted, we consider the redo stack lost.
             RedoStack.Clear();
+        }
+
+        /// <summary>
+        /// Checks the invariant that the <see cref="UndoStack"/> has at most
+        /// one action with progress state <see cref="ReversibleAction.Progress.NoEffect"/>
+        /// and this action is at the top of <see cref="UndoStack"/>.
+        /// </summary>
+        private void AssertAtMostOneActionWithNoEffect()
+        {
+            if (UndoStack.Count > 0)
+            {
+                bool first = true;
+                foreach (ReversibleAction action in UndoStack)
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        UnityEngine.Assertions.Assert.IsTrue(action.CurrentProgress() != ReversibleAction.Progress.NoEffect);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -122,19 +173,18 @@ namespace SEE.Utils
                 // as normal actions because the user would not get any visible 
                 // feedback of her/his Undo decision because that kind of action has
                 // not had any effect yet.
-
-                ReversibleAction current = UndoStack.Pop();
-                current.Stop();
-                LastActionWithEffect(ref current);
-
+                UndoStack.Peek().Stop();
+                ReversibleAction current = LastActionWithEffect();
                 if (current != null)
                 {
                     // assert: current has had an effect
                     current.Undo();
                     RedoStack.Push(current);
-
-                    // Now we will resume with the action at the top of the current UndoStack.
-                    current = Current;
+                    UndoStack.Pop();
+                    // current has been undone and moved on the RedoStack.
+                    // We will resume with the next top-element of the stack that 
+                    // has had an effect if there is any.
+                    current = LastActionWithEffect();
                     if (current != null)
                     {
                         Resume(current);
@@ -164,31 +214,30 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Sets given <paramref name="action"/> to the action in <see cref="UndoStack"/>
-        /// that has had an effect, i.e., whose current progress is different from
-        /// <see cref="ReversibleAction.Progress.NoEffect"/>. All actions on the
-        /// <see cref="UndoStack"/> with state <see cref="ReversibleAction.Progress.NoEffect"/>
-        /// will be popped off. The resulting <paramref name="action"/> may be null
-        /// if none of the actions on the <see cref="UndoStack"/> has had any effect.
+        /// Returns the last action on the <see cref="UndoStack"/> that
+        /// has had any effect (preliminary or complete) or null if there is
+        /// no such action. 
+        /// 
+        /// Side effect: All actions at the top of the <see cref="UndoStack"/> 
+        /// are popped off.
         /// </summary>
-        /// <param name="action">the last action on the <see cref="UndoStack"/> that
-        /// has had any effect (preliminary or complete) or null</param>
-        private void LastActionWithEffect(ref ReversibleAction action)
+        /// <returns>the last action on the <see cref="UndoStack"/> that
+        /// has had any effect (preliminary or complete) or null<</returns>
+        private ReversibleAction LastActionWithEffect()
         {
-            while (action.CurrentProgress() == ReversibleAction.Progress.NoEffect)
+            while (UndoStack.Count > 0)
             {
-                if (UndoStack.Count > 0)
+                ReversibleAction action = UndoStack.Peek();
+                if (action.CurrentProgress() != ReversibleAction.Progress.NoEffect)
                 {
-                    // continue with next action until we find one that has had an effect
-                    action = UndoStack.Pop();
+                    return action;
                 }
                 else
                 {
-                    // all actions undone
-                    action = null;
-                    return;
+                    UndoStack.Pop();
                 }
             }
+            return null;
         }
 
         /// <summary>
@@ -208,20 +257,26 @@ namespace SEE.Utils
         {
             if (RedoStack.Count > 0)
             {
-                //Dump("Redo ");
                 Current?.Stop();
                 // The last undone action becomes the currently executed action again.
                 // This action may have state <see cref="ReversibleAction.Progress.InProgress"/>
                 // or <see cref="ReversibleAction.Progress.Completed"/>.
-                ReversibleAction action = RedoStack.Pop();
-                UndoStack.Push(action);
-                action.Redo();
-                Resume(action);
+                ReversibleAction redoAction = RedoStack.Pop();
+                {
+                    // Clear the UndoStack from actions without any effect.
+                    LastActionWithEffect();
+                }
+                UndoStack.Push(redoAction);
+                redoAction.Redo();
+                Resume(redoAction);
+
+                UnityEngine.Assertions.Assert.IsTrue(RedoStack.Count == 0
+                             || RedoStack.Peek().CurrentProgress() != ReversibleAction.Progress.NoEffect);
             }
             else
             {
                 throw new EmptyUndoHistoryException();
-            }
+            }            
         }
 
         /// <summary>
@@ -257,9 +312,11 @@ namespace SEE.Utils
         /// is emitted.
         /// </summary>
         /// <param name="message">message to be prepended to output</param>
+#pragma warning disable IDE0051 // Dump is not used
         private void Dump(string message = "")
+#pragma warning restore IDE0051 // Dump is not used
         {
-            string newMessage = message + $"Current: {ToString(Current)} UndoStack: {ToString(UndoStack)} RedoStack: {ToString(RedoStack)}\n";
+            string newMessage = message + $"UndoStack: {ToString(UndoStack)} RedoStack: {ToString(RedoStack)}\n";
             if (previousMessage != newMessage)
             {
                 previousMessage = newMessage;
