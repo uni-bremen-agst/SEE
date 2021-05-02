@@ -261,12 +261,12 @@ namespace SEE.Game
         protected Dictionary<string, ILayoutNode> CurrentLayoutShown => _currentCity?.Layout;  // not serialized by Unity
 
         /// <summary>
-        /// Evaluates the performance of the edge animation
+        /// Evaluates the performance of the edge animation.
         /// </summary>
         private int edgeAnimationPerfScore = 10;
 
         /// <summary>
-        /// Saves how many edges were moved during the last animation
+        /// Saves how many edges were moved during the last animation.
         /// </summary>
         private int lastMovedEdgesCount = 0;
 
@@ -708,10 +708,10 @@ namespace SEE.Game
                         //Approximates the length of the edge over the control points to save computing power.
                         float dist = Vector3.Distance(nP.controlPoints[0], nP.controlPoints[nP.controlPoints.Count() - 1]);
 
-                        //The AdjustedSamplerate is determined by the performance of the last animation
-                        //and tries to achieve a balance between performance and aesthetics
-                        //by giving all edges a number of points according to their length,
-                        //the total number of edges and the performance of the last animation.  
+                        // The AdjustedSamplerate is determined by the performance of the last animation
+                        // and tries to achieve a balance between performance and aesthetics
+                        // by giving all edges a number of points according to their length,
+                        // the total number of edges, and the performance of the last animation.  
                         double adjustedSampleRate = Math.Floor(edgeAnimationPerfScore * dist * 10 * lastMovedEdgesCount / matchedEdges.Count());
 
                         lastMovedEdgesCount = matchedEdges.Count();
@@ -722,7 +722,7 @@ namespace SEE.Game
                             adjustedSampleRate++;
                         }
 
-                        //No edge should have more than 75, or less than 2 points.
+                        // No edge should have more than 75, or less than 2 points.
                         adjustedSampleRate = Math.Min(Math.Max(adjustedSampleRate, 2), 75);
 
                         // Creates new line points from the control points 
@@ -739,7 +739,7 @@ namespace SEE.Game
                 timer = 0f;
                 // Starts the animation of the edges
                 moveEdges = true;
-                //Resets performance Score
+                // Resets performance Score
                 edgeAnimationPerfScore = 10;
             }
             catch (ArgumentNullException)
@@ -781,7 +781,6 @@ namespace SEE.Game
             {
                 return false;
             }
-
         }
 
         /// <summary>
@@ -793,7 +792,7 @@ namespace SEE.Game
             {
                 timer += Time.deltaTime;
 
-                //We try to keep the animation between 30 and 60 FPS, so we adjust the PerformanceScore at each iteration
+                // We try to keep the animation between 30 and 60 FPS, so we adjust the PerformanceScore at each iteration.
                 if (Time.deltaTime > 0.033f)
                 {
                     edgeAnimationPerfScore -= 2;
@@ -803,7 +802,7 @@ namespace SEE.Game
                     edgeAnimationPerfScore += 1;
                 }
 
-                //If the performance drops too much, we halve the number of points to be drawn by half.
+                // If the performance drops too much, we halve the number of points to be drawn by half.
                 if (edgeAnimationPerfScore < -200)
                 {
                     DynamicSampleRateReduction();
