@@ -300,7 +300,7 @@ namespace SEE.Game.Evolution
 
             Dictionary<string, GameObject> remainingNodes = new Dictionary<string, GameObject>();
 
-            foreach(var node in nodes)
+            foreach (var node in nodes)
             {
                 remainingNodes.Add(node.Key, node.Value);
             }
