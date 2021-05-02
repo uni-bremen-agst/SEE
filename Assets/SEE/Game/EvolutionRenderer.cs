@@ -268,7 +268,7 @@ namespace SEE.Game
         /// <summary>
         /// Saves how many edges were moved during the last animation
         /// </summary>
-        int lastMovedEdgesCount = 0;
+        private int lastMovedEdgesCount = 0;
 
         /// <summary>
         /// The city (graph + layout) to be shown next.
