@@ -263,7 +263,7 @@ namespace SEE.Game
         /// <summary>
         /// Evaluates the performance of the edge animation
         /// </summary>
-        int edgeAnimationPerfScore = 10;
+        private int edgeAnimationPerfScore = 10;
 
         /// <summary>
         /// Saves how many edges were moved during the last animation
