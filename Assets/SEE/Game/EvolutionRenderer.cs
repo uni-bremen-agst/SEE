@@ -764,8 +764,8 @@ namespace SEE.Game
 
                     if (oP.linePoints.Count() <= 2) return true;
 
-                    Vector3[] oldLinePointsHalf = oP.linePoints.Where((value, index) => index % 2 == 0).ToArray();
-                    Vector3[] newLinePointsHalf = nP.linePoints.Where((value, index) => index % 2 == 0).ToArray();
+                    Vector3[] oldLinePointsHalf = oP.linePoints.Where((_, index) => index % 2 == 0).ToArray();
+                    Vector3[] newLinePointsHalf = nP.linePoints.Where((_, index) => index % 2 == 0).ToArray();
                     nP.linePoints = newLinePointsHalf;
 
                     // Saves the new line points to the LineRenderer
