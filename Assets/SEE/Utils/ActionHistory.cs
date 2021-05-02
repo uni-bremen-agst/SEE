@@ -276,7 +276,7 @@ namespace SEE.Utils
             else
             {
                 throw new EmptyUndoHistoryException();
-            }            
+            }
         }
 
         /// <summary>
