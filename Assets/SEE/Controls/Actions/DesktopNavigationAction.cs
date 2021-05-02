@@ -1,4 +1,5 @@
 using System;
+using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.UI3D;
 using SEE.GO;
@@ -15,7 +16,9 @@ namespace SEE.Controls.Actions
     /// mouse, and keyboard. Similar interactions specific to VR are implemented
     /// in XRNavigationAction.
     /// </summary>
+    [RequireComponent(typeof(CityCursor))]
     [RequireComponent(typeof(Collider))]
+    //[RequireComponent(typeof(SEECity))] // FIXME: We cannot simply request that a SEECity exists. There are also other kinds of AbstractSEECity classes.
     public class DesktopNavigationAction : NavigationAction
     {
         /// <summary>
@@ -25,7 +28,7 @@ namespace SEE.Controls.Actions
         {
             internal const float MaxVelocity = 10.0f;                        // This is only used, if the city was moved as a whole
             internal const float MaxSqrVelocity = MaxVelocity * MaxVelocity;
-            internal const float DragFrictionFactor = 32.0f;
+            internal const float DragFrictionCoefficient = 32.0f;
             internal const float SnapStepCount = 8;
             internal const float SnapStepAngle = 360.0f / SnapStepCount;
 
@@ -58,18 +61,22 @@ namespace SEE.Controls.Actions
         /// </summary>
         private struct _ActionState
         {
-            internal bool selectToggle;       // Whether selected elements should be toggled instead of being selected separate
             internal bool startDrag;
             internal bool dragHoveredOnly;    // true, if only the element, that is hovered by the mouse should be moved instead of whole city
             internal bool drag;
             internal bool cancel;
             internal bool snap;
             internal bool reset;
-            internal Vector3 mousePosition;
             internal float zoomStepsDelta;
             internal bool zoomToggleToObject;
-            internal Transform hoveredTransform;
         }
+
+        /// <summary>
+        /// The cursor visually represents the center of all selected objects and is used
+        /// for the center of rotations.
+        /// </summary>
+        [Tooltip("The cursor to visualize the center of the selection")]
+        [SerializeField] private CityCursor cursor;
 
         /// <summary>
         /// The plane, the city is located on top of.
@@ -80,12 +87,6 @@ namespace SEE.Controls.Actions
         /// Whether the city is currently moved or rotated by the player.
         /// </summary>
         private bool movingOrRotating;
-
-        /// <summary>
-        /// The cursor visually represents the center of all selected objects and is used
-        /// for the center of rotations.
-        /// </summary>
-        private Game.UI3D.Cursor cursor;
 
         /// <summary>
         /// The current move state.
@@ -111,6 +112,7 @@ namespace SEE.Controls.Actions
             }
 
             base.Awake();
+            cursor = GetComponent<CityCursor>();
 
             ActionState.OnStateChanged += OnStateChanged;
         }
@@ -119,7 +121,6 @@ namespace SEE.Controls.Actions
         {
             raycastPlane = new UnityEngine.Plane(Vector3.up, CityTransform.position);
             movingOrRotating = false;
-            cursor = Game.UI3D.Cursor.Create();
 
             moveState.moveGizmo = MoveGizmo.Create(0.008f * portalPlane.MinLengthXZ);
             moveState.cityBounds = CityTransform.GetComponent<Collider>().bounds;
@@ -147,16 +148,15 @@ namespace SEE.Controls.Actions
             {
                 bool isMouseOverGUI = Raycasting.IsMouseOverGUI();
 
-                // Fill action state with player input. Input MUST NOT be inquired in
-                // FixedUpdate() for the input to feel responsive!
-                actionState.selectToggle = Input.GetKey(KeyCode.LeftControl);
+                // Fill action state with player input.
+                // Note: Input MUST NOT be inquired in FixedUpdate() for the input to
+                // feel responsive!
                 actionState.drag = Input.GetMouseButton(2);
                 actionState.startDrag |= !isMouseOverGUI && Input.GetMouseButtonDown(2);
-                actionState.dragHoveredOnly = Input.GetKey(KeyBindings.Snap);
-                actionState.cancel |= Input.GetKeyDown(KeyBindings.Cancel);
-                actionState.snap = Input.GetKey(KeyCode.LeftAlt);
-                actionState.reset |= (actionState.drag || !isMouseOverGUI) && Input.GetKeyDown(KeyBindings.Reset);
-                actionState.mousePosition = Input.mousePosition;
+                actionState.dragHoveredOnly = SEEInput.DragCity();
+                actionState.cancel |= SEEInput.Cancel();
+                actionState.snap = SEEInput.Snap();
+                actionState.reset |= (actionState.drag || !isMouseOverGUI) && SEEInput.Reset();
 
                 // FIXME: The selection of graph elements below will executed only if the 
                 // ray hits the clipping area. If the player looks at the city from aside,
@@ -167,35 +167,8 @@ namespace SEE.Controls.Actions
                 RaycastClippingPlane(out bool _, out bool insideClippingArea, out Vector3 _);
 
                 // Find hovered GameObject with node or edge, if it exists
-                actionState.hoveredTransform = null;
                 if (insideClippingArea)
                 {
-                    if (Input.GetKeyDown(KeyBindings.Unselect))
-                    {
-                        InteractableObject.UnselectAll(true);
-                    }
-                    else if (Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.None)
-                    {
-                        Transform hoveredTransform = raycastHit.transform;
-                        // parentTransform walks up the game-object hierarchy toward the
-                        // containing CityTransform. If the CityTransform is reached, we
-                        // know that hoveredTransform is part of the CityTransform, thus,
-                        // belongs to the city, we are dealing with.
-                        Transform parentTransform = hoveredTransform;
-                        do
-                        {
-                            if (parentTransform == CityTransform)
-                            {                                
-                                actionState.hoveredTransform = hoveredTransform;
-                                break;
-                            }
-                            else
-                            {
-                                parentTransform = parentTransform.parent;
-                            }
-                        } while (parentTransform != null);
-                    }
-
                     // For simplicity, zooming is only allowed if the city is not
                     // currently dragged
                     if (!isMouseOverGUI && !actionState.drag)
@@ -204,19 +177,15 @@ namespace SEE.Controls.Actions
                     }
                 }
 
-                if (!actionState.drag && !Equals(ActionState.Value, ActionStateType.Map))
+                // TODO(torben): extract zoom and/or disable this script if latter conditions are false
+                if (!actionState.drag && (ActionState.Value == ActionStateType.Move || ActionState.Value == ActionStateType.Rotate))
                 {
-                    actionState.zoomToggleToObject |= Input.GetKeyDown(KeyBindings.ZoomInto);
-
-                    if (Input.GetMouseButtonDown(0) && !isMouseOverGUI)
-                    {
-                        Select(actionState.hoveredTransform ? actionState.hoveredTransform.gameObject : null, !actionState.selectToggle);
-                    }
+                    actionState.zoomToggleToObject |= SEEInput.ZoomInto();
                 }
 
-                if (Equals(ActionState.Value, ActionStateType.Rotate) && cursor.HasFocus())
+                if (Equals(ActionState.Value, ActionStateType.Rotate) && cursor.E.HasFocus())
                 {
-                    rotateState.rotateGizmo.Center = cursor.GetPosition();
+                    rotateState.rotateGizmo.Center = cursor.E.GetPosition();
                     rotateState.rotateGizmo.Radius = 0.2f * (MainCamera.Camera.transform.position - rotateState.rotateGizmo.Center).magnitude;
                 }
             }
@@ -233,14 +202,9 @@ namespace SEE.Controls.Actions
             bool synchronize = false;
             RaycastClippingPlane(out bool hitPlane, out bool insideClippingArea, out Vector3 planeHitPoint);
 
-            if (actionState.cancel && !movingOrRotating && !actionState.selectToggle)
-            {
-                Select(null, true);
-            }
+            #region Move City
 
-            #region Move Action
-
-            else if (Equals(ActionState.Value, ActionStateType.Move))
+            if (Equals(ActionState.Value, ActionStateType.Move))
             {
                 if (actionState.reset) // reset to center of table
                 {
@@ -275,6 +239,14 @@ namespace SEE.Controls.Actions
                         moveState.draggedTransform = null;
                         synchronize = true;
                     }
+                    else
+                    {
+                        InteractableObject o = InteractableObject.HoveredObject;
+                        if (o)
+                        {
+                            InteractableObject.UnselectAllInGraph(o.ItsGraph(), true);
+                        }
+                    }
                 }
                 else if (actionState.drag && hitPlane) // start or continue movement
                 {
@@ -284,10 +256,11 @@ namespace SEE.Controls.Actions
                         {
                             if (actionState.dragHoveredOnly)
                             {
-                                if (actionState.hoveredTransform != null)
+                                InteractableObject o = InteractableObject.HoveredObject;
+                                if (o)
                                 {
                                     movingOrRotating = true;
-                                    moveState.draggedTransform = actionState.hoveredTransform;
+                                    moveState.draggedTransform = o.transform;
                                 }
                             }
                             else
@@ -339,16 +312,14 @@ namespace SEE.Controls.Actions
                 {
                     if (moveState.draggedTransform != CityTransform) // only reparent non-root nodes
                     {
-                        synchronize = true;
-
                         Transform movingObject = moveState.draggedTransform;
                         Vector3 originalPosition = moveState.dragStartTransformPosition + moveState.dragStartOffset
                                 - Vector3.Scale(moveState.dragCanonicalOffset, movingObject.localScale);
 
                         GameNodeMover.FinalizePosition(movingObject.gameObject, originalPosition);
+                        synchronize = true;
                     }
 
-                    actionState.startDrag = false;
                     movingOrRotating = false;
 
                     moveState.draggedTransform.GetComponent<InteractableObject>().SetGrab(false, true);
@@ -373,7 +344,14 @@ namespace SEE.Controls.Actions
                     {
                         movingOrRotating = false;
 
-                        Array.ForEach(cursor.GetFocusses(), e => e.GetComponent<InteractableObject>().SetGrab(false, true));
+                        foreach (Transform t in cursor.E.GetFocusses())
+                        {
+                            InteractableObject o = t.GetComponent<InteractableObject>();
+                            if (o.IsGrabbed)
+                            {
+                                o.SetGrab(false, true);
+                            }
+                        }
                         rotateState.rotateGizmo.gameObject.SetActive(false);
 
                         CityTransform.RotateAround(rotateState.rotateGizmo.Center, Vector3.up, -CityTransform.rotation.eulerAngles.y);
@@ -386,15 +364,19 @@ namespace SEE.Controls.Actions
                     {
                         movingOrRotating = false;
 
-                        Array.ForEach(cursor.GetFocusses(), e => e.GetComponent<InteractableObject>().SetGrab(false, true));
+                        Array.ForEach(cursor.E.GetFocusses(), e => e.GetComponent<InteractableObject>().SetGrab(false, true));
                         rotateState.rotateGizmo.gameObject.SetActive(false);
 
                         CityTransform.rotation = Quaternion.Euler(0.0f, rotateState.originalEulerAngleY, 0.0f);
                         CityTransform.position = rotateState.originalPosition;
                         synchronize = true;
                     }
+                    else
+                    {
+                        InteractableObject.UnselectAllInGraph(moveState.draggedTransform.GetComponent<GraphElement>().ItsGraph, true);
+                    }
                 }
-                else if (actionState.drag && hitPlane && cursor.HasFocus()) // start or continue rotation
+                else if (actionState.drag && hitPlane && cursor.E.HasFocus()) // start or continue rotation
                 {
                     Vector2 toHit = planeHitPoint.XZ() - rotateState.rotateGizmo.Center.XZ();
                     float toHitAngle = toHit.Angle360();
@@ -403,7 +385,7 @@ namespace SEE.Controls.Actions
                     {
                         movingOrRotating = true;
 
-                        Array.ForEach(cursor.GetFocusses(), e => e.GetComponent<InteractableObject>().SetGrab(true, true));
+                        Array.ForEach(cursor.E.GetFocusses(), e => e.GetComponent<InteractableObject>().SetGrab(true, true));
                         rotateState.rotateGizmo.gameObject.SetActive(true);
 
                         rotateState.originalEulerAngleY = CityTransform.rotation.eulerAngles.y;
@@ -420,7 +402,7 @@ namespace SEE.Controls.Actions
                         {
                             angle = AngleMod(Mathf.Round(angle / _RotateState.SnapStepAngle) * _RotateState.SnapStepAngle);
                         }
-                        CityTransform.RotateAround(cursor.GetPosition(), Vector3.up, angle - CityTransform.rotation.eulerAngles.y);
+                        CityTransform.RotateAround(cursor.E.GetPosition(), Vector3.up, angle - CityTransform.rotation.eulerAngles.y);
 
                         float prevAngle = Mathf.Rad2Deg * rotateState.rotateGizmo.GetMaxAngle();
                         float currAngle = toHitAngle;
@@ -446,7 +428,7 @@ namespace SEE.Controls.Actions
                 {
                     movingOrRotating = false;
 
-                    Array.ForEach(cursor.GetFocusses(), e => e.GetComponent<InteractableObject>().SetGrab(false, true));
+                    Array.ForEach(cursor.E.GetFocusses(), e => e.GetComponent<InteractableObject>().SetGrab(false, true));
                     rotateState.rotateGizmo.gameObject.SetActive(false);
                 }
             }
@@ -458,9 +440,9 @@ namespace SEE.Controls.Actions
             if (actionState.zoomToggleToObject)
             {
                 actionState.zoomToggleToObject = false;
-                if (cursor.HasFocus())
+                if (cursor.E.HasFocus())
                 {
-                    float optimalTargetZoomFactor = portalPlane.MinLengthXZ / (cursor.GetDiameterXZ() / zoomState.currentZoomFactor);
+                    float optimalTargetZoomFactor = portalPlane.MinLengthXZ / (cursor.E.GetDiameterXZ() / zoomState.currentZoomFactor);
                     float optimalTargetZoomSteps = ConvertZoomFactorToZoomSteps(optimalTargetZoomFactor);
                     int actualTargetZoomSteps = Mathf.FloorToInt(optimalTargetZoomSteps);
                     float actualTargetZoomFactor = ConvertZoomStepsToZoomFactor(actualTargetZoomSteps);
@@ -475,7 +457,7 @@ namespace SEE.Controls.Actions
                     if (zoomSteps != 0)
                     {
                         float zoomFactor = ConvertZoomStepsToZoomFactor(zoomSteps);
-                        Vector2 centerOfTableAfterZoom = zoomSteps == -(int)zoomState.currentTargetZoomSteps ? CityTransform.position.XZ() : cursor.GetPosition().XZ();
+                        Vector2 centerOfTableAfterZoom = zoomSteps == -(int)zoomState.currentTargetZoomSteps ? CityTransform.position.XZ() : cursor.E.GetPosition().XZ();
                         Vector2 toCenterOfTable = portalPlane.CenterXZ - centerOfTableAfterZoom;
                         Vector2 zoomCenter = portalPlane.CenterXZ - (toCenterOfTable * (zoomFactor / (zoomFactor - 1.0f)));
                         float duration = 2.0f * ZoomState.DefaultZoomDuration;
@@ -504,11 +486,7 @@ namespace SEE.Controls.Actions
             if (!movingOrRotating)
             {
                 // Clamp velocity
-                float sqrMag = moveState.moveVelocity.sqrMagnitude;
-                if (sqrMag > _MoveState.MaxSqrVelocity)
-                {
-                    moveState.moveVelocity = moveState.moveVelocity / Mathf.Sqrt(sqrMag) * _MoveState.MaxVelocity;
-                }
+                moveState.moveVelocity = PhysicsUtil.ClampVelocity(moveState.moveVelocity, _MoveState.MaxVelocity);
 
                 // Apply velocity to city position
                 if (moveState.moveVelocity.sqrMagnitude != 0.0f)
@@ -518,7 +496,7 @@ namespace SEE.Controls.Actions
                 }
 
                 // Apply friction to velocity
-                Vector3 acceleration = _MoveState.DragFrictionFactor * -moveState.moveVelocity;
+                Vector3 acceleration = PhysicsUtil.Friction(moveState.moveVelocity, _MoveState.DragFrictionCoefficient);
                 moveState.moveVelocity += acceleration * Time.fixedDeltaTime;
             }
 
@@ -564,10 +542,16 @@ namespace SEE.Controls.Actions
             if (Equals(value, ActionStateType.Move))
             {
                 rotateState.rotateGizmo?.gameObject.SetActive(false);
+                enabled = true;
             }
             else if (Equals(value, ActionStateType.Rotate))
             {
                 moveState.moveGizmo?.gameObject.SetActive(false);
+                enabled = true;
+            }
+            else
+            {
+                enabled = false;
             }
         }
 
@@ -582,54 +566,6 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// If <paramref name="replaceAndDontToggle"/> is <code>true</code>, the given
-        /// object (if not <code>null</code>) will be selected and every selected object
-        /// will be deselected. Otherwise, the given objects selection state will be
-        /// toggled and the selection state of other selected objects will not change.
-        /// </summary>
-        /// <param name="go">The object to be selected/toggled.</param>
-        /// <param name="replaceAndDontToggle">Whether the object should be selected
-        /// solely or be toggled on/off.</param>
-        private void Select(GameObject go, bool replaceAndDontToggle)
-        {
-            if (replaceAndDontToggle)
-            {
-                foreach (Transform oldFocus in cursor.GetFocusses())
-                {
-                    InteractableObject interactable = oldFocus.GetComponent<InteractableObject>();
-                    if (interactable)
-                    {
-                        interactable.SetSelect(false, true); // TODO(torben): callback and have cursor always focus on every 'InteractableObject.SelectedObjects'-element
-                        cursor.RemoveFocus(oldFocus);
-                    }
-                }
-
-                if (go)
-                {
-                    go.GetComponent<InteractableObject>()?.SetSelect(true, true);
-                    cursor.ReplaceFocus(go.transform);
-                }
-            }
-            else if (go) // replaceAndDontToggle == false
-            {
-                InteractableObject interactable = go.GetComponent<InteractableObject>();
-                if (interactable)
-                {
-                    if (interactable.IsSelected)
-                    {
-                        interactable.SetSelect(false, true);
-                        cursor.RemoveFocus(go.transform);
-                    }
-                    else
-                    {
-                        interactable.SetSelect(true, true);
-                        cursor.AddFocus(go.transform);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// Raycasts against the clipping plane of the city ground.
         /// </summary>
         /// <param name="hitPlane">Whether the infinite plane was hit
@@ -639,7 +575,7 @@ namespace SEE.Controls.Actions
         /// <param name="planeHitPoint">The point, the plane was hit by the ray.</param>
         private void RaycastClippingPlane(out bool hitPlane, out bool insideClippingArea, out Vector3 planeHitPoint)
         {
-            Ray ray = MainCamera.Camera.ScreenPointToRay(actionState.mousePosition);
+            Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
 
             hitPlane = raycastPlane.Raycast(ray, out float enter);
             if (hitPlane)

@@ -106,7 +106,10 @@ namespace SEE.Game.UI.CodeWindow
                 codeWindow.enabled = false;
             }
 
-            space?.SetActive(false);
+            if (space != null)
+            {
+                space.SetActive(false);
+            }
         }
 
         /// <summary>
@@ -120,7 +123,10 @@ namespace SEE.Game.UI.CodeWindow
                 codeWindow.enabled = true;
             }
 
-            space?.SetActive(true);
+            if (space)
+            {
+                space.SetActive(true);
+            }
         }
 
         /// <summary>

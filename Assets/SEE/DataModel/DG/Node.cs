@@ -66,6 +66,10 @@ namespace SEE.DataModel.DG
         public int Level
         {
             get => level;
+            set
+            {
+                level = value;
+            }
         }
 
         /// <summary>
@@ -623,6 +627,11 @@ namespace SEE.DataModel.DG
                 }
             }
             return false;
+        }
+
+        public static implicit operator bool(Node node)
+        {
+            return node != null;
         }
     }
 }
