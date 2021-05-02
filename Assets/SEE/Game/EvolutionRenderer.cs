@@ -652,16 +652,16 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Checks if two edges are equal
+        /// Checks whether two edges are equal.
         /// </summary>
-        /// <param name="firstEdge">First edge to be checked</param>
-        /// <param name="secondEdge">Second edge to be checked</param>
-        /// <returns></returns>
-        protected virtual bool FindIdenticalGameEdges(GameObject firstEdge, GameObject secondEdge)
+        /// <param name="left">First edge to be checked</param>
+        /// <param name="right">Second edge to be checked</param>
+        /// <returns>true if both edges are equal</returns>
+        protected virtual bool FindIdenticalGameEdges(GameObject left, GameObject right)
         {
-            return firstEdge.TryGetComponent(out EdgeRef oldEdgeRef)
-                && secondEdge.TryGetComponent(out EdgeRef newEdgeRef)
-                && oldEdgeRef.Value.Equals(newEdgeRef.Value);
+            return left.TryGetComponent(out EdgeRef leftEdgeRef)
+                && right.TryGetComponent(out EdgeRef rightEdgeRef)
+                && leftEdgeRef.Value.ID == rightEdgeRef.Value.ID;
         }
 
         /// <summary>
@@ -675,10 +675,10 @@ namespace SEE.Game
             matchedEdges = new List<(GameObject, GameObject)>();
             foreach (GameObject newEdge in newEdges)
             {
-                GameObject temp = oldEdges.ToList().Find(i => FindIdenticalGameEdges(i, newEdge));
-                if (temp != null)
+                GameObject oldEdge = oldEdges.ToList().Find(i => FindIdenticalGameEdges(i, newEdge));
+                if (oldEdge != null)
                 {
-                    matchedEdges.Add((temp, newEdge));
+                    matchedEdges.Add((oldEdge, newEdge));
                 }
             }
         }
@@ -808,6 +808,11 @@ namespace SEE.Game
                     DynamicSampleRateReduction();
 
                 }
+                RedrawEdges();
+            }
+
+            void RedrawEdges()
+            {
                 foreach ((GameObject oldEdge, GameObject newEdge) in matchedEdges)
                 {
                     if (oldEdge.TryGetComponent(out LineRenderer lineRenderer)
