@@ -80,6 +80,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         private bool hideAllTransitiveClosure;
 
+
+       
+
+        private HideModeSelector mode;
+
         enum EdgeSelector
         {
             Incomming,
@@ -108,9 +113,29 @@ namespace SEE.Controls.Actions
         public override void Start()
         {
             base.Stop();
+            OpenDialog();
             selectedObjects = new HashSet<GameObject>();
             InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
             InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
+        }
+
+
+        private void OpenDialog()
+        {
+            // This dialog will set the source name and type of memento.node.
+            SEE.Game.UI.PropertyDialog.HidePropertyDialog dialog = new SEE.Game.UI.PropertyDialog.HidePropertyDialog();
+
+            // If the OK button is pressed, we continue with ProgressState.ValuesAreGiven.
+            dialog.OnConfirm.AddListener(() => OKButtonPressed());
+            // If the Cancel button is pressed, we continue with ProgressState.AddingIsCanceled.
+            dialog.Open();
+
+            void OKButtonPressed()
+            {
+                mode = dialog.mode;
+                Debug.Log("MODE\n" + dialog.mode);
+               
+            }
         }
 
         public override void Stop()
@@ -124,69 +149,72 @@ namespace SEE.Controls.Actions
         // Update is called once per frame
         public override bool Update()
         {
-            if (hideAll)
+            switch (mode)
             {
-                if (HideAll())
-                {
-                    hadAnEffect = true;
-                    return true;
-                }
-            } else if (hideSelected)
-            {
-                if (HideSelected())
-                {
-                    hadAnEffect = true;
-                    return true;
-                }
-            } else if (hideUnselected)
-            {
-                if (HideUnselected())
-                {
-                    hadAnEffect = true;
-                    return true;
-                }
-            } else if (hideOutgoing)
-            {
-                if (HideOutgoingEdges())
-                {
-                    hadAnEffect = true;
-                    return true;
-                }
-            } else if (hideIncoming)
-            {
-                if (HideIncommingEdges())
-                {
-                    hadAnEffect = true;
-                    return true;
-                }
-            } else if (hideAllEdgesOfSelected)
-            {
-                if (HideAllConnectedEdges())
-                {
-                    hadAnEffect = true;
-                    return true;
-                }
-            } else if (hideForwardTransitiveClosure)
-            {
-                if (HideFowardTransitive())
-                {
-                    hadAnEffect = true;
-                    return true;
-                }
-            } else if (hideBackwardTransitiveClosure)
-            {
-                if (HideBackwardTransitive())
-                {
-                    hadAnEffect = true;
-                    return true;
-                }
-            } else if (hideAllTransitiveClosure)
-            {
-                if (HideAllTransitive())
-                {
-                    hadAnEffect = true;
-                    return true;
-                }
+                case HideModeSelector.HideAll:
+                    if (HideAll())
+                    {
+                        hadAnEffect = true;
+                        return true;
+                    }
+                    break;
+                case HideModeSelector.HideSelected:
+                    if (HideSelected())
+                    {
+                        hadAnEffect = true;
+                        return true;
+                    }
+                    break;
+                case HideModeSelector.HideUnselected:
+                    if (HideUnselected())
+                    {
+                        hadAnEffect = true;
+                        return true;
+                    }
+                    break;
+                case HideModeSelector.HideOutgoing:
+                    if (HideOutgoingEdges())
+                    {
+                        hadAnEffect = true;
+                        return true;
+                    }
+                    break;
+                case HideModeSelector.HideIncoming:
+                    if (HideIncommingEdges())
+                    {
+                        hadAnEffect = true;
+                        return true;
+                    }
+                    break;
+                case HideModeSelector.HideAllEdgesOfSelected:
+                    if (HideAllConnectedEdges())
+                    {
+                        hadAnEffect = true;
+                        return true;
+                    }
+                    break;
+                case HideModeSelector.HideForwardTransitveClosure:
+                    if (HideFowardTransitive())
+                    {
+                        hadAnEffect = true;
+                        return true;
+                    }
+                    break;
+                case HideModeSelector.HideBackwardTransitiveClosure:
+                    if (HideBackwardTransitive())
+                    {
+                        hadAnEffect = true;
+                        return true;
+                    }
+                    break;
+                case HideModeSelector.HideAllTransitiveClosure:
+                    if(HideAllTransitive())
+                    {
+                        hadAnEffect = true;
+                        return true;
+                    }
+                    break;
+                default: return false;
             }
             return false;
         }
@@ -325,20 +353,25 @@ namespace SEE.Controls.Actions
         /// <returns> true if all nodes and edges could be successfully hidden </returns>
         private bool HideAll()
         {
-            GameObject city = selectedObject;
-            while (!city.CompareTag(Tags.CodeCity))
-            {
-                city = city.transform.parent.gameObject;
-            }
+            if (selectedObject != null) {
+                GameObject city = selectedObject;
+                while (!city.CompareTag(Tags.CodeCity))
+                {
+                    city = city.transform.parent.gameObject;
+                }
 
-            List<GameObject> nodesEdges = GetAllChildrenRecursively(city.transform, new List<GameObject>());
-            
-            foreach (GameObject g in nodesEdges)
+                List<GameObject> nodesEdges = GetAllChildrenRecursively(city.transform, new List<GameObject>());
+
+                foreach (GameObject g in nodesEdges)
+                {
+                    GameObjectExtensions.SetVisibility(g, false, true);
+                    hiddenObjects.Add(g);
+                }
+                return true;
+            } else
             {
-                GameObjectExtensions.SetVisibility(g, false, true);
-                hiddenObjects.Add(g);
+                return false;
             }
-            return true;
         }
 
         /// <summary>
@@ -600,8 +633,9 @@ namespace SEE.Controls.Actions
         {
             if(edge.TryGetComponent(out EdgeRef edgeRef))
             {
-                string sourceID = edgeRef.edge.Source.ID;
-                string targetID = edgeRef.edge.Target.ID;
+                string sourceID = edgeRef.Value.Source.ID;
+                string targetID = edgeRef.Value.Target.ID;
+               
 
                 foreach (GameObject node in GameObject.FindGameObjectsWithTag(Tags.Node))
                 {
@@ -637,7 +671,7 @@ namespace SEE.Controls.Actions
                 {
                     if (edge.TryGetComponent(out EdgeRef edgeRef))
                     {
-                        if (subsetNames.Contains(edgeRef.edge.Source.ID) && subsetNames.Contains(edgeRef.edge.Target.ID))
+                        if (subsetNames.Contains(edgeRef.Value.Source.ID) && subsetNames.Contains(edgeRef.Value.Target.ID))
                         {
                             if (edge.TryGetComponent(out InteractableObject interactable))
                             {
