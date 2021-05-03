@@ -127,6 +127,8 @@ namespace SEE.Controls.Actions
 
             // If the OK button is pressed, we continue with ProgressState.ValuesAreGiven.
             dialog.OnConfirm.AddListener(() => OKButtonPressed());
+            dialog.OnCancel.AddListener(() => Cancelled());
+
             // If the Cancel button is pressed, we continue with ProgressState.AddingIsCanceled.
             dialog.Open();
 
@@ -135,6 +137,10 @@ namespace SEE.Controls.Actions
                 mode = dialog.mode;
                 Debug.Log("MODE\n" + dialog.mode);
                
+            }
+            void Cancelled()
+            {
+                Stop();
             }
         }
 
@@ -267,7 +273,7 @@ namespace SEE.Controls.Actions
 
                 foreach (GameObject g in nodesEdges)
                 {
-                    if (!selectedObjects.Contains(g) && !g.name.Equals("implementation"))
+                    if (!selectedObjects.Contains(g) && !g.name.Equals("implementation") && !g.name.Equals("architecture"))
                     {
                         unselectedObjects.Add(g);
                     }
@@ -364,8 +370,12 @@ namespace SEE.Controls.Actions
 
                 foreach (GameObject g in nodesEdges)
                 {
-                    GameObjectExtensions.SetVisibility(g, false, true);
-                    hiddenObjects.Add(g);
+                    if(!g.name.Equals("implementation") && !g.name.Equals("architecture"))
+                    {
+                        GameObjectExtensions.SetVisibility(g, false, true);
+                        hiddenObjects.Add(g);
+                    }
+                    
                 }
                 return true;
             } else
