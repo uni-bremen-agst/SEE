@@ -58,7 +58,7 @@ namespace SEE.Net
             {
                 Debug.Log("run");
                 GameObject gameObject = GameObject.Find(GameObjectID);
-               
+
 
                 if (gameObject != null)
                 {
@@ -72,38 +72,39 @@ namespace SEE.Net
                         {
                             try
                             {
-                              graph.AddEdge(edgeReference.Value);
-                            } catch (Exception e) 
-                            { 
-                                 
+                                graph.AddEdge(edgeReference.Value);
                             }
-                        }
-
-                        if (gameObject.HasNodeRef())
-                        {
-
-                        List<GameObject> removeFromGarbage = new List<GameObject>();
-                        removeFromGarbage.Add(gameObject);
-                        PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(removeFromGarbage)));
-                        Node node = gameObject.GetNode();
-                        DeleteAction del = new DeleteAction();
-                        foreach(KeyValuePair<GameObject, Graph> nodesAndGraph in del.deletedNodes)
-                        {
-                            if (nodesAndGraph.Key == node)
+                            catch (Exception e)
                             {
-                                nodesAndGraph.Value.AddNode(node);
-                                nodesAndGraph.Value.FinalizeNodeHierarchy();
+
                             }
                         }
                     }
-                }
-                  
+                        if (gameObject.HasNodeRef())
+                        {
 
-                else
-                {
-                    throw new System.Exception($"There is no game object with the ID {GameObjectID}");
+                            List<GameObject> removeFromGarbage = new List<GameObject>();
+                            removeFromGarbage.Add(gameObject);
+                            PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(removeFromGarbage)));
+                            Node node = gameObject.GetNode();
+                            DeleteAction del = new DeleteAction();
+                            foreach (KeyValuePair<GameObject, Graph> nodesAndGraph in del.deletedNodes)
+                            {
+                                if (nodesAndGraph.Key == node)
+                                {
+                                    nodesAndGraph.Value.AddNode(node);
+                                    nodesAndGraph.Value.FinalizeNodeHierarchy();
+                                }
+                            }
+                        }
+                    }
+
+
+                    else
+                    {
+                        throw new System.Exception($"There is no game object with the ID {GameObjectID}");
+                    }
                 }
             }
         }
     }
-}
