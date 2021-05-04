@@ -37,7 +37,7 @@ namespace SEE.GO
             Destroy(E);
         }
 
-        private void AnySelectIn(InteractableObject interactableObject, bool isOwner)
+        private void AnySelectIn(InteractableObject interactableObject, bool isInitiator)
         {
             Graph selectedGraph = interactableObject.GraphElemRef.elem.ItsGraph;
             if (selectedGraph.Equals(city.LoadedGraph))
@@ -46,7 +46,7 @@ namespace SEE.GO
             }
         }
 
-        private void AnySelectOut(InteractableObject interactableObject, bool isOwner)
+        private void AnySelectOut(InteractableObject interactableObject, bool isInitiator)
         {
             Graph selectedGraph = interactableObject.GraphElemRef.elem.ItsGraph;
             if (selectedGraph.Equals(city.LoadedGraph))

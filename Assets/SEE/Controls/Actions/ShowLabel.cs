@@ -68,15 +68,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Called when the object is selected. If <paramref name="isOwner"/> is false, a remote
+        /// Called when the object is selected. If <paramref name="isInitiator"/> is false, a remote
         /// player has triggered this event and, hence, nothing will be done. Otherwise
         /// the label is shown.
         /// </summary>
         /// <param name="interactableObject">the object being selected</param>
-        /// <param name="isOwner">true if a local user initiated this call</param>
-        private void SelectionOn(InteractableObject interactableObject, bool isOwner)
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        private void SelectionOn(InteractableObject interactableObject, bool isInitiator)
         {
-            if (isOwner)
+            if (isInitiator)
             {
                 isSelected = true;
                 // if the object is currently hovered over, the label is already shown
@@ -88,15 +88,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Called when the object is deselected. If <paramref name="isOwner"/> is false, a remote
+        /// Called when the object is deselected. If <paramref name="isInitiator"/> is false, a remote
         /// player has triggered this event and, hence, nothing will be done. Otherwise
         /// the label is destroyed unless the object is still hovered.
         /// </summary>
         /// <param name="interactableObject">the object being selected</param>
-        /// <param name="isOwner">true if a local user initiated this call</param>
-        private void SelectionOff(InteractableObject interactableObject, bool isOwner)
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        private void SelectionOff(InteractableObject interactableObject, bool isInitiator)
         {
-            if (isOwner)
+            if (isInitiator)
             {
                 isSelected = false;
                 if (!isHovered)
@@ -107,15 +107,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Called when the object is being hovered over. If <paramref name="isOwner"/> is false, a remote
+        /// Called when the object is being hovered over. If <paramref name="isInitiator"/> is false, a remote
         /// player has triggered this event and, hence, nothing will be done. Otherwise
         /// the label is shown.
         /// </summary>
         /// <param name="interactableObject">the object being hovered over</param>
-        /// <param name="isOwner">true if a local user initiated this call</param>
-        private void HoverOn(InteractableObject interactableObject, bool isOwner)
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        private void HoverOn(InteractableObject interactableObject, bool isInitiator)
         {
-            if (isOwner)
+            if (isInitiator)
             {
                 isHovered = true;
                 // if the object is currently selected, the label is already shown
@@ -127,15 +127,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Called when the object is no longer hovered over. If <paramref name="isOwner"/> 
+        /// Called when the object is no longer hovered over. If <paramref name="isInitiator"/> 
         /// is false, a remote player has triggered this event and, hence, nothing will be done.
         /// Otherwise the label is destroyed unless the object is still selected.
         /// </summary>
         /// <param name="interactableObject">the object being hovered over</param>
-        /// <param name="isOwner">true if a local user initiated this call</param>
-        private void HoverOff(InteractableObject interactableObject, bool isOwner)
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        private void HoverOff(InteractableObject interactableObject, bool isInitiator)
         {
-            if (isOwner)
+            if (isInitiator)
             {
                 isHovered = false;
                 if (!isSelected)

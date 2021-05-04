@@ -270,8 +270,8 @@ namespace SEE.Game.Charts
         /// Updates the info text.
         /// </summary>
         /// <param name="interactableObject">the object being hovered over</param>
-        /// <param name="isOwner">true if a local user initiated this call (unused)</param>
-        public void OnHoverIn(InteractableObject interactableObject, bool isOwner)
+        /// <param name="isInitiator">true if a local user initiated this call (unused)</param>
+        public void OnHoverIn(InteractableObject interactableObject, bool isInitiator)
         {
             if (!interactableObject.IsSelected)
             {
@@ -286,8 +286,8 @@ namespace SEE.Game.Charts
         /// Updates the info text.
         /// </summary>
         /// <param name="interactableObject">the object being hovered over</param>
-        /// <param name="isOwner">true if a local user initiated this call (unused)</param>
-        public void OnHoverOut(InteractableObject interactableObject, bool isOwner)
+        /// <param name="isInitiator">true if a local user initiated this call (unused)</param>
+        public void OnHoverOut(InteractableObject interactableObject, bool isInitiator)
         {
             if (!interactableObject.IsSelected)
             {
@@ -302,8 +302,8 @@ namespace SEE.Game.Charts
         /// Updates the info text and highlights this marker.
         /// </summary>
         /// <param name="interactableObject">the object being selected</param>
-        /// <param name="isOwner">true if a local user initiated this call (unused)</param>
-        public void OnSelectIn(InteractableObject interactableObject, bool isOwner)
+        /// <param name="isInitiator">true if a local user initiated this call (unused)</param>
+        public void OnSelectIn(InteractableObject interactableObject, bool isInitiator)
         {
             selectedCount++;
             if (!interactableObject.IsHovered)
@@ -321,8 +321,8 @@ namespace SEE.Game.Charts
         /// interactable object is still selected.
         /// </summary>
         /// <param name="interactableObject">the object being selected</param>
-        /// <param name="isOwner">true if a local user initiated this call (unused)</param>
-        public void OnSelectOut(InteractableObject interactableObject, bool isOwner)
+        /// <param name="isInitiator">true if a local user initiated this call (unused)</param>
+        public void OnSelectOut(InteractableObject interactableObject, bool isInitiator)
         {
             selectedCount--;
             if (!interactableObject.IsHovered)
