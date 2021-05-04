@@ -74,7 +74,7 @@ namespace SEE.Net
                             del.deletedEdges.Add(gameObject, graph);
                         }
                         AnimationsOfDeletion.HideEdges(gameObject);
-                        //GameEdgeAdder.Remove(gameObject);
+                        GameEdgeAdder.Remove(gameObject);
                     }
                 }
 
