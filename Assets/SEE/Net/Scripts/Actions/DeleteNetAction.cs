@@ -59,7 +59,6 @@ namespace SEE.Net
                 {
                     if (gameObject.HasNodeRef())
                     {
-                        del.deletedNodes.Add(gameObject, gameObject.ItsGraph());
                         GameNodeAdder.Remove(gameObject);
                         Portal.SetInfinitePortal(gameObject);
                         PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.MoveNodeToGarbage(gameObject.AllAncestors()));
