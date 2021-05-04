@@ -190,11 +190,11 @@ namespace SEE.Controls.Actions
                     lastNode = nodeGraphPair.Key;
                     graphInDeletedNodes = nodeGraphPair.Value;
                 }
-               
+                new UndoDeleteNetAction(lastNode.name, graphInDeletedNodes).Execute(null);
             }
             // Re-add all edges to their graphs.
 
-            new UndoDeleteNetAction(lastNode.name, graphInDeletedNodes).Execute(null);
+           
 
             foreach (KeyValuePair<GameObject, Graph> edgeGraphPair in deletedEdges)
             {
