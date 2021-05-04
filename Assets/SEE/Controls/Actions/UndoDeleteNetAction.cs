@@ -26,18 +26,18 @@ namespace SEE.Net
 
         public GameObject garbageCan;
 
-        public Graph graph;
+        public String parentID;
 
         /// <summary>
         /// Creates a new DeleteNetAction.
         /// </summary>
         /// <param name="gameObjectID">the unique name of the gameObject of a node or edge 
         /// that has to be deleted</param>
-        public UndoDeleteNetAction(string gameObjectID,  Graph graph) : base()
+        public UndoDeleteNetAction(string gameObjectID,  String parentID) : base()
         {
             this.GameObjectID = gameObjectID;
             garbageCan = GameObject.Find("garbageCan");
-            this.graph = graph;
+            this.parentID = parentID;
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace SEE.Net
             {
                 Debug.Log("run");
                 GameObject gameObject = GameObject.Find(GameObjectID);
-               
+              GameObject parentOfNode =  GameObject.Find(parentID);
 
                 if (gameObject != null)
                 {
@@ -72,7 +72,7 @@ namespace SEE.Net
                         {
                             try
                             {
-                                graph.AddEdge(edgeReference.Value);
+                               // graph.AddEdge(edgeReference.Value);
                             }
                             catch (Exception e)
                             {
@@ -88,11 +88,7 @@ namespace SEE.Net
                             PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(removeFromGarbage)));
                             Node node = gameObject.GetNode();
                             Debug.Log(node.ItsGraph);
-                           if(gameObject.TryGetComponentOrLog<DeleteAction>(out DeleteAction delete)){
-
-                            Debug.Log("deletedNodes");
-                            Debug.Log(delete.deletedNodes.Values);
-                        }
+                            GameNodeAdder.AddNodeToGraph(parentOfNode.GetNode(),gameObject.GetNode() );
                         }
                     }
 

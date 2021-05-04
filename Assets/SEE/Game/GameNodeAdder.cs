@@ -45,7 +45,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="parent">The node that should be the parent of <paramref name="node"/></param>
         /// <param name="node">The node to add to the graph</param>
-        private static void AddNodeToGraph(Node parent, Node node)
+        public static void AddNodeToGraph(Node parent, Node node)
         {
             if (parent == null)
             {

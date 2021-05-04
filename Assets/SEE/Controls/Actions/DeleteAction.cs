@@ -53,6 +53,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         public Dictionary<GameObject, Graph> deletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
 
+        private Dictionary<GameObject, string> parents { get; set; } = new Dictionary<GameObject, string>();
+
         /// <summary>
         /// The name of the garbage can gameObject.
         /// </summary>
@@ -189,8 +191,12 @@ namespace SEE.Controls.Actions
                     }
                     lastNode = nodeGraphPair.Key;
                     graphInDeletedNodes = nodeGraphPair.Value;
+                   if(parents.TryGetValue(lastNode, out string parentID))
+                    {
+                        new UndoDeleteNetAction(lastNode.name, parentID).Execute(null);
+                    }
                 }
-                new UndoDeleteNetAction(lastNode.name, graphInDeletedNodes).Execute(null);
+               
             }
             // Re-add all edges to their graphs.
 
@@ -204,7 +210,8 @@ namespace SEE.Controls.Actions
                     edgeGraphPair.Value.AddEdge(edgeReference.Value);
                     PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.DelayEdges(edgeGraphPair.Key));
                     lastNode = edgeGraphPair.Key;
-                    new UndoDeleteNetAction(lastNode.name, edgeGraphPair.Value).Execute(null);
+                    
+                    new UndoDeleteNetAction(lastNode.name, null).Execute(null);
                 }
                 
             }
@@ -274,6 +281,9 @@ namespace SEE.Controls.Actions
             {
                 DeleteNode(deletedGameNode);
                 new DeleteNetAction(deletedGameNode.name).Execute(null);
+                parents.Add(deletedGameNode, deletedGameNode.GetNode().Parent.ID);
+                string parentID = deletedGameNode.GetNode().Parent.ID;
+    
             }
             hadAnEffect = true;
         }
