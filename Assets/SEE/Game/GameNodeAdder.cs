@@ -124,8 +124,6 @@ namespace SEE.Game
         {   
             Node node = gameNode.GetNode();
             Graph graph = node.ItsGraph;
-            Debug.Log("Graph" + graph);
-            Debug.Log("Node" + node);
             graph.RemoveNode(node);
             graph.FinalizeNodeHierarchy();
         }
