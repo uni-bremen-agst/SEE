@@ -79,6 +79,11 @@ namespace Lean.Touch
 				return;
 			}
 
+			if (finger.Index == LeanTouch.HOVER_FINGER_INDEX)
+			{
+				return;
+			}
+
 			if (finger.TapCount == requiredTapCount)
 			{
 				if (onFinger != null)

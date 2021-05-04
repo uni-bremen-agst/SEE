@@ -142,7 +142,8 @@ namespace Lean.Touch.Editor
 	[UnityEditor.CustomEditor(typeof(TARGET))]
 	public class LeanTouchSimulator_Editor : LeanEditor
 	{
-		static LeanTouchSimulator_Editor()
+		[UnityEditor.InitializeOnLoadMethod]
+		static void Hook()
 		{
 			LeanTouch_Editor.OnExtendInspector += HandleExtendInspector;
 		}

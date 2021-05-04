@@ -80,6 +80,11 @@ namespace Lean.Touch
 				return;
 			}
 
+			if (finger.Index == LeanTouch.HOVER_FINGER_INDEX)
+			{
+				return;
+			}
+
 			fingers.Add(finger);
 
 			if (fingers.Count == requiredCount)

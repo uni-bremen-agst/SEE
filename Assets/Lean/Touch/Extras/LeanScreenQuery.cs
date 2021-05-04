@@ -4,10 +4,10 @@ using UnityEngine.EventSystems;
 
 namespace Lean.Common
 {
-    /// <summary>This struct stores information about and allows you to search the scene for a specific object on screen space.</summary>
-    [System.Serializable]
-    public struct LeanScreenQuery
-    {
+	/// <summary>This struct stores information about and allows you to search the scene for a specific object on screen space.</summary>
+	[System.Serializable]
+	public struct LeanScreenQuery
+	{
 		public enum MethodType
 		{
 			Raycast
@@ -33,13 +33,13 @@ namespace Lean.Common
 		/// <summary>The component found from the search must have this tag.</summary>
 		public string RequiredTag;
 
-        /// <summary>The camera used to perform the search.
+		/// <summary>The camera used to perform the search.
 		/// None = MainCamera.</summary>
-        public Camera Camera;
+		public Camera Camera;
 
 		public float Distance;
 
-        private static RaycastHit[] raycastHits = new RaycastHit[1024];
+		private static RaycastHit[] raycastHits = new RaycastHit[1024];
 
 		private static RaycastHit2D[] raycastHit2Ds = new RaycastHit2D[1024];
 
@@ -52,6 +52,8 @@ namespace Lean.Common
 		// Used by RaycastGui
 		private static EventSystem tempEventSystem;
 
+		private static List<KeyValuePair<GameObject, int>> tempLayers = new List<KeyValuePair<GameObject, int>>();
+
 		public LeanScreenQuery(MethodType newMethod)
 		{
 			Method      = newMethod;
@@ -62,59 +64,151 @@ namespace Lean.Common
 			Distance    = 50.0f;
 		}
 
-        public T Query<T>(GameObject gameObject, Vector2 screenPosition, ref Vector3 worldPosition)
-			where T : Component
-        {
+		public static void ChangeLayers(GameObject root, bool ancestors, bool children)
+		{
+			tempLayers.Add(new KeyValuePair<GameObject, int>(root, root.layer));
+
+			root.layer = 2; // Ignore raycast
+
+			if (ancestors == true && root.transform.parent != null)
+			{
+				ChangeLayers(root.transform.parent.gameObject, true, false);
+			}
+
+			if (children == true)
+			{
+				for (var i = root.transform.childCount - 1; i >= 0; i--)
+				{
+					ChangeLayers(root.transform.GetChild(i).gameObject, false, true);
+				}
+			}
+		}
+
+		public static void RevertLayers()
+		{
+			foreach (var tempLayer in tempLayers)
+			{
+				if (tempLayer.Key != null)
+				{
+					tempLayer.Key.layer = tempLayer.Value;
+				}
+			}
+
+			tempLayers.Clear();
+		}
+
+		public T Query<T>(GameObject gameObject, Vector2 screenPosition)
+		{
+			var result        = default(T);
+			var root          = default(Component);
+			var worldPosition = default(Vector3);
+
+			if (TryQuery(gameObject, screenPosition, ref result, ref root, ref worldPosition) == true)
+			{
+				return result;
+			}
+
+			return default(T);
+		}
+
+		public bool TryQuery<T>(GameObject gameObject, Vector2 screenPosition, ref T result, ref Component root, ref Vector3 worldPosition)
+		{
 			var camera       = LeanHelper.GetCamera(Camera, gameObject);
-			var bestResult   = default(Component);
+			var bestHit      = default(Component);
 			var bestDistance = float.PositiveInfinity;
 			var bestPosition = default(Vector3);
 
-            if (camera != null)
+			if (camera != null)
 			{
 				if (camera.pixelRect.Contains(screenPosition) == true)
 				{
-					DoRaycast3D(camera, screenPosition, ref bestResult, ref bestDistance, ref bestPosition);
-					DoRaycast2D(camera, screenPosition, ref bestResult, ref bestDistance, ref bestPosition);
-					DoRaycastUI(screenPosition, ref bestResult, ref bestDistance, ref bestPosition);
+					DoRaycast3D(camera, screenPosition, ref bestHit, ref bestDistance, ref bestPosition);
+					DoRaycast2D(camera, screenPosition, ref bestHit, ref bestDistance, ref bestPosition);
+					DoRaycastUI(screenPosition, ref bestHit, ref bestDistance, ref bestPosition);
 				}
 			}
 
-			if (bestResult != null)
+			if (bestHit != null)
 			{
 				worldPosition = bestPosition;
 
-				return Result<T>(bestResult);
+				return TryResult(bestHit, ref result, ref root);
 			}
 
-			return null;
-        }
+			return false;
+		}
 
-		private T Result<T>(Component bestResult)
-			where T : Component
+		private bool TryResult<T>(Component hit, ref T result, ref Component component)
 		{
-			var result = default(T);
-
-			if (bestResult != null)
+			if (hit != null)
 			{
 				switch (Search)
 				{
-					case SearchType.GetComponent:           result = bestResult.GetComponent          <T>(); break;
-					case SearchType.GetComponentInParent:   result = bestResult.GetComponentInParent  <T>(); break;
-					case SearchType.GetComponentInChildren: result = bestResult.GetComponentInChildren<T>(); break;
+					case SearchType.GetComponent:           if (TryGetComponent          (hit, ref result, ref component) == false) return false; break;
+					case SearchType.GetComponentInParent:   if (TryGetComponentInParent  (hit, ref result, ref component) == false) return false; break;
+					case SearchType.GetComponentInChildren: if (TryGetComponentInChildren(hit, ref result, ref component) == false) return false; break;
 				}
 
 				// Discard if tag doesn't match
-				if (result != null && string.IsNullOrEmpty(RequiredTag) == false && result.tag != RequiredTag)
+				if (result != null && string.IsNullOrEmpty(RequiredTag) == false && component.tag != RequiredTag)
 				{
-					result = null;
+					return false;
+				}
+
+				return true;
+			}
+
+			return false;
+		}
+
+		private bool TryGetComponent<T>(Component hit, ref T result, ref Component component)
+		{
+			result = hit.GetComponent<T>();
+
+			if (result != null)
+			{
+				component = hit;
+
+				return true;
+			}
+
+			return false;
+		}
+
+		private bool TryGetComponentInParent<T>(Component hit, ref T result, ref Component component)
+		{
+			if (TryGetComponent(hit, ref result, ref component) == true)
+			{
+				return true;
+			}
+
+			if (hit.transform.parent != null)
+			{
+				return TryGetComponentInParent(hit.transform.parent, ref result, ref component);
+			}
+
+			return false;
+		}
+
+		private bool TryGetComponentInChildren<T>(Component hit, ref T result, ref Component component)
+		{
+			if (TryGetComponent(hit, ref result, ref component) == true)
+			{
+				return true;
+			}
+
+			for (var i = 0; i < hit.transform.childCount; i++)
+			{
+				if (TryGetComponentInParent(hit.transform.GetChild(i), ref result, ref component) == true)
+				{
+					return true;
 				}
 			}
 
-			return result;
+			return false;
 		}
 
-        private static int GetClosestRaycastHitsIndex(int count)
+		private static int GetClosestRaycastHitsIndex(int count)
 		{
 			var closestIndex    = -1;
 			var closestDistance = float.PositiveInfinity;
@@ -222,7 +316,7 @@ namespace Lean.Common
 				}
 			}
 		}
-    }
+	}
 }
 
 #if UNITY_EDITOR
