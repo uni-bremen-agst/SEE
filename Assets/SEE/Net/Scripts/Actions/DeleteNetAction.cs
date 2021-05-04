@@ -61,7 +61,6 @@ namespace SEE.Net
                     if (gameObject.HasNodeRef())
                     {
                         del.deletedNodes.Add(gameObject, gameObject.ItsGraph());
-                        Debug.Log("Graph im deletenet:" + gameObject.ItsGraph());
                         //GameNodeAdder.Remove(gameObject);
                         Portal.SetInfinitePortal(gameObject);
                         PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.MoveNodeToGarbage(gameObject.AllAncestors()));
@@ -69,10 +68,9 @@ namespace SEE.Net
                        // del.MarkAsDeleted(gameObject.AllAncestors());
                         Portal.SetInfinitePortal(gameObject);
                         Node node = gameObject.GetNode();
-                        Graph graph = node.ItsGraph;
-                        Debug.Log("der node gecasted" + graph);
-                        graph.RemoveNode(node);
-                        graph.FinalizeNodeHierarchy();
+                       // Graph graph = node.ItsGraph;
+                        //graph.RemoveNode(node);
+                      //  graph.FinalizeNodeHierarchy();
 
 
                     }

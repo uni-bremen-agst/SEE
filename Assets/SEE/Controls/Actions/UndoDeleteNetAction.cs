@@ -38,7 +38,6 @@ namespace SEE.Net
             this.GameObjectID = gameObjectID;
             garbageCan = GameObject.Find("garbageCan");
             this.graph = graph;
-            Debug.Log("testDebugUndo");
         }
 
         /// <summary>
@@ -89,8 +88,8 @@ namespace SEE.Net
                         removeFromGarbage.Add(gameObject);
                         PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(removeFromGarbage)));
                         Node node = gameObject.GetNode();
-                        graph.AddNode(node);
-                        graph.FinalizeNodeHierarchy();
+                       // graph.AddNode(node);
+                        //graph.FinalizeNodeHierarchy();
                     }
                 }
                   
