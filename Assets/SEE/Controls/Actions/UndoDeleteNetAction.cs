@@ -75,14 +75,13 @@ namespace SEE.Net
                               graph.AddEdge(edgeReference.Value);
                             } catch (Exception e) 
                             { 
-                                
-                                
+                                 
                             }
                         }
-                        
-                    }
-                    else
-                    {
+
+                        if (gameObject.HasNodeRef())
+                        {
+
                         List<GameObject> removeFromGarbage = new List<GameObject>();
                         removeFromGarbage.Add(gameObject);
                         PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(removeFromGarbage)));
