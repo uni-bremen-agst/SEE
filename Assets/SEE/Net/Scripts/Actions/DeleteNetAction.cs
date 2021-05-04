@@ -68,9 +68,9 @@ namespace SEE.Net
                        // del.MarkAsDeleted(gameObject.AllAncestors());
                         Portal.SetInfinitePortal(gameObject);
                         Node node = gameObject.GetNode();
-                       // Graph graph = node.ItsGraph;
-                        //graph.RemoveNode(node);
-                      //  graph.FinalizeNodeHierarchy();
+                        Graph graph = node.ItsGraph;
+                        graph.RemoveNode(node);
+                        graph.FinalizeNodeHierarchy();
 
 
                     }
