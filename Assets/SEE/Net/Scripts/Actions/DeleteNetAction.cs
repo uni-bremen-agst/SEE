@@ -60,6 +60,7 @@ namespace SEE.Net
                     if (gameObject.HasNodeRef())
                     {
                         GameNodeAdder.Remove(gameObject);
+                        Debug.Log(gameObject.GetNode().ItsGraph + " graph nach removal");
                         Portal.SetInfinitePortal(gameObject);
                         PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.MoveNodeToGarbage(gameObject.AllAncestors()));
                         Portal.SetInfinitePortal(gameObject);
