@@ -72,8 +72,7 @@ namespace SEE.Net
                         {
                             try
                             {
-                                Debug.Log("addEdge");
-                                graph.AddEdge(edgeReference.Value);
+                              graph.AddEdge(edgeReference.Value);
                             } catch (Exception e) 
                             { 
                                 
@@ -88,8 +87,15 @@ namespace SEE.Net
                         removeFromGarbage.Add(gameObject);
                         PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(removeFromGarbage)));
                         Node node = gameObject.GetNode();
-                       // graph.AddNode(node);
-                        //graph.FinalizeNodeHierarchy();
+                        DeleteAction del = new DeleteAction();
+                        foreach(KeyValuePair<GameObject, Graph> nodesAndGraph in del.deletedNodes)
+                        {
+                            if (nodesAndGraph.Key == node)
+                            {
+                                nodesAndGraph.Value.AddNode(node);
+                                nodesAndGraph.Value.FinalizeNodeHierarchy();
+                            }
+                        }
                     }
                 }
                   
