@@ -88,10 +88,12 @@ namespace SEE.Net
                             PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(removeFromGarbage)));
                             Node node = gameObject.GetNode();
                             DeleteAction del = new DeleteAction();
+                    
                             foreach (KeyValuePair<GameObject, Graph> nodesAndGraph in del.deletedNodes)
                             {
                                 if (nodesAndGraph.Key == node)
                                 {
+                                    Debug.Log(nodesAndGraph.Value);
                                     nodesAndGraph.Value.AddNode(node);
                                     nodesAndGraph.Value.FinalizeNodeHierarchy();
                                 }
