@@ -55,7 +55,6 @@ namespace SEE.Net
             {   
                 GameObject gameObject = GameObject.Find(GameObjectID);
                 DeleteAction del = new DeleteAction();
-                del.NewInstance();
                 if (gameObject != null)
                 {
                     if (gameObject.HasNodeRef())
@@ -68,11 +67,14 @@ namespace SEE.Net
                        // del.MarkAsDeleted(gameObject.AllAncestors());
                         Portal.SetInfinitePortal(gameObject);
                         Node node = gameObject.GetNode();
-                        Graph graph = node.ItsGraph;
-                        graph.RemoveNode(node);
-                        graph.FinalizeNodeHierarchy();
-
-
+                        foreach (KeyValuePair<GameObject, Graph> nodesAndGraph in del.deletedNodes)
+                        {
+                            if (nodesAndGraph.Key == node)
+                            {
+                                nodesAndGraph.Value.RemoveNode(node);
+                                nodesAndGraph.Value.FinalizeNodeHierarchy();
+                            }
+                        }
                     }
                     else if (gameObject.HasEdgeRef())
                     {
