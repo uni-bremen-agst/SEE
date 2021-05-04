@@ -88,10 +88,10 @@ namespace SEE.Net
                         List<GameObject> removeFromGarbage = new List<GameObject>();
                         removeFromGarbage.Add(gameObject);
                         PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(removeFromGarbage)));
-                        Node node = gameObject.GetNode();
-                        Graph graph = node.ItsGraph;
-                        graph.AddNode(node);
-                        graph.FinalizeNodeHierarchy();
+                       // Node node = gameObject.GetNode();
+                       // Graph graph = node.ItsGraph;
+                        //graph.AddNode(node);
+                       // graph.FinalizeNodeHierarchy();
                     }
                 }
                   
