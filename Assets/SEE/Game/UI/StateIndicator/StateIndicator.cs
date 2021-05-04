@@ -62,12 +62,18 @@ namespace SEE.Game.UI.StateIndicator
 
         private void OnDisable()
         {
-            ModePanelImage?.gameObject.SetActive(false);
+            if (ModePanelImage != null)
+            {
+                ModePanelImage.gameObject.SetActive(false);
+            }
         }
 
         private void OnEnable()
         {
-            ModePanelImage?.gameObject.SetActive(true);
+            if (ModePanelImage != null)
+            {
+                ModePanelImage.gameObject.SetActive(true);
+            }
         }
 
         /// <summary>

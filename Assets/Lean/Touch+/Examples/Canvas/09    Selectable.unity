@@ -269,7 +269,8 @@ MonoBehaviour:
   rotateTo: 0
   dragAfterSpawn: 1
   selectOnSpawn: 1
-  selectWith: {fileID: 377794234}
+  selectWith: {fileID: 0}
+  deselectOnUp: 1
   ScreenDepth:
     Conversion: 0
     Camera: {fileID: 0}
@@ -380,119 +381,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &377794233
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 377794236}
-  - component: {fileID: 377794235}
-  - component: {fileID: 377794234}
-  m_Layer: 0
-  m_Name: Press To Select
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &377794234
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 377794233}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 479d695282ba6cf4ba3ab3c4848f05e8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  deselectWithNothing: 0
-  limit: 0
-  maxSelectables: 0
-  reselect: 3
-  selectables: []
-  onSelected:
-    m_PersistentCalls:
-      m_Calls: []
-  onDeselected:
-    m_PersistentCalls:
-      m_Calls: []
-  onNothing:
-    m_PersistentCalls:
-      m_Calls: []
-  ScreenQuery:
-    Method: 0
-    Layers:
-      serializedVersion: 2
-      m_Bits: 4294967291
-    Search: 1
-    RequiredTag: 
-    Camera: {fileID: 0}
-    Distance: 50
-  deselectWithFingers: 1
-  onSelectedFinger:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &377794235
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 377794233}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bbb097c07812299498915a0a3e793843, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ignoreStartedOverGui: 1
-  requiredSelectable: {fileID: 0}
-  onFinger:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 377794234}
-        m_MethodName: SelectScreenPosition
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  ScreenDepth:
-    Conversion: 1
-    Camera: {fileID: 0}
-    Object: {fileID: 0}
-    Layers:
-      serializedVersion: 2
-      m_Bits: 4294967291
-    Distance: 0
-  onWorld:
-    m_PersistentCalls:
-      m_Calls: []
-  onScreen:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!4 &377794236
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 377794233}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &685151107
 GameObject:
@@ -663,7 +551,8 @@ MonoBehaviour:
   rotateTo: 0
   dragAfterSpawn: 1
   selectOnSpawn: 1
-  selectWith: {fileID: 377794234}
+  selectWith: {fileID: 0}
+  deselectOnUp: 1
   ScreenDepth:
     Conversion: 0
     Camera: {fileID: 0}
@@ -1432,7 +1321,8 @@ MonoBehaviour:
   rotateTo: 0
   dragAfterSpawn: 1
   selectOnSpawn: 1
-  selectWith: {fileID: 377794234}
+  selectWith: {fileID: 0}
+  deselectOnUp: 1
   ScreenDepth:
     Conversion: 0
     Camera: {fileID: 0}
@@ -1803,12 +1693,13 @@ PrefabInstance:
     - target: {fileID: 114457744909205792, guid: 8df6337a574cdad4bb6ec66cc50c6c2b,
         type: 3}
       propertyPath: m_Text
-      value: This shows you how the <color=#0FF>Drag To Spawn</color> and <color=#0FF>Press
-        To Select</color> demo scenes can be combined. This is done by enabling the
-        <color=#0FF>LeanSpawnWithFinger.SelectOnSpawn</color> setting, and dropping
-        the <color=#0FF>Press To Select</color> object into the <color=#0FF>LeanSpawnWithFinger.SelectWith</color>
-        setting. This will automatically select the object when spawned, and deselect
-        it when released.
+      value: This shows you how to modify the <color=#0FF>Drag To Spawn</color> demo
+        scene to select the spawned object while the spawning finger is still touching
+        the screen. This is done by enabling the <color=#0FF>LeanSpawnWithFinger</color>
+        component's <color=#0FF>SelectOnSpawn</color> and <color=#0FF>DeselectOnUp</color>
+        settings.   Keep in mind the spawned prefab must have the <color=#0FF>LeanSelectable</color>
+        component. In this demo scene the <color=#0FF>LeanSelectableRendererColor</color>
+        component is also used to show the color of the selected object.
       objectReference: {fileID: 0}
     - target: {fileID: 224356063559649096, guid: 8df6337a574cdad4bb6ec66cc50c6c2b,
         type: 3}

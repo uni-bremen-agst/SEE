@@ -159,12 +159,18 @@ namespace SEE.Game.UI.Tooltip
 
         private void OnDisable()
         {
-            tooltipGameObject?.SetActive(false);
+            if (tooltipGameObject != null)
+            {
+                tooltipGameObject.SetActive(false);
+            }
         }
 
         private void OnEnable()
         {
-            tooltipGameObject?.SetActive(true);
+            if (tooltipGameObject != null)
+            {
+                tooltipGameObject.SetActive(true);
+            }
         }
 
         protected override void StartHoloLens()
