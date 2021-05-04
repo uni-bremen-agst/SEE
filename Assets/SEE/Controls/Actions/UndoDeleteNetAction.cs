@@ -89,7 +89,7 @@ namespace SEE.Net
                             Node node = gameObject.GetNode();
                             Debug.Log(node.ItsGraph);
                             DeleteAction del = new DeleteAction();
-                    
+                        Debug.Log(graph + " deleteUndo");
                             foreach (KeyValuePair<GameObject, Graph> nodesAndGraph in del.deletedNodes)
                             {
                                 if (nodesAndGraph.Key == node)
