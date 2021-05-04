@@ -63,10 +63,7 @@ namespace SEE.Net
                         GameNodeAdder.Remove(gameObject);
                         Portal.SetInfinitePortal(gameObject);
                         PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.MoveNodeToGarbage(gameObject.AllAncestors()));
-                        //del.Delete(gameObject);
-                       // del.MarkAsDeleted(gameObject.AllAncestors());
                         Portal.SetInfinitePortal(gameObject);
-                        Node node = gameObject.GetNode();
                       
                     }
                     else if (gameObject.HasEdgeRef())
