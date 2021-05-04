@@ -132,7 +132,7 @@ namespace SEE.Controls
             }
 
             yield return new WaitForSeconds(TimeToWait);
-            oldPositions.Clear();
+            //oldPositions.Clear();
             deletedNodes.Clear();
             deletedEdges.Clear();
             InteractableObject.UnselectAll(true);
@@ -174,6 +174,10 @@ namespace SEE.Controls
         public static void HideEdges (GameObject gameEdge)
         {
             gameEdge.SetVisibility(false, true);
+            if (!deletedEdges.ContainsKey(gameEdge))
+            {
+                deletedEdges.Add(gameEdge, gameEdge.GetGraph());
+            }
         }
         // FIX ME  : 
         // Hiding edges for DelelteAction and DeleteNetAction 

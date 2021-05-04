@@ -1,9 +1,10 @@
-﻿using Assets.SEE.Game;
+using Assets.SEE.Game;
 using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,7 +14,7 @@ namespace SEE.Net
     /// This class is responsible for deleting a node or edge via network from one client to all others and 
     /// to the server. 
     /// </summary>
-    public class DeleteNetAction : AbstractAction
+    public class UndoDeleteNetAction : AbstractAction
     {
         // Note: All attributes are made public so that they will be serialized
         // for the network transfer.
@@ -25,16 +26,19 @@ namespace SEE.Net
 
         public GameObject garbageCan;
 
+        public Graph graph;
 
         /// <summary>
         /// Creates a new DeleteNetAction.
         /// </summary>
         /// <param name="gameObjectID">the unique name of the gameObject of a node or edge 
         /// that has to be deleted</param>
-        public DeleteNetAction(string gameObjectID) : base()
+        public UndoDeleteNetAction(string gameObjectID, Graph graph) : base()
         {
             this.GameObjectID = gameObjectID;
             garbageCan = GameObject.Find("garbageCan");
+            this.graph = graph;
+            Debug.Log("testDebugUndo");
         }
 
         /// <summary>
@@ -52,47 +56,46 @@ namespace SEE.Net
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
-            {   
+            {
+                Debug.Log("run");
                 GameObject gameObject = GameObject.Find(GameObjectID);
-                DeleteAction del = new DeleteAction();
-                del.NewInstance();
+               
+
                 if (gameObject != null)
                 {
-                    if (gameObject.HasNodeRef())
+
+                    if (gameObject.HasEdgeRef())
                     {
-                        del.deletedNodes.Add(gameObject, gameObject.ItsGraph());
-                        Debug.Log("Graph im deletenet:" + gameObject.ItsGraph());
-                        //GameNodeAdder.Remove(gameObject);
-                        Portal.SetInfinitePortal(gameObject);
-                        PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.MoveNodeToGarbage(gameObject.AllAncestors()));
-                        //del.Delete(gameObject);
-                       // del.MarkAsDeleted(gameObject.AllAncestors());
-                        Portal.SetInfinitePortal(gameObject);
+
+
+                        PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.DelayEdges(gameObject));
+                        if (gameObject.TryGetComponentOrLog(out EdgeRef edgeReference))
+                        {
+                            try
+                            {
+                                Debug.Log("addEdge");
+                                graph.AddEdge(edgeReference.Value);
+                            } catch (Exception e) 
+                            { 
+                                
+                                
+                            }
+                        }
+                        
+                    }
+                    else
+                    {
+                        List<GameObject> removeFromGarbage = new List<GameObject>();
+                        removeFromGarbage.Add(gameObject);
+                        PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(removeFromGarbage)));
                         Node node = gameObject.GetNode();
                         Graph graph = node.ItsGraph;
-                        Debug.Log("der node gecasted" + graph);
-                        graph.RemoveNode(node);
+                        graph.AddNode(node);
                         graph.FinalizeNodeHierarchy();
-
-
-                    }
-                    else if (gameObject.HasEdgeRef())
-                    {
-                        if (gameObject.TryGetEdge(out Edge edge))
-                        {
-                            Graph graph = edge.ItsGraph;
-                            del.deletedEdges.Add(gameObject, graph);
-                        }
-                        AnimationsOfDeletion.HideEdges(gameObject);
-                        GameEdgeAdder.Remove(gameObject);
                     }
                 }
+                  
 
-
-
-                
-
-    
                 else
                 {
                     throw new System.Exception($"There is no game object with the ID {GameObjectID}");

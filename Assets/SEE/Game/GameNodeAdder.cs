@@ -121,14 +121,13 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNode">game node to be removed</param>
         public static void Remove(GameObject gameNode)
-        {
-           
+        {   
             Node node = gameNode.GetNode();
             Graph graph = node.ItsGraph;
+            Debug.Log("Graph" + graph);
+            Debug.Log("Node" + node);
             graph.RemoveNode(node);
             graph.FinalizeNodeHierarchy();
-            // GameObject.Destroy(gameNode);
-            
         }
     }
 }
