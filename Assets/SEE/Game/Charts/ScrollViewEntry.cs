@@ -77,7 +77,7 @@ namespace SEE.Game.Charts
 
             #region InteractableObject Events
 
-            internal void OnHover(InteractableObject _, bool isOwner)
+            internal void OnHover(InteractableObject _, bool isInitiator)
             {
                 if (interactableObject == null || !interactableObject.IsSelected)
                 {
@@ -98,7 +98,7 @@ namespace SEE.Game.Charts
                 }
             }
 
-            internal void OnUnhover(InteractableObject _, bool isOwner)
+            internal void OnUnhover(InteractableObject _, bool isInitiator)
             {
                 if (interactableObject == null || !interactableObject.IsSelected)
                 {
@@ -114,8 +114,8 @@ namespace SEE.Game.Charts
             }
 
             /// <param name="interactableObject">the object being selected</param>
-            /// <param name="isOwner">true if a local user initiated this call (unused)</param>
-            private void OnSelect(InteractableObject o, bool isOwner)
+            /// <param name="isInitiator">true if a local user initiated this call (unused)</param>
+            private void OnSelect(InteractableObject o, bool isInitiator)
             {
                 ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);
                 if (entry != null)
@@ -131,8 +131,8 @@ namespace SEE.Game.Charts
             }
 
             /// <param name="interactableObject">the object being selected</param>
-            /// <param name="isOwner">true if a local user initiated this call (unused)</param>
-            private void OnUnselect(InteractableObject o, bool isOwner)
+            /// <param name="isInitiator">true if a local user initiated this call (unused)</param>
+            private void OnUnselect(InteractableObject o, bool isInitiator)
             {
                 ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);
                 if (entry != null)

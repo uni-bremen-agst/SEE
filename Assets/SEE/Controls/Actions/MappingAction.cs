@@ -163,7 +163,7 @@ namespace SEE.Controls.Actions
         // Events
         //----------------------------------------------------------------
 
-        private void ReplaceSelect(List<InteractableObject> replaced, List<InteractableObject> by, bool isOwner)
+        private void ReplaceSelect(List<InteractableObject> replaced, List<InteractableObject> by, bool isInitiator)
         {
             // TODO(torben): for now!
             Assert.IsTrue(replaced.Count <= 1);

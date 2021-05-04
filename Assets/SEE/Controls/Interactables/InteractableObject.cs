@@ -287,23 +287,23 @@ namespace SEE.Controls
         /// Sets <see cref="HoverFlags"/> to given <paramref name="hoverFlags"/>. Then if 
         /// the object is being hovered over (<see cref="IsHovered"/>), the <see cref="HoverIn"/> 
         /// and <see cref="AnyHoverIn"/> events are triggered with this <see cref="InteractableObject"/>
-        /// and <paramref name="isOwner"/> as arguments. If <paramref name="isOwner"/>, the <see cref="LocalHoverIn"/> 
+        /// and <paramref name="isInitiator"/> as arguments. If <paramref name="isInitiator"/>, the <see cref="LocalHoverIn"/> 
         /// and <see cref="LocalAnyHoverIn"/> events are triggered with this <see cref="InteractableObject"/>
         /// additionally. This <see cref="InteractableObject"/> will be added to the set of <see cref="HoveredObjects"/>.
         /// 
         /// If instead the object is NOT being hovered over (<see cref="IsHovered"/>), the <see cref="HoverOut"/> 
         /// and <see cref="AnyHoverOut"/> events are triggered with this <see cref="InteractableObject"/>
-        /// and <paramref name="isOwner"/> as arguments. If <paramref name="isOwner"/>, the <see cref="LocalHoverOut"/> 
+        /// and <paramref name="isInitiator"/> as arguments. If <paramref name="isInitiator"/>, the <see cref="LocalHoverOut"/> 
         /// and <see cref="LocalAnyHoverOut"/> events are triggered with this <see cref="InteractableObject"/>
         /// additionally. This <see cref="InteractableObject"/> will be removed from the set of <see cref="HoveredObjects"/>.
         /// 
-        /// At any rate, if we are running in multiplayer mode and <paramref name="isOwner"/> is true,
+        /// At any rate, if we are running in multiplayer mode and <paramref name="isInitiator"/> is true,
         /// <see cref="Net.SetHoverAction"/> will be called with the given <paramref name="hoverFlags"/>.
         /// and this <see cref="InteractableObject"/>.
         /// </summary>
         /// <param name="hoverFlags">New value for <see cref="HoverFlags"./></param>
-        /// <param name="isOwner">Whether this client is initiating the hovering action.</param>
-        public void SetHoverFlags(uint hoverFlags, bool isOwner)
+        /// <param name="isInitiator">Whether this client is initiating the hovering action.</param>
+        public void SetHoverFlags(uint hoverFlags, bool isInitiator)
         {
             Assert.IsTrue(HoverFlags != hoverFlags);
 
@@ -311,9 +311,9 @@ namespace SEE.Controls
 
             if (IsHovered)
             {
-                HoverIn?.Invoke(this, isOwner);
-                AnyHoverIn?.Invoke(this, isOwner);
-                if (isOwner)
+                HoverIn?.Invoke(this, isInitiator);
+                AnyHoverIn?.Invoke(this, isInitiator);
+                if (isInitiator)
                 {
                     // The local player has hovered on this object and needs to be informed about it.
                     // Non-local player are not concerned here.
@@ -325,9 +325,9 @@ namespace SEE.Controls
             }
             else
             {
-                HoverOut?.Invoke(this, isOwner);
-                AnyHoverOut?.Invoke(this, isOwner);
-                if (isOwner)
+                HoverOut?.Invoke(this, isInitiator);
+                AnyHoverOut?.Invoke(this, isInitiator);
+                if (isInitiator)
                 {
                     // The local player has finished hovering on this object and needs to be informed about it.
                     // Non-local player are not concerned here.
@@ -338,7 +338,7 @@ namespace SEE.Controls
                 HoveredObject = null;
             }
 
-            if (!Net.Network.UseInOfflineMode && isOwner)
+            if (!Net.Network.UseInOfflineMode && isInitiator)
             {
                 new Net.SetHoverAction(this, hoverFlags).Execute();
             }
@@ -348,18 +348,18 @@ namespace SEE.Controls
         /// Runs <see cref="SetHoverFlags(uint, bool)"/> with the first parameter, say H,
         /// that equals <see cref="HoverFlags"/> with the <paramref name="hoverFlag"/> bit 
         /// turned on if <paramref name="setFlag"/> or turned off if not <paramref name="setFlag"/>.
-        /// The second parameter is <paramref name="isOwner"/>.
+        /// The second parameter is <paramref name="isInitiator"/>.
         /// 
         /// Note: This method may be called locally when a local user interacts with the
         /// object or remotely when a remote user has interacted with the object. In the
-        /// former case, <paramref name="isOwner"/> will be true. In the
+        /// former case, <paramref name="isInitiator"/> will be true. In the
         /// latter case, it will be called via <see cref="SEE.Net.SetHoverAction.ExecuteOnClient()"/>
-        /// where <paramref name="isOwner"/> is false.
+        /// where <paramref name="isInitiator"/> is false.
         /// </summary>
         /// <param name="hoverFlag">The flag to be set or unset.</param>
         /// <param name="setFlag">Whether this object should be hovered.</param>
-        /// <param name="isOwner">Whether this client is initiating the hovering action.</param>
-        public void SetHoverFlag(HoverFlag hoverFlag, bool setFlag, bool isOwner)
+        /// <param name="isInitiator">Whether this client is initiating the hovering action.</param>
+        public void SetHoverFlag(HoverFlag hoverFlag, bool setFlag, bool isInitiator)
         {
             uint hoverFlags;
             if (setFlag)
@@ -372,18 +372,18 @@ namespace SEE.Controls
                 // hoverFlag will be "turned off" in HoverFlags
                 hoverFlags = HoverFlags & ~(uint)hoverFlag;
             }
-            SetHoverFlags(hoverFlags, isOwner);
+            SetHoverFlags(hoverFlags, isInitiator);
         }
 
         /// <summary>
         /// Unhovers all objects.
         /// </summary>
-        /// <param name="isOwner">Whether this client is initiating the grabbing action.</param>
-        public static void UnhoverAll(bool isOwner)
+        /// <param name="isInitiator">Whether this client is initiating the grabbing action.</param>
+        public static void UnhoverAll(bool isInitiator)
         {
             while (HoveredObjects.Count != 0)
             {
-                HoveredObjects.ElementAt(HoveredObjects.Count - 1).SetHoverFlags(0, isOwner);
+                HoveredObjects.ElementAt(HoveredObjects.Count - 1).SetHoverFlags(0, isInitiator);
             }
         }
 
@@ -395,8 +395,8 @@ namespace SEE.Controls
         /// respectively, to <see cref="SelectedObjects"/> depending upon <paramref name="select"/>.
         /// </summary>
         /// <param name="select">Whether this object should be selected.</param>
-        /// <param name="isOwner">Whether this client is initiating the selection action.</param>
-        public void SetSelect(bool select, bool isOwner)
+        /// <param name="isInitiator">Whether this client is initiating the selection action.</param>
+        public void SetSelect(bool select, bool isInitiator)
         {
             Assert.IsTrue(IsSelected != select);
 
@@ -416,9 +416,9 @@ namespace SEE.Controls
                 graphToSelectedIOs[graph].Add(this);
 
                 // Invoke events
-                SelectIn?.Invoke(this, isOwner);
-                AnySelectIn?.Invoke(this, isOwner);
-                if (isOwner)
+                SelectIn?.Invoke(this, isInitiator);
+                AnySelectIn?.Invoke(this, isInitiator);
+                if (isInitiator)
                 {
                     // The local player has selected this object and needs to be informed about it.
                     // Non-local player are not concerned here.
@@ -435,9 +435,9 @@ namespace SEE.Controls
                 graphToSelectedIOs[GraphElemRef.elem.ItsGraph].Remove(this);
 
                 // Invoke events
-                SelectOut?.Invoke(this, isOwner);
-                AnySelectOut?.Invoke(this, isOwner);
-                if (isOwner)
+                SelectOut?.Invoke(this, isInitiator);
+                AnySelectOut?.Invoke(this, isInitiator);
+                if (isInitiator)
                 {
                     // The local player has deselected this object and needs to be informed about it.
                     // Non-local player are not concerned here.
@@ -446,7 +446,7 @@ namespace SEE.Controls
                 }
             }
 
-            if (!Net.Network.UseInOfflineMode && isOwner)
+            if (!Net.Network.UseInOfflineMode && isInitiator)
             {
                 new Net.SetSelectAction(this, select).Execute();
             }
@@ -455,9 +455,9 @@ namespace SEE.Controls
         /// <summary>
         /// Deselects all currently selected interactable objects.
         /// </summary>
-        /// <param name="isOwner">Whether this client is initiating the action.</param>
-        public static void UnselectAll(bool isOwner) => UnselectAllInternal(isOwner, true);
-        private static void UnselectAllInternal(bool isOwner, bool invokeReplaceEvent)
+        /// <param name="isInitiator">Whether this client is initiating the action.</param>
+        public static void UnselectAll(bool isInitiator) => UnselectAllInternal(isInitiator, true);
+        private static void UnselectAllInternal(bool isInitiator, bool invokeReplaceEvent)
         {
             List<InteractableObject> replaced = SelectedObjects.ToList();
             List<InteractableObject> by = new List<InteractableObject>();
@@ -467,16 +467,16 @@ namespace SEE.Controls
                 // InteractableObject from SelectedObjects.
                 while (SelectedObjects.Count != 0)
                 {
-                    SelectedObjects.ElementAt(SelectedObjects.Count - 1).SetSelect(false, isOwner);
+                    SelectedObjects.ElementAt(SelectedObjects.Count - 1).SetSelect(false, isInitiator);
                 }
                 if (invokeReplaceEvent)
                 {
-                    ReplaceSelect?.Invoke(replaced, by, isOwner);
+                    ReplaceSelect?.Invoke(replaced, by, isInitiator);
                 }
             }
         }
 
-        public static void ReplaceSelection(InteractableObject interactableObject, bool isOwner)
+        public static void ReplaceSelection(InteractableObject interactableObject, bool isInitiator)
         {
             List<InteractableObject> replaced = SelectedObjects.ToList();
             List<InteractableObject> by = new List<InteractableObject>(1);
@@ -486,12 +486,12 @@ namespace SEE.Controls
             }
             if (replaced.Count > 0 || by.Count > 0)
             {
-                UnselectAllInternal(isOwner, false);
+                UnselectAllInternal(isInitiator, false);
                 if (interactableObject)
                 {
-                    interactableObject.SetSelect(true, isOwner);
+                    interactableObject.SetSelect(true, isInitiator);
                 }
-                ReplaceSelect?.Invoke(replaced, by, isOwner);
+                ReplaceSelect?.Invoke(replaced, by, isInitiator);
             }
         }
 
@@ -500,8 +500,8 @@ namespace SEE.Controls
         /// <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">The graph of which the objects are to be deselected.</param>
-        /// <param name="isOwner">Whether this client is initiating the action.</param>
-        public static void UnselectAllInGraph(Graph graph, bool isOwner)
+        /// <param name="isInitiator">Whether this client is initiating the action.</param>
+        public static void UnselectAllInGraph(Graph graph, bool isInitiator)
         {
             if (graphToSelectedIOs.TryGetValue(graph, out HashSet<InteractableObject> s))
             {
@@ -510,7 +510,7 @@ namespace SEE.Controls
                 {
                     e = s.GetEnumerator();
                     e.MoveNext();
-                    e.Current.SetSelect(false, isOwner);
+                    e.Current.SetSelect(false, isInitiator);
                 }
             }
         }
@@ -519,8 +519,8 @@ namespace SEE.Controls
         /// Visually emphasizes this object for grabbing.
         /// </summary>
         /// <param name="grab">Whether this object should be grabbed.</param>
-        /// <param name="isOwner">Whether this client is initiating the grabbing action.</param>
-        public void SetGrab(bool grab, bool isOwner)
+        /// <param name="isInitiator">Whether this client is initiating the grabbing action.</param>
+        public void SetGrab(bool grab, bool isInitiator)
         {
             Assert.IsTrue(IsGrabbed != grab);
 
@@ -528,9 +528,9 @@ namespace SEE.Controls
 
             if (grab)
             {
-                GrabIn?.Invoke(this, isOwner);
-                AnyGrabIn?.Invoke(this, isOwner);
-                if (isOwner)
+                GrabIn?.Invoke(this, isInitiator);
+                AnyGrabIn?.Invoke(this, isInitiator);
+                if (isInitiator)
                 {
                     // The local player has grabbed this object and needs to be informed about it.
                     // Non-local player are not concerned here.
@@ -541,9 +541,9 @@ namespace SEE.Controls
             }
             else
             {
-                GrabOut?.Invoke(this, isOwner);
-                AnyGrabOut?.Invoke(this, isOwner);
-                if (isOwner)
+                GrabOut?.Invoke(this, isInitiator);
+                AnyGrabOut?.Invoke(this, isInitiator);
+                if (isInitiator)
                 {
                     // The local player has finished grabbing this object and needs to be informed about it.
                     // Non-local player are not concerned here.
@@ -553,7 +553,7 @@ namespace SEE.Controls
                 GrabbedObjects.Remove(this);
             }
 
-            if (!Net.Network.UseInOfflineMode && isOwner)
+            if (!Net.Network.UseInOfflineMode && isInitiator)
             {
                 new Net.SetGrabAction(this, grab).Execute();
                 if (grab)
@@ -571,12 +571,12 @@ namespace SEE.Controls
         /// <summary>
         /// Ungrabs all objects.
         /// </summary>
-        /// <param name="isOwner">Whether this client is initiating the grabbing action.</param>
-        public static void UngrabAll(bool isOwner)
+        /// <param name="isInitiator">Whether this client is initiating the grabbing action.</param>
+        public static void UngrabAll(bool isInitiator)
         {
             while (GrabbedObjects.Count != 0)
             {
-                GrabbedObjects.ElementAt(GrabbedObjects.Count - 1).SetGrab(false, isOwner);
+                GrabbedObjects.ElementAt(GrabbedObjects.Count - 1).SetGrab(false, isInitiator);
             }
         }
 
@@ -599,8 +599,8 @@ namespace SEE.Controls
         /// remote or local players must be made.
         /// </summary>
         /// <param name="interactableObject">the object being hovered over (or no longer being hovered over)</param>
-        /// <param name="isOwner">true if a local player initiated this call</param>
-        public delegate void MultiPlayerHoverAction(InteractableObject interactableObject, bool isOwner);
+        /// <param name="isInitiator">true if a local player initiated this call</param>
+        public delegate void MultiPlayerHoverAction(InteractableObject interactableObject, bool isInitiator);
 
         /// <summary>
         /// A delegate to be called when a hovering event has happened (hover over
@@ -696,10 +696,10 @@ namespace SEE.Controls
         /// or deselecting the game object). Intended for multiplayer actions.
         /// </summary>
         /// <param name="interactableObject">the object being selected</param>
-        /// <param name="isOwner">true if a local user initiated this call</param>
-        public delegate void MultiPlayerSelectAction(InteractableObject interactableObject, bool isOwner);
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        public delegate void MultiPlayerSelectAction(InteractableObject interactableObject, bool isInitiator);
 
-        public delegate void MulitPlayerReplaceSelectAction(List<InteractableObject> replaced, List<InteractableObject> by, bool isOwner);
+        public delegate void MulitPlayerReplaceSelectAction(List<InteractableObject> replaced, List<InteractableObject> by, bool isInitiator);
 
         /// <summary>
         /// A delegate to be called when a selection event has happened (selecting
@@ -763,8 +763,8 @@ namespace SEE.Controls
         /// or releasing the game object). Intended for multiplayer actions.
         /// </summary>
         /// <param name="interactableObject">the object being grabbed (or no longer grabbed)</param>
-        /// <param name="isOwner">true if a local user initiated this call</param>
-        public delegate void MultiPlayerGrabAction(InteractableObject interactableObject, bool isOwner);
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        public delegate void MultiPlayerGrabAction(InteractableObject interactableObject, bool isInitiator);
         /// <summary>
         /// A delegate to be called when a grab event has happened (grabbing
         /// or releasing the game object). Intended for actions of the local player only.
@@ -837,7 +837,7 @@ namespace SEE.Controls
             // Debug.LogFormat("{0}.OnMouseEnter({1}) @ {2}\n", this.GetType().FullName, gameObject.name, Time.time);
             if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer && !Raycasting.IsMouseOverGUI())
             {
-                SetHoverFlag(HoverFlag.World, setFlag: true, isOwner: true);
+                SetHoverFlag(HoverFlag.World, true, true);
             }
         }
 
@@ -852,11 +852,11 @@ namespace SEE.Controls
                 bool isWorldBitSet = (HoverFlags & (uint)HoverFlag.World) != 0;
                 if (isWorldBitSet && Raycasting.IsMouseOverGUI())
                 {
-                    SetHoverFlag(HoverFlag.World, setFlag: false, isOwner: true);
+                    SetHoverFlag(HoverFlag.World, setFlag: false, isInitiator: true);
                 }
                 else if (!isWorldBitSet && !Raycasting.IsMouseOverGUI())
                 {
-                    SetHoverFlag(HoverFlag.World, setFlag: true, isOwner: true);
+                    SetHoverFlag(HoverFlag.World, setFlag: true, isInitiator: true);
                 }
             }
         }
@@ -868,7 +868,7 @@ namespace SEE.Controls
         {
             if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer && !Raycasting.IsMouseOverGUI())
             {
-                SetHoverFlag(HoverFlag.World, setFlag: false, isOwner: true);
+                SetHoverFlag(HoverFlag.World, setFlag: false, isInitiator: true);
             }
         }
         
