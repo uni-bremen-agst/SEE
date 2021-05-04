@@ -293,12 +293,11 @@ namespace SEE.Controls.Actions
             if (gameNode.TryGetComponentOrLog(out NodeRef nodeRef))
             {
                 Graph graph = nodeRef.Value.ItsGraph;
-                deletedNodes[gameNode] = graph;     
-                graph.RemoveNode(nodeRef.Value);
-                graph.FinalizeNodeHierarchy();
+                deletedNodes[gameNode] = graph;
                 Debug.Log(graph);
                 Debug.Log(nodeRef.Value);
-                
+                graph.RemoveNode(nodeRef.Value);
+                graph.FinalizeNodeHierarchy(); 
             }
         }
 
