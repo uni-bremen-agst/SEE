@@ -194,6 +194,7 @@ namespace SEE.Controls.Actions
                    if(parents.TryGetValue(lastNode, out string parentID))
                     {
                         new UndoDeleteNetAction(lastNode.name, parentID).Execute(null);
+                        parents.Remove(lastNode);
                     }
                 }
                
