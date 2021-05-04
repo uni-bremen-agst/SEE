@@ -231,6 +231,26 @@ namespace SEE.Controls
             GraphElemRef = GetComponent<GraphElementRef>();
         }
 
+        private void OnDestroy()
+        {
+            if (IsHovered)
+            {
+                SetHoverFlags(0, true);
+            }
+            if (IsSelected)
+            {
+                SetSelect(false, true);
+            }
+            if (IsGrabbed)
+            {
+                SetGrab(false, true);
+            }
+            GraphElemRef = null;
+            interactable = null;
+            idToInteractableObjectDict.Remove(ID);
+            ID = uint.MaxValue;
+        }
+
         /// <summary>
         /// Returns the interactable object of given id or <code>null</code>, if it does
         /// not exist.
@@ -260,8 +280,8 @@ namespace SEE.Controls
             }
             return graphToSelectedIOs[graph];
         }
-            
-  #region Interaction
+        
+        #region Interaction
 
         /// <summary>
         /// Sets <see cref="HoverFlags"/> to given <paramref name="hoverFlags"/>. Then if 
@@ -436,33 +456,43 @@ namespace SEE.Controls
         /// Deselects all currently selected interactable objects.
         /// </summary>
         /// <param name="isOwner">Whether this client is initiating the action.</param>
-        public static void UnselectAll(bool isOwner)
+        public static void UnselectAll(bool isOwner) => UnselectAllInternal(isOwner, true);
+        private static void UnselectAllInternal(bool isOwner, bool invokeReplaceEvent)
         {
             List<InteractableObject> replaced = SelectedObjects.ToList();
             List<InteractableObject> by = new List<InteractableObject>();
-            // Note: This is no endless loop because SetSelect will remove this 
-            // InteractableObject from SelectedObjects.
-            while (SelectedObjects.Count != 0)
+            if (replaced.Count > 0 || by.Count > 0)
             {
-                SelectedObjects.ElementAt(SelectedObjects.Count - 1).SetSelect(false, isOwner);
+                // Note: This is no endless loop because SetSelect will remove this 
+                // InteractableObject from SelectedObjects.
+                while (SelectedObjects.Count != 0)
+                {
+                    SelectedObjects.ElementAt(SelectedObjects.Count - 1).SetSelect(false, isOwner);
+                }
+                if (invokeReplaceEvent)
+                {
+                    ReplaceSelect?.Invoke(replaced, by, isOwner);
+                }
             }
-            ReplaceSelect?.Invoke(replaced, by, isOwner);
         }
 
         public static void ReplaceSelection(InteractableObject interactableObject, bool isOwner)
         {
             List<InteractableObject> replaced = SelectedObjects.ToList();
-            List<InteractableObject> by = new List<InteractableObject>();
+            List<InteractableObject> by = new List<InteractableObject>(1);
             if (interactableObject)
             {
                 by.Add(interactableObject);
             }
-            UnselectAll(isOwner);
-            if (interactableObject)
+            if (replaced.Count > 0 || by.Count > 0)
             {
-                interactableObject.SetSelect(true, isOwner);
+                UnselectAllInternal(isOwner, false);
+                if (interactableObject)
+                {
+                    interactableObject.SetSelect(true, isOwner);
+                }
+                ReplaceSelect?.Invoke(replaced, by, isOwner);
             }
-            ReplaceSelect?.Invoke(replaced, by, isOwner);
         }
 
         /// <summary>
