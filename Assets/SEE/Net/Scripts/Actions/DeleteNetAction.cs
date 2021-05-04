@@ -60,21 +60,14 @@ namespace SEE.Net
                     if (gameObject.HasNodeRef())
                     {
                         del.deletedNodes.Add(gameObject, gameObject.ItsGraph());
-                        //GameNodeAdder.Remove(gameObject);
+                        GameNodeAdder.Remove(gameObject);
                         Portal.SetInfinitePortal(gameObject);
                         PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.MoveNodeToGarbage(gameObject.AllAncestors()));
                         //del.Delete(gameObject);
                        // del.MarkAsDeleted(gameObject.AllAncestors());
                         Portal.SetInfinitePortal(gameObject);
                         Node node = gameObject.GetNode();
-                        foreach (KeyValuePair<GameObject, Graph> nodesAndGraph in del.deletedNodes)
-                        {
-                            if (nodesAndGraph.Key == node)
-                            {
-                                nodesAndGraph.Value.RemoveNode(node);
-                                nodesAndGraph.Value.FinalizeNodeHierarchy();
-                            }
-                        }
+                      
                     }
                     else if (gameObject.HasEdgeRef())
                     {
