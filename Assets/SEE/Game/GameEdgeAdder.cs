@@ -75,7 +75,6 @@ namespace Assets.SEE.Game
             {
                 Graph graph = edge.ItsGraph;
                 graph.RemoveEdge(edge);
-                GameObject.Destroy(gameEdge);
             }
             else
             {

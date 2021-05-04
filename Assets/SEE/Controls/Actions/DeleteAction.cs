@@ -49,9 +49,9 @@ namespace SEE.Controls.Actions
         public Dictionary<GameObject, Graph> deletedNodes { get; set; } = new Dictionary<GameObject, Graph>();
 
         /// <summary>
-        /// A history of all edges and the graph where they were attached to, deleted by this action.
+        /// A history of all edges and the graph they were attached to, deleted by this action.
         /// </summary>
-        private Dictionary<GameObject, Graph> deletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
+        public Dictionary<GameObject, Graph> deletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
 
         /// <summary>
         /// The name of the garbage can gameObject.
@@ -138,7 +138,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="deletedObject">selected GameObject that along with its children should be removed</param>
         /// <returns>true if <paramref name="deletedObject"/> was actually deleted</returns>
-        private bool Delete(GameObject deletedObject)
+        public bool Delete(GameObject deletedObject)
         {            
             if (deletedObject.CompareTag(Tags.Edge))
             {
@@ -164,8 +164,8 @@ namespace SEE.Controls.Actions
                     MarkAsDeleted(deletedObject.AllAncestors());
                 }
             }
-            new DeleteNetAction(deletedObject.name).Execute();
             hadAnEffect = true;
+           // new DeleteNetAction(deletedObject.name).Execute(null); 
             return true;
         }
 
@@ -174,7 +174,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Undo()
         {
+            base.Undo();
+            GameObject lastNode = null;
+            Graph graphInDeletedNodes = null;
             // Re-add all nodes to their graphs.
+
             foreach (KeyValuePair<GameObject, Graph> nodeGraphPair in deletedNodes)
             {
                 if (nodeGraphPair.Key.TryGetComponentOrLog(out NodeRef nodeRef))
@@ -183,9 +187,15 @@ namespace SEE.Controls.Actions
                     {
                         nodeGraphPair.Value.AddNode(nodeRef.Value);
                     }
+                    lastNode = nodeGraphPair.Key;
+                    graphInDeletedNodes = nodeGraphPair.Value;
                 }
+               
             }
             // Re-add all edges to their graphs.
+
+            new UndoDeleteNetAction(lastNode.name, graphInDeletedNodes).Execute(null);
+
             foreach (KeyValuePair<GameObject, Graph> edgeGraphPair in deletedEdges)
             {
 
@@ -193,9 +203,15 @@ namespace SEE.Controls.Actions
                 {
                     edgeGraphPair.Value.AddEdge(edgeReference.Value);
                     PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.DelayEdges(edgeGraphPair.Key));
+                    lastNode = edgeGraphPair.Key;
+                    new UndoDeleteNetAction(lastNode.name, edgeGraphPair.Value).Execute(null);
                 }
+                
             }
+
             PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(deletedNodes.Keys)));
+            
+           
         }
 
         /// <summary>
@@ -206,6 +222,7 @@ namespace SEE.Controls.Actions
             foreach (GameObject gameObject in explicitlyDeletedNodesAndEdges)
             {
                 Delete(gameObject);
+                new DeleteNetAction(gameObject.name).Execute(null);
             }
         }
 
@@ -249,12 +266,14 @@ namespace SEE.Controls.Actions
             foreach (GameObject implicitlyDeletedEdge in implicitlyDeletedEdges)
             {
                 DeleteEdge(implicitlyDeletedEdge);
+                new DeleteNetAction(implicitlyDeletedEdge.name).Execute(null);
             }
 
             // Finally, we remove the nodes themselves.
             foreach (GameObject deletedGameNode in gameNodesToDelete)
             {
                 DeleteNode(deletedGameNode);
+                new DeleteNetAction(deletedGameNode.name).Execute(null);
             }
             hadAnEffect = true;
         }
@@ -274,8 +293,12 @@ namespace SEE.Controls.Actions
             if (gameNode.TryGetComponentOrLog(out NodeRef nodeRef))
             {
                 Graph graph = nodeRef.Value.ItsGraph;
-                deletedNodes[gameNode] = graph;
+                deletedNodes[gameNode] = graph;     
                 graph.RemoveNode(nodeRef.Value);
+                graph.FinalizeNodeHierarchy();
+                Debug.Log(graph);
+                Debug.Log(nodeRef.Value);
+                
             }
         }
 
