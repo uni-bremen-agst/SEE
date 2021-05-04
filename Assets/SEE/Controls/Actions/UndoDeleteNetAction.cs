@@ -33,7 +33,7 @@ namespace SEE.Net
         /// </summary>
         /// <param name="gameObjectID">the unique name of the gameObject of a node or edge 
         /// that has to be deleted</param>
-        public UndoDeleteNetAction(string gameObjectID, Graph graph) : base()
+        public UndoDeleteNetAction(string gameObjectID,  Graph graph) : base()
         {
             this.GameObjectID = gameObjectID;
             garbageCan = GameObject.Find("garbageCan");
@@ -58,7 +58,7 @@ namespace SEE.Net
             {
                 Debug.Log("run");
                 GameObject gameObject = GameObject.Find(GameObjectID);
-                
+               
 
                 if (gameObject != null)
                 {
@@ -88,17 +88,11 @@ namespace SEE.Net
                             PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(removeFromGarbage)));
                             Node node = gameObject.GetNode();
                             Debug.Log(node.ItsGraph);
-                            DeleteAction del = new DeleteAction();
-                        Debug.Log(graph + " deleteUndo");
-                            foreach (KeyValuePair<GameObject, Graph> nodesAndGraph in del.deletedNodes)
-                            {
-                                if (nodesAndGraph.Key == node)
-                                {
-                                    Debug.Log(nodesAndGraph.Value);
-                                    nodesAndGraph.Value.AddNode(node);
-                                    nodesAndGraph.Value.FinalizeNodeHierarchy();
-                                }
-                            }
+                           if(gameObject.TryGetComponentOrLog<DeleteAction>(out DeleteAction delete)){
+
+                            Debug.Log("deletedNodes");
+                            Debug.Log(delete.deletedNodes.Values);
+                        }
                         }
                     }
 
