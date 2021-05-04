@@ -58,7 +58,7 @@ namespace SEE.Net
             {
                 Debug.Log("run");
                 GameObject gameObject = GameObject.Find(GameObjectID);
-              GameObject parentOfNode =  GameObject.Find(parentID);
+                GameObject parentOfNode =  GameObject.Find(parentID);
 
                 if (gameObject != null)
                 {
@@ -87,7 +87,6 @@ namespace SEE.Net
                             removeFromGarbage.Add(gameObject);
                             PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(removeFromGarbage)));
                             Node node = gameObject.GetNode();
-                            Debug.Log(node.ItsGraph);
                             GameNodeAdder.AddNodeToGraph(parentOfNode.GetNode(),gameObject.GetNode() );
                         }
                     }

@@ -282,7 +282,6 @@ namespace SEE.Controls.Actions
                 DeleteNode(deletedGameNode);
                 new DeleteNetAction(deletedGameNode.name).Execute(null);
                 parents.Add(deletedGameNode, deletedGameNode.GetNode().Parent.ID);
-                string parentID = deletedGameNode.GetNode().Parent.ID;
     
             }
             hadAnEffect = true;
@@ -304,8 +303,6 @@ namespace SEE.Controls.Actions
             {
                 Graph graph = nodeRef.Value.ItsGraph;
                 deletedNodes[gameNode] = graph;
-                Debug.Log(graph);
-                Debug.Log(nodeRef.Value);
                 graph.RemoveNode(nodeRef.Value);
                 graph.FinalizeNodeHierarchy(); 
             }
