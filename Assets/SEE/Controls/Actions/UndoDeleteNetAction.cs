@@ -61,12 +61,25 @@ namespace SEE.Net
                 Debug.Log("run");
                 GameObject gameObject = GameObject.Find(GameObjectID);
                 GameObject parentOfNode =  GameObject.Find(parentID);
+                Graph graphOfCity = parentOfNode.ContainingCity().LoadedGraph;
+
+                Debug.Log(graphOfCity + " graphofcity");
                 if (parentOfNode.HasNodeRef())
                 {
                     graph = parentOfNode.ItsGraph();
-                } else if (parentOfNode.HasEdgeRef()) 
+                    Debug.Log(graphOfCity + " graphNodeRef");
+
+                    // oder Graph über city holen 
+                    //parentOfNode.ContainingCity()
+                    // city.loaded graph
+                }
+                else if (parentOfNode.HasEdgeRef()) 
                 {
                     graph = parentOfNode.GetGraph();
+                    // oder Graph über city holen 
+                    //parentOfNode.ContainingCity()
+                    // city.loaded graph
+                    Debug.Log(graphOfCity + " graphEdgeRef");
                 }
 
                 if (gameObject != null)
