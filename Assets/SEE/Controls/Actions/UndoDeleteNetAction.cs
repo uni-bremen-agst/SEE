@@ -89,9 +89,12 @@ namespace SEE.Net
                             Node node = gameObject.GetNode();
                         //GameNodeAdder.AddNodeToGraph(parentOfNode.GetNode(),gameObject.GetNode() );
                             Graph graphOfNode = parentOfNode.ItsGraph();
+                        Debug.Log(graphOfNode);
                         if (!graphOfNode == null )
-                        { graphOfNode.AddNode(gameObject.GetNode()); 
-                        }
+                        { graphOfNode.AddNode(node);
+                            graphOfNode.FinalizeNodeHierarchy();
+                            node.ItsGraph = graphOfNode;
+                         }
                             
                         }
                     }

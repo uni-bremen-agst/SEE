@@ -302,8 +302,11 @@ namespace SEE.Controls.Actions
         {
             if (gameNode.TryGetComponentOrLog(out NodeRef nodeRef))
             {
+               
                 Graph graph = nodeRef.Value.ItsGraph;
                 deletedNodes[gameNode] = graph;
+                Debug.Log(graph);
+                Debug.Log("im deleteSkript");
                 graph.RemoveNode(nodeRef.Value);
                 graph.FinalizeNodeHierarchy(); 
             }
