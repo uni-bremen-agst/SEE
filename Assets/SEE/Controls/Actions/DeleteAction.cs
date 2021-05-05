@@ -307,7 +307,8 @@ namespace SEE.Controls.Actions
                 deletedNodes[gameNode] = graph;
                 Debug.Log(graph);
                 Debug.Log("im deleteSkript");
-                Debug.Log(parents.Values);
+                Debug.Log(parents.Values.ToString());
+                Debug.Log(parents.Keys);
                 graph.RemoveNode(nodeRef.Value);
                 graph.FinalizeNodeHierarchy(); 
             }
