@@ -97,20 +97,19 @@ namespace SEE.Controls.Actions
                         codeWindow.Title += $" ({selectedFile})";
                     }
 
-                    string path = Path.Combine(selectedPath, selectedFile);
+                   // string path = Path.Combine(selectedPath, selectedFile);
+                   // string content = File.ReadAllText(path);
+                   //
+                   // Java9Lexer lexer = new Java9Lexer(CharStreams.fromString(content));
+                   //
+                   // CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+                   // tokenStream.Fill();
+                   // foreach (IToken token in tokenStream.GetTokens())
+                   // {
+                   //     Debug.Log(lexer.Vocabulary.GetSymbolicName(token.Type);
+                   //
+                   // }
 
-                    string content = File.ReadAllText(path);
-
-                    Java9Lexer lexer = new Java9Lexer(CharStreams.fromString(content));
-
-                    CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-                    tokenStream.Fill();
-                    foreach (IToken token in tokenStream.GetTokens())
-                    {
-                        Debug.Log(token.Text + "has type" + token.Type);
-                    }
-
-                    //codeWindow.EnterFromText(content);
 
                     codeWindow.EnterFromFile($"{selectedPath}{selectedFile}"); // selectedPath has trailing /
                 }
