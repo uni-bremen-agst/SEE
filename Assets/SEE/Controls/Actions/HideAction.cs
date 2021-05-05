@@ -269,17 +269,20 @@ namespace SEE.Controls.Actions
 
                 List<GameObject> nodesEdges = GetAllChildrenRecursively(city.transform, new List<GameObject>());
 
-                List<GameObject> unselectedObjects = new List<GameObject>();
-
-                foreach (GameObject g in nodesEdges)
+                foreach (GameObject g in selectedObjects)
                 {
-                    if (!selectedObjects.Contains(g) && !g.name.Equals("implementation") && !g.name.Equals("architecture"))
+                    //remove all parent objects of selected object from list of nodes and edges
+                    Transform parent = g.transform.parent;
+                    while (parent != null)
                     {
-                        unselectedObjects.Add(g);
+                        nodesEdges.Remove(parent.gameObject);
+                        parent = parent.transform.parent;
                     }
+                    //remove selected object
+                    nodesEdges.Remove(g);
                 }
 
-                foreach (GameObject g in unselectedObjects)
+                foreach (GameObject g in nodesEdges)
                 {
                     Assert.IsTrue(g.HasNodeRef() || g.HasEdgeRef());
                     if (g.CompareTag(Tags.Edge))
