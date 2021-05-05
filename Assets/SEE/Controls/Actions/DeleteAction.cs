@@ -210,8 +210,8 @@ namespace SEE.Controls.Actions
                     edgeGraphPair.Value.AddEdge(edgeReference.Value);
                     PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.DelayEdges(edgeGraphPair.Key));
                     lastNode = edgeGraphPair.Key;
-                    parents.TryGetValue(lastNode, out string nodesID);
-                    new UndoDeleteNetAction(lastNode.name, nodesID).Execute(null);
+                   // parents.TryGetValue(lastNode, out string nodesID);
+                    new UndoDeleteNetAction(lastNode.name, parentsID).Execute(null);
                 }
                 
             }
@@ -255,8 +255,8 @@ namespace SEE.Controls.Actions
                 if (deletedGameNode.TryGetComponentOrLog(out NodeRef nodeRef))
                 {
                     ISet<string> attachedEdges = nodeRef.GetEdgeIds();
-                    parentsID = deletedGameNode.gameObject.GetNode().Parent.ID;
-                   
+                    parentsID = deletedGameNode.gameObject.GetNode().Parent.SourceName;
+                    Debug.Log(parentsID = deletedGameNode.gameObject.GetNode().Parent.SourceName);
                     foreach (GameObject edge in edgesInScene)
                     {
                         if (edge.activeInHierarchy && attachedEdges.Contains(edge.name))
