@@ -7,39 +7,67 @@ using SEE.Controls;
 
 namespace SEE.Game.UI3D
 {
+    /// <summary>
+    /// Properties of 3d ui-elements.
+    /// </summary>
     internal static class UI3DProperties
     {
-        public const float DefaultAlpha = 0.5f;
-        public static readonly Color DefaultColor = new Color(1.0f, 0.25f, 0.0f, DefaultAlpha);
-        public static readonly Color DefaultColorSecondary = new Color(1.0f, 0.75f, 0.0f, DefaultAlpha);
-        public static readonly Color DefaultColorTertiary = new Color(1.0f, 0.0f, 0.5f, DefaultAlpha);
-    }
-
-    internal class Cursor3D : MonoBehaviour
-    {
-        private const string OutlineShaderName = "Unlit/CursorOutlineShader";
-        private const string PlainColorShaderName = "Unlit/PlainColorShader";
+        /// <summary>
+        /// A plain color shader used for single-colored objects.
+        /// </summary>
+        internal const string PlainColorShaderName = "Unlit/PlainColorShader";
 
         /// <summary>
-        /// The list of Transforms currently in the focus.
+        /// The default alpha value used for various transparent ui-elements.
+        /// </summary>
+        internal const float DefaultAlpha = 0.5f;
+
+        /// <summary>
+        /// The default color of every 3d ui-element.
+        /// </summary>
+        internal static readonly Color DefaultColor = new Color(1.0f, 0.25f, 0.0f, DefaultAlpha);
+
+        /// <summary>
+        /// The secondary default color of every 3d ui-element.
+        /// </summary>
+        internal static readonly Color DefaultColorSecondary = new Color(1.0f, 0.75f, 0.0f, DefaultAlpha);
+
+        /// <summary>
+        /// The tertiary color of every 3d ui-element.
+        /// </summary>
+        internal static readonly Color DefaultColorTertiary = new Color(1.0f, 0.0f, 0.5f, DefaultAlpha);
+    }
+
+    /// <summary>
+    /// The cursor representing the center of the selected elements of a city visually. May be used
+    /// as e.g. center of rotation.
+    /// </summary>
+    internal class Cursor3D : MonoBehaviour
+    {
+        /// <summary>
+        /// The name of the shader used for the circular outline of the cursor.
+        /// </summary>
+        private const string OutlineShaderName = "Unlit/CursorOutlineShader";
+
+        /// <summary>
+        /// The focusses of the cursor.
         /// </summary>
         private List<InteractableObject> focusses;
 
-        private GameObject outline;
-        private Material outlineMaterial;
-
+        /// <summary>
+        /// The halved length of one axis line.
+        /// </summary>
         private float axisHalfLength;
-        private Material axisMaterial;
-
-        private bool hasRunThisFrame;
-
-        private Cursor3D()
-        {
-        }
 
         /// <summary>
-        /// Removes every Transform from <see cref="focusses"/> that has been
-        /// destroyed, i.e., for which == null holds (Unity has redefined operator ==).
+        /// The material of the axis used for rendering the axis as lines.
+        /// </summary>
+        private Material axisMaterial;
+
+        /// <summary>
+        /// Removes every <see cref="Transform"/> <code>t</code> from <see cref="focusses"/> that
+        /// has been destroyed, i.e., for which <code>t == null</code> holds (Unity has redefined
+        /// operator <code>==</code>).
         /// </summary>
         private void RemoveDestroyedTransforms()
         {
@@ -53,27 +81,36 @@ namespace SEE.Game.UI3D
             }
         }
 
+        /// <summary>
+        /// Creates a new cursor. The city name is only used in debug build.
+        /// </summary>
+        /// <param name="cityName">The name of the city, this cursor is used for.</param>
+        /// <returns></returns>
+#if UNITY_EDITOR
+        internal static Cursor3D Create(string cityName)
+        {
+            GameObject go = new GameObject("Cursor: " + cityName);
+#else
         internal static Cursor3D Create()
         {
-            GameObject go = new GameObject("Cursor");
+            GameObject go = new GameObject();
+#endif
             Cursor3D c = go.AddComponent<Cursor3D>();
 
             c.focusses = new List<InteractableObject>();
 
-            c.outline = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            Destroy(c.outline.GetComponent<MeshCollider>());
-            c.outline.transform.parent = go.transform;
-            c.outline.transform.localPosition = Vector3.zero;
-            c.outline.transform.localScale = Vector3.one;
-            c.outlineMaterial = new Material(Shader.Find(OutlineShaderName));
-            c.outlineMaterial.SetTexture("_MainTex", TextureGenerator.CreateCircleOutlineTextureR8(32, 31, 1.0f, 0.0f));
-            c.outlineMaterial.SetColor("_Color", UI3DProperties.DefaultColor);
-            c.outline.GetComponent<MeshRenderer>().sharedMaterial = c.outlineMaterial;
+            GameObject outlineGameObject = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            Destroy(outlineGameObject.GetComponent<MeshCollider>());
+            outlineGameObject.transform.parent = go.transform;
+            outlineGameObject.transform.localPosition = Vector3.zero;
+            outlineGameObject.transform.localScale = Vector3.one;
+            Material outlineMaterial = new Material(Shader.Find(OutlineShaderName));
+            outlineMaterial.SetTexture("_MainTex", TextureGenerator.CreateCircleOutlineTextureR8(32, 31, 1.0f, 0.0f));
+            outlineMaterial.SetColor("_Color", UI3DProperties.DefaultColor);
+            outlineGameObject.GetComponent<MeshRenderer>().sharedMaterial = outlineMaterial;
 
-            c.axisMaterial = new Material(Shader.Find(PlainColorShaderName));
+            c.axisMaterial = new Material(Shader.Find(UI3DProperties.PlainColorShaderName));
             c.axisMaterial.SetColor("_Color", Color.black);
-
-            c.hasRunThisFrame = false;
 
             c.gameObject.SetActive(false);
 
@@ -82,25 +119,23 @@ namespace SEE.Game.UI3D
 
         private void Update()
         {
-            hasRunThisFrame = false;
             RemoveDestroyedTransforms();
+            gameObject.SetActive(focusses.Count != 0);
             if (focusses.Count != 0)
             {
-                transform.position = GetPosition();
+                transform.position = ComputeCenter();
                 axisHalfLength = 0.01f * (MainCamera.Camera.transform.position - transform.position).magnitude;
             }
         }
 
         private void OnRenderObject()
         {
-            if (!hasRunThisFrame && HasFocus() && axisHalfLength > 0.0f)
+            if (HasFocus() && axisHalfLength > 0.0f)
             {
-                hasRunThisFrame = true;
-
                 axisMaterial.SetPass(0);
                 GL.Begin(GL.LINES);
                 {
-                    Vector3 c = GetPosition();
+                    Vector3 c = ComputeCenter();
                     GL.Vertex(new Vector3(c.x - axisHalfLength, c.y, c.z));
                     GL.Vertex(new Vector3(c.x + axisHalfLength, c.y, c.z));
                     GL.Vertex(new Vector3(c.x, c.y - axisHalfLength, c.z));
@@ -112,20 +147,30 @@ namespace SEE.Game.UI3D
             }
         }
 
+        /// <summary>
+        /// Whether the cursor has a focus.
+        /// </summary>
+        /// <returns></returns>
         public bool HasFocus()
         {
             RemoveDestroyedTransforms();
             return focusses.Count != 0;
         }
 
-        public InteractableObject[] GetFocusses()
+        /// <summary>
+        /// Returns the current focusses as an array.
+        /// </summary>
+        /// <returns>The current focusses as an array.</returns>
+        public IEnumerable<InteractableObject> GetFocusses()
         {
             RemoveDestroyedTransforms();
-            InteractableObject[] result = new InteractableObject[focusses.Count];
-            focusses.CopyTo(result);
-            return result;
+            return focusses;
         }
 
+        /// <summary>
+        /// Adds a focus to the focussed objects of the cursor.
+        /// </summary>
+        /// <param name="focus">The new additional focus.</param>
         public void AddFocus(InteractableObject focus)
         {
             if (focus && !focusses.Contains(focus))
@@ -135,6 +180,10 @@ namespace SEE.Game.UI3D
             }
         }
 
+        /// <summary>
+        /// Removed a focus from the focussed objects of the cursor.
+        /// </summary>
+        /// <param name="focus">The focus to be removed.</param>
         public void RemoveFocus(InteractableObject focus)
         {
             if (focus)
@@ -144,6 +193,10 @@ namespace SEE.Game.UI3D
             }
         }
 
+        /// <summary>
+        /// Replaces the focusses by given focusses.
+        /// </summary>
+        /// <param name="focusses">The new focusses.</param>
         public void ReplaceFocusses(List<InteractableObject> focusses)
         {
             if (focusses != null && focusses.Count != 0)
@@ -158,6 +211,10 @@ namespace SEE.Game.UI3D
             }
         }
 
+        /// <summary>
+        /// Replaces the focus by given object.
+        /// </summary>
+        /// <param name="focus">The new focus.</param>
         public void ReplaceFocus(InteractableObject focus)
         {
             if (focus != null)
@@ -173,47 +230,67 @@ namespace SEE.Game.UI3D
             }
         }
 
-        public Vector3 GetPosition()
+        /// <summary>
+        /// Computes and returns the current center of the cursor.
+        /// </summary>
+        /// <returns>The center of the cursor.</returns>
+        public Vector3 ComputeCenter()
         {
-            Vector3 result = Vector3.zero;
-
             RemoveDestroyedTransforms();
 
+            Vector3 result;
             if (focusses.Count == 1)
             {
                 result = focusses[0].transform.position;
             }
             else
             {
-                Assert.IsTrue(focusses.Count == 2);
-                GetMostDistantFocussesXZ(out Transform _, out Transform _, out float _, out float _, out float _, out result);
+                Assert.IsTrue(focusses.Count >= 2);
+                GetFarthestSpacedOutFocussesXZ(out Transform _, out Transform _, out float _, out float _, out float _, out result);
             }
 
             return result;
         }
 
-        public float GetDiameterXZ()
+        /// <summary>
+        /// Computes and returns the distance between the two farthest spaced out focusses' outer
+        /// edges on the XZ-plane.
+        /// </summary>
+        /// <returns>The distance between the two farthest spaced out focusses' outer edges on the
+        /// XZ-plane.</returns>
+        public float ComputeDiameterXZ()
         {
-            float result = 0.0f;
-
             RemoveDestroyedTransforms();
 
+            float result;
             if (focusses.Count == 1)
             {
                 result = focusses[0].transform.lossyScale.x;
             }
             else
             {
-                GetMostDistantFocussesXZ(out Transform _, out Transform _, out float _, out float _, out result, out Vector3 _);
+                GetFarthestSpacedOutFocussesXZ(out _, out _, out _, out _, out result, out _);
             }
 
             return result;
         }
 
-        private void GetMostDistantFocussesXZ(
-            out Transform focus0, out Transform focus1,
-            out float radius0, out float radius1,
-            out float diameter, out Vector3 center)
+        /// <summary>
+        /// Computes the farthest spaced out focusses and outputs some properties.
+        /// </summary>
+        /// <param name="focus0">The 1st found focus.</param>
+        /// <param name="focus1">The 2nd found focus.</param>
+        /// <param name="radius0">The radius of the 1st found focus.</param>
+        /// <param name="radius1">The radius of the 2nd found focus.</param>
+        /// <param name="diameter">The distance between the two focusses' outer edges.</param>
+        /// <param name="center">The center between the two focusses.</param>
+        private void GetFarthestSpacedOutFocussesXZ(
+            out Transform focus0,
+            out Transform focus1,
+            out float radius0,
+            out float radius1,
+            out float diameter,
+            out Vector3 center)
         {
             Assert.IsTrue(focusses.Count >= 2);
 
@@ -282,17 +359,40 @@ namespace SEE.Game.UI3D
         }
     }
 
+    /// <summary>
+    /// This gizmo represents the movement of elements of a city visually.
+    /// </summary>
     internal class MoveGizmo : MonoBehaviour
     {
-        private const string PlainColorShaderName = "Unlit/PlainColorShader";
-
+        /// <summary>
+        /// The start position of the movement visualization.
+        /// </summary>
         private Vector3 start;
+
+        /// <summary>
+        /// The end position of the movement visualization.
+        /// </summary>
         private Vector3 end;
 
-        private Material planeMaterial;
-        private Material axisMaterial;
-        private Material lineMaterial;
+        /// <summary>
+        /// The material of the filled rectangle.
+        /// </summary>
+        private Material fillRectangleMaterial;
 
+        /// <summary>
+        /// The material for the outlined rectangle.
+        /// </summary>
+        private Material outlineRectangleMaterial;
+        
+        /// <summary>
+        /// The material of the line between the start- and end-position.
+        /// </summary>
+        private Material directLineMaterial;
+
+        /// <summary>
+        /// Creates a new move-gizmo.
+        /// </summary>
+        /// <returns>The gizmo.</returns>
         internal static MoveGizmo Create()
         {
             GameObject go = new GameObject("MovePivot");
@@ -301,13 +401,13 @@ namespace SEE.Game.UI3D
             p.start = Vector3.zero;
             p.end = Vector3.zero;
 
-            Shader shader = Shader.Find(PlainColorShaderName);
-            p.planeMaterial = new Material(shader);
-            p.axisMaterial = new Material(shader);
-            p.lineMaterial = new Material(shader);
-            p.planeMaterial.SetColor("_Color", new Color(0.5f, 0.5f, 0.5f, 0.2f * UI3DProperties.DefaultAlpha));
-            p.axisMaterial.SetColor("_Color", new Color(0.0f, 0.0f, 0.0f, 0.5f * UI3DProperties.DefaultAlpha));
-            p.lineMaterial.SetColor("_Color", UI3DProperties.DefaultColor);
+            Shader shader = Shader.Find(UI3DProperties.PlainColorShaderName);
+            p.fillRectangleMaterial = new Material(shader);
+            p.outlineRectangleMaterial = new Material(shader);
+            p.directLineMaterial = new Material(shader);
+            p.fillRectangleMaterial.SetColor("_Color", new Color(0.5f, 0.5f, 0.5f, 0.2f * UI3DProperties.DefaultAlpha));
+            p.outlineRectangleMaterial.SetColor("_Color", new Color(0.0f, 0.0f, 0.0f, 0.5f * UI3DProperties.DefaultAlpha));
+            p.directLineMaterial.SetColor("_Color", UI3DProperties.DefaultColor);
 
             go.SetActive(false);
 
@@ -316,7 +416,7 @@ namespace SEE.Game.UI3D
 
         private void OnRenderObject()
         {
-            planeMaterial.SetPass(0);
+            fillRectangleMaterial.SetPass(0);
             GL.Begin(GL.QUADS);
             {
                 GL.Vertex(start);
@@ -326,7 +426,7 @@ namespace SEE.Game.UI3D
             }
             GL.End();
 
-            axisMaterial.SetPass(0);
+            outlineRectangleMaterial.SetPass(0);
             GL.Begin(GL.LINES);
             {
                 GL.Vertex(start);
@@ -341,7 +441,7 @@ namespace SEE.Game.UI3D
             }
             GL.End();
 
-            lineMaterial.SetPass(0);
+            directLineMaterial.SetPass(0);
             GL.Begin(GL.LINES);
             {
                 GL.Vertex(start);
@@ -350,6 +450,11 @@ namespace SEE.Game.UI3D
             GL.End();
         }
 
+        /// <summary>
+        /// Sets the start- and end-position of the movement visualization.
+        /// </summary>
+        /// <param name="startPoint">The new start point.</param>
+        /// <param name="endPoint">The new end point.</param>
         internal void SetPositions(Vector3 startPoint, Vector3 endPoint)
         {
             start = startPoint;
@@ -357,18 +462,72 @@ namespace SEE.Game.UI3D
         }
     }
 
+    /// <summary>
+    /// This gizmo visually represents a rotation of an object.
+    /// </summary>
     public class RotateGizmo : MonoBehaviour
     {
-        private const string PivotOutlineShaderName = "Unlit/RotationGizmoShader";
-        private const float Alpha = 0.5f;
+        /// <summary>
+        /// The name of the material responsible for rendering the circular rotation visualization.
+        /// </summary>
+        private const string RotateGizmoShaderName = "Unlit/RotateGizmoShader";
 
+        /// <summary>
+        /// The center of the rotation.
+        /// </summary>
         public Vector3 Center { get => transform.position; set => transform.position = value; }
+
+        /// <summary>
+        /// The radius of the gizmo.
+        /// </summary>
         public float Radius { get => transform.localScale.x; set => transform.localScale = new Vector3(value, value, value); }
 
+        /// <summary>
+        /// The material responsible for rendering the circular rotation visualization.
+        /// </summary>
         private Material material;
-        private float minAngle;
-        private float maxAngle;
 
+        /// <summary>
+        /// <see cref="StartAngle"/>
+        /// </summary>
+        private float startAngle;
+
+        /// <summary>
+        /// The start angle of the rotation.
+        /// </summary>
+        internal float StartAngle
+        {
+            get => startAngle;
+            set
+            {
+                startAngle = value;
+                material.SetFloat("_MinAngle", value);
+            }
+        }
+
+        /// <summary>
+        /// <see cref="TargetAngle"/>
+        /// </summary>
+        private float targetAngle;
+
+        /// <summary>
+        /// The target angle of the rotation.
+        /// </summary>
+        internal float TargetAngle
+        {
+            get => targetAngle;
+            set
+            {
+                targetAngle = value;
+                material.SetFloat("_MaxAngle", value);
+            }
+        }
+
+        /// <summary>
+        /// Creates a rotation gizmo.
+        /// </summary>
+        /// <param name="textureResolution">The resolution of the outline texture.</param>
+        /// <returns>The gizmo.</returns>
         internal static RotateGizmo Create(int textureResolution)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Quad);
@@ -382,37 +541,15 @@ namespace SEE.Game.UI3D
             int outer = textureResolution / 2;
             int inner = Mathf.RoundToInt(outer * 0.98f);
 
-            p.material = new Material(Shader.Find(PivotOutlineShaderName));
-            p.material.SetTexture("_MainTex", TextureGenerator.CreateCircleOutlineTextureR8(outer, inner, Alpha, 0.0f));
-            p.material.SetFloat("_Alpha", Alpha);
+            p.material = new Material(Shader.Find(RotateGizmoShaderName));
+            p.material.SetTexture("_MainTex", TextureGenerator.CreateCircleOutlineTextureR8(outer, inner, UI3DProperties.DefaultAlpha, 0.0f));
+            p.material.SetColor("_Color", UI3DProperties.DefaultColor);
+            p.material.SetFloat("_Alpha", UI3DProperties.DefaultAlpha);
 
             go.GetComponent<MeshRenderer>().sharedMaterial = p.material;
             go.SetActive(false);
 
             return p;
-        }
-
-        internal float GetMinAngle()
-        {
-            return minAngle;
-        }
-
-        internal float GetMaxAngle()
-        {
-            return maxAngle;
-        }
-
-        internal void SetMinAngle(float minAngleRadians)
-        {
-            minAngle = minAngleRadians;
-            material.SetFloat("_MinAngle", minAngleRadians);
-        }
-
-        internal void SetMaxAngle(float maxAngleRadians)
-        {
-            maxAngle = maxAngleRadians;
-            material.SetFloat("_MaxAngle", maxAngleRadians);
-            material.SetColor("_Color", UI3DProperties.DefaultColor);
         }
     }
 }

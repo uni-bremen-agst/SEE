@@ -1,10 +1,10 @@
 ﻿#if UNITY_EDITOR
 
-using System.Linq;
 using SEE;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Utils;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;

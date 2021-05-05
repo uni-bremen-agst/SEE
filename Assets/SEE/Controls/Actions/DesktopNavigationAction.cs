@@ -130,7 +130,7 @@ namespace SEE.Controls.Actions
                 actionState.zoomToggleToObject = false;
                 if (cursor.E.HasFocus())
                 {
-                    float optimalTargetZoomFactor = portalPlane.MinLengthXZ / (cursor.E.GetDiameterXZ() / zoomState.currentZoomFactor);
+                    float optimalTargetZoomFactor = portalPlane.MinLengthXZ / (cursor.E.ComputeDiameterXZ() / zoomState.currentZoomFactor);
                     float optimalTargetZoomSteps = ConvertZoomFactorToZoomSteps(optimalTargetZoomFactor);
                     int actualTargetZoomSteps = Mathf.FloorToInt(optimalTargetZoomSteps);
                     float actualTargetZoomFactor = ConvertZoomStepsToZoomFactor(actualTargetZoomSteps);
@@ -145,7 +145,7 @@ namespace SEE.Controls.Actions
                     if (zoomSteps != 0)
                     {
                         float zoomFactor = ConvertZoomStepsToZoomFactor(zoomSteps);
-                        Vector2 centerOfTableAfterZoom = zoomSteps == -(int)zoomState.currentTargetZoomSteps ? CityTransform.position.XZ() : cursor.E.GetPosition().XZ();
+                        Vector2 centerOfTableAfterZoom = zoomSteps == -(int)zoomState.currentTargetZoomSteps ? CityTransform.position.XZ() : cursor.E.ComputeCenter().XZ();
                         Vector2 toCenterOfTable = portalPlane.CenterXZ - centerOfTableAfterZoom;
                         Vector2 zoomCenter = portalPlane.CenterXZ - (toCenterOfTable * (zoomFactor / (zoomFactor - 1.0f)));
                         float duration = 2.0f * ZoomState.DefaultZoomDuration;

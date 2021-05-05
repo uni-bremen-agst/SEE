@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.MixedReality.Toolkit.Input;
+﻿using Microsoft.MixedReality.Toolkit.Input;
 using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Valve.VR.InteractionSystem;
@@ -166,10 +167,10 @@ namespace SEE.Controls
             return (Edge)GraphElemRef.elem;
         }
 
-        public Graph ItsGraph()
-        {
-            return GraphElemRef.elem.ItsGraph;
-        }
+        /// <summary>
+        /// <see cref="GraphElement.ItsGraph"/>
+        /// </summary>
+        public Graph ItsGraph => GraphElemRef.elem.ItsGraph;
 
         /// <summary>
         /// A bit vector for hovering flags. Each flag is a bit as defined in <see cref="HoverFlag"/>.
@@ -305,8 +306,19 @@ namespace SEE.Controls
         /// <param name="isInitiator">Whether this client is initiating the hovering action.</param>
         public void SetHoverFlags(uint hoverFlags, bool isInitiator)
         {
-            Assert.IsTrue(HoverFlags != hoverFlags);
-
+#if UNITY_EDITOR
+            if (hoverFlags == HoverFlags)
+            {
+                string message = "Flags to be set are identical to the active flags. Active flags:";
+                HoverFlag[] flags = (HoverFlag[])Enum.GetValues(typeof(HoverFlag));
+                foreach (HoverFlag flag in flags)
+                {
+                    message += "\n\t" + flag.ToString() + ": " + (IsHoverFlagSet(flag) ? "Yes" : "No");
+                }
+                Debug.LogWarning(message);
+                return;
+            }
+#endif
             HoverFlags = hoverFlags;
 
             if (IsHovered)
@@ -453,10 +465,18 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Deselects all currently selected interactable objects.
+        /// Deselects all currently selected interactable objects and invokes the
+        /// <see cref="ReplaceSelect"/> event.
         /// </summary>
         /// <param name="isInitiator">Whether this client is initiating the action.</param>
         public static void UnselectAll(bool isInitiator) => UnselectAllInternal(isInitiator, true);
+
+        /// <summary>
+        /// Deselects all currently selected interactable objects and invokes the
+        /// <see cref="ReplaceSelect"/> event, if <paramref name="invokeReplaceEvent"/> is true.
+        /// </summary>
+        /// <param name="isInitiator">Whether this client is initiating the action.</param>
+        /// <param name="invokeReplaceEvent">Whether the replace event should be invoked.</param>
         private static void UnselectAllInternal(bool isInitiator, bool invokeReplaceEvent)
         {
             List<InteractableObject> replaced = SelectedObjects.ToList();
@@ -476,6 +496,12 @@ namespace SEE.Controls
             }
         }
 
+        /// <summary>
+        /// Replaces current selection by <paramref name="interactableObject"/> and invokes the
+        /// replace event.
+        /// </summary>
+        /// <param name="interactableObject">The new selected object.</param>
+        /// <param name="isInitiator">Whether this client is initiating the action.</param>
         public static void ReplaceSelection(InteractableObject interactableObject, bool isInitiator)
         {
             List<InteractableObject> replaced = SelectedObjects.ToList();
@@ -834,8 +860,8 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseEnter()
         {
-            // Debug.LogFormat("{0}.OnMouseEnter({1}) @ {2}\n", this.GetType().FullName, gameObject.name, Time.time);
-            if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer && !Raycasting.IsMouseOverGUI())
+            bool isDesktopPlayer = PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer;
+            if (isDesktopPlayer && !Raycasting.IsMouseOverGUI())
             {
                 SetHoverFlag(HoverFlag.World, true, true);
             }
@@ -846,17 +872,18 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseOver()
         {
-            if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer)
+            bool isDesktopPlayer = PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer;
+            if (isDesktopPlayer)
             {
-                // Does this mouse event relate to a city-world object (game node or edge)?
-                bool isWorldBitSet = (HoverFlags & (uint)HoverFlag.World) != 0;
-                if (isWorldBitSet && Raycasting.IsMouseOverGUI())
+                bool isFlagSet = IsHoverFlagSet(HoverFlag.World);
+                bool isMouseOverGUI = Raycasting.IsMouseOverGUI();
+                if (isFlagSet && isMouseOverGUI)
                 {
-                    SetHoverFlag(HoverFlag.World, setFlag: false, isInitiator: true);
+                    SetHoverFlag(HoverFlag.World, false, true);
                 }
-                else if (!isWorldBitSet && !Raycasting.IsMouseOverGUI())
+                else if (!isFlagSet && !isMouseOverGUI)
                 {
-                    SetHoverFlag(HoverFlag.World, setFlag: true, isInitiator: true);
+                    SetHoverFlag(HoverFlag.World, true, true);
                 }
             }
         }
@@ -866,9 +893,10 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseExit()
         {
-            if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer && !Raycasting.IsMouseOverGUI())
+            bool isDesktopPlayer = PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer;
+            if (isDesktopPlayer && IsHoverFlagSet(HoverFlag.World))
             {
-                SetHoverFlag(HoverFlag.World, setFlag: false, isInitiator: true);
+                SetHoverFlag(HoverFlag.World, false, true);
             }
         }
         

@@ -111,7 +111,7 @@ namespace SEE.Controls.Actions
                 }
                 else if (obj)
                 {
-                    InteractableObject.UnselectAllInGraph(obj.ItsGraph(), true); // TODO(torben): this should be in SelectAction.cs
+                    InteractableObject.UnselectAllInGraph(obj.ItsGraph, true); // TODO(torben): this should be in SelectAction.cs
                 }
             }
             else if (SEEInput.Drag()) // start or continue rotation
@@ -132,7 +132,7 @@ namespace SEE.Controls.Actions
                             o.SetGrab(true, true);
                         }
                         gizmo.gameObject.SetActive(true);
-                        gizmo.Center = cursor.E.HasFocus() ? hit.cursor.E.GetPosition() : hit.root.position;
+                        gizmo.Center = cursor.E.HasFocus() ? hit.cursor.E.ComputeCenter() : hit.root.position;
 
                         Vector2 toHit = planeHitPoint.XZ() - gizmo.Center.XZ();
                         float toHitAngle = toHit.Angle360();
@@ -140,8 +140,8 @@ namespace SEE.Controls.Actions
                         originalEulerAngleY = root.rotation.eulerAngles.y;
                         originalPosition = root.position;
                         startAngle = AngleMod(root.rotation.eulerAngles.y - toHitAngle);
-                        gizmo.SetMinAngle(Mathf.Deg2Rad * toHitAngle);
-                        gizmo.SetMaxAngle(Mathf.Deg2Rad * toHitAngle);
+                        gizmo.StartAngle = Mathf.Deg2Rad * toHitAngle;
+                        gizmo.TargetAngle = Mathf.Deg2Rad * toHitAngle;
                     }
                 }
 
@@ -156,7 +156,7 @@ namespace SEE.Controls.Actions
                     }
                     hit.root.RotateAround(gizmo.Center, Vector3.up, angle - hit.root.rotation.eulerAngles.y);
 
-                    float prevAngle = Mathf.Rad2Deg * gizmo.GetMaxAngle();
+                    float prevAngle = Mathf.Rad2Deg * gizmo.TargetAngle;
                     float currAngle = toHitAngle;
 
                     while (Mathf.Abs(currAngle + 360.0f - prevAngle) < Mathf.Abs(currAngle - prevAngle))
@@ -171,7 +171,7 @@ namespace SEE.Controls.Actions
                     {
                         currAngle = Mathf.Round((currAngle + startAngle) / (SnapStepAngle)) * (SnapStepAngle) - startAngle;
                     }
-                    gizmo.SetMaxAngle(Mathf.Deg2Rad * currAngle);
+                    gizmo.TargetAngle = Mathf.Deg2Rad * currAngle;
 
                     synchronize = true;
                 }
@@ -189,7 +189,7 @@ namespace SEE.Controls.Actions
                     }
                     gizmo.gameObject.SetActive(false);
 
-                    root.RotateAround(cursor.E.HasFocus() ? cursor.E.GetPosition() : root.position, Vector3.up, -root.rotation.eulerAngles.y);
+                    root.RotateAround(cursor.E.HasFocus() ? cursor.E.ComputeCenter() : root.position, Vector3.up, -root.rotation.eulerAngles.y);
                     synchronize = true;
                 }
             }
