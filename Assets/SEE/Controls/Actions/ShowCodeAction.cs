@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.IO;
+using System.Linq;
+using Antlr4.Runtime;
 using SEE.Game.UI.CodeWindow;
 using SEE.GO;
 using SEE.Net;
@@ -94,6 +97,21 @@ namespace SEE.Controls.Actions
                         codeWindow.Title += $" ({selectedFile})";
                     }
 
+                    string path = Path.Combine(selectedPath, selectedFile);
+
+                    string content = File.ReadAllText(path);
+
+                    Java9Lexer lexer = new Java9Lexer(CharStreams.fromString(content));
+
+                    CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+                    tokenStream.Fill();
+                    foreach (IToken token in tokenStream.GetTokens())
+                    {
+                        Debug.Log(token.Text + "has type" + token.Type);
+                    }
+
+                    //codeWindow.EnterFromText(content);
+
                     codeWindow.EnterFromFile($"{selectedPath}{selectedFile}"); // selectedPath has trailing /
                 }
 
@@ -113,6 +131,11 @@ namespace SEE.Controls.Actions
                 spaceManager[CodeSpaceManager.LOCAL_PLAYER].ActiveCodeWindow = codeWindow;
                 //TODO: Set font size etc per SEECity settings (maybe, or maybe that's too much)
             }
+        }
+
+        private void Java9LexerBase()
+        {
+            throw new NotImplementedException();
         }
 
         private void LocalAnySelectIn(InteractableObject interactableObject)
