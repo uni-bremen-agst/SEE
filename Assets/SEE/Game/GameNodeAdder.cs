@@ -96,7 +96,7 @@ namespace SEE.Game
             {
                 Node node = NewGraphNode(nodeID);
                 AddNodeToGraph(parent.GetNode(), node);
-                GameObject result = city.Renderer.NewLeafNode(node);
+                GameObject result = city.Renderer.DrawLeafNode(node);
                 result.transform.localScale = worldSpaceScale;
                 result.transform.position = position;
                 result.transform.SetParent(parent.transform);
