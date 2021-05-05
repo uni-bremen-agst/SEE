@@ -256,10 +256,7 @@ namespace SEE.Controls.Actions
                 {
                     ISet<string> attachedEdges = nodeRef.GetEdgeIds();
                     parentsID = deletedGameNode.gameObject.GetNode().Parent.ID;
-                    GameObject GOparents = deletedGameNode.GetComponentInParent<GameObject>();
-
-                    Debug.Log(GOparents.name);
-
+                   
                     foreach (GameObject edge in edgesInScene)
                     {
                         if (edge.activeInHierarchy && attachedEdges.Contains(edge.name))
@@ -276,16 +273,18 @@ namespace SEE.Controls.Actions
             // Now delete the incoming and outgoing edges.
             foreach (GameObject implicitlyDeletedEdge in implicitlyDeletedEdges)
             {
-                DeleteEdge(implicitlyDeletedEdge);
                 parents.Add(implicitlyDeletedEdge, parentsID);
+                DeleteEdge(implicitlyDeletedEdge);
+                
                 new DeleteNetAction(implicitlyDeletedEdge.name).Execute(null);
             }
 
             // Finally, we remove the nodes themselves.
             foreach (GameObject deletedGameNode in gameNodesToDelete)
             {
-                DeleteNode(deletedGameNode);
                 parents.Add(deletedGameNode, deletedGameNode.GetNode().Parent.ID);
+                DeleteNode(deletedGameNode);
+              
                 new DeleteNetAction(deletedGameNode.name).Execute(null);
                 
     
