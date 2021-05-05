@@ -178,7 +178,7 @@ namespace SEE.Controls.Actions
         {
             base.Undo();
             GameObject lastNode = null;
-            Graph graphInDeletedNodes = null;
+            string parentsID = "";
             // Re-add all nodes to their graphs.
 
             foreach (KeyValuePair<GameObject, Graph> nodeGraphPair in deletedNodes)
@@ -190,11 +190,11 @@ namespace SEE.Controls.Actions
                         nodeGraphPair.Value.AddNode(nodeRef.Value);
                     }
                     lastNode = nodeGraphPair.Key;
-                    graphInDeletedNodes = nodeGraphPair.Value;
                    if(parents.TryGetValue(lastNode, out string parentID))
                     {
                         new UndoDeleteNetAction(lastNode.name, parentID).Execute(null);
                         parents.Remove(lastNode);
+                        parentsID = parentID;
                     }
                 }
                
@@ -212,7 +212,7 @@ namespace SEE.Controls.Actions
                     PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.DelayEdges(edgeGraphPair.Key));
                     lastNode = edgeGraphPair.Key;
                     
-                    new UndoDeleteNetAction(lastNode.name, null).Execute(null);
+                    new UndoDeleteNetAction(lastNode.name, parentsID).Execute(null);
                 }
                 
             }
@@ -274,6 +274,7 @@ namespace SEE.Controls.Actions
             foreach (GameObject implicitlyDeletedEdge in implicitlyDeletedEdges)
             {
                 DeleteEdge(implicitlyDeletedEdge);
+                parents.Add(implicitlyDeletedEdge, implicitlyDeletedEdge.name);
                 new DeleteNetAction(implicitlyDeletedEdge.name).Execute(null);
             }
 
@@ -281,8 +282,9 @@ namespace SEE.Controls.Actions
             foreach (GameObject deletedGameNode in gameNodesToDelete)
             {
                 DeleteNode(deletedGameNode);
-                new DeleteNetAction(deletedGameNode.name).Execute(null);
                 parents.Add(deletedGameNode, deletedGameNode.GetNode().Parent.ID);
+                new DeleteNetAction(deletedGameNode.name).Execute(null);
+                
     
             }
             hadAnEffect = true;
