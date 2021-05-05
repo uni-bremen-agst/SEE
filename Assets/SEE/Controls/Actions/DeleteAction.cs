@@ -256,6 +256,7 @@ namespace SEE.Controls.Actions
                 {
                     ISet<string> attachedEdges = nodeRef.GetEdgeIds();
                     parentsID = deletedGameNode.GetNode().Parent.ID;
+                    Debug.Log(parentsID);
                     foreach (GameObject edge in edgesInScene)
                     {
                         if (edge.activeInHierarchy && attachedEdges.Contains(edge.name))
