@@ -1,4 +1,4 @@
-﻿Shader "Unlit/RotationGizmoShader"
+﻿Shader "Unlit/RotateGizmoShader"
 {
     Properties
     {

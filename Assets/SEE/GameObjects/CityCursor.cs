@@ -17,7 +17,11 @@ namespace SEE.GO
             if (TryGetComponent(out SEECity city))
             {
                 this.city = city;
+#if UNITY_EDITOR
+                E = Cursor3D.Create(city.name);
+#else
                 E = Cursor3D.Create();
+#endif
 
                 InteractableObject.AnySelectIn += AnySelectIn;
                 InteractableObject.AnySelectOut += AnySelectOut;
