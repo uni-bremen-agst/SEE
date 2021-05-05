@@ -59,6 +59,7 @@ namespace SEE.Net
                 Debug.Log("run");
                 GameObject gameObject = GameObject.Find(GameObjectID);
                 GameObject parentOfNode =  GameObject.Find(parentID);
+                Graph graphOfNode = parentOfNode.ItsGraph();
 
                 if (gameObject != null)
                 {
@@ -72,11 +73,11 @@ namespace SEE.Net
                         {
                             try
                             {
-                               // graph.AddEdge(edgeReference.Value);
+                                 graphOfNode.AddEdge(edgeReference.Value);
                             }
                             catch (Exception e)
                             {
-
+                                Debug.Log("edgeReference canot be added");
                             }
                         }
                     }
@@ -87,18 +88,14 @@ namespace SEE.Net
                             removeFromGarbage.Add(gameObject);
                             PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(removeFromGarbage)));
                             Node node = gameObject.GetNode();
-                        //GameNodeAdder.AddNodeToGraph(parentOfNode.GetNode(),gameObject.GetNode() );
-                            Graph graphOfNode = parentOfNode.ItsGraph();
-                        Debug.Log(graphOfNode);
-                        if (!graphOfNode == null)
+                            //GameNodeAdder.AddNodeToGraph(parentOfNode.GetNode(),gameObject.GetNode() );
 
-                            
-                        {
+                            Debug.Log(graphOfNode);
                             Debug.Log("adding node to graph");
                             graphOfNode.AddNode(node);
                             graphOfNode.FinalizeNodeHierarchy();
                             node.ItsGraph = graphOfNode;
-                         }
+                         
                             
                         }
                     }
