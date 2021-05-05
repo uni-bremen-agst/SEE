@@ -256,7 +256,7 @@ namespace SEE.Controls.Actions
                 {
                     ISet<string> attachedEdges = nodeRef.GetEdgeIds();
                     parentsID = deletedGameNode.gameObject.GetNode().Parent.ID;
-                    GameObject GOparents = deletedGameNode.gameObject.GetComponentInParent<GameObject>();
+                    GameObject GOparents = deletedGameNode.GetComponentInParent<GameObject>();
 
                     Debug.Log(GOparents.name);
 
