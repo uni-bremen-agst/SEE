@@ -193,7 +193,6 @@ namespace SEE.Controls.Actions
                    if(parents.TryGetValue(lastNode, out string parentID))
                     {
                         new UndoDeleteNetAction(lastNode.name, parentID).Execute(null);
-                        parents.Remove(lastNode);
                         parentsID = parentID;
                     }
                 }
@@ -211,8 +210,8 @@ namespace SEE.Controls.Actions
                     edgeGraphPair.Value.AddEdge(edgeReference.Value);
                     PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.DelayEdges(edgeGraphPair.Key));
                     lastNode = edgeGraphPair.Key;
-                    
-                    new UndoDeleteNetAction(lastNode.name, parentsID).Execute(null);
+                    parents.TryGetValue(lastNode, out string nodesID);
+                    new UndoDeleteNetAction(lastNode.name, nodesID).Execute(null);
                 }
                 
             }
@@ -248,7 +247,7 @@ namespace SEE.Controls.Actions
         public void MarkAsDeleted(IList<GameObject> gameNodesToDelete)
         {
             ISet<GameObject> edgesInScene = new HashSet<GameObject>(GameObject.FindGameObjectsWithTag(Tags.Edge));
-
+            string parentsID = "";
             // First identify all incoming and outgoing edges for all nodes in gameNodesToDelete
             HashSet<GameObject> implicitlyDeletedEdges = new HashSet<GameObject>();
             foreach (GameObject deletedGameNode in gameNodesToDelete)
@@ -256,7 +255,7 @@ namespace SEE.Controls.Actions
                 if (deletedGameNode.TryGetComponentOrLog(out NodeRef nodeRef))
                 {
                     ISet<string> attachedEdges = nodeRef.GetEdgeIds();
-
+                    parentsID = deletedGameNode.GetNode().Parent.ID;
                     foreach (GameObject edge in edgesInScene)
                     {
                         if (edge.activeInHierarchy && attachedEdges.Contains(edge.name))
@@ -274,7 +273,7 @@ namespace SEE.Controls.Actions
             foreach (GameObject implicitlyDeletedEdge in implicitlyDeletedEdges)
             {
                 DeleteEdge(implicitlyDeletedEdge);
-                parents.Add(implicitlyDeletedEdge, implicitlyDeletedEdge.name);
+                parents.Add(implicitlyDeletedEdge, parentsID);
                 new DeleteNetAction(implicitlyDeletedEdge.name).Execute(null);
             }
 
