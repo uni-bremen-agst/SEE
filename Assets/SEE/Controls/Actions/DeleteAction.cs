@@ -255,6 +255,11 @@ namespace SEE.Controls.Actions
                 if (deletedGameNode.TryGetComponentOrLog(out NodeRef nodeRef))
                 {
                     ISet<string> attachedEdges = nodeRef.GetEdgeIds();
+                    parentsID = deletedGameNode.gameObject.GetNode().Parent.ID;
+                    Node parNoderef = deletedGameNode.GetNode().Parent;
+                 
+                    Debug.Log(par + " parent" );
+                   
                     foreach (GameObject edge in edgesInScene)
                     {
                         if (edge.activeInHierarchy && attachedEdges.Contains(edge.name))
@@ -272,9 +277,7 @@ namespace SEE.Controls.Actions
             foreach (GameObject implicitlyDeletedEdge in implicitlyDeletedEdges)
             {
                 DeleteEdge(implicitlyDeletedEdge);
-                parentsID = implicitlyDeletedEdge.gameObject.Target().name;
                 parents.Add(implicitlyDeletedEdge, parentsID);
-                
                 new DeleteNetAction(implicitlyDeletedEdge.name).Execute(null);
             }
 
@@ -282,9 +285,10 @@ namespace SEE.Controls.Actions
             foreach (GameObject deletedGameNode in gameNodesToDelete)
             {
                 DeleteNode(deletedGameNode);
-                parents.Add(deletedGameNode, parentsID);
+                parents.Add(deletedGameNode, deletedGameNode.GetNode().Parent.ID);
                 new DeleteNetAction(deletedGameNode.name).Execute(null);
                 
+    
             }
             hadAnEffect = true;
         }
