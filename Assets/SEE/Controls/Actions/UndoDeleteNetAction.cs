@@ -87,7 +87,12 @@ namespace SEE.Net
                             removeFromGarbage.Add(gameObject);
                             PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(removeFromGarbage)));
                             Node node = gameObject.GetNode();
-                            GameNodeAdder.AddNodeToGraph(parentOfNode.GetNode(),gameObject.GetNode() );
+                        //GameNodeAdder.AddNodeToGraph(parentOfNode.GetNode(),gameObject.GetNode() );
+                            Graph graphOfNode = parentOfNode.ItsGraph();
+                        if (!graphOfNode == null )
+                        { graphOfNode.AddNode(gameObject.GetNode()); 
+                        }
+                            
                         }
                     }
 
