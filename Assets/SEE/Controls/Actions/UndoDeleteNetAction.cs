@@ -92,8 +92,10 @@ namespace SEE.Net
                         Debug.Log(graphOfNode);
                         if (!graphOfNode == null)
 
+                            
+                        {
                             Debug.Log("adding node to graph");
-                        {  graphOfNode.AddNode(node);
+                            graphOfNode.AddNode(node);
                             graphOfNode.FinalizeNodeHierarchy();
                             node.ItsGraph = graphOfNode;
                          }
