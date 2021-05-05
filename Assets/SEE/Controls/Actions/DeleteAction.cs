@@ -255,8 +255,11 @@ namespace SEE.Controls.Actions
                 if (deletedGameNode.TryGetComponentOrLog(out NodeRef nodeRef))
                 {
                     ISet<string> attachedEdges = nodeRef.GetEdgeIds();
-                    parentsID = deletedGameNode.GetNode().Parent.ID;
-                    Debug.Log(parentsID);
+                    parentsID = deletedGameNode.gameObject.GetNode().Parent.ID;
+                    Debug.Log(parentsID + " parentsID");
+                    Debug.Log(deletedGameNode.GetNode().Parent.ItsGraph + "its graph");
+                    Node par = deletedGameNode.GetNode().Parent;
+                    Debug.Log(par + " parent" );
                     foreach (GameObject edge in edgesInScene)
                     {
                         if (edge.activeInHierarchy && attachedEdges.Contains(edge.name))
