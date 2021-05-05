@@ -256,10 +256,10 @@ namespace SEE.Controls.Actions
                 {
                     ISet<string> attachedEdges = nodeRef.GetEdgeIds();
                     parentsID = deletedGameNode.gameObject.GetNode().Parent.ID;
-                    GameObject[] g = deletedGameNode.gameObject.GetComponentsInParent<GameObject>();
-                    string pars = g[0].name;
-                    Debug.Log(pars);
-                    Debug.Log(g[0].ItsGraph() + " test" );
+                    GameObject GOparents = deletedGameNode.gameObject.GetComponentInParent<GameObject>();
+
+                    Debug.Log(GOparents.name);
+
                     foreach (GameObject edge in edgesInScene)
                     {
                         if (edge.activeInHierarchy && attachedEdges.Contains(edge.name))
