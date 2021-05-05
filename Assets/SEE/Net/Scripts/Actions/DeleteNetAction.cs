@@ -64,7 +64,7 @@ namespace SEE.Net
                         Portal.SetInfinitePortal(gameObject);
                         PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.MoveNodeToGarbage(gameObject.AllAncestors()));
                         Portal.SetInfinitePortal(gameObject);
-                      
+                        del.deletedNodes.Add(gameObject, gameObject.GetNode().ItsGraph);
                     }
                     else if (gameObject.HasEdgeRef())
                     {
