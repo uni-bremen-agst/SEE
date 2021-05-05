@@ -28,6 +28,8 @@ namespace SEE.Net
 
         public String parentID;
 
+        public Graph graph; 
+
         /// <summary>
         /// Creates a new DeleteNetAction.
         /// </summary>
@@ -59,7 +61,13 @@ namespace SEE.Net
                 Debug.Log("run");
                 GameObject gameObject = GameObject.Find(GameObjectID);
                 GameObject parentOfNode =  GameObject.Find(parentID);
-                Graph graphOfNode = parentOfNode.ItsGraph();
+                if (parentOfNode.HasNodeRef())
+                {
+                    graph = parentOfNode.ItsGraph();
+                } else if (parentOfNode.HasEdgeRef()) 
+                {
+                    graph = parentOfNode.GetGraph();
+                }
 
                 if (gameObject != null)
                 {
@@ -73,7 +81,7 @@ namespace SEE.Net
                         {
                             try
                             {
-                                 graphOfNode.AddEdge(edgeReference.Value);
+                                 graph.AddEdge(edgeReference.Value);
                             }
                             catch (Exception e)
                             {
@@ -90,11 +98,11 @@ namespace SEE.Net
                             Node node = gameObject.GetNode();
                             //GameNodeAdder.AddNodeToGraph(parentOfNode.GetNode(),gameObject.GetNode() );
 
-                            Debug.Log(graphOfNode);
+                            Debug.Log(graph);
                             Debug.Log("adding node to graph");
-                            graphOfNode.AddNode(node);
-                            graphOfNode.FinalizeNodeHierarchy();
-                            node.ItsGraph = graphOfNode;
+                            graph.AddNode(node);
+                            graph.FinalizeNodeHierarchy();
+                            node.ItsGraph = graph;
                          
                             
                         }
