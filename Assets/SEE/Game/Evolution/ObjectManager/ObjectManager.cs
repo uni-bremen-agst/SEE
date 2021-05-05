@@ -113,7 +113,7 @@ namespace SEE.Game.Evolution
             bool hasPlane = currentPlane != null;
             if (!hasPlane)
             {
-                currentPlane = _graphRenderer.NewPlane(gameObjects, city.transform.position.y);
+                currentPlane = _graphRenderer.DrawPlane(gameObjects, city.transform.position.y);
             }
             plane = currentPlane;
             return hasPlane;
@@ -172,12 +172,12 @@ namespace SEE.Game.Evolution
                 {
                     // NewLeafNode() will attach node to gameNode and will 
                     // also set the scale and style of gameNode.
-                    gameNode = _graphRenderer.NewLeafNode(node);
+                    gameNode = _graphRenderer.DrawLeafNode(node);
                 }
                 else
                 {
                     // NewInnerNode() will attach node to gameNode.
-                    gameNode = _graphRenderer.NewInnerNode(node);
+                    gameNode = _graphRenderer.DrawInnerNode(node);
                     // Note: The scale of inner nodes will be adjusted later when
                     // we have the layout. 
                 }
