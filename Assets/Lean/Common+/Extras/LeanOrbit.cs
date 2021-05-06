@@ -21,23 +21,14 @@ namespace Lean.Common
 		/// 10 = Quickly change.</summary>
 		public float Damping { set { damping = value; } get { return damping; } } [FSA("Dampening")] [FSA("Damping")] [SerializeField] private float damping = -1.0f;
 
-		/// <summary>Pitch of the rotation in degrees.</summary>
-		public float Pitch { set { pitch = value; } get { return pitch; } } [FSA("Pitch")] [SerializeField] private float pitch;
-
 		/// <summary>The strength of the pitch changes with vertical finger movement.</summary>
 		public float PitchSensitivity { set { pitchSensitivity = value; } get { return pitchSensitivity; } } [FSA("PitchSensitivity")] [SerializeField] private float pitchSensitivity = 0.25f;
-
-		/// <summary>Yaw of the rotation in degrees.</summary>
-		public float Yaw { set { yaw = value; } get { return yaw; } } [FSA("Yaw")] [SerializeField] private float yaw;
 
 		/// <summary>The strength of the yaw changes with horizontal finger movement.</summary>
 		public float YawSensitivity { set { yawSensitivity = value; } get { return yawSensitivity; } } [FSA("YawSensitivity")] [SerializeField] private float yawSensitivity = 0.25f;
 
 		[SerializeField]
-		private float currentPitch;
-
-		[SerializeField]
-		private float currentYaw;
+		private Vector3 remainingDelta;
 
 		public void Rotate(Vector2 delta)
 		{
@@ -50,49 +41,83 @@ namespace Lean.Common
 			RotateYaw  ( delta.x);
 		}
 
+		public Vector3 GetPivotPoint()
+		{
+			if (pivot != null)
+			{
+				return pivot.position;
+			}
+
+			return Vector3.zero;
+		}
+
 		public void RotatePitch(float delta)
 		{
-			var axis = Quaternion.Euler(0.0f, yaw, 0.0f) * Vector3.right;
-
 			delta *= pitchSensitivity * GetSensitivity();
 
-			transform.RotateAround(pivot.position, axis, delta);
+			var oldPosition = transform.position;
+			var pivotPoint  = GetPivotPoint();
+			var angles      = Quaternion.LookRotation(pivotPoint - transform.position, Vector3.up).eulerAngles;
+
+			var pitch = Mathf.DeltaAngle(0.0f, angles.x);
+			var yaw   = angles.y;
+
+			if (pitch + delta < -89.0f) delta = -89.0f - pitch;
+			if (pitch + delta >  89.0f) delta =  89.0f - pitch;
+
+			transform.position += remainingDelta;
+
+			transform.RotateAround(pivotPoint, Quaternion.Euler(0.0f, yaw, 0.0f) * Vector3.right, delta);
+
+			if (damping >= 0.0f)
+			{
+				remainingDelta += transform.position - (oldPosition + remainingDelta);
+
+				transform.position = oldPosition;
+			}
+			else
+			{
+				remainingDelta = Vector3.zero;
+			}
 		}
 
 		public void RotateYaw(float delta)
 		{
-			var axis = Vector3.up;
-
 			delta *= yawSensitivity * GetSensitivity();
 
-			transform.RotateAround(pivot.position, axis, delta);
-		}
+			var oldPosition = transform.position;
 
-		protected virtual void Start()
-		{
-			currentPitch = pitch;
-			currentYaw   = yaw;
+			transform.position += remainingDelta;
+
+			transform.RotateAround(pivot.position, Vector3.up, delta);
+
+			if (damping >= 0.0f)
+			{
+				remainingDelta += transform.position - (oldPosition + remainingDelta);
+
+				transform.position = oldPosition;
+			}
+			else
+			{
+				remainingDelta = Vector3.zero;
+			}
 		}
 
 		protected virtual void LateUpdate()
 		{
-			if (pivot != null)
-			{
-				var angles = Quaternion.LookRotation(pivot.position - transform.position, Vector3.up).eulerAngles;
-
-				pitch = angles.x;
-				yaw   = angles.y;
-			}
-
 			// Get t value
 			var factor = LeanHelper.GetDampenFactor(damping, Time.deltaTime);
 
-			// Lerp the current values to the target ones
-			currentPitch = Mathf.Lerp(currentPitch, pitch, factor);
-			currentYaw   = Mathf.Lerp(currentYaw  , yaw  , factor);
+			var newDelta = Vector3.Lerp(remainingDelta, Vector3.zero, factor);
 
-			// Rotate to pitch and yaw values
-			transform.localRotation = Quaternion.Euler(currentPitch, currentYaw, 0.0f);
+			transform.position += remainingDelta - newDelta;
+
+			if (pivot != null)
+			{
+				transform.LookAt(pivot, Vector3.up);
+			}
+
+			remainingDelta = newDelta;
 		}
 
 		private float GetSensitivity()
@@ -128,10 +153,8 @@ namespace Lean.Common.Editor
 			Draw("_camera", "If you want the rotation to be scaled by the camera FOV, then set the camera here.");
 			Draw("pivot", "The camera will orbit around this point.");
 			Draw("damping", "If you want this component to change smoothly over time, then this allows you to control how quick the changes reach their target value.\n\n-1 = Instantly change.\n\n1 = Slowly change.\n\n10 = Quickly change.");
-			
-			Draw("pitch", "Pitch of the rotation in degrees.");
+
 			Draw("pitchSensitivity", "The strength of the pitch changes with vertical finger movement.");
-			Draw("yaw", "Yaw of the rotation in degrees.");
 			Draw("yawSensitivity", "The strength of the yaw changes with horizontal finger movement.");
 		}
 	}

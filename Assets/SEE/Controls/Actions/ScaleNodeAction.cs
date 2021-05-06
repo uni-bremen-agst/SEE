@@ -283,10 +283,10 @@ namespace SEE.Controls.Actions
                             // selection. The user this time neither selected the object to be scaled again nor one
                             // of the scaling gizmos. That means, the action is finished and needs to be
                             // finalized if the user has actually triggered a change at all.
-                            hadAnEffect = objectToScale.transform.position != beforeAction.Position
-                                || objectToScale.transform.lossyScale != beforeAction.Scale;
-                            if (hadAnEffect)
+                            if (objectToScale.transform.position != beforeAction.Position
+                                || objectToScale.transform.lossyScale != beforeAction.Scale)
                             {
+                                currentState = ReversibleAction.Progress.Completed;
                                 // Scaling action is finalized.
                                 afterAction = new Memento(objectToScale);
                                 draggedSphere = null;
@@ -484,7 +484,7 @@ namespace SEE.Controls.Actions
             // Transform the new position and scale
             objectToScale.transform.position = position;
             objectToScale.SetScale(scale);
-            hadAnEffect = true;
+            currentState = ReversibleAction.Progress.InProgress;
             new ScaleNodeNetAction(objectToScale.name, scale, position).Execute();
         }
 

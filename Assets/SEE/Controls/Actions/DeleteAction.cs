@@ -153,7 +153,10 @@ namespace SEE.Controls.Actions
                 Assert.IsTrue(hitGraphElement.HasNodeRef() || hitGraphElement.HasEdgeRef());
                 explicitlyDeletedNodesAndEdges.Add(hitGraphElement);
                 bool result = Delete(hitGraphElement);
-                hadAnEffect = result;  
+                if (result)
+                {
+                    currentState = ReversibleAction.Progress.Completed;
+                }
                 return result; // the selected objects are deleted and this action is done now
             }
             else

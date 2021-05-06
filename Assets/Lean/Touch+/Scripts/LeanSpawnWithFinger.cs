@@ -20,7 +20,8 @@ namespace Lean.Touch
 		[System.Serializable]
 		public class FingerData : LeanFingerData
 		{
-			public Transform Clone;
+			public Transform      Clone;
+			public LeanSelectable Selectable;
 		}
 
 		/// <summary>The prefab that this component can spawn.</summary>
@@ -32,12 +33,20 @@ namespace Lean.Touch
 		/// <summary>Hold on to the spawned clone while the spawning finger is still being held?</summary>
 		public bool DragAfterSpawn { set { dragAfterSpawn = value; } get { return dragAfterSpawn; } } [FSA("DragAfterSpawn")] [SerializeField] private bool dragAfterSpawn;
 
+		/// <summary>If the spawned object is dropped on top of the wrong GameObject (e.g. UI), destroy it?</summary>
+		public bool DestroyIfBlocked { set { destroyIfBlocked = value; } get { return destroyIfBlocked; } } [SerializeField] private bool destroyIfBlocked;
+
+		public LeanScreenQuery ScreenQuery = new LeanScreenQuery(LeanScreenQuery.MethodType.Raycast);
+
 		/// <summary>If the specified prefab is selectable, select it when spawned?</summary>
 		public bool SelectOnSpawn { set { selectOnSpawn = value; } get { return selectOnSpawn; } } [SerializeField] private bool selectOnSpawn;
 
 		/// <summary>If you want the spawned component to be a selected with a specific select component, you can specify it here.
 		/// None/null = It will be self selected.</summary>
 		public LeanSelect SelectWith { set { selectWith = value; } get { return selectWith; } } [SerializeField] private LeanSelect selectWith;
+
+		/// <summary>If the selecting finger goes up, deselect the object?</summary>
+		public bool DeselectOnUp { set { deselectOnUp = value; } get { return deselectOnUp; } } [SerializeField] private bool deselectOnUp;
 
 		/// <summary>The conversion method used to find a world point from a screen point.</summary>
 		public LeanScreenDepth ScreenDepth = new LeanScreenDepth(LeanScreenDepth.ConversionType.FixedDistance, Physics.DefaultRaycastLayers, 10.0f);
@@ -65,15 +74,17 @@ namespace Lean.Touch
 			if (prefab != null && finger != null)
 			{
 				// Spawn and position
-				var clone = Instantiate(prefab);
+				var clone      = Instantiate(prefab);
+				var fingerData = default(FingerData);
 
 				UpdateSpawnedTransform(finger, clone);
 
 				clone.gameObject.SetActive(true);
 
+				// Drag?
 				if (dragAfterSpawn == true)
 				{
-					var fingerData = LeanFingerData.FindOrCreate(ref fingerDatas, finger);
+					fingerData = LeanFingerData.FindOrCreate(ref fingerDatas, finger);
 
 					fingerData.Clone = clone;
 				}
@@ -114,6 +125,11 @@ namespace Lean.Touch
 						{
 							selectable.SelfSelected = true;
 						}
+					}
+
+					if (fingerData != null)
+					{
+						fingerData.Selectable = selectable;
 					}
 				}
 			}
@@ -190,6 +206,28 @@ namespace Lean.Touch
 
 		private void HandleFingerUp(LeanFinger finger)
 		{
+			var fingerData = LeanFingerData.Find(fingerDatas, finger);
+
+			if (deselectOnUp == true && fingerData != null && fingerData.Selectable != null)
+			{
+				fingerData.Selectable.Deselect();
+			}
+
+			if (fingerData != null && fingerData.Clone != null)
+			{
+				if (destroyIfBlocked == true)
+				{
+					LeanScreenQuery.ChangeLayers(fingerData.Clone.gameObject, false, true);
+
+					if (ScreenQuery.Query<Component>(gameObject, finger.ScreenPosition) == null)
+					{
+						Destroy(fingerData.Clone.gameObject);
+					}
+
+					LeanScreenQuery.RevertLayers();
+				}
+			}
+
 			LeanFingerData.Remove(fingerDatas, finger, fingerDataPool);
 		}
 	}
@@ -213,11 +251,24 @@ namespace Lean.Touch.Editor
 			EndError();
 			Draw("rotateTo", "How should the spawned prefab be rotated?");
 			Draw("dragAfterSpawn", "Hold on to the spawned clone while the spawning finger is still being held?");
+			if (Any(tgts, t => t.DragAfterSpawn == true))
+			{
+				BeginIndent();
+					Draw("destroyIfBlocked", "If the spawned object is dropped on top of the wrong GameObject (e.g. UI), destroy it?");
+					if (Any(tgts, t => t.DestroyIfBlocked == true))
+					{
+						BeginIndent();
+							Draw("ScreenQuery");
+						EndIndent();
+					}
+				EndIndent();
+			}
 			Draw("selectOnSpawn", "If the specified prefab is selectable, select it when spawned?");
 			if (Any(tgts, t => t.SelectOnSpawn == true))
 			{
 				BeginIndent();
 					Draw("selectWith", "If you want the spawned component to be a selected with a specific select component, you can specify it here.\n\nNone/null = It will be self selected.");
+					Draw("deselectOnUp", "If the selecting finger goes up, deselect the object?");
 				EndIndent();
 			}
 			Draw("ScreenDepth");
