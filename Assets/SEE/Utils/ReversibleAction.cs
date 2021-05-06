@@ -121,7 +121,6 @@ namespace SEE.Utils
         void Redo();
 
         /// <summary>
-<<<<<<< HEAD
         /// Getter for the ID of the specific action.
         /// </summary>
         /// <returns>the id of a specific action</returns>
@@ -143,8 +142,6 @@ namespace SEE.Utils
         List<string> GetChangedObjects();
 
         /// <summary>
-=======
->>>>>>> origin/master
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
         /// <returns>the <see cref="ActionStateType"/> of this action</returns>

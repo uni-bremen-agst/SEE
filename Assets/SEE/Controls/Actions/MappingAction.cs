@@ -1016,16 +1016,17 @@ namespace SEE.Controls.Actions
             return ActionStateType.Map;
         }
 
-<<<<<<< HEAD
         public List<string> GetChangedObjects()
         {
             throw new System.NotImplementedException();
         }
 
         public string GetId()
-=======
+        {
+            throw new NotImplementedException();
+        }
+
         ReversibleAction.Progress ReversibleAction.CurrentProgress()
->>>>>>> origin/master
         {
             throw new NotImplementedException();
         }
