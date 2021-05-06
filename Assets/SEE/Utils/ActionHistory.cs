@@ -109,6 +109,18 @@ namespace Assets.SEE.Utils
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="oldItem"></param>
+        /// <param name="newItem"></param>
+        public void Replace(Tuple<bool, HistoryType, string, List<string>> oldItem, Tuple<bool, HistoryType, string, List<string>> newItem, bool isNetwork)
+        {
+            int index = GetIndexOfAction(oldItem.Item3);
+            allActionsList[index] = newItem;
+            if(!isNetwork) new GlobalActionHistoryNetwork().Replace(oldItem.Item2, oldItem.Item3, ListToString(oldItem.Item4), newItem.Item2, ListToString(newItem.Item4));
+        }
+
+        /// <summary>
         /// Finds a specific action by here id from the OwnActions
         /// </summary>
         /// <param name="id">thge id of the action</param>
@@ -228,13 +240,14 @@ namespace Assets.SEE.Utils
             if (ActionHasConflicts(activeAction.GetChangedObjects()))
             {
                 Debug.LogWarning("Undo not possible, someone else had made a change on the same object!");
-                Tuple<bool, HistoryType, string, List<string>> lockedAction = new Tuple<bool, HistoryType, string, List<string>>
+                /*Tuple<bool, HistoryType, string, List<string>> lockedAction = new Tuple<bool, HistoryType, string, List<string>>
                     (false, HistoryType.undoneAction, lastAction.Item3, lastAction.Item4);
 
                 DeleteItem(lastAction.Item3, lastAction.Item1);
                 new GlobalActionHistoryNetwork().Delete( lastAction.Item3);
                 Push(lockedAction);
-                new GlobalActionHistoryNetwork().Push(lockedAction.Item2, lockedAction.Item3, ListToString(lockedAction.Item4));
+                new GlobalActionHistoryNetwork().Push(lockedAction.Item2, lockedAction.Item3, ListToString(lockedAction.Item4)); */
+                Replace(lastAction, new Tuple<bool, HistoryType, string, List<string>>(false, HistoryType.undoneAction, lastAction.Item3, lastAction.Item4), false);
                 activeAction = FindById(FindLastActionOfPlayer(true,HistoryType.action).Item3);
                 activeAction?.Start();
                 return;
@@ -271,11 +284,13 @@ namespace Assets.SEE.Utils
             activeAction?.Stop();
             if (ActionHasConflicts(lastUndoneAction.Item4))
             {
-                Tuple<bool, HistoryType, string, List<string>> lockedAction = new Tuple<bool, HistoryType, string, List<string>>(false, HistoryType.undoneAction, lastUndoneAction.Item3, lastUndoneAction.Item4);
+                /*Tuple<bool, HistoryType, string, List<string>> lockedAction = new Tuple<bool, HistoryType, string, List<string>>(false, HistoryType.undoneAction, lastUndoneAction.Item3, lastUndoneAction.Item4);
                 DeleteItem(lastUndoneAction.Item3, lastUndoneAction.Item1);
                 new GlobalActionHistoryNetwork().Delete(lastUndoneAction.Item3);
                 Push(lockedAction);
-                new GlobalActionHistoryNetwork().Push(lockedAction.Item2, lockedAction.Item3, ListToString(lockedAction.Item4));
+                new GlobalActionHistoryNetwork().Push(lockedAction.Item2, lockedAction.Item3, ListToString(lockedAction.Item4)); */
+
+                Replace(lastUndoneAction, new Tuple<bool, HistoryType, string, List<string>>(false, HistoryType.undoneAction, lastUndoneAction.Item3, lastUndoneAction.Item4), false);
                 Debug.LogWarning("Redo not possible, someone else had made a change on the same object!");
                 activeAction = FindById(FindLastActionOfPlayer(true, HistoryType.action).Item3);
                 activeAction?.Start();

@@ -60,6 +60,11 @@ namespace SEE.Controls.Actions
             history.Push(action);
         }
 
+        public static void Replace(Tuple<bool, HistoryType, string, List<string>> oldItem, Tuple<bool, HistoryType, string, List<string>> newItem, bool isNetwork)
+        {
+            history.Replace(oldItem, newItem, isNetwork);
+        }
+
         /// <summary>
         /// Deletes an item from the action list depending on its id.
         /// </summary>

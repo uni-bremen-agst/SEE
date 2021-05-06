@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static Assets.SEE.Utils.ActionHistory;
 
 namespace SEE.Net
 {
@@ -28,13 +29,23 @@ namespace SEE.Net
         public List<string> changedObjects;
 
         /// <summary>
-        /// Wether a object should be pushed or removed
+        /// Wether a object should be pushed
         /// </summary>
         public bool push = false;
 
         /// <summary>
+        /// Wether a object should be deleted
+        /// </summary>
+        public bool delete = false;
+
+        /// <summary>
         /// Syncs the ActionHistory between the Clients
         /// </summary>
+        /// 
+
+        Tuple<bool, HistoryType, string, List<string>> oldItem;
+
+        Tuple<bool, HistoryType, string, List<string>> newItem;
         public GlobalActionHistoryNetwork() 
         {
             // Intentionally left blank.
@@ -56,7 +67,8 @@ namespace SEE.Net
             if (!IsRequester())
             {
                 if (push) GlobalActionHistory.Push(new Tuple<bool, ActionHistory.HistoryType, string, List<string>>(false, type, actionId, changedObjects));
-                else GlobalActionHistory.DeleteItem(actionId, false);
+                else if (delete) GlobalActionHistory.DeleteItem(actionId, false);
+                else GlobalActionHistory.Replace(oldItem, newItem, true);
             }
         }
 
@@ -83,6 +95,18 @@ namespace SEE.Net
         {
             this.actionId = actionId;
             push = false;
+            Execute(null);
+        }
+
+        /// <summary>
+        /// Updates an Entry through all clients
+        /// </summary>
+        public void Replace(ActionHistory.HistoryType oldType, string id, string oldChangedObjects, ActionHistory.HistoryType newType, string newChangedObjects)
+        {
+            oldItem = new Tuple<bool, HistoryType, string, List<string>>(false, oldType, id, StringToList(oldChangedObjects));
+            newItem = new Tuple<bool, HistoryType, string, List<string>>(false, newType, id, StringToList(newChangedObjects));
+            push = false;
+            delete = false;
             Execute(null);
         }
 
