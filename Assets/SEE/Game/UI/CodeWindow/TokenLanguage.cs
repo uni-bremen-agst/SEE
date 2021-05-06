@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Antlr4.Runtime;
 
 namespace SEE.Game.UI.CodeWindow
 {
@@ -9,9 +12,15 @@ namespace SEE.Game.UI.CodeWindow
     public class TokenLanguage
     {
         /// <summary>
-        /// Name of the antlr lexer the keywords were taken from.
+        /// File extensions which apply for the given language.
+        /// May not intersect any other languages file extensions.
         /// </summary>
-        public string LexerName { get; }
+        public ISet<string> FileExtensions { get; }
+        
+        /// <summary>
+        /// Name of the antlr lexer file the keywords were taken from.
+        /// </summary>
+        public string LexerFileName { get; }
 
         /// <summary>
         /// Symbolic names for keywords of a language. This also includes boolean literals and null literals.
@@ -48,12 +57,21 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         public ISet<string> Newlines { get; }
         
-        #region Language Specifics (symbolic type names)
+        #region Java Language
 
         /// <summary>
         /// Name of the antlr grammar lexer.
         /// </summary>
-        private static readonly string javaName = "Java9Lexer";
+        private const string javaFileName = "Java9Lexer.g4";
+
+        /// <summary>
+        /// Set of java file extensions.
+        /// </summary>
+        private static readonly HashSet<string> javaExtensions = new HashSet<string>
+        {
+            "java"
+        };
+
         /// <summary>
         /// Set of antlr type names for Java keywords.
         /// </summary>
@@ -94,7 +112,6 @@ namespace SEE.Game.UI.CodeWindow
         
         #endregion
 
-        
         #region Static Types
 
         /// <summary>
@@ -105,7 +122,7 @@ namespace SEE.Game.UI.CodeWindow
         /// <summary>
         /// Token Language for Java.
         /// </summary>
-        public static readonly TokenLanguage Java = new TokenLanguage(javaName, javaKeywords, javaNumbers,
+        public static readonly TokenLanguage Java = new TokenLanguage(javaFileName, javaExtensions, javaKeywords, javaNumbers,
             javaStrings, javaPunctuation, javaIdentifiers, javaWhitespace, javaNewlines);
 
         #endregion
@@ -114,7 +131,8 @@ namespace SEE.Game.UI.CodeWindow
         /// Constructor for the token language.
         /// </summary>
         /// <remarks>Should never be accessible from outside this class.</remarks>
-        /// <param name="lexerName">Name of this lexer grammar</param>
+        /// <param name="lexerFileName">Name of this lexer grammar</param>
+        /// <param name="fileExtensions">List of file extensions for this language</param>
         /// <param name="keywords">Keywords of this language</param>
         /// <param name="numberLiterals">Number literals of this language</param>
         /// <param name="stringLiterals">String literals of this language</param>
@@ -122,12 +140,16 @@ namespace SEE.Game.UI.CodeWindow
         /// <param name="identifiers">Identifiers for this language</param>
         /// <param name="whitespace">Whitespace for this language</param>
         /// <param name="newlines">Newlines for this language</param>
-        private TokenLanguage(string lexerName, ISet<string> keywords, ISet<string> numberLiterals,
-                                   ISet<string> stringLiterals, ISet<string> punctuation,
-                                   ISet<string> identifiers, ISet<string> whitespace,
-                                   ISet<string> newlines)
+        private TokenLanguage(string lexerFileName, ISet<string> fileExtensions, ISet<string> keywords, 
+                              ISet<string> numberLiterals, ISet<string> stringLiterals, ISet<string> punctuation,
+                              ISet<string> identifiers, ISet<string> whitespace, ISet<string> newlines)
         {
-            LexerName = lexerName;
+            if (AllTokenLanguages.Any(x => x.LexerFileName.Equals(lexerFileName) || x.FileExtensions.Overlaps(fileExtensions)))
+            {
+                throw new ArgumentException("Lexer file name and file extensions must be unique per language!");
+            }
+            LexerFileName = lexerFileName;
+            FileExtensions = fileExtensions;
             Keywords = keywords;
             NumberLiterals = numberLiterals;
             StringLiterals = stringLiterals;
@@ -137,6 +159,44 @@ namespace SEE.Game.UI.CodeWindow
             Newlines = newlines;
             
             AllTokenLanguages.Add(this);
+        }
+
+        /// <summary>
+        /// Returns the matching token language for the given <paramref name="lexerFileName"/>.
+        /// If no matching token language is found, an exception will be thrown.
+        /// </summary>
+        /// <param name="lexerFileName">File name of the antlr lexer. Can be found in <c>lexer.GrammarFileName</c></param>
+        /// <returns>The matching token language</returns>
+        public static TokenLanguage fromLexerFileName(string lexerFileName)
+        {
+            return AllTokenLanguages.Single(x => x.LexerFileName.Equals(lexerFileName));
+        }
+
+        /// <summary>
+        /// Returns the matching token language for the given <paramref name="extension"/>.
+        /// If no matching token language is found, an exception will be thrown.
+        /// </summary>
+        /// <param name="extension">File extension for the language.</param>
+        /// <returns>The matching token language.</returns>
+        public static TokenLanguage fromFileExtension(string extension)
+        {
+            return AllTokenLanguages.Single(x => x.FileExtensions.Contains(extension));
+        }
+
+        /// <summary>
+        /// Creates a new lexer matching the <see cref="LexerFileName"/> of this language.
+        /// </summary>
+        /// <param name="content">The string which shall be parsed by the lexer.</param>
+        /// <returns>the new matching lexer</returns>
+        /// <exception cref="InvalidOperationException">If no lexer is defined for this language.</exception>
+        public Lexer CreateLexer(string content)
+        {
+            if (LexerFileName.Equals(javaFileName))
+            {
+                return new Java9Lexer(CharStreams.fromString(content));
+            }
+
+            throw new InvalidOperationException("No lexer defined for this language yet.");
         }
 
         /// <summary>
