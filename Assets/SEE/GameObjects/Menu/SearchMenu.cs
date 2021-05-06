@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using SEE.Controls;
 using SEE.Game;
+using SEE.Game.UI.Notification;
 using SEE.Game.UI.PropertyDialog;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.GO.Menu
@@ -13,19 +16,50 @@ namespace SEE.GO.Menu
         private PropertyDialog searchDialog;
         private StringProperty searchString;
 
+        private const int BLINK_SECONDS = 10;
+
         private readonly IDictionary<string, ICollection<GameObject>> cachedNodes = new Dictionary<string, ICollection<GameObject>>();
 
         private void ExecuteSearch()
         {
             IEnumerable<GameObject> results = cachedNodes.Where(x => FilterString(x.Key).Equals(FilterString(searchString.Value)))
                                                          .SelectMany(x => x.Value);
+            int found = 0;
             foreach (GameObject result in results)
             {
-                //TODO: Display arrow above game object (reuse the "spears" from evolution?)
-                Debug.Log($"Found {result.name}!");
+                found++;
+                if (result.TryGetComponentOrLog(out Renderer cityRenderer))
+                {
+                    Material material = cityRenderer.sharedMaterials.Last();
+                    StartCoroutine(BlinkFor(BLINK_SECONDS, material));
+                }
+                //TODO: Blink
+            }
+
+            if (found == 0)
+            {
+                ShowNotification.Warn("No nodes found", "No nodes found for the search term "
+                                                        + $"'{FilterString(searchString.Value)}'.");
+            }
+            else
+            {
+                ShowNotification.Info($"{found} nodes found", $"Found {found} nodes for search term " 
+                                                              + $"'{searchString.Value}'. Nodes will blink for {BLINK_SECONDS} seconds.");
             }
 
             SEEInput.KeyboardShortcutsEnabled = true;
+        }
+
+        private static IEnumerator BlinkFor(int seconds, Material material)
+        {
+            Color originalColor = material.color;
+            for (int i = seconds*2; i > 0; i--)
+            {
+                material.color = material.color.Invert();
+                yield return new WaitForSeconds(0.5f);
+            }
+
+            material.color = originalColor;
         }
 
         private static string FilterString(string input)
