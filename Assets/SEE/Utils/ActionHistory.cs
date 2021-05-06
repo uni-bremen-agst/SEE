@@ -23,7 +23,7 @@ namespace SEE.Utils
     {
         // Implementation note: This ActionHistory is a bit more complicated than
         // action histories in other contexts because we do not have atomic actions
-        // that are either executed or not. Our <see cref="ReversibleAction> have
+        // that are either executed or not. Our <see cref="ReversibleAction"/> have
         // a life cycle described by <see cref="ReversibleAction.Progress"/>.
         // They start and receive Update calls until they are completely done.
         // If an action was completely done, the execution continues with a new instance
@@ -95,21 +95,7 @@ namespace SEE.Utils
         /// </summary>
         private void AssertAtMostOneActionWithNoEffect()
         {
-            if (UndoStack.Count > 0)
-            {
-                bool first = true;
-                foreach (ReversibleAction action in UndoStack)
-                {
-                    if (first)
-                    {
-                        first = false;
-                    }
-                    else
-                    {
-                        UnityEngine.Assertions.Assert.IsTrue(action.CurrentProgress() != ReversibleAction.Progress.NoEffect);
-                    }
-                }
-            }
+            UnityEngine.Assertions.Assert.IsTrue(UndoStack.Skip(1).All(action => action.CurrentProgress() != ReversibleAction.Progress.NoEffect));
         }
 
         /// <summary>
