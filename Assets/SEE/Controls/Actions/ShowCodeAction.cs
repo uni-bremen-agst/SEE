@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Antlr4.Runtime;
 using SEE.Game.UI.CodeWindow;
 using SEE.GO;
 using SEE.Net;
@@ -97,21 +96,7 @@ namespace SEE.Controls.Actions
                         codeWindow.Title += $" ({selectedFile})";
                     }
 
-                   // string path = Path.Combine(selectedPath, selectedFile);
-                   // string content = File.ReadAllText(path);
-                   //
-                   // Java9Lexer lexer = new Java9Lexer(CharStreams.fromString(content));
-                   //
-                   // CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-                   // tokenStream.Fill();
-                   // foreach (IToken token in tokenStream.GetTokens())
-                   // {
-                   //     Debug.Log(lexer.Vocabulary.GetSymbolicName(token.Type);
-                   //
-                   // }
-
-
-                    codeWindow.EnterFromFile($"{selectedPath}{selectedFile}"); // selectedPath has trailing /
+                    codeWindow.EnterFromFile(Path.Combine(selectedPath, selectedFile));
                 }
 
                 // Pass line number to automatically scroll to it, if it exists
