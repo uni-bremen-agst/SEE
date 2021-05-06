@@ -71,7 +71,7 @@ namespace SEE.Controls.Actions
         /// <param name="id">the id of the action which should be deleted</param>
         public static void DeleteItem(string id, bool isOwner)
         {
-            history.DeleteItem(id, isOwner);
+            history.DeleteItem(id);
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType"/> of the currently executed action or null</returns>
         public static ActionStateType Current()
         {
-            return history.GetActiveAction()?.GetActionStateType();
+            return history.Current?.GetActionStateType();
         }
 
         /// <summary>
