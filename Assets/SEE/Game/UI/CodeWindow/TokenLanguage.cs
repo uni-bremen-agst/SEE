@@ -16,37 +16,37 @@ namespace SEE.Game.UI.CodeWindow
         /// <summary>
         /// Symbolic names for keywords of a language. This also includes boolean literals and null literals.
         /// </summary>
-        public ICollection<string> Keywords { get; }
+        public ISet<string> Keywords { get; }
         
         /// <summary>
         /// Symbolic names for number literals of a language. This includes integer literals, floating point literals, etc.
         /// </summary>
-        public ICollection<string> NumberLiterals { get; }
+        public ISet<string> NumberLiterals { get; }
         
         /// <summary>
         /// Symbolic names for string literals of a language. Also includes character literals.
         /// </summary>
-        public ICollection<string> StringLiterals { get; }
+        public ISet<string> StringLiterals { get; }
         
         /// <summary>
         /// Symbolic names for separators and operators of a language.
         /// </summary>
-        public ICollection<string> Punctuation { get; }
+        public ISet<string> Punctuation { get; }
         
         /// <summary>
         /// Symbolic names for identifiers in a language.
         /// </summary>
-        public ICollection<string> Identifiers { get; }
+        public ISet<string> Identifiers { get; }
         
         /// <summary>
         /// Symbolic names for whitespace in a language, excluding newlines.
         /// </summary>
-        public ICollection<string> Whitespace { get; }
+        public ISet<string> Whitespace { get; }
             
         /// <summary>
         /// Symbolic names for newlines in a language.
         /// </summary>
-        public ICollection<string> Newlines { get; }
+        public ISet<string> Newlines { get; }
         
         #region Language Specifics (symbolic type names)
 
@@ -55,9 +55,9 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         private static readonly string javaName = "Java9Lexer";
         /// <summary>
-        /// List of antlr type names for Java keywords.
+        /// Set of antlr type names for Java keywords.
         /// </summary>
-        private static readonly List<string> javaKeywords = new List<string>
+        private static readonly HashSet<string> javaKeywords = new HashSet<string>
         {
             "ABSTRACT", "ASSERT", "BOOLEAN", "BREAK", "BYTE", "CASE", "CATCH", "CHAR", "CLASS", "CONST", "CONTINUE",
             "DEFAULT", "DO", "DOUBLE", "ELSE", "ENUM", "EXPORTS", "EXTENDS", "FINAL", "FINALLY", "FLOAT", "FOR",
@@ -68,29 +68,29 @@ namespace SEE.Game.UI.CodeWindow
             "BooleanLiteral", "NullLiteral"
         };
         /// <summary>
-        /// List of antlr type names for Java integer and floating point literals.
+        /// Set of antlr type names for Java integer and floating point literals.
         /// </summary>
-        private static readonly List<string> javaNumbers = new List<string> { "IntegerLiteral", "FloatingPointLiteral" };
-        /// <summary>List of antlr type names for Java character and string literals.</summary>
-        private static readonly List<string> javaStrings = new List<string> { "CharacterLiteral", "StringLiteral" };
-        /// <summary>List of antlr type names for Java separators and operators.</summary>
-        private static readonly List<string> javaPunctuation = new List<string> { "LPAREN", "RPAREN", "LBRACE",
+        private static readonly HashSet<string> javaNumbers = new HashSet<string> { "IntegerLiteral", "FloatingPointLiteral" };
+        /// <summary>Set of antlr type names for Java character and string literals.</summary>
+        private static readonly HashSet<string> javaStrings = new HashSet<string> { "CharacterLiteral", "StringLiteral" };
+        /// <summary>Set of antlr type names for Java separators and operators.</summary>
+        private static readonly HashSet<string> javaPunctuation = new HashSet<string> { "LPAREN", "RPAREN", "LBRACE",
             "RBRACE", "LBRACK", "RBRACK", "SEMI", "COMMA", "DOT", "ELLIPSIS", "AT", "COLONCOLON",
             "ASSIGN", "GT", "LT", "BANG", "TILDE", "QUESTION", "COLON", "ARROW", "EQUAL", "LE", "GE", "NOTEQUAL", "AND",
             "OR", "INC", "DEC", "ADD", "SUB", "MUL", "DIV", "BITAND", "BITOR", "CARET", "MOD",
             "ADD_ASSIGN", "SUB_ASSIGN", "MUL_ASSIGN", "DIV_ASSIGN", "AND_ASSIGN", "OR_ASSIGN", "XOR_ASSIGN",
             "MOD_ASSIGN", "LSHIFT_ASSIGN", "RSHIFT_ASSIGN", "URSHIFT_ASSIGN"
         };
-        /// <summary>List of antlr type names for Java identifiers.</summary>
-        private static readonly List<string> javaIdentifiers = new List<string> { "Identifier" };
+        /// <summary>Set of antlr type names for Java identifiers.</summary>
+        private static readonly HashSet<string> javaIdentifiers = new HashSet<string> { "Identifier" };
         /// <summary>
-        /// List of antlr type names for Java whitespace.
+        /// Set of antlr type names for Java whitespace.
         /// </summary>
-        private static readonly List<string> javaWhitespace = new List<string> { "WS" };
+        private static readonly HashSet<string> javaWhitespace = new HashSet<string> { "WS" };
         /// <summary>
-        /// List of antlr type names for Java newlines.
+        /// Set of antlr type names for Java newlines.
         /// </summary>
-        private static readonly List<string> javaNewlines = new List<string> { /* FIXME: Not in lexer grammar */ };
+        private static readonly HashSet<string> javaNewlines = new HashSet<string> { /* FIXME: Not in lexer grammar */ };
         
         #endregion
 
@@ -122,10 +122,10 @@ namespace SEE.Game.UI.CodeWindow
         /// <param name="identifiers">Identifiers for this language</param>
         /// <param name="whitespace">Whitespace for this language</param>
         /// <param name="newlines">Newlines for this language</param>
-        private TokenLanguage(string lexerName, ICollection<string> keywords, ICollection<string> numberLiterals,
-                                   ICollection<string> stringLiterals, ICollection<string> punctuation,
-                                   ICollection<string> identifiers, ICollection<string> whitespace,
-                                   ICollection<string> newlines)
+        private TokenLanguage(string lexerName, ISet<string> keywords, ISet<string> numberLiterals,
+                                   ISet<string> stringLiterals, ISet<string> punctuation,
+                                   ISet<string> identifiers, ISet<string> whitespace,
+                                   ISet<string> newlines)
         {
             LexerName = lexerName;
             Keywords = keywords;
