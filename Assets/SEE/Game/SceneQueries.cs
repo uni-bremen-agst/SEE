@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SEE.Controls;
 using SEE.DataModel;
 using SEE.DataModel.DG;
@@ -13,46 +14,6 @@ namespace SEE.Game
     /// </summary>
     internal static class SceneQueries
     {
-        private const string ArchGOName = "Architecture";
-        private const string ImplGOName = "Implementation";
-
-        private static SEECity arch = null;
-        private static SEECity impl = null;
-
-        public static SEECity GetArch()
-        {
-            if (!arch)
-            {
-                SEECity[] cities = Object.FindObjectsOfType<SEECity>();
-                foreach (SEECity city in cities)
-                {
-                    if (city.gameObject.name.Equals(ArchGOName))
-                    {
-                        arch = city;
-                        break;
-                    }
-                }
-            }
-            return arch;
-        }
-
-        public static SEECity GetImpl()
-        {
-            if (!impl)
-            {
-                SEECity[] cities = Object.FindObjectsOfType<SEECity>();
-                foreach (SEECity city in cities)
-                {
-                    if (city.gameObject.name.Equals(ImplGOName))
-                    {
-                        impl = city;
-                        break;
-                    }
-                }
-            }
-            return impl;
-        }
-
         /// <summary>
         /// Returns all game objects in the current scene tagged by Tags.Node and having
         /// a valid reference to a graph node.
@@ -274,13 +235,119 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Retrieves the game object representing a node with the given <paramref name="nodeID"/>.
+        /// 
+        /// Note: This is an expensive operation as it traverses all objects in the scene.
+        /// FIXME: We may need to cache all this information in look up tables for better
+        /// performance.
+        /// 
+        /// Precondition: Such a game object actually exists.
+        /// </summary>
+        /// <param name="nodeID">the unique ID of the node to be retrieved</param>
+        /// <returns>the game object representing the node with the given <paramref name="nodeID"/></returns>
+        /// <exception cref="Exception">thrown if there is no such object</exception>
+        public static GameObject RetrieveGameNode(string nodeID)
+        {
+            foreach (GameObject gameNode in AllGameNodesInScene(true, true))
+            {
+                if (gameNode.name == nodeID)
+                {
+                    return gameNode;
+                }
+            }
+            throw new Exception($"Node named {nodeID} not found.");
+        }
+
+        /// <summary>
+        /// Retrieves the game object representing the given <paramref name="node"/>.
+        /// 
+        /// Note: This is an expensive operation as it traverses all objects in the scene.
+        /// FIXME: We may need to cache all this information in look up tables for better
+        /// performance.
+        /// 
+        /// Preconditions: 
+        ///   (1) <paramref name="node"/> is not null.
+        ///   (2) Such a game object actually exists.
+        /// </summary>
+        /// <param name="node">the node to be retrieved</param>
+        /// <returns>the game object representing the given <paramref name="node"/></returns>
+        /// <exception cref="Exception">thrown if there is no such object</exception>
+        public static GameObject RetrieveGameNode(Node node)
+        {
+            return RetrieveGameNode(node.ID);
+        }
+
+        /// <summary>
+        /// Retrieves the game object representing the node referenced by the given <paramref name="nodeRef"/>.
+        /// 
+        /// Note: This is an expensive operation as it traverses all objects in the scene.
+        /// FIXME: We may need to cache all this information in look up tables for better
+        /// performance.
+        /// 
+        /// Preconditions: 
+        /// (1) <paramref name="nodeRef"/> must reference a valid node.
+        /// (2) Such a game object actually exists.
+        /// </summary>
+        /// <param name="nodeRef">a reference to the node to be retrieved</param>
+        /// <returns>the game object representing the node referenced by the given <paramref name="nodeRef"/></returns>
+        /// <exception cref="Exception">thrown if there is no such object</exception>
+        public static GameObject RetrieveGameNode(NodeRef nodeRef)
+        {
+            return RetrieveGameNode(nodeRef.Value);
+        }
+
+        //------------------------------------------------------------
+        // Queries necessary in the context of the reflexion analysis.
+        //------------------------------------------------------------
+
+        private const string ArchGOName = "Architecture";
+        private const string ImplGOName = "Implementation";
+
+        private static SEECity arch = null;
+        private static SEECity impl = null;
+
+        public static SEECity GetArch()
+        {
+            if (!arch)
+            {
+                SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
+                foreach (SEECity city in cities)
+                {
+                    if (city.gameObject.name.Equals(ArchGOName))
+                    {
+                        arch = city;
+                        break;
+                    }
+                }
+            }
+            return arch;
+        }
+
+        public static SEECity GetImpl()
+        {
+            if (!impl)
+            {
+                SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
+                foreach (SEECity city in cities)
+                {
+                    if (city.gameObject.name.Equals(ImplGOName))
+                    {
+                        impl = city;
+                        break;
+                    }
+                }
+            }
+            return impl;
+        }
+
+        /// <summary>
         /// Finds the implementation city in the scene.
         /// </summary>
         /// <returns>The implementation city of the scene.</returns>
         public static SEECity FindImplementation()
         {
             SEECity result = null;
-            SEECity[] cities = Object.FindObjectsOfType<SEECity>();
+            SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
             foreach (SEECity city in cities)
             {
                 if (city.gameObject.name.Equals("Implementation"))
@@ -304,7 +371,7 @@ namespace SEE.Game
         public static SEECity FindArchitecture()
         {
             SEECity result = null;
-            SEECity[] cities = Object.FindObjectsOfType<SEECity>();
+            SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
             foreach (SEECity city in cities)
             {
                 if (city.gameObject.name.Equals("Architecture"))
