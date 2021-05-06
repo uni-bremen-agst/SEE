@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -30,6 +31,9 @@ namespace SEE.Utils
         // of the same action kind. If an action is undone while in progress state
         // <see cref="ReversibleAction.Progress.InProgress"/>, it has already had
         // some effect that needs to be undone.
+        //
+        // See also the test cases in <seealso cref="SEETests.TestActionHistory"/> for 
+        // additional information.
 
         /// <summary>
         /// The history of actions that have been executed (and have not yet been undone). The currently
@@ -95,7 +99,8 @@ namespace SEE.Utils
         /// </summary>
         private void AssertAtMostOneActionWithNoEffect()
         {
-            UnityEngine.Assertions.Assert.IsTrue(UndoStack.Skip(1).All(action => action.CurrentProgress() != ReversibleAction.Progress.NoEffect));
+            UnityEngine.Assertions.Assert.IsTrue
+                (UndoStack.Skip(1).All(action => action.CurrentProgress() != ReversibleAction.Progress.NoEffect));
         }
 
         /// <summary>
@@ -184,10 +189,14 @@ namespace SEE.Utils
         /// if its current progress is <see cref="ReversibleAction.Progress.Completed"/>
         /// or otherwise with <paramref name="action"/> if the current progress
         /// is <see cref="ReversibleAction.Progress.InProgress"/>.
+        /// 
+        /// Precondition: the current progress of <paramref name="action"/>
+        /// is different from <see cref="ReversibleAction.Progress.NoEffect"/>.
         /// </summary>
         /// <param name="action">action to be resumed</param>
         private void Resume(ReversibleAction action)
         {
+            UnityEngine.Assertions.Assert.IsTrue(action.CurrentProgress() != ReversibleAction.Progress.NoEffect);
             if (action.CurrentProgress() == ReversibleAction.Progress.Completed)
             {
                 // We will resume with a fresh instance of the current action as
@@ -248,10 +257,8 @@ namespace SEE.Utils
                 // This action may have state <see cref="ReversibleAction.Progress.InProgress"/>
                 // or <see cref="ReversibleAction.Progress.Completed"/>.
                 ReversibleAction redoAction = RedoStack.Pop();
-                {
-                    // Clear the UndoStack from actions without any effect.
-                    LastActionWithEffect();
-                }
+                // Clear the UndoStack from actions without any effect.
+                LastActionWithEffect();
                 UndoStack.Push(redoAction);
                 redoAction.Redo();
                 Resume(redoAction);

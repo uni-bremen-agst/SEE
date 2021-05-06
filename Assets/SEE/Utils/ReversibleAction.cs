@@ -13,6 +13,9 @@ namespace SEE.Utils
     /// can be reversed (have Undo() and Redo()). Their protocol resembles 
     /// Unity's protocol for MonoBehaviours regarding <see cref="Awake"/>,
     /// <see cref="Start"/>, and <see cref="Update"/>.
+    /// 
+    /// See also the test cases in <seealso cref="SEETests.TestActionHistory"/> for 
+    /// additional information.
     /// </summary>
     public interface ReversibleAction
     {
