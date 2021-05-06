@@ -5,6 +5,10 @@ namespace SEE.Controls.Actions
 {
     public enum HideModeSelector
     {
+        Select,
+        SelectSingleHide,
+        SelectMultipleHide,
+        SelectHighlight,
         HideAll,
         HideSelected,
         HideUnselected,
@@ -14,6 +18,7 @@ namespace SEE.Controls.Actions
         HideForwardTransitveClosure,
         HideBackwardTransitiveClosure,
         HideAllTransitiveClosure,
+        HighlightEdges,
     }
 }
 

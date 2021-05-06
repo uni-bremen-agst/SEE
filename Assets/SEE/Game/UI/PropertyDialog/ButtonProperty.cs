@@ -58,9 +58,6 @@ namespace SEE.Game.UI.PropertyDialog
             SetButtonName(button);
 
 
-
-
-
             void SetButtonName(GameObject button)
             {
                 GameObject text = button.transform.Find("Text").gameObject;

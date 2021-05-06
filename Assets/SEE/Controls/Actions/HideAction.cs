@@ -35,6 +35,9 @@ namespace SEE.Controls.Actions
         /// </summary>
         private ISet<GameObject> undoneList = new HashSet<GameObject>();
 
+
+        private readonly AbstractSEECity settings;
+
         /// <summary>
         /// Specifies whether all objects of selected city should be hidden.
         /// </summary>
@@ -79,6 +82,9 @@ namespace SEE.Controls.Actions
         /// Specifies whether the transitive closure of the graph should be hidden.
         /// </summary>
         private bool hideAllTransitiveClosure;
+
+        private ISet<GameObject> highlightesEdges = new HashSet<GameObject>();
+
 
 
        
@@ -147,14 +153,33 @@ namespace SEE.Controls.Actions
         public override void Stop()
         {
             base.Stop();
+
+            MakeAllVisible();
+            //UnHightLightEdges();
             selectedObjects = null;
             InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
             InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
         }
 
+        private void UnHightLightEdges()
+        {
+            foreach(GameObject edge in highlightesEdges)
+            {
+                if (edge.TryGetComponent(out LineRenderer lineRenderer))
+                {
+                    lineRenderer.widthMultiplier = 1f;
+                    highlightesEdges.Add(edge);
+                }
+            }
+        }
+
         // Update is called once per frame
         public override bool Update()
         {
+
+
+            Debug.Log("Selected Objects: " + selectedObjects.Count);
+            MakeUnselectedTransparent();
             switch (mode)
             {
                 case HideModeSelector.HideAll:
@@ -220,7 +245,15 @@ namespace SEE.Controls.Actions
                         return true;
                     }
                     break;
+                case HideModeSelector.HighlightEdges:
+                    if (HighLightEdges())
+                    {
+                        hadAnEffect = true;
+                        return true;
+                    }
+                    break;
                 default: return false;
+
             }
             return false;
         }
@@ -231,7 +264,8 @@ namespace SEE.Controls.Actions
         /// <returns> true if all selected objects could be successfully hidden </returns>
         private bool HideSelected()
         {
-            if (selectedObjects != null && selectedObjects.Count > 0 && Input.GetKey(KeyCode.Return))
+            Debug.Log("Selected: " + selectedObjects.Count);
+            if (selectedObjects != null && selectedObjects.Count > 0)
             {
                 foreach (GameObject g in selectedObjects)
                 {
@@ -259,7 +293,7 @@ namespace SEE.Controls.Actions
         /// <returns> true if all unselected objects could be successfully hidden </returns>
         private bool HideUnselected()
         {
-            if (selectedObjects != null && selectedObjects.Count > 0 && selectedObject != null && Input.GetKey(KeyCode.Return))
+            if (selectedObjects != null && selectedObjects.Count > 0 && selectedObject != null )
             {
                 GameObject city = selectedObject;
                 while (!city.CompareTag(Tags.CodeCity))
@@ -273,7 +307,7 @@ namespace SEE.Controls.Actions
 
                 foreach (GameObject g in nodesEdges)
                 {
-                    if (!selectedObjects.Contains(g) && !g.name.Equals("implementation") && !g.name.Equals("architecture"))
+                    if (!selectedObjects.Contains(g) && !g.name.Equals("implementation") && g.name.Equals("architecture"))
                     {
                         unselectedObjects.Add(g);
                     }
@@ -323,6 +357,18 @@ namespace SEE.Controls.Actions
             }
         }
 
+        private bool HighLightEdge(GameObject edge)
+        {
+            
+            if (edge.TryGetComponent(out LineRenderer lineRenderer))
+            {
+                lineRenderer.widthMultiplier = 5f;
+                highlightesEdges.Add(edge);
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Hides a node including all the connected edges.
         /// </summary>
@@ -353,6 +399,98 @@ namespace SEE.Controls.Actions
             return true;
         }
 
+
+        private bool MakeUnselectedTransparent()
+        {
+            if (selectedObject != null)
+            {
+                GameObject city = selectedObject;
+                while (!city.CompareTag(Tags.CodeCity))
+                {
+                    city = city.transform.parent.gameObject;
+                }
+
+                List<GameObject> nodesEdges = GetAllChildrenRecursively(city.transform, new List<GameObject>());
+
+                foreach (GameObject g in nodesEdges)
+                {
+                    if (!g.name.Equals("implementation") && !g.name.Equals("architecture"))
+                    {
+                        if (g.TryGetComponent(out Renderer renderer))
+                        {
+                                Color oldColor = renderer.material.color;
+                                Color newColor = new Color(oldColor.r, oldColor.g, oldColor.b, 0.5f);
+                                renderer.material.SetColor("_Color", newColor);
+                        }
+                        hiddenObjects.Add(g);
+                    }
+
+                }
+                if(selectedObjects != null)
+                {
+                    foreach (GameObject g in selectedObjects)
+                    {
+                        if (!g.name.Equals("implementation") && !g.name.Equals("architecture"))
+                        {
+                            if (g.TryGetComponent(out Renderer renderer))
+                            {
+                                Color oldColor = renderer.material.color;
+                                Color newColor = new Color(oldColor.r, oldColor.g, oldColor.b, 1f);
+                                renderer.material.SetColor("_Color", newColor);
+                            }
+                            hiddenObjects.Add(g);
+                        }
+
+                    }
+                }
+                
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+
+        private bool MakeAllVisible()
+        {
+            if (selectedObject != null)
+            {
+                GameObject city = selectedObject;
+                while (!city.CompareTag(Tags.CodeCity))
+                {
+                    city = city.transform.parent.gameObject;
+                }
+
+                List<GameObject> nodesEdges = GetAllChildrenRecursively(city.transform, new List<GameObject>());
+
+                foreach (GameObject g in nodesEdges)
+                {
+                    if (!g.name.Equals("implementation") && !g.name.Equals("architecture"))
+                    {
+                        if (g.TryGetComponent(out Renderer renderer))
+                        {
+                            Color oldColor = renderer.material.color;
+                            Color newColor = new Color(oldColor.r, oldColor.g, oldColor.b, 1f);
+                            renderer.material.SetColor("_Color", newColor);
+                        }
+                        hiddenObjects.Add(g);
+                    }
+
+                }
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+
+
+
         /// <summary>
         /// Hides all nodes and edges of the selected city.
         /// </summary>
@@ -372,6 +510,7 @@ namespace SEE.Controls.Actions
                 {
                     if(!g.name.Equals("implementation") && !g.name.Equals("architecture"))
                     {
+
                         GameObjectExtensions.SetVisibility(g, false, true);
                         hiddenObjects.Add(g);
                     }
@@ -503,6 +642,8 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
+            UnHightLightEdges();
+            highlightesEdges.Clear();
             foreach (GameObject g in hiddenObjects)
             {
                 GameObjectExtensions.SetVisibility(g, true, false);
@@ -691,6 +832,20 @@ namespace SEE.Controls.Actions
                     }
                 }
             }
+        }
+
+
+        private bool HighLightEdges()
+        {
+            SelectEdgesBetweenSubsetOfNodes(selectedObjects);
+            foreach(GameObject edge in selectedObjects)
+            {
+                HighLightEdge(edge);
+
+            }
+            
+            Debug.Log("Selected Objects: " + selectedObjects.Count);
+            return true;
         }
 
         /// <summary>
