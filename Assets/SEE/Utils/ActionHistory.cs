@@ -95,21 +95,7 @@ namespace SEE.Utils
         /// </summary>
         private void AssertAtMostOneActionWithNoEffect()
         {
-            if (UndoStack.Count > 0)
-            {
-                bool first = true;
-                foreach (ReversibleAction action in UndoStack)
-                {
-                    if (first)
-                    {
-                        first = false;
-                    }
-                    else
-                    {
-                        UnityEngine.Assertions.Assert.IsTrue(action.CurrentProgress() != ReversibleAction.Progress.NoEffect);
-                    }
-                }
-            }
+            UnityEngine.Assertions.Assert.IsTrue(UndoStack.Skip(1).All(action => action.CurrentProgress() != ReversibleAction.Progress.NoEffect));
         }
 
         /// <summary>
