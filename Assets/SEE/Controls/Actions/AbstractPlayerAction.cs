@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
@@ -22,33 +23,32 @@ namespace SEE.Controls.Actions
         protected GameObject hoveredObject = null;
 
         /// <summary>
-        /// True if this action has had already some effect that would need to be undone.
-        /// Must be set by subclasses. Will be manipulated in <see cref="Undo"/> and
-        /// <see cref="Redo"/>, too.
+        /// The current state of the action as specified by <see cref="ReversibleAction.Progress"/>.
         /// </summary>
-        protected bool hadAnEffect = false;
+        protected ReversibleAction.Progress currentState = ReversibleAction.Progress.NoEffect;
 
         /// <summary>
         /// The undo operation which has to be implemented specifically by subclasses
-        /// to revert the effect of an executed action. Marks the actions as having
-        /// had no effect.
+        /// to revert the effect of an executed action. 
         /// See <see cref="ReversibleAction.Undo"/>.
         /// </summary>
         public virtual void Undo()
         {
-            hadAnEffect = false;
+            Assert.IsTrue(currentState == ReversibleAction.Progress.InProgress
+                || currentState == ReversibleAction.Progress.Completed);
+            // intentionally left blank; can be overridden by subclasses
         }
 
         /// <summary>
         /// The redo operation which has to be implemented specifically by subclasses
         /// to revert the effect of an undone action, in other words, to return to 
         /// the state at the point in time when <see cref="Undo"/> was called.
-        /// Marks the actions as having had an effect.
         /// See <see cref="ReversibleAction.Redo"/>.
         /// </summary>
         public virtual void Redo()
         {
-            hadAnEffect = true;
+            Assert.IsTrue(currentState == ReversibleAction.Progress.Completed);
+            // intentionally left blank; can be overridden by subclasses
         }
 
         /// <summary>
@@ -162,13 +162,14 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Returns true if this action has had already some effect that would need to be undone.
-        /// <see cref="ReversibleAction.HadEffect"/>
+        /// Returns the current state of the action indicating whether it has had an effect 
+        /// that may need to be undone and whether it is still ongoing.
+        /// Implements <see cref="ReversibleAction.CurrentProgress"/>.
         /// </summary>
-        /// <returns>true if this action has had already some effect that would need to be undone</returns>
-        public bool HadEffect()
+        /// <returns>the current state of the action</returns>
+        public ReversibleAction.Progress CurrentProgress()
         {
-            return hadAnEffect;
+            return currentState;
         }
 
         /// <summary>

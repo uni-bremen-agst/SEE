@@ -14,6 +14,9 @@ namespace SEE.Utils
     /// can be reversed (have Undo() and Redo()). Their protocol resembles 
     /// Unity's protocol for MonoBehaviours regarding <see cref="Awake"/>,
     /// <see cref="Start"/>, and <see cref="Update"/>.
+    /// 
+    /// See also the test cases in <seealso cref="SEETests.TestActionHistory"/> for 
+    /// additional information.
     /// </summary>
     public interface ReversibleAction
     {
@@ -45,6 +48,28 @@ namespace SEE.Utils
         // holds as an invariant.
 
         /// <summary>
+        /// The state of an action. Whether Undo/Redo can be called depends
+        /// upon this state as follows:
+        /// 
+        /// <see cref="NoEffect"/>   => neither Undo nor Redo
+        /// <see cref="InProgress"/> => only Undo
+        /// <see cref="Completed"/>  => both Undo and Redo
+        /// </summary>
+        enum Progress
+        {
+            NoEffect = 0,   // The action has not had any effect whatsoever yet.
+            InProgress = 1, // The action has had a preliminary effect that needs to be undone, but is not yet complete.
+            Completed = 2   // The action has had an effect and is completed.
+        }
+
+        /// <summary>
+        /// Returns the current state of the action indicating whether it has had an effect 
+        /// that may need to be undone and whether it is still ongoing.
+        /// </summary>
+        /// <returns>the current state of the action</returns>
+        Progress CurrentProgress();
+
+        /// <summary>
         /// Will be called exactly once before <see cref="Start"/> and any other method
         /// in this interface. Here code can be executed for intialization.
         /// </summary>
@@ -67,6 +92,8 @@ namespace SEE.Utils
         /// <summary>
         /// Will be called after <see cref="Start"/>. Can be called multiple times
         /// (e.g., once per frame) for continuously executing the action.
+        /// Assertion: This action is in state <see cref="Progress.NoEffect"/>
+        /// or <see cref="Progress.InProgress"/>.
         /// </summary>
         /// <returns>true if action is completed</returns>
         bool Update();
@@ -80,6 +107,8 @@ namespace SEE.Utils
 
         /// <summary>
         /// Called when the effect of the action is to be reversed.
+        /// Assertion: This action is in state <see cref="Progress.Completed"/>
+        /// or <see cref="Progress.InProgress"/>.
         /// </summary>
         void Undo();
 
@@ -87,10 +116,12 @@ namespace SEE.Utils
         /// Called when the action was previously reversed by <see cref="Undo"/>
         /// to re-establish the effect that was undone.
         /// Precondition: <see cref="Undo"/> was called before.
+        /// Assertion: This action is in state <see cref="Progress.Completed"/>.
         /// </summary>
         void Redo();
 
         /// <summary>
+<<<<<<< HEAD
         /// Getter for the ID of the specific action.
         /// </summary>
         /// <returns>the id of a specific action</returns>
@@ -112,6 +143,8 @@ namespace SEE.Utils
         List<string> GetChangedObjects();
 
         /// <summary>
+=======
+>>>>>>> origin/master
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
         /// <returns>the <see cref="ActionStateType"/> of this action</returns>

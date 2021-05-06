@@ -154,7 +154,7 @@ namespace SEE.Controls.Actions
                     to = null;
                     // action is completed (successfully or not; it does not matter)
                     result = true;
-                    hadAnEffect = true;
+                    currentState = ReversibleAction.Progress.Completed;
                 }
             }
             // Forget from and to upon user request.
