@@ -11,7 +11,7 @@ namespace Lean.Common
 #if ENABLE_INPUT_SYSTEM
 		private static System.Collections.Generic.Dictionary<KeyCode, NewCode> keyMapping = new System.Collections.Generic.Dictionary<KeyCode, NewCode>()
 		{
-			{ KeyCode.None, NewCode.None },
+			//{ KeyCode.None, NewCode.None },
 			{ KeyCode.Backspace, NewCode.Backspace },
 			{ KeyCode.Tab, NewCode.Tab },
 			{ KeyCode.Clear, NewCode.None },
