@@ -2,6 +2,8 @@ using SEE.Net;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
 using UnityEngine;
 
 namespace Assets.SEE.Utils
@@ -13,6 +15,12 @@ namespace Assets.SEE.Utils
         {
 
         }
+
+        public class EmptyUndoHistoryException : System.Exception
+        {
+
+        }
+
         // Implementation note: This ActionHistory is a bit more complicated than
         // action histories in other contexts because we do not have atomic actions
         // that are either executed or not. Our <see cref="ReversibleAction"/> have
@@ -49,7 +57,12 @@ namespace Assets.SEE.Utils
         /// <summary>
         /// Contains all actions executed by the player.
         /// </summary>
-        private List<ReversibleAction> ownActions = new List<ReversibleAction>();
+        private Stack<ReversibleAction> ownActions1 = new Stack<ReversibleAction>();
+
+        /// <summary>
+        /// Contains all undone actions executed by the player.
+        /// </summary>
+        private Stack<ReversibleAction> ownUndoneActions = new Stack<ReversibleAction>();
 
         /// <summary>
         /// Contains the Active Action from each Player needs to be updated with each undo/redo/action
@@ -67,12 +80,11 @@ namespace Assets.SEE.Utils
         /// and this action is at the top of <see cref="UndoStack"/>.
         /// </summary>
         private void AssertAtMostOneActionWithNoEffect()
-        {  
-            for(int i = ownActions.Count - 2; i >= 0; i--)
-            {
-                if (ownActions[i].CurrentProgress() != ReversibleAction.Progress.NoEffect) throw new MoreThanOneActionWithNoEffectException();
-            }
+        {
+            UnityEngine.Assertions.Assert.IsTrue
+               (ownActions1.Skip(1).All(action => action.CurrentProgress() != ReversibleAction.Progress.NoEffect));
         }
+
         /// <summary>
         /// Let C be the currently executed action (if there is any) in this action history. 
         /// Then <see cref="ReversibleAction.Stop"/> will be called for C. After that 
@@ -91,9 +103,7 @@ namespace Assets.SEE.Utils
         public void Execute(ReversibleAction action, bool ignoreRedoDeletion = false)
         {
             activeAction?.Stop();
-            //Push(new Tuple<bool, HistoryType, string, List<string>>(true, HistoryType.action, action.GetId(), null));
-            //new GlobalActionHistoryNetwork().Push(HistoryType.action, action.GetId(), null);
-            ownActions.Add(action);
+            ownActions1.Push(action);
             activeAction = action;
             action.Awake();
             action.Start();
@@ -125,11 +135,6 @@ namespace Assets.SEE.Utils
         /// <param name="action">The action and all of its specific values which are needed for the history</param>
         public void Push(Tuple<bool, HistoryType, string, List<string>> action)
         {
-            if (allActionsList.Count >= historySize)
-            {
-                allActionsList.RemoveAt(0);
-                ownActions.Remove(FindById(allActionsList[0].Item3)); //FIXME: Should we check if FindById is null?
-            }
             allActionsList.Add(action);
         }
 
@@ -138,22 +143,12 @@ namespace Assets.SEE.Utils
         /// </summary>
         /// <param name="oldItem"></param>
         /// <param name="newItem"></param>
-        public void Replace(Tuple<bool, HistoryType, string, List<string>> oldItem, Tuple<bool, HistoryType, string, List<string>> newItem, bool isNetwork)
+        public void Replace(Tuple<bool, HistoryType, string, List<string>> oldItem, 
+            Tuple<bool, HistoryType, string, List<string>> newItem, bool isNetwork)
         {
-            int index = GetIndexOfAction(oldItem.Item3);  //FIXME: OwnAction msus evtl auch geloescht werden
+            int index = GetIndexOfAction(oldItem.Item3);  //FIXME: OwnAction muss evtl auch geloescht werden
             allActionsList[index] = newItem;
             if (!isNetwork) new GlobalActionHistoryNetwork().Replace(oldItem.Item2, oldItem.Item3, ListToString(oldItem.Item4), newItem.Item2, ListToString(newItem.Item4));
-        }
-
-        /// <summary>
-        /// Finds a specific action by here id from the OwnActions
-        /// </summary>
-        /// <param name="id">thge id of the action</param>
-        /// <returns>the action</returns>
-        private ReversibleAction FindById(string id)
-        {
-            foreach (ReversibleAction it in ownActions) if (it.GetId().Equals(id)) return it;
-            return null;
         }
 
         /// <summary>
@@ -219,27 +214,27 @@ namespace Assets.SEE.Utils
             {
                 if (allActionsList[i].Item1.Equals(true) && allActionsList[i].Item2.Equals(HistoryType.undoneAction))
                 {
-                    ownActions.Remove(FindById(allActionsList[i].Item3));
                     new GlobalActionHistoryNetwork().Delete(allActionsList[i].Item3);
                     allActionsList.RemoveAt(i);
                     i--;
                 }
                 isRedo = false;
             }
+            ownUndoneActions.Clear();
         }
 
         /// <summary>
         /// Deletes an item from the action list depending on its id.
         /// </summary>
         /// <param name="id">the id of the action which should be deleted</param>
-        public void DeleteItem(string id, bool isOwner)
+        public void DeleteItem(string id)
         {
             for (int i = 0; i < allActionsList.Count; i++)
             {
                 if (allActionsList[i].Item3.Equals(id))
                 {
+                    // Fixme: Pop an jeder Stelle ausführen, wo DeleteItem() aufgerufen wird.
                     allActionsList.RemoveAt(i);
-                    if (isOwner) ownActions.Remove(FindById(id));
                     return;
                 }
             }
@@ -250,43 +245,45 @@ namespace Assets.SEE.Utils
         /// </summary>
         public void Undo()
         {
-            // Tuple<bool, HistoryType, string, List<string>> lastAction = FindLastActionOfPlayer(true, HistoryType.action);
-            // if (lastAction == null) return;
-            // while (!activeAction.HadEffect())
-            // {
-            activeAction.Stop();
+            ownActions1.Peek().Stop();
+
             ReversibleAction current = LastActionWithEffect();
+
             if (current == null) return;
+
             Tuple<bool, HistoryType, string, List<string>> lastAction = allActionsList[GetIndexOfAction(current.GetId())];
 
-            if (ActionHasConflicts(activeAction.GetChangedObjects()))
+            if (ActionHasConflicts(current.GetChangedObjects()))
             {
                 Debug.LogWarning("Undo not possible, someone else had made a change on the same object!");
                 Replace(lastAction, new Tuple<bool, HistoryType, string, List<string>>(false, HistoryType.undoneAction, lastAction.Item3, lastAction.Item4), false);
-                //FIXME OWN ACTION PFLEGEN
-                activeAction = FindById(FindLastActionOfPlayer(true, HistoryType.action).Item3);
-                activeAction?.Start();
+
+                ownActions1.Pop();
+                ownActions1.Peek().Start();
+                activeAction = LastActionWithEffect();
                 return;
             }
             else
             {
                 current.Undo();
-                DeleteItem(lastAction.Item3, lastAction.Item1);
+                ownUndoneActions.Push(current);
+                ownActions1.Pop();
+                DeleteItem(lastAction.Item3);
                 new GlobalActionHistoryNetwork().Delete(lastAction.Item3);
+
                 Tuple<bool, HistoryType, string, List<string>> undoneAction = new Tuple<bool, HistoryType, string, List<string>>
                     (true, HistoryType.undoneAction, lastAction.Item3, lastAction.Item4);
 
                 Push(undoneAction);
-                ownActions.Add(activeAction);
                 new GlobalActionHistoryNetwork().Push(undoneAction.Item2, undoneAction.Item3, ListToString(undoneAction.Item4));
 
-                lastAction = FindLastActionOfPlayer(true, HistoryType.action);
-                if (lastAction == null) return;
-                activeAction = FindById(lastAction.Item3);
-
-                Execute(activeAction.NewInstance(), true);
+                // lastAction = FindLastActionOfPlayer(true, HistoryType.action);
+                activeAction = LastActionWithEffect();
+                if (activeAction == null) return;
                 isRedo = true;
 
+                Resume(activeAction);
+                
             }
         }
 
@@ -296,28 +293,62 @@ namespace Assets.SEE.Utils
         public void Redo()
         {
             Tuple<bool, HistoryType, string, List<string>> lastUndoneAction = FindLastActionOfPlayer(true, HistoryType.undoneAction);
-            if (lastUndoneAction == null) return;
-            activeAction?.Stop();
-            if (ActionHasConflicts(lastUndoneAction.Item4))
+            if (ownUndoneActions.Count == 0)
             {
-                Replace(lastUndoneAction, new Tuple<bool, HistoryType, string, List<string>>(false, HistoryType.undoneAction, lastUndoneAction.Item3, lastUndoneAction.Item4), false);
-                Debug.LogWarning("Redo not possible, someone else had made a change on the same object!");
-                activeAction = FindById(FindLastActionOfPlayer(true, HistoryType.action).Item3);
-                activeAction?.Start();
-                return;
+                throw new EmptyUndoHistoryException();
             }
-            ReversibleAction temp = FindById(lastUndoneAction.Item3);
-            temp.Redo();
+            else
+            {
+                ownActions1?.Peek().Stop();
+                if (ActionHasConflicts(lastUndoneAction.Item4))
+                {
+                    ownUndoneActions.Pop();
+                    Replace(lastUndoneAction, new Tuple<bool, HistoryType, string, List<string>>(false, HistoryType.undoneAction, lastUndoneAction.Item3, lastUndoneAction.Item4), false);
+                    Debug.LogWarning("Redo not possible, someone else had made a change on the same object!");
+                    ownActions1.Peek().Start();
+                    return;
+                }
 
-            Tuple<bool, HistoryType, string, List<string>> redoneAction = new Tuple<bool, HistoryType, string, List<string>>(true, HistoryType.action, lastUndoneAction.Item3, lastUndoneAction.Item4);
-            DeleteItem(lastUndoneAction.Item3, lastUndoneAction.Item1);
-            new GlobalActionHistoryNetwork().Delete(lastUndoneAction.Item3);
-            Push(redoneAction);
-            new GlobalActionHistoryNetwork().Push(redoneAction.Item2, redoneAction.Item3, ListToString(redoneAction.Item4));
-            activeAction = temp;
-            ownActions.Add(temp);
-            Execute(activeAction.NewInstance(), true);
+                ReversibleAction redoAction = ownUndoneActions.Pop();
+                LastActionWithEffect();
+                ownActions1.Push(redoAction);
+                redoAction.Redo();
+                Resume(redoAction);
 
+                UnityEngine.Assertions.Assert.IsTrue(ownUndoneActions.Count == 0
+                                 || ownUndoneActions.Peek().CurrentProgress() != ReversibleAction.Progress.NoEffect);
+
+                Tuple<bool, HistoryType, string, List<string>> redoneAction = new Tuple<bool, HistoryType, string, List<string>>(true, HistoryType.action, lastUndoneAction.Item3, lastUndoneAction.Item4);
+                DeleteItem(lastUndoneAction.Item3);
+                new GlobalActionHistoryNetwork().Delete(lastUndoneAction.Item3);
+                Push(redoneAction);
+                new GlobalActionHistoryNetwork().Push(redoneAction.Item2, redoneAction.Item3, ListToString(redoneAction.Item4));
+
+            }
+        }
+
+        /// <summary>
+        /// Resumes the execution with a fresh instance of the given <paramref name="action"/> 
+        /// if its current progress is <see cref="ReversibleAction.Progress.Completed"/>
+        /// or otherwise with <paramref name="action"/> if the current progress
+        /// is <see cref="ReversibleAction.Progress.InProgress"/>.
+        /// 
+        /// Precondition: the current progress of <paramref name="action"/>
+        /// is different from <see cref="ReversibleAction.Progress.NoEffect"/>.
+        /// </summary>
+        /// <param name="action">action to be resumed</param>
+        private void Resume(ReversibleAction action)
+        {
+            UnityEngine.Assertions.Assert.IsTrue(action.CurrentProgress() != ReversibleAction.Progress.NoEffect);
+            if (action.CurrentProgress() == ReversibleAction.Progress.Completed)
+            {
+                // We will resume with a fresh instance of the current action as
+                // the (now) current has already been completed.
+                action = action.NewInstance();
+                ownActions1.Push(action);
+                action.Awake();
+            }
+            action.Start();
         }
 
         /// <summary>
@@ -332,16 +363,16 @@ namespace Assets.SEE.Utils
         /// has had any effect (preliminary or complete) or null<</returns>
         private ReversibleAction LastActionWithEffect()
         {
-            while(ownActions.Count > 0)
+            while(ownActions1.Count > 0)
             {
-                ReversibleAction action = ownActions[ownActions.Count - 1];
+                ReversibleAction action = ownActions1.Peek();
                 if (action.CurrentProgress() != ReversibleAction.Progress.NoEffect)
                 {
                     return action;
                 }
                 else
                 {
-                   ownActions.RemoveAt(ownActions.Count-1);
+                    ownActions1.Pop();
                 }
             }
             return null;
