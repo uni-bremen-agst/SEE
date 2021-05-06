@@ -125,6 +125,11 @@ namespace Lean.Touch
 
 		private void HandleFingerDown(LeanFinger finger)
 		{
+			//if (finger.Index == LeanTouch.HOVER_FINGER_INDEX)
+			//{
+			//	return;
+			//}
+
 			var fingers = Use.UpdateAndGetFingers();
 
 			if (fingers.Contains(finger) == true)

@@ -140,6 +140,11 @@ namespace Lean.Touch
 
 		private void HandleFingerDown(LeanFinger finger)
 		{
+			if (finger.Index == LeanTouch.HOVER_FINGER_INDEX)
+			{
+				return;
+			}
+
 			if (ElementOverlapped(finger) == true)
 			{
 				downFingers.Add(finger);

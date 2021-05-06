@@ -28,8 +28,7 @@ namespace Lean.Common
 		/// <summary>When the amount of selected objects no longer matches the <b>RequiredCount</b>, this event will be invoked.</summary>
 		public UnityEvent OnUnmatch { get { if (onUnmatch == null) onUnmatch = new UnityEvent(); return onUnmatch; } } [SerializeField] private UnityEvent onUnmatch;
 
-		[SerializeField]
-		private bool inside;
+		public bool Matched { set { SetMatched(value); } get { return matched; } } [FSA("inside")] [SerializeField] private bool matched;
 
 		protected virtual void OnEnable()
 		{
@@ -55,18 +54,13 @@ namespace Lean.Common
 			UpdateState();
 		}
 
-		private void UpdateState()
+		private void SetMatched(bool value)
 		{
-			var min       = matchMin >= 0 ? matchMin : LeanSelectable.Instances.Count;
-			var max       = matchMax >= 0 ? matchMax : LeanSelectable.Instances.Count;
-			var raw       = LeanSelectable.IsSelectedCount;
-			var newInside = raw >= min && raw <= max;
-
-			if (newInside != inside)
+			if (matched != value)
 			{
-				inside = newInside;
+				matched = value;
 
-				if (inside == true)
+				if (matched == true)
 				{
 					if (onMatch != null)
 					{
@@ -81,6 +75,15 @@ namespace Lean.Common
 					}
 				}
 			}
+		}
+
+		private void UpdateState()
+		{
+			var min = matchMin >= 0 ? matchMin : LeanSelectable.Instances.Count;
+			var max = matchMax >= 0 ? matchMax : LeanSelectable.Instances.Count;
+			var raw = LeanSelectable.IsSelectedCount;
+
+			SetMatched(raw >= min && raw <= max);
 		}
 	}
 }
@@ -111,6 +114,10 @@ namespace Lean.Common.Editor
 
 			if (usedB == true || usedC == true || showUnusedEvents == true)
 			{
+				if (Draw("matched") == true)
+				{
+					Each(tgts, t => t.Matched = serializedObject.FindProperty("matched").boolValue, true);
+				}
 				Draw("matchMin", "The minimum amount of objects that must be selected for a match.\n\n-1 = Max.");
 				Draw("matchMax", "The maximum amount of objects that can be selected for a match.\n\n-1 = Max.");
 			}
