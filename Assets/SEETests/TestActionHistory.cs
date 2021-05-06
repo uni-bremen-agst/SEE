@@ -230,7 +230,6 @@ namespace SEETests
             // c4 is undone; execution will resume with c3, because c3 is still 
             // in progress (TestAction.Update() always yields false).
             hist.Undo();
-            Assert.AreEqual(3, hist.UndoCount);
             CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c2, value: true,  awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c3, value: true,  awake: 1, start: 2, update: 1, stop: 1);
