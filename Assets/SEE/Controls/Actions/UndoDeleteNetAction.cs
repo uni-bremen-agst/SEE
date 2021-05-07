@@ -74,9 +74,19 @@ namespace SEE.Net
                 {
                     Debug.Log(edgeRef.Value.ItsGraph);
                 }
-                    
-               // Debug.Log(rootNode.GetGraph());
-               
+                
+                Debug.Log(rootNode.GetGraph());
+
+
+                if (!(rootNode.HasNodeRef()&& rootNode.HasEdgeRef()))
+                {
+                    if(SceneQueries.GetCodeCity(rootNode.transform).TryGetComponent<SEECity>(out SEECity city))
+                    {
+                        Debug.Log(city.LoadedGraph);
+                    }
+                   
+                }
+
                 if (rootNode.HasNodeRef())
                 {
                     graph = rootNode.ItsGraph();
