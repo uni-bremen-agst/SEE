@@ -39,7 +39,7 @@ namespace SEE.Net
         {
             this.GameObjectID = gameObjectID;
             garbageCan = GameObject.Find("garbageCan");
-            this.rootID = parentID;
+            this.rootID = rootID;
         }
 
         /// <summary>
@@ -58,7 +58,6 @@ namespace SEE.Net
         {
             if (!IsRequester())
             {
-                Debug.Log("run");
                 GameObject gameObject = GameObject.Find(GameObjectID);
                 GameObject rootNode = GameObject.Find(rootID);
 
@@ -92,7 +91,7 @@ namespace SEE.Net
                     {
                         List<GameObject> removeFromGarbage = new List<GameObject>();
                         removeFromGarbage.Add(gameObject);
-                        PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(removeFromGarbage)));
+                        PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(removeFromGarbage));
                         Node node = gameObject.GetNode();
                         graph.AddNode(node);
                         graph.FinalizeNodeHierarchy();
