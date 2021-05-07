@@ -286,16 +286,12 @@ namespace SEE.Controls.Actions
             foreach (GameObject implicitlyDeletedEdge in implicitlyDeletedEdges)
             {
                 DeleteEdge(implicitlyDeletedEdge);
-                new DeleteNetAction(implicitlyDeletedEdge.name).Execute(null);
             }
 
             // Finally, we remove the nodes themselves.
             foreach (GameObject deletedGameNode in gameNodesToDelete)
-            {
-               
-                DeleteNode(deletedGameNode);
-                new DeleteNetAction(deletedGameNode.name).Execute(null);
-                
+            {    
+                DeleteNode(deletedGameNode);  
             }
         }
 
