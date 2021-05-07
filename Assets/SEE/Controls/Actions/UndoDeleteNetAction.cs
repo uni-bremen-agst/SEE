@@ -64,9 +64,18 @@ namespace SEE.Net
 
 
                 Debug.Log(rootNode.name);
+                if (rootNode.TryGetComponentOrLog(out NodeRef nodeRef))
+                {
+                    Debug.Log(nodeRef.Value.ItsGraph);
+                        
+                }
 
-                Debug.Log(rootNode.ItsGraph());
-                Debug.Log(rootNode.GetGraph());
+                if (rootNode.TryGetComponentOrLog(out EdgeRef edgeRef))
+                {
+                    Debug.Log(edgeRef.Value.ItsGraph);
+                }
+                    
+               // Debug.Log(rootNode.GetGraph());
                
                 if (rootNode.HasNodeRef())
                 {
