@@ -198,7 +198,7 @@ namespace SEE.Controls.Actions
                         {
                             if (roots.Value == nodeGraphPair.Key)
                             {
-                                new UndoDeleteNetAction(nodeGraphPair.Value.Name, roots.Key.name).Execute(null);
+                                new UndoDeleteNetAction(nodeGraphPair.Value.Name, roots.Key.ID()).Execute(null);
                             }
                         }
                     }     
@@ -224,7 +224,7 @@ namespace SEE.Controls.Actions
                     {
                         if (roots.Value == edgeGraphPair.Key)
                         {
-                            new UndoDeleteNetAction(edgeGraphPair.Value.Name, roots.Key.name).Execute(null);
+                            new UndoDeleteNetAction(edgeGraphPair.Value.Name, roots.Key.ID()).Execute(null);
                         }
                     }
                 }
