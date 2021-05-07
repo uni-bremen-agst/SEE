@@ -26,20 +26,20 @@ namespace SEE.Net
 
         public GameObject garbageCan;
 
-        public String parentID;
+        public String rootID;
 
-        public Graph graph; 
+        public Graph graph;
 
         /// <summary>
         /// Creates a new DeleteNetAction.
         /// </summary>
         /// <param name="gameObjectID">the unique name of the gameObject of a node or edge 
         /// that has to be deleted</param>
-        public UndoDeleteNetAction(string gameObjectID,  String parentID) : base()
+        public UndoDeleteNetAction(string gameObjectID, String rootID) : base()
         {
             this.GameObjectID = gameObjectID;
             garbageCan = GameObject.Find("garbageCan");
-            this.parentID = parentID;
+            this.rootID = parentID;
         }
 
         /// <summary>
@@ -60,64 +60,27 @@ namespace SEE.Net
             {
                 Debug.Log("run");
                 GameObject gameObject = GameObject.Find(GameObjectID);
-                GameObject rootNode =  GameObject.Find(parentID);
+                GameObject rootNode = GameObject.Find(rootID);
 
-
-                Debug.Log(rootNode.name);
-                if (rootNode.TryGetComponentOrLog(out NodeRef nodeRef))
-                {
-                    Debug.Log(nodeRef.Value.ItsGraph);
-                        
-                }
-
-                if (rootNode.TryGetComponentOrLog(out EdgeRef edgeRef))
-                {
-                    Debug.Log(edgeRef.Value.ItsGraph);
-                }
-                
-               graph = rootNode.GetGraph();
-
-
-                if (!(rootNode.HasNodeRef()&& rootNode.HasEdgeRef()))
-                {
-                    if(SceneQueries.GetCodeCity(rootNode.transform).TryGetComponent<SEECity>(out SEECity city))
-                    {
-                        Debug.Log(city.LoadedGraph);
-                    }
-                   
-                }
-
-                if (rootNode.HasNodeRef())
-                {
-                    graph = rootNode.ItsGraph();
-                    Debug.Log(graph +  "graph");
-
-                    // oder Graph über city holen 
-                    //parentOfNode.ContainingCity()
-                    // city.loaded graph
-                }
-                else if (rootNode.HasEdgeRef()) 
+                if (rootNode != null)
                 {
                     graph = rootNode.GetGraph();
-                    // oder Graph über city holen 
-                    //parentOfNode.ContainingCity()
-                    // city.loaded graph
-                    Debug.Log(graph + " graphEdgeRef");
+                }
+                else
+                {
+                    throw new System.Exception($"There is no game object with the ID {rootID}");
                 }
 
                 if (gameObject != null)
                 {
-
                     if (gameObject.HasEdgeRef())
                     {
-
-
                         PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.DelayEdges(gameObject));
                         if (gameObject.TryGetComponentOrLog(out EdgeRef edgeReference))
                         {
                             try
                             {
-                                 graph.AddEdge(edgeReference.Value);
+                                graph.AddEdge(edgeReference.Value);
                             }
                             catch (Exception e)
                             {
@@ -125,31 +88,23 @@ namespace SEE.Net
                             }
                         }
                     }
-                        if (gameObject.HasNodeRef())
-                        {
-
-                            List<GameObject> removeFromGarbage = new List<GameObject>();
-                            removeFromGarbage.Add(gameObject);
-                            PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(removeFromGarbage)));
-                            Node node = gameObject.GetNode();
-                            //GameNodeAdder.AddNodeToGraph(parentOfNode.GetNode(),gameObject.GetNode() );
-
-                            Debug.Log(graph);
-                            Debug.Log("adding node to graph");
-                            graph.AddNode(node);
-                            graph.FinalizeNodeHierarchy();
-                            node.ItsGraph = graph;
-                         
-                            
-                        }
-                    }
-
-
-                    else
+                    if (gameObject.HasNodeRef())
                     {
-                        throw new System.Exception($"There is no game object with the ID {GameObjectID}");
+                        List<GameObject> removeFromGarbage = new List<GameObject>();
+                        removeFromGarbage.Add(gameObject);
+                        PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(removeFromGarbage)));
+                        Node node = gameObject.GetNode();
+                        graph.AddNode(node);
+                        graph.FinalizeNodeHierarchy();
+                        node.ItsGraph = graph;
                     }
+                }
+
+                else
+                {
+                    throw new System.Exception($"There is no game object with the ID {GameObjectID}");
                 }
             }
         }
     }
+}

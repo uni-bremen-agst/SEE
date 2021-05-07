@@ -44,7 +44,7 @@ namespace SEE.Controls.Actions
         private ISet<GameObject> explicitlyDeletedNodesAndEdges = new HashSet<GameObject>();
 
         /// <summary>
-        /// A history of all nodes and the graph where they were attached to, deleted by this action.
+        /// A history of all nodes and the graph they were attached to, deleted by this action.
         /// </summary>
         public Dictionary<GameObject, Graph> deletedNodes { get; set; } = new Dictionary<GameObject, Graph>();
 
@@ -53,7 +53,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         public Dictionary<GameObject, Graph> deletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
 
-        private Dictionary<GameObject, Graph> parents { get; set; } = new Dictionary<GameObject, Graph>();
+        /// <summary>
+        /// A datastructure containing the graph´s root of the specific city. 
+        /// </summary>
+        private Dictionary<GameObject, Graph> roots { get; set; } = new Dictionary<GameObject, Graph>();
 
         /// <summary>
         /// The name of the garbage can gameObject.
@@ -144,7 +147,7 @@ namespace SEE.Controls.Actions
         /// <param name="deletedObject">selected GameObject that along with its children should be removed</param>
         /// <returns>true if <paramref name="deletedObject"/> was actually deleted</returns>
         public bool Delete(GameObject deletedObject)
-        {            
+        {
             if (deletedObject.CompareTag(Tags.Edge))
             {
                 InteractableObject.UnselectAll(true);
@@ -169,8 +172,7 @@ namespace SEE.Controls.Actions
                     MarkAsDeleted(deletedObject.AllAncestors());
                 }
             }
-            //hadAnEffect = true;
-           // new DeleteNetAction(deletedObject.name).Execute(null); 
+
             return true;
         }
 
@@ -180,7 +182,7 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
-           
+
             // Re-add all nodes to their graphs.
 
             foreach (KeyValuePair<GameObject, Graph> nodeGraphPair in deletedNodes)
@@ -190,25 +192,26 @@ namespace SEE.Controls.Actions
                     if (!nodeGraphPair.Value.Contains(nodeRef.Value))
                     {
                         nodeGraphPair.Value.AddNode(nodeRef.Value);
-                        if (!parents.ContainsValue(nodeGraphPair.Value))
+                        if (!roots.ContainsValue(nodeGraphPair.Value))
                         {
                             FindRoot(nodeGraphPair.Value);
                         }
-                        foreach (KeyValuePair<GameObject, Graph> roots in parents)
+
+                        // although a loop within a loop should be avoided in general,
+                        // in this case the amount of objects in <paramref name="roots"/> is limited to the amount of codecites.
+                        foreach (KeyValuePair<GameObject, Graph> roots in roots)
                         {
                             if (roots.Value == nodeGraphPair.Key)
                             {
                                 new UndoDeleteNetAction(nodeGraphPair.Key.name, roots.Key.name).Execute(null);
                             }
                         }
-                    }     
+                    }
                 }
-               
+
             }
+
             // Re-add all edges to their graphs.
-
-           
-
             foreach (KeyValuePair<GameObject, Graph> edgeGraphPair in deletedEdges)
             {
 
@@ -216,11 +219,11 @@ namespace SEE.Controls.Actions
                 {
                     edgeGraphPair.Value.AddEdge(edgeReference.Value);
                     PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.DelayEdges(edgeGraphPair.Key));
-                    if (!parents.ContainsValue(edgeGraphPair.Value))
+                    if (!roots.ContainsValue(edgeGraphPair.Value))
                     {
                         FindRoot(edgeGraphPair.Value);
                     }
-                    foreach (KeyValuePair<GameObject, Graph> roots in parents)
+                    foreach (KeyValuePair<GameObject, Graph> roots in roots)
                     {
                         if (roots.Value == edgeGraphPair.Key)
                         {
@@ -228,12 +231,10 @@ namespace SEE.Controls.Actions
                         }
                     }
                 }
-                
+
             }
 
             PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(deletedNodes.Keys)));
-            
-           
         }
 
         /// <summary>
@@ -290,8 +291,8 @@ namespace SEE.Controls.Actions
 
             // Finally, we remove the nodes themselves.
             foreach (GameObject deletedGameNode in gameNodesToDelete)
-            {    
-                DeleteNode(deletedGameNode);  
+            {
+                DeleteNode(deletedGameNode);
             }
         }
 
@@ -309,16 +310,16 @@ namespace SEE.Controls.Actions
         {
             if (gameNode.TryGetComponentOrLog(out NodeRef nodeRef))
             {
-               
+
                 Graph graph = nodeRef.Value.ItsGraph;
                 deletedNodes[gameNode] = graph;
-                if(!parents.ContainsValue(graph))
+                if (!roots.ContainsValue(graph))
                 {
                     FindRoot(graph);
                 }
                 new DeleteNetAction(gameNode.name).Execute(null);
                 graph.RemoveNode(nodeRef.Value);
-                graph.FinalizeNodeHierarchy(); 
+                graph.FinalizeNodeHierarchy();
             }
         }
 
@@ -336,7 +337,7 @@ namespace SEE.Controls.Actions
             {
                 AnimationsOfDeletion.HideEdges(gameEdge);
                 Graph graph = edgeRef.Value.ItsGraph;
-                if (!parents.ContainsValue(graph))
+                if (!roots.ContainsValue(graph))
                 {
                     FindRoot(graph);
                 }
@@ -355,6 +356,10 @@ namespace SEE.Controls.Actions
             return ActionStateType.Delete;
         }
 
+        /// <summary>
+        /// Finds the root of the graph and saves the gameobject and the <param name="graph"></param> in a global field.
+        /// </summary>
+        /// <param name="graph"></param>
         private void FindRoot(Graph graph)
         {
             List<Node> rootNodes = graph.GetRoots();
@@ -363,7 +368,7 @@ namespace SEE.Controls.Actions
             {
                 rootOfCity = SceneQueries.RetrieveGameNode(root.ID);
             }
-            parents.Add(rootOfCity, graph);
+            roots.Add(rootOfCity, graph);
         }
     }
 }

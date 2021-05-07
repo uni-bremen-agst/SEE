@@ -54,7 +54,8 @@ namespace SEE.Net
             if (!IsRequester())
             {   
                 GameObject gameObject = GameObject.Find(GameObjectID);
-                DeleteAction del = new DeleteAction();
+                DeleteAction del = new DeleteAction(); // might be completely unnecessary
+
                 if (gameObject != null)
                 {
                     if (gameObject.HasNodeRef())
@@ -77,11 +78,6 @@ namespace SEE.Net
                     }
                 }
 
-
-
-                
-
-    
                 else
                 {
                     throw new System.Exception($"There is no game object with the ID {GameObjectID}");
