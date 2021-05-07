@@ -61,6 +61,12 @@ namespace SEE.Net
                 Debug.Log("run");
                 GameObject gameObject = GameObject.Find(GameObjectID);
                 GameObject rootNode =  GameObject.Find(parentID);
+
+
+                Debug.Log(rootNode.name);
+
+                Debug.Log(rootNode.ItsGraph());
+                Debug.Log(rootNode.GetGraph());
                
                 if (rootNode.HasNodeRef())
                 {
