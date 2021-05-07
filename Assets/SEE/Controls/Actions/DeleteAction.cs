@@ -361,7 +361,10 @@ namespace SEE.Controls.Actions
 
         private void FindRoot(GameObject gameNodeOrEdge)
         {
-            Graph graph = gameNodeOrEdge.ItsGraph();
+            Graph graph = gameNodeOrEdge.GetGraph();
+          
+            
+
             List<Node> rootNodes = graph.GetRoots();
             GameObject rootOfCity = new GameObject();
             foreach (Node root in rootNodes)
