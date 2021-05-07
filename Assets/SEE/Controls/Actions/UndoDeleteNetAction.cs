@@ -75,7 +75,7 @@ namespace SEE.Net
                     Debug.Log(edgeRef.Value.ItsGraph);
                 }
                 
-                Debug.Log(rootNode.GetGraph());
+               graph = rootNode.GetGraph();
 
 
                 if (!(rootNode.HasNodeRef()&& rootNode.HasEdgeRef()))
