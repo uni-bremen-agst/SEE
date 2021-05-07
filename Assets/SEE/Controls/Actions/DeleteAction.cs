@@ -192,7 +192,7 @@ namespace SEE.Controls.Actions
                         nodeGraphPair.Value.AddNode(nodeRef.Value);
                         if (!parents.ContainsValue(nodeGraphPair.Value))
                         {
-                            FindRoot(nodeGraphPair.Key);
+                            FindRoot(nodeGraphPair.Value);
                         }
                         foreach (KeyValuePair<GameObject, Graph> roots in parents)
                         {
@@ -218,7 +218,7 @@ namespace SEE.Controls.Actions
                     PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.DelayEdges(edgeGraphPair.Key));
                     if (!parents.ContainsValue(edgeGraphPair.Value))
                     {
-                        FindRoot(edgeGraphPair.Key);
+                        FindRoot(edgeGraphPair.Value);
                     }
                     foreach (KeyValuePair<GameObject, Graph> roots in parents)
                     {
@@ -318,7 +318,7 @@ namespace SEE.Controls.Actions
                 deletedNodes[gameNode] = graph;
                 if(!parents.ContainsValue(graph))
                 {
-                    FindRoot(gameNode);
+                    FindRoot(graph);
                 }
                 new DeleteNetAction(gameNode.name).Execute(null);
                 graph.RemoveNode(nodeRef.Value);
@@ -342,7 +342,7 @@ namespace SEE.Controls.Actions
                 Graph graph = edgeRef.Value.ItsGraph;
                 if (!parents.ContainsValue(graph))
                 {
-                    FindRoot(gameEdge);
+                    FindRoot(graph);
                 }
                 new DeleteNetAction(gameEdge.name).Execute(null);
                 deletedEdges[gameEdge] = graph;
@@ -359,12 +359,8 @@ namespace SEE.Controls.Actions
             return ActionStateType.Delete;
         }
 
-        private void FindRoot(GameObject gameNodeOrEdge)
+        private void FindRoot(Graph graph)
         {
-            Graph graph = gameNodeOrEdge.GetGraph();
-          
-            
-
             List<Node> rootNodes = graph.GetRoots();
             GameObject rootOfCity = new GameObject();
             foreach (Node root in rootNodes)
