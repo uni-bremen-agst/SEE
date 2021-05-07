@@ -16,8 +16,6 @@ namespace SEE.Game.UI.PropertyDialog
     {
         public HideModeSelector mode;
 
-        
-
         /// <summary>
         /// Event triggered when the user presses the OK button. Clients can
         /// register on this event to receive a notification when this happens.
@@ -28,7 +26,6 @@ namespace SEE.Game.UI.PropertyDialog
         /// register on this event to receive a notification when this happens.
         /// </summary>
         public readonly UnityEvent OnCancel = new UnityEvent();
-
 
         /// <summary>
         /// The dialog used to manipulate the node.
@@ -43,24 +40,21 @@ namespace SEE.Game.UI.PropertyDialog
         /// The dialog property for the name of the node to be entered in the dialog.
         /// </summary>
         ///
-        private ButtonProperty b0;
-        private ButtonProperty b1;
-        private ButtonProperty b2;
-        private ButtonProperty b5;
-        private ButtonProperty b4;
-        private ButtonProperty b3;
-        private ButtonProperty b6;
-        private ButtonProperty b7;
-        private ButtonProperty b8;
-        private ButtonProperty b9;
-        private ButtonProperty b10;
 
-        private ButtonProperty fdb0;
         private ButtonProperty fdb1;
         private ButtonProperty fdb2;
 
+        private ButtonProperty sdb1;
+        private ButtonProperty sdb2;
+        private ButtonProperty sdb3;
+        private ButtonProperty sdb4;
+        private ButtonProperty sdb5;
+        private ButtonProperty sdb6;
 
-        private ButtonProperty doneSelectiongButton;
+        private ButtonProperty mdb1;
+        private ButtonProperty mdb2;
+        private ButtonProperty mdb3;
+        private ButtonProperty mdb4;
 
         public HideInInspector selectedMode;
 
@@ -73,44 +67,31 @@ namespace SEE.Game.UI.PropertyDialog
             indicator.AnchorMin = Vector2.zero;
             indicator.AnchorMax = Vector2.zero;
             indicator.Pivot = Vector2.zero;
-
             indicator.ChangeState("Select Objects");
 
             indicator.OnSelected.AddListener(() => SetMode(indicator.hideMode));
-
-
-
-
         }
 
         public void Open()
         {
             dialog = new GameObject("Hideaction mode selector");
 
-            // Name of the node
-
-            fdb0 = dialog.AddComponent<ButtonProperty>();
-            fdb0.Name = "Single Selection";
-            fdb0.Description = "Select objects";
-            fdb0.Value = HideModeSelector.SelectSingleHide;
-
             fdb1 = dialog.AddComponent<ButtonProperty>();
-            fdb1.Name = "Multiple Selection"; 
+            fdb1.Name = "Single Selection";
             fdb1.Description = "Select objects";
-            fdb1.Value = HideModeSelector.SelectMultipleHide;
+            fdb1.Value = HideModeSelector.SelectSingleHide;
 
+            fdb2 = dialog.AddComponent<ButtonProperty>();
+            fdb2.Name = "Multiple Selection";
+            fdb2.Description = "Select objects";
+            fdb2.Value = HideModeSelector.SelectMultipleHide;
 
-            // Group for node name and type
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
-            group.AddProperty(fdb0);
             group.AddProperty(fdb1);
+            group.AddProperty(fdb2);
 
-            fdb0.OnSelected.AddListener(() => SetMode(fdb0.hideMode));
             fdb1.OnSelected.AddListener(() => SetMode(fdb1.hideMode));
-
-
-
-
+            fdb2.OnSelected.AddListener(() => SetMode(fdb2.hideMode));
 
             // Dialog
             PropertyDialog propertyDialog = dialog.AddComponent<PropertyDialog>();
@@ -125,77 +106,59 @@ namespace SEE.Game.UI.PropertyDialog
             SEEInput.KeyboardShortcutsEnabled = false;
             // Go online
             propertyDialog.DialogShouldBeShown = true;
-
         }
 
 
         public void OpenSinge()
-
         {
-
-
-
-
             dialog = new GameObject("Hideaction mode selector");
 
-            b1 = dialog.AddComponent<ButtonProperty>();
-            b1.Name = "Hide all";
-            b1.Description = "Hides everything";
-            b1.Value = HideModeSelector.HideAll;
+            sdb1 = dialog.AddComponent<ButtonProperty>();
+            sdb1.Name = "Hide all";
+            sdb1.Description = "Hides everything";
+            sdb1.Value = HideModeSelector.HideAll;
 
+            sdb2 = dialog.AddComponent<ButtonProperty>();
+            sdb2.Name = "Hide incoming";
+            sdb2.Description = "Hides only incoming edges";
+            sdb2.Value = HideModeSelector.HideIncoming;
 
+            sdb3 = dialog.AddComponent<ButtonProperty>();
+            sdb3.Name = "Hide outgoing";
+            sdb3.Description = "Beschreibung";
+            sdb3.Value = HideModeSelector.HideOutgoing;
 
-            b4 = dialog.AddComponent<ButtonProperty>();
-            b4.Name = "Hide incoming";
-            b4.Description = "Hides only incoming edges";
-            b4.Value = HideModeSelector.HideIncoming;
+            sdb4 = dialog.AddComponent<ButtonProperty>();
+            sdb4.Name = "Hide forward transitive closure";
+            sdb4.Description = "Beschreibung";
+            sdb4.Value = HideModeSelector.HideForwardTransitveClosure;
 
+            sdb5 = dialog.AddComponent<ButtonProperty>();
+            sdb5.Name = "Hide backward transitive closure";
+            sdb5.Description = "Beschreibung";
+            sdb5.Value = HideModeSelector.HideBackwardTransitiveClosure;
 
-            b5 = dialog.AddComponent<ButtonProperty>();
-            b5.Name = "Hide outgoing";
-            b5.Description = "Beschreibung";
-            b5.Value = HideModeSelector.HideOutgoing;
-
-
-
-            b7 = dialog.AddComponent<ButtonProperty>();
-            b7.Name = "Hide forward transitive closure";
-            b7.Description = "Beschreibung";
-            b7.Value = HideModeSelector.HideForwardTransitveClosure;
-
-            b8 = dialog.AddComponent<ButtonProperty>();
-            b8.Name = "Hide backward transitive closure";
-            b8.Description = "Beschreibung";
-            b8.Value = HideModeSelector.HideBackwardTransitiveClosure;
-
-            b9 = dialog.AddComponent<ButtonProperty>();
-            b9.Name = "Hide transitive closure";
-            b9.Description = "Beschreibung";
-            b9.Value = HideModeSelector.HideAllTransitiveClosure;
-
-
-
+            sdb6 = dialog.AddComponent<ButtonProperty>();
+            sdb6.Name = "Hide transitive closure";
+            sdb6.Description = "Beschreibung";
+            sdb6.Value = HideModeSelector.HideAllTransitiveClosure;
 
             // Group for node name and type
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
-            group.AddProperty(b1);
-            group.AddProperty(b4);
-            group.AddProperty(b5);
+            group.AddProperty(sdb1);
+            group.AddProperty(sdb2);
+            group.AddProperty(sdb3);
 
-            group.AddProperty(b7);
-            group.AddProperty(b8);
-            group.AddProperty(b9);
+            group.AddProperty(sdb4);
+            group.AddProperty(sdb5);
+            group.AddProperty(sdb6);
 
-            b1.OnSelected.AddListener(() => SetMode(b1.hideMode));
-            b4.OnSelected.AddListener(() => SetMode(b4.hideMode));
-            b5.OnSelected.AddListener(() => SetMode(b5.hideMode));
-            b7.OnSelected.AddListener(() => SetMode(b7.hideMode));
-            b8.OnSelected.AddListener(() => SetMode(b8.hideMode));
-            b9.OnSelected.AddListener(() => SetMode(b9.hideMode));
-
-
-
-
+            sdb1.OnSelected.AddListener(() => SetMode(sdb1.hideMode));
+            sdb2.OnSelected.AddListener(() => SetMode(sdb2.hideMode));
+            sdb3.OnSelected.AddListener(() => SetMode(sdb3.hideMode));
+            sdb4.OnSelected.AddListener(() => SetMode(sdb4.hideMode));
+            sdb5.OnSelected.AddListener(() => SetMode(sdb5.hideMode));
+            sdb6.OnSelected.AddListener(() => SetMode(sdb6.hideMode));
 
             // Dialog
             PropertyDialog propertyDialog = dialog.AddComponent<PropertyDialog>();
@@ -211,8 +174,6 @@ namespace SEE.Game.UI.PropertyDialog
             // Go online
             propertyDialog.DialogShouldBeShown = true;
         }
-
-
 
         /// <summary>
         /// Creates and opens the dialog.
@@ -221,41 +182,37 @@ namespace SEE.Game.UI.PropertyDialog
         {
             dialog = new GameObject("Hideaction mode selector");
 
-            b2 = dialog.AddComponent<ButtonProperty>();
-            b2.Name = "Hide selected";
-            b2.Description = "Hides only the selected objects";
-            b2.Value = HideModeSelector.HideSelected;
+            mdb1 = dialog.AddComponent<ButtonProperty>();
+            mdb1.Name = "Hide selected";
+            mdb1.Description = "Hides only the selected objects";
+            mdb1.Value = HideModeSelector.HideSelected;
 
-            b3 = dialog.AddComponent<ButtonProperty>();
-            b3.Name = "Hide unselceted";
-            b3.Description = "Hides only the unselected objects";
-            b3.Value = HideModeSelector.HideUnselected;
+            mdb2 = dialog.AddComponent<ButtonProperty>();
+            mdb2.Name = "Hide unselceted";
+            mdb2.Description = "Hides only the unselected objects";
+            mdb2.Value = HideModeSelector.HideUnselected;
 
-            b6 = dialog.AddComponent<ButtonProperty>();
-            b6.Name = "Hide all edges of selected";
-            b6.Description = "Beschreibung";
-            b6.Value = HideModeSelector.HideAllEdgesOfSelected;
+            mdb3 = dialog.AddComponent<ButtonProperty>();
+            mdb3.Name = "Hide all edges of selected";
+            mdb3.Description = "Beschreibung";
+            mdb3.Value = HideModeSelector.HideAllEdgesOfSelected;
 
-            b10 = dialog.AddComponent<ButtonProperty>();
-            b10.Name = "Highlight connection Edges";
-            b10.Description = "Beschreibung";
-            b10.Value = HideModeSelector.HighlightEdges;
+            mdb4 = dialog.AddComponent<ButtonProperty>();
+            mdb4.Name = "Highlight connection Edges";
+            mdb4.Description = "Beschreibung";
+            mdb4.Value = HideModeSelector.HighlightEdges;
 
             // Group for node name and type
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
-            group.AddProperty(b2);
-            group.AddProperty(b3);
-            group.AddProperty(b6);
-            group.AddProperty(b10);
+            group.AddProperty(mdb1);
+            group.AddProperty(mdb2);
+            group.AddProperty(mdb3);
+            group.AddProperty(mdb4);
 
-            b2.OnSelected.AddListener(() => SetMode(b2.hideMode));
-            b3.OnSelected.AddListener(() => SetMode(b3.hideMode));
-            b6.OnSelected.AddListener(() => SetMode(b6.hideMode));
-            b10.OnSelected.AddListener(() => SetMode(b10.hideMode));
-
-
-
-
+            mdb1.OnSelected.AddListener(() => SetMode(mdb1.hideMode));
+            mdb2.OnSelected.AddListener(() => SetMode(mdb2.hideMode));
+            mdb3.OnSelected.AddListener(() => SetMode(mdb3.hideMode));
+            mdb4.OnSelected.AddListener(() => SetMode(mdb4.hideMode));
 
             // Dialog
             PropertyDialog propertyDialog = dialog.AddComponent<PropertyDialog>();
@@ -270,7 +227,6 @@ namespace SEE.Game.UI.PropertyDialog
             SEEInput.KeyboardShortcutsEnabled = false;
             // Go online
             propertyDialog.DialogShouldBeShown = true;
-
         }
 
         void SetMode(HideModeSelector mode)
@@ -293,10 +249,8 @@ namespace SEE.Game.UI.PropertyDialog
                     this.mode = mode;
                     OKButtonPressed();
                     break;
-
             }
         }
-
 
         /// <summary>
         /// Notifies all listeners on <see cref="OnCancel"/> and closes the dialog.

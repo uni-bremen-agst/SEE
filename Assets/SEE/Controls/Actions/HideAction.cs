@@ -35,59 +35,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         private ISet<GameObject> undoneList = new HashSet<GameObject>();
 
-
-        private readonly AbstractSEECity settings;
-
         /// <summary>
-        /// Specifies whether all objects of selected city should be hidden.
+        /// Saves all highlightesEdges
         /// </summary>
-        private bool hideAll;
-
-        /// <summary>
-        /// Specifies whether selected objects should be hidden.
-        /// </summary>
-        private bool hideSelected;
-
-        /// <summary>
-        /// Specifies whether unselected objects should be hidden.
-        /// </summary>
-        private bool hideUnselected;
-
-        /// <summary>
-        /// Specifies whether incoming edges of selected node (including connected nodes) should be hidden.
-        /// </summary>
-        private bool hideIncoming;
-
-        /// <summary>
-        /// Specifies whether outgoing edges of selected node (including connected nodes) should be hidden.
-        /// </summary>
-        private bool hideOutgoing;
-
-        /// <summary>
-        /// Specifies whether all edges of selected node (including connected nodes) should be hidden.
-        /// </summary>
-        private bool hideAllEdgesOfSelected;
-
-        /// <summary>
-        /// Specifies whether the forward transitive closure of the graph should be hidden.
-        /// </summary>
-        private bool hideForwardTransitiveClosure;
-
-        /// <summary>
-        /// Specifies whether the backward transitive closure of the graph should be hidden.
-        /// </summary>
-        private bool hideBackwardTransitiveClosure;
-
-        /// <summary>
-        /// Specifies whether the transitive closure of the graph should be hidden.
-        /// </summary>
-        private bool hideAllTransitiveClosure;
-
         private ISet<GameObject> highlightesEdges = new HashSet<GameObject>();
-
-
-
-       
 
         private HideModeSelector mode;
 
@@ -125,24 +76,18 @@ namespace SEE.Controls.Actions
             InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
         }
 
-
         private void OpenDialog()
         {
-            // This dialog will set the source name and type of memento.node.
             SEE.Game.UI.PropertyDialog.HidePropertyDialog dialog = new SEE.Game.UI.PropertyDialog.HidePropertyDialog();
 
-            // If the OK button is pressed, we continue with ProgressState.ValuesAreGiven.
             dialog.OnConfirm.AddListener(() => OKButtonPressed());
             dialog.OnCancel.AddListener(() => Cancelled());
 
-            // If the Cancel button is pressed, we continue with ProgressState.AddingIsCanceled.
             dialog.Open();
 
             void OKButtonPressed()
             {
                 mode = dialog.mode;
-                Debug.Log("MODE\n" + dialog.mode);
-               
             }
             void Cancelled()
             {
@@ -153,32 +98,15 @@ namespace SEE.Controls.Actions
         public override void Stop()
         {
             base.Stop();
-
             MakeAllVisible();
-            //UnHightLightEdges();
             selectedObjects = null;
             InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
             InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
         }
 
-        private void UnHightLightEdges()
-        {
-            foreach(GameObject edge in highlightesEdges)
-            {
-                if (edge.TryGetComponent(out LineRenderer lineRenderer))
-                {
-                    lineRenderer.widthMultiplier = 1f;
-                    highlightesEdges.Add(edge);
-                }
-            }
-        }
-
         // Update is called once per frame
         public override bool Update()
         {
-
-
-            Debug.Log("Selected Objects: " + selectedObjects.Count);
             MakeUnselectedTransparent();
             switch (mode)
             {
@@ -246,7 +174,7 @@ namespace SEE.Controls.Actions
                     }
                     break;
                 case HideModeSelector.HighlightEdges:
-                    if (HighLightEdges())
+                    if (HighlightEdges())
                     {
                         hadAnEffect = true;
                         return true;
@@ -360,9 +288,13 @@ namespace SEE.Controls.Actions
             }
         }
 
-        private bool HighLightEdge(GameObject edge)
+        /// <summary>
+        /// Highlights edge by making the edge thicker
+        /// </summary>
+        /// <param name="edge">The edge to be highlighted</param>
+        /// <returns>true if the edge could be made thicker</returns>
+        private bool HighlightEdge(GameObject edge)
         {
-            
             if (edge.TryGetComponent(out LineRenderer lineRenderer))
             {
                 lineRenderer.widthMultiplier = 5f;
@@ -370,6 +302,21 @@ namespace SEE.Controls.Actions
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Makes all edges thinner again
+        /// </summary>
+        private void ReverseHighlightEdges()
+        {
+            foreach (GameObject edge in highlightesEdges)
+            {
+                if (edge.TryGetComponent(out LineRenderer lineRenderer))
+                {
+                    lineRenderer.widthMultiplier = 1f;
+                    highlightesEdges.Add(edge);
+                }
+            }
         }
 
         /// <summary>
@@ -402,7 +349,10 @@ namespace SEE.Controls.Actions
             return true;
         }
 
-
+        /// <summary>
+        /// Makes all the objects that are not selected transparent.
+        /// </summary>
+        /// <returns>true if all unselected objects have been made transparent</returns>
         private bool MakeUnselectedTransparent()
         {
             if (selectedObject != null)
@@ -455,7 +405,10 @@ namespace SEE.Controls.Actions
             }
         }
 
-
+        /// <summary>
+        /// Makes all objects opaque again
+        /// </summary>
+        /// <returns>true if the objects could be made visible again</returns>
         private bool MakeAllVisible()
         {
             if (selectedObject != null)
@@ -490,9 +443,6 @@ namespace SEE.Controls.Actions
                 return false;
             }
         }
-
-
-
 
         /// <summary>
         /// Hides all nodes and edges of the selected city.
@@ -645,7 +595,7 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
-            UnHightLightEdges();
+            ReverseHighlightEdges();
             highlightesEdges.Clear();
             foreach (GameObject g in hiddenObjects)
             {
@@ -810,8 +760,10 @@ namespace SEE.Controls.Actions
                 }
             }
         }
-
-
+        /// <summary>
+        /// Selects all edges that lie between the selected nodes
+        /// </summary>
+        /// <param name="subset">The nodes that are selected</param>
         private void SelectEdgesBetweenSubsetOfNodes(HashSet<GameObject> subset)
         { 
             if(subset != null && subset.Count > 0)
@@ -837,18 +789,18 @@ namespace SEE.Controls.Actions
             }
         }
 
-
-        private bool HighLightEdges()
+        /// <summary>
+        /// Highlights all edges that lie between nodes
+        /// </summary>
+        private bool HighlightEdges()
         {
             SelectEdgesBetweenSubsetOfNodes(selectedObjects);
+            bool succsess = true;
             foreach(GameObject edge in selectedObjects)
             {
-                HighLightEdge(edge);
-
+                succsess = HighlightEdge(edge);
             }
-            
-            Debug.Log("Selected Objects: " + selectedObjects.Count);
-            return true;
+            return succsess;
         }
 
         /// <summary>
@@ -896,6 +848,5 @@ namespace SEE.Controls.Actions
         {
             return ActionStateType.Hide;
         }
-
     }
 }
