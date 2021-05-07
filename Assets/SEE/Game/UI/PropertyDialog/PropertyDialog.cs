@@ -32,7 +32,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// A group could, for instance, be shown as a foldout or tab. The exact
         /// visual representation depends on the implementation.
         /// </summary>
-        protected readonly List<PropertyGroup> groups = new List<PropertyGroup>();
+        private readonly List<PropertyGroup> groups = new List<PropertyGroup>();
 
         /// <summary>
         /// A read-only wrapper around the list of groups for this dialog.
@@ -58,7 +58,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// request to show the dialog, where the actual occurence of the dialog can be delayed 
         /// somewhat.
         /// </summary>
-        protected bool dialogIsShown = false;
+        private bool dialogIsShown = false;
         /// <summary>
         /// Whether the dialog should be shown.
         /// </summary>
@@ -81,7 +81,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// </summary>
         private void OnDestroy()
         {
-            GameObject.Destroy(dialog);
+            Destroy(dialog);
         }
 
         /// <summary>
@@ -109,7 +109,11 @@ namespace SEE.Game.UI.PropertyDialog
         /// <param name="value">whether enabling or disabling is requested</param>
         private void Enable(bool value)
         {
-            dialog?.SetActive(value);
+            if (dialog != null)
+            {
+                dialog.SetActive(value);
+            }
+
             foreach (PropertyGroup group in groups)
             {
                 group.enabled = value;

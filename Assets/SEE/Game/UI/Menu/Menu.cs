@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.Game.UI
+namespace SEE.Game.UI.Menu
 {
     /// <summary>
     /// Represents a menu of various actions the user can choose from.
@@ -51,7 +51,7 @@ namespace SEE.Game.UI
         /// If this does not match <see cref="MenuShown"/>,
         /// the <see cref="Update"/> method will update the UI accordingly.
         /// </summary>
-        private bool CurrentMenuShown = false;
+        private bool CurrentMenuShown;
 
         /// <summary>
         /// This event will be called whenever an entry in the menu is chosen.

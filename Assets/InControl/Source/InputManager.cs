@@ -5,7 +5,6 @@ namespace InControl
 	using System.Collections.ObjectModel;
 	using UnityEngine;
 
-
 	#if NETFX_CORE
 	using System.Reflection;
 	#endif
@@ -71,6 +70,10 @@ namespace InControl
 		public static bool IsSetup { get; private set; }
 
 
+		public static IMouseProvider MouseProvider { get; private set; }
+		public static IKeyboardProvider KeyboardProvider { get; private set; }
+
+
 		internal static string Platform { get; private set; }
 
 		static bool applicationIsFocused;
@@ -120,6 +123,12 @@ namespace InControl
 
 			playerActionSets.Clear();
 
+			MouseProvider = new UnityMouseProvider();
+			MouseProvider.Setup();
+
+			KeyboardProvider = new UnityKeyboardProvider();
+			KeyboardProvider.Setup();
+
 			// TODO: Can this move further down after the UnityInputDeviceManager is added, which is more intuitive?
 			// Currently it's used to verify we're in or after setup for various functions that are
 			// called during manager initialization. There should be a safer way... maybe add IsReset?
@@ -137,20 +146,6 @@ namespace InControl
 			if (UWPDeviceManager.Enable())
 			{
 				enableUnityInput = false;
-			}
-			#endif
-
-			#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-			if (EnableXInput && enableUnityInput)
-			{
-				XInputDeviceManager.Enable();
-			}
-			#endif
-
-			#if UNITY_IOS || UNITY_TVOS
-			if (EnableICade)
-			{
-				ICadeDeviceManager.Enable();
 			}
 			#endif
 
@@ -175,6 +170,27 @@ namespace InControl
 			}
 			#endif
 
+			#if UNITY_STADIA
+			if (StadiaInputDeviceManager.Enable())
+			{
+				enableUnityInput = false;
+			}
+			#endif
+
+			#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+			if (EnableXInput && enableUnityInput)
+			{
+				XInputDeviceManager.Enable();
+			}
+			#endif
+
+			#if UNITY_IOS || UNITY_TVOS
+			if (EnableICade)
+			{
+				ICadeDeviceManager.Enable();
+			}
+			#endif
+
 			// TODO: Can this move further down after the UnityInputDeviceManager is added, which is more intuitive?
 			// Currently, it allows use of InputManager.HideDevicesWithProfile() to be called in OnSetup, which is possibly useful?
 			if (OnSetup != null)
@@ -189,7 +205,11 @@ namespace InControl
 
 			if (enableUnityInput)
 			{
+				#if INCONTROL_USE_NEW_UNITY_INPUT
+				AddDeviceManager<NewUnityInputDeviceManager>();
+				#else
 				AddDeviceManager<UnityInputDeviceManager>();
+				#endif
 			}
 
 			return true;
@@ -216,6 +236,9 @@ namespace InControl
 			DestroyDevices();
 
 			playerActionSets.Clear();
+
+			MouseProvider.Reset();
+			KeyboardProvider.Reset();
 
 			IsSetup = false;
 		}
@@ -253,6 +276,9 @@ namespace InControl
 			currentTick++;
 			UpdateCurrentTime();
 			var deltaTime = currentTime - lastUpdateTime;
+
+			MouseProvider.Update();
+			KeyboardProvider.Update();
 
 			UpdateDeviceManagers( deltaTime );
 

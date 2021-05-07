@@ -44,7 +44,7 @@ namespace OdinSerializer.Editor
         /// <param name="scanResources">Whether to scan the project's resources.</param>
         /// <param name="resourcesToScan">An optional list of the resource paths to scan. Only has an effect if the scanResources argument is true. All the resources will be scanned if null.</param>
         /// <returns>true if the scan succeeded, false if the scan failed or was cancelled</returns>
-        public static bool ScanProjectForSerializedTypes(out List<Type> serializedTypes, bool scanBuildScenes = true, bool scanAllAssetBundles = true, bool scanPreloadedAssets = true, bool scanResources = true, List<string> resourcesToScan = null)
+        public static bool ScanProjectForSerializedTypes(out List<Type> serializedTypes, bool scanBuildScenes = true, bool scanAllAssetBundles = true, bool scanPreloadedAssets = true, bool scanResources = true, List<string> resourcesToScan = null, bool scanAddressables = true)
         {
             using (var scanner = new AOTSupportScanner())
             {
@@ -74,6 +74,13 @@ namespace OdinSerializer.Editor
                 if (scanPreloadedAssets && !scanner.ScanPreloadedAssets(showProgressBar: true))
                 {
                     Debug.Log("Project scan canceled while scanning preloaded assets and their dependencies.");
+                    serializedTypes = null;
+                    return false;
+                }
+
+                if (scanAddressables && !scanner.ScanAllAddressables(includeAssetDependencies: true, showProgressBar: true))
+                {
+                    Debug.Log("Project scan canceled while scanning addressable assets and their dependencies.");
                     serializedTypes = null;
                     return false;
                 }
@@ -345,9 +352,13 @@ namespace OdinSerializer.Editor
                 pluginImporter.SetCompatibleWithAnyPlatform(true);
 
                 // Disable for all standalones
-                pluginImporter.SetCompatibleWithPlatform(BuildTarget.StandaloneLinux, false);
                 pluginImporter.SetCompatibleWithPlatform(BuildTarget.StandaloneLinux64, false);
-                pluginImporter.SetCompatibleWithPlatform(BuildTarget.StandaloneLinuxUniversal, false);
+                
+                if (!UnityVersion.IsVersionOrGreater(2019, 2))
+                {
+                    pluginImporter.SetCompatibleWithPlatform((BuildTarget)17, false);       // StandaloneLinux
+                    pluginImporter.SetCompatibleWithPlatform((BuildTarget)25, false);       // StandaloneLinuxUniversal
+                }
 
                 // StandaloneOSXUniversal (<= 2017.2) / StandaloneOSX (>= 2017.3)
                 pluginImporter.SetCompatibleWithPlatform((BuildTarget)2, false);

@@ -1,4 +1,4 @@
-Modern UI Pack - v4.4.1
+Modern UI Pack - v4.4.2
 
 Make sure to update TextMesh Pro to the latest version and import its essentials.
 Online documentation: https://docs.google.com/document/d/1TMecEhM6jYPWs9xyyIhugwIhLd8aV98KcasPDq6bApA
@@ -10,7 +10,6 @@ Discord: https://discord.gg/VXpHyUt
 Twitter: https://twitter.com/michskyHQ
 YouTube: https://www.youtube.com/c/michsky
 Reddit: https://www.reddit.com/user/michsky
-Steam: https://steamcommunity.com/id/geezjesus
 
 Special thanks to:
 Geno (Contributor)
@@ -19,6 +18,15 @@ Kabbouchi (Tester)
 Takashi Sakai
 
 Changelog v4.4.2
+----------------------------------------
+• Added script-based animation solution for buttons
+• Improved Button editor layout
+• Improved Window Manager editor features
+• Fixed Range Slider bound issues
+• Fixed WebGL crashes caused by UI Manager
+----------------------------------------
+
+Changelog v4.4.1f
 ----------------------------------------
 • Fixed demo layout issues
 ----------------------------------------

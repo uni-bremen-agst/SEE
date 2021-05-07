@@ -59,6 +59,7 @@ namespace Michsky.UI.ModernUIPack
             var windowFadeOut = serializedObject.FindProperty("windowFadeOut");
             var buttonFadeIn = serializedObject.FindProperty("buttonFadeIn");
             var buttonFadeOut = serializedObject.FindProperty("buttonFadeOut");
+            var editMode = serializedObject.FindProperty("editMode");
 
             switch (currentTab)
             {
@@ -101,6 +102,12 @@ namespace Michsky.UI.ModernUIPack
                     EditorGUILayout.PropertyField(buttonFadeOut, new GUIContent(""));
 
                     GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal(EditorStyles.helpBox);
+
+                    editMode.boolValue = GUILayout.Toggle(editMode.boolValue, new GUIContent("Edit Mode"), customSkin.FindStyle("Toggle"));
+                    editMode.boolValue = GUILayout.Toggle(editMode.boolValue, new GUIContent(""), customSkin.FindStyle("Toggle Helper"));
+
+                    GUILayout.EndHorizontal();
 
                     if (wmTarget.windows.Count != 0)
                     {
@@ -111,6 +118,20 @@ namespace Michsky.UI.ModernUIPack
 
                         GUILayout.Space(2);
                         EditorGUILayout.LabelField(new GUIContent(wmTarget.windows[currentWindowIndex.intValue].windowName), customSkin.FindStyle("Text"));
+
+                        if (editMode.boolValue == true)
+                        {
+                            EditorGUILayout.HelpBox("While Edit Mode is enabled, you can change the visibility of window objects by changing the slider value.", MessageType.Info);
+
+                            for (int i = 0; i < wmTarget.windows.Count; i++)
+                            {
+                                if (i == currentWindowIndex.intValue)
+                                    wmTarget.windows[currentWindowIndex.intValue].windowObject.GetComponent<CanvasGroup>().alpha = 1;
+                                else
+                                    wmTarget.windows[i].windowObject.GetComponent<CanvasGroup>().alpha = 0;
+                            }
+                        }
+
                         GUILayout.EndVertical();
                     }
 

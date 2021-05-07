@@ -3,6 +3,7 @@ using UnityEditor;
 
 namespace Michsky.UI.ModernUIPack
 {
+    [CanEditMultipleObjects]
     [CustomEditor(typeof(ButtonManagerWithIcon))]
     public class ButtonManagerWithIconEditor : Editor
     {
@@ -80,6 +81,8 @@ namespace Michsky.UI.ModernUIPack
             var maxSize = serializedObject.FindProperty("maxSize");
             var startColor = serializedObject.FindProperty("startColor");
             var transitionColor = serializedObject.FindProperty("transitionColor");
+            var animationSolution = serializedObject.FindProperty("animationSolution");
+            var fadingMultiplier = serializedObject.FindProperty("fadingMultiplier");
 
             switch (currentTab)
             {
@@ -196,6 +199,18 @@ namespace Michsky.UI.ModernUIPack
                     break;
 
                 case 2:
+                    GUILayout.BeginHorizontal(EditorStyles.helpBox);
+
+                    EditorGUILayout.LabelField(new GUIContent("Animation Solution"), customSkin.FindStyle("Text"), GUILayout.Width(120));
+                    EditorGUILayout.PropertyField(animationSolution, new GUIContent(""));
+
+                    GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal(EditorStyles.helpBox);
+
+                    EditorGUILayout.LabelField(new GUIContent("Fading Multiplier"), customSkin.FindStyle("Text"), GUILayout.Width(120));
+                    EditorGUILayout.PropertyField(fadingMultiplier, new GUIContent(""));
+
+                    GUILayout.EndHorizontal();
                     GUILayout.BeginHorizontal(EditorStyles.helpBox);
 
                     useCustomContent.boolValue = GUILayout.Toggle(useCustomContent.boolValue, new GUIContent("Use Custom Content"), customSkin.FindStyle("Toggle"));

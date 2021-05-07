@@ -125,7 +125,7 @@ namespace SEE.Controls.Actions
 
                     DrawLine();
                     // The line has been continued so this action has had a visible effect.
-                    hadAnEffect = true;
+                    currentState = ReversibleAction.Progress.Completed;
                 }
                 // The action is considered complete if the mouse button is no longer pressed.
                 return Input.GetMouseButtonUp(0);

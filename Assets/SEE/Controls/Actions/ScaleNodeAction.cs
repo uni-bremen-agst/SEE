@@ -1,139 +1,228 @@
 ﻿using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
+using System;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Action to scale an existing node.
+    /// Action to scale a node.
     /// </summary>
     public class ScaleNodeAction : AbstractPlayerAction
     {
         /// <summary>
-        /// The old position of the top sphere
+        /// Returns a new instance of <see cref="ScaleNodeAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public static ReversibleAction CreateReversibleAction()
+        {
+            return new ScaleNodeAction();
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="ScaleNodeAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
+        }
+
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this action.
+        /// </summary>
+        /// <returns><see cref="ActionStateType.ScaleNode"/></returns>
+        public override ActionStateType GetActionStateType()
+        {
+            return ActionStateType.ScaleNode;
+        }
+
+        /// <summary>
+        /// The old position of the top sphere.
         /// </summary>
         private Vector3 topOldSpherePos;
 
         /// <summary>
-        /// The old position of the first corner sphere
+        /// The old position of the first corner sphere.
         /// </summary>
         private Vector3 firstCornerOldSpherePos;
 
         /// <summary>
-        /// The old position of the second corner sphere
+        /// The old position of the second corner sphere.
         /// </summary>
         private Vector3 secondCornerOldSpherePos;
 
         /// <summary>
-        /// The old position of the third corner sphere
+        /// The old position of the third corner sphere.
         /// </summary>
         private Vector3 thirdCornerOldSpherePos;
 
         /// <summary>
-        /// The old position of the forth corner sphere
+        /// The old position of the forth corner sphere.
         /// </summary>
         private Vector3 forthCornerOldSpherePos;
 
         /// <summary>
-        /// The old position of the first side sphere
+        /// The old position of the first side sphere.
         /// </summary>
         private Vector3 firstSideOldSpherePos;
 
         /// <summary>
-        /// The old position of the second side sphere
+        /// The old position of the second side sphere.
         /// </summary>
         private Vector3 secondSideOldSpherePos;
 
         /// <summary>
-        /// The old position of the third side sphere
+        /// The old position of the third side sphere.
         /// </summary>
         private Vector3 thirdSideOldSpherePos;
 
         /// <summary>
-        /// The old position of the forth side sphere
+        /// The old position of the forth side sphere.
         /// </summary>
         private Vector3 forthSideOldSpherePos;
 
         /// <summary>
-        /// The scale at the start so the user can reset the changes made during scaling
-        /// </summary>
-        private Vector3 originalScale;
-
-        /// <summary>
-        /// The position at the start so the user can reset the changes made during scaling
-        /// </summary>
-        private Vector3 originalPosition;
-
-        /// <summary>
-        /// The sphere on top of the gameObject to scale
+        /// The sphere on top of the gameObject to scale.
         /// </summary>
         private GameObject topSphere;
 
         /// <summary>
-        /// The sphere on the first corner of the gameObject to scale
+        /// The sphere on the first corner of the gameObject to scale.
         /// </summary>
         private GameObject firstCornerSphere; //x0 y0
 
         /// <summary>
-        /// The sphere on the second corner of the gameObject to scale
+        /// The sphere on the second corner of the gameObject to scale.
         /// </summary>
         private GameObject secondCornerSphere; //x1 y0
 
         /// <summary>
-        /// The sphere on the third corner of the gameObject to scale
+        /// The sphere on the third corner of the gameObject to scale.
         /// </summary>
         private GameObject thirdCornerSphere; //x1 y1
 
         /// <summary>
-        /// The sphere on the forth corner of the gameObject to scale
+        /// The sphere on the forth corner of the gameObject to scale.
         /// </summary>
         private GameObject forthCornerSphere; //x0 y1
 
         /// <summary>
-        /// The sphere on the first side of the gameObject to scale
+        /// The sphere on the first side of the gameObject to scale.
         /// </summary>
         private GameObject firstSideSphere; //x0 y0
 
         /// <summary>
-        /// The sphere on the second side of the gameObject to scale
+        /// The sphere on the second side of the gameObject to scale.
         /// </summary>
         private GameObject secondSideSphere; //x1 y0
 
         /// <summary>
-        /// The sphere on the third side of the gameObject to scale
+        /// The sphere on the third side of the gameObject to scale.
         /// </summary>
         private GameObject thirdSideSphere; //x1 y1
 
         /// <summary>
-        /// The sphere on the forth side of the gameObject to scale
+        /// The sphere on the forth side of the gameObject to scale.
         /// </summary>
         private GameObject forthSideSphere; //x0 y1
 
         /// <summary>
-        /// The gameObject which will end the scaling and start the save process
-        /// </summary>
-        private GameObject endWithSave;
-
-        /// <summary>
-        /// The gameObject which will end the scaling process and start the discard changes process
-        /// </summary>
-        private GameObject endWithOutSave;
-
-        /// <summary>
-        /// The gameObject in which will be saved which sphere was dragged
+        /// The scaling gizmo selected by the user to scale <see cref="objectToScale"/>.
+        /// Will be null if none was selected yet.
         /// </summary>
         private GameObject draggedSphere;
 
         /// <summary>
-        /// The gameObject which should be scaled
+        /// The gameObject that is currently selected and should be scaled.
+        /// Will be null if no object has been selected yet.
         /// </summary>
         private GameObject objectToScale;
 
-        public override void Start()
+        /// <summary>
+        /// A memento of the position and scale of <see cref="objectToScale"/> before
+        /// or after, respectively, it was scaled.
+        /// </summary>
+        private class Memento
         {
-            InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
-            InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
+            /// <summary>
+            /// The scale at the point in time when the memento was created (in world space).
+            /// </summary>
+            public readonly Vector3 Scale;
+
+            /// <summary>
+            /// The position at the point in time when the memento was created (in world space).
+            /// </summary>
+            public readonly Vector3 Position;
+
+            /// <summary>
+            /// Constructor taking a snapshot of the position and scale of <paramref name="gameObject"/>.
+            /// </summary>
+            /// <param name="gameObject">object whose position and scale are to be captured</param>
+            public Memento(GameObject gameObject) 
+            {
+                Position = gameObject.transform.position;
+                Scale = gameObject.transform.lossyScale;
+            }
+
+            /// <summary>
+            /// Reverts the position and scale of <paramref name="gameObject"/> to
+            /// <see cref="Position"/> and <see cref="Scale"/>.
+            /// </summary>
+            /// <param name="gameObject">object whose position and scale are to be restored</param>
+            public void Revert(GameObject gameObject)
+            {
+                gameObject.SetScale(Scale);
+                gameObject.transform.position = Position;
+            }
+        }
+
+        /// <summary>
+        /// Removes all scaling gizmos.
+        /// </summary>
+        public override void Stop()
+        {
+            base.Stop();
+            RemoveSpheres();
+        }
+
+        /// <summary>
+        /// The memento for <see cref="objectToScale"/> before the action begun,
+        /// that is, the original values. This memento is needed for <see cref="Undo"/>.
+        /// </summary>
+        private Memento beforeAction;
+
+        /// <summary>
+        /// The memento for <see cref="objectToScale"/> after the action was completed,
+        /// that is, the values after the scaling. This memento is needed for <see cref="Redo"/>.
+        /// </summary>
+        private Memento afterAction;
+
+        /// <summary>
+        /// Undoes this ScaleNodeAction.
+        /// </summary>
+        public override void Undo()
+        {
+            base.Undo();
+            beforeAction.Revert(objectToScale);
+            new ScaleNodeNetAction(objectToScale.name, objectToScale.transform.lossyScale, objectToScale.transform.position).Execute();
+        }
+
+        /// <summary>
+        /// Redoes this ScaleNodeAction.
+        /// </summary>
+        public override void Redo()
+        {
+            if (afterAction != null)
+            {
+                // The user might have canceled the scaling operation, in which case
+                // afterAction will be null. Only if something has actually changed,
+                // we need to re-do the action.
+                base.Redo();
+                afterAction.Revert(objectToScale);
+                new ScaleNodeNetAction(objectToScale.name, objectToScale.transform.lossyScale, objectToScale.transform.position).Execute();
+            }
         }
 
         /// <summary>
@@ -143,192 +232,199 @@ namespace SEE.Controls.Actions
         private bool scalingGizmosAreDrawn = false;
 
         /// <summary
-        /// See <see cref="ReversibleAction.Update"/>.
+        /// See <see cref="ReversibleAction.Update"/>. 
+        /// 
+        /// Note: The action is finalized only if the user selects anything except the 
+        /// <see cref="objectToScale"/> or any of the scaling gizmos.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            bool result = false;
-
-            if (objectToScale != null && !scalingGizmosAreDrawn)
+            if (objectToScale != null)
             {
-                // We draw the gizmos that allow a user to scale the object in all three dimensions.
-
-                originalScale = objectToScale.transform.lossyScale;
-                originalPosition = objectToScale.transform.position;
-
-                // Top sphere
-                topSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                SphereRadius(topSphere);
-
-                // Corner spheres
-                firstCornerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                SphereRadius(firstCornerSphere);
-
-                secondCornerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                SphereRadius(secondCornerSphere);
-
-                thirdCornerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                SphereRadius(thirdCornerSphere);
-
-                forthCornerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                SphereRadius(forthCornerSphere);
-
-                // Side spheres
-                firstSideSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                SphereRadius(firstSideSphere);
-
-                secondSideSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                SphereRadius(secondSideSphere);
-
-                thirdSideSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                SphereRadius(thirdSideSphere);
-
-                forthSideSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                SphereRadius(forthSideSphere);
-
-                // End operations
-                endWithSave = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                SphereRadius(endWithSave);
-                endWithSave.GetComponent<Renderer>().material.color = Color.green;
-
-                endWithOutSave = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                SphereRadius(endWithOutSave);
-                endWithOutSave.GetComponent<Renderer>().material.color = Color.red;
-
-                // Positioning
-                SetOnRoof();
-                SetOnSide();
-                scalingGizmosAreDrawn = true;
+                // We can scale objectToScale.
+                if (!scalingGizmosAreDrawn)
+                {
+                    DrawGamingGizmos();
+                }
+                if (SEEInput.Drag())
+                {
+                    if (draggedSphere == null && Raycasting.RayCastAnything(out RaycastHit raycastHit))
+                    {
+                        draggedSphere = SelectedScalingGizmo(raycastHit.collider.gameObject);
+                    }
+                    if (draggedSphere != null)
+                    {
+                        Scaling();
+                    }
+                }
             }
-            if (Input.GetMouseButtonDown(0) && objectToScale == null)
+
+            if (SEEInput.Select())
             {
-                objectToScale = hoveredObject;
-            }
-            if (scalingGizmosAreDrawn && Input.GetMouseButton(0))
-            {
-                if (draggedSphere == null)
-                {
-                    Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
-
-                    // Casts the ray and get the first game object hit
-                    Physics.Raycast(ray, out RaycastHit hit);
-
-                    // Moves the sphere that was hit.
-                    // Top
-                    if (hit.collider == topSphere.GetComponent<Collider>())
-                    {
-                        draggedSphere = topSphere;
-                    } // Corners
-                    else if (hit.collider == firstCornerSphere.GetComponent<Collider>())
-                    {
-                        draggedSphere = firstCornerSphere;
-                    }
-                    else if (hit.collider == secondCornerSphere.GetComponent<Collider>())
-                    {
-                        draggedSphere = secondCornerSphere;
-                    }
-                    else if (hit.collider == thirdCornerSphere.GetComponent<Collider>())
-                    {
-                        draggedSphere = thirdCornerSphere;
-                    }
-                    else if (hit.collider == forthCornerSphere.GetComponent<Collider>())
-                    {
-                        draggedSphere = forthCornerSphere;
-                    }
-                    // Sides
-                    else if (hit.collider == firstSideSphere.GetComponent<Collider>())
-                    {
-                        draggedSphere = firstSideSphere;
-                    }
-                    else if (hit.collider == secondSideSphere.GetComponent<Collider>())
-                    {
-                        draggedSphere = secondSideSphere;
-                    }
-                    else if (hit.collider == thirdSideSphere.GetComponent<Collider>())
-                    {
-                        draggedSphere = thirdSideSphere;
-                    }
-                    else if (hit.collider == forthSideSphere.GetComponent<Collider>())
-                    {
-                        draggedSphere = forthSideSphere;
-                    }
-                    //End Scaling
-                    else if (hit.collider == endWithSave.GetComponent<Collider>())
-                    {
-                        EndScale(true);
-                        // scaling is finalized
-                        result = true;
-                    }
-                    else if (hit.collider == endWithOutSave.GetComponent<Collider>())
-                    {
-                        EndScale(false);
-                    }
-                }
-
-                if (draggedSphere == topSphere)
-                {
-                    GameNodeMover.MoveToLockAxes(draggedSphere, false, true, false);
-                }
-                else if (draggedSphere == firstCornerSphere || draggedSphere == secondCornerSphere 
-                         || draggedSphere == thirdCornerSphere || draggedSphere == forthCornerSphere)
-                {
-                    GameNodeMover.MoveToLockAxes(draggedSphere, true, false, true);
-                }
-                else if (draggedSphere == firstSideSphere || draggedSphere == secondSideSphere)
-                {
-                    GameNodeMover.MoveToLockAxes(draggedSphere, true, false, false);
-                }
-                else if (draggedSphere == thirdSideSphere || draggedSphere == forthSideSphere)
-                {
-                    GameNodeMover.MoveToLockAxes(draggedSphere, false, false, true);
-                }
-                else
-                {
-                    draggedSphere = null;
-                }
-
+                HitGraphElement hitGraphElement = Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _);
                 if (objectToScale != null)
                 {
-                    ScaleNode();
-                    SetOnRoof();
-                    SetOnSide();
-                }                
+                    // An object to be scaled has been selected already. Yet, we have another selection event.
+                    // Is something else selected?
+                    if (objectToScale != raycastHit.collider.gameObject)
+                    {
+                        // The user has selected something different from objectToScale.
+                        // Is it one of our scaling gizmos?
+                        GameObject selectedScalingGizmo = SelectedScalingGizmo(raycastHit.collider.gameObject);
+                        if (selectedScalingGizmo != null)
+                        {
+                            draggedSphere = selectedScalingGizmo;
+                            return false;
+                        }
+                        else
+                        {
+                            // Summary: An object to be scaled had been selected. The user then tried another
+                            // selection. The user this time neither selected the object to be scaled again nor one
+                            // of the scaling gizmos. That means, the action is finished and needs to be
+                            // finalized if the user has actually triggered a change at all.
+                            if (objectToScale.transform.position != beforeAction.Position
+                                || objectToScale.transform.lossyScale != beforeAction.Scale)
+                            {
+                                currentState = ReversibleAction.Progress.Completed;
+                                // Scaling action is finalized.
+                                afterAction = new Memento(objectToScale);
+                                draggedSphere = null;
+                                return true;
+                            }
+                            else
+                            {
+                                // Nothing has changed. We will continue with the action.
+                                // We continue with the newly selected node if a node was selected.
+                                if (hitGraphElement == HitGraphElement.Node)
+                                {
+                                    objectToScale = raycastHit.collider.gameObject;
+                                }
+                                else
+                                {
+                                    objectToScale = null;
+                                }
+                                RemoveSpheres();
+                                draggedSphere = null;
+                                return false;
+                            }
+                        }
+                    }
+                }
+                else if (hitGraphElement == HitGraphElement.Node)
+                {
+                    // No object to be scaled had been selected yet, but now we have one.
+                    objectToScale = raycastHit.collider.gameObject;
+                    beforeAction = new Memento(objectToScale);
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Scales <see cref="objectToScale"/> and drags and re-draws the scaling gizmos. 
+        /// </summary>
+        private void Scaling()
+        {
+            DragSphere(draggedSphere);
+            
+            ScaleNode();
+            SetOnRoof();
+            SetOnSide();
+            AdjustSizeOfScalingGizmos();
+        }
+
+        /// <summary>
+        /// Adjusts the size of the scaling elements according to the size of <see cref="objectToScale"/>.
+        /// </summary>
+        private void AdjustSizeOfScalingGizmos()
+        {
+            SphereRadius(topSphere);
+            SphereRadius(firstSideSphere);
+            SphereRadius(secondSideSphere);
+            SphereRadius(thirdSideSphere);
+            SphereRadius(forthSideSphere);
+            SphereRadius(firstCornerSphere);
+            SphereRadius(secondCornerSphere);
+            SphereRadius(thirdCornerSphere);
+            SphereRadius(forthCornerSphere);
+        }
+
+        /// <summary>
+        /// Drags the given <paramref name="scalingGizmo"/> along its axis.
+        /// </summary>
+        /// <param name="scalingGizmo">scaling gizmo to be dragged</param>
+        private void DragSphere(GameObject scalingGizmo)
+        {
+            // Move the draggedSphere along its axis according to the user's request.
+            // Each gizmo is locked to one particular axis.
+            if (scalingGizmo == topSphere)
+            {
+                GameNodeMover.MoveToLockAxes(scalingGizmo, false, true, false);
+            }
+            else if (scalingGizmo == firstCornerSphere || scalingGizmo == secondCornerSphere
+                     || scalingGizmo == thirdCornerSphere || scalingGizmo == forthCornerSphere)
+            {
+                GameNodeMover.MoveToLockAxes(scalingGizmo, true, false, true);
+            }
+            else if (scalingGizmo == firstSideSphere || scalingGizmo == secondSideSphere)
+            {
+                GameNodeMover.MoveToLockAxes(scalingGizmo, true, false, false);
+            }
+            else if (scalingGizmo == thirdSideSphere || scalingGizmo == forthSideSphere)
+            {
+                GameNodeMover.MoveToLockAxes(scalingGizmo, false, false, true);
             }
             else
             {
-                if (objectToScale != null && scalingGizmosAreDrawn)
-                {
-                    draggedSphere = null;
-                    // Adjust the size of the scaling elements
-                    SphereRadius(topSphere);
-                    SphereRadius(firstSideSphere);
-                    SphereRadius(secondSideSphere);
-                    SphereRadius(thirdSideSphere);
-                    SphereRadius(forthSideSphere);
-                    SphereRadius(firstCornerSphere);
-                    SphereRadius(secondCornerSphere);
-                    SphereRadius(thirdCornerSphere);
-                    SphereRadius(forthCornerSphere);
-
-                    SphereRadius(endWithOutSave);
-                    SphereRadius(endWithSave);
-                }
+                throw new ArgumentException($"Unexpected scaling gizmo {scalingGizmo.name}.");
             }
-            return result;
         }
 
         /// <summary>
-        /// Remove the spheres after finishing the action or more explicitly canceling the
-        /// action and switch to another.
+        /// Draws the gizmos that allow a user to scale the object in all three dimensions.
         /// </summary>
-        public override void Stop()
+        private void DrawGamingGizmos()
         {
-            RemoveSpheres();
+            // Top sphere
+            topSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            SphereRadius(topSphere);
+
+            // Corner spheres
+            firstCornerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            SphereRadius(firstCornerSphere);
+
+            secondCornerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            SphereRadius(secondCornerSphere);
+
+            thirdCornerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            SphereRadius(thirdCornerSphere);
+
+            forthCornerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            SphereRadius(forthCornerSphere);
+
+            // Side spheres
+            firstSideSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            SphereRadius(firstSideSphere);
+
+            secondSideSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            SphereRadius(secondSideSphere);
+
+            thirdSideSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            SphereRadius(thirdSideSphere);
+
+            forthSideSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            SphereRadius(forthSideSphere);
+
+            // Positioning
+            SetOnRoof();
+            SetOnSide();
+            scalingGizmosAreDrawn = true;
         }
 
         /// <summary>
-        /// Sets the new scale of a node based on the sphere elements.
+        /// Sets the new scale of <see cref="objectToScale"/> based on the scaling gizmos.
         /// </summary>
         private void ScaleNode()
         {
@@ -341,18 +437,22 @@ namespace SEE.Controls.Actions
 
             // Corner scaling
             float scaleCorner = 0;
-            scaleCorner -= firstCornerSphere.transform.position.x - firstCornerOldSpherePos.x + (firstCornerSphere.transform.position.z - firstCornerOldSpherePos.z); //* 0.5f;
-            scaleCorner += secondCornerSphere.transform.position.x - secondCornerOldSpherePos.x - (secondCornerSphere.transform.position.z - secondCornerOldSpherePos.z); //* 0.5f;
-            scaleCorner += thirdCornerSphere.transform.position.x - thirdCornerOldSpherePos.x + (thirdCornerSphere.transform.position.z - thirdCornerOldSpherePos.z);// * 0.5f;
-            scaleCorner -= forthCornerSphere.transform.position.x - forthCornerOldSpherePos.x - (forthCornerSphere.transform.position.z - forthCornerOldSpherePos.z);// * 0.5f;
+            scaleCorner -= firstCornerSphere.transform.position.x - firstCornerOldSpherePos.x 
+                + (firstCornerSphere.transform.position.z - firstCornerOldSpherePos.z);
+            scaleCorner += secondCornerSphere.transform.position.x - secondCornerOldSpherePos.x 
+                - (secondCornerSphere.transform.position.z - secondCornerOldSpherePos.z);
+            scaleCorner += thirdCornerSphere.transform.position.x - thirdCornerOldSpherePos.x 
+                + (thirdCornerSphere.transform.position.z - thirdCornerOldSpherePos.z);
+            scaleCorner -= forthCornerSphere.transform.position.x - forthCornerOldSpherePos.x 
+                - (forthCornerSphere.transform.position.z - forthCornerOldSpherePos.z);
 
             scale.x += scaleCorner;
             scale.z += scaleCorner;
 
             // Move the gameObject so the user thinks she/he scaled only in one direction
             Vector3 position = objectToScale.transform.position;
-            position.y += scale.y * 0.5f;
-           
+            position.y += scale.y / 2;
+
             // Setting the old positions
             topOldSpherePos = topSphere.transform.position;
             firstCornerOldSpherePos = firstCornerSphere.transform.position;
@@ -384,26 +484,33 @@ namespace SEE.Controls.Actions
             // Transform the new position and scale
             objectToScale.transform.position = position;
             objectToScale.SetScale(scale);
+            currentState = ReversibleAction.Progress.InProgress;
             new ScaleNodeNetAction(objectToScale.name, scale, position).Execute();
         }
 
         /// <summary>
-        /// Sets the top sphere at the top of <see cref="objectToScale"/> and
-        /// the Save (<see cref="endWithSave"/>) and Discard (<see cref="endWithOutSave"/>)
-        /// objects.
+        /// Sets the top scale gizmo at the top of <see cref="objectToScale"/>.
         /// </summary>
         private void SetOnRoof()
         {
             Vector3 pos = objectToScale.transform.position;
-            pos.y = objectToScale.GetRoof() + 0.01f;
+            // The scaling sphere is just above the center of the roof of objectToScale.
+            pos.y = objectToScale.GetRoof() + ScalingSphereRadius();
             topSphere.transform.position = pos;
-
             topOldSpherePos = topSphere.transform.position;
-            pos.y += 0.2f;
-            pos.x += 0.1f;
-            endWithSave.transform.position = pos;
-            pos.x -= 0.2f;
-            endWithOutSave.transform.position = pos;
+        }
+
+        /// <summary>
+        /// Returns the radius of the sphere used to visualize the gizmo to scale the object.
+        /// </summary>
+        /// <returns>radius of the sphere</returns>
+        private float ScalingSphereRadius()
+        {
+            // Assumptions: We assume firstCornerSphere has the same scale as every
+            // other scaling sphere and that it is actually a sphere (more precisely,
+            // that its width and depth are the same so that we can use the x scale
+            // or the z scale; it does not matter).
+            return firstCornerSphere.transform.lossyScale.x / 2.0f;
         }
 
         /// <summary>
@@ -412,116 +519,102 @@ namespace SEE.Controls.Actions
         private void SetOnSide()
         {
             Transform trns = objectToScale.transform;
+            float sphereRadius = ScalingSphereRadius();
+            float xOffset = trns.lossyScale.x / 2 + sphereRadius;
+            float zOffset = trns.lossyScale.z / 2 + sphereRadius;
 
-            // first corner
-            Vector3 pos = objectToScale.transform.position;
-            pos.y = objectToScale.GetRoof();
-            pos.x -= trns.lossyScale.x / 2 + 0.02f;
-            pos.z -= trns.lossyScale.z / 2 + 0.02f;
-            firstCornerSphere.transform.position = pos;
-            firstCornerOldSpherePos = pos;
+            Vector3 Corner(float xOffset, float zOffset)
+            {
+                Vector3 result = trns.position;
+                result.y = objectToScale.GetRoof();
+                result.x += xOffset;
+                result.z += zOffset;
+                return result;
+            }
 
-            // second corner
-            pos = objectToScale.transform.position;
-            pos.y = objectToScale.GetRoof();
-            pos.x += trns.lossyScale.x / 2 + 0.02f;
-            pos.z -= trns.lossyScale.z / 2 + 0.02f;
-            secondCornerSphere.transform.position = pos;
-            secondCornerOldSpherePos = pos;
+            // Calulate the positions of the scaling handles at the four corners of the roof.
+            {
+                // south-west corner
+                {
+                    Vector3 pos = Corner(-xOffset, -zOffset);
+                    firstCornerSphere.transform.position = pos;
+                    firstCornerOldSpherePos = pos;
+                }
+                // south-east corner 
+                {
+                    Vector3 pos = Corner(xOffset, -zOffset);
+                    secondCornerSphere.transform.position = pos;
+                    secondCornerOldSpherePos = pos;
+                }
+                // north-east corner
+                {
+                    Vector3 pos = Corner(xOffset, zOffset);
+                    thirdCornerSphere.transform.position = pos;
+                    thirdCornerOldSpherePos = pos;
+                }
+                // north-west corner
+                {
+                    Vector3 pos = Corner(-xOffset, zOffset);
+                    forthCornerSphere.transform.position = pos;
+                    forthCornerOldSpherePos = pos;
+                }
+            }
 
-            // third corner
-            pos = objectToScale.transform.position;
-            pos.y = objectToScale.GetRoof();
-            pos.x += trns.lossyScale.x / 2 + 0.02f;
-            pos.z += trns.lossyScale.z / 2 + 0.02f;
-            thirdCornerSphere.transform.position = pos;
-            thirdCornerOldSpherePos = pos;
-
-            // forth corner
-            pos = objectToScale.transform.position;
-            pos.y = objectToScale.GetRoof();
-            pos.x -= trns.lossyScale.x / 2 + 0.02f;
-            pos.z += trns.lossyScale.z / 2 + 0.02f;
-            forthCornerSphere.transform.position = pos;
-            forthCornerOldSpherePos = pos;
-
-            // first side
-            pos = objectToScale.transform.position;
-            pos.y = objectToScale.GetRoof();
-            pos.x -= trns.lossyScale.x / 2 + 0.01f;
-
-            firstSideSphere.transform.position = pos;
-            firstSideOldSpherePos = pos;
-
-            // second side
-            pos = objectToScale.transform.position;
-            pos.y = objectToScale.GetRoof();
-            pos.x += trns.lossyScale.x / 2 + 0.01f;
-
-            secondSideSphere.transform.position = pos;
-            secondSideOldSpherePos = pos;
-
-            // third side
-            pos = objectToScale.transform.position;
-            pos.y = objectToScale.GetRoof();
-
-            pos.z -= trns.lossyScale.z / 2 + 0.01f;
-            thirdSideSphere.transform.position = pos;
-            thirdSideOldSpherePos = pos;
-
-            // forth side
-            pos = objectToScale.transform.position;
-            pos.y = objectToScale.GetRoof();
-
-            pos.z += trns.lossyScale.z / 2 + 0.01f;
-            forthSideSphere.transform.position = pos;
-            forthSideOldSpherePos = pos;
+            // Calulate the positions of the scaling handles at the four sides of the roof.
+            {
+                // west side
+                {
+                    Vector3 pos = Corner(-xOffset, 0);
+                    firstSideSphere.transform.position = pos;
+                    firstSideOldSpherePos = pos;
+                }
+                // east side
+                {
+                    Vector3 pos = Corner(xOffset, 0);
+                    secondSideSphere.transform.position = pos;
+                    secondSideOldSpherePos = pos;
+                }
+                // south side
+                {
+                    Vector3 pos = Corner(0, -zOffset);
+                    thirdSideSphere.transform.position = pos;
+                    thirdSideOldSpherePos = pos;
+                }
+                // north side
+                {
+                    Vector3 pos = Corner(0, zOffset);
+                    forthSideSphere.transform.position = pos;
+                    forthSideOldSpherePos = pos;
+                }
+            }
         }
 
         /// <summary>
+        /// The minimal scale a scaling sphere may have in world space.
+        /// </summary>
+        private const float minimalSphereScale = 0.01f;
+
+        /// <summary>
+        /// The size of the scaling spheres will be relative to the game object to be scaled.
+        /// This factor determines that scale. It will be multiplied by the x or z scale of
+        /// <see cref="objectToScale"/> (the smaller of the two). If that value is shorter
+        /// than <see cref="minimalSphereScale"/>, <see cref="minimalSphereScale"/> will
+        /// be used instead.
+        /// </summary>
+        private const float relativeSphereScale = 0.1f;
+
+        /// <summary>
         /// Sets the radius of a sphere dependent on the X and Z scale of <paramref name="sphere"/>
-        ///  that is to be scaled.</summary>
+        /// that is to be scaled.</summary>
         /// <param name="sphere">the sphere to be scaled</param>
         private void SphereRadius(GameObject sphere)
         {
             Vector3 goScale = objectToScale.transform.lossyScale;
-            if (goScale.x > goScale.z && goScale.z > 0.1f)
-            {
-                sphere.transform.localScale = new Vector3(goScale.z, goScale.z, goScale.z) * 0.1f; ;
-            }
-            else if (goScale.x > 0.1f)
-            {
-                sphere.transform.localScale = new Vector3(goScale.x, goScale.x, goScale.x) * 0.1f;
-            }
-            else
-            {
-                sphere.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
-            }
+            sphere.transform.localScale = Vector3.one * Mathf.Max(Mathf.Min(goScale.x, goScale.z) * relativeSphereScale, minimalSphereScale);
         }
 
         /// <summary>
-        /// This will end the scaling action the user can choose between save and discard.
-        /// </summary>
-        /// <param name="save">Whether the changes should be saved</param>
-        public void EndScale(bool save)
-        {
-            if (save)
-            {
-                // FIXME: Currently, the changes will not be saved after closing the game. 
-                // SAVE THE CHANGES
-                RemoveSpheres();
-            }
-            else
-            {
-                objectToScale.SetScale(originalScale);
-                objectToScale.transform.position = originalPosition;
-                new ScaleNodeNetAction(objectToScale.name, originalScale, originalPosition).Execute();
-                RemoveSpheres();
-            }
-        }
-
-        /// <summary>
-        /// Resets all attributes from the gameObject.
+        /// Destroys all scaling gizmos. Sets <see cref="scalingGizmosAreDrawn"/> to false.
         /// </summary>
         public void RemoveSpheres()
         {
@@ -534,53 +627,37 @@ namespace SEE.Controls.Actions
             Destroyer.DestroyGameObject(secondSideSphere);
             Destroyer.DestroyGameObject(thirdSideSphere);
             Destroyer.DestroyGameObject(forthSideSphere);
-            Destroyer.DestroyGameObject(endWithSave);
-            Destroyer.DestroyGameObject(endWithOutSave);
-            objectToScale = null;
             scalingGizmosAreDrawn = false;
         }
 
         /// <summary>
-        /// Undoes this ScaleNodeAction
+        /// If <paramref name="gameObject"/> is any of our scaling gizmos, 
+        /// this gizmo will be returned; otherwise null
         /// </summary>
-        public override void Undo()
+        /// <param name="gameObject">the hit game object</param>
+        /// <returns><paramref name="gameObject"/> if it is one of our scaling gizmos or null</returns>
+        private GameObject SelectedScalingGizmo(GameObject gameObject)
         {
-            Debug.Log("Undo ScaleNode");
-        }
-
-        /// <summary>
-        /// Redoes this DeleteAction
-        /// </summary>
-        public override void Redo()
-        {
-            Debug.Log("Redo ScaleNode");
-        }
-
-        /// <summary>
-        /// Returns a new instance of <see cref="ScaleNodeAction"/>.
-        /// </summary>
-        /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
-        {
-            return new ScaleNodeAction();
-        }
-
-        /// <summary>
-        /// Returns a new instance of <see cref="ScaleNodeAction"/>.
-        /// </summary>
-        /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
-        {
-            return CreateReversibleAction();
-        }
-
-        /// <summary>
-        /// Returns the <see cref="ActionStateType"/> of this action.
-        /// </summary>
-        /// <returns><see cref="ActionStateType.ScaleNode"/></returns>
-        public override ActionStateType GetActionStateType()
-        {
-            return ActionStateType.ScaleNode;
+            if (!scalingGizmosAreDrawn)
+            {
+                return null;
+            }
+            else if (gameObject == topSphere
+                || gameObject == firstCornerSphere
+                || gameObject == secondCornerSphere
+                || gameObject == thirdCornerSphere
+                || gameObject == forthCornerSphere
+                || gameObject == firstSideSphere
+                || gameObject == secondSideSphere
+                || gameObject == thirdSideSphere
+                || gameObject == forthSideSphere)
+            {
+                return gameObject;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

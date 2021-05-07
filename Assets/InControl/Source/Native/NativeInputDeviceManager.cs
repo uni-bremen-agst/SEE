@@ -305,6 +305,7 @@ namespace InControl
 					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.PlayStation4MacNativeProfile) );
 					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.SteelseriesNimbusMacNativeProfile) );
 					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.HoriPadUltimateMacNativeProfile) );
+					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.NintendoSwitchProMacNativeProfile) );
 				}
 
 				InputManager.AddDeviceManager<NativeInputDeviceManager>();
