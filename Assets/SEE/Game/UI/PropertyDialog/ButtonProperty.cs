@@ -13,19 +13,24 @@ namespace SEE.Game.UI.PropertyDialog
     /// </summary>
     public class ButtonProperty : Property<HideModeSelector>
     {
-        public string content;
         /// <summary>
         /// The prefab for a string input field.
         /// </summary>
         private const string ButtonPrefeb = "Prefabs/UI/Button";
 
+        /// <summary>
+        /// EventFunction that is triggered when the button is pressed
+        /// </summary>
         public readonly UnityEvent OnSelected = new UnityEvent();
 
         /// <summary>
-        /// Instantiation of the prefab <see cref="StringInputFieldPrefab"/>.
+        /// Instantiation of the prefab <see cref="ButtonPrefeb"/>.
         /// </summary>
         private GameObject button;
 
+        /// <summary>
+        /// Saves the HideMode associated with the button.
+        /// </summary>
         public HideModeSelector hideMode;
 
         /// <summary>
@@ -42,7 +47,7 @@ namespace SEE.Game.UI.PropertyDialog
         private Tooltip.Tooltip tooltip;
 
         /// <summary>
-        /// Sets <see cref="inputField"/> as an instantiation of prefab <see cref="StringInputFieldPrefab"/>.
+        /// Sets <see cref="button"/> as an instantiation of prefab <see cref="ButtonPrefeb"/>.
         /// Sets the label and value of the field.
         /// </summary>
         protected override void StartDesktop()
@@ -53,16 +58,15 @@ namespace SEE.Game.UI.PropertyDialog
             {
                 SetParent(parentOfInputField);
             }
+
             button.gameObject.name = Name;
             SetupTooltip(button);
-            SetButtonName(button);
+            SetUpButtonName(button);
 
-
-            void SetButtonName(GameObject button)
+            void SetUpButtonName(GameObject button)
             {
                 GameObject text = button.transform.Find("Text").gameObject;
                 GameObject icon = button.transform.Find("Icon").gameObject;
-
 
                 button.name = Name;
                 if (!button.TryGetComponentOrLog(out Michsky.UI.ModernUIPack.ButtonManagerBasicWithIcon buttonManager) ||
@@ -74,17 +78,13 @@ namespace SEE.Game.UI.PropertyDialog
                 buttonManager.buttonText = Name;
                 buttonManager.clickEvent.AddListener(() => Clicked());
                 pointerHelper.EnterEvent.AddListener(() => tooltip.Show(Description));
-
-
-
             }
 
             void Clicked()
             {
                 OnSelected.Invoke();
-                //Debug.Log(hideMode); 
             }
-            
+
         }
 
         void SetupTooltip(GameObject button)

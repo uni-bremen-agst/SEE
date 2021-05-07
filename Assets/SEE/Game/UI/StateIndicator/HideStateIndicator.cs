@@ -14,7 +14,7 @@ namespace SEE.Game.UI.StateIndicator
     /// Indicates some kind of state with which a text and a color is associated.
     /// The state will be displayed on the screen.
     /// </summary>
-    public class HideStateIndicator: PlatformDependentComponent
+    public class HideStateIndicator : PlatformDependentComponent
     {
         /// <summary>
         /// Text of the mode panel.
@@ -29,7 +29,7 @@ namespace SEE.Game.UI.StateIndicator
         /// <summary>
         /// Path to the prefab of the mode panel.
         /// </summary>
-        private const string MODE_PANEL_PREFAB = "Prefabs/UI/HideModePanel";
+        private const string HIDE_MODE_PANEL_PREFAB = "Prefabs/UI/HideModePanel";
 
         /// <summary>
         /// The color of the state indicator after it has been instantiated.
@@ -41,9 +41,6 @@ namespace SEE.Game.UI.StateIndicator
         /// </summary>
         private string StartText = "Select Objects";
 
-
-        private GameObject button;
-
         public string buttonName;
 
         private Tooltip.Tooltip tooltip;
@@ -52,7 +49,6 @@ namespace SEE.Game.UI.StateIndicator
 
         public HideModeSelector hideMode;
 
-
         public readonly UnityEvent OnSelected = new UnityEvent();
 
         /// <summary>
@@ -60,7 +56,7 @@ namespace SEE.Game.UI.StateIndicator
         /// Changes will only have an effect before Start() is called.
         /// </summary>
         public Vector2 AnchorMin = Vector2.left;
-        
+
         /// <summary>
         /// The normalized position in the canvas that the lower left corner is anchored to.
         /// Changes will only have an effect before Start() is called.
@@ -111,11 +107,7 @@ namespace SEE.Game.UI.StateIndicator
             buttonManager.buttonText = buttonName;
             buttonManager.clickEvent.AddListener(() => Clicked());
             pointerHelper.EnterEvent.AddListener(() => tooltip.Show(description));
-
-
-
         }
-
 
         void SetupTooltip(GameObject indicator)
         {
@@ -138,24 +130,6 @@ namespace SEE.Game.UI.StateIndicator
         void Clicked()
         {
             OnSelected.Invoke();
-            //Debug.Log(hideMode); 
-        }
-
-        void SetupTooltip()
-        {
-            tooltip  = gameObject.AddComponent<Tooltip.Tooltip>();
-            if (button.TryGetComponentOrLog(out PointerHelper pointerHelper))
-            {
-                // Register listeners on entry and exit events, respectively
-                pointerHelper.EnterEvent.AddListener(() => tooltip.Show(description));
-                pointerHelper.ExitEvent.AddListener(tooltip.Hide);
-                // FIXME scrolling doesn't work while hovering above the field, because
-                // the Modern UI Pack uses an Event Trigger (see Utils/PointerHelper for an explanation.)
-                // It is unclear how to resolve this without either abstaining from using the Modern UI Pack
-                // in this instance or without modifying the Modern UI Pack, which would complicate 
-                // updates greatly. Perhaps the author of the Modern UI Pack (or Unity developers?) should
-                // be contacted about this.
-            }
         }
 
         /// <summary>
@@ -163,14 +137,14 @@ namespace SEE.Game.UI.StateIndicator
         /// </summary>
         protected override void StartDesktop()
         {
-            
-            GameObject indicator = PrefabInstantiator.InstantiatePrefab(MODE_PANEL_PREFAB, Canvas.transform, false);
+
+            GameObject indicator = PrefabInstantiator.InstantiatePrefab(HIDE_MODE_PANEL_PREFAB, Canvas.transform, false);
             indicator.name = Title;
             SetupTooltip(indicator);
             SetButtonName(indicator);
 
 
-            RectTransform rectTransform = (RectTransform) indicator.transform;
+            RectTransform rectTransform = (RectTransform)indicator.transform;
             rectTransform.anchorMin = AnchorMin;
             rectTransform.anchorMax = AnchorMax;
             rectTransform.pivot = Pivot;
@@ -200,13 +174,13 @@ namespace SEE.Game.UI.StateIndicator
         {
             if (HasStarted)
             {
-               // ModePanelImage.color = color.ColorWithAlpha(0.5f);
+                // ModePanelImage.color = color.ColorWithAlpha(0.5f);
                 ModePanelText.text = text;
             }
             else
             {
                 // Indicator has not yet been initialized
-              //  StartColor = color.ColorWithAlpha(0.5f);
+                //  StartColor = color.ColorWithAlpha(0.5f);
                 StartText = text;
             }
         }
