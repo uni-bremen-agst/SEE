@@ -43,7 +43,7 @@ namespace SEE.Game.Charts
         /// </summary>
         public void CreateChart()
         {
-            GameObject chart = Instantiate(chartPrefab, chartsCanvas);
+            Instantiate(chartPrefab, chartsCanvas);
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using SEE.Controls;
 using SEE.DataModel;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.GO
@@ -18,7 +19,7 @@ namespace SEE.GO
         /// <returns>a player for the desktop environment</returns>
         public static GameObject CreateDesktopPlayer(Plane plane)
         {
-            GameObject player = InstantiatePlayer("Prefabs/Players/DesktopPlayer");
+            GameObject player = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/DesktopPlayer");
             player.name = PlayerInputType.DesktopPlayer.ToString();
             player.tag = Tags.MainCamera;
             player.GetComponent<DesktopPlayerMovement>().focusedObject = plane;
@@ -32,7 +33,7 @@ namespace SEE.GO
         /// <returns>a player for the VR environment</returns>
         public static GameObject CreateVRPlayer()
         {
-            GameObject player = InstantiatePlayer("Prefabs/Players/VRPlayer");
+            GameObject player = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/VRPlayer");
             player.name = PlayerInputType.VRPlayer.ToString();
             return player;
         }
@@ -44,7 +45,7 @@ namespace SEE.GO
         /// <returns>a player for the AR environment of HoloLens</returns>
         public static GameObject CreateHololensPlayer()
         {
-            GameObject player = InstantiatePlayer("Prefabs/Players/HoloLensPlayer");
+            GameObject player = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/HoloLensPlayer");
             player.name = PlayerInputType.HoloLensPlayer.ToString();
             return player;
         }
@@ -56,38 +57,9 @@ namespace SEE.GO
         /// <returns>a player for the gamepad/touchpad environment</returns>
         public static GameObject CreateTouchGamepadPlayer()
         {
-            GameObject player = InstantiatePlayer("Prefabs/Players/InControl");
+            GameObject player = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/InControl");
             player.name = PlayerInputType.TouchGamepadPlayer.ToString();
             return player;
-        }
-
-        /// <summary>
-        /// Returns an instantiation of the given <paramref name="prefabPath"/>.
-        /// </summary>
-        /// <param name="prefabPath">path to the prefab; must be contained in a folder Resources within Assets</param>
-        /// <exception cref="System.Exception">thrown if <paramref name="prefabPath"/> does not denote a prefab
-        /// or that prefab cannot be instantiated</exception>
-        /// <returns>instantiated prefab</returns>
-        private static GameObject InstantiatePlayer(string prefabPath)
-        {
-            // We are assuming that all necessary components are already attached in the prefab.
-            Object prefab = Resources.Load<GameObject>(prefabPath);
-            if (prefab == null)
-            {
-                throw new System.Exception($"Prefab {prefabPath} does not exist.\n");
-            }
-            else
-            {
-                GameObject player = GameObject.Instantiate(prefab) as GameObject;
-                if (player == null)
-                {
-                    throw new System.Exception($"Prefab {prefabPath} exists but could not be instantiated.\n");
-                }
-                else
-                {
-                    return player;
-                }
-            }
         }
     }
 }

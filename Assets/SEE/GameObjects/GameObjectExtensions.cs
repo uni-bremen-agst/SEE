@@ -1,5 +1,4 @@
 using SEE.DataModel.DG;
-using SEE.Utils;
 using System;
 using OdinSerializer.Utilities;
 using UnityEngine;
@@ -208,7 +207,28 @@ namespace SEE.GO
         /// <returns>The height of the Roof from this <paramref name="node"/></returns>
         public static float GetRoof(this GameObject node)
         {
-            return node.transform.position.y + node.Size().y / 2.0f;
+            return node.transform.position.y + node.WorldSpaceScale().y / 2.0f;
+        }
+
+        /// <summary>
+        /// Returns the size of the given <paramref name="gameObject"/> in world space.
+        /// </summary>
+        /// <param name="gameObject">object whose size is requested</param>
+        /// <returns>size of given <paramref name="gameObject"/></returns>
+        public static Vector3 WorldSpaceScale(this GameObject gameObject)
+        {
+            // For some objects, such as capsules, lossyScale gives wrong results.
+            // The more reliable option to determine the size is using the 
+            // object's renderer if it has one.
+            if (gameObject.TryGetComponent(out Renderer renderer))
+            {
+                return renderer.bounds.size;
+            }
+            else
+            {
+                // No renderer, so we use lossyScale as a fallback.
+                return gameObject.transform.lossyScale;
+            }
         }
 
         /// <summary>
@@ -446,7 +466,7 @@ namespace SEE.GO
         {
             if (gameObject.CompareTag(Tags.Edge) && gameObject.TryGetComponent(out EdgeRef edgeRef))
             {
-                return RetrieveNode(edgeRef.SourceNodeID);
+                return SceneQueries.RetrieveGameNode(edgeRef.SourceNodeID);
             }
             else
             {
@@ -467,33 +487,12 @@ namespace SEE.GO
         {
             if (gameObject.CompareTag(Tags.Edge) && gameObject.TryGetComponent(out EdgeRef edgeRef))
             {
-                return RetrieveNode(edgeRef.SourceNodeID);
+                return SceneQueries.RetrieveGameNode(edgeRef.SourceNodeID);
             }
             else
             {
                 throw new Exception($"Game object {gameObject.name} is not an edge. It has no target node.");
             }
-        }
-
-        /// <summary>
-        /// Retrieves the game object representing a node with the given <paramref name="nodeID"/>.
-        /// 
-        /// Note: This is an expensive operation as it traverses all objects in the scene.
-        /// FIXME: We may need to cache all this information in look up tables for better
-        /// performance.
-        /// </summary>
-        /// <param name="nodeID">the unique ID of the node to be retrieved</param>
-        /// <returns>the node with the given <paramref name="nodeID"/></returns>
-        private static GameObject RetrieveNode(string nodeID)
-        {
-            foreach (GameObject gameNode in SceneQueries.AllGameNodesInScene(true, true))
-            {
-                if (gameNode.name == nodeID)
-                {
-                    return gameNode;
-                }
-            }
-            throw new Exception($"Node named {nodeID} not found.");
         }
     }
 }
