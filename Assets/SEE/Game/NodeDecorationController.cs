@@ -102,7 +102,8 @@ public class NodeDecorationController : MonoBehaviour
     /// <summary>
     /// Contain the values of the above declared variables, limited to values between 0 and 1
     /// </summary>
-    [SerializeField, Range(0f, 1f)]  private float _floorHightPercentage, _lobbySpanPercentage, _roofHeightPercentage, _roofSpanPercentage;
+    [SerializeField, Range(0f, 1f)]  
+    private float _floorHightPercentage, _lobbySpanPercentage, _roofHeightPercentage, _roofSpanPercentage;
 
     /// <summary>
     /// Tile-texture used to decorate the block around it's sides
@@ -144,7 +145,6 @@ public class NodeDecorationController : MonoBehaviour
     /// </summary>
     private void renderLobby()
     {
-        // ========== TODO scale these when scaling gameobject ==========
         float lobbySizeX = nodeSize.x + nodeSize.x * _lobbySpanPercentage;
         float lobbySizeZ = nodeSize.z + nodeSize.z * _lobbySpanPercentage;
         float lobbyHeight = nodeSize.y * _floorHightPercentage;
@@ -169,7 +169,6 @@ public class NodeDecorationController : MonoBehaviour
     /// </summary>
     private void renderRoof()
     {
-        // ========== TODO scale these when scaling gameobject ==========
         float roofSizeX = nodeSize.x + nodeSize.x * _roofSpanPercentage;
         float roofSizeZ = nodeSize.z + nodeSize.z * _roofSpanPercentage;
         float roofHeight = nodeSize.y * _roofHeightPercentage;
@@ -270,35 +269,55 @@ public class NodeDecorationController : MonoBehaviour
     }
 
     /// <summary>
-    /// Computes how many tiles fit the given side of the gameobject block
-    /// <param name="side">Side of the block, which's tile-amount to calculate</param>
-    /// </summary>
-    // TODO side 0-3, clockwise
-    private int GetTilesPerSide(int side)
-    {
-        return 0;
-    }
-
-    /// <summary>
     /// Decorates the block
     /// </summary>
     private void decoratePackedBlock(List<GameObject> hiddenObjects, GameObject parent)
     {
         for (int i = 0; i < hiddenObjects.Count; i++)
         {
-            GameObject clone = new GameObject();
+            GameObject clone = new GameObject(); // TODO this gameobject has no rendered mesh. Use GameObject.CreatePrimitive instead
             clone.transform.position.Set(hiddenObjects[i].transform.position.x, parent.transform.localScale.y, hiddenObjects[i].transform.position.z);
             clone.transform.localScale.Set(hiddenObjects[i].transform.localScale.x, 0.00000001f, hiddenObjects[i].transform.localScale.z);
         }
-        decoratePackedBlockWall();
+        decoratePackedBlockWall(hiddenObjects,parent);
     }
 
     /// <summary>
-    /// Decorates the wall of the block
+    /// Decorates the walls of the packed block
+    /// <param name="hiddenObjects">The list of gamenodes that are hidden inside the packed block</param>
+    /// <param name="packedBlock">The packed block</param>
     /// </summary>
-    private void decoratePackedBlockWall()
+    private void decoratePackedBlockWall(List<GameObject> hiddenObjects, GameObject packedBlock)
     {
-      
+        float totalBlocksHeight = 0f;
+        Vector3 packedBlockDimensions = packedBlock.transform.localScale;
+        // Compute sum of block heights
+        foreach (GameObject o in hiddenObjects)
+        {
+            totalBlocksHeight += packedBlockDimensions.y;
+        }
+        // Create gameobject clones and set them on the walls of the packed block
+        List<GameObject> clones = new List<GameObject>();
+        foreach (GameObject o in hiddenObjects)
+        {
+            // North/South clones (Positive x - north, negative x - south)
+            GameObject cloneN = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            GameObject cloneS = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            cloneN.name = "PackedBlockNorthWallDecoration";
+            cloneS.name = "PackedBlockSouthWallDecoration";
+            // Compute dimensions of clones
+            float blockOccupancyHorizontal = o.transform.localScale.y / totalBlocksHeight * packedBlockDimensions.z;
+            float blockOccupancyVertical = o.transform.localScale.y / totalBlocksHeight * packedBlockDimensions.y;
+            Vector3 size = new Vector3(0.00000001f,blockOccupancyVertical,blockOccupancyHorizontal); // TODO remove magic number
+            cloneN.transform.localScale = size;
+            cloneS.transform.localScale = size;
+
+            // West/East clones (Positive z - west, negative z - east)
+            GameObject cloneW = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            GameObject cloneE = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            cloneW.name = "PackedBlockWesthWallDecoration";
+            cloneE.name = "PackedBlockEastWallDecoration";
+        }
     }
 
     // Start is called before the first frame update
@@ -323,6 +342,57 @@ public class NodeDecorationController : MonoBehaviour
             fetchNodeDetails();
             renderLobby();
             renderRoof();
+        }
+    }
+
+    /// <summary>
+    /// Test the block decoration implementation both visually and mathematically
+    /// </summary>
+    private void testImplementation()
+    {
+        List<GameObject> childNodes = new List<GameObject>();
+        // Free space inbetween child nodes
+        float freeSpaceX = 0.01f * nodeSize.x;
+        float freeSpaceZ = 0.01f * nodeSize.z;
+        // Create a few child nodes
+        for (int i=0; i<12; i++)
+        {
+            GameObject o = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            // Gamenodes will be laid out as 4x3 graph while testing
+            Vector3 childNodeDimensions = new Vector3(nodeSize.x / 4 - 5f * freeSpaceX, Random.Range(0.01f * nodeSize.y, nodeSize.y), nodeSize.z / 3 - 5f * freeSpaceZ);
+            o.transform.localScale = childNodeDimensions;
+            o.name = i.ToString();
+            o.GetComponent<Renderer>().material.color = Color.red;
+            o.transform.SetParent(nodeObject.transform);
+            childNodes.Add(o);
+        }
+        // Find corners of parent node, parent node is moved using it's 3d center
+        float parentNodeLowX = nodeLocation.x - nodeSize.x / 2;
+        float parentNodeHighX = nodeLocation.x + nodeSize.x / 2;
+        float parentNodeLowZ = nodeLocation.z - nodeSize.z / 2;
+        float parentNodeHighZ = nodeLocation.z + nodeSize.z / 2;
+        float parentNodeFloorY = nodeLocation.y - nodeSize.y / 2;
+        // Lay nodes out as 4x3 grid inside parent node
+        int currentListIndex = 0;
+        float currentLocationX = parentNodeLowX + freeSpaceX;
+        float currentLocationZ = parentNodeLowZ + freeSpaceZ;
+        float childWidthX = nodeSize.x / 4 - 5f * freeSpaceX;
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                GameObject currentChild = childNodes[currentListIndex];
+                // Location for current child
+                float childLocX = currentLocationX + currentChild.transform.localScale.x / 2;
+                float childLocZ = currentLocationZ + currentChild.transform.localScale.z / 2;
+                float childLocY = parentNodeFloorY + currentChild.transform.localScale.y / 2;
+                // Move child to new location
+                currentChild.transform.position = new Vector3(childLocX, childLocY, childLocZ);
+                currentListIndex += 1;
+                currentLocationZ += freeSpaceZ + currentChild.transform.localScale.z; 
+            }
+            currentLocationZ = parentNodeLowZ + freeSpaceZ;
+            currentLocationX = freeSpaceX + childWidthX;
         }
     }
 }
