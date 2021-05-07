@@ -276,7 +276,7 @@ public class NodeDecorationController : MonoBehaviour
         for (int i = 0; i < hiddenObjects.Count; i++)
         {
             GameObject clone = new GameObject(); // TODO this gameobject has no rendered mesh. Use GameObject.CreatePrimitive instead
-            clone.transform.position.Set(hiddenObjects[i].transform.position.x, parent.transform.localScale.y, hiddenObjects[i].transform.position.z);
+            clone.transform.position.Set(hiddenObjects[i].transform.position.x, parent.transform.localScale.y, hiddenObjects[i].transform.position.z); // TODO the height is wong as it doesn't take the gameobject's y position into account
             clone.transform.localScale.Set(hiddenObjects[i].transform.localScale.x, 0.00000001f, hiddenObjects[i].transform.localScale.z);
         }
         decoratePackedBlockWall(hiddenObjects,parent);
@@ -289,30 +289,92 @@ public class NodeDecorationController : MonoBehaviour
     /// </summary>
     private void decoratePackedBlockWall(List<GameObject> hiddenObjects, GameObject packedBlock)
     {
-        float totalBlocksHeight = 0f;
+        // Get packed block dimensions and corners, North - Positive X, West - Positive Z
         Vector3 packedBlockDimensions = packedBlock.transform.localScale;
+        Vector3 packedBlockLocation = packedBlock.transform.position;
+        float NECornerX = packedBlockLocation.x + packedBlockDimensions.x / 2;
+        float NECornerZ = packedBlockLocation.z - packedBlockDimensions.z / 2;
+        float SECornerX = packedBlockLocation.x - packedBlockDimensions.x / 2;
+        float SECornerZ = packedBlockLocation.z - packedBlockDimensions.z / 2;
+        float NWCornerX = packedBlockLocation.x + packedBlockDimensions.x / 2;
+        float NWCornerZ = packedBlockLocation.z + packedBlockDimensions.z / 2;
+        float SWCornerX = packedBlockLocation.x - packedBlockDimensions.x / 2;
+        float SWCornerZ = packedBlockLocation.z + packedBlockDimensions.z / 2;
+        float packedBlockFloorY = packedBlockLocation.y - packedBlockDimensions.y / 2;
+
         // Compute sum of block heights
+        float totalBlocksHeight = 0f;
         foreach (GameObject o in hiddenObjects)
         {
             totalBlocksHeight += packedBlockDimensions.y;
         }
+        
+        // How much empty space to show between the block decorations, tweak the 1% at will
+        float freeSpaceX = 0.01f * packedBlock.transform.localScale.x;
+        float freeSpaceY = 0.01f * packedBlock.transform.localScale.y;
+        float freeSpaceZ = 0.01f * packedBlock.transform.localScale.z;
+        
+        // Compute block grid
+        float roundedRoot = Mathf.Ceil(Mathf.Sqrt(hiddenObjects.Count));
+        float blocksHorizontalAxis = roundedRoot;
+        float blocksVerticalAxis = roundedRoot;
+        // Check for an empty row (too many rows)
+        // Math: Assuming 4x4 grid, if the last row is empty and we have 11 gameObjects, we calculate
+        // 16 - 11 >=? 4 -> if yes then the last row is empty and can be removed. Note that 9 blocks will create a 3x3 grid
+        if (blocksHorizontalAxis * blocksVerticalAxis - hiddenObjects.Count >= blocksVerticalAxis)
+        {
+            blocksHorizontalAxis -= 1;
+        }
+
+        // Add empty gameobject children to identify different clones
+        GameObject northClones = new GameObject();
+        GameObject southClones = new GameObject();
+        GameObject westClones = new GameObject();
+        GameObject eastClones = new GameObject();
+        northClones.transform.name = "northClones";
+        southClones.transform.name = "southClones";
+        westClones.transform.name = "westClones";
+        eastClones.transform.name = "eastClones";
+        northClones.transform.SetParent(packedBlock.transform);
+        southClones.transform.SetParent(packedBlock.transform);
+        westClones.transform.SetParent(packedBlock.transform);
+        eastClones.transform.SetParent(packedBlock.transform);
+
+        // Location on each surface, used to align clones on block surface
+        float northPosZ = NECornerZ + freeSpaceZ;
+        float northPosY = packedBlockFloorY + freeSpaceY;
+        float southPosZ = SECornerZ + freeSpaceZ;
+        float southPosY = packedBlockFloorY + freeSpaceY;
+        float eastPosX = SECornerX + freeSpaceX;
+        float eastPosY = packedBlockFloorY + freeSpaceY;
+        float westPosX = SWCornerX + freeSpaceX;
+        float westPosY = packedBlockFloorY + freeSpaceY;
+
         // Create gameobject clones and set them on the walls of the packed block
-        List<GameObject> clones = new List<GameObject>();
+        List <GameObject> clones = new List<GameObject>();
         foreach (GameObject o in hiddenObjects)
         {
-            // North/South clones (Positive x - north, negative x - south)
+            // Block height percentage - in contrast to total height
+            float blockHeightPercentage = o.transform.localScale.y / totalBlocksHeight;
+
+            // Create positive north clone
             GameObject cloneN = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            cloneN.name = o.transform.name + "NorthDecorator";
+            
+
+            // Create North/South clones (Positive x - north, negative x - south)
+
             GameObject cloneS = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            cloneN.name = "PackedBlockNorthWallDecoration";
+            
             cloneS.name = "PackedBlockSouthWallDecoration";
             // Compute dimensions of clones
-            float blockOccupancyHorizontal = o.transform.localScale.y / totalBlocksHeight * packedBlockDimensions.z;
-            float blockOccupancyVertical = o.transform.localScale.y / totalBlocksHeight * packedBlockDimensions.y;
+            float blockOccupancyHorizontal = blockHeightPercentage * packedBlockDimensions.z;
+            float blockOccupancyVertical = blockHeightPercentage * packedBlockDimensions.y;
             Vector3 size = new Vector3(0.00000001f,blockOccupancyVertical,blockOccupancyHorizontal); // TODO remove magic number
             cloneN.transform.localScale = size;
             cloneS.transform.localScale = size;
 
-            // West/East clones (Positive z - west, negative z - east)
+            // Create West/East clones (Positive z - west, negative z - east)
             GameObject cloneW = GameObject.CreatePrimitive(PrimitiveType.Cube);
             GameObject cloneE = GameObject.CreatePrimitive(PrimitiveType.Cube);
             cloneW.name = "PackedBlockWesthWallDecoration";
