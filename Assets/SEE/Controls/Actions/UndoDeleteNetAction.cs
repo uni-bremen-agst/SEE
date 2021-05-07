@@ -60,20 +60,20 @@ namespace SEE.Net
             {
                 Debug.Log("run");
                 GameObject gameObject = GameObject.Find(GameObjectID);
-                GameObject parentOfNode =  GameObject.Find(parentID);
+                GameObject rootNode =  GameObject.Find(parentID);
                
-                if (parentOfNode.HasNodeRef())
+                if (rootNode.HasNodeRef())
                 {
-                    graph = parentOfNode.ItsGraph();
+                    graph = rootNode.ItsGraph();
                     Debug.Log(graph +  "graph");
 
                     // oder Graph über city holen 
                     //parentOfNode.ContainingCity()
                     // city.loaded graph
                 }
-                else if (parentOfNode.HasEdgeRef()) 
+                else if (rootNode.HasEdgeRef()) 
                 {
-                    graph = parentOfNode.GetGraph();
+                    graph = rootNode.GetGraph();
                     // oder Graph über city holen 
                     //parentOfNode.ContainingCity()
                     // city.loaded graph
