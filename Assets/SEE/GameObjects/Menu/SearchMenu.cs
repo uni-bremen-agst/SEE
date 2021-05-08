@@ -41,10 +41,14 @@ namespace SEE.GO.Menu
                 ShowNotification.Warn("No nodes found", "No nodes found for the search term "
                                                         + $"'{FilterString(searchString.Value)}'.");
             }
-            else
+            else if (found == 1)
             {
                 ShowNotification.Info($"{found} nodes found", $"Found {found} nodes for search term " 
                                                               + $"'{searchString.Value}'. Nodes will blink for {BLINK_SECONDS} seconds.");
+            } 
+            else 
+            {
+                //TODO: Fuzzy search
             }
 
             SEEInput.KeyboardShortcutsEnabled = true;
@@ -82,7 +86,7 @@ namespace SEE.GO.Menu
             }
                 
             searchString = gameObject.AddComponent<StringProperty>();
-            searchString.name = "Source name";
+            searchString.Name = "Source name";
             searchString.Description = "The name of the source code component to search for.";
             
             PropertyGroup group = gameObject.AddComponent<PropertyGroup>();
@@ -98,7 +102,6 @@ namespace SEE.GO.Menu
             searchDialog.OnCancel.AddListener(() => SEEInput.KeyboardShortcutsEnabled = true);
             searchDialog.OnConfirm.AddListener(ExecuteSearch);
             
-            //TODO: Bool property (regex yes/no)
             //TODO: Bool properties (leaves, nodes)
             //TODO: Selection property (select city)
         }
