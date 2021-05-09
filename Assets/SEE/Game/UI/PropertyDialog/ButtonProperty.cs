@@ -41,7 +41,7 @@ namespace SEE.Game.UI.PropertyDialog
         private GameObject parentOfInputField;
 
         /// <summary>
-        /// The tooltip containing the <see cref="Description"/> of this <see cref="Property"/>, which will
+        /// The tooltip containing the <see cref="description"/> of this <see cref="Property"/>, which will
         /// be displayed when hovering above it.
         /// </summary>
         private Tooltip.Tooltip tooltip;
@@ -87,6 +87,10 @@ namespace SEE.Game.UI.PropertyDialog
 
         }
 
+        /// <summary>
+        /// Sets up the tooltips for the button
+        /// </summary>
+        /// <param name="button">The object to which the tooltip is to be attached</param>
         void SetupTooltip(GameObject button)
         {
             tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
