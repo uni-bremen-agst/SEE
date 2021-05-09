@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
-using SEE.Controls.Actions;
 using UnityEngine.Events;
 
 namespace SEE.Game.UI.PropertyDialog
@@ -16,7 +14,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// <summary>
         /// The prefab for a string input field.
         /// </summary>
-        private const string ButtonPrefeb = "Prefabs/UI/Button";
+        private const string ButtonPrefab = "Prefabs/UI/Button";
 
         /// <summary>
         /// EventFunction that is triggered when the button is pressed
@@ -24,14 +22,23 @@ namespace SEE.Game.UI.PropertyDialog
         public readonly UnityEvent OnSelected = new UnityEvent();
 
         /// <summary>
-        /// Instantiation of the prefab <see cref="ButtonPrefeb"/>.
+        /// Instantiation of the prefab <see cref="ButtonPrefab"/>.
         /// </summary>
         private GameObject button;
 
         /// <summary>
-        /// Saves the HideMode associated with the button.
+        /// Saves the <see cref="HideModeSelector"/> associated with the button.
         /// </summary>
         public HideModeSelector hideMode;
+
+        /// <summary>
+        /// Value of the input field.
+        /// </summary>
+        public override HideModeSelector Value
+        {
+            get => hideMode;
+            set => hideMode = value;
+        }
 
         /// <summary>
         /// The parent of <see cref="inputField"/>. Because <see cref="SetParent(GameObject)"/>
@@ -47,12 +54,12 @@ namespace SEE.Game.UI.PropertyDialog
         private Tooltip.Tooltip tooltip;
 
         /// <summary>
-        /// Sets <see cref="button"/> as an instantiation of prefab <see cref="ButtonPrefeb"/>.
+        /// Sets <see cref="button"/> as an instantiation of prefab <see cref="ButtonPrefab"/>.
         /// Sets the label and value of the field.
         /// </summary>
         protected override void StartDesktop()
         {
-            button = PrefabInstantiator.InstantiatePrefab(ButtonPrefeb, instantiateInWorldSpace: false);
+            button = PrefabInstantiator.InstantiatePrefab(ButtonPrefab, instantiateInWorldSpace: false);
 
             if (parentOfInputField != null)
             {
@@ -60,14 +67,11 @@ namespace SEE.Game.UI.PropertyDialog
             }
 
             button.gameObject.name = Name;
-            SetupTooltip(button);
-            SetUpButtonName(button);
+            SetupTooltip();
+            SetUpButtonName();
 
-            void SetUpButtonName(GameObject button)
+            void SetUpButtonName()
             {
-                GameObject text = button.transform.Find("Text").gameObject;
-                GameObject icon = button.transform.Find("Icon").gameObject;
-
                 button.name = Name;
                 if (!button.TryGetComponentOrLog(out Michsky.UI.ModernUIPack.ButtonManagerBasicWithIcon buttonManager) ||
                     !button.TryGetComponentOrLog(out PointerHelper pointerHelper))
@@ -76,7 +80,7 @@ namespace SEE.Game.UI.PropertyDialog
                 }
 
                 buttonManager.buttonText = Name;
-                buttonManager.clickEvent.AddListener(() => Clicked());
+                buttonManager.clickEvent.AddListener(Clicked);
                 pointerHelper.EnterEvent.AddListener(() => tooltip.Show(Description));
             }
 
@@ -91,7 +95,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// Sets up the tooltips for the button
         /// </summary>
         /// <param name="button">The object to which the tooltip is to be attached</param>
-        void SetupTooltip(GameObject button)
+        private void SetupTooltip()
         {
             tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
             if (button.TryGetComponentOrLog(out PointerHelper pointerHelper))
@@ -122,21 +126,6 @@ namespace SEE.Game.UI.PropertyDialog
             {
                 /// save for later assignment in <see cref="StartDesktop"/>
                 parentOfInputField = parent;
-            }
-        }
-
-        /// <summary>
-        /// Value of the input field.
-        /// </summary>
-        public override HideModeSelector Value
-        {
-            get
-            {
-                return Value;
-            }
-            set
-            {
-                hideMode = value;
             }
         }
     }
