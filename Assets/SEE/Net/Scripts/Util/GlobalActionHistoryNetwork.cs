@@ -3,7 +3,6 @@ using SEE.Controls.Actions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using static Assets.SEE.Utils.ActionHistory;
 
 namespace SEE.Net
@@ -39,13 +38,15 @@ namespace SEE.Net
         public bool delete = false;
 
         /// <summary>
-        /// Syncs the ActionHistory between the Clients
+        /// The old item which has to be replaced.
         /// </summary>
-        /// 
-
         Tuple<bool, HistoryType, string, List<string>> oldItem;
 
+        /// <summary>
+        /// The new item which is replacing the old.
+        /// </summary>
         Tuple<bool, HistoryType, string, List<string>> newItem;
+
         public GlobalActionHistoryNetwork() 
         {
             // Intentionally left blank.
