@@ -69,7 +69,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// <summary>
         /// Creates a menu to select multiple elements from a graph
         /// </summary>
-        public void OpenSelectionMenu()
+        private void OpenSelectionMenu()
         {
             // Creating a new selection
             selection = new GameObject("Indicator");
@@ -90,7 +90,7 @@ namespace SEE.Game.UI.PropertyDialog
         public void Open()
         {
             // Creating a new dialog
-            dialog = new GameObject("Hideaction mode selector");
+            dialog = new GameObject("HideAction mode selector");
 
             // Create new buttons 
             fdb1 = dialog.AddComponent<ButtonProperty>();
@@ -133,7 +133,7 @@ namespace SEE.Game.UI.PropertyDialog
         public void OpenSinge()
         {
             // Creating a new dialog
-            dialog = new GameObject("Hideaction mode selector");
+            dialog = new GameObject("HideAction mode selector");
 
             // Create new buttons 
             sdb1 = dialog.AddComponent<ButtonProperty>();
@@ -201,10 +201,10 @@ namespace SEE.Game.UI.PropertyDialog
         /// <summary>
         /// Provides all possible functions that are available for the selection of multiple elements.
         /// </summary>
-        public void OpenMultiple()
+        private void OpenMultiple()
         {
             // Creating a new dialog
-            dialog = new GameObject("Hideaction mode selector");
+            dialog = new GameObject("HideAction mode selector");
 
             // Create new buttons
             mdb1 = dialog.AddComponent<ButtonProperty>();
@@ -213,7 +213,7 @@ namespace SEE.Game.UI.PropertyDialog
             mdb1.Value = HideModeSelector.HideSelected;
 
             mdb2 = dialog.AddComponent<ButtonProperty>();
-            mdb2.Name = "Hide unselceted";
+            mdb2.Name = "Hide unselected";
             mdb2.Description = "Hides only the unselected objects";
             mdb2.Value = HideModeSelector.HideUnselected;
 
@@ -258,7 +258,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// Opens the appropriate dialogues for the corresponding selections.
         /// </summary>
         /// <param name="mode">The mode associated with the button pressed</param>
-        void SetMode(HideModeSelector mode)
+        private void SetMode(HideModeSelector mode)
         {
             switch (mode)
             {

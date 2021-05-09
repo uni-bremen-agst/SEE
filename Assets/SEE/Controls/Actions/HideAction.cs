@@ -28,17 +28,17 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The list of currently hidden objects.
         /// </summary>
-        private ISet<GameObject> hiddenObjects = new HashSet<GameObject>();
+        private readonly ISet<GameObject> hiddenObjects = new HashSet<GameObject>();
 
         /// <summary>
         /// The list of objects whose visibility was changed in recent undo (needed for redo).
         /// </summary>
-        private ISet<GameObject> undoneList = new HashSet<GameObject>();
+        private readonly ISet<GameObject> undoneList = new HashSet<GameObject>();
 
         /// <summary>
         /// Saves all highlightesEdges
         /// </summary>
-        private ISet<GameObject> highlightesEdges = new HashSet<GameObject>();
+        private readonly ISet<GameObject> highlightesEdges = new HashSet<GameObject>();
 
         private HideModeSelector mode;
 
@@ -80,8 +80,8 @@ namespace SEE.Controls.Actions
         {
             SEE.Game.UI.PropertyDialog.HidePropertyDialog dialog = new SEE.Game.UI.PropertyDialog.HidePropertyDialog();
 
-            dialog.OnConfirm.AddListener(() => OKButtonPressed());
-            dialog.OnCancel.AddListener(() => Cancelled());
+            dialog.OnConfirm.AddListener(OKButtonPressed);
+            dialog.OnCancel.AddListener(Cancelled);
 
             dialog.Open();
 
@@ -279,7 +279,7 @@ namespace SEE.Controls.Actions
             if (rendered)
             {
                 hiddenObjects.Add(edge);
-                GameObjectExtensions.SetVisibility(edge, false, true);
+                edge.SetVisibility(false);
                 return true;
             }
             else
@@ -340,12 +340,12 @@ namespace SEE.Controls.Actions
                     if (edge.activeInHierarchy && edgeIDs.Contains(edge.name) && rendered)
                     {
                         hiddenObjects.Add(edge);
-                        GameObjectExtensions.SetVisibility(edge, false, true);
+                        edge.SetVisibility(false);
                     }
                 }
             }
             hiddenObjects.Add(node);
-            GameObjectExtensions.SetVisibility(node, false, true);
+            node.SetVisiblity(false);
             return true;
         }
 
@@ -463,8 +463,7 @@ namespace SEE.Controls.Actions
                 {
                     if(!g.name.Equals("implementation") && !g.name.Equals("architecture"))
                     {
-
-                        GameObjectExtensions.SetVisibility(g, false, true);
+                        g.SetVisibility(false);
                         hiddenObjects.Add(g);
                     }
                     
@@ -482,7 +481,7 @@ namespace SEE.Controls.Actions
         /// <param name="transform"> Transform of the game object </param>
         /// <param name="objectList"> Current list of all node and edge children </param>
         /// <returns> list of all node and edge children of a game object </returns>
-        private List<GameObject> GetAllChildrenRecursively(Transform transform, List<GameObject> objectList)
+        private static List<GameObject> GetAllChildrenRecursively(Transform transform, List<GameObject> objectList)
         {
             foreach (Transform child in transform)
             {
@@ -506,7 +505,6 @@ namespace SEE.Controls.Actions
         {
             if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
             {
-
                 HashSet<string> edgeIDs = new HashSet<string>();
                 HashSet<string> nodeIDs = new HashSet<string>();
 
@@ -522,7 +520,7 @@ namespace SEE.Controls.Actions
                     if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                     {
                         hiddenObjects.Add(edge);
-                        GameObjectExtensions.SetVisibility(edge, false, true);
+                        edge.SetVisibility(false);
                     }
                 }
                 foreach (GameObject node in GameObject.FindGameObjectsWithTag(Tags.Node))
@@ -534,7 +532,7 @@ namespace SEE.Controls.Actions
                     }
                 }
                 return true;
-                }
+            }
             return false;   
         }
 
@@ -563,7 +561,7 @@ namespace SEE.Controls.Actions
                     if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                     {
                         hiddenObjects.Add(edge);
-                        GameObjectExtensions.SetVisibility(edge, false, true);
+                        edge.SetVisibility(false);
                     }
                 }
                 foreach (GameObject node in GameObject.FindGameObjectsWithTag(Tags.Node))
@@ -575,7 +573,7 @@ namespace SEE.Controls.Actions
                     }
                 }
                 return true;
-                }
+            }
             return false;         
         }
 
@@ -599,7 +597,7 @@ namespace SEE.Controls.Actions
             highlightesEdges.Clear();
             foreach (GameObject g in hiddenObjects)
             {
-                GameObjectExtensions.SetVisibility(g, true, false);
+                g.SetVisibility(true, false);
                 undoneList.Add(g);
             }
             hiddenObjects.Clear();
@@ -613,7 +611,7 @@ namespace SEE.Controls.Actions
             base.Redo();
             foreach (GameObject g in undoneList)
             {
-                GameObjectExtensions.SetVisibility(g, false, false);
+                g.SetVisibility(false, false);
                 hiddenObjects.Add(g);
             }
             undoneList.Clear();
@@ -634,7 +632,7 @@ namespace SEE.Controls.Actions
                     if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                     {
                         hiddenObjects.Add(edge);
-                        GameObjectExtensions.SetVisibility(edge, false, true);
+                        edge.SetVisibility(false);
                     }
                 }
                 foreach (GameObject node in GameObject.FindGameObjectsWithTag(Tags.Node))
@@ -656,7 +654,7 @@ namespace SEE.Controls.Actions
         /// <param name="edgeIDs"> list of IDs of edges reachable from the node</param>
         /// <param name="nodeIDs"> list of IDs of nodes reachable from the node</param>
         /// <returns> a tuple of two hashsets of strings containing the edge IDs and the node IDs </returns>
-        private (HashSet<string>, HashSet<string>) ForwardTransitiveRecursive(Node node, HashSet<string> edgeIDs, HashSet<string> nodeIDs)
+        private static (HashSet<string>, HashSet<string>) ForwardTransitiveRecursive(Node node, HashSet<string> edgeIDs, HashSet<string> nodeIDs)
         {
             nodeIDs.Add(node.ID);
             foreach (Edge edge in node.Outgoings)
@@ -685,7 +683,7 @@ namespace SEE.Controls.Actions
                     if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                     {
                         hiddenObjects.Add(edge);
-                        GameObjectExtensions.SetVisibility(edge, false, true);
+                        edge.SetVisibility(false);
                     }
                 }
                 foreach (GameObject node in GameObject.FindGameObjectsWithTag(Tags.Node))
@@ -707,7 +705,7 @@ namespace SEE.Controls.Actions
         /// <param name="edgeIDs"> list of IDs of edges reachable from the node</param>
         /// <param name="nodeIDs"> list of IDs of nodes reachable from the node</param>
         /// <returns> a tuple of two hashsets of strings containing the edge IDs and the node IDs </returns>
-        private (HashSet<string>, HashSet<string>) BackwardTransitiveRecursive(Node node, HashSet<string> edgeIDs, HashSet<string> nodeIDs)
+        private static (HashSet<string>, HashSet<string>) BackwardTransitiveRecursive(Node node, HashSet<string> edgeIDs, HashSet<string> nodeIDs)
         {
             nodeIDs.Add(node.ID);
             foreach (Edge edge in node.Incomings)
@@ -764,15 +762,11 @@ namespace SEE.Controls.Actions
         /// Selects all edges that lie between the selected nodes
         /// </summary>
         /// <param name="subset">The nodes that are selected</param>
-        private void SelectEdgesBetweenSubsetOfNodes(HashSet<GameObject> subset)
+        private static void SelectEdgesBetweenSubsetOfNodes(ICollection<GameObject> subset)
         { 
             if(subset != null && subset.Count > 0)
             {
-                List<string> subsetNames = new List<string>();
-                foreach (GameObject g in subset)
-                {
-                    subsetNames.Add(g.name);
-                }
+                List<string> subsetNames = subset.Select(g => g.name).ToList();
                 foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
                 {
                     if (edge.TryGetComponent(out EdgeRef edgeRef))
@@ -826,8 +820,7 @@ namespace SEE.Controls.Actions
         {
             if (interactableObject != null)
             {
-                selectedObject = interactableObject.gameObject;
-                selectedObjects.Add(interactableObject.gameObject);
+                selectedObjects.Add(selectedObject = interactableObject.gameObject);
             }
         }
 

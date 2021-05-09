@@ -53,7 +53,7 @@ namespace SEE.Game.UI.StateIndicator
         private Tooltip.Tooltip tooltip;
 
         /// <summary>
-        ///Saves the description of the button
+        /// Saves the description of the button
         /// </summary>
         public string description;
 
@@ -109,11 +109,9 @@ namespace SEE.Game.UI.StateIndicator
         /// Sets all relevant values for the button
         /// </summary>
         /// <param name="indicator">Parent GameObject via which the button is accessed</param>
-        void SetUpButton(GameObject indicator)
+        private void SetUpButton(GameObject indicator)
         {
             GameObject button = indicator.transform.Find("Button").gameObject;
-            GameObject text = button.transform.Find("Text").gameObject;
-            GameObject icon = button.transform.Find("Icon").gameObject;
 
 
             button.name = buttonName;
@@ -124,7 +122,7 @@ namespace SEE.Game.UI.StateIndicator
             }
 
             buttonManager.buttonText = buttonName;
-            buttonManager.clickEvent.AddListener(() => Clicked());
+            buttonManager.clickEvent.AddListener(Clicked);
             pointerHelper.EnterEvent.AddListener(() => tooltip.Show(description));
         }
 
@@ -132,7 +130,7 @@ namespace SEE.Game.UI.StateIndicator
         /// Sets up the tooltips for the button
         /// </summary>
         /// <param name="indicator">Parent GameObject via which the button is accessed</param>
-        void SetupTooltip(GameObject indicator)
+        private void SetupTooltip(GameObject indicator)
         {
             GameObject button = indicator.transform.Find("Button").gameObject;
             tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
@@ -141,19 +139,13 @@ namespace SEE.Game.UI.StateIndicator
                 // Register listeners on entry and exit events, respectively
                 pointerHelper.EnterEvent.AddListener(() => tooltip.Show(description));
                 pointerHelper.ExitEvent.AddListener(tooltip.Hide);
-                // FIXME scrolling doesn't work while hovering above the field, because
-                // the Modern UI Pack uses an Event Trigger (see Utils/PointerHelper for an explanation.)
-                // It is unclear how to resolve this without either abstaining from using the Modern UI Pack
-                // in this instance or without modifying the Modern UI Pack, which would complicate 
-                // updates greatly. Perhaps the author of the Modern UI Pack (or Unity developers?) should
-                // be contacted about this.
             }
         }
 
         /// <summary>
         /// Event, is called when the button is clicked.
         /// </summary>
-        void Clicked()
+        private void Clicked()
         {
             OnSelected.Invoke();
         }
@@ -167,7 +159,6 @@ namespace SEE.Game.UI.StateIndicator
             indicator.name = Title;
             SetupTooltip(indicator);
             SetUpButton(indicator);
-
 
             RectTransform rectTransform = (RectTransform)indicator.transform;
             rectTransform.anchorMin = AnchorMin;
@@ -199,13 +190,11 @@ namespace SEE.Game.UI.StateIndicator
         {
             if (HasStarted)
             {
-                // ModePanelImage.color = color.ColorWithAlpha(0.5f);
                 ModePanelText.text = text;
             }
             else
             {
                 // Indicator has not yet been initialized
-                //  StartColor = color.ColorWithAlpha(0.5f);
                 StartText = text;
             }
         }
