@@ -43,7 +43,7 @@ namespace SEE.Controls.Actions
 
         enum EdgeSelector
         {
-            Incomming,
+            Incoming,
             Outgoing
         }
 
@@ -138,7 +138,7 @@ namespace SEE.Controls.Actions
                     }
                     break;
                 case HideModeSelector.HideIncoming:
-                    if (HideIncommingEdges())
+                    if (HideIncomingEdges())
                     {
                         hadAnEffect = true;
                         return true;
@@ -539,7 +539,7 @@ namespace SEE.Controls.Actions
         /// Hides incoming edges of currently selected node including the connected nodes.
         /// </summary>
         /// <returns> true if incoming edges of currently selected node including the connected nodes were hidden</returns>
-        private bool HideIncommingEdges()
+        private bool HideIncomingEdges()
         {
             if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
             {
@@ -582,7 +582,7 @@ namespace SEE.Controls.Actions
         /// <returns> true if incoming edges of currently selected node including the connected nodes were hidden </returns>
         private bool HideAllConnectedEdges()
         {
-            return HideIncommingEdges() && HideOutgoingEdges();
+            return HideIncomingEdges() && HideOutgoingEdges();
         }
 
 
@@ -619,7 +619,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Hide the forward transitive closure (all nodes reachable from the selected node by going forwards)
         /// </summary>
-        private bool HideFowardTransitive()
+        private bool HideForwardTransitive()
         {
             if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
             {
