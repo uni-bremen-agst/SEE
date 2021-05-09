@@ -41,14 +41,30 @@ namespace SEE.Game.UI.StateIndicator
         /// </summary>
         private string StartText = "Select Objects";
 
+        /// <summary>
+        /// Saves the name of the button
+        /// </summary>
         public string buttonName;
 
+        /// <summary>
+        /// The tooltip containing the <see cref=description"/> of this <see cref="Property"/>, which will
+        /// be displayed when hovering above it.
+        /// </summary>
         private Tooltip.Tooltip tooltip;
 
+        /// <summary>
+        ///Saves the description of the button
+        /// </summary>
         public string description;
 
+        /// <summary>
+        /// Saves which HideMode the button represents
+        /// </summary>
         public HideModeSelector hideMode;
 
+        /// <summary>
+        /// Event triggered when the user presses the button.
+        /// </summary>
         public readonly UnityEvent OnSelected = new UnityEvent();
 
         /// <summary>
@@ -89,8 +105,11 @@ namespace SEE.Game.UI.StateIndicator
             }
         }
 
-        [System.Obsolete]
-        void SetButtonName(GameObject indicator)
+        /// <summary>
+        /// Sets all relevant values for the button
+        /// </summary>
+        /// <param name="indicator">Parent GameObject via which the button is accessed</param>
+        void SetUpButton(GameObject indicator)
         {
             GameObject button = indicator.transform.Find("Button").gameObject;
             GameObject text = button.transform.Find("Text").gameObject;
@@ -109,6 +128,10 @@ namespace SEE.Game.UI.StateIndicator
             pointerHelper.EnterEvent.AddListener(() => tooltip.Show(description));
         }
 
+        /// <summary>
+        /// Sets up the tooltips for the button
+        /// </summary>
+        /// <param name="indicator">Parent GameObject via which the button is accessed</param>
         void SetupTooltip(GameObject indicator)
         {
             GameObject button = indicator.transform.Find("Button").gameObject;
@@ -127,6 +150,9 @@ namespace SEE.Game.UI.StateIndicator
             }
         }
 
+        /// <summary>
+        /// Event, is called when the button is clicked.
+        /// </summary>
         void Clicked()
         {
             OnSelected.Invoke();
@@ -137,11 +163,10 @@ namespace SEE.Game.UI.StateIndicator
         /// </summary>
         protected override void StartDesktop()
         {
-
             GameObject indicator = PrefabInstantiator.InstantiatePrefab(HIDE_MODE_PANEL_PREFAB, Canvas.transform, false);
             indicator.name = Title;
             SetupTooltip(indicator);
-            SetButtonName(indicator);
+            SetUpButton(indicator);
 
 
             RectTransform rectTransform = (RectTransform)indicator.transform;

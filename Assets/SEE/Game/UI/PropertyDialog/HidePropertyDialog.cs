@@ -28,19 +28,29 @@ namespace SEE.Game.UI.PropertyDialog
         public readonly UnityEvent OnCancel = new UnityEvent();
 
         /// <summary>
-        /// The dialog used to manipulate the node.
+        /// The dialog used to select the HideMode.
         /// </summary>
         private GameObject dialog;
 
+        /// <summary>
+        /// Used to select multiple elements in a graph.
+        /// </summary>
         private GameObject selection;
 
+        /// <summary>
+        /// Shows the current HideMode
+        /// </summary>
         private HideStateIndicator indicator;
 
         /// <summary>
-        /// The dialog property for the name of the node to be entered in the dialog.
+        /// Represents the Selected HideMode
         /// </summary>
-        ///
+        public HideInInspector selectedMode;
 
+
+        /// <summary>
+        /// Menu buttons to select the HideMode
+        /// </summary>
         private ButtonProperty fdb1;
         private ButtonProperty fdb2;
 
@@ -56,26 +66,33 @@ namespace SEE.Game.UI.PropertyDialog
         private ButtonProperty mdb3;
         private ButtonProperty mdb4;
 
-        public HideInInspector selectedMode;
-
-
+        /// <summary>
+        /// Creates a menu to select multiple elements from a graph
+        /// </summary>
         public void OpenSelectionMenu()
         {
+            // Creating a new selection
             selection = new GameObject("Indicator");
             indicator = selection.AddComponent<HideStateIndicator>();
-            indicator.buttonName = "Done Selection";
+            indicator.buttonName = "Done selecting";
             indicator.AnchorMin = Vector2.zero;
             indicator.AnchorMax = Vector2.zero;
             indicator.Pivot = Vector2.zero;
             indicator.ChangeState("Select Objects");
 
+            // Register listeners for selection menu
             indicator.OnSelected.AddListener(() => SetMode(indicator.hideMode));
         }
 
+        /// <summary>
+        /// Opens a new dialogue that asks whether you want to select only one or several elements (for a better overview).
+        /// </summary>
         public void Open()
         {
+            // Creating a new dialog
             dialog = new GameObject("Hideaction mode selector");
 
+            // Create new buttons 
             fdb1 = dialog.AddComponent<ButtonProperty>();
             fdb1.Name = "Single Selection";
             fdb1.Description = "Select objects";
@@ -86,10 +103,12 @@ namespace SEE.Game.UI.PropertyDialog
             fdb2.Description = "Select objects";
             fdb2.Value = HideModeSelector.SelectMultipleHide;
 
+            // Group for buttons
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
             group.AddProperty(fdb1);
             group.AddProperty(fdb2);
 
+            // Register listeners for buttons
             fdb1.OnSelected.AddListener(() => SetMode(fdb1.hideMode));
             fdb2.OnSelected.AddListener(() => SetMode(fdb2.hideMode));
 
@@ -99,7 +118,7 @@ namespace SEE.Game.UI.PropertyDialog
             propertyDialog.Description = "Select hide mode";
             propertyDialog.AddGroup(group);
 
-            // Register listeners
+            // Register listeners for dialog
             propertyDialog.OnConfirm.AddListener(OKButtonPressed);
             propertyDialog.OnCancel.AddListener(CancelButtonPressed);
 
@@ -108,11 +127,15 @@ namespace SEE.Game.UI.PropertyDialog
             propertyDialog.DialogShouldBeShown = true;
         }
 
-
+        /// <summary>
+        /// Provides all possible functions that are available for the selection of a single element.
+        /// </summary>
         public void OpenSinge()
         {
+            // Creating a new dialog
             dialog = new GameObject("Hideaction mode selector");
 
+            // Create new buttons 
             sdb1 = dialog.AddComponent<ButtonProperty>();
             sdb1.Name = "Hide all";
             sdb1.Description = "Hides everything";
@@ -143,16 +166,16 @@ namespace SEE.Game.UI.PropertyDialog
             sdb6.Description = "Beschreibung";
             sdb6.Value = HideModeSelector.HideAllTransitiveClosure;
 
-            // Group for node name and type
+            // Group for buttons
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
             group.AddProperty(sdb1);
             group.AddProperty(sdb2);
             group.AddProperty(sdb3);
-
             group.AddProperty(sdb4);
             group.AddProperty(sdb5);
             group.AddProperty(sdb6);
 
+            // Register listeners for buttons
             sdb1.OnSelected.AddListener(() => SetMode(sdb1.hideMode));
             sdb2.OnSelected.AddListener(() => SetMode(sdb2.hideMode));
             sdb3.OnSelected.AddListener(() => SetMode(sdb3.hideMode));
@@ -166,7 +189,7 @@ namespace SEE.Game.UI.PropertyDialog
             propertyDialog.Description = "Select hide mode";
             propertyDialog.AddGroup(group);
 
-            // Register listeners
+            // Register listeners for dialog
             propertyDialog.OnConfirm.AddListener(OKButtonPressed);
             propertyDialog.OnCancel.AddListener(CancelButtonPressed);
 
@@ -176,12 +199,14 @@ namespace SEE.Game.UI.PropertyDialog
         }
 
         /// <summary>
-        /// Creates and opens the dialog.
+        /// Provides all possible functions that are available for the selection of multiple elements.
         /// </summary>
         public void OpenMultiple()
         {
+            // Creating a new dialog
             dialog = new GameObject("Hideaction mode selector");
 
+            // Create new buttons
             mdb1 = dialog.AddComponent<ButtonProperty>();
             mdb1.Name = "Hide selected";
             mdb1.Description = "Hides only the selected objects";
@@ -229,6 +254,10 @@ namespace SEE.Game.UI.PropertyDialog
             propertyDialog.DialogShouldBeShown = true;
         }
 
+        /// <summary>
+        /// Opens the appropriate dialogues for the corresponding selections.
+        /// </summary>
+        /// <param name="mode">The mode associated with the button pressed</param>
         void SetMode(HideModeSelector mode)
         {
             switch (mode)
