@@ -1,10 +1,9 @@
 ﻿using SEE.DataModel;
 using SEE.DataModel.DG;
-using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -345,7 +344,7 @@ namespace SEE.Controls.Actions
                 }
             }
             hiddenObjects.Add(node);
-            node.SetVisiblity(false);
+            node.SetVisibility(false);
             return true;
         }
 
