@@ -152,7 +152,7 @@ namespace SEE.Controls.Actions
                     }
                     break;
                 case HideModeSelector.HideForwardTransitveClosure:
-                    if (HideFowardTransitive())
+                    if (HideForwardTransitive())
                     {
                         hadAnEffect = true;
                         return true;
@@ -180,7 +180,6 @@ namespace SEE.Controls.Actions
                     }
                     break;
                 default: return false;
-
             }
             return false;
         }
@@ -242,7 +241,6 @@ namespace SEE.Controls.Actions
                     //remove selected object
                     nodesEdges.Remove(g);
                 }
-
                 foreach (GameObject g in nodesEdges)
                 {
                     Assert.IsTrue(g.HasNodeRef() || g.HasEdgeRef());
@@ -376,7 +374,6 @@ namespace SEE.Controls.Actions
                         }
                         hiddenObjects.Add(g);
                     }
-
                 }
                 if(selectedObjects != null)
                 {
@@ -392,10 +389,8 @@ namespace SEE.Controls.Actions
                             }
                             hiddenObjects.Add(g);
                         }
-
                     }
                 }
-                
                 return true;
             }
             else
@@ -432,9 +427,7 @@ namespace SEE.Controls.Actions
                         }
                         hiddenObjects.Add(g);
                     }
-
                 }
-
                 return true;
             }
             else
@@ -465,7 +458,6 @@ namespace SEE.Controls.Actions
                         g.SetVisibility(false);
                         hiddenObjects.Add(g);
                     }
-                    
                 }
                 return true;
             } else
@@ -514,8 +506,7 @@ namespace SEE.Controls.Actions
                 }
 
                 foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
-                {
-                            
+                {     
                     if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                     {
                         hiddenObjects.Add(edge);
@@ -584,7 +575,6 @@ namespace SEE.Controls.Actions
         {
             return HideIncomingEdges() && HideOutgoingEdges();
         }
-
 
         /// <summary>
         /// Undoes the action.
@@ -674,7 +664,6 @@ namespace SEE.Controls.Actions
         {
             if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
             {
-
                 (HashSet<string> edgeIDs, HashSet<string> nodeIDs) = BackwardTransitiveRecursive(nodeRef.Value, new HashSet<string>(), new HashSet<string>());
 
                 foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
@@ -723,7 +712,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private bool HideAllTransitive()
         {
-            return HideFowardTransitive() && HideBackwardTransitive();
+            return HideForwardTransitive() && HideBackwardTransitive();
         }
 
         /// <summary>
@@ -737,7 +726,6 @@ namespace SEE.Controls.Actions
                 string sourceID = edgeRef.Value.Source.ID;
                 string targetID = edgeRef.Value.Target.ID;
                
-
                 foreach (GameObject node in GameObject.FindGameObjectsWithTag(Tags.Node))
                 {
                     if (node.name.Equals(sourceID))
