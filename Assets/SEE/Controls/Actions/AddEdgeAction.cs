@@ -148,12 +148,12 @@ namespace SEE.Controls.Actions
                 {
                     // The edge ID was created by the graph renderer.
                     memento.edgeID = createdEdge.ID();
-                    from = null;
-                    to = null;
                     // action is completed (successfully or not; it does not matter)
                     result = true;
                     currentState = ReversibleAction.Progress.Completed;
                 }
+                from = null;
+                to = null;
             }
             // Forget from and to upon user request.
             if (SEEInput.Unselect())
@@ -208,7 +208,10 @@ namespace SEE.Controls.Actions
             }
             GameObject result = GameEdgeAdder.Add(memento.from, memento.to, memento.edgeID);
             // Note that we need to use result.name as edge ID because edgeMemento.edgeID could be null.
-            new AddEdgeNetAction(memento.from.name, memento.to.name, result.name).Execute();
+            if(result != null)
+            {
+                new AddEdgeNetAction(memento.from.name, memento.to.name, result.name).Execute();
+            }
             return result;
         }
 
