@@ -1,3 +1,4 @@
+using SEE.Game.UI.Notification;
 using SEE.Net;
 using SEE.Utils;
 using System;
@@ -243,6 +244,7 @@ namespace Assets.SEE.Utils
 
             if (ActionHasConflicts(current.GetChangedObjects()))
             {
+                ShowNotification.Error("Error:", "Undo not possible, someone else had made a change on the same object!");
                 Debug.LogWarning("Undo not possible, someone else had made a change on the same object!");
                 Replace(lastAction, new Tuple<bool, HistoryType, string, List<string>>(false, HistoryType.undoneAction, lastAction.Item3, lastAction.Item4), false);
 
@@ -288,6 +290,7 @@ namespace Assets.SEE.Utils
                 {
                     RedoHistory.Pop();
                     Replace(lastUndoneAction, new Tuple<bool, HistoryType, string, List<string>>(false, HistoryType.undoneAction, lastUndoneAction.Item3, lastUndoneAction.Item4), false);
+                    ShowNotification.Error("Error:", "Redo not possible, someone else had made a change on the same object!");
                     Debug.LogWarning("Redo not possible, someone else had made a change on the same object!");
                     LastAction.Start();
                     return;
