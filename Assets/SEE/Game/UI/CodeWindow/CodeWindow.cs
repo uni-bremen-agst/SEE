@@ -195,24 +195,27 @@ namespace SEE.Game.UI.CodeWindow
                 Text = "<i>This file is empty.</i>";
                 return;
             }
+            
+            // We need to insert this pseudo-token here so that the first line gets a line number
+            tokenList.Insert(0, new SEEToken(string.Empty, SEEToken.Type.Newlines, -1, 0));
 
             // Needed padding is the number of lines, because the line number will be at most this long
-            int neededPadding = $"{tokenList.Count(x => x.Type.Equals(SEETokenType.Newlines))}".Length;
+            int neededPadding = $"{tokenList.Count(x => x.TokenType.Equals(SEEToken.Type.Newlines))}".Length;
             int lineNumber = 1;
             foreach (SEEToken token in tokenList)
             {
-                if (token.Type == SEETokenType.Unknown)
+                if (token.TokenType == SEEToken.Type.Unknown)
                 {
                     Debug.LogError($"Unknown token encountered for text '{token.Text}'.\n");
                 }
                 // No "else if" because we still want to display this token.
-                if (token.Type == SEETokenType.Whitespace)
+                if (token.TokenType == SEEToken.Type.Whitespace)
                 {
                     // We just copy the whitespace verbatim, no need to even color it.
                     // Note: We have to assume that whitespace will not interfere with TMP's XML syntax.
                     Text += token.Text;
                 }
-                else if (token.Type == SEETokenType.Newlines)
+                else if (token.TokenType == SEEToken.Type.Newlines)
                 {
                     // First, of course, the newline
                     Text += "\n";
@@ -224,7 +227,7 @@ namespace SEE.Game.UI.CodeWindow
                 }
                 else
                 {
-                    Text += $"<color=#{token.Type.Color}><noparse>{token.Text}</noparse></color>";
+                    Text += $"<color=#{token.TokenType.Color}><noparse>{token.Text}</noparse></color>";
                 }
             }
         }

@@ -7,7 +7,7 @@ using Antlr4.Runtime;
 namespace SEE.Game.UI.CodeWindow
 {
     /// <summary>
-    /// Represents a token from a source code file, including <see cref="Text"/> and a <see cref="SEETokenType"/>.
+    /// Represents a token from a source code file, including <see cref="Text"/> and a <see cref="SEE.Game.UI.CodeWindow.SEEToken.Type"/>.
     /// </summary>
     public readonly struct SEEToken
     {
@@ -15,20 +15,22 @@ namespace SEE.Game.UI.CodeWindow
         /// The text of the token.
         /// </summary>
         public readonly string Text;
-        
+
         /// <summary>
         /// The type of this token.
         /// </summary>
-        public readonly SEETokenType Type;
-        
+        public readonly Type TokenType;
+
         /// <summary>
-        /// The inclusive index of the beginning of this token, relative to the file this token is contained in.
+        /// The inclusive index of the beginning of this token.
+        /// The index is measured from the beginning of the file, whereas the first character has the index 0.
         /// </summary>
         public readonly int StartOffset;
-        
+
         /// <summary>
-        /// The exclusive index of the end of this token, relative to the file this token is contained in.
+        /// The exclusive index of the end of this token.
         /// In other words, this is the index of the first character not belonging to this token.
+        /// The index is measured from the beginning of the file, whereas the first character has the index 0.
         /// </summary>
         public readonly int EndOffset;
 
@@ -47,10 +49,10 @@ namespace SEE.Game.UI.CodeWindow
         /// If <paramref name="endOffset"/> is smaller than <paramref name="startOffset"/>
         /// </exception>
         /// <exception cref="ArgumentException">If <paramref name="startOffset"/> is less than -1.</exception>
-        public SEEToken(string text, SEETokenType type, int startOffset, int endOffset)
+        public SEEToken(string text, Type type, int startOffset, int endOffset)
         {
             Text = text ?? throw new ArgumentNullException(nameof(text));
-            Type = type ?? throw new ArgumentNullException(nameof(type));
+            TokenType = type ?? throw new ArgumentNullException(nameof(type));
             if (endOffset < startOffset)
             {
                 throw new ArgumentOutOfRangeException($"{nameof(endOffset)} must not be smaller than {nameof(startOffset)}!");
@@ -60,6 +62,7 @@ namespace SEE.Game.UI.CodeWindow
             {
                 throw new ArgumentException($"{nameof(startOffset)} must not be less than -1!");
             }
+
             StartOffset = startOffset;
             EndOffset = endOffset;
         }
@@ -76,9 +79,9 @@ namespace SEE.Game.UI.CodeWindow
         public static SEEToken fromAntlrToken(IToken token, Lexer lexer, TokenLanguage language = null)
         {
             language ??= TokenLanguage.fromLexerFileName(lexer.GrammarFileName);
-            return new SEEToken(token.Text, 
-                                SEETokenType.fromAntlrType(language, lexer.Vocabulary.GetSymbolicName(token.Type)),
-                                token.StartIndex, token.StopIndex+1); // Antlr StopIndex is inclusive
+            return new SEEToken(token.Text,
+                                Type.fromAntlrType(language, lexer.Vocabulary.GetSymbolicName(token.Type)),
+                                token.StartIndex, token.StopIndex + 1); // Antlr StopIndex is inclusive
         }
 
         /// <summary>
@@ -91,8 +94,6 @@ namespace SEE.Game.UI.CodeWindow
         /// <ul>
         /// <li>The language of the file will be determined by checking its file extension.</li>
         /// <li>Each token will be created by using <see cref="fromAntlrToken"/>.</li>
-        /// <li>The first token in this list will always be a token of type <see cref="SEETokenType.Newlines"/>
-        /// with empty text.</li>
         /// </ul>
         /// </remarks>
         public static IEnumerable<SEEToken> fromFile(string filename)
@@ -103,8 +104,111 @@ namespace SEE.Game.UI.CodeWindow
             tokenStream.Fill();
             // Generate list of SEETokens using the token stream and its language
             IList<SEEToken> tokenList = tokenStream.GetTokens().Select(x => fromAntlrToken(x, lexer, language)).ToList();
-            tokenList.Insert(0, new SEEToken(string.Empty, SEETokenType.Newlines, -1, 0));
             return tokenList;
+        }
+
+        /// <summary>
+        /// Represents a kind of token in a programming language, with an associated color.
+        /// For example, this may be a <see cref="Keyword"/> or an <see cref="Identifier"/>.
+        /// </summary>
+        public class Type
+        {
+            /// <summary>
+            /// Name of the token type.
+            /// This has to match with the corresponding collection in <see cref="TokenLanguage"/>.
+            /// </summary>
+            public string Name { get; }
+
+            /// <summary>
+            /// Color the token type should be rendered in in hexadecimal RGB notation (no '#' sign).
+            /// An optional fourth byte may be entered to define the alpha value.
+            /// </summary>
+            /// <example>Red would be "FF0000". Semitransparent black would be "00000088".</example>
+            public string Color { get; }
+
+            #region Static Types
+
+            /// <summary>
+            /// A list of all possible tokens.
+            /// </summary>
+            public static IList<Type> AllTokens { get; } = new List<Type>();
+
+            /* IMPORTANT: The name has to match with the name of the collection in TokenLanguage! */
+
+            /// <summary>
+            /// Keyword tokens. This also includes boolean literals and null literals.
+            /// </summary>
+            public static readonly Type Keyword = new Type("Keywords", "D988F2"); // purple
+
+            /// <summary>
+            /// Number literal tokens. This includes integer literals, floating point literals, etc.
+            /// </summary>
+            public static readonly Type NumberLiteral = new Type("NumberLiterals", "D48F35"); // orange
+
+            /// <summary>
+            /// String literal tokens. This also includes character literals.
+            /// </summary>
+            public static readonly Type StringLiteral = new Type("StringLiterals", "92F288"); // light green
+
+            /// <summary>
+            /// Punctuation tokens, such as separators and operators.
+            /// </summary>
+            public static readonly Type Punctuation = new Type("Punctuation", "96E5FF"); // light blue
+
+            /// <summary>
+            /// Identifier tokens, such as variable names.
+            /// </summary>
+            public static readonly Type Identifier = new Type("Identifiers", "FFFFFF"); // white
+
+            /// <summary>
+            /// Whitespace tokens, excluding newlines.
+            /// </summary>
+            public static readonly Type Whitespace = new Type("Whitespace", "000000"); // color doesn't matter
+
+            /// <summary>
+            /// Newline tokens. Must contain exactly one newline.
+            /// </summary>
+            public static readonly Type Newlines = new Type("Newlines", "000000"); // color doesn't matter
+
+            /// <summary>
+            /// Unknown tokens, i.e. those not recognized by the lexer.
+            /// </summary>
+            public static readonly Type Unknown = new Type("Unknown", "FFFFFF"); // white
+
+            //TODO: If we choose parsers instead of lexers, methods and class names may get their own color
+
+            #endregion
+
+            /// <summary>
+            /// Constructor for this class.
+            /// </summary>
+            /// <remarks>Must never be accessible from the outside.</remarks>
+            /// <param name="name">Name of this token type</param>
+            /// <param name="color">Color this token type should be shown in</param>
+            private Type(string name, string color)
+            {
+                Color = color;
+                Name = name;
+                AllTokens.Add(this);
+            }
+
+            /// <summary>
+            /// Returns the corresponding <see cref="Type"/> for the given <paramref name="symbolicName"/> in the given
+            /// <paramref name="language"/>. If it's not recognized, <see cref="Unknown"/> will be returned.
+            /// </summary>
+            /// <param name="language">The language the <paramref name="symbolicName"/> is from</param>
+            /// <param name="symbolicName">Symbolic name from an antlr lexer</param>
+            /// <returns>The corresponding token for the given <paramref name="symbolicName"/>.</returns>
+            public static Type fromAntlrType(TokenLanguage language, string symbolicName)
+            {
+                if (language == null || symbolicName == null)
+                {
+                    throw new ArgumentNullException();
+                }
+
+                string typeName = language.TypeName(symbolicName);
+                return AllTokens.SingleOrDefault(x => x.Name.Equals(typeName)) ?? Unknown;
+            }
         }
     }
 }
