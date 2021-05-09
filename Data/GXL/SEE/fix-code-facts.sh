@@ -19,6 +19,7 @@ fi
 echo ""
 
 # check whether the path is of the form /c/..., otherwise future regexes will not work.
+# (https://stackoverflow.com/a/4774063)
 SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 if [[ ! "$SCRIPTPATH" =~ ^/[a-z]/ ]]; then
 	echo "Sorry, this script only supports GitBash/git-scm/MINGW (https://gitforwindows.org) installations for now."
