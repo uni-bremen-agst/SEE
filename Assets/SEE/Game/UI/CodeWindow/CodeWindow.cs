@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Antlr4.Runtime;
 using DG.Tweening;
 using SEE.GO;
 using TMPro;
@@ -182,45 +181,38 @@ namespace SEE.Game.UI.CodeWindow
         /// <exception cref="ArgumentException">
         /// If the given <paramref name="lexer"/> is not of a supported grammar.
         /// </exception>
-        public void EnterFromLexer(Lexer lexer, TokenLanguage language = null)
+        public void EnterFromTokens(IEnumerable<SEEToken> tokens)
         {
-            if (lexer == null)
+            if (tokens == null)
             {
-                throw new ArgumentNullException(nameof(lexer));
+                throw new ArgumentNullException(nameof(tokens));
             }
-
-            CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-            tokenStream.Fill();
-            language ??= TokenLanguage.fromLexerFileName(lexer.GrammarFileName);
-
-            if (language == null)
+            
+            // Avoid multiple enumeration in case iteration over the data source is expensive
+            List<SEEToken> tokenList = tokens.ToList();
+            if (!tokenList.Any())
             {
-                string supportedGrammars = string.Join(", ", TokenLanguage.AllTokenLanguages.Select(x => x.LexerFileName));
-                throw new ArgumentException($"The given {nameof(lexer)} is not of a supported grammar."
-                                            + $"Supported grammars are {supportedGrammars}.");
+                Text = "<i>This file is empty.</i>";
+                return;
             }
-            // Generate list of SEETokens using the token stream and its language
-            IList<(string, SEEToken)> tokenList = tokenStream.GetTokens()
-                   .Select(t => (t.Text, SEEToken.fromAntlrType(language, lexer.Vocabulary.GetSymbolicName(t.Type)))).ToList();
-            tokenList.Insert(0, ("", SEEToken.Newlines));
 
             // Needed padding is the number of lines, because the line number will be at most this long
-            int neededPadding = $"{tokenList.Count(x => x.Item2.Equals(SEEToken.Newlines))}".Length;
+            int neededPadding = $"{tokenList.Count(x => x.Type.Equals(SEETokenType.Newlines))}".Length;
             int lineNumber = 1;
-            foreach ((string text, SEEToken token) in tokenList)
+            foreach (SEEToken token in tokenList)
             {
-                if (token == SEEToken.Unknown)
+                if (token.Type == SEETokenType.Unknown)
                 {
-                    Debug.LogError("Unknown token encountered for text '" + text + "'\n");
+                    Debug.LogError($"Unknown token encountered for text '{token.Text}'.\n");
                 }
-                
-                if (token == SEEToken.Whitespace)
+                // No "else if" because we still want to display this token.
+                if (token.Type == SEETokenType.Whitespace)
                 {
                     // We just copy the whitespace verbatim, no need to even color it.
                     // Note: We have to assume that whitespace will not interfere with TMP's XML syntax.
-                    Text += text;
+                    Text += token.Text;
                 }
-                else if (token == SEEToken.Newlines)
+                else if (token.Type == SEETokenType.Newlines)
                 {
                     // First, of course, the newline
                     Text += "\n";
@@ -232,7 +224,7 @@ namespace SEE.Game.UI.CodeWindow
                 }
                 else
                 {
-                    Text += $"<color=#{token.Color}><noparse>{text}</noparse></color>";
+                    Text += $"<color=#{token.Type.Color}><noparse>{token.Text}</noparse></color>";
                 }
             }
         }
@@ -283,8 +275,7 @@ namespace SEE.Game.UI.CodeWindow
             {
                 if (syntaxHighlighting)
                 {
-                    TokenLanguage language = TokenLanguage.fromFileExtension(Path.GetExtension(filename)?.Substring(1));
-                    EnterFromLexer(language.CreateLexer(File.ReadAllText(filename)), language);
+                    EnterFromTokens(SEEToken.fromFile(filename));
                 }
                 else
                 {

@@ -6,7 +6,7 @@ using Antlr4.Runtime;
 namespace SEE.Game.UI.CodeWindow
 {
     /// <summary>
-    /// Represents a language a <see cref="SEEToken"/> is in.
+    /// Represents a language a <see cref="SEETokenType"/> is in.
     /// Symbolic names for the antlr lexer are specified here.
     /// </summary>
     public class TokenLanguage
@@ -69,7 +69,8 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         private static readonly HashSet<string> javaExtensions = new HashSet<string>
         {
-            "java"
+            "java",
+            "cs" //FIXME: Remove this debugging entry!
         };
 
         /// <summary>
@@ -167,9 +168,12 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         /// <param name="lexerFileName">File name of the antlr lexer. Can be found in <c>lexer.GrammarFileName</c></param>
         /// <returns>The matching token language</returns>
+        /// <exception cref="ArgumentException">If the given <paramref name="lexerFileName"/> is not supported.</exception>
         public static TokenLanguage fromLexerFileName(string lexerFileName)
         {
-            return AllTokenLanguages.Single(x => x.LexerFileName.Equals(lexerFileName));
+            return AllTokenLanguages.SingleOrDefault(x => x.LexerFileName.Equals(lexerFileName))
+                   ?? throw new ArgumentException($"The given {nameof(lexerFileName)} is not of a supported grammar. Supported grammars are "
+                                                  + string.Join(", ", AllTokenLanguages.Select(x => x.LexerFileName)));
         }
 
         /// <summary>
@@ -178,9 +182,12 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         /// <param name="extension">File extension for the language.</param>
         /// <returns>The matching token language.</returns>
+        /// <exception cref="ArgumentException">If the given <paramref name="extension"/> is not supported.</exception>
         public static TokenLanguage fromFileExtension(string extension)
         {
-            return AllTokenLanguages.Single(x => x.FileExtensions.Contains(extension));
+            return AllTokenLanguages.SingleOrDefault(x => x.FileExtensions.Contains(extension))
+                   ?? throw new ArgumentException("The given filetype is not supported. Supported filetypes are "
+                                                  + string.Join(", ", AllTokenLanguages.SelectMany(x => x.FileExtensions)));
         }
 
         /// <summary>

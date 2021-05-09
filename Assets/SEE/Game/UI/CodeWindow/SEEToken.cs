@@ -1,103 +1,110 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Antlr4.Runtime;
 
 namespace SEE.Game.UI.CodeWindow
 {
     /// <summary>
-    /// Represents a token of some kind in a programming language, with an associated color.
-    /// FIXME: This, along with <see cref="TokenLanguage"/> needs to be moved to a more fitting place.
+    /// Represents a token from a source code file, including <see cref="Text"/> and a <see cref="SEETokenType"/>.
     /// </summary>
-    public class SEEToken
+    public readonly struct SEEToken
     {
         /// <summary>
-        /// Name of the token.
-        /// This has to match with the corresponding collection in <see cref="TokenLanguage"/>.
+        /// The text of the token.
         /// </summary>
-        public string Name { get; }
+        public readonly string Text;
         
         /// <summary>
-        /// Color the token should be rendered in in hexadecimal RGB notation (no '#' sign).
-        /// An optional fourth byte may be entered to define the alpha value.
+        /// The type of this token.
         /// </summary>
-        /// <example>Red would be "FF0000". Semitransparent black would be "00000088".</example>
-        public string Color { get; }
-
-        #region Static Types
-
-        /// <summary>
-        /// A list of all possible tokens.
-        /// </summary>
-        public static IList<SEEToken> AllTokens { get; } = new List<SEEToken>();
-
-        /* IMPORTANT: The name has to match with the name of the collection in TokenLanguage! */
+        public readonly SEETokenType Type;
         
         /// <summary>
-        /// Keyword tokens. This also includes boolean literals and null literals.
+        /// The inclusive index of the beginning of this token, relative to the file this token is contained in.
         /// </summary>
-        public static readonly SEEToken Keyword = new SEEToken("Keywords", "D988F2"); // purple
-        /// <summary>
-        /// Number literal tokens. This includes integer literals, floating point literals, etc.
-        /// </summary>
-        public static readonly SEEToken NumberLiteral = new SEEToken("NumberLiterals", "D48F35"); // orange
-        /// <summary>
-        /// String literal tokens. This also includes character literals.
-        /// </summary>
-        public static readonly SEEToken StringLiteral = new SEEToken("StringLiterals", "92F288"); // light green
-        /// <summary>
-        /// Punctuation tokens, such as separators and operators.
-        /// </summary>
-        public static readonly SEEToken Punctuation = new SEEToken("Punctuation", "96E5FF"); // light blue
-        /// <summary>
-        /// Identifier tokens, such as variable names.
-        /// </summary>
-        public static readonly SEEToken Identifier = new SEEToken("Identifiers", "FFFFFF"); // white
-        /// <summary>
-        /// Whitespace tokens, excluding newlines.
-        /// </summary>
-        public static readonly SEEToken Whitespace = new SEEToken("Whitespace", "000000"); // color doesn't matter
-        /// <summary>
-        /// Newline tokens. Must contain exactly one newline.
-        /// </summary>
-        public static readonly SEEToken Newlines = new SEEToken("Newlines", "000000"); // color doesn't matter
-        /// <summary>
-        /// Unknown tokens, i.e. those not recognized by the lexer.
-        /// </summary>
-        public static readonly SEEToken Unknown = new SEEToken("Unknown", "FFFFFF"); // white
+        public readonly int StartOffset;
         
-        //TODO: If we choose parsers instead of lexers, methods and class names may get their own color
-
-        #endregion
+        /// <summary>
+        /// The exclusive index of the end of this token, relative to the file this token is contained in.
+        /// In other words, this is the index of the first character not belonging to this token.
+        /// </summary>
+        public readonly int EndOffset;
 
         /// <summary>
         /// Constructor for this class.
         /// </summary>
-        /// <remarks>Must never be accessible from the outside.</remarks>
-        /// <param name="name">Name of this token</param>
-        /// <param name="color">Color this tokens should be shown in</param>
-        private SEEToken(string name, string color)
+        /// <param name="text">Text of this token. Must not be <c>null</c>.</param>
+        /// <param name="type">Type of this token. Must not be <c>null</c>.</param>
+        /// <param name="startOffset">Start offset of this token. Must not be negative, except for the special value
+        /// -1, which indicates the very first newline of the file</param>
+        /// <param name="endOffset">End offset of this token. Must not be smaller than <paramref name="startOffset"/>.</param>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="text"/> or <paramref name="type"/> is <c>null</c>.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// If <paramref name="endOffset"/> is smaller than <paramref name="startOffset"/>
+        /// </exception>
+        /// <exception cref="ArgumentException">If <paramref name="startOffset"/> is less than -1.</exception>
+        public SEEToken(string text, SEETokenType type, int startOffset, int endOffset)
         {
-            Color = color;
-            Name = name;
-            AllTokens.Add(this);
+            Text = text ?? throw new ArgumentNullException(nameof(text));
+            Type = type ?? throw new ArgumentNullException(nameof(type));
+            if (endOffset < startOffset)
+            {
+                throw new ArgumentOutOfRangeException($"{nameof(endOffset)} must not be smaller than {nameof(startOffset)}!");
+            }
+            // endOffset is greater than startOffset at this point, so it can't be negative after this part
+            else if (startOffset < -1)
+            {
+                throw new ArgumentException($"{nameof(startOffset)} must not be less than -1!");
+            }
+            StartOffset = startOffset;
+            EndOffset = endOffset;
         }
 
         /// <summary>
-        /// Returns the corresponding <see cref="SEEToken"/> for the given <paramref name="symbolicName"/> in the given
-        /// <paramref name="language"/>. If it's not recognized, <see cref="Unknown"/> will be returned.
+        /// Creates a new <see cref="SEEToken"/> from the given <paramref name="token"/> parsed by the given
+        /// <paramref name="lexer"/>.
         /// </summary>
-        /// <param name="language">The language the <paramref name="symbolicName"/> is from</param>
-        /// <param name="symbolicName">Symbolic name from an antlr lexer</param>
-        /// <returns>The corresponding token for the given <paramref name="symbolicName"/>.</returns>
-        public static SEEToken fromAntlrType(TokenLanguage language, string symbolicName)
+        /// <param name="token">The token which shall be converted to a <see cref="SEEToken"/></param>
+        /// <param name="lexer">The lexer with which the token was created.</param>
+        /// <param name="language">The language of the <paramref name="token"/>.
+        /// If this is not given, the language will be inferred from the given <paramref name="lexer"/>'s grammar.</param>
+        /// <returns>The <see cref="SEEToken"/> corresponding to the given <see cref="token"/>.</returns>
+        public static SEEToken fromAntlrToken(IToken token, Lexer lexer, TokenLanguage language = null)
         {
-            if (language == null || symbolicName == null)
-            {
-                throw new ArgumentNullException();
-            }
-            string typeName = language.TypeName(symbolicName);
-            return AllTokens.SingleOrDefault(x => x.Name.Equals(typeName)) ?? Unknown;
+            language ??= TokenLanguage.fromLexerFileName(lexer.GrammarFileName);
+            return new SEEToken(token.Text, 
+                                SEETokenType.fromAntlrType(language, lexer.Vocabulary.GetSymbolicName(token.Type)),
+                                token.StartIndex, token.StopIndex+1); // Antlr StopIndex is inclusive
         }
-        
+
+        /// <summary>
+        /// Returns a list of <see cref="SEEToken"/>s created by parsing the file at the supplied
+        /// <paramref name="filename"/>.
+        /// </summary>
+        /// <param name="filename">Path to the source code file which shall be read and parsed.</param>
+        /// <returns>A list of tokens created from the source code file.</returns>
+        /// <remarks>
+        /// <ul>
+        /// <li>The language of the file will be determined by checking its file extension.</li>
+        /// <li>Each token will be created by using <see cref="fromAntlrToken"/>.</li>
+        /// <li>The first token in this list will always be a token of type <see cref="SEETokenType.Newlines"/>
+        /// with empty text.</li>
+        /// </ul>
+        /// </remarks>
+        public static IEnumerable<SEEToken> fromFile(string filename)
+        {
+            TokenLanguage language = TokenLanguage.fromFileExtension(Path.GetExtension(filename)?.Substring(1));
+            Lexer lexer = language.CreateLexer(File.ReadAllText(filename));
+            CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+            tokenStream.Fill();
+            // Generate list of SEETokens using the token stream and its language
+            IList<SEEToken> tokenList = tokenStream.GetTokens().Select(x => fromAntlrToken(x, lexer, language)).ToList();
+            tokenList.Insert(0, new SEEToken(string.Empty, SEETokenType.Newlines, -1, 0));
+            return tokenList;
+        }
     }
 }

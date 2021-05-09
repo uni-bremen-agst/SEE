@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using SEE.Game.UI.CodeWindow;
 using SEE.GO;
@@ -115,11 +114,6 @@ namespace SEE.Controls.Actions
                 spaceManager[CodeSpaceManager.LOCAL_PLAYER].ActiveCodeWindow = codeWindow;
                 //TODO: Set font size etc per SEECity settings (maybe, or maybe that's too much)
             }
-        }
-
-        private void Java9LexerBase()
-        {
-            throw new NotImplementedException();
         }
 
         private void LocalAnySelectIn(InteractableObject interactableObject)
