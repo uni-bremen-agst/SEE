@@ -3,13 +3,21 @@
 set -o errexit
 set -o nounset
 
-echo "This script will change the paths in CodeFacts.gxl to your path to SEE, this way it can access the source code files correctly."
-if [[ $# -gt 1 ]]; then
-	echo "Run this script without any parameters to execute it now."
+TARGET="CodeFacts.gxl"
+if [[ $# -gt 1 || $1 == "-h" || $1 == "--help" ]]; then
+	printf "usage: %s [TARGET]\n\nThis script will change the paths in TARGET to your local paths to SEE. If TARGET is not specified, the CodeFacts.gxl file will be used." "$0"
 	exit 0
+elif [[ $# == 1 ]]; then
+	if [[ -r "$1" && -w "$1" ]]; then
+		TARGET="$1"
+	else
+		echo "The given file either doesn't exist, or isn't readable and writable."
+		exit -1
+	fi
 fi
 
 # ask for validation
+echo "This script will change the paths in $TARGET to your path to SEE, this way it can access the source code files correctly."
 echo -n "Proceed? [y/n]: "
 read -rn 1 answer
 if [[ "$answer" != "y" ]]; then
@@ -28,9 +36,9 @@ fi
 
 # extract path to SEE
 if [[ "$SCRIPTPATH" =~ ^/([a-z])/(.*)/Data/GXL ]]; then
-	drive=$(echo "${BASH_REMATCH[1]}" | tr [:lower:] [:upper:]) # make uppercase
+	drive=$(echo "${BASH_REMATCH[1]}" | tr "[:lower:]" "[:upper:]") # make uppercase
 	otherpath="${BASH_REMATCH[2]}"
-	seepath="${drive}:/${otherpath}"
+	seepath=$(echo "${drive}:/${otherpath}/" | sed 's/\//\\\//g') # escape slashes
 	echo "$seepath"
 else
 	echo "Couldn't find SEE on your drive, which is very weird, considering this script should be running from it right now. Did you move this script outside of SEE's folder?"
@@ -38,10 +46,10 @@ else
 fi
 
 # finally, replace path with this user's path
-if perl -pi.bak -e "s/[A-Z]:\/(.*)\/(?=Assets|Library|Temp)/C:\/Users\/Falko\/Documents\/SEE\//g" "$SCRIPTPATH/CodeFacts.gxl"; then
-	echo "Success, path has been replaced. A backup of the original file is accessible at CodeFacts.gxl.bak."
+if perl -pi.bak -e "s/[A-Z]:\/(.*)\/(?=Assets|Library|Temp)/$seepath/g" "$TARGET"; then
+	echo "Success, path has been replaced. A backup of the original file is accessible at $TARGET.bak."
 	exit 0
 else
-	echo "There seems to have been an unkown problem while replacing the path. Maybe the CodeFacts.gxl doesn't exist in $SCRIPTPATH?"
+	echo "There seems to have been an unkown problem while replacing the path. Maybe the $TARGET doesn't exist at that path or in $SCRIPTPATH?"
 	exit 3
 fi
