@@ -182,7 +182,7 @@ namespace SEE.Controls.Actions
         /// A getter for the id of a specific action.
         /// </summary>
         /// <returns></returns>
-        string ReversibleAction.GetId()
+        public string GetId()
         {
             return id.ToString();
         }
