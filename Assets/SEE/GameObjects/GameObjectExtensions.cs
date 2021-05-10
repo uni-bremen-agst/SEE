@@ -134,6 +134,22 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Sets the alpha value (transparency) of the given <paramref name="gameObject"/>
+        /// to <paramref name="alpha"/>.
+        /// </summary>
+        /// <param name="gameObject">game objects whose transparency is to be set</param>
+        /// <param name="alpha">a value in between 0 and 1 for transparence</param>
+        public static void SetTransparency(this GameObject gameObject, float alpha)
+        {
+            if (gameObject.TryGetComponent(out Renderer renderer))
+            {
+                Color oldColor = renderer.material.color;
+                Color newColor = new Color(oldColor.r, oldColor.g, oldColor.b, alpha);
+                renderer.material.SetColor("_Color", newColor);
+            }
+        }
+
+        /// <summary>
         /// Sets the start and end line color of <paramref name="gameObject"/>.
         /// 
         /// Precondition: <paramref name="gameObject"/> must have a line renderer.
