@@ -1,5 +1,6 @@
 ﻿using SEE.DataModel;
 using SEE.DataModel.DG;
+using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The list of currently selected objects.
         /// </summary>
-        private HashSet<GameObject> selectedObjects;
+        private HashSet<GameObject> selectedObjects = new HashSet<GameObject>();
 
         /// <summary>
         /// The list of currently hidden objects.
@@ -65,12 +66,13 @@ namespace SEE.Controls.Actions
             return CreateReversibleAction();
         }
 
-        // Start is called before the first frame update
+        /// <summary>
+        /// Opens the dialog and registers this action for local selection events.
+        /// </summary>
         public override void Start()
         {
             base.Stop();
             OpenDialog();
-            selectedObjects = new HashSet<GameObject>();
             InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
             InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
         }
@@ -94,11 +96,14 @@ namespace SEE.Controls.Actions
             }
         }
 
+        /// <summary>
+        /// Clears <see cref="selectedObjects"/> and unregisters from local selection events.
+        /// </summary>
         public override void Stop()
         {
             base.Stop();
             MakeAllVisible();
-            selectedObjects = null;
+            selectedObjects.Clear();
             InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
             InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
         }
@@ -112,70 +117,70 @@ namespace SEE.Controls.Actions
                 case HideModeSelector.HideAll:
                     if (HideAll())
                     {
-                        hadAnEffect = true;
+                        currentState = ReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideSelected:
                     if (HideSelected())
                     {
-                        hadAnEffect = true;
+                        currentState = ReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideUnselected:
                     if (HideUnselected())
                     {
-                        hadAnEffect = true;
+                        currentState = ReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideOutgoing:
                     if (HideOutgoingEdges())
                     {
-                        hadAnEffect = true;
+                        currentState = ReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideIncoming:
                     if (HideIncomingEdges())
                     {
-                        hadAnEffect = true;
+                        currentState = ReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideAllEdgesOfSelected:
                     if (HideAllConnectedEdges())
                     {
-                        hadAnEffect = true;
+                        currentState = ReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideForwardTransitveClosure:
                     if (HideForwardTransitive())
                     {
-                        hadAnEffect = true;
+                        currentState = ReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideBackwardTransitiveClosure:
                     if (HideBackwardTransitive())
                     {
-                        hadAnEffect = true;
+                        currentState = ReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideAllTransitiveClosure:
                     if(HideAllTransitive())
                     {
-                        hadAnEffect = true;
+                        currentState = ReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HighlightEdges:
                     if (HighlightEdges())
                     {
-                        hadAnEffect = true;
+                        currentState = ReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
@@ -190,8 +195,7 @@ namespace SEE.Controls.Actions
         /// <returns> true if all selected objects could be successfully hidden </returns>
         private bool HideSelected()
         {
-            Debug.Log("Selected: " + selectedObjects.Count);
-            if (selectedObjects != null && selectedObjects.Count > 0)
+            if (selectedObjects.Count > 0)
             {
                 foreach (GameObject g in selectedObjects)
                 {
@@ -219,7 +223,7 @@ namespace SEE.Controls.Actions
         /// <returns> true if all unselected objects could be successfully hidden </returns>
         private bool HideUnselected()
         {
-            if (selectedObjects != null && selectedObjects.Count > 0 && selectedObject != null )
+            if (selectedObjects.Count > 0 && selectedObject != null )
             {
                 GameObject city = selectedObject;
                 while (!city.CompareTag(Tags.CodeCity))
@@ -364,31 +368,20 @@ namespace SEE.Controls.Actions
 
                 foreach (GameObject g in nodesEdges)
                 {
+                    // FIXME: Why these names? Do not make any assumptions about names of code cities.
                     if (!g.name.Equals("implementation") && !g.name.Equals("architecture"))
                     {
-                        if (g.TryGetComponent(out Renderer renderer))
-                        {
-                                Color oldColor = renderer.material.color;
-                                Color newColor = new Color(oldColor.r, oldColor.g, oldColor.b, 0.5f);
-                                renderer.material.SetColor("_Color", newColor);
-                        }
+                        g.SetTransparency(0.5f);
                         hiddenObjects.Add(g);
                     }
                 }
-                if(selectedObjects != null)
+                foreach (GameObject g in selectedObjects)
                 {
-                    foreach (GameObject g in selectedObjects)
+                    // FIXME: Why these names? Do not make any assumptions about names of code cities.
+                    if (!g.name.Equals("implementation") && !g.name.Equals("architecture"))
                     {
-                        if (!g.name.Equals("implementation") && !g.name.Equals("architecture"))
-                        {
-                            if (g.TryGetComponent(out Renderer renderer))
-                            {
-                                Color oldColor = renderer.material.color;
-                                Color newColor = new Color(oldColor.r, oldColor.g, oldColor.b, 1f);
-                                renderer.material.SetColor("_Color", newColor);
-                            }
-                            hiddenObjects.Add(g);
-                        }
+                        g.SetTransparency(1.0f);
+                        hiddenObjects.Add(g);
                     }
                 }
                 return true;
@@ -407,24 +400,15 @@ namespace SEE.Controls.Actions
         {
             if (selectedObject != null)
             {
-                GameObject city = selectedObject;
-                while (!city.CompareTag(Tags.CodeCity))
-                {
-                    city = city.transform.parent.gameObject;
-                }
-
+                GameObject city = SceneQueries.GetCodeCity(selectedObject.transform).gameObject;
                 List<GameObject> nodesEdges = GetAllChildrenRecursively(city.transform, new List<GameObject>());
 
                 foreach (GameObject g in nodesEdges)
                 {
+                    // FIXME: The names should not occur here.
                     if (!g.name.Equals("implementation") && !g.name.Equals("architecture"))
                     {
-                        if (g.TryGetComponent(out Renderer renderer))
-                        {
-                            Color oldColor = renderer.material.color;
-                            Color newColor = new Color(oldColor.r, oldColor.g, oldColor.b, 1f);
-                            renderer.material.SetColor("_Color", newColor);
-                        }
+                        g.SetTransparency(1f);
                         hiddenObjects.Add(g);
                     }
                 }
@@ -442,25 +426,23 @@ namespace SEE.Controls.Actions
         /// <returns> true if all nodes and edges could be successfully hidden </returns>
         private bool HideAll()
         {
-            if (selectedObject != null) {
-                GameObject city = selectedObject;
-                while (!city.CompareTag(Tags.CodeCity))
-                {
-                    city = city.transform.parent.gameObject;
-                }
-
+            if (selectedObject != null) 
+            {
+                GameObject city = SceneQueries.GetCodeCity(selectedObject.transform).gameObject; 
                 List<GameObject> nodesEdges = GetAllChildrenRecursively(city.transform, new List<GameObject>());
 
                 foreach (GameObject g in nodesEdges)
                 {
-                    if(!g.name.Equals("implementation") && !g.name.Equals("architecture"))
+                    // FIXME: The names should not occur here.
+                    if (!g.name.Equals("implementation") && !g.name.Equals("architecture"))
                     {
                         g.SetVisibility(false);
                         hiddenObjects.Add(g);
                     }
                 }
                 return true;
-            } else
+            } 
+            else
             {
                 return false;
             }
@@ -480,7 +462,7 @@ namespace SEE.Controls.Actions
                 {
                     objectList.Add(child.gameObject);
                 }
-                if(child.childCount > 0)
+                if (child.childCount > 0)
                 {
                     GetAllChildrenRecursively(child, objectList);
                 }
@@ -534,7 +516,6 @@ namespace SEE.Controls.Actions
         {
             if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
             {
-
                 HashSet<string> edgeIDs = new HashSet<string>();
                 HashSet<string> nodeIDs = new HashSet<string>();
 
@@ -542,7 +523,6 @@ namespace SEE.Controls.Actions
                 {
                     edgeIDs.Add(edge.ID);
                     nodeIDs.Add(edge.Source.ID);
-
                 }
 
                 foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
@@ -556,7 +536,6 @@ namespace SEE.Controls.Actions
                 }
                 foreach (GameObject node in GameObject.FindGameObjectsWithTag(Tags.Node))
                 {
-
                     if (node.activeInHierarchy && nodeIDs.Contains(node.name))
                     {
                         HideNodeIncludingConnectedEdges(node);
@@ -717,11 +696,13 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Selects source and target node of edge.
+        /// 
+        /// FIXME: Not used. Can it be removed? Then please remove it.
         /// </summary>
         /// <param name="edge"> edge to select source and target node of </param>
         private void SelectSourceAndTargetOfEdge(GameObject edge)
         {
-            if(edge.TryGetComponent(out EdgeRef edgeRef))
+            if (edge.TryGetComponent(out EdgeRef edgeRef))
             {
                 string sourceID = edgeRef.Value.Source.ID;
                 string targetID = edgeRef.Value.Target.ID;
@@ -745,15 +726,16 @@ namespace SEE.Controls.Actions
                 }
             }
         }
+
         /// <summary>
         /// Selects all edges that lie between the selected nodes
         /// </summary>
-        /// <param name="subset">The nodes that are selected</param>
-        private static void SelectEdgesBetweenSubsetOfNodes(ICollection<GameObject> subset)
+        /// <param name="nodes">The nodes that are selected</param>
+        private static void SelectEdgesBetweenSubsetOfNodes(ICollection<GameObject> nodes)
         { 
-            if(subset != null && subset.Count > 0)
+            if (nodes != null && nodes.Count > 0)
             {
-                List<string> subsetNames = subset.Select(g => g.name).ToList();
+                List<string> subsetNames = nodes.Select(g => g.name).ToList();
                 foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
                 {
                     if (edge.TryGetComponent(out EdgeRef edgeRef))
@@ -776,12 +758,12 @@ namespace SEE.Controls.Actions
         private bool HighlightEdges()
         {
             SelectEdgesBetweenSubsetOfNodes(selectedObjects);
-            bool succsess = true;
-            foreach(GameObject edge in selectedObjects)
+            bool success = true;
+            foreach (GameObject edge in selectedObjects)
             {
-                succsess = HighlightEdge(edge);
+                success = HighlightEdge(edge);
             }
-            return succsess;
+            return success;
         }
 
         /// <summary>
