@@ -174,7 +174,6 @@ namespace Assets.SEE.Utils
             int index = GetIndexOfAction(LastAction.GetId());
             if (index == -1)
             {
-                Debug.Log("ERROR IN GETCOUNT");
                 return false;
             }
             index++;
@@ -245,7 +244,6 @@ namespace Assets.SEE.Utils
             if (ActionHasConflicts(current.GetChangedObjects()))
             {
                 ShowNotification.Error("Error:", "Undo not possible, someone else had made a change on the same object!");
-                Debug.LogWarning("Undo not possible, someone else had made a change on the same object!");
                 Replace(lastAction, new Tuple<bool, HistoryType, string, List<string>>(false, HistoryType.undoneAction, lastAction.Item3, lastAction.Item4), false);
 
                 UndoHistory.Pop();
@@ -269,7 +267,6 @@ namespace Assets.SEE.Utils
                 isRedo = true;
 
                 Resume(current);
-                
             }
         }
 
@@ -281,7 +278,7 @@ namespace Assets.SEE.Utils
             Tuple<bool, HistoryType, string, List<string>> lastUndoneAction = FindLastActionOfPlayer(true, HistoryType.undoneAction);
             if (RedoHistory.Count == 0)
             {
-                throw new EmptyUndoHistoryException();
+                throw new EmptyHistoryException();
             }
             else
             {
@@ -291,7 +288,6 @@ namespace Assets.SEE.Utils
                     RedoHistory.Pop();
                     Replace(lastUndoneAction, new Tuple<bool, HistoryType, string, List<string>>(false, HistoryType.undoneAction, lastUndoneAction.Item3, lastUndoneAction.Item4), false);
                     ShowNotification.Error("Error:", "Redo not possible, someone else had made a change on the same object!");
-                    Debug.LogWarning("Redo not possible, someone else had made a change on the same object!");
                     LastAction.Start();
                     return;
                 }
@@ -310,7 +306,6 @@ namespace Assets.SEE.Utils
                 new GlobalActionHistoryNetwork().Delete(lastUndoneAction.Item3);
                 Push(redoneAction);
                 new GlobalActionHistoryNetwork().Push(redoneAction.Item2, redoneAction.Item3, ListToString(redoneAction.Item4));
-
             }
         }
 
@@ -408,15 +403,15 @@ namespace Assets.SEE.Utils
             else return null;
         }
 
-
-        public class MoreThanOneActionWithNoEffectException : System.Exception
+        /// <summary>
+        /// Thrown in case of an empty history.
+        /// </summary>
+        public class EmptyHistoryException : Exception
         {
+            public EmptyHistoryException()
+            {
 
-        }
-
-        public class EmptyUndoHistoryException : System.Exception
-        {
-
+            }
         }
     }
 }

@@ -13,27 +13,27 @@ namespace SEE.Net
     public  class GlobalActionHistoryNetwork : AbstractAction
     { 
         /// <summary>
-        /// which type of action (action, undoneAction) 
+        /// The type of the action (action or undoneAction).
         /// </summary>
         public ActionHistory.HistoryType type;
 
         /// <summary>
-        /// The id of the action
+        /// The id of the action.
         /// </summary>
         public string actionId;
 
         /// <summary>
-        /// all ids from the objects that the action has changed
+        /// The ids of all objects which are changed by the action.
         /// </summary>
         public List<string> changedObjects;
 
         /// <summary>
-        /// Wether a object should be pushed
+        /// True, if an action should be pushed, else false.
         /// </summary>
         public bool push = false;
 
         /// <summary>
-        /// Wether a object should be deleted
+        /// True, if an action should be deleted, else false.
         /// </summary>
         public bool delete = false;
 
@@ -100,7 +100,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Updates an Entry through all clients
+        /// Updates an entry through all clients
         /// </summary>
         public void Replace(ActionHistory.HistoryType oldType, string id, string oldChangedObjects, ActionHistory.HistoryType newType, string newChangedObjects)
         {
