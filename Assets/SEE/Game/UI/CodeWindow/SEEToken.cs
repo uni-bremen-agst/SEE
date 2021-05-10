@@ -168,7 +168,7 @@ namespace SEE.Game.UI.CodeWindow
             /// <summary>
             /// Newline tokens. Must contain exactly one newline.
             /// </summary>
-            public static readonly Type Newlines = new Type("Newlines", "000000"); // color doesn't matter
+            public static readonly Type Newline = new Type("Newline", "000000"); // color doesn't matter
 
             /// <summary>
             /// Unknown tokens, i.e. those not recognized by the lexer.
