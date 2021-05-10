@@ -21,6 +21,13 @@ namespace SEE.Game.UI.CodeWindow
         /// Name of the antlr lexer file the keywords were taken from.
         /// </summary>
         public string LexerFileName { get; }
+        
+        /// <summary>
+        /// Number of spaces equivalent to a tab in this language.
+        /// </summary>
+        private int TabWidth { get; }
+        //TODO: Actually use this
+        //TODO: Add set for comments, and add a corresponding type to SEEToken
 
         /// <summary>
         /// Symbolic names for keywords of a language. This also includes boolean literals and null literals.
@@ -55,7 +62,7 @@ namespace SEE.Game.UI.CodeWindow
         /// <summary>
         /// Symbolic names for newlines in a language.
         /// </summary>
-        public ISet<string> Newlines { get; }
+        public ISet<string> Newline { get; }
         
         #region Java Language
 
@@ -109,7 +116,7 @@ namespace SEE.Game.UI.CodeWindow
         /// <summary>
         /// Set of antlr type names for Java newlines.
         /// </summary>
-        private static readonly HashSet<string> javaNewlines = new HashSet<string> { /* FIXME: Not in lexer grammar */ };
+        private static readonly HashSet<string> javaNewlines = new HashSet<string> { "NEWLINE" };
         
         #endregion
 
@@ -140,10 +147,10 @@ namespace SEE.Game.UI.CodeWindow
         /// <param name="punctuation">Punctuation for this language</param>
         /// <param name="identifiers">Identifiers for this language</param>
         /// <param name="whitespace">Whitespace for this language</param>
-        /// <param name="newlines">Newlines for this language</param>
+        /// <param name="newline">Newlines for this language</param>
         private TokenLanguage(string lexerFileName, ISet<string> fileExtensions, ISet<string> keywords, 
                               ISet<string> numberLiterals, ISet<string> stringLiterals, ISet<string> punctuation,
-                              ISet<string> identifiers, ISet<string> whitespace, ISet<string> newlines)
+                              ISet<string> identifiers, ISet<string> whitespace, ISet<string> newline)
         {
             if (AllTokenLanguages.Any(x => x.LexerFileName.Equals(lexerFileName) || x.FileExtensions.Overlaps(fileExtensions)))
             {
@@ -157,7 +164,7 @@ namespace SEE.Game.UI.CodeWindow
             Punctuation = punctuation;
             Identifiers = identifiers;
             Whitespace = whitespace;
-            Newlines = newlines;
+            Newline = newline;
             
             AllTokenLanguages.Add(this);
         }
@@ -220,7 +227,7 @@ namespace SEE.Game.UI.CodeWindow
             // in succession, but due to the usage of nameof() a refactoring of this kind would break this.
             if (Keywords.Contains(token))
             {
-                return nameof(token);
+                return nameof(Keywords);
             }
             if (NumberLiterals.Contains(token))
             {
@@ -242,9 +249,9 @@ namespace SEE.Game.UI.CodeWindow
             {
                 return nameof(Whitespace);
             }
-            if (Newlines.Contains(token))
+            if (Newline.Contains(token))
             {
-                return nameof(Newlines);
+                return nameof(Newline);
             }
 
             return null;

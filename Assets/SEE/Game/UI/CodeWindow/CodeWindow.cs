@@ -197,10 +197,10 @@ namespace SEE.Game.UI.CodeWindow
             }
             
             // We need to insert this pseudo-token here so that the first line gets a line number
-            tokenList.Insert(0, new SEEToken(string.Empty, SEEToken.Type.Newlines, -1, 0));
+            tokenList.Insert(0, new SEEToken(string.Empty, SEEToken.Type.Newline, -1, 0));
 
             // Needed padding is the number of lines, because the line number will be at most this long
-            int neededPadding = $"{tokenList.Count(x => x.TokenType.Equals(SEEToken.Type.Newlines))}".Length;
+            int neededPadding = $"{tokenList.Count(x => x.TokenType.Equals(SEEToken.Type.Newline))}".Length;
             int lineNumber = 1;
             foreach (SEEToken token in tokenList)
             {
@@ -208,14 +208,8 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     Debug.LogError($"Unknown token encountered for text '{token.Text}'.\n");
                 }
-                // No "else if" because we still want to display this token.
-                if (token.TokenType == SEEToken.Type.Whitespace)
-                {
-                    // We just copy the whitespace verbatim, no need to even color it.
-                    // Note: We have to assume that whitespace will not interfere with TMP's XML syntax.
-                    Text += token.Text;
-                }
-                else if (token.TokenType == SEEToken.Type.Newlines)
+
+                if (token.TokenType == SEEToken.Type.Newline)
                 {
                     // First, of course, the newline
                     Text += "\n";
@@ -227,7 +221,35 @@ namespace SEE.Game.UI.CodeWindow
                 }
                 else
                 {
-                    Text += $"<color=#{token.TokenType.Color}><noparse>{token.Text}</noparse></color>";
+                    bool firstRun = true;
+                    string[] tokenLines = token.Text.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None);
+                    foreach (string line in tokenLines)
+                    {
+                        if (!firstRun)
+                        {
+                            // First, of course, the newline
+                            Text += "\n";
+                            // Add whitespace next to line number so it's consistent
+                            Text += string.Join("", Enumerable.Repeat(" ", neededPadding - $"{lineNumber}".Length));
+                            // Line number will be typeset in grey to distinguish it from the rest
+                            Text += $"<color=#CCCCCC>{lineNumber}</color> ";
+                            lineNumber++;
+                        }
+                        
+                        // No "else if" because we still want to display this token.
+                        if (token.TokenType == SEEToken.Type.Whitespace)
+                        {
+                            // We just copy the whitespace verbatim, no need to even color it.
+                            // Note: We have to assume that whitespace will not interfere with TMP's XML syntax.
+                            Text += line.Replace("\t", "    ");
+                        }
+                        else
+                        {
+                            Text += $"<color=#{token.TokenType.Color}><noparse>{line}</noparse></color>";
+                        }
+
+                        firstRun = false;
+                    }
                 }
             }
         }
