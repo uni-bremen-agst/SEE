@@ -840,10 +840,10 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// <see cref="ReversibleAction.HadEffect"/>
+        /// <see cref="ReversibleAction.CurrentProgress"/>
         /// </summary>
         /// <returns>true if this action has had already some effect that would need to be undone</returns>
-        public bool HadEffect()
+        public bool CurrentProgress()
         {
             return false; // FIXME
         }
@@ -1014,6 +1014,11 @@ namespace SEE.Controls.Actions
         public ActionStateType GetActionStateType()
         {
             return ActionStateType.Map;
+        }
+
+        ReversibleAction.Progress ReversibleAction.CurrentProgress()
+        {
+            throw new NotImplementedException();
         }
     }
 }

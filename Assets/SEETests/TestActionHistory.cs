@@ -37,7 +37,6 @@ namespace SEETests
             public void Start()
             {
                 StartCalls++;
-                IsOn = true;
                 // AwakeCalls has been called once before.
                 Assert.AreEqual(1, AwakeCalls);
                 // The number of Start calls is always one ahead of the number of Stop calls.
@@ -72,6 +71,7 @@ namespace SEETests
 
             public bool Update()
             {
+                IsOn = true;
                 UpdateCalls++;
                 // AwakeCalls has been called once before.
                 Assert.AreEqual(1, AwakeCalls);
@@ -91,12 +91,23 @@ namespace SEETests
             }
 
             /// <summary>
-            /// This action has always had an effect.
+            /// Returns <see cref="ReversibleAction.Progress.InProgress"/> if this action has 
+            /// had an effect, that is, if <see cref="Update"/> has been called before; 
+            /// otherwise <see cref="ReversibleAction.Progress.NoEffect"/> is returned.
+            /// It will never return <see cref="ReversibleAction.Progress.Completed"/>
+            /// because <see cref="Update"/> always yields false.
             /// </summary>
-            /// <returns></returns>
-            public bool HadEffect()
+            /// <returns>current progress state</returns>
+            public ReversibleAction.Progress CurrentProgress()
             {
-                return true;
+                if (UpdateCalls > 0)
+                {
+                    return ReversibleAction.Progress.InProgress;
+                }
+                else
+                {
+                    return ReversibleAction.Progress.NoEffect;
+                }
             }
 
             /// <summary>
@@ -118,6 +129,7 @@ namespace SEETests
         public void SetUp()
         {
             hist = new ActionHistory();
+            Counter.Reset();
         }
 
         [Test]
@@ -127,20 +139,31 @@ namespace SEETests
             Assert.Throws<EmptyUndoHistoryException>(() => hist.Redo());
         }
 
-        [Test]
+        [Test]        
         public void OneAction()
         {
+            // Note: TestAction is an action that continues forever, that is,
+            // no Update call will ever return true and its progress state
+            // is initially <see cref="ReversibleAction.Progress.NoEffect"/>
+            // and after the first Update call <see cref="ReversibleAction.Progress.InProgress"/>
+            // for the rest of its life.
             TestAction c = new TestAction();
             CheckCalls(c, value: false, awake: 0, start: 0, update: 0, stop: 0);
             hist.Execute(c);
-            CheckCalls(c, value: true, awake: 1, start: 1, update: 0, stop: 0);
+            CheckCalls(c, value: false, awake: 1, start: 1, update: 0, stop: 0);
             hist.Update();
             CheckCalls(c, value: true, awake: 1, start: 1, update: 1, stop: 0);
             hist.Update();
             CheckCalls(c, value: true, awake: 1, start: 1, update: 2, stop: 0);
+            // c is in progress, but not yet completed. The following Undo call will interrupt c.
             hist.Undo();
+            // Because c is interrupted, Undo will trigger a Stop. Because Undo moves
+            // c from the UndoStack to the RedoStack, the UndoStack will be empty.
+            // c will not receive another Start message.
             CheckCalls(c, value: false, awake: 1, start: 1, update: 2, stop: 1);
             hist.Redo();
+            // Because c was not completed, Redo will resume with it.
+            // The call of Start will be received by c.
             CheckCalls(c, value: true, awake: 1, start: 2, update: 2, stop: 1);
         }
 
@@ -158,13 +181,15 @@ namespace SEETests
             CheckCalls(c4, value: false, awake: 0, start: 0, update: 0, stop: 0);
 
             hist.Execute(c1);
-            CheckCalls(c1, value: true, awake: 1, start: 1, update: 0, stop: 0);
+            // No Update has occurred so far.
+            CheckCalls(c1, value: false, awake: 1, start: 1, update: 0, stop: 0);
             hist.Update();
+            // Update has set the new value.
             CheckCalls(c1, value: true, awake: 1, start: 1, update: 1, stop: 0);
 
             hist.Execute(c2);
             CheckCalls(c1, value: true, awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c2, value: true, awake: 1, start: 1, update: 0, stop: 0);
+            CheckCalls(c2, value: false, awake: 1, start: 1, update: 0, stop: 0);
             hist.Update();
             CheckCalls(c1, value: true, awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c2, value: true, awake: 1, start: 1, update: 1, stop: 0);
@@ -172,7 +197,7 @@ namespace SEETests
             hist.Execute(c3);
             CheckCalls(c1, value: true, awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c2, value: true, awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c3, value: true, awake: 1, start: 1, update: 0, stop: 0);
+            CheckCalls(c3, value: false, awake: 1, start: 1, update: 0, stop: 0);
             hist.Update();
             CheckCalls(c1, value: true, awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c2, value: true, awake: 1, start: 1, update: 1, stop: 1);
@@ -182,15 +207,17 @@ namespace SEETests
             CheckCalls(c1, value: true, awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c2, value: true, awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c3, value: true, awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c4, value: true, awake: 1, start: 1, update: 0, stop: 0);
+            CheckCalls(c4, value: false, awake: 1, start: 1, update: 0, stop: 0);
             hist.Update();
             CheckCalls(c1, value: true, awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c2, value: true, awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c3, value: true, awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c4, value: true, awake: 1, start: 1, update: 1, stop: 0);
 
-            // c4 is undone; c3 is running
+            // c4 is undone; execution will resume with c3, because c3 is still 
+            // in progress (TestAction.Update() always yields false).
             hist.Undo();
+            Assert.AreEqual(3, hist.UndoCount);
             CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c2, value: true,  awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c3, value: true,  awake: 1, start: 2, update: 1, stop: 1);
@@ -269,7 +296,7 @@ namespace SEETests
             CheckCalls(c2, value: true,  awake: 1, start: 3, update: 3, stop: 3);
             CheckCalls(c3, value: false, awake: 1, start: 4, update: 4, stop: 4);
             CheckCalls(c4, value: false, awake: 1, start: 2, update: 2, stop: 2);
-            CheckCalls(c5, value: true,  awake: 1, start: 1, update: 0, stop: 0);
+            CheckCalls(c5, value: false,  awake: 1, start: 1, update: 0, stop: 0);
             hist.Update();
             CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c2, value: true,  awake: 1, start: 3, update: 3, stop: 3);
@@ -328,7 +355,7 @@ namespace SEETests
             CheckCalls(c3, value: false, awake: 1, start: 4, update: 4, stop: 4);
             CheckCalls(c4, value: false, awake: 1, start: 2, update: 2, stop: 2);
             CheckCalls(c5, value: false, awake: 1, start: 1, update: 1, stop: 1);
-            CheckCalls(c6, value: true,  awake: 1, start: 1, update: 0, stop: 0);
+            CheckCalls(c6, value: false,  awake: 1, start: 1, update: 0, stop: 0);
             hist.Update();
             CheckCalls(c1, value: false, awake: 1, start: 2, update: 2, stop: 2);
             CheckCalls(c2, value: false, awake: 1, start: 4, update: 4, stop: 4);
@@ -379,6 +406,11 @@ namespace SEETests
         {
             protected static int counter = 0;
 
+            public static void Reset()
+            {
+                counter = 0;
+            }
+
             public static int Value { get => counter; }
 
             public void Awake()
@@ -396,10 +428,11 @@ namespace SEETests
                 // nothing to be done
             }
 
-            protected bool hadEffect = false;
-            public bool HadEffect()
+            protected ReversibleAction.Progress currentProgress = ReversibleAction.Progress.NoEffect;
+
+            public ReversibleAction.Progress CurrentProgress()
             {
-                return hadEffect;
+                return currentProgress;
             }
             
             public abstract ReversibleAction NewInstance();
@@ -435,7 +468,7 @@ namespace SEETests
 
             public override bool Update()
             {
-                hadEffect = true;
+                currentProgress = ReversibleAction.Progress.Completed;
                 counter++;
                 return true;
             }
@@ -463,7 +496,7 @@ namespace SEETests
 
             public override bool Update()
             {
-                hadEffect = true;
+                currentProgress = ReversibleAction.Progress.Completed;
                 counter--;
                 return true;
             }
@@ -471,10 +504,14 @@ namespace SEETests
 
         /// <summary>
         /// Test scenario for a non-continuous action with immediate effect.
+        /// Every Update call for Decrement and Increment will yield true.
+        /// Thus, their progress state is initially <see cref="ReversibleAction.Progress.NoEffect"/>
+        /// and after the first Update call <see cref="ReversibleAction.Progress.Completed"/>
+        /// for the rest of their life.
         /// </summary>
         [Test]        
         public void TestCounterAction()
-        {
+        {            
             hist.Execute(new Increment());
             Assert.AreEqual(0, Counter.Value);
             Assert.AreEqual(1, hist.UndoCount);
@@ -491,55 +528,100 @@ namespace SEETests
             Assert.AreEqual(3, Counter.Value);
             Assert.AreEqual(4, hist.UndoCount);
             Assert.AreEqual(0, hist.RedoCount);
+            // Because Increment.Update yields true every time it is called,
+            // the execution will always continue with a new instance of 
+            // Increment. We have had three calls to Update. Including the
+            // first Execute, we should have four actions on the UndoStack.
+            Assert.AreEqual(4, hist.UndoCount);
             hist.Undo();
             Assert.AreEqual(2, Counter.Value);
-            // because the effect takes place only if Update was called, there are only two actions on the stack
-            Assert.AreEqual(2, hist.UndoCount); 
+            // Undo will remove one completed action and then resume with
+            // a new instance of Increment.
+            Assert.AreEqual(3, hist.UndoCount); 
             Assert.AreEqual(1, hist.RedoCount);
             hist.Undo();
             Assert.AreEqual(1, Counter.Value);
-            Assert.AreEqual(1, hist.UndoCount);
+            Assert.AreEqual(2, hist.UndoCount);
             Assert.AreEqual(2, hist.RedoCount);
             hist.Undo();
             Assert.AreEqual(0, Counter.Value);
+            // The UndoStack has one completed Increment action and one
+            // instance of Increment that has had no effect yet.
+            // If Undo is called, all actions without any effect will
+            // be removed. This leaves the single action with effect,
+            // which then is moved from the UndoStack to the RedoStack.
+            // Thus, the UndoStack will be empty at this point.
             Assert.AreEqual(0, hist.UndoCount);
             Assert.AreEqual(3, hist.RedoCount);
             hist.Redo();
             Assert.AreEqual(1, Counter.Value);
-            Assert.AreEqual(1, hist.UndoCount);
+            // Redo moves an action from the RedoStack to the UndoStack.
+            // Because that action was completed, a new instance of 
+            // Increment will be put onto the UndoStack that will be used
+            // to resume.
+            Assert.AreEqual(2, hist.UndoCount);
             Assert.AreEqual(2, hist.RedoCount);
             hist.Redo();
             Assert.AreEqual(2, Counter.Value);
-            Assert.AreEqual(2, hist.UndoCount);
+            Assert.AreEqual(3, hist.UndoCount);
             Assert.AreEqual(1, hist.RedoCount);
             hist.Execute(new Decrement());
+            // The new instance of the Increment action that was put on
+            // the stack due to Redo above has not received any Update call.
+            // Hence, it will be popped off the UndoStack. Thus, UndoCount
+            // remains the same.
             Assert.AreEqual(2, Counter.Value); // still 2 because no Update was called
             Assert.AreEqual(3, hist.UndoCount);
             Assert.AreEqual(0, hist.RedoCount); // RedoStack is lost
             hist.Update();
+            // Update has completed Decrement. A new instance of Decrement will
+            // be put on the Undo stack.
             Assert.AreEqual(1, Counter.Value);
             Assert.AreEqual(4, hist.UndoCount);
             Assert.AreEqual(0, hist.RedoCount);
+            // No Update has been called for the new instance of Decrement just put
+            // on the UndoStack, hence, the Decrement at the top of the UndoStack
+            // has still progress state NoEffect. Thus it will be popped off the UndoStack
+            // when the next Increment is added by the following line.
             hist.Execute(new Increment());
             Assert.AreEqual(1, Counter.Value);  // still 1 because no Update was called
-            Assert.AreEqual(5, hist.UndoCount);
+            Assert.AreEqual(4, hist.UndoCount);
             Assert.AreEqual(0, hist.RedoCount);
-            // Undo without prior Update; that means we are actually undoing Decrement
+            // Undo without prior Update for the Increment just added; that means we are actually
+            // undoing Decrement. The Increment will be popped off the UndoStack. Then the 
+            // Decrement will be undone and moved from the UndoStack to the RedoStack.
+            // Now a completed Increment will be at the top of the stack. Because it is
+            // completed, a new instance of Increment will be added.
             hist.Undo();
             Assert.AreEqual(2, Counter.Value);
-            Assert.AreEqual(2, hist.UndoCount); // 2 because we have have removed the Increment without effect and then Decrement
+            Assert.AreEqual(3, hist.UndoCount);
             Assert.AreEqual(1, hist.RedoCount);
             hist.Undo(); // undoing an Increment
+            // No Update has been called for the new instance of the Increment with
+            // progress state NoEffect. Hence, it will be popped off the UndoStack.
+            // Now the completed Increment will be at the top of the UndoStack again.
+            // This is now undone, that is, moved from the UndoStack to the RedoStack.
+            // After that a completed Increment (actually the very first Increment
+            // executed) is at the top of the UndoStack again, and as a consequence
+            // a new instance of Increment is added to the UndoStack in progress state
+            // NoEffect.
             Assert.AreEqual(1, Counter.Value);
-            Assert.AreEqual(1, hist.UndoCount);
-            Assert.AreEqual(2, hist.RedoCount);
-            hist.Redo(); // re-doing an Increment
-            Assert.AreEqual(2, Counter.Value);
             Assert.AreEqual(2, hist.UndoCount);
+            Assert.AreEqual(2, hist.RedoCount);
+            // The current situation is a follows: the UndoStack consists of an
+            // Increment with no effect and one completed Increment. The RedoStack
+            // has a completed Increment and a completed Decrement.
+            hist.Redo(); // re-doing an Increment
+            // The Increment with no effect is popped off the UndoStack.
+            // The completed Increment is moved from the RedoStack to the UndoStack.
+            // Because that Increment is completed, a new instance of Increment
+            // with progress state NoEffect will be added to the UndoStack.
+            Assert.AreEqual(2, Counter.Value);
+            Assert.AreEqual(3, hist.UndoCount);
             Assert.AreEqual(1, hist.RedoCount);
             hist.Redo(); // re-doing a Decrement
             Assert.AreEqual(1, Counter.Value);
-            Assert.AreEqual(3, hist.UndoCount);
+            Assert.AreEqual(4, hist.UndoCount);
             Assert.AreEqual(0, hist.RedoCount);
         }
     }
