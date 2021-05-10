@@ -73,8 +73,8 @@ namespace SEE.Game.UI.PropertyDialog
             void SetUpButtonName()
             {
                 button.name = Name;
-                if (!button.TryGetComponentOrLog(out Michsky.UI.ModernUIPack.ButtonManagerBasicWithIcon buttonManager) ||
-                    !button.TryGetComponentOrLog(out PointerHelper pointerHelper))
+                if (!button.TryGetComponentOrLog(out Michsky.UI.ModernUIPack.ButtonManagerBasicWithIcon buttonManager)
+                    || !button.TryGetComponentOrLog(out PointerHelper pointerHelper))
                 {
                     return;
                 }
@@ -88,7 +88,6 @@ namespace SEE.Game.UI.PropertyDialog
             {
                 OnSelected.Invoke();
             }
-
         }
 
         /// <summary>
