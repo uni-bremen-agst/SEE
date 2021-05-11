@@ -31,15 +31,15 @@ namespace SEE.Net
         public String rootID;
 
         /// <summary>
-        /// The graph a node or an edge is removed from in the network.
+        /// The client´s graph a node or an edge had been removed from.
         /// </summary>
         public Graph graph;
 
         /// <summary>
-        /// Creates a new DeleteNetAction.
+        /// Creates a new UndoDeleteNetAction.
         /// </summary>
-        /// <param name="gameObjectID">the unique name of the gameObject of a node or edge 
-        /// that has to be deleted</param>
+        /// <param name="gameObjectID"></param> the unique name of the gameObject of a node or edge 
+        /// which had been deleted before
         public UndoDeleteNetAction(string gameObjectID, String rootID) : base()
         {
             this.gameObjectID = gameObjectID;
@@ -56,7 +56,8 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Deletes the game object identified by <see cref="gameObjectID"/> on each client.
+        /// Undoes any deletion of a game object identified by <see cref="gameObjectID"/> on each client.
+        /// Furthermore any node or edge which had been removed before will be added again to the clients graph.
         /// </summary>
         protected override void ExecuteOnClient()
         {
