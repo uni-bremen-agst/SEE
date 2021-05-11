@@ -231,9 +231,7 @@ namespace SEE.Controls.Actions
                         }
                     }
                 }
-
             }
-
             PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(deletedNodes.Keys)));
         }
 
