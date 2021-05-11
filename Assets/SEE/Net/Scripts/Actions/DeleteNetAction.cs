@@ -54,8 +54,6 @@ namespace SEE.Net
             if (!IsRequester())
             {   
                 GameObject gameObject = GameObject.Find(GameObjectID);
-               // DeleteAction del = new DeleteAction(); // might be completely unnecessary
-
                 if (gameObject != null)
                 {
                     if (gameObject.HasNodeRef())
@@ -64,20 +62,17 @@ namespace SEE.Net
                         Portal.SetInfinitePortal(gameObject);
                         PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.MoveNodeToGarbage(gameObject.AllAncestors()));
                         Portal.SetInfinitePortal(gameObject);
-                      //  del.deletedNodes.Add(gameObject, gameObject.GetNode().ItsGraph);
                     }
                     else if (gameObject.HasEdgeRef())
                     {
                         if (gameObject.TryGetEdge(out Edge edge))
                         {
                             Graph graph = edge.ItsGraph;
-                           // del.deletedEdges.Add(gameObject, graph);
                         }
                         AnimationsOfDeletion.HideEdges(gameObject);
                         GameEdgeAdder.Remove(gameObject);
                     }
                 }
-
                 else
                 {
                     throw new System.Exception($"There is no game object with the ID {GameObjectID}");
