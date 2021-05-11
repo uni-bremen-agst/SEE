@@ -76,7 +76,7 @@ namespace SEE.Controls
         /// <returns>the waiting time between moving deleted nodes over the garbage can and then into the garbage can</returns>
         public static IEnumerator MoveNodeToGarbage(IList<GameObject> deletedNodes)
         {
-           
+
             garbageCan = GameObject.Find("GarbageCan");
             // We need to reset the portal of all all deletedNodes so that we can move
             // them to the garbage bin. Otherwise they will become invisible if they 
@@ -113,7 +113,7 @@ namespace SEE.Controls
         /// </summary>
         /// <param name="deletedNode">The nodes to be removed from the garbage-can</param>
         /// <returns>the waiting time between moving deleted nodes from the garbage-can and then to the city</returns>
-        public static  IEnumerator RemoveNodeFromGarbage(IList<GameObject> deletedNodes)
+        public static IEnumerator RemoveNodeFromGarbage(IList<GameObject> deletedNodes)
         {
             // vertical movement of nodes
             foreach (GameObject deletedNode in deletedNodes)
@@ -173,7 +173,7 @@ namespace SEE.Controls
         /// Hides a given param name="gameEdge"></param> having been deleted before.
         /// </summary>
         /// <param name="gameEdge"></param>
-        public static void HideEdges (GameObject gameEdge)
+        public static void HideEdges(GameObject gameEdge)
         {
             gameEdge.SetVisibility(false, true);
             if (!deletedEdges.ContainsKey(gameEdge))
