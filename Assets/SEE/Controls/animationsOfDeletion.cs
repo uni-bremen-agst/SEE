@@ -1,4 +1,3 @@
-using SEE.Controls.Actions;
 using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
@@ -8,8 +7,8 @@ using UnityEngine;
 using SEE.DataModel.DG;
 
 /// <summary>
-/// A class providing methods needed for certain animations of gameobjects having been deleted by the user, for instance
-/// the movement of a gameobject to the garbage can.
+/// A class providing methods needed fot the animations of gameobjects having been deleted by the user, for instance
+/// the movement of a gamenode to the garbage can, as well as the inverse undo- mechanism.
 /// </summary>
 namespace SEE.Controls
 {
@@ -110,13 +109,13 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Removes all given nodes from the garbage can and back into the city.
+        /// Removes all given nodes from the garbage can back into the city.
         /// </summary>
         /// <param name="deletedNode">The nodes to be removed from the garbage-can</param>
         /// <returns>the waiting time between moving deleted nodes from the garbage-can and then to the city</returns>
         public static  IEnumerator RemoveNodeFromGarbage(IList<GameObject> deletedNodes)
         {
-            // up, out of the garbage can
+            // vertical movement of nodes
             foreach (GameObject deletedNode in deletedNodes)
             {
                 Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + 1.4f, garbageCan.transform.position.z), TimeForAnimation);
@@ -160,7 +159,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Delays the visibility of edges having been removed from the garbe can.
+        /// Delays the visibility of edges having been removed from the garbage can.
         /// </summary>
         /// <param name="edge"></param>
         /// <returns></returns>
@@ -170,7 +169,10 @@ namespace SEE.Controls
             edge.SetVisibility(true, true);
         }
 
-
+        /// <summary>
+        /// Hides a given param name="gameEdge"></param> having been deleted before.
+        /// </summary>
+        /// <param name="gameEdge"></param>
         public static void HideEdges (GameObject gameEdge)
         {
             gameEdge.SetVisibility(false, true);
@@ -179,11 +181,6 @@ namespace SEE.Controls
                 deletedEdges.Add(gameEdge, gameEdge.GetGraph());
             }
         }
-        // FIX ME  : 
-        // Hiding edges for DelelteAction and DeleteNetAction 
-        // public static hideEdges (){
-        // }
-        //
     }
 
 }

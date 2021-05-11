@@ -11,8 +11,9 @@ using UnityEngine;
 namespace SEE.Net
 {
     /// <summary>
-    /// This class is responsible for deleting a node or edge via network from one client to all others and 
-    /// to the server. 
+    ///  This class handels the undo mechanism of the deleteNet script.
+    ///  It reverts the deletion by adding any deleted node or edge from a specific graph and 
+    ///  uses the animated undo mechanism of the animationsOfDeletion script used as a coroutine. 
     /// </summary>
     public class UndoDeleteNetAction : AbstractAction
     {
@@ -25,7 +26,7 @@ namespace SEE.Net
         public string GameObjectID;
 
         /// <summary>
-        /// The unique ID of a given root. Necessary for any client to find the specific graph , a node or an edge is removed from.
+        /// The unique ID of a given root. Necessary for any client to find the specific graph, a node or an edge is removed from.
         /// </summary>
         public String rootID;
 
