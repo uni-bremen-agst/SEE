@@ -52,7 +52,7 @@ namespace SEE.Net
                     if (gameObject.HasNodeRef())
                     {
                         GameNodeAdder.Remove(gameObject);
-                        Portal.SetInfinitePortal(gameObject);
+                        //Portal.SetInfinitePortal(gameObject);
                         PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.MoveNodeToGarbage(gameObject.AllAncestors()));
                         Portal.SetInfinitePortal(gameObject);
                     }

@@ -1,6 +1,4 @@
-using Assets.SEE.Game;
 using SEE.Controls;
-using SEE.Controls.Actions;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
@@ -93,7 +91,7 @@ namespace SEE.Net
                             }
                             catch (Exception e)
                             {
-                                Debug.LogWarningFormat("Edge canot be added to the graph \n", e);
+                                Debug.LogWarningFormat("Edge cannot be added to the graph \n", e);
                             }
                         }
                     }
