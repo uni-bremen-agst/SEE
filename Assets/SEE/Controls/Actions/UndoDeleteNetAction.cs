@@ -73,6 +73,7 @@ namespace SEE.Net
                 {
                     graph = rootNode.GetGraph();
                     Assert.IsNotNull(graph, "graph shall not be null");
+                   
                 }
                 else
                 {

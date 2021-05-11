@@ -53,7 +53,7 @@ namespace SEE.Controls.Actions
         public Dictionary<GameObject, Graph> deletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
 
         /// <summary>
-        /// A datastructure containing the graph´s root of the specific city. 
+        /// A datastructure containing the graph´s root of a SEEcity and its graph. 
         /// </summary>
         private Dictionary<GameObject, Graph> roots { get; set; } = new Dictionary<GameObject, Graph>();
 
@@ -354,7 +354,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Finds the root of the graph and saves the gameobject and the <param name="graph"></param> in a global field.
+        /// Finds the root of the <paramref name="graph"/> and saves the gameobject and the <param name="graph"></param> in <see cref="roots"/>
         /// </summary>
         /// <param name="graph"></param>
         private void FindRoot(Graph graph)

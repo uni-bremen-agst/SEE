@@ -7,8 +7,8 @@ using UnityEngine;
 using SEE.DataModel.DG;
 
 /// <summary>
-/// A class providing methods needed fot the animations of gameobjects having been deleted by the user, for instance
-/// the movement of a gamenode to the garbage can, as well as the inverse undo- mechanism.
+/// A class providing methods needed for the animations of gameobjects having been deleted by the user, for instance
+/// the movement of a gamenode to the garbage can, as well as the inverse undo-mechanism.
 /// </summary>
 namespace SEE.Controls
 {
@@ -42,7 +42,6 @@ namespace SEE.Controls
         /// </summary>
         private static Dictionary<GameObject, Vector3> shrinkFactors { get; set; } = new Dictionary<GameObject, Vector3>();
 
-
         // <summary>
         /// A history of the old positions of the nodes deleted by this action.
         /// </summary>
@@ -51,13 +50,13 @@ namespace SEE.Controls
         /// <summary>
         /// Number of animations used for an object's expansion, removing it from the garbage can.
         /// </summary>
-        private const float stepsOfExpansionAnimation = 10;
+        private const float StepsOfExpansionAnimation = 10;
 
         /// <summary>
         /// The time (in seconds) between animations of expanding a node that is being restored
         /// from the garbage can.
         /// </summary>
-        private const float timeBetweenExpansionAnimation = 0.14f;
+        private const float TimeBetweenExpansionAnimation = 0.14f;
 
         /// <summary>
         /// A history of all edges and the graph where they were attached to, deleted by this action.
@@ -76,7 +75,6 @@ namespace SEE.Controls
         /// <returns>the waiting time between moving deleted nodes over the garbage can and then into the garbage can</returns>
         public static IEnumerator MoveNodeToGarbage(IList<GameObject> deletedNodes)
         {
-
             garbageCan = GameObject.Find("GarbageCan");
             // We need to reset the portal of all all deletedNodes so that we can move
             // them to the garbage bin. Otherwise they will become invisible if they 
@@ -131,7 +129,6 @@ namespace SEE.Controls
             }
 
             yield return new WaitForSeconds(TimeToWait);
-            //oldPositions.Clear();
             deletedNodes.Clear();
             deletedEdges.Clear();
             InteractableObject.UnselectAll(true);
@@ -146,14 +143,14 @@ namespace SEE.Controls
         {
             yield return new WaitForSeconds(TimeToWait);
             Vector3 shrinkFactor = shrinkFactors[deletedNode];
-            float animationsCount = stepsOfExpansionAnimation;
-            float exponent = 1 / stepsOfExpansionAnimation;
+            float animationsCount = StepsOfExpansionAnimation;
+            float exponent = 1 / StepsOfExpansionAnimation;
             shrinkFactor = VectorOperations.ExponentOfVectorCoordinates(shrinkFactor, exponent);
 
             while (animationsCount > 0)
             {
                 deletedNode.transform.localScale = VectorOperations.DivideVectors(shrinkFactor, deletedNode.transform.localScale);
-                yield return new WaitForSeconds(timeBetweenExpansionAnimation);
+                yield return new WaitForSeconds(TimeBetweenExpansionAnimation);
                 animationsCount--;
             }
         }
