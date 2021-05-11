@@ -21,7 +21,7 @@ namespace SEE.Net
         /// <summary>
         /// The unique name of the gameObject of a node or edge that needs to be deleted.
         /// </summary>
-        public string GameObjectID;
+        public string gameObjectID;
 
         /// <summary>
         /// Creates a new DeleteNetAction.
@@ -30,7 +30,7 @@ namespace SEE.Net
         /// that has to be deleted</param>
         public DeleteNetAction(string gameObjectID) : base()
         {
-            this.GameObjectID = gameObjectID;
+            this.gameObjectID = gameObjectID;
         }
 
         /// <summary>
@@ -43,13 +43,13 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Deletes the game object identified by <see cref="GameObjectID"/> on each client.
+        /// Deletes the game object identified by <see cref="gameObjectID"/> on each client.
         /// </summary>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
             {   
-                GameObject gameObject = GameObject.Find(GameObjectID);
+                GameObject gameObject = GameObject.Find(gameObjectID);
                 if (gameObject != null)
                 {
                     if (gameObject.HasNodeRef())
@@ -71,7 +71,7 @@ namespace SEE.Net
                 }
                 else
                 {
-                    throw new System.Exception($"There is no game object with the ID {GameObjectID}");
+                    throw new System.Exception($"There is no game object with the ID {gameObjectID}");
                 }
             }
         }
