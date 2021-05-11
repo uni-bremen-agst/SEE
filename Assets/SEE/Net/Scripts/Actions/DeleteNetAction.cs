@@ -10,8 +10,8 @@ using UnityEngine;
 namespace SEE.Net
 {
     /// <summary>
-    /// This class is responsible for deleting a node or edge via network from one client to all others and 
-    /// to the server. 
+    /// This class contains the logic of the deleteAction script which is necessary for any client in order to delete a given
+    /// gameObject.
     /// </summary>
     public class DeleteNetAction : AbstractAction
     {
