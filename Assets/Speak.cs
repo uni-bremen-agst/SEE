@@ -1,6 +1,7 @@
 using UnityEngine;
 using Crosstales.RTVoice;
 using Crosstales.RTVoice.Model;
+using SEE.Controls;
 
 namespace SEE.Game.Avatars
 {
@@ -25,13 +26,27 @@ namespace SEE.Game.Avatars
         /// Sets <see cref="audioSource"/>. If no <see cref="AudioSource"/>
         /// can be found, this component will be disabled.
         /// </summary>
-        void Start()
+        private void Start()
         {
             if (!TryGetComponent(out audioSource))
             {
                 Debug.LogError("No AudioSource found.\n");
                 enabled = false;
             }
+            else
+            {
+                Invoke("Welcome", 3);
+            }
+        }
+
+        /// <summary>
+        /// Speaks the <see cref="welcomeText"/>. It is called as a delayed
+        /// function within <see cref="Start"/>. If you ever rename this method,
+        /// you must adjust the string literal in <see cref="Start"/>.
+        /// </summary>
+        private void Welcome()
+        {
+            Say(welcomeText);
         }
 
         /// <summary>
@@ -47,11 +62,17 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
+        /// Text to be spoken as a welcome message.
+        /// </summary>
+        private const string welcomeText = "Hi there! Welcome! I am SEE. I am here to help. "
+            + "Just press key <prosody rate = \"slow\"><say-as interpret-as= \"characters\"> H </say-as></prosody> and I will help.";
+
+        /// <summary>
         /// You can use Speech Synthesis Markup Language (SSML) to
         /// influence the pronounciation. See, for instance,
         /// https://cloud.google.com/text-to-speech/docs/ssml
         /// </summary>
-        const string text = "Welcome to the wonderful world of SEE, "
+        private const string helpText = "Welcome to the wonderful world of SEE, "
             + "<prosody rate=\"slow\"><say-as interpret-as=\"characters\">S E E</say-as></prosody>, "
             + "for software engineering experience. "
             + "SEE let's you visualize your software as code cities. "
@@ -82,12 +103,14 @@ namespace SEE.Game.Avatars
             + "To bring up the menu for additional actions, just hit the space bar. "
             + "And now <emphasis level=\"strong\">have fun</emphasis>!";
 
-        // Update is called once per frame
-        void Update()
+        /// <summary>
+        /// If the user asks for help, the <see cref="helpText"/> is spoken.
+        /// </summary>
+        private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.T))
+            if (SEEInput.Help())
             {                
-                Say(text);
+                Say(helpText);
             }
         }
 
