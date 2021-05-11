@@ -7,7 +7,6 @@ using SEE.GO;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using NUnit.Framework;
 using UnityEngine.Assertions;
 
 namespace SEE.Net
