@@ -798,10 +798,7 @@ namespace SEE.Controls.Actions
 
         private void LocalAnySelectOut(InteractableObject interactableObject)
         {
-            if (selectedObjects.Contains(interactableObject.gameObject))
-            {
-                selectedObjects.Remove(interactableObject.gameObject);
-            }
+            selectedObjects.Remove(interactableObject.gameObject);
             selectedObject = null;
         }
 
