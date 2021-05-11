@@ -21,9 +21,9 @@ namespace SEE.Net
         // for the network transfer.
 
         /// <summary>
-        /// The unique name of the gameObject of a node or edge that needs to be deleted.
+        /// The unique ID of the gameObject of a node or edge that needs to be deleted.
         /// </summary>
-        public string GameObjectID;
+        public string gameObjectID;
 
         /// <summary>
         /// The unique ID of a given root. Necessary for any client to find the specific graph, a node or an edge is removed from.
@@ -42,7 +42,7 @@ namespace SEE.Net
         /// that has to be deleted</param>
         public UndoDeleteNetAction(string gameObjectID, String rootID) : base()
         {
-            this.GameObjectID = gameObjectID;
+            this.gameObjectID = gameObjectID;
             this.rootID = rootID;
         }
 
@@ -56,13 +56,13 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Deletes the game object identified by <see cref="GameObjectID"/> on each client.
+        /// Deletes the game object identified by <see cref="gameObjectID"/> on each client.
         /// </summary>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
             {
-                GameObject gameObject = GameObject.Find(GameObjectID);
+                GameObject gameObject = GameObject.Find(gameObjectID);
                 GameObject rootNode = GameObject.Find(rootID);
                 if (rootNode != null)
                 {
@@ -103,7 +103,7 @@ namespace SEE.Net
                 }
                 else
                 {
-                    throw new System.Exception($"There is no game object with the ID {GameObjectID}");
+                    throw new System.Exception($"There is no game object with the ID {gameObjectID}");
                 }
             }
         }
