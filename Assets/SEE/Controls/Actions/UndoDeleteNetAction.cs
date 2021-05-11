@@ -92,7 +92,7 @@ namespace SEE.Net
                             }
                             catch (Exception e)
                             {
-                                Debug.Log("edgeReference canot be added");
+                                Debug.LogWarningFormat("Edge canot be added to the graph \n", e);
                             }
                         }
                     }
