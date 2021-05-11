@@ -24,11 +24,14 @@ namespace SEE.Net
         /// </summary>
         public string GameObjectID;
 
-      
-      //  public GameObject garbageCan;
-
+        /// <summary>
+        /// The unique ID of a given root. Necessary for any client to find the specific graph , a node or an edge is removed from.
+        /// </summary>
         public String rootID;
 
+        /// <summary>
+        /// The graph a node or an edge is removed from in the network.
+        /// </summary>
         public Graph graph;
 
         /// <summary>
@@ -39,7 +42,6 @@ namespace SEE.Net
         public UndoDeleteNetAction(string gameObjectID, String rootID) : base()
         {
             this.GameObjectID = gameObjectID;
-           // garbageCan = GameObject.Find("garbageCan");
             this.rootID = rootID;
         }
 
