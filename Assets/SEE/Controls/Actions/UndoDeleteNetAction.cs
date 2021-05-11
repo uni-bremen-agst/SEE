@@ -96,6 +96,7 @@ namespace SEE.Net
                         List<GameObject> removeFromGarbage = new List<GameObject>();
                         removeFromGarbage.Add(gameObject);
                         PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(removeFromGarbage));
+                        Portal.SetInfinitePortal(gameObject);
                         Node node = gameObject.GetNode();
                         graph.AddNode(node);
                         graph.FinalizeNodeHierarchy();
