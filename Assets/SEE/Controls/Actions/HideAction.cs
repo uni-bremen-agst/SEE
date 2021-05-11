@@ -108,7 +108,10 @@ namespace SEE.Controls.Actions
             InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
         }
 
-        // Update is called once per frame
+        /// <summary>
+        /// See <see cref="ReversibleAction.Update"/>.
+        /// </summary>
+        /// <returns>true if completed</returns>
         public override bool Update()
         {
             MakeUnselectedTransparent();
@@ -797,9 +800,9 @@ namespace SEE.Controls.Actions
         {
             if (selectedObjects.Contains(interactableObject.gameObject))
             {
-                selectedObject = null;
                 selectedObjects.Remove(interactableObject.gameObject);
             }
+            selectedObject = null;
         }
 
         /// <summary>
