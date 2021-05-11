@@ -7,6 +7,8 @@ using SEE.GO;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using NUnit.Framework;
+using UnityEngine.Assertions;
 
 namespace SEE.Net
 {
@@ -68,6 +70,7 @@ namespace SEE.Net
                 if (rootNode != null)
                 {
                     graph = rootNode.GetGraph();
+                    Assert.IsNotNull(graph, "lorem ipsum : "); // TODO Either Debug.Log or user notification
                 }
                 else
                 {

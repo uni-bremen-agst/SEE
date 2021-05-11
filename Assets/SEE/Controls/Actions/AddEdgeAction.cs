@@ -173,6 +173,7 @@ namespace SEE.Controls.Actions
         {
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             GameEdgeAdder.Remove(createdEdge);
+            Destroyer.DestroyGameObject(createdEdge);
             new DeleteNetAction(createdEdge.name).Execute();
             createdEdge = null;
         }
