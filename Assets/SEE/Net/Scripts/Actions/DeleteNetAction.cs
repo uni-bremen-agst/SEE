@@ -23,9 +23,6 @@ namespace SEE.Net
         /// </summary>
         public string GameObjectID;
 
-        public GameObject garbageCan;
-
-
         /// <summary>
         /// Creates a new DeleteNetAction.
         /// </summary>
@@ -34,7 +31,6 @@ namespace SEE.Net
         public DeleteNetAction(string gameObjectID) : base()
         {
             this.GameObjectID = gameObjectID;
-            garbageCan = GameObject.Find("garbageCan");
         }
 
         /// <summary>
