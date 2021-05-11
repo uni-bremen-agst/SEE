@@ -1,10 +1,7 @@
 ﻿using Assets.SEE.Game;
 using SEE.Controls;
-using SEE.Controls.Actions;
-using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Net
