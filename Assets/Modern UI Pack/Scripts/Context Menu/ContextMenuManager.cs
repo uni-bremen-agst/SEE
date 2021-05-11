@@ -5,7 +5,6 @@ namespace Michsky.UI.ModernUIPack
     public class ContextMenuManager : MonoBehaviour
     {
         // Resources
-        [SerializeField]
         public Canvas mainCanvas;
         public GameObject contextButton;
         public GameObject contextContent;
@@ -84,6 +83,12 @@ namespace Michsky.UI.ModernUIPack
                 contextRect.position = cursorPos;
                 contextContent.transform.position = new Vector3(cursorPos.x + contentPos.x, cursorPos.y + contentPos.y, 0);
             }
+        }
+
+        public void OpenContextMenu()
+        {
+            contextAnimator.Play("Menu In");
+            isContextMenuOn = true;
         }
 
         public void CloseOnClick()

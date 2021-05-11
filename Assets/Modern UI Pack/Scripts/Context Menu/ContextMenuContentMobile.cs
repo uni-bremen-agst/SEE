@@ -8,12 +8,15 @@ using TMPro;
 
 namespace Michsky.UI.ModernUIPack
 {
-    [AddComponentMenu("Modern UI Pack/Context Menu/Context Menu Content")]
-    public class ContextMenuContent : MonoBehaviour, IPointerClickHandler
+    [AddComponentMenu("Modern UI Pack/Context Menu/Context Menu Content (Mobile)")]
+    public class ContextMenuContentMobile : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         [Header("Resources")]
         public ContextMenuManager contextManager;
         public Transform itemParent;
+
+        [Header("Settings")]
+        [Range(0.1f, 6)] public float holdToOpen = 0.75f;
 
         [Header("Items")]
         public List<ContextItem> contexItems = new List<ContextItem>();
@@ -24,6 +27,8 @@ namespace Michsky.UI.ModernUIPack
         TextMeshProUGUI setItemText;
         Sprite imageHelper;
         string textHelper;
+        float timer;
+        bool timerEnabled;
 
         [System.Serializable]
         public class ContextItem
@@ -58,15 +63,44 @@ namespace Michsky.UI.ModernUIPack
                 Destroy(child.gameObject);
         }
 
-        public void OnPointerClick(PointerEventData eventData)
+        void Update()
         {
+            if (timerEnabled == true)
+            {
+                timer += Time.deltaTime;
+
+                if (timer >= holdToOpen)
+                {
+                    CheckForTimer();
+                    timerEnabled = false;
+                    timer = 0;
+                }
+            }
+        }
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            timerEnabled = true;
+        }
+
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            timerEnabled = false;
+            timer = 0;
+        }
+
+        public void CheckForTimer()
+        {
+            if (timer <= holdToOpen)
+                return;
+
             if (contextManager.isContextMenuOn == true)
             {
                 contextAnimator.Play("Menu Out");
                 contextManager.isContextMenuOn = false;
             }
 
-            else if (eventData.button == PointerEventData.InputButton.Right && contextManager.isContextMenuOn == false)
+            else if (contextManager.isContextMenuOn == false)
             {
                 foreach (Transform child in itemParent)
                     Destroy(child.gameObject);
