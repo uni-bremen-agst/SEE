@@ -61,10 +61,6 @@ namespace SEE.Net
                     }
                     else if (gameObject.HasEdgeRef())
                     {
-                      //  if (gameObject.TryGetEdge(out Edge edge))
-                      //  {
-                          //  Graph graph = edge.ItsGraph;
-                      //  }
                         AnimationsOfDeletion.HideEdges(gameObject);
                         GameEdgeAdder.Remove(gameObject);
                     }
