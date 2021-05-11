@@ -48,7 +48,7 @@ namespace SEE.Net
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
-            {   
+            {
                 GameObject gameObject = GameObject.Find(gameObjectID);
                 if (gameObject != null)
                 {
