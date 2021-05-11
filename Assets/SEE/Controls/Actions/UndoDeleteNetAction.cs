@@ -24,7 +24,8 @@ namespace SEE.Net
         /// </summary>
         public string GameObjectID;
 
-        public GameObject garbageCan;
+      
+      //  public GameObject garbageCan;
 
         public String rootID;
 
@@ -38,7 +39,7 @@ namespace SEE.Net
         public UndoDeleteNetAction(string gameObjectID, String rootID) : base()
         {
             this.GameObjectID = gameObjectID;
-            garbageCan = GameObject.Find("garbageCan");
+           // garbageCan = GameObject.Find("garbageCan");
             this.rootID = rootID;
         }
 
@@ -60,7 +61,6 @@ namespace SEE.Net
             {
                 GameObject gameObject = GameObject.Find(GameObjectID);
                 GameObject rootNode = GameObject.Find(rootID);
-
                 if (rootNode != null)
                 {
                     graph = rootNode.GetGraph();
@@ -98,7 +98,6 @@ namespace SEE.Net
                         node.ItsGraph = graph;
                     }
                 }
-
                 else
                 {
                     throw new System.Exception($"There is no game object with the ID {GameObjectID}");
