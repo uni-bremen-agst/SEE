@@ -214,13 +214,7 @@ namespace SEE.Game.UI.CodeWindow
 
                 if (token.TokenType == SEEToken.Type.Newline)
                 {
-                    // First, of course, the newline
-                    Text += "\n";
-                    // Add whitespace next to line number so it's consistent
-                    Text += string.Join("", Enumerable.Repeat(" ", neededPadding-$"{lineNumber}".Length));
-                    // Line number will be typeset in grey to distinguish it from the rest
-                    Text += $"<color=#CCCCCC>{lineNumber}</color> ";
-                    lineNumber++;
+                    AppendNewline(ref lineNumber, ref Text, neededPadding);
                 }
                 else if (token.TokenType != SEEToken.Type.EOF) // skip EOF token completely
                 {
@@ -231,13 +225,7 @@ namespace SEE.Game.UI.CodeWindow
                         // Any entry after the first is on a separate line
                         if (!firstRun)
                         {
-                            // First, of course, the newline
-                            Text += "\n";
-                            // Add whitespace next to line number so it's consistent
-                            Text += string.Join("", Enumerable.Repeat(" ", neededPadding - $"{lineNumber}".Length));
-                            // Line number will be typeset in grey to distinguish it from the rest
-                            Text += $"<color=#CCCCCC>{lineNumber}</color> ";
-                            lineNumber++;
+                            AppendNewline(ref lineNumber, ref Text, neededPadding);
                         }
                         
                         // No "else if" because we still want to display this token.
@@ -260,6 +248,18 @@ namespace SEE.Game.UI.CodeWindow
             // Lines are equal to number of newlines, including the initial newline
             lines = Text.Count(x => x.Equals('\n')); // No more weird CRLF shenanigans are present at this point
             Text = Text.TrimStart('\n'); // Remove leading newline
+
+            // Appends a newline to the text, assuming we're at theLineNumber and need the given padding.
+            static void AppendNewline(ref int theLineNumber, ref string text, int padding)
+            {
+                // First, of course, the newline
+                text += "\n";
+                // Add whitespace next to line number so it's consistent
+                text += string.Join("", Enumerable.Repeat(" ", padding - $"{theLineNumber}".Length));
+                // Line number will be typeset in grey to distinguish it from the rest
+                text += $"<color=#CCCCCC>{theLineNumber}</color> ";
+                theLineNumber++;
+            }
         }
         
         /// <summary>
