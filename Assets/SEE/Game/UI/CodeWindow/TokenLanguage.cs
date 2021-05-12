@@ -23,11 +23,20 @@ namespace SEE.Game.UI.CodeWindow
         public string LexerFileName { get; }
         
         /// <summary>
-        /// Number of spaces equivalent to a tab in this language.
+        /// Default number of spaces a tab is equivalent to.
         /// </summary>
-        private int TabWidth { get; }
-        //TODO: Actually use this
-        //TODO: Add set for comments, and add a corresponding type to SEEToken
+        private const int DEFAULT_TAB_WIDTH = 4;
+
+        /// <summary>
+        /// Number of spaces equivalent to a tab in this language.
+        /// If not specified, this will be <see cref="DEFAULT_TAB_WIDTH"/>.
+        /// </summary>
+        public int TabWidth { get; }
+        
+        /// <summary>
+        /// Symbolic names for comments of a language, including block, line, and documentation comments.
+        /// </summary>
+        public ISet<string> Comments { get; }
 
         /// <summary>
         /// Symbolic names for keywords of a language. This also includes boolean literals and null literals.
@@ -117,6 +126,10 @@ namespace SEE.Game.UI.CodeWindow
         /// Set of antlr type names for Java newlines.
         /// </summary>
         private static readonly HashSet<string> javaNewlines = new HashSet<string> { "NEWLINE" };
+        /// <summary>
+        /// Set of antlr type names for Java comments.
+        /// </summary>
+        private static readonly HashSet<string> javaComments = new HashSet<string> { "COMMENT", "LINE_COMMENT" };
         
         #endregion
 
@@ -131,7 +144,7 @@ namespace SEE.Game.UI.CodeWindow
         /// Token Language for Java.
         /// </summary>
         public static readonly TokenLanguage Java = new TokenLanguage(javaFileName, javaExtensions, javaKeywords, javaNumbers,
-            javaStrings, javaPunctuation, javaIdentifiers, javaWhitespace, javaNewlines);
+            javaStrings, javaPunctuation, javaIdentifiers, javaWhitespace, javaNewlines, javaComments);
 
         #endregion
 
@@ -148,9 +161,12 @@ namespace SEE.Game.UI.CodeWindow
         /// <param name="identifiers">Identifiers for this language</param>
         /// <param name="whitespace">Whitespace for this language</param>
         /// <param name="newline">Newlines for this language</param>
+        /// <param name="comments">Comments for this language</param>
+        /// <param name="tabWidth">Number of spaces a tab is equivalent to</param>
         private TokenLanguage(string lexerFileName, ISet<string> fileExtensions, ISet<string> keywords, 
                               ISet<string> numberLiterals, ISet<string> stringLiterals, ISet<string> punctuation,
-                              ISet<string> identifiers, ISet<string> whitespace, ISet<string> newline)
+                              ISet<string> identifiers, ISet<string> whitespace, ISet<string> newline,
+                              ISet<string> comments, int tabWidth = DEFAULT_TAB_WIDTH)
         {
             if (AllTokenLanguages.Any(x => x.LexerFileName.Equals(lexerFileName) || x.FileExtensions.Overlaps(fileExtensions)))
             {
@@ -165,6 +181,8 @@ namespace SEE.Game.UI.CodeWindow
             Identifiers = identifiers;
             Whitespace = whitespace;
             Newline = newline;
+            Comments = comments;
+            TabWidth = tabWidth;
             
             AllTokenLanguages.Add(this);
         }
@@ -224,7 +242,7 @@ namespace SEE.Game.UI.CodeWindow
         {
             // We go through each category and check whether it contains the token.
             // I know that this looks like it may be abstracted because the same thing is done on different objects
-            // in succession, but due to the usage of nameof() a refactoring of this kind would break this.
+            // in succession, but due to the usage of nameof() a refactoring of this kind would break it.
             if (Keywords.Contains(token))
             {
                 return nameof(Keywords);
@@ -244,6 +262,10 @@ namespace SEE.Game.UI.CodeWindow
             if (Identifiers.Contains(token))
             {
                 return nameof(Identifiers);
+            }
+            if (Comments.Contains(token))
+            {
+                return nameof(Comments);
             }
             if (Whitespace.Contains(token))
             {
