@@ -6,21 +6,35 @@ using SEE.Controls;
 namespace SEE.Game.Avatars
 {
     /// <summary>
-    /// This component is intended to be attached to a UMA character
-    /// that is supposed to speak. The character must have a <see cref="AudioSource"/>
-    /// component attached to it.
+    /// This component is intended to be attached to a UMA character acting as
+    /// personal assistant and that is supposed to speak. The character must have a
+    /// <see cref="AudioSource"/> component attached to it.
     /// </summary>
     public class Speak : MonoBehaviour
     {
         /// <summary>
-        /// The audio source used to say the text.
+        /// The audio source used to say the text. Will be retrieved from the character.
         /// </summary>
         private AudioSource audioSource;
 
         /// <summary>
-        /// The voice used to speak.
+        /// The voice used to speak. Will be retrieved from the available voices on
+        /// the current system.
         /// </summary>
         private Voice voice;
+
+        /// <summary>
+        /// The animator of the personal assistant that will read the text.
+        /// Will be retrieved from the character.
+        /// </summary>
+        private Animator animator;
+
+        /// <summary>
+        /// Hash identifier for the IsTalking condition of the <see cref="animator"/> controller.
+        /// Works as a handle to manipulate the state of the character. Will be retrieved from
+        /// <see cref="animator"/>.
+        /// </summary>
+        private int isTalking;
 
         /// <summary>
         /// Sets <see cref="audioSource"/>. If no <see cref="AudioSource"/>
@@ -33,8 +47,15 @@ namespace SEE.Game.Avatars
                 Debug.LogError("No AudioSource found.\n");
                 enabled = false;
             }
+            else if (!TryGetComponent(out animator))
+            {
+                Debug.LogError("No animator component found.\n");
+                enabled = false;
+            }
             else
             {
+                isTalking = Animator.StringToHash("IsTalking");
+                // We want to start the welcome message 3 seconds after the game has started.
                 Invoke("Welcome", 3);
             }
         }
@@ -50,8 +71,8 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// Dumps the available voices on the current platform to the
-        /// debugging console.
+        /// Dumps the available voices on the current platform to the debugging console.
+        /// Can be used to retrieve the available voices on the current system.
         /// </summary>
         private void DumpVoices()
         {
@@ -68,6 +89,7 @@ namespace SEE.Game.Avatars
             + "Just press key <prosody rate = \"slow\"><say-as interpret-as= \"characters\"> H </say-as></prosody> and I will help.";
 
         /// <summary>
+        /// General overview on SEE.
         /// You can use Speech Synthesis Markup Language (SSML) to
         /// influence the pronounciation. See, for instance,
         /// https://cloud.google.com/text-to-speech/docs/ssml
@@ -138,7 +160,21 @@ namespace SEE.Game.Avatars
                     DumpVoices();
                 }
             }
+            animator?.SetBool(isTalking, true);
             Speaker.Instance.Speak(text, audioSource, voice: voice);
+            Speaker.Instance.OnSpeakCompleted.AddListener(BackToIdle);
+        }
+
+        /// <summary>
+        /// Callback to reset the state of the animator to idle. It will
+        /// be registered by <see cref="Say"/> and be called when the text 
+        /// if completely spoken.
+        /// </summary>
+        /// <param name="message">a message from RT-Voice (currently not used)</param>
+        private void BackToIdle(string message)
+        {
+            animator?.SetBool(isTalking, false);
+            Speaker.Instance.OnSpeakCompleted.RemoveListener(BackToIdle);
         }
     }
 }
