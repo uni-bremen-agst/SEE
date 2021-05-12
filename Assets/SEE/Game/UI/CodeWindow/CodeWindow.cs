@@ -195,11 +195,14 @@ namespace SEE.Game.UI.CodeWindow
                 Text = "<i>This file is empty.</i>";
                 return;
             }
+
+            TokenLanguage language = tokenList.First().Language;
             
             // We need to insert this pseudo-token here so that the first line gets a line number
-            tokenList.Insert(0, new SEEToken(string.Empty, SEEToken.Type.Newline, -1, 0));
+            tokenList.Insert(0, new SEEToken(string.Empty, SEEToken.Type.Newline, -1, 0, language));
 
             // Needed padding is the number of lines, because the line number will be at most this long
+            // FIXME: In certain edge cases this won't work, e.g. block comments can span multiple lines. Use text.
             int neededPadding = $"{tokenList.Count(x => x.TokenType.Equals(SEEToken.Type.Newline))}".Length;
             int lineNumber = 1;
             foreach (SEEToken token in tokenList)
@@ -225,6 +228,7 @@ namespace SEE.Game.UI.CodeWindow
                     string[] tokenLines = token.Text.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None);
                     foreach (string line in tokenLines)
                     {
+                        // Any entry after the first is on a separate line
                         if (!firstRun)
                         {
                             // First, of course, the newline
@@ -241,7 +245,7 @@ namespace SEE.Game.UI.CodeWindow
                         {
                             // We just copy the whitespace verbatim, no need to even color it.
                             // Note: We have to assume that whitespace will not interfere with TMP's XML syntax.
-                            Text += line.Replace("\t", "    ");
+                            Text += line.Replace("\t", new string(' ', language.TabWidth));
                         }
                         else
                         {
@@ -289,6 +293,8 @@ namespace SEE.Game.UI.CodeWindow
         /// If the language is not supported, an ArgumentException will be thrown.</param>
         public void EnterFromFile(string filename, bool syntaxHighlighting = true)
         {
+            FilePath = filename;
+            
             // Try to read the file, otherwise display the error message.
             if (!File.Exists(filename))
             {
@@ -298,22 +304,29 @@ namespace SEE.Game.UI.CodeWindow
             }
             try
             {
+                //TODO: First line empty, <EOF>
+                //TODO: Maybe disable syntax highlighting for huge files, as it would impact performance badly
                 if (syntaxHighlighting)
                 {
-                    EnterFromTokens(SEEToken.fromFile(filename));
+                    try
+                    {
+                        EnterFromTokens(SEEToken.fromFile(filename));
+                        return;
+                    }
+                    catch (ArgumentException e)
+                    {
+                        // In case the filetype is not supported, we render the text normally.
+                        Debug.LogError($"Encountered an exception, disabling syntax highlighting: {e}");
+                    }
                 }
-                else
-                {
-                    EnterFromText(File.ReadAllLines(filename));
-                }
+
+                EnterFromText(File.ReadAllLines(filename));
             }
             catch (IOException exception)
             {
                 Text = $"<color=\"red\"><noparse>{exception}</noparse></color>";
                 Debug.LogError(exception);
             }
-
-            FilePath = filename;
         }
 
         /// <summary>
