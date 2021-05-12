@@ -12,6 +12,16 @@ namespace SEE.Game.UI.CodeWindow
     public class TokenLanguage
     {
         /// <summary>
+        /// Default number of spaces a tab is equivalent to.
+        /// </summary>
+        private const int DEFAULT_TAB_WIDTH = 4;
+
+        /// <summary>
+        /// Language-independent symbolic name for the end of file token.
+        /// </summary>
+        private const string EOF = "EOF";
+        
+        /// <summary>
         /// File extensions which apply for the given language.
         /// May not intersect any other languages file extensions.
         /// </summary>
@@ -21,11 +31,6 @@ namespace SEE.Game.UI.CodeWindow
         /// Name of the antlr lexer file the keywords were taken from.
         /// </summary>
         public string LexerFileName { get; }
-        
-        /// <summary>
-        /// Default number of spaces a tab is equivalent to.
-        /// </summary>
-        private const int DEFAULT_TAB_WIDTH = 4;
 
         /// <summary>
         /// Number of spaces equivalent to a tab in this language.
@@ -275,8 +280,7 @@ namespace SEE.Game.UI.CodeWindow
             {
                 return nameof(Newline);
             }
-
-            return null;
+            return EOF.Equals(token) ? nameof(EOF) : null;
         }
     }
 }

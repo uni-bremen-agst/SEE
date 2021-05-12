@@ -222,7 +222,7 @@ namespace SEE.Game.UI.CodeWindow
                     Text += $"<color=#CCCCCC>{lineNumber}</color> ";
                     lineNumber++;
                 }
-                else
+                else if (token.TokenType != SEEToken.Type.EOF) // skip EOF token completely
                 {
                     bool firstRun = true;
                     string[] tokenLines = token.Text.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None);
@@ -256,6 +256,10 @@ namespace SEE.Game.UI.CodeWindow
                     }
                 }
             }
+
+            // Lines are equal to number of newlines, including the initial newline
+            lines = Text.Count(x => x.Equals('\n')); // No more weird CRLF shenanigans are present at this point
+            Text = Text.TrimStart('\n'); // Remove leading newline
         }
         
         /// <summary>
