@@ -196,8 +196,9 @@ namespace SEE.Controls.Actions
                             FindRoot(nodeGraphPair.Value);
                         }
 
-                        // although a loop within a loop should be avoided in general,
-                        // in this case the amount of objects in <paramref name="roots"/> is limited to the amount of codecites.
+                        // although a loop within a loop should be avoided in general due to performance reasons,
+                        // in this case the amount of objects in <paramref name="roots"/> is limited to the amount of codecites, which likely
+                        // will be kept below three.
                         foreach (KeyValuePair<GameObject, Graph> roots in roots)
                         {
                             if (roots.Value == nodeGraphPair.Key)
@@ -213,7 +214,6 @@ namespace SEE.Controls.Actions
             // Re-add all edges to their graphs.
             foreach (KeyValuePair<GameObject, Graph> edgeGraphPair in deletedEdges)
             {
-
                 if (edgeGraphPair.Key.TryGetComponentOrLog(out EdgeRef edgeReference))
                 {
                     edgeGraphPair.Value.AddEdge(edgeReference.Value);
@@ -307,7 +307,6 @@ namespace SEE.Controls.Actions
         {
             if (gameNode.TryGetComponentOrLog(out NodeRef nodeRef))
             {
-
                 Graph graph = nodeRef.Value.ItsGraph;
                 deletedNodes[gameNode] = graph;
                 if (!roots.ContainsValue(graph))
