@@ -90,8 +90,7 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         private static readonly HashSet<string> javaExtensions = new HashSet<string>
         {
-            "java",
-            "cs" //FIXME: Remove this debugging entry!
+            "java"
         };
 
         /// <summary>
@@ -228,9 +227,10 @@ namespace SEE.Game.UI.CodeWindow
         /// <exception cref="InvalidOperationException">If no lexer is defined for this language.</exception>
         public Lexer CreateLexer(string content)
         {
+            ICharStream input = CharStreams.fromString(content);
             if (LexerFileName.Equals(javaFileName))
             {
-                return new Java9Lexer(CharStreams.fromString(content));
+                return new Java9Lexer(input);
             }
 
             throw new InvalidOperationException("No lexer defined for this language yet.");

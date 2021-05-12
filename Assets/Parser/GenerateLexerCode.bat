@@ -2,4 +2,5 @@
 @ECHO OFF
 for %%f in (*.g4) do (
     java -jar antlr.jar -Dlanguage=CSharp %%~nf.g4
+    ECHO Lexer generated for %%f%.
 )
