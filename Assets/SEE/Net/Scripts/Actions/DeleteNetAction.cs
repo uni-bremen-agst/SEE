@@ -8,7 +8,7 @@ namespace SEE.Net
 {
     /// <summary>
     /// This class contains the logic of the deleteAction script which is necessary for any client in order to delete a given
-    /// gameObject.
+    /// gameObject in the network.
     /// </summary>
     public class DeleteNetAction : AbstractAction
     {

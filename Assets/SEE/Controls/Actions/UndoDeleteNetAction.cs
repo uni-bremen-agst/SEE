@@ -58,7 +58,7 @@ namespace SEE.Net
 
         /// <summary>
         /// Undoes any deletion of a game object identified by <see cref="gameObjectID"/> on each client.
-        /// Furthermore any node or edge which had been removed before will be added again to the clients graph.
+        /// Furthermore any node or edge which had been removed before is be added again to the clients graph.
         /// The graph is identified by <see cref="rootID"/>
         /// </summary>
         protected override void ExecuteOnClient()
