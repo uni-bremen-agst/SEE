@@ -183,6 +183,11 @@ namespace SEE.Game.UI.CodeWindow
             public static readonly Type Newline = new Type("Newline", "000000"); // color doesn't matter
 
             /// <summary>
+            /// End-Of-File token.
+            /// </summary>
+            public static readonly Type EOF = new Type("EOF", "000000"); // color doesn't matter
+
+            /// <summary>
             /// Unknown tokens, i.e. those not recognized by the lexer.
             /// </summary>
             public static readonly Type Unknown = new Type("Unknown", "FFFFFF"); // white
