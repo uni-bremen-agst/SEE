@@ -270,16 +270,18 @@ public class NodeDecorationController : MonoBehaviour
 
     /// <summary>
     /// Decorates the block
+    /// <param name="hiddenObjects">The list of gamenodes that are hidden inside the packed block</param>
+    /// <param name="packedBlock">The packed block</param>
     /// </summary>
-    private void decoratePackedBlock(List<GameObject> hiddenObjects, GameObject parent)
+    private void decoratePackedBlock(List<GameObject> hiddenObjects, GameObject packedBlock)
     {
         for (int i = 0; i < hiddenObjects.Count; i++)
         {
-            GameObject clone = new GameObject(); // TODO this gameobject has no rendered mesh. Use GameObject.CreatePrimitive instead
-            clone.transform.position.Set(hiddenObjects[i].transform.position.x, parent.transform.localScale.y, hiddenObjects[i].transform.position.z); // TODO the height is wong as it doesn't take the gameobject's y position into account
+            GameObject clone = GameObject.CreatePrimitive(PrimitiveType.Cube); 
+            clone.transform.position.Set(hiddenObjects[i].transform.position.x, packedBlock.transform.position.y + packedBlock.transform.localScale.y, hiddenObjects[i].transform.position.z); 
             clone.transform.localScale.Set(hiddenObjects[i].transform.localScale.x, 0.00000001f, hiddenObjects[i].transform.localScale.z);
         }
-        decoratePackedBlockWall(hiddenObjects,parent);
+        decoratePackedBlockWall(hiddenObjects,packedBlock);
     }
 
     /// <summary>
