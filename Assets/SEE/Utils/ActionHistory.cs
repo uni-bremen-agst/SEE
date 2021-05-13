@@ -52,9 +52,9 @@ namespace Assets.SEE.Utils
         private Stack<ReversibleAction> RedoHistory { get; } = new Stack<ReversibleAction>();
 
         /// <summary>
-        /// Checks the invariant that the <see cref="UndoStack"/> has at most
+        /// Checks the invariant that the <see cref="UndoHistory"/> has at most
         /// one action with progress state <see cref="ReversibleAction.Progress.NoEffect"/>
-        /// and this action is at the top of <see cref="UndoStack"/>.
+        /// and this action is at the top of <see cref="UndoHistory"/>.
         /// </summary>
         private void AssertAtMostOneActionWithNoEffect()
         {
@@ -103,7 +103,6 @@ namespace Assets.SEE.Utils
         /// </summary>
         public void Update()
         {
-
             if (LastAction != null && LastAction.Update())
             {
                 Push(new Tuple<bool, HistoryType, string, List<string>>(true, HistoryType.action, LastAction.GetId(), LastAction.GetChangedObjects()));
@@ -132,7 +131,7 @@ namespace Assets.SEE.Utils
         public void Replace(Tuple<bool, HistoryType, string, List<string>> oldItem, 
             Tuple<bool, HistoryType, string, List<string>> newItem, bool isNetwork)
         {
-            int index = GetIndexOfAction(oldItem.Item3);  //FIXME: OwnAction muss evtl auch geloescht werden
+            int index = GetIndexOfAction(oldItem.Item3);
             globalHistory[index] = newItem;
             if (!isNetwork) new GlobalActionHistoryNetwork().Replace(oldItem.Item2, oldItem.Item3, ListToString(oldItem.Item4), newItem.Item2, ListToString(newItem.Item4));
         }
@@ -219,7 +218,6 @@ namespace Assets.SEE.Utils
             {
                 if (globalHistory[i].Item3.Equals(id))
                 {
-                    // Fixme: Pop an jeder Stelle ausführen, wo DeleteItem() aufgerufen wird.
                     globalHistory.RemoveAt(i);
                     return;
                 }
