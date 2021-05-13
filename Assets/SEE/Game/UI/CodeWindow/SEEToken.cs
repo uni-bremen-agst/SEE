@@ -35,6 +35,11 @@ namespace SEE.Game.UI.CodeWindow
         public readonly int EndOffset;
 
         /// <summary>
+        /// The language of the source code this token was parsed from.
+        /// </summary>
+        public readonly TokenLanguage Language;
+
+        /// <summary>
         /// Constructor for this class.
         /// </summary>
         /// <param name="text">Text of this token. Must not be <c>null</c>.</param>
@@ -42,6 +47,7 @@ namespace SEE.Game.UI.CodeWindow
         /// <param name="startOffset">Start offset of this token. Must not be negative, except for the special value
         /// -1, which indicates the very first newline of the file</param>
         /// <param name="endOffset">End offset of this token. Must not be smaller than <paramref name="startOffset"/>.</param>
+        /// <param name="language">The language of the source code this token is from</param>
         /// <exception cref="ArgumentNullException">
         /// If <paramref name="text"/> or <paramref name="type"/> is <c>null</c>.
         /// </exception>
@@ -49,7 +55,7 @@ namespace SEE.Game.UI.CodeWindow
         /// If <paramref name="endOffset"/> is smaller than <paramref name="startOffset"/>
         /// </exception>
         /// <exception cref="ArgumentException">If <paramref name="startOffset"/> is less than -1.</exception>
-        public SEEToken(string text, Type type, int startOffset, int endOffset)
+        public SEEToken(string text, Type type, int startOffset, int endOffset, TokenLanguage language)
         {
             Text = text ?? throw new ArgumentNullException(nameof(text));
             TokenType = type ?? throw new ArgumentNullException(nameof(type));
@@ -65,6 +71,7 @@ namespace SEE.Game.UI.CodeWindow
 
             StartOffset = startOffset;
             EndOffset = endOffset;
+            Language = language;
         }
 
         /// <summary>
@@ -81,7 +88,7 @@ namespace SEE.Game.UI.CodeWindow
             language ??= TokenLanguage.fromLexerFileName(lexer.GrammarFileName);
             return new SEEToken(token.Text,
                                 Type.fromAntlrType(language, lexer.Vocabulary.GetSymbolicName(token.Type)),
-                                token.StartIndex, token.StopIndex + 1); // Antlr StopIndex is inclusive
+                                token.StartIndex, token.StopIndex + 1, language); // Antlr StopIndex is inclusive
         }
 
         /// <summary>
@@ -159,6 +166,11 @@ namespace SEE.Game.UI.CodeWindow
             /// Identifier tokens, such as variable names.
             /// </summary>
             public static readonly Type Identifier = new Type("Identifiers", "FFFFFF"); // white
+            
+            /// <summary>
+            /// Comments of any kind.
+            /// </summary>
+            public static readonly Type Comment = new Type("Comments", "6F708E"); // dark bluish gray
 
             /// <summary>
             /// Whitespace tokens, excluding newlines.
@@ -171,11 +183,14 @@ namespace SEE.Game.UI.CodeWindow
             public static readonly Type Newline = new Type("Newline", "000000"); // color doesn't matter
 
             /// <summary>
+            /// End-Of-File token.
+            /// </summary>
+            public static readonly Type EOF = new Type("EOF", "000000"); // color doesn't matter
+
+            /// <summary>
             /// Unknown tokens, i.e. those not recognized by the lexer.
             /// </summary>
             public static readonly Type Unknown = new Type("Unknown", "FFFFFF"); // white
-
-            //TODO: If we choose parsers instead of lexers, methods and class names may get their own color
 
             #endregion
 
