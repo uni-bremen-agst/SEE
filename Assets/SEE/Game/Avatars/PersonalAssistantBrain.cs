@@ -2,6 +2,8 @@ using UnityEngine;
 using Crosstales.RTVoice;
 using Crosstales.RTVoice.Model;
 using SEE.Controls;
+using System;
+using System.Text;
 
 namespace SEE.Game.Avatars
 {
@@ -82,6 +84,22 @@ namespace SEE.Game.Avatars
             }
         }
 
+        public void CurrentTime()
+        {
+            DateTime now = DateTime.Now;
+            StringBuilder builder = new StringBuilder("It is now ");
+            builder.Append(now.Hour);
+            builder.Append(" o'clock and ");
+            builder.Append(now.Minute);
+            builder.Append(" minutes. Time for coffee.");
+            Say(builder.ToString());
+        }
+
+        public void About()
+        {
+            Say(aboutText);
+        }
+
         /// <summary>
         /// Text to be spoken as a welcome message.
         /// </summary>
@@ -125,6 +143,11 @@ namespace SEE.Game.Avatars
             + "to move up and down. "
             + "To bring up the menu for additional actions, just hit the space bar. "
             + "And now <emphasis level=\"strong\">have fun</emphasis>!";
+
+        private const string aboutText = "I am SEE. "             
+            + "Myself and all the world you see, was created by Christian, Falko, Jan, Leonard, Lino, Marcel, Moritz, "
+            + "Nick, Rainer, Robin, Simon, Sören, Thore, Thorsten, Torben, and many others. "
+            + "<emphasis level=\"strong\">Thanks, guys!</emphasis>";
 
         /// <summary>
         /// If the user asks for help, the <see cref="helpText"/> is spoken.
