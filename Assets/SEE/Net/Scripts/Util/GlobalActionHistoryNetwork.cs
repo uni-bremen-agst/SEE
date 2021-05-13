@@ -72,6 +72,7 @@ namespace SEE.Net
         /// </summary>
         protected override void ExecuteOnClient()
         {
+            UnityEngine.Debug.LogWarning("Ausführung im Netzwerk");
             if (!IsRequester())
             {
                 if (mode == Mode.push)
