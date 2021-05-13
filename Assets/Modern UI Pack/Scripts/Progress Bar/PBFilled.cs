@@ -5,11 +5,11 @@ namespace Michsky.UI.ModernUIPack
 {
     public class PBFilled : MonoBehaviour
     {
-        [Header("RESOURCES")]
+        [Header("Resources")]
         public TextMeshProUGUI minLabel;
         public TextMeshProUGUI maxLabel;
 
-        [Header("SETTINGS")]
+        [Header("Settings")]
         [Range(0, 100)] public int transitionAfter = 50;
         public Color minColor = new Color(0, 0, 0, 255);
         public Color maxColor = new Color(255, 255, 255, 255);

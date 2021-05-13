@@ -1,0 +1,21 @@
+﻿#if UNITY_EDITOR
+using UnityEditor;
+using Crosstales.RTVoice.EditorUtil;
+using UnityEngine;
+using UnityEditor.SceneManagement;
+
+namespace Crosstales.RTVoice.EditorIntegration
+{
+   /// <summary>Editor component for the "Hierarchy"-menu.</summary>
+   public static class VoiceInitializerGameObject
+   {
+      [MenuItem("GameObject/" + Util.Constants.ASSET_NAME + "/VoiceInitializer", false, EditorHelper.GO_ID + 8)]
+      private static void AddVoiceInitializer()
+      {
+         PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath($"Assets{EditorConfig.ASSET_PATH}Extras/VoiceInitializer/Resources/Prefabs/VoiceInitializer.prefab", typeof(GameObject)));
+         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+      }
+   }
+}
+#endif
+// © 2021 crosstales LLC (https://www.crosstales.com)

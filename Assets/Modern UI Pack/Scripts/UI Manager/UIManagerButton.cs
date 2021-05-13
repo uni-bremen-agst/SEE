@@ -1,5 +1,4 @@
-﻿#if UNITY_EDITOR
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
@@ -8,9 +7,10 @@ namespace Michsky.UI.ModernUIPack
     [ExecuteInEditMode]
     public class UIManagerButton : MonoBehaviour
     {
-        [Header("SETTINGS")]
+        [Header("Settings")]
         public UIManager UIManagerAsset;
         public ButtonType buttonType;
+        public bool webglMode = false;
 
         // Basic Resources
         [HideInInspector] public Image basicFilled;
@@ -81,6 +81,9 @@ namespace Michsky.UI.ModernUIPack
 
         void Awake()
         {
+            if (Application.isPlaying && webglMode == true)
+                return;
+
             try
             {
                 if (UIManagerAsset == null)
@@ -95,10 +98,7 @@ namespace Michsky.UI.ModernUIPack
                 }
             }
 
-            catch
-            {
-                Debug.Log("<b>[Modern UI Pack]</b> No UI Manager found, assign it manually.", this);
-            }
+            catch { Debug.Log("<b>[Modern UI Pack]</b> No UI Manager found, assign it manually.", this); }
         }
 
         void LateUpdate()
@@ -112,6 +112,9 @@ namespace Michsky.UI.ModernUIPack
 
         void UpdateButton()
         {
+            if (Application.isPlaying && webglMode == true)
+                return;
+
             try
             {
                 if (UIManagerAsset.buttonThemeType == UIManager.ButtonThemeType.BASIC)
@@ -308,4 +311,3 @@ namespace Michsky.UI.ModernUIPack
         }
     }
 }
-#endif
