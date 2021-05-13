@@ -189,7 +189,6 @@ namespace SEE.Controls.Actions
                 memento.Parent.name,
                 memento.NodeID
             };
-
             return changedObjects;
         }
     }

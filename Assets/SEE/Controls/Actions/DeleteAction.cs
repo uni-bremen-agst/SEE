@@ -464,7 +464,6 @@ namespace SEE.Controls.Actions
             {
                 changedObjects.Add(deletedObject.name);
             }
-
             return changedObjects.Distinct().ToList();
         }
     }

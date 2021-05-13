@@ -246,7 +246,6 @@ namespace SEE.Controls.Actions
                 memento.to.name,
                 createdEdge.name
             };
-
             return changedObjects;
         }
     }

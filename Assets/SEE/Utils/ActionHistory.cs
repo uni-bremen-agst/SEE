@@ -8,6 +8,15 @@ namespace Assets.SEE.Utils
 {
     public class ActionHistory
     {
+        // If a player executes an action that changes the same GameObject as an action
+        // of an other player, the player that has done action first,
+        // cannot perform an undo or redo on that because of an conflict.
+        // If the second player undoes the newer change of the object, 
+        // the undo of the older change is still not possible because
+        // the change is still on the redoHistory of the other player.
+        // Iff the player that has the newer action undoes the action 
+        // and clears his redoHistory by performing another action,
+        // the other player can undone his action.
 
         // Implementation note: This ActionHistory is a bit more complicated than
         // action histories in other contexts because we do not have atomic actions
@@ -165,7 +174,7 @@ namespace Assets.SEE.Utils
         /// </summary>
         /// <param name="affectedGameObjects">the gameObjects affected by the action to be undone/redone.</param>
         /// <param name="actionId">the id of the action which possibly has conflicts.</param>
-        /// <returns>true, if there are conflicts, else false</returns>
+        /// <returns>true, if there are conflicts, else false.</returns>
         private bool ActionHasConflicts(List<string> affectedGameObjects, string actionId )
         {
             int index = GetIndexOfAction(actionId);
@@ -191,7 +200,7 @@ namespace Assets.SEE.Utils
         }
 
         /// <summary>
-        /// Deletes all redos of the user.Also, it deletes them from the globalHistory.
+        /// Deletes all redos of the user. Also, it deletes them from the globalHistory.
         /// </summary>
         private void DeleteAllRedos()
         {
@@ -211,7 +220,7 @@ namespace Assets.SEE.Utils
         /// <summary>
         /// Deletes an item from the <see cref="globalHistory"/> depending on its id.
         /// </summary>
-        /// <param name="id">the id of the action which should be deleted</param>
+        /// <param name="id">the id of the action which should be deleted.</param>
         public void DeleteItem(string id)
         {
             for (int i = 0; i < globalHistory.Count; i++)
@@ -226,6 +235,7 @@ namespace Assets.SEE.Utils
 
         /// <summary>
         /// Undoes the last action with an effect of a specific player.
+        /// If an undo isnt possible or no one is remaining the user gets an notification.
         /// </summary>
         public void Undo()
         {
@@ -273,6 +283,7 @@ namespace Assets.SEE.Utils
 
         /// <summary>
         /// Redoes the last undone action of a specific player.
+        /// If an redo isnt possible or no one is remaining the user gets an notification.
         /// </summary>
         public void Redo()
         {

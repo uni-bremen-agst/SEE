@@ -80,7 +80,7 @@ namespace SEE.Net
                 }
                 else if (mode == Mode.delete)
                 {
-                    GlobalActionHistory.DeleteItem(actionId, false);
+                    GlobalActionHistory.DeleteItem(actionId);
                 }
                 else if (mode == Mode.replace)
                 {
@@ -121,6 +121,11 @@ namespace SEE.Net
         /// <summary>
         /// Updates an entry through all clients.
         /// </summary>
+        /// <param name="oldType">The type old item.</param>
+        /// <param name="id">The id of the items.</param>
+        /// <param name="oldChangedObjects">The changedObjects from the old item.</param>
+        /// <param name="newType">The type of the new item.</param>
+        /// <param name="newChangedObjects">The changedObjects of the new item.</param>
         public void Replace(ActionHistory.HistoryType oldType, string id, string oldChangedObjects, ActionHistory.HistoryType newType, string newChangedObjects)
         {
             oldItem = new Tuple<bool, HistoryType, string, List<string>>(false, oldType, id, StringToList(oldChangedObjects));
