@@ -8,6 +8,26 @@ using UnityEngine;
 public class NodeDecorationController : MonoBehaviour
 {
     /// <summary>
+    /// Whether or not the block contains other nodes 
+    /// </summary>
+    public bool foldedBlock = false;
+
+    /// <summary>
+    /// Enables debug and runs tests
+    /// </summary>
+    public bool debug = false;
+
+    /// <summary>
+    /// Number of rows for test block
+    /// </summary>
+    public int testBlockRowCount;
+
+    /// <summary>
+    /// Number of columns for test block
+    /// </summary>
+    public int testBlockColumnCount;
+
+    /// <summary>
     /// The gameNode to be decorated
     /// </summary>
     public GameObject nodeObject;
@@ -176,7 +196,7 @@ public class NodeDecorationController : MonoBehaviour
         switch (selectedRoofType)
         {
             case RoofType.Tetrahedron:
-                GameObject tetrahedron = createFourFacedTetrahedron(roofSizeX, roofHeight, roofSizeZ);
+                GameObject tetrahedron = createPyramid(roofSizeX, roofHeight, roofSizeZ);
                 tetrahedron.transform.SetParent(nodeObject.transform);
                 // Move tetrahedron to top of building, tetrahedron is moved with the bottom left corner
                 tetrahedron.transform.position = new Vector3(nodeLocation.x - roofSizeX / 2, nodeSize.y / 2 + nodeLocation.y, nodeLocation.z - roofSizeZ / 2);
@@ -226,10 +246,10 @@ public class NodeDecorationController : MonoBehaviour
 
     /// <summary>
     /// <author name="Leonard Haddad"/>
-    /// Generates a 4-faced tetrahedron at the given coordinates
+    /// Generates a 4-faced pyramid at the given coordinates
     /// Inspired by an article by <a href="https://blog.nobel-joergensen.com/2010/12/25/procedural-generated-mesh-in-unity/">Morten Nobel-Jørgensen</a>,
     /// </summary>
-    public GameObject createFourFacedTetrahedron(float sizeX, float height, float sizeZ)
+    public GameObject createPyramid(float sizeX, float height, float sizeZ)
     {
         GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
         go.name = "Tetrahedron";
@@ -323,7 +343,7 @@ public class NodeDecorationController : MonoBehaviour
         // 16 - 11 >=? 4 -> if yes then the last row is empty and can be removed. Note that 9 blocks will create a 3x3 grid
         if (blocksHorizontalAxis * blocksVerticalAxis - hiddenObjects.Count >= blocksVerticalAxis)
         {
-            blocksHorizontalAxis -= 1;
+            blocksVerticalAxis -= 1;
         }
 
         // Add empty gameobject children to identify different clones
@@ -352,9 +372,12 @@ public class NodeDecorationController : MonoBehaviour
 
         // Create gameobject clones and set them on the walls of the packed block
         List <GameObject> clones = new List<GameObject>();
+        float maxCloneWidthZ = (packedBlockDimensions.z - freeSpaceZ * (blocksHorizontalAxis + 1)) / blocksHorizontalAxis; 
+        float maxCloneWidthX = (packedBlockDimensions.x - freeSpaceX * (blocksHorizontalAxis + 1)) / blocksHorizontalAxis;
+        float maxCloneHeightY = (packedBlockDimensions.y - freeSpaceY * (blocksVerticalAxis + 1)) / blocksVerticalAxis;
         foreach (GameObject o in hiddenObjects)
         {
-            // Block height percentage - in contrast to total height
+            // Block height percentage - in contrast to total height, used for scaling the clone
             float blockHeightPercentage = o.transform.localScale.y / totalBlocksHeight;
 
             // Create positive north clone
@@ -386,8 +409,21 @@ public class NodeDecorationController : MonoBehaviour
     void Start()
     {
         fetchNodeDetails();
-        renderLobby();
-        renderRoof();
+        if (!foldedBlock)
+        {
+            renderLobby();
+            renderRoof();
+        }
+        else
+        {
+            if (debug)
+            {
+                testImplementation(testBlockColumnCount, testBlockRowCount);
+            }
+            else {
+                // TODO add decoration call here
+            }
+        }
     }
 
     // Update is called once per frame
@@ -402,15 +438,29 @@ public class NodeDecorationController : MonoBehaviour
                 Destroy(nodeObject.transform.GetChild(i).gameObject);
             }
             fetchNodeDetails();
-            renderLobby();
-            renderRoof();
+            if (!foldedBlock)
+            {
+                renderLobby();
+                renderRoof();
+            }
+            else
+            {
+                if (debug)
+                {
+                    testImplementation(testBlockColumnCount, testBlockRowCount);
+                }
+                else
+                {
+                    // TODO add decoration call
+                }
+            }
         }
     }
 
     /// <summary>
     /// Test the block decoration implementation both visually and mathematically
     /// </summary>
-    private void testImplementation()
+    private void testImplementation(int columns, int rows)
     {
         List<GameObject> childNodes = new List<GameObject>();
         // Free space inbetween child nodes
@@ -421,7 +471,7 @@ public class NodeDecorationController : MonoBehaviour
         {
             GameObject o = GameObject.CreatePrimitive(PrimitiveType.Cube);
             // Gamenodes will be laid out as 4x3 graph while testing
-            Vector3 childNodeDimensions = new Vector3(nodeSize.x / 4 - 5f * freeSpaceX, Random.Range(0.01f * nodeSize.y, nodeSize.y), nodeSize.z / 3 - 5f * freeSpaceZ);
+            Vector3 childNodeDimensions = new Vector3((nodeSize.x - 5f * freeSpaceX) / rows, Random.Range(0.01f * nodeSize.y, nodeSize.y), (nodeSize.z - 5f * freeSpaceZ) / columns);
             o.transform.localScale = childNodeDimensions;
             o.name = i.ToString();
             o.GetComponent<Renderer>().material.color = Color.red;
@@ -439,9 +489,9 @@ public class NodeDecorationController : MonoBehaviour
         float currentLocationX = parentNodeLowX + freeSpaceX;
         float currentLocationZ = parentNodeLowZ + freeSpaceZ;
         float childWidthX = nodeSize.x / 4 - 5f * freeSpaceX;
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < rows; i++)
         {
-            for (int j = 0; j < 3; j++)
+            for (int j = 0; j < columns; j++)
             {
                 GameObject currentChild = childNodes[currentListIndex];
                 // Location for current child
