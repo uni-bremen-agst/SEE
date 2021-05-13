@@ -6,7 +6,7 @@ using Antlr4.Runtime;
 namespace SEE.Game.UI.CodeWindow
 {
     /// <summary>
-    /// Represents a language a <see cref="SEETokenType"/> is in.
+    /// Represents a language a <see cref="SEEToken.Type"/> is in.
     /// Symbolic names for the antlr lexer are specified here.
     /// </summary>
     public class TokenLanguage
@@ -81,7 +81,7 @@ namespace SEE.Game.UI.CodeWindow
         #region Java Language
 
         /// <summary>
-        /// Name of the antlr grammar lexer.
+        /// Name of the Java antlr grammar lexer.
         /// </summary>
         private const string javaFileName = "Java9Lexer.g4";
 
@@ -141,7 +141,7 @@ namespace SEE.Game.UI.CodeWindow
         #region C# Language
 
         /// <summary>
-        /// Name of the antlr grammar lexer.
+        /// Name of the C# antlr grammar lexer.
         /// </summary>
         private const string cSharpFileName = "CSharpLexer.g4";
 
@@ -158,6 +158,7 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         private static readonly HashSet<string> cSharpKeywords = new HashSet<string>
         {
+            // General keywords
             "ABSTRACT", "ADD", "ALIAS", "ARGLIST", "AS", "ASCENDING", "ASYNC", "AWAIT", "BASE", "BOOL", "BREAK", "BY",
             "BYTE", "CASE", "CATCH", "CHAR", "CHECKED", "CLASS", "CONST", "CONTINUE", "DECIMAL", "DEFAULT", "DELEGATE",
             "DESCENDING", "DO", "DOUBLE", "DYNAMIC", "ELSE", "ENUM", "EQUALS", "EVENT", "EXPLICIT", "EXTERN", "FALSE",
@@ -167,37 +168,62 @@ namespace SEE.Game.UI.CodeWindow
             "PUBLIC", "READONLY", "REF", "REMOVE","RETURN", "SBYTE", "SEALED", "SELECT", "SET", "SHORT", "SIZEOF",
             "STACKALLOC", "STATIC", "STRING", "STRUCT", "SWITCH", "THIS", "THROW", "TRUE", "TRY", "TYPEOF", "UINT",
             "ULONG", "UNCHECKED", "UNMANAGED", "UNSAFE", "USHORT", "USING", "VAR", "VIRTUAL", "VOID", "VOLATILE", "WHEN",
-            "WHERE", "WHILE", "YIELD"
+            "WHERE", "WHILE", "YIELD", "SHARP",
+            // Directive keywords (anything within a directive is treated as a keyword, similar to IDEs
+            "DIRECTIVE_TRUE", "DIRECTIVE_FALSE", "DEFINE", "UNDEF", "DIRECTIVE_IF",
+            "ELIF", "DIRECTIVE_ELSE", "ENDIF", "LINE", "ERROR", "WARNING", "REGION", "ENDREGION", "PRAGMA", "NULLABLE", 
+            "DIRECTIVE_DEFAULT", "DIRECTIVE_HIDDEN", "DIRECTIVE_OPEN_PARENS", "DIRECTIVE_CLOSE_PARENS", "DIRECTIVE_BANG",
+            "DIRECTIVE_OP_EQ", "DIRECTIVE_OP_NE", "DIRECTIVE_OP_AND", "DIRECTIVE_OP_OR", "CONDITIONAL_SYMBOL"
         };
         /// <summary>
         /// Set of antlr type names for CSharp integer and floating point literals.
         /// </summary>
-        private static readonly HashSet<string> cSharpNumbers = new HashSet<string> { "LITERAL_ACCES", "INTEGER_LITERAL", "HEX_INTEGER_LITERAL", "BIN_INTEGER_LITERAL", "REAL_LITERAL" };
+        private static readonly HashSet<string> cSharpNumbers = new HashSet<string> { 
+            "LITERAL_ACCESS", "INTEGER_LITERAL", "HEX_INTEGER_LITERAL", "BIN_INTEGER_LITERAL", "REAL_LITERAL", "DIGITS"
+        };
         /// <summary>Set of antlr type names for CSharp character and string literals.</summary>
-        private static readonly HashSet<string> cSharpStrings = new HashSet<string> { "CHARACTER_LITERAL", "REGULAR_STRING", "VERBATIUM_STRING", "INTERPOLATED_REGULAR_STRING_STAR",
-            "INTERPOLATED_VERBATIUM_STRING_START"};
+        private static readonly HashSet<string> cSharpStrings = new HashSet<string> { 
+            "CHARACTER_LITERAL", "REGULAR_STRING", "VERBATIUM_STRING", "INTERPOLATED_REGULAR_STRING_START",
+            "INTERPOLATED_VERBATIUM_STRING_START", "VERBATIUM_DOUBLE_QUOTE_INSIDE",
+            "DOUBLE_QUOTE_INSIDE", "REGULAR_STRING_INSIDE", "VERBATIUM_INSIDE_STRING"
+        };
         /// <summary>Set of antlr type names for CSharp separators and operators.</summary>
-        private static readonly HashSet<string> cSharpPunctuation = new HashSet<string> { "OPEN_BRACE", "CLOSE_BRACE", "OPEN_BRACKET",
+        private static readonly HashSet<string> cSharpPunctuation = new HashSet<string> { 
+            "OPEN_BRACE", "CLOSE_BRACE", "OPEN_BRACKET",
             "CLOSE_BRACKET", "OPEN_PARENS", "CLOSE_PARENS", "DOT", "COMMA", "COLON", "SEMICOLON", "PLUS", "MINUS", "STAR", "DIV",
             "PERCENT", "AMP", "BITWISE_OR", "CARET", "BANG", "TILDE", "ASSIGNMENT", "LT", "GT", "INTERR", "DOUBLE_COLON",
             "OP_COALESCING", "OP_INC", "OP_DEC", "OP_AND", "OP_OR", "OP_PTR", "OP_EQ", "OP_NE", "OP_LE", "OP_GE", "OP_ADD_ASSIGNMENT",
             "OP_SUB_ASSIGNMENT", "OP_MULT_ASSIGNMENT", "OP_DIV_ASSIGNMENT", "OP_MOD_ASSIGNMENT", "OP_AND_ASSIGNMENT", "OP_OR_ASSIGNMENT",
-            "OP_XOR_ASSIGNMENT", "OP_LEFT_SHIFT", "OP_LEFT_SHIFT_ASSIGNMENT", "OP_COALESCING_ASSIGNMENT", "OP_RANGE"
+            "OP_XOR_ASSIGNMENT", "OP_LEFT_SHIFT", "OP_LEFT_SHIFT_ASSIGNMENT", "OP_COALESCING_ASSIGNMENT", "OP_RANGE",
+            "DOUBLE_CURLY_INSIDE", "OPEN_BRACE_INSIDE", "REGULAR_CHAR_INSIDE"
         };
         /// <summary>Set of antlr type names for CSharp identifiers.</summary>
-        private static readonly HashSet<string> cSharpIdentifiers = new HashSet<string> { "Identifier" };
+        private static readonly HashSet<string> cSharpIdentifiers = new HashSet<string>
+        {
+            "IDENTIFIER", "TEXT"
+        };
         /// <summary>
         /// Set of antlr type names for CSharp whitespace.
         /// </summary>
-        private static readonly HashSet<string> cSharpWhitespace = new HashSet<string> { "WHITESPACES" };
+        private static readonly HashSet<string> cSharpWhitespace = new HashSet<string>
+        {
+            "WHITESPACES", "DIRECTIVE_WHITESPACES"
+        };
         /// <summary>
         /// Set of antlr type names for CSharp newlines.
         /// </summary>
-        private static readonly HashSet<string> cSharpNewlines = new HashSet<string> { "NL" };
+        private static readonly HashSet<string> cSharpNewlines = new HashSet<string>
+        {
+            "NL", "TEXT_NEW_LINE", "DIRECTIVE_NEW_LINE"
+        };
         /// <summary>
         /// Set of antlr type names for Java comments.
         /// </summary>
-        private static readonly HashSet<string> cSharpComments = new HashSet<string> { "SINGLE_LINE_DOC_COMMENT", "DELIMITED_DOC_COMMENT", "SINGLE_LINE_COMMENT", "DELIMITED_COMMENT" };
+        private static readonly HashSet<string> cSharpComments = new HashSet<string>
+        {
+            "SINGLE_LINE_DOC_COMMENT", "DELIMITED_DOC_COMMENT", "SINGLE_LINE_COMMENT", "DELIMITED_COMMENT",
+            "DIRECTIVE_SINGLE_LINE_COMMENT"
+        };
         
 
         #endregion
@@ -216,7 +242,7 @@ namespace SEE.Game.UI.CodeWindow
             javaStrings, javaPunctuation, javaIdentifiers, javaWhitespace, javaNewlines, javaComments);
 
         /// <summary>
-        /// Token Language for Java.
+        /// Token Language for C#.
         /// </summary>
         public static readonly TokenLanguage CSharp = new TokenLanguage(cSharpFileName, cSharpExtensions, cSharpKeywords, cSharpNumbers,
             cSharpStrings, cSharpPunctuation, cSharpIdentifiers, cSharpWhitespace, cSharpNewlines, cSharpComments);
@@ -248,6 +274,10 @@ namespace SEE.Game.UI.CodeWindow
             {
                 throw new ArgumentException("Lexer file name and file extensions must be unique per language!");
             }
+            if (AnyOverlaps())
+            {
+                throw new ArgumentException("Symbolic names may not appear in more than one set each!");
+            }
             LexerFileName = lexerFileName;
             FileExtensions = fileExtensions;
             Keywords = keywords;
@@ -261,6 +291,14 @@ namespace SEE.Game.UI.CodeWindow
             TabWidth = tabWidth;
             
             AllTokenLanguages.Add(this);
+
+            // Check whether any of the symbolic names are used twice
+            bool AnyOverlaps()
+            {
+                return keywords.Intersect(numberLiterals).Intersect(stringLiterals).Intersect(punctuation)
+                               .Intersect(identifiers).Intersect(whitespace).Intersect(newline)
+                               .Intersect(comments).Any();
+            }
         }
 
         /// <summary>
@@ -300,15 +338,12 @@ namespace SEE.Game.UI.CodeWindow
         public Lexer CreateLexer(string content)
         {
             ICharStream input = CharStreams.fromString(content);
-            if (LexerFileName.Equals(javaFileName))
+            return LexerFileName switch
             {
-                return new Java9Lexer(input);
-            } else if (LexerFileName.Equals(cSharpFileName))
-            {
-                return new CSharpLexer(input);
-            }
-
-            throw new InvalidOperationException("No lexer defined for this language yet.");
+                javaFileName => new Java9Lexer(input),
+                cSharpFileName => new CSharpLexer(input),
+                _ => throw new InvalidOperationException("No lexer defined for this language yet.")
+            };
         }
 
         /// <summary>
