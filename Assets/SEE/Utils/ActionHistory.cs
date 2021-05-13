@@ -338,14 +338,14 @@ namespace Assets.SEE.Utils
         }
 
         /// <summary>
-        /// Returns the last action on the <see cref="UndoStack"/> that
+        /// Returns the last action on the <see cref="UndoHistory"/> that
         /// has had any effect (preliminary or complete) or null if there is
         /// no such action. 
         /// 
-        /// Side effect: All actions at the top of the <see cref="UndoStack"/> 
+        /// Side effect: All actions at the top of the <see cref="UndoHistory"/> 
         /// are popped off.
         /// </summary>
-        /// <returns>the last action on the <see cref="UndoStack"/> that
+        /// <returns>the last action on the <see cref="UndoHistory"/> that
         /// has had any effect (preliminary or complete) or null<</returns>
         private ReversibleAction LastActionWithEffect()
         {
@@ -405,17 +405,6 @@ namespace Assets.SEE.Utils
                 return result.Substring(0, result.Length - 1);
             }
             else return null;
-        }
-
-        /// <summary>
-        /// Thrown in case of an empty history.
-        /// </summary>
-        public class EmptyHistoryException : Exception
-        {
-            public EmptyHistoryException()
-            {
-
-            }
         }
     }
 }
