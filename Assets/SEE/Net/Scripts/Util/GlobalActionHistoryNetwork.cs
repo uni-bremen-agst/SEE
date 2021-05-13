@@ -40,12 +40,12 @@ namespace SEE.Net
         /// <summary>
         /// The old item which has to be replaced.
         /// </summary>
-        Tuple<bool, HistoryType, string, List<string>> oldItem;
+        public Tuple<bool, HistoryType, string, List<string>> oldItem;
 
         /// <summary>
         /// The new item which is replacing the old.
         /// </summary>
-        Tuple<bool, HistoryType, string, List<string>> newItem;
+        public Tuple<bool, HistoryType, string, List<string>> newItem;
 
         public GlobalActionHistoryNetwork() 
         {
