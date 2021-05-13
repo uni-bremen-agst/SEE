@@ -204,7 +204,6 @@ namespace SEE.Controls.Actions
             {
                 gameObjectID
             };
-
             return changedObjects;
         }
 

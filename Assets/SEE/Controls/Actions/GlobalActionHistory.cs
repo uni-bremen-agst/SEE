@@ -60,6 +60,12 @@ namespace SEE.Controls.Actions
             history.Push(action);
         }
 
+        /// <summary>
+        /// Replaces a item in the globalHistory.
+        /// </summary>
+        /// <param name="oldItem">the item that should be replaced.</param>
+        /// <param name="newItem">the new item inserted instead.</param>
+        /// <param name="isNetwork">true, if the call comes from another client through the network, else false.</param>
         public static void Replace(Tuple<bool, HistoryType, string, List<string>> oldItem, Tuple<bool, HistoryType, string, List<string>> newItem, bool isNetwork)
         {
             history.Replace(oldItem, newItem, isNetwork);
@@ -69,7 +75,7 @@ namespace SEE.Controls.Actions
         /// Deletes an item from the action list depending on its id.
         /// </summary>
         /// <param name="id">the id of the action which should be deleted</param>
-        public static void DeleteItem(string id, bool isOwner)
+        public static void DeleteItem(string id)
         {
             history.DeleteItem(id);
         }
