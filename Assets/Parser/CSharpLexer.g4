@@ -243,7 +243,7 @@ OP_RANGE:                 '..';
 mode INTERPOLATION_STRING;
 
 DOUBLE_CURLY_INSIDE:           '{{';
-OPEN_BRACE_INSIDE:             '{' { curlyLevels.Push(1); } -> skip, pushMode(DEFAULT_MODE);
+OPEN_BRACE_INSIDE:             '{' { curlyLevels.Push(1); } -> pushMode(DEFAULT_MODE);
 REGULAR_CHAR_INSIDE:           { !verbatium }? SimpleEscapeSequence;
 VERBATIUM_DOUBLE_QUOTE_INSIDE: {  verbatium }? '""';
 DOUBLE_QUOTE_INSIDE:           '"' { interpolatedStringLevel--; interpolatedVerbatiums.Pop();
@@ -254,12 +254,12 @@ VERBATIUM_INSIDE_STRING:       {  verbatium }? ~('{' | '"')+;
 mode INTERPOLATION_FORMAT;
 
 DOUBLE_CURLY_CLOSE_INSIDE:      '}}' -> type(FORMAT_STRING);
-CLOSE_BRACE_INSIDE:             '}' { curlyLevels.Pop(); }   -> skip, popMode;
+CLOSE_BRACE_INSIDE:             '}' { curlyLevels.Pop(); }   -> popMode;
 FORMAT_STRING:                  ~'}'+;
 
 mode DIRECTIVE_MODE;
 
-DIRECTIVE_WHITESPACES:         Whitespace+                      -> channel(HIDDEN);
+DIRECTIVE_WHITESPACES:         Whitespace+                      -> channel(DIRECTIVE);
 DIGITS:                        [0-9]+                           -> channel(DIRECTIVE);
 DIRECTIVE_TRUE:                'true'                           -> channel(DIRECTIVE), type(TRUE);
 DIRECTIVE_FALSE:               'false'                          -> channel(DIRECTIVE), type(FALSE);
