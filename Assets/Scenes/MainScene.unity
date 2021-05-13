@@ -9993,6 +9993,7 @@ GameObject:
   - component: {fileID: 4505405447454905641}
   - component: {fileID: 4505405447454905640}
   - component: {fileID: 4505405447454905648}
+  - component: {fileID: 4505405447454905649}
   m_Layer: 0
   m_Name: PersonalAssistant
   m_TagString: Untagged
@@ -12109,7 +12110,7 @@ MonoBehaviour:
   randomHoldDurationMax: 0.5
   configReady: 1
   warnOnNullRefs: 1
-  inspSalsaLinked: 1
+  inspSalsaLinked: 0
   inspStateFoldoutProcessing: 0
   inspStateFoldoutSettings: 0
   inspStateFoldoutEmotes: 0
@@ -14876,6 +14877,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad2cd940fecf01c4eb252fc5adffd870, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4505405447454905649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4505405447454905637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ab3138f47a2e8541a485469328ce4c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GrammarFilePath: C:/Users/koschke/SEA.new/Assets/StreamingAssets/PersonalAssistantGrammar.grxml
 --- !u!4 &4505405447455184589
 Transform:
   m_ObjectHideFlags: 0
