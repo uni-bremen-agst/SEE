@@ -291,7 +291,7 @@ namespace Assets.SEE.Utils
             }
             else
             {
-                if(LastAction != null) LastAction.Stop(); //FIXME: SOLLTE HIER NACH UNDENDLICH VIELEN UNDOS NICHT FLIEGEN
+                if(LastAction != null) LastAction.Stop(); 
                 if (ActionHasConflicts(lastUndoneAction.Item4, lastUndoneAction.Item3))
                 {
                     RedoHistory.Pop();
