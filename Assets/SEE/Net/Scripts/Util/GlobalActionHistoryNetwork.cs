@@ -74,9 +74,19 @@ namespace SEE.Net
         {
             if (!IsRequester())
             {
-                if (mode == Mode.push) GlobalActionHistory.Push(new Tuple<bool, ActionHistory.HistoryType, string, List<string>>(false, type, actionId, changedObjects));
-                else if (mode == Mode.delete) GlobalActionHistory.DeleteItem(actionId, false);
-                else if (mode == Mode.replace) GlobalActionHistory.Replace(oldItem, newItem, true);
+                if (mode == Mode.push)
+                {
+                    GlobalActionHistory.Push(new Tuple<bool, ActionHistory.HistoryType, string, List<string>>(false, type, actionId, changedObjects));
+                    UnityEngine.Debug.LogWarning("PUSSSH");
+                }
+                else if (mode == Mode.delete)
+                {
+                    GlobalActionHistory.DeleteItem(actionId, false);
+                }
+                else if (mode == Mode.replace)
+                {
+                    GlobalActionHistory.Replace(oldItem, newItem, true);
+                }
                 mode = Mode.init;
             }
         }
