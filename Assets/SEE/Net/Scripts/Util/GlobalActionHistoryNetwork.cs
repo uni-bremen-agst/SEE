@@ -37,6 +37,8 @@ namespace SEE.Net
         /// </summary>
         public bool delete = false;
 
+        public bool replace = false;
+
         /// <summary>
         /// The old item which has to be replaced.
         /// </summary>
@@ -69,7 +71,8 @@ namespace SEE.Net
             {
                 if (push) GlobalActionHistory.Push(new Tuple<bool, ActionHistory.HistoryType, string, List<string>>(false, type, actionId, changedObjects));
                 else if (delete) GlobalActionHistory.DeleteItem(actionId, false);
-                else GlobalActionHistory.Replace(oldItem, newItem, true);
+                else if (replace) GlobalActionHistory.Replace(oldItem, newItem, true);
+                else UnityEngine.Debug.Log("Sollte nicht erreicht werden");
             }
         }
 
@@ -108,6 +111,7 @@ namespace SEE.Net
             newItem = new Tuple<bool, HistoryType, string, List<string>>(false, newType, id, StringToList(newChangedObjects));
             push = false;
             delete = false;
+            replace = true;
             Execute(null);
         }
 
