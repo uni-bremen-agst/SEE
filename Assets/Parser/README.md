@@ -1,4 +1,4 @@
-﻿# Adding a new grammar
+# Adding a new grammar
 It's recommended to use the grammar's from [this repository](https://github.com/antlr/grammars-v4).
 The repository is very extensive and should cover any required languages.
 
@@ -17,14 +17,14 @@ The java9 lexer grammar will be used as an example below.
 If any of these conditions aren't true, please edit the grammar accordingly:
 - No rule must resolve to `skip` or `channel(HIDDEN)`.
   - Example: 
-  ```antlrv4
+  ```antlr
   COMMENT : '/*' .*? '*/' -> channel(HIDDEN);
   // this should be changed to the following instead:
   COMMENT : '/*' .*? '*/';
   ```
 - There must be separate rules for whitespace and newlines.
   - Example (note that all three possible types of newlines must be accounted for):
-  ```antlrv4
+  ```antlr
   WS : [ \t\r\n\u000C]+;
   // this should be changed to the following instead:
   WS : [ \t\u000C]+;
