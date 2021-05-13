@@ -169,9 +169,9 @@ namespace Assets.SEE.Utils
         /// </summary>
         /// <param name="affectedGameObjects">the gameObjects affected by the action to be undone/redone.</param>
         /// <returns>true, if there are conflicts, else false</returns>
-        private bool ActionHasConflicts(List<string> affectedGameObjects)
+        private bool ActionHasConflicts(List<string> affectedGameObjects, string actionId )
         {
-            int index = GetIndexOfAction(LastAction.GetId());
+            int index = GetIndexOfAction(actionId);
             if (index == -1)
             {
                 return false;
@@ -248,7 +248,7 @@ namespace Assets.SEE.Utils
 
             Tuple<bool, HistoryType, string, List<string>> lastAction = globalHistory[GetIndexOfAction(current.GetId())];
 
-            if (ActionHasConflicts(current.GetChangedObjects()))
+            if (ActionHasConflicts(current.GetChangedObjects(), current.GetId()))
             {
                 ShowNotification.Error("Error:", "Undo not possible, someone else had made a change on the same object!");
                 Replace(lastAction, new Tuple<bool, HistoryType, string, List<string>>(false, HistoryType.undoneAction, lastAction.Item3, lastAction.Item4), false);
@@ -292,7 +292,7 @@ namespace Assets.SEE.Utils
             else
             {
                 if(LastAction != null) LastAction.Stop(); //FIXME: SOLLTE HIER NACH UNDENDLICH VIELEN UNDOS NICHT FLIEGEN
-                if (ActionHasConflicts(lastUndoneAction.Item4))
+                if (ActionHasConflicts(lastUndoneAction.Item4, lastUndoneAction.Item3))
                 {
                     RedoHistory.Pop();
                     Replace(lastUndoneAction, new Tuple<bool, HistoryType, string, List<string>>(false, HistoryType.undoneAction, lastUndoneAction.Item3, lastUndoneAction.Item4), false);
