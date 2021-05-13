@@ -2,6 +2,7 @@
 using System.Text;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
+using static UnityEngine.Windows.Speech.PhraseRecognizer;
 
 namespace SEE.Controls
 {
@@ -32,63 +33,32 @@ namespace SEE.Controls
         private GrammarRecognizer recognizer;
 
         /// <summary>
-        /// Path to the grammar file.
+        /// Sets up and starts the grammar recognizer.
         /// </summary>
-        private readonly string grammarFilePath = Application.streamingAssetsPath + "/PersonalAssistantGrammar.grxml";
-
-        private void Start()
+        /// <param name="grammarFilePath">path to the SRGS grammar file</param>
+        public GrammarInput(string grammarFilePath)
         {
-            try
-            {
-                recognizer = new GrammarRecognizer(grammarFilePath);
-                recognizer.OnPhraseRecognized += OnPhraseRecognized;
-                recognizer.Start();
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"Exception occured when loading grammar from {grammarFilePath}: {e.Message}\n");
-                enabled = false;
-            }
+            recognizer = new GrammarRecognizer(grammarFilePath);            
+            recognizer.Start();
         }
 
-        private void OnPhraseRecognized(PhraseRecognizedEventArgs args)
-        {            
-            Debug.Log($"Phrase detected phrase '{args.text}' with confidence {args.confidence}\n");
-            SemanticMeaning[] meanings = args.semanticMeanings;
-            if (meanings != null)
-            {
-                foreach (SemanticMeaning meaning in meanings)
-                {
-                    Debug.Log($"Meaning: {meaning.key} => {ToString(meaning.values)}\n");
-                }
-            }
+        public void Register(PhraseRecognizedDelegate phraseRecognizedDelegate)
+        {
+            recognizer.OnPhraseRecognized += phraseRecognizedDelegate;
+        }
+
+        public void Unregister(PhraseRecognizedDelegate phraseRecognizedDelegate)
+        {
+            recognizer.OnPhraseRecognized -= phraseRecognizedDelegate;
         }
 
         /// <summary>
-        /// Returns the concatenation of all <paramref name="values"/> (separated by
-        /// a blank). Can be used for debugging.
+        /// Shuts down this GrammarInput.
         /// </summary>
-        /// <param name="values"></param>
-        /// <returns>concatenation of all <paramref name="values"/></returns>
-        private string ToString(string[] values)
-        {           
-            StringBuilder builder = new StringBuilder();
-            foreach (string value in values)
-            {
-                builder.Append(value + " ");
-            }
-            return builder.ToString();
-        }
-
-        /// <summary>
-        /// Shuts down <see cref="recognizer"/>.
-        /// Called by Unity when the application closes.
-        /// </summary>
-        private void OnApplicationQuit()
+        public void Close()
         {
             if (recognizer != null && recognizer.IsRunning)
             {
-                recognizer.OnPhraseRecognized -= OnPhraseRecognized;
                 recognizer.Stop();
             }
         }
