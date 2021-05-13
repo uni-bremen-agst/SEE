@@ -12,6 +12,16 @@ namespace SEE.Game.UI.CodeWindow
     public class TokenLanguage
     {
         /// <summary>
+        /// Default number of spaces a tab is equivalent to.
+        /// </summary>
+        private const int DEFAULT_TAB_WIDTH = 4;
+
+        /// <summary>
+        /// Language-independent symbolic name for the end of file token.
+        /// </summary>
+        private const string EOF = "EOF";
+        
+        /// <summary>
         /// File extensions which apply for the given language.
         /// May not intersect any other languages file extensions.
         /// </summary>
@@ -21,13 +31,17 @@ namespace SEE.Game.UI.CodeWindow
         /// Name of the antlr lexer file the keywords were taken from.
         /// </summary>
         public string LexerFileName { get; }
-        
+
         /// <summary>
         /// Number of spaces equivalent to a tab in this language.
+        /// If not specified, this will be <see cref="DEFAULT_TAB_WIDTH"/>.
         /// </summary>
-        private int TabWidth { get; }
-        //TODO: Actually use this
-        //TODO: Add set for comments, and add a corresponding type to SEEToken
+        public int TabWidth { get; }
+        
+        /// <summary>
+        /// Symbolic names for comments of a language, including block, line, and documentation comments.
+        /// </summary>
+        public ISet<string> Comments { get; }
 
         /// <summary>
         /// Symbolic names for keywords of a language. This also includes boolean literals and null literals.
@@ -116,6 +130,11 @@ namespace SEE.Game.UI.CodeWindow
         /// Set of antlr type names for Java newlines.
         /// </summary>
         private static readonly HashSet<string> javaNewlines = new HashSet<string> { "NEWLINE" };
+        /// <summary>
+        /// Set of antlr type names for Java comments.
+        /// </summary>
+        private static readonly HashSet<string> javaComments = new HashSet<string> { "COMMENT", "LINE_COMMENT" };
+
 
         #endregion
 
@@ -175,6 +194,11 @@ namespace SEE.Game.UI.CodeWindow
         /// Set of antlr type names for CSharp newlines.
         /// </summary>
         private static readonly HashSet<string> cSharpNewlines = new HashSet<string> { "NL" };
+        /// <summary>
+        /// Set of antlr type names for Java comments.
+        /// </summary>
+        private static readonly HashSet<string> cSharpComments = new HashSet<string> { "SINGLE_LINE_DOC_COMMENT", "DELIMITED_DOC_COMMENT", "SINGLE_LINE_COMMENT", "DELIMITED_COMMENT" };
+        
 
         #endregion
 
@@ -189,13 +213,13 @@ namespace SEE.Game.UI.CodeWindow
         /// Token Language for Java.
         /// </summary>
         public static readonly TokenLanguage Java = new TokenLanguage(javaFileName, javaExtensions, javaKeywords, javaNumbers,
-            javaStrings, javaPunctuation, javaIdentifiers, javaWhitespace, javaNewlines);
+            javaStrings, javaPunctuation, javaIdentifiers, javaWhitespace, javaNewlines, javaComments);
 
         /// <summary>
         /// Token Language for Java.
         /// </summary>
         public static readonly TokenLanguage CSharp = new TokenLanguage(cSharpFileName, cSharpExtensions, cSharpKeywords, cSharpNumbers,
-            cSharpStrings, cSharpPunctuation, cSharpIdentifiers, cSharpWhitespace, cSharpNewlines);
+            cSharpStrings, cSharpPunctuation, cSharpIdentifiers, cSharpWhitespace, cSharpNewlines, cSharpComments);
 
 
         #endregion
@@ -213,9 +237,12 @@ namespace SEE.Game.UI.CodeWindow
         /// <param name="identifiers">Identifiers for this language</param>
         /// <param name="whitespace">Whitespace for this language</param>
         /// <param name="newline">Newlines for this language</param>
+        /// <param name="comments">Comments for this language</param>
+        /// <param name="tabWidth">Number of spaces a tab is equivalent to</param>
         private TokenLanguage(string lexerFileName, ISet<string> fileExtensions, ISet<string> keywords, 
                               ISet<string> numberLiterals, ISet<string> stringLiterals, ISet<string> punctuation,
-                              ISet<string> identifiers, ISet<string> whitespace, ISet<string> newline)
+                              ISet<string> identifiers, ISet<string> whitespace, ISet<string> newline,
+                              ISet<string> comments, int tabWidth = DEFAULT_TAB_WIDTH)
         {
             if (AllTokenLanguages.Any(x => x.LexerFileName.Equals(lexerFileName) || x.FileExtensions.Overlaps(fileExtensions)))
             {
@@ -230,6 +257,8 @@ namespace SEE.Game.UI.CodeWindow
             Identifiers = identifiers;
             Whitespace = whitespace;
             Newline = newline;
+            Comments = comments;
+            TabWidth = tabWidth;
             
             AllTokenLanguages.Add(this);
         }
@@ -270,12 +299,13 @@ namespace SEE.Game.UI.CodeWindow
         /// <exception cref="InvalidOperationException">If no lexer is defined for this language.</exception>
         public Lexer CreateLexer(string content)
         {
+            ICharStream input = CharStreams.fromString(content);
             if (LexerFileName.Equals(javaFileName))
             {
-                return new Java9Lexer(CharStreams.fromString(content));
+                return new Java9Lexer(input);
             } else if (LexerFileName.Equals(cSharpFileName))
             {
-                return new CSharpLexer(CharStreams.fromString(content));
+                return new CSharpLexer(input);
             }
 
             throw new InvalidOperationException("No lexer defined for this language yet.");
@@ -292,7 +322,7 @@ namespace SEE.Game.UI.CodeWindow
         {
             // We go through each category and check whether it contains the token.
             // I know that this looks like it may be abstracted because the same thing is done on different objects
-            // in succession, but due to the usage of nameof() a refactoring of this kind would break this.
+            // in succession, but due to the usage of nameof() a refactoring of this kind would break it.
             if (Keywords.Contains(token))
             {
                 return nameof(Keywords);
@@ -313,6 +343,10 @@ namespace SEE.Game.UI.CodeWindow
             {
                 return nameof(Identifiers);
             }
+            if (Comments.Contains(token))
+            {
+                return nameof(Comments);
+            }
             if (Whitespace.Contains(token))
             {
                 return nameof(Whitespace);
@@ -321,8 +355,7 @@ namespace SEE.Game.UI.CodeWindow
             {
                 return nameof(Newline);
             }
-
-            return null;
+            return EOF.Equals(token) ? nameof(EOF) : null;
         }
     }
 }
