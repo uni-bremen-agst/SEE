@@ -16,7 +16,7 @@ namespace SEE.Net
         /// <summary>
         /// The state which determines which action should be performed.
         /// </summary>
-        private enum Mode
+        public enum Mode
         {
             init,
             push,
@@ -27,7 +27,7 @@ namespace SEE.Net
         /// <summary>
         /// The specific instance of <see cref="Mode"/>
         /// </summary>
-        private Mode mode = Mode.init;
+        public Mode mode = Mode.init;
 
         /// <summary>
         /// The type of the action (action or undoneAction).
@@ -72,13 +72,11 @@ namespace SEE.Net
         /// </summary>
         protected override void ExecuteOnClient()
         {
-            UnityEngine.Debug.LogWarning("Ausführung im Netzwerk");
             if (!IsRequester())
             {
                 if (mode == Mode.push)
                 {
                     GlobalActionHistory.Push(new Tuple<bool, ActionHistory.HistoryType, string, List<string>>(false, type, actionId, changedObjects));
-                    UnityEngine.Debug.LogWarning("PUSSSH");
                 }
                 else if (mode == Mode.delete)
                 {
