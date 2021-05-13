@@ -76,8 +76,7 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         private static readonly HashSet<string> javaExtensions = new HashSet<string>
         {
-            "java",
-            "cs" //FIXME: Remove this debugging entry!
+            "java"
         };
 
         /// <summary>
@@ -117,7 +116,66 @@ namespace SEE.Game.UI.CodeWindow
         /// Set of antlr type names for Java newlines.
         /// </summary>
         private static readonly HashSet<string> javaNewlines = new HashSet<string> { "NEWLINE" };
-        
+
+        #endregion
+
+        #region C# Language
+
+        /// <summary>
+        /// Name of the antlr grammar lexer.
+        /// </summary>
+        private const string cSharpFileName = "CSharpLexer.g4";
+
+        /// <summary>
+        /// Set of CSharp file extensions.
+        /// </summary>
+        private static readonly HashSet<string> cSharpExtensions = new HashSet<string>
+        {
+            "cs"
+        };
+
+        /// <summary>
+        /// Set of antlr type names for CSharp keywords.
+        /// </summary>
+        private static readonly HashSet<string> cSharpKeywords = new HashSet<string>
+        {
+            "ABSTRACT", "ADD", "ALIAS", "ARGLIST", "AS", "ASCENDING", "ASYNC", "AWAIT", "BASE", "BOOL", "BREAK", "BY",
+            "BYTE", "CASE", "CATCH", "CHAR", "CHECKED", "CLASS", "CONST", "CONTINUE", "DECIMAL", "DEFAULT", "DELEGATE",
+            "DESCENDING", "DO", "DOUBLE", "DYNAMIC", "ELSE", "ENUM", "EQUALS", "EVENT", "EXPLICIT", "EXTERN", "FALSE",
+            "FINALLY", "FIXED", "FLOAT", "FOR", "FOREACH", "FROM", "GET", "GOTO", "GROUP", "IF", "IMPLICIT", "IN", "INT",
+            "INTERFACE", "INTERNAL", "INTO", "IS", "JOIN", "LET", "LOCK", "LONG", "NAMEOF", "NAMESPACE", "NEW", "NULL_",
+            "OBJECT", "ON", "OPERATOR", "ORDERBY", "OUT", "OVERRIDE", "PARAMS", "PARTIAL", "PRIVATE", "PROTECTED",
+            "PUBLIC", "READONLY", "REF", "REMOVE","RETURN", "SBYTE", "SEALED", "SELECT", "SET", "SHORT", "SIZEOF",
+            "STACKALLOC", "STATIC", "STRING", "STRUCT", "SWITCH", "THIS", "THROW", "TRUE", "TRY", "TYPEOF", "UINT",
+            "ULONG", "UNCHECKED", "UNMANAGED", "UNSAFE", "USHORT", "USING", "VAR", "VIRTUAL", "VOID", "VOLATILE", "WHEN",
+            "WHERE", "WHILE", "YIELD"
+        };
+        /// <summary>
+        /// Set of antlr type names for CSharp integer and floating point literals.
+        /// </summary>
+        private static readonly HashSet<string> cSharpNumbers = new HashSet<string> { "LITERAL_ACCES", "INTEGER_LITERAL", "HEX_INTEGER_LITERAL", "BIN_INTEGER_LITERAL", "REAL_LITERAL" };
+        /// <summary>Set of antlr type names for CSharp character and string literals.</summary>
+        private static readonly HashSet<string> cSharpStrings = new HashSet<string> { "CHARACTER_LITERAL", "REGULAR_STRING", "VERBATIUM_STRING", "INTERPOLATED_REGULAR_STRING_STAR",
+            "INTERPOLATED_VERBATIUM_STRING_START"};
+        /// <summary>Set of antlr type names for CSharp separators and operators.</summary>
+        private static readonly HashSet<string> cSharpPunctuation = new HashSet<string> { "OPEN_BRACE", "CLOSE_BRACE", "OPEN_BRACKET",
+            "CLOSE_BRACKET", "OPEN_PARENS", "CLOSE_PARENS", "DOT", "COMMA", "COLON", "SEMICOLON", "PLUS", "MINUS", "STAR", "DIV",
+            "PERCENT", "AMP", "BITWISE_OR", "CARET", "BANG", "TILDE", "ASSIGNMENT", "LT", "GT", "INTERR", "DOUBLE_COLON",
+            "OP_COALESCING", "OP_INC", "OP_DEC", "OP_AND", "OP_OR", "OP_PTR", "OP_EQ", "OP_NE", "OP_LE", "OP_GE", "OP_ADD_ASSIGNMENT",
+            "OP_SUB_ASSIGNMENT", "OP_MULT_ASSIGNMENT", "OP_DIV_ASSIGNMENT", "OP_MOD_ASSIGNMENT", "OP_AND_ASSIGNMENT", "OP_OR_ASSIGNMENT",
+            "OP_XOR_ASSIGNMENT", "OP_LEFT_SHIFT", "OP_LEFT_SHIFT_ASSIGNMENT", "OP_COALESCING_ASSIGNMENT", "OP_RANGE"
+        };
+        /// <summary>Set of antlr type names for CSharp identifiers.</summary>
+        private static readonly HashSet<string> cSharpIdentifiers = new HashSet<string> { "Identifier" };
+        /// <summary>
+        /// Set of antlr type names for CSharp whitespace.
+        /// </summary>
+        private static readonly HashSet<string> cSharpWhitespace = new HashSet<string> { "WHITESPACES" };
+        /// <summary>
+        /// Set of antlr type names for CSharp newlines.
+        /// </summary>
+        private static readonly HashSet<string> cSharpNewlines = new HashSet<string> { "NL" };
+
         #endregion
 
         #region Static Types
@@ -132,6 +190,13 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         public static readonly TokenLanguage Java = new TokenLanguage(javaFileName, javaExtensions, javaKeywords, javaNumbers,
             javaStrings, javaPunctuation, javaIdentifiers, javaWhitespace, javaNewlines);
+
+        /// <summary>
+        /// Token Language for Java.
+        /// </summary>
+        public static readonly TokenLanguage CSharp = new TokenLanguage(cSharpFileName, cSharpExtensions, cSharpKeywords, cSharpNumbers,
+            cSharpStrings, cSharpPunctuation, cSharpIdentifiers, cSharpWhitespace, cSharpNewlines);
+
 
         #endregion
 
@@ -208,6 +273,9 @@ namespace SEE.Game.UI.CodeWindow
             if (LexerFileName.Equals(javaFileName))
             {
                 return new Java9Lexer(CharStreams.fromString(content));
+            } else if (LexerFileName.Equals(cSharpFileName))
+            {
+                return new CSharpLexer(CharStreams.fromString(content));
             }
 
             throw new InvalidOperationException("No lexer defined for this language yet.");
