@@ -4,8 +4,6 @@ using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-
 namespace Assets.SEE.Utils
 {
     public class ActionHistory
@@ -39,8 +37,7 @@ namespace Assets.SEE.Utils
         private bool isRedo = false;
 
         /// <summary>
-        /// The actionList it has an Tupel of a bool Isowner, The type of the Action (Undo Redo Action), the id of the ReversibleAction, the list with the ids of the manipulated GameObjects.
-        /// A ringbuffer
+        /// The actionHistory, which is synchronised through the network on each client.
         /// </summary>
         private List<Tuple<bool, HistoryType, string, List<string>>> globalHistory = new List<Tuple<bool, HistoryType, string, List<string>>>();
 
@@ -168,6 +165,7 @@ namespace Assets.SEE.Utils
         /// Checks whether the action to be executed has conflicts to another action.
         /// </summary>
         /// <param name="affectedGameObjects">the gameObjects affected by the action to be undone/redone.</param>
+        /// <param name="actionId">the id of the action which possibly has conflicts.</param>
         /// <returns>true, if there are conflicts, else false</returns>
         private bool ActionHasConflicts(List<string> affectedGameObjects, string actionId )
         {
@@ -238,10 +236,8 @@ namespace Assets.SEE.Utils
                 ShowNotification.Error("Error:", "Undo not possible, no changes left to undo!");
                 return;
             }
-
             LastAction.Stop();
             
-
             ReversibleAction current = LastActionWithEffect();
 
             if (current == null) return;
@@ -287,7 +283,6 @@ namespace Assets.SEE.Utils
             {
                 ShowNotification.Error("Error:", "Redo not possible, no action left to be redone,!");
                 return;
-                //throw new EmptyHistoryException(); //FIXME USER BENACHRICHTIGEN
             }
             else
             {
