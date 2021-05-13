@@ -8,7 +8,7 @@ using static Assets.SEE.Utils.ActionHistory;
 namespace SEE.Net
 {
     /// <summary>
-    /// Sync the actionhistory through the network on each client.
+    /// Syncs the action history through the network on each client.
     /// </summary>
     public  class GlobalActionHistoryNetwork : AbstractAction
     { 
@@ -28,22 +28,6 @@ namespace SEE.Net
         public List<string> changedObjects;
 
         /// <summary>
-        /// True, if an action should be pushed, else false.
-        /// </summary>
-        public bool push = false;
-
-        /// <summary>
-        /// True, if an action should be deleted, else false.
-        /// </summary>
-        public bool delete = false;
-
-
-        /// <summary>
-        /// True, if an action should be replaced, else false.
-        /// </summary>
-        public bool replace = false;
-
-        /// <summary>
         /// The old item which has to be replaced.
         /// </summary>
         public Tuple<bool, HistoryType, string, List<string>> oldItem;
@@ -59,7 +43,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Stuff to execute on the Server. Nothing to be done here.
+        /// Stuff to execute on the server. Nothing to be done here.
         /// </summary>
         protected override void ExecuteOnServer()
         {
@@ -81,7 +65,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Initiats the push of an action on each client
+        /// Initiates the push of an action on each client
         /// </summary>
         /// <param name="type">Which type is the action (action, undoneAction)</param>
         /// <param name="actionId">The id of the action</param>
@@ -97,7 +81,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Initiats the Deletion process on each Client
+        /// Initiates the deletion process on each client.
         /// </summary>
         /// <param name="actionId">The id of the action</param>
         public void Delete(string actionId) 
@@ -109,7 +93,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Updates an entry through all clients
+        /// Updates an entry through all clients.
         /// </summary>
         public void Replace(ActionHistory.HistoryType oldType, string id, string oldChangedObjects, ActionHistory.HistoryType newType, string newChangedObjects)
         {
