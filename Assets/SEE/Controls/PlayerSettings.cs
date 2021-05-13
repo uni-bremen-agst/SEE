@@ -213,10 +213,8 @@ namespace SEE.Controls
             }
             else
             {
-                {
-                    // Create Teleporting game object
-                    PrefabInstantiator.InstantiatePrefab("Prefabs/Players/Teleporting").name = "Teleporting";
-                }
+                // Create Teleporting game object
+                PrefabInstantiator.InstantiatePrefab("Prefabs/Players/Teleporting").name = "Teleporting";
                 {
                     // Attach TeleportArea to floor
                     // The TeleportArea replaces the material of the game object it is attached to
