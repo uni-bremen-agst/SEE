@@ -37,6 +37,10 @@ namespace SEE.Net
         /// </summary>
         public bool delete = false;
 
+
+        /// <summary>
+        /// True, if an action should be replaced, else false.
+        /// </summary>
         public bool replace = false;
 
         /// <summary>
