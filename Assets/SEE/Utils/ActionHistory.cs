@@ -233,7 +233,14 @@ namespace Assets.SEE.Utils
         /// </summary>
         public void Undo()
         {
+            if (UndoHistory.Count < 2) 
+            {
+                ShowNotification.Error("Error:", "Undo not possible, no changes left to undo!");
+                return;
+            }
+
             LastAction.Stop();
+            
 
             ReversibleAction current = LastActionWithEffect();
 
@@ -278,11 +285,13 @@ namespace Assets.SEE.Utils
             Tuple<bool, HistoryType, string, List<string>> lastUndoneAction = FindLastActionOfPlayer(true, HistoryType.undoneAction);
             if (RedoHistory.Count == 0)
             {
-                throw new EmptyHistoryException();
+                ShowNotification.Error("Error:", "Redo not possible, no action left to be redone,!");
+                return;
+                //throw new EmptyHistoryException(); //FIXME USER BENACHRICHTIGEN
             }
             else
             {
-                LastAction.Stop();
+                if(LastAction != null) LastAction.Stop(); //FIXME: SOLLTE HIER NACH UNDENDLICH VIELEN UNDOS NICHT FLIEGEN
                 if (ActionHasConflicts(lastUndoneAction.Item4))
                 {
                     RedoHistory.Pop();
