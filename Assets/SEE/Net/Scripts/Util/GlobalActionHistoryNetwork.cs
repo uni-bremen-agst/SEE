@@ -12,6 +12,22 @@ namespace SEE.Net
     /// </summary>
     public  class GlobalActionHistoryNetwork : AbstractAction
     { 
+
+        /// <summary>
+        /// Which mode should the Execute perform
+        /// </summary>
+        private enum Mode
+        {
+            init,
+            push,
+            delete,
+            replace,
+        };
+        /// <summary>
+        /// State of the mode
+        /// </summary>
+        private Mode mode = Mode.init;
+
         /// <summary>
         /// The type of the action (action or undoneAction).
         /// </summary>
@@ -36,7 +52,6 @@ namespace SEE.Net
         /// True, if an action should be deleted, else false.
         /// </summary>
         public bool delete = false;
-
 
         /// <summary>
         /// True, if an action should be replaced, else false.
@@ -73,10 +88,10 @@ namespace SEE.Net
         {
             if (!IsRequester())
             {
-                if (push) GlobalActionHistory.Push(new Tuple<bool, ActionHistory.HistoryType, string, List<string>>(false, type, actionId, changedObjects));
-                else if (delete) GlobalActionHistory.DeleteItem(actionId, false);
-                else if (replace) GlobalActionHistory.Replace(oldItem, newItem, true);
-                else UnityEngine.Debug.Log("Sollte nicht erreicht werden");
+                if (mode == Mode.push) GlobalActionHistory.Push(new Tuple<bool, ActionHistory.HistoryType, string, List<string>>(false, type, actionId, changedObjects));
+                else if (mode == Mode.delete) GlobalActionHistory.DeleteItem(actionId, false);
+                else if (mode == Mode.replace) GlobalActionHistory.Replace(oldItem, newItem, true);
+                mode = Mode.init;
             }
         }
 
@@ -87,8 +102,8 @@ namespace SEE.Net
         /// <param name="actionId">The id of the action</param>
         /// <param name="changedObjects">The ids of the objects which are edited from the action</param>
         public void Push( ActionHistory.HistoryType type, string actionId, string changedObjects)
-        { 
-            push = true;
+        {
+            mode = Mode.push;
             this.type = type;
             this.actionId = actionId;
             this.changedObjects = StringToList(changedObjects);
@@ -103,8 +118,8 @@ namespace SEE.Net
         public void Delete(string actionId) 
         {
             this.actionId = actionId;
-            push = false;
-            delete = true;
+            mode = Mode.delete;
+
             Execute(null);
         }
 
@@ -115,9 +130,7 @@ namespace SEE.Net
         {
             oldItem = new Tuple<bool, HistoryType, string, List<string>>(false, oldType, id, StringToList(oldChangedObjects));
             newItem = new Tuple<bool, HistoryType, string, List<string>>(false, newType, id, StringToList(newChangedObjects));
-            push = false;
-            delete = false;
-            replace = true;
+            mode = Mode.replace;
             Execute(null);
         }
 
