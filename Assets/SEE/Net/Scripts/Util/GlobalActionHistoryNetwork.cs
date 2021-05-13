@@ -93,6 +93,7 @@ namespace SEE.Net
             this.actionId = actionId;
             this.changedObjects = StringToList(changedObjects);
             Execute(null);    
+
         }
 
         /// <summary>
@@ -103,6 +104,7 @@ namespace SEE.Net
         {
             this.actionId = actionId;
             push = false;
+            delete = true;
             Execute(null);
         }
 
