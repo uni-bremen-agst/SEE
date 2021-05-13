@@ -10,7 +10,7 @@ namespace SEE.Game.Avatars
     /// personal assistant and that is supposed to speak. The character must have a
     /// <see cref="AudioSource"/> component attached to it.
     /// </summary>
-    public class Speak : MonoBehaviour
+    public class PersonalAssistantBrain : MonoBehaviour
     {
         /// <summary>
         /// The audio source used to say the text. Will be retrieved from the character.
