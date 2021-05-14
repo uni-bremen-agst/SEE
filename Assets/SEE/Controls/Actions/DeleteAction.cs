@@ -199,11 +199,11 @@ namespace SEE.Controls.Actions
                         // although a loop within a loop should be avoided in general due to performance reasons,
                         // in this case the amount of objects in <paramref name="roots"/> is limited to the amount of codecites, which likely
                         // will be kept below three.
-                        foreach (KeyValuePair<GameObject, Graph> roots in roots)
+                        foreach (KeyValuePair<GameObject, Graph> rootReference in roots)
                         {
-                            if (roots.Value == nodeGraphPair.Key)
+                            if (rootReference.Value == nodeGraphPair.Key)
                             {
-                                new UndoDeleteNetAction(nodeGraphPair.Key.name, roots.Key.name).Execute(null);
+                                new UndoDeleteNetAction(nodeGraphPair.Key.name, rootReference.Key.name).Execute(null);
                             }
                         }
                     }
