@@ -123,7 +123,7 @@ namespace SEE.Utils
         /// <summary>
         /// Getter for the ID of the specific action.
         /// </summary>
-        /// <returns>the id of a specific action</returns>
+        /// <returns>the ID of a specific action</returns>
         string GetId();
 
         /// <summary>
