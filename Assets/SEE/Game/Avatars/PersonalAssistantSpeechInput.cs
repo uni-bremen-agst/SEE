@@ -40,6 +40,7 @@ namespace SEE.Game.Avatars
             {
                 input = new GrammarInput(GrammarFilePath);
                 input.Register(OnPhraseRecognized);
+                input.Start();
                 if (!gameObject.TryGetComponentOrLog(out brain))
                 {
                     enabled = false;
@@ -108,8 +109,26 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void OnApplicationQuit()
         {
+            OnDisable();
+            input?.Dispose();
+        }
+
+        /// <summary>
+        /// Re-starts <see cref="input"/>.
+        /// </summary>
+        private void OnEnable()
+        {
+            input.Start();
+            input.Register(OnPhraseRecognized);
+        }
+
+        /// <summary>
+        /// Stops <see cref="input"/>.
+        /// </summary>
+        private void OnDisable()
+        {
+            input.Stop();
             input.Unregister(OnPhraseRecognized);
-            input?.Close();
         }
     }
 }
