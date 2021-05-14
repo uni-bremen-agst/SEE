@@ -63,16 +63,6 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// Speaks the <see cref="welcomeText"/>. It is called as a delayed
-        /// function within <see cref="Start"/>. If you ever rename this method,
-        /// you must adjust the string literal in <see cref="Start"/>.
-        /// </summary>
-        private void Welcome()
-        {
-            Say(welcomeText);
-        }
-
-        /// <summary>
         /// Dumps the available voices on the current platform to the debugging console.
         /// Can be used to retrieve the available voices on the current system.
         /// </summary>
@@ -84,6 +74,46 @@ namespace SEE.Game.Avatars
             }
         }
 
+        /// <summary>
+        /// If the user asks for help, the <see cref="helpText"/> is spoken.
+        /// </summary>
+        private void Update()
+        {
+            if (SEEInput.Help())
+            {
+                Help();
+            }
+        }
+
+        /// <summary>
+        /// Speaks the <see cref="welcomeText"/>. It is called as a delayed
+        /// function within <see cref="Start"/>. If you ever rename this method,
+        /// you must adjust the string literal in <see cref="Start"/>.
+        /// </summary>
+        public void Welcome()
+        {
+            Say(welcomeText);
+        }
+
+        /// <summary>
+        /// Speaks the general help text.
+        /// </summary>
+        public void Help()
+        {
+            Say(helpText);
+        }
+
+        /// <summary>
+        /// Reads aloud general information about SEE.
+        /// </summary>
+        public void About()
+        {
+            Say(aboutText);
+        }
+
+        /// <summary>
+        /// Tells the current time.
+        /// </summary>
         public void CurrentTime()
         {
             DateTime now = DateTime.Now;
@@ -95,9 +125,45 @@ namespace SEE.Game.Avatars
             Say(builder.ToString());
         }
 
-        public void About()
+        /// <summary>
+        /// Speaks the given <paramref name="text"/>. The text can be annotated
+        /// in Speech Synthesis Markup Language (SSML).
+        /// 
+        /// A female US English voice will be used if available.
+        /// </summary>
+        /// <param name="text">text to be spoken</param>
+        public void Say(string text)
         {
-            Say(aboutText);
+            /// Note: We do not set <see cref="voice"/> in <see cref="Start"/>
+            /// because we do not want to rely on the order in which the various
+            /// <see cref="Start"/> calls are being made by Unity. RTVoice has
+            /// its own <see cref="Start"/> which retrieves the available voices
+            /// from the system. If that <see cref="Start"/> is called after ours,
+            /// <see cref="Speaker.Instance.VoiceForGender"/> cannot return any voice.
+            if (voice == null)
+            {
+                voice = Speaker.Instance.VoiceForGender(Crosstales.RTVoice.Model.Enum.Gender.FEMALE, culture: "en-US");
+                if (voice == null)
+                {
+                    Debug.LogWarning("Requested voice not found.\n");
+                    DumpVoices();
+                }
+            }
+            animator?.SetBool(isTalking, true);
+            Speaker.Instance.Speak(text, audioSource, voice: voice);
+            Speaker.Instance.OnSpeakCompleted.AddListener(BackToIdle);
+        }
+
+        /// <summary>
+        /// Callback to reset the state of the animator to idle. It will
+        /// be registered by <see cref="Say"/> and be called when the text 
+        /// if completely spoken.
+        /// </summary>
+        /// <param name="message">a message from RT-Voice (currently not used)</param>
+        private void BackToIdle(string message)
+        {
+            animator?.SetBool(isTalking, false);
+            Speaker.Instance.OnSpeakCompleted.RemoveListener(BackToIdle);
         }
 
         /// <summary>
@@ -144,66 +210,12 @@ namespace SEE.Game.Avatars
             + "To bring up the menu for additional actions, just hit the space bar. "
             + "And now <emphasis level=\"strong\">have fun</emphasis>!";
 
-        private const string aboutText = "I am SEE. "             
+        /// <summary>
+        /// A brief information about SEE and its developers.
+        /// </summary>
+        private const string aboutText = "I am SEE. "
             + "Myself and all the world you see, was created by Christian, Falko, Jan, Leonard, Lino, Marcel, Moritz, "
             + "Nick, Rainer, Robin, Simon, Sören, Thore, Thorsten, Torben, and many others. "
             + "<emphasis level=\"strong\">Thanks, guys!</emphasis>";
-
-        /// <summary>
-        /// If the user asks for help, the <see cref="helpText"/> is spoken.
-        /// </summary>
-        private void Update()
-        {
-            if (SEEInput.Help())
-            {
-                Help();
-            }
-        }
-
-        public void Help()
-        {
-            Say(helpText);
-        }
-
-        /// <summary>
-        /// Speaks the given <paramref name="text"/>. The text can be annotated
-        /// in Speech Synthesis Markup Language (SSML).
-        /// 
-        /// A female US English voice will be used if available.
-        /// </summary>
-        /// <param name="text">text to be spoken</param>
-        private void Say(string text)
-        {
-            /// Note: We do not set <see cref="voice"/> in <see cref="Start"/>
-            /// because we do not want to rely on the order in which the various
-            /// <see cref="Start"/> calls are being made by Unity. RTVoice has
-            /// its own <see cref="Start"/> which retrieves the available voices
-            /// from the system. If that <see cref="Start"/> is called after ours,
-            /// <see cref="Speaker.Instance.VoiceForGender"/> cannot return any voice.
-            if (voice == null)
-            {
-                voice = Speaker.Instance.VoiceForGender(Crosstales.RTVoice.Model.Enum.Gender.FEMALE, culture: "en-US");
-                if (voice == null)
-                {
-                    Debug.LogWarning("Requested voice not found.\n");
-                    DumpVoices();
-                }
-            }
-            animator?.SetBool(isTalking, true);
-            Speaker.Instance.Speak(text, audioSource, voice: voice);
-            Speaker.Instance.OnSpeakCompleted.AddListener(BackToIdle);
-        }
-
-        /// <summary>
-        /// Callback to reset the state of the animator to idle. It will
-        /// be registered by <see cref="Say"/> and be called when the text 
-        /// if completely spoken.
-        /// </summary>
-        /// <param name="message">a message from RT-Voice (currently not used)</param>
-        private void BackToIdle(string message)
-        {
-            animator?.SetBool(isTalking, false);
-            Speaker.Instance.OnSpeakCompleted.RemoveListener(BackToIdle);
-        }
     }
 }
