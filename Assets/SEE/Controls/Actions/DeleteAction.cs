@@ -53,7 +53,7 @@ namespace SEE.Controls.Actions
         public Dictionary<GameObject, Graph> deletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
 
         /// <summary>
-        /// A data structure containing the graph´s root of a SEEcity and its graph. 
+        /// A data structure containing the graph's root of a SEEcity and its graph. 
         /// </summary>
         private Dictionary<GameObject, Graph> roots { get; set; } = new Dictionary<GameObject, Graph>();
 
@@ -222,11 +222,11 @@ namespace SEE.Controls.Actions
                     {
                         FindRoot(edgeGraphPair.Value);
                     }
-                    foreach (KeyValuePair<GameObject, Graph> roots in roots)
+                    foreach (KeyValuePair<GameObject, Graph> rootReference in roots)
                     {
-                        if (roots.Value == edgeGraphPair.Key)
+                        if (rootReference.Value == edgeGraphPair.Key)
                         {
-                            new UndoDeleteNetAction(edgeGraphPair.Key.name, roots.Key.name).Execute(null);
+                            new UndoDeleteNetAction(edgeGraphPair.Key.name, rootReference.Key.name).Execute(null);
                         }
                     }
                 }
