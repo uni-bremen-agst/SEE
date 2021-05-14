@@ -39,8 +39,8 @@ namespace SEE.Net
         /// Creates a new UndoDeleteNetAction instance.
         /// </summary>
         /// <param name="gameObjectID"></param> the unique name of the gameObject of a node or edge 
-        /// which had been deleted before
-        /// <param name="rootID"></param> the unique name of a graph´s root.
+        /// which had been deleted before</param>
+        /// <param name="rootID">the unique name of a graph's root</param>
         public UndoDeleteNetAction(string gameObjectID, String rootID) : base()
         {
             this.gameObjectID = gameObjectID;
@@ -58,7 +58,7 @@ namespace SEE.Net
 
         /// <summary>
         /// Undoes any deletion of a game object identified by <see cref="gameObjectID"/> on each client.
-        /// Furthermore any node or edge which had been removed before is be added again to the clients graph.
+        /// Furthermore any node or edge which had been removed before is added again to the client´s graph.
         /// The graph is identified by <see cref="rootID"/>
         /// </summary>
         protected override void ExecuteOnClient()
@@ -70,8 +70,7 @@ namespace SEE.Net
                 if (rootNode != null)
                 {
                     graph = rootNode.GetGraph();
-                    Assert.IsNotNull(graph, "graph shall not be null");
-                   
+                    Assert.IsNotNull(graph, "graph shall not be null");  
                 }
                 else
                 {
@@ -91,7 +90,7 @@ namespace SEE.Net
                             }
                             catch (Exception e)
                             {
-                                Debug.LogWarningFormat("Edge cannot be added to the graph \n", e);
+                                Debug.LogError($"Edge cannot be added to the graph: {e}\n");
                             }
                         }
                     }
