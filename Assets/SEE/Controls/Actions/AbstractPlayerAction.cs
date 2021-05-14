@@ -13,7 +13,7 @@ namespace SEE.Controls.Actions
     public abstract class AbstractPlayerAction : ReversibleAction
     {
         /// <summary>
-        /// The unique id of an action.
+        /// The unique ID of an action.
         /// </summary>
         private readonly Guid id = Guid.NewGuid();
 
@@ -173,15 +173,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Returns the id´s of all gameObjects manipulated by the specific action.
+        /// Returns the IDs of all gameObjects manipulated by the specific action.
         /// </summary>
-        /// <returns>All id´s of manipulated gameObjects</returns>
+        /// <returns>All IDs of manipulated gameObjects</returns>
         public abstract List<string> GetChangedObjects();
 
         /// <summary>
-        /// A getter for the id of a specific action.
+        /// A getter for the ID of this action.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The ID of this action as a string</returns>
         public string GetId()
         {
             return id.ToString();

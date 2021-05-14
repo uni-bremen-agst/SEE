@@ -179,17 +179,16 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Returns all Ids of gameObjects manipulated by this action.
+        /// Returns all IDs of gameObjects manipulated by this action.
         /// </summary>
-        /// <returns>all Ids of gameObjects manipulated by this action</returns>
+        /// <returns>all IDs of gameObjects manipulated by this action</returns>
         public override List<string> GetChangedObjects()
         {
-            List<string> changedObjects = new List<string>
+            return new List<string>
             {
                 memento.Parent.name,
                 memento.NodeID
             };
-            return changedObjects;
         }
     }
 }
