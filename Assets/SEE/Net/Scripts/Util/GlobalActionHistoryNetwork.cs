@@ -52,12 +52,12 @@ namespace SEE.Net
         /// <summary>
         /// The old item which has to be replaced.
         /// </summary>
-        public Tuple<bool, HistoryType, string, List<string>> oldItem;
+        public GlobalHistoryEntry oldItem;
 
         /// <summary>
         /// The new item which is replacing the old.
         /// </summary>
-        public Tuple<bool, HistoryType, string, List<string>> newItem;
+        public GlobalHistoryEntry newItem;
 
         public GlobalActionHistoryNetwork() 
         {
@@ -81,7 +81,7 @@ namespace SEE.Net
             {
                 if (mode == Mode.push)
                 {
-                    GlobalActionHistory.Push(new Tuple<bool, ActionHistory.HistoryType, string, List<string>>(false, type, actionId, changedObjects));
+                    GlobalActionHistory.Push(new GlobalHistoryEntry(false, type, actionId, changedObjects));
                 }
                 else if (mode == Mode.delete)
                 {
@@ -133,8 +133,8 @@ namespace SEE.Net
         /// <param name="newChangedObjects">The changedObjects of the new item.</param>
         public void Replace(ActionHistory.HistoryType oldType, string id, string oldChangedObjects, ActionHistory.HistoryType newType, string newChangedObjects)
         {
-            oldItem = new Tuple<bool, HistoryType, string, List<string>>(false, oldType, id, StringToList(oldChangedObjects));
-            newItem = new Tuple<bool, HistoryType, string, List<string>>(false, newType, id, StringToList(newChangedObjects));
+            oldItem = new GlobalHistoryEntry(false, oldType, id, StringToList(oldChangedObjects));
+            newItem = new GlobalHistoryEntry(false, newType, id, StringToList(newChangedObjects));
             mode = Mode.replace;
             Execute(null);
         }
@@ -146,7 +146,7 @@ namespace SEE.Net
         /// <returns>a list of names of changed gameObjects</returns>
         private static List<string> StringToList(string changedObjectsToParse)
         {
-            return changedObjectsToParse?.Split(',').ToList();
+            return changedObjectsToParse?.Split('?').ToList();
         }
     }
 }

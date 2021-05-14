@@ -55,7 +55,7 @@ namespace SEE.Controls.Actions
         /// Pushes new actions to the <see cref="allActionsList"/>
         /// </summary>
         /// <param name="action">The action and all of its specific values which are needed for the history</param>
-        public static void Push(Tuple<bool, HistoryType, string, List<string>> action)
+        public static void Push(GlobalHistoryEntry action)
         {
             history.Push(action);
         }
@@ -66,7 +66,7 @@ namespace SEE.Controls.Actions
         /// <param name="oldItem">the item that should be replaced.</param>
         /// <param name="newItem">the new item inserted instead.</param>
         /// <param name="isNetwork">true, if the call comes from another client through the network, else false.</param>
-        public static void Replace(Tuple<bool, HistoryType, string, List<string>> oldItem, Tuple<bool, HistoryType, string, List<string>> newItem, bool isNetwork)
+        public static void Replace(GlobalHistoryEntry oldItem, GlobalHistoryEntry newItem, bool isNetwork)
         {
             history.Replace(oldItem, newItem, isNetwork);
         }
