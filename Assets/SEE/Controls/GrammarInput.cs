@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text;
-using UnityEngine;
-using UnityEngine.Windows.Speech;
+﻿using UnityEngine.Windows.Speech;
 using static UnityEngine.Windows.Speech.PhraseRecognizer;
 
 namespace SEE.Controls
