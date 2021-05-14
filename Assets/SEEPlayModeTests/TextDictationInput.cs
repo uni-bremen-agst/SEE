@@ -1,5 +1,4 @@
-﻿using NUnit.Framework;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.Windows.Speech;
@@ -8,6 +7,10 @@ namespace SEE.Controls
 {
     /// <summary>
     /// Test cases for <see cref="DictationInput"/>.
+    ///
+    /// Note: This test is not automated. It expects that a human tester uses
+    /// a microphone to talk. The recognized input is shown on the console
+    /// for inspection.
     /// </summary>
     class TextDictationInput
     {
