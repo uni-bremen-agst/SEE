@@ -20,6 +20,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject selectedObject;
 
+        private HashSet<GameObject> selectedObjects2 = new HashSet<GameObject>();
+
         /// <summary>
         /// The list of currently selected objects.
         /// </summary>
@@ -29,6 +31,11 @@ namespace SEE.Controls.Actions
         /// The list of currently hidden objects.
         /// </summary>
         private readonly ISet<GameObject> hiddenObjects = new HashSet<GameObject>();
+
+        /// <summary>
+        /// The list of currently transparent objects.
+        /// </summary>
+        private readonly ISet<GameObject> transparentObjects = new HashSet<GameObject>();
 
         /// <summary>
         /// The list of objects whose visibility was changed in recent undo (needed for redo).
@@ -102,7 +109,7 @@ namespace SEE.Controls.Actions
         public override void Stop()
         {
             base.Stop();
-            MakeAllVisible();
+            ReverseMakeUnselectedTransparent();
             selectedObjects.Clear();
             InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
             InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
@@ -117,6 +124,9 @@ namespace SEE.Controls.Actions
             MakeUnselectedTransparent();
             switch (mode)
             {
+                case HideModeSelector.Select:
+                    SelectObjects();
+                    break;
                 case HideModeSelector.HideAll:
                     if (HideAll())
                     {
@@ -159,7 +169,7 @@ namespace SEE.Controls.Actions
                         return true;
                     }
                     break;
-                case HideModeSelector.HideForwardTransitveClosure:
+                case HideModeSelector.HideForwardTransitiveClosure:
                     if (HideForwardTransitive())
                     {
                         currentState = ReversibleAction.Progress.Completed;
@@ -174,7 +184,7 @@ namespace SEE.Controls.Actions
                     }
                     break;
                 case HideModeSelector.HideAllTransitiveClosure:
-                    if(HideAllTransitive())
+                    if (HideAllTransitive())
                     {
                         currentState = ReversibleAction.Progress.Completed;
                         return true;
@@ -226,7 +236,7 @@ namespace SEE.Controls.Actions
         /// <returns> true if all unselected objects could be successfully hidden </returns>
         private bool HideUnselected()
         {
-            if (selectedObjects.Count > 0 && selectedObject != null )
+            if (selectedObjects.Count > 0 && selectedObject != null)
             {
                 GameObject city = selectedObject;
                 while (!city.CompareTag(Tags.CodeCity))
@@ -371,20 +381,18 @@ namespace SEE.Controls.Actions
 
                 foreach (GameObject g in nodesEdges)
                 {
-                    // FIXME: Why these names? Do not make any assumptions about names of code cities.
-                    if (!g.name.Equals("implementation") && !g.name.Equals("architecture"))
+                    if (!hiddenObjects.Contains(g) && g != null)
                     {
                         g.SetTransparency(0.5f);
-                        hiddenObjects.Add(g);
+                        transparentObjects.Add(g);
                     }
                 }
                 foreach (GameObject g in selectedObjects)
                 {
-                    // FIXME: Why these names? Do not make any assumptions about names of code cities.
-                    if (!g.name.Equals("implementation") && !g.name.Equals("architecture"))
+                    if (!hiddenObjects.Contains(g) && g != null)
                     {
                         g.SetTransparency(1.0f);
-                        hiddenObjects.Add(g);
+                        transparentObjects.Remove(g);
                     }
                 }
                 return true;
@@ -399,28 +407,24 @@ namespace SEE.Controls.Actions
         /// Makes all objects opaque again
         /// </summary>
         /// <returns>true if the objects could be made visible again</returns>
-        private bool MakeAllVisible()
+        private bool ReverseMakeUnselectedTransparent()
         {
             if (selectedObject != null)
             {
                 GameObject city = SceneQueries.GetCodeCity(selectedObject.transform).gameObject;
                 List<GameObject> nodesEdges = GetAllChildrenRecursively(city.transform, new List<GameObject>());
 
-                foreach (GameObject g in nodesEdges)
+                foreach (GameObject g in transparentObjects)
                 {
-                    // FIXME: The names should not occur here.
-                    if (!g.name.Equals("implementation") && !g.name.Equals("architecture"))
-                    {
-                        g.SetTransparency(1f);
-                        hiddenObjects.Add(g);
-                    }
+                    g.SetTransparency(1f);
                 }
+                transparentObjects.Clear();
                 return true;
             }
             else
             {
                 return false;
-            }
+           }
         }
 
         /// <summary>
@@ -429,22 +433,19 @@ namespace SEE.Controls.Actions
         /// <returns> true if all nodes and edges could be successfully hidden </returns>
         private bool HideAll()
         {
-            if (selectedObject != null) 
+            if (selectedObject != null)
             {
-                GameObject city = SceneQueries.GetCodeCity(selectedObject.transform).gameObject; 
+                GameObject city = SceneQueries.GetCodeCity(selectedObject.transform).gameObject;
                 List<GameObject> nodesEdges = GetAllChildrenRecursively(city.transform, new List<GameObject>());
 
                 foreach (GameObject g in nodesEdges)
                 {
-                    // FIXME: The names should not occur here.
-                    if (!g.name.Equals("implementation") && !g.name.Equals("architecture"))
-                    {
-                        g.SetVisibility(false);
-                        hiddenObjects.Add(g);
-                    }
+                    g.SetVisibility(false);
+                    hiddenObjects.Add(g);
                 }
+
                 return true;
-            } 
+            }
             else
             {
                 return false;
@@ -491,7 +492,7 @@ namespace SEE.Controls.Actions
                 }
 
                 foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
-                {     
+                {
                     if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                     {
                         hiddenObjects.Add(edge);
@@ -508,7 +509,7 @@ namespace SEE.Controls.Actions
                 }
                 return true;
             }
-            return false;   
+            return false;
         }
 
         /// <summary>
@@ -530,7 +531,7 @@ namespace SEE.Controls.Actions
 
                 foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
                 {
-                            
+
                     if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                     {
                         hiddenObjects.Add(edge);
@@ -546,7 +547,7 @@ namespace SEE.Controls.Actions
                 }
                 return true;
             }
-            return false;         
+            return false;
         }
 
         /// <summary>
@@ -596,7 +597,7 @@ namespace SEE.Controls.Actions
             if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
             {
 
-                (HashSet <string> edgeIDs, HashSet <string> nodeIDs) = ForwardTransitiveRecursive(nodeRef.Value, new HashSet<string>(), new HashSet<string>());
+                (HashSet<string> edgeIDs, HashSet<string> nodeIDs) = ForwardTransitiveRecursive(nodeRef.Value, new HashSet<string>(), new HashSet<string>());
 
                 foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
                 {
@@ -689,6 +690,15 @@ namespace SEE.Controls.Actions
             return (edgeIDs, nodeIDs);
         }
 
+        private void SelectObjects()
+        {
+            if(selectedObject != null)
+            {
+                _ = selectedObjects2.Contains(selectedObject) ? selectedObjects2.Remove(selectedObject) : selectedObjects2.Add(selectedObject);
+            }
+            Debug.Log("Count: " + selectedObjects2.Count());
+        }
+
         /// <summary>
         /// Hide the transitive closure (all nodes reachable from the selected node)
         /// </summary>
@@ -709,7 +719,7 @@ namespace SEE.Controls.Actions
             {
                 string sourceID = edgeRef.Value.Source.ID;
                 string targetID = edgeRef.Value.Target.ID;
-               
+
                 foreach (GameObject node in GameObject.FindGameObjectsWithTag(Tags.Node))
                 {
                     if (node.name.Equals(sourceID))
@@ -735,7 +745,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="nodes">The nodes that are selected</param>
         private static void SelectEdgesBetweenSubsetOfNodes(ICollection<GameObject> nodes)
-        { 
+        {
             if (nodes != null && nodes.Count > 0)
             {
                 List<string> subsetNames = nodes.Select(g => g.name).ToList();
@@ -764,7 +774,10 @@ namespace SEE.Controls.Actions
             bool success = true;
             foreach (GameObject edge in selectedObjects)
             {
-                success = HighlightEdge(edge);
+                if (!HighlightEdge(edge))
+                {
+                    success = false;
+                }
             }
             return success;
         }

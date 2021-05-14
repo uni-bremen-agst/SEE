@@ -7,12 +7,12 @@ using UnityEngine.Events;
 namespace SEE.Game.UI.PropertyDialog
 {
     /// <summary>
-    /// A string input field for a property dialog.
+    /// A button for a for a property dialog.
     /// </summary>
     public class ButtonProperty : Property<HideModeSelector>
     {
         /// <summary>
-        /// The prefab for a string input field.
+        /// The prefab for a button
         /// </summary>
         private const string ButtonPrefab = "Prefabs/UI/Button";
 
@@ -102,12 +102,6 @@ namespace SEE.Game.UI.PropertyDialog
                 // Register listeners on entry and exit events, respectively
                 pointerHelper.EnterEvent.AddListener(() => tooltip.Show(Description));
                 pointerHelper.ExitEvent.AddListener(tooltip.Hide);
-                // FIXME scrolling doesn't work while hovering above the field, because
-                // the Modern UI Pack uses an Event Trigger (see Utils/PointerHelper for an explanation.)
-                // It is unclear how to resolve this without either abstaining from using the Modern UI Pack
-                // in this instance or without modifying the Modern UI Pack, which would complicate 
-                // updates greatly. Perhaps the author of the Modern UI Pack (or Unity developers?) should
-                // be contacted about this.
             }
         }
 

@@ -11,7 +11,7 @@ using SEE.Game.UI.Tooltip;
 namespace SEE.Game.UI.StateIndicator
 {
     /// <summary>
-    /// Indicates some kind of state with which a text and a color is associated.
+    /// Indicates some kind of state with which a text is associated.
     /// The state will be displayed on the screen.
     /// </summary>
     public class HideStateIndicator : PlatformDependentComponent
