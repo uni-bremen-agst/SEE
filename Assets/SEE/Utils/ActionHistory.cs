@@ -65,7 +65,7 @@ namespace Assets.SEE.Utils
         /// </summary>
         private bool isRedo = false;
 
-        GlobalActionHistoryNetwork globalActionHistoryNetwork = new GlobalActionHistoryNetwork();
+        //GlobalActionHistoryNetwork globalActionHistoryNetwork = new GlobalActionHistoryNetwork();
 
         /// <summary>
         /// The actionHistory, which is synchronised through the network on each client.
@@ -137,7 +137,7 @@ namespace Assets.SEE.Utils
             if (LastAction != null && LastAction.Update())
             {
                 Push(new GlobalHistoryEntry(true, HistoryType.action, LastAction.GetId(), LastAction.GetChangedObjects()));
-                globalActionHistoryNetwork.Push(HistoryType.action, LastAction.GetId(), ListToString(LastAction.GetChangedObjects()));
+                new GlobalActionHistoryNetwork().Push(HistoryType.action, LastAction.GetId(), ListToString(LastAction.GetChangedObjects()));
                 Execute(LastAction.NewInstance());
             }
         }
