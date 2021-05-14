@@ -10,6 +10,9 @@ namespace SEE.Controls
     /// set of keywords or a particular grammar. The recognization, however, may
     /// be less accurate. This speech recognition may be useful for free texts
     /// in the context of dictation.
+    /// 
+    /// As an example on how to use this class, take a look at the test class
+    /// TestDictationInput.
     /// </summary>
     public class DictationInput : SpeechInput
     {
