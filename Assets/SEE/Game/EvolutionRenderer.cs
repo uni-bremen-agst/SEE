@@ -296,7 +296,7 @@ namespace SEE.Game
         /// <summary>
         /// Saves the names of the game objects representing nodes that were not moved during an iteration.
         /// </summary>
-        private HashSet<string> negligibleNodes = new HashSet<string>();
+        private ISet<string> negligibleNodes = new HashSet<string>();
 
         /// <summary>
         /// List for saving the copied nodes. Is used for animation.

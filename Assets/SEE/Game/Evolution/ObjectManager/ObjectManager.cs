@@ -56,7 +56,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// The names of the game objects representing nodes that do not need to be considered when animating.
         /// </summary>
-        public HashSet<string> NegligibleNodes { get; set; }
+        public ISet<string> NegligibleNodes { get; set; }
 
         /// <summary>
         /// A dictionary containing all created nodes that are currently in use. The set of
