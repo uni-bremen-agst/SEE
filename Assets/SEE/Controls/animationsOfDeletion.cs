@@ -89,10 +89,7 @@ namespace SEE.Controls
             foreach (GameObject deletedNode in deletedNodes)
             {
                 oldPositions[deletedNode] = deletedNode.transform.position;
-               // if (!deletedNodes.Contains(deletedNode))
-                //{
-                    Portal.SetInfinitePortal(deletedNode);
-                //}
+                Portal.SetInfinitePortal(deletedNode);
             }
             foreach (GameObject deletedNode in deletedNodes)
             {
