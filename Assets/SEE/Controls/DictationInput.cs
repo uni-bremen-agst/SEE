@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Windows.Speech;
+using static UnityEngine.Windows.Speech.DictationRecognizer;
 
 namespace SEE.Controls
 {
@@ -19,6 +20,14 @@ namespace SEE.Controls
         // SPERR_SPEECH_PRIVACY_POLICY_NOT_ACCEPTED (0x80045509).
 
         /// <summary>
+        /// Constructor setting up the recognizer.
+        /// </summary>
+        public DictationInput()
+        {
+            recognizer = new DictationRecognizer();
+        }
+
+        /// <summary>
         /// The recognizer used for dictation.
         /// </summary>
         private DictationRecognizer recognizer;
@@ -26,18 +35,82 @@ namespace SEE.Controls
         /// <summary>
         /// Starts the <see cref="recognizer"/>.
         /// </summary>
-        private void Start()
+        public override void Start()
         {
-            StartDictationEngine();
+            recognizer.DictationComplete += OnDictationComplete;
+            recognizer.DictationError += OnDictationError;
+            recognizer.Start();
         }
 
         /// <summary>
-        /// Event that is triggered when the recognizer changes its hypothesis for the current fragment.
+        /// Stops the <see cref="recognizer"/>.
         /// </summary>
-        /// <param name="text"></param>
-        private void OnDictationHypothesis(string text)
+        public override void Stop()
         {
-            Debug.Log($"Dictation hypothesis: {text}\n");
+            if (recognizer != null)
+            {               
+                recognizer.DictationComplete -= OnDictationComplete;
+                recognizer.DictationError -= OnDictationError;
+
+                if (recognizer.Status == SpeechSystemStatus.Running)
+                {
+                    recognizer.Stop();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Stops and disposes the recognizer. It cannot be re-started again.
+        /// </summary>
+        public override void Dispose()
+        {
+            Stop();
+            recognizer?.Dispose();
+            recognizer = null;
+        }
+
+        /// <summary>
+        /// Registers <paramref name="dictationResultDelegate"/> as a callback
+        /// to be called when a phrase was recognized to report the result.
+        /// </summary>
+        /// <param name="dictationResultDelegate">delegate to be registered</param>
+        public void Register(DictationResultDelegate dictationResultDelegate)
+        {
+            recognizer.DictationResult += dictationResultDelegate;
+        }
+
+        /// <summary>
+        /// Unregisters <paramref name="dictationResultDelegate"/> as a callback
+        /// formerly to be called when a phrase was recognized to report the result.
+        /// </summary>
+        /// <param name="dictationResultDelegate">delegate to be unregistered</param>
+        public void Unregister(DictationResultDelegate dictationResultDelegate)
+        {
+            recognizer.DictationResult -= dictationResultDelegate;
+        }
+
+        /// <summary>
+        /// Registers <paramref name="dictationHypothesisDelegate"/> as a callback
+        /// to be called when there is a hypothesis on the phrase currently being 
+        /// recognized. The hypothesis is subject to change depending upon the
+        /// following input. The final result will be provided by a 
+        /// DictationResultDelegate later.
+        /// </summary>
+        /// <param name="dictationHypothesisDelegate">delegate to be registered</param>
+        public void Register(DictationHypothesisDelegate dictationHypothesisDelegate)
+        {
+            recognizer.DictationHypothesis += dictationHypothesisDelegate;
+        }
+
+        /// <summary>
+        /// Unregisters <paramref name="dictationHypothesisDelegate"/> as a callback
+        /// formerly to be called when there is a hypothesis on the phrase currently being 
+        /// recognized.
+        /// </summary>
+        /// <param name="dictationHypothesisDelegate">delegate to be unregistered</param>
+        public void Unregister(DictationHypothesisDelegate dictationHypothesisDelegate)
+        {
+            recognizer.DictationHypothesis -= dictationHypothesisDelegate;
         }
 
         /// <summary>
@@ -54,15 +127,15 @@ namespace SEE.Controls
                 case DictationCompletionCause.Canceled:
                 case DictationCompletionCause.Complete:
                     // Restart required
-                    CloseDictationEngine();
-                    StartDictationEngine();
+                    Stop();
+                    Start();
                     break;
                 case DictationCompletionCause.UnknownError:
                 case DictationCompletionCause.AudioQualityFailure:
                 case DictationCompletionCause.MicrophoneUnavailable:
                 case DictationCompletionCause.NetworkFailure:
                     // Error
-                    CloseDictationEngine();
+                    Stop();
                     break;
             }
         }
@@ -105,68 +178,13 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Event indicating a phrase has been recognized with the specified <paramref name="confidence"/> level.
-        /// </summary>
-        /// <param name="text">phrase recognized</param>
-        /// <param name="confidence">confidence level of the recognition</param>
-        private void OnDictationResult(string text, ConfidenceLevel confidence)
-        {
-            Debug.Log("Dictation result: " + text);
-        }
-
-        /// <summary>
         /// Callback that is triggered when the recognizer session encouters an error.
         /// </summary>
-        /// <param name="error"></param>
-        /// <param name="hresult"></param>
+        /// <param name="error">the error message</param>
+        /// <param name="hresult">HRESULT code that corresponds to the error</param>
         private void OnDictationError(string error, int hresult)
         {
-            Debug.Log("Dictation error: " + error);
-        }
-
-        /// <summary>
-        /// Shuts down <see cref="recognizer"/>.
-        /// Called by Unity when the application closes.
-        /// </summary>
-        private void OnApplicationQuit()
-        {
-            CloseDictationEngine();
-        }
-
-        /// <summary>
-        /// Starts the <see cref="recognizer"/>.
-        /// </summary>
-        private void StartDictationEngine()
-        {
-            recognizer = new DictationRecognizer();
-
-            recognizer.DictationHypothesis += OnDictationHypothesis;
-            recognizer.DictationResult += OnDictationResult;
-            recognizer.DictationComplete += OnDictationComplete;
-            recognizer.DictationError += OnDictationError;
-
-            recognizer.Start();
-        }
-
-        /// <summary>
-        /// Shuts down the <see cref="recognizer"/>.
-        /// </summary>
-        private void CloseDictationEngine()
-        {
-            if (recognizer != null)
-            {
-                recognizer.DictationHypothesis -= OnDictationHypothesis;
-                recognizer.DictationComplete -= OnDictationComplete;
-                recognizer.DictationResult -= OnDictationResult;
-                recognizer.DictationError -= OnDictationError;
-
-                if (recognizer.Status == SpeechSystemStatus.Running)
-                {
-                    recognizer.Stop();
-                }
-
-                recognizer.Dispose();
-            }
+            Debug.Log($"Dictation error: {error} with hresult code: {hresult}.\n");
         }
     }
 }

@@ -38,29 +38,56 @@ namespace SEE.Controls
         /// <param name="grammarFilePath">path to the SRGS grammar file</param>
         public GrammarInput(string grammarFilePath)
         {
-            recognizer = new GrammarRecognizer(grammarFilePath);            
-            recognizer.Start();
+            recognizer = new GrammarRecognizer(grammarFilePath);
         }
 
+        /// <summary>
+        /// Registers the given <paramref name="phraseRecognizedDelegate"/> as 
+        /// callback to be called when a phrase was recognized.
+        /// </summary>
+        /// <param name="phraseRecognizedDelegate">callback to be registered</param>
         public void Register(PhraseRecognizedDelegate phraseRecognizedDelegate)
         {
             recognizer.OnPhraseRecognized += phraseRecognizedDelegate;
         }
 
+        /// <summary>
+        /// Unregisters the given <paramref name="phraseRecognizedDelegate"/> as 
+        /// callback formerly to be called when a phrase was recognized.
+        /// </summary>
+        /// <param name="phraseRecognizedDelegate">callback to be unregistered</param>
         public void Unregister(PhraseRecognizedDelegate phraseRecognizedDelegate)
         {
             recognizer.OnPhraseRecognized -= phraseRecognizedDelegate;
         }
 
         /// <summary>
-        /// Shuts down this GrammarInput.
+        /// Starts the recognizer.
         /// </summary>
-        public void Close()
+        public override void Start()
+        {
+            recognizer?.Start();
+        }
+
+        /// <summary>
+        /// Stops the recognizer. It can be re-started by <see cref="Start"/> again.
+        /// </summary>
+        public override void Stop()
         {
             if (recognizer != null && recognizer.IsRunning)
             {
-                recognizer.Stop();
+                recognizer.Stop();                
             }
+        }
+
+        /// <summary>
+        /// Stops and disposes the recognizer. It cannot be re-started again.
+        /// </summary>
+        public override void Dispose()
+        {
+            Stop();
+            recognizer?.Dispose();
+            recognizer = null;
         }
     }
 }
