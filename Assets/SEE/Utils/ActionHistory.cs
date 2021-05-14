@@ -188,8 +188,7 @@ namespace Assets.SEE.Utils
             {
                 return false;
             }
-            index++;
-            for (int i = index; i < globalHistory.Count; i++)
+            for (int i = ++index; i < globalHistory.Count; i++)
             {
                 foreach (string s in affectedGameObjects)
                 {
@@ -224,43 +223,39 @@ namespace Assets.SEE.Utils
         }
 
         /// <summary>
-        /// Deletes an item from the <see cref="globalHistory"/> depending on its id.
+        /// Deletes an item from the <see cref="globalHistory"/> depending on its ID.
         /// </summary>
-        /// <param name="id">the id of the action which should be deleted.</param>
+        /// <param name="id">the ID of the action which should be deleted.</param>
         public void DeleteItem(string id)
         {
-            for (int i = 0; i < globalHistory.Count; i++)
-            {
-                if (globalHistory[i].Item3.Equals(id))
-                {
-                    globalHistory.RemoveAt(i);
-                    return;
-                }
-            }
+            globalHistory.Remove(globalHistory.FirstOrDefault(x => x.Item3.Equals(id)));
         }
 
         /// <summary>
         /// Undoes the last action with an effect of a specific player.
-        /// If an undo isnt possible or no one is remaining the user gets an notification.
+        /// If a undo isn't possible or no one is remaining the user gets a notification.
         /// </summary>
         public void Undo()
         {
             if (UndoHistory.Count < 2) 
             {
-                ShowNotification.Error("Error:", "Undo not possible, no changes left to undo!");
+                ShowNotification.Error("Error", "Undo not possible, no changes left to undo!");
                 return;
             }
             LastAction.Stop();
             
             ReversibleAction current = LastActionWithEffect();
 
-            if (current == null) return;
+            if (current == null)
+            {
+                return;
+            }
 
             Tuple<bool, HistoryType, string, List<string>> lastAction = globalHistory[GetIndexOfAction(current.GetId())];
 
             if (ActionHasConflicts(current.GetChangedObjects(), current.GetId()))
             {
-                ShowNotification.Error("Error:", "Undo not possible, someone else had made a change on the same object!");
+                ShowNotification.Error("Error", "Undo not possible, someone else had made a change on the same object!");
                 Replace(lastAction, new Tuple<bool, HistoryType, string, List<string>>(false, HistoryType.undoneAction, lastAction.Item3, lastAction.Item4), false);
 
                 UndoHistory.Pop();
@@ -280,7 +275,10 @@ namespace Assets.SEE.Utils
 
                 Push(undoneAction);
                 new GlobalActionHistoryNetwork().Push(undoneAction.Item2, undoneAction.Item3, ListToString(undoneAction.Item4));
-                if (current == null) return;
+                if (current == null)
+                {
+                    return;
+                }
                 isRedo = true;
 
                 Resume(current);
@@ -289,24 +287,24 @@ namespace Assets.SEE.Utils
 
         /// <summary>
         /// Redoes the last undone action of a specific player.
-        /// If an redo isnt possible or no one is remaining the user gets an notification.
+        /// If a redo isn't possible or no one is remaining the user gets a notification.
         /// </summary>
         public void Redo()
         {
             Tuple<bool, HistoryType, string, List<string>> lastUndoneAction = FindLastActionOfPlayer(true, HistoryType.undoneAction);
             if (RedoHistory.Count == 0)
             {
-                ShowNotification.Error("Error:", "Redo not possible, no action left to be redone,!");
+                ShowNotification.Error("Error", "Redo not possible, no action left to be redone,!");
                 return;
             }
             else
             {
-                if(LastAction != null) LastAction.Stop(); 
+                LastAction?.Stop(); 
                 if (ActionHasConflicts(lastUndoneAction.Item4, lastUndoneAction.Item3))
                 {
                     RedoHistory.Pop();
                     Replace(lastUndoneAction, new Tuple<bool, HistoryType, string, List<string>>(false, HistoryType.undoneAction, lastUndoneAction.Item3, lastUndoneAction.Item4), false);
-                    ShowNotification.Error("Error:", "Redo not possible, someone else had made a change on the same object!");
+                    ShowNotification.Error("Error", "Redo not possible, someone else had made a change on the same object!");
                     LastAction.Start();
                     return;
                 }
@@ -380,21 +378,18 @@ namespace Assets.SEE.Utils
         }
 
         /// <summary>
-        /// Gets the number of all actions which are executed by other users after the action with the id <paramref name="idOfAction"/>.
-        /// <param name="idOfAction">the unique id of the action whose index has to be found.</param>
+        /// Gets the number of all actions which are executed by other users after the action with the ID <paramref name="idOfAction"/>.
+        /// <param name="idOfAction">the unique ID of the action whose index has to be found.</param>
         /// </summary>
-        /// <returns>the number of newer actions than that with the id <paramref name="idOfAction"/>, which are not executed by the owner.</returns>
+        /// <returns>the number of newer actions than the one with the ID <paramref name="idOfAction"/>, which is not executed by the owner.</returns>
         private int GetIndexOfAction(string idOfAction)
         {
-            for (int i = globalHistory.Count - 1; i >= 0; i--)
-            {
-                if (globalHistory[i].Item3.Equals(idOfAction)) return i;
-            }
-            return -1;
+            return globalHistory.Select((item, index) => new { item, index }).Reverse().FirstOrDefault(x => x.item.Item3.Equals(idOfAction))?.index ?? -1;
+
         }
 
         /// <summary>
-        /// Returns wether a player has no Actions left to be undone
+        /// Returns whether a player has no actions left to be undone
         /// </summary>
         /// <returns>true if no action left, else false.</returns>
         public bool NoActionsLeft()
@@ -407,19 +402,9 @@ namespace Assets.SEE.Utils
         /// </summary>
         /// <param name="gameObjectIds">the gameObjectIds</param>
         /// <returns>a single comma seperated string of all gameObjectIds.</returns>
-        private string ListToString(List<string> gameObjectIds)
+        private static string ListToString(List<string> gameObjectIds)
         {
-            string result = "";
-            if (gameObjectIds == null) return null;
-            foreach (string s in gameObjectIds)
-            {
-                result += s + ",";
-            }
-            if (result != "" && result != null)
-            {
-                return result.Substring(0, result.Length - 1);
-            }
-            else return null;
+            return (gameObjectIds != null) ? string.Join(",", gameObjectIds) : null;
         }
     }
 }
