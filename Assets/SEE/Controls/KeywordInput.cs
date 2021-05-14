@@ -24,7 +24,7 @@ namespace SEE.Controls
         /// <summary>
         /// Starts the <see cref="recognizer"/>.
         /// </summary>
-        private void Start()
+        public override void Start()
         {
             recognizer = new KeywordRecognizer(keywords);
             recognizer.OnPhraseRecognized += OnPhraseRecognized;
@@ -44,13 +44,23 @@ namespace SEE.Controls
         /// Shuts down <see cref="recognizer"/>.
         /// Called by Unity when the application closes.
         /// </summary>
-        private void OnApplicationQuit()
+        public override void Stop()
         {
             if (recognizer != null && recognizer.IsRunning)
             {
                 recognizer.OnPhraseRecognized -= OnPhraseRecognized;
                 recognizer.Stop();
             }
+        }
+
+        /// <summary>
+        /// Stops and disposes the recognizer. It cannot be re-started again.
+        /// </summary>
+        public override void Dispose()
+        {
+            Stop();
+            recognizer?.Dispose();
+            recognizer = null;
         }
     }
 }
