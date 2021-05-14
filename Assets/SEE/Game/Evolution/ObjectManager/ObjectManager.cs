@@ -297,34 +297,8 @@ namespace SEE.Game.Evolution
         {
             ClearNewEdges();
 
-            Dictionary<string, GameObject> remainingNodes = new Dictionary<string, GameObject>();
+            newEdges = _graphRenderer.EdgeLayout(nodes.Values, false);
 
-            foreach (var node in nodes)
-            {
-                remainingNodes.Add(node.Key, node.Value);
-            }
-
-            foreach (var node in nodes)
-            {
-                foreach (Edge edge in node.Value.GetNode().Outgoings)
-                {
-                    string id = edge.Target.ID;
-                    if (NegligibleNodes.Contains(id))
-                    {
-                        remainingNodes.Remove(id);
-                    }
-                }
-                if (NegligibleNodes.Contains(node.Key))
-                {
-                    remainingNodes.Remove(node.Key);
-                }
-            }
-
-            if (remainingNodes.Count() != 0)
-            {
-                newEdges = _graphRenderer.EdgeLayout(remainingNodes.Values, false);
-            }
-            
             return newEdges;
         }
 

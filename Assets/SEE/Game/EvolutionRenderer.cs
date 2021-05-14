@@ -922,7 +922,7 @@ namespace SEE.Game
                 // Edge was not moved
                 if (XZAreEqual(layoutNode.CenterPosition, currentGameNode.transform.position))
                 {
-                    negligibleNodes.Add(currentGameNode.name);
+                    negligibleNodes.Add(currentGameNode.ID());
                 }
                 // Node existed before.
                 if (diff.AreDifferent(formerGraphNode, graphNode))
