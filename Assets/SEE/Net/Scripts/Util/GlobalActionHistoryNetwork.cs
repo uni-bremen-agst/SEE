@@ -15,6 +15,11 @@ namespace SEE.Net
 
         /// <summary>
         /// The state which determines which action should be performed.
+        /// States:
+        /// init: the initial state, no code executedOnClient.
+        /// push: an new item should be pushed to the globalHistory on each client.
+        /// delete: an old item should be deleted from the globalHistory on each client.
+        /// replace: an entry in the globalHistory should be overwritten by newer changes on each client.
         /// </summary>
         public enum Mode
         {
@@ -35,12 +40,12 @@ namespace SEE.Net
         public ActionHistory.HistoryType type;
 
         /// <summary>
-        /// The id of the action.
+        /// The ID of the action.
         /// </summary>
         public string actionId;
 
         /// <summary>
-        /// The ids of all objects which are changed by the action.
+        /// The IDs of all objects which are changed by the action.
         /// </summary>
         public List<string> changedObjects;
 
@@ -93,10 +98,10 @@ namespace SEE.Net
         /// <summary>
         /// Initiates the push of an action on each client
         /// </summary>
-        /// <param name="type">Which type is the action (action, undoneAction)</param>
-        /// <param name="actionId">The id of the action</param>
-        /// <param name="changedObjects">The ids of the objects which are edited from the action</param>
-        public void Push( ActionHistory.HistoryType type, string actionId, string changedObjects)
+        /// <param name="type">The type of the action (action, undoneAction)</param>
+        /// <param name="actionId">The ID of the action</param>
+        /// <param name="changedObjects">The IDs of the objects which are edited from the action</param>
+        public void Push(ActionHistory.HistoryType type, string actionId, string changedObjects)
         {
             mode = Mode.push;
             this.type = type;
@@ -109,7 +114,7 @@ namespace SEE.Net
         /// <summary>
         /// Initiates the deletion process on each client.
         /// </summary>
-        /// <param name="actionId">The id of the action</param>
+        /// <param name="actionId">The ID of the action</param>
         public void Delete(string actionId) 
         {
             this.actionId = actionId;
@@ -121,8 +126,8 @@ namespace SEE.Net
         /// <summary>
         /// Updates an entry through all clients.
         /// </summary>
-        /// <param name="oldType">The type old item.</param>
-        /// <param name="id">The id of the items.</param>
+        /// <param name="oldType">The type of the old item.</param>
+        /// <param name="id">The ID of the items.</param>
         /// <param name="oldChangedObjects">The changedObjects from the old item.</param>
         /// <param name="newType">The type of the new item.</param>
         /// <param name="newChangedObjects">The changedObjects of the new item.</param>
@@ -139,16 +144,9 @@ namespace SEE.Net
         /// </summary>
         /// <param name="changedObjectsToParse">the changed objects which has to be parsed</param>
         /// <returns>a list of names of changed gameObjects</returns>
-        private List<string> StringToList(string changedObjectsToParse)
+        private static List<string> StringToList(string changedObjectsToParse)
         {
-            if (changedObjectsToParse == null)
-            {
-                return null;
-            }
-            string[] changedObjectsAsArray = new string[changedObjectsToParse.Split(',').Length];
-            changedObjectsAsArray = changedObjectsToParse.Split(',');
-            List<string> result = changedObjectsAsArray.ToList();
-            return result;
+            return changedObjectsToParse?.Split(',').ToList();
         }
     }
 }

@@ -6,17 +6,20 @@ using System.Collections.Generic;
 using System.Linq;
 namespace Assets.SEE.Utils
 {
+    /// <summary>
+    /// Maintains a history of executed reversible actions that can be undone and redone.
+    /// </summary>
     public class ActionHistory
     {
         // If a player executes an action that changes the same GameObject as an action
-        // of an other player, the player that has done action first,
-        // cannot perform an undo or redo on that because of an conflict.
+        // of another player, the player that has done the action first
+        // cannot perform an undo or redo on that because of a conflict.
         // If the second player undoes the newer change of the object, 
         // the undo of the older change is still not possible because
         // the change is still on the redoHistory of the other player.
         // Iff the player that has the newer action undoes the action 
         // and clears his redoHistory by performing another action,
-        // the other player can undone his action.
+        // the other player can undo his action.
 
         // Implementation note: This ActionHistory is a bit more complicated than
         // action histories in other contexts because we do not have atomic actions
@@ -41,7 +44,7 @@ namespace Assets.SEE.Utils
         };
 
         /// <summary>
-        /// If a user has done a undo
+        /// If a user has done an undo
         /// </summary>
         private bool isRedo = false;
 
@@ -90,7 +93,7 @@ namespace Assets.SEE.Utils
         /// Precondition: <paramref name="action"/> is not already present in the action history.
         /// </summary>
         /// <param name="action">the action to be executed</param>
-        /// <param name="ignoreRedoDeletion">Run with out deltetion of redos</param>
+        /// <param name="ignoreRedoDeletion">Run without deletion of redos</param>
         public void Execute(ReversibleAction action, bool ignoreRedoDeletion = false)
         {
             AssertAtMostOneActionWithNoEffect();
@@ -131,8 +134,8 @@ namespace Assets.SEE.Utils
 
         /// <summary>
         /// Replaces the unfinished action in the  <see cref="globalHistory"/> with the finished action.
-        /// It is important, because the gameObjects, which are manipulated by the action has to be listed just the same
-        /// as the values for the memento´s.
+        /// It is important, because the gameObjects, which are manipulated by the action have to be listed just the same
+        /// as the values for the memento's.
         /// </summary>
         /// <param name="oldItem">the old item in the <see cref="globalHistory"/>.</param>
         /// <param name="newItem">the new item in the <see cref="globalHistory"/>.</param>
@@ -142,7 +145,10 @@ namespace Assets.SEE.Utils
         {
             int index = GetIndexOfAction(oldItem.Item3);
             globalHistory[index] = newItem;
-            if (!isNetwork) new GlobalActionHistoryNetwork().Replace(oldItem.Item2, oldItem.Item3, ListToString(oldItem.Item4), newItem.Item2, ListToString(newItem.Item4));
+            if (!isNetwork)
+            {
+                new GlobalActionHistoryNetwork().Replace(oldItem.Item2, oldItem.Item3, ListToString(oldItem.Item4), newItem.Item2, ListToString(newItem.Item4));
+            }
         }
 
         /// <summary>
@@ -173,7 +179,7 @@ namespace Assets.SEE.Utils
         /// Checks whether the action to be executed has conflicts to another action.
         /// </summary>
         /// <param name="affectedGameObjects">the gameObjects affected by the action to be undone/redone.</param>
-        /// <param name="actionId">the id of the action which possibly has conflicts.</param>
+        /// <param name="actionId">the ID of the action which possibly has conflicts.</param>
         /// <returns>true, if there are conflicts, else false.</returns>
         private bool ActionHasConflicts(List<string> affectedGameObjects, string actionId )
         {

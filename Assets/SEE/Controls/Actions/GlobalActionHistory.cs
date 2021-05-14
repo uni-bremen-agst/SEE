@@ -61,7 +61,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Replaces a item in the globalHistory.
+        /// Replaces an item in the globalHistory.
         /// </summary>
         /// <param name="oldItem">the item that should be replaced.</param>
         /// <param name="newItem">the new item inserted instead.</param>
@@ -72,9 +72,9 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Deletes an item from the action list depending on its id.
+        /// Deletes an item from the action list depending on its ID.
         /// </summary>
-        /// <param name="id">the id of the action which should be deleted</param>
+        /// <param name="id">the ID of the action which should be deleted</param>
         public static void DeleteItem(string id)
         {
             history.DeleteItem(id);
