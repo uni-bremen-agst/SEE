@@ -34,6 +34,23 @@ namespace Assets.SEE.Utils
         // See also the test cases in <seealso cref="SEETests.TestActionHistory"/> for 
         // additional information.
 
+        public struct GlobalHistoryEntry
+        {
+            public GlobalHistoryEntry(bool isOwner, HistoryType type, string actionID, List<string> changedObjects)
+            {
+                IsOwner = isOwner;
+                ActionType = type;
+                ActionID = actionID;
+                ChangedObjects = changedObjects;
+            }
+
+            public bool IsOwner { get; }
+            public HistoryType ActionType { get; }
+            public string ActionID { get; }
+            public List<string> ChangedObjects { get; }
+    
+        }
+
         /// <summary>
         /// An enum which sets the type of an action in the history.
         /// </summary>
@@ -48,10 +65,12 @@ namespace Assets.SEE.Utils
         /// </summary>
         private bool isRedo = false;
 
+        GlobalActionHistoryNetwork globalActionHistoryNetwork = new GlobalActionHistoryNetwork();
+
         /// <summary>
         /// The actionHistory, which is synchronised through the network on each client.
         /// </summary>
-        private List<Tuple<bool, HistoryType, string, List<string>>> globalHistory = new List<Tuple<bool, HistoryType, string, List<string>>>();
+        private List<GlobalHistoryEntry> globalHistory = new List<GlobalHistoryEntry>();
 
         /// <summary>
         /// Contains all actions executed by the player.
@@ -117,8 +136,8 @@ namespace Assets.SEE.Utils
         {
             if (LastAction != null && LastAction.Update())
             {
-                Push(new Tuple<bool, HistoryType, string, List<string>>(true, HistoryType.action, LastAction.GetId(), LastAction.GetChangedObjects()));
-                new GlobalActionHistoryNetwork().Push(HistoryType.action, LastAction.GetId(), ListToString(LastAction.GetChangedObjects()));
+                Push(new GlobalHistoryEntry(true, HistoryType.action, LastAction.GetId(), LastAction.GetChangedObjects()));
+                globalActionHistoryNetwork.Push(HistoryType.action, LastAction.GetId(), ListToString(LastAction.GetChangedObjects()));
                 Execute(LastAction.NewInstance());
             }
         }
@@ -126,10 +145,10 @@ namespace Assets.SEE.Utils
         /// <summary>
         /// Pushes new actions to the <see cref="globalHistory"/>.
         /// </summary>
-        /// <param name="action">The action and all of its specific values which are needed for the history</param>
-        public void Push(Tuple<bool, HistoryType, string, List<string>> action)
+        /// <param name="entry">The action and all of its specific values which are needed for the history</param>
+        public void Push(GlobalHistoryEntry entry)
         {
-            globalHistory.Add(action);
+            globalHistory.Add(entry);
         }
 
         /// <summary>
@@ -140,39 +159,27 @@ namespace Assets.SEE.Utils
         /// <param name="oldItem">the old item in the <see cref="globalHistory"/>.</param>
         /// <param name="newItem">the new item in the <see cref="globalHistory"/>.</param>
         /// <param name="isNetwork">true, if the function call came from network, else false.</param>
-        public void Replace(Tuple<bool, HistoryType, string, List<string>> oldItem, 
-            Tuple<bool, HistoryType, string, List<string>> newItem, bool isNetwork)
+        public void Replace(GlobalHistoryEntry oldItem, 
+            GlobalHistoryEntry newItem, bool isNetwork)
         {
-            int index = GetIndexOfAction(oldItem.Item3);
+            int index = GetIndexOfAction(oldItem.ActionID);
             globalHistory[index] = newItem;
             if (!isNetwork)
             {
-                new GlobalActionHistoryNetwork().Replace(oldItem.Item2, oldItem.Item3, ListToString(oldItem.Item4), newItem.Item2, ListToString(newItem.Item4));
+                new GlobalActionHistoryNetwork().Replace(oldItem.ActionType, oldItem.ActionID, ListToString(oldItem.ChangedObjects), newItem.ActionType, ListToString(newItem.ChangedObjects));
             }
         }
 
         /// <summary>
         /// Finds the last executed action of a specific player in the <see cref="globalHistory"/>.
         /// </summary>
-        /// <param name="isOwner">true, if the user is the owner of the action, else false.</param>
         /// <param name="type">the type of action the user wants to perform</param>
-        /// <returns>A tuple of the latest users action and if any later done action blocks the undo (True if some action is blocking || false if not)</returns>  
-        /// Returns as second in the tuple that so each action could check it on its own >> List<ReversibleAction>> Returns Null if no action was found
-        private Tuple<bool, HistoryType, string, List<string>> FindLastActionOfPlayer(bool isOwner, HistoryType type)
+        /// 
+        /// <returns>A GlobalHistoryEntry. If the player has no last action of the given type left, the entry will be empty </returns>
+        private GlobalHistoryEntry FindLastActionOfPlayer(HistoryType type)
         {
-            Tuple<bool, HistoryType, string, List<string>> result = null;
-
-            for (int i = globalHistory.Count - 1; i >= 0; i--)
-            {
-                if (type == HistoryType.undoneAction && globalHistory[i].Item2 == HistoryType.undoneAction
-                    || type == HistoryType.action && globalHistory[i].Item2 == HistoryType.action
-                    && globalHistory[i].Item1 == true)
-                {
-                    result = globalHistory[i];
-                    break;
-                }
-            }
-            return result;
+            return globalHistory.FirstOrDefault(item => type == HistoryType.undoneAction && item.ActionType == HistoryType.undoneAction
+                                           || type == HistoryType.action && item.ActionType == HistoryType.action && item.IsOwner == true);
         }
 
         /// <summary>
@@ -192,9 +199,9 @@ namespace Assets.SEE.Utils
             {
                 foreach (string s in affectedGameObjects)
                 {
-                    if (globalHistory[i].Item4 != null)
+                    if (globalHistory[i].ChangedObjects != null)
                     {
-                        if (globalHistory[i].Item4.Contains(s) && globalHistory[i].Item1 == false)
+                        if (globalHistory[i].ChangedObjects.Contains(s) && globalHistory[i].IsOwner == false)
                         {
                             return true;
                         }
@@ -211,9 +218,9 @@ namespace Assets.SEE.Utils
         {
             for (int i = 0; i < globalHistory.Count; i++)
             {
-                if (globalHistory[i].Item1.Equals(true) && globalHistory[i].Item2.Equals(HistoryType.undoneAction))
+                if (globalHistory[i].IsOwner.Equals(true) && globalHistory[i].ActionType.Equals(HistoryType.undoneAction))
                 {
-                    new GlobalActionHistoryNetwork().Delete(globalHistory[i].Item3);
+                    new GlobalActionHistoryNetwork().Delete(globalHistory[i].ActionID);
                     globalHistory.RemoveAt(i);
                     i--;
                 }
@@ -228,7 +235,7 @@ namespace Assets.SEE.Utils
         /// <param name="id">the ID of the action which should be deleted.</param>
         public void DeleteItem(string id)
         {
-            globalHistory.Remove(globalHistory.FirstOrDefault(x => x.Item3.Equals(id)));
+            globalHistory.Remove(globalHistory.FirstOrDefault(x => x.ActionID.Equals(id)));
         }
 
         /// <summary>
@@ -251,12 +258,12 @@ namespace Assets.SEE.Utils
                 return;
             }
 
-            Tuple<bool, HistoryType, string, List<string>> lastAction = globalHistory[GetIndexOfAction(current.GetId())];
+            GlobalHistoryEntry lastAction = globalHistory[GetIndexOfAction(current.GetId())];
 
             if (ActionHasConflicts(current.GetChangedObjects(), current.GetId()))
             {
                 ShowNotification.Error("Error", "Undo not possible, someone else had made a change on the same object!");
-                Replace(lastAction, new Tuple<bool, HistoryType, string, List<string>>(false, HistoryType.undoneAction, lastAction.Item3, lastAction.Item4), false);
+                Replace(lastAction, new GlobalHistoryEntry(false, HistoryType.undoneAction, lastAction.ActionID, lastAction.ChangedObjects), false);
 
                 UndoHistory.Pop();
                 current.Start();
@@ -267,14 +274,13 @@ namespace Assets.SEE.Utils
                 current.Undo();
                 RedoHistory.Push(current);
                 UndoHistory.Pop();
-                DeleteItem(lastAction.Item3);
-                new GlobalActionHistoryNetwork().Delete(lastAction.Item3);
+                DeleteItem(lastAction.ActionID);
+                new GlobalActionHistoryNetwork().Delete(lastAction.ActionID);
 
-                Tuple<bool, HistoryType, string, List<string>> undoneAction = new Tuple<bool, HistoryType, string, List<string>>
-                    (true, HistoryType.undoneAction, lastAction.Item3, lastAction.Item4);
+                GlobalHistoryEntry undoneAction = new GlobalHistoryEntry(true, HistoryType.undoneAction, lastAction.ActionID, lastAction.ChangedObjects);
 
                 Push(undoneAction);
-                new GlobalActionHistoryNetwork().Push(undoneAction.Item2, undoneAction.Item3, ListToString(undoneAction.Item4));
+                new GlobalActionHistoryNetwork().Push(undoneAction.ActionType, undoneAction.ActionID, ListToString(undoneAction.ChangedObjects));
                 if (current == null)
                 {
                     return;
@@ -291,8 +297,8 @@ namespace Assets.SEE.Utils
         /// </summary>
         public void Redo()
         {
-            Tuple<bool, HistoryType, string, List<string>> lastUndoneAction = FindLastActionOfPlayer(true, HistoryType.undoneAction);
-            if (RedoHistory.Count == 0)
+            GlobalHistoryEntry lastUndoneAction = FindLastActionOfPlayer(HistoryType.undoneAction);
+            if (RedoHistory.Count == 0 || lastUndoneAction.ActionID == null)
             {
                 ShowNotification.Error("Error", "Redo not possible, no action left to be redone,!");
                 return;
@@ -300,10 +306,10 @@ namespace Assets.SEE.Utils
             else
             {
                 LastAction?.Stop(); 
-                if (ActionHasConflicts(lastUndoneAction.Item4, lastUndoneAction.Item3))
+                if (ActionHasConflicts(lastUndoneAction.ChangedObjects, lastUndoneAction.ActionID))
                 {
                     RedoHistory.Pop();
-                    Replace(lastUndoneAction, new Tuple<bool, HistoryType, string, List<string>>(false, HistoryType.undoneAction, lastUndoneAction.Item3, lastUndoneAction.Item4), false);
+                    Replace(lastUndoneAction, new GlobalHistoryEntry(false, HistoryType.undoneAction, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects), false);
                     ShowNotification.Error("Error", "Redo not possible, someone else had made a change on the same object!");
                     LastAction.Start();
                     return;
@@ -318,11 +324,11 @@ namespace Assets.SEE.Utils
                 UnityEngine.Assertions.Assert.IsTrue(RedoHistory.Count == 0
                                  || RedoHistory.Peek().CurrentProgress() != ReversibleAction.Progress.NoEffect);
 
-                Tuple<bool, HistoryType, string, List<string>> redoneAction = new Tuple<bool, HistoryType, string, List<string>>(true, HistoryType.action, lastUndoneAction.Item3, lastUndoneAction.Item4);
-                DeleteItem(lastUndoneAction.Item3);
-                new GlobalActionHistoryNetwork().Delete(lastUndoneAction.Item3);
+                GlobalHistoryEntry redoneAction = new GlobalHistoryEntry(true, HistoryType.action, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects);
+                DeleteItem(lastUndoneAction.ActionID);
+                new GlobalActionHistoryNetwork().Delete(lastUndoneAction.ActionID);
                 Push(redoneAction);
-                new GlobalActionHistoryNetwork().Push(redoneAction.Item2, redoneAction.Item3, ListToString(redoneAction.Item4));
+                new GlobalActionHistoryNetwork().Push(redoneAction.ActionType, redoneAction.ActionID, ListToString(redoneAction.ChangedObjects));
             }
         }
 
@@ -384,7 +390,7 @@ namespace Assets.SEE.Utils
         /// <returns>the number of newer actions than the one with the ID <paramref name="idOfAction"/>, which is not executed by the owner.</returns>
         private int GetIndexOfAction(string idOfAction)
         {
-            return globalHistory.Select((item, index) => new { item, index }).Reverse().FirstOrDefault(x => x.item.Item3.Equals(idOfAction))?.index ?? -1;
+            return globalHistory.Select((item, index) => new { item, index }).Reverse().FirstOrDefault(x => x.item.ActionID.Equals(idOfAction))?.index ?? -1;
 
         }
 
@@ -394,7 +400,7 @@ namespace Assets.SEE.Utils
         /// <returns>true if no action left, else false.</returns>
         public bool NoActionsLeft()
         {
-            return FindLastActionOfPlayer(true, HistoryType.action) == null;
+            return FindLastActionOfPlayer(HistoryType.action).ActionID == null;
         }
 
         /// <summary>
@@ -404,7 +410,7 @@ namespace Assets.SEE.Utils
         /// <returns>a single comma seperated string of all gameObjectIds.</returns>
         private static string ListToString(List<string> gameObjectIds)
         {
-            return (gameObjectIds != null) ? string.Join(",", gameObjectIds) : null;
+            return (gameObjectIds != null) ? string.Join("?", gameObjectIds) : null;
         }
     }
 }
