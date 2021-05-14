@@ -1,8 +1,10 @@
-﻿using System;
+﻿using SEE.Controls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Windows.Speech;
 
 namespace SEE.Game.UI.Menu
 {
@@ -78,6 +80,92 @@ namespace SEE.Game.UI.Menu
         public void ShowMenu(bool show)
         {
             MenuShown = show;
+            Listen(show);
+        }
+
+        /// <summary>
+        /// The keyword recognizer used to detect the spoken menu entry titles.
+        /// </summary>
+        private KeywordInput keywordInput;
+
+        /// <summary>
+        /// If <paramref name="listen"/> is true, the <see cref="keywordInput"/>
+        /// is started to listen to the mentry entry titles and one of the entries
+        /// can be triggered by saying its title. If <paramref name="listen"/> is
+        /// false instead, the <see cref="keywordInput"/> will be disposed.
+        /// </summary>
+        /// <param name="listen">whether <see cref="keywordInput"/> should be
+        /// listening</param>
+        private void Listen(bool listen)
+        {
+            if (listen)
+            {
+                keywordInput = new KeywordInput(GetMenuEntryTitles());
+                keywordInput.Register(OnMenuEntryTitleRecognized);
+                keywordInput.Start();
+            }
+            else if (keywordInput != null)
+            {
+                keywordInput.Unregister(OnMenuEntryTitleRecognized);
+                keywordInput.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// The keyword to be used to close the menu verbally.
+        /// </summary>
+        private const string CloseMenuCommand = "close menu";
+
+        /// <summary>
+        /// Returns the titles of all <see cref="entries"/> plus
+        /// <see cref="CloseMenuCommand"/> appended at the end.
+        /// </summary>
+        /// <returns>titles of all <see cref="entries"/> appended by 
+        /// <see cref="CloseMenuCommand"/></returns>
+        private string[] GetMenuEntryTitles()
+        {
+            /// +1 because of the appended <see cref="CloseMenuCommand"/>
+            string[] result = new string[entries.Count + 1];
+
+            int i = 0;
+            foreach (MenuEntry entry in entries)
+            {
+                result[i] = entry.Title;
+                i++;
+            }
+            // Note: It is important to append this pseudo entry at the end
+            // of all true menu entry titles because the index matters later
+            // when the entry's action is called.
+            result[i] = CloseMenuCommand;
+            return result;
+        }
+
+        /// <summary>
+        /// Callback registered in <see cref="Listen(bool)"/> to be called when
+        /// one of the menu entry titles was recognized (spoken by the user).
+        /// Triggers the corresponding action of the selected entry if the 
+        /// corresponding entry title was recognized and then and then
+        /// closes the menu again. If only <see cref="CloseMenuCommand"/>
+        /// was recognized, no action will be triggered, yet the menu will
+        /// be closed, too.
+        /// </summary>
+        /// <param name="args">the phrase recognized</param>
+        private void OnMenuEntryTitleRecognized(PhraseRecognizedEventArgs args)
+        {
+            int i = 0;
+            foreach (string keyword in GetMenuEntryTitles())
+            {
+                if (args.text == keyword)
+                {
+                    if (args.text != CloseMenuCommand)
+                    {
+                        SelectEntry(i);
+                    }
+                    ToggleMenu();
+                    break;
+                }
+                i++;
+            }
         }
 
         /// <summary>
