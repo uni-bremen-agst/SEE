@@ -171,7 +171,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Hides a given paramref name="gameEdge"></param> having been deleted before.
+        /// Hides a given paramref name="gameEdge"/> having been deleted before.
         /// </summary>
         /// <param name="gameEdge"></param>
         public static void HideEdges(GameObject gameEdge)

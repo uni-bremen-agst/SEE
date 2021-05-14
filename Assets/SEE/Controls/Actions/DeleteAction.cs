@@ -355,7 +355,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Finds the root of the <paramref name="graph"/> and saves the gameobject and the <paramref name="graph"/> in <see cref="roots"/>
         /// </summary>
-        /// <param name="graph"></param>
+        /// <param name="graph"</param>
         private void FindRoot(Graph graph)
         {
             List<Node> rootNodes = graph.GetRoots();
