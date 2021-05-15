@@ -198,7 +198,73 @@ namespace SEE.Game.UI.CodeWindow
         /// Set of antlr type names for Java comments.
         /// </summary>
         private static readonly HashSet<string> cSharpComments = new HashSet<string> { "SINGLE_LINE_DOC_COMMENT", "DELIMITED_DOC_COMMENT", "SINGLE_LINE_COMMENT", "DELIMITED_COMMENT" };
-        
+
+
+        #endregion
+
+        #region CPP Language
+
+        /// <summary>
+        /// Name of the antlr grammar lexer.
+        /// </summary>
+        private const string cppFileName = "CPP14Lexer.g4";
+
+        /// <summary>
+        /// Set of CPP file extensions.
+        /// </summary>
+        private static readonly HashSet<string> cppExtensions = new HashSet<string>
+        {
+            "cpp"
+        };
+
+        /// <summary>
+        /// Set of antlr type names for CPP keywords.
+        /// </summary>
+        private static readonly HashSet<string> cppKeywords = new HashSet<string>
+        {
+            "Alignas", "Alignof", "Asm", "Auto", "Bool", "Break", "Case",
+        "Catch", "Char", "Char16", "Char32", "Class", "Const", "Constexpr", "Const_cast",
+        "Continue", "Decltype", "Default", "Delete", "Do", "Double", "Dynamic_cast",
+        "Else", "Enum", "Explicit", "Export", "Extern", "False_", "Final", "Float",
+        "For", "Friend", "Goto", "If", "Inline", "Int", "Long", "Mutable", "Namespace",
+        "New", "Noexcept", "Nullptr", "Operator", "Override", "Private", "Protected",
+        "Public", "Register", "Reinterpret_cast", "Return", "Short", "Signed",
+        "Sizeof", "Static", "Static_assert", "Static_cast", "Struct", "Switch",
+        "Template", "This", "Thread_local", "Throw", "True_", "Try", "Typedef",
+        "Typeid_", "Typename_", "Union", "Unsigned", "Using", "Virtual", "Void",
+        "Volatile", "Wchar", "While",
+        };
+        /// <summary>
+        /// Set of antlr type names for CPP integer and floating point literals.
+        /// </summary>
+        private static readonly HashSet<string> cppNumbers = new HashSet<string> { "IntegerLiteral", "CharacterLiteral", "FloatingLiteral" };
+        /// <summary>Set of antlr type names for CPP character and string literals.</summary>
+        private static readonly HashSet<string> cppStrings = new HashSet<string> { "StringLiteral" };
+        /// <summary>Set of antlr type names for CPP separators and operators.</summary>
+        private static readonly HashSet<string> cppPunctuation = new HashSet<string> { "LeftParen", "RightParen", "LeftBracket",
+        "RightBracket", "LeftBrace", "RightBrace", "Plus", "Minus", "Star", "Div",
+        "Mod", "Caret", "And", "Or", "Tilde", "Not", "Assign", "Less", "Greater",
+        "PlusAssign", "MinusAssign", "StarAssign", "DivAssign", "ModAssign", "XorAssign",
+        "AndAssign", "OrAssign", "LeftShiftAssign", "RightShiftAssign", "Equal",
+        "NotEqual", "LessEqual", "GreaterEqual", "AndAnd", "OrOr", "PlusPlus",
+        "MinusMinus", "Comma", "ArrowStar", "Arrow", "Question", "Colon", "Doublecolon",
+        "Semi", "Dot", "DotStar", "Ellipsis"
+        };
+        /// <summary>Set of antlr type names for CPP identifiers.</summary>
+        private static readonly HashSet<string> cppIdentifiers = new HashSet<string> { "Identifier" };
+        /// <summary>
+        /// Set of antlr type names for CPP whitespace.
+        /// </summary>
+        private static readonly HashSet<string> cppWhitespace = new HashSet<string> { "Whitespace" };
+        /// <summary>
+        /// Set of antlr type names for CPP newlines.
+        /// </summary>
+        private static readonly HashSet<string> cppNewlines = new HashSet<string> { "Newline" };
+        /// <summary>
+        /// Set of antlr type names for CPP comments.
+        /// </summary>
+        private static readonly HashSet<string> cppComments = new HashSet<string> { "BlockComment", "LineComment" };
+
 
         #endregion
 
@@ -216,10 +282,16 @@ namespace SEE.Game.UI.CodeWindow
             javaStrings, javaPunctuation, javaIdentifiers, javaWhitespace, javaNewlines, javaComments);
 
         /// <summary>
-        /// Token Language for Java.
+        /// Token Language for CSharp.
         /// </summary>
         public static readonly TokenLanguage CSharp = new TokenLanguage(cSharpFileName, cSharpExtensions, cSharpKeywords, cSharpNumbers,
             cSharpStrings, cSharpPunctuation, cSharpIdentifiers, cSharpWhitespace, cSharpNewlines, cSharpComments);
+
+        /// <summary>
+        /// Token Language for CPP.
+        /// </summary>
+        public static readonly TokenLanguage CPP = new TokenLanguage(cppFileName, cppExtensions, cppKeywords, cppNumbers,
+            cppStrings, cppPunctuation, cppIdentifiers, cppWhitespace, cppNewlines, cppComments);
 
 
         #endregion
@@ -306,6 +378,9 @@ namespace SEE.Game.UI.CodeWindow
             } else if (LexerFileName.Equals(cSharpFileName))
             {
                 return new CSharpLexer(input);
+            } else if (LexerFileName.Equals(cppFileName))
+            {
+                return new CPP14Lexer(input);
             }
 
             throw new InvalidOperationException("No lexer defined for this language yet.");
