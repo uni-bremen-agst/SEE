@@ -82,14 +82,11 @@ Finally, you have to edit the file `Assets/SEE/Game/UI/CodeWindow/TokenLanguage.
    - If, in your language, it is customary to use a number different than 4 spaces to be equivalent to a tab,
     add this number as the final parameter to the `new TokenLanguage` constructor call.
 4. Finally, you'll need to edit the `CreateLexer` method.
-   Add another `else if` statement below the existing ones like the following, once again
+   Add another switch branch below the existing ones like the following, once again
    replacing `lang` with the name of your language and replacing `LangLexer` with the name
    of the new lexer (most likely the name of the lexer file created earlier, you need to import its namespace):
    ```cs
-    else if (LexerFileName.Equals(langFileName))
-    {
-        return new LangLexer(input);
-    }
+    langFileName => new LangLexer(input),
    ```
 5. And you're done! Try loading a file of this type into SEE and open it as a code window.
    If it works, you should see some color. If you don't, or if something seems wrong, check the logs.
