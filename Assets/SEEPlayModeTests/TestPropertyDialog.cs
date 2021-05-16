@@ -1,6 +1,6 @@
-﻿using NUnit.Framework;
+﻿using System.Collections;
+using NUnit.Framework;
 using SEE.Controls;
-using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -12,7 +12,7 @@ namespace SEE.Game.UI.PropertyDialog
     /// <summary>
     /// Test cases for <see cref="PropertyDialog"/>.
     /// </summary>
-    class TestPropertyDialog
+    internal class TestPropertyDialog
     {
         [UnitySetUp]
         public IEnumerator Setup()
