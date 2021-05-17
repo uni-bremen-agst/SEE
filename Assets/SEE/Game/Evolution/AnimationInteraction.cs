@@ -29,15 +29,11 @@ using UnityEngine.UI;
 namespace SEE.Game.Evolution
 {
     /// <summary>
-    /// The AnimationInteraction manages user inputs and interfaces
+    /// The AnimationInteraction manages user inputs and interfaces for the animation of the
+    /// evolution.
     /// </summary>
     public class AnimationInteraction : MonoBehaviour
     {
-        /// <summary>
-        /// The camera from the user.
-        /// </summary>
-        //public FlyCamera FlyCamera; // serialized by Unity (it is a MonoBehaviour)
-
         /// <summary>
         /// Whether the UI for selecting revisions is currently shown.
         /// </summary>
@@ -455,12 +451,6 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// FIXME: the index of the previous graph shown. This is used only
-        /// for debugging. Remove it.
-        /// </summary>
-        private int previousGraphIndex = -1;
-
-        /// <summary>
         /// Handles the user input as follows:
         ///   KeyBindings.PreviousRevision => previous graph revision is shown
         ///   KeyBindings.NextRevision     => next graph revision is shown
@@ -474,15 +464,7 @@ namespace SEE.Game.Evolution
         private void Update()
         {
             if (!IsRevisionSelectionOpen)
-            {
-                // FIXME: Remove this code. It is used only for debugging to see
-                // whether any progress is made.
-                if (previousGraphIndex != evolutionRenderer.CurrentGraphIndex)
-                {
-                    previousGraphIndex = evolutionRenderer.CurrentGraphIndex;
-                    Debug.Log($"currentGraphIndex={previousGraphIndex}\n");
-                }
-                
+            {                
                 if (SEEInput.PreviousRevision())
                 {
                     evolutionRenderer.ShowPreviousGraph();
