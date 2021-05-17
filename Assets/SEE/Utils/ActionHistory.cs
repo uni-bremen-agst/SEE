@@ -134,6 +134,7 @@ namespace Assets.SEE.Utils
         /// </summary>
         public void Update()
         {
+            UnityEngine.Debug.LogWarning(" STACK SIZE " + globalHistory.Count);
             if (LastAction != null && LastAction.Update())
             {
                 Push(new GlobalHistoryEntry(true, HistoryType.action, LastAction.GetId(), LastAction.GetChangedObjects()));
@@ -162,6 +163,7 @@ namespace Assets.SEE.Utils
         public void Replace(GlobalHistoryEntry oldItem, 
             GlobalHistoryEntry newItem, bool isNetwork)
         {
+            UnityEngine.Debug.LogError("REPLACE " + oldItem.ActionID);
             int index = GetIndexOfAction(oldItem.ActionID);
             UnityEngine.Debug.LogError(index);
             globalHistory[index] = newItem;
@@ -400,12 +402,7 @@ namespace Assets.SEE.Utils
         /// <returns>the number of newer actions than the one with the ID <paramref name="idOfAction"/>, which is not executed by the owner.</returns>
         private int GetIndexOfAction(string idOfAction)
         {
-            for (int i = globalHistory.Count - 1; i >= 0; i--)
-            {
-                if (globalHistory[i].ActionID.Equals(idOfAction)) return i;
-            }
-            return -1;
-
+            return globalHistory.Select((item, index) => new { item, index }).Reverse().FirstOrDefault(x => x.item.ActionID.Equals(idOfAction))?.index ?? -1;
         }
 
         /// <summary>
