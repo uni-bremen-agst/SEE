@@ -1,7 +1,6 @@
 using SEE.Game.UI.Notification;
 using SEE.Net;
 using SEE.Utils;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 namespace Assets.SEE.Utils
@@ -48,7 +47,7 @@ namespace Assets.SEE.Utils
             public HistoryType ActionType { get; }
             public string ActionID { get; }
             public List<string> ChangedObjects { get; }
-    
+
         }
 
         /// <summary>
@@ -134,7 +133,6 @@ namespace Assets.SEE.Utils
         /// </summary>
         public void Update()
         {
-            UnityEngine.Debug.LogWarning(" STACK SIZE " + globalHistory.Count);
             if (LastAction != null && LastAction.Update())
             {
                 Push(new GlobalHistoryEntry(true, HistoryType.action, LastAction.GetId(), LastAction.GetChangedObjects()));
@@ -160,12 +158,10 @@ namespace Assets.SEE.Utils
         /// <param name="oldItem">the old item in the <see cref="globalHistory"/>.</param>
         /// <param name="newItem">the new item in the <see cref="globalHistory"/>.</param>
         /// <param name="isNetwork">true, if the function call came from network, else false.</param>
-        public void Replace(GlobalHistoryEntry oldItem, 
+        public void Replace(GlobalHistoryEntry oldItem,
             GlobalHistoryEntry newItem, bool isNetwork)
         {
-            UnityEngine.Debug.LogError("REPLACE " + oldItem.ActionID);
             int index = GetIndexOfAction(oldItem.ActionID);
-            UnityEngine.Debug.LogError(index);
             globalHistory[index] = newItem;
             if (!isNetwork)
             {
@@ -199,7 +195,7 @@ namespace Assets.SEE.Utils
         /// <param name="affectedGameObjects">the gameObjects affected by the action to be undone/redone.</param>
         /// <param name="actionId">the ID of the action which possibly has conflicts.</param>
         /// <returns>true, if there are conflicts, else false.</returns>
-        private bool ActionHasConflicts(List<string> affectedGameObjects, string actionId )
+        private bool ActionHasConflicts(List<string> affectedGameObjects, string actionId)
         {
             int index = GetIndexOfAction(actionId);
             if (index == -1)
@@ -247,7 +243,7 @@ namespace Assets.SEE.Utils
         public void DeleteItem(string id)
         {
             globalHistory.Remove(globalHistory.FirstOrDefault(x => x.ActionID.Equals(id)));
-            
+
         }
 
         /// <summary>
@@ -256,13 +252,13 @@ namespace Assets.SEE.Utils
         /// </summary>
         public void Undo()
         {
-            if (UndoHistory.Count < 2) 
+            if (UndoHistory.Count < 2)
             {
                 ShowNotification.Error("Error", "Undo not possible, no changes left to undo!");
                 return;
             }
             LastAction.Stop();
-            
+
             ReversibleAction current = LastActionWithEffect();
 
             if (current == null)
@@ -317,7 +313,7 @@ namespace Assets.SEE.Utils
             }
             else
             {
-                LastAction?.Stop(); 
+                LastAction?.Stop();
                 if (ActionHasConflicts(lastUndoneAction.ChangedObjects, lastUndoneAction.ActionID))
                 {
                     RedoHistory.Pop();
@@ -380,7 +376,7 @@ namespace Assets.SEE.Utils
         /// has had any effect (preliminary or complete) or null<</returns>
         private ReversibleAction LastActionWithEffect()
         {
-            while(UndoHistory.Count > 0)
+            while (UndoHistory.Count > 0)
             {
                 ReversibleAction action = UndoHistory.Peek();
                 if (action.CurrentProgress() != ReversibleAction.Progress.NoEffect)
