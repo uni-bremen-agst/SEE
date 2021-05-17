@@ -3,10 +3,10 @@ using SEE.GO;
 using SEE.Utils;
 using System;
 using UnityEngine;
-using Assets.SEE.Game;
 using System.Collections.Generic;
 using SEE.DataModel.DG;
 using SEE.DataModel;
+using System.Linq;
 
 namespace SEE.Controls.Actions
 {

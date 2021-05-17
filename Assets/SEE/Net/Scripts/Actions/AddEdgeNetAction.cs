@@ -1,4 +1,4 @@
-﻿using Assets.SEE.Game;
+﻿using SEE.Game;
 using UnityEngine;
 
 namespace SEE.Net
