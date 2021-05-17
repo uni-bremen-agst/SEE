@@ -50,14 +50,24 @@ namespace SEE.Net
         public List<string> changedObjects;
 
         /// <summary>
-        /// The old item which has to be replaced.
+        /// The IDs of all objects which are changed by the old action.
         /// </summary>
-        public GlobalHistoryEntry oldItem;
+        public List<string> oldChangedObjects;
 
         /// <summary>
-        /// The new item which is replacing the old.
+        /// The old items ID which has to be replaced.
         /// </summary>
-        public GlobalHistoryEntry newItem;
+        public string ID;
+
+        /// <summary>
+        /// The old items type which has to be replaced.
+        /// </summary>
+        public HistoryType oldItemType;
+
+        /// <summary>
+        /// The new items type which is replacing the old.
+        /// </summary>
+        public HistoryType newItemType;
 
         public GlobalActionHistoryNetwork() 
         {
@@ -89,8 +99,10 @@ namespace SEE.Net
                 }
                 else if (mode == Mode.replace)
                 {
-                    UnityEngine.Debug.LogError("NETWORK ID" + oldItem.ActionID + " " + newItem.ActionID);
-                    GlobalActionHistory.Replace(oldItem, newItem, true);
+                    //UnityEngine.Debug.LogError("NETWORK ID" + oldItem.ActionID + " " + newItem.ActionID);
+                    //UnityEngine.Debug.LogError("NETWORK CHANGED OBJECTs" + oldItem.ChangedObjects);
+                    //GlobalActionHistory.Replace(oldItem, newItem, true);
+                    GlobalActionHistory.Replace(new GlobalHistoryEntry(false, oldItemType, ID, oldChangedObjects), new GlobalHistoryEntry(false, newItemType, ID, changedObjects), true);
                 }
                 mode = Mode.init;
             }
@@ -135,8 +147,14 @@ namespace SEE.Net
         public void Replace(ActionHistory.HistoryType oldType, string id, string oldChangedObjects, ActionHistory.HistoryType newType, string newChangedObjects)
         {
             UnityEngine.Debug.LogError("ID NETWORK " + id);
-            oldItem = new GlobalHistoryEntry(false, oldType, id, StringToList(oldChangedObjects));
-            newItem = new GlobalHistoryEntry(false, newType, id, StringToList(newChangedObjects));
+            oldItemType = oldType;
+            ID = id;
+            this.oldChangedObjects = StringToList(oldChangedObjects);
+            changedObjects = StringToList(newChangedObjects);
+
+
+            //oldItem = new GlobalHistoryEntry(false, oldType, id, StringToList(oldChangedObjects));
+            //newItem = new GlobalHistoryEntry(false, newType, id, StringToList(newChangedObjects));
             mode = Mode.replace;
             Execute(null);
         }
