@@ -134,7 +134,6 @@ namespace Assets.SEE.Utils
         /// </summary>
         public void Update()
         {
-            UnityEngine.Debug.LogError(RedoHistory.Count);
             if (LastAction != null && LastAction.Update())
             {
                 Push(new GlobalHistoryEntry(true, HistoryType.action, LastAction.GetId(), LastAction.GetChangedObjects()));
