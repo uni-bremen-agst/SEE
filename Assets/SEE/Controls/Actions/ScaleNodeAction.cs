@@ -341,14 +341,7 @@ namespace SEE.Controls.Actions
                     if (node.TryGetComponent(out NodeRef nodeRef))
                     {
 
-                        foreach (Edge edge in nodeRef.Value.Outgoings)
-                        {
-                            edgesToBeRedrawn.Add(edge);
-                        }
-                        foreach (Edge edge in nodeRef.Value.Incomings)
-                        {
-                            edgesToBeRedrawn.Add(edge);
-                        }
+                        edgesToBeRedrawn.UnionWith(nodeRef.Value.Outgoings.Union(nodeRef.Value.Incomings));
                     }
                 }
             }
