@@ -89,6 +89,7 @@ namespace SEE.Net
                 }
                 else if (mode == Mode.replace)
                 {
+                    UnityEngine.Debug.LogError("NETWORK ID" + oldItem.ActionID + " " + newItem.ActionID);
                     GlobalActionHistory.Replace(oldItem, newItem, true);
                 }
                 mode = Mode.init;
