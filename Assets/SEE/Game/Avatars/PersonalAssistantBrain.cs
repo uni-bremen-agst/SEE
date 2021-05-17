@@ -58,7 +58,7 @@ namespace SEE.Game.Avatars
             {
                 isTalking = Animator.StringToHash("IsTalking");
                 // We want to start the welcome message 3 seconds after the game has started.
-                Invoke("Welcome", 3);
+                Invoke(nameof(Welcome), 3);
             }
         }
 
@@ -87,8 +87,7 @@ namespace SEE.Game.Avatars
 
         /// <summary>
         /// Speaks the <see cref="welcomeText"/>. It is called as a delayed
-        /// function within <see cref="Start"/>. If you ever rename this method,
-        /// you must adjust the string literal in <see cref="Start"/>.
+        /// function within <see cref="Start"/>.
         /// </summary>
         public void Welcome()
         {

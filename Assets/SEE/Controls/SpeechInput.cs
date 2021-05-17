@@ -14,7 +14,7 @@
         public abstract void Start();
 
         /// <summary>
-        /// Stops the recognizer. It cann be re-started again
+        /// Stops the recognizer. It can be re-started again
         /// by calling <see cref="Start"/>.
         /// </summary>
         public abstract void Stop();

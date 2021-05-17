@@ -1,7 +1,6 @@
 ﻿using SEE.Controls;
 using SEE.GO;
 using System;
-using System.Text;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
 
@@ -91,16 +90,11 @@ namespace SEE.Game.Avatars
         /// Returns the concatenation of all <paramref name="values"/> (separated by
         /// a blank). Can be used for debugging.
         /// </summary>
-        /// <param name="values"></param>
+        /// <param name="values">values to be concatenated</param>
         /// <returns>concatenation of all <paramref name="values"/></returns>
         private string ToString(string[] values)
         {
-            StringBuilder builder = new StringBuilder();
-            foreach (string value in values)
-            {
-                builder.Append(value + " ");
-            }
-            return builder.ToString();
+            return string.Join(", ", values);
         }
 
         /// <summary>
