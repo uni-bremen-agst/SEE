@@ -134,6 +134,7 @@ namespace Assets.SEE.Utils
         /// </summary>
         public void Update()
         {
+            UnityEngine.Debug.LogError(RedoHistory.Count);
             if (LastAction != null && LastAction.Update())
             {
                 Push(new GlobalHistoryEntry(true, HistoryType.action, LastAction.GetId(), LastAction.GetChangedObjects()));
@@ -176,10 +177,18 @@ namespace Assets.SEE.Utils
         /// <param name="type">the type of action the user wants to perform</param>
         /// 
         /// <returns>A GlobalHistoryEntry. If the player has no last action of the given type left, the entry will be empty </returns>
-        private GlobalHistoryEntry FindLastActionOfPlayer(HistoryType type)
+        private GlobalHistoryEntry FindLastActionOfPlayer(HistoryType type) // Note the one liner from @Falkos Suggestion dosent work properly if we do an undo redo combination more than one time
         {
-            return globalHistory.FirstOrDefault(item => type == HistoryType.undoneAction && item.ActionType == HistoryType.undoneAction
-                                           || type == HistoryType.action && item.ActionType == HistoryType.action && item.IsOwner == true);
+            for (int i = globalHistory.Count - 1; i >= 0; i--)
+            {
+                if (type == HistoryType.undoneAction && globalHistory[i].ActionType == HistoryType.undoneAction
+                    || type == HistoryType.action && globalHistory[i].ActionType == HistoryType.action
+                    && globalHistory[i].IsOwner == true)
+                {
+                    return globalHistory[i];
+                }
+            }
+            return new GlobalHistoryEntry();
         }
 
         /// <summary>
@@ -236,6 +245,7 @@ namespace Assets.SEE.Utils
         public void DeleteItem(string id)
         {
             globalHistory.Remove(globalHistory.FirstOrDefault(x => x.ActionID.Equals(id)));
+            
         }
 
         /// <summary>
