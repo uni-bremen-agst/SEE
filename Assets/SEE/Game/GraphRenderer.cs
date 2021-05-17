@@ -162,8 +162,7 @@ namespace SEE.Game
         /// Creates and returns a new edge between <paramref name="from"/> and <paramref name="to"/>
         /// based on the current settings. A new edge will be added to the underlying graph, too.
         /// 
-        /// Note: null may be returned if no edge layout was chosen. The graph edge will be
-        /// created and added to the underlying graph anyway.
+        /// Note: A default edge layout will be used if no edge layout was chosen.
         /// 
         /// Precondition: <paramref name="from"/> and <paramref name="to"/> must have a valid
         /// node reference. The corresponding graph nodes must be in the same graph.
@@ -171,7 +170,9 @@ namespace SEE.Game
         /// <param name="from">source of the new edge</param>
         /// <param name="to">target of the new edge</param>
         /// <param name="id">id of the new edge. If it is null or empty, a new id will be generated</param>
-        /// <returns>the new edge or null</returns>
+        /// <returns>the new edge</returns>
+        /// <exception cref="Exception">thrown if <paramref name="from"/> or <paramref name="to"/>
+        /// are not contained in any graph or contained in different graphs</exception>
         public GameObject DrawEdge(GameObject from, GameObject to, string id)
         {
             Node fromNode = from.GetNode();
@@ -197,11 +198,13 @@ namespace SEE.Game
 
             Graph graph = fromNode.ItsGraph;
             graph.AddEdge(edge);
-
-            if (settings.EdgeLayout == EdgeLayoutKind.None)
+            // Save edge layout so that we can restore it if we need to select a default layout.
+            EdgeLayoutKind savedEdgeLayout = settings.EdgeLayout;
+            if (savedEdgeLayout == EdgeLayoutKind.None)
             {
                 Debug.LogWarning($"An edge {edge.ID} from {fromNode.ID} to {toNode.ID} was added to the graph, but no edge layout was chosen.\n");
-                return null;
+                // Select default layout
+                settings.EdgeLayout = EdgeLayoutKind.Spline;
             }
 
             // Creating the game object representing the edge.
@@ -247,6 +250,8 @@ namespace SEE.Game
             resultingEdge.transform.SetParent(rootNode.transform);
             // The portal of the new edge is inherited from the codeCity.
             Portal.SetPortal(root: codeCity, gameObject: resultingEdge);
+            // Reset original edge layout.
+            settings.EdgeLayout = savedEdgeLayout;
             return resultingEdge;
         }
 
