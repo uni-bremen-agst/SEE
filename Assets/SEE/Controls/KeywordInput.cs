@@ -43,7 +43,7 @@ namespace SEE.Controls
         /// Registers <paramref name="phraseRecognizedDelegate"/> as a callback to
         /// be called when one of the keywords was recognized.
         /// </summary>
-        /// <param name="phraseRecognizedDelegate"></param>
+        /// <param name="phraseRecognizedDelegate">delegate to be registered</param>
         public void Register(PhraseRecognizedDelegate phraseRecognizedDelegate)
         {
             recognizer.OnPhraseRecognized += phraseRecognizedDelegate;
@@ -53,7 +53,7 @@ namespace SEE.Controls
         /// Unregisters <paramref name="phraseRecognizedDelegate"/> as a callback formerly to
         /// be called when one of the keywords was recognized.
         /// </summary>
-        /// <param name="phraseRecognizedDelegate"></param>
+        /// <param name="phraseRecognizedDelegate">delegate to be unregistered</param>
         public void Unregister(PhraseRecognizedDelegate phraseRecognizedDelegate)
         {
             recognizer.OnPhraseRecognized -= phraseRecognizedDelegate;
