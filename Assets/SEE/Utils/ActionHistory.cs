@@ -400,7 +400,11 @@ namespace Assets.SEE.Utils
         /// <returns>the number of newer actions than the one with the ID <paramref name="idOfAction"/>, which is not executed by the owner.</returns>
         private int GetIndexOfAction(string idOfAction)
         {
-            return globalHistory.Select((item, index) => new { item, index }).Reverse().FirstOrDefault(x => x.item.ActionID.Equals(idOfAction))?.index ?? -1;
+            for (int i = globalHistory.Count - 1; i >= 0; i--)
+            {
+                if (globalHistory[i].ActionID.Equals(idOfAction)) return i;
+            }
+            return -1;
 
         }
 
