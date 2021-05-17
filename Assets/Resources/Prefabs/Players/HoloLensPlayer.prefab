@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 570184862889824319}
   - component: {fileID: 570184862889824304}
   - component: {fileID: 570184862889824305}
+  - component: {fileID: -1983423616591924248}
   m_Layer: 0
   m_Name: HoloLensPlayer
   m_TagString: MainCamera
@@ -134,3 +135,11 @@ MonoBehaviour:
   gazeTransform: {fileID: 0}
   minHeadVelocityThreshold: 0.5
   maxHeadVelocityThreshold: 2
+--- !u!81 &-1983423616591924248
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 570184862889824307}
+  m_Enabled: 1
