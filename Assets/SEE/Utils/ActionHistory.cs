@@ -163,6 +163,7 @@ namespace Assets.SEE.Utils
             GlobalHistoryEntry newItem, bool isNetwork)
         {
             int index = GetIndexOfAction(oldItem.ActionID);
+            UnityEngine.Debug.LogError(index);
             globalHistory[index] = newItem;
             if (!isNetwork)
             {
