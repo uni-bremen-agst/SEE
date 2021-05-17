@@ -1,4 +1,4 @@
-Modern UI Pack - v4.4.2
+Modern UI Pack - v4.4.3
 
 Make sure to update TextMesh Pro to the latest version and import its essentials.
 Online documentation: https://docs.google.com/document/d/1TMecEhM6jYPWs9xyyIhugwIhLd8aV98KcasPDq6bApA
@@ -16,6 +16,17 @@ Geno (Contributor)
 Filmos (Tester)
 Kabbouchi (Tester)
 Takashi Sakai
+
+Changelog v4.4.3
+----------------------------------------
+• Added delay option for tooltip content
+• Added mobile support for context menu
+• Added update mode selection for ripples
+• Improved modal window editor layout
+• Improved ripple creation system
+• Fixed dev-build logs caused by UI Manager
+• Fixed window manager states for mobile
+----------------------------------------
 
 Changelog v4.4.2
 ----------------------------------------

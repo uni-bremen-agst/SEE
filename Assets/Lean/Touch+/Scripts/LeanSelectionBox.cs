@@ -34,6 +34,12 @@ namespace Lean.Touch
 		/// <summary>The selected objects will be selected by this component.</summary>
 		public LeanSelectByFinger Select { set { select = value; } get { return select; } } [FSA("Select")] [SerializeField] private LeanSelectByFinger select;
 
+		/// <summary>For an object to be selected, it must be in one of these layers.</summary>
+		public LayerMask RequiredLayers { set { requiredLayers = value; } get { return requiredLayers; } } [SerializeField] private LayerMask requiredLayers = -1;
+
+		/// <summary>For an object to be selected, it must have one of these tags.</summary>
+		public List<string> RequiredTags { get { if (requiredTags == null) requiredTags = new List<string>(); return requiredTags; } } [SerializeField] private List<string> requiredTags;
+
 		// This stores all the links between Fingers and RectTransform instances
 		private List<FingerData> fingerDatas = new List<FingerData>();
 
@@ -42,16 +48,16 @@ namespace Lean.Touch
 
 		protected virtual void OnEnable()
 		{
-			LeanTouch.OnFingerDown += HandleFingerDown;
-			LeanTouch.OnFingerUpdate  += HandleFingerSet;
-			LeanTouch.OnFingerUp   += HandleFingerUp;
+			LeanTouch.OnFingerDown   += HandleFingerDown;
+			LeanTouch.OnFingerUpdate += HandleFingerSet;
+			LeanTouch.OnFingerUp     += HandleFingerUp;
 		}
 
 		protected virtual void OnDisable()
 		{
-			LeanTouch.OnFingerDown -= HandleFingerDown;
-			LeanTouch.OnFingerUpdate  -= HandleFingerSet;
-			LeanTouch.OnFingerUp   -= HandleFingerUp;
+			LeanTouch.OnFingerDown   -= HandleFingerDown;
+			LeanTouch.OnFingerUpdate -= HandleFingerSet;
+			LeanTouch.OnFingerUp     -= HandleFingerUp;
 		}
 
 		private void HandleFingerDown(LeanFinger finger)
@@ -64,6 +70,11 @@ namespace Lean.Touch
 
 			// Only use fingers clear of the GUI
 			if (ignoreIfStartedOverGui == true && finger.StartedOverGui == true)
+			{
+				return;
+			}
+
+			if (finger.Index == LeanTouch.HOVER_FINGER_INDEX)
 			{
 				return;
 			}
@@ -160,11 +171,16 @@ namespace Lean.Touch
 
 				foreach (var selectable in LeanSelectableByFinger.Instances)
 				{
-					var viewportPoint = camera.WorldToViewportPoint(selectable.transform.position);
+					var selectableMask = 1 << selectable.gameObject.layer;
 
-					if (viewportRect.Contains(viewportPoint) == true)
+					if ((selectableMask & requiredLayers) != 0 && HasRequiredTag(selectable.tag) == true)
 					{
-						selectables.Add(selectable);
+						var viewportPoint = camera.WorldToViewportPoint(selectable.transform.position);
+
+						if (viewportRect.Contains(viewportPoint) == true)
+						{
+							selectables.Add(selectable);
+						}
 					}
 				}
 
@@ -175,6 +191,29 @@ namespace Lean.Touch
 			{
 				Debug.LogError("Failed to find camera. Either tag your cameras MainCamera, or set one in this component.", this);
 			}
+		}
+
+		private bool HasRequiredTag(string tag)
+		{
+			var count = 0;
+
+			if (requiredTags != null)
+			{
+				foreach (var requiredTag in requiredTags)
+				{
+					if (string.IsNullOrEmpty(requiredTag) == false)
+					{
+						count += 1;
+
+						if (requiredTag == tag)
+						{
+							return true;
+						}
+					}
+				}
+			}
+
+			return count == 0;
 		}
 	}
 }
@@ -203,6 +242,13 @@ namespace Lean.Touch.Editor
 			BeginError(Any(tgts, t => t.Select == null));
 				Draw("select", "The selected objects will be selected by this component.");
 			EndError();
+			
+			Separator();
+
+			BeginError(Any(tgts, t => t.RequiredLayers == 0));
+				Draw("requiredLayers", "For an object to be selected, it must be in one of these layers.");
+			EndError();
+			Draw("requiredTags", "For an object to be selected, it must have one of these tags.");
 		}
 	}
 }

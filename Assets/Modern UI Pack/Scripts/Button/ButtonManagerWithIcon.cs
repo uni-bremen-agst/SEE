@@ -37,6 +37,7 @@ namespace Michsky.UI.ModernUIPack
         public bool useRipple = true;
 
         // Ripple
+        public RippleUpdateMode rippleUpdateMode = RippleUpdateMode.UNSCALED_TIME;
         public Sprite rippleShape;
         [Range(0.1f, 5)] public float speed = 1f;
         [Range(0.5f, 25)] public float maxSize = 4f;
@@ -55,6 +56,12 @@ namespace Michsky.UI.ModernUIPack
         {
             ANIMATOR,
             SCRIPT
+        }
+
+        public enum RippleUpdateMode
+        {
+            NORMAL,
+            UNSCALED_TIME
         }
 
         void Start()
@@ -98,7 +105,6 @@ namespace Michsky.UI.ModernUIPack
             if (rippleParent != null)
             {
                 GameObject rippleObj = new GameObject();
-                rippleObj.AddComponent<Ripple>();
                 rippleObj.AddComponent<Image>();
                 rippleObj.GetComponent<Image>().sprite = rippleShape;
                 rippleObj.name = "Ripple";
@@ -115,10 +121,17 @@ namespace Michsky.UI.ModernUIPack
                 else
                     rippleObj.transform.position = pos;
 
-                rippleObj.GetComponent<Ripple>().speed = speed;
-                rippleObj.GetComponent<Ripple>().maxSize = maxSize;
-                rippleObj.GetComponent<Ripple>().startColor = startColor;
-                rippleObj.GetComponent<Ripple>().transitionColor = transitionColor;
+                rippleObj.AddComponent<Ripple>();
+                Ripple tempRipple = rippleObj.GetComponent<Ripple>();
+                tempRipple.speed = speed;
+                tempRipple.maxSize = maxSize;
+                tempRipple.startColor = startColor;
+                tempRipple.transitionColor = transitionColor;
+
+                if (rippleUpdateMode == RippleUpdateMode.NORMAL)
+                    tempRipple.unscaledTime = false;
+                else
+                    tempRipple.unscaledTime = true;
             }
         }
 
