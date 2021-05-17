@@ -118,9 +118,9 @@ namespace SEE.Game.Avatars
             DateTime now = DateTime.Now;
             StringBuilder builder = new StringBuilder("It is now ");
             builder.Append(now.Hour);
-            builder.Append(" o'clock and ");
+            builder.Append(" hours and ");
             builder.Append(now.Minute);
-            builder.Append(" minutes. Time for coffee.");
+            builder.Append(" minutes. Time for coffee?");
             Say(builder.ToString());
         }
 
@@ -144,7 +144,7 @@ namespace SEE.Game.Avatars
                 voice = Speaker.Instance.VoiceForGender(Crosstales.RTVoice.Model.Enum.Gender.FEMALE, culture: "en-US");
                 if (voice == null)
                 {
-                    Debug.LogWarning("Requested voice not found.\n");
+                    Debug.LogError("Requested voice not found. A default voice will be used. The available voices are:\n");
                     DumpVoices();
                 }
             }

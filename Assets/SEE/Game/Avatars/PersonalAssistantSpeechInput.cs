@@ -10,7 +10,7 @@ namespace SEE.Game.Avatars
     /// A component to be attached to the personal assistant to enable speech
     /// recognition to control it.
     /// </summary>
-    class PersonalAssistantSpeechInput : MonoBehaviour
+    public class PersonalAssistantSpeechInput : MonoBehaviour
     {
         /// <summary>
         /// Path to the SRGS grammar file. The grammar is expected to define the
