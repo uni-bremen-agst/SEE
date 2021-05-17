@@ -354,7 +354,7 @@ namespace SEE.Controls.Actions
                 GameObject source = GameObject.Find(edge.Source.ID);
                 GameObject target = GameObject.Find(edge.Target.ID);
 
-                if(source != null && target != null)
+                if (source != null && target != null)
                 {
                     sourceTargetEdge.Add((source, target, edge.ID));
                 }
