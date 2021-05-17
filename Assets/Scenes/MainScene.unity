@@ -2612,7 +2612,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72b5a3a8c344fef4e9c21230c76f7c52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  foldedBlock: 1
+  debug: 1
+  testBlockRowCount: 3
+  testBlockColumnCount: 4
   nodeObject: {fileID: 1526592059}
+  selectedRoofType: 0
   _floorHightPercentage: 0.2
   _lobbySpanPercentage: 0.1
   _roofHeightPercentage: 0.453
