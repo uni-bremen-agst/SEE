@@ -657,7 +657,7 @@ namespace SEE.Game
         /// <param name="left">First edge to be checked</param>
         /// <param name="right">Second edge to be checked</param>
         /// <returns>true if both edges are equal</returns>
-        protected virtual bool FindIdenticalGameEdges(GameObject left, GameObject right)
+        protected virtual bool AreEqualGameEdges(GameObject left, GameObject right)
         {
             return left.TryGetComponent(out EdgeRef leftEdgeRef)
                 && right.TryGetComponent(out EdgeRef rightEdgeRef)
@@ -675,7 +675,7 @@ namespace SEE.Game
             matchedEdges = new List<(GameObject, GameObject)>();
             foreach (GameObject newEdge in newEdges)
             {
-                GameObject oldEdge = oldEdges.ToList().Find(i => FindIdenticalGameEdges(i, newEdge));
+                GameObject oldEdge = oldEdges.ToList().Find(i => AreEqualGameEdges(i, newEdge));
                 if (oldEdge != null)
                 {
                     matchedEdges.Add((oldEdge, newEdge));
@@ -690,14 +690,14 @@ namespace SEE.Game
         {
             try
             {
-                // Calculates the edges for the next graph
+                // Calculates the edges for the next graph.
                 IList<GameObject> newEdges = objectManager.CalculateNewEdgeControlPoints().ToList();
                 IList<GameObject> oldEdges = objectManager.GetEdges().ToList();
 
                 // Searches for pairs between old and new edge.
                 EdgeMatcher(oldEdges, newEdges);
 
-                // Case distinction in case the layout does not need sample points
+                // Case distinction in case the layout does not need sample points.
                 if (!graphRenderer.GetSettings().EdgeLayout.Equals(EdgeLayoutKind.Straight) && newEdges.Count() != 0)
                 {
                     foreach ((GameObject oldEdge, GameObject newEdge) in matchedEdges)
@@ -705,7 +705,7 @@ namespace SEE.Game
                         oldEdge.TryGetComponent(out Points oP);
                         newEdge.TryGetComponent(out Points nP);
 
-                        //Approximates the length of the edge over the control points to save computing power.
+                        // Approximates the length of the edge over the control points to save computing power.
                         float dist = Vector3.Distance(nP.controlPoints[0], nP.controlPoints[nP.controlPoints.Count() - 1]);
 
                         // The AdjustedSamplerate is determined by the performance of the last animation
@@ -756,7 +756,7 @@ namespace SEE.Game
         {
             try
             {
-                //Copies every second point
+                // Copies every second point.
                 foreach ((GameObject oldEdge, GameObject newEdge) in matchedEdges)
                 {
                     oldEdge.TryGetComponent<Points>(out Points oP);
@@ -1379,7 +1379,6 @@ namespace SEE.Game
                     Debug.Log("This is already the first graph revision.\n");
                 }
             }
-
             else
             {
                 AnimationFinishedEvent.RemoveListener(OnAutoPlayReverseCanContinue);

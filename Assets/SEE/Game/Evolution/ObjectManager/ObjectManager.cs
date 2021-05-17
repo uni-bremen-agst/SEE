@@ -296,9 +296,7 @@ namespace SEE.Game.Evolution
         public ICollection<GameObject> CalculateNewEdgeControlPoints()
         {
             ClearNewEdges();
-
             newEdges = _graphRenderer.EdgeLayout(nodes.Values, false);
-
             return newEdges;
         }
 

@@ -464,7 +464,7 @@ namespace SEE.Game.Evolution
         private void Update()
         {
             if (!IsRevisionSelectionOpen)
-            {                
+            {
                 if (SEEInput.PreviousRevision())
                 {
                     evolutionRenderer.ShowPreviousGraph();
