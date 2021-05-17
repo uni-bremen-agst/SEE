@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.Windows.Speech;
 using NUnit.Framework;
+using System.Linq;
 
 namespace SEE.Controls
 {
@@ -58,32 +59,18 @@ namespace SEE.Controls
             Debug.Log(builder.ToString());
 
             // Make sure whatever was recognized is one of the expected keywords.
-            bool found = false;
-            foreach (string keyword in keywords)
-            {
-                if (args.text == keyword)
-                {
-                    found = true;
-                    break;
-                }
-            }
-            Assert.That(found);
+            Assert.That(keywords.Any(keyword => args.text == keyword));
         }
 
         /// <summary>
         /// Returns the concatenation of all <paramref name="values"/> (separated by
         /// a blank). Can be used for debugging.
         /// </summary>
-        /// <param name="values"></param>
+        /// <param name="values">values to be concatenated</param>
         /// <returns>concatenation of all <paramref name="values"/></returns>
         private string ToString(string[] values)
         {
-            StringBuilder builder = new StringBuilder();
-            foreach (string value in values)
-            {
-                builder.Append("'" + value + "' ");
-            }
-            return builder.ToString();
+            return string.Join(", ", values.Select(x => $"'{x}'"));
         }
     }
 }
