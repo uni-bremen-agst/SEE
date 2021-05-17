@@ -341,14 +341,7 @@ namespace SEE.Controls.Actions
                     if (node.TryGetComponent(out NodeRef nodeRef))
                     {
 
-                        foreach (Edge edge in nodeRef.Value.Outgoings)
-                        {
-                            edgesToBeRedrawn.Add(edge);
-                        }
-                        foreach (Edge edge in nodeRef.Value.Incomings)
-                        {
-                            edgesToBeRedrawn.Add(edge);
-                        }
+                        edgesToBeRedrawn.UnionWith(nodeRef.Value.Outgoings.Union(nodeRef.Value.Incomings));
                     }
                 }
             }
@@ -361,7 +354,7 @@ namespace SEE.Controls.Actions
                 GameObject source = GameObject.Find(edge.Source.ID);
                 GameObject target = GameObject.Find(edge.Target.ID);
 
-                if(source != null && target != null)
+                if (source != null && target != null)
                 {
                     sourceTargetEdge.Add((source, target, edge.ID));
                 }
