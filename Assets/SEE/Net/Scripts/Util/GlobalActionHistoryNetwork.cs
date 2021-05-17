@@ -1,6 +1,5 @@
 using Assets.SEE.Utils;
 using SEE.Controls.Actions;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using static Assets.SEE.Utils.ActionHistory;
@@ -10,8 +9,8 @@ namespace SEE.Net
     /// <summary>
     /// Syncs the action history through the network on each client.
     /// </summary>
-    public  class GlobalActionHistoryNetwork : AbstractAction
-    { 
+    public class GlobalActionHistoryNetwork : AbstractAction
+    {
 
         /// <summary>
         /// The state which determines which action should be performed.
@@ -69,7 +68,7 @@ namespace SEE.Net
         /// </summary>
         public HistoryType newItemType;
 
-        public GlobalActionHistoryNetwork() 
+        public GlobalActionHistoryNetwork()
         {
             // Intentionally left blank.
         }
@@ -99,9 +98,6 @@ namespace SEE.Net
                 }
                 else if (mode == Mode.replace)
                 {
-                    //UnityEngine.Debug.LogError("NETWORK ID" + oldItem.ActionID + " " + newItem.ActionID);
-                    //UnityEngine.Debug.LogError("NETWORK CHANGED OBJECTs" + oldItem.ChangedObjects);
-                    //GlobalActionHistory.Replace(oldItem, newItem, true);
                     GlobalActionHistory.Replace(new GlobalHistoryEntry(false, oldItemType, ID, oldChangedObjects), new GlobalHistoryEntry(false, newItemType, ID, changedObjects), true);
                 }
                 mode = Mode.init;
@@ -120,7 +116,7 @@ namespace SEE.Net
             this.type = type;
             this.actionId = actionId;
             this.changedObjects = StringToList(changedObjects);
-            Execute(null);    
+            Execute(null);
 
         }
 
@@ -128,7 +124,7 @@ namespace SEE.Net
         /// Initiates the deletion process on each client.
         /// </summary>
         /// <param name="actionId">The ID of the action</param>
-        public void Delete(string actionId) 
+        public void Delete(string actionId)
         {
             this.actionId = actionId;
             mode = Mode.delete;
@@ -146,15 +142,10 @@ namespace SEE.Net
         /// <param name="newChangedObjects">The changedObjects of the new item.</param>
         public void Replace(ActionHistory.HistoryType oldType, string id, string oldChangedObjects, ActionHistory.HistoryType newType, string newChangedObjects)
         {
-            UnityEngine.Debug.LogError("ID NETWORK " + id);
             oldItemType = oldType;
             ID = id;
             this.oldChangedObjects = StringToList(oldChangedObjects);
             changedObjects = StringToList(newChangedObjects);
-
-
-            //oldItem = new GlobalHistoryEntry(false, oldType, id, StringToList(oldChangedObjects));
-            //newItem = new GlobalHistoryEntry(false, newType, id, StringToList(newChangedObjects));
             mode = Mode.replace;
             Execute(null);
         }
