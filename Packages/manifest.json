@@ -14,6 +14,7 @@
     "com.unity.timeline": "1.4.7",
     "com.unity.ugui": "1.0.0",
     "com.unity.xr.management": "4.0.3",
+    "com.unity.xr.windowsmr": "4.4.2",
     "com.valvesoftware.unity.openvr": "file:../Assets/SteamVR/OpenVRUnityXRPackage/Editor/com.valvesoftware.unity.openvr-1.1.4.tgz",
     "com.yasirkula.dynamicpanels": "https://github.com/yasirkula/UnityDynamicPanels.git",
     "com.unity.modules.ai": "1.0.0",
