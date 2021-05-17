@@ -134,6 +134,7 @@ namespace SEE.Net
         /// <param name="newChangedObjects">The changedObjects of the new item.</param>
         public void Replace(ActionHistory.HistoryType oldType, string id, string oldChangedObjects, ActionHistory.HistoryType newType, string newChangedObjects)
         {
+            UnityEngine.Debug.LogError("ID NETWORK " + id);
             oldItem = new GlobalHistoryEntry(false, oldType, id, StringToList(oldChangedObjects));
             newItem = new GlobalHistoryEntry(false, newType, id, StringToList(newChangedObjects));
             mode = Mode.replace;
