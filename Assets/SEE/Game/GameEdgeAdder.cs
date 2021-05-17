@@ -4,13 +4,13 @@ using SEE.GO;
 using System;
 using UnityEngine;
 
-namespace Assets.SEE.Game
+namespace SEE.Game
 {
     /// <summary>
     /// Creates new game objects representing graph edges or deleting these again,
     /// respectively.
     /// </summary>
-    class GameEdgeAdder
+    public class GameEdgeAdder
     {
         /// <summary>
         /// Creates and returns a new edge from <paramref name="source"/> to <paramref name="target"/>.
