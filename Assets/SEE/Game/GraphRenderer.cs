@@ -34,14 +34,11 @@ namespace SEE.Game
         {
             this.settings = settings;
             ShaderType = Materials.ShaderType.Transparent;
-            switch (this.settings.LeafObjects)
+            leafNodeFactory = this.settings.LeafObjects switch
             {
-                case LeafNodeKinds.Blocks:
-                    leafNodeFactory = new CubeFactory(ShaderType, this.settings.LeafNodeColorRange);
-                    break;
-                default:
-                    throw new Exception("Unhandled GraphSettings.LeafNodeKinds");
-            }
+                LeafNodeKinds.Blocks => new CubeFactory(ShaderType, this.settings.LeafNodeColorRange),
+                _ => throw new Exception("Unhandled GraphSettings.LeafNodeKinds")
+            };
             innerNodeFactory = GetInnerNodeFactory(this.settings.InnerNodeObjects);
             this.graph = graph;
             if (this.graph != null)
@@ -51,7 +48,7 @@ namespace SEE.Game
             }
         }
 
-        public readonly Materials.ShaderType ShaderType;
+        private readonly Materials.ShaderType ShaderType;
 
         /// <summary>
         /// The distance between two stacked game objects (parent/child).

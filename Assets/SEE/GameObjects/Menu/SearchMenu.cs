@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SEE.Controls;
 using SEE.Game;
+using SEE.Game.Evolution;
 using SEE.Game.UI.Notification;
 using SEE.Game.UI.PropertyDialog;
 using SEE.Utils;
@@ -16,7 +17,11 @@ namespace SEE.GO.Menu
         private PropertyDialog searchDialog;
         private StringProperty searchString;
 
-        private const int BLINK_SECONDS = 10;
+        private const int BLINK_SECONDS = 15;
+        private const float MARKER_HEIGHT = 1f;
+        private const float MARKER_WIDTH = 0.01f;
+
+        private static readonly Color MARKER_COLOR = Color.red;
 
         private readonly IDictionary<string, ICollection<GameObject>> cachedNodes = new Dictionary<string, ICollection<GameObject>>();
 
@@ -28,27 +33,41 @@ namespace SEE.GO.Menu
             foreach (GameObject result in results)
             {
                 found++;
-                if (result.TryGetComponentOrLog(out Renderer cityRenderer))
+                GameObject cityObject = SceneQueries.GetCodeCity(result.transform).gameObject;
+                if (result.TryGetComponentOrLog(out Renderer cityRenderer) && 
+                    cityObject.TryGetComponentOrLog(out AbstractSEECity city))
                 {
+                    GraphRenderer graphRenderer = new GraphRenderer(city, null);
+                    Marker marker = new Marker(graphRenderer, MARKER_WIDTH, MARKER_HEIGHT, MARKER_COLOR, 
+                                               default, default, AbstractAnimator.DefaultAnimationTime);
                     Material material = cityRenderer.sharedMaterials.Last();
                     StartCoroutine(BlinkFor(BLINK_SECONDS, material));
+
+                    IEnumerator RemoveMarkerWhenDone()
+                    {
+                        yield return new WaitForSeconds(BLINK_SECONDS);
+                        marker.Clear();
+                    }
+                    
+                    StartCoroutine(RemoveMarkerWhenDone());
+                    marker.MarkBorn(result);
                 }
-                //TODO: Blink
             }
 
-            if (found == 0)
+            switch (found)
             {
-                ShowNotification.Warn("No nodes found", "No nodes found for the search term "
-                                                        + $"'{FilterString(searchString.Value)}'.");
-            }
-            else if (found == 1)
-            {
-                ShowNotification.Info($"{found} nodes found", $"Found {found} nodes for search term " 
-                                                              + $"'{searchString.Value}'. Nodes will blink for {BLINK_SECONDS} seconds.");
-            } 
-            else 
-            {
-                //TODO: Fuzzy search
+                case 0:
+                    ShowNotification.Warn("No nodes found", "No nodes found for the search term "
+                                                            + $"'{FilterString(searchString.Value)}'.");
+                    break;
+                case 1:
+                    ShowNotification.Info($"{found} nodes found", $"Found {found} nodes for search term " 
+                                                                  + $"'{searchString.Value}'. Nodes will blink for {BLINK_SECONDS} seconds.");
+                    break;
+                default:
+                    ShowNotification.Error("Not implemented", "This has not yet been implemented.");
+                    //TODO: Fuzzy search
+                    break;
             }
 
             SEEInput.KeyboardShortcutsEnabled = true;
