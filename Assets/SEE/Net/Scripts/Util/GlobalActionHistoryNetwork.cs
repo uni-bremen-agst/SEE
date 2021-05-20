@@ -125,7 +125,6 @@ namespace SEE.Net
             this.actionId = actionId;
             this.changedObjects = StringToList(changedObjects);
             Execute(null);
-
         }
 
         /// <summary>
@@ -163,12 +162,14 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Parses a comma-separated string of changedObjects and returns them as single elements in a list.
+        /// Splits the given <paramref name="changedObjectsToParse"/> (assumed to be a 
+        /// list of game-object ids) and returns them as a list.
         /// </summary>
-        /// <param name="changedObjectsToParse">the changed objects which has to be parsed</param>
-        /// <returns>a list of names of changed gameObjects</returns>
+        /// <param name="changedObjectsToParse">the changed objects to be split</param>
+        /// <returns>a list of ids of changed gameObjects</returns>
         private static List<string> StringToList(string changedObjectsToParse)
         {
+            // FIXME: This will not work if IDs contain a ?.
             return changedObjectsToParse?.Split('?').ToList();
         }
     }
