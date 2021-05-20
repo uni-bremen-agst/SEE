@@ -331,7 +331,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void AdjustEdge()
         {
-            GameEdgeUpdater.UpdateAllConnectingEdgesOfNode(objectToScale);
+            GameEdgeMover.MoveAllConnectingEdgesOfNode(objectToScale);
         }
 
         /// <summary>
