@@ -14,7 +14,7 @@ namespace SEE.Net
         /// <summary>
         /// The state that determines which action should be performed.
         /// </summary>
-        private enum Mode
+        public enum Mode
         {
             /// <summary>
             /// The initial state, no code executedOnClient.
@@ -37,7 +37,7 @@ namespace SEE.Net
         /// <summary>
         /// The specific instance of <see cref="Mode"/>
         /// </summary>
-        private Mode mode = Mode.Init;
+        public Mode mode = Mode.Init;
 
         /// <summary>
         /// The type of the action (action or undoneAction).
