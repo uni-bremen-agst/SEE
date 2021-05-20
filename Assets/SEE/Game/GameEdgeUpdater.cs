@@ -54,7 +54,6 @@ namespace SEE.Game
                 {
                     if (n.TryGetComponent(out NodeRef _))
                     {
-                        // FIXME: Is a break missing here?
                         nodeList = GetAllChildNodes(n.GetNode());
                         break;
                     }
