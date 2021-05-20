@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.DataModel.DG;
+using SEE.Game;
 
 /// <summary>
 /// Decorates each block with an assigned texture
@@ -41,6 +43,21 @@ public class NodeDecorationController : MonoBehaviour
     /// The gameNode's location
     /// </summary>
     private Vector3 nodeLocation;
+
+    /// <summary>
+    /// To use treemap decoration/regular wall decorations
+    /// </summary>
+    public bool decorateUsingTreemap = false;
+
+    /// <summary>
+    /// Treemap layout settings
+    /// </summary>
+    public AbstractSEECity treemapSettings;
+
+    /// <summary>
+    /// Treemap graph
+    /// </summary>
+    private Graph treemapGraph;
 
     /// <summary>
     /// Roof type dropdown menu items
@@ -308,6 +325,58 @@ public class NodeDecorationController : MonoBehaviour
     }
 
     /// <summary>
+    /// Decorates the walls of the packed block using a treemap
+    /// <param name="settings">The settings to be applied to the layout</param>
+    /// <param name="hiddenNodesGraph">Graph containing the hidden nodes</param>
+    /// <param name="packedBlock">The packed block</param>
+    /// </summary>
+    private void decoratePackedBlockWithTreemap(AbstractSEECity settings, Graph hiddenNodesGraph, GameObject packedBlock)
+    {
+        // Graph renderer to render treemaps
+        GraphRenderer renderer = new GraphRenderer(settings, hiddenNodesGraph);
+
+        // Get packed block dimensions and location, North - Positive X, West - Positive Z
+        Vector3 packedBlockDimensions = packedBlock.transform.localScale;
+        Vector3 packedBlockLocation = packedBlock.transform.localPosition;
+
+        // Render treemaps on each surface
+        GameObject treemapParent = new GameObject("Treemap-Decorators");
+        treemapParent.transform.SetParent(nodeObject.transform);
+        // North
+        GameObject planeN = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        planeN.name = "northTreemap";
+        planeN.transform.localScale = new Vector3(0.1f * packedBlockDimensions.y, 0.01f, 0.1f * packedBlockDimensions.z);
+        planeN.transform.localPosition = new Vector3(packedBlockLocation.x + packedBlockDimensions.x / 2 + 0.005f, packedBlockLocation.y, packedBlockLocation.z);
+        renderer.Draw(planeN);
+        planeN.transform.rotation = Quaternion.Euler(0f, 0f, -90f);
+        planeN.transform.SetParent(treemapParent.transform);
+        // South
+        GameObject planeS = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        planeS.name = "southTreemap";
+        planeS.transform.localScale = new Vector3(0.1f * packedBlockDimensions.y, 0.01f, 0.1f * packedBlockDimensions.z);
+        planeS.transform.localPosition = new Vector3(packedBlockLocation.x - packedBlockDimensions.x / 2 - 0.005f, packedBlockLocation.y, packedBlockLocation.z);
+        renderer.Draw(planeS);
+        planeS.transform.rotation = Quaternion.Euler(0f, 0f, 90f);
+        planeS.transform.SetParent(treemapParent.transform);
+        // West
+        GameObject planeW = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        planeW.name = "westTreemap";
+        planeW.transform.localScale = new Vector3(0.1f * packedBlockDimensions.z, 0.01f, 0.1f * packedBlockDimensions.y);
+        planeW.transform.localPosition = new Vector3(packedBlockLocation.x, packedBlockLocation.y, packedBlockLocation.z + packedBlockDimensions.z / 2 + 0.005f);
+        renderer.Draw(planeW);
+        planeW.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+        planeW.transform.SetParent(treemapParent.transform);
+        // East
+        GameObject planeE = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        planeE.name = "eastTreemap";
+        planeE.transform.localScale = new Vector3(0.1f * packedBlockDimensions.z, 0.01f, 0.1f * packedBlockDimensions.y);
+        planeE.transform.localPosition = new Vector3(packedBlockLocation.x, packedBlockLocation.y, packedBlockLocation.z - packedBlockDimensions.z / 2 - 0.005f);
+        renderer.Draw(planeE);
+        planeE.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
+        planeE.transform.SetParent(treemapParent.transform);
+    }
+
+    /// <summary>
     /// Decorates the walls of the packed block
     /// <param name="hiddenObjects">The list of gamenodes that are hidden inside the packed block</param>
     /// <param name="packedBlock">The packed block</param>
@@ -320,15 +389,9 @@ public class NodeDecorationController : MonoBehaviour
 
         // Corners of the block computed with simple geometry
         Vector3 northWestTopCorner = new Vector3(packedBlockLocation.x + 0.5f * packedBlockDimensions.x, packedBlockLocation.y + 0.5f * packedBlockDimensions.y, packedBlockLocation.z + 0.5f * packedBlockDimensions.z);
-        Vector3 northWestBottomCorner = new Vector3(packedBlockLocation.x + 0.5f * packedBlockDimensions.x, packedBlockLocation.y - 0.5f * packedBlockDimensions.y, packedBlockLocation.z + 0.5f * packedBlockDimensions.z);
         Vector3 northEastTopCorner = new Vector3(packedBlockLocation.x + 0.5f * packedBlockDimensions.x, packedBlockLocation.y + 0.5f * packedBlockDimensions.y, packedBlockLocation.z - 0.5f * packedBlockDimensions.z);
-        Vector3 northEastBottomCorner = new Vector3(packedBlockLocation.x + 0.5f * packedBlockDimensions.x, packedBlockLocation.y - 0.5f * packedBlockDimensions.y, packedBlockLocation.z - 0.5f * packedBlockDimensions.z);
         Vector3 southWestTopCorner = new Vector3(packedBlockLocation.x - 0.5f * packedBlockDimensions.x, packedBlockLocation.y + 0.5f * packedBlockDimensions.y, packedBlockLocation.z + 0.5f * packedBlockDimensions.z);
-        Vector3 southWestBottomCorner = new Vector3(packedBlockLocation.x - 0.5f * packedBlockDimensions.x, packedBlockLocation.y - 0.5f * packedBlockDimensions.y, packedBlockLocation.z + 0.5f * packedBlockDimensions.z);
         Vector3 southEastTopCorner = new Vector3(packedBlockLocation.x - 0.5f * packedBlockDimensions.x, packedBlockLocation.y + 0.5f * packedBlockDimensions.y, packedBlockLocation.z - 0.5f * packedBlockDimensions.z);
-        Vector3 southEastBottomCorner = new Vector3(packedBlockLocation.x - 0.5f * packedBlockDimensions.x, packedBlockLocation.y - 0.5f * packedBlockDimensions.y, packedBlockLocation.z - 0.5f * packedBlockDimensions.z);
-
-        float packedBlockFloorY = packedBlockLocation.y - packedBlockDimensions.y / 2;
 
         // Compute sum of block heights
         float totalBlocksHeight = 0f;
@@ -481,9 +544,23 @@ public class NodeDecorationController : MonoBehaviour
         {
             if (debug)
             {
-                testImplementation(testBlockColumnCount, testBlockRowCount);
+                if (!decorateUsingTreemap)
+                {
+                    testImplementation(testBlockColumnCount, testBlockRowCount);
+                }
+                else
+                {
+                    testTreemapDecoration(testBlockColumnCount, testBlockRowCount);
+                }
             }
-            decoratePackedBlock(childNodes, nodeObject);
+            if (!decorateUsingTreemap)
+            {
+                decoratePackedBlock(childNodes, nodeObject);
+            }
+            else
+            {
+                decoratePackedBlockWithTreemap(treemapSettings, treemapGraph, nodeObject);
+            }
         }
     }
 
@@ -508,9 +585,23 @@ public class NodeDecorationController : MonoBehaviour
             {
                 if (debug)
                 {
-                    testImplementation(testBlockColumnCount, testBlockRowCount);
+                    if (!decorateUsingTreemap)
+                    {
+                        testImplementation(testBlockColumnCount, testBlockRowCount);
+                    }
+                    else
+                    {
+                        testTreemapDecoration(testBlockColumnCount, testBlockRowCount);
+                    }
                 }
-                decoratePackedBlock(childNodes, nodeObject);
+                if (!decorateUsingTreemap)
+                {
+                    decoratePackedBlock(childNodes, nodeObject);
+                }
+                else
+                {
+                    decoratePackedBlockWithTreemap(treemapSettings, treemapGraph, nodeObject);
+                }
             }
         }
     }
@@ -570,5 +661,33 @@ public class NodeDecorationController : MonoBehaviour
             currentLocationZ = parentNodeLowZ + freeSpaceZ;
             currentLocationX += freeSpaceX + childWidthX;
         }
+    }
+
+    /// <summary>
+    /// Test the treemap decoration implementation
+    /// </summary>
+    private void testTreemapDecoration(int columns, int rows)
+    {
+        Graph graph = new Graph("test");
+        int counter = 0;
+        for (int i=0; i<columns; i++)
+        {
+          //  Node parent = new Node();
+         //   parent.ID = i + "-DummyParentNode";
+         //   graph.AddNode(parent);
+            for (int j=0; j<rows; j++)
+            {
+                Node n = new Node();
+                n.ID = counter + "-DummyNode";
+                n.SetLevel(1);
+            //    n.SetLevel(1);
+             //   parent.AddChild(n);
+             //   n.Parent = parent;
+                graph.AddNode(n);
+                counter++;
+            }
+        }
+        graph.FinalizeNodeHierarchy();
+        treemapGraph = graph;
     }
 }
