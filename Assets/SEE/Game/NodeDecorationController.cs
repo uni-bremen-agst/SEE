@@ -334,7 +334,7 @@ public class NodeDecorationController : MonoBehaviour
     {
         // Graph renderer to render treemaps
         GraphRenderer renderer = new GraphRenderer(settings, hiddenNodesGraph);
-
+        
         // Get packed block dimensions and location, North - Positive X, West - Positive Z
         Vector3 packedBlockDimensions = packedBlock.transform.localScale;
         Vector3 packedBlockLocation = packedBlock.transform.localPosition;
@@ -343,35 +343,35 @@ public class NodeDecorationController : MonoBehaviour
         GameObject treemapParent = new GameObject("Treemap-Decorators");
         treemapParent.transform.SetParent(nodeObject.transform);
         // North
-        GameObject planeN = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        GameObject planeN = new GameObject();
         planeN.name = "northTreemap";
-        planeN.transform.localScale = new Vector3(0.1f * packedBlockDimensions.y, 0.01f, 0.1f * packedBlockDimensions.z);
-        planeN.transform.localPosition = new Vector3(packedBlockLocation.x + packedBlockDimensions.x / 2 + 0.005f, packedBlockLocation.y, packedBlockLocation.z);
         renderer.Draw(planeN);
+        planeN.transform.localScale = new Vector3(packedBlockDimensions.y, 0.1f, packedBlockDimensions.z);
+        planeN.transform.localPosition = new Vector3(packedBlockLocation.x + packedBlockDimensions.x / 2 - planeN.transform.localScale.y / 2, packedBlockLocation.y, packedBlockLocation.z);
         planeN.transform.rotation = Quaternion.Euler(0f, 0f, -90f);
         planeN.transform.SetParent(treemapParent.transform);
         // South
-        GameObject planeS = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        GameObject planeS = new GameObject();
         planeS.name = "southTreemap";
-        planeS.transform.localScale = new Vector3(0.1f * packedBlockDimensions.y, 0.01f, 0.1f * packedBlockDimensions.z);
-        planeS.transform.localPosition = new Vector3(packedBlockLocation.x - packedBlockDimensions.x / 2 - 0.005f, packedBlockLocation.y, packedBlockLocation.z);
         renderer.Draw(planeS);
+        planeS.transform.localScale = new Vector3(packedBlockDimensions.y, 0.1f, packedBlockDimensions.z);
+        planeS.transform.localPosition = new Vector3(packedBlockLocation.x - packedBlockDimensions.x / 2 + planeN.transform.localScale.y / 2, packedBlockLocation.y, packedBlockLocation.z);
         planeS.transform.rotation = Quaternion.Euler(0f, 0f, 90f);
         planeS.transform.SetParent(treemapParent.transform);
         // West
-        GameObject planeW = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        GameObject planeW = new GameObject();
         planeW.name = "westTreemap";
-        planeW.transform.localScale = new Vector3(0.1f * packedBlockDimensions.z, 0.01f, 0.1f * packedBlockDimensions.y);
-        planeW.transform.localPosition = new Vector3(packedBlockLocation.x, packedBlockLocation.y, packedBlockLocation.z + packedBlockDimensions.z / 2 + 0.005f);
         renderer.Draw(planeW);
+        planeW.transform.localScale = new Vector3(packedBlockDimensions.z, 0.1f, packedBlockDimensions.y);
+        planeW.transform.localPosition = new Vector3(packedBlockLocation.x, packedBlockLocation.y, packedBlockLocation.z + packedBlockDimensions.z / 2 - planeN.transform.localScale.y / 2);
         planeW.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
         planeW.transform.SetParent(treemapParent.transform);
         // East
-        GameObject planeE = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        GameObject planeE = new GameObject();
         planeE.name = "eastTreemap";
-        planeE.transform.localScale = new Vector3(0.1f * packedBlockDimensions.z, 0.01f, 0.1f * packedBlockDimensions.y);
-        planeE.transform.localPosition = new Vector3(packedBlockLocation.x, packedBlockLocation.y, packedBlockLocation.z - packedBlockDimensions.z / 2 - 0.005f);
         renderer.Draw(planeE);
+        planeE.transform.localScale = new Vector3(packedBlockDimensions.z, 0.1f, packedBlockDimensions.y);
+        planeE.transform.localPosition = new Vector3(packedBlockLocation.x, packedBlockLocation.y, packedBlockLocation.z - packedBlockDimensions.z / 2 + planeN.transform.localScale.y / 2);
         planeE.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
         planeE.transform.SetParent(treemapParent.transform);
     }
