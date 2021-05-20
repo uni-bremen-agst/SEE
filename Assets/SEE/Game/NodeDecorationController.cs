@@ -477,6 +477,8 @@ public class NodeDecorationController : MonoBehaviour
     /// </summary>
     private void testImplementation(int columns, int rows)
     {
+        GameObject debugObject = new GameObject("Debug");
+        debugObject.transform.SetParent(nodeObject.transform);
         // Free space inbetween child nodes
         float freeSpaceX = 0.01f * nodeSize.x;
         float freeSpaceZ = 0.01f * nodeSize.z;
@@ -491,7 +493,7 @@ public class NodeDecorationController : MonoBehaviour
             o.transform.localScale = childNodeDimensions;
             o.name = i.ToString();
             o.GetComponent<Renderer>().material.color = Color.red;
-           // o.transform.SetParent(nodeObject.transform);
+            o.transform.SetParent(debugObject.transform);
             childNodes.Add(o);
         }
         // Find corners of parent node, parent node is moved using it's 3d center
@@ -513,7 +515,7 @@ public class NodeDecorationController : MonoBehaviour
                 float childLocZ = currentLocationZ + currentChild.transform.localScale.z / 2;
                 float childLocY = parentNodeFloorY + currentChild.transform.localScale.y / 2;
                 // Move child to new location
-                currentChild.transform.position = new Vector3(childLocX, childLocY, childLocZ);
+                currentChild.transform.localPosition = new Vector3(childLocX, childLocY, childLocZ);
                 currentListIndex++;
                 currentLocationZ += freeSpaceZ + currentChild.transform.localScale.z; 
             }
