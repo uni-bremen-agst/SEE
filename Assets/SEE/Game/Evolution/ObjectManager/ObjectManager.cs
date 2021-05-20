@@ -54,6 +54,11 @@ namespace SEE.Game.Evolution
         private GameObject currentPlane;
 
         /// <summary>
+        /// The names of the game objects representing nodes that do not need to be considered when animating.
+        /// </summary>
+        public ISet<string> NegligibleNodes { get; set; }
+
+        /// <summary>
         /// A dictionary containing all created nodes that are currently in use. The set of
         /// nodes contained may be an accumulation of all nodes created and added by GetInnerNode()
         /// and GetLeaf() so far and not just those of one single graph in the graph series
@@ -236,14 +241,14 @@ namespace SEE.Game.Evolution
         public bool RemoveNode(Node node, out GameObject gameObject)
         {
             node.AssertNotNull("node");
-            
+
             bool wasNodeRemoved = nodes.TryGetValue(node.ID, out gameObject);
             // Create power beam for deleted node
             if (wasNodeRemoved)
             {
                 MoveScaleShakeAnimator.BeamAnimator.GetInstance().CreatePowerBeam
                                                                     (gameObject.transform.position,
-                                                                     deletedNodeBeamColor, 
+                                                                     deletedNodeBeamColor,
                                                                      deletedNodeBeamScale);
             }
             // Add the removed node id to the revision changes list
@@ -284,7 +289,8 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Calculates the edges of the next graph
+        /// Calculates the edges of the next graph.
+        /// Checks which nodes have moved to calculate only those that have actually changed their position.
         /// </summary>
         /// <returns>The list of calculated edges of the next graph</returns>
         public ICollection<GameObject> CalculateNewEdgeControlPoints()
