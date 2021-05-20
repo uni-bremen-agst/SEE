@@ -11,27 +11,33 @@ namespace SEE.Net
     /// </summary>
     public class GlobalActionHistoryNetwork : AbstractAction
     {
-
         /// <summary>
-        /// The state which determines which action should be performed.
-        /// States:
-        /// init: the initial state, no code executedOnClient.
-        /// push: an new item should be pushed to the globalHistory on each client.
-        /// delete: an old item should be deleted from the globalHistory on each client.
-        /// replace: an entry in the globalHistory should be overwritten by newer changes on each client.
+        /// The state that determines which action should be performed.
         /// </summary>
-        public enum Mode
+        private enum Mode
         {
-            init,
-            push,
-            delete,
-            replace,
+            /// <summary>
+            /// The initial state, no code executedOnClient.
+            /// </summary>
+            Init,
+            /// <summary>
+            /// A new item should be pushed onto the globalHistory on each client.
+            /// </summary>
+            Push,
+            /// <summary>
+            /// An old item should be deleted from the globalHistory on each client.
+            /// </summary>
+            Delete,
+            /// <summary>
+            /// An entry in the globalHistory should be overwritten by newer changes on each client.
+            /// </summary>
+            Replace,
         };
 
         /// <summary>
         /// The specific instance of <see cref="Mode"/>
         /// </summary>
-        public Mode mode = Mode.init;
+        private Mode mode = Mode.Init;
 
         /// <summary>
         /// The type of the action (action or undoneAction).
@@ -88,19 +94,19 @@ namespace SEE.Net
         {
             if (!IsRequester())
             {
-                if (mode == Mode.push)
+                if (mode == Mode.Push)
                 {
                     GlobalActionHistory.Push(new GlobalHistoryEntry(false, type, actionId, changedObjects));
                 }
-                else if (mode == Mode.delete)
+                else if (mode == Mode.Delete)
                 {
                     GlobalActionHistory.DeleteItem(actionId);
                 }
-                else if (mode == Mode.replace)
+                else if (mode == Mode.Replace)
                 {
                     GlobalActionHistory.Replace(new GlobalHistoryEntry(false, oldItemType, ID, oldChangedObjects), new GlobalHistoryEntry(false, newItemType, ID, changedObjects), true);
                 }
-                mode = Mode.init;
+                mode = Mode.Init;
             }
         }
 
@@ -112,7 +118,7 @@ namespace SEE.Net
         /// <param name="changedObjects">The IDs of the objects which are edited from the action</param>
         public void Push(ActionHistory.HistoryType type, string actionId, string changedObjects)
         {
-            mode = Mode.push;
+            mode = Mode.Push;
             this.type = type;
             this.actionId = actionId;
             this.changedObjects = StringToList(changedObjects);
@@ -127,7 +133,7 @@ namespace SEE.Net
         public void Delete(string actionId)
         {
             this.actionId = actionId;
-            mode = Mode.delete;
+            mode = Mode.Delete;
 
             Execute(null);
         }
@@ -146,7 +152,7 @@ namespace SEE.Net
             ID = id;
             this.oldChangedObjects = StringToList(oldChangedObjects);
             changedObjects = StringToList(newChangedObjects);
-            mode = Mode.replace;
+            mode = Mode.Replace;
             Execute(null);
         }
 
