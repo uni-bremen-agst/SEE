@@ -10,7 +10,7 @@ namespace SEE.Game
     /// <summary>
     /// Used to recalculate the incoming and outgoing edges of a node, as well as the edges of its children. 
     /// </summary>
-    public class GameEdgeUpdater
+    public static class GameEdgeUpdater
     {
         /// <summary>
         /// Searches all inner nodes for a node.
