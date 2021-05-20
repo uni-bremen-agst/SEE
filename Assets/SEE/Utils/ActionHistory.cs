@@ -304,7 +304,7 @@ namespace SEE.Utils
             GlobalHistoryEntry lastUndoneAction = FindLastActionOfPlayer(HistoryType.undoneAction);
             if (RedoHistory.Count == 0 || lastUndoneAction.ActionID == null)
             {
-                ShowNotification.Error("Error", "Redo not possible, no action left to be redone,!");
+                ShowNotification.Error("Error", "Redo not possible, no action left to be redone!");
                 return;
             }
             else
@@ -314,7 +314,7 @@ namespace SEE.Utils
                 {
                     RedoHistory.Pop();
                     Replace(lastUndoneAction, new GlobalHistoryEntry(false, HistoryType.undoneAction, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects), false);
-                    ShowNotification.Error("Error", "Redo not possible, someone else had made a change on the same object!");
+                    ShowNotification.Error("Error", "Redo not possible, someone else has changed the same object!");
                     LastAction.Start();
                     return;
                 }
