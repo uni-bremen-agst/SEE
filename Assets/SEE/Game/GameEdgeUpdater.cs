@@ -56,6 +56,7 @@ namespace SEE.Game
                     {
                         // FIXME: Is a break missing here?
                         nodeList = GetAllChildNodes(n.GetNode());
+                        break;
                     }
                 }
             }
