@@ -29,6 +29,11 @@ namespace SEE.Controls.Actions
             return ActionStateType.Rotate;
         }
 
+        /// <summary>
+        /// Returns the list of IDs of all game objects changed by this action.
+        /// <see cref="ReversibleAction.GetChangedObjects"/>
+        /// </summary>
+        /// <returns>empty list because this action does not change anything</returns>
         public override List<string> GetChangedObjects()
         {
             throw new System.NotImplementedException();
