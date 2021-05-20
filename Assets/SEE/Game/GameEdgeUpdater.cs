@@ -55,6 +55,7 @@ namespace SEE.Game
                     if (n.TryGetComponent(out NodeRef _))
                     {
                         nodeList = GetAllChildNodes(n.GetNode());
+                        break;
                     }
                 }
             }
