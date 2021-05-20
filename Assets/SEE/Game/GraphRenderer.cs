@@ -188,12 +188,13 @@ namespace SEE.Game
 
             Graph graph = fromNode.ItsGraph;
             graph.AddEdge(edge);
-
-            if (settings.edgeLayoutSettings.kind == EdgeLayoutKind.None)
+            // Save edge layout so that we can restore it if we need to select a default layout.
+            EdgeLayoutKind savedEdgeLayout = settings.edgeLayoutSettings.kind;
+            if (savedEdgeLayout == EdgeLayoutKind.None)
             {
                 Debug.LogWarning($"An edge {edge.ID} from {fromNode.ID} to {toNode.ID} was added to the graph, but no edge layout was chosen.\n");
                 // Select default layout
-                settings.EdgeLayout = EdgeLayoutKind.Spline;
+                settings.edgeLayoutSettings.kind = EdgeLayoutKind.Spline;
             }
 
             // Creating the game object representing the edge.
@@ -240,7 +241,7 @@ namespace SEE.Game
             // The portal of the new edge is inherited from the codeCity.
             Portal.SetPortal(root: codeCity, gameObject: resultingEdge);
             // Reset original edge layout.
-            settings.EdgeLayout = savedEdgeLayout;
+            settings.edgeLayoutSettings.kind = savedEdgeLayout;
             return resultingEdge;
         }
 

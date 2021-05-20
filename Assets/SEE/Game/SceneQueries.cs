@@ -14,66 +14,6 @@ namespace SEE.Game
     /// </summary>
     internal static class SceneQueries
     {
-        private const string ArchGOName = "Architecture";
-        private const string ImplGOName = "Implementation";
-        private const string mappGOName = "Mapping";
-
-        private static SEECity arch = null;
-        private static SEECity impl = null;
-        private static SEECity mapp = null;
-
-        // TODO(torben): these are very similar to FindImplementation() etc. below @SuperSimilarQuery
-        public static SEECity GetArch()
-        {
-            if (!arch)
-            {
-                SEECity[] cities = Object.FindObjectsOfType<SEECity>();
-                foreach (SEECity city in cities)
-                {
-                    if (city.gameObject.name.Equals(ArchGOName))
-                    {
-                        arch = city;
-                        break;
-                    }
-                }
-            }
-            return arch;
-        }
-
-        public static SEECity GetImpl()
-        {
-            if (!impl)
-            {
-                SEECity[] cities = Object.FindObjectsOfType<SEECity>();
-                foreach (SEECity city in cities)
-                {
-                    if (city.gameObject.name.Equals(ImplGOName))
-                    {
-                        impl = city;
-                        break;
-                    }
-                }
-            }
-            return impl;
-        }
-
-        public static SEECity GetMapp()
-        {
-            if (!mapp)
-            {
-                SEECity[] cities = Object.FindObjectsOfType<SEECity>();
-                foreach (SEECity city in cities)
-                {
-                    if (city.gameObject.name.Equals(mappGOName))
-                    {
-                        mapp = city;
-                        break;
-                    }
-                }
-            }
-            return mapp;
-        }
-
         /// <summary>
         /// Returns all game objects in the current scene tagged by Tags.Node and having
         /// a valid reference to a graph node.
@@ -372,10 +312,13 @@ namespace SEE.Game
 
         private const string ArchGOName = "Architecture";
         private const string ImplGOName = "Implementation";
+        private const string MappGOName = "Mapping";
 
         private static SEECity arch = null;
         private static SEECity impl = null;
+        private static SEECity mapp = null;
 
+        // TODO(torben): these are very similar to FindImplementation() etc. below @SuperSimilarQuery
         public static SEECity GetArch()
         {
             if (!arch)
@@ -408,6 +351,23 @@ namespace SEE.Game
                 }
             }
             return impl;
+        }
+
+        public static SEECity GetMapp()
+        {
+            if (!mapp)
+            {
+                SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
+                foreach (SEECity city in cities)
+                {
+                    if (city.gameObject.name.Equals(MappGOName))
+                    {
+                        mapp = city;
+                        break;
+                    }
+                }
+            }
+            return mapp;
         }
 
         /// <summary>
