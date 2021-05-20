@@ -1,8 +1,8 @@
-using Assets.SEE.Utils;
+using SEE.Utils;
 using SEE.Controls.Actions;
 using System.Collections.Generic;
 using System.Linq;
-using static Assets.SEE.Utils.ActionHistory;
+using static SEE.Utils.ActionHistory;
 
 namespace SEE.Net
 {
@@ -104,7 +104,9 @@ namespace SEE.Net
                 }
                 else if (mode == Mode.Replace)
                 {
-                    GlobalActionHistory.Replace(new GlobalHistoryEntry(false, oldItemType, ID, oldChangedObjects), new GlobalHistoryEntry(false, newItemType, ID, changedObjects), true);
+                    GlobalActionHistory.Replace(new GlobalHistoryEntry(false, oldItemType, ID, oldChangedObjects), 
+                                                new GlobalHistoryEntry(false, newItemType, ID, changedObjects), 
+                                                true);
                 }
                 mode = Mode.Init;
             }
@@ -134,7 +136,6 @@ namespace SEE.Net
         {
             this.actionId = actionId;
             mode = Mode.Delete;
-
             Execute(null);
         }
 
@@ -146,7 +147,12 @@ namespace SEE.Net
         /// <param name="oldChangedObjects">The changedObjects from the old item.</param>
         /// <param name="newType">The type of the new item.</param>
         /// <param name="newChangedObjects">The changedObjects of the new item.</param>
-        public void Replace(ActionHistory.HistoryType oldType, string id, string oldChangedObjects, ActionHistory.HistoryType newType, string newChangedObjects)
+        public void Replace
+                     (ActionHistory.HistoryType oldType, 
+                      string id, 
+                      string oldChangedObjects, 
+                      ActionHistory.HistoryType newType, 
+                      string newChangedObjects)
         {
             oldItemType = oldType;
             ID = id;
@@ -157,7 +163,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Parses a comma-seperated string of changedObjects and returns them as single elements in a list.
+        /// Parses a comma-separated string of changedObjects and returns them as single elements in a list.
         /// </summary>
         /// <param name="changedObjectsToParse">the changed objects which has to be parsed</param>
         /// <returns>a list of names of changed gameObjects</returns>
