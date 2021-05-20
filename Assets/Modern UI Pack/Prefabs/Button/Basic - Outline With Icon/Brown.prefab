@@ -728,17 +728,21 @@ MonoBehaviour:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
+  buttonVar: {fileID: 0}
   normalIcon: {fileID: 114690556058365308}
   highlightedIcon: {fileID: 114439062159838520}
   normalText: {fileID: 114292799569505100}
   highlightedText: {fileID: 114385667758719456}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 3538548261984310885}
+  animationSolution: 1
+  fadingMultiplier: 8
   useCustomContent: 0
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
   useRipple: 1
+  rippleUpdateMode: 1
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6

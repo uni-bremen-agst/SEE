@@ -146,6 +146,7 @@ GameObject:
   - component: {fileID: 7147975206492293413}
   - component: {fileID: 7147975206492293412}
   - component: {fileID: 7147975206492293415}
+  - component: {fileID: 1235397880999053833}
   m_Layer: 0
   m_Name: InControl
   m_TagString: Untagged
@@ -219,6 +220,14 @@ MonoBehaviour:
   enableControlsOnTouch: 1
   _controlsEnabled: 1
   controlsLayer: 5
+--- !u!81 &1235397880999053833
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7147975206492293414}
+  m_Enabled: 1
 --- !u!1 &7147975206999930684
 GameObject:
   m_ObjectHideFlags: 0

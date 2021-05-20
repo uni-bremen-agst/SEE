@@ -11,11 +11,11 @@ namespace Michsky.UI.ModernUIPack
     [AddComponentMenu("Modern UI Pack/Context Menu/Context Menu Content")]
     public class ContextMenuContent : MonoBehaviour, IPointerClickHandler
     {
-        [Header("RESOURCES")]
+        [Header("Resources")]
         public ContextMenuManager contextManager;
         public Transform itemParent;
 
-        [Header("ITEMS")]
+        [Header("Items")]
         public List<ContextItem> contexItems = new List<ContextItem>();
 
         Animator contextAnimator;
@@ -28,7 +28,7 @@ namespace Michsky.UI.ModernUIPack
         [System.Serializable]
         public class ContextItem
         {
-            public string itemText;
+            public string itemText = "Item Text";
             public Sprite itemIcon;
             public ContextItemType contextItemType;
             public UnityEvent onClickEvents;
@@ -37,6 +37,7 @@ namespace Michsky.UI.ModernUIPack
         public enum ContextItemType
         {
             BUTTON
+            // SUB_MENU
         }
 
         void Start()
@@ -46,15 +47,13 @@ namespace Michsky.UI.ModernUIPack
                 try
                 {
                     contextManager = GameObject.Find("Context Menu").GetComponent<ContextMenuManager>();
-                    contextAnimator = contextManager.contextAnimator;
                     itemParent = contextManager.transform.Find("Content/Item List").transform;
                 }
 
-                catch
-                {
-                    Debug.Log("Context Menu - No variable attached to Context Manager.", this);
-                }
-            } 
+                catch { Debug.Log("<b>[Context Menu]</b> No variable attached to Context Manager.", this); return; }
+            }
+
+            contextAnimator = contextManager.contextAnimator;
 
             foreach (Transform child in itemParent)
                 Destroy(child.gameObject);
