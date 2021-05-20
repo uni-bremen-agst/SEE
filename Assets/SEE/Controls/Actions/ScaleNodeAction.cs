@@ -4,7 +4,6 @@ using SEE.Utils;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using System.Collections.Generic;
 using SEE.DataModel.DG;
 using SEE.DataModel;
 using System.Linq;
