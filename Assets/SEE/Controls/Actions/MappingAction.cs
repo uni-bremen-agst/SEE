@@ -402,7 +402,9 @@ namespace SEE.Controls.Actions
 
         ReversibleAction.Progress ReversibleAction.CurrentProgress()
         {
-            throw new NotImplementedException();
+            throw new System.NotImplementedException();
         }
+
+        #endregion
     }
 }
