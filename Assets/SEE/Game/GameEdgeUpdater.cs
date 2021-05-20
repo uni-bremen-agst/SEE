@@ -16,7 +16,7 @@ namespace SEE.Game
         /// Searches all inner nodes for a node.
         /// </summary>
         /// <param name="node">The node for which all inner nodes are to be searched for</param>
-        /// <returns>All nodes found including the start node</returns>
+        /// <returns>All nodes found including the <paramref name="node"/></returns>
         private static ISet<Node> GetAllChildNodes(Node node)
         {
             ISet<Node> listOfChildNodes = new HashSet<Node>
@@ -41,7 +41,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Recalculates all edges of a node, as well as the edges of its children 
+        /// Recalculates all edges of a node, as well as the edges of its children.
         /// </summary>
         /// <param name="node">The node whose edges are to be recalculated</param>
         public static void UpdateAllConnectingEdgesOfNode(GameObject node)
@@ -54,6 +54,7 @@ namespace SEE.Game
                 {
                     if (n.TryGetComponent(out NodeRef _))
                     {
+                        // FIXME: Is a break missing here?
                         nodeList = GetAllChildNodes(n.GetNode());
                     }
                 }
