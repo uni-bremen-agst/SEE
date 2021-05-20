@@ -1018,16 +1018,19 @@ namespace SEE.Controls.Actions
 
         public List<string> GetChangedObjects()
         {
-            throw new System.NotImplementedException();
+            // TODO
+            throw new NotImplementedException();
         }
 
         public string GetId()
         {
+            // TODO
             throw new NotImplementedException();
         }
 
         ReversibleAction.Progress ReversibleAction.CurrentProgress()
         {
+            // TODO
             throw new NotImplementedException();
         }
     }
