@@ -502,7 +502,7 @@ namespace Michsky.UI.ModernUIPack
         [MenuItem("GameObject/Modern UI Pack/Button/Basic - Outline/Pink", false, 0)]
         static void BOPIN()
         {
-            CreateButton("Button/Basic Outline/Pink");
+            CreateButton("Button/Basic - Outline/Pink");
         }
 
         [MenuItem("GameObject/Modern UI Pack/Button/Basic - Outline/Purple", false, 0)]

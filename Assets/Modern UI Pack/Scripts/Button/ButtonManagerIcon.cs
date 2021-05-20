@@ -3,6 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace Michsky.UI.ModernUIPack
 {
@@ -58,6 +61,15 @@ namespace Michsky.UI.ModernUIPack
         {
             NORMAL,
             UNSCALED_TIME
+        }
+
+        void OnEnable()
+        {
+            if (normalCG == null && highlightedCG == null)
+                return;
+
+            normalCG.alpha = 1;
+            highlightedCG.alpha = 0;
         }
 
         void Start()
@@ -132,7 +144,13 @@ namespace Michsky.UI.ModernUIPack
         public void OnPointerDown(PointerEventData eventData)
         {
             if (useRipple == true && isPointerOn == true)
+#if ENABLE_LEGACY_INPUT_MANAGER
                 CreateRipple(Input.mousePosition);
+#elif ENABLE_INPUT_SYSTEM && ENABLE_LEGACY_INPUT_MANAGER
+                CreateRipple(Input.mousePosition);
+#elif ENABLE_INPUT_SYSTEM
+                CreateRipple(Mouse.current.position.ReadValue());
+#endif
             else if (useRipple == false)
                 this.enabled = false;
         }
