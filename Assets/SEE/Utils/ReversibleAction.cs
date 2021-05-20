@@ -121,9 +121,9 @@ namespace SEE.Utils
         void Redo();
 
         /// <summary>
-        /// Getter for the ID of the specific action.
+        /// Returns the ID of this action.
         /// </summary>
-        /// <returns>the ID of a specific action</returns>
+        /// <returns>the ID of this action</returns>
         string GetId();
 
         /// <summary>
