@@ -45,7 +45,8 @@ public class NodeDecorationController : MonoBehaviour
     /// <summary>
     /// Roof type dropdown menu items
     /// </summary>
-    public enum RoofType {
+    public enum RoofType
+    {
         Rectangular,
         Tetrahedron,
         Dome
@@ -60,7 +61,8 @@ public class NodeDecorationController : MonoBehaviour
     /// The Height-Percentage the bottom floor should have in
     /// contrast to the building height
     /// </summary>
-    public float floorHightPercentage {
+    public float floorHightPercentage
+    {
         get
         {
             return _floorHightPercentage;
@@ -122,7 +124,7 @@ public class NodeDecorationController : MonoBehaviour
     /// <summary>
     /// Contain the values of the above declared variables, limited to values between 0 and 1
     /// </summary>
-    [SerializeField, Range(0f, 1f)]  
+    [SerializeField, Range(0f, 1f)]
     private float _floorHightPercentage, _lobbySpanPercentage, _roofHeightPercentage, _roofSpanPercentage;
 
     /// <summary>
@@ -155,7 +157,8 @@ public class NodeDecorationController : MonoBehaviour
     /// <summary>
     /// Get the gameNode's different properties
     /// </summary>
-    private void fetchNodeDetails() {
+    private void fetchNodeDetails()
+    {
         nodeSize = nodeObject.transform.localScale;
         nodeLocation = nodeObject.transform.position;
     }
@@ -202,7 +205,7 @@ public class NodeDecorationController : MonoBehaviour
                 tetrahedron.transform.position = new Vector3(nodeLocation.x - roofSizeX / 2, nodeSize.y / 2 + nodeLocation.y, nodeLocation.z - roofSizeZ / 2);
                 break;
             case RoofType.Rectangular:
-                renderRectangularRoof(roofSizeX,roofHeight,roofSizeZ);
+                renderRectangularRoof(roofSizeX, roofHeight, roofSizeZ);
                 break;
             case RoofType.Dome:
                 renderDomeRoof(roofSizeX, roofHeight, roofSizeZ);
@@ -297,11 +300,11 @@ public class NodeDecorationController : MonoBehaviour
     {
         for (int i = 0; i < hiddenObjects.Count; i++)
         {
-            GameObject clone = GameObject.CreatePrimitive(PrimitiveType.Cube); 
-            clone.transform.position.Set(hiddenObjects[i].transform.position.x, packedBlock.transform.position.y + packedBlock.transform.localScale.y, hiddenObjects[i].transform.position.z); 
+            GameObject clone = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            clone.transform.position.Set(hiddenObjects[i].transform.position.x, packedBlock.transform.position.y + packedBlock.transform.localScale.y, hiddenObjects[i].transform.position.z);
             clone.transform.localScale.Set(hiddenObjects[i].transform.localScale.x, 0.00000001f, hiddenObjects[i].transform.localScale.z);
         }
-        decoratePackedBlockWall(hiddenObjects,packedBlock);
+        decoratePackedBlockWalls(hiddenObjects, packedBlock);
     }
 
     /// <summary>
@@ -309,7 +312,7 @@ public class NodeDecorationController : MonoBehaviour
     /// <param name="hiddenObjects">The list of gamenodes that are hidden inside the packed block</param>
     /// <param name="packedBlock">The packed block</param>
     /// </summary>
-    private void decoratePackedBlockWall(List<GameObject> hiddenObjects, GameObject packedBlock)
+    private void decoratePackedBlockWalls(List<GameObject> hiddenObjects, GameObject packedBlock)
     {
         // Get packed block dimensions and corners, North - Positive X, West - Positive Z
         Vector3 packedBlockDimensions = packedBlock.transform.localScale;
@@ -324,7 +327,7 @@ public class NodeDecorationController : MonoBehaviour
         Vector3 southWestBottomCorner = new Vector3(packedBlockLocation.x - 0.5f * packedBlockDimensions.x, packedBlockLocation.y - 0.5f * packedBlockDimensions.y, packedBlockLocation.z + 0.5f * packedBlockDimensions.z);
         Vector3 southEastTopCorner = new Vector3(packedBlockLocation.x - 0.5f * packedBlockDimensions.x, packedBlockLocation.y + 0.5f * packedBlockDimensions.y, packedBlockLocation.z - 0.5f * packedBlockDimensions.z);
         Vector3 southEastBottomCorner = new Vector3(packedBlockLocation.x - 0.5f * packedBlockDimensions.x, packedBlockLocation.y - 0.5f * packedBlockDimensions.y, packedBlockLocation.z - 0.5f * packedBlockDimensions.z);
-        
+
         float packedBlockFloorY = packedBlockLocation.y - packedBlockDimensions.y / 2;
 
         // Compute sum of block heights
@@ -333,12 +336,12 @@ public class NodeDecorationController : MonoBehaviour
         {
             totalBlocksHeight += packedBlockDimensions.y;
         }
-        
+
         // How much empty space to show between the block decorations, tweak the 1% at will
         float freeSpaceX = 0.01f * packedBlock.transform.localScale.x;
         float freeSpaceY = 0.01f * packedBlock.transform.localScale.y;
         float freeSpaceZ = 0.01f * packedBlock.transform.localScale.z;
-        
+
         // Compute block grid
         float roundedRoot = Mathf.Ceil(Mathf.Sqrt(hiddenObjects.Count));
         float blocksHorizontalAxis = roundedRoot;
@@ -353,70 +356,115 @@ public class NodeDecorationController : MonoBehaviour
         }
 
         // Add empty gameobject children to identify different clones
-        GameObject northClones = new GameObject();
-        GameObject southClones = new GameObject();
-        GameObject westClones = new GameObject();
-        GameObject eastClones = new GameObject();
-        northClones.transform.name = "northClones";
-        southClones.transform.name = "southClones";
-        westClones.transform.name = "westClones";
-        eastClones.transform.name = "eastClones";
+        GameObject northClones = new GameObject("northClones");
+        GameObject southClones = new GameObject("southClones");
+        GameObject westClones = new GameObject("westClones");
+        GameObject eastClones = new GameObject("eastClones");
         northClones.transform.SetParent(packedBlock.transform);
         southClones.transform.SetParent(packedBlock.transform);
         westClones.transform.SetParent(packedBlock.transform);
         eastClones.transform.SetParent(packedBlock.transform);
 
-        // Location on each surface, used to align clones on block surface
+        // Location on each surface, used to align clones on block surface, top-down left-right approach
         Vector3 currentPosN = new Vector3(northEastTopCorner.x, northEastTopCorner.y - freeSpaceY, northEastTopCorner.z + freeSpaceZ); // Blocks placed from east to west on northern surface, top to bottom
         Vector3 currentPosW = new Vector3(northWestTopCorner.x - freeSpaceX, northWestTopCorner.y - freeSpaceY, northWestTopCorner.z); // Blocks placed from north to south on western surface, top to bottom
         Vector3 currentPosS = new Vector3(southWestTopCorner.x, southWestTopCorner.y - freeSpaceY, southWestTopCorner.z - freeSpaceZ); // Blocks placed from west to east on southern surface, top to bottom
         Vector3 currentPosE = new Vector3(southEastTopCorner.x + freeSpaceX, southEastTopCorner.y - freeSpaceY, southEastTopCorner.z); // Blocks placed from south to north on eastern surface, top to bottom
 
         // Create gameobject clones and set them on the walls of the packed block
-        List <GameObject> clones = new List<GameObject>();
-        float maxCloneWidthZ = (packedBlockDimensions.z - freeSpaceZ * (blocksHorizontalAxis + 1)) / blocksHorizontalAxis; 
-        float maxCloneWidthX = (packedBlockDimensions.x - freeSpaceX * (blocksHorizontalAxis + 1)) / blocksHorizontalAxis;
+        List<GameObject> clones = new List<GameObject>();
         float maxCloneHeightY = (packedBlockDimensions.y - freeSpaceY * (blocksVerticalAxis + 1)) / blocksVerticalAxis;
-        for (int i=0;i<blocksVerticalAxis;i++)
+        int currentClone = 0;
+        for (int i = 0; i < blocksVerticalAxis; i++)
         {
-            for (int j=0; j<blocksHorizontalAxis; i++)
+            // Used to determine how much space every block is allowed to take up on the horizontal axis
+            float blockHeightHorizontal = 0f;
+            for (int j = 0; j < blocksHorizontalAxis; j++)
             {
+                if (i + j >= hiddenObjects.Count - 1)
+                {
+                    break;
+                }
+                blockHeightHorizontal += hiddenObjects[i + j].transform.localScale.y;
+            }
+            // Used to determine how much space every block is allowed to take up on the vertical axis
+            Dictionary<float, float> blockHeightVertical = new Dictionary<float, float>();
+            // Draw the blocks
+            for (int j = 0; j < blocksHorizontalAxis; j++)
+            {
+                // The grid isn't necessarily filled in all spots
+                if (i + j >= hiddenObjects.Count - 1)
+                {
+                    break;
+                }
+                // Compute height percentage for current column if it isn't already computed
+                if (!blockHeightVertical.ContainsKey(j))
+                {
+                    float totalHeight = 0f;
+                    for (int k = 0; k < blocksVerticalAxis; k++)
+                    {
+                        if (k+j >= hiddenObjects.Count-1)
+                        {
+                            break;
+                        }
+                        totalHeight += hiddenObjects[j + k].transform.localScale.y;
+                    }
+                    blockHeightVertical.Add(j, totalHeight);
+                }
+
                 GameObject o = hiddenObjects[i + j];
                 Color materialColor = o.GetComponent<Renderer>().material.color;
 
-                // Block height percentage - in contrast to total height, used for scaling the clone
-                float blockHeightPercentage = o.transform.localScale.y / totalBlocksHeight;
+                // Determines how much space the block is allowed to take up on the vertical Axis
+                float blockHeightPercentageY = o.transform.localScale.y / blockHeightVertical[j];
+                float blockHeightPercentageHorizontal = o.transform.localScale.y / blockHeightHorizontal;
+                float nodeSizeHorizontalZ = blockHeightPercentageHorizontal * (packedBlockDimensions.z - (blocksHorizontalAxis + 1) * freeSpaceZ);
+                float nodeSizeHorizontalX = blockHeightPercentageHorizontal * (packedBlockDimensions.x - (blocksHorizontalAxis + 1) * freeSpaceX);
+                float nodeSizeVertical = maxCloneHeightY * blockHeightPercentageY;
 
-                // Create positive north clone
+                // Create north clone
                 GameObject cloneN = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                cloneN.name = o.transform.name + "NorthDecorator";
+                cloneN.name = currentClone + "-NorthDecorator";
                 cloneN.GetComponent<Renderer>().material.color = materialColor;
-                cloneN.transform.localScale = new Vector3(0.1f * packedBlockDimensions.x, blockHeightPercentage * maxCloneHeightY, blockHeightPercentage * maxCloneWidthZ);
-                cloneN.transform.position = currentPosN + new Vector3(0,-(cloneN.transform.localScale.y/2),cloneN.transform.localScale.z/2);
+                cloneN.transform.localScale = new Vector3(0.1f * packedBlockDimensions.x, nodeSizeVertical, nodeSizeHorizontalZ);
+                cloneN.transform.localPosition = currentPosN + new Vector3(0, -(maxCloneHeightY / 2), cloneN.transform.localScale.z / 2);
                 cloneN.transform.SetParent(northClones.transform);
-                /*
-                // Create North/South clones (Positive x - north, negative x - south)
 
+                // Create south clone
                 GameObject cloneS = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                cloneS.name = currentClone + "-SouthDecorator";
+                cloneS.GetComponent<Renderer>().material.color = materialColor;
+                cloneS.transform.localScale = new Vector3(0.1f * packedBlockDimensions.x, nodeSizeVertical, nodeSizeHorizontalZ);
+                cloneS.transform.localPosition = currentPosS + new Vector3(0, -(maxCloneHeightY / 2), -(cloneS.transform.localScale.z / 2));
+                cloneS.transform.SetParent(southClones.transform);
 
-                cloneS.name = "PackedBlockSouthWallDecoration";
-                // Compute dimensions of clones
-                float blockOccupancyHorizontal = blockHeightPercentage * packedBlockDimensions.z;
-                float blockOccupancyVertical = blockHeightPercentage * packedBlockDimensions.y;
-                Vector3 size = new Vector3(0.00000001f, blockOccupancyVertical, blockOccupancyHorizontal); // TODO remove magic number
-                cloneN.transform.localScale = size;
-                cloneS.transform.localScale = size;
-
-                // Create West/East clones (Positive z - west, negative z - east)
+                // Create west clone
                 GameObject cloneW = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                GameObject cloneE = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                cloneW.name = "PackedBlockWesthWallDecoration";
-                cloneE.name = "PackedBlockEastWallDecoration"; */
+                cloneW.name = currentClone + "-WestDecorator";
+                cloneW.GetComponent<Renderer>().material.color = materialColor;
+                cloneW.transform.localScale = new Vector3(nodeSizeHorizontalX, nodeSizeVertical, 0.1f * packedBlockDimensions.z);
+                cloneW.transform.localPosition = currentPosW + new Vector3(-(cloneW.transform.localScale.x / 2), -(maxCloneHeightY / 2), 0);
+                cloneW.transform.SetParent(westClones.transform);
 
-                currentPosN += new Vector3(0,0,maxCloneWidthZ + freeSpaceZ);
-                Debug.Log("Current postition: " + currentPosN.ToString());
+                // Create east clone
+                GameObject cloneE = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                cloneE.name = currentClone + "-EastDecorator";
+                cloneE.GetComponent<Renderer>().material.color = materialColor;
+                cloneE.transform.localScale = new Vector3(nodeSizeHorizontalX, nodeSizeVertical, 0.1f * packedBlockDimensions.z);
+                cloneE.transform.localPosition = currentPosE + new Vector3(cloneE.transform.localScale.x / 2, -(maxCloneHeightY / 2), 0);
+                cloneE.transform.SetParent(eastClones.transform);
+
+                // Move position along
+                currentPosN += new Vector3(0, 0, nodeSizeHorizontalZ + freeSpaceZ);
+                currentPosS += new Vector3(0, 0, -(nodeSizeHorizontalZ + freeSpaceZ));
+                currentPosW += new Vector3(-(nodeSizeHorizontalX + freeSpaceX), 0, 0);
+                currentPosE += new Vector3(nodeSizeHorizontalX + freeSpaceX, 0, 0);
+                currentClone++;
             }
             currentPosN = new Vector3(currentPosN.x, currentPosN.y - freeSpaceY - maxCloneHeightY, northEastTopCorner.z + freeSpaceZ);
+            currentPosS = new Vector3(currentPosS.x, currentPosS.y - freeSpaceY - maxCloneHeightY, southWestTopCorner.z + freeSpaceZ);
+            currentPosW = new Vector3(northWestTopCorner.x + freeSpaceX, currentPosW.y - freeSpaceY - maxCloneHeightY, currentPosW.z);
+            currentPosE = new Vector3(southEastTopCorner.x + freeSpaceX, currentPosE.y - freeSpaceY - maxCloneHeightY, currentPosE.z);
         }
     }
 
@@ -446,7 +494,7 @@ public class NodeDecorationController : MonoBehaviour
         {
             // TODO remove this after testing
             Debug.Log("Node size changed, reloading data...");
-            for (int i=0; i<nodeObject.transform.childCount; ++i)
+            for (int i = 0; i < nodeObject.transform.childCount; ++i)
             {
                 Destroy(nodeObject.transform.GetChild(i).gameObject);
             }
@@ -483,12 +531,12 @@ public class NodeDecorationController : MonoBehaviour
         float freeSpaceX = 0.01f * nodeSize.x;
         float freeSpaceZ = 0.01f * nodeSize.z;
         // Create a few child nodes
-        for (int i=0; i < (rows * columns); i++)
+        for (int i = 0; i < (rows * columns); i++)
         {
             GameObject o = GameObject.CreatePrimitive(PrimitiveType.Cube);
             // Max node size x = (size.x - freeSpaceCount.x * freeSpaceSize.x) / amountOfRows
             // Max node size z = (size.z - freeSpaceCount.z * freeSpaceSize.z) / amountOfColumns
-            Vector3 childNodeDimensions = new Vector3((nodeSize.x - (rows + 1) * freeSpaceX) / rows, 
+            Vector3 childNodeDimensions = new Vector3((nodeSize.x - (rows + 1) * freeSpaceX) / rows,
                 Random.Range(0.01f * nodeSize.y, nodeSize.y), (nodeSize.z - (columns + 1) * freeSpaceZ) / columns);
             o.transform.localScale = childNodeDimensions;
             o.name = i.ToString();
@@ -517,7 +565,7 @@ public class NodeDecorationController : MonoBehaviour
                 // Move child to new location
                 currentChild.transform.localPosition = new Vector3(childLocX, childLocY, childLocZ);
                 currentListIndex++;
-                currentLocationZ += freeSpaceZ + currentChild.transform.localScale.z; 
+                currentLocationZ += freeSpaceZ + currentChild.transform.localScale.z;
             }
             currentLocationZ = parentNodeLowZ + freeSpaceZ;
             currentLocationX += freeSpaceX + childWidthX;
