@@ -1,6 +1,5 @@
 using SEE.Game.UI.Notification;
 using SEE.Net;
-using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,7 +16,7 @@ namespace SEE.Utils
         // If the second player undoes the newer change of the object, 
         // the undo of the older change is still not possible because
         // the change is still on the redoHistory of the other player.
-        // Iff the player that has the newer action undoes the action 
+        // If the player who executed the newer action undoes the action 
         // and clears his redoHistory by performing another action,
         // the other player can undo his action.
 
@@ -176,7 +175,7 @@ namespace SEE.Utils
         /// <param name="type">the type of action the user wants to perform</param>
         /// 
         /// <returns>A GlobalHistoryEntry. If the player has no last action of the given type left, the entry will be empty </returns>
-        private GlobalHistoryEntry FindLastActionOfPlayer(HistoryType type) // Note the one liner from @Falkos Suggestion dosent work properly if we do an undo redo combination more than one time
+        private GlobalHistoryEntry FindLastActionOfPlayer(HistoryType type) // Note the one liner from @Falkos suggestion doesn't work properly if we do an undo redo combination more than once.
         {
             for (int i = globalHistory.Count - 1; i >= 0; i--)
             {
@@ -203,13 +202,14 @@ namespace SEE.Utils
             {
                 return false;
             }
-            for (int i = ++index; i < globalHistory.Count; i++)
+            ++index;
+            for (int i = index; i < globalHistory.Count; i++)
             {
                 foreach (string s in affectedGameObjects)
                 {
                     if (globalHistory[i].ChangedObjects != null)
                     {
-                        if (globalHistory[i].ChangedObjects.Contains(s) && globalHistory[i].IsOwner == false)
+                        if (globalHistory[i].ChangedObjects.Contains(s) && !globalHistory[i].IsOwner)
                         {
                             return true;
                         }
@@ -244,7 +244,6 @@ namespace SEE.Utils
         public void DeleteItem(string id)
         {
             globalHistory.Remove(globalHistory.FirstOrDefault(x => x.ActionID.Equals(id)));
-
         }
 
         /// <summary>
@@ -259,7 +258,6 @@ namespace SEE.Utils
                 return;
             }
             LastAction.Stop();
-
             ReversibleAction current = LastActionWithEffect();
 
             if (current == null)
@@ -273,7 +271,6 @@ namespace SEE.Utils
             {
                 ShowNotification.Error("Error", "Undo not possible, someone else had made a change on the same object!");
                 Replace(lastAction, new GlobalHistoryEntry(false, HistoryType.undoneAction, lastAction.ActionID, lastAction.ChangedObjects), false);
-
                 UndoHistory.Pop();
                 current.Start();
                 return;
@@ -287,7 +284,6 @@ namespace SEE.Utils
                 new GlobalActionHistoryNetwork().Delete(lastAction.ActionID);
 
                 GlobalHistoryEntry undoneAction = new GlobalHistoryEntry(true, HistoryType.undoneAction, lastAction.ActionID, lastAction.ChangedObjects);
-
                 Push(undoneAction);
                 new GlobalActionHistoryNetwork().Push(undoneAction.ActionType, undoneAction.ActionID, ListToString(undoneAction.ChangedObjects));
                 if (current == null)
@@ -295,7 +291,6 @@ namespace SEE.Utils
                     return;
                 }
                 isRedo = true;
-
                 Resume(current);
             }
         }
