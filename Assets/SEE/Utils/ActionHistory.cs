@@ -3,7 +3,8 @@ using SEE.Net;
 using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
-namespace Assets.SEE.Utils
+
+namespace SEE.Utils
 {
     /// <summary>
     /// Maintains a history of executed reversible actions that can be undone and redone.

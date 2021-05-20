@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Utils;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using SEE.Controls.Actions;
 using SEE.Utils;
 using System.Collections.Generic;
@@ -25,7 +24,6 @@ namespace SEETests
 
             private int UndoCalls = 0;
             private int RedoCalls = 0;
-
 
             public void Awake()
             {
