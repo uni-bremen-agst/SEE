@@ -1,0 +1,71 @@
+<grammar version="1.0" xml:lang="en-US" root="sentences"
+ xmlns="http://www.w3.org/2001/06/grammar" tag-format="semantics/1.0">
+
+  <!-- grammar root rule -->
+  <rule id="sentences">
+    <ruleref uri="#intro" />
+	<one-of>
+	  <item><ruleref uri="#help" /> <tag> out.action = "help"; </tag></item>
+      <item><ruleref uri="#timeQuery" /> <tag> out.action = "time"; </tag></item>
+	  <item><ruleref uri="#aboutYou" /><tag> out.action = "about"; </tag></item>
+	</one-of>
+  </rule>
+
+  <!-- trigger phrase for SEE -->
+  <rule id="intro">
+     <one-of>
+       <item> hey </item>
+	   <item> hi </item>
+	   <item> I </item>
+	   <item> okay </item>
+	   <item>  </item>
+	 </one-of>
+	 <item> see </item>
+  </rule>
+  
+  <!-- help -->
+  <rule id="help">
+    <one-of>
+      <item> I need help </item>
+      <item> help me </item>
+      <item> give help </item>
+	  <item> provide help </item>
+    </one-of>
+  </rule>
+
+  <!-- current time -->
+  <rule id="timeQuery">
+    <one-of>
+      <item> what time is it </item>
+      <item> what is the current time </item>
+      <item> how late is it </item>
+    </one-of>
+  </rule>
+
+  <!-- more about SEE -->
+  <rule id="aboutYou">
+    <one-of>      
+	  <item> who are you</item>
+      <item> what are you</item>
+	  <item> tell me more <item repeat="0-1"><ruleref uri="#about"/> <ruleref uri="#yourself"/></item></item>
+      <item> who made <ruleref uri="#yourself"/></item>
+    </one-of>
+  </rule>
+  
+  <!-- about/on -->
+  <rule id="about">
+    <one-of>
+      <item> about </item>
+      <item> on </item>
+    </one-of>
+  </rule>
+  
+  <!-- you/yourself -->
+  <rule id="yourself">
+  	 <one-of>
+	   <item>you</item>
+	   <item>yourself</item>
+	 </one-of>
+  </rule>	  
+  
+</grammar>

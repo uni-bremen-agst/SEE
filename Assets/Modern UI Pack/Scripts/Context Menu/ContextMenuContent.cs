@@ -47,12 +47,13 @@ namespace Michsky.UI.ModernUIPack
                 try
                 {
                     contextManager = GameObject.Find("Context Menu").GetComponent<ContextMenuManager>();
-                    contextAnimator = contextManager.contextAnimator;
                     itemParent = contextManager.transform.Find("Content/Item List").transform;
                 }
 
-                catch { Debug.Log("Context Menu - No variable attached to Context Manager.", this); }
-            } 
+                catch { Debug.Log("<b>[Context Menu]</b> No variable attached to Context Manager.", this); return; }
+            }
+
+            contextAnimator = contextManager.contextAnimator;
 
             foreach (Transform child in itemParent)
                 Destroy(child.gameObject);

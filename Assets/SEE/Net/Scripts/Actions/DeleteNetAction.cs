@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Game;
-using SEE.Game;
+﻿using SEE.Game;
 using SEE.GO;
 using UnityEngine;
 
