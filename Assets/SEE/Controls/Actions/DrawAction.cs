@@ -176,6 +176,13 @@ namespace SEE.Controls.Actions
             return ActionStateType.Draw;
         }
 
+        /// <summary>
+        /// The list of the IDs of all gameObjects changed by this action.
+        /// <see cref="ReversibleAction.GetActionStateType"/>
+        /// Because this action does not actually change any game object, 
+        /// an empty list is returned.
+        /// </summary>
+        /// <returns>an empty list</returns>
         public override List<string> GetChangedObjects()
         {
             return new List<string>();
