@@ -52,7 +52,7 @@ namespace SEE.Game
             {
                 if (n.activeInHierarchy && n.ID().Equals(node.ID()))
                 {
-                    if (n.TryGetComponent(out NodeRef nodeRef))
+                    if (n.TryGetComponent(out NodeRef _))
                     {
                         nodeList = GetAllChildNodes(n.GetNode());
                     }
