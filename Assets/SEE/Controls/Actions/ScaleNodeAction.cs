@@ -331,44 +331,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void AdjustEdge()
         {
-            HashSet<Edge> edgesToBeRedrawn = new HashSet<Edge>();
-
-            // Search for all incoming and outgoing edges
-            foreach (GameObject node in GameObject.FindGameObjectsWithTag(Tags.Node))
-            {
-                if (node.activeInHierarchy && node.ID().Equals(objectToScale.ID()))
-                {
-                    if (node.TryGetComponent(out NodeRef nodeRef))
-                    {
-
-                        edgesToBeRedrawn.UnionWith(nodeRef.Value.Outgoings.Union(nodeRef.Value.Incomings));
-                    }
-                }
-            }
-
-            List<(GameObject, GameObject, String)> sourceTargetEdge = new List<(GameObject, GameObject, string)>();
-
-            // Search for the corresponding GameObjects
-            foreach (Edge edge in edgesToBeRedrawn)
-            {
-                GameObject source = GameObject.Find(edge.Source.ID);
-                GameObject target = GameObject.Find(edge.Target.ID);
-
-                if (source != null && target != null)
-                {
-                    sourceTargetEdge.Add((source, target, edge.ID));
-                }
-            }
-            // Deleting the old edges
-            foreach ((GameObject, GameObject, string) element in sourceTargetEdge)
-            {
-                GameEdgeAdder.Remove(GameObject.Find(element.Item3));
-            }
-            // Create the new edges
-            foreach ((GameObject, GameObject, string) element in sourceTargetEdge)
-            {
-                GameEdgeAdder.Add(element.Item1, element.Item2, element.Item3);
-            }
+            GameEdgeUpdater.UpdateAllConnectingEdgesOfNode(objectToScale);
         }
 
         /// <summary>
