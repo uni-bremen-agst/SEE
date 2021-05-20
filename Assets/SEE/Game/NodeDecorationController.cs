@@ -481,28 +481,28 @@ public class NodeDecorationController : MonoBehaviour
         float freeSpaceX = 0.01f * nodeSize.x;
         float freeSpaceZ = 0.01f * nodeSize.z;
         // Create a few child nodes
-        for (int i=0; i<12; i++)
+        for (int i=0; i < (rows * columns); i++)
         {
             GameObject o = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            // Gamenodes will be laid out as 4x3 graph while testing
-            Vector3 childNodeDimensions = new Vector3((nodeSize.x - 5f * freeSpaceX) / rows, Random.Range(0.01f * nodeSize.y, nodeSize.y), (nodeSize.z - 5f * freeSpaceZ) / columns);
+            // Max node size x = (size.x - freeSpaceCount.x * freeSpaceSize.x) / amountOfRows
+            // Max node size z = (size.z - freeSpaceCount.z * freeSpaceSize.z) / amountOfColumns
+            Vector3 childNodeDimensions = new Vector3((nodeSize.x - (rows + 1) * freeSpaceX) / rows, 
+                Random.Range(0.01f * nodeSize.y, nodeSize.y), (nodeSize.z - (columns + 1) * freeSpaceZ) / columns);
             o.transform.localScale = childNodeDimensions;
             o.name = i.ToString();
             o.GetComponent<Renderer>().material.color = Color.red;
-            o.transform.SetParent(nodeObject.transform);
+           // o.transform.SetParent(nodeObject.transform);
             childNodes.Add(o);
         }
         // Find corners of parent node, parent node is moved using it's 3d center
         float parentNodeLowX = nodeLocation.x - nodeSize.x / 2;
-        float parentNodeHighX = nodeLocation.x + nodeSize.x / 2;
         float parentNodeLowZ = nodeLocation.z - nodeSize.z / 2;
-        float parentNodeHighZ = nodeLocation.z + nodeSize.z / 2;
         float parentNodeFloorY = nodeLocation.y - nodeSize.y / 2;
-        // Lay nodes out as 4x3 grid inside parent node
+        // Lay nodes out as a grid inside parent node
         int currentListIndex = 0;
         float currentLocationX = parentNodeLowX + freeSpaceX;
         float currentLocationZ = parentNodeLowZ + freeSpaceZ;
-        float childWidthX = nodeSize.x / 4 - 5f * freeSpaceX;
+        float childWidthX = (nodeSize.x - (rows + 1) * freeSpaceX) / rows;
         for (int i = 0; i < rows; i++)
         {
             for (int j = 0; j < columns; j++)
@@ -518,7 +518,7 @@ public class NodeDecorationController : MonoBehaviour
                 currentLocationZ += freeSpaceZ + currentChild.transform.localScale.z; 
             }
             currentLocationZ = parentNodeLowZ + freeSpaceZ;
-            currentLocationX = freeSpaceX + childWidthX;
+            currentLocationX += freeSpaceX + childWidthX;
         }
     }
 }
