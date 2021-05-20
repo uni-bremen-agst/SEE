@@ -127,9 +127,9 @@ namespace SEE.Utils
         string GetId();
 
         /// <summary>
-        /// Provides a list with the changed gameObject IDs.
+        /// Provides a list with the IDs of all changed gameObjects.
         /// </summary>
-        /// <returns>A List of all GameObjects that be changed by the active action</returns>
+        /// <returns>A List of the IDs of all GameObjects that were changed by the active action</returns>
         List<string> GetChangedObjects();
 
         /// <summary>
