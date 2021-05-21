@@ -1,4 +1,4 @@
-﻿using Assets.SEE.Game;
+﻿using SEE.Game;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Net;

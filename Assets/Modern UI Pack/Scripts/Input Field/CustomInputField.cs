@@ -7,9 +7,9 @@ namespace Michsky.UI.ModernUIPack
     [RequireComponent(typeof(Animator))]
     public class CustomInputField : MonoBehaviour
     {
-        // Resources
-        [HideInInspector] public TMP_InputField inputText;
-        [HideInInspector] public Animator inputFieldAnimator;
+        [Header("Resources")]
+        public TMP_InputField inputText;
+        public Animator inputFieldAnimator;
 
         // Hidden variables
         private string inAnim = "In";
@@ -37,7 +37,7 @@ namespace Michsky.UI.ModernUIPack
             UpdateState();
         }
 
-        public void AnimateIn()
+        public void AnimateIn() 
         {
             inputFieldAnimator.Play(inAnim);
         }
