@@ -27,8 +27,11 @@ namespace SEE.Controls.Actions
             {
                 // the hit object is the parent in which to create the new node
                 GameObject parent = raycastHit.collider.gameObject;
+                parent.transform.position.Set(parent.transform.position.x, parent.transform.position.y - parent.WorldSpaceScale().y / 2.0f, parent.transform.position.z);
+                parent.transform.localScale = new Vector3(parent.transform.localScale.x, parent.transform.localScale.x * 0.5f, parent.transform.localScale.z);
                 // The position at which the parent was hit will be the center point of the new node
                 Vector3 position = raycastHit.point;
+                position.Set(position[0], parent.transform.position.y + parent.WorldSpaceScale().y, position[2]);
                 Vector3 scale = FindSize(parent, position);
                 addedGameNode = GameNodeAdder.Add(parent, position: position, worldSpaceScale: scale);
                 if (addedGameNode != null)
