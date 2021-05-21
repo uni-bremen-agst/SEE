@@ -10,10 +10,11 @@ using UnityEngine.Assertions;
 namespace SEE.Net
 {
     /// <summary>
-    ///  This class processes the undo mechanism of the deleteNet script.
-    ///  It reverts the deletion by adding any deleted node or edge from a specific graph and 
-    ///  uses the animated undo mechanism of the animationsOfDeletion script used as a coroutine in order to move the deleted nodes to
-    ///  their original position. 
+    ///  This class implements undo for the <see cref="DeleteNetAction"/>.
+    ///  It reverts the deletion by adding any deleted node or edge from a 
+    ///  specific graph and uses the animated undo mechanism of the 
+    ///  <see cref="AnimationsOfDeletion"/> used as a coroutine in order to move 
+    ///  the deleted nodes to their original position. 
     /// </summary>
     public class UndoDeleteNetAction : AbstractAction
     {
@@ -36,9 +37,9 @@ namespace SEE.Net
         public Graph graph;
 
         /// <summary>
-        /// Creates a new UndoDeleteNetAction instance.
+        /// Returns a new <see cref="UndoDeleteNetAction"/> instance.
         /// </summary>
-        /// <param name="gameObjectID"></param> the unique name of the gameObject of a node or edge 
+        /// <param name="gameObjectID">the unique name of the gameObject of a node or edge 
         /// which had been deleted before</param>
         /// <param name="rootID">the unique name of a graph's root</param>
         public UndoDeleteNetAction(string gameObjectID, String rootID) : base()
