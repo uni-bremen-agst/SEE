@@ -144,15 +144,13 @@ namespace SEE.Controls
         {
             yield return new WaitForSeconds(TimeToWait);
             Vector3 shrinkFactor = shrinkFactors[deletedNode];
-            float animationsCount = StepsOfExpansionAnimation;
             float exponent = 1 / StepsOfExpansionAnimation;
             shrinkFactor = VectorOperations.ExponentOfVectorCoordinates(shrinkFactor, exponent);
 
-            while (animationsCount > 0)
+            for (float animationsCount = StepsOfExpansionAnimation; animationsCount > 0; animationsCount--)
             {
                 deletedNode.transform.localScale = VectorOperations.DivideVectors(shrinkFactor, deletedNode.transform.localScale);
                 yield return new WaitForSeconds(TimeBetweenExpansionAnimation);
-                animationsCount--;
             }
         }
 
