@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using SEE.DataModel.DG;
 using SEE.Game;
+using SEE.GO;
 
 /// <summary>
 /// Decorates each block with an assigned texture
@@ -374,6 +375,8 @@ public class NodeDecorationController : MonoBehaviour
         planeE.transform.localPosition = new Vector3(packedBlockLocation.x, packedBlockLocation.y, packedBlockLocation.z - packedBlockDimensions.z / 2 + planeN.transform.localScale.y / 2);
         planeE.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
         planeE.transform.SetParent(treemapParent.transform);
+        // TODO Test if needed with actual gameNodes
+        Portal.SetInfinitePortal(packedBlock);
     }
 
     /// <summary>
