@@ -13,13 +13,16 @@ namespace SEE.Game
     public static class GameEdgeMover
     {
         /// <summary>
-        /// Gets a node and then recursively searches for all children for that node, if any. Returns all nodes found
+        /// If <paramref name="node"/> is a root, an empty set is returned; otherwise
+        /// returns the given <paramref name="node"/> and all its transitive ancestors.
         /// </summary>
-        /// <param name="node">The node for which all inner nodes are to be searched for</param>
-        /// <returns>All nodes found including the start node</returns>
+        /// <param name="node">node of the node-decomposition hierarchy to be returned</param>
+        /// <returns>All nodes found including the <paramref name="node"/> or empty set
+        /// is <paramref name="node"/> is a root</returns>
         private static ISet<Node> GetAllChildNodes(Node node)
         {
-            //If the node is the root we can ignore it, because all nodes and edges are contained in it and are automatically scaled.
+            // If the node is the root we can ignore it, because all nodes and
+            // edges are contained in it and are automatically scaled.
             if (node.IsRoot())
             {
                 return new HashSet<Node>();
@@ -35,11 +38,6 @@ namespace SEE.Game
 
             void AddChildNode(Node node)
             {
-                //We can ignore the leaves because they cannot contain children.
-                if (node.IsLeaf())
-                {
-                    return;
-                }
                 foreach (Node childNode in node.Children())
                 {
                     listOfChildNodes.Add(childNode);
