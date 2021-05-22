@@ -134,7 +134,7 @@ namespace SEE.Controls.Actions
                     // will run an animation that moves them into a garbage bin. Only when they arrive there,
                     // we will actually delete them.
                     // FIXME: Shouldn't the edges be moved to the garbage bin, too?
-                    PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.MoveNodeToGarbage(deletedObject.AllAncestors()));
+                    PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.MoveNodeToGarbage(deletedObject.AllAncestors()));
                     Portal.SetInfinitePortal(deletedObject);
                     MarkAsDeleted(deletedObject.AllAncestors());
                 }
@@ -182,7 +182,8 @@ namespace SEE.Controls.Actions
                 if (edgeGraphPair.Key.TryGetComponentOrLog(out EdgeRef edgeReference))
                 {
                     edgeGraphPair.Value.AddEdge(edgeReference.Value);
-                    PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.UnhideEdge(edgeGraphPair.Key));
+                    PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.UnhideEdge
+                        (edgeGraphPair.Key));
                     if (!roots.ContainsValue(edgeGraphPair.Value))
                     {
                         FindRoot(edgeGraphPair.Value);
@@ -196,7 +197,7 @@ namespace SEE.Controls.Actions
                     }
                 }
             }
-            PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(new List<GameObject>(deletedNodes.Keys)));
+            PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.RemoveNodeFromGarbage(new List<GameObject>(deletedNodes.Keys)));
         }
 
         /// <summary>
@@ -296,7 +297,7 @@ namespace SEE.Controls.Actions
         {
             if (gameEdge.TryGetComponentOrLog(out EdgeRef edgeRef))
             {
-                AnimationsOfDeletion.HideEdge(gameEdge);
+                DeletionAnimation.HideEdge(gameEdge);
                 Graph graph = edgeRef.Value.ItsGraph;
                 if (!roots.ContainsValue(graph))
                 {
