@@ -44,7 +44,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="parent">The node that should be the parent of <paramref name="node"/></param>
         /// <param name="node">The node to add to the graph</param>
-        public static void AddNodeToGraph(Node parent, Node node)
+        private static void AddNodeToGraph(Node parent, Node node)
         {
             if (parent == null)
             {
@@ -125,7 +125,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNode">game node to be removed</param>
         public static void Remove(GameObject gameNode)
-        {   
+        {
             Node node = gameNode.GetNode();
             Graph graph = node.ItsGraph;
             graph.RemoveNode(node);
