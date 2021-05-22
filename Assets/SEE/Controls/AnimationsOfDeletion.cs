@@ -7,12 +7,13 @@ using UnityEngine;
 using SEE.DataModel.DG;
 using System.Collections.Concurrent;
 
-/// <summary>
-/// A class providing methods needed for the animations of gameobjects having been deleted by the user, for instance
-/// the movement of a gamenode to the garbage can, as well as the inverse undo-mechanism.
-/// </summary>
 namespace SEE.Controls
 {
+    /// <summary>
+    /// A class providing methods needed for the animations of gameobjects having been deleted 
+    /// by the user, for instance, the movement of a game node to the garbage can, as well 
+    /// as the inverse undo mechanism.
+    /// </summary>
     public static class AnimationsOfDeletion
     {
         /// <summary>
@@ -29,7 +30,7 @@ namespace SEE.Controls
         /// <summary>
         /// The animation time of the animation of moving a node to the top of the garbage can.
         /// </summary>
-        public const float TimeForAnimation = 1f;
+        private const float TimeForAnimation = 1f;
 
         /// <summary>
         /// The waiting time of the animation for moving a node into a garbage can from over the garbage can.
