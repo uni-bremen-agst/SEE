@@ -172,7 +172,7 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
-            GameEdgeAdder.Remove(createdEdge);            
+            GameEdgeAdder.Remove(createdEdge);
             new DeleteNetAction(createdEdge.name).Execute();
             Destroyer.DestroyGameObject(createdEdge);
             createdEdge = null;
