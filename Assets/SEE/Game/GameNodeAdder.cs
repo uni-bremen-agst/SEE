@@ -1,5 +1,4 @@
-﻿using SEE.Controls;
-using SEE.DataModel.DG;
+﻿using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
 using System;
@@ -112,10 +111,15 @@ namespace SEE.Game
         /// <summary>
         /// Inverse operation of <see cref="Add(GameObject, Vector3, Vector3, string)"/>.
         /// Removes the given <paramref name="gameNode"/> from the scene and its associated 
-        /// graph node from its graph. <paramref name="gameNode"/> is destroyed afterwards.
+        /// graph node from its graph. 
         /// 
-        /// Note: If <paramref name="gameNode"/> represents an inner node of the node
+        /// Notes: 
+        /// 
+        /// <paramref name="gameNode"/> is not actually destroyed.
+        /// 
+        /// If <paramref name="gameNode"/> represents an inner node of the node
         /// hierarchy, its ancestors will not be deleted.
+        /// 
         /// Precondition: <paramref name="gameNode"/> must have a valid NodeRef; otherwise
         /// an exception will be thrown.
         /// </summary>
