@@ -1,6 +1,7 @@
 using SEE.Controls;
 using SEE.Game;
 using SEE.GO;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Net
@@ -56,7 +57,7 @@ namespace SEE.Net
                     }
                     else if (gameObject.HasEdgeRef())
                     {
-                        DeletionAnimation.HideEdge(gameObject);
+                        PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.MoveNodeToGarbage(new List<GameObject> {gameObject}));
                         GameEdgeAdder.Remove(gameObject);
                         // Note: gameObject is not actually destroyed because it will be
                         // moved to the garbage can from where it can be restored.

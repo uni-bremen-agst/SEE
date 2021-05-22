@@ -86,7 +86,7 @@ namespace SEE.Net
                 {
                     if (gameObject.HasEdgeRef())
                     {
-                        PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.UnhideEdge(gameObject));
+                        PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.RemoveNodeFromGarbage(new List<GameObject> {gameObject}));
                         if (gameObject.TryGetComponentOrLog(out EdgeRef edgeReference))
                         {
                             try
