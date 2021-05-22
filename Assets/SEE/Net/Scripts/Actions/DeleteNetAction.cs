@@ -6,8 +6,7 @@ using UnityEngine;
 namespace SEE.Net
 {
     /// <summary>
-    /// This class contains the logic of the deleteAction script which is necessary for any client in order to delete a given
-    /// gameObject in the network.
+    /// This class propagates a <see cref="DeleteAction"/> to all clients in the network.
     /// </summary>
     public class DeleteNetAction : AbstractAction
     {
@@ -17,7 +16,7 @@ namespace SEE.Net
         /// <summary>
         /// The unique name of the gameObject of a node or edge that needs to be deleted.
         /// </summary>
-        public string gameObjectID;
+        public string GameObjectID;
 
         /// <summary>
         /// Creates a new DeleteNetAction.
@@ -26,7 +25,7 @@ namespace SEE.Net
         /// that has to be deleted</param>
         public DeleteNetAction(string gameObjectID) : base()
         {
-            this.gameObjectID = gameObjectID;
+            this.GameObjectID = gameObjectID;
         }
 
         /// <summary>
@@ -39,18 +38,19 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Deletes the game object identified by <see cref="gameObjectID"/> on each client.
+        /// Deletes the game object identified by <see cref="GameObjectID"/> on each client.
         /// </summary>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
             {
-                GameObject gameObject = GameObject.Find(gameObjectID);
+                GameObject gameObject = GameObject.Find(GameObjectID);
                 if (gameObject != null)
                 {
                     if (gameObject.HasNodeRef())
                     {
                         GameNodeAdder.Remove(gameObject);
+                        // gameObject is not actually destroyed because we are moving it to the garbage can.
                         PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.MoveNodeToGarbage(gameObject.AllAncestors()));
                         Portal.SetInfinitePortal(gameObject);
                     }
@@ -62,7 +62,7 @@ namespace SEE.Net
                 }
                 else
                 {
-                    throw new System.Exception($"There is no game object with the ID {gameObjectID}");
+                    throw new System.Exception($"There is no game object with the ID {GameObjectID}");
                 }
             }
         }
