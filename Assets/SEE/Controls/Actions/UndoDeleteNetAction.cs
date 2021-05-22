@@ -24,17 +24,18 @@ namespace SEE.Net
         /// <summary>
         /// The unique ID of the gameObject of a node or edge that needs to be deleted.
         /// </summary>
-        public string gameObjectID;
+        public string GameObjectID;
 
         /// <summary>
-        /// The unique ID of a given root. Necessary for any client to find the specific graph, a node or an edge is removed from.
+        /// The unique ID of a given root. Necessary for any client to find the specific graph, 
+        /// a node or an edge is removed from.
         /// </summary>
-        public String rootID;
+        public String RootID;
 
         /// <summary>
-        /// The client´s graph a node or an edge had been removed from.
+        /// The client's graph a node or an edge has been removed from.
         /// </summary>
-        public Graph graph;
+        public Graph Graph;
 
         /// <summary>
         /// Returns a new <see cref="UndoDeleteNetAction"/> instance.
@@ -44,8 +45,8 @@ namespace SEE.Net
         /// <param name="rootID">the unique name of a graph's root</param>
         public UndoDeleteNetAction(string gameObjectID, String rootID) : base()
         {
-            this.gameObjectID = gameObjectID;
-            this.rootID = rootID;
+            this.GameObjectID = gameObjectID;
+            this.RootID = rootID;
         }
 
         /// <summary>
@@ -58,26 +59,29 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Undoes any deletion of a game object identified by <see cref="gameObjectID"/> on each client.
-        /// Furthermore any node or edge which had been removed before is added again to the client´s graph.
-        /// The graph is identified by <see cref="rootID"/>
+        /// Undoes any deletion of a game object identified by <see cref="GameObjectID"/> on each client.
+        /// Furthermore any node or edge which has been removed before is added again to the client´s graph.
+        /// The graph is identified by <see cref="RootID"/>.
         /// </summary>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
-            {
-                GameObject gameObject = GameObject.Find(gameObjectID);
-                GameObject rootNode = GameObject.Find(rootID);
+            {                
+                GameObject rootNode = GameObject.Find(RootID);
                 if (rootNode != null)
                 {
-                    graph = rootNode.GetGraph();
-                    Assert.IsNotNull(graph, "graph shall not be null");  
+                    Graph = rootNode.GetGraph();
+                    if (Graph == null)
+                    {
+                        throw new Exception("Graph shall not be null.");
+                    }
                 }
                 else
                 {
-                    throw new System.Exception($"There is no game object with the ID {rootID}");
+                    throw new Exception($"There is no game object with the ID {RootID}.");
                 }
 
+                GameObject gameObject = GameObject.Find(GameObjectID);
                 if (gameObject != null)
                 {
                     if (gameObject.HasEdgeRef())
@@ -87,29 +91,29 @@ namespace SEE.Net
                         {
                             try
                             {
-                                graph.AddEdge(edgeReference.Value);
+                                Graph.AddEdge(edgeReference.Value);
                             }
                             catch (Exception e)
                             {
-                                Debug.LogError($"Edge cannot be added to the graph: {e}\n");
+                                Debug.LogError($"Edge cannot be added to the graph: {e}.\n");
                             }
                         }
                     }
-                    if (gameObject.HasNodeRef())
+                    else if (gameObject.HasNodeRef())
                     {
-                        List<GameObject> removeFromGarbage = new List<GameObject>();
-                        removeFromGarbage.Add(gameObject);
+                        List<GameObject> removeFromGarbage = new List<GameObject>
+                        {
+                            gameObject
+                        };
                         PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.RemoveNodeFromGarbage(removeFromGarbage));
                         Portal.SetInfinitePortal(gameObject);
-                        Node node = gameObject.GetNode();
-                        graph.AddNode(node);
-                        graph.FinalizeNodeHierarchy();
-                        node.ItsGraph = graph;
+                        Graph.AddNode(gameObject.GetNode());
+                        Graph.FinalizeNodeHierarchy();
                     }
                 }
                 else
                 {
-                    throw new System.Exception($"There is no game object with the ID {gameObjectID}");
+                    throw new Exception($"There is no game object with the ID {GameObjectID}.");
                 }
             }
         }
