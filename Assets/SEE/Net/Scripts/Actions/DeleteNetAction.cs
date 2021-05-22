@@ -56,7 +56,7 @@ namespace SEE.Net
                     }
                     else if (gameObject.HasEdgeRef())
                     {
-                        AnimationsOfDeletion.HideEdges(gameObject);
+                        AnimationsOfDeletion.HideEdge(gameObject);
                         GameEdgeAdder.Remove(gameObject);
                     }
                 }

@@ -82,7 +82,7 @@ namespace SEE.Net
                 {
                     if (gameObject.HasEdgeRef())
                     {
-                        PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.DelayEdges(gameObject));
+                        PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.UnhideEdge(gameObject));
                         if (gameObject.TryGetComponentOrLog(out EdgeRef edgeReference))
                         {
                             try

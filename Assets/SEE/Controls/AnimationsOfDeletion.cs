@@ -22,6 +22,11 @@ namespace SEE.Controls
         private static GameObject garbageCan;
 
         /// <summary>
+        /// The name of the game object representing the garbage can.
+        /// </summary>
+        private const string GarbageCanName = "GarbageCan";
+
+        /// <summary>
         /// The animation time of the animation of moving a node to the top of the garbage can.
         /// </summary>
         public const float TimeForAnimation = 1f;
@@ -71,6 +76,30 @@ namespace SEE.Controls
         private static ConcurrentDictionary<GameObject, Graph> deletedEdges { get; set; } = new ConcurrentDictionary<GameObject, Graph>();
 
         /// <summary>
+        /// Returns the position of the garbage can if one exists in the scene.
+        /// If none exists, an empty game object representing it will be used
+        /// as a substitute at location <see cref="Vector3.zero"/>.
+        /// </summary>
+        /// <returns>position of the garbage can in world space</returns>
+        private static Vector3 GarbageCanPosition()
+        {
+            if (garbageCan == null)
+            {
+                garbageCan = GameObject.Find(GarbageCanName);
+                if (garbageCan == null)
+                {
+                    Debug.LogError($"No {GarbageCanName} found.\n");
+                    // We want the error message to be emitted only once.
+                    // For this reason, we will create an empty game object for the missing garbage can
+                    // and use that as a substitute.
+                    garbageCan = new GameObject(GarbageCanName);
+                    garbageCan.transform.position = Vector3.zero;
+                }
+            }
+            return garbageCan.transform.position;
+        }
+
+        /// <summary>
         /// Moves all nodes in <paramref name="deletedNodes"/> to the garbage can
         /// using an animation. When they finally arrive there, they will be 
         /// deleted. 
@@ -82,7 +111,8 @@ namespace SEE.Controls
         /// <returns>the waiting time between moving deleted nodes over the garbage can and then into the garbage can</returns>
         public static IEnumerator MoveNodeToGarbage(IList<GameObject> deletedNodes)
         {
-            garbageCan = GameObject.Find("GarbageCan");
+            Vector3 garbageCanPosition = GarbageCanPosition();
+
             // We need to reset the portal of all all deletedNodes so that we can move
             // them to the garbage bin. Otherwise they will become invisible if they 
             // leave their portal.
@@ -93,7 +123,11 @@ namespace SEE.Controls
             }
             foreach (GameObject deletedNode in deletedNodes)
             {
-                Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + verticalHeight, garbageCan.transform.position.z), TimeForAnimation);
+                Tweens.Move(deletedNode, 
+                            new Vector3(garbageCanPosition.x,
+                                        garbageCanPosition.y + verticalHeight,
+                                        garbageCanPosition.z), 
+                            TimeForAnimation);
             }
             yield return new WaitForSeconds(TimeToWait);
 
@@ -102,22 +136,24 @@ namespace SEE.Controls
                 Vector3 shrinkFactor = VectorOperations.DivideVectors(deletedNode.transform.localScale, defaultGarbageVector);
                 shrinkFactors.TryAdd(deletedNode, shrinkFactor);
                 deletedNode.transform.localScale = Vector3.Scale(deletedNode.transform.localScale, shrinkFactor);
-                Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y, garbageCan.transform.position.z), TimeForAnimation);
+                Tweens.Move(deletedNode, garbageCanPosition, TimeForAnimation);
             }
             yield return new WaitForSeconds(TimeToWait);
         }
 
         /// <summary>
-        /// Removes all given nodes from the garbage can back into the city.
+        /// Removes all given nodes from the garbage can back to their original location.
         /// </summary>
-        /// <param name="deletedNode">The nodes to be removed from the garbage-can</param>
+        /// <param name="deletedNodes">The nodes to be removed from the garbage can</param>
         /// <returns>the waiting time between moving deleted nodes from the garbage can and then to the city</returns>
         public static IEnumerator RemoveNodeFromGarbage(IList<GameObject> deletedNodes)
         {
+            Vector3 garbageCanPosition = GarbageCanPosition();
+
             // vertical movement of nodes
             foreach (GameObject deletedNode in deletedNodes)
             {
-                Tweens.Move(deletedNode, new Vector3(garbageCan.transform.position.x, garbageCan.transform.position.y + verticalHeight, garbageCan.transform.position.z), TimeForAnimation);
+                Tweens.Move(deletedNode, new Vector3(garbageCanPosition.x, garbageCanPosition.y + verticalHeight, garbageCanPosition.z), TimeForAnimation);
                 PlayerSettings.GetPlayerSettings().StartCoroutine(WaitAndExpand(deletedNode));
             }
 
@@ -155,21 +191,23 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Delays the visibility of edges having been removed from the garbage can.
+        /// Unhides the given <paramref name="gameEdge"/> after some delay.
+        /// 
+        /// Intended to be used as a co-routine.
         /// </summary>
-        /// <param name="edge"></param>
-        /// <returns> The time suspension of a coroutine </returns>
-        public static IEnumerator DelayEdges(GameObject edge)
+        /// <param name="gameEdge">game edge to be shown again</param>
+        /// <returns>The time of the delay</returns>
+        public static IEnumerator UnhideEdge(GameObject gameEdge)
         {
             yield return new WaitForSeconds(TimeForAnimation + TimeToWait);
-            edge.SetVisibility(true, true);
+            gameEdge.SetVisibility(true, true);
         }
 
         /// <summary>
-        /// Hides a given paramref name="gameEdge"/> having been deleted before.
+        /// Hides given <paramref name="gameEdge"/> and adds it to the list of deleted edges.
         /// </summary>
-        /// <param name="gameEdge"></param>
-        public static void HideEdges(GameObject gameEdge)
+        /// <param name="gameEdge">game edge to be hidden</param>
+        public static void HideEdge(GameObject gameEdge)
         {
             gameEdge.SetVisibility(false, true);
             deletedEdges.TryAdd(gameEdge, gameEdge.GetGraph()); 
