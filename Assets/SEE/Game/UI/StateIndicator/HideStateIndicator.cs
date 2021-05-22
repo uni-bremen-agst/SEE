@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using Valve.VR.InteractionSystem;
 using SEE.Controls.Actions;
 using SEE.Game.UI.Tooltip;
+using Michsky.UI.ModernUIPack;
 
 namespace SEE.Game.UI.StateIndicator
 {
@@ -27,6 +28,16 @@ namespace SEE.Game.UI.StateIndicator
         private Image ModePanelImage;
 
         /// <summary>
+        /// Represents the button that confirms the selection in the UI
+        /// </summary>
+        private GameObject doneButton;
+
+        /// <summary>
+        /// Represents the button that cancels the selection in the UI
+        /// </summary>
+        private GameObject backbutton;
+
+        /// <summary>
         /// Path to the prefab of the mode panel.
         /// </summary>
         private const string HIDE_MODE_PANEL_PREFAB = "Prefabs/UI/HideModePanel";
@@ -42,25 +53,78 @@ namespace SEE.Game.UI.StateIndicator
         private string StartText = "Select Objects";
 
         /// <summary>
-        /// Saves the name of the button
+        /// Saves the name of <see cref="doneButton"/>
         /// </summary>
-        public string buttonName;
+        public string buttonNameDone;
+
+        /// <summary>
+        /// Saves the name of the button that cancels the selection in the UI.
+        /// </summary>
+        public string buttonNameBack;
+
+        /// <summary>
+        /// Used to store the color of <see cref="doneButton"/>.
+        /// </summary>
+        public Color buttonColorDone;
+
+        /// <summary>
+        /// Used to change the color of the cancels the selection in the UI.
+        /// </summary>
+        public Color buttonColorBack;
 
         /// <summary>
         /// The tooltip containing the <see cref=description"/> of this <see cref="Property"/>, which will
         /// be displayed when hovering above it.
+        /// Used for <see cref="doneButton"/>.
         /// </summary>
-        private Tooltip.Tooltip tooltip;
+        private Tooltip.Tooltip tooltipDone;
 
         /// <summary>
-        /// Saves the description of the button
+        /// The tooltip containing the <see cref=description"/> of this <see cref="Property"/>, which will
+        /// be displayed when hovering above it.
+        /// Used for <see cref="backbutton"/>.
         /// </summary>
-        public string description;
+        private Tooltip.Tooltip tooltipBack;
 
         /// <summary>
-        /// Saves which HideMode the button represents
+        /// Saves the description of <see cref="doneButton"/>
+        /// </summary>
+        public string descriptionDone;
+
+        /// <summary>
+        /// Saves the description of <see cref="backbutton"/>
+        /// </summary>
+        public string descriptionBack;
+
+        /// <summary>
+        /// Saves which function from the <see cref=HideAction"/> is to be executed upon confirmation.
         /// </summary>
         public HideModeSelector hideMode;
+
+        /// <summary>
+        /// Saves which property <see cref="doneButton"/> has.
+        /// </summary>
+        public HideModeSelector selectionTypeDone;
+
+        /// <summary>
+        /// Saves which property <see cref="backbutton"/> has.
+        /// </summary>
+        public HideModeSelector selectionTypeBack;
+
+        /// <summary>
+        /// Saves whether the selection was cancelled or confirmed.
+        /// </summary>
+        public HideModeSelector confirmCancel;
+
+        /// <summary>
+        /// Used to store the icon of <see cref="doneButton"/>
+        /// </summary>
+        public Sprite iconSpriteDone;
+
+        /// <summary>
+        /// Used to store the icon of <see cref="backbutton"/>
+        /// </summary>
+        public Sprite iconSpriteBack;
 
         /// <summary>
         /// Event triggered when the user presses the button.
@@ -109,37 +173,110 @@ namespace SEE.Game.UI.StateIndicator
         /// Sets all relevant values for the button
         /// </summary>
         /// <param name="indicator">Parent GameObject via which the button is accessed</param>
-        private void SetUpButton(GameObject indicator)
+        private void SetUpButtonDone(GameObject indicator)
         {
-            GameObject button = indicator.transform.Find("Button").gameObject;
+            doneButton = indicator.transform.Find("Button_Done").gameObject;
+            GameObject text = doneButton.transform.Find("Text").gameObject;
+            GameObject icon = doneButton.transform.Find("Icon").gameObject;
 
-
-            button.name = buttonName;
-            if (!button.TryGetComponentOrLog(out Michsky.UI.ModernUIPack.ButtonManagerBasicWithIcon buttonManager) ||
-                !button.TryGetComponentOrLog(out PointerHelper pointerHelper))
+            doneButton.name = buttonNameDone;
+            if (!doneButton.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager) ||
+                    !doneButton.TryGetComponentOrLog(out Image buttonImage) ||
+                    !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro) ||
+                    !icon.TryGetComponentOrLog(out Image iconImage) ||
+                    !doneButton.TryGetComponentOrLog(out PointerHelper pointerHelper))
             {
                 return;
             }
 
-            buttonManager.buttonText = buttonName;
-            buttonManager.clickEvent.AddListener(Clicked);
-            pointerHelper.EnterEvent.AddListener(() => tooltip.Show(description));
+            if (iconSpriteDone != null)
+            {
+                buttonManager.buttonIcon = iconSpriteDone;
+            }
+
+            buttonImage.color = buttonColorDone;
+            textMeshPro.color = buttonColorDone.IdealTextColor();
+            iconImage.color = buttonColorBack.IdealTextColor();
+            buttonManager.buttonText = buttonNameDone;
+
+            buttonManager.clickEvent.AddListener(() => setSelectionType(selectionTypeDone));
+            pointerHelper.EnterEvent.AddListener(() => tooltipDone.Show(descriptionDone));
         }
 
         /// <summary>
-        /// Sets up the tooltips for the button
+        /// Sets all relevant values for the button
         /// </summary>
         /// <param name="indicator">Parent GameObject via which the button is accessed</param>
-        private void SetupTooltip(GameObject indicator)
+        private void SetUpButtonBack(GameObject indicator)
         {
-            GameObject button = indicator.transform.Find("Button").gameObject;
-            tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
+            backbutton = indicator.transform.Find("Button_Back").gameObject;
+            GameObject text = backbutton.transform.Find("Text").gameObject;
+            GameObject icon = backbutton.transform.Find("Icon").gameObject;
+
+            backbutton.name = buttonNameBack;
+            if (!backbutton.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager) ||
+                    !backbutton.TryGetComponentOrLog(out Image buttonImage) ||
+                    !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro) ||
+                    !icon.TryGetComponentOrLog(out Image iconImage) ||
+                    !backbutton.TryGetComponentOrLog(out PointerHelper pointerHelper))
+            {
+                return;
+            }
+            
+            if(iconSpriteBack != null)
+            {
+                buttonManager.buttonIcon = iconSpriteBack;
+            }
+
+            buttonImage.color = buttonColorBack;
+            textMeshPro.color = buttonColorBack.IdealTextColor();
+            iconImage.color = buttonColorBack.IdealTextColor();
+            buttonManager.buttonText = buttonNameBack;
+
+            buttonManager.clickEvent.AddListener(() => setSelectionType(selectionTypeBack));
+            pointerHelper.EnterEvent.AddListener(() => tooltipBack.Show(descriptionBack));
+        }
+
+        /// <summary>
+        /// Sets up the tooltips for <see cref="doneButton"/>
+        /// </summary>
+        /// <param name="indicator">The parent object of <see cref="doneButton"/> to which the tooltip is to be attached</param>
+        private void SetupTooltipDone(GameObject indicator)
+        {
+            GameObject button = indicator.transform.Find("Button_Done").gameObject;
+            tooltipDone = gameObject.AddComponent<Tooltip.Tooltip>();
             if (button.TryGetComponentOrLog(out PointerHelper pointerHelper))
             {
                 // Register listeners on entry and exit events, respectively
-                pointerHelper.EnterEvent.AddListener(() => tooltip.Show(description));
-                pointerHelper.ExitEvent.AddListener(tooltip.Hide);
+                pointerHelper.EnterEvent.AddListener(() => tooltipDone.Show(descriptionDone));
+                pointerHelper.ExitEvent.AddListener(tooltipDone.Hide);
             }
+        }
+
+        /// <summary>
+        /// Sets up the tooltips for <see cref="backbutton"/>
+        /// </summary>
+        /// <param name="indicator">The parent object of <see cref="backbutton"/> to which the tooltip is to be attached</param>
+        private void SetupTooltipBack(GameObject indicator)
+        {
+            GameObject button = indicator.transform.Find("Button_Back").gameObject;
+            tooltipBack = gameObject.AddComponent<Tooltip.Tooltip>();
+            if (button.TryGetComponentOrLog(out PointerHelper pointerHelper))
+            {
+                // Register listeners on entry and exit events, respectively
+                pointerHelper.EnterEvent.AddListener(() => tooltipBack.Show(descriptionBack));
+                pointerHelper.ExitEvent.AddListener(tooltipBack.Hide);
+            }
+        }
+
+        /// <summary>
+        /// Sets <see cref="confirmCancel"/> to decide whether the selection was confirmed or cancelled. Then calls <see cref="Clicked"/> to trigger the listener.
+        /// </summary>
+        /// <param name="selectionType"></param>
+        private void setSelectionType(HideModeSelector selectionType)
+        {
+            confirmCancel = selectionType;
+            Clicked();
         }
 
         /// <summary>
@@ -157,8 +294,10 @@ namespace SEE.Game.UI.StateIndicator
         {
             GameObject indicator = PrefabInstantiator.InstantiatePrefab(HIDE_MODE_PANEL_PREFAB, Canvas.transform, false);
             indicator.name = Title;
-            SetupTooltip(indicator);
-            SetUpButton(indicator);
+            SetupTooltipDone(indicator);
+            SetupTooltipBack(indicator);
+            SetUpButtonDone(indicator);
+            SetUpButtonBack(indicator);
 
             RectTransform rectTransform = (RectTransform)indicator.transform;
             rectTransform.anchorMin = AnchorMin;

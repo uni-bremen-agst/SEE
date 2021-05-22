@@ -20,7 +20,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject selectedObject;
 
-        private HashSet<GameObject> selectedObjects2 = new HashSet<GameObject>();
 
         /// <summary>
         /// The list of currently selected objects.
@@ -43,12 +42,24 @@ namespace SEE.Controls.Actions
         private readonly ISet<GameObject> undoneList = new HashSet<GameObject>();
 
         /// <summary>
-        /// Saves all highlightesEdges
+        /// Saves all highlighted edges
         /// </summary>
-        private readonly ISet<GameObject> highlightesEdges = new HashSet<GameObject>();
+        private readonly ISet<GameObject> highlightedEdges = new HashSet<GameObject>();
 
+        /// <summary>
+        /// Saves the edges that were highlighted and would then be reset by an undo.(Needed for redo)
+        /// </summary>
+        private readonly ISet<GameObject> redoHighlightedEdges = new HashSet<GameObject>();
+
+        /// <summary>
+        /// Saves the mode selected in <see cref="OpenDialog"/> to be used for hiding/highlighting the objects.
+        /// </summary>
         private HideModeSelector mode;
 
+        /// <summary>
+        /// Used for selecting between incoming and outgoing edges
+        /// to realise all the functions that distinguish between the two cases.
+        /// </summary>
         enum EdgeSelector
         {
             Incoming,
@@ -84,6 +95,10 @@ namespace SEE.Controls.Actions
             InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
         }
 
+        /// <summary>
+        /// Opens dialog to select the function to be executed.
+        /// Takes over the desired selection at the end.
+        /// </summary>
         private void OpenDialog()
         {
             SEE.Game.UI.PropertyDialog.HidePropertyDialog dialog = new SEE.Game.UI.PropertyDialog.HidePropertyDialog();
@@ -124,9 +139,6 @@ namespace SEE.Controls.Actions
             MakeUnselectedTransparent();
             switch (mode)
             {
-                case HideModeSelector.Select:
-                    SelectObjects();
-                    break;
                 case HideModeSelector.HideAll:
                     if (HideAll())
                     {
@@ -191,12 +203,9 @@ namespace SEE.Controls.Actions
                     }
                     break;
                 case HideModeSelector.HighlightEdges:
-                    if (HighlightEdges())
-                    {
-                        currentState = ReversibleAction.Progress.Completed;
-                        return true;
-                    }
-                    break;
+                    HighlightEdges();
+                    currentState = ReversibleAction.Progress.Completed;
+                    return true;
                 default: return false;
             }
             return false;
@@ -312,7 +321,7 @@ namespace SEE.Controls.Actions
             if (edge.TryGetComponent(out LineRenderer lineRenderer))
             {
                 lineRenderer.widthMultiplier = 5f;
-                highlightesEdges.Add(edge);
+                highlightedEdges.Add(edge);
                 return true;
             }
             return false;
@@ -323,14 +332,15 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void ReverseHighlightEdges()
         {
-            foreach (GameObject edge in highlightesEdges)
+            foreach (GameObject edge in highlightedEdges)
             {
                 if (edge.TryGetComponent(out LineRenderer lineRenderer))
                 {
                     lineRenderer.widthMultiplier = 1f;
-                    highlightesEdges.Add(edge);
+                    redoHighlightedEdges.Add(edge);
                 }
             }
+            highlightedEdges.Clear();
         }
 
         /// <summary>
@@ -424,7 +434,7 @@ namespace SEE.Controls.Actions
             else
             {
                 return false;
-           }
+            }
         }
 
         /// <summary>
@@ -566,7 +576,6 @@ namespace SEE.Controls.Actions
         {
             base.Undo();
             ReverseHighlightEdges();
-            highlightesEdges.Clear();
             foreach (GameObject g in hiddenObjects)
             {
                 g.SetVisibility(true, false);
@@ -581,6 +590,11 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
+            foreach (GameObject edge in redoHighlightedEdges)
+            {
+                HighlightEdge(edge);
+            }
+            redoHighlightedEdges.Clear();
             foreach (GameObject g in undoneList)
             {
                 g.SetVisibility(false, false);
@@ -690,54 +704,12 @@ namespace SEE.Controls.Actions
             return (edgeIDs, nodeIDs);
         }
 
-        private void SelectObjects()
-        {
-            if(selectedObject != null)
-            {
-                _ = selectedObjects2.Contains(selectedObject) ? selectedObjects2.Remove(selectedObject) : selectedObjects2.Add(selectedObject);
-            }
-            Debug.Log("Count: " + selectedObjects2.Count());
-        }
-
         /// <summary>
         /// Hide the transitive closure (all nodes reachable from the selected node)
         /// </summary>
         private bool HideAllTransitive()
         {
             return HideForwardTransitive() && HideBackwardTransitive();
-        }
-
-        /// <summary>
-        /// Selects source and target node of edge.
-        /// 
-        /// FIXME: Not used. Can it be removed? Then please remove it.
-        /// </summary>
-        /// <param name="edge"> edge to select source and target node of </param>
-        private void SelectSourceAndTargetOfEdge(GameObject edge)
-        {
-            if (edge.TryGetComponent(out EdgeRef edgeRef))
-            {
-                string sourceID = edgeRef.Value.Source.ID;
-                string targetID = edgeRef.Value.Target.ID;
-
-                foreach (GameObject node in GameObject.FindGameObjectsWithTag(Tags.Node))
-                {
-                    if (node.name.Equals(sourceID))
-                    {
-                        if (node.TryGetComponent(out InteractableObject interactable))
-                        {
-                            interactable.SetSelect(true, true);
-                        }
-                    }
-                    else if (node.name.Equals(targetID))
-                    {
-                        if (node.TryGetComponent(out InteractableObject interactable))
-                        {
-                            interactable.SetSelect(true, true);
-                        }
-                    }
-                }
-            }
         }
 
         /// <summary>
@@ -766,20 +738,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Highlights all edges that lie between nodes
+        /// Highlights all edges that lie between nodes by making the edges thicker
         /// </summary>
-        private bool HighlightEdges()
+        private void HighlightEdges()
         {
             SelectEdgesBetweenSubsetOfNodes(selectedObjects);
-            bool success = true;
             foreach (GameObject edge in selectedObjects)
             {
-                if (!HighlightEdge(edge))
-                {
-                    success = false;
-                }
+                HighlightEdge(edge);
             }
-            return success;
         }
 
         /// <summary>

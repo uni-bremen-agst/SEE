@@ -5,9 +5,10 @@ namespace SEE.Controls.Actions
     /// </summary>
     public enum HideModeSelector
     {
-        Select,
-        SelectSingleHide,
-        SelectMultipleHide,
+        Back,
+        Confirmed,
+        SelectSingle,
+        SelectMultiple,
         HideAll,
         HideSelected,
         HideUnselected,
