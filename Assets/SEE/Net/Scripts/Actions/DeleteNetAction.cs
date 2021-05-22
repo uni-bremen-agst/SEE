@@ -58,6 +58,8 @@ namespace SEE.Net
                     {
                         DeletionAnimation.HideEdge(gameObject);
                         GameEdgeAdder.Remove(gameObject);
+                        // Note: gameObject is not actually destroyed because it will be
+                        // moved to the garbage can from where it can be restored.
                     }
                 }
                 else
