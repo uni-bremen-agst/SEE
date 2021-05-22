@@ -83,7 +83,7 @@ namespace SEE.Game
         private static void MoveEdgesOfNode(GameObject node, bool allNodes)
         {
             ISet<Node> nodeList = new HashSet<Node>();
-            // Search for the node in question and its children
+            // Search for the node in question and its children.
             foreach (GameObject n in GameObject.FindGameObjectsWithTag(Tags.Node))
             {
                 if (n.activeInHierarchy && n.ID().Equals(node.ID()))
@@ -101,7 +101,7 @@ namespace SEE.Game
             foreach (Node nodeToBeRedrawn in nodeList)
             {
                 ISet<Edge> edgesToBeRedrawn = new HashSet<Edge>();
-                ///Search for all incoming and outgoing edges
+                // Search for all incoming and outgoing edges.
                 foreach (GameObject n in GameObject.FindGameObjectsWithTag(Tags.Node))
                 {
                     if (n.activeInHierarchy && n.ID().Equals(nodeToBeRedrawn.ID))
@@ -115,7 +115,7 @@ namespace SEE.Game
 
                 ISet<(GameObject, GameObject, string)> sourceTargetEdge = new HashSet<(GameObject, GameObject, string)>();
 
-                // Search for the corresponding GameObjects
+                // Search for the corresponding GameObjects.
                 foreach (Edge edge in edgesToBeRedrawn)
                 {
                     GameObject source = GameObject.Find(edge.Source.ID);
@@ -126,7 +126,7 @@ namespace SEE.Game
                         sourceTargetEdge.Add((source, target, edge.ID));
                     }
                 }
-                //Sort out all duplicate edges
+                // Sort out all duplicate edges.
                 foreach ((GameObject, GameObject, string) element in sourceTargetEdge)
                 {
                     if (!backupSourceTargetEdge.Any(item => item.Item3.Equals(element.Item3)))
@@ -137,7 +137,7 @@ namespace SEE.Game
             }
             if (allNodes)
             {
-                //Delete all old edges
+                // Delete all old edges.
                 foreach ((GameObject, GameObject, string) element in backupSourceTargetEdge)
                 {
                     GameEdgeAdder.Remove(GameObject.Find(element.Item3));
@@ -152,7 +152,7 @@ namespace SEE.Game
             {
                 ISet<(GameObject, GameObject, string)> sourceTargetEdgeWithinSameSubset = new HashSet<(GameObject, GameObject, string)>();
 
-                //Looks if the edge represents the connection between two nodes in the same inner node, if so it can be ignored
+                // Looks if the edge represents the connection between two nodes in the same inner node, if so it can be ignored.
                 foreach ((GameObject, GameObject, string) element in backupSourceTargetEdge)
                 {
                     if (!nodeList.Contains(element.Item1.GetNode()) || !nodeList.Contains(element.Item2.GetNode()))
@@ -160,18 +160,17 @@ namespace SEE.Game
                         sourceTargetEdgeWithinSameSubset.Add(element);
                     }
                 }
-                //Delete all old edges
+                // Delete all old edges.
                 foreach ((GameObject, GameObject, string) element in sourceTargetEdgeWithinSameSubset)
                 {
                     GameEdgeAdder.Remove(GameObject.Find(element.Item3));
                 }
-                //Create all new edges
+                // Create all new edges.
                 foreach ((GameObject, GameObject, string) element in sourceTargetEdgeWithinSameSubset)
                 {
                     GameEdgeAdder.Add(element.Item1, element.Item2, element.Item3);
                 }
             }
-
         }
     }
 }
