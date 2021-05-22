@@ -45,48 +45,17 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// A history of all nodes and the graph they were attached to, deleted by this action.
         /// </summary>
-        public Dictionary<GameObject, Graph> deletedNodes { get; set; } = new Dictionary<GameObject, Graph>();
+        private Dictionary<GameObject, Graph> deletedNodes { get; set; } = new Dictionary<GameObject, Graph>();
 
         /// <summary>
         /// A history of all edges and the graph they were attached to, deleted by this action.
         /// </summary>
-        public Dictionary<GameObject, Graph> deletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
+        private Dictionary<GameObject, Graph> deletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
 
         /// <summary>
         /// A data structure containing the graph's root of a SEEcity and its graph. 
         /// </summary>
         private Dictionary<GameObject, Graph> roots { get; set; } = new Dictionary<GameObject, Graph>();
-
-        /// <summary>
-        /// The name of the garbage can gameObject.
-        /// </summary>
-        private const string GarbageCanName = "GarbageCan";
-
-        /// <summary>
-        /// The garbage can the deleted nodes will be moved to. It is the object named 
-        /// <see cref="GarbageCanName"/>.
-        /// </summary>
-        private GameObject garbageCan;
-
-        /// <summary>
-        /// True, if the moving process of a node to the garbage can is running, else false.
-        /// Avoids multiple calls of coroutine.
-        /// </summary>
-        private bool animationIsRunning = false;
-
-        // <summary>
-        /// A history of the old positions of the nodes deleted by this action.
-        /// </summary>
-        private static Dictionary<GameObject, Vector3> oldPositions = new Dictionary<GameObject, Vector3>();
-
-        /// <summary>
-        /// Sets <see cref="garbageCan"/> by retrieving it by name <see cref="GarbageCanName"/>
-        /// from the scene.
-        /// </summary>
-        public override void Awake()
-        {
-            garbageCan = GameObject.Find(GarbageCanName);
-        }
 
         /// <summary>
         /// Disables the general selection provided by <see cref="SEEInput.Select"/>.
@@ -115,11 +84,10 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
             // FIXME: Needs adaptation for VR where no mouse is available.
-            if (!animationIsRunning
-                && Input.GetMouseButtonDown(0)
+            if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.None)
             {
-                // the hit object is the parent in which to create the new node
+                // the hit object is the one to be deleted
                 GameObject hitGraphElement = raycastHit.collider.gameObject;
                 Assert.IsTrue(hitGraphElement.HasNodeRef() || hitGraphElement.HasEdgeRef());
                 explicitlyDeletedNodesAndEdges.Add(hitGraphElement);
@@ -145,7 +113,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="deletedObject">selected GameObject that along with its children should be removed</param>
         /// <returns>true if <paramref name="deletedObject"/> was actually deleted</returns>
-        public bool Delete(GameObject deletedObject)
+        private bool Delete(GameObject deletedObject)
         {
             if (deletedObject.CompareTag(Tags.Edge))
             {
@@ -171,7 +139,6 @@ namespace SEE.Controls.Actions
                     MarkAsDeleted(deletedObject.AllAncestors());
                 }
             }
-
             return true;
         }
 
@@ -183,7 +150,6 @@ namespace SEE.Controls.Actions
             base.Undo();
 
             // Re-add all nodes to their graphs.
-
             foreach (KeyValuePair<GameObject, Graph> nodeGraphPair in deletedNodes)
             {
                 if (nodeGraphPair.Key.TryGetComponentOrLog(out NodeRef nodeRef))
@@ -208,7 +174,6 @@ namespace SEE.Controls.Actions
                         }
                     }
                 }
-
             }
 
             // Re-add all edges to their graphs.
@@ -257,7 +222,7 @@ namespace SEE.Controls.Actions
         /// of the game-node hierarchy. All of them represent graph nodes.
         /// </summary>
         /// <param name="gameNodesToDelete">all deleted objects of the last operation</param>
-        public void MarkAsDeleted(IList<GameObject> gameNodesToDelete)
+        private void MarkAsDeleted(IList<GameObject> gameNodesToDelete)
         {
             ISet<GameObject> edgesInScene = new HashSet<GameObject>(GameObject.FindGameObjectsWithTag(Tags.Edge));
             // First identify all incoming and outgoing edges for all nodes in gameNodesToDelete
