@@ -182,7 +182,7 @@ namespace SEE.Controls.Actions
                 if (edgeGraphPair.Key.TryGetComponentOrLog(out EdgeRef edgeReference))
                 {
                     edgeGraphPair.Value.AddEdge(edgeReference.Value);
-                    PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.DelayEdges(edgeGraphPair.Key));
+                    PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.UnhideEdge(edgeGraphPair.Key));
                     if (!roots.ContainsValue(edgeGraphPair.Value))
                     {
                         FindRoot(edgeGraphPair.Value);
@@ -296,7 +296,7 @@ namespace SEE.Controls.Actions
         {
             if (gameEdge.TryGetComponentOrLog(out EdgeRef edgeRef))
             {
-                AnimationsOfDeletion.HideEdges(gameEdge);
+                AnimationsOfDeletion.HideEdge(gameEdge);
                 Graph graph = edgeRef.Value.ItsGraph;
                 if (!roots.ContainsValue(graph))
                 {
