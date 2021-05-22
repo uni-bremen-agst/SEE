@@ -2,6 +2,7 @@ using SEE.Game.UI.Notification;
 using SEE.Net;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace SEE.Utils
 {
@@ -35,6 +36,13 @@ namespace SEE.Utils
 
         public struct GlobalHistoryEntry
         {
+            /// <summary>
+            /// Represents an entry in the globalHistory.
+            /// </summary>
+            /// <param name="isOwner">Is the user the owner</param>
+            /// <param name="type">The type of the action</param>
+            /// <param name="actionID">The ID of the action</param>
+            /// <param name="changedObjects">The objects that there changed by this action</param>
             public GlobalHistoryEntry(bool isOwner, HistoryType type, string actionID, List<string> changedObjects)
             {
                 IsOwner = isOwner;
@@ -64,7 +72,7 @@ namespace SEE.Utils
         /// </summary>
         private bool isRedo = false;
 
-        //GlobalActionHistoryNetwork globalActionHistoryNetwork = new GlobalActionHistoryNetwork();
+        //NetActionHistory globalActionHistoryNetwork = new NetActionHistory();
 
         /// <summary>
         /// The actionHistory, which is synchronised through the network on each client.
@@ -136,7 +144,7 @@ namespace SEE.Utils
             if (LastAction != null && LastAction.Update())
             {
                 Push(new GlobalHistoryEntry(true, HistoryType.action, LastAction.GetId(), LastAction.GetChangedObjects()));
-                new GlobalActionHistoryNetwork().Push(HistoryType.action, LastAction.GetId(), ListToString(LastAction.GetChangedObjects()));
+                new NetActionHistory().Push(HistoryType.action, LastAction.GetId(), ListToString(LastAction.GetChangedObjects()));
                 Execute(LastAction.NewInstance());
             }
         }
@@ -165,7 +173,7 @@ namespace SEE.Utils
             globalHistory[index] = newItem;
             if (!isNetwork)
             {
-                new GlobalActionHistoryNetwork().Replace(oldItem.ActionType, oldItem.ActionID, ListToString(oldItem.ChangedObjects), newItem.ActionType, ListToString(newItem.ChangedObjects));
+                new NetActionHistory().Replace(oldItem.ActionType, oldItem.ActionID, ListToString(oldItem.ChangedObjects), newItem.ActionType, ListToString(newItem.ChangedObjects));
             }
         }
 
@@ -228,7 +236,7 @@ namespace SEE.Utils
             {
                 if (globalHistory[i].IsOwner.Equals(true) && globalHistory[i].ActionType.Equals(HistoryType.undoneAction))
                 {
-                    new GlobalActionHistoryNetwork().Delete(globalHistory[i].ActionID);
+                    new NetActionHistory().Delete(globalHistory[i].ActionID);
                     globalHistory.RemoveAt(i);
                     i--;
                 }
@@ -281,11 +289,11 @@ namespace SEE.Utils
                 RedoHistory.Push(current);
                 UndoHistory.Pop();
                 DeleteItem(lastAction.ActionID);
-                new GlobalActionHistoryNetwork().Delete(lastAction.ActionID);
+                new NetActionHistory().Delete(lastAction.ActionID);
 
                 GlobalHistoryEntry undoneAction = new GlobalHistoryEntry(true, HistoryType.undoneAction, lastAction.ActionID, lastAction.ChangedObjects);
                 Push(undoneAction);
-                new GlobalActionHistoryNetwork().Push(undoneAction.ActionType, undoneAction.ActionID, ListToString(undoneAction.ChangedObjects));
+                new NetActionHistory().Push(undoneAction.ActionType, undoneAction.ActionID, ListToString(undoneAction.ChangedObjects));
                 if (current == null)
                 {
                     return;
@@ -330,9 +338,9 @@ namespace SEE.Utils
 
                 GlobalHistoryEntry redoneAction = new GlobalHistoryEntry(true, HistoryType.action, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects);
                 DeleteItem(lastUndoneAction.ActionID);
-                new GlobalActionHistoryNetwork().Delete(lastUndoneAction.ActionID);
+                new NetActionHistory().Delete(lastUndoneAction.ActionID);
                 Push(redoneAction);
-                new GlobalActionHistoryNetwork().Push(redoneAction.ActionType, redoneAction.ActionID, ListToString(redoneAction.ChangedObjects));
+                new NetActionHistory().Push(redoneAction.ActionType, redoneAction.ActionID, ListToString(redoneAction.ChangedObjects));
             }
         }
 
@@ -413,7 +421,7 @@ namespace SEE.Utils
         /// <returns>a single comma seperated string of all gameObjectIds.</returns>
         private static string ListToString(List<string> gameObjectIds)
         {
-            return (gameObjectIds != null) ? string.Join("?", gameObjectIds) : null;
+            return (gameObjectIds != null) ? JsonUtility.ToJson(gameObjectIds) : null;
         }
     }
 }
