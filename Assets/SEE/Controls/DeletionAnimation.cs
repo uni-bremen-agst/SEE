@@ -14,7 +14,7 @@ namespace SEE.Controls
     /// by the user, for instance, the movement of a game node to the garbage can, as well 
     /// as the inverse undo mechanism.
     /// </summary>
-    public static class AnimationsOfDeletion
+    public static class DeletionAnimation
     {
         /// <summary>
         /// The garbage can the deleted nodes will be moved to. It is the object named 

@@ -51,12 +51,12 @@ namespace SEE.Net
                     {
                         GameNodeAdder.Remove(gameObject);
                         // gameObject is not actually destroyed because we are moving it to the garbage can.
-                        PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.MoveNodeToGarbage(gameObject.AllAncestors()));
+                        PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.MoveNodeToGarbage(gameObject.AllAncestors()));
                         Portal.SetInfinitePortal(gameObject);
                     }
                     else if (gameObject.HasEdgeRef())
                     {
-                        AnimationsOfDeletion.HideEdge(gameObject);
+                        DeletionAnimation.HideEdge(gameObject);
                         GameEdgeAdder.Remove(gameObject);
                     }
                 }

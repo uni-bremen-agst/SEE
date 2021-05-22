@@ -13,7 +13,7 @@ namespace SEE.Net
     ///  This class implements undo for the <see cref="DeleteNetAction"/>.
     ///  It reverts the deletion by adding any deleted node or edge from a 
     ///  specific graph and uses the animated undo mechanism of the 
-    ///  <see cref="AnimationsOfDeletion"/> used as a coroutine in order to move 
+    ///  <see cref="DeletionAnimation"/> used as a coroutine in order to move 
     ///  the deleted nodes to their original position. 
     /// </summary>
     public class UndoDeleteNetAction : AbstractAction
@@ -82,7 +82,7 @@ namespace SEE.Net
                 {
                     if (gameObject.HasEdgeRef())
                     {
-                        PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.UnhideEdge(gameObject));
+                        PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.UnhideEdge(gameObject));
                         if (gameObject.TryGetComponentOrLog(out EdgeRef edgeReference))
                         {
                             try
@@ -99,7 +99,7 @@ namespace SEE.Net
                     {
                         List<GameObject> removeFromGarbage = new List<GameObject>();
                         removeFromGarbage.Add(gameObject);
-                        PlayerSettings.GetPlayerSettings().StartCoroutine(AnimationsOfDeletion.RemoveNodeFromGarbage(removeFromGarbage));
+                        PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.RemoveNodeFromGarbage(removeFromGarbage));
                         Portal.SetInfinitePortal(gameObject);
                         Node node = gameObject.GetNode();
                         graph.AddNode(node);
