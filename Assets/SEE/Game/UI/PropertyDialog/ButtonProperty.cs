@@ -1,8 +1,11 @@
-﻿using SEE.Controls.Actions;
+﻿using Michsky.UI.ModernUIPack;
+using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 namespace SEE.Game.UI.PropertyDialog
 {
@@ -27,9 +30,24 @@ namespace SEE.Game.UI.PropertyDialog
         private GameObject button;
 
         /// <summary>
-        /// Saves the <see cref="HideModeSelector"/> associated with the button.
+        /// Used to store the icon of the button
+        /// </summary>
+        public Sprite iconSprite;
+
+        /// <summary>
+        /// Saves which method of the hide action is to be executed.
         /// </summary>
         public HideModeSelector hideMode;
+
+        /// <summary>
+        /// Saves whether the button represents a function of the Hide action that can select several or only one element.
+        /// </summary>
+        public HideModeSelector selectionType;
+
+        /// <summary>
+        /// Used to set the color of the button
+        /// </summary>
+        public Color buttonColor;
 
         /// <summary>
         /// Value of the input field.
@@ -41,11 +59,11 @@ namespace SEE.Game.UI.PropertyDialog
         }
 
         /// <summary>
-        /// The parent of <see cref="inputField"/>. Because <see cref="SetParent(GameObject)"/>
+        /// The parent of the Button. Because <see cref="SetParent(GameObject)"/>
         /// may be called before <see cref="StartDesktop"/>, the parameter passed to 
         /// <see cref="SetParent(GameObject)"/> will be buffered in this attribute.
         /// </summary>
-        private GameObject parentOfInputField;
+        private GameObject parent;
 
         /// <summary>
         /// The tooltip containing the <see cref="description"/> of this <see cref="Property"/>, which will
@@ -61,23 +79,34 @@ namespace SEE.Game.UI.PropertyDialog
         {
             button = PrefabInstantiator.InstantiatePrefab(ButtonPrefab, instantiateInWorldSpace: false);
 
-            if (parentOfInputField != null)
+            if (parent != null)
             {
-                SetParent(parentOfInputField);
+                SetParent(parent);
             }
 
-            button.gameObject.name = Name;
             SetupTooltip();
-            SetUpButtonName();
+            SetUpButton();
 
-            void SetUpButtonName()
+            void SetUpButton()
             {
                 button.name = Name;
-                if (!button.TryGetComponentOrLog(out Michsky.UI.ModernUIPack.ButtonManagerBasicWithIcon buttonManager)
-                    || !button.TryGetComponentOrLog(out PointerHelper pointerHelper))
+                GameObject text = button.transform.Find("Text").gameObject;
+                GameObject icon = button.transform.Find("Icon").gameObject;
+
+                if (!button.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager) ||
+                    !button.TryGetComponentOrLog(out Image buttonImage) ||
+                    !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro) ||
+                    !icon.TryGetComponentOrLog(out Image iconImage) ||
+                    !button.TryGetComponentOrLog(out PointerHelper pointerHelper))
                 {
                     return;
                 }
+
+                buttonImage.color = buttonColor;
+                textMeshPro.color = buttonColor.IdealTextColor();
+                iconImage.color = buttonColor.IdealTextColor();
+                iconImage.sprite = iconSprite;
+
 
                 buttonManager.buttonText = Name;
                 buttonManager.clickEvent.AddListener(Clicked);
@@ -118,7 +147,7 @@ namespace SEE.Game.UI.PropertyDialog
             else
             {
                 /// save for later assignment in <see cref="StartDesktop"/>
-                parentOfInputField = parent;
+                this.parent = parent;
             }
         }
     }

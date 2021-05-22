@@ -6,16 +6,17 @@ using UnityEngine;
 using UnityEngine.Events;
 using SEE.Controls.Actions;
 using SEE.Game.UI.StateIndicator;
+using SEE.Utils;
 
 namespace SEE.Game.UI.PropertyDialog
 {
     /// <summary>
-    /// A dialogue to select which objects should be hidden in the graph and how.
+    /// Creates different dialogues to access all functions from the <see cref="HideAction"/> within the UI.
     /// </summary>
     public class HidePropertyDialog
     {
         /// <summary>
-        /// Is used to select the actual HideMode.
+        /// Stores which function from the <see cref="HideAction"/> is to be executed.
         /// </summary>
         public HideModeSelector mode;
 
@@ -31,24 +32,14 @@ namespace SEE.Game.UI.PropertyDialog
         public readonly UnityEvent OnCancel = new UnityEvent();
 
         /// <summary>
-        /// The dialog used to select single or multiple selection.
+        /// Dialogue providing all functions from the <see cref="HideAction"/> class
         /// </summary>
-        private GameObject selectionDialog;
-
-        /// <summary>
-        /// Dialog providing all functions for multiple selection
-        /// </summary>
-        private GameObject multipleDialog;
-
-        /// <summary>
-        /// Dialogue providing all functions for single selection
-        /// </summary>
-        private GameObject singleDialog;
+        private GameObject dialog;
 
         /// <summary>
         /// Used to select multiple elements in a graph.
         /// </summary>
-        private GameObject selection;
+        private GameObject selectionDialog;
 
         /// <summary>
         /// Shows the current HideMode
@@ -59,17 +50,6 @@ namespace SEE.Game.UI.PropertyDialog
         /// Represents the Selected HideMode
         /// </summary>
         public HideInInspector selectedMode;
-
-
-        /// <summary>
-        /// Button to select the single selection menu
-        /// </summary>
-        private ButtonProperty bOpenSingleSelectionMenu;
-
-        /// <summary>
-        /// Button to select the multiple selection menue
-        /// </summary>
-        private ButtonProperty bOpenMultipleSelectionMenu;
 
         /// <summary>
         /// Button to hide all elements
@@ -122,185 +102,144 @@ namespace SEE.Game.UI.PropertyDialog
         private ButtonProperty bHighlightConnectingEdges;
 
         /// <summary>
-        /// Creates a menu to select multiple elements from a graph
+        /// Creates a new dialogue to realise functions where several elements are selected.
+        /// The dialogue contains two buttons to confirm and cancel the selection.
         /// </summary>
-        private void OpenSelectionMenu()
+        private void OpenSelectionMenu(HideModeSelector hidemode)
         {
             // Creating a new selection
-            selection = new GameObject("Indicator");
-            indicator = selection.AddComponent<HideStateIndicator>();
-            indicator.buttonName = "Done selecting";
+            selectionDialog = new GameObject("Indicator");
+
+            indicator = selectionDialog.AddComponent<HideStateIndicator>();
+            indicator.buttonNameDone = "Done";
+            indicator.buttonNameBack = "Back";
+            indicator.buttonColorBack = Color.red.Darker();
+            indicator.buttonColorDone = Color.green.Darker();
             indicator.AnchorMin = Vector2.zero;
             indicator.AnchorMax = Vector2.zero;
             indicator.Pivot = Vector2.zero;
+            indicator.selectionTypeDone = HideModeSelector.Confirmed;
+            indicator.selectionTypeBack = HideModeSelector.Back;
+            indicator.descriptionBack = "Back to selection";
+            indicator.descriptionDone = "Confirm selection";
+            indicator.hideMode = hidemode;
             indicator.ChangeState("Select Objects");
-
+           
             // Register listeners for selection menu
-            indicator.OnSelected.AddListener(() => SetMode(indicator.hideMode));
-        }
-
-        /// <summary>
-        /// Opens a new dialogue that asks whether you want to select only one or several elements (for a better overview).
-        /// </summary>
-        public void Open()
-        {
-            // Creating a new dialog
-            selectionDialog = new GameObject("HideAction mode selector");
-
-            // Create new buttons 
-            bOpenSingleSelectionMenu = selectionDialog.AddComponent<ButtonProperty>();
-            bOpenSingleSelectionMenu.Name = "Single Selection";
-            bOpenSingleSelectionMenu.Description = "Select objects";
-            bOpenSingleSelectionMenu.Value = HideModeSelector.SelectSingleHide;
-
-            bOpenMultipleSelectionMenu = selectionDialog.AddComponent<ButtonProperty>();
-            bOpenMultipleSelectionMenu.Name = "Multiple Selection";
-            bOpenMultipleSelectionMenu.Description = "Select objects";
-            bOpenMultipleSelectionMenu.Value = HideModeSelector.SelectMultipleHide;
-
-            // Group for buttons
-            PropertyGroup group = selectionDialog.AddComponent<PropertyGroup>();
-            group.AddProperty(bOpenSingleSelectionMenu);
-            group.AddProperty(bOpenMultipleSelectionMenu);
-
-            // Register listeners for buttons
-            bOpenSingleSelectionMenu.OnSelected.AddListener(() => SetMode(bOpenSingleSelectionMenu.hideMode));
-            bOpenMultipleSelectionMenu.OnSelected.AddListener(() => SetMode(bOpenMultipleSelectionMenu.hideMode));
-
-            // Dialog
-            PropertyDialog propertyDialog = selectionDialog.AddComponent<PropertyDialog>();
-            propertyDialog.Title = "Select mode";
-            propertyDialog.Description = "Select hide mode";
-            propertyDialog.AddGroup(group);
-
-            // Register listeners for dialog
-            propertyDialog.OnConfirm.AddListener(OKButtonPressed);
-            propertyDialog.OnCancel.AddListener(CancelButtonPressed);
-
-            SEEInput.KeyboardShortcutsEnabled = false;
-            // Go online
-            propertyDialog.DialogShouldBeShown = true;
+            indicator.OnSelected.AddListener(() => SetMode(indicator.hideMode, indicator.confirmCancel));
         }
 
         /// <summary>
         /// Provides all possible functions that are available for the selection of a single element.
         /// </summary>
-        public void OpenSinge()
+        public void Open()
         {
             // Creating a new dialog
-            singleDialog = new GameObject("HideAction mode selector");
+            dialog = new GameObject("HideAction mode selector");
 
             // Create new buttons 
-            bHideAll = singleDialog.AddComponent<ButtonProperty>();
+            bHideAll = dialog.AddComponent<ButtonProperty>();
             bHideAll.Name = "Hide all";
             bHideAll.Description = "Hides everything";
+            bHideAll.buttonColor = Color.red.Darker();
             bHideAll.Value = HideModeSelector.HideAll;
+            bHideAll.selectionType = HideModeSelector.SelectSingle;
 
-            bHideIncoming = singleDialog.AddComponent<ButtonProperty>();
+            bHideIncoming = dialog.AddComponent<ButtonProperty>();
             bHideIncoming.Name = "Hide incoming";
             bHideIncoming.Description = "Hides only incoming edges";
+            bHideIncoming.buttonColor = Color.blue.Darker();
             bHideIncoming.Value = HideModeSelector.HideIncoming;
+            bHideIncoming.selectionType = HideModeSelector.SelectSingle;
 
-            bHideOutgoing = singleDialog.AddComponent<ButtonProperty>();
+            bHideOutgoing = dialog.AddComponent<ButtonProperty>();
             bHideOutgoing.Name = "Hide outgoing";
-            bHideOutgoing.Description = "Beschreibung";
+            bHideOutgoing.Description = "Hides only outgoing edges";
+            bHideOutgoing.buttonColor = Color.magenta.Darker();
             bHideOutgoing.Value = HideModeSelector.HideOutgoing;
+            bHideOutgoing.selectionType = HideModeSelector.SelectSingle;
 
-            bHideForwardTransitiveClosure = singleDialog.AddComponent<ButtonProperty>();
+            bHideForwardTransitiveClosure = dialog.AddComponent<ButtonProperty>();
             bHideForwardTransitiveClosure.Name = "Hide forward transitive closure";
-            bHideForwardTransitiveClosure.Description = "Beschreibung";
+            bHideForwardTransitiveClosure.Description = "Looks which nodes are reachable via all outgoing edges of the selected node and hides them.";
+            bHideForwardTransitiveClosure.buttonColor = Color.cyan.Darker();
             bHideForwardTransitiveClosure.Value = HideModeSelector.HideForwardTransitiveClosure;
+            bHideForwardTransitiveClosure.selectionType = HideModeSelector.SelectSingle;
 
-            bHideBackwardTransitiveClosure = singleDialog.AddComponent<ButtonProperty>();
+            bHideBackwardTransitiveClosure = dialog.AddComponent<ButtonProperty>();
             bHideBackwardTransitiveClosure.Name = "Hide backward transitive closure";
-            bHideBackwardTransitiveClosure.Description = "Beschreibung";
+            bHideBackwardTransitiveClosure.Description = "Looks which nodes are reachable via all incoming edges of the selected node and hides them.";
+            bHideBackwardTransitiveClosure.buttonColor = Color.red.Darker();
             bHideBackwardTransitiveClosure.Value = HideModeSelector.HideBackwardTransitiveClosure;
+            bHideBackwardTransitiveClosure.selectionType = HideModeSelector.SelectSingle;
 
-            bHideTransitiveClosure = singleDialog.AddComponent<ButtonProperty>();
+            bHideTransitiveClosure = dialog.AddComponent<ButtonProperty>();
             bHideTransitiveClosure.Name = "Hide transitive closure";
-            bHideTransitiveClosure.Description = "Beschreibung";
+            bHideTransitiveClosure.Description = "Looks which nodes are reachable via all incoming and outgoing edges of the selected node and hides them.";
+            bHideTransitiveClosure.buttonColor = Color.yellow.Darker();
             bHideTransitiveClosure.Value = HideModeSelector.HideAllTransitiveClosure;
+            bHideTransitiveClosure.selectionType = HideModeSelector.SelectSingle;
+
+            bHideSelected = dialog.AddComponent<ButtonProperty>();
+            bHideSelected.Name = "Hide selected";
+            bHideSelected.Description = "Hides only the selected objects";
+            bHideSelected.buttonColor = Color.green.Darker();
+            bHideSelected.Value = HideModeSelector.HideSelected;
+            bHideSelected.selectionType = HideModeSelector.SelectMultiple;
+
+            bHideUnselected = dialog.AddComponent<ButtonProperty>();
+            bHideUnselected.Name = "Hide unselected";
+            bHideUnselected.Description = "Hides only the unselected objects";
+            bHideUnselected.buttonColor = Color.yellow.Darker();
+            bHideUnselected.Value = HideModeSelector.HideUnselected;
+            bHideUnselected.selectionType = HideModeSelector.SelectMultiple;
+
+            bHideAllEdgesOfSelected = dialog.AddComponent<ButtonProperty>();
+            bHideAllEdgesOfSelected.Name = "Hide all edges of selected";
+            bHideAllEdgesOfSelected.Description = "Hides the edges for all selected nodes";
+            bHideAllEdgesOfSelected.buttonColor = Color.magenta.Darker();
+            bHideAllEdgesOfSelected.Value = HideModeSelector.HideAllEdgesOfSelected;
+            bHideAllEdgesOfSelected.selectionType = HideModeSelector.SelectMultiple;
+
+            bHighlightConnectingEdges = dialog.AddComponent<ButtonProperty>();
+            bHighlightConnectingEdges.Name = "Highlight connection Edges";
+            bHighlightConnectingEdges.Description = "Looks which edges represent a connection between the selected nodes and highlights them.";
+            bHighlightConnectingEdges.buttonColor = Color.yellow.Darker();
+            bHighlightConnectingEdges.Value = HideModeSelector.HighlightEdges;
+            bHighlightConnectingEdges.selectionType = HideModeSelector.SelectMultiple;
 
             // Group for buttons
-            PropertyGroup group = singleDialog.AddComponent<PropertyGroup>();
+            PropertyGroup group = dialog.AddComponent<PropertyGroup>();
             group.AddProperty(bHideAll);
             group.AddProperty(bHideIncoming);
             group.AddProperty(bHideOutgoing);
             group.AddProperty(bHideForwardTransitiveClosure);
             group.AddProperty(bHideBackwardTransitiveClosure);
             group.AddProperty(bHideTransitiveClosure);
-
-            // Register listeners for buttons
-            bHideAll.OnSelected.AddListener(() => SetMode(bHideAll.hideMode));
-            bHideIncoming.OnSelected.AddListener(() => SetMode(bHideIncoming.hideMode));
-            bHideOutgoing.OnSelected.AddListener(() => SetMode(bHideOutgoing.hideMode));
-            bHideForwardTransitiveClosure.OnSelected.AddListener(() => SetMode(bHideForwardTransitiveClosure.hideMode));
-            bHideBackwardTransitiveClosure.OnSelected.AddListener(() => SetMode(bHideBackwardTransitiveClosure.hideMode));
-            bHideTransitiveClosure.OnSelected.AddListener(() => SetMode(bHideTransitiveClosure.hideMode));
-
-            // Dialog
-            PropertyDialog propertyDialog = singleDialog.AddComponent<PropertyDialog>();
-            propertyDialog.Title = "Select mode";
-            propertyDialog.Description = "Select hide mode";
-            propertyDialog.AddGroup(group);
-
-            // Register listeners for dialog
-            propertyDialog.OnConfirm.AddListener(OKButtonPressed);
-            propertyDialog.OnCancel.AddListener(CancelButtonPressed);
-
-            SEEInput.KeyboardShortcutsEnabled = false;
-            // Go online
-            propertyDialog.DialogShouldBeShown = true;
-        }
-
-        /// <summary>
-        /// Provides all possible functions that are available for the selection of multiple elements.
-        /// </summary>
-        private void OpenMultiple()
-        {
-            // Creating a new dialog
-            multipleDialog = new GameObject("HideAction mode selector");
-
-            // Create new buttons
-            bHideSelected = multipleDialog.AddComponent<ButtonProperty>();
-            bHideSelected.Name = "Hide selected";
-            bHideSelected.Description = "Hides only the selected objects";
-            bHideSelected.Value = HideModeSelector.HideSelected;
-
-            bHideUnselected = multipleDialog.AddComponent<ButtonProperty>();
-            bHideUnselected.Name = "Hide unselected";
-            bHideUnselected.Description = "Hides only the unselected objects";
-            bHideUnselected.Value = HideModeSelector.HideUnselected;
-
-            bHideAllEdgesOfSelected = multipleDialog.AddComponent<ButtonProperty>();
-            bHideAllEdgesOfSelected.Name = "Hide all edges of selected";
-            bHideAllEdgesOfSelected.Description = "Beschreibung";
-            bHideAllEdgesOfSelected.Value = HideModeSelector.HideAllEdgesOfSelected;
-
-            bHighlightConnectingEdges = multipleDialog.AddComponent<ButtonProperty>();
-            bHighlightConnectingEdges.Name = "Highlight connection Edges";
-            bHighlightConnectingEdges.Description = "Beschreibung";
-            bHighlightConnectingEdges.Value = HideModeSelector.HighlightEdges;
-
-            // Group for node name and type
-            PropertyGroup group = multipleDialog.AddComponent<PropertyGroup>();
             group.AddProperty(bHideSelected);
             group.AddProperty(bHideUnselected);
             group.AddProperty(bHideAllEdgesOfSelected);
             group.AddProperty(bHighlightConnectingEdges);
 
-            bHideSelected.OnSelected.AddListener(() => SetMode(bHideSelected.hideMode));
-            bHideUnselected.OnSelected.AddListener(() => SetMode(bHideUnselected.hideMode));
-            bHideAllEdgesOfSelected.OnSelected.AddListener(() => SetMode(bHideAllEdgesOfSelected.hideMode));
-            bHighlightConnectingEdges.OnSelected.AddListener(() => SetMode(bHighlightConnectingEdges.hideMode));
+            // Register listeners for buttons
+            bHideAll.OnSelected.AddListener(() => SetMode(bHideAll.hideMode, bHideAll.selectionType));
+            bHideIncoming.OnSelected.AddListener(() => SetMode(bHideIncoming.hideMode, bHideIncoming.selectionType));
+            bHideOutgoing.OnSelected.AddListener(() => SetMode(bHideOutgoing.hideMode, bHideOutgoing.selectionType));
+            bHideForwardTransitiveClosure.OnSelected.AddListener(() => SetMode(bHideForwardTransitiveClosure.hideMode, bHideForwardTransitiveClosure.selectionType));
+            bHideBackwardTransitiveClosure.OnSelected.AddListener(() => SetMode(bHideBackwardTransitiveClosure.hideMode, bHideForwardTransitiveClosure.selectionType));
+            bHideTransitiveClosure.OnSelected.AddListener(() => SetMode(bHideTransitiveClosure.hideMode, bHideTransitiveClosure.selectionType));
+            bHideSelected.OnSelected.AddListener(() => SetMode(bHideSelected.hideMode, bHideSelected.selectionType));
+            bHideUnselected.OnSelected.AddListener(() => SetMode(bHideUnselected.hideMode, bHideUnselected.selectionType));
+            bHideAllEdgesOfSelected.OnSelected.AddListener(() => SetMode(bHideAllEdgesOfSelected.hideMode, bHideAllEdgesOfSelected.selectionType));
+            bHighlightConnectingEdges.OnSelected.AddListener(() => SetMode(bHighlightConnectingEdges.hideMode, bHighlightConnectingEdges.selectionType));
 
             // Dialog
-            PropertyDialog propertyDialog = multipleDialog.AddComponent<PropertyDialog>();
+            PropertyDialog propertyDialog = dialog.AddComponent<PropertyDialog>();
             propertyDialog.Title = "Select mode";
             propertyDialog.Description = "Select hide mode";
             propertyDialog.AddGroup(group);
 
-            // Register listeners
+            // Register listeners for dialog
             propertyDialog.OnConfirm.AddListener(OKButtonPressed);
             propertyDialog.OnCancel.AddListener(CancelButtonPressed);
 
@@ -313,25 +252,27 @@ namespace SEE.Game.UI.PropertyDialog
         /// Opens the appropriate dialogues for the corresponding selections.
         /// </summary>
         /// <param name="mode">The mode associated with the button pressed</param>
-        private void SetMode(HideModeSelector mode)
+        private void SetMode(HideModeSelector mode, HideModeSelector selectionType)
         {
-            switch (mode)
+            switch (selectionType)
             {
-                case HideModeSelector.SelectSingleHide:
-                    Close();
-                    OpenSinge();
-                    break;
-                case HideModeSelector.SelectMultipleHide:
-                    Close();
-                    OpenSelectionMenu();
-                    break;
-                case HideModeSelector.Select:
-                    Close();
-                    OpenMultiple();
-                    break;
-                default:
+                case HideModeSelector.SelectSingle:
                     this.mode = mode;
                     OKButtonPressed();
+                    break;
+                case HideModeSelector.SelectMultiple:
+                    Close();
+                    OpenSelectionMenu(mode);
+                    break;
+                case HideModeSelector.Confirmed:
+                    this.mode = mode;
+                    OKButtonPressed();
+                    break;
+                case HideModeSelector.Back:
+                    Close();
+                    Open();
+                    break;
+                default:
                     break;
             }
         }
@@ -347,8 +288,8 @@ namespace SEE.Game.UI.PropertyDialog
         }
 
         /// <summary>
-        /// Sets the attributes of <see cref="node"/> to the trimmed values entered in the dialog,
-        /// notifies all listeners on <see cref="OnConfirm"/>, and closes the dialog.
+        /// Called after selecting the desired <see cref="HideAction"/> function and selecting the desired element(s).
+        /// Completes the selection
         /// </summary>
         private void OKButtonPressed()
         {
@@ -358,29 +299,19 @@ namespace SEE.Game.UI.PropertyDialog
         }
 
         /// <summary>
-        /// Destroys <see cref="selectionDialog"/>. <see cref="selectionDialog"/> will be null afterwards.
+        /// Destroys all open dialogues and sets them to null
         /// </summary>
         private void Close()
         {
+            if (dialog != null)
+            {
+                Object.Destroy(dialog);
+                dialog = null;
+            }
             if (selectionDialog != null)
             {
                 Object.Destroy(selectionDialog);
                 selectionDialog = null;
-            }
-            if (singleDialog != null)
-            {
-                Object.Destroy(singleDialog);
-                singleDialog = null;
-            }
-            if (multipleDialog != null)
-            {
-                Object.Destroy(multipleDialog);
-                multipleDialog = null;
-            }
-            if (selection != null)
-            {
-                Object.Destroy(selection);
-                selection = null;
             }
         }
     }
