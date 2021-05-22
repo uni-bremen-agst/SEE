@@ -3,13 +3,14 @@ using SEE.Controls.Actions;
 using System.Collections.Generic;
 using System.Linq;
 using static SEE.Utils.ActionHistory;
+using UnityEngine;
 
 namespace SEE.Net
 {
     /// <summary>
     /// Syncs the action history through the network on each client.
     /// </summary>
-    public class GlobalActionHistoryNetwork : AbstractAction
+    public class NetActionHistory : AbstractAction
     {
         /// <summary>
         /// The state that determines which action should be performed.
@@ -74,7 +75,7 @@ namespace SEE.Net
         /// </summary>
         public HistoryType newItemType;
 
-        public GlobalActionHistoryNetwork()
+        public NetActionHistory()
         {
             // Intentionally left blank.
         }
@@ -94,19 +95,18 @@ namespace SEE.Net
         {
             if (!IsRequester())
             {
-                if (mode == Mode.Push)
-                {
-                    GlobalActionHistory.Push(new GlobalHistoryEntry(false, type, actionId, changedObjects));
-                }
-                else if (mode == Mode.Delete)
-                {
-                    GlobalActionHistory.DeleteItem(actionId);
-                }
-                else if (mode == Mode.Replace)
-                {
-                    GlobalActionHistory.Replace(new GlobalHistoryEntry(false, oldItemType, ID, oldChangedObjects), 
-                                                new GlobalHistoryEntry(false, newItemType, ID, changedObjects), 
-                                                true);
+                switch(mode){
+                    case Mode.Push:
+                        GlobalActionHistory.Push(new GlobalHistoryEntry(false, type, actionId, changedObjects));
+                        break;
+                    case Mode.Delete:
+                        GlobalActionHistory.DeleteItem(actionId);
+                        break;
+                    case Mode.Replace:
+                        GlobalActionHistory.Replace(new GlobalHistoryEntry(false, oldItemType, ID, oldChangedObjects),
+                                               new GlobalHistoryEntry(false, newItemType, ID, changedObjects),
+                                               true);
+                        break;
                 }
                 mode = Mode.Init;
             }
@@ -169,8 +169,7 @@ namespace SEE.Net
         /// <returns>a list of ids of changed gameObjects</returns>
         private static List<string> StringToList(string changedObjectsToParse)
         {
-            // FIXME: This will not work if IDs contain a ?.
-            return changedObjectsToParse?.Split('?').ToList();
+            return JsonUtility.FromJson<List<string>>(changedObjectsToParse);
         }
     }
 }
