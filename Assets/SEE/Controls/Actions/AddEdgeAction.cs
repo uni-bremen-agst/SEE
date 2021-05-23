@@ -1,4 +1,4 @@
-﻿using Assets.SEE.Game;
+﻿using SEE.Game;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Net;
@@ -171,9 +171,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Undo()
         {
-            base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
+            base.Undo();
             GameEdgeAdder.Remove(createdEdge);
             new DeleteNetAction(createdEdge.name).Execute();
+            Destroyer.DestroyGameObject(createdEdge);
             createdEdge = null;
         }
 
@@ -182,7 +183,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Redo()
         {
-            base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
+            base.Redo();
             createdEdge = CreateEdge(ref memento);
         }
 
