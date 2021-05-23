@@ -530,7 +530,6 @@ namespace SEE.Controls.Actions
 
                 foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
                 {
-
                     if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
                     {
                         hiddenObjects.Add(edge);
@@ -593,13 +592,12 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Hide the forward transitive closure (all nodes reachable from the selected node by going forwards)
+        /// Hides the forward transitive closure (all nodes reachable from the selected node by going forwards).
         /// </summary>
         private bool HideForwardTransitive()
         {
             if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
             {
-
                 (HashSet<string> edgeIDs, HashSet<string> nodeIDs) = ForwardTransitiveRecursive(nodeRef.Value, new HashSet<string>(), new HashSet<string>());
 
                 foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
@@ -644,7 +642,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Hide the backward transitive closure (all nodes reachable from the selected node by going backwards)
+        /// Hides the backward transitive closure (all nodes reachable from the selected node by going backwards).
         /// </summary>
         private bool HideBackwardTransitive()
         {
@@ -694,7 +692,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Hide the transitive closure (all nodes reachable from the selected node)
+        /// Hides the transitive closure (all nodes reachable from the selected node).
         /// </summary>
         private bool HideAllTransitive()
         {
@@ -727,7 +725,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Highlights all edges that lie between nodes by making the edges thicker
+        /// Highlights all edges that lie between nodes by making the edges thicker.
         /// </summary>
         private void HighlightEdges()
         {
