@@ -93,11 +93,11 @@ namespace SEE.Game.UI.PropertyDialog
                 GameObject text = button.transform.Find("Text").gameObject;
                 GameObject icon = button.transform.Find("Icon").gameObject;
 
-                if (!button.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager) ||
-                    !button.TryGetComponentOrLog(out Image buttonImage) ||
-                    !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro) ||
-                    !icon.TryGetComponentOrLog(out Image iconImage) ||
-                    !button.TryGetComponentOrLog(out PointerHelper pointerHelper))
+                if (!button.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager)
+                     || !button.TryGetComponentOrLog(out Image buttonImage)
+                     || !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro)
+                     || !icon.TryGetComponentOrLog(out Image iconImage)
+                     || !button.TryGetComponentOrLog(out PointerHelper pointerHelper))
                 {
                     return;
                 }
