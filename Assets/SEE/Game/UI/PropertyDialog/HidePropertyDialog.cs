@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using SEE.Controls;
-using SEE.DataModel.DG;
+﻿using SEE.Controls;
 using UnityEngine;
 using UnityEngine.Events;
 using SEE.Controls.Actions;
@@ -111,22 +108,22 @@ namespace SEE.Game.UI.PropertyDialog
             selectionDialog = new GameObject("Indicator");
 
             indicator = selectionDialog.AddComponent<HideStateIndicator>();
-            indicator.buttonNameDone = "Done";
-            indicator.buttonNameBack = "Back";
-            indicator.buttonColorBack = Color.red.Darker();
-            indicator.buttonColorDone = Color.green.Darker();
+            indicator.ButtonNameDone = "Done";
+            indicator.ButtonNameBack = "Back";
+            indicator.ButtonColorBack = Color.red.Darker();
+            indicator.ButtonColorDone = Color.green.Darker();
             indicator.AnchorMin = Vector2.zero;
             indicator.AnchorMax = Vector2.zero;
             indicator.Pivot = Vector2.zero;
-            indicator.selectionTypeDone = HideModeSelector.Confirmed;
-            indicator.selectionTypeBack = HideModeSelector.Back;
-            indicator.descriptionBack = "Back to selection";
-            indicator.descriptionDone = "Confirm selection";
-            indicator.hideMode = hidemode;
+            indicator.SelectionTypeDone = HideModeSelector.Confirmed;
+            indicator.SelectionTypeBack = HideModeSelector.Back;
+            indicator.DescriptionBack = "Back to selection";
+            indicator.DescriptionDone = "Confirm selection";
+            indicator.HideMode = hidemode;
             indicator.ChangeState("Select Objects");
            
             // Register listeners for selection menu
-            indicator.OnSelected.AddListener(() => SetMode(indicator.hideMode, indicator.confirmCancel));
+            indicator.OnSelected.AddListener(() => SetMode(indicator.HideMode, indicator.ConfirmCancel));
         }
 
         /// <summary>
@@ -161,49 +158,49 @@ namespace SEE.Game.UI.PropertyDialog
 
             bHideForwardTransitiveClosure = dialog.AddComponent<ButtonProperty>();
             bHideForwardTransitiveClosure.Name = "Hide forward transitive closure";
-            bHideForwardTransitiveClosure.Description = "Looks which nodes are reachable via all outgoing edges of the selected node and hides them.";
+            bHideForwardTransitiveClosure.Description = "Hides nodes reachable transitively via outgoing edges of the selected node.";
             bHideForwardTransitiveClosure.buttonColor = Color.cyan.Darker();
             bHideForwardTransitiveClosure.Value = HideModeSelector.HideForwardTransitiveClosure;
             bHideForwardTransitiveClosure.selectionType = HideModeSelector.SelectSingle;
 
             bHideBackwardTransitiveClosure = dialog.AddComponent<ButtonProperty>();
             bHideBackwardTransitiveClosure.Name = "Hide backward transitive closure";
-            bHideBackwardTransitiveClosure.Description = "Looks which nodes are reachable via all incoming edges of the selected node and hides them.";
+            bHideBackwardTransitiveClosure.Description = "Hides nodes reachable transitively via incoming edges of the selected node.";
             bHideBackwardTransitiveClosure.buttonColor = Color.red.Darker();
             bHideBackwardTransitiveClosure.Value = HideModeSelector.HideBackwardTransitiveClosure;
             bHideBackwardTransitiveClosure.selectionType = HideModeSelector.SelectSingle;
 
             bHideTransitiveClosure = dialog.AddComponent<ButtonProperty>();
             bHideTransitiveClosure.Name = "Hide transitive closure";
-            bHideTransitiveClosure.Description = "Looks which nodes are reachable via all incoming and outgoing edges of the selected node and hides them.";
+            bHideTransitiveClosure.Description = "Hides nodes reachable transitively via incoming and outgoing edges of the selected node.";
             bHideTransitiveClosure.buttonColor = Color.yellow.Darker();
             bHideTransitiveClosure.Value = HideModeSelector.HideAllTransitiveClosure;
             bHideTransitiveClosure.selectionType = HideModeSelector.SelectSingle;
 
             bHideSelected = dialog.AddComponent<ButtonProperty>();
             bHideSelected.Name = "Hide selected";
-            bHideSelected.Description = "Hides only the selected objects";
+            bHideSelected.Description = "Hides only the selected objects.";
             bHideSelected.buttonColor = Color.green.Darker();
             bHideSelected.Value = HideModeSelector.HideSelected;
             bHideSelected.selectionType = HideModeSelector.SelectMultiple;
 
             bHideUnselected = dialog.AddComponent<ButtonProperty>();
             bHideUnselected.Name = "Hide unselected";
-            bHideUnselected.Description = "Hides only the unselected objects";
+            bHideUnselected.Description = "Hides only the unselected objects.";
             bHideUnselected.buttonColor = Color.yellow.Darker();
             bHideUnselected.Value = HideModeSelector.HideUnselected;
             bHideUnselected.selectionType = HideModeSelector.SelectMultiple;
 
             bHideAllEdgesOfSelected = dialog.AddComponent<ButtonProperty>();
-            bHideAllEdgesOfSelected.Name = "Hide all edges of selected";
-            bHideAllEdgesOfSelected.Description = "Hides the edges for all selected nodes";
+            bHideAllEdgesOfSelected.Name = "Hide edges";
+            bHideAllEdgesOfSelected.Description = "Hides the edges for all selected nodes.";
             bHideAllEdgesOfSelected.buttonColor = Color.magenta.Darker();
             bHideAllEdgesOfSelected.Value = HideModeSelector.HideAllEdgesOfSelected;
             bHideAllEdgesOfSelected.selectionType = HideModeSelector.SelectMultiple;
 
             bHighlightConnectingEdges = dialog.AddComponent<ButtonProperty>();
-            bHighlightConnectingEdges.Name = "Highlight connection Edges";
-            bHighlightConnectingEdges.Description = "Looks which edges represent a connection between the selected nodes and highlights them.";
+            bHighlightConnectingEdges.Name = "Highlight connecting edges";
+            bHighlightConnectingEdges.Description = "Highlights edges connecting the selected nodes.";
             bHighlightConnectingEdges.buttonColor = Color.yellow.Darker();
             bHighlightConnectingEdges.Value = HideModeSelector.HighlightEdges;
             bHighlightConnectingEdges.selectionType = HideModeSelector.SelectMultiple;
