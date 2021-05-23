@@ -183,7 +183,7 @@ namespace SEE.Utils
         /// <param name="type">the type of action the user wants to perform</param>
         /// 
         /// <returns>A GlobalHistoryEntry. If the player has no last action of the given type left, the entry will be empty </returns>
-        private GlobalHistoryEntry FindLastActionOfPlayer(HistoryType type) // Note the one liner from @Falkos suggestion doesn't work properly if we do an undo redo combination more than once.
+        private GlobalHistoryEntry FindLastActionOfPlayer(HistoryType type)
         {
             for (int i = globalHistory.Count - 1; i >= 0; i--)
             {
