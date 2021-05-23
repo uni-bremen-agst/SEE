@@ -4,73 +4,57 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using Valve.VR.InteractionSystem;
 using SEE.Controls.Actions;
-using SEE.Game.UI.Tooltip;
 using Michsky.UI.ModernUIPack;
 
 namespace SEE.Game.UI.StateIndicator
 {
     /// <summary>
-    /// Indicates some kind of state with which a text is associated.
+    /// An indicator for hiding nodes and edges.
     /// The state will be displayed on the screen.
     /// </summary>
-    public class HideStateIndicator : PlatformDependentComponent
+    public class HideStateIndicator : AbstractStateIndicator
     {
         /// <summary>
-        /// Text of the mode panel.
+        /// Sets the <see cref="Title"/>, <see cref="PREFAB"/>, and <see cref="StartText"/> 
+        /// of this state indicator.
         /// </summary>
-        private TextMeshProUGUI ModePanelText;
+        private void Awake()
+        {
+            Title = "Hide Selection Panel";
+            PREFAB = "Prefabs/UI/HideModePanel";
+            StartText = "Select Objects";
+        }
 
         /// <summary>
-        /// Background image (color) of the mode panel.
-        /// </summary>
-        private Image ModePanelImage;
-
-        /// <summary>
-        /// Represents the button that confirms the selection in the UI
+        /// Represents the button that confirms the selection in the UI.
         /// </summary>
         private GameObject doneButton;
 
         /// <summary>
-        /// Represents the button that cancels the selection in the UI
+        /// Represents the button that cancels the selection in the UI.
         /// </summary>
         private GameObject backbutton;
 
         /// <summary>
-        /// Path to the prefab of the mode panel.
-        /// </summary>
-        private const string HIDE_MODE_PANEL_PREFAB = "Prefabs/UI/HideModePanel";
-
-        /// <summary>
-        /// The color of the state indicator after it has been instantiated.
-        /// </summary>
-        private Color StartColor = Color.gray.ColorWithAlpha(0.5f);
-
-        /// <summary>
-        /// The text of the state indicator after it has been instantiated.
-        /// </summary>
-        private string StartText = "Select Objects";
-
-        /// <summary>
         /// Saves the name of <see cref="doneButton"/>
         /// </summary>
-        public string buttonNameDone;
+        public string ButtonNameDone;
 
         /// <summary>
         /// Saves the name of the button that cancels the selection in the UI.
         /// </summary>
-        public string buttonNameBack;
+        public string ButtonNameBack;
 
         /// <summary>
         /// Used to store the color of <see cref="doneButton"/>.
         /// </summary>
-        public Color buttonColorDone;
+        public Color ButtonColorDone;
 
         /// <summary>
         /// Used to change the color of the cancels the selection in the UI.
         /// </summary>
-        public Color buttonColorBack;
+        public Color ButtonColorBack;
 
         /// <summary>
         /// The tooltip containing the <see cref=description"/> of this <see cref="Property"/>, which will
@@ -89,85 +73,47 @@ namespace SEE.Game.UI.StateIndicator
         /// <summary>
         /// Saves the description of <see cref="doneButton"/>
         /// </summary>
-        public string descriptionDone;
+        public string DescriptionDone;
 
         /// <summary>
         /// Saves the description of <see cref="backbutton"/>
         /// </summary>
-        public string descriptionBack;
+        public string DescriptionBack;
 
         /// <summary>
         /// Saves which function from the <see cref=HideAction"/> is to be executed upon confirmation.
         /// </summary>
-        public HideModeSelector hideMode;
+        public HideModeSelector HideMode;
 
         /// <summary>
         /// Saves which property <see cref="doneButton"/> has.
         /// </summary>
-        public HideModeSelector selectionTypeDone;
+        public HideModeSelector SelectionTypeDone;
 
         /// <summary>
         /// Saves which property <see cref="backbutton"/> has.
         /// </summary>
-        public HideModeSelector selectionTypeBack;
+        public HideModeSelector SelectionTypeBack;
 
         /// <summary>
         /// Saves whether the selection was cancelled or confirmed.
         /// </summary>
-        public HideModeSelector confirmCancel;
+        public HideModeSelector ConfirmCancel;
 
         /// <summary>
         /// Used to store the icon of <see cref="doneButton"/>
         /// </summary>
-        public Sprite iconSpriteDone;
+        private Sprite iconSpriteDone;
 
         /// <summary>
         /// Used to store the icon of <see cref="backbutton"/>
         /// </summary>
-        public Sprite iconSpriteBack;
+        private Sprite iconSpriteBack;
 
         /// <summary>
         /// Event triggered when the user presses the button.
         /// </summary>
         public readonly UnityEvent OnSelected = new UnityEvent();
-
-        /// <summary>
-        /// The normalized position in the canvas that the upper right corner is anchored to.
-        /// Changes will only have an effect before Start() is called.
-        /// </summary>
-        public Vector2 AnchorMin = Vector2.left;
-
-        /// <summary>
-        /// The normalized position in the canvas that the lower left corner is anchored to.
-        /// Changes will only have an effect before Start() is called.
-        /// </summary>
-        public Vector2 AnchorMax = Vector2.left;
-
-        /// <summary>
-        /// The normalized position in this Canvas that it rotates around.
-        /// </summary>
-        public Vector2 Pivot = Vector2.left;
-
-        /// <summary>
-        /// Name of this state indicator. Will not be displayed to the player.
-        /// </summary>
-        public string Title = "Hide Selection Panel";
-
-        private void OnDisable()
-        {
-            if (ModePanelImage != null)
-            {
-                ModePanelImage.gameObject.SetActive(false);
-            }
-        }
-
-        private void OnEnable()
-        {
-            if (ModePanelImage != null)
-            {
-                ModePanelImage.gameObject.SetActive(true);
-            }
-        }
 
         /// <summary>
         /// Sets all relevant values for the button
@@ -179,7 +125,7 @@ namespace SEE.Game.UI.StateIndicator
             GameObject text = doneButton.transform.Find("Text").gameObject;
             GameObject icon = doneButton.transform.Find("Icon").gameObject;
 
-            doneButton.name = buttonNameDone;
+            doneButton.name = ButtonNameDone;
             if (!doneButton.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager) ||
                     !doneButton.TryGetComponentOrLog(out Image buttonImage) ||
                     !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro) ||
@@ -194,13 +140,13 @@ namespace SEE.Game.UI.StateIndicator
                 buttonManager.buttonIcon = iconSpriteDone;
             }
 
-            buttonImage.color = buttonColorDone;
-            textMeshPro.color = buttonColorDone.IdealTextColor();
-            iconImage.color = buttonColorBack.IdealTextColor();
-            buttonManager.buttonText = buttonNameDone;
+            buttonImage.color = ButtonColorDone;
+            textMeshPro.color = ButtonColorDone.IdealTextColor();
+            iconImage.color = ButtonColorBack.IdealTextColor();
+            buttonManager.buttonText = ButtonNameDone;
 
-            buttonManager.clickEvent.AddListener(() => setSelectionType(selectionTypeDone));
-            pointerHelper.EnterEvent.AddListener(() => tooltipDone.Show(descriptionDone));
+            buttonManager.clickEvent.AddListener(() => SetSelectionType(SelectionTypeDone));
+            pointerHelper.EnterEvent.AddListener(() => tooltipDone.Show(DescriptionDone));
         }
 
         /// <summary>
@@ -213,7 +159,7 @@ namespace SEE.Game.UI.StateIndicator
             GameObject text = backbutton.transform.Find("Text").gameObject;
             GameObject icon = backbutton.transform.Find("Icon").gameObject;
 
-            backbutton.name = buttonNameBack;
+            backbutton.name = ButtonNameBack;
             if (!backbutton.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager) ||
                     !backbutton.TryGetComponentOrLog(out Image buttonImage) ||
                     !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro) ||
@@ -228,13 +174,13 @@ namespace SEE.Game.UI.StateIndicator
                 buttonManager.buttonIcon = iconSpriteBack;
             }
 
-            buttonImage.color = buttonColorBack;
-            textMeshPro.color = buttonColorBack.IdealTextColor();
-            iconImage.color = buttonColorBack.IdealTextColor();
-            buttonManager.buttonText = buttonNameBack;
+            buttonImage.color = ButtonColorBack;
+            textMeshPro.color = ButtonColorBack.IdealTextColor();
+            iconImage.color = ButtonColorBack.IdealTextColor();
+            buttonManager.buttonText = ButtonNameBack;
 
-            buttonManager.clickEvent.AddListener(() => setSelectionType(selectionTypeBack));
-            pointerHelper.EnterEvent.AddListener(() => tooltipBack.Show(descriptionBack));
+            buttonManager.clickEvent.AddListener(() => SetSelectionType(SelectionTypeBack));
+            pointerHelper.EnterEvent.AddListener(() => tooltipBack.Show(DescriptionBack));
         }
 
         /// <summary>
@@ -248,7 +194,7 @@ namespace SEE.Game.UI.StateIndicator
             if (button.TryGetComponentOrLog(out PointerHelper pointerHelper))
             {
                 // Register listeners on entry and exit events, respectively
-                pointerHelper.EnterEvent.AddListener(() => tooltipDone.Show(descriptionDone));
+                pointerHelper.EnterEvent.AddListener(() => tooltipDone.Show(DescriptionDone));
                 pointerHelper.ExitEvent.AddListener(tooltipDone.Hide);
             }
         }
@@ -264,18 +210,19 @@ namespace SEE.Game.UI.StateIndicator
             if (button.TryGetComponentOrLog(out PointerHelper pointerHelper))
             {
                 // Register listeners on entry and exit events, respectively
-                pointerHelper.EnterEvent.AddListener(() => tooltipBack.Show(descriptionBack));
+                pointerHelper.EnterEvent.AddListener(() => tooltipBack.Show(DescriptionBack));
                 pointerHelper.ExitEvent.AddListener(tooltipBack.Hide);
             }
         }
 
         /// <summary>
-        /// Sets <see cref="confirmCancel"/> to decide whether the selection was confirmed or cancelled. Then calls <see cref="Clicked"/> to trigger the listener.
+        /// Sets <see cref="ConfirmCancel"/> to decide whether the selection was confirmed or cancelled. 
+        /// Then calls <see cref="Clicked"/> to trigger the listener.
         /// </summary>
         /// <param name="selectionType"></param>
-        private void setSelectionType(HideModeSelector selectionType)
+        private void SetSelectionType(HideModeSelector selectionType)
         {
-            confirmCancel = selectionType;
+            ConfirmCancel = selectionType;
             Clicked();
         }
 
@@ -289,42 +236,21 @@ namespace SEE.Game.UI.StateIndicator
 
         /// <summary>
         /// Adds the indicator prefab and parents it to the UI Canvas.
+        /// Sets up the tool tips and buttons.
         /// </summary>
         protected override void StartDesktop()
         {
-            GameObject indicator = PrefabInstantiator.InstantiatePrefab(HIDE_MODE_PANEL_PREFAB, Canvas.transform, false);
-            indicator.name = Title;
+            GameObject indicator = StartDesktopInit();
             SetupTooltipDone(indicator);
             SetupTooltipBack(indicator);
             SetUpButtonDone(indicator);
             SetUpButtonBack(indicator);
-
-            RectTransform rectTransform = (RectTransform)indicator.transform;
-            rectTransform.anchorMin = AnchorMin;
-            rectTransform.anchorMax = AnchorMax;
-            rectTransform.pivot = Pivot;
-            rectTransform.anchoredPosition = Vector2.zero;
-
-            if (indicator.TryGetComponentOrLog(out ModePanelImage))
-            {
-                ModePanelImage.color = StartColor;
-            }
-
-            if (indicator.transform.Find("ModeText")?.gameObject.TryGetComponentOrLog(out ModePanelText) != null)
-            {
-                ModePanelText.SetText(StartText);
-            }
-            else
-            {
-                Debug.LogError("Couldn't find ModeText game object in ModePanel\n");
-            }
         }
 
         /// <summary>
         /// Changes the indicator to display the given <paramref name="text"/> and the given <paramref name="color"/>.
         /// </summary>
         /// <param name="text">The text to display</param>
-        /// <param name="color">The background color of the indicator</param>
         public void ChangeState(string text)
         {
             if (HasStarted)
