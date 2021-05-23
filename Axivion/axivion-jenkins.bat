@@ -16,7 +16,7 @@ REM include Bauhaus bin in exectuable path
 set "PATH=C:\Program Files (x86)\Bauhaus\bin;%PATH%"
 
 REM SEE project directory (generally the Jenkins workspace)
-if ("%WORKSPACE%"=="")
+if "%WORKSPACE%" == "" (
   set "SEEDIRECTORY=%cd%"
 else (
   set "SEEDIRECTORY=%WORKSPACE%"
