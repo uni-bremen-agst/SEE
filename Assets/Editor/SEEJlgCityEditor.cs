@@ -47,7 +47,7 @@ namespace SEEEditor
         {
             base.Attributes();
             SEEJlgCity city = target as SEEJlgCity;
-            city.JLGPath = GetDataPath("JLG file", city.JLGPath, Filenames.ExtensionWithoutPeriod(Filenames.JLGExtension));
+            city.JLGPath = DataPathEditor.GetDataPath("JLG file", city.JLGPath, Filenames.ExtensionWithoutPeriod(Filenames.JLGExtension));
             AnimationAttributes();
         }
 

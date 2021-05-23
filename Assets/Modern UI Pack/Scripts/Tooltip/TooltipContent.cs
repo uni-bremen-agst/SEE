@@ -1,15 +1,18 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using TMPro;
 
 namespace Michsky.UI.ModernUIPack
 {
+    [AddComponentMenu("Modern UI Pack/Tooltip/Tooltip Content")]
     public class TooltipContent : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        [Header("CONTENT")]
+        [Header("Content")]
         [TextArea] public string description;
+        public float delay;
 
-        [Header("RESOURCES")]
+        [Header("Resources")]
         public GameObject tooltipRect;
         public TextMeshProUGUI descriptionText;
 
@@ -26,10 +29,7 @@ namespace Michsky.UI.ModernUIPack
                     descriptionText = tooltipRect.transform.GetComponentInChildren<TextMeshProUGUI>();
                 }
 
-                catch
-                {
-                    Debug.LogError("No Tooltip object assigned.", this);
-                }
+                catch { Debug.LogError("No Tooltip Rect assigned.", this); }
             }
 
             if (tooltipRect != null)
@@ -41,23 +41,37 @@ namespace Michsky.UI.ModernUIPack
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (tooltipRect != null)
-            {
-                descriptionText.text = description;
-                tpManager.allowUpdating = true;
-                tooltipAnimator.gameObject.SetActive(false);
-                tooltipAnimator.gameObject.SetActive(true);
+            if (tooltipRect == null)
+                return;
+
+            descriptionText.text = description;
+            tpManager.allowUpdating = true;
+            tooltipAnimator.gameObject.SetActive(false);
+            tooltipAnimator.gameObject.SetActive(true);
+
+            if (delay == 0)
                 tooltipAnimator.Play("In");
-            }
+            else
+                StartCoroutine("ShowTooltip");
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            if (tooltipRect != null)
-            {
-                tooltipAnimator.Play("Out");
-                tpManager.allowUpdating = false;
-            }
+            if (tooltipRect == null)
+                return;
+
+            if (delay != 0)
+                StopCoroutine("ShowTooltip");
+
+            tooltipAnimator.Play("Out");
+            tpManager.allowUpdating = false;
+        }
+
+        IEnumerator ShowTooltip()
+        {
+            yield return new WaitForSeconds(delay);
+            tooltipAnimator.Play("In");
+            StopCoroutine("ShowTooltip");
         }
     }
 }

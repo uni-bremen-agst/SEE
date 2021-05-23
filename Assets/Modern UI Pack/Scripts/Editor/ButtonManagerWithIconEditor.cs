@@ -83,6 +83,7 @@ namespace Michsky.UI.ModernUIPack
             var transitionColor = serializedObject.FindProperty("transitionColor");
             var animationSolution = serializedObject.FindProperty("animationSolution");
             var fadingMultiplier = serializedObject.FindProperty("fadingMultiplier");
+            var rippleUpdateMode = serializedObject.FindProperty("rippleUpdateMode");
 
             switch (currentTab)
             {
@@ -273,6 +274,12 @@ namespace Michsky.UI.ModernUIPack
 
                         centered.boolValue = GUILayout.Toggle(centered.boolValue, new GUIContent("Centered"), customSkin.FindStyle("Toggle"));
                         centered.boolValue = GUILayout.Toggle(centered.boolValue, new GUIContent(""), customSkin.FindStyle("Toggle Helper"));
+
+                        GUILayout.EndHorizontal();
+                        GUILayout.BeginHorizontal(EditorStyles.helpBox);
+
+                        EditorGUILayout.LabelField(new GUIContent("Update Mode"), customSkin.FindStyle("Text"), GUILayout.Width(120));
+                        EditorGUILayout.PropertyField(rippleUpdateMode, new GUIContent(""));
 
                         GUILayout.EndHorizontal();
                         GUILayout.BeginHorizontal(EditorStyles.helpBox);

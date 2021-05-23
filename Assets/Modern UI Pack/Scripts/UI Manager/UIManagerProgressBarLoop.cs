@@ -1,5 +1,4 @@
-﻿#if UNITY_EDITOR
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace Michsky.UI.ModernUIPack
@@ -7,17 +6,21 @@ namespace Michsky.UI.ModernUIPack
     [ExecuteInEditMode]
     public class UIManagerProgressBarLoop : MonoBehaviour
     {
-        [Header("SETTINGS")]
+        [Header("Settings")]
         public UIManager UIManagerAsset;
         public bool hasBackground;
         public bool useRegularBackground;
+        public bool webglMode = false;
 
-        [Header("RESOURCES")]
+        [Header("Resources")]
         public Image bar;
         [HideInInspector] public Image background;
 
         void Awake()
         {
+            if (Application.isPlaying && webglMode == true)
+                return;
+
             try
             {
                 if (UIManagerAsset == null)
@@ -32,10 +35,7 @@ namespace Michsky.UI.ModernUIPack
                 }
             }
 
-            catch
-            {
-                Debug.Log("<b>[Modern UI Pack]</b> No UI Manager found, assign it manually.", this);
-            }
+            catch { Debug.Log("<b>[Modern UI Pack]</b> No UI Manager found, assign it manually.", this); }
         }
 
         void LateUpdate()
@@ -49,6 +49,9 @@ namespace Michsky.UI.ModernUIPack
 
         void UpdateProgressBar()
         {
+            if (Application.isPlaying && webglMode == true)
+                return;
+
             try
             {
                 bar.color = UIManagerAsset.progressBarColor;
@@ -66,4 +69,3 @@ namespace Michsky.UI.ModernUIPack
         }
     }
 }
-#endif
