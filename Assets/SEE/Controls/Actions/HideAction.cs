@@ -20,7 +20,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject selectedObject;
 
-
         /// <summary>
         /// The list of currently selected objects.
         /// </summary>
@@ -55,16 +54,6 @@ namespace SEE.Controls.Actions
         /// Saves the mode selected in <see cref="OpenDialog"/> to be used for hiding/highlighting the objects.
         /// </summary>
         private HideModeSelector mode;
-
-        /// <summary>
-        /// Used for selecting between incoming and outgoing edges
-        /// to realise all the functions that distinguish between the two cases.
-        /// </summary>
-        enum EdgeSelector
-        {
-            Incoming,
-            Outgoing
-        }
 
         /// <summary>
         /// Returns a new instance of <see cref="HideAction"/>.
