@@ -7,7 +7,7 @@ using SEE.Utils;
 namespace SEEEditor
 {
     /// <summary>
-    /// Editor for SceneAnimator for capturing demo videos.
+    /// Editor for PersonalAssistantSpeechInput.
     /// </summary>
     [CustomEditor(typeof(PersonalAssistantSpeechInput))]
     class PersonalAssistantSpeechInputEditor : Editor
