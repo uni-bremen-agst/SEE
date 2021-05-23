@@ -359,6 +359,17 @@ namespace SEE.Controls.Actions
             }
             hiddenObjects.Add(node);
             node.SetVisibility(false);
+            foreach (Transform child in node.transform)
+            {
+                GameObject childGameObject = child.gameObject;
+                if (childGameObject.CompareTag(Tags.Edge))
+                {
+                    HideEdge(childGameObject);
+                } else if (childGameObject.CompareTag(Tags.Node))
+                {
+                    HideNodeIncludingConnectedEdges(childGameObject);
+                }
+            }
             return true;
         }
 
