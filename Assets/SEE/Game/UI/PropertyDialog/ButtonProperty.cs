@@ -15,12 +15,12 @@ namespace SEE.Game.UI.PropertyDialog
     public class ButtonProperty : Property<HideModeSelector>
     {
         /// <summary>
-        /// The prefab for a button
+        /// The prefab for a button.
         /// </summary>
         private const string ButtonPrefab = "Prefabs/UI/Button";
 
         /// <summary>
-        /// EventFunction that is triggered when the button is pressed
+        /// EventFunction that is triggered when the button is pressed.
         /// </summary>
         public readonly UnityEvent OnSelected = new UnityEvent();
 
@@ -30,7 +30,7 @@ namespace SEE.Game.UI.PropertyDialog
         private GameObject button;
 
         /// <summary>
-        /// Used to store the icon of the button
+        /// Used to store the icon of the button.
         /// </summary>
         public Sprite iconSprite;
 
@@ -45,7 +45,7 @@ namespace SEE.Game.UI.PropertyDialog
         public HideModeSelector selectionType;
 
         /// <summary>
-        /// Used to set the color of the button
+        /// Used to set the color of the button.
         /// </summary>
         public Color buttonColor;
 
@@ -107,7 +107,6 @@ namespace SEE.Game.UI.PropertyDialog
                 iconImage.color = buttonColor.IdealTextColor();
                 iconImage.sprite = iconSprite;
 
-
                 buttonManager.buttonText = Name;
                 buttonManager.clickEvent.AddListener(Clicked);
                 pointerHelper.EnterEvent.AddListener(() => tooltip.Show(Description));
@@ -120,7 +119,7 @@ namespace SEE.Game.UI.PropertyDialog
         }
 
         /// <summary>
-        /// Sets up the tooltips for the button
+        /// Sets up the tooltips for the button.
         /// </summary>
         /// <param name="button">The object to which the tooltip is to be attached</param>
         private void SetupTooltip()
