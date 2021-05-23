@@ -51,9 +51,14 @@ public class NodeDecorationController : MonoBehaviour
     public bool decorateUsingTreemap = false;
 
     /// <summary>
-    /// Treemap layout settings
+    /// Treemap layout settings for the block's side decorations
     /// </summary>
-    public AbstractSEECity treemapSettings;
+    public AbstractSEECity sideTreemapSettings;
+
+    /// <summary>
+    /// Treemap layout settings for the block's top decorator
+    /// </summary>
+    public AbstractSEECity surfaceTreemapSettings;
 
     /// <summary>
     /// Treemap graph
@@ -326,6 +331,24 @@ public class NodeDecorationController : MonoBehaviour
     }
 
     /// <summary>
+    /// Decorates the top of the packed block using a treemap
+    /// <param name="settings">The settings to be applied to the layout</param>
+    /// <param name="hiddenNodesGraph">Graph containing the hidden nodes</param>
+    /// <param name="packedBlockLocation">The location of the packed block</param>
+    /// <param name="packedBlockDimensions">The dimensions of the packed block</param>
+    /// <param name="treemapParent">The parent gameobject that holds all decorators</param>
+    /// </summary>
+    private void decoratePackedBlockSurfaceWithTreemap(AbstractSEECity settings, Graph hiddenNodesGraph, Vector3 packedBlockLocation, Vector3 packedBlockDimensions, GameObject treemapParent)
+    {
+        GraphRenderer renderer = new GraphRenderer(settings, hiddenNodesGraph);
+        GameObject empty = new GameObject("TopSurfaceTreemap");
+        renderer.Draw(empty);
+        empty.transform.localScale = new Vector3(packedBlockDimensions.x, 0.1f, packedBlockDimensions.z);
+        empty.transform.localPosition = new Vector3(packedBlockLocation.x, packedBlockLocation.y + packedBlockDimensions.y / 2 - empty.transform.localScale.y / 2, packedBlockLocation.z);
+        empty.transform.SetParent(treemapParent.transform);
+    }
+
+    /// <summary>
     /// Decorates the walls of the packed block using a treemap
     /// <param name="settings">The settings to be applied to the layout</param>
     /// <param name="hiddenNodesGraph">Graph containing the hidden nodes</param>
@@ -343,6 +366,7 @@ public class NodeDecorationController : MonoBehaviour
         // Render treemaps on each surface
         GameObject treemapParent = new GameObject("Treemap-Decorators");
         treemapParent.transform.SetParent(nodeObject.transform);
+        decoratePackedBlockSurfaceWithTreemap(surfaceTreemapSettings, hiddenNodesGraph, packedBlockLocation, packedBlockDimensions, treemapParent);
         // North
         GameObject planeN = new GameObject();
         planeN.name = "northTreemap";
@@ -562,7 +586,7 @@ public class NodeDecorationController : MonoBehaviour
             }
             else
             {
-                decoratePackedBlockWithTreemap(treemapSettings, treemapGraph, nodeObject);
+                decoratePackedBlockWithTreemap(sideTreemapSettings, treemapGraph, nodeObject);
             }
         }
     }
@@ -603,7 +627,7 @@ public class NodeDecorationController : MonoBehaviour
                 }
                 else
                 {
-                    decoratePackedBlockWithTreemap(treemapSettings, treemapGraph, nodeObject);
+                    decoratePackedBlockWithTreemap(sideTreemapSettings, treemapGraph, nodeObject);
                 }
             }
         }
