@@ -15,10 +15,11 @@ REM set "BAUHAUS_PYTHON=C:\Users\SWT\AppData\Local\Programs\Python\Python38\pyth
 REM include Bauhaus bin in exectuable path
 set "PATH=C:\Program Files (x86)\Bauhaus\bin;%PATH%"
 
-REM SEE project directory (generally the Jenkins workspace)
+REM SEE project directory (generally the Jenkins workspace if this job is run
+REM by Jenkins, in which case WORKSPACE is set, or otherwise the current directory)
 if "%WORKSPACE%" == "" (
   set "SEEDIRECTORY=%cd%"
-else (
+) else (
   set "SEEDIRECTORY=%WORKSPACE%"
 )
 
