@@ -321,12 +321,17 @@ public class NodeDecorationController : MonoBehaviour
     /// </summary>
     private void decoratePackedBlock(List<GameObject> hiddenObjects, GameObject packedBlock)
     {
+        GameObject topDecorator = new GameObject("TopDecorator");
         for (int i = 0; i < hiddenObjects.Count; i++)
         {
             GameObject clone = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            clone.transform.position.Set(hiddenObjects[i].transform.position.x, packedBlock.transform.position.y + packedBlock.transform.localScale.y, hiddenObjects[i].transform.position.z);
-            clone.transform.localScale.Set(hiddenObjects[i].transform.localScale.x, 0.00000001f, hiddenObjects[i].transform.localScale.z);
+            clone.transform.localPosition = new Vector3(hiddenObjects[i].transform.position.x, packedBlock.transform.position.y + packedBlock.transform.localScale.y/2, hiddenObjects[i].transform.position.z);
+            clone.transform.localScale = new Vector3(hiddenObjects[i].transform.localScale.x, 0.01f, hiddenObjects[i].transform.localScale.z);
+            clone.GetComponent<Renderer>().material = hiddenObjects[i].GetComponent<Renderer>().material;
+            clone.name = hiddenObjects[i].name + "-TopDecorator";
+            clone.transform.SetParent(topDecorator.transform);
         }
+        topDecorator.transform.SetParent(packedBlock.transform);
         decoratePackedBlockWalls(hiddenObjects, packedBlock);
     }
 
@@ -503,7 +508,7 @@ public class NodeDecorationController : MonoBehaviour
                 }
 
                 GameObject o = hiddenObjects[i + j];
-                Color materialColor = o.GetComponent<Renderer>().material.color;
+                Material blockMaterial = o.GetComponent<Renderer>().material;
 
                 // Determines how much space the block is allowed to take up on the vertical Axis
                 float blockHeightPercentageY = o.transform.localScale.y / blockHeightVertical[j];
@@ -515,7 +520,7 @@ public class NodeDecorationController : MonoBehaviour
                 // Create north clone
                 GameObject cloneN = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 cloneN.name = currentClone + "-NorthDecorator";
-                cloneN.GetComponent<Renderer>().material.color = materialColor;
+                cloneN.GetComponent<Renderer>().material = blockMaterial;
                 cloneN.transform.localScale = new Vector3(0.1f * packedBlockDimensions.x, nodeSizeVertical, nodeSizeHorizontalZ);
                 cloneN.transform.localPosition = currentPosN + new Vector3(0, -(maxCloneHeightY / 2), cloneN.transform.localScale.z / 2);
                 cloneN.transform.SetParent(northClones.transform);
@@ -523,7 +528,7 @@ public class NodeDecorationController : MonoBehaviour
                 // Create south clone
                 GameObject cloneS = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 cloneS.name = currentClone + "-SouthDecorator";
-                cloneS.GetComponent<Renderer>().material.color = materialColor;
+                cloneS.GetComponent<Renderer>().material = blockMaterial;
                 cloneS.transform.localScale = new Vector3(0.1f * packedBlockDimensions.x, nodeSizeVertical, nodeSizeHorizontalZ);
                 cloneS.transform.localPosition = currentPosS + new Vector3(0, -(maxCloneHeightY / 2), -(cloneS.transform.localScale.z / 2));
                 cloneS.transform.SetParent(southClones.transform);
@@ -531,7 +536,7 @@ public class NodeDecorationController : MonoBehaviour
                 // Create west clone
                 GameObject cloneW = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 cloneW.name = currentClone + "-WestDecorator";
-                cloneW.GetComponent<Renderer>().material.color = materialColor;
+                cloneW.GetComponent<Renderer>().material = blockMaterial;
                 cloneW.transform.localScale = new Vector3(nodeSizeHorizontalX, nodeSizeVertical, 0.1f * packedBlockDimensions.z);
                 cloneW.transform.localPosition = currentPosW + new Vector3(-(cloneW.transform.localScale.x / 2), -(maxCloneHeightY / 2), 0);
                 cloneW.transform.SetParent(westClones.transform);
@@ -539,7 +544,7 @@ public class NodeDecorationController : MonoBehaviour
                 // Create east clone
                 GameObject cloneE = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 cloneE.name = currentClone + "-EastDecorator";
-                cloneE.GetComponent<Renderer>().material.color = materialColor;
+                cloneE.GetComponent<Renderer>().material = blockMaterial;
                 cloneE.transform.localScale = new Vector3(nodeSizeHorizontalX, nodeSizeVertical, 0.1f * packedBlockDimensions.z);
                 cloneE.transform.localPosition = currentPosE + new Vector3(cloneE.transform.localScale.x / 2, -(maxCloneHeightY / 2), 0);
                 cloneE.transform.SetParent(eastClones.transform);
