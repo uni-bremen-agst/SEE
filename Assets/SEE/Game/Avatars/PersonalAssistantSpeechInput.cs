@@ -17,7 +17,7 @@ namespace SEE.Game.Avatars
         /// following semantics: help, time, about.
         /// </summary>
         [Tooltip("Path to the SRGS grammar file defining the speech input language.")]
-        public string GrammarFilePath = Application.streamingAssetsPath + "/PersonalAssistantGrammar.grxml";
+        public DataPath GrammarFilePath;
 
         /// <summary>
         /// The grammar recognizer used to interpret the speech input.
@@ -37,7 +37,7 @@ namespace SEE.Game.Avatars
         {
             try
             {
-                input = new GrammarInput(GrammarFilePath);
+                input = new GrammarInput(GrammarFilePath.Path);
                 input.Register(OnPhraseRecognized);
                 input.Start();
                 if (!gameObject.TryGetComponentOrLog(out brain))
@@ -59,13 +59,13 @@ namespace SEE.Game.Avatars
         /// <param name="args">details about the recognized sentence</param>
         private void OnPhraseRecognized(PhraseRecognizedEventArgs args)
         {
-            Debug.Log($"Phrase detected phrase '{args.text}' with confidence {args.confidence}\n");
+            // Debug.Log($"Phrase detected phrase '{args.text}' with confidence {args.confidence}\n");
             SemanticMeaning[] meanings = args.semanticMeanings;
             if (meanings != null)
             {
                 foreach (SemanticMeaning meaning in meanings)
                 {
-                    Debug.Log($"Meaning: {meaning.key} => {ToString(meaning.values)}\n");
+                    // Debug.Log($"Meaning: {meaning.key} => {ToString(meaning.values)}\n");
                     foreach (string value in meaning.values)
                     {
                         // help, time, about
