@@ -449,7 +449,7 @@ namespace SEE.Controls.Actions
         /// Returns all IDs of gameObjects manipulated by this action.
         /// </summary>
         /// <returns>all IDs of gameObjects manipulated by this action</returns>
-        public override List<string> GetChangedObjects()
+        public override IList<string> GetChangedObjects()
         {
             return deletedNodes.Keys.Union(deletedEdges.Keys).Union(explicitlyDeletedNodesAndEdges).Select(x => x.name).ToList();
         }

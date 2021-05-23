@@ -43,7 +43,7 @@ namespace SEE.Utils
             /// <param name="type">The type of the action</param>
             /// <param name="actionID">The ID of the action</param>
             /// <param name="changedObjects">The objects that there changed by this action</param>
-            public GlobalHistoryEntry(bool isOwner, HistoryType type, string actionID, List<string> changedObjects)
+            public GlobalHistoryEntry(bool isOwner, HistoryType type, string actionID, IList<string> changedObjects)
             {
                 IsOwner = isOwner;
                 ActionType = type;
@@ -54,7 +54,7 @@ namespace SEE.Utils
             public bool IsOwner { get; }
             public HistoryType ActionType { get; }
             public string ActionID { get; }
-            public List<string> ChangedObjects { get; }
+            public IList<string> ChangedObjects { get; }
 
         }
 
@@ -203,7 +203,7 @@ namespace SEE.Utils
         /// <param name="affectedGameObjects">the gameObjects affected by the action to be undone/redone.</param>
         /// <param name="actionId">the ID of the action which possibly has conflicts.</param>
         /// <returns>true, if there are conflicts, else false.</returns>
-        private bool ActionHasConflicts(List<string> affectedGameObjects, string actionId)
+        private bool ActionHasConflicts(IList<string> affectedGameObjects, string actionId)
         {
             int index = GetIndexOfAction(actionId);
             if (index == -1)
@@ -294,10 +294,6 @@ namespace SEE.Utils
                 GlobalHistoryEntry undoneAction = new GlobalHistoryEntry(true, HistoryType.undoneAction, lastAction.ActionID, lastAction.ChangedObjects);
                 Push(undoneAction);
                 new NetActionHistory().Push(undoneAction.ActionType, undoneAction.ActionID, ListToString(undoneAction.ChangedObjects));
-                if (current == null)
-                {
-                    return;
-                }
                 isRedo = true;
                 Resume(current);
             }
@@ -419,7 +415,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="gameObjectIds">the gameObjectIds</param>
         /// <returns>a single comma seperated string of all gameObjectIds.</returns>
-        private static string ListToString(List<string> gameObjectIds)
+        private static string ListToString(IList<string> gameObjectIds)
         {
             return (gameObjectIds != null) ? JsonUtility.ToJson(gameObjectIds) : null;
         }
