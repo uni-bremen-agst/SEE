@@ -441,7 +441,6 @@ public class NodeDecorationController : MonoBehaviour
         float roundedRoot = Mathf.Ceil(Mathf.Sqrt(hiddenObjects.Count));
         float blocksHorizontalAxis = roundedRoot;
         float blocksVerticalAxis = roundedRoot;
-        Debug.Log("Horizontal: " + blocksHorizontalAxis + ", Vertical: " + blocksVerticalAxis);
         // Check for an empty row (too many rows)
         // Math: Assuming 4x4 grid, if the last row is empty and we have 11 gameObjects, we calculate
         // 16 - 11 >=? 4 -> if yes then the last row is empty and can be removed. Note that 9 blocks will create a 3x3 grid
@@ -601,8 +600,6 @@ public class NodeDecorationController : MonoBehaviour
     {
         if (nodeObject.transform.localScale != nodeSize)
         {
-            // TODO remove this after testing
-            Debug.Log("Node size changed, reloading data...");
             for (int i = 0; i < nodeObject.transform.childCount; ++i)
             {
                 Destroy(nodeObject.transform.GetChild(i).gameObject);
@@ -704,17 +701,11 @@ public class NodeDecorationController : MonoBehaviour
         int counter = 0;
         for (int i=0; i<columns; i++)
         {
-          //  Node parent = new Node();
-         //   parent.ID = i + "-DummyParentNode";
-         //   graph.AddNode(parent);
             for (int j=0; j<rows; j++)
             {
                 Node n = new Node();
                 n.ID = counter + "-DummyNode";
                 n.SetLevel(1);
-            //    n.SetLevel(1);
-             //   parent.AddChild(n);
-             //   n.Parent = parent;
                 graph.AddNode(n);
                 counter++;
             }
