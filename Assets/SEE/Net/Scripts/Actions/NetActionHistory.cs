@@ -53,12 +53,12 @@ namespace SEE.Net
         /// <summary>
         /// The IDs of all objects which are changed by the action.
         /// </summary>
-        public List<string> changedObjects;
+        public IList<string> changedObjects;
 
         /// <summary>
         /// The IDs of all objects which are changed by the old action.
         /// </summary>
-        public List<string> oldChangedObjects;
+        public IList<string> oldChangedObjects;
 
         /// <summary>
         /// The old items ID which has to be replaced.
@@ -167,9 +167,9 @@ namespace SEE.Net
         /// </summary>
         /// <param name="changedObjectsToParse">the changed objects to be split</param>
         /// <returns>a list of ids of changed gameObjects</returns>
-        private static List<string> StringToList(string changedObjectsToParse)
+        private static IList<string> StringToList(string changedObjectsToParse)
         {
-            return JsonUtility.FromJson<List<string>>(changedObjectsToParse);
+            return JsonUtility.FromJson<IList<string>>(changedObjectsToParse);
         }
     }
 }

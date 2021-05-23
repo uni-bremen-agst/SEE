@@ -183,7 +183,7 @@ namespace SEE.Controls.Actions
         /// an empty list is returned.
         /// </summary>
         /// <returns>an empty list</returns>
-        public override List<string> GetChangedObjects()
+        public override IList<string> GetChangedObjects()
         {
             return new List<string>();
         }

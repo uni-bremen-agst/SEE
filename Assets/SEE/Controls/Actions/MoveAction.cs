@@ -34,7 +34,7 @@ namespace SEE.Controls.Actions
         /// <see cref="ReversibleAction.GetChangedObjects"/>
         /// </summary>
         /// <returns>empty list because this action does not change anything</returns>
-        public override List<string> GetChangedObjects()
+        public override IList<string> GetChangedObjects()
         {
             return new List<string>();
         }

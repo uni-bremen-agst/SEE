@@ -1016,7 +1016,7 @@ namespace SEE.Controls.Actions
             return ActionStateType.Map;
         }
 
-        public List<string> GetChangedObjects()
+        public IList<string> GetChangedObjects()
         {
             // TODO
             throw new NotImplementedException();
