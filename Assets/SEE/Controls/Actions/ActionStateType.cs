@@ -40,29 +40,28 @@ namespace SEE.Controls.Actions
                                 Color.green.Darker(), "Materials/ModernUIPack/Minus",
                                 AddEdgeAction.CreateReversibleAction);
         public static ActionStateType NewNode { get; } =
-            new ActionStateType(4, "New Node", "Creates a new node",
+            new ActionStateType(4, "New Node", "Create a new node",
                                 Color.green.Darker(), "Materials/ModernUIPack/Plus",
                                 AddNodeAction.CreateReversibleAction);
         public static ActionStateType EditNode { get; } =
-            new ActionStateType(5, "Edit Node", "Edits a node",
+            new ActionStateType(5, "Edit Node", "Edit a node",
                                 Color.green.Darker(), "Materials/ModernUIPack/Settings",
                                 EditNodeAction.CreateReversibleAction);
         public static ActionStateType ScaleNode { get; } =
-            new ActionStateType(6, "Scale Node", "Scales a node",
+            new ActionStateType(6, "Scale Node", "Scale a node",
                                 Color.green.Darker(), "Materials/ModernUIPack/Crop",
                                 ScaleNodeAction.CreateReversibleAction);
         public static ActionStateType Delete { get; } =
-            new ActionStateType(7, "Delete", "Deletes a node or edge",
+            new ActionStateType(7, "Delete", "Delete a node or an edge",
                                 Color.yellow.Darker(), "Materials/ModernUIPack/Trash",
                                 DeleteAction.CreateReversibleAction);
+        public static ActionStateType ShowCode { get; } =
+            new ActionStateType(8, "Show Code", "Display the source code of a node.",
+                                Color.black, "Materials/ModernUIPack/Document", null);
         public static ActionStateType Draw { get; } =
-            new ActionStateType(8, "Draw", "Draws a line",
+            new ActionStateType(9, "Draw", "Draw a line",
                         Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                         DrawAction.CreateReversibleAction);
-        public static ActionStateType Dummy { get; } =
-            new ActionStateType(9, "Dummy", "Example action creating spheres",
-                                Color.magenta.Darker(), "Materials/ModernUIPack/Plus",
-                                DummyAction.CreateReversibleAction);
         #endregion
 
         /// <summary>
@@ -100,7 +99,7 @@ namespace SEE.Controls.Actions
         /// Delegate to be called to create a new instance of this kind of action.
         /// May be null if none needs to be created (in which case this delegate will not be called).
         /// </summary>
-        public CreateReversibleAction CreateReversible;
+        public CreateReversibleAction CreateReversible { get; }
 
         /// <summary>
         /// Constructor for ActionStateType.

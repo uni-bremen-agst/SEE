@@ -51,19 +51,41 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Disables the given <paramref name="monoBehaviour"/> and prints the given message, 
-        /// if the given <paramref name="condition"/> is <c>true</c>.
+        /// Disables the given <paramref name="monoBehaviour"/> and prints the given
+        /// message, if the given <paramref name="condition"/> is <code>true</code>.
+        /// Returns the evaluated condition.
         /// </summary>
         /// <param name="monoBehaviour">The MonoBehaviour to disable on condition.</param>
         /// <param name="condition">The condition to check.</param>
         /// <param name="message">The message to print on condition.</param>
-        public static void DisableOnCondition(UnityEngine.MonoBehaviour monoBehaviour, bool condition, string message)
+        /// <returns>Returns whether the given monoBehaviour was disabled or not (The
+        /// evaluated condition).</returns>
+        public static bool DisableOnCondition(UnityEngine.MonoBehaviour monoBehaviour, bool condition, string message)
         {
             if (condition)
             {
                 UnityEngine.Debug.LogError($"{monoBehaviour.GetType().FullName} of game object {monoBehaviour.gameObject.FullName()}: {message}. Component will be disabled.\n");
                 monoBehaviour.enabled = false;
             }
+            return condition;
+        }
+
+        /// <summary>
+        /// Disables the given <paramref name="monoBehaviour"/>, if the given
+        /// <paramref name="condition"/> is <code>true</code>. Returns the evaluated
+        /// condition.
+        /// </summary>
+        /// <param name="monoBehaviour">The MonoBehaviour to disable on condition.</param>
+        /// <param name="condition">The condition to check.</param>
+        /// <returns>Returns whether the given monoBehaviour was disabled or not (The
+        /// evaluated condition).</returns>
+        public static bool DisableOnCondition(UnityEngine.MonoBehaviour monoBehaviour, bool condition)
+        {
+            if (condition)
+            {
+                monoBehaviour.enabled = false;
+            }
+            return condition;
         }
 
         /// <summary>

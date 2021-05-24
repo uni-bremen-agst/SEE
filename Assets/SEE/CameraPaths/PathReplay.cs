@@ -1,3 +1,4 @@
+using SEE.Controls;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace SEE.CameraPaths
         /// The object to be moved along the recorded path.
         /// </summary>
         [Tooltip("The object to be moved along the recorded path. If not set, the main camera will be moved.")]
-        public GameObject movedObject;
+        public GameObject MovedObject;
 
         /// <summary>
         /// Name of the file where to load the captured data camera path points from.
@@ -28,6 +29,19 @@ namespace SEE.CameraPaths
         /// </summary>
         [Tooltip("Whether the path should be drawn as a sequence of lines in the game.")]
         public bool ShowPath = false;
+
+        /// <summary>
+        /// If true, the moved object and all its ancestors will be activated.
+        /// This may be useful if there are game objects not activated by default.
+        /// </summary>
+        [Tooltip("If true, the moved object and all its ancestors will be activated. "
+                  + "This may be useful if there are game objects not activated by default.")]
+        public bool ActivateOnStart = false;
+
+        /// <summary>
+        /// If true, the path is replayed, otherwise stopped.
+        /// </summary>
+        private bool isRunning = true;
 
         /// <summary>
         /// The path of the camera to be followed.
@@ -105,23 +119,29 @@ namespace SEE.CameraPaths
         /// </summary>
         private void Start()
         {
-            if (movedObject == null)
-            {                
-                movedObject = MainCamera.Camera.gameObject;
-                if (movedObject == null)
+            if (MovedObject == null)
+            {               
+                // We are using the main camera.
+                MovedObject = MainCamera.Camera.gameObject;
+                if (MovedObject == null)
                 {
                     Debug.LogError($"No game object to be moved was assigned. No camera was found. The movement will be disabled.\n");
                     enabled = false;
                 }
                 else
                 {
-                    Debug.Log($"No game object to be moved was assigned. We will be using the camera at {movedObject.name}.\n");
+                    Debug.Log($"No game object to be moved was assigned. We will be using the camera at {MovedObject.name}.\n");
                 }
+            }
+            else if (ActivateOnStart)
+            {
+                // A MovedObject was assigned and we are to activate it on start.
+                Activate(MovedObject, true);
             }
             try
             {
                 path = CameraPath.ReadPath(Filename);
-                Debug.LogFormat("Read camera path from {0}\n", Filename);
+                Debug.Log($"Read path for {MovedObject.name} from {Filename}\n");
                 if (ShowPath)
                 {
                     path.Draw();
@@ -129,33 +149,47 @@ namespace SEE.CameraPaths
             }
             catch (Exception e)
             {
-                Debug.LogErrorFormat("ScriptedCamera: Could not read path from file {0}: {1}\n", Filename, e.ToString());
+                Debug.LogError($"PathReplay: Could not read path from file {Filename} for {MovedObject.name}: {e.Message}\n");
                 enabled = false;
                 return;
             }
             if (path.Count < 1)
             {
-                Debug.LogWarning("ScriptedCamera: Requiring at least one location.\n");
+                Debug.LogWarning("PathReplay: Requiring at least one location.\n");
                 enabled = false;
                 return;
             }
             try
             {
-                spline = TinySpline.BSpline.InterpolateCatmullRom(VectorsToList(path), 4);
+                spline = BSpline.InterpolateCatmullRom(VectorsToList(path), 4);
                 enabled = true;
             }
             catch (Exception e)
             {
-                Debug.LogWarning($"ScriptedCamera: Interpolation failed with error '{e.Message}'\n");
-                Debug.LogWarning($"ScriptedCamera: Creating spline with default location\n");
+                Debug.LogWarning($"PathReplay: Interpolation failed with error '{e.Message}'\n");
+                Debug.LogWarning($"PathReplay: Creating spline with default location\n");
                 spline = new BSpline(1, 4, 0)
                 {
                     ControlPoints = new List<double> { 0, 0, 0, 0 }
                 };
                 enabled = false;
             }
-            movedObject.transform.position = ListToVectors(spline.ControlPointAt(0))[0];
-            movedObject.transform.rotation = path[0].rotation;
+            MovedObject.transform.position = ListToVectors(spline.ControlPointAt(0))[0];
+            MovedObject.transform.rotation = path[0].rotation;
+        }
+
+        /// <summary>
+        /// Activate (true)/deactivates (false) <paramref name="parent"/> and all its descendants.
+        /// </summary>
+        /// <param name="parent">root of the game-object tree</param>
+        /// <param name="activate">whether the game objects should be activated or deactivated</param>
+        private static void Activate(GameObject parent, bool activate)
+        {
+            parent.SetActive(activate);
+            foreach (Transform child in parent.transform)
+            {
+                Activate(child.gameObject, activate);
+            }
         }
 
         /// <summary>
@@ -164,9 +198,16 @@ namespace SEE.CameraPaths
         /// </summary>
         private void Update()
         {
-            time += Time.deltaTime;
-            movedObject.transform.position = ListToVectors(spline.Bisect(time, 0.001, false, 3).Result)[0];
-            movedObject.transform.rotation = Forward(ref location, time);
+            if (SEEInput.TogglePathPlaying())
+            {
+                isRunning = !isRunning;
+            }
+            if (isRunning)
+            {
+                time += Time.deltaTime;
+                MovedObject.transform.position = ListToVectors(spline.Bisect(time, 0.001, false, 3).Result)[0];
+                MovedObject.transform.rotation = Forward(ref location, time);
+            }
         }
 
         /// <summary>

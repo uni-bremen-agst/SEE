@@ -7,10 +7,11 @@ namespace Michsky.UI.ModernUIPack
     [ExecuteInEditMode]
     public class UIManagerModalWindow : MonoBehaviour
     {
-        [Header("SETTINGS")]
+        [Header("Settings")]
         public UIManager UIManagerAsset;
+        public bool webglMode = false;
 
-        [Header("RESOURCES")]
+        [Header("Resources")]
         public Image background;
         public Image contentBackground;
         public Image icon;
@@ -19,6 +20,9 @@ namespace Michsky.UI.ModernUIPack
 
         void Awake()
         {
+            if (Application.isPlaying && webglMode == true)
+                return;
+
             try
             {
                 if (UIManagerAsset == null)
@@ -33,10 +37,7 @@ namespace Michsky.UI.ModernUIPack
                 }
             }
 
-            catch
-            {
-                Debug.Log("<b>[Modern UI Pack]</b> No UI Manager found, assign it manually.", this);
-            }
+            catch { Debug.Log("<b>[Modern UI Pack]</b> No UI Manager found, assign it manually.", this); }
         }
 
         void LateUpdate()
@@ -50,6 +51,9 @@ namespace Michsky.UI.ModernUIPack
 
         void UpdateModalWindow()
         {
+            if (Application.isPlaying && webglMode == true)
+                return;
+
             try
             {
                 background.color = UIManagerAsset.modalWindowBackgroundColor;

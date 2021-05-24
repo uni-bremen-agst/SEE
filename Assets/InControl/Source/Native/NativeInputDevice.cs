@@ -24,6 +24,8 @@ namespace InControl
 		int numUnknownButtons;
 		int numUnknownAnalogs;
 
+		InputControlSource[] controlSourceByTarget;
+
 
 		internal NativeInputDevice() {}
 
@@ -43,6 +45,9 @@ namespace InControl
 			analogs = new Int16[Info.numAnalogs];
 
 			AnalogSnapshot = null;
+
+			const int numInputControlTypes = (int) InputControlType.Count + 1;
+			controlSourceByTarget = new InputControlSource[numInputControlTypes];
 
 			ClearInputState();
 			ClearControls();
@@ -66,6 +71,8 @@ namespace InControl
 					analogControl.UpperDeadZone = Mathf.Min( profile.UpperDeadZone, analogMapping.UpperDeadZone );
 					analogControl.Raw = analogMapping.Raw;
 					analogControl.Passive = analogMapping.Passive;
+
+					controlSourceByTarget[(int) analogMapping.Target] = analogMapping.Source;
 				}
 
 				var buttonMappingCount = profile.ButtonCount;
@@ -74,6 +81,8 @@ namespace InControl
 					var buttonMapping = profile.ButtonMappings[i];
 					var buttonControl = AddControl( buttonMapping.Target, buttonMapping.Name );
 					buttonControl.Passive = buttonMapping.Passive;
+
+					controlSourceByTarget[(int) buttonMapping.Target] = buttonMapping.Source;
 				}
 			}
 			else
@@ -203,6 +212,53 @@ namespace InControl
 		public override void SetLightFlash( float flashOnDuration, float flashOffDuration )
 		{
 			Native.SetLightFlash( Handle, FloatToByte( flashOnDuration ), FloatToByte( flashOffDuration ) );
+		}
+
+
+		readonly System.Text.StringBuilder glyphName = new System.Text.StringBuilder( 256 );
+		const string defaultGlyphName = "";
+
+
+		public string GetAppleGlyphNameForControl( InputControlType controlType )
+		{
+			if (InputManager.NativeInputEnableMFi && Info.vendorID == 0xffff)
+			{
+				var controlSource = controlSourceByTarget[(int) controlType];
+				if (controlSource.SourceType != InputControlSourceType.None)
+				{
+					IntPtr data;
+					UInt32 size;
+
+					// ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
+					// ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+					switch (controlSource.SourceType)
+					{
+						case InputControlSourceType.Button:
+							size = Native.GetButtonGlyphName( Handle, (UInt32) controlSource.Index, out data );
+							break;
+						case InputControlSourceType.Analog:
+							size = Native.GetAnalogGlyphName( Handle, (UInt32) controlSource.Index, out data );
+							break;
+						default:
+							data = IntPtr.Zero;
+							size = 0;
+							break;
+					}
+
+					if (size > 0)
+					{
+						glyphName.Clear();
+						for (var i = 0; i < size; i++)
+						{
+							glyphName.Append( (char) Marshal.ReadByte( data, i ) );
+						}
+
+						return glyphName.ToString();
+					}
+				}
+			}
+
+			return defaultGlyphName;
 		}
 
 

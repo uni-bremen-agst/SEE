@@ -1,14 +1,12 @@
 ﻿using SEE.Game;
-using SEE.GO;
-using System;
 using UnityEngine;
 
-namespace SEE.Controls.Actions
+namespace SEE.Net
 {
     /// <summary>
     /// Creates a new edge through the network on each client.
     /// </summary>
-    public class AddEdgeNetAction : Net.AbstractAction
+    public class AddEdgeNetAction : AbstractAction
     {
         /// <summary>
         /// The id of the gameObject from which the edge should be drawn (source node).
@@ -21,8 +19,8 @@ namespace SEE.Controls.Actions
         public string ToId;
 
         /// <summary>
-        /// The unique of the edge. May be empty or null, in which case a random
-        /// unique ID will be create on the client side.
+        /// The unique id of the edge. May be empty or null, in which case a random
+        /// unique ID will be created on the client side.
         /// </summary>
         public string EdgeID;
 
@@ -31,6 +29,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="fromId">The id of the gameObject from which the edge should be drawn</param>
         /// <param name="toId">The id of the gameObject to which the edge should be drawn</param>
+        /// <param name="edgeID">The unique ID of the edge; may be null or empty in which case
+        /// a random ID will used</param>
         public AddEdgeNetAction(string fromId, string toId, string edgeID)
         {
             this.FromId = fromId;
@@ -59,26 +59,7 @@ namespace SEE.Controls.Actions
                     GameObject toGO = GameObject.Find(ToId);
                     if (toGO)
                     {
-                        Transform codeCity = SceneQueries.GetCodeCity(fromGO.transform);
-                        if (codeCity)
-                        {
-                            if (codeCity.gameObject.TryGetComponentOrLog(out SEECity city))
-                            {
-                                try
-                                {
-                                    city.Renderer.DrawEdge(fromGO, toGO, EdgeID);
-                                }
-
-                                catch (Exception e)
-                                {
-                                    Debug.LogError($"The new edge from {fromGO.name} to {toGO.name} could not be created: {e.Message}.\n");
-                                }
-                            }
-                        }
-                        else
-                        {
-                            Debug.LogError($"Game node named {FromId} is not contained in a code city.\n");
-                        }
+                        GameEdgeAdder.Add(fromGO, toGO, EdgeID);
                     }
                     else
                     {

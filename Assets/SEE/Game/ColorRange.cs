@@ -29,6 +29,13 @@ namespace SEE.Game
             NumberOfColors = numberOfColors;
         }
 
+        public ColorRange(Color color)
+        {
+            lower = color;
+            upper = color;
+            NumberOfColors = 1;
+        }
+
         private const string LowerLabel = "Lower";
         private const string UpperLabel = "Upper";
         private const string NumberOfColorsLabel = "NumberOfColors";

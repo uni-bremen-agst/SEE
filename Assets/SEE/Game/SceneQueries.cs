@@ -1,16 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SEE.Controls;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.GO;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Game
 {
     /// <summary>
     /// Provides queries on game objects in the current scence at run-time.
     /// </summary>
-    internal class SceneQueries
+    internal static class SceneQueries
     {
         /// <summary>
         /// Returns all game objects in the current scene tagged by Tags.Node and having
@@ -140,81 +142,6 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// True if <paramref name="gameNode"/> represents a leaf in the graph.
-        /// 
-        /// Precondition: <paramref name="gameNode"/> has a NodeRef component attached to it
-        /// that is a valid graph node reference.
-        /// </summary>
-        /// <param name="gameNode">game object representing a Node to be queried whether it is a leaf</param>
-        /// <returns>true if <paramref name="gameNode"/> represents a leaf in the graph</returns>
-        public static bool IsLeaf(GameObject gameNode)
-        {
-            return gameNode.GetComponent<NodeRef>()?.Value?.IsLeaf() ?? false;
-        }
-
-        /// <summary>
-        /// True if <paramref name="nodeRef"/> represents a leaf in the graph.
-        /// </summary>
-        /// <param name="nodeRef">a reference to a Node to be queried whether it is a leaf</param>
-        /// <returns>true if <paramref name="nodeRef"/> references a leaf in the graph</returns>
-        public static bool IsLeaf(NodeRef nodeRef)
-        {
-            return nodeRef?.Value?.IsLeaf() ?? false;
-        }
-
-        /// <summary>
-        /// True if <paramref name="gameNode"/> represents an inner node in the graph.
-        /// 
-        /// Precondition: <paramref name="gameNode"/> has a NodeRef component attached to it
-        /// that is a valid graph node reference.
-        /// </summary>
-        /// <param name="gameNode"></param>
-        /// <returns>true if <paramref name="gameNode"/> represents an inner node in the graph</returns>
-        public static bool IsInnerNode(GameObject gameNode)
-        {
-            return gameNode.GetComponent<NodeRef>()?.Value?.IsInnerNode() ?? false;
-        }
-
-        /// <summary>
-        /// Returns the Source.Name attribute of <paramref name="gameNode"/>. 
-        /// If <paramref name="gameNode"/> has no valid node reference, the name
-        /// of <paramref name="gameNode"/> is returned instead.
-        /// </summary>
-        /// <param name="gameNode">game object representing a node whose Source.Name is requested</param>
-        /// <returns>source name of <paramref name="gameNode"/></returns>
-        public static string SourceName(GameObject gameNode)
-        {
-            if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
-            {
-                if (nodeRef.Value != null)
-                {
-                    return nodeRef.Value.SourceName;
-                }
-            }
-            return gameNode.name;
-        }
-
-        /// <summary>
-        /// Returns the Source.Name attribute of <paramref name="nodeRef"/>. 
-        /// If <paramref name="nodeRef"/> is no valid node reference,
-        /// then the name of the game object it is associated with is returned.
-        /// If it is neither associated with a game object, the empty
-        /// string is returned.
-        /// </summary>
-        /// <param name="nodeRef">a reference to a Node whose Source.Name is requested</param>
-        /// <returns>source name of <paramref name="nodeRef"/></returns>
-        public static string SourceName(NodeRef nodeRef)
-        {
-            string result = string.Empty;
-
-            if (nodeRef)
-            {
-                result = nodeRef.Value?.SourceName ?? nodeRef.gameObject.name;
-            }
-            return result;
-        }
-
-        /// <summary>
         /// Returns first child of <paramref name="codeCity"/> tagged by Tags.Node. 
         /// If <paramref name="codeCity"/> is a node representing a code city,
         /// the result is considered the root of the graph.
@@ -301,10 +228,164 @@ namespace SEE.Game
         /// </summary>
         /// <param name="codeCity">object representing a code city</param>
         /// <returns>the graph represented by <paramref name="codeCity"/> or null</returns>
-        public static Graph GetGraph(GameObject codeCity)
+        public static Graph GetGraph(this GameObject codeCity)
         {
             Node root = GetCityRootGraphNode(codeCity);
             return root?.ItsGraph;
+        }
+
+        /// <summary>
+        /// Retrieves the game object representing a node with the given <paramref name="nodeID"/>.
+        /// 
+        /// Note: This is an expensive operation as it traverses all objects in the scene.
+        /// FIXME: We may need to cache all this information in look up tables for better
+        /// performance.
+        /// 
+        /// Precondition: Such a game object actually exists.
+        /// </summary>
+        /// <param name="nodeID">the unique ID of the node to be retrieved</param>
+        /// <returns>the game object representing the node with the given <paramref name="nodeID"/></returns>
+        /// <exception cref="Exception">thrown if there is no such object</exception>
+        public static GameObject RetrieveGameNode(string nodeID)
+        {
+            foreach (GameObject gameNode in AllGameNodesInScene(true, true))
+            {
+                if (gameNode.name == nodeID)
+                {
+                    return gameNode;
+                }
+            }
+            throw new Exception($"Node named {nodeID} not found.");
+        }
+
+        /// <summary>
+        /// Retrieves the game object representing the given <paramref name="node"/>.
+        /// 
+        /// Note: This is an expensive operation as it traverses all objects in the scene.
+        /// FIXME: We may need to cache all this information in look up tables for better
+        /// performance.
+        /// 
+        /// Preconditions: 
+        ///   (1) <paramref name="node"/> is not null.
+        ///   (2) Such a game object actually exists.
+        /// </summary>
+        /// <param name="node">the node to be retrieved</param>
+        /// <returns>the game object representing the given <paramref name="node"/></returns>
+        /// <exception cref="Exception">thrown if there is no such object</exception>
+        public static GameObject RetrieveGameNode(Node node)
+        {
+            return RetrieveGameNode(node.ID);
+        }
+
+        /// <summary>
+        /// Retrieves the game object representing the node referenced by the given <paramref name="nodeRef"/>.
+        /// 
+        /// Note: This is an expensive operation as it traverses all objects in the scene.
+        /// FIXME: We may need to cache all this information in look up tables for better
+        /// performance.
+        /// 
+        /// Preconditions: 
+        /// (1) <paramref name="nodeRef"/> must reference a valid node.
+        /// (2) Such a game object actually exists.
+        /// </summary>
+        /// <param name="nodeRef">a reference to the node to be retrieved</param>
+        /// <returns>the game object representing the node referenced by the given <paramref name="nodeRef"/></returns>
+        /// <exception cref="Exception">thrown if there is no such object</exception>
+        public static GameObject RetrieveGameNode(NodeRef nodeRef)
+        {
+            return RetrieveGameNode(nodeRef.Value);
+        }
+
+        //------------------------------------------------------------
+        // Queries necessary in the context of the reflexion analysis.
+        //------------------------------------------------------------
+
+        private const string ArchGOName = "Architecture";
+        private const string ImplGOName = "Implementation";
+
+        private static SEECity arch = null;
+        private static SEECity impl = null;
+
+        public static SEECity GetArch()
+        {
+            if (!arch)
+            {
+                SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
+                foreach (SEECity city in cities)
+                {
+                    if (city.gameObject.name.Equals(ArchGOName))
+                    {
+                        arch = city;
+                        break;
+                    }
+                }
+            }
+            return arch;
+        }
+
+        public static SEECity GetImpl()
+        {
+            if (!impl)
+            {
+                SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
+                foreach (SEECity city in cities)
+                {
+                    if (city.gameObject.name.Equals(ImplGOName))
+                    {
+                        impl = city;
+                        break;
+                    }
+                }
+            }
+            return impl;
+        }
+
+        /// <summary>
+        /// Finds the implementation city in the scene.
+        /// </summary>
+        /// <returns>The implementation city of the scene.</returns>
+        public static SEECity FindImplementation()
+        {
+            SEECity result = null;
+            SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
+            foreach (SEECity city in cities)
+            {
+                if (city.gameObject.name.Equals("Implementation"))
+                {
+#if UNITY_EDITOR
+                    Assert.IsNull(result, "There must be exactly one implementation city!");
+#endif
+                    result = city;
+#if !UNITY_EDITOR
+                    break;
+#endif
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Finds the architecture city in the scene.
+        /// </summary>
+        /// <returns>The architecture city of the scene.</returns>
+        public static SEECity FindArchitecture()
+        {
+            SEECity result = null;
+            SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
+            foreach (SEECity city in cities)
+            {
+                if (city.gameObject.name.Equals("Architecture"))
+                {
+#if UNITY_EDITOR
+                    Assert.IsNull(result, "There must be exactly one architecture city!");
+#endif
+                    result = city;
+#if !UNITY_EDITOR
+                    break;
+#endif
+                }
+            }
+            return result;
         }
     }
 }

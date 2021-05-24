@@ -24,11 +24,11 @@ namespace SEE.Game
         /// <summary>
         /// Left front corner of the culling portal.
         /// </summary>
-        private Vector2 leftFrontCorner;
+        private readonly Vector2 leftFrontCorner;
         /// <summary>
         /// Right front corner of the culling portal.
         /// </summary>
-        private Vector2 rightBackCorner;
+        private readonly Vector2 rightBackCorner;
 
         /// <summary>
         /// Prefab for absences.
@@ -71,14 +71,13 @@ namespace SEE.Game
                 distance += Vector3.Distance(positionOfLastDecoration, currentPosition);
                 if (distance >= distanceBetweenDecorations)
                 {
-                    GameObject decoration = Object.Instantiate(prefab);
+                    GameObject decoration = Object.Instantiate(prefab, gameEdge.transform, true);
                     Vector3 dotPosition = currentPosition;
                     decoration.transform.localScale = Vector3.one * demeter;
                     dotPosition.y += line.startWidth + decoration.transform.lossyScale.y / 2.0f; // above the line
                     decoration.transform.position = dotPosition;
                     decoration.tag = Tags.Decoration;
                     decoration.name = name;
-                    decoration.transform.SetParent(gameEdge.transform);
                     Portal.SetPortal(decoration.transform, leftFrontCorner, rightBackCorner);
                     distance = 0;
                 }
@@ -95,7 +94,7 @@ namespace SEE.Game
         {
             foreach (Transform child in gameEdge.transform)
             {
-                if (child.tag == Tags.Decoration)
+                if (child.CompareTag(Tags.Decoration))
                 {
                     Destroyer.DestroyGameObject(child.gameObject);
                 }

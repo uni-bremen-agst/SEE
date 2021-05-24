@@ -2,13 +2,73 @@
 <!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
 <gxl xmlns:xlink="http://www.w3.org/1999/xlink">
   <graph id="CodeFacts" edgeids="true">
+      <node id="N1">
+      <type xlink:href="Method"/>
+      <attr name="Source.Name">
+        <string>m1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>p1.c1.m1</string>
+      </attr>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>1</int>
+      </attr>	  
+      <attr name="Metric.Lines.LOC">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.McCabe_Complexity">
+        <int>1</int>
+      </attr>	  
+    </node>
+	  <node id="N2">
+      <type xlink:href="Field"/>
+      <attr name="Source.Name">
+        <string>f1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>p1.c1.f1</string>
+      </attr>  
+      <attr name="Metric.Lines.LOC">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>1</int>
+      </attr>	 	  
+    </node>
+	  <node id="N3">
+      <type xlink:href="Class"/>
+      <attr name="Source.Name">
+        <string>c1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>p1.c1</string>
+      </attr>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>1</int>
+      </attr>	  
+      <attr name="Metric.Lines.LOC">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.McCabe_Complexity">
+        <int>1</int>
+      </attr>	  
+    </node>
     <node id="N4">
       <type xlink:href="Class"/>
       <attr name="Source.Name">
-        <string>h1</string>
+        <string>c2</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>h1</string>
+        <string>p1.c2</string>
       </attr>
       <attr name="Metric.Number_Of_Calling_Routines">
         <int>1</int>
@@ -26,10 +86,10 @@
     <node id="N5">
       <type xlink:href="Class"/>
       <attr name="Source.Name">
-        <string>h2</string>
+        <string>c3</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>h2</string>
+        <string>p1.c3</string>
       </attr>
       <attr name="Metric.Number_Of_Calling_Routines">
         <int>2</int>
@@ -47,10 +107,10 @@
     <node id="N6">
       <type xlink:href="Class"/>
       <attr name="Source.Name">
-        <string>h3</string>
+        <string>c4</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>h3</string>
+        <string>p1.c4</string>
       </attr>
       <attr name="Metric.Number_Of_Calling_Routines">
         <int>3</int>
@@ -68,29 +128,41 @@
     <node id="N7">
       <type xlink:href="Package"/>
       <attr name="Source.Name">
-        <string>implementation</string>
+        <string>p1</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>implementation</string>
+        <string>p1</string>
       </attr>
 	  <attr name="Metric.Number_Of_Descendants">
         <int>3</int>
       </attr>	
     </node>
-    <edge id="E3" from="N4" to="N5">
+	<edge id="E1" from="N1" to="N3">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E2" from="N2" to="N3">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E3" from="N3" to="N7">
+      <type xlink:href="Belongs_To"/>
+    </edge>	
+    <edge id="E4" from="N4" to="N7">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E5" from="N5" to="N7">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E6" from="N6" to="N7">
+      <type xlink:href="Belongs_To"/>
+    </edge>	
+    <edge id="E7" from="N4" to="N5">
       <type xlink:href="Call"/>
     </edge>
-    <edge id="E4" from="N5" to="N6">
+    <edge id="E8" from="N5" to="N6">
       <type xlink:href="Call"/>
     </edge>
-    <edge id="E5" from="N4" to="N7">
-      <type xlink:href="Belongs_To"/>
-    </edge>
-    <edge id="E6" from="N5" to="N7">
-      <type xlink:href="Belongs_To"/>
-    </edge>
-    <edge id="E7" from="N6" to="N7">
-      <type xlink:href="Belongs_To"/>
+	<edge id="E9" from="N1" to="N2">
+      <type xlink:href="Set"/>
     </edge>
   </graph>
 </gxl>

@@ -225,8 +225,8 @@ namespace SEE.Game
                 }
                 else if (child.TryGetComponent(out EdgeRef edgeRef))
                 {
-                    edgeRef.edge = graph.GetEdge(child.name);
-                    if (edgeRef.edge == null)
+                    edgeRef.Value = graph.GetEdge(child.name);
+                    if (edgeRef.Value == null)
                     {
                         Debug.LogWarningFormat("Could not resolve edge reference {0}.\n", child.name);          
                     }
@@ -264,7 +264,7 @@ namespace SEE.Game
             int numberOfErrors = MetricImporter.Load(LoadedGraph, filename);
             if (numberOfErrors > 0)
             {
-                Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", filename, numberOfErrors);
+                Debug.LogWarning($"CSV file {filename} has {numberOfErrors} many errors.\n");
             }
             p.End();
         }

@@ -11,6 +11,10 @@
 /[Bb]uild/
 /[Bb]uilds/
 /[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+
+# MemoryCaptures can get excessive in size.
+# They also could contain extremely sensitive data
 /[Mm]emoryCaptures/
 
 # Never ignore Asset meta data
@@ -56,10 +60,18 @@ sysinfo.txt
 
 # Builds
 *.apk
+*.aab
 *.unitypackage
 
 # Crashlytics generated file
 crashlytics-build.properties
+
+# Packed Addressables
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+
+# Temporary auto-generated Android Assets
+/[Aa]ssets/[Ss]treamingAssets/aa.meta
+/[Aa]ssets/[Ss]treamingAssets/aa/*
 
 ########################
 # For Windows in general
@@ -110,3 +122,12 @@ PacketHandlerErrorGlobal*.txt
 LinuxPlayer_s.debug
 UnityPlayer_s.debug
 .idea
+
+# For Odin Inspector: Ignore the auto-generated AOT compatibility dll.
+/Assets/Plugins/Sirenix/Assemblies/AOT/*
+
+# For Odin Inspector:  Ignore all unpacked demos.
+/Assets/Plugins/Sirenix/Demos/*
+
+# For Odin Inspector:  But keep the demo packages themselves.
+!/Assets/Plugins/Sirenix/Demos/*.unitypackage 
