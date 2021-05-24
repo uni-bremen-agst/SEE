@@ -1,5 +1,6 @@
 ﻿using SEE.Utils;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
@@ -10,59 +11,37 @@ namespace SEE.Controls.Actions
     public abstract class AbstractPlayerAction : ReversibleAction
     {
         /// <summary>
-        /// The current name of the gameObject that contains the canvas operations and components.
-        /// </summary>
-        protected const string nameOfCanvasObject = "CanvasObject";
-
-        /// <summary>
-        /// The gameObject that contains the CanvasGenerator and the actual CanvasObject.
-        /// </summary>
-        protected GameObject canvasObject;
-
-        /// <summary>
         /// The object that the cursor hovers over.
         /// </summary>
         protected GameObject hoveredObject = null;
 
         /// <summary>
-        /// True if this action has had already some effect that would need to be undone.
-        /// Must be set by subclasses. Will be manipulated in <see cref="Undo"/> and
-        /// <see cref="Redo"/>, too.
+        /// The current state of the action as specified by <see cref="ReversibleAction.Progress"/>.
         /// </summary>
-        protected bool hadAnEffect = false;
-
-        /// <summary>
-        /// Finds the GameObject that contains the CanvasOperations and components
-        /// and saves it in the <see cref="canvasObject"/>.
-        /// </summary>
-        /// <returns>true if the <see cref="canvasObject"/> could be found</returns>
-        protected bool InitializeCanvasObject()
-        {
-            canvasObject = GameObject.Find(nameOfCanvasObject);
-            return canvasObject != null;
-        }
+        protected ReversibleAction.Progress currentState = ReversibleAction.Progress.NoEffect;
 
         /// <summary>
         /// The undo operation which has to be implemented specifically by subclasses
-        /// to revert the effect of an executed action. Marks the actions as having
-        /// had no effect.
+        /// to revert the effect of an executed action. 
         /// See <see cref="ReversibleAction.Undo"/>.
         /// </summary>
         public virtual void Undo()
         {
-            hadAnEffect = false;
+            Assert.IsTrue(currentState == ReversibleAction.Progress.InProgress
+                || currentState == ReversibleAction.Progress.Completed);
+            // intentionally left blank; can be overridden by subclasses
         }
 
         /// <summary>
         /// The redo operation which has to be implemented specifically by subclasses
         /// to revert the effect of an undone action, in other words, to return to 
         /// the state at the point in time when <see cref="Undo"/> was called.
-        /// Marks the actions as having had an effect.
         /// See <see cref="ReversibleAction.Redo"/>.
         /// </summary>
         public virtual void Redo()
         {
-            hadAnEffect = true;
+            Assert.IsTrue(currentState == ReversibleAction.Progress.Completed);
+            // intentionally left blank; can be overridden by subclasses
         }
 
         /// <summary>
@@ -176,13 +155,14 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Returns true if this action has had already some effect that would need to be undone.
-        /// <see cref="ReversibleAction.HadEffect"/>
+        /// Returns the current state of the action indicating whether it has had an effect 
+        /// that may need to be undone and whether it is still ongoing.
+        /// Implements <see cref="ReversibleAction.CurrentProgress"/>.
         /// </summary>
-        /// <returns>true if this action has had already some effect that would need to be undone</returns>
-        public bool HadEffect()
+        /// <returns>the current state of the action</returns>
+        public ReversibleAction.Progress CurrentProgress()
         {
-            return hadAnEffect;
+            return currentState;
         }
     }
 }

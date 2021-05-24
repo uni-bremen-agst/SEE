@@ -8,9 +8,6 @@ REM call this first to avoid failing with an error because of the error
 REM "The system cannot find the path specified.":
 cmd.exe /c
 
-REM user workspace (generally the home directory or the Jenkins workspace)
-set "USERWORKSPACE=%WORKSPACE%"
-
 REM Python
 REM set "PATH=C:\Users\SWT\AppData\Local\Programs\Python\Python38;%PATH%"
 REM set "BAUHAUS_PYTHON=C:\Users\SWT\AppData\Local\Programs\Python\Python38\python.exe"
@@ -18,23 +15,26 @@ REM set "BAUHAUS_PYTHON=C:\Users\SWT\AppData\Local\Programs\Python\Python38\pyth
 REM include Bauhaus bin in exectuable path
 set "PATH=C:\Program Files (x86)\Bauhaus\bin;%PATH%"
 
-REM echo "%PATH%"
-
-REM SEE project directory
-set "SEEDIRECTORY=%USERWORKSPACE%"
+REM SEE project directory (generally the Jenkins workspace if this job is run
+REM by Jenkins, in which case WORKSPACE is set, or otherwise the current directory)
+if "%WORKSPACE%" == "" (
+  set "SEEDIRECTORY=%cd%"
+) else (
+  set "SEEDIRECTORY=%WORKSPACE%"
+)
 
 REM where the Axivion configuration resides within SEE
 set "BAUHAUS_CONFIG=%SEEDIRECTORY%\Axivion"
 
 REM where the Axivion dashserver configuration resides
-set "SWT=C:\Users\SWT"
-set "AXIVION_DASHBOARD_CONFIG=%SWT%\Axivion"
+set "AXIVION_DASHBOARD_CONFIG=C:\Users\koschke\Axivion"
 set "AXIVION_DATABASES_DIR=%AXIVION_DASHBOARD_CONFIG%"
 set "REQUESTS_CA_BUNDLE=%AXIVION_DASHBOARD_CONFIG%\cert\auto.crt"
 
 REM URL of the dashserver
 REM set "AXIVION_DASHBOARD_URL=https://localhost:9443/axivion/"
-set "AXIVION_DASHBOARD_URL=https://swt-jenkins.informatik.uni-bremen.de:9443/axivion/"
+REM set "AXIVION_DASHBOARD_URL=https://swt-jenkins.informatik.uni-bremen.de:9443/axivion/"
+set "AXIVION_DASHBOARD_URL=https://stvive.informatik.uni-bremen.de:9443/axivion/"
 
 REM If the dashserver is installed as a Windows service, you can
 REM start and stop it as follows:
@@ -42,7 +42,7 @@ REM   net (start|stop) "axivion_dashboard_service"
 REM or use the Windows Services Console (services.msc).
 
 REM The Visual Studio .csproj files need to be created before we can start the build.
-"C:\Program Files\Unity\Hub\Editor\2019.4.21f1\Editor\Unity.exe" -batchmode -nographics -logFile - -executeMethod UnityEditor.SyncVS.SyncSolution -projectPath . -quit
+"C:\Program Files\Unity\Hub\Editor\2020.3.9f1\Editor\Unity.exe" -batchmode -nographics -logFile - -executeMethod UnityEditor.SyncVS.SyncSolution -projectPath . -quit
 
 REM Count the number of command-line parameters
 setlocal enabledelayedexpansion
@@ -64,4 +64,3 @@ IF %argCount% == 0 (
   REM %*
   %~1
 )
-

@@ -23,11 +23,6 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// The unique identifier of a node (unique within a graph).
-        /// </summary>
-        private string id = "";
-
-        /// <summary>
-        /// The unique identifier of a node (unique within a graph).
         /// 
         /// Important note on setting this property:
         /// This will only set the id attribute, but does not alter the
@@ -36,11 +31,7 @@ namespace SEE.DataModel.DG
         /// Otherwise expect inconsistencies. If the node has not been added
         /// to a graph, however, setting this property is safe.
         /// </summary>
-        public override string ID
-        {
-            get => id;
-            set => id = value;
-        }
+        public override string ID { get; set; } = "";
 
         /// <summary>
         /// The attribute name for the name of nodes. They may or may not be unique.
@@ -75,6 +66,10 @@ namespace SEE.DataModel.DG
         public int Level
         {
             get => level;
+            set
+            {
+                level = value;
+            }
         }
 
         /// <summary>
@@ -164,7 +159,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="other">to be compared to</param>
         /// <returns>true if equal</returns>
-        public override bool Equals(System.Object other)
+        public override bool Equals(object other)
         {
             if (!base.Equals(other))
             {
@@ -173,7 +168,7 @@ namespace SEE.DataModel.DG
             else
             {
                 Node otherNode = other as Node;
-                if (level != otherNode.level)
+                if (level != otherNode?.level)
                 {
                     Report(ID + ": The levels are different");
                     return false;
@@ -632,6 +627,11 @@ namespace SEE.DataModel.DG
                 }
             }
             return false;
+        }
+
+        public static implicit operator bool(Node node)
+        {
+            return node != null;
         }
     }
 }

@@ -20,9 +20,16 @@ namespace SEEEditor
             base.OnInspectorGUI();
             SEECityEvolution city = target as SEECityEvolution;
             Attributes();
-            city.MaxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.MaxRevisionsToLoad);
-            city.MarkerWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width of markers", city.MarkerWidth));
-            city.MarkerHeight = Mathf.Max(0, EditorGUILayout.FloatField("Height of markers", city.MarkerHeight));
+            showAnimationFoldOut = EditorGUILayout.Foldout(showAnimationFoldOut, "Animation", true, EditorStyles.foldoutHeader);
+            if (showAnimationFoldOut)
+            {
+                city.MaxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.MaxRevisionsToLoad);
+                city.MarkerWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width of markers", city.MarkerWidth));
+                city.MarkerHeight = Mathf.Max(0, EditorGUILayout.FloatField("Height of markers", city.MarkerHeight));
+                city.AdditionBeamColor = EditorGUILayout.ColorField("Color of addition markers", city.AdditionBeamColor);
+                city.ChangeBeamColor = EditorGUILayout.ColorField("Color of change markers", city.ChangeBeamColor);
+                city.DeletionBeamColor = EditorGUILayout.ColorField("Color of deletion markers", city.DeletionBeamColor);
+            }
             ShowNodeTypes(city);
             Buttons();
         }
@@ -31,6 +38,11 @@ namespace SEEEditor
         /// The loaded graph. It is the first one in the series of graphs.
         /// </summary>
         private Graph firstGraph = null;
+
+        /// <summary>
+        /// Whether the animation foldout should be expanded.
+        /// </summary>
+        private bool showAnimationFoldOut = false;
 
         /// <summary>
         /// Creates the buttons for loading the first graph of the evolution series.
@@ -79,7 +91,7 @@ namespace SEEEditor
         protected void Attributes()
         {
             SEECityEvolution city = target as SEECityEvolution;
-            city.GXLDirectory = GetDataPath("GXL directory", city.GXLDirectory, fileDialogue: false);
+            city.GXLDirectory = DataPathEditor.GetDataPath("GXL directory", city.GXLDirectory, fileDialogue: false);
         }
     }
 }

@@ -61,7 +61,7 @@ namespace SEE.Game.Charts.VR
         /// </summary>
         private void GetSettingData()
         {
-            _distanceThreshold = ChartManager.Instance.distanceThreshold;
+            _distanceThreshold = ChartManager.Instance.DistanceThreshold;
         }
 
         /// <summary>

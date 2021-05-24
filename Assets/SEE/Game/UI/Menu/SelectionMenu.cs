@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace SEE.Game.UI
+namespace SEE.Game.UI.Menu
 {
     /// <summary>
     /// A menu in which the user can choose one active selection out of a menu.
@@ -23,7 +23,7 @@ namespace SEE.Game.UI
         /// </summary>
         public ToggleMenuEntry ActiveEntry 
         { 
-            get => entries.FirstOrDefault(entry => entry.Active);
+            get => entries.SingleOrDefault(entry => entry.Active);
             set => entries.ForEach(entry => entry.Active = entry == value);
         }
     }
