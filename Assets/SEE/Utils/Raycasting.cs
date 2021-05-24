@@ -82,6 +82,13 @@ namespace SEE.Utils
             return !IsMouseOverGUI() && Physics.Raycast(MainCamera.Camera.ScreenPointToRay(Input.mousePosition), out raycastHit);
         }
 
+        /// <summary>
+        /// Raycasts agaings <see cref="InteractableObject"/>s and outputs either the closest hit
+        /// or <code>null</code>, if no such hit exists.
+        /// </summary>
+        /// <param name="raycastHit">The raycast hit for the hit interactable object or the default value.</param>
+        /// <param name="obj">The hit object or <code>null</code>.</param>
+        /// <returns>The corresponting enum value for the hit.</returns>
         public static HitGraphElement RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject obj)
         {
             HitGraphElement result = HitGraphElement.None;
@@ -112,7 +119,8 @@ namespace SEE.Utils
         /// <summary>
         /// Whether the mouse currently hovers over a GUI element.
         /// 
-        /// Note: If there is no EventSystem, false will be returned.
+        /// Note: If no <see cref="EventSystem"/> exists in the scene, internal calls will fails
+        /// and <code>false</code> will be returned.
         /// </summary>
         /// <returns>Whether the mouse currently hovers over a GUI element.</returns>
         public static bool IsMouseOverGUI()
@@ -142,11 +150,17 @@ namespace SEE.Utils
             return result;
         }
 
-        // TODO(torben): combine raycastPlane and clippingPlane somehow. They are often used together
-        // TODO(torben): doc
-        public static void RaycastClippingPlane(UnityEngine.Plane raycastPlane, GO.Plane clippingPlane, out bool hit, out bool hitInsideClippingArea, out Vector3 hitPointOnPlane)
+        /// <summary>
+        /// Raycasts against the clipping plane.
+        /// </summary>
+        /// <param name="clippingPlane">The plane, which defines the clipping area.</param>
+        /// <param name="hit">Whether the clipping plane was hit.</param>
+        /// <param name="hitInsideClippingArea">Whether the clipping plane was hit inside of its clipping area.</param>
+        /// <param name="hitPointOnPlane">The hit position on the plane or <see cref="Vector3.zero"/>, if the plane was not hit.</param>
+        public static void RaycastClippingPlane(GO.Plane clippingPlane, out bool hit, out bool hitInsideClippingArea, out Vector3 hitPointOnPlane)
         {
             Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
+            UnityEngine.Plane raycastPlane = new UnityEngine.Plane(Vector3.up, clippingPlane.transform.position);
             hit = raycastPlane.Raycast(ray, out float enter);
             if (hit)
             {
