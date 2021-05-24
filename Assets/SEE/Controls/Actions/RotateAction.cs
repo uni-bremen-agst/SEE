@@ -79,7 +79,7 @@ namespace SEE.Controls.Actions
         /// <returns>always false</returns>
         public override bool Update()
         {
-            InteractableObject obj = InteractableObject.HoveredObject;
+            InteractableObject obj = InteractableObject.HoveredObjectWithWorldFlag;
             Transform root = null;
             CityCursor cursor = null;
 

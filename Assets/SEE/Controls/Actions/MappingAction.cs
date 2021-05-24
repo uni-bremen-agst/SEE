@@ -120,7 +120,7 @@ namespace SEE.Controls.Actions
             if (Input.GetKeyDown(KeyCode.M)) // TODO(torben): Bindings
             {
                 mapping.FinalizeNodeHierarchy();
-                SEECity city = SceneQueries.GetMapp();
+                SEECity city = SceneQueries.FindMapping();
                 city.LoadedGraph = mapping;
                 city.ReDrawGraph();
             }
@@ -182,7 +182,7 @@ namespace SEE.Controls.Actions
                         Node dst = mapping.GetNode(dstNode.ID);
                         src.Reparent(dst);
                         mapping.FinalizeNodeHierarchy();
-                        SEECity city = SceneQueries.GetMapp();
+                        SEECity city = SceneQueries.FindMapping();
                         city.LoadedGraph = mapping;
                         city.ReDrawGraph();
                     }
@@ -220,15 +220,6 @@ namespace SEE.Controls.Actions
                     Debug.LogErrorFormat("UNHANDLED CALLBACK: {0}\n", changeEvent);
                     break;
             }
-        }
-
-        /// <summary>
-        /// <see cref="ReversibleAction.CurrentProgress"/>
-        /// </summary>
-        /// <returns>true if this action has had already some effect that would need to be undone</returns>
-        public bool CurrentProgress()
-        {
-            return false; // FIXME
         }
 
         /// <summary>
@@ -400,9 +391,11 @@ namespace SEE.Controls.Actions
             return ActionStateType.Map;
         }
 
-        ReversibleAction.Progress ReversibleAction.CurrentProgress()
+        public ReversibleAction.Progress CurrentProgress()
         {
-            throw new System.NotImplementedException();
+            // FIXME
+            ReversibleAction.Progress result = ReversibleAction.Progress.NoEffect;
+            return result;
         }
 
         #endregion

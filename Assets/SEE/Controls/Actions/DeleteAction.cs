@@ -274,6 +274,7 @@ namespace SEE.Controls.Actions
                     Portal.SetInfinitePortal(deletedNode);
                 }
             }
+            // FIXME is this framerate independent?
             MarkAsDeleted(deletedNodes);
             foreach (GameObject deletedNode in deletedNodes)
             {
