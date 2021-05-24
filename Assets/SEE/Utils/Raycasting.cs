@@ -76,7 +76,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="raycastHit">hit object if true is returned, undefined otherwise</param>
         /// <returns>true if the mouse is not over any GUI element and if anything was hit</returns>
-        public static bool RayCastAnything(out RaycastHit raycastHit)
+        public static bool RaycastAnything(out RaycastHit raycastHit)
         {
             raycastHit = new RaycastHit();
             return !IsMouseOverGUI() && Physics.Raycast(MainCamera.Camera.ScreenPointToRay(Input.mousePosition), out raycastHit);
@@ -140,6 +140,31 @@ namespace SEE.Utils
                 hit = Vector3.positiveInfinity;
             }
             return result;
+        }
+
+        // TODO(torben): combine raycastPlane and clippingPlane somehow. They are often used together
+        // TODO(torben): doc
+        public static void RaycastClippingPlane(UnityEngine.Plane raycastPlane, GO.Plane clippingPlane, out bool hit, out bool hitInsideClippingArea, out Vector3 hitPointOnPlane)
+        {
+            Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
+            hit = raycastPlane.Raycast(ray, out float enter);
+            if (hit)
+            {
+                hitPointOnPlane = ray.GetPoint(enter);
+                MathExtensions.TestPointAABB(
+                    hitPointOnPlane.XZ(),
+                    clippingPlane.LeftFrontCorner,
+                    clippingPlane.RightBackCorner,
+                    out float distanceFromPoint,
+                    out _
+                );
+                hitInsideClippingArea = distanceFromPoint < 0.0f;
+            }
+            else
+            {
+                hitInsideClippingArea = false;
+                hitPointOnPlane = Vector3.zero;
+            }
         }
     }
 }

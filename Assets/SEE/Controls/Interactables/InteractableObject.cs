@@ -66,9 +66,11 @@ namespace SEE.Controls
         public static readonly HashSet<InteractableObject> HoveredObjects = new HashSet<InteractableObject>();
 
         /// <summary>
-        /// The object, that is currently hovered by this player.
+        /// The object, that is currently hovered by this player. The is always only ever
+        /// one object hovered by this player with the flag <see cref="HoverFlag.World"/>
+        /// set.
         /// </summary>
-        public static InteractableObject HoveredObject { get; private set; } = null;
+        public static InteractableObject HoveredObjectWithWorldFlag { get; private set; } = null;
 
         /// <summary>
         /// The selected objects.
@@ -319,6 +321,7 @@ namespace SEE.Controls
                 return;
             }
 #endif
+            uint prevHoverFlags = HoverFlags;
             HoverFlags = hoverFlags;
 
             if (IsHovered)
@@ -333,7 +336,11 @@ namespace SEE.Controls
                     LocalAnyHoverIn?.Invoke(this);
                 }
                 HoveredObjects.Add(this);
-                HoveredObject = this;
+                if (IsHoverFlagSet(HoverFlag.World))
+                {
+                    Assert.IsNull(HoveredObjectWithWorldFlag);
+                    HoveredObjectWithWorldFlag = this;
+                }
             }
             else
             {
@@ -347,7 +354,11 @@ namespace SEE.Controls
                     LocalAnyHoverOut?.Invoke(this);
                 }
                 HoveredObjects.Remove(this);
-                HoveredObject = null;
+                if ((prevHoverFlags & (uint)HoverFlag.World) != 0)
+                {
+                    Assert.IsNotNull(HoveredObjectWithWorldFlag);
+                    HoveredObjectWithWorldFlag = null;
+                }
             }
 
             if (!Net.Network.UseInOfflineMode && isInitiator)

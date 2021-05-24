@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.10009589, g: 0.1694057, b: 0.30514205, a: 1}
+  m_IndirectSpecularColor: {r: 0.10010709, g: 0.1693151, b: 0.30522084, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -136,8 +136,6 @@ GameObject:
   - component: {fileID: 57077448}
   - component: {fileID: 57077447}
   - component: {fileID: 57077446}
-  - component: {fileID: 57077445}
-  - component: {fileID: 57077444}
   - component: {fileID: 57077443}
   - component: {fileID: 57077442}
   m_Layer: 0
@@ -1170,35 +1168,6 @@ MonoBehaviour:
     Root: 3
     relativePath: 
     absolutePath: 
---- !u!114 &57077444
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 57077441}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 92867cfc4f3c3b84ab96f006078aaad3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  portalPlane: {fileID: 57077446}
-  id: 3
---- !u!114 &57077445
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 57077441}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd9537a868ba1214eba7ee3caf4c2e76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  portalPlane: {fileID: 57077446}
-  id: 3
-  cursor: {fileID: 57077442}
 --- !u!114 &57077446
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1301,8 +1270,6 @@ GameObject:
   - component: {fileID: 155696311}
   - component: {fileID: 155696310}
   - component: {fileID: 155696309}
-  - component: {fileID: 155696308}
-  - component: {fileID: 155696307}
   - component: {fileID: 155696306}
   - component: {fileID: 155696313}
   m_Layer: 0
@@ -2381,35 +2348,6 @@ MonoBehaviour:
     Root: 1
     relativePath: /Data/GXL/TestProjectToDebug/CodeFacts.jlg
     absolutePath: 
---- !u!114 &155696307
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 155696305}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 92867cfc4f3c3b84ab96f006078aaad3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  portalPlane: {fileID: 155696309}
-  id: 4
---- !u!114 &155696308
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 155696305}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd9537a868ba1214eba7ee3caf4c2e76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  portalPlane: {fileID: 155696309}
-  id: 4
-  cursor: {fileID: 0}
 --- !u!114 &155696309
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2792,8 +2730,6 @@ GameObject:
   - component: {fileID: 551180601}
   - component: {fileID: 551180600}
   - component: {fileID: 551180599}
-  - component: {fileID: 551180598}
-  - component: {fileID: 551180597}
   - component: {fileID: 551180596}
   - component: {fileID: 551180595}
   - component: {fileID: 551180592}
@@ -3855,35 +3791,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ScaleFactor: 1
   HeightOffset: 0.0031000376
---- !u!114 &551180597
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 551180591}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 92867cfc4f3c3b84ab96f006078aaad3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  portalPlane: {fileID: 551180596}
-  id: 3
---- !u!114 &551180598
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 551180591}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd9537a868ba1214eba7ee3caf4c2e76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  portalPlane: {fileID: 551180596}
-  id: 3
-  cursor: {fileID: 0}
 --- !u!65 &551180599
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4882,8 +4789,6 @@ GameObject:
   - component: {fileID: 1642873249}
   - component: {fileID: 1642873248}
   - component: {fileID: 1642873247}
-  - component: {fileID: 1642873246}
-  - component: {fileID: 1642873245}
   - component: {fileID: 1642873244}
   - component: {fileID: 1642873251}
   m_Layer: 0
@@ -5956,35 +5861,6 @@ MonoBehaviour:
     Root: 1
     relativePath: /Data/GXL/dynamic-tests/example_01.dyn
     absolutePath: 
---- !u!114 &1642873245
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1642873243}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 92867cfc4f3c3b84ab96f006078aaad3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  portalPlane: {fileID: 1642873247}
-  id: 5
---- !u!114 &1642873246
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1642873243}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd9537a868ba1214eba7ee3caf4c2e76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  portalPlane: {fileID: 1642873247}
-  id: 5
-  cursor: {fileID: 0}
 --- !u!114 &1642873247
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6202,8 +6078,6 @@ GameObject:
   - component: {fileID: 1758871334}
   - component: {fileID: 1758871333}
   - component: {fileID: 1758871332}
-  - component: {fileID: 1758871331}
-  - component: {fileID: 1758871330}
   - component: {fileID: 1758871329}
   - component: {fileID: 1758871337}
   m_Layer: 0
@@ -7224,35 +7098,6 @@ MonoBehaviour:
     Root: 3
     relativePath: /mini/Architecture.csv
     absolutePath: 
---- !u!114 &1758871330
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1758871328}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 92867cfc4f3c3b84ab96f006078aaad3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  portalPlane: {fileID: 1758871332}
-  id: 1
---- !u!114 &1758871331
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1758871328}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd9537a868ba1214eba7ee3caf4c2e76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  portalPlane: {fileID: 1758871332}
-  id: 1
-  cursor: {fileID: 1758871337}
 --- !u!114 &1758871332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7685,8 +7530,6 @@ GameObject:
   - component: {fileID: 1972412195}
   - component: {fileID: 1972412194}
   - component: {fileID: 1972412193}
-  - component: {fileID: 1972412192}
-  - component: {fileID: 1972412191}
   - component: {fileID: 1972412190}
   - component: {fileID: 1972412198}
   m_Layer: 0
@@ -7722,7 +7565,7 @@ MonoBehaviour:
       Data: 0|SEE.GlobalCityAttributes, SEE
     - Name: lodCulling
       Entry: 4
-      Data: 0.01
+      Data: 0.0001
     - Name: layoutPath
       Entry: 7
       Data: 1|SEE.Game.DataPath, SEE
@@ -8707,35 +8550,6 @@ MonoBehaviour:
     Root: 0
     relativePath: /mini/CodeFacts.csv
     absolutePath: C:\dev\SEE\Data\GXL\linux-clones\fs\CodeFacts.csv
---- !u!114 &1972412191
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1972412189}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 92867cfc4f3c3b84ab96f006078aaad3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  portalPlane: {fileID: 1972412193}
-  id: 2
---- !u!114 &1972412192
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1972412189}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd9537a868ba1214eba7ee3caf4c2e76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  portalPlane: {fileID: 1972412193}
-  id: 2
-  cursor: {fileID: 1972412198}
 --- !u!114 &1972412193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8749,7 +8563,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.0031023026
+  HeightOffset: 0.0030852556
 --- !u!65 &1972412194
 BoxCollider:
   m_ObjectHideFlags: 0

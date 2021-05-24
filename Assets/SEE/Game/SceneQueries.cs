@@ -108,7 +108,11 @@ namespace SEE.Game
             HashSet<Node> result = new HashSet<Node>();
             foreach (NodeRef nodeRef in nodeRefs)
             {
-                IEnumerable<Node> nodes = nodeRef?.Value?.ItsGraph?.GetRoots();
+                IEnumerable<Node> nodes = null;
+                if (nodeRef != null)
+                {
+                    nodes = nodeRef.Value?.ItsGraph?.GetRoots();
+                }
                 if (nodes != null)
                 {
                     foreach (Node node in nodes)
@@ -310,104 +314,77 @@ namespace SEE.Game
         // Queries necessary in the context of the reflexion analysis.
         //------------------------------------------------------------
 
-        private const string ArchGOName = "Architecture";
-        private const string ImplGOName = "Implementation";
-        private const string MappGOName = "Mapping";
-
-        private static SEECity arch = null;
-        private static SEECity impl = null;
-        private static SEECity mapp = null;
-
-        // TODO(torben): these are very similar to FindImplementation() etc. below @SuperSimilarQuery
-        public static SEECity GetArch()
-        {
-            if (!arch)
-            {
-                SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
-                foreach (SEECity city in cities)
-                {
-                    if (city.gameObject.name.Equals(ArchGOName))
-                    {
-                        arch = city;
-                        break;
-                    }
-                }
-            }
-            return arch;
-        }
-
-        public static SEECity GetImpl()
-        {
-            if (!impl)
-            {
-                SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
-                foreach (SEECity city in cities)
-                {
-                    if (city.gameObject.name.Equals(ImplGOName))
-                    {
-                        impl = city;
-                        break;
-                    }
-                }
-            }
-            return impl;
-        }
-
-        public static SEECity GetMapp()
-        {
-            if (!mapp)
-            {
-                SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
-                foreach (SEECity city in cities)
-                {
-                    if (city.gameObject.name.Equals(MappGOName))
-                    {
-                        mapp = city;
-                        break;
-                    }
-                }
-            }
-            return mapp;
-        }
+        /// <summary>
+        /// Cached implementation city
+        /// </summary>
+        private static SEECity cachedImplementation = null;
 
         /// <summary>
-        /// Finds the implementation city in the scene.
+        /// Cached architecture city
+        /// </summary>
+        private static SEECity cachedArchitecture = null;
+
+        /// <summary>
+        /// Cached mapping city
+        /// </summary>
+        private static SEECity cachedMapping = null;
+
+        /// <summary>
+        /// Finds the implementation city in the scene. The city may be cached.
         /// </summary>
         /// <returns>The implementation city of the scene.</returns>
-        public static SEECity FindImplementation() // @SuperSimilarQuery
+        public static SEECity FindImplementation()
         {
-            SEECity result = null;
-            SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
-            foreach (SEECity city in cities)
+            if (!cachedImplementation)
             {
-                if (city.gameObject.name.Equals("Implementation"))
-                {
-#if UNITY_EDITOR
-                    Assert.IsNull(result, "There must be exactly one implementation city!");
-#endif
-                    result = city;
-#if !UNITY_EDITOR
-                    break;
-#endif
-                }
+                cachedImplementation = FindSEECity("Implementation");
             }
-            return result;
+            return cachedImplementation;
         }
 
         /// <summary>
-        /// Finds the architecture city in the scene.
+        /// Finds the architecture city in the scene. The city may be cached.
         /// </summary>
         /// <returns>The architecture city of the scene.</returns>
-        public static SEECity FindArchitecture() // @SuperSimilarQuery
+        public static SEECity FindArchitecture()
+        {
+            if (!cachedArchitecture)
+            {
+                cachedArchitecture = FindSEECity("Architecture");
+            }
+            return cachedArchitecture;
+        }
+
+        /// <summary>
+        /// Finds the mapping city in the scene. The city may be cached.
+        /// </summary>
+        /// <returns>The mapping city of the scene.</returns>
+        public static SEECity FindMapping()
+        {
+            if (!cachedMapping)
+            {
+                cachedMapping = FindSEECity("Mapping");
+            }
+            return cachedMapping;
+        }
+
+        /// <summary>
+        /// Finds the <see cref="SEECity"/> of <see cref="GameObject"/> with name
+        /// <paramref name="name"/>. As this method does not cache anything, this call is quite
+        /// heavy and should not be called too often.
+        /// </summary>
+        /// <param name="name">The name of the object with city component attached.</param>
+        /// <returns>The found city or <code>null</code>, if no such city exists.</returns>
+        private static SEECity FindSEECity(string name)
         {
             SEECity result = null;
             SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
             foreach (SEECity city in cities)
             {
-                if (city.gameObject.name.Equals("Architecture"))
+                if (city.gameObject.name.Equals(name))
                 {
 #if UNITY_EDITOR
-                    Assert.IsNull(result, "There must be exactly one architecture city!");
+                    Assert.IsNull(result, "There must be exactly one city named " + name + "!");
 #endif
                     result = city;
 #if !UNITY_EDITOR

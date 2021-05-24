@@ -1,7 +1,3 @@
-using System;
-using SEE.DataModel.DG;
-using SEE.Game;
-using SEE.Game.UI3D;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -133,13 +129,11 @@ namespace SEE.Controls.Actions
                     float optimalTargetZoomFactor = portalPlane.MinLengthXZ / (cursor.E.ComputeDiameterXZ() / zoomState.currentZoomFactor);
                     float optimalTargetZoomSteps = ConvertZoomFactorToZoomSteps(optimalTargetZoomFactor);
                     int actualTargetZoomSteps = Mathf.FloorToInt(optimalTargetZoomSteps);
-                    float actualTargetZoomFactor = ConvertZoomStepsToZoomFactor(actualTargetZoomSteps);
 
                     int zoomSteps = actualTargetZoomSteps - (int)zoomState.currentTargetZoomSteps;
                     if (zoomSteps == 0)
                     {
                         zoomSteps = -(int)zoomState.currentTargetZoomSteps;
-                        actualTargetZoomFactor = 1.0f;
                     }
 
                     if (zoomSteps != 0)
