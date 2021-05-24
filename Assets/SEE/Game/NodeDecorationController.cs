@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using SEE.DataModel.DG;
 using SEE.Game;
-using SEE.GO;
 
 /// <summary>
 /// Decorates each block with an assigned texture
@@ -215,23 +213,25 @@ public class NodeDecorationController : MonoBehaviour
     /// </summary>
     private void renderRoof()
     {
-        float roofSizeX = nodeSize.x + nodeSize.x * _roofSpanPercentage;
-        float roofSizeZ = nodeSize.z + nodeSize.z * _roofSpanPercentage;
-        float roofHeight = nodeSize.y * _roofHeightPercentage;
+        Vector3 roofScale = new Vector3(nodeSize.x + nodeSize.x * _roofSpanPercentage,
+                                        nodeSize.z + nodeSize.z * _roofSpanPercentage,
+                                        nodeSize.y * _roofHeightPercentage);
         // Create roof GameObject
         switch (selectedRoofType)
         {
             case RoofType.Tetrahedron:
-                GameObject tetrahedron = createPyramid(roofSizeX, roofHeight, roofSizeZ);
+                GameObject tetrahedron = createPyramid(roofScale);
                 tetrahedron.transform.SetParent(nodeObject.transform);
                 // Move tetrahedron to top of building, tetrahedron is moved with the bottom left corner
-                tetrahedron.transform.position = new Vector3(nodeLocation.x - roofSizeX / 2, nodeSize.y / 2 + nodeLocation.y, nodeLocation.z - roofSizeZ / 2);
+                tetrahedron.transform.position = new Vector3(nodeLocation.x - roofScale.x / 2, 
+                                                             nodeSize.y / 2 + nodeLocation.y, 
+                                                             nodeLocation.z - roofScale.z / 2);
                 break;
             case RoofType.Rectangular:
-                renderRectangularRoof(roofSizeX, roofHeight, roofSizeZ);
+                renderRectangularRoof(roofScale);
                 break;
             case RoofType.Dome:
-                renderDomeRoof(roofSizeX, roofHeight, roofSizeZ);
+                renderDomeRoof(roofScale);
                 break;
             default:
                 break;
@@ -240,15 +240,13 @@ public class NodeDecorationController : MonoBehaviour
 
     /// <summary>
     /// Renders a rectangular roof for the node object
-    /// <param name="roofSizeX">The roof's size on the X-axis</param>
-    /// <param name="roofHeight">The roof's height on the Y-axis</param>
-    /// <param name="roofSizeZ">The roof's size on the Z-axis</param>
     /// </summary>
-    private void renderRectangularRoof(float roofSizeX, float roofHeight, float roofSizeZ)
+    /// <param name="roofScale">scale of the roof</param>
+    private void renderRectangularRoof(Vector3 roofScale)
     {
         GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
         go.name = "RectangularRoof";
-        go.transform.localScale = new Vector3(roofSizeX, roofHeight, roofSizeZ);
+        go.transform.localScale = roofScale;
         float nodeRoofHeight = nodeObject.transform.position.y + nodeSize.y / 2;
         go.transform.position = new Vector3(nodeLocation.x, nodeRoofHeight, nodeLocation.z);
         go.transform.SetParent(nodeObject.transform);
@@ -256,15 +254,13 @@ public class NodeDecorationController : MonoBehaviour
 
     /// <summary>
     /// Renders a dome roof for the node object
-    /// <param name="roofSizeX">The roof's size on the X-axis</param>
-    /// <param name="roofHeight">The roof's height on the Y-axis</param>
-    /// <param name="roofSizeZ">The roof's size on the Z-axis</param>
     /// </summary>
-    private void renderDomeRoof(float roofSizeX, float roofHeight, float roofSizeZ)
+    /// <param name="roofScale">scale of the roof</param>
+    private void renderDomeRoof(Vector3 roofScale)
     {
         GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         go.name = "SphericalRoof";
-        go.transform.localScale = new Vector3(roofSizeX, roofHeight, roofSizeZ);
+        go.transform.localScale = roofScale;
         float nodeRoofHeight = nodeObject.transform.position.y + nodeSize.y / 2;
         go.transform.position = new Vector3(nodeLocation.x, nodeRoofHeight, nodeLocation.z);
         go.transform.SetParent(nodeObject.transform);
@@ -275,18 +271,19 @@ public class NodeDecorationController : MonoBehaviour
     /// Generates a 4-faced pyramid at the given coordinates
     /// Inspired by an article by <a href="https://blog.nobel-joergensen.com/2010/12/25/procedural-generated-mesh-in-unity/">Morten Nobel-Jørgensen</a>,
     /// </summary>
-    public GameObject createPyramid(float sizeX, float height, float sizeZ)
+    /// <param name="roofScale">scale of the roof</param>
+    public GameObject createPyramid(Vector3 roofScale)
     {
         GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
         go.name = "Tetrahedron";
         MeshFilter meshFilter = go.GetComponent<MeshFilter>();
         // Tetrahedron floor nodes
         Vector3 p0 = new Vector3(0, 0, 0);
-        Vector3 p1 = new Vector3(sizeX, 0, 0);
-        Vector3 p2 = new Vector3(sizeX, 0, sizeZ);
-        Vector3 p3 = new Vector3(0, 0, sizeZ);
+        Vector3 p1 = new Vector3(roofScale.x, 0, 0);
+        Vector3 p2 = new Vector3(roofScale.x, 0, roofScale.z);
+        Vector3 p3 = new Vector3(0, 0, roofScale.z);
         // Tetrahedron top node
-        Vector3 p4 = new Vector3(sizeX / 2, height, sizeZ / 2);
+        Vector3 p4 = new Vector3(roofScale.x / 2, roofScale.y, roofScale.z / 2);
         // Create gameObject mesh
         Mesh mesh = new Mesh();
         mesh.Clear();
