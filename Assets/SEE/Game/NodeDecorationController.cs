@@ -316,7 +316,7 @@ public class NodeDecorationController : MonoBehaviour
     /// <param name="hiddenObjects">The list of gamenodes that are hidden inside the packed block</param>
     /// <param name="packedBlock">The packed block</param>
     /// </summary>
-    private void decoratePackedBlock(List<GameObject> hiddenObjects, GameObject packedBlock)
+    private void decoratePackedBlock(IList<GameObject> hiddenObjects, GameObject packedBlock)
     {
         GameObject topDecorator = new GameObject("TopDecorator");
         for (int i = 0; i < hiddenObjects.Count; i++)
@@ -410,7 +410,7 @@ public class NodeDecorationController : MonoBehaviour
     /// <param name="hiddenObjects">The list of gamenodes that are hidden inside the packed block</param>
     /// <param name="packedBlock">The packed block</param>
     /// </summary>
-    private void decoratePackedBlockWalls(List<GameObject> hiddenObjects, GameObject packedBlock)
+    private void decoratePackedBlockWalls(IList<GameObject> hiddenObjects, GameObject packedBlock)
     {
         // Get packed block dimensions and corners, North - Positive X, West - Positive Z
         Vector3 packedBlockDimensions = packedBlock.transform.localScale;
@@ -635,7 +635,7 @@ public class NodeDecorationController : MonoBehaviour
     /// <summary>
     /// Child nodes of this block
     /// </summary>
-    private List<GameObject> childNodes = new List<GameObject>();
+    private IList<GameObject> childNodes = new List<GameObject>();
 
     /// <summary>
     /// Test the block decoration implementation both visually and mathematically
