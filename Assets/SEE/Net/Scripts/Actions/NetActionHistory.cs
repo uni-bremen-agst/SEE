@@ -167,9 +167,9 @@ namespace SEE.Net
         /// </summary>
         /// <param name="changedObjectsToParse">the changed objects to be split</param>
         /// <returns>a list of ids of changed gameObjects</returns>
-        private static IList<string> StringToList(string changedObjectsToParse)
+        private static List<string> StringToList(string changedObjectsToParse)
         {
-            return JsonUtility.FromJson<IList<string>>(changedObjectsToParse);
+            return JsonUtility.FromJson<List<string>>(changedObjectsToParse);
         }
     }
 }
