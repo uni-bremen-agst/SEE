@@ -3,7 +3,6 @@ using System.Diagnostics;
 
 namespace SEE.Net.Util
 {
-
     /// <summary>
     /// An internal logger for the networking.
     /// </summary>
