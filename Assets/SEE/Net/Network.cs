@@ -14,7 +14,6 @@ using UnityEngine.Assertions;
 
 namespace SEE.Net
 {
-
     /// <summary>
     /// Handles the most general parts of networking.
     /// </summary>
@@ -139,7 +138,7 @@ namespace SEE.Net
         {
             if (instance)
             {
-                Util.Logger.LogError("There must not be more than one Network-script! This script will be destroyed!");
+                Util.Logger.LogError("There must not be more than one Network component! This component will be destroyed!");
                 Destroy(this);
                 return;
             }
