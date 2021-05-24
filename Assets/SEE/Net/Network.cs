@@ -8,6 +8,7 @@ using System.Threading;
 using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
 using SEE.Game;
+using SEE.Net.Util;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -138,7 +139,7 @@ namespace SEE.Net
         {
             if (instance)
             {
-                Logger.LogError("There must not be more than one Network-script! This script will be destroyed!");
+                Util.Logger.LogError("There must not be more than one Network-script! This script will be destroyed!");
                 Destroy(this);
                 return;
             }
@@ -171,7 +172,7 @@ namespace SEE.Net
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError("Some network-error happened! Continuing in offline mode...\nException: " + e);
+                    Util.Logger.LogError("Some network-error happened! Continuing in offline mode...\nException: " + e);
                     useInOfflineMode = true;
                 }
             }
@@ -194,7 +195,7 @@ namespace SEE.Net
                     }
                     else
                     {
-                        Logger.LogError("Unsupported city-type!");
+                        Util.Logger.LogError("Unsupported city-type!");
                     }
                 }
             }
@@ -342,7 +343,7 @@ namespace SEE.Net
                     }
                     catch (Exception e)
                     {
-                        Logger.LogException(e);
+                        Util.Logger.LogException(e);
                     }
                 }
 
@@ -352,7 +353,7 @@ namespace SEE.Net
                 }
                 catch (Exception e)
                 {
-                    Logger.LogException(e);
+                    Util.Logger.LogException(e);
                 }
             }
         }
@@ -409,7 +410,7 @@ namespace SEE.Net
                     {
                         deadConnections.Add(connection);
                         Invoker.Invoke((Connection c) => { deadConnections.Remove(c); }, 1.0f, connection);
-                        Logger.LogWarning(
+                        Util.Logger.LogWarning(
                             "Packet could not be sent to '" +
                             connection.ConnectionInfo.RemoteEndPoint.ToString() +
                             "'! Destination may not be listening or connection timed out. Closing connection!"
@@ -503,7 +504,7 @@ namespace SEE.Net
                     if (HostServer && VivoxChannelSession.Participants.Count != 0)
                     {
                         // TODO: this channel already exists and the name is unavailable!
-                        Logger.Log("Channel with given name already exists. Select a differend name!");
+                        Util.Logger.Log("Channel with given name already exists. Select a differend name!");
                         VivoxChannelSession.Disconnect();
                         VivoxLoginSession.DeleteChannelSession(channelID);
                     }
@@ -525,7 +526,7 @@ namespace SEE.Net
                 }
                 catch (Exception e)
                 {
-                    Logger.LogException(e);
+                    Util.Logger.LogException(e);
                 }
             });
         }
@@ -558,8 +559,8 @@ namespace SEE.Net
             {
                 switch (channelSession.AudioState)
                 {
-                    case VivoxUnity.ConnectionState.Connected: Logger.Log("Audio chat connected in " + channelSession.Key.Name + " channel."); break;
-                    case VivoxUnity.ConnectionState.Disconnected: Logger.Log("Audio chat disconnected in " + channelSession.Key.Name + " channel."); break;
+                    case VivoxUnity.ConnectionState.Connected: Util.Logger.Log("Audio chat connected in " + channelSession.Key.Name + " channel."); break;
+                    case VivoxUnity.ConnectionState.Disconnected: Util.Logger.Log("Audio chat disconnected in " + channelSession.Key.Name + " channel."); break;
                 }
             }
             else if (propertyChangedEventArgs.PropertyName == "TextState")
@@ -567,11 +568,11 @@ namespace SEE.Net
                 switch (channelSession.TextState)
                 {
                     case VivoxUnity.ConnectionState.Connected:
-                        Logger.Log("Text chat connected in " + channelSession.Key.Name + " channel.");
+                        Util.Logger.Log("Text chat connected in " + channelSession.Key.Name + " channel.");
                         SendGroupMessage();
                         break;
                     case VivoxUnity.ConnectionState.Disconnected:
-                        Logger.Log("Text chat disconnected in " + channelSession.Key.Name + " channel.");
+                        Util.Logger.Log("Text chat disconnected in " + channelSession.Key.Name + " channel.");
                         break;
                 }
             }
@@ -583,7 +584,7 @@ namespace SEE.Net
             string senderName = queueItemAddedEventArgs.Value.Sender.Name;
             string message = queueItemAddedEventArgs.Value.Message;
 
-            Logger.Log(channelName + ": " + senderName + ": " + message + "\n");
+            Util.Logger.Log(channelName + ": " + senderName + ": " + message + "\n");
         }
 
         private void OnApplicationQuit()

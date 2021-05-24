@@ -4,6 +4,7 @@ using System.Net;
 using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
 using NetworkCommsDotNet.Connections.TCP;
+using SEE.Net.Util;
 
 namespace SEE.Net
 {
