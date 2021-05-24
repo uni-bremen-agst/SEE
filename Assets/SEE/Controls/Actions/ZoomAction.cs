@@ -1,6 +1,3 @@
-using SEE.Game;
-using SEE.GO;
-using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,7 +8,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Zoom commands hold data about zooming into or out of the city.
         /// </summary>
-        private class ZoomCommand
+        protected class ZoomCommand
         {
             internal readonly float TargetZoomSteps; // The amount of zoom steps this command is trying to reach
             internal readonly Vector2 ZoomCenter;    // The position onto where this command is supposed to zoom on the XZ-plane
@@ -51,7 +48,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The zoom state contains the active zoom commands and further relevant data.
         /// </summary>
-        private struct ZoomState
+        protected struct ZoomState
         {
             internal const float DefaultZoomDuration = 0.1f;
             internal const uint ZoomMaxSteps = 32;
@@ -81,90 +78,20 @@ namespace SEE.Controls.Actions
             }
         }
 
+        /// <summary>
+        /// The zoom states for every root transform of a city. Once the first zoom is initiated,
+        /// the zoom state will be inserted here.
+        /// </summary>
         private Dictionary<Transform, ZoomState> rootTransformToZoomStates = new Dictionary<Transform, ZoomState>();
 
         /// <summary>
-        /// Applies the currently active zoom commands to the city.
+        /// Executes every active zoom command. Logic is done in fixed time steps to ensure
+        /// framerate independence for physical movement. This way, the result will look the same,
+        /// no matter what the framerate of the game may be.
         /// </summary>
-        /// <returns>Whether the transform of the city has been changed at all.</returns>
-        private void Update()
+        private void FixedUpdate()
         {
-            InteractableObject obj = InteractableObject.HoveredObjectWithWorldFlag;
-
-            // If we don't hover over any part of a city, we can't initiate any zooming related action
-            if (obj)
-            {
-                Transform rootTransform = SceneQueries.GetCityRootTransformUpwards(obj.transform);
-                UnityEngine.Plane raycastPlane = new UnityEngine.Plane(Vector3.up, rootTransform.position);
-                GO.Plane clippingPlane = rootTransform.parent.GetComponent<GO.Plane>();
-                Raycasting.RaycastClippingPlane(raycastPlane, clippingPlane, out _, out bool hitInsideClippingArea, out Vector3 hitPointOnPlane);
-
-                // We need to hit something inside of its clipping area
-                // TODO(torben): do we even want to hover things that are not inside of the clipping area? look at InteractableObject for that
-                if (hitInsideClippingArea)
-                {
-                    float zoomStepsDelta = Input.mouseScrollDelta.y;
-                    bool zoomInto = SEEInput.ZoomInto();
-                    bool zoomTowards = Mathf.Abs(zoomStepsDelta) >= 1.0f;
-
-                    if (zoomInto || zoomTowards)
-                    {
-                        // Determine zoomable transform
-                        if (!rootTransformToZoomStates.TryGetValue(rootTransform, out ZoomState hitZoomState))
-                        {
-                            hitZoomState = new ZoomState
-                            {
-                                originalScale = rootTransform.localScale,
-                                zoomCommands = new List<ZoomCommand>((int)ZoomState.ZoomMaxSteps),
-                                currentTargetZoomSteps = 0,
-                                currentZoomFactor = 1.0f
-                            };
-                        }
-
-                        // Zoom into city containing the currently hovered element
-                        if (zoomInto)
-                        {
-                            CityCursor cursor = rootTransform.parent.GetComponent<CityCursor>();
-                            if (cursor.E.HasFocus())
-                            {
-                                float optimalTargetZoomFactor = clippingPlane.MinLengthXZ / (cursor.E.ComputeDiameterXZ() / hitZoomState.currentZoomFactor);
-                                float optimalTargetZoomSteps = ConvertZoomFactorToZoomSteps(optimalTargetZoomFactor);
-                                int actualTargetZoomSteps = Mathf.FloorToInt(optimalTargetZoomSteps);
-
-                                int zoomSteps = actualTargetZoomSteps - (int)hitZoomState.currentTargetZoomSteps;
-                                if (zoomSteps == 0)
-                                {
-                                    zoomSteps = -(int)hitZoomState.currentTargetZoomSteps;
-                                }
-
-                                if (zoomSteps != 0)
-                                {
-                                    float zoomFactor = ConvertZoomStepsToZoomFactor(zoomSteps);
-                                    Vector2 centerOfTableAfterZoom = zoomSteps == -(int)hitZoomState.currentTargetZoomSteps ? rootTransform.position.XZ() : cursor.E.ComputeCenter().XZ();
-                                    Vector2 toCenterOfTable = clippingPlane.CenterXZ - centerOfTableAfterZoom;
-                                    Vector2 zoomCenter = clippingPlane.CenterXZ - (toCenterOfTable * (zoomFactor / (zoomFactor - 1.0f)));
-                                    float duration = 2.0f * ZoomState.DefaultZoomDuration;
-                                    hitZoomState.PushZoomCommand(zoomCenter, zoomSteps, duration);
-                                }
-                            }
-                        }
-
-                        // Apply zoom steps towards the city containing the currently hovered element
-                        if (zoomTowards)
-                        {
-                            int zoomSteps = zoomStepsDelta >= 0 ? Mathf.FloorToInt(zoomStepsDelta) : Mathf.FloorToInt(zoomStepsDelta);
-                            zoomSteps = Mathf.Clamp(zoomSteps, -(int)hitZoomState.currentTargetZoomSteps, (int)ZoomState.ZoomMaxSteps - (int)hitZoomState.currentTargetZoomSteps);
-                            hitZoomState.PushZoomCommand(hitPointOnPlane.XZ(), zoomSteps, ZoomState.DefaultZoomDuration);
-                        }
-
-                        // Note: This is the only place we ever insert a zoom state. The reason for the insertion here is that a ZoomState is a struct and we only ever modify a copy of it.
-                        rootTransformToZoomStates[rootTransform] = hitZoomState;
-                    }
-                }
-            }
-
             // TODO(torben): the remaining part should work both for desktop and vr and can be extracted!!!
-            // TODO(torben): put into FixedUpdate!
             Dictionary<Transform, ZoomState> newDict = new Dictionary<Transform, ZoomState>(rootTransformToZoomStates.Count);
             foreach (KeyValuePair<Transform, ZoomState> pair in rootTransformToZoomStates)
             {
@@ -226,12 +153,40 @@ namespace SEE.Controls.Actions
             rootTransformToZoomStates = newDict;
         }
 
+        /// <param name="transform">The transform to get the copy of its zoom state for.</param>
+        /// <returns>A copy of the current zoom state of given transform or a new instance, if no
+        /// such zoom state exists yet.</returns>
+        protected ZoomState GetZoomStateCopy(Transform transform)
+        {
+            if (!rootTransformToZoomStates.TryGetValue(transform, out ZoomState result))
+            {
+                result = new ZoomState
+                {
+                    originalScale = transform.localScale,
+                    zoomCommands = new List<ZoomCommand>((int)ZoomState.ZoomMaxSteps),
+                    currentTargetZoomSteps = 0,
+                    currentZoomFactor = 1.0f
+                };
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Updates the zoom state of the given transform with a copy of the given zoom state.
+        /// </summary>
+        /// <param name="transform">The transform to update the zoom state for.</param>
+        /// <param name="zoomState">The zoom state to use a copy of for given transform.</param>
+        protected void UpdateZoomState(Transform transform, ZoomState zoomState)
+        {
+            rootTransformToZoomStates[transform] = zoomState;
+        }
+
         /// <summary>
         /// Converts zoom steps to an actual zoom factor (scale factor).
         /// </summary>
         /// <param name="zoomSteps">The amount of zoom steps.</param>
         /// <returns>The zoom factor.</returns>
-        private static float ConvertZoomStepsToZoomFactor(float zoomSteps)
+        protected static float ConvertZoomStepsToZoomFactor(float zoomSteps)
         {
             float result = Mathf.Pow(2, zoomSteps * ZoomState.ZoomFactor);
             return result;
@@ -242,7 +197,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="zoomFactor">The zoom factor.</param>
         /// <returns>The amount of zoom steps.</returns>
-        private static float ConvertZoomFactorToZoomSteps(float zoomFactor)
+        protected static float ConvertZoomFactorToZoomSteps(float zoomFactor)
         {
             float result = Mathf.Log(zoomFactor, 2) / ZoomState.ZoomFactor;
             return result;

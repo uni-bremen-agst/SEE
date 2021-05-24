@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 6839967699279661582}
   - component: {fileID: 637028239384079898}
   - component: {fileID: -1556465120740209359}
-  - component: {fileID: 4225989449508293016}
+  - component: {fileID: 2429369898342928831}
   - component: {fileID: 6840467278216287030}
   m_Layer: 0
   m_Name: DesktopPlayer
@@ -170,7 +170,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1501b72e2e3bd084fba424e7ad5dff73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &4225989449508293016
+--- !u!114 &2429369898342928831
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -179,7 +179,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6839967699279661599}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3d868a2d3d5b29a43a534ee8e61f245a, type: 3}
+  m_Script: {fileID: 11500000, guid: 622dcdad617a1074e9c17a47a589dfd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!81 &6840467278216287030
