@@ -22,29 +22,34 @@ namespace SEE.Controls.Actions
             bool result = false;
 
             // FIXME: Needs adaptation for VR where no mouse is available.
-            if (Input.GetMouseButtonDown(0) 
+            if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
             {
                 // the hit object is the parent in which to create the new node
                 GameObject parent = raycastHit.collider.gameObject;
-                parent.transform.position.Set(parent.transform.position.x, parent.transform.position.y - parent.WorldSpaceScale().y / 2.0f, parent.transform.position.z);
-                parent.transform.localScale = new Vector3(parent.transform.localScale.x, parent.transform.localScale.x * 0.5f, parent.transform.localScale.z);
-                // The position at which the parent was hit will be the center point of the new node
-                Vector3 position = raycastHit.point;
-                position.Set(position[0], parent.transform.position.y + parent.WorldSpaceScale().y, position[2]);
-                Vector3 scale = FindSize(parent, position);
-                addedGameNode = GameNodeAdder.Add(parent, position: position, worldSpaceScale: scale);
-                if (addedGameNode != null)
+                if (parent.TryGetComponentOrLog(out NodeRef nodeRef) && !parent.transform.parent.TryGetComponent(out AbstractSEECity _))
                 {
-                    memento = new Memento(parent, position: position, scale: scale);
-                    memento.NodeID = addedGameNode.name;
-                    new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
-                    result = true;
-                    currentState = ReversibleAction.Progress.Completed;
-                }
-                else
-                {
-                    Debug.LogError($"New node could not be created.\n");
+                    string nodeId = nodeRef.Value.ID;
+                    Transform grandParent = parent.transform.parent;
+                    Vector3 oldPos = new Vector3(parent.transform.position.x, grandParent.transform.position.y, parent.transform.position.z);
+                    Vector3 oldWorldScale = FindSize(parent.gameObject, new Vector3(oldPos.x, grandParent.position.y, oldPos.z));
+                    GameNodeAdder.Remove(parent);
+                    parent = GameNodeAdder.Add(grandParent.gameObject, oldPos, 2* oldWorldScale, nodeId, false);
+                    // The position at which the parent was hit will be the center point of the new node
+                    Vector3 scale = FindSize(parent, oldPos);
+                    addedGameNode = GameNodeAdder.Add(parent, position: new Vector3(oldPos.x, parent.GetRoof() + scale.y, oldPos.z), worldSpaceScale: scale);
+                    if (addedGameNode != null)
+                    {
+                        memento = new Memento(parent, position: oldPos, scale: scale);
+                        memento.NodeID = addedGameNode.name;
+                        new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
+                        result = true;
+                        currentState = ReversibleAction.Progress.Completed;
+                    }
+                    else
+                    {
+                        Debug.LogError($"New node could not be created.\n");
+                    }
                 }
             }
             return result;
@@ -124,7 +129,7 @@ namespace SEE.Controls.Actions
             }
             result.y = 0.01f;
             return result;
-        }       
+        }
 
         /// <summary>
         /// Undoes this AddNodeAction.

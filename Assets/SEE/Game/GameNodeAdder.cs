@@ -89,14 +89,22 @@ namespace SEE.Game
         /// <param name="worldSpaceScale">the scale in world space of the new game node</param>
         /// <param name="nodeID">the unique ID of the new node; if null or empty, a random ID will be used</param>
         /// <returns>new child game node or null if none could be created</returns>
-        public static GameObject Add(GameObject parent, Vector3 position, Vector3 worldSpaceScale, string nodeID = null)
+        public static GameObject Add(GameObject parent, Vector3 position, Vector3 worldSpaceScale, string nodeID = null,bool isLeaf = true)
         {
             SEECity city = parent.ContainingCity();
             if (city != null)
             {
                 Node node = NewGraphNode(nodeID);
                 AddNodeToGraph(parent.GetNode(), node);
-                GameObject result = city.Renderer.NewLeafNode(node);
+                GameObject result;
+                if (isLeaf)
+                {
+                    result = city.Renderer.NewLeafNode(node);
+                }
+                else
+                {
+                    result = city.Renderer.NewInnerNode(node);
+                }
                 result.transform.localScale = worldSpaceScale;
                 result.transform.position = position;
                 result.transform.SetParent(parent.transform);
