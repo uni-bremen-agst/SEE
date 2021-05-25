@@ -112,8 +112,8 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void OnEnable()
         {
-            input.Start();
-            input.Register(OnPhraseRecognized);
+            input?.Start();
+            input?.Register(OnPhraseRecognized);
         }
 
         /// <summary>
@@ -121,8 +121,8 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void OnDisable()
         {
-            input.Stop();
-            input.Unregister(OnPhraseRecognized);
+            input?.Stop();
+            input?.Unregister(OnPhraseRecognized);
         }
     }
 }

@@ -4,10 +4,10 @@ using System.Net;
 using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
 using NetworkCommsDotNet.Connections.TCP;
+using SEE.Net.Util;
 
 namespace SEE.Net
 {
-
     /// <summary>
     /// The client of the game. Can connect to exactly one server.
     /// </summary>
@@ -80,10 +80,14 @@ namespace SEE.Net
                         Logger.Log($"Connection with server established: {Connection}");
                         break;
                     }
-                    catch (ConnectionSetupException) { }
+                    catch (ConnectionSetupException) 
+                    {
+                        Logger.Log($"No server connection could be established using : {connectionInfo}");
+                    }
                 }
                 if (!success)
                 {
+                    Logger.Log($"No server connection could be established using. You may want to check your firewall configuration.");
                     Network.SwitchToOfflineMode();
                     throw new ConnectionSetupException();
                 }
@@ -117,5 +121,4 @@ namespace SEE.Net
             }
         }
     }
-
 }
