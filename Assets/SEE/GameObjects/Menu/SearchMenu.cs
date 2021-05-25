@@ -1,13 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FuzzySharp;
+using FuzzySharp.Extractor;
 using SEE.Controls;
 using SEE.Game;
 using SEE.Game.Evolution;
+using SEE.Game.UI.Menu;
 using SEE.Game.UI.Notification;
 using SEE.Game.UI.PropertyDialog;
 using SEE.Utils;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace SEE.GO.Menu
 {
@@ -17,6 +21,8 @@ namespace SEE.GO.Menu
         private PropertyDialog searchDialog;
         private StringProperty searchString;
 
+        private bool stillHighlighting = true;
+
         private const int BLINK_SECONDS = 15;
         private const float MARKER_HEIGHT = 1f;
         private const float MARKER_WIDTH = 0.01f;
@@ -24,36 +30,25 @@ namespace SEE.GO.Menu
         private static readonly Color MARKER_COLOR = Color.red;
 
         private readonly IDictionary<string, ICollection<GameObject>> cachedNodes = new Dictionary<string, ICollection<GameObject>>();
+        private SimpleMenu resultMenu;
+        /// <summary>
+        /// A list containing all entries in the <see cref="resultMenu"/>.
+        /// </summary>
+        /// <remarks>This is not an <see cref="IList{T}"/> because the <c>ForEach</c> function is not defined for the
+        /// interface, which is used in <see cref="ShowResultsMenu"/>.</remarks>
+        private readonly List<MenuEntry> resultMenuEntries = new List<MenuEntry>();
 
         private void ExecuteSearch()
         {
-            IEnumerable<GameObject> results = cachedNodes.Where(x => FilterString(x.Key).Equals(FilterString(searchString.Value)))
-                                                         .SelectMany(x => x.Value);
-            int found = 0;
-            foreach (GameObject result in results)
-            {
-                found++;
-                GameObject cityObject = SceneQueries.GetCodeCity(result.transform).gameObject;
-                if (result.TryGetComponentOrLog(out Renderer cityRenderer) && 
-                    cityObject.TryGetComponentOrLog(out AbstractSEECity city))
-                {
-                    GraphRenderer graphRenderer = new GraphRenderer(city, null);
-                    Marker marker = new Marker(graphRenderer, MARKER_WIDTH, MARKER_HEIGHT, MARKER_COLOR, 
-                                               default, default, AbstractAnimator.DefaultAnimationTime);
-                    Material material = cityRenderer.sharedMaterials.Last();
-                    StartCoroutine(BlinkFor(BLINK_SECONDS, material));
-
-                    IEnumerator RemoveMarkerWhenDone()
-                    {
-                        yield return new WaitForSeconds(BLINK_SECONDS);
-                        marker.Clear();
-                    }
-                    
-                    StartCoroutine(RemoveMarkerWhenDone());
-                    marker.MarkBorn(result);
-                }
-            }
-
+            SEEInput.KeyboardShortcutsEnabled = true;
+            // Format: (score, name, found game object)
+            IEnumerable<(int, string, GameObject)> results =
+                Process.ExtractTop(FilterString(searchString.Value), cachedNodes.Keys)
+                       .Where(x => x.Score > 0) // results with score 0 are usually garbage
+                       .SelectMany(x => cachedNodes[x.Value].Select(y => (x.Score, x.Value, y)))
+                       .ToList();
+            
+            int found = results.Count();
             switch (found)
             {
                 case 0:
@@ -61,23 +56,86 @@ namespace SEE.GO.Menu
                                                             + $"'{FilterString(searchString.Value)}'.");
                     break;
                 case 1:
-                    ShowNotification.Info($"{found} nodes found", $"Found {found} nodes for search term " 
-                                                                  + $"'{searchString.Value}'. Nodes will blink for {BLINK_SECONDS} seconds.");
+                    HighlightNode(results.First().Item3, results.First().Item2);
                     break;
                 default:
-                    ShowNotification.Error("Not implemented", "This has not yet been implemented.");
-                    //TODO: Fuzzy search
+                    ShowResultsMenu(results);
                     break;
             }
 
-            SEEInput.KeyboardShortcutsEnabled = true;
+        }
+        
+        private void ShowResultsMenu(IEnumerable<(int, string, GameObject)> results)
+        {
+            if (resultMenu == null)
+            {
+                // Initialize result menu
+                resultMenu = gameObject.AddComponent<SimpleMenu>();
+                resultMenu.Title = "Search Results";
+                resultMenu.Description = "Please select the node you wish to highlight.";
+                resultMenu.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Search");
+            }
+
+            // Entries will be greyed out the further they go
+            resultMenuEntries.ForEach(resultMenu.RemoveEntry); // clean up previous entries
+            resultMenuEntries.Clear();
+            resultMenuEntries.AddRange(results.Select(x => new MenuEntry(() => MenuEntryAction(x.Item3, x.Item2), 
+                                                                         x.Item2, entryColor: ScoreColor(x.Item1))));
+            resultMenuEntries.ForEach(resultMenu.AddEntry);
+            resultMenu.ShowMenu(true);
+
+            // Highlight node and close menu when entry was chosen
+            void MenuEntryAction(GameObject chosen, string chosenName)
+            {
+                HighlightNode(chosen, chosenName);
+                resultMenu.ShowMenu(false);
+            }
+
+            // Returns a color between black and gray, the higher the given score the grayer it is
+            static Color ScoreColor(int score)
+            {
+                Debug.Log(score);
+                return Color.Lerp(Color.gray, Color.white, score / 100f);
+            }
         }
 
-        private static IEnumerator BlinkFor(int seconds, Material material)
+        private void HighlightNode(GameObject result, string resultName)
+        {
+            ShowNotification.Info($"Highlighting '{resultName}'", 
+                                  $"The selected node will be blinking and marked by a spear for {BLINK_SECONDS}.");
+            GameObject cityObject = SceneQueries.GetCodeCity(result.transform).gameObject;
+            if (result.TryGetComponentOrLog(out Renderer cityRenderer) &&
+                cityObject.TryGetComponentOrLog(out AbstractSEECity city))
+            {
+                // Display marker above the node
+                GraphRenderer graphRenderer = new GraphRenderer(city, null);
+                Marker marker = new Marker(graphRenderer, MARKER_WIDTH, MARKER_HEIGHT, MARKER_COLOR,
+                                           default, default, AbstractAnimator.DefaultAnimationTime);
+                Material material = cityRenderer.sharedMaterials.Last();
+                StartCoroutine(BlinkFor(BLINK_SECONDS, material));
+
+                StartCoroutine(RemoveMarkerWhenDone(marker));
+                marker.MarkBorn(result);
+            }
+
+            static IEnumerator RemoveMarkerWhenDone(Marker marker)
+            {
+                yield return new WaitForSeconds(BLINK_SECONDS);
+                marker.Clear();
+            }
+        }
+
+        private IEnumerator BlinkFor(int seconds, Material material)
         {
             Color originalColor = material.color;
+            stillHighlighting = true;
             for (int i = seconds*2; i > 0; i--)
             {
+                if (stillHighlighting) 
+                {
+                    // Another search has been started
+                    break;
+                }
                 material.color = material.color.Invert();
                 yield return new WaitForSeconds(0.5f);
             }
@@ -88,7 +146,7 @@ namespace SEE.GO.Menu
         private static string FilterString(string input)
         {
             const string zeroWidthSpace = "\u200B";
-            return input.ToLower().Trim().Replace(zeroWidthSpace, string.Empty);
+            return input.Trim().Replace(zeroWidthSpace, string.Empty);
         }
 
         private void Start()
@@ -113,8 +171,9 @@ namespace SEE.GO.Menu
             group.AddProperty(searchString);
             
             searchDialog = gameObject.AddComponent<PropertyDialog>();
-            searchDialog.Title = "Search for a node";
+            searchDialog.Title = "Search node";
             searchDialog.Description = "Enter the node name you wish to search for.";
+            searchDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Search");
             searchDialog.AddGroup(group);
             
             // Re-enable keyboard shortcuts on cancel
@@ -129,6 +188,7 @@ namespace SEE.GO.Menu
         {
             if (SEEInput.ToggleSearch())
             {
+                stillHighlighting = true;
                 searchDialog.DialogShouldBeShown = true;
                 SEEInput.KeyboardShortcutsEnabled = false;
             }

@@ -13,7 +13,7 @@ namespace SEE.Game.UI.Menu
     /// Responsible for the desktop UI for menus.
     /// </summary>
     /// <typeparam name="T">the type of entries used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
-    public partial class Menu<T>
+    public partial class SimpleMenu<T>
     {
         /// <summary>
         /// The path to the prefab for the menu game object.
@@ -175,14 +175,12 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// Destroys the button with the same text as the given <paramref name="entry"/>.
         /// If no such button exists, nothing will happen.
-        /// If more than one such button exists, an InvalidOperationException will be thrown.
+        /// If more than one such button exists, the first in the list will be removed.
         /// </summary>
         /// <param name="entry">The entry whose button shall be destroyed.</param>
-        /// <exception cref="System.InvalidOperationException">If more than one button with the same text as
-        /// <paramref name="entry"/> exists.</exception>
         private void RemoveDesktopButton(T entry)
         {
-            Destroy(ButtonManagers.SingleOrDefault(x => x.buttonText == entry.Title)?.gameObject);
+            Destroy(ButtonManagers?.FirstOrDefault(x => x.buttonText == entry.Title)?.gameObject);
         }
 
         protected override void UpdateDesktop()
