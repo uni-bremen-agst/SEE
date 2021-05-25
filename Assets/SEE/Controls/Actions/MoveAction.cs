@@ -9,7 +9,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// An action to move nodes. 
     /// </summary>
-    class MoveAction : AbstractPlayerAction
+    public class MoveAction : AbstractPlayerAction
     {
         private struct Hit
         {
@@ -42,35 +42,27 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="MoveAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="MoveAction"/></returns>
-        internal static ReversibleAction CreateReversibleAction()
+        internal static ReversibleAction CreateReversibleAction() => new MoveAction
         {
-            MoveAction result = new MoveAction
-            {
-                moving = false,
-                hit = new Hit(),
-                dragStartTransformPosition = Vector3.positiveInfinity,
-                dragStartOffset = Vector3.positiveInfinity,
-                dragCanonicalOffset = Vector3.positiveInfinity
-            };
-            return result;
-        }
+            moving = false,
+            hit = new Hit(),
+            dragStartTransformPosition = Vector3.positiveInfinity,
+            dragStartOffset = Vector3.positiveInfinity,
+            dragCanonicalOffset = Vector3.positiveInfinity
+        };
 
         /// <summary>
         /// Returns a new instance of <see cref="MoveAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
+        public override ReversibleAction NewInstance() => new MoveAction
         {
-            MoveAction result = new MoveAction
-            {
-                moving = moving,
-                hit = hit,
-                dragStartTransformPosition = dragStartTransformPosition,
-                dragStartOffset = dragStartOffset,
-                dragCanonicalOffset = dragCanonicalOffset
-            };
-            return result;
-        }
+            moving = moving,
+            hit = hit,
+            dragStartTransformPosition = dragStartTransformPosition,
+            dragStartOffset = dragStartOffset,
+            dragCanonicalOffset = dragCanonicalOffset
+        };
 
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
@@ -175,6 +167,10 @@ namespace SEE.Controls.Actions
 
                 moving = false;
                 hit = new Hit();
+
+                #region AbstractPlayerAction
+                currentState = ReversibleAction.Progress.Completed;
+                #endregion
             }
 
             if (synchronize)
@@ -182,6 +178,13 @@ namespace SEE.Controls.Actions
                 // TODO(torben): synchronize!
                 //new Net.SyncCitiesAction(this).Execute();
             }
+
+            #region AbstractPlayerAction
+            if (currentState != ReversibleAction.Progress.Completed)
+            {
+                currentState = moving ? ReversibleAction.Progress.InProgress : ReversibleAction.Progress.NoEffect;
+            }
+            #endregion
 
             return true;
         }
