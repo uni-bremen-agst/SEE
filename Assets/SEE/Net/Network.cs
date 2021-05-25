@@ -120,10 +120,24 @@ namespace SEE.Net
         public static bool InternalLoggingEnabled => instance && instance.internalLoggingEnabled;
 #endif
 
+        private static Thread mainThread = null;
         /// <summary>
         /// Contains the main thread of the application.
         /// </summary>
-        public static Thread MainThread { get; private set; } = Thread.CurrentThread;
+        public static Thread MainThread
+        {
+            get
+            {
+                Assert.IsNotNull(mainThread, "The main Unity thread must not have been determined as of now!");
+                return mainThread;
+            }
+            private set
+            {
+                Assert.IsNull(mainThread, "The main Unity thread has already been determined!");
+                Assert.IsNotNull(value, "The main Unity thread can not be null!");
+                mainThread = value;
+            }
+        }
 
         /// <summary>
         /// List of dead connections. Is packets can not be sent, this list is searched
@@ -144,6 +158,8 @@ namespace SEE.Net
             }
 
             instance = this;
+
+            MainThread = Thread.CurrentThread;
 
             if (!useInOfflineMode)
             {
