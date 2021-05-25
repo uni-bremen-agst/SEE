@@ -304,6 +304,7 @@ MonoBehaviour:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
+  buttonVar: {fileID: 0}
   normalImage: {fileID: 114497620367084474}
   normalText: {fileID: 114244554492011962}
   soundSource: {fileID: 0}
@@ -313,6 +314,7 @@ MonoBehaviour:
   useHoverSound: 1
   useClickSound: 1
   useRipple: 1
+  rippleUpdateMode: 1
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6

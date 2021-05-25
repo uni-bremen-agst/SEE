@@ -1,0 +1,1 @@
+Please use the .Net Standard 2.0 version when the UWP project targeting the newer .Net Standard 2.0. Currently the Odin Serializer does not support .Net Standard. 

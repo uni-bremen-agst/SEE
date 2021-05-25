@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace Michsky.UI.ModernUIPack
 {
@@ -44,7 +47,13 @@ namespace Michsky.UI.ModernUIPack
         {
             if (allowUpdating == true)
             {
+#if ENABLE_LEGACY_INPUT_MANAGER
                 cursorPos = Input.mousePosition;
+#elif ENABLE_INPUT_SYSTEM && ENABLE_LEGACY_INPUT_MANAGER
+                cursorPos = Input.mousePosition;
+#elif ENABLE_INPUT_SYSTEM
+                cursorPos = Mouse.current.position.ReadValue();
+#endif
                 cursorPos.z = tooltipZHelper.position.z;       
                 uiPos = tooltipRect.anchoredPosition;
                 CheckForBounds();

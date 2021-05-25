@@ -100,7 +100,7 @@ namespace SEEEditor
                                                            "Global attributes", true, EditorStyles.foldoutHeader);
             if (showGlobalAttributes)
             {                
-                city.CityPath = GetDataPath("Settings file", city.CityPath, Filenames.ExtensionWithoutPeriod(Filenames.ConfigExtension));
+                city.CityPath = DataPathEditor.GetDataPath("Settings file", city.CityPath, Filenames.ExtensionWithoutPeriod(Filenames.ConfigExtension));
                 GUILayout.BeginHorizontal();
                 if (GUILayout.Button("Load", GUILayout.Width(50)))
                 {
@@ -122,49 +122,6 @@ namespace SEEEditor
 
             // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
             // TODO: We may want to allow a user to define which node attributes should be mapped onto which icons
-        }
-
-        /// <summary>
-        /// Adds controls to set the attributes of <paramref name="dataPath"/>.
-        /// </summary>
-        /// <param name="label">a label in front of the controls shown in the inspector</param>
-        /// <param name="dataPath">the path to be set here</param>
-        /// <param name="extension">the extension the selected file should have (used as filter in file panel)</param>
-        /// <param name="fileDialogue">if true, a file panel is opened; otherwise a directory panel</param>
-        /// <returns>the resulting data specified as selected  by the user</returns>
-        protected static DataPath GetDataPath(string label, DataPath dataPath, string extension = "", bool fileDialogue = true)
-        {
-            GUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(label);
-
-            GUILayout.BeginVertical();
-            GUILayout.BeginHorizontal();
-            dataPath.Root = (DataPath.RootKind)EditorGUILayout.EnumPopup(dataPath.Root, GUILayout.Width(100));
-            if (dataPath.Root == DataPath.RootKind.Absolute)
-            {
-                dataPath.AbsolutePath = EditorGUILayout.TextField(dataPath.AbsolutePath);
-            }
-            else
-            {
-                dataPath.RelativePath = EditorGUILayout.TextField(dataPath.RelativePath);
-            }
-            if (GUILayout.Button("...", GUILayout.Width(20)))
-            {
-                string selectedPath = fileDialogue ?
-                      EditorUtility.OpenFilePanel("Select file", dataPath.RootPath, extension)
-                    : EditorUtility.OpenFolderPanel("Select directory", dataPath.RootPath, extension);
-                if (!string.IsNullOrEmpty(selectedPath))
-                {
-                    dataPath.Set(selectedPath);
-                }
-            }
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.LabelField(dataPath.Path);
-            EditorGUILayout.EndVertical();
-
-            EditorGUILayout.EndHorizontal();
-            return dataPath;
         }
 
         /// <summary>
@@ -256,7 +213,7 @@ namespace SEEEditor
             {
                 city.LeafObjects = (AbstractSEECity.LeafNodeKinds) EditorGUILayout.EnumPopup("Leaf nodes", city.LeafObjects);
                 city.NodeLayout = (NodeLayoutKind) EditorGUILayout.EnumPopup("Node layout", city.NodeLayout);
-                city.LayoutPath = GetDataPath("Layout file", city.LayoutPath, "gvl");
+                city.LayoutPath = DataPathEditor.GetDataPath("Layout file", city.LayoutPath, "gvl");
 
                 GUILayout.BeginHorizontal();
                 EditorGUILayout.PrefixLabel("Inner nodes");

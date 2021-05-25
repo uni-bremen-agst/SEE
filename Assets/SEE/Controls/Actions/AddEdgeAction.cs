@@ -1,7 +1,9 @@
-﻿using Assets.SEE.Game;
+﻿using SEE.Game;
+using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Net;
 using SEE.Utils;
+using System;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -148,9 +150,9 @@ namespace SEE.Controls.Actions
                 {
                     // The edge ID was created by the graph renderer.
                     memento.edgeID = createdEdge.ID();
+                    // action is completed (successfully or not; it does not matter)
                     from = null;
                     to = null;
-                    // action is completed (successfully or not; it does not matter)
                     result = true;
                     currentState = ReversibleAction.Progress.Completed;
                 }
@@ -169,9 +171,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Undo()
         {
-            base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
+            base.Undo();
             GameEdgeAdder.Remove(createdEdge);
             new DeleteNetAction(createdEdge.name).Execute();
+            Destroyer.DestroyGameObject(createdEdge);
             createdEdge = null;
         }
 
@@ -180,7 +183,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Redo()
         {
-            base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
+            base.Redo();
             createdEdge = CreateEdge(ref memento);
         }
 
@@ -206,10 +209,19 @@ namespace SEE.Controls.Actions
             {
                 memento.to = GameObject.Find(memento.toID);
             }
-            GameObject result = GameEdgeAdder.Add(memento.from, memento.to, memento.edgeID);
-            // Note that we need to use result.name as edge ID because edgeMemento.edgeID could be null.
-            new AddEdgeNetAction(memento.from.name, memento.to.name, result.name).Execute();
-            return result;
+            try
+            {
+                GameObject result = GameEdgeAdder.Add(memento.from, memento.to, memento.edgeID);
+                UnityEngine.Assertions.Assert.IsNotNull(result);
+                // Note that we need to use result.name as edge ID because edgeMemento.edgeID could be null.
+                new AddEdgeNetAction(memento.from.name, memento.to.name, result.name).Execute();
+                return result;
+            }
+            catch (Exception e)
+            {
+                ShowNotification.Error("New edge", $"An edge could not be created: {e.Message}.");
+                return null;
+            }
         }
 
         /// <summary>
