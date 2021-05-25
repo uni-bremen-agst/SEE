@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace SEE.Net
 {
-
     /// <summary>
     /// The player synchronizes the player transform with the camera transform.
     /// </summary>
@@ -28,9 +27,9 @@ namespace SEE.Net
                     throw new System.NullReferenceException("Main camera must not be null!");
                 }
                 cameraTransform = MainCamera.Camera.transform;
-                for (int i = 0; i < transform.childCount; i++)
+                foreach (Transform child in transform)
                 {
-                    transform.GetChild(i).gameObject.SetActive(false);
+                    child.gameObject.SetActive(false);
                 }
             }
             else
@@ -48,5 +47,4 @@ namespace SEE.Net
             transform.rotation = cameraTransform.rotation;
         }
     }
-
 }
