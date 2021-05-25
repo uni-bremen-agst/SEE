@@ -2,7 +2,6 @@
 using SEE.Game.UI3D;
 using SEE.GO;
 using SEE.Utils;
-using System;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -10,7 +9,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// An action to rotate nodes. 
     /// </summary>
-    class RotateAction : AbstractPlayerAction
+    public class RotateAction : AbstractPlayerAction
     {
         private struct Hit
         {
@@ -34,35 +33,27 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="RotateAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="RotateAction"/></returns>
-        internal static ReversibleAction CreateReversibleAction()
+        internal static ReversibleAction CreateReversibleAction() => new RotateAction
         {
-            RotateAction result = new RotateAction
-            {
-                rotating = false,
-                hit = new Hit(),
-                originalEulerAngleY = 0.0f,
-                originalPosition = Vector3.zero,
-                startAngle = 0.0f
-            };
-            return result;
-        }
+            rotating = false,
+            hit = new Hit(),
+            originalEulerAngleY = 0.0f,
+            originalPosition = Vector3.zero,
+            startAngle = 0.0f
+        };
 
         /// <summary>
         /// Returns a new instance of <see cref="RotateAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
+        public override ReversibleAction NewInstance() => new RotateAction
         {
-            RotateAction result = new RotateAction
-            {
-                rotating = rotating,
-                hit = hit,
-                originalEulerAngleY = originalEulerAngleY,
-                originalPosition = originalPosition,
-                startAngle = startAngle
-            };
-            return result;
-        }
+            rotating = rotating,
+            hit = hit,
+            originalEulerAngleY = originalEulerAngleY,
+            originalPosition = originalPosition,
+            startAngle = startAngle
+        };
 
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
@@ -202,6 +193,10 @@ namespace SEE.Controls.Actions
                     o.SetGrab(false, true);
                 }
                 gizmo.gameObject.SetActive(false);
+
+                #region AbstractPlayerAction
+                currentState = ReversibleAction.Progress.Completed;
+                #endregion
             }
 
             if (synchronize)
@@ -209,6 +204,13 @@ namespace SEE.Controls.Actions
                 // TODO(torben): synchronize
                 //new Net.SyncCitiesAction(this).Execute();
             }
+
+            #region AbstractPlayerAction
+            if (currentState != ReversibleAction.Progress.Completed)
+            {
+                currentState = rotating ? ReversibleAction.Progress.InProgress : ReversibleAction.Progress.NoEffect;
+            }
+            #endregion
 
             return true;
         }
