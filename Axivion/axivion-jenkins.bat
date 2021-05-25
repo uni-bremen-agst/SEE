@@ -15,8 +15,13 @@ REM set "BAUHAUS_PYTHON=C:\Users\SWT\AppData\Local\Programs\Python\Python38\pyth
 REM include Bauhaus bin in exectuable path
 set "PATH=C:\Program Files (x86)\Bauhaus\bin;%PATH%"
 
-REM SEE project directory (generally the Jenkins workspace)
-set "SEEDIRECTORY=%WORKSPACE%"
+REM SEE project directory (generally the Jenkins workspace if this job is run
+REM by Jenkins, in which case WORKSPACE is set, or otherwise the current directory)
+if "%WORKSPACE%" == "" (
+  set "SEEDIRECTORY=%cd%"
+) else (
+  set "SEEDIRECTORY=%WORKSPACE%"
+)
 
 REM where the Axivion configuration resides within SEE
 set "BAUHAUS_CONFIG=%SEEDIRECTORY%\Axivion"
@@ -37,7 +42,7 @@ REM   net (start|stop) "axivion_dashboard_service"
 REM or use the Windows Services Console (services.msc).
 
 REM The Visual Studio .csproj files need to be created before we can start the build.
-"C:\Program Files\Unity\Hub\Editor\2020.3.5f1\Editor\Unity.exe" -batchmode -nographics -logFile - -executeMethod UnityEditor.SyncVS.SyncSolution -projectPath . -quit
+"C:\Program Files\Unity\Hub\Editor\2020.3.9f1\Editor\Unity.exe" -batchmode -nographics -logFile - -executeMethod UnityEditor.SyncVS.SyncSolution -projectPath . -quit
 
 REM Count the number of command-line parameters
 setlocal enabledelayedexpansion

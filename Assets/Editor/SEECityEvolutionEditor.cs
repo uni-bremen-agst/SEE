@@ -91,7 +91,7 @@ namespace SEEEditor
         protected void Attributes()
         {
             SEECityEvolution city = target as SEECityEvolution;
-            city.GXLDirectory = GetDataPath("GXL directory", city.GXLDirectory, fileDialogue: false);
+            city.GXLDirectory = DataPathEditor.GetDataPath("GXL directory", city.GXLDirectory, fileDialogue: false);
         }
     }
 }
