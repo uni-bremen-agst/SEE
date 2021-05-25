@@ -65,7 +65,10 @@ namespace SEE.Game
         /// <summary>
         /// Inverse operation of <see cref="Add(GameObject, GameObject, string)"/>.
         /// Removes the given <paramref name="gameEdge"/> from the scene and its associated 
-        /// graph edge from its graph. <paramref name="gameEdge"/> is destroyed afterwards.
+        /// graph edge from its graph.
+        /// 
+        /// Note: <paramref name="gameEdge"/> is not actually destroyed.
+        /// 
         /// Precondition: <paramref name="gameEdge"/> must have a valid EdgeRef; otherwise
         /// an exception will be thrown.
         /// </summary>
@@ -76,7 +79,6 @@ namespace SEE.Game
             {
                 Graph graph = edge.ItsGraph;
                 graph.RemoveEdge(edge);
-                GameObject.Destroy(gameEdge);
             }
             else
             {

@@ -5,10 +5,10 @@ using System.Net;
 using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
 using UnityEngine;
+using SEE.Net.Util;
 
 namespace SEE.Net
 {
-
     /// <summary>
     /// The server of the game. Various clients can connect to this server in case they
     /// know the IP-address.
@@ -96,12 +96,12 @@ namespace SEE.Net
                     {
                         message += "\n" + connectionListener.LocalListenEndPoint;
                     }
-                    Logger.Log(message);
+                    Util.Logger.Log(message);
 #endif
                 }
                 catch (Exception e)
                 {
-                    Logger.LogException(e);
+                    Util.Logger.LogException(e);
                 }
 
                 initialized = true;
@@ -178,7 +178,7 @@ namespace SEE.Net
             {
                 if (!Connections.Contains(connection))
                 {
-                    Logger.Log("Connection with client established: " + connection);
+                    Util.Logger.Log("Connection with client established: " + connection);
 
                     // synchronize current state with new client
                     if (!connection.ConnectionInfo.RemoteEndPoint.Equals(Client.LocalEndPoint))
@@ -288,10 +288,9 @@ namespace SEE.Net
                         }
                     }
 
-                    Logger.Log("Connection closed: " + connection);
+                    Util.Logger.Log($"Connection closed: {connection}");
                 }
             }
         }
     }
-
 }

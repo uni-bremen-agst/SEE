@@ -1,12 +1,12 @@
-﻿using SEE.Game;
+using SEE.Controls;
+using SEE.Game;
 using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Net
 {
     /// <summary>
-    /// This class is responsible for deleting a node or edge via network from one client to all others and 
-    /// to the server. 
+    /// This class propagates a <see cref="DeleteAction"/> to all clients in the network.
     /// </summary>
     public class DeleteNetAction : AbstractAction
     {
@@ -23,7 +23,7 @@ namespace SEE.Net
         /// </summary>
         /// <param name="gameObjectID">the unique name of the gameObject of a node or edge 
         /// that has to be deleted</param>
-        public DeleteNetAction(string gameObjectID)
+        public DeleteNetAction(string gameObjectID) : base()
         {
             this.GameObjectID = gameObjectID;
         }
@@ -50,10 +50,16 @@ namespace SEE.Net
                     if (gameObject.HasNodeRef())
                     {
                         GameNodeAdder.Remove(gameObject);
+                        // gameObject is not actually destroyed because we are moving it to the garbage can.
+                        PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.MoveNodeToGarbage(gameObject.AllAncestors()));
+                        Portal.SetInfinitePortal(gameObject);
                     }
                     else if (gameObject.HasEdgeRef())
                     {
+                        DeletionAnimation.HideEdge(gameObject);
                         GameEdgeAdder.Remove(gameObject);
+                        // Note: gameObject is not actually destroyed because it will be
+                        // moved to the garbage can from where it can be restored.
                     }
                 }
                 else
