@@ -55,7 +55,10 @@ namespace SEE.Controls
         /// <param name="phraseRecognizedDelegate">callback to be unregistered</param>
         public void Unregister(PhraseRecognizedDelegate phraseRecognizedDelegate)
         {
-            recognizer.OnPhraseRecognized -= phraseRecognizedDelegate;
+            if (recognizer != null)
+            {
+                recognizer.OnPhraseRecognized -= phraseRecognizedDelegate;
+            }
         }
 
         /// <summary>

@@ -109,7 +109,7 @@ namespace SEEEditor
             showGlobalAttributes = EditorGUILayout.Foldout(showGlobalAttributes, "Global attributes", true, EditorStyles.foldoutHeader);
             if (showGlobalAttributes)
             {                
-                city.CityPath = GetDataPath("Settings file", city.CityPath, Filenames.ExtensionWithoutPeriod(Filenames.ConfigExtension));
+                city.CityPath = DataPathEditor.GetDataPath("Settings file", city.CityPath, Filenames.ExtensionWithoutPeriod(Filenames.ConfigExtension));
                 GUILayout.BeginHorizontal();
                 if (GUILayout.Button("Load", GUILayout.Width(50)))
                 {
