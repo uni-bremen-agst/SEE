@@ -86,7 +86,7 @@ namespace SEE
     }
 
     /// <summary>
-    /// The settings of leaf nodes of a specific kind. They may be unique per <see cref="Node.Kind"/>.
+    /// The settings of leaf nodes of a specific kind. They may be unique per <see cref="Node.NodeDomain"/>.
     /// </summary>
     public class LeafNodeAttributes
     {
@@ -102,7 +102,7 @@ namespace SEE
     }
 
     /// <summary>
-    /// The setting for inner nodes of a specific kind. They may be unique per <see cref="Node.Kind"/>.
+    /// The setting for inner nodes of a specific kind. They may be unique per <see cref="Node.NodeDomain"/>.
     /// </summary>
     public class InnerNodeAttributes
     {

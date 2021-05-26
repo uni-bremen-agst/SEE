@@ -35,16 +35,16 @@ namespace SEE.Game
         public GlobalCityAttributes globalCityAttributes = new GlobalCityAttributes();
 
         /// <summary>
-        /// The attributes of the leaf nodes per kind. They are indexed by <see cref="Node.Kind"/>
+        /// The attributes of the leaf nodes per kind. They are indexed by <see cref="Node.NodeDomain"/>
         /// casted to an integer.
         /// </summary>
-        public LeafNodeAttributes[] leafNodeAttributesPerKind = ArrayUtils.New((int)Node.Kind.Count, (int _) => new LeafNodeAttributes());
+        public LeafNodeAttributes[] leafNodeAttributesPerKind = ArrayUtils.New((int)Node.NodeDomain.Count, (int _) => new LeafNodeAttributes());
 
         /// <summary>
-        /// The attributes of the inner nodes per kind. They are indexed by <see cref="Node.Kind"/>
+        /// The attributes of the inner nodes per kind. They are indexed by <see cref="Node.NodeDomain"/>
         /// casted to an integer.
         /// </summary>
-        public InnerNodeAttributes[] innerNodeAttributesPerKind = ArrayUtils.New((int)Node.Kind.Count, (int _) => new InnerNodeAttributes());
+        public InnerNodeAttributes[] innerNodeAttributesPerKind = ArrayUtils.New((int)Node.NodeDomain.Count, (int _) => new InnerNodeAttributes());
 
         /// <summary>
         /// The node layout settings.
@@ -552,7 +552,7 @@ namespace SEE.Game
                 {
                     if (!node.IsLeaf())
                     {
-                        dirsShape.Add(node.ID, innerNodeAttributesPerKind[(int)node.kind].kind);
+                        dirsShape.Add(node.ID, innerNodeAttributesPerKind[(int)node.Domain].kind);
                         dirsLocal.Add(node.ID, false);
                         dirsLayout.Add(node.ID, nodeLayoutSettings.kind);
                     }

@@ -13,6 +13,7 @@ namespace SEE.DataModel.DG
             Node result = new Node();
             result.ID = id;
             result.Type = type;
+            result.Domain = Node.NodeDomain.Implementation;
             graph.AddNode(result);
             return result;
         }
