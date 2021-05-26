@@ -120,7 +120,7 @@ namespace SEE.Utils
         /// Whether the mouse currently hovers over a GUI element.
         /// 
         /// Note: If no <see cref="EventSystem"/> exists in the scene, internal calls will fails
-        /// and <code>false</code> will be returned.
+        /// and <c>false</c> will be returned.
         /// </summary>
         /// <returns>Whether the mouse currently hovers over a GUI element.</returns>
         public static bool IsMouseOverGUI()
