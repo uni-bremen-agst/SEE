@@ -117,7 +117,7 @@ namespace SEE.Controls.Actions
 
         public bool Update()
         {
-            if (Input.GetKeyDown(KeyCode.M)) // TODO(torben): Bindings
+            if (SEEInput.Mapping())
             {
                 mapping.FinalizeNodeHierarchy();
                 SEECity city = SceneQueries.FindMapping();

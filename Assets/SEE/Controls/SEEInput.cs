@@ -97,6 +97,15 @@ namespace SEE.Controls
 #endif
         }
 
+        /// <summary>
+        /// The user wants to map an implementation node onto an architecture node for the architecture analysis.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        internal static bool Mapping()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Mapping);
+        }
+
         //-----------------------------------------------------
         // Camera path recording and playing
         //-----------------------------------------------------
