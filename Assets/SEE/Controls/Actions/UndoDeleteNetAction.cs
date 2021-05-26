@@ -85,7 +85,7 @@ namespace SEE.Net
                 {
                     if (gameObject.HasEdgeRef())
                     {
-                        PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.RemoveNodeFromGarbage(new List<GameObject> {gameObject}));
+                        PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.RemoveFromGarbage(new List<GameObject> {gameObject}));
                         if (gameObject.TryGetComponentOrLog(out EdgeRef edgeReference))
                         {
                             try
@@ -104,7 +104,7 @@ namespace SEE.Net
                         {
                             gameObject
                         };
-                        PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.RemoveNodeFromGarbage(removeFromGarbage));
+                        PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.RemoveFromGarbage(removeFromGarbage));
                         Portal.SetInfinitePortal(gameObject);
                         Graph.AddNode(gameObject.GetNode());
                         Graph.FinalizeNodeHierarchy();

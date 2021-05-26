@@ -143,11 +143,11 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Removes all given nodes from the garbage can back to their original location.
+        /// Removes all given <paramref name="deletedNodesOrEdges"/> from the garbage can back to their original location.
         /// </summary>
-        /// <param name="deletedNodesAndEdges">The nodes to be removed from the garbage can</param>
-        /// <returns>the waiting time between moving deleted nodes from the garbage can and then to the city</returns>
-        public static IEnumerator RemoveNodeFromGarbage(IList<GameObject> deletedNodesOrEdges)
+        /// <param name="deletedNodesAndEdges">The nodes and edges to be removed from the garbage can</param>
+        /// <returns>the waiting time between moving deleted objexra from the garbage can and then to the city</returns>
+        public static IEnumerator RemoveFromGarbage(IList<GameObject> deletedNodesOrEdges)
         {
             Vector3 garbageCanPosition = GarbageCanPosition();
 
