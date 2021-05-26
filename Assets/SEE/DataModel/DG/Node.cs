@@ -11,19 +11,48 @@ namespace SEE.DataModel.DG
         // IMPORTANT NOTES:
         //
         // If you use Clone() to create a copy of a node, be aware that the clone
-        // will have a deep copy of all attributes and the type of the node only.
+        // will have a deep copy of all attributes and the type and domain of the node only.
         // The hierarchy information (parent, children, level) is not copied at all.
         // The clone will appear as a node without parent and children at level 0.
         // Neither will its incoming and outgoing edges be copied.
 
-        public enum Kind : byte
+        /// <summary>
+        /// The domain of a node regarding the architecture analysis, that is, 
+        /// whether it belongs to the architecture, implementation, or 
+        /// mapping between the two.
+        /// </summary>
+        public enum NodeDomain : byte
         {
+            /// <summary>
+            /// Does not belong to any domain.
+            /// </summary>
             Unspecified,
+            /// <summary>
+            /// Represents a fact retrieved from the implementation,
+            /// typically created by a static analysis.
+            /// </summary>
             Implementation,
+            /// <summary>
+            /// Represents a concept in the architecture and was created 
+            /// by the software architecture. It is part of the architecture
+            /// model.
+            /// </summary>
             Architecture,
+            /// <summary>
+            /// Is part of the mapping from the implementation domain
+            /// onto the architecture domain.
+            /// </summary>
             Mapping,
+            /// <summary>
+            /// FIXME: What exactly does this represent?
+            /// </summary>
             Count
         }
+
+        /// <summary>
+        /// The domain of the node.
+        /// </summary>
+        public NodeDomain Domain = NodeDomain.Unspecified;
 
         /// <summary>
         /// The attribute name for unique identifiers (within a graph).
@@ -41,8 +70,6 @@ namespace SEE.DataModel.DG
         /// to a graph, however, setting this property is safe.
         /// </summary>
         public override string ID { get; set; } = "";
-
-        public Kind kind = Kind.Unspecified;
 
         /// <summary>
         /// The attribute name for the name of nodes. They may or may not be unique.

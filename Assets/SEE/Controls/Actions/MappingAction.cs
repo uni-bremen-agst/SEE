@@ -39,17 +39,17 @@ namespace SEE.Controls.Actions
             mapping.Name = mappingName;
             foreach (Node n in impl.Nodes())
             {
-                n.kind |= Node.Kind.Implementation;
+                n.Domain |= Node.NodeDomain.Implementation;
             }
             foreach (Node n in arch.Nodes())
             {
-                n.kind |= Node.Kind.Architecture;
+                n.Domain |= Node.NodeDomain.Architecture;
             }
             Node mappingRoot = new Node
             {
                 ID = mappingName,
                 SourceName = mappingName,
-                kind = Node.Kind.Mapping,
+                Domain = Node.NodeDomain.Mapping,
                 Type = "Mapping",
                 Parent = null
             };
@@ -173,10 +173,10 @@ namespace SEE.Controls.Actions
             {
                 if (replaced[0].TryGetNode(out Node srcNode) && by[0].TryGetNode(out Node dstNode))
                 {
-                    Node.Kind srcKind = srcNode.kind;
-                    Node.Kind dstKind = dstNode.kind;
+                    Node.NodeDomain srcKind = srcNode.Domain;
+                    Node.NodeDomain dstKind = dstNode.Domain;
                     // Note: Arch elems should not be moved into impl elems
-                    if (!srcNode.ID.Equals(dstNode.ID) && !(srcKind == Node.Kind.Architecture && dstKind == Node.Kind.Implementation) && !srcNode.IsRoot())
+                    if (!srcNode.ID.Equals(dstNode.ID) && !(srcKind == Node.NodeDomain.Architecture && dstKind == Node.NodeDomain.Implementation) && !srcNode.IsRoot())
                     {
                         Node src = mapping.GetNode(srcNode.ID);
                         Node dst = mapping.GetNode(dstNode.ID);

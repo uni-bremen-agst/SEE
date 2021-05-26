@@ -11,6 +11,7 @@ namespace SEE.DataModel.DG
         {
             Node node = new Node();
             node.Type = "Routine";
+            node.Domain = Node.NodeDomain.Implementation;
             node.ID = linkname;
             node.SourceName = "Source_" + linkname;
             node.SetFloat("float", 1.0f);
@@ -29,6 +30,7 @@ namespace SEE.DataModel.DG
 
             Node clone = (Node)original.Clone();
             Assert.That(clone.Type == original.Type);
+            Assert.That(clone.Domain == original.Domain);
             Assert.That(clone.ID == original.ID);
             Assert.That(clone.SourceName == original.SourceName);
             Assert.That(clone.GetFloat("float") == original.GetFloat("float"));
