@@ -148,6 +148,7 @@ namespace SEE.Game.Charts
         // TODO(torben): i'd rather have the Viewport sizes, as this is slightly too
         // large. as a result, i have to calculate 'first' in Update() every frame with
         // 'verticalScrollBar.value'
+
         /// <summary>
         /// The transform if the scroll view rect is used to determine the max size and
         /// thus the upper limit of entries of the panel.
@@ -236,7 +237,8 @@ namespace SEE.Game.Charts
 
         private ScrollViewEntry[] scrollViewEntries;
         private ScrollViewEntryData[] scrollViewEntryData;
-        private Stack<ScrollViewEntry> pool;
+        private List<ScrollViewEntry> scrollViewEntryPool;
+        private List<ChartMarker> chartMarkerPool;
 
         private int previousFirst = 0;
         private int previousOnePastLast = 0;
@@ -252,7 +254,8 @@ namespace SEE.Game.Charts
         {
             Assert.IsTrue(scrollContent.transform.childCount == 0);
 
-            pool = new Stack<ScrollViewEntry>(maxPanelEntryCount);
+            scrollViewEntryPool = new List<ScrollViewEntry>(maxPanelEntryCount);
+            chartMarkerPool = new List<ChartMarker>();
 
             ReloadData();
         }
@@ -388,12 +391,20 @@ namespace SEE.Game.Charts
 
         private void PushScrollViewEntriesToPool(int first, int onePastLast)
         {
+            // Increase necessary capacity at once to reduce number of memory allocations to one
+            int newCount = scrollViewEntryPool.Count + onePastLast - first;
+            if (newCount > scrollViewEntryPool.Capacity)
+            {
+                scrollViewEntryPool.Capacity = newCount;
+            }
+
+            // Pool objects
             for (int i = first; i < onePastLast; i++)
             {
                 Assert.IsNotNull(scrollViewEntries[i], "The toggle to be pooled is null!");
 
                 scrollViewEntries[i].OnDestroy();
-                pool.Push(scrollViewEntries[i]);
+                scrollViewEntryPool.Add(scrollViewEntries[i]);
                 scrollViewEntries[i] = null;
             }
         }
@@ -408,12 +419,13 @@ namespace SEE.Game.Charts
         /// <param name="go">The game object containing the scroll view toggle.</param>
         private void RetrieveScrollViewEntry(ref ScrollViewEntry svt, ref GameObject go)
         {
-            if (pool.Count > 0)
+            if (scrollViewEntryPool.Count > 0) // Retrieve from pooled objects...
             {
-                svt = pool.Pop();
+                svt = scrollViewEntryPool[scrollViewEntryPool.Count - 1];
+                scrollViewEntryPool.RemoveAt(scrollViewEntryPool.Count - 1);
                 go = svt.gameObject;
             }
-            else
+            else // ... or create a new one
             {
                 go = Instantiate(scrollEntryPrefab, scrollContent.transform);
                 svt = go.GetComponent<ScrollViewEntry>();
@@ -873,12 +885,22 @@ namespace SEE.Game.Charts
                     GameObject marker;
                     if (currentReusedActiveMarkerIndex < activeMarkers.Count)
                     {
+                        // Reuse previously used marker
                         chartMarker = activeMarkers[currentReusedActiveMarkerIndex++];
                         chartMarker.OnDestroy();
                         marker = chartMarker.gameObject;
                     }
+                    else if (chartMarkerPool.Count > 0)
+                    {
+                        // Retrieve marker from pool
+                        chartMarker = chartMarkerPool[chartMarkerPool.Count - 1];
+                        marker = chartMarker.gameObject;
+                        marker.SetActive(true);
+                        chartMarkerPool.RemoveAt(chartMarkerPool.Count - 1);
+                    }
                     else
                     {
+                        // Create new marker
                         marker = Instantiate(markerPrefab, entries.transform);
                         chartMarker = marker.GetComponent<ChartMarker>();
                     }
@@ -902,19 +924,31 @@ namespace SEE.Game.Charts
                 chartMarker.PushInteractableObject(nodeRef.GetComponent<InteractableObject>(), infoText);
             }
 
-            for (int m = currentReusedActiveMarkerIndex; m < activeMarkers.Count; m++)
+            // Increase capacity at once to reduce number of allocations to only one.
+            int markerPoolCount = chartMarkerPool.Count + activeMarkers.Count - currentReusedActiveMarkerIndex;
+            if (markerPoolCount > chartMarkerPool.Capacity)
             {
-                if (activeMarkers[m].gameObject != null)
+                chartMarkerPool.Capacity = markerPoolCount;
+            }
+
+            for (int i = currentReusedActiveMarkerIndex; i < activeMarkers.Count; i++)
+            {
+                if (activeMarkers[i].gameObject != null)
                 {
-                    Destroy(activeMarkers[m].gameObject); // TODO(torben): these could potentially still be pooled for future rebuilds
+                    // Pool markers for future use
+                    activeMarkers[i].gameObject.SetActive(false);
+                    activeMarkers[i].OnDestroy();
+#if UNITY_EDITOR
+                    activeMarkers[i].name = "Pooled ChartMarker";
+#endif
+                    chartMarkerPool.Add(activeMarkers[i]);
                 }
             }
             activeMarkers = updatedMarkers;
         }
 
         /// <summary>
-        /// Hoveres every interactable object of every marker, that is inside given
-        /// bounds.
+        /// Hoveres every interactable object of every marker, that is inside given bounds.
         /// </summary>
         /// <param name="min">The min value of the bounds.</param>
         /// <param name="max">The max value of the bounds.</param>

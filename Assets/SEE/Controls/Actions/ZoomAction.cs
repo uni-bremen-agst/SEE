@@ -119,7 +119,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void FixedUpdate()
         {
-            // TODO(torben): the remaining part should work both for desktop and vr and can be extracted!!!
             Dictionary<Transform, ZoomState> newDict = new Dictionary<Transform, ZoomState>(rootTransformToZoomStates.Count);
             foreach (KeyValuePair<Transform, ZoomState> pair in rootTransformToZoomStates)
             {
@@ -163,6 +162,8 @@ namespace SEE.Controls.Actions
                     //moveState.dragStartTransformPosition += moveState.dragStartOffset;
                     //moveState.dragStartOffset = Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale);
                     //moveState.dragStartTransformPosition -= moveState.dragStartOffset;
+
+
 
                     // TODO(torben): synchronize here
                 }

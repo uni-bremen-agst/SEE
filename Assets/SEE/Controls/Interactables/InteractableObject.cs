@@ -29,9 +29,6 @@ namespace SEE.Controls
     /// <summary>
     /// Super class of the behaviours of game objects the player interacts with.
     /// </summary>
-    //[RequireComponent(typeof(GraphElement))]
-    //[RequireComponent(typeof(Interactable))]
-    // TODO(torben): for some reason, with these enabled, unity can not attach this component, even though the required components exist... (InteractableDecorator.cs)
     public sealed class InteractableObject : MonoBehaviour, IMixedRealityFocusHandler
     {
         // Tutorial on grabbing objects:
@@ -58,7 +55,7 @@ namespace SEE.Controls
         /// <summary>
         /// The interactable objects.
         /// </summary>
-        private static readonly Dictionary<uint, InteractableObject> idToInteractableObjectDict = new Dictionary<uint, InteractableObject>(); // TODO(torben): is a simple list sufficient?
+        private static readonly Dictionary<uint, InteractableObject> idToInteractableObjectDict = new Dictionary<uint, InteractableObject>();
 
         /// <summary>
         /// The hovered objects.
@@ -852,15 +849,6 @@ namespace SEE.Controls
         /// Intended for actions of the local player only.
         /// </summary>
         public static event LocalPlayerGrabAction LocalAnyGrabOut;
-
-#if false // TODO(torben): will we ever need this?
-        public delegate void CollisionAction(InteractableObject interactableObject, Collision collision);
-        public event CollisionAction CollisionIn;
-        public event CollisionAction CollisionOut;
-
-        private void OnCollisionEnter(Collision collision) => CollisionIn?.Invoke(this, collision);
-        private void OnCollisionExit(Collision collision) => CollisionIn?.Invoke(this, collision);
-#endif
 
         //----------------------------------------------------------------
         // Mouse actions

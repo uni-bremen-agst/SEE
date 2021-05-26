@@ -44,7 +44,9 @@ namespace SEE.DataModel.DG
             /// </summary>
             Mapping,
             /// <summary>
-            /// FIXME: What exactly does this represent?
+            /// The number of possible <see cref="NodeDomain"/>s. As more values are added above
+            /// this element, the integer value of this element will represent the number of
+            /// elements in this enum.
             /// </summary>
             Count
         }

@@ -37,7 +37,7 @@ namespace SEE.DataModel.DG
         {
             this.source = source;
             this.target = target;
-            id = Utils.RandomStrings.Get(); // TODO(torben): This could potentially not be unique
+            id = Utils.RandomStrings.Get(); // FIXME This could potentially not be unique @NotUniqueNaming
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         public Edge()
         {
-            id = Utils.RandomStrings.Get(); // TODO(torben): This could potentially not be unique
+            id = Utils.RandomStrings.Get(); // FIXME This could potentially not be unique @NotUniqueNaming
         }
 
         /// <summary>
