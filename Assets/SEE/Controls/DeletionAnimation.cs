@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using SEE.DataModel.DG;
 using System.Collections.Concurrent;
-using SEE.Controls;
 
 namespace SEE.Controls
 {
@@ -168,21 +167,18 @@ namespace SEE.Controls
                 {
                   Tweens.Move(nodeOrEdgeReference, oldPositions[nodeOrEdgeReference], TimeForAnimation);
                 }
-
-                else 
+                else if (nodeOrEdgeReference.TryGetComponentOrLog(out EdgeRef edgeReference))
                 {
-                    if (nodeOrEdgeReference.TryGetComponentOrLog(out EdgeRef edgeReference))
-                      {
-                        Node target = edgeReference.Value.Target;
-                        GameObject targetObject = SceneQueries.RetrieveGameNode(target.ID);
+                    Node target = edgeReference.Value.Target;
+                    GameObject targetObject = SceneQueries.RetrieveGameNode(target.ID);
 
-                        // due to the fact edges as a GameObject have the orginal position (0,0,0) unlike nodes and it would look like they move through the city on towards the ground 
-                        // having been removed fom the garbage can, we consequently move the edges first to their target´s node position and
-                        // afterwards to their final original position.
-                        Tweens.Move(nodeOrEdgeReference, targetObject.transform.position, TimeForAnimation / 2);
-                        yield return new WaitForSeconds(TimeForAnimation /2);
-                        Tweens.Move(nodeOrEdgeReference, oldPositions[nodeOrEdgeReference], TimeForAnimation);
-                    }
+                    // Due to the fact that edges as a GameObject have the orginal position (0,0,0) unlike nodes
+                    // and it would look like they move through the city on towards the ground 
+                    // having been removed fom the garbage can, we consequently move the edges first to 
+                    // their target´s node position and afterwards to their final original position.
+                    Tweens.Move(nodeOrEdgeReference, targetObject.transform.position, TimeForAnimation / 2);
+                    yield return new WaitForSeconds(TimeForAnimation / 2);
+                    Tweens.Move(nodeOrEdgeReference, oldPositions[nodeOrEdgeReference], TimeForAnimation);
                 }
             }
            
