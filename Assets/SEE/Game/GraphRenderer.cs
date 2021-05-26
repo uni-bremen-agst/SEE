@@ -1352,7 +1352,7 @@ namespace SEE.Game
             }
             else
             {
-                Assert.IsTrue((coloringKind == ColoringKind.RandomRange));
+                Assert.IsTrue(coloringKind == ColoringKind.RandomRange);
                 result = UnityEngine.Random.Range(0, (int)numberOfStyles);
             }
             return result;
