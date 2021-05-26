@@ -65,12 +65,24 @@ namespace SEE.Controls.Actions
         {
             internal const float DefaultZoomDuration = 0.1f;
             internal const uint ZoomMaxSteps = 32;
-            internal const float ZoomFactor = 0.5f;          // Handles the speed in which is zoomed into the city
+            /// <summary>
+            /// Handles the speed in which is zoomed into the city.
+            /// </summary>
+            internal const float ZoomFactor = 0.5f;
 
-            internal Vector3 originalScale;                  // Original scale of city for reset
+            /// <summary>
+            /// Original scale of city for reset.
+            /// </summary>
+            internal Vector3 originalScale;
             internal List<ZoomCommand> zoomCommands;
-            internal float currentTargetZoomSteps;           // The desired amount of zoom steps
-            internal float currentZoomFactor;                // Current zoom factor or scale of the city, relative to its original scale
+            /// <summary>
+            /// The desired amount of zoom steps.
+            /// </summary>
+            internal float currentTargetZoomSteps;
+            /// <summary>
+            /// Current zoom factor or scale of the city, relative to its original scale.
+            /// </summary>
+            internal float currentZoomFactor;
 
             /// <summary>
             /// Pushes a zoom command for execution. Zoom commands are automatically removed
