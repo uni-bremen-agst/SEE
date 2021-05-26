@@ -83,7 +83,7 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Raycasts agaings <see cref="InteractableObject"/>s and outputs either the closest hit
+        /// Raycasts against <see cref="InteractableObject"/>s and outputs either the closest hit
         /// or <code>null</code>, if no such hit exists.
         /// </summary>
         /// <param name="raycastHit">The raycast hit for the hit interactable object or the default value.</param>
