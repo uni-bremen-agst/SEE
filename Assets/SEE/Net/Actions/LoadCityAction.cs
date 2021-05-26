@@ -130,7 +130,8 @@ namespace SEE.Net
         /// <param name="city">The city to load.</param>
         public LoadCityAction(AbstractSEECity city)
         {
-            // TODO(torben): fix
+            // FIXME if this class is still wanted, it needs to be fixed and tested. the city
+            // settings had large refactorings and this was left out as of now.
 
             gameObjectName = city.name;
             type = city.GetType().ToString();
