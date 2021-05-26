@@ -21,7 +21,7 @@ namespace SEEEditor
             if (nodeRef.Value != null)
             {
                 EditorGUILayout.TextField("Level", nodeRef.Value.Level.ToString());
-                EditorGUILayout.EnumPopup("Kind", nodeRef.Value.kind);
+                EditorGUILayout.EnumPopup("Domain", nodeRef.Value.Domain);
                 ShowTypeAndAttributes(nodeRef.Value);
             }
             else

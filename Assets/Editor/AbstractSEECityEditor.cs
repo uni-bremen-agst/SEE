@@ -34,9 +34,9 @@ namespace SEEEditor
         private bool showLeafAttributes = true;
 
         /// <summary>
-        /// Whether the leaf node attributes for a given <see cref="Node.Kind"/> should be expanded.
+        /// Whether the leaf node attributes for a given <see cref="Node.NodeDomain"/> should be expanded.
         /// </summary>
-        private bool[] showLeafAttributesAtIndex = Enumerable.Repeat(false, (int)Node.Kind.Count).ToArray();
+        private bool[] showLeafAttributesAtIndex = Enumerable.Repeat(false, (int)Node.NodeDomain.Count).ToArray();
 
         /// <summary>
         /// Whether the inner node attribute foldout should be expanded.
@@ -44,9 +44,9 @@ namespace SEEEditor
         private bool showInnerAttributes = true;
 
         /// <summary>
-        /// Whether the inner node attributes for a given <see cref="Node.Kind"/> should be expanded.
+        /// Whether the inner node attributes for a given <see cref="Node.NodeDomain"/> should be expanded.
         /// </summary>
-        private bool[] showInnerAttributesAtIndex = Enumerable.Repeat(false, (int)Node.Kind.Count).ToArray();
+        private bool[] showInnerAttributesAtIndex = Enumerable.Repeat(false, (int)Node.NodeDomain.Count).ToArray();
 
         /// <summary>
         /// Whether the "nodes and node layout" foldout should be expanded.
@@ -246,7 +246,7 @@ namespace SEEEditor
                 Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
 
                 settings.kind = (NodeLayoutKind)EditorGUILayout.EnumPopup("Node layout", settings.kind);
-                city.globalCityAttributes.layoutPath = GetDataPath("Layout file", city.globalCityAttributes.layoutPath, "gvl");
+                city.globalCityAttributes.layoutPath = GetDataPath("Layout file", city.globalCityAttributes.layoutPath, Filenames.ExtensionWithoutPeriod(Filenames.GVLExtension));
                 settings.zScoreScale = EditorGUILayout.Toggle("Z-score scaling", settings.zScoreScale);
                 settings.showErosions = EditorGUILayout.Toggle("Show erosions", settings.showErosions);
                 settings.maxErosionWidth = EditorGUILayout.FloatField("Max. width of erosion icon", settings.maxErosionWidth);
@@ -262,9 +262,9 @@ namespace SEEEditor
             if (showInnerAttributes)
             {
                 EditorGUI.indentLevel++;
-                for (int i = 0; i < (int)Node.Kind.Count; i++)
+                for (int i = 0; i < (int)Node.NodeDomain.Count; i++)
                 {
-                    string label = "Type: " + ((Node.Kind)i).ToString();
+                    string label = "Domain: " + ((Node.NodeDomain)i).ToString();
                     showInnerAttributesAtIndex[i] = EditorGUILayout.Foldout(showInnerAttributesAtIndex[i], label, EditorStyles.foldout);
                     if (showInnerAttributesAtIndex[i])
                     {
@@ -298,9 +298,9 @@ namespace SEEEditor
             if (showLeafAttributes)
             {
                 EditorGUI.indentLevel++;
-                for (int i = 0; i < (int)Node.Kind.Count; i++)
+                for (int i = 0; i < (int)Node.NodeDomain.Count; i++)
                 {
-                    string label = "Type: " + ((Node.Kind)i).ToString();
+                    string label = "Domain: " + ((Node.NodeDomain)i).ToString();
                     showLeafAttributesAtIndex[i] = EditorGUILayout.Foldout(showLeafAttributesAtIndex[i], label, EditorStyles.foldout);
                     if (showLeafAttributesAtIndex[i])
                     {
