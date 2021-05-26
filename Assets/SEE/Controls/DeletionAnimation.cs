@@ -17,7 +17,7 @@ namespace SEE.Controls
     public static class DeletionAnimation
     {
         /// <summary>
-        /// The garbage can the deleted nodes will be moved to. It is the object named 
+        /// The garbage can the deleted nodes and edges will be moved to. It is the object named 
         /// <see cref="GarbageCanName"/>.
         /// </summary>
         private static GameObject garbageCan;
@@ -28,18 +28,19 @@ namespace SEE.Controls
         private const string GarbageCanName = "GarbageCan";
 
         /// <summary>
-        /// The animation time of the animation of moving a node to the top of the garbage can.
+        /// The animation time of the animation of moving a deleted object to the top of the garbage can.
         /// </summary>
         private const float TimeForAnimation = 1f;
 
         /// <summary>
-        /// The waiting time of the animation for moving a node into a garbage can from over the garbage can.
+        /// The waiting time of the animation for moving a deleted object into the garbage can from 
+        /// over the garbage can.
         /// </summary>
         private const float TimeToWait = 1f;
 
         /// <summary>
-        /// The vertical height above the garbage can the removed nodes move to during the undo process respectively
-        /// the nodes move to having been deleted.
+        /// The vertical height above the garbage can the removed objects move to during the undo process, respectively,
+        /// the objects move to having been deleted.
         /// </summary>
         private const float verticalHeight = 1.4f;
 
@@ -52,11 +53,13 @@ namespace SEE.Controls
 
         /// <summary>
         /// A list of ratios of the current localScale and a target scale.
+        /// 
+        /// FIXME: Why is a ConcurrentDictionary needed?
         /// </summary>
         private static ConcurrentDictionary<GameObject, Vector3> shrinkFactors { get; set; } = new ConcurrentDictionary<GameObject, Vector3>();
 
         // <summary>
-        /// A history of the old positions of the nodes deleted by this action.
+        /// A history of the old positions of the objects deleted by this action.
         /// </summary>
         private static Dictionary<GameObject, Vector3> oldPositions = new Dictionary<GameObject, Vector3>();
 
@@ -66,13 +69,15 @@ namespace SEE.Controls
         private const float StepsOfExpansionAnimation = 10;
 
         /// <summary>
-        /// The time (in seconds) between animations of expanding a node that is being restored
+        /// The time (in seconds) between animations of expanding a deleted object that is being restored
         /// from the garbage can.
         /// </summary>
         private const float TimeBetweenExpansionAnimation = 0.14f;
 
         /// <summary>
         /// A history of all edges and the graph where they were attached to, deleted by this action.
+        /// 
+        /// FIXME: Why is a ConcurrentDictionary needed?
         /// </summary>
         private static ConcurrentDictionary<GameObject, Graph> deletedEdges { get; set; } = new ConcurrentDictionary<GameObject, Graph>();
 
@@ -101,16 +106,12 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Moves all nodes or edges  in <paramref name="deletedNodes"/> to the garbage can
-        /// using an animation. When they finally arrive there, they will be 
-        /// deleted. 
-        /// 
-        /// Assumption: <paramref name="deletedNodes"/> contains all nodes in a subtree
-        /// of the game-node hierarchy. All of them represent graph nodes.
+        /// Moves all nodes and edges in <paramref name="deletedNodes"/> to the garbage can
+        /// using an animation. When they finally arrive there, they will be deleted. 
         /// </summary>
-        /// <param name="deletedNodes">the deleted nodes which will be moved to the garbage can.</param>
-        /// <returns>the waiting time between moving deleted nodes over the garbage can and then into the garbage can</returns>
-        public static IEnumerator MoveNodeOrEdgeToGarbage(IList<GameObject> deletedNodesAndEdges)
+        /// <param name="deletedNodesAndEdges">the deleted nodes and edges which will be moved to the garbage can.</param>
+        /// <returns>the waiting time between moving deleted objects over the garbage can and then into the garbage can</returns>
+        public static IEnumerator MoveToGarbage(IList<GameObject> deletedNodesAndEdges)
         {
             Vector3 garbageCanPosition = GarbageCanPosition();
 
@@ -151,11 +152,11 @@ namespace SEE.Controls
         {
             Vector3 garbageCanPosition = GarbageCanPosition();
 
-            // vertical movement of nodes
-            foreach (GameObject deletedNode in deletedNodesOrEdges)
+            // vertical movement of deleted objects
+            foreach (GameObject deletedObject in deletedNodesOrEdges)
             {
-                Tweens.Move(deletedNode, new Vector3(garbageCanPosition.x, garbageCanPosition.y + verticalHeight, garbageCanPosition.z), TimeForAnimation);
-                PlayerSettings.GetPlayerSettings().StartCoroutine(WaitAndExpand(deletedNode));
+                Tweens.Move(deletedObject, new Vector3(garbageCanPosition.x, garbageCanPosition.y + verticalHeight, garbageCanPosition.z), TimeForAnimation);
+                PlayerSettings.GetPlayerSettings().StartCoroutine(WaitAndExpand(deletedObject));
             }
 
             yield return new WaitForSeconds(TimeToWait);
@@ -189,45 +190,23 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Coroutine that waits and expands the shrunk object which is currently being removed from the garbage can.
+        /// Coroutine that waits and expands the shrunk object which is currently being removed
+        /// from the garbage can.
         /// </summary>
-        /// <param name="deletedNode">The nodes to be removed from the garbage-can</param>
-        /// <returns>the waiting time between moving deleted nodes from the garbage can and then to the city</returns>
-        private static IEnumerator WaitAndExpand(GameObject deletedNode)
+        /// <param name="deletedObject">The object to be removed from the garbage can</param>
+        /// <returns>the waiting time between moving deleted objects from the garbage can and then to the city</returns>
+        private static IEnumerator WaitAndExpand(GameObject deletedObject)
         {
             yield return new WaitForSeconds(TimeToWait);
-            Vector3 shrinkFactor = shrinkFactors[deletedNode];
+            Vector3 shrinkFactor = shrinkFactors[deletedObject];
             float exponent = 1 / StepsOfExpansionAnimation;
             shrinkFactor = VectorOperations.ExponentOfVectorCoordinates(shrinkFactor, exponent);
 
             for (float animationsCount = StepsOfExpansionAnimation; animationsCount > 0; animationsCount--)
             {
-                deletedNode.transform.localScale = VectorOperations.DivideVectors(shrinkFactor, deletedNode.transform.localScale);
+                deletedObject.transform.localScale = VectorOperations.DivideVectors(shrinkFactor, deletedObject.transform.localScale);
                 yield return new WaitForSeconds(TimeBetweenExpansionAnimation);
             }
-        }
-
-        /// <summary>
-        /// Unhides the given <paramref name="gameEdge"/> after some delay.
-        /// 
-        /// Intended to be used as a co-routine.
-        /// </summary>
-        /// <param name="gameEdge">game edge to be shown again</param>
-        /// <returns>The time of the delay</returns>
-        public static IEnumerator UnhideEdge(GameObject gameEdge)
-        {
-            yield return new WaitForSeconds(TimeForAnimation + TimeToWait);
-            gameEdge.SetVisibility(true, true);
-        }
-
-        /// <summary>
-        /// Hides given <paramref name="gameEdge"/> and adds it to the list of deleted edges.
-        /// </summary>
-        /// <param name="gameEdge">game edge to be hidden</param>
-        public static void HideEdge(GameObject gameEdge)
-        {
-            gameEdge.SetVisibility(false, true);
-            deletedEdges.TryAdd(gameEdge, gameEdge.GetGraph()); 
         }
     }
 }

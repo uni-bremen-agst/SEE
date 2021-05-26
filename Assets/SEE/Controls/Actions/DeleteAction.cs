@@ -133,7 +133,7 @@ namespace SEE.Controls.Actions
                     // The selectedObject (a node) and its ancestors are not deleted immediately. Instead we
                     // will run an animation that moves them into a garbage bin. Only when they arrive there,
                     // we will actually delete them.
-                    PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.MoveNodeOrEdgeToGarbage(deletedObject.AllAncestors()));
+                    PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.MoveToGarbage(deletedObject.AllAncestors()));
                     Portal.SetInfinitePortal(deletedObject);
                     MarkAsDeleted(deletedObject.AllAncestors());
                 }
@@ -181,8 +181,6 @@ namespace SEE.Controls.Actions
                 if (edgeGraphPair.Key.TryGetComponentOrLog(out EdgeRef edgeReference))
                 {
                     edgeGraphPair.Value.AddEdge(edgeReference.Value);
-                    PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.UnhideEdge
-                        (edgeGraphPair.Key));
                     if (!roots.ContainsValue(edgeGraphPair.Value))
                     {
                         FindRoot(edgeGraphPair.Value);
@@ -304,7 +302,7 @@ namespace SEE.Controls.Actions
                 }
                 new DeleteNetAction(gameEdge.name).Execute(null);
                 deletedEdges[gameEdge] = graph;
-                PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.MoveNodeOrEdgeToGarbage(new List<GameObject> {gameEdge}));
+                PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.MoveToGarbage(new List<GameObject> {gameEdge}));
                 graph.RemoveEdge(edgeRef.Value);
             }
         }
