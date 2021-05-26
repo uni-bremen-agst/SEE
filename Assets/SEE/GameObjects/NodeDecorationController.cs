@@ -3,13 +3,13 @@ using UnityEngine;
 using SEE.DataModel.DG;
 using SEE.Game;
 using System.Linq;
-
-/// <summary>
-/// Decorates each block with an assigned texture.
-/// </summary>
+using System;
 
 namespace SEE.GO
 {
+    /// <summary>
+    /// Decorates each block with an assigned texture.
+    /// </summary>
     public class NodeDecorationController : MonoBehaviour
     {
         /// <summary>
@@ -27,66 +27,67 @@ namespace SEE.GO
 
         /// <summary>
         /// The block is a folded block when it hides other nodes
-        /// inside of it. If set to true the block sides are decorated
+        /// inside of it. If set to true, the block sides are decorated
         /// using treemaps to indicate the different metrics of the hidden nodes.
         /// Otherwise the block gets decorated using a roof that corresponds to the
-        /// type the node has (for instance Enum > Rounded Roof)
+        /// type the node has (for instance Enum > Rounded Roof).
         /// </summary>
         public bool FoldedBlock = false;
 
         /// <summary>
         /// Can be used to test node decorations when adding roof types
-        /// and/or modifyign the treemaps
+        /// and/or modifying the treemaps.
         /// </summary>
+        [Obsolete("This field can be removed when everything works.")]
         public bool Debug = false;
 
         /// <summary>
-        /// Number of rows for test block
+        /// Number of rows for test block.
         /// </summary>
         public int TestBlockRowCount;
 
         /// <summary>
-        /// Number of columns for test block
+        /// Number of columns for test block.
         /// </summary>
         public int TestBlockColumnCount;
 
         /// <summary>
-        /// The gameNode to be decorated
+        /// The gameNode to be decorated.
         /// </summary>
         public GameObject NodeObject;
 
         /// <summary>
-        /// The gameNode's bounds' size
+        /// The gameNode's bounds' size.
         /// </summary>
         private Vector3 nodeSize;
 
         /// <summary>
-        /// The gameNode's location
+        /// The gameNode's location.
         /// </summary>
         private Vector3 nodeLocation;
 
         /// <summary>
-        /// To use treemap decoration/regular wall decorations
+        /// To use treemap decoration/regular wall decorations.
         /// </summary>
         public bool DecorateUsingTreemap = false;
 
         /// <summary>
-        /// Treemap layout settings for the block's side decorations
+        /// Treemap layout settings for the block's side decorations.
         /// </summary>
         public AbstractSEECity SideTreemapSettings;
 
         /// <summary>
-        /// Treemap layout settings for the block's top decorator
+        /// Treemap layout settings for the block's top decorator.
         /// </summary>
         public AbstractSEECity SurfaceTreemapSettings;
 
         /// <summary>
-        /// Treemap graph
+        /// Treemap graph.
         /// </summary>
         private Graph treemapGraph;
 
         /// <summary>
-        /// Roof type dropdown menu items
+        /// Roof type dropdown menu items.
         /// </summary>
         public enum RoofType
         {
@@ -96,13 +97,14 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Roof dropdown menu selector (inspector)
+        /// Roof dropdown menu selector (inspector).
         /// </summary>
         public RoofType SelectedRoofType;
 
+        [SerializeField, Range(0f, 1f)] private float floorHightPercentage;
         /// <summary>
-        /// The Height-Percentage the bottom floor should have in
-        /// contrast to the building height
+        /// The height percentage the bottom floor should have in
+        /// contrast to the building height.
         /// </summary>
         public float FloorHightPercentage
         {
@@ -116,9 +118,10 @@ namespace SEE.GO
             }
         }
 
+        [SerializeField, Range(0f, 1f)] private float lobbySpanPercentage;
         /// <summary>
         /// How far out the lobby should be from the building, percentage
-        /// is in contrast to the building width
+        /// is in contrast to the building width.
         /// </summary>
         public float LobbySpanPercentage
         {
@@ -132,9 +135,10 @@ namespace SEE.GO
             }
         }
 
+        [SerializeField, Range(0f, 1f)] private float roofHeightPercentage;
         /// <summary>
-        /// The Height-Percentage the roof should have in contrast
-        /// to the building height
+        /// The height percentage the roof should have in contrast
+        /// to the building height.
         /// </summary>
         public float RoofHeightPercentage
         {
@@ -148,9 +152,10 @@ namespace SEE.GO
             }
         }
 
+        [SerializeField, Range(0f, 1f)] private float roofSpanPercentage;
         /// <summary>
         /// How far out/in the roof should be in contast to the building, percentage
-        /// is in contrast to building width
+        /// is in contrast to building width.
         /// </summary>
         public float RoofSpanPercentage
         {
@@ -165,24 +170,18 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Contain the values of the above declared variables, limited to values between 0 and 1
+        /// Get the gameNode's different properties.
         /// </summary>
-        [SerializeField, Range(0f, 1f)]
-        private float floorHightPercentage, lobbySpanPercentage, roofHeightPercentage, roofSpanPercentage;
-
-        /// <summary>
-        /// Get the gameNode's different properties
-        /// </summary>
-        private void fetchNodeDetails()
+        private void FetchNodeDetails()
         {
             nodeSize = NodeObject.transform.localScale;
             nodeLocation = NodeObject.transform.position;
         }
 
         /// <summary>
-        /// Renders the bottom floor of a building
+        /// Renders the bottom floor of a building.
         /// </summary>
-        private void renderLobby()
+        private void RenderLobby()
         {
             float lobbySizeX = nodeSize.x + nodeSize.x * lobbySpanPercentage;
             float lobbySizeZ = nodeSize.z + nodeSize.z * lobbySpanPercentage;
@@ -203,10 +202,10 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Renders the tetrahedron roof of a building
-        /// <remarks>Percentages are supplied as values between 0 and 1<remarks>
+        /// Renders the tetrahedron roof of a building.
+        /// <remarks>Percentages are supplied as values between 0 and 1.<remarks>
         /// </summary>
-        private void renderRoof()
+        private void RenderRoof()
         {
             Vector3 roofScale = new Vector3(nodeSize.x + nodeSize.x * roofSpanPercentage,
                                             nodeSize.z + nodeSize.z * roofSpanPercentage,
@@ -215,7 +214,7 @@ namespace SEE.GO
             switch (SelectedRoofType)
             {
                 case RoofType.Tetrahedron:
-                    GameObject tetrahedron = createPyramid(roofScale);
+                    GameObject tetrahedron = CreatePyramid(roofScale);
                     tetrahedron.transform.SetParent(NodeObject.transform);
                     // Move tetrahedron to top of building, tetrahedron is moved with the bottom left corner
                     tetrahedron.transform.position = new Vector3(nodeLocation.x - roofScale.x / 2,
@@ -223,10 +222,10 @@ namespace SEE.GO
                                                                  nodeLocation.z - roofScale.z / 2);
                     break;
                 case RoofType.Rectangular:
-                    renderRectangularRoof(roofScale);
+                    RenderRectangularRoof(roofScale);
                     break;
                 case RoofType.Dome:
-                    renderDomeRoof(roofScale);
+                    RenderDomeRoof(roofScale);
                     break;
                 default:
                     throw new System.Exception("Unsupported Roof Type!");
@@ -234,10 +233,10 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Renders a rectangular roof for the node object
+        /// Renders a rectangular roof for the node object.
         /// </summary>
         /// <param name="roofScale">scale of the roof</param>
-        private void renderRectangularRoof(Vector3 roofScale)
+        private void RenderRectangularRoof(Vector3 roofScale)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
             go.name = "RectangularRoof";
@@ -248,10 +247,10 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Renders a dome roof for the node object
+        /// Renders a dome roof for the node object.
         /// </summary>
         /// <param name="roofScale">scale of the roof</param>
-        private void renderDomeRoof(Vector3 roofScale)
+        private void RenderDomeRoof(Vector3 roofScale)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             go.name = "SphericalRoof";
@@ -263,11 +262,11 @@ namespace SEE.GO
 
         /// <summary>
         /// <author name="Leonard Haddad"/>
-        /// Generates a 4-faced pyramid at the given coordinates
-        /// Inspired by an article by <a href="https://blog.nobel-joergensen.com/2010/12/25/procedural-generated-mesh-in-unity/">Morten Nobel-Jørgensen</a>,
+        /// Generates a 4-faced pyramid at the given coordinates.
+        /// Inspired by an article by <a href="https://blog.nobel-joergensen.com/2010/12/25/procedural-generated-mesh-in-unity/">Morten Nobel-Jørgensen</a>.
         /// </summary>
         /// <param name="roofScale">scale of the roof</param>
-        public GameObject createPyramid(Vector3 roofScale)
+        public GameObject CreatePyramid(Vector3 roofScale)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
             go.name = "Tetrahedron";
@@ -283,13 +282,13 @@ namespace SEE.GO
             Mesh mesh = new Mesh();
             mesh.Clear();
             mesh.vertices = new Vector3[] {
-            p0,p1,p3, // Bottom vertex #1
-            p2,p3,p1, // Bottom vertex #2
-            p1,p4,p2,
-            p2,p4,p3,
-            p3,p4,p0,
-            p0,p4,p1
-        };
+                p0, p1, p3, // Bottom vertex #1
+                p2, p3, p1, // Bottom vertex #2
+                p1, p4, p2,
+                p2, p4, p3,
+                p3, p4, p0,
+                p0, p4, p1
+            };
             mesh.triangles = Enumerable.Range(0, 17).ToArray();
             mesh.RecalculateNormals();
             mesh.RecalculateBounds();
@@ -299,11 +298,11 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Decorates the block
+        /// Decorates the block.
         /// </summary>
         /// <param name="hiddenObjects">The list of gamenodes that are hidden inside the packed block</param>
         /// <param name="packedBlock">The packed block</param>
-        private void decoratePackedBlock(IList<GameObject> hiddenObjects, GameObject packedBlock)
+        private void DecoratePackedBlock(IList<GameObject> hiddenObjects, GameObject packedBlock)
         {
             GameObject topDecorator = new GameObject("TopDecorator");
             foreach (GameObject o in hiddenObjects)
@@ -316,18 +315,18 @@ namespace SEE.GO
                 clone.transform.SetParent(topDecorator.transform);
             }
             topDecorator.transform.SetParent(packedBlock.transform);
-            decoratePackedBlockWalls(hiddenObjects, packedBlock);
+            DecoratePackedBlockWalls(hiddenObjects, packedBlock);
         }
 
         /// <summary>
-        /// Decorates the top of the packed block using a treemap
+        /// Decorates the top of the packed block using a treemap.
         /// </summary>
         /// <param name="settings">The settings to be applied to the layout</param>
         /// <param name="hiddenNodesGraph">Graph containing the hidden nodes</param>
         /// <param name="packedBlockLocation">The location of the packed block</param>
         /// <param name="packedBlockDimensions">The dimensions of the packed block</param>
         /// <param name="treemapParent">The parent gameobject that holds all decorators</param>
-        private void decoratePackedBlockSurfaceWithTreemap(AbstractSEECity settings, Graph hiddenNodesGraph, Vector3 packedBlockLocation, Vector3 packedBlockDimensions, GameObject treemapParent)
+        private void DecoratePackedBlockSurfaceWithTreemap(AbstractSEECity settings, Graph hiddenNodesGraph, Vector3 packedBlockLocation, Vector3 packedBlockDimensions, GameObject treemapParent)
         {
             GraphRenderer renderer = new GraphRenderer(settings, hiddenNodesGraph);
             GameObject empty = new GameObject("TopSurfaceTreemap");
@@ -338,12 +337,12 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Decorates the walls of the packed block using a treemap
+        /// Decorates the walls of the packed block using a treemap.
         /// </summary>
         /// <param name="settings">The settings to be applied to the layout</param>
         /// <param name="hiddenNodesGraph">Graph containing the hidden nodes</param>
         /// <param name="packedBlock">The packed block</param>
-        private void decoratePackedBlockWithTreemap(AbstractSEECity settings, Graph hiddenNodesGraph, GameObject packedBlock)
+        private void DecoratePackedBlockWithTreemap(AbstractSEECity settings, Graph hiddenNodesGraph, GameObject packedBlock)
         {
             // Graph renderer to render treemaps
             GraphRenderer renderer = new GraphRenderer(settings, hiddenNodesGraph);
@@ -355,7 +354,7 @@ namespace SEE.GO
             // Render treemaps on each surface
             GameObject treemapParent = new GameObject("Treemap-Decorators");
             treemapParent.transform.SetParent(NodeObject.transform);
-            decoratePackedBlockSurfaceWithTreemap(SurfaceTreemapSettings, hiddenNodesGraph, packedBlockLocation, packedBlockDimensions, treemapParent);
+            DecoratePackedBlockSurfaceWithTreemap(SurfaceTreemapSettings, hiddenNodesGraph, packedBlockLocation, packedBlockDimensions, treemapParent);
             // North
             GameObject planeN = new GameObject();
             planeN.name = "northTreemap";
@@ -393,21 +392,29 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Decorates the walls of the packed block
+        /// Decorates the walls of the packed block.
         /// </summary>
         /// <param name="hiddenObjects">The list of gamenodes that are hidden inside the packed block</param>
         /// <param name="packedBlock">The packed block</param>
-        private void decoratePackedBlockWalls(IList<GameObject> hiddenObjects, GameObject packedBlock)
+        private void DecoratePackedBlockWalls(IList<GameObject> hiddenObjects, GameObject packedBlock)
         {
             // Get packed block dimensions and corners, North - Positive X, West - Positive Z
             Vector3 packedBlockDimensions = packedBlock.transform.localScale;
             Vector3 packedBlockLocation = packedBlock.transform.position;
 
             // Corners of the block computed with simple geometry
-            Vector3 northWestTopCorner = new Vector3(packedBlockLocation.x + 0.5f * packedBlockDimensions.x, packedBlockLocation.y + 0.5f * packedBlockDimensions.y, packedBlockLocation.z + 0.5f * packedBlockDimensions.z);
-            Vector3 northEastTopCorner = new Vector3(packedBlockLocation.x + 0.5f * packedBlockDimensions.x, packedBlockLocation.y + 0.5f * packedBlockDimensions.y, packedBlockLocation.z - 0.5f * packedBlockDimensions.z);
-            Vector3 southWestTopCorner = new Vector3(packedBlockLocation.x - 0.5f * packedBlockDimensions.x, packedBlockLocation.y + 0.5f * packedBlockDimensions.y, packedBlockLocation.z + 0.5f * packedBlockDimensions.z);
-            Vector3 southEastTopCorner = new Vector3(packedBlockLocation.x - 0.5f * packedBlockDimensions.x, packedBlockLocation.y + 0.5f * packedBlockDimensions.y, packedBlockLocation.z - 0.5f * packedBlockDimensions.z);
+            Vector3 northWestTopCorner = new Vector3(packedBlockLocation.x + 0.5f * packedBlockDimensions.x, 
+                                                     packedBlockLocation.y + 0.5f * packedBlockDimensions.y, 
+                                                     packedBlockLocation.z + 0.5f * packedBlockDimensions.z);
+            Vector3 northEastTopCorner = new Vector3(packedBlockLocation.x + 0.5f * packedBlockDimensions.x, 
+                                                     packedBlockLocation.y + 0.5f * packedBlockDimensions.y, 
+                                                     packedBlockLocation.z - 0.5f * packedBlockDimensions.z);
+            Vector3 southWestTopCorner = new Vector3(packedBlockLocation.x - 0.5f * packedBlockDimensions.x, 
+                                                     packedBlockLocation.y + 0.5f * packedBlockDimensions.y, 
+                                                     packedBlockLocation.z + 0.5f * packedBlockDimensions.z);
+            Vector3 southEastTopCorner = new Vector3(packedBlockLocation.x - 0.5f * packedBlockDimensions.x, 
+                                                     packedBlockLocation.y + 0.5f * packedBlockDimensions.y, 
+                                                     packedBlockLocation.z - 0.5f * packedBlockDimensions.z);
 
             // Compute sum of block heights
             float totalBlocksHeight = 0f;
@@ -443,11 +450,15 @@ namespace SEE.GO
             westClones.transform.SetParent(packedBlock.transform);
             eastClones.transform.SetParent(packedBlock.transform);
 
-            // Location on each surface, used to align clones on block surface, top-down left-right approach
-            Vector3 currentPosN = new Vector3(northEastTopCorner.x, northEastTopCorner.y - freeSpaceY, northEastTopCorner.z + freeSpaceZ); // Blocks placed from east to west on northern surface, top to bottom
-            Vector3 currentPosW = new Vector3(northWestTopCorner.x - freeSpaceX, northWestTopCorner.y - freeSpaceY, northWestTopCorner.z); // Blocks placed from north to south on western surface, top to bottom
-            Vector3 currentPosS = new Vector3(southWestTopCorner.x, southWestTopCorner.y - freeSpaceY, southWestTopCorner.z - freeSpaceZ); // Blocks placed from west to east on southern surface, top to bottom
-            Vector3 currentPosE = new Vector3(southEastTopCorner.x + freeSpaceX, southEastTopCorner.y - freeSpaceY, southEastTopCorner.z); // Blocks placed from south to north on eastern surface, top to bottom
+            // Location on each surface, used to align clones on block surface, top-down left-right approach.
+            // Blocks placed from east to west on northern surface, top to bottom
+            Vector3 currentPosN = new Vector3(northEastTopCorner.x, northEastTopCorner.y - freeSpaceY, northEastTopCorner.z + freeSpaceZ);
+            // Blocks placed from north to south on western surface, top to bottom
+            Vector3 currentPosW = new Vector3(northWestTopCorner.x - freeSpaceX, northWestTopCorner.y - freeSpaceY, northWestTopCorner.z);
+            // Blocks placed from west to east on southern surface, top to bottom
+            Vector3 currentPosS = new Vector3(southWestTopCorner.x, southWestTopCorner.y - freeSpaceY, southWestTopCorner.z - freeSpaceZ);
+            // Blocks placed from south to north on eastern surface, top to bottom
+            Vector3 currentPosE = new Vector3(southEastTopCorner.x + freeSpaceX, southEastTopCorner.y - freeSpaceY, southEastTopCorner.z);
 
             // Create gameobject clones and set them on the walls of the packed block
             List<GameObject> clones = new List<GameObject>();
@@ -538,15 +549,15 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Decorate Nodes at runtime
+        /// Decorate nodes at runtime.
         /// </summary>
         void Start()
         {
-            fetchNodeDetails();
+            FetchNodeDetails();
             if (!FoldedBlock)
             {
-                renderLobby();
-                renderRoof();
+                RenderLobby();
+                RenderRoof();
             }
             else
             {
@@ -554,33 +565,34 @@ namespace SEE.GO
                 {
                     if (!DecorateUsingTreemap)
                     {
-                        testImplementation(TestBlockColumnCount, TestBlockRowCount);
+                        TestImplementation(TestBlockColumnCount, TestBlockRowCount);
                     }
                     else
                     {
-                        testTreemapDecoration(TestBlockColumnCount, TestBlockRowCount);
+                        TestTreemapDecoration(TestBlockColumnCount, TestBlockRowCount);
                     }
                 }
                 if (!DecorateUsingTreemap)
                 {
-                    decoratePackedBlock(childNodes, NodeObject);
+                    DecoratePackedBlock(childNodes, NodeObject);
                 }
                 else
                 {
-                    decoratePackedBlockWithTreemap(SideTreemapSettings, treemapGraph, NodeObject);
+                    DecoratePackedBlockWithTreemap(SideTreemapSettings, treemapGraph, NodeObject);
                 }
             }
         }
 
         /// <summary>
-        /// Child nodes of this block
+        /// Child nodes of this block.
         /// </summary>
-        private IList<GameObject> childNodes = new List<GameObject>();
+        private readonly IList<GameObject> childNodes = new List<GameObject>();
 
         /// <summary>
-        /// Test the block decoration implementation both visually and mathematically
+        /// Tests the block decoration implementation both visually and mathematically.
         /// </summary>
-        private void testImplementation(int columns, int rows)
+        [Obsolete("This test method can be removed when everything works.")]
+        private void TestImplementation(int columns, int rows)
         {
             GameObject debugObject = new GameObject("Debug");
             debugObject.transform.SetParent(NodeObject.transform);
@@ -594,7 +606,7 @@ namespace SEE.GO
                 // Max node size x = (size.x - freeSpaceCount.x * freeSpaceSize.x) / amountOfRows
                 // Max node size z = (size.z - freeSpaceCount.z * freeSpaceSize.z) / amountOfColumns
                 Vector3 childNodeDimensions = new Vector3((nodeSize.x - (rows + 1) * freeSpaceX) / rows,
-                    Random.Range(globalFreeSpacePercentage * nodeSize.y, nodeSize.y), (nodeSize.z - (columns + 1) * freeSpaceZ) / columns);
+                    UnityEngine.Random.Range(globalFreeSpacePercentage * nodeSize.y, nodeSize.y), (nodeSize.z - (columns + 1) * freeSpaceZ) / columns);
                 o.transform.localScale = childNodeDimensions;
                 o.name = i.ToString();
                 o.GetComponent<Renderer>().material.color = Color.red;
@@ -630,9 +642,10 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Test the treemap decoration implementation
+        /// Tests the treemap decoration implementation.
         /// </summary>
-        private void testTreemapDecoration(int columns, int rows)
+        [Obsolete("This test method can be removed when everything works.")]
+        private void TestTreemapDecoration(int columns, int rows)
         {
             Graph graph = new Graph("test");
             int counter = 0;
