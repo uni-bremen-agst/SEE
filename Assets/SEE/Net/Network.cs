@@ -121,9 +121,29 @@ namespace SEE.Net
 #endif
 
         /// <summary>
-        /// Contains the main thread of the application.
+        /// The Unity main thread. Note that we cannot initialize its value here
+        /// because the elaboration code initializing static attributes may be
+        /// executed by a thread different from Unity's main thread. This attribute
+        /// will be initialized in <see cref="Awake"/> for this reason.
         /// </summary>
-        public static Thread MainThread { get; private set; } = Thread.CurrentThread;
+        private static Thread mainThread = null;
+        /// <summary>
+        /// Contains the Unity main thread of the application.
+        /// </summary>
+        public static Thread MainThread
+        {
+            get
+            {
+                Assert.IsNotNull(mainThread, "The main Unity thread must not have been determined as of now!");
+                return mainThread;
+            }
+            private set
+            {
+                Assert.IsNull(mainThread, "The main Unity thread has already been determined!");
+                Assert.IsNotNull(value, "The main Unity thread must not be null!");
+                mainThread = value;
+            }
+        }
 
         /// <summary>
         /// List of dead connections. Is packets can not be sent, this list is searched
@@ -144,6 +164,12 @@ namespace SEE.Net
             }
 
             instance = this;
+
+            /// The field <see cref="MainThread"/> is supposed to denote Unity's main thread.
+            /// The <see cref="Awake"/> function is guaranteed to be executed by Unity's main
+            /// thread, that is, <see cref="Thread.CurrentThread"/> represents Unity's 
+            /// main thread here.
+            MainThread = Thread.CurrentThread;
 
             if (!useInOfflineMode)
             {
@@ -194,7 +220,7 @@ namespace SEE.Net
                     }
                     else
                     {
-                        Util.Logger.LogError("Unsupported city-type!");
+                        Util.Logger.LogError("Unsupported city type!");
                     }
                 }
             }
