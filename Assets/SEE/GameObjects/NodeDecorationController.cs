@@ -15,7 +15,7 @@ namespace SEE.GO
         /// <summary>
         /// Child nodes of this block.
         /// </summary>
-        public IList<GameObject> childNodes = new List<GameObject>();
+        public IList<GameObject> ChildNodes = new List<GameObject>();
         
         /// <summary>
         /// The height the treemap decorators should have, is set
