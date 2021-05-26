@@ -92,7 +92,7 @@ namespace SEE.Game
             {
                 string postfix = '#' + i.ToString();
                 writer.Save(leafNodeAttributesPerKind[i].kind.ToString(), LeafObjectsLabel + postfix);
-                writer.Save(leafNodeAttributesPerKind[i].coloringKind.ToString(), LeafNodeColoringKindLabel + postfix); // TODO(torben): ToString() could be replaced by cast to int for performance
+                writer.Save(leafNodeAttributesPerKind[i].coloringKind.ToString(), LeafNodeColoringKindLabel + postfix); // FIXME ToString() could be replaced by cast to int for performance
                 leafNodeAttributesPerKind[i].colorRange.Save(writer, LeafNodeColorRangeLabel + postfix);
                 writer.Save(leafNodeAttributesPerKind[i].widthMetric, WidthMetricLabel + postfix);
                 writer.Save(leafNodeAttributesPerKind[i].heightMetric, HeightMetricLabel + postfix);

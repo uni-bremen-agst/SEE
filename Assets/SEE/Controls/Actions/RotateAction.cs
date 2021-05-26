@@ -102,7 +102,7 @@ namespace SEE.Controls.Actions
                 }
                 else if (obj)
                 {
-                    InteractableObject.UnselectAllInGraph(obj.ItsGraph, true); // TODO(torben): this should be in SelectAction.cs
+                    InteractableObject.UnselectAllInGraph(obj.ItsGraph, true); // TODO(torben): Explanation in MoveAction.cs: @UnselectInWrongPlace
                 }
             }
             else if (SEEInput.Drag()) // start or continue rotation

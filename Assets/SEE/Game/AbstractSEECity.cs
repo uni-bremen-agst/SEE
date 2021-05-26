@@ -59,7 +59,7 @@ namespace SEE.Game
         /// <summary>
         /// The cose graph settings.
         /// </summary>
-        public CoseGraphSettings coseGraphSettings = new CoseGraphSettings(); // TODO(torben): put into CitySettings.cs
+        public CoseGraphSettings coseGraphSettings = new CoseGraphSettings(); // FIXME put into CitySettings.cs
 
         /// <summary>
         /// Saves the settings of this code city to <see cref="CityPath"/>.

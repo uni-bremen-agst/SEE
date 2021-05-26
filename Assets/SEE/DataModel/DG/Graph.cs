@@ -406,8 +406,35 @@ namespace SEE.DataModel.DG
         /// Returns the list of nodes without parent.
         /// </summary>
         /// <returns>root nodes of the hierarchy</returns>
-        public List<Node> GetRoots() // TODO(torben): this query could be cached to improve performance
+        public List<Node> GetRoots()
         {
+            // FIXME this method is called often, which is why it should be more performant.
+            // firstly, the result of this query could be cached to improve performance. this is
+            // only possible, if the graph is final and nodes do not change parents anymore.
+            // moreover, we could count the number of root nodes, create a list with appropriate
+            // capacity and then fill it. then, we could also use an array. this reduces the number
+            // of mallocs and potentially improves performance. profile the implementation below
+#if false
+            Node[] values = nodes.Values.ToArray();
+            int capacity = 0;
+            int count = values.Length;
+            for (int i = 0; i < count; i++)
+            {
+                if (values[i].IsRoot())
+                {
+                    capacity++;
+                }
+            }
+            List<Node> result = new List<Node>(capacity);
+            for (int i = 0; i < count; i++)
+            {
+                if (values[i].IsRoot())
+                {
+                    result.Add(values[i]);
+                }
+            }
+            return result;
+#else
             List<Node> result = new List<Node>();
             foreach (Node node in nodes.Values)
             {
@@ -417,6 +444,7 @@ namespace SEE.DataModel.DG
                 }
             }
             return result;
+#endif
         }
 
         /// <summary>
