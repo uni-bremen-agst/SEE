@@ -89,7 +89,7 @@ namespace SEE.GO
         /// <summary>
         /// Treemap graph.
         /// </summary>
-        private Graph treemapGraph;
+        public Graph TreemapGraph;
 
         /// <summary>
         /// Roof type dropdown menu items.
