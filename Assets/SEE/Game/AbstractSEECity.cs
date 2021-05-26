@@ -476,13 +476,7 @@ namespace SEE.Game
         /// <returns>all metrics used for visual attributes of an inner node</returns>
         public ICollection<string> AllInnerNodeMetrics()
         {
-            List<string> result = new List<string>(leafNodeAttributesPerKind.Length * 2);
-            foreach (InnerNodeAttributes innerNodeAttributes in innerNodeAttributesPerKind)
-            {
-                result.Add(innerNodeAttributes.styleMetric);
-                result.Add(innerNodeAttributes.heightMetric);
-            }
-            return result;
+            return innerNodeAttributesPerKind.SelectMany(x => new[] {x.styleMetric, x.heightMetric}).ToList();
         }
 
         //--------------------------------------
