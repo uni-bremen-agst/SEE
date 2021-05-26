@@ -66,7 +66,7 @@ namespace SEE.Controls
         public static readonly HashSet<InteractableObject> HoveredObjects = new HashSet<InteractableObject>();
 
         /// <summary>
-        /// The object, that is currently hovered by this player. The is always only ever
+        /// The object, that is currently hovered by this player. There is always only ever
         /// one object hovered by this player with the flag <see cref="HoverFlag.World"/>
         /// set.
         /// </summary>

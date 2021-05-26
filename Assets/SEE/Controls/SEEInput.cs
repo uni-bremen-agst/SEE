@@ -219,7 +219,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// The user wants to start dragging the city in it's entirety or parts of it.
+        /// The user wants to start dragging the city in its entirety or parts of it.
         /// </summary>
         /// <returns>true if the user requests this action</returns>
         internal static bool StartDrag()
