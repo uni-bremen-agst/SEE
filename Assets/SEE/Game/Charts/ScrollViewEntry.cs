@@ -66,18 +66,23 @@ namespace SEE.Game.Charts
 
                     if (this.interactableObject.IsSelected)
                     {
-                        OnSelect(this.interactableObject, true); // TODO(torben): cache address of owner in InteractableObject
+                        OnSelect();
                     }
                     else if (this.interactableObject.IsHovered)
                     {
-                        OnHover(this.interactableObject, true); // TODO(torben): cache address of owner in InteractableObject
+                        OnHover();
                     }
                 }
             }
 
             #region InteractableObject Events
 
-            internal void OnHover(InteractableObject _, bool isInitiator)
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="_0">unused</param>
+            /// <param name="_1">unused</param>
+            internal void OnHover(InteractableObject _0 = null, bool _1 = true)
             {
                 if (interactableObject == null || !interactableObject.IsSelected)
                 {
@@ -98,7 +103,12 @@ namespace SEE.Game.Charts
                 }
             }
 
-            internal void OnUnhover(InteractableObject _, bool isOwner)
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="_0">unused</param>
+            /// <param name="_1">unused</param>
+            internal void OnUnhover(InteractableObject _0 = null, bool _1 = true)
             {
                 if (interactableObject == null || !interactableObject.IsSelected)
                 {
@@ -113,9 +123,12 @@ namespace SEE.Game.Charts
                 }
             }
 
-            /// <param name="interactableObject">the object being selected</param>
-            /// <param name="isOwner">true if a local user initiated this call (unused)</param>
-            private void OnSelect(InteractableObject o, bool isOwner)
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="_0">unused</param>
+            /// <param name="_1">unused</param>
+            private void OnSelect(InteractableObject _0 = null, bool _1 = true)
             {
                 ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);
                 if (entry != null)
@@ -130,9 +143,12 @@ namespace SEE.Game.Charts
                 }
             }
 
-            /// <param name="interactableObject">the object being selected</param>
-            /// <param name="isOwner">true if a local user initiated this call (unused)</param>
-            private void OnUnselect(InteractableObject o, bool isOwner)
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="o">the unselected interactable object</param>
+            /// <param name="_1">unused</param>
+            private void OnUnselect(InteractableObject o, bool _1 = true)
             {
                 ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);
                 if (entry != null)
@@ -354,11 +370,11 @@ namespace SEE.Game.Charts
             {
                 if (enter)
                 {
-                    eventHandler.OnHover(null, true);
+                    eventHandler.OnHover();
                 }
                 else
                 {
-                    eventHandler.OnUnhover(null, true);
+                    eventHandler.OnUnhover();
                 }
             }
         }

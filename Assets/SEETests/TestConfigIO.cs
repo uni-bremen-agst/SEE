@@ -468,7 +468,7 @@ namespace SEE.Utils
         /// <param name="actual">actual settings</param>
         private void AbstractSEECityAttributesAreEqual(AbstractSEECity expected, AbstractSEECity actual)
         {
-            // TODO(torben): convert
+            // FIXME reintroduce tests
 #if false
             Assert.AreEqual(expected.LODCulling, actual.LODCulling);
             AreEqual(expected.LayoutPath, actual.LayoutPath);
@@ -669,7 +669,7 @@ namespace SEE.Utils
         /// <param name="city">the city whose attributes are to be re-assigned</param>
         private static void WipeOutAbstractSEECityAttributes(AbstractSEECity city)
         {
-            // TODO(torben): convert
+            // FIXME reintroduce tests
 #if false
             city.LODCulling++;
             city.LayoutPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gvl");

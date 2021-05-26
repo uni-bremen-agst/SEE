@@ -522,9 +522,6 @@ namespace SEE.Game
 
                     CreateObjectHierarchy(nodeMap, parent);
 
-                    // TODO(torben): This was already called before on the individual nodes. Is this obsolete or was this necessary for some special case? It created everything twice.
-                    //InteractionDecorator.PrepareForInteraction(nodeToGameObject);
-
                     // Decorations must be applied after the blocks have been placed, so that
                     // we also know their positions.
                     AddDecorations(nodeToGameObject);
@@ -1036,7 +1033,8 @@ namespace SEE.Game
         /// <param name="gameNodes">a list with gamenode objects</param>
         protected void AddDecorations(ICollection<GameObject> gameNodes)
         {
-            // TODO(torben): the index 0 may be wrong!
+            // FIXME the decorations must be added for every kind separately. currently, the kind
+            // at index '0' is used, which is not correct
             AddDecorations(gameNodes, settings.innerNodeAttributesPerKind[0].kind, settings.nodeLayoutSettings.kind);
         }
 
@@ -1271,8 +1269,6 @@ namespace SEE.Game
             result.AddComponent<NodeRef>().Value = node;
             AdjustScaleOfLeaf(result);
             AddLOD(result);
-            // TODO(torben): is this call necessary?
-            //Portal.SetInfinitePortal(result);
             InteractionDecorator.PrepareForInteraction(result);
             return result;
         }

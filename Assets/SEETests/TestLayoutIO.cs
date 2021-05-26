@@ -232,7 +232,7 @@ namespace SEE.Layout
         [Test]
         public void TestRead()
         {
-            // TODO(torben): convert
+            // FIXME reintroduce tests
 #if false
             // The relative path to the GXL and GVL files.
 

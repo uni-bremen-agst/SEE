@@ -63,7 +63,7 @@ namespace SEE.Net
             Assert.IsNotNull(controller, "Controller could not be found! Is it enabled? Name: " + name);
             controllerTransform = controller.transform;
 
-            // TODO(torben): Here, we may want to disable the visuals of the local controller, as we most likely already have a visual representation
+            // FIXME Here, we may want to disable the visuals of the local controller, as we most likely already have a visual representation
         }
 
         /// <summary>

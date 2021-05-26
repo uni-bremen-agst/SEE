@@ -305,9 +305,9 @@ namespace SEE.Game.UI3D
             {
                 for (int j = i + 1; j < focusses.Count; j++)
                 {
-                    // TODO(torben): it is assumed that the x and z scale are
-                    // identical and x or z are the diameter of the circle, which is
-                    // obviously not true for rectangular layouts!
+                    // FIXME it is assumed that the x and z scale are identical and x or z are the
+                    // diameter of the circle, which is obviously not true for rectangular
+                    // layouts!
 
                     Transform foc0 = focusses[i].transform;
                     Transform foc1 = focusses[j].transform;

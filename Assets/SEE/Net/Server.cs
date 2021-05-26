@@ -282,7 +282,7 @@ namespace SEE.Net
                     {
                         foreach (Controls.InteractableObject hoveredInteractable in hoveredInteractables)
                         {
-                            SetHoverAction action = new SetHoverAction(hoveredInteractable, 0); // TODO(torben): is the '0' correct here?
+                            SetHoverAction action = new SetHoverAction(hoveredInteractable, 0);
                             action.SetRequester(remoteEndPoint);
                             action.Execute();
                         }
