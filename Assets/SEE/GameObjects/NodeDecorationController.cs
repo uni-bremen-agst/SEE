@@ -13,6 +13,11 @@ namespace SEE.GO
     public class NodeDecorationController : MonoBehaviour
     {
         /// <summary>
+        /// Child nodes of this block.
+        /// </summary>
+        public IList<GameObject> childNodes = new List<GameObject>();
+        
+        /// <summary>
         /// The height the treemap decorators should have, is set
         /// to 0.1f so they are basically flush with the surface of the
         /// blocks.
@@ -582,11 +587,6 @@ namespace SEE.GO
                 }
             }
         }
-
-        /// <summary>
-        /// Child nodes of this block.
-        /// </summary>
-        private readonly IList<GameObject> childNodes = new List<GameObject>();
 
         /// <summary>
         /// Tests the block decoration implementation both visually and mathematically.
