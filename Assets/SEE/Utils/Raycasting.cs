@@ -84,11 +84,11 @@ namespace SEE.Utils
 
         /// <summary>
         /// Raycasts against <see cref="InteractableObject"/>s and outputs either the closest hit
-        /// or <code>null</code>, if no such hit exists.
+        /// or <c>null</c>, if no such hit exists.
         /// </summary>
         /// <param name="raycastHit">The raycast hit for the hit interactable object or the default value.</param>
-        /// <param name="obj">The hit object or <code>null</code>.</param>
-        /// <returns>The corresponting enum value for the hit.</returns>
+        /// <param name="obj">The hit object or <c>null</c>.</param>
+        /// <returns>The corresponding enum value for the hit.</returns>
         public static HitGraphElement RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject obj)
         {
             HitGraphElement result = HitGraphElement.None;
