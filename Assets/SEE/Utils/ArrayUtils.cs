@@ -14,12 +14,7 @@ namespace SEE.Utils
         /// <returns>The created array.</returns>
         public static T[] New<T>(int length, Func<int, T> objCreatorFunc)
         {
-            T[] result = new T[length];
-            for (int i = 0; i < length; i++)
-            {
-                result[i] = objCreatorFunc(i);
-            }
-            return result;
+            return Enumerable.Range(0, length).Select(objCreatorFunc).ToArray();
         }
     }
 }
