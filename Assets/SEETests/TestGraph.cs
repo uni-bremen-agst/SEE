@@ -104,8 +104,7 @@ namespace SEE.DataModel.DG
 
         private HashSet<Edge> AsSet(List<Edge> edges)
         {
-            HashSet<Edge> result = new HashSet<Edge>(edges);
-            return result;
+            return new HashSet<Edge>(edges);
         }
 
         /// <summary>
