@@ -12129,7 +12129,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: b6fb03c27a50bde4c90aa0b2d201eab7, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -14807,7 +14807,7 @@ MonoBehaviour:
   isDebug: 0
   useAudioAnalysis: 1
   needAudioSource: 1
-  inspStateFoldoutProcessing: 0
+  inspStateFoldoutProcessing: 1
   inspStateFoldoutSettings: 0
   inspStateFoldoutVisemes: 0
   inspCollectionDisplayMode: 0
@@ -14893,7 +14893,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ab3138f47a2e8541a485469328ce4c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GrammarFilePath: C:/Users/koschke/SEA.new/Assets/StreamingAssets/PersonalAssistantGrammar.grxml
+  GrammarFilePath:
+    Root: 3
+    relativePath: /PersonalAssistantGrammar.grxml
+    absolutePath: 
 --- !u!4 &4505405447455184589
 Transform:
   m_ObjectHideFlags: 0

@@ -275,6 +275,9 @@ namespace SEE.Net
     }
 
     /// <summary>
+    /// Updates position, rotation and potentially local scale of an interactable
+    /// object.
+    /// 
     /// !!! IMPORTANT !!!
     ///   See <see cref="AbstractAction"/> before modifying this class!
     /// </summary>
@@ -343,5 +346,4 @@ namespace SEE.Net
             }
         }
     }
-
 }

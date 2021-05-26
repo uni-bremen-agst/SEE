@@ -96,6 +96,7 @@ namespace SEE.Net
         {
             lock (serializedPendingPackets)
             {
+                // FIXME: Why this assert? It always fails.
                 Assert.AreEqual(Thread.CurrentThread, Network.MainThread);
                 foreach (SerializedPendingPacket serializedPendingPacket in serializedPendingPackets)
                 {
