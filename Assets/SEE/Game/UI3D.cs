@@ -65,9 +65,9 @@ namespace SEE.Game.UI3D
         private Material axisMaterial;
 
         /// <summary>
-        /// Removes every <see cref="Transform"/> <code>t</code> from <see cref="focusses"/> that
-        /// has been destroyed, i.e., for which <code>t == null</code> holds (Unity has redefined
-        /// operator <code>==</code>).
+        /// Removes every <see cref="Transform"/> <c>t</c> from <see cref="focusses"/> that
+        /// has been destroyed, i.e., for which <c>t == null</c> holds (Unity has redefined
+        /// operator <c>==</c>).
         /// </summary>
         private void RemoveDestroyedTransforms()
         {
