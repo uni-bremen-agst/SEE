@@ -6,14 +6,26 @@ namespace SEE.Controls.Actions
     public class ZoomAction : MonoBehaviour
     {
         /// <summary>
-        /// Zoom commands hold data about zooming into or out of the city.
+        /// Zoom actions hold data about zooming into or out of the city.
         /// </summary>
         protected class ZoomCommand
         {
-            internal readonly float TargetZoomSteps; // The amount of zoom steps this command is trying to reach
-            internal readonly Vector2 ZoomCenter;    // The position onto where this command is supposed to zoom on the XZ-plane
-            private readonly float duration;         // The amount of time in seconds that it should take to reach <see cref="TargetZoomSteps"/>
-            private readonly float startTime;        // The creation time of the zoom command
+            /// <summary>
+            /// The amount of zoom steps this command is trying to reach.
+            /// </summary>
+            internal readonly float TargetZoomSteps;
+            /// <summary>
+            /// The position onto where this command is supposed to zoom on the XZ-plane.
+            /// </summary>
+            internal readonly Vector2 ZoomCenter;
+            /// <summary>
+            /// The amount of time in seconds that it should take to reach <see cref="TargetZoomSteps"/>.
+            /// </summary>
+            private readonly float duration;
+            /// <summary>
+            /// The creation time of the zoom command.
+            /// </summary>
+            private readonly float startTime;
 
             internal ZoomCommand(Vector2 zoomCenter, float targetZoomSteps, float duration)
             {
@@ -23,11 +35,13 @@ namespace SEE.Controls.Actions
                 startTime = Time.realtimeSinceStartup;
             }
 
+            /// <summary>
+            /// Returns true if the command has finished zooming.
+            /// </summary>
             /// <returns>Whether the command has finished zooming.</returns>
             internal bool IsFinished()
             {
-                bool result = Time.realtimeSinceStartup - startTime >= duration;
-                return result;
+                return Time.realtimeSinceStartup - startTime >= duration;
             }
 
             /// <summary>
@@ -40,8 +54,7 @@ namespace SEE.Controls.Actions
             {
                 float x = Mathf.Min((Time.realtimeSinceStartup - startTime) / duration, 1.0f);
                 float t = 0.5f - 0.5f * Mathf.Cos(x * Mathf.PI);
-                float result = t * TargetZoomSteps;
-                return result;
+                return t * TargetZoomSteps;
             }
         }
 
@@ -188,8 +201,7 @@ namespace SEE.Controls.Actions
         /// <returns>The zoom factor.</returns>
         protected static float ConvertZoomStepsToZoomFactor(float zoomSteps)
         {
-            float result = Mathf.Pow(2, zoomSteps * ZoomState.ZoomFactor);
-            return result;
+            return Mathf.Pow(2, zoomSteps * ZoomState.ZoomFactor);
         }
 
         /// <summary>
@@ -199,8 +211,7 @@ namespace SEE.Controls.Actions
         /// <returns>The amount of zoom steps.</returns>
         protected static float ConvertZoomFactorToZoomSteps(float zoomFactor)
         {
-            float result = Mathf.Log(zoomFactor, 2) / ZoomState.ZoomFactor;
-            return result;
+            return Mathf.Log(zoomFactor, 2) / ZoomState.ZoomFactor;
         }
     }
 }
