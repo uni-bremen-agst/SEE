@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
+    /// <summary>
+    /// Zoom actions holding data about zooming into or out of the city 
+    /// for a Desktop environment.
+    /// </summary>
     public class ZoomActionDesktop : ZoomAction
     {
         /// <summary>
