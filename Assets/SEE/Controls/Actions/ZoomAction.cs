@@ -3,10 +3,13 @@ using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
+    /// <summary>
+    /// Implements zooming into or out of a code city.
+    /// </summary>
     public class ZoomAction : MonoBehaviour
     {
         /// <summary>
-        /// Zoom actions hold data about zooming into or out of the city.
+        /// Zoom commands hold data about zooming into or out of the city.
         /// </summary>
         protected class ZoomCommand
         {
