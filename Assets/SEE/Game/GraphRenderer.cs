@@ -1569,21 +1569,14 @@ namespace SEE.Game
             for (int i = 0; i < (int)Node.NodeDomain.Count; i++)
             {
                 Vector3 denominator = Vector3.negativeInfinity;
-                foreach (KeyValuePair<Node, GameObject> pair in nodeMap)
+                IEnumerable<KeyValuePair<Node, GameObject>> nodeMapMatchingDomain = nodeMap.Where(x => (int)x.Key.Domain == i);
+                foreach (KeyValuePair<Node, GameObject> pair in nodeMapMatchingDomain)
                 {
-                    if ((int)pair.Key.Domain == i)
-                    {
-                        Vector3 scale = pair.Value.transform.localScale;
-                        denominator = Vector3.Max(denominator, scale);
-                    }
-
+                    denominator = Vector3.Max(denominator, pair.Value.transform.localScale);
                 }
-                foreach (KeyValuePair<Node, GameObject> pair in nodeMap)
+                foreach (KeyValuePair<Node, GameObject> pair in nodeMapMatchingDomain)
                 {
-                    if ((int)pair.Key.Domain == i)
-                    {
-                        pair.Value.transform.localScale = pair.Value.transform.localScale.DividePairwise(denominator);
-                    }
+                    pair.Value.transform.localScale = pair.Value.transform.localScale.DividePairwise(denominator);
                 }
             }
         }
