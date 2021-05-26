@@ -108,11 +108,7 @@ namespace SEE.Game
             HashSet<Node> result = new HashSet<Node>();
             foreach (NodeRef nodeRef in nodeRefs)
             {
-                IEnumerable<Node> nodes = null;
-                if (nodeRef != null)
-                {
-                    nodes = nodeRef.Value?.ItsGraph?.GetRoots();
-                }
+                IEnumerable<Node> nodes = nodeRef?.Value?.ItsGraph?.GetRoots();
                 if (nodes != null)
                 {
                     foreach (Node node in nodes)
