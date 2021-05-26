@@ -136,24 +136,29 @@ namespace SEE.Controls
         //----------------------------------------------------
 
         /// <summary>
+        /// Architecture mapping: maps implementation entity onto architecture entity.
+        /// </summary>
+        internal static KeyCode Mapping = Register(KeyCode.V, Scope.Architecture, "Architecture mapping: maps implementation entity onto architecture entity.");
+
+        /// <summary>
         /// Architecture mapping: saves the current architecture mapping.
         /// </summary>
-        internal static KeyCode SaveArchitectureMapping = Register(KeyCode.F, Scope.Architecture, "Architecture mapping: saves the current architecture mapping.");
+        //internal static KeyCode SaveArchitectureMapping = Register(KeyCode.F, Scope.Architecture, "Architecture mapping: saves the current architecture mapping.");
 
         /// <summary>
         /// Architecture mapping: copies/removes selected implementation node to/from clipboard.
         /// </summary>
-        internal static KeyCode AddOrRemoveFromClipboard = Register(KeyCode.C, Scope.Architecture, "Architecture mapping: copies/removes selected implementation node to/from clipboard.");
+        //internal static KeyCode AddOrRemoveFromClipboard = Register(KeyCode.C, Scope.Architecture, "Architecture mapping: copies/removes selected implementation node to/from clipboard.");
 
         /// <summary>
         /// Architecture mapping: maps all nodes in clipboard onto selected architecture node.
         /// </summary>
-        internal static KeyCode PasteClipboard = Register(KeyCode.V, Scope.Architecture, "Architecture mapping: maps all nodes in clipboard onto selected architecture node.");
+        //internal static KeyCode PasteClipboard = Register(KeyCode.V, Scope.Architecture, "Architecture mapping: maps all nodes in clipboard onto selected architecture node.");
 
         /// <summary>
         /// Architecture mapping: clears clipboard.
         /// </summary>
-        internal static KeyCode ClearClipboard = Register(KeyCode.X, Scope.Architecture, "Architecture mapping: clears clipboard.");
+        //internal static KeyCode ClearClipboard = Register(KeyCode.X, Scope.Architecture, "Architecture mapping: clears clipboard.");
 
         //-----------------------------------------------------
         // Navigation in a code city
