@@ -111,7 +111,7 @@ namespace SEE.Controls
         /// </summary>
         /// <param name="deletedNodes">the deleted nodes which will be moved to the garbage can.</param>
         /// <returns>the waiting time between moving deleted nodes over the garbage can and then into the garbage can</returns>
-        public static IEnumerator MoveNodeToGarbage(IList<GameObject> deletedNodesAndEdges)
+        public static IEnumerator MoveNodeOrEdgeToGarbage(IList<GameObject> deletedNodesAndEdges)
         {
             Vector3 garbageCanPosition = GarbageCanPosition();
 
