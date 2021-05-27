@@ -1,4 +1,4 @@
-using SEE.Game.UI.Notification;
+﻿using SEE.Game.UI.Notification;
 using SEE.Net;
 using System.Collections.Generic;
 using System.Linq;
@@ -417,7 +417,7 @@ namespace SEE.Utils
         /// <returns>a single comma seperated string of all gameObjectIds.</returns>
         private static string ListToString(List<string> gameObjectIds)
         {
-            return (gameObjectIds != null) ? JsonUtility.ToJson(gameObjectIds) : null;
+            return (gameObjectIds != null) ? string.Join("╗", gameObjectIds) : null;
         }
     }
 }
