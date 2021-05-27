@@ -128,6 +128,19 @@ namespace Michsky.UI.ModernUIPack
 
                     EditorGUILayout.PropertyField(onConfirm, new GUIContent("On Confirm"), true);
                     EditorGUILayout.PropertyField(onCancel, new GUIContent("On Cancel"), true);
+
+                    if (mwTarget.GetComponent<CanvasGroup>().alpha == 0)
+                    {
+                        if (GUILayout.Button("Make It Visible", customSkin.button))
+                            mwTarget.GetComponent<CanvasGroup>().alpha = 1;
+                    }
+
+                    else
+                    {
+                        if (GUILayout.Button("Make It Invisible", customSkin.button))
+                            mwTarget.GetComponent<CanvasGroup>().alpha = 0;
+                    }
+
                     break;
 
                 case 1:

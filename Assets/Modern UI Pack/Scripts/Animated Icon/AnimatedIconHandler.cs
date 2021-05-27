@@ -6,11 +6,11 @@ namespace Michsky.UI.ModernUIPack
 {
     public class AnimatedIconHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        [Header("SETTINGS")]
+        [Header("Settings")]
         public PlayType playType;
+        public Animator iconAnimator;
+        public Button eventButton;
 
-        Animator iconAnimator;
-        Button eventButton;
         bool isClicked;
 
         public enum PlayType
@@ -21,7 +21,8 @@ namespace Michsky.UI.ModernUIPack
 
         void Start()
         {
-            iconAnimator = gameObject.GetComponent<Animator>();
+            if (iconAnimator == null)
+                iconAnimator = gameObject.GetComponent<Animator>();
 
             if (playType == PlayType.CLICK)
             {

@@ -114,7 +114,7 @@ namespace SEE.Controls.Actions
                 case ProgressState.ValuesAreGiven:
                     progress = ProgressState.NoNodeSelected;
                     result = true;
-                    hadAnEffect = true;
+                    currentState = ReversibleAction.Progress.Completed;
                     NotifyClients(memento.node);
                     break;
 

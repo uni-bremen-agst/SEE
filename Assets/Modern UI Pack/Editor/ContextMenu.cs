@@ -502,7 +502,7 @@ namespace Michsky.UI.ModernUIPack
         [MenuItem("GameObject/Modern UI Pack/Button/Basic - Outline/Pink", false, 0)]
         static void BOPIN()
         {
-            CreateButton("Button/Basic Outline/Pink");
+            CreateButton("Button/Basic - Outline/Pink");
         }
 
         [MenuItem("GameObject/Modern UI Pack/Button/Basic - Outline/Purple", false, 0)]
@@ -1099,7 +1099,7 @@ namespace Michsky.UI.ModernUIPack
             CreateObject("Charts/Pie Chart");
         }
 
-        [MenuItem("GameObject/Modern UI Pack/Context Menu/Standard", false, 0)]
+        [MenuItem("GameObject/Modern UI Pack/Context Menu System", false, 0)]
         static void CTXM()
         {
             CreateObject("Context Menu/Context Menu");
@@ -1117,7 +1117,7 @@ namespace Michsky.UI.ModernUIPack
             CreateObject("Dropdown/Dropdown - Multi Select");
         }
 
-        [MenuItem("GameObject/Modern UI Pack/Horizontal Selector/Standard", false, 0)]
+        [MenuItem("GameObject/Modern UI Pack/Horizontal Selector", false, 0)]
         static void HSS()
         {
             CreateObject("Horizontal Selector/Horizontal Selector");
@@ -1165,7 +1165,7 @@ namespace Michsky.UI.ModernUIPack
             CreateObject("Input Field/Input Field - Standard (Right)");
         }
 
-        [MenuItem("GameObject/Modern UI Pack/List View/Standard", false, 0)]
+        [MenuItem("GameObject/Modern UI Pack/List View", false, 0)]
         static void LVS()
         {
             CreateObject("List View/List View");
@@ -1183,7 +1183,7 @@ namespace Michsky.UI.ModernUIPack
             CreateObject("Modal Window/Style 2");
         }
 
-        [MenuItem("GameObject/Modern UI Pack/Movable Window/Standard", false, 0)]
+        [MenuItem("GameObject/Modern UI Pack/Movable Window", false, 0)]
         static void MVWSSWT()
         {
             CreateObject("Movable Window/Movable Window");
@@ -1285,7 +1285,7 @@ namespace Michsky.UI.ModernUIPack
             CreateObject("Progress Bar (Loop)/PB Loop - Radial Trapez");
         }
 
-        [MenuItem("GameObject/Modern UI Pack/Scrollbar/Standard", false, 0)]
+        [MenuItem("GameObject/Modern UI Pack/Scrollbar", false, 0)]
         static void SCS()
         {
             CreateObject("Scrollbar/Scrollbar");
@@ -1399,7 +1399,7 @@ namespace Michsky.UI.ModernUIPack
             CreateObject("Toggle/Toggle Group Panel");
         }
 
-        [MenuItem("GameObject/Modern UI Pack/Tooltip/Tooltip System", false, 0)]
+        [MenuItem("GameObject/Modern UI Pack/Tooltip System", false, 0)]
         static void TTS()
         {
             CreateObject("Tooltip/Tooltip");

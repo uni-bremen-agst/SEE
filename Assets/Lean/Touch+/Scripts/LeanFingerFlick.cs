@@ -107,6 +107,11 @@ namespace Lean.Touch
 
 		private void HandleFingerDown(LeanFinger finger)
 		{
+			if (finger.Index == LeanTouch.HOVER_FINGER_INDEX)
+			{
+				return;
+			}
+
 			var data = LeanFingerData.FindOrCreate(ref fingerDatas, finger);
 
 			data.Flicked = false;

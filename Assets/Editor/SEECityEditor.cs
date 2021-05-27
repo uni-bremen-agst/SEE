@@ -324,8 +324,8 @@ namespace SEEEditor
                                                     "Data Files", true, EditorStyles.foldoutHeader);
             if (showDataFiles)
             {
-                seeCity.GXLPath = GetDataPath("GXL file", seeCity.GXLPath, Filenames.ExtensionWithoutPeriod(Filenames.GXLExtension));
-                seeCity.CSVPath = GetDataPath("Metric file", seeCity.CSVPath, Filenames.ExtensionWithoutPeriod(Filenames.CSVExtension));
+                seeCity.GXLPath = DataPathEditor.GetDataPath("GXL file", seeCity.GXLPath, Filenames.ExtensionWithoutPeriod(Filenames.GXLExtension));
+                seeCity.CSVPath = DataPathEditor.GetDataPath("Metric file", seeCity.CSVPath, Filenames.ExtensionWithoutPeriod(Filenames.CSVExtension));
             }
         }
 

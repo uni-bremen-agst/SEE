@@ -29,15 +29,11 @@ using UnityEngine.UI;
 namespace SEE.Game.Evolution
 {
     /// <summary>
-    /// The AnimationInteraction manages user inputs and interfaces
+    /// The AnimationInteraction manages user inputs and interfaces for the animation of the
+    /// evolution.
     /// </summary>
     public class AnimationInteraction : MonoBehaviour
     {
-        /// <summary>
-        /// The camera from the user.
-        /// </summary>
-        //public FlyCamera FlyCamera; // serialized by Unity (it is a MonoBehaviour)
-
         /// <summary>
         /// Whether the UI for selecting revisions is currently shown.
         /// </summary>

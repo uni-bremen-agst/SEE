@@ -3,6 +3,10 @@ using SEE.GO;
 using SEE.Utils;
 using System;
 using UnityEngine;
+using System.Collections.Generic;
+using SEE.DataModel.DG;
+using SEE.DataModel;
+using System.Linq;
 
 namespace SEE.Controls.Actions
 {
@@ -160,7 +164,7 @@ namespace SEE.Controls.Actions
             /// Constructor taking a snapshot of the position and scale of <paramref name="gameObject"/>.
             /// </summary>
             /// <param name="gameObject">object whose position and scale are to be captured</param>
-            public Memento(GameObject gameObject) 
+            public Memento(GameObject gameObject)
             {
                 Position = gameObject.transform.position;
                 Scale = gameObject.transform.lossyScale;
@@ -283,10 +287,10 @@ namespace SEE.Controls.Actions
                             // selection. The user this time neither selected the object to be scaled again nor one
                             // of the scaling gizmos. That means, the action is finished and needs to be
                             // finalized if the user has actually triggered a change at all.
-                            hadAnEffect = objectToScale.transform.position != beforeAction.Position
-                                || objectToScale.transform.lossyScale != beforeAction.Scale;
-                            if (hadAnEffect)
+                            if (objectToScale.transform.position != beforeAction.Position
+                                || objectToScale.transform.lossyScale != beforeAction.Scale)
                             {
+                                currentState = ReversibleAction.Progress.Completed;
                                 // Scaling action is finalized.
                                 afterAction = new Memento(objectToScale);
                                 draggedSphere = null;
@@ -323,16 +327,25 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Looks at all the incoming and outgoing edges of a node and replaces these edges depending on the new scaling of the node. 
+        /// </summary>
+        private void AdjustEdge()
+        {
+            GameEdgeMover.MoveAllConnectingEdgesOfNode(objectToScale);
+        }
+
+        /// <summary>
         /// Scales <see cref="objectToScale"/> and drags and re-draws the scaling gizmos. 
         /// </summary>
         private void Scaling()
         {
             DragSphere(draggedSphere);
-            
+
             ScaleNode();
             SetOnRoof();
             SetOnSide();
             AdjustSizeOfScalingGizmos();
+            AdjustEdge();
         }
 
         /// <summary>
@@ -437,13 +450,13 @@ namespace SEE.Controls.Actions
 
             // Corner scaling
             float scaleCorner = 0;
-            scaleCorner -= firstCornerSphere.transform.position.x - firstCornerOldSpherePos.x 
+            scaleCorner -= firstCornerSphere.transform.position.x - firstCornerOldSpherePos.x
                 + (firstCornerSphere.transform.position.z - firstCornerOldSpherePos.z);
-            scaleCorner += secondCornerSphere.transform.position.x - secondCornerOldSpherePos.x 
+            scaleCorner += secondCornerSphere.transform.position.x - secondCornerOldSpherePos.x
                 - (secondCornerSphere.transform.position.z - secondCornerOldSpherePos.z);
-            scaleCorner += thirdCornerSphere.transform.position.x - thirdCornerOldSpherePos.x 
+            scaleCorner += thirdCornerSphere.transform.position.x - thirdCornerOldSpherePos.x
                 + (thirdCornerSphere.transform.position.z - thirdCornerOldSpherePos.z);
-            scaleCorner -= forthCornerSphere.transform.position.x - forthCornerOldSpherePos.x 
+            scaleCorner -= forthCornerSphere.transform.position.x - forthCornerOldSpherePos.x
                 - (forthCornerSphere.transform.position.z - forthCornerOldSpherePos.z);
 
             scale.x += scaleCorner;
@@ -484,7 +497,8 @@ namespace SEE.Controls.Actions
             // Transform the new position and scale
             objectToScale.transform.position = position;
             objectToScale.SetScale(scale);
-            hadAnEffect = true;
+            currentState = ReversibleAction.Progress.InProgress;
+
             new ScaleNodeNetAction(objectToScale.name, scale, position).Execute();
         }
 
