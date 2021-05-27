@@ -176,7 +176,7 @@ namespace SEE.Controls.Actions
         /// Returns the IDs of all gameObjects manipulated by the specific action.
         /// </summary>
         /// <returns>All IDs of manipulated gameObjects</returns>
-        public abstract IList<string> GetChangedObjects();
+        public abstract List<string> GetChangedObjects();
 
         /// <summary>
         /// A getter for the ID of this action.

@@ -43,7 +43,7 @@ namespace SEE.Utils
             /// <param name="type">The type of the action</param>
             /// <param name="actionID">The ID of the action</param>
             /// <param name="changedObjects">The objects that there changed by this action</param>
-            public GlobalHistoryEntry(bool isOwner, HistoryType type, string actionID, IList<string> changedObjects)
+            public GlobalHistoryEntry(bool isOwner, HistoryType type, string actionID, List<string> changedObjects)
             {
                 IsOwner = isOwner;
                 ActionType = type;
@@ -54,7 +54,7 @@ namespace SEE.Utils
             public bool IsOwner { get; }
             public HistoryType ActionType { get; }
             public string ActionID { get; }
-            public IList<string> ChangedObjects { get; }
+            public List<string> ChangedObjects { get; }
 
         }
 
@@ -415,7 +415,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="gameObjectIds">the gameObjectIds</param>
         /// <returns>a single comma seperated string of all gameObjectIds.</returns>
-        private static string ListToString(IList<string> gameObjectIds)
+        private static string ListToString(List<string> gameObjectIds)
         {
             return (gameObjectIds != null) ? JsonUtility.ToJson(gameObjectIds) : null;
         }
