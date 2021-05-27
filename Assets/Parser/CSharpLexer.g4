@@ -168,7 +168,7 @@ if (interpolatedStringLevel > 0)
     if (curlyLevels.Peek() == 0)
     {
         curlyLevels.Pop();
-        Skip();
+        //Skip();
         PopMode();
     }
 }
@@ -254,7 +254,7 @@ VERBATIUM_INSIDE_STRING:       {  verbatium }? ~('{' | '"')+;
 mode INTERPOLATION_FORMAT;
 
 DOUBLE_CURLY_CLOSE_INSIDE:      '}}' -> type(FORMAT_STRING);
-CLOSE_BRACE_INSIDE:             '}' { curlyLevels.Pop(); }   -> popMode;
+CLOSE_BRACE_INSIDE:             '}' { curlyLevels.Pop(); }  -> popMode;
 FORMAT_STRING:                  ~'}'+;
 
 mode DIRECTIVE_MODE;
