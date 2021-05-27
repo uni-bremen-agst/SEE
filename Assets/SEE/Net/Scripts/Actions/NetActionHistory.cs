@@ -1,4 +1,4 @@
-using SEE.Utils;
+﻿using SEE.Utils;
 using SEE.Controls.Actions;
 using System.Collections.Generic;
 using System.Linq;
@@ -169,7 +169,7 @@ namespace SEE.Net
         /// <returns>a list of ids of changed gameObjects</returns>
         private static List<string> StringToList(string changedObjectsToParse)
         {
-            return JsonUtility.FromJson<List<string>>(changedObjectsToParse);
+             return changedObjectsToParse?.Split('╗').ToList();
         }
     }
 }
