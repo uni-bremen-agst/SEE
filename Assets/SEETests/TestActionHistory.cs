@@ -143,12 +143,6 @@ namespace SEETests
             Counter.Reset();
         }
 
-      /*  [Test]
-        public void EmptyHistory()
-        {
-            Assert.Throws<EmptyActionHistoryException>(() => hist.Undo());
-            Assert.Throws<EmptyUndoHistoryException>(() => hist.Redo());
-        } */
 
         [Test]        
         public void OneAction()
