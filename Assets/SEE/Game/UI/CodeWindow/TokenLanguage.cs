@@ -240,7 +240,7 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         private static readonly HashSet<string> cppExtensions = new HashSet<string>
         {
-            "cpp"
+            "cpp", "cxx", "hpp"
         };
 
         /// <summary>
@@ -249,32 +249,43 @@ namespace SEE.Game.UI.CodeWindow
         private static readonly HashSet<string> cppKeywords = new HashSet<string>
         {
             "Alignas", "Alignof", "Asm", "Auto", "Bool", "Break", "Case",
-        "Catch", "Char", "Char16", "Char32", "Class", "Const", "Constexpr", "Const_cast",
-        "Continue", "Decltype", "Default", "Delete", "Do", "Double", "Dynamic_cast",
-        "Else", "Enum", "Explicit", "Export", "Extern", "False_", "Final", "Float",
-        "For", "Friend", "Goto", "If", "Inline", "Int", "Long", "Mutable", "Namespace",
-        "New", "Noexcept", "Nullptr", "Operator", "Override", "Private", "Protected",
-        "Public", "Register", "Reinterpret_cast", "Return", "Short", "Signed",
-        "Sizeof", "Static", "Static_assert", "Static_cast", "Struct", "Switch",
-        "Template", "This", "Thread_local", "Throw", "True_", "Try", "Typedef",
-        "Typeid_", "Typename_", "Union", "Unsigned", "Using", "Virtual", "Void",
-        "Volatile", "Wchar", "While",
+            "Catch", "Char", "Char16", "Char32", "Class", "Const", "Constexpr", "Const_cast",
+            "Continue", "Decltype", "Default", "Delete", "Do", "Double", "Dynamic_cast",
+            "Else", "Enum", "Explicit", "Export", "Extern", "False_", "Final", "Float",
+            "For", "Friend", "Goto", "If", "Inline", "Int", "Long", "Mutable", "Namespace",
+            "New", "Noexcept", "Nullptr", "Operator", "Override", "Private", "Protected",
+            "Public", "Register", "Reinterpret_cast", "Return", "Short", "Signed",
+            "Sizeof", "Static", "Static_assert", "Static_cast", "Struct", "Switch",
+            "Template", "This", "Thread_local", "Throw", "True_", "Try", "Typedef",
+            "Typeid_", "Typename_", "Union", "Unsigned", "Using", "Virtual", "Void",
+            "Volatile", "Wchar", "While",
+            "BooleanLiteral", "PointerLiteral", "UserDefinedLiteral",
+            "MultiLineMacro", "Directive"
         };
         /// <summary>
         /// Set of antlr type names for CPP integer and floating point literals.
         /// </summary>
-        private static readonly HashSet<string> cppNumbers = new HashSet<string> { "IntegerLiteral", "CharacterLiteral", "FloatingLiteral" };
+        private static readonly HashSet<string> cppNumbers = new HashSet<string>
+        {
+            "IntegerLiteral", "FloatingLiteral", "DecimalLiteral", "OctalLiteral", "HexadecimalLiteral",
+            "BinaryLiteral", "Integersuffix", "UserDefinedIntegerLiteral", "UserDefinedFloatingLiteral"
+        };
         /// <summary>Set of antlr type names for CPP character and string literals.</summary>
-        private static readonly HashSet<string> cppStrings = new HashSet<string> { "StringLiteral" };
+        private static readonly HashSet<string> cppStrings = new HashSet<string>
+        {
+            "StringLiteral", "CharacterLiteral", "UserDefinedStringLiteral", "UserDefinedCharacterLiteral"
+        };
         /// <summary>Set of antlr type names for CPP separators and operators.</summary>
-        private static readonly HashSet<string> cppPunctuation = new HashSet<string> { "LeftParen", "RightParen", "LeftBracket",
-        "RightBracket", "LeftBrace", "RightBrace", "Plus", "Minus", "Star", "Div",
-        "Mod", "Caret", "And", "Or", "Tilde", "Not", "Assign", "Less", "Greater",
-        "PlusAssign", "MinusAssign", "StarAssign", "DivAssign", "ModAssign", "XorAssign",
-        "AndAssign", "OrAssign", "LeftShiftAssign", "RightShiftAssign", "Equal",
-        "NotEqual", "LessEqual", "GreaterEqual", "AndAnd", "OrOr", "PlusPlus",
-        "MinusMinus", "Comma", "ArrowStar", "Arrow", "Question", "Colon", "Doublecolon",
-        "Semi", "Dot", "DotStar", "Ellipsis"
+        private static readonly HashSet<string> cppPunctuation = new HashSet<string> 
+        { 
+            "LeftParen", "RightParen", "LeftBracket",
+            "RightBracket", "LeftBrace", "RightBrace", "Plus", "Minus", "Star", "Div",
+            "Mod", "Caret", "And", "Or", "Tilde", "Not", "Assign", "Less", "Greater",
+            "PlusAssign", "MinusAssign", "StarAssign", "DivAssign", "ModAssign", "XorAssign",
+            "AndAssign", "OrAssign", "LeftShiftAssign", "RightShiftAssign", "Equal",
+            "NotEqual", "LessEqual", "GreaterEqual", "AndAnd", "OrOr", "PlusPlus",
+            "MinusMinus", "Comma", "ArrowStar", "Arrow", "Question", "Colon", "Doublecolon",
+            "Semi", "Dot", "DotStar", "Ellipsis"
         };
         /// <summary>Set of antlr type names for CPP identifiers.</summary>
         private static readonly HashSet<string> cppIdentifiers = new HashSet<string> { "Identifier" };
