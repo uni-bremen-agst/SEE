@@ -61,5 +61,4 @@ namespace SEE.Net
             transform.rotation = controllerTransform.rotation;
         }
     }
-
 }

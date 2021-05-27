@@ -99,6 +99,11 @@ namespace Lean.Touch
 				return;
 			}
 
+			if (finger.Index == LeanTouch.HOVER_FINGER_INDEX)
+			{
+				return;
+			}
+
 			// Get link for this finger and reset
 			var fingerData = LeanFingerData.FindOrCreate(ref fingerDatas, finger);
 

@@ -69,6 +69,11 @@ namespace Lean.Touch
 				return;
 			}
 
+			if (finger.Index == LeanTouch.HOVER_FINGER_INDEX)
+			{
+				return;
+			}
+
 			if (ElementOverlapped(finger) == true)
 			{
 				if (onFinger != null)
