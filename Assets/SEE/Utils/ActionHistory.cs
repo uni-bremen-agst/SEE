@@ -419,5 +419,23 @@ namespace SEE.Utils
         {
             return (gameObjectIds != null) ? string.Join("╗", gameObjectIds) : null;
         }
+
+        /// <summary>
+        /// Gets the undo stack size
+        /// </summary>
+        /// <returns>Undo stack size</returns>
+        public int GetUndoCount()
+        {
+            return UndoHistory.Count;
+        }
+
+        /// <summary>
+        /// Gets the redo stack size
+        /// </summary>
+        /// <returns>Redo stack size</returns>
+        public int GetRedoCount()
+        {
+            return RedoHistory.Count;
+        }
     }
 }
