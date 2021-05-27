@@ -120,7 +120,7 @@ namespace SEETests
                 throw new System.NotImplementedException();
             }
 
-            public IList<string> GetChangedObjects()
+            public List<string> GetChangedObjects()
             {
                 throw new System.NotImplementedException();
             }
@@ -455,7 +455,7 @@ namespace SEETests
                 throw new System.NotImplementedException();
             }
 
-            public IList<string> GetChangedObjects()
+            public List<string> GetChangedObjects()
             {
                 throw new System.NotImplementedException();
             }

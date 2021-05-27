@@ -53,12 +53,12 @@ namespace SEE.Net
         /// <summary>
         /// The IDs of all objects which are changed by the action.
         /// </summary>
-        public IList<string> changedObjects;
+        public List<string> changedObjects;
 
         /// <summary>
         /// The IDs of all objects which are changed by the old action.
         /// </summary>
-        public IList<string> oldChangedObjects;
+        public List<string> oldChangedObjects;
 
         /// <summary>
         /// The old items ID which has to be replaced.
