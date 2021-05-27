@@ -222,6 +222,7 @@ namespace SEETests
             // c4 is undone; execution will resume with c3, because c3 is still 
             // in progress (TestAction.Update() always yields false).
             hist.Undo();
+            Assert.AreEqual(3, hist.GetUndoCount());
             CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c2, value: true,  awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c3, value: true,  awake: 1, start: 2, update: 1, stop: 1);
@@ -523,40 +524,40 @@ namespace SEETests
         /// and after the first Update call <see cref="ReversibleAction.Progress.Completed"/>
         /// for the rest of their life.
         /// </summary>
-       /* [Test]        
+        [Test]        
         public void TestCounterAction()
         {            
             hist.Execute(new Increment());
             Assert.AreEqual(0, Counter.Value);
-            Assert.AreEqual(1, hist.UndoCount);
-            Assert.AreEqual(0, hist.RedoCount);            
+            Assert.AreEqual(1, hist.GetUndoCount());
+            Assert.AreEqual(0, hist.GetRedoCount());            
             hist.Update();
             Assert.AreEqual(1, Counter.Value);
-            Assert.AreEqual(2, hist.UndoCount);
-            Assert.AreEqual(0, hist.RedoCount);
+            Assert.AreEqual(2, hist.GetUndoCount());
+            Assert.AreEqual(0, hist.GetRedoCount());
             hist.Update();
             Assert.AreEqual(2, Counter.Value);
-            Assert.AreEqual(3, hist.UndoCount);
-            Assert.AreEqual(0, hist.RedoCount);
+            Assert.AreEqual(3, hist.GetUndoCount());
+            Assert.AreEqual(0, hist.GetRedoCount());
             hist.Update();
             Assert.AreEqual(3, Counter.Value);
-            Assert.AreEqual(4, hist.UndoCount);
-            Assert.AreEqual(0, hist.RedoCount);
+            Assert.AreEqual(4, hist.GetUndoCount());
+            Assert.AreEqual(0, hist.GetRedoCount());
             // Because Increment.Update yields true every time it is called,
             // the execution will always continue with a new instance of 
             // Increment. We have had three calls to Update. Including the
             // first Execute, we should have four actions on the UndoStack.
-            Assert.AreEqual(4, hist.UndoCount);
+            Assert.AreEqual(4, hist.GetUndoCount());
             hist.Undo();
             Assert.AreEqual(2, Counter.Value);
             // Undo will remove one completed action and then resume with
             // a new instance of Increment.
-            Assert.AreEqual(3, hist.UndoCount); 
-            Assert.AreEqual(1, hist.RedoCount);
+            Assert.AreEqual(3, hist.GetUndoCount()); 
+            Assert.AreEqual(1, hist.GetRedoCount());
             hist.Undo();
             Assert.AreEqual(1, Counter.Value);
-            Assert.AreEqual(2, hist.UndoCount);
-            Assert.AreEqual(2, hist.RedoCount);
+            Assert.AreEqual(2, hist.GetUndoCount());
+            Assert.AreEqual(2, hist.GetRedoCount());
             hist.Undo();
             Assert.AreEqual(0, Counter.Value);
             // The UndoStack has one completed Increment action and one
@@ -565,42 +566,42 @@ namespace SEETests
             // be removed. This leaves the single action with effect,
             // which then is moved from the UndoStack to the RedoStack.
             // Thus, the UndoStack will be empty at this point.
-            Assert.AreEqual(0, hist.UndoCount);
-            Assert.AreEqual(3, hist.RedoCount);
+            Assert.AreEqual(0, hist.GetUndoCount());
+            Assert.AreEqual(3, hist.GetRedoCount());
             hist.Redo();
             Assert.AreEqual(1, Counter.Value);
             // Redo moves an action from the RedoStack to the UndoStack.
             // Because that action was completed, a new instance of 
             // Increment will be put onto the UndoStack that will be used
             // to resume.
-            Assert.AreEqual(2, hist.UndoCount);
-            Assert.AreEqual(2, hist.RedoCount);
+            Assert.AreEqual(2, hist.GetUndoCount());
+            Assert.AreEqual(2, hist.GetRedoCount());
             hist.Redo();
             Assert.AreEqual(2, Counter.Value);
-            Assert.AreEqual(3, hist.UndoCount);
-            Assert.AreEqual(1, hist.RedoCount);
+            Assert.AreEqual(3, hist.GetUndoCount());
+            Assert.AreEqual(1, hist.GetRedoCount());
             hist.Execute(new Decrement());
             // The new instance of the Increment action that was put on
             // the stack due to Redo above has not received any Update call.
             // Hence, it will be popped off the UndoStack. Thus, UndoCount
             // remains the same.
             Assert.AreEqual(2, Counter.Value); // still 2 because no Update was called
-            Assert.AreEqual(3, hist.UndoCount);
-            Assert.AreEqual(0, hist.RedoCount); // RedoStack is lost
+            Assert.AreEqual(3, hist.GetUndoCount());
+            Assert.AreEqual(0, hist.GetRedoCount()); // RedoStack is lost
             hist.Update();
             // Update has completed Decrement. A new instance of Decrement will
             // be put on the Undo stack.
             Assert.AreEqual(1, Counter.Value);
-            Assert.AreEqual(4, hist.UndoCount);
-            Assert.AreEqual(0, hist.RedoCount);
+            Assert.AreEqual(4, hist.GetUndoCount());
+            Assert.AreEqual(0, hist.GetRedoCount());
             // No Update has been called for the new instance of Decrement just put
             // on the UndoStack, hence, the Decrement at the top of the UndoStack
             // has still progress state NoEffect. Thus it will be popped off the UndoStack
             // when the next Increment is added by the following line.
             hist.Execute(new Increment());
             Assert.AreEqual(1, Counter.Value);  // still 1 because no Update was called
-            Assert.AreEqual(4, hist.UndoCount);
-            Assert.AreEqual(0, hist.RedoCount);
+            Assert.AreEqual(4, hist.GetUndoCount());
+            Assert.AreEqual(0, hist.GetRedoCount());
             // Undo without prior Update for the Increment just added; that means we are actually
             // undoing Decrement. The Increment will be popped off the UndoStack. Then the 
             // Decrement will be undone and moved from the UndoStack to the RedoStack.
@@ -608,8 +609,8 @@ namespace SEETests
             // completed, a new instance of Increment will be added.
             hist.Undo();
             Assert.AreEqual(2, Counter.Value);
-            Assert.AreEqual(3, hist.UndoCount);
-            Assert.AreEqual(1, hist.RedoCount);
+            Assert.AreEqual(3, hist.GetUndoCount());
+            Assert.AreEqual(1, hist.GetRedoCount());
             hist.Undo(); // undoing an Increment
             // No Update has been called for the new instance of the Increment with
             // progress state NoEffect. Hence, it will be popped off the UndoStack.
@@ -620,8 +621,8 @@ namespace SEETests
             // a new instance of Increment is added to the UndoStack in progress state
             // NoEffect.
             Assert.AreEqual(1, Counter.Value);
-            Assert.AreEqual(2, hist.UndoCount);
-            Assert.AreEqual(2, hist.RedoCount);
+            Assert.AreEqual(2, hist.GetUndoCount());
+            Assert.AreEqual(2, hist.GetRedoCount());
             // The current situation is a follows: the UndoStack consists of an
             // Increment with no effect and one completed Increment. The RedoStack
             // has a completed Increment and a completed Decrement.
@@ -631,12 +632,12 @@ namespace SEETests
             // Because that Increment is completed, a new instance of Increment
             // with progress state NoEffect will be added to the UndoStack.
             Assert.AreEqual(2, Counter.Value);
-            Assert.AreEqual(3, hist.UndoCount);
-            Assert.AreEqual(1, hist.RedoCount);
+            Assert.AreEqual(3, hist.GetUndoCount());
+            Assert.AreEqual(1, hist.GetRedoCount());
             hist.Redo(); // re-doing a Decrement
             Assert.AreEqual(1, Counter.Value);
-            Assert.AreEqual(4, hist.UndoCount);
-            Assert.AreEqual(0, hist.RedoCount);
-        } */
+            Assert.AreEqual(4, hist.GetUndoCount());
+            Assert.AreEqual(0, hist.GetRedoCount());
+        } 
     } 
 }
