@@ -677,12 +677,10 @@ namespace SEE.GO
                 {
                     Node n = new Node();
                     n.ID = counter + "-DummyNode";
-                    n.SetLevel(1);
                     graph.AddNode(n);
                     counter++;
                 }
             }
-            graph.FinalizeNodeHierarchy();
             TreemapGraph = graph;
         }
     }

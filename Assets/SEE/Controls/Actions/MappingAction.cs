@@ -119,7 +119,6 @@ namespace SEE.Controls.Actions
         {
             if (SEEInput.Mapping())
             {
-                mapping.FinalizeNodeHierarchy();
                 SEECity city = SceneQueries.FindMapping();
                 city.LoadedGraph = mapping;
                 city.ReDrawGraph();
@@ -181,7 +180,6 @@ namespace SEE.Controls.Actions
                         Node src = mapping.GetNode(srcNode.ID);
                         Node dst = mapping.GetNode(dstNode.ID);
                         src.Reparent(dst);
-                        mapping.FinalizeNodeHierarchy();
                         SEECity city = SceneQueries.FindMapping();
                         city.LoadedGraph = mapping;
                         city.ReDrawGraph();

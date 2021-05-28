@@ -163,8 +163,6 @@ namespace SEE.Controls.Actions
                     //moveState.dragStartOffset = Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale);
                     //moveState.dragStartTransformPosition -= moveState.dragStartOffset;
 
-
-
                     // TODO(torben): synchronize here
                 }
                 else

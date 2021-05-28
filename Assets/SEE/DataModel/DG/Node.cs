@@ -102,10 +102,22 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The level of a node in the hierarchy. The level of a root node is 0.
         /// For all other nodes, the level is the level of its parent + 1.
+        /// The level of a node that is currently in no graph is 0.
         /// </summary>
         public int Level
         {
-            get => level;
+            get
+            {
+                if (ItsGraph == null)
+                {
+                    return 0;
+                }
+                if (ItsGraph.NodeHierarchyHasChanged)
+                {
+                    ItsGraph.FinalizeNodeHierarchy();
+                }
+                return level;
+            }                
             set
             {
                 level = value;
@@ -114,7 +126,9 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Sets the level of the node as specified by the parameter and sets
-        /// the respective level values of each of its (transitive) descendants. 
+        /// the respective level values of each of its (transitive) descendants.
+        /// 
+        /// Note: This method should be called only by <see cref="Graph"/>.
         /// </summary>
         internal void SetLevel(int level)
         {
@@ -460,15 +474,15 @@ namespace SEE.DataModel.DG
         /// <param name="child">descendant to be added to node</param>
         public void AddChild(Node child)
         {
-            if (ReferenceEquals(child.Parent, null))
+            if (child.Parent == null)
             {
                 children.Add(child);
                 child.Parent = this;
+                ItsGraph.NodeHierarchyHasChanged = true;
             }
             else
             {
-                throw new Exception("Hierarchical edges do not form a tree. Node with multiple parents: "
-                    + child.ID);
+                throw new Exception($"Node hierarchy does not form a tree. Node with multiple parents: {child.ID}.");
             }
         }
 
@@ -489,7 +503,7 @@ namespace SEE.DataModel.DG
                 {
                     parent.children.Remove(this);
                     parent = null;
-                    graph.FinalizeNodeHierarchy();
+                    ItsGraph.NodeHierarchyHasChanged = true;
                 }
             }
             else
@@ -506,7 +520,7 @@ namespace SEE.DataModel.DG
                     parent = newParent;
                     parent.children.Add(this);
                 }
-                graph.FinalizeNodeHierarchy();
+                ItsGraph.NodeHierarchyHasChanged = true;
             }
         }
 

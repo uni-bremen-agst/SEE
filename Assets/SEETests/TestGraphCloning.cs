@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace SEE.DataModel.DG
 {
@@ -130,10 +131,6 @@ namespace SEE.DataModel.DG
             original.AddNode(n1_c1_c2);
             n1_c1.AddChild(n1_c1_c1);
             n1_c1.AddChild(n1_c1_c2);
-
-            // Note: The levels must be calculated when the hierarchy has been
-            // established. This is not done automatically.
-            original.FinalizeNodeHierarchy();
 
             Graph clone = (Graph)original.Clone();
             Assert.That(clone.Path == original.Path);
