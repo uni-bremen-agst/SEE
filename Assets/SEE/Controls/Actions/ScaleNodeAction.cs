@@ -253,7 +253,7 @@ namespace SEE.Controls.Actions
                 }
                 if (SEEInput.Drag())
                 {
-                    if (draggedSphere == null && Raycasting.RayCastAnything(out RaycastHit raycastHit))
+                    if (draggedSphere == null && Raycasting.RaycastAnything(out RaycastHit raycastHit))
                     {
                         draggedSphere = SelectedScalingGizmo(raycastHit.collider.gameObject);
                     }

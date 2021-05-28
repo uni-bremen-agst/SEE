@@ -140,17 +140,15 @@ namespace SEE.Game.Charts
 
             chartContent.AttachShowInChartCallbackFn(o, OnShowInChartEvent);
 
-            // Note(torben): This if-else-statepent only works, because 'OnSelectIn'
-            // does everything 'OnHoverIn' does, but more.
+            // Note: This if-else-statepent only works, because 'OnSelectIn' does everything
+            // 'OnHoverIn' does, but more.
             if (o.IsSelected)
             {
-                // TODO(torben): the owner should be cached inside InteractableObject, create functions like e.g. IsHoveredByThisClient()...
-                OnSelectIn(o, true);
+                OnSelectIn(o);
             }
             else if (o.IsHovered)
             {
-                // TODO(torben): the owner should be cached inside InteractableObject, create functions like e.g. IsHoveredByThisClient()...
-                OnHoverIn(o, true);
+                OnHoverIn(o);
             }
 
             UpdateVisibility();
@@ -211,8 +209,6 @@ namespace SEE.Game.Charts
         {
             if (image.enabled)
             {
-                // TODO(torben): the action state could be global for some cases. the line below exists in DesktopNavigationAction.cs and could somewhat be shared
-                //actionState.selectToggle = Input.GetKey(KeyBindings.ToggleMetricHover);
                 if (!SEEInput.ToggleMetricHoveringSelection())
                 {
                     InteractableObject.UnhoverAll(true);
@@ -270,8 +266,8 @@ namespace SEE.Game.Charts
         /// Updates the info text.
         /// </summary>
         /// <param name="interactableObject">the object being hovered over</param>
-        /// <param name="isOwner">true if a local user initiated this call (unused)</param>
-        public void OnHoverIn(InteractableObject interactableObject, bool isOwner)
+        /// <param name="_">ignored</param>
+        public void OnHoverIn(InteractableObject interactableObject, bool _ = true)
         {
             if (!interactableObject.IsSelected)
             {
@@ -286,8 +282,8 @@ namespace SEE.Game.Charts
         /// Updates the info text.
         /// </summary>
         /// <param name="interactableObject">the object being hovered over</param>
-        /// <param name="isOwner">true if a local user initiated this call (unused)</param>
-        public void OnHoverOut(InteractableObject interactableObject, bool isOwner)
+        /// <param name="_">ignored</param>
+        public void OnHoverOut(InteractableObject interactableObject, bool _ = true)
         {
             if (!interactableObject.IsSelected)
             {
@@ -302,8 +298,8 @@ namespace SEE.Game.Charts
         /// Updates the info text and highlights this marker.
         /// </summary>
         /// <param name="interactableObject">the object being selected</param>
-        /// <param name="isOwner">true if a local user initiated this call (unused)</param>
-        public void OnSelectIn(InteractableObject interactableObject, bool isOwner)
+        /// <param name="_">ignored</param>
+        public void OnSelectIn(InteractableObject interactableObject, bool _ = true)
         {
             selectedCount++;
             if (!interactableObject.IsHovered)
@@ -321,8 +317,8 @@ namespace SEE.Game.Charts
         /// interactable object is still selected.
         /// </summary>
         /// <param name="interactableObject">the object being selected</param>
-        /// <param name="isOwner">true if a local user initiated this call (unused)</param>
-        public void OnSelectOut(InteractableObject interactableObject, bool isOwner)
+        /// <param name="_">ignored</param>
+        public void OnSelectOut(InteractableObject interactableObject, bool _ = true)
         {
             selectedCount--;
             if (!interactableObject.IsHovered)

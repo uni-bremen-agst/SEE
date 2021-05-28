@@ -122,7 +122,7 @@ namespace SEE.Layout.NodeLayouts.Cose
             name = "Compound Spring Embedder Layout";
             nodeToCoseNode = new Dictionary<ILayoutNode, CoseNode>();
             this.settings = settings;
-            SetupGraphSettings(settings.CoseGraphSettings);
+            SetupGraphSettings(settings.coseGraphSettings);
         }
 
         /// <summary>
@@ -257,8 +257,8 @@ namespace SEE.Layout.NodeLayouts.Cose
             int edgeLength = CoseHelper.GetGoodEgdeLength(countNode, countMax, leafNodesCount, edgesCount);
             int repulsionStrength = CoseHelper.GetGoodRepulsionRange(countMax, countNode, edgesCount);
 
-            settings.CoseGraphSettings.RepulsionStrength = repulsionStrength;
-            settings.CoseGraphSettings.EdgeLength = edgeLength;
+            settings.coseGraphSettings.RepulsionStrength = repulsionStrength;
+            settings.coseGraphSettings.EdgeLength = edgeLength;
 
             CoseLayoutSettings.Edge_Length = edgeLength;
             CoseLayoutSettings.Repulsion_Strength = repulsionStrength;
@@ -334,8 +334,8 @@ namespace SEE.Layout.NodeLayouts.Cose
         {
             CoseLayoutSettings.Edge_Length = edgeLength;
             CoseLayoutSettings.Repulsion_Strength = repulsionStrength;
-            settings.CoseGraphSettings.EdgeLength = edgeLength;
-            settings.CoseGraphSettings.RepulsionStrength = repulsionStrength;
+            settings.coseGraphSettings.EdgeLength = edgeLength;
+            settings.coseGraphSettings.RepulsionStrength = repulsionStrength;
 
             StartLayoutProzess();
             SetCalculatedLayoutPositionToNodes();
