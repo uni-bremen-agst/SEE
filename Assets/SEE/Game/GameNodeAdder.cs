@@ -72,7 +72,6 @@ namespace SEE.Game
                 }
                 graph.AddNode(node);
                 parent.AddChild(node);
-                graph.FinalizeNodeHierarchy();
             }
         }
 
@@ -129,7 +128,6 @@ namespace SEE.Game
             Node node = gameNode.GetNode();
             Graph graph = node.ItsGraph;
             graph.RemoveNode(node);
-            graph.FinalizeNodeHierarchy();
         }
     }
 }
