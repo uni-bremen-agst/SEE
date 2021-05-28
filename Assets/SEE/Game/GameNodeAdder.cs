@@ -21,7 +21,7 @@ namespace SEE.Game
         /// <returns>new graph node</returns>
         private static Node NewGraphNode(string nodeID)
         {
-            string ID = string.IsNullOrEmpty(nodeID) ? RandomStrings.Get() : nodeID;
+            string ID = string.IsNullOrEmpty(nodeID) ? Guid.NewGuid().ToString() : nodeID;
             return new Node()
             {
                 ID = ID,
@@ -63,11 +63,11 @@ namespace SEE.Game
                 }
                 if (string.IsNullOrEmpty(node.ID))
                 {
-                    // Loop until the node.ID is unique.
-                    node.ID = RandomStrings.Get();
+                    // Loop until the node.ID is unique within the graph.
+                    node.ID = Guid.NewGuid().ToString();
                     while (graph.GetNode(node.ID) != null)
                     {
-                        node.ID = RandomStrings.Get();
+                        node.ID = Guid.NewGuid().ToString();
                     }
                 }
                 graph.AddNode(node);
