@@ -948,7 +948,7 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Hoveres every interactable object of every marker, that is inside given bounds.
+        /// Hovers every interactable object of every marker that is inside given bounds.
         /// </summary>
         /// <param name="min">The min value of the bounds.</param>
         /// <param name="max">The max value of the bounds.</param>
