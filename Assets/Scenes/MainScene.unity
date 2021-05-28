@@ -1256,7 +1256,7 @@ Transform:
   m_LocalScale: {x: 1, y: 0.0001, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &155696305
 GameObject:
@@ -2428,7 +2428,7 @@ Transform:
   m_LocalScale: {x: 1, y: 0.0001, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &155696313
 MonoBehaviour:
@@ -3889,7 +3889,7 @@ Transform:
   - {fileID: 326830033}
   - {fileID: 1305587995}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &614110200
 PrefabInstance:
@@ -4473,7 +4473,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 433544, guid: fe29e3c90ef88194184c6f3656db5ec5, type: 3}
       propertyPath: m_RootOrder
-      value: 13
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 433544, guid: fe29e3c90ef88194184c6f3656db5ec5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4865,6 +4865,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1381114940}
   - component: {fileID: 1381114939}
+  - component: {fileID: 1381114941}
   m_Layer: 0
   m_Name: Player Settings
   m_TagString: Untagged
@@ -4908,6 +4909,28 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1381114941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1381114938}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68cd993404524eb45918638d10b68356, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useInOfflineMode: 1
+  hostServer: 1
+  remoteServerIPAddress: 192.168.178.120
+  localServerPort: 55555
+  remoteServerPort: 55555
+  loadCityOnStart: 0
+  networkCommsLoggingEnabled: 0
+  internalLoggingEnabled: 1
+  minimalSeverity: 2
+  vivoxChannelName: 
 --- !u!4 &1502973842 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400004, guid: 01dfb375646cba84e9b92e2cedf7d149, type: 3}
@@ -6077,7 +6100,7 @@ Transform:
   m_LocalScale: {x: 1, y: 0.0001, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1642873251
 MonoBehaviour:
@@ -6100,7 +6123,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2280538230575761087, guid: 4791a6d14e45cb04a9e63875472d1e75, type: 3}
       propertyPath: m_RootOrder
-      value: 10
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 2280538230575761087, guid: 4791a6d14e45cb04a9e63875472d1e75, type: 3}
       propertyPath: m_LocalPosition.x
@@ -6148,59 +6171,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4791a6d14e45cb04a9e63875472d1e75, type: 3}
---- !u!1 &1755647557
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1755647559}
-  - component: {fileID: 1755647558}
-  m_Layer: 0
-  m_Name: Network
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1755647558
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1755647557}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 68cd993404524eb45918638d10b68356, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  useInOfflineMode: 1
-  hostServer: 0
-  remoteServerIPAddress: 
-  localServerPort: 55555
-  remoteServerPort: 0
-  loadCityOnStart: 0
-  networkCommsLoggingEnabled: 0
-  internalLoggingEnabled: 1
-  minimalSeverity: 2
-  vivoxChannelName: 
---- !u!4 &1755647559
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1755647557}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1758871328
 GameObject:
   m_ObjectHideFlags: 0
@@ -7322,7 +7292,7 @@ Transform:
   m_LocalScale: {x: 0.9, y: 0.0001, z: 0.9}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1758871337
 MonoBehaviour:
@@ -8611,13 +8581,13 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 2
+      Data: 4
     - Name: 
       Entry: 7
       Data: 
     - Name: $k
       Entry: 1
-      Data: File
+      Data: Method
     - Name: $v
       Entry: 5
       Data: true
@@ -8629,7 +8599,31 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Directory
+      Data: Field
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Class
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Package
     - Name: $v
       Entry: 5
       Data: true
@@ -8679,11 +8673,11 @@ MonoBehaviour:
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
   GXLPath:
-    Root: 0
+    Root: 3
     relativePath: /mini/CodeFacts.gxl
     absolutePath: C:\dev\SEE\Data\GXL\linux-clones\fs\CodeFacts.gxl
   CSVPath:
-    Root: 0
+    Root: 3
     relativePath: /mini/CodeFacts.csv
     absolutePath: C:\dev\SEE\Data\GXL\linux-clones\fs\CodeFacts.csv
 --- !u!114 &1972412193
@@ -8699,7 +8693,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.0030852556
+  HeightOffset: 0.004589379
 --- !u!65 &1972412194
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8774,7 +8768,7 @@ Transform:
   m_LocalScale: {x: 1, y: 0.0001, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1972412198
 MonoBehaviour:
@@ -8958,7 +8952,7 @@ Transform:
   m_Children:
   - {fileID: 7848797144439543212}
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5938819682562171534
 MonoBehaviour:
