@@ -167,16 +167,22 @@ namespace SEE.Utils
             }
         }
 
-        /// <summary>
-        /// Calls the update method of each active action.
+        /// Calls <see cref="ReversibleAction.Update"/> for the currently executed action of this
+        /// action history if there is any. If that action signals that it is complete (via
+        /// <see cref="ReversibleAction.Update"/>), a new instance of the same kind as this
+        /// action will be created, added to the action history and become the new currently
+        /// executed action. If there is no currently executed action, nothing happens.
         /// </summary>
         public void Update()
         {
-            if (LastAction != null && LastAction.Update())
+            ReversibleAction lastAction = LastAction;
+            if (lastAction != null && lastAction.Update())
             {
-                Push(new GlobalHistoryEntry(true, HistoryType.action, LastAction.GetId(), LastAction.GetChangedObjects()));
-                new NetActionHistory().Push(HistoryType.action, LastAction.GetId(), LastAction.GetChangedObjects());
-                Execute(LastAction.NewInstance());
+                string actionID = LastAction.GetId();
+                List<string> changedObjects = lastAction.GetChangedObjects();
+                Push(new GlobalHistoryEntry(true, HistoryType.action, actionID, changedObjects));
+                new NetActionHistory().Push(HistoryType.action, actionID, changedObjects);
+                Execute(lastAction.NewInstance());
             }
         }
 
