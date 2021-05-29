@@ -1,9 +1,7 @@
 ﻿using SEE.Utils;
 using SEE.Controls.Actions;
 using System.Collections.Generic;
-using System.Linq;
 using static SEE.Utils.ActionHistory;
-using UnityEngine;
 
 namespace SEE.Net
 {
@@ -75,11 +73,6 @@ namespace SEE.Net
         /// </summary>
         public HistoryType newItemType;
 
-        public NetActionHistory()
-        {
-            // Intentionally left blank.
-        }
-
         /// <summary>
         /// Stuff to execute on the server. Nothing to be done here.
         /// </summary>
@@ -104,8 +97,8 @@ namespace SEE.Net
                         break;
                     case Mode.Replace:
                         GlobalActionHistory.Replace(new GlobalHistoryEntry(false, oldItemType, ID, oldChangedObjects),
-                                               new GlobalHistoryEntry(false, newItemType, ID, changedObjects),
-                                               true);
+                                                    new GlobalHistoryEntry(false, newItemType, ID, changedObjects),
+                                                    true);
                         break;
                 }
                 mode = Mode.Init;
@@ -118,12 +111,12 @@ namespace SEE.Net
         /// <param name="type">The type of the action (action, undoneAction)</param>
         /// <param name="actionId">The ID of the action</param>
         /// <param name="changedObjects">The IDs of the objects which are edited from the action</param>
-        public void Push(ActionHistory.HistoryType type, string actionId, string changedObjects)
+        public void Push(ActionHistory.HistoryType type, string actionId, List<string> changedObjects)
         {
             mode = Mode.Push;
             this.type = type;
             this.actionId = actionId;
-            this.changedObjects = StringToList(changedObjects);
+            this.changedObjects = changedObjects;
             Execute(null);
         }
 
@@ -149,27 +142,16 @@ namespace SEE.Net
         public void Replace
                      (ActionHistory.HistoryType oldType, 
                       string id, 
-                      string oldChangedObjects, 
+                      List<string >oldChangedObjects, 
                       ActionHistory.HistoryType newType, 
-                      string newChangedObjects)
+                      List<string> newChangedObjects)
         {
             oldItemType = oldType;
             ID = id;
-            this.oldChangedObjects = StringToList(oldChangedObjects);
-            changedObjects = StringToList(newChangedObjects);
+            this.oldChangedObjects = oldChangedObjects;
+            this.changedObjects = newChangedObjects;
             mode = Mode.Replace;
             Execute(null);
-        }
-
-        /// <summary>
-        /// Splits the given <paramref name="changedObjectsToParse"/> (assumed to be a 
-        /// list of game-object ids) and returns them as a list.
-        /// </summary>
-        /// <param name="changedObjectsToParse">the changed objects to be split</param>
-        /// <returns>a list of ids of changed gameObjects</returns>
-        private static List<string> StringToList(string changedObjectsToParse)
-        {
-             return changedObjectsToParse?.Split('╗').ToList();
         }
     }
 }
