@@ -21,7 +21,7 @@ namespace SEE.Game
         /// <returns>new graph node</returns>
         private static Node NewGraphNode(string nodeID)
         {
-            string ID = string.IsNullOrEmpty(nodeID) ? RandomStrings.Get() : nodeID;
+            string ID = string.IsNullOrEmpty(nodeID) ? Guid.NewGuid().ToString() : nodeID;
             return new Node()
             {
                 ID = ID,
@@ -63,16 +63,15 @@ namespace SEE.Game
                 }
                 if (string.IsNullOrEmpty(node.ID))
                 {
-                    // Loop until the node.ID is unique.
-                    node.ID = RandomStrings.Get();
+                    // Loop until the node.ID is unique within the graph.
+                    node.ID = Guid.NewGuid().ToString();
                     while (graph.GetNode(node.ID) != null)
                     {
-                        node.ID = RandomStrings.Get();
+                        node.ID = Guid.NewGuid().ToString();
                     }
                 }
                 graph.AddNode(node);
                 parent.AddChild(node);
-                graph.FinalizeNodeHierarchy();
             }
         }
 
@@ -96,7 +95,7 @@ namespace SEE.Game
             {
                 Node node = NewGraphNode(nodeID);
                 AddNodeToGraph(parent.GetNode(), node);
-                GameObject result = city.Renderer.NewLeafNode(node);
+                GameObject result = city.Renderer.DrawLeafNode(node);
                 result.transform.localScale = worldSpaceScale;
                 result.transform.position = position;
                 result.transform.SetParent(parent.transform);
@@ -111,10 +110,15 @@ namespace SEE.Game
         /// <summary>
         /// Inverse operation of <see cref="Add(GameObject, Vector3, Vector3, string)"/>.
         /// Removes the given <paramref name="gameNode"/> from the scene and its associated 
-        /// graph node from its graph. <paramref name="gameNode"/> is destroyed afterwards.
+        /// graph node from its graph. 
         /// 
-        /// Note: If <paramref name="gameNode"/> represents an inner node of the node
+        /// Notes: 
+        /// 
+        /// <paramref name="gameNode"/> is not actually destroyed.
+        /// 
+        /// If <paramref name="gameNode"/> represents an inner node of the node
         /// hierarchy, its ancestors will not be deleted.
+        /// 
         /// Precondition: <paramref name="gameNode"/> must have a valid NodeRef; otherwise
         /// an exception will be thrown.
         /// </summary>
@@ -124,8 +128,6 @@ namespace SEE.Game
             Node node = gameNode.GetNode();
             Graph graph = node.ItsGraph;
             graph.RemoveNode(node);
-            graph.FinalizeNodeHierarchy();
-            GameObject.Destroy(gameNode);
         }
     }
 }

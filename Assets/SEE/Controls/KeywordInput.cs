@@ -1,20 +1,30 @@
-﻿using System;
-using System.Text;
-using UnityEngine;
-using UnityEngine.Windows.Speech;
+﻿using UnityEngine.Windows.Speech;
+using static UnityEngine.Windows.Speech.PhraseRecognizer;
 
 namespace SEE.Controls
 {
     /// <summary>
     /// Speech input based on a predefined set of keywords.
     /// Only this fixed set of keywords can be detected.
+    /// 
+    /// KeywordInput listens to speech input and attempts to match 
+    /// uttered phrases to a list of registered keywords.
+    /// There can be many KeywordInputs active at any given time, 
+    /// but no two KeywordInputs may be listening for the same keyword.
+    /// 
+    /// As an example on how to use this class, take a look at the test
+    /// case TestKeywordInput.
     /// </summary>
     public class KeywordInput : SpeechInput
     {
         /// <summary>
-        /// The keywords to be recognized.
+        /// Constructor allowing to pass the list of keywords to be recognized.
         /// </summary>
-        private string[] keywords = new string[] { "up", "down", "left", "right" };
+        /// <param name="keywords">keywords to be recognized</param>
+        public KeywordInput(string[] keywords)
+        {
+            recognizer = new KeywordRecognizer(keywords);
+        }
 
         /// <summary>
         /// The recognizer for the <see cref="keywords"/>.
@@ -24,33 +34,51 @@ namespace SEE.Controls
         /// <summary>
         /// Starts the <see cref="recognizer"/>.
         /// </summary>
-        private void Start()
-        {
-            recognizer = new KeywordRecognizer(keywords);
-            recognizer.OnPhraseRecognized += OnPhraseRecognized;
+        public override void Start()
+        {                        
             recognizer.Start();
         }
 
-        private void OnPhraseRecognized(PhraseRecognizedEventArgs args)
+        /// <summary>
+        /// Registers <paramref name="phraseRecognizedDelegate"/> as a callback to
+        /// be called when one of the keywords was recognized.
+        /// </summary>
+        /// <param name="phraseRecognizedDelegate">delegate to be registered</param>
+        public void Register(PhraseRecognizedDelegate phraseRecognizedDelegate)
         {
-            StringBuilder builder = new StringBuilder();
-            builder.AppendFormat("{0} ({1}){2}", args.text, args.confidence, Environment.NewLine);
-            builder.AppendFormat("\tTimestamp: {0}{1}", args.phraseStartTime, Environment.NewLine);
-            builder.AppendFormat("\tDuration: {0} seconds{1}", args.phraseDuration.TotalSeconds, Environment.NewLine);
-            Debug.Log(builder.ToString());
+            recognizer.OnPhraseRecognized += phraseRecognizedDelegate;
+        }
+
+        /// <summary>
+        /// Unregisters <paramref name="phraseRecognizedDelegate"/> as a callback formerly to
+        /// be called when one of the keywords was recognized.
+        /// </summary>
+        /// <param name="phraseRecognizedDelegate">delegate to be unregistered</param>
+        public void Unregister(PhraseRecognizedDelegate phraseRecognizedDelegate)
+        {
+            recognizer.OnPhraseRecognized -= phraseRecognizedDelegate;
         }
 
         /// <summary>
         /// Shuts down <see cref="recognizer"/>.
         /// Called by Unity when the application closes.
         /// </summary>
-        private void OnApplicationQuit()
+        public override void Stop()
         {
             if (recognizer != null && recognizer.IsRunning)
             {
-                recognizer.OnPhraseRecognized -= OnPhraseRecognized;
                 recognizer.Stop();
             }
+        }
+
+        /// <summary>
+        /// Stops and disposes the recognizer. It cannot be re-started again.
+        /// </summary>
+        public override void Dispose()
+        {
+            Stop();
+            recognizer?.Dispose();
+            recognizer = null;
         }
     }
 }

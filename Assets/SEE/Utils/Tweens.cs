@@ -10,6 +10,14 @@ namespace SEE.Utils
     internal class Tweens : MonoBehaviour
     {        
         /// <summary>
+        /// Sets the capacity of DOTween.
+        /// </summary>
+        static Tweens()
+        {
+            DOTween.SetTweensCapacity(2000, 100);
+        }
+
+        /// <summary>
         /// Moves a GameObject to a specific position over a given duration
         /// and makes a <paramref name="callback"/> if this is not null.
         /// </summary>

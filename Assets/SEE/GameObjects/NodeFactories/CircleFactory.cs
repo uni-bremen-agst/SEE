@@ -14,9 +14,8 @@ namespace SEE.GO
         /// for the actual rendering.
         /// </summary>
         /// <param name="colorRange">the color range of the created objects</param>
-        /// <param name="unit">initial unit for the width of all lines</param>
-        public CircleFactory(ColorRange colorRange, float unit)
-            : base(colorRange, unit)
+        public CircleFactory(ColorRange colorRange)
+            : base(colorRange)
         {
             material = Materials.New(Materials.ShaderType.TransparentLine, colorRange.upper);
         }

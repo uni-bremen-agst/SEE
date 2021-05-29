@@ -1,16 +1,15 @@
 ﻿using SEE.DataModel.DG;
-using SEE.Game;
 using SEE.GO;
 using System;
 using UnityEngine;
 
-namespace Assets.SEE.Game
+namespace SEE.Game
 {
     /// <summary>
     /// Creates new game objects representing graph edges or deleting these again,
     /// respectively.
     /// </summary>
-    class GameEdgeAdder
+    public class GameEdgeAdder
     {
         /// <summary>
         /// Creates and returns a new edge from <paramref name="source"/> to <paramref name="target"/>.
@@ -66,7 +65,10 @@ namespace Assets.SEE.Game
         /// <summary>
         /// Inverse operation of <see cref="Add(GameObject, GameObject, string)"/>.
         /// Removes the given <paramref name="gameEdge"/> from the scene and its associated 
-        /// graph edge from its graph. <paramref name="gameEdge"/> is destroyed afterwards.
+        /// graph edge from its graph.
+        /// 
+        /// Note: <paramref name="gameEdge"/> is not actually destroyed.
+        /// 
         /// Precondition: <paramref name="gameEdge"/> must have a valid EdgeRef; otherwise
         /// an exception will be thrown.
         /// </summary>
@@ -77,7 +79,6 @@ namespace Assets.SEE.Game
             {
                 Graph graph = edge.ItsGraph;
                 graph.RemoveEdge(edge);
-                GameObject.Destroy(gameEdge);
             }
             else
             {

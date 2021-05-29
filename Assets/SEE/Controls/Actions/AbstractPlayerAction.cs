@@ -101,28 +101,6 @@ namespace SEE.Controls.Actions
         protected void LocalAnyHoverIn(InteractableObject interactableObject)
         {
             hoveredObject = interactableObject.gameObject;
-
-            // FIXME: For an unknown reason, the mouse events in InteractableObject will be
-            // triggered twice per frame, which causes this method to be called twice.
-            // We need to further investigate this issue.
-            //Debug.LogFormat("{0}.LocalAnyHoverIn({1})\n",
-            //                this.GetType().FullName, 
-            //                interactableObject == null ? "NULL" : interactableObject.name);
-            //try
-            //{
-            //    if (interactableObject.gameObject != hoveredObject)
-            //    {
-            //        Assert.IsNull(hoveredObject);
-            //        hoveredObject = interactableObject.gameObject;
-            //    }
-            //}
-            //catch (Exception e)
-            //{
-            //    Debug.LogErrorFormat("{0}.LocalAnyHoverIn throws {1}. [hoveredObject: {2}. interactableObject: {3}.\n",
-            //                          this.GetType().FullName,
-            //                          e.Message, hoveredObject == null ? "NULL" : hoveredObject.name, interactableObject.name);
-            //    // FIXME: There are AssertionExceptions 
-            //}
         }
 
         /// <summary>
@@ -133,25 +111,6 @@ namespace SEE.Controls.Actions
         protected void LocalAnyHoverOut(InteractableObject interactableObject)
         {
             hoveredObject = null;
-
-            // FIXME: For an unknown reason, the mouse events in InteractableObject will be
-            // triggered twice per frame, which causes this method to be called twice.
-            // We need to further investigate this issue.
-            //Debug.LogFormat("{0}.LocalAnyHoverOut({1})\n",
-            //                this.GetType().FullName,
-            //                interactableObject == null ? "NULL" : interactableObject.name);
-            //try
-            //{
-            //    Assert.IsTrue(hoveredObject == interactableObject.gameObject);
-            //    hoveredObject = null;
-            //}
-            //catch (Exception e)
-            //{
-            //    Debug.LogErrorFormat("{0}.LocalAnyHoverOut throws {1}. [hoveredObject: {2}. interactableObject: {3}.\n",
-            //                         this.GetType().FullName,
-            //                         e.Message, hoveredObject == null ? "NULL" : hoveredObject.name, interactableObject.name);
-            //    // FIXME: There are AssertionExceptions 
-            //}
         }
 
         /// <summary>
