@@ -150,8 +150,7 @@ namespace SEE.Utils
         /// Precondition: <paramref name="action"/> is not already present in the action history.
         /// </summary>
         /// <param name="action">the action to be executed</param>
-        /// <param name="ignoreRedoDeletion">Run without deletion of redos</param>
-        public void Execute(ReversibleAction action, bool ignoreRedoDeletion = false)
+        public void Execute(ReversibleAction action)
         {
             AssertAtMostOneActionWithNoEffect();
             LastAction?.Stop();
@@ -159,12 +158,6 @@ namespace SEE.Utils
             UndoHistory.Push(action);
             action.Awake();
             action.Start();
-
-            // Whenever a new action is excuted, we consider the redo stack lost.
-            if (!ignoreRedoDeletion && isRedo)
-            {
-                DeleteAllRedos();
-            }
         }
 
         /// Calls <see cref="ReversibleAction.Update"/> for the currently executed action of this
