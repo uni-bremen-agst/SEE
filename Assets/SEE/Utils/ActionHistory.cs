@@ -82,11 +82,23 @@ namespace SEE.Utils
                 ChangedObjects = changedObjects;
             }
 
+            /// <summary>
+            /// This action was triggered by the local player.
+            /// </summary>
             public bool IsOwner { get; }
+            /// <summary>
+            /// Whether the action was executed or undone.
+            /// </summary>
             public HistoryType ActionType { get; }
+            /// <summary>
+            /// The unique ID of the action.
+            /// </summary>
             public string ActionID { get; }
+            /// <summary>
+            /// The unique identifiers of all game objects changed by this action.
+            /// This information is the basis to detect conflicting changes.
+            /// </summary>
             public List<string> ChangedObjects { get; }
-
         }
 
         /// <summary>
