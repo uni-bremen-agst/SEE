@@ -101,7 +101,7 @@ namespace SEE.Controls.Actions
         /// <returns>true if the action history is empty</returns>
         public static bool IsEmpty()
         {
-            return history.NoActionsLeft();
+            return history.IsEmpty();
         }
     }
 }
