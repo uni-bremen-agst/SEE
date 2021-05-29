@@ -93,7 +93,7 @@ namespace SEE.Net
                         GlobalActionHistory.Push(new GlobalHistoryEntry(false, Type, ActionId, NewChangedObjects));
                         break;
                     case ModeKind.Delete:
-                        GlobalActionHistory.DeleteItem(ActionId);
+                        GlobalActionHistory.RemoveAction(ActionId);
                         break;
                     case ModeKind.Replace:
                         GlobalActionHistory.Replace(new GlobalHistoryEntry(false, OldItemType, ID, OldChangedObjects),

@@ -57,7 +57,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Pushes new actions to the <see cref="allActionsList"/>
+        /// Pushes new actions to the history of executed actions.
         /// </summary>
         /// <param name="action">The action and all of its specific values which are needed for the history</param>
         public static void Push(GlobalHistoryEntry action)
@@ -77,10 +77,10 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Deletes an item from the action list depending on its ID.
+        /// Removes the action with given <paramref name="id"/> from the history of executed actions.
         /// </summary>
-        /// <param name="id">the ID of the action which should be deleted</param>
-        public static void DeleteItem(string id)
+        /// <param name="id">the ID of the action that should be removed</param>
+        public static void RemoveAction(string id)
         {
             history.RemoveAction(id);
         }
