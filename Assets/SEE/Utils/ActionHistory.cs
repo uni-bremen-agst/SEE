@@ -261,8 +261,7 @@ namespace SEE.Utils
         /// Finds the last executed action of a specific player in the <see cref="globalHistory"/>.
         /// </summary>
         /// <param name="type">the type of action the user wants to perform</param>
-        /// 
-        /// <returns>A GlobalHistoryEntry. If the player has no last action of the given type left, the entry will be empty </returns>
+        /// <returns>A GlobalHistoryEntry. If the player has no last action of the given type left, the entry will be empty</returns>
         private GlobalHistoryEntry FindLastActionOfPlayer(HistoryType type)
         {
             for (int i = globalHistory.Count - 1; i >= 0; i--)
@@ -483,10 +482,10 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Returns whether a player has no actions left to be undone
+        /// Returns whether a player has no actions left to be undone.
         /// </summary>
-        /// <returns>true if no action left, else false.</returns>
-        public bool NoActionsLeft()
+        /// <returns>true if no action left</returns>
+        public bool IsEmpty()
         {
             return FindLastActionOfPlayer(HistoryType.Action).ActionID == null;
         }
