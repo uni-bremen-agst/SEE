@@ -164,7 +164,9 @@ namespace SEE.Utils
         /// action history if there is any. If that action signals that it is complete (via
         /// <see cref="ReversibleAction.Update"/>), a new instance of the same kind as this
         /// action will be created, added to the action history and become the new currently
-        /// executed action. If there is no currently executed action, nothing happens.
+        /// executed action. The Update is propagated to all clients in the network.
+        /// 
+        /// If there is no currently executed action, nothing happens.
         /// </summary>
         public void Update()
         {
@@ -254,24 +256,6 @@ namespace SEE.Utils
                 }
             }
             return false;
-        }
-
-        /// <summary>
-        /// Deletes all redos of the user. Also, it deletes them from the globalHistory.
-        /// </summary>
-        private void DeleteAllRedos()
-        {
-            for (int i = 0; i < globalHistory.Count; i++)
-            {
-                if (globalHistory[i].IsOwner.Equals(true) && globalHistory[i].ActionType.Equals(HistoryType.undoneAction))
-                {
-                    new NetActionHistory().Delete(globalHistory[i].ActionID);
-                    globalHistory.RemoveAt(i);
-                    i--;
-                }
-                isRedo = false;
-            }
-            RedoHistory.Clear();
         }
 
         /// <summary>
