@@ -132,9 +132,9 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// The last executed action in the undo history.
+        /// The currently executing action in the undo history.
         /// </summary>
-        public ReversibleAction LastAction => UndoHistory.Count > 0 ? UndoHistory.Peek() : null;
+        public ReversibleAction CurrentAction => UndoHistory.Count > 0 ? UndoHistory.Peek() : null;
 
         /// <summary>
         /// Let C be the currently executed action (if there is any) in this action history. 
@@ -153,7 +153,7 @@ namespace SEE.Utils
         public void Execute(ReversibleAction action)
         {
             AssertAtMostOneActionWithNoEffect();
-            LastAction?.Stop();
+            CurrentAction?.Stop();
             LastActionWithEffect();
             UndoHistory.Push(action);
             action.Awake();
@@ -170,10 +170,10 @@ namespace SEE.Utils
         /// </summary>
         public void Update()
         {
-            ReversibleAction lastAction = LastAction;
+            ReversibleAction lastAction = CurrentAction;
             if (lastAction != null && lastAction.Update())
             {
-                string actionID = LastAction.GetId();
+                string actionID = lastAction.GetId();
                 List<string> changedObjects = lastAction.GetChangedObjects();
                 Push(new GlobalHistoryEntry(true, HistoryType.action, actionID, changedObjects));
                 new NetActionHistory().Push(HistoryType.action, actionID, changedObjects);
@@ -277,7 +277,7 @@ namespace SEE.Utils
             {
                 throw new UndoImpossible("Undo not possible, no changes left to undo!");
             }
-            LastAction.Stop();
+            CurrentAction.Stop();
             ReversibleAction current = LastActionWithEffect();
 
             if (current == null)
@@ -323,12 +323,12 @@ namespace SEE.Utils
             }
             else
             {
-                LastAction?.Stop();
+                CurrentAction?.Stop();
                 if (ActionHasConflicts(lastUndoneAction.ChangedObjects, lastUndoneAction.ActionID))
                 {
                     RedoHistory.Pop();
                     Replace(lastUndoneAction, new GlobalHistoryEntry(false, HistoryType.undoneAction, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects), false);
-                    LastAction.Start();
+                    CurrentAction.Start();
                     throw new RedoImpossible("Redo not possible. Someone else has made a change on the same object.");
                 }
 

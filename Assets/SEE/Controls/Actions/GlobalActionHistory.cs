@@ -86,7 +86,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType"/> of the currently executed action or null</returns>
         public static ActionStateType Current()
         {
-            return history.LastAction?.GetActionStateType();
+            return history.CurrentAction?.GetActionStateType();
         }
 
         /// <summary>
