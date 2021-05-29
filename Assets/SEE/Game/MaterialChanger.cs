@@ -27,7 +27,9 @@ namespace SEE.Game
         /// Assigns the special material to the gameObject and stores the original 
         /// material in oldMaterial.
         /// </summary>
-        public void UseSpecialMaterial(bool isOwner)
+        /// <param name="isInitiator">Whether this client should visually be the initiator of the
+        /// special material selection.</param>
+        public void UseSpecialMaterial(bool isInitiator)
         {
             Renderer renderer = gameObject.GetComponent<Renderer>();
             if (!oldMaterial)
@@ -35,7 +37,7 @@ namespace SEE.Game
                 oldMaterial = renderer.sharedMaterial;
             }
 
-            renderer.sharedMaterial = isOwner ? LocalSpecialMaterial : RemoteSpecialMaterial;
+            renderer.sharedMaterial = isInitiator ? LocalSpecialMaterial : RemoteSpecialMaterial;
             renderer.sharedMaterial.renderQueue = oldMaterial.renderQueue;
         }
 

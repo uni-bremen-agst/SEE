@@ -282,7 +282,6 @@ namespace SEE.Controls.Actions
                 }
                 new DeleteNetAction(gameNode.name).Execute(null);
                 graph.RemoveNode(nodeRef.Value);
-                graph.FinalizeNodeHierarchy();
             }
         }
 

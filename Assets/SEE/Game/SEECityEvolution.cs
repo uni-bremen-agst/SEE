@@ -141,7 +141,6 @@ namespace SEE.Game
             {
                 Graph graph = graphs.First<Graph>();
                 graph = RelevantGraph(graph);
-                graph.FinalizeNodeHierarchy();
                 return graph;
             }
         }
