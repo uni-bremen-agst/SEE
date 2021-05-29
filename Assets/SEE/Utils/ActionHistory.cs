@@ -1,11 +1,42 @@
-﻿using SEE.Game.UI.Notification;
-using SEE.Net;
+﻿using SEE.Net;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace SEE.Utils
 {
+    /// <summary>
+    /// Thrown in case an Undo is called although there is no action
+    /// that could be undone or if there are conflicting actions
+    /// to be undone.
+    /// </summary>
+    public class UndoImpossible : Exception
+    {
+        /// <summary>
+        /// Constructor providing additional information about the reason
+        /// for the exception.
+        /// </summary>
+        /// <param name="message">additional information</param>
+        public UndoImpossible(string message) : base(message)
+        { }
+    }
+
+    /// <summary>
+    /// Thrown in case a Redo is called although there is no action
+    /// that could be re-done or if there are conflicting actions
+    /// to be re-done.
+    /// </summary>
+    public class RedoImpossible : Exception
+    {
+        /// <summary>
+        /// Constructor providing additional information about the reason
+        /// for the exception.
+        /// </summary>
+        /// <param name="message">additional information</param>
+        public RedoImpossible(string message) : base(message)
+        { }
+    }
+
     /// <summary>
     /// Maintains a history of executed reversible actions that can be undone and redone.
     /// </summary>
@@ -259,10 +290,9 @@ namespace SEE.Utils
         /// </summary>
         public void Undo()
         {
-            if (UndoHistory.Count < 2)
+            if (UndoHistory.Count == 0)
             {
-                ShowNotification.Error("Error", "Undo not possible, no changes left to undo!");
-                return;
+                throw new UndoImpossible("Undo not possible, no changes left to undo!");
             }
             LastAction.Stop();
             ReversibleAction current = LastActionWithEffect();
@@ -275,12 +305,11 @@ namespace SEE.Utils
             GlobalHistoryEntry lastAction = globalHistory[GetIndexOfAction(current.GetId())];
 
             if (ActionHasConflicts(current.GetChangedObjects(), current.GetId()))
-            {
-                ShowNotification.Error("Error", "Undo not possible, someone else had made a change on the same object!");
+            {                
                 Replace(lastAction, new GlobalHistoryEntry(false, HistoryType.undoneAction, lastAction.ActionID, lastAction.ChangedObjects), false);
                 UndoHistory.Pop();
                 current.Start();
-                return;
+                throw new UndoImpossible("Undo not possible. Someone else has made a change on the same object.");
             }
             else
             {
@@ -300,15 +329,14 @@ namespace SEE.Utils
 
         /// <summary>
         /// Redoes the last undone action of a specific player.
-        /// If a redo isn't possible or no one is remaining the user gets a notification.
         /// </summary>
+        /// <exception cref="RedoImpossible">thrown in there is no action that could be re-done</exception>
         public void Redo()
         {
             GlobalHistoryEntry lastUndoneAction = FindLastActionOfPlayer(HistoryType.undoneAction);
             if (RedoHistory.Count == 0 || lastUndoneAction.ActionID == null)
             {
-                ShowNotification.Error("Error", "Redo not possible, no action left to be redone!");
-                return;
+                throw new RedoImpossible("Redo not possible, no action left to be redone!");
             }
             else
             {
@@ -317,9 +345,8 @@ namespace SEE.Utils
                 {
                     RedoHistory.Pop();
                     Replace(lastUndoneAction, new GlobalHistoryEntry(false, HistoryType.undoneAction, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects), false);
-                    ShowNotification.Error("Error", "Redo not possible, someone else has changed the same object!");
                     LastAction.Start();
-                    return;
+                    throw new RedoImpossible("Redo not possible. Someone else has made a change on the same object.");
                 }
 
                 ReversibleAction redoAction = RedoHistory.Pop();
@@ -391,13 +418,23 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Gets the number of all actions which are executed by other users after the action with the ID <paramref name="idOfAction"/>.
-        /// <param name="idOfAction">the unique ID of the action whose index has to be found.</param>
+        /// Returns the index of the last action having the given <paramref name="idOfAction"/>
+        /// within <see cref="globalHistory"/> or -1 if there is none.
+        /// <param name="idOfAction">the unique ID of the action whose index has to be found</param>
         /// </summary>
-        /// <returns>the number of newer actions than the one with the ID <paramref name="idOfAction"/>, which is not executed by the owner.</returns>
+        /// <returns>index of the last action having the given <paramref name="idOfAction"/>
+        /// within <see cref="globalHistory"/> or -1</returns>
         private int GetIndexOfAction(string idOfAction)
         {
-            return globalHistory.Select((item, index) => new { item, index }).Reverse().FirstOrDefault(x => x.item.ActionID.Equals(idOfAction))?.index ?? -1;
+            // Traversing globalHistory backward.
+            for (int i = globalHistory.Count - 1; i >= 0; i--)
+            {
+                if (globalHistory[i].ActionID == idOfAction)
+                {
+                    return i;
+                }
+            }
+            return -1;
         }
 
         /// <summary>
