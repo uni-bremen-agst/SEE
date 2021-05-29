@@ -171,7 +171,7 @@ namespace SEE.Utils
             globalHistory[GetIndexOfAction(oldItem.ActionID)] = newItem;
             if (!isNetwork)
             {
-                new NetActionHistory().Replace(oldItem.ActionType, oldItem.ActionID, oldItem.ChangedObjects, 
+                new NetActionHistory().Replace(oldItem.ActionID, oldItem.ActionType, oldItem.ChangedObjects,
                                                newItem.ActionType, newItem.ChangedObjects);
             }
         }
@@ -410,19 +410,19 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Gets the undo stack size
+        /// Returns the number of action that can be undone.
         /// </summary>
-        /// <returns>Undo stack size</returns>
-        public int GetUndoCount()
+        /// <returns>number of un-doable actions</returns>
+        public int UndoCount()
         {
             return UndoHistory.Count;
         }
 
         /// <summary>
-        /// Gets the redo stack size
+        /// Returns the number of action that can be redone.
         /// </summary>
-        /// <returns>Redo stack size</returns>
-        public int GetRedoCount()
+        /// <returns>number of re-doable actions</returns>
+        public int RedoCount()
         {
             return RedoHistory.Count;
         }
