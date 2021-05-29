@@ -76,7 +76,7 @@ namespace SEE.Controls.Actions
         /// <param name="id">the ID of the action which should be deleted</param>
         public static void DeleteItem(string id)
         {
-            history.DeleteItem(id);
+            history.RemoveAction(id);
         }
 
         /// <summary>

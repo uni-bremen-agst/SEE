@@ -173,9 +173,11 @@ namespace SEE.Utils
 
         /// <summary>
         /// Adds <paramref name="action"/> to the global history, that is,
-        /// to <see cref="globalHistory"/> and also via the network to all clients.
+        /// to <see cref="globalHistory"/> and also via the network on all clients.
+        /// 
+        /// This is the counterpart of <see cref="RemoveFromGlobalHistory(GlobalHistoryEntry)"/>.
         /// </summary>
-        /// <param name="action"></param>
+        /// <param name="action">action to be added</param>
         private void AddToGlobalHistory(ReversibleAction action)
         {
             string actionID = action.GetId();
@@ -185,12 +187,34 @@ namespace SEE.Utils
         }
 
         /// <summary>
+        /// Removes <paramref name="action"/> from the global history, that is,
+        /// from <see cref="globalHistory"/> and also via the network on all clients.
+        /// 
+        /// This is the counterpart of <see cref="AddToGlobalHistory(ReversibleAction)"/>.
+        /// </summary>
+        /// <param name="action">action to be added</param>
+        private void RemoveFromGlobalHistory(GlobalHistoryEntry action)
+        {
+            RemoveAction(action.ActionID);
+            new NetActionHistory().Delete(action.ActionID);
+        }
+
+        /// <summary>
         /// Pushes new actions to the <see cref="globalHistory"/>.
         /// </summary>
         /// <param name="entry">The action and all of its specific values which are needed for the history</param>
         public void Push(GlobalHistoryEntry entry)
         {
             globalHistory.Add(entry);
+        }
+
+        /// <summary>
+        /// Removes the action with given <paramref name="id"/> from the <see cref="globalHistory"/>.
+        /// </summary>
+        /// <param name="id">the ID of the action that should be removed</param>
+        public void RemoveAction(string id)
+        {
+            globalHistory.Remove(globalHistory.FirstOrDefault(x => x.ActionID.Equals(id)));
         }
 
         /// <summary>
@@ -262,15 +286,6 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Deletes an item from the <see cref="globalHistory"/> depending on its ID.
-        /// </summary>
-        /// <param name="id">the ID of the action which should be deleted.</param>
-        public void DeleteItem(string id)
-        {
-            globalHistory.Remove(globalHistory.FirstOrDefault(x => x.ActionID.Equals(id)));
-        }
-
-        /// <summary>
         /// Undoes the last action with an effect of a specific player.
         /// If a undo isn't possible or no one is remaining the user gets a notification.
         /// </summary>
@@ -280,6 +295,22 @@ namespace SEE.Utils
             {
                 throw new UndoImpossible("Undo not possible, no changes left to undo!");
             }
+            // The top element of the UndoStack is the current action. It
+            // may or may not be completed. The latter is the case when
+            // multiple Undos occur in a row. For the very first Undo without
+            // prior Undo the action is still running and is not yet completed.
+            // In that case, it may have had some preliminary effects already
+            // or not. If it has had preliminary effects,
+            // we will treat it similarly to a completed action, that is, undo
+            // its effects and push it onto the RedoStack. This way it may
+            // be resumed by way of Redo. If it has had no effect yet, we do not
+            // undo it and it will not be pushed onto RedoStack. Instead we
+            // will just pop it off the UndoStack and continue with the next action
+            // on the UndoStack. The reason for this decision is as follows: It would
+            // be confusing for a user if we would undo actions without any effect
+            // as normal actions because the user would not get any visible
+            // feedback of her/his Undo decision because that kind of action has
+            // not had any effect yet.
             CurrentAction.Stop();
             ReversibleAction current = LastActionWithEffect();
 
@@ -302,13 +333,20 @@ namespace SEE.Utils
                 current.Undo();
                 RedoHistory.Push(current);
                 UndoHistory.Pop();
-                DeleteItem(lastAction.ActionID);
-                new NetActionHistory().Delete(lastAction.ActionID);
+                RemoveFromGlobalHistory(lastAction);
 
                 GlobalHistoryEntry undoneAction = new GlobalHistoryEntry(true, HistoryType.undoneAction, lastAction.ActionID, lastAction.ChangedObjects);
                 Push(undoneAction);
                 new NetActionHistory().Push(undoneAction.ActionType, undoneAction.ActionID, undoneAction.ChangedObjects);
-                Resume(current);
+
+                // current has been undone and moved on the RedoStack.
+                // We will resume with the next top-element of the stack that
+                // has had an effect if there is any.
+                current = LastActionWithEffect();
+                if (current != null)
+                {
+                    Resume(current);
+                }
             }
         }
 
@@ -344,7 +382,7 @@ namespace SEE.Utils
                                  || RedoHistory.Peek().CurrentProgress() != ReversibleAction.Progress.NoEffect);
 
                 GlobalHistoryEntry redoneAction = new GlobalHistoryEntry(true, HistoryType.action, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects);
-                DeleteItem(lastUndoneAction.ActionID);
+                RemoveAction(lastUndoneAction.ActionID);
                 new NetActionHistory().Delete(lastUndoneAction.ActionID);
                 Push(redoneAction);
                 new NetActionHistory().Push(redoneAction.ActionType, redoneAction.ActionID, redoneAction.ChangedObjects);
