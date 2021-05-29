@@ -99,13 +99,6 @@ namespace SEE.Utils
         };
 
         /// <summary>
-        /// If a user has done an undo
-        /// </summary>
-        private bool isRedo = false;
-
-        //NetActionHistory globalActionHistoryNetwork = new NetActionHistory();
-
-        /// <summary>
         /// The actionHistory, which is synchronised through the network on each client.
         /// </summary>
         private List<GlobalHistoryEntry> globalHistory = new List<GlobalHistoryEntry>();
@@ -315,7 +308,6 @@ namespace SEE.Utils
                 GlobalHistoryEntry undoneAction = new GlobalHistoryEntry(true, HistoryType.undoneAction, lastAction.ActionID, lastAction.ChangedObjects);
                 Push(undoneAction);
                 new NetActionHistory().Push(undoneAction.ActionType, undoneAction.ActionID, undoneAction.ChangedObjects);
-                isRedo = true;
                 Resume(current);
             }
         }
