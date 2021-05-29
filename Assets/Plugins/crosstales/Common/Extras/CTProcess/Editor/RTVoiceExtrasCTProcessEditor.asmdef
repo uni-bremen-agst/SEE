@@ -1,0 +1,19 @@
+{
+    "name": "RTVoiceExtrasCTProcessEditor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:c00c533428eef954f9aa7467f0bdf431",
+        "GUID:ca76ebd8bc3e2d44ba5e232fcd7b5fc0"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -159,8 +159,6 @@ namespace SEEEditor
             codeCity.AddComponent<BoxCollider>();
             // Attach portal plane to navigation action components
             Plane plane = codeCity.AddComponent<Plane>();
-            codeCity.AddComponent<DesktopNavigationAction>().portalPlane = plane;
-            codeCity.AddComponent<XRNavigationAction>().portalPlane = plane;
 
             codeCity.AddComponent(CityTypes[selectedCityType]);
         }

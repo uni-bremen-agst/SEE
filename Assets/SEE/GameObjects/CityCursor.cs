@@ -9,15 +9,19 @@ namespace SEE.GO
     // [RequireComponent(typeof(SEECity))] // FIXME: We cannot simply request that a SEECity exists. There are also other kinds of AbstractSEECity classes.
     public class CityCursor : MonoBehaviour
     {
-        private Graph graph;
         internal Cursor3D E { get; private set; }
+        private SEECity city;
 
         private void Start()
         {
             if (TryGetComponent(out SEECity city))
             {
-                graph = city.LoadedGraph;
+                this.city = city;
+#if UNITY_EDITOR
+                E = Cursor3D.Create(city.name);
+#else
                 E = Cursor3D.Create();
+#endif
 
                 InteractableObject.AnySelectIn += AnySelectIn;
                 InteractableObject.AnySelectOut += AnySelectOut;
@@ -37,19 +41,21 @@ namespace SEE.GO
             Destroy(E);
         }
 
-        private void AnySelectIn(InteractableObject interactableObject, bool isOwner)
+        private void AnySelectIn(InteractableObject interactableObject, bool isInitiator)
         {
-            if (interactableObject.GraphElemRef.elem.ItsGraph.Equals(graph))
+            Graph selectedGraph = interactableObject.GraphElemRef.elem.ItsGraph;
+            if (selectedGraph.Equals(city.LoadedGraph))
             {
-                E.AddFocus(interactableObject.transform);
+                E.AddFocus(interactableObject);
             }
         }
 
-        private void AnySelectOut(InteractableObject interactableObject, bool isOwner)
+        private void AnySelectOut(InteractableObject interactableObject, bool isInitiator)
         {
-            if (interactableObject.GraphElemRef.elem.ItsGraph.Equals(graph))
+            Graph selectedGraph = interactableObject.GraphElemRef.elem.ItsGraph;
+            if (selectedGraph.Equals(city.LoadedGraph))
             {
-                E.RemoveFocus(interactableObject.transform);
+                E.RemoveFocus(interactableObject);
             }
         }
     }

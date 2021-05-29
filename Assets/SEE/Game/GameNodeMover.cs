@@ -28,7 +28,11 @@ namespace SEE.Game
         public static void MoveTo(GameObject movingObject)
         {
             float step = MovingSpeed * Time.deltaTime;
-            Vector3 target = TipOfRayPosition(movingObject); // TODO(torben): this should probably not be the same distance but raycast onto everything and put object on top of the closest hit or something like that?
+            // FIXME regarding 'target': currently, the tip of the ray is of a fixed distance from
+            // the ray starting position into the ray direction. it would be better if we did a
+            // raycast into the scene, see what we hit and use that as the tip. the result feels
+            // way better and it also prevents intersection with other objects.
+            Vector3 target = TipOfRayPosition(movingObject);
             movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, target, step);
         }
 

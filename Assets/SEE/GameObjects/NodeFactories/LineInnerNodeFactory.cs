@@ -16,10 +16,9 @@ namespace SEE.GO
         /// </summary>
         /// <param name="colorRange">the color range of the created objects</param>
         /// <param name="unit">initial unit for the width of all lines</param>
-        public LineInnerNodeFactory(ColorRange colorRange, float unit = 1.0f)
+        public LineInnerNodeFactory(ColorRange colorRange)
             : base(Materials.ShaderType.TransparentLine, colorRange)
         {
-            this.unit = unit;
         }
 
         /// <summary>
