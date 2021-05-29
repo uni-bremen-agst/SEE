@@ -28,7 +28,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         public static void Undo()
         {
-            history.Undo();
+            if (history.UndoCount() > 0)
+            {
+                history.Undo();
+            }
         }
 
         /// <summary>
@@ -36,7 +39,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         public static void Redo()
         {
-            history.Redo();
+            if (history.RedoCount() > 0)
+            {
+                history.Redo();
+            }
         }
 
         /// <summary>
