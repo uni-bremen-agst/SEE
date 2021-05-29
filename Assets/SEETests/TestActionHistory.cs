@@ -3,7 +3,6 @@ using SEE.Controls.Actions;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace SEETests
 {
