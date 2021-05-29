@@ -156,6 +156,7 @@ namespace SEE.Utils
             CurrentAction?.Stop();
             LastActionWithEffect();
             UndoHistory.Push(action);
+            AddToGlobalHistory(action);
             action.Awake();
             action.Start();
         }
@@ -172,8 +173,7 @@ namespace SEE.Utils
         {
             ReversibleAction lastAction = CurrentAction;
             if (lastAction != null && lastAction.Update())
-            {
-                AddToGlobalHistory(lastAction);
+            {                
                 Execute(lastAction.NewInstance());
             }
         }
