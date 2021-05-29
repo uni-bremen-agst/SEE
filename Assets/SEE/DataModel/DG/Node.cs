@@ -11,10 +11,50 @@ namespace SEE.DataModel.DG
         // IMPORTANT NOTES:
         //
         // If you use Clone() to create a copy of a node, be aware that the clone
-        // will have a deep copy of all attributes and the type of the node only.
+        // will have a deep copy of all attributes and the type and domain of the node only.
         // The hierarchy information (parent, children, level) is not copied at all.
         // The clone will appear as a node without parent and children at level 0.
         // Neither will its incoming and outgoing edges be copied.
+
+        /// <summary>
+        /// The domain of a node regarding the architecture analysis, that is, 
+        /// whether it belongs to the architecture, implementation, or 
+        /// mapping between the two.
+        /// </summary>
+        public enum NodeDomain : byte
+        {
+            /// <summary>
+            /// Does not belong to any domain.
+            /// </summary>
+            Unspecified,
+            /// <summary>
+            /// Represents a fact retrieved from the implementation,
+            /// typically created by a static analysis.
+            /// </summary>
+            Implementation,
+            /// <summary>
+            /// Represents a concept in the architecture and was created 
+            /// by the software architecture. It is part of the architecture
+            /// model.
+            /// </summary>
+            Architecture,
+            /// <summary>
+            /// Is part of the mapping from the implementation domain
+            /// onto the architecture domain.
+            /// </summary>
+            Mapping,
+            /// <summary>
+            /// The number of possible <see cref="NodeDomain"/>s. As more values are added above
+            /// this element, the integer value of this element will represent the number of
+            /// elements in this enum.
+            /// </summary>
+            Count
+        }
+
+        /// <summary>
+        /// The domain of the node.
+        /// </summary>
+        public NodeDomain Domain = NodeDomain.Unspecified;
 
         /// <summary>
         /// The attribute name for unique identifiers (within a graph).
@@ -62,10 +102,22 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The level of a node in the hierarchy. The level of a root node is 0.
         /// For all other nodes, the level is the level of its parent + 1.
+        /// The level of a node that is currently in no graph is 0.
         /// </summary>
         public int Level
         {
-            get => level;
+            get
+            {
+                if (ItsGraph == null)
+                {
+                    return 0;
+                }
+                if (ItsGraph.NodeHierarchyHasChanged)
+                {
+                    ItsGraph.FinalizeNodeHierarchy();
+                }
+                return level;
+            }                
             set
             {
                 level = value;
@@ -74,7 +126,9 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Sets the level of the node as specified by the parameter and sets
-        /// the respective level values of each of its (transitive) descendants. 
+        /// the respective level values of each of its (transitive) descendants.
+        /// 
+        /// Note: This method should be called only by <see cref="Graph"/>.
         /// </summary>
         internal void SetLevel(int level)
         {
@@ -420,15 +474,15 @@ namespace SEE.DataModel.DG
         /// <param name="child">descendant to be added to node</param>
         public void AddChild(Node child)
         {
-            if (ReferenceEquals(child.Parent, null))
+            if (child.Parent == null)
             {
                 children.Add(child);
                 child.Parent = this;
+                ItsGraph.NodeHierarchyHasChanged = true;
             }
             else
             {
-                throw new Exception("Hierarchical edges do not form a tree. Node with multiple parents: "
-                    + child.ID);
+                throw new Exception($"Node hierarchy does not form a tree. Node with multiple parents: {child.ID}.");
             }
         }
 
@@ -449,7 +503,7 @@ namespace SEE.DataModel.DG
                 {
                     parent.children.Remove(this);
                     parent = null;
-                    graph.FinalizeNodeHierarchy();
+                    ItsGraph.NodeHierarchyHasChanged = true;
                 }
             }
             else
@@ -466,7 +520,7 @@ namespace SEE.DataModel.DG
                     parent = newParent;
                     parent.children.Add(this);
                 }
-                graph.FinalizeNodeHierarchy();
+                ItsGraph.NodeHierarchyHasChanged = true;
             }
         }
 

@@ -46,7 +46,8 @@ namespace SEE.Controls.Actions
         public static void Execute(ActionStateType actionType)
         {
             ActionState.Value = actionType;
-            history.Execute(actionType.CreateReversible());
+            ReversibleAction action = actionType.CreateReversible();
+            history.Execute(action);
         }
 
         /// <summary>

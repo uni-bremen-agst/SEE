@@ -4,9 +4,6 @@ using SEE.Utils;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using SEE.DataModel.DG;
-using SEE.DataModel;
-using System.Linq;
 
 namespace SEE.Controls.Actions
 {
@@ -253,7 +250,7 @@ namespace SEE.Controls.Actions
                 }
                 if (SEEInput.Drag())
                 {
-                    if (draggedSphere == null && Raycasting.RayCastAnything(out RaycastHit raycastHit))
+                    if (draggedSphere == null && Raycasting.RaycastAnything(out RaycastHit raycastHit))
                     {
                         draggedSphere = SelectedScalingGizmo(raycastHit.collider.gameObject);
                     }

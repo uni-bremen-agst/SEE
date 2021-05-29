@@ -13,6 +13,7 @@ namespace SEE.DataModel.DG
             Node result = new Node();
             result.ID = id;
             result.Type = type;
+            result.Domain = Node.NodeDomain.Implementation;
             graph.AddNode(result);
             return result;
         }
@@ -103,8 +104,7 @@ namespace SEE.DataModel.DG
 
         private HashSet<Edge> AsSet(List<Edge> edges)
         {
-            HashSet<Edge> result = new HashSet<Edge>(edges);
-            return result;
+            return new HashSet<Edge>(edges);
         }
 
         /// <summary>
@@ -236,12 +236,10 @@ namespace SEE.DataModel.DG
             string t = "Routine";
 
             Graph g = new Graph();
-            g.FinalizeNodeHierarchy();
             Assert.AreEqual(0, g.MaxDepth);            
 
             Node a = NewNode(g, "a", t);
             Node b = NewNode(g, "b", t);
-            g.FinalizeNodeHierarchy();
 
             // hierarchy:
             //  a   b
@@ -262,7 +260,6 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(1, g.MaxDepth);
 
             Node bc = Child(g, b, "bc", t);
-            g.FinalizeNodeHierarchy();
             // hierarchy:
             //  a   b
             //      |
@@ -289,7 +286,6 @@ namespace SEE.DataModel.DG
             Node ac = Child(g, a, "ac", t);
             Node acc = Child(g, ac, "acc", t);
             Node bcc = Child(g, bc, "bcc", t);
-            g.FinalizeNodeHierarchy();
             bc.Reparent(b);
             // hierarchy:
             //  a   b
