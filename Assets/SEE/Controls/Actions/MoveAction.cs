@@ -5,7 +5,6 @@ using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-
 namespace SEE.Controls.Actions
 {
     /// <summary>
