@@ -94,7 +94,15 @@ namespace SEE.Utils
         /// </summary>
         public enum HistoryType
         {
+            /// <summary>
+            /// Marker for an action that was executed and not undone (it
+            /// may have been undone, but then it was re-done again).
+            /// </summary>
             Action,
+            /// <summary>
+            /// Marker for an action that was executed but then undone (and
+            /// since then not again re-done).
+            /// </summary>
             UndoneAction,
         };
 
