@@ -1,7 +1,9 @@
 ﻿using NUnit.Framework;
 using SEE.Controls.Actions;
 using SEE.Utils;
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEETests
 {
@@ -111,23 +113,38 @@ namespace SEETests
                 }
             }
 
+            private class TestActionStateType : ActionStateType 
+            {
+                public TestActionStateType() : base(TestAction.CreateReversibleAction)
+                { }
+            }
+
+            private static ActionStateType actionStateType = new TestActionStateType();
+
+            private static ReversibleAction CreateReversibleAction()
+            {
+                return new TestAction();
+            }
+
             /// <summary>
             /// Returns the <see cref="ActionStateType"/> of this action.
             /// </summary>
             /// <returns>the <see cref="ActionStateType"/> of this action</returns>
             public ActionStateType GetActionStateType()
             {
-                throw new System.NotImplementedException();
+                return actionStateType;
             }
 
             public List<string> GetChangedObjects()
             {
-                throw new System.NotImplementedException();
+                return new List<string>();
             }
 
+            private readonly string id = Guid.NewGuid().ToString();
+
             public string GetId()
-            {
-                throw new System.NotImplementedException();
+            {                
+                return id;
             }
         }
 
@@ -143,15 +160,14 @@ namespace SEETests
             Counter.Reset();
         }
 
-
         [Test]        
         public void OneAction()
         {
-            // Note: TestAction is an action that continues forever, that is,
-            // no Update call will ever return true and its progress state
-            // is initially <see cref="ReversibleAction.Progress.NoEffect"/>
-            // and after the first Update call <see cref="ReversibleAction.Progress.InProgress"/>
-            // for the rest of its life.
+            /// Note: TestAction is an action that continues forever, that is,
+            /// no Update call will ever return true and its progress state
+            /// is initially <see cref="ReversibleAction.Progress.NoEffect"/>
+            /// and after the first Update call <see cref="ReversibleAction.Progress.InProgress"/>
+            /// for the rest of its life.
             TestAction c = new TestAction();
             CheckCalls(c, value: false, awake: 0, start: 0, update: 0, stop: 0);
             hist.Execute(c);
