@@ -173,12 +173,22 @@ namespace SEE.Utils
             ReversibleAction lastAction = CurrentAction;
             if (lastAction != null && lastAction.Update())
             {
-                string actionID = lastAction.GetId();
-                List<string> changedObjects = lastAction.GetChangedObjects();
-                Push(new GlobalHistoryEntry(true, HistoryType.action, actionID, changedObjects));
-                new NetActionHistory().Push(HistoryType.action, actionID, changedObjects);
+                AddToGlobalHistory(lastAction);
                 Execute(lastAction.NewInstance());
             }
+        }
+
+        /// <summary>
+        /// Adds <paramref name="action"/> to the global history, that is,
+        /// to <see cref="globalHistory"/> and also via the network to all clients.
+        /// </summary>
+        /// <param name="action"></param>
+        private void AddToGlobalHistory(ReversibleAction action)
+        {
+            string actionID = action.GetId();
+            List<string> changedObjects = action.GetChangedObjects();
+            Push(new GlobalHistoryEntry(true, HistoryType.action, actionID, changedObjects));
+            new NetActionHistory().Push(HistoryType.action, actionID, changedObjects);
         }
 
         /// <summary>
