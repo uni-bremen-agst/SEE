@@ -90,7 +90,7 @@ namespace SEE.Game
             CityPath.Save(writer, CityPathLabel);
             for (int i = 0; i < leafNodeAttributesPerKind.Length; i++)
             {
-                string postfix = '#' + i.ToString();
+                string postfix = '_' + i.ToString();
                 writer.Save(leafNodeAttributesPerKind[i].kind.ToString(), LeafObjectsLabel + postfix);
                 writer.Save(leafNodeAttributesPerKind[i].coloringKind.ToString(), LeafNodeColoringKindLabel + postfix);
                 leafNodeAttributesPerKind[i].colorRange.Save(writer, LeafNodeColorRangeLabel + postfix);
@@ -102,7 +102,7 @@ namespace SEE.Game
             }
             for (int i = 0; i < innerNodeAttributesPerKind.Length; i++)
             {
-                string postfix = '#' + i.ToString();
+                string postfix = '_' + i.ToString();
                 writer.Save(innerNodeAttributesPerKind[i].kind.ToString(), InnerNodeObjectsLabel + postfix);
                 writer.Save(innerNodeAttributesPerKind[i].coloringKind.ToString(), InnerNodeColoringKindLabel + postfix);
                 innerNodeAttributesPerKind[i].colorRange.Save(writer, InnerNodeColorRangeLabel + postfix);
@@ -169,7 +169,7 @@ namespace SEE.Game
             CityPath.Restore(attributes, CityPathLabel);
             for (int i = 0; i < leafNodeAttributesCount; i++)
             {
-                string postfix = '#' + i.ToString();
+                string postfix = '_' + i.ToString();
                 ConfigIO.RestoreEnum(attributes, LeafObjectsLabel + postfix, ref leafNodeAttributesPerKind[i].kind);
                 ConfigIO.RestoreEnum(attributes, LeafNodeColoringKindLabel + postfix, ref leafNodeAttributesPerKind[i].coloringKind);
                 leafNodeAttributesPerKind[i].colorRange.Restore(attributes, LeafNodeColorRangeLabel + postfix);
@@ -181,7 +181,7 @@ namespace SEE.Game
             }
             for (int i = 0; i < innerNodeAttributesCount; i++)
             {
-                string postfix = '#' + i.ToString();
+                string postfix = '_' + i.ToString();
                 ConfigIO.RestoreEnum(attributes, InnerNodeObjectsLabel + postfix, ref innerNodeAttributesPerKind[i].kind);
                 ConfigIO.RestoreEnum(attributes, InnerNodeColoringKindLabel + postfix, ref innerNodeAttributesPerKind[i].coloringKind);
                 innerNodeAttributesPerKind[i].colorRange.Restore(attributes, InnerNodeColorRangeLabel + postfix);
