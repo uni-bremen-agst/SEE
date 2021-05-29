@@ -144,7 +144,7 @@ namespace SEE.Utils
             if (LastAction != null && LastAction.Update())
             {
                 Push(new GlobalHistoryEntry(true, HistoryType.action, LastAction.GetId(), LastAction.GetChangedObjects()));
-                new NetActionHistory().Push(HistoryType.action, LastAction.GetId(), ListToString(LastAction.GetChangedObjects()));
+                new NetActionHistory().Push(HistoryType.action, LastAction.GetId(), LastAction.GetChangedObjects());
                 Execute(LastAction.NewInstance());
             }
         }
@@ -161,19 +161,18 @@ namespace SEE.Utils
         /// <summary>
         /// Replaces the unfinished action in the  <see cref="globalHistory"/> with the finished action.
         /// It is important, because the gameObjects, which are manipulated by the action have to be listed just the same
-        /// as the values for the memento's.
+        /// as the values for the mementos.
         /// </summary>
         /// <param name="oldItem">the old item in the <see cref="globalHistory"/>.</param>
         /// <param name="newItem">the new item in the <see cref="globalHistory"/>.</param>
-        /// <param name="isNetwork">true, if the function call came from network, else false.</param>
-        public void Replace(GlobalHistoryEntry oldItem,
-            GlobalHistoryEntry newItem, bool isNetwork)
+        /// <param name="isNetwork">whether the function call came from the network</param>
+        public void Replace(GlobalHistoryEntry oldItem, GlobalHistoryEntry newItem, bool isNetwork)
         {
-            int index = GetIndexOfAction(oldItem.ActionID);
-            globalHistory[index] = newItem;
+            globalHistory[GetIndexOfAction(oldItem.ActionID)] = newItem;
             if (!isNetwork)
             {
-                new NetActionHistory().Replace(oldItem.ActionType, oldItem.ActionID, ListToString(oldItem.ChangedObjects), newItem.ActionType, ListToString(newItem.ChangedObjects));
+                new NetActionHistory().Replace(oldItem.ActionType, oldItem.ActionID, oldItem.ChangedObjects, 
+                                               newItem.ActionType, newItem.ChangedObjects);
             }
         }
 
@@ -189,7 +188,7 @@ namespace SEE.Utils
             {
                 if (type == HistoryType.undoneAction && globalHistory[i].ActionType == HistoryType.undoneAction
                     || type == HistoryType.action && globalHistory[i].ActionType == HistoryType.action
-                    && globalHistory[i].IsOwner == true)
+                    && globalHistory[i].IsOwner)
                 {
                     return globalHistory[i];
                 }
@@ -293,7 +292,7 @@ namespace SEE.Utils
 
                 GlobalHistoryEntry undoneAction = new GlobalHistoryEntry(true, HistoryType.undoneAction, lastAction.ActionID, lastAction.ChangedObjects);
                 Push(undoneAction);
-                new NetActionHistory().Push(undoneAction.ActionType, undoneAction.ActionID, ListToString(undoneAction.ChangedObjects));
+                new NetActionHistory().Push(undoneAction.ActionType, undoneAction.ActionID, undoneAction.ChangedObjects);
                 isRedo = true;
                 Resume(current);
             }
@@ -336,7 +335,7 @@ namespace SEE.Utils
                 DeleteItem(lastUndoneAction.ActionID);
                 new NetActionHistory().Delete(lastUndoneAction.ActionID);
                 Push(redoneAction);
-                new NetActionHistory().Push(redoneAction.ActionType, redoneAction.ActionID, ListToString(redoneAction.ChangedObjects));
+                new NetActionHistory().Push(redoneAction.ActionType, redoneAction.ActionID, redoneAction.ChangedObjects);
             }
         }
 
@@ -408,16 +407,6 @@ namespace SEE.Utils
         public bool NoActionsLeft()
         {
             return FindLastActionOfPlayer(HistoryType.action).ActionID == null;
-        }
-
-        /// <summary>
-        /// Converts a List of gameObjectIds to a single comma seperated string for sending it to other clients.
-        /// </summary>
-        /// <param name="gameObjectIds">the gameObjectIds</param>
-        /// <returns>a single comma seperated string of all gameObjectIds.</returns>
-        private static string ListToString(List<string> gameObjectIds)
-        {
-            return (gameObjectIds != null) ? string.Join("╗", gameObjectIds) : null;
         }
 
         /// <summary>
