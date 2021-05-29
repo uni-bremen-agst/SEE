@@ -13,7 +13,7 @@ namespace SEE.Net
         /// <summary>
         /// The state that determines which action should be performed.
         /// </summary>
-        public enum Mode
+        public enum ModeKind
         {
             /// <summary>
             /// The initial state, no code executedOnClient.
@@ -34,29 +34,29 @@ namespace SEE.Net
         };
 
         /// <summary>
-        /// The specific instance of <see cref="Mode"/>
+        /// The specific instance of <see cref="ModeKind"/>
         /// </summary>
-        public Mode mode = Mode.Init;
+        public ModeKind Mode = ModeKind.Init;
 
         /// <summary>
         /// The type of the action (action or undoneAction).
         /// </summary>
-        public ActionHistory.HistoryType type;
+        public ActionHistory.HistoryType Type;
 
         /// <summary>
         /// The ID of the action.
         /// </summary>
-        public string actionId;
+        public string ActionId;
 
         /// <summary>
         /// The IDs of all objects which are changed by the action.
         /// </summary>
-        public List<string> changedObjects;
+        public List<string> NewChangedObjects;
 
         /// <summary>
         /// The IDs of all objects which are changed by the old action.
         /// </summary>
-        public List<string> oldChangedObjects;
+        public List<string> OldChangedObjects;
 
         /// <summary>
         /// The old items ID which has to be replaced.
@@ -66,12 +66,12 @@ namespace SEE.Net
         /// <summary>
         /// The old items type which has to be replaced.
         /// </summary>
-        public HistoryType oldItemType;
+        public HistoryType OldItemType;
 
         /// <summary>
         /// The new items type which is replacing the old.
         /// </summary>
-        public HistoryType newItemType;
+        public HistoryType NewItemType;
 
         /// <summary>
         /// Stuff to execute on the server. Nothing to be done here.
@@ -88,35 +88,35 @@ namespace SEE.Net
         {
             if (!IsRequester())
             {
-                switch(mode){
-                    case Mode.Push:
-                        GlobalActionHistory.Push(new GlobalHistoryEntry(false, type, actionId, changedObjects));
+                switch(Mode){
+                    case ModeKind.Push:
+                        GlobalActionHistory.Push(new GlobalHistoryEntry(false, Type, ActionId, NewChangedObjects));
                         break;
-                    case Mode.Delete:
-                        GlobalActionHistory.DeleteItem(actionId);
+                    case ModeKind.Delete:
+                        GlobalActionHistory.DeleteItem(ActionId);
                         break;
-                    case Mode.Replace:
-                        GlobalActionHistory.Replace(new GlobalHistoryEntry(false, oldItemType, ID, oldChangedObjects),
-                                                    new GlobalHistoryEntry(false, newItemType, ID, changedObjects),
+                    case ModeKind.Replace:
+                        GlobalActionHistory.Replace(new GlobalHistoryEntry(false, OldItemType, ID, OldChangedObjects),
+                                                    new GlobalHistoryEntry(false, NewItemType, ID, NewChangedObjects),
                                                     true);
                         break;
                 }
-                mode = Mode.Init;
+                Mode = ModeKind.Init;
             }
         }
 
         /// <summary>
-        /// Initiates the push of an action on each client
+        /// Initiates the push of this action on every client.
         /// </summary>
         /// <param name="type">The type of the action (action, undoneAction)</param>
         /// <param name="actionId">The ID of the action</param>
-        /// <param name="changedObjects">The IDs of the objects which are edited from the action</param>
+        /// <param name="changedObjects">The IDs of the objects edited by the action</param>
         public void Push(ActionHistory.HistoryType type, string actionId, List<string> changedObjects)
         {
-            mode = Mode.Push;
-            this.type = type;
-            this.actionId = actionId;
-            this.changedObjects = changedObjects;
+            Mode = ModeKind.Push;
+            Type = type;
+            ActionId = actionId;
+            NewChangedObjects = changedObjects;
             Execute(null);
         }
 
@@ -126,31 +126,32 @@ namespace SEE.Net
         /// <param name="actionId">The ID of the action</param>
         public void Delete(string actionId)
         {
-            this.actionId = actionId;
-            mode = Mode.Delete;
+            ActionId = actionId;
+            Mode = ModeKind.Delete;
             Execute(null);
         }
 
         /// <summary>
         /// Updates an entry through all clients.
         /// </summary>
-        /// <param name="oldType">The type of the old item.</param>
         /// <param name="id">The ID of the items.</param>
+        /// <param name="oldType">The type of the old item.</param>
         /// <param name="oldChangedObjects">The changedObjects from the old item.</param>
         /// <param name="newType">The type of the new item.</param>
         /// <param name="newChangedObjects">The changedObjects of the new item.</param>
         public void Replace
-                     (ActionHistory.HistoryType oldType, 
-                      string id, 
-                      List<string >oldChangedObjects, 
-                      ActionHistory.HistoryType newType, 
+                     (string id,
+                      ActionHistory.HistoryType oldType,
+                      List<string> oldChangedObjects,
+                      ActionHistory.HistoryType newType,
                       List<string> newChangedObjects)
         {
-            oldItemType = oldType;
+            OldItemType = oldType;
+            NewItemType = newType;
             ID = id;
-            this.oldChangedObjects = oldChangedObjects;
-            this.changedObjects = newChangedObjects;
-            mode = Mode.Replace;
+            OldChangedObjects = oldChangedObjects;
+            NewChangedObjects = newChangedObjects;            
+            Mode = ModeKind.Replace;
             Execute(null);
         }
     }
