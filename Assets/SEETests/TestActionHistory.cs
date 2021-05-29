@@ -460,20 +460,19 @@ namespace SEETests
             public abstract void Undo();
             public abstract bool Update();
 
-            public ActionStateType GetActionStateType()
-            {
-                throw new System.NotImplementedException();
-            }
-
             public List<string> GetChangedObjects()
             {
-                throw new System.NotImplementedException();
+                return new List<string>();
             }
+
+            private readonly string id = Guid.NewGuid().ToString();
 
             public string GetId()
             {
-                throw new System.NotImplementedException();
+                return id;
             }
+
+            public abstract ActionStateType GetActionStateType();
         }
 
         /// <summary>
@@ -502,6 +501,28 @@ namespace SEETests
                 counter++;
                 return true;
             }
+
+            private class IncrementActionStateType : ActionStateType
+            {
+                public IncrementActionStateType() : base(CreateReversibleAction)
+                { }
+            }
+
+            private static ActionStateType actionStateType = new IncrementActionStateType();
+
+            private static ReversibleAction CreateReversibleAction()
+            {
+                return new Increment();
+            }
+
+            /// <summary>
+            /// Returns the <see cref="ActionStateType"/> of this action.
+            /// </summary>
+            /// <returns>the <see cref="ActionStateType"/> of this action</returns>
+            public override ActionStateType GetActionStateType()
+            {
+                return actionStateType;
+            }
         }
 
         /// <summary>
@@ -529,6 +550,28 @@ namespace SEETests
                 currentProgress = ReversibleAction.Progress.Completed;
                 counter--;
                 return true;
+            }
+
+            private class DecrementActionStateType : ActionStateType
+            {
+                public DecrementActionStateType() : base(CreateReversibleAction)
+                { }
+            }
+
+            private static ActionStateType actionStateType = new DecrementActionStateType();
+
+            private static ReversibleAction CreateReversibleAction()
+            {
+                return new Decrement();
+            }
+
+            /// <summary>
+            /// Returns the <see cref="ActionStateType"/> of this action.
+            /// </summary>
+            /// <returns>the <see cref="ActionStateType"/> of this action</returns>
+            public override ActionStateType GetActionStateType()
+            {
+                return actionStateType;
             }
         }
 
