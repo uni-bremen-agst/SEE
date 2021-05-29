@@ -94,8 +94,8 @@ namespace SEE.Utils
         /// </summary>
         public enum HistoryType
         {
-            action,
-            undoneAction,
+            Action,
+            UndoneAction,
         };
 
         /// <summary>
@@ -184,8 +184,8 @@ namespace SEE.Utils
         {
             string actionID = action.GetId();
             List<string> changedObjects = action.GetChangedObjects();
-            Push(new GlobalHistoryEntry(true, HistoryType.action, actionID, changedObjects));
-            new NetActionHistory().Push(HistoryType.action, actionID, changedObjects);
+            Push(new GlobalHistoryEntry(true, HistoryType.Action, actionID, changedObjects));
+            new NetActionHistory().Push(HistoryType.Action, actionID, changedObjects);
         }
 
         /// <summary>
@@ -247,8 +247,8 @@ namespace SEE.Utils
         {
             for (int i = globalHistory.Count - 1; i >= 0; i--)
             {
-                if (type == HistoryType.undoneAction && globalHistory[i].ActionType == HistoryType.undoneAction
-                    || type == HistoryType.action && globalHistory[i].ActionType == HistoryType.action
+                if (type == HistoryType.UndoneAction && globalHistory[i].ActionType == HistoryType.UndoneAction
+                    || type == HistoryType.Action && globalHistory[i].ActionType == HistoryType.Action
                     && globalHistory[i].IsOwner)
                 {
                     return globalHistory[i];
@@ -325,7 +325,7 @@ namespace SEE.Utils
 
             if (ActionHasConflicts(current.GetChangedObjects(), current.GetId()))
             {                
-                Replace(lastAction, new GlobalHistoryEntry(false, HistoryType.undoneAction, lastAction.ActionID, lastAction.ChangedObjects), false);
+                Replace(lastAction, new GlobalHistoryEntry(false, HistoryType.UndoneAction, lastAction.ActionID, lastAction.ChangedObjects), false);
                 UndoHistory.Pop();
                 current.Start();
                 throw new UndoImpossible("Undo not possible. Someone else has made a change on the same object.");
@@ -337,7 +337,7 @@ namespace SEE.Utils
                 UndoHistory.Pop();
                 RemoveFromGlobalHistory(lastAction);
 
-                GlobalHistoryEntry undoneAction = new GlobalHistoryEntry(true, HistoryType.undoneAction, lastAction.ActionID, lastAction.ChangedObjects);
+                GlobalHistoryEntry undoneAction = new GlobalHistoryEntry(true, HistoryType.UndoneAction, lastAction.ActionID, lastAction.ChangedObjects);
                 Push(undoneAction);
                 new NetActionHistory().Push(undoneAction.ActionType, undoneAction.ActionID, undoneAction.ChangedObjects);
 
@@ -358,7 +358,7 @@ namespace SEE.Utils
         /// <exception cref="RedoImpossible">thrown in there is no action that could be re-done</exception>
         public void Redo()
         {
-            GlobalHistoryEntry lastUndoneAction = FindLastActionOfPlayer(HistoryType.undoneAction);
+            GlobalHistoryEntry lastUndoneAction = FindLastActionOfPlayer(HistoryType.UndoneAction);
             if (RedoHistory.Count == 0 || lastUndoneAction.ActionID == null)
             {
                 throw new RedoImpossible("Redo not possible, no action left to be redone!");
@@ -369,7 +369,7 @@ namespace SEE.Utils
                 if (ActionHasConflicts(lastUndoneAction.ChangedObjects, lastUndoneAction.ActionID))
                 {
                     RedoHistory.Pop();
-                    Replace(lastUndoneAction, new GlobalHistoryEntry(false, HistoryType.undoneAction, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects), false);
+                    Replace(lastUndoneAction, new GlobalHistoryEntry(false, HistoryType.UndoneAction, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects), false);
                     CurrentAction.Start();
                     throw new RedoImpossible("Redo not possible. Someone else has made a change on the same object.");
                 }
@@ -383,7 +383,7 @@ namespace SEE.Utils
                 UnityEngine.Assertions.Assert.IsTrue(RedoHistory.Count == 0
                                  || RedoHistory.Peek().CurrentProgress() != ReversibleAction.Progress.NoEffect);
 
-                GlobalHistoryEntry redoneAction = new GlobalHistoryEntry(true, HistoryType.action, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects);
+                GlobalHistoryEntry redoneAction = new GlobalHistoryEntry(true, HistoryType.Action, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects);
                 RemoveAction(lastUndoneAction.ActionID);
                 new NetActionHistory().Delete(lastUndoneAction.ActionID);
                 Push(redoneAction);
@@ -468,7 +468,7 @@ namespace SEE.Utils
         /// <returns>true if no action left, else false.</returns>
         public bool NoActionsLeft()
         {
-            return FindLastActionOfPlayer(HistoryType.action).ActionID == null;
+            return FindLastActionOfPlayer(HistoryType.Action).ActionID == null;
         }
 
         /// <summary>
