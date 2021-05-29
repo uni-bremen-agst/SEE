@@ -152,6 +152,8 @@ namespace SEE.Utils
             AddToGlobalHistory(action);
             action.Awake();
             action.Start();
+            // Whenever a new action is excuted, we consider the redo history lost.
+            RedoHistory.Clear();
         }
 
         /// Calls <see cref="ReversibleAction.Update"/> for the currently executed action of this
