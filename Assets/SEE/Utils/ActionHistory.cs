@@ -120,8 +120,15 @@ namespace SEE.Utils
 
         /// <summary>
         /// The actionHistory, which is synchronised through the network on each client.
+        /// 
+        /// FIXME: This list should be forgetting, that is, it should not grow
+        /// without limit. Otherwise we will run into performance problems if
+        /// the history is large and the actions have changed many objects.
+        /// See the details in <see cref="ActionHasConflicts"/>.
+        /// Quite likely a dictionary indexed by the action ids would be a
+        /// better data structure, because of the faster look up.
         /// </summary>
-        private List<GlobalHistoryEntry> globalHistory = new List<GlobalHistoryEntry>();
+        private readonly List<GlobalHistoryEntry> globalHistory = new List<GlobalHistoryEntry>();
 
         /// <summary>
         /// Contains all actions executed by the player.
@@ -168,8 +175,7 @@ namespace SEE.Utils
             AssertAtMostOneActionWithNoEffect();
             CurrentAction?.Stop();
             LastActionWithEffect();
-            UndoHistory.Push(action);
-            AddToGlobalHistory(action);
+            UndoHistory.Push(action);            
             action.Awake();
             action.Start();
             // Whenever a new action is excuted, we consider the redo history lost.
@@ -188,7 +194,11 @@ namespace SEE.Utils
         {
             ReversibleAction lastAction = CurrentAction;
             if (lastAction != null && lastAction.Update())
-            {                
+            {
+                // Note: An action is put to the global history only when
+                // its execution is completed, that is, if its Update
+                // yields true. Here is the place, where this is the fact.
+                AddToGlobalHistory(lastAction);
                 Execute(lastAction.NewInstance());
             }
         }
@@ -222,9 +232,10 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Pushes new actions to the <see cref="globalHistory"/>.
+        /// Pushes <paramref name="entry"/> to the <see cref="globalHistory"/>.
+        /// The addition remains local, that is, is not propagated to all clients.
         /// </summary>
-        /// <param name="entry">The action and all of its specific values which are needed for the history</param>
+        /// <param name="entry">The action and all of its specific values needed for the history</param>
         public void Push(GlobalHistoryEntry entry)
         {
             globalHistory.Add(entry);
@@ -277,11 +288,16 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Checks whether the action to be executed has conflicts to another action.
+        /// Checks whether the action with the given <paramref name="actionId"/> present
+        /// in <see cref="globalHistory"/> has a conflict to another action in the
+        /// <see cref="globalHistory"/>. Two actions have a conflict if their two
+        /// sets of modified game objects overlap.
+        /// If the action is not contained in <see cref="globalHistory"/>, it
+        /// cannot have a conflict.
         /// </summary>
-        /// <param name="affectedGameObjects">the gameObjects affected by the action to be undone/redone.</param>
-        /// <param name="actionId">the ID of the action which possibly has conflicts.</param>
-        /// <returns>true, if there are conflicts, else false.</returns>
+        /// <param name="affectedGameObjects">the gameObjects modified by the action</param>
+        /// <param name="actionId">the ID of the action</param>
+        /// <returns>true if there are conflicts</returns>
         private bool ActionHasConflicts(IList<string> affectedGameObjects, string actionId)
         {
             int index = GetIndexOfAction(actionId);
@@ -340,26 +356,40 @@ namespace SEE.Utils
                 return;
             }
 
-            GlobalHistoryEntry lastAction = globalHistory[GetIndexOfAction(current.GetId())];
-
             if (ActionHasConflicts(current.GetChangedObjects(), current.GetId()))
-            {                
+            {
+                GlobalHistoryEntry lastAction = globalHistory[GetIndexOfAction(current.GetId())];
                 Replace(lastAction, new GlobalHistoryEntry(false, HistoryType.UndoneAction, lastAction.ActionID, lastAction.ChangedObjects), false);
                 UndoHistory.Pop();
-                current.Start();
+                current = LastActionWithEffect();
+                if (current != null)
+                {
+                    Resume(current);
+                }
                 throw new UndoImpossible("Undo not possible. Someone else has made a change on the same object.");
             }
             else
-            {
+            {                
                 current.Undo();
                 RedoHistory.Push(current);
                 UndoHistory.Pop();
-                RemoveFromGlobalHistory(lastAction);
 
-                GlobalHistoryEntry undoneAction = new GlobalHistoryEntry(true, HistoryType.UndoneAction, lastAction.ActionID, lastAction.ChangedObjects);
-                Push(undoneAction);
-                new NetActionHistory().Push(undoneAction.ActionType, undoneAction.ActionID, undoneAction.ChangedObjects);
+                /// The global action history contains only those actions whose
+                /// execution is completed. The current action could be still
+                /// be running (we know that it has already had an effect,
+                /// that is, its current progress cannot be <see cref="ReversibleAction.Progress.NoEffect"/>,
+                /// otherwise we would not have arrived here). If it is still
+                /// running, it cannot be found in the global history.
+                if (current.CurrentProgress() == ReversibleAction.Progress.Completed)
+                {
+                    /// current is a fully executed action contained in <see cref="globalHistory"/>
+                    GlobalHistoryEntry lastAction = globalHistory[GetIndexOfAction(current.GetId())];
+                    RemoveFromGlobalHistory(lastAction);
 
+                    GlobalHistoryEntry undoneAction = new GlobalHistoryEntry(true, HistoryType.UndoneAction, lastAction.ActionID, lastAction.ChangedObjects);
+                    Push(undoneAction);
+                    new NetActionHistory().Push(undoneAction.ActionType, undoneAction.ActionID, undoneAction.ChangedObjects);
+                }
                 // current has been undone and moved on the RedoStack.
                 // We will resume with the next top-element of the stack that
                 // has had an effect if there is any.
@@ -376,16 +406,19 @@ namespace SEE.Utils
         /// </summary>
         /// <exception cref="RedoImpossible">thrown in there is no action that could be re-done</exception>
         public void Redo()
-        {
-            GlobalHistoryEntry lastUndoneAction = FindLastActionOfPlayer(HistoryType.UndoneAction);
-            if (RedoHistory.Count == 0 || lastUndoneAction.ActionID == null)
+        {            
+            if (RedoHistory.Count == 0)
             {
                 throw new RedoImpossible("Redo not possible, no action left to be redone!");
             }
             else
             {
                 CurrentAction?.Stop();
-                if (ActionHasConflicts(lastUndoneAction.ChangedObjects, lastUndoneAction.ActionID))
+                // If the action to be redone has not been executed completely,
+                // it will not be contained in the global history, in which case
+                // lastUndoneAction.ActionID will be null.
+                GlobalHistoryEntry lastUndoneAction = FindLastActionOfPlayer(HistoryType.UndoneAction);                
+                if (lastUndoneAction.ActionID != null && ActionHasConflicts(lastUndoneAction.ChangedObjects, lastUndoneAction.ActionID))
                 {
                     RedoHistory.Pop();
                     Replace(lastUndoneAction, new GlobalHistoryEntry(false, HistoryType.UndoneAction, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects), false);
@@ -402,11 +435,17 @@ namespace SEE.Utils
                 UnityEngine.Assertions.Assert.IsTrue(RedoHistory.Count == 0
                                  || RedoHistory.Peek().CurrentProgress() != ReversibleAction.Progress.NoEffect);
 
-                GlobalHistoryEntry redoneAction = new GlobalHistoryEntry(true, HistoryType.Action, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects);
-                RemoveAction(lastUndoneAction.ActionID);
-                new NetActionHistory().Delete(lastUndoneAction.ActionID);
-                Push(redoneAction);
-                new NetActionHistory().Push(redoneAction.ActionType, redoneAction.ActionID, redoneAction.ChangedObjects);
+                // Only if the action to be redone has been executed completely
+                // and is, thus, contained in the global history, we need to update
+                // the global history.
+                if (lastUndoneAction.ActionID != null)
+                {
+                    GlobalHistoryEntry redoneAction = new GlobalHistoryEntry(true, HistoryType.Action, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects);
+                    RemoveAction(lastUndoneAction.ActionID);
+                    new NetActionHistory().Delete(lastUndoneAction.ActionID);
+                    Push(redoneAction);
+                    new NetActionHistory().Push(redoneAction.ActionType, redoneAction.ActionID, redoneAction.ChangedObjects);
+                }
             }
         }
 
