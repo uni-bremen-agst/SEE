@@ -163,7 +163,8 @@ namespace SEE.Game
                 // Delete all old edges.
                 foreach ((GameObject, GameObject, string) element in sourceTargetEdgeWithinSameSubset)
                 {
-                    GameEdgeAdder.Remove(GameObject.Find(element.Item3));
+                    Object.Destroy(GameObject.Find(element.Item3));
+                    //GameEdgeAdder.Remove(GameObject.Find(element.Item3));
                 }
                 // Create all new edges.
                 foreach ((GameObject, GameObject, string) element in sourceTargetEdgeWithinSameSubset)
