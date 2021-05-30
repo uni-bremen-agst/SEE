@@ -521,15 +521,6 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Returns whether a player has no actions left to be undone.
-        /// </summary>
-        /// <returns>true if no action left</returns>
-        public bool IsEmpty()
-        {
-            return FindLastActionOfPlayer(HistoryType.Action).ActionID == null;
-        }
-
-        /// <summary>
         /// Returns the number of action that can be undone.
         /// </summary>
         /// <returns>number of un-doable actions</returns>
