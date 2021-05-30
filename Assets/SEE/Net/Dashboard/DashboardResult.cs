@@ -36,9 +36,6 @@ namespace SEE.Net.Dashboard
         /// </summary>
         /// <exception cref="DashboardException">Will be thrown if <see cref="Success"/> is <c>false</c>
         /// and contains additional information about the <see cref="Error"/> or <see cref="Exception"/>.</exception>
-        /// <exception cref="InvalidOperationException">Will be thrown if this object is in an invalid state
-        /// and implies a programming error, because this will only happen if <see cref="Success"/> is <c>false</c>
-        /// without <see cref="Error"/> or <see cref="Exception"/> being defined.</exception>
         public void PossiblyThrow()
         {
             if (Success)
