@@ -3,20 +3,63 @@ using System.Collections.Generic;
 
 namespace SEE.Net.Dashboard.Model
 {
+    /// <summary>
+    /// Describes the version of analysis data of a certain Project.
+    /// </summary>
     [Serializable]
     public class AnalysisVersion
     {
+        /// <summary>
+        /// The 0-based index of all the known analysis versions of a project.
+        /// The version with index 0 never contains actual analysis data,
+        /// but always refers to a fictional version without any issues that happened before version 1.
+        /// </summary>
         public readonly int index;
+
+        /// <summary>
+        /// The display-name of a version.
+        /// Don’t expect this to be parseable in any way but use it to represent the version
+        /// as it may contain descriptive information like a version control system tag name.
+        /// </summary>
         public readonly string name;
+        
+        /// <summary>
+        /// The date of this version containing time zone information.
+        /// This is the preferred way of referring to a specific version.
+        /// </summary>
         public readonly DateTime date;
+        
+        /// <summary>
+        /// The unix-representation of date without time zone information (always UTC)
+        /// </summary>
         public readonly ulong millis;
-        public readonly IDictionary<string, VersionKindInfo> issueCounts;
+        
+        /// <summary>
+        /// For every Issue Kind contains some Issue counts.
+        /// Namely the Total count, as well as the newly Added and newly Removed issues in comparison with
+        /// the version before. N.B. The Bauhaus Version used to analyze the project must be at least
+        /// 6.5.0 in order for these values to be available.
+        /// </summary>
+        public readonly IDictionary<string, VersionKindCount> issueCounts;
+        
+        /// <summary>
+        /// Version information of the Axivion Suite used to do this analysis run.
+        /// Note that this field is only available when the analysis was done with at least version 6.5.0.
+        /// </summary>
         public readonly ToolsVersion toolsVersion;
+        
+        /// <summary>
+        /// The total lines of code of the project at the current version if available.
+        /// </summary>
         public readonly uint linesOfCode;
+        
+        /// <summary>
+        /// The clone ratio of the project at the current version if available.
+        /// </summary>
         public readonly float cloneRatio;
 
-        public AnalysisVersion(int index, string name, DateTime date, ulong millis, 
-                               IDictionary<string, VersionKindInfo> issueCounts, ToolsVersion toolsVersion, 
+        public AnalysisVersion(int index, string name, DateTime date, ulong millis,
+                               IDictionary<string, VersionKindCount> issueCounts, ToolsVersion toolsVersion,
                                uint linesOfCode, float cloneRatio)
         {
             this.index = index;
@@ -29,14 +72,26 @@ namespace SEE.Net.Dashboard.Model
             this.cloneRatio = cloneRatio;
         }
 
+        /// <summary>
+        /// Refers to a specific version of the Axivion Suite.
+        /// </summary>
         [Serializable]
         public class ToolsVersion
         {
+            /// <summary>
+            /// Version number for display purposes.
+            /// </summary>
             public readonly string name;
+            /// <summary>
+            /// Parseable, numeric version number suitable for version comparisons.
+            /// </summary>
             public readonly string number;
-            public readonly string buildDate;
+            /// <summary>
+            /// Build date.
+            /// </summary>
+            public readonly DateTime buildDate;
 
-            public ToolsVersion(string name, string number, string buildDate)
+            public ToolsVersion(string name, string number, DateTime buildDate)
             {
                 this.name = name;
                 this.number = number;
@@ -44,14 +99,29 @@ namespace SEE.Net.Dashboard.Model
             }
         }
 
+        /// <summary>
+        /// Kind-specific issue count statistics that are cheaply available.
+        /// </summary>
         [Serializable]
-        public class VersionKindInfo
+        public class VersionKindCount
         {
+            /// <summary>
+            /// The number of issues of a kind in a version.
+            /// </summary>
             public readonly uint Total;
+            
+            /// <summary>
+            /// The number of issues of a kind present in a version that were not present in the previous version.
+            /// </summary>
             public readonly uint Added;
+            
+            /// <summary>
+            /// The number of issues of a kind that were present in the previous version
+            /// and are not present in the current version any more.
+            /// </summary>
             public readonly uint Removed;
 
-            public VersionKindInfo(uint total, uint added, uint removed)
+            public VersionKindCount(uint total, uint added, uint removed)
             {
                 Total = total;
                 Added = added;
