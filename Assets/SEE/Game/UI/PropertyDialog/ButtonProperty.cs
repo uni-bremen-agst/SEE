@@ -92,7 +92,7 @@ namespace SEE.Game.UI.PropertyDialog
                 button.name = Name;
                 GameObject text = button.transform.Find("Text").gameObject;
                 GameObject icon = button.transform.Find("Icon").gameObject;
-
+                
                 if (!button.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager)
                      || !button.TryGetComponentOrLog(out Image buttonImage)
                      || !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro)
@@ -102,6 +102,7 @@ namespace SEE.Game.UI.PropertyDialog
                     return;
                 }
 
+                textMeshPro.fontSize = 20;
                 buttonImage.color = buttonColor;
                 textMeshPro.color = buttonColor.IdealTextColor();
                 iconImage.color = buttonColor.IdealTextColor();
