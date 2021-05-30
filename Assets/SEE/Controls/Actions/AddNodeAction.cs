@@ -11,7 +11,7 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class AddNodeAction : AbstractPlayerAction
     {
-        /// <summary>
+        /// <summa
         /// If the user clicks with the mouse hitting a game object representing a graph node, 
         /// this graph node is a parent to which a new node is created and added as a child.
         /// <see cref="ReversibleAction.Update"/>.
@@ -32,12 +32,17 @@ namespace SEE.Controls.Actions
                     string nodeId = nodeRef.Value.ID;
                     Transform grandParent = parent.transform.parent;
                     Vector3 oldPos = new Vector3(parent.transform.position.x, grandParent.transform.position.y, parent.transform.position.z);
-                    Vector3 oldWorldScale = FindSize(parent.gameObject, new Vector3(oldPos.x, grandParent.position.y, oldPos.z));
+                    Vector3 oldWorldScale = FindSize(parent.gameObject, oldPos);
+                    oldWorldScale = new Vector3(oldWorldScale.x * 5, oldWorldScale.y, oldWorldScale.z * 5);
                     GameNodeAdder.Remove(parent);
                     parent = GameNodeAdder.Add(grandParent.gameObject, oldPos, 2* oldWorldScale, nodeId, false);
-                    // The position at which the parent was hit will be the center point of the new node
+                    //The position at which the parent was hit will be the center point of the new node
+                    //TODO: Locate new LeafNode according to point clicked into the circle.
                     Vector3 scale = FindSize(parent, oldPos);
+                    //TODO: Find a fitted scaling and replace filler
+                    scale = new Vector3(scale.x * 2, scale.y * 2, scale.z * 2);
                     addedGameNode = GameNodeAdder.Add(parent, position: new Vector3(oldPos.x, parent.GetRoof() + scale.y, oldPos.z), worldSpaceScale: scale);
+                    //TODO: implement AddNodeAddAction
                     if (addedGameNode != null)
                     {
                         memento = new Memento(parent, position: oldPos, scale: scale);
