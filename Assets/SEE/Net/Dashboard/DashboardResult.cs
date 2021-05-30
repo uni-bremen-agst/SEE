@@ -5,13 +5,44 @@ using UnityEngine;
 
 namespace SEE.Net.Dashboard
 {
+    /// <summary>
+    /// Represents the result of an API call to the Axivion dashboard, which may or may not have been successful.
+    /// In case of success, the received object can be retrieved using the generic <see cref="RetrieveObject{T}"/>
+    /// method.
+    /// </summary>
     public class DashboardResult
     {
+        /// <summary>
+        /// Whether the API call has been successful.
+        /// </summary>
         public bool Success { get; private set; }
+        
+        /// <summary>
+        /// This contains the error object which has been returned from the dashboard, if the call was not successful
+        /// due to an API error. Will be <see cref="null"/> if <see cref="Success"/> is <c>true</c>
+        /// or if <see cref="Exception"/> is not <c>null</c>.
+        /// </summary>
         public readonly DashboardError Error;
+        
+        /// <summary>
+        /// This contains the exception which occurred when trying to access the dashboard.
+        /// Will be <see cref="null"/> if <see cref="Success"/> is <c>true</c> or if <see cref="Error"/>
+        /// is not <c>null</c>.
+        /// </summary>
         public readonly Exception Exception;
+        
+        /// <summary>
+        /// Contains the received JSON from the dashboard.
+        /// May be <c>null</c> if <see cref="Success"/> is <c>false</c>.
+        /// </summary>
         private readonly string json;
 
+        /// <summary>
+        /// Instantiates a new instance of this class from the given success value and JSON.
+        /// </summary>
+        /// <param name="success">True if the API call has been successful (HTTP code 200).</param>
+        /// <param name="json">JSON returned from the server. May not be <c>null</c>.</param>
+        /// <exception cref="ArgumentNullException">If the given <paramref name="json"/> is <c>null</c>.</exception>
         public DashboardResult(bool success, string json)
         {
             this.json = json ?? throw new ArgumentNullException(nameof(json));
@@ -23,6 +54,11 @@ namespace SEE.Net.Dashboard
             Success = success;
         }
 
+        /// <summary>
+        /// Instantiates a new instance of this class with <see cref="Success"/> as <c>false</c> and the given exception
+        /// as the cause.
+        /// </summary>
+        /// <param name="exception">The cause of the failure to access the dashboard API.</param>
         public DashboardResult(Exception exception)
         {
             Success = false;
@@ -36,7 +72,7 @@ namespace SEE.Net.Dashboard
         /// </summary>
         /// <exception cref="DashboardException">Will be thrown if <see cref="Success"/> is <c>false</c>
         /// and contains additional information about the <see cref="Error"/> or <see cref="Exception"/>.</exception>
-        public void PossiblyThrow()
+        private void PossiblyThrow()
         {
             if (Success)
             {
@@ -85,6 +121,10 @@ namespace SEE.Net.Dashboard
             }
         }
 
+        /// <summary>
+        /// Returns a human-readable representation of this class.
+        /// </summary>
+        /// <returns>human-readable representation of this class.</returns>
         public override string ToString()
         {
             return $"{nameof(Error)}: {Error}, {nameof(Exception)}: {Exception}, {nameof(json)}: {json}, {nameof(Success)}: {Success}";
