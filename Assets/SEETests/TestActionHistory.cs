@@ -134,9 +134,9 @@ namespace SEETests
                 return actionStateType;
             }
 
-            public List<string> GetChangedObjects()
+            public HashSet<string> GetChangedObjects()
             {
-                return new List<string>();
+                return new HashSet<string>();
             }
 
             private readonly string id = Guid.NewGuid().ToString();
@@ -460,9 +460,9 @@ namespace SEETests
             public abstract void Undo();
             public abstract bool Update();
 
-            public List<string> GetChangedObjects()
+            public HashSet<string> GetChangedObjects()
             {
-                return new List<string>();
+                return new HashSet<string>();
             }
 
             private readonly string id = Guid.NewGuid().ToString();

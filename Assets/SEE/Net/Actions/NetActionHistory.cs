@@ -2,6 +2,7 @@
 using SEE.Controls.Actions;
 using System.Collections.Generic;
 using static SEE.Utils.ActionHistory;
+using System.Linq;
 
 namespace SEE.Net
 {
@@ -50,11 +51,15 @@ namespace SEE.Net
 
         /// <summary>
         /// The IDs of all objects which are changed by the action.
+        /// The data structure is a list, although logically it is a set.
+        /// Yet, Unity cannot serialize HashSets, so we use List instead.
         /// </summary>
         public List<string> NewChangedObjects;
 
         /// <summary>
         /// The IDs of all objects which are changed by the old action.
+        /// The data structure is a list, although logically it is a set.
+        /// Yet, Unity cannot serialize HashSets, so we use List instead.
         /// </summary>
         public List<string> OldChangedObjects;
 
@@ -90,14 +95,14 @@ namespace SEE.Net
             {
                 switch(Mode){
                     case ModeKind.Push:
-                        GlobalActionHistory.Push(new GlobalHistoryEntry(false, Type, ActionId, NewChangedObjects));
+                        GlobalActionHistory.Push(new GlobalHistoryEntry(false, Type, ActionId, new HashSet<string>(NewChangedObjects)));
                         break;
                     case ModeKind.Delete:
                         GlobalActionHistory.RemoveAction(ActionId);
                         break;
                     case ModeKind.Replace:
-                        GlobalActionHistory.Replace(new GlobalHistoryEntry(false, OldItemType, ID, OldChangedObjects),
-                                                    new GlobalHistoryEntry(false, NewItemType, ID, NewChangedObjects),
+                        GlobalActionHistory.Replace(new GlobalHistoryEntry(false, OldItemType, ID, new HashSet<string>(OldChangedObjects)),
+                                                    new GlobalHistoryEntry(false, NewItemType, ID, new HashSet<string>(NewChangedObjects)),
                                                     true);
                         break;
                 }
@@ -111,12 +116,12 @@ namespace SEE.Net
         /// <param name="type">The type of the action (action, undoneAction)</param>
         /// <param name="actionId">The ID of the action</param>
         /// <param name="changedObjects">The IDs of the objects edited by the action</param>
-        public void Push(ActionHistory.HistoryType type, string actionId, List<string> changedObjects)
+        public void Push(ActionHistory.HistoryType type, string actionId, HashSet<string> changedObjects)
         {
             Mode = ModeKind.Push;
             Type = type;
             ActionId = actionId;
-            NewChangedObjects = changedObjects;
+            NewChangedObjects = changedObjects.ToList();
             Execute(null);
         }
 
@@ -142,15 +147,15 @@ namespace SEE.Net
         public void Replace
                      (string id,
                       ActionHistory.HistoryType oldType,
-                      List<string> oldChangedObjects,
+                      HashSet<string> oldChangedObjects,
                       ActionHistory.HistoryType newType,
-                      List<string> newChangedObjects)
+                      HashSet<string> newChangedObjects)
         {
             OldItemType = oldType;
             NewItemType = newType;
             ID = id;
-            OldChangedObjects = oldChangedObjects;
-            NewChangedObjects = newChangedObjects;            
+            OldChangedObjects = oldChangedObjects.ToList();
+            NewChangedObjects = newChangedObjects.ToList();            
             Mode = ModeKind.Replace;
             Execute(null);
         }

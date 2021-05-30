@@ -394,10 +394,10 @@ namespace SEE.Controls.Actions
         /// <see cref="ReversibleAction.GetChangedObjects"/>.
         /// </summary>
         /// <returns>The list of the IDs of all game objects changed by this action</returns>
-        public List<string> GetChangedObjects()
+        public HashSet<string> GetChangedObjects()
         {
             // TODO
-            return new List<string>();
+            return new HashSet<string>();
         }
 
         /// <summary>
