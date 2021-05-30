@@ -70,9 +70,9 @@ namespace SEE.Controls.Actions
         /// <see cref="ReversibleAction.GetChangedObjects"/>
         /// </summary>
         /// <returns>empty list because this action does not change anything</returns>
-        public override List<string> GetChangedObjects()
+        public override HashSet<string> GetChangedObjects()
         {
-            return new List<string>();
+            return new HashSet<string>();
         }
 
         /// Returns the <see cref="ActionStateType"/> of this action.

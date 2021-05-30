@@ -130,7 +130,7 @@ namespace SEE.Utils
         /// Returns the list of IDs of all game objects changed by this action.
         /// </summary>
         /// <returns>The list of the IDs of all game objects changed by this action</returns>
-        List<string> GetChangedObjects();
+        HashSet<string> GetChangedObjects();
 
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.

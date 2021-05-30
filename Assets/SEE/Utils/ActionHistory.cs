@@ -74,7 +74,7 @@ namespace SEE.Utils
             /// <param name="type">The type of the action</param>
             /// <param name="actionID">The ID of the action</param>
             /// <param name="changedObjects">The objects that there changed by this action</param>
-            public GlobalHistoryEntry(bool isOwner, HistoryType type, string actionID, List<string> changedObjects)
+            public GlobalHistoryEntry(bool isOwner, HistoryType type, string actionID, HashSet<string> changedObjects)
             {
                 IsOwner = isOwner;
                 ActionType = type;
@@ -98,7 +98,7 @@ namespace SEE.Utils
             /// The unique identifiers of all game objects changed by this action.
             /// This information is the basis to detect conflicting changes.
             /// </summary>
-            public List<string> ChangedObjects { get; }
+            public HashSet<string> ChangedObjects { get; }
         }
 
         /// <summary>
@@ -213,7 +213,7 @@ namespace SEE.Utils
         private void AddToGlobalHistory(ReversibleAction action)
         {
             string actionID = action.GetId();
-            List<string> changedObjects = action.GetChangedObjects();
+            HashSet<string> changedObjects = action.GetChangedObjects();
             Push(new GlobalHistoryEntry(true, HistoryType.Action, actionID, changedObjects));
             new NetActionHistory().Push(HistoryType.Action, actionID, changedObjects);
         }
@@ -298,8 +298,12 @@ namespace SEE.Utils
         /// <param name="affectedGameObjects">the gameObjects modified by the action</param>
         /// <param name="actionId">the ID of the action</param>
         /// <returns>true if there are conflicts</returns>
-        private bool ActionHasConflicts(IList<string> affectedGameObjects, string actionId)
+        private bool ActionHasConflicts(HashSet<string> affectedGameObjects, string actionId)
         {
+            if (affectedGameObjects.Count == 0)
+            {
+                return false;
+            }
             int index = GetIndexOfAction(actionId);
             if (index == -1)
             {
@@ -308,15 +312,9 @@ namespace SEE.Utils
             ++index;
             for (int i = index; i < globalHistory.Count; i++)
             {
-                foreach (string s in affectedGameObjects)
+                if (!globalHistory[i].IsOwner && affectedGameObjects.Overlaps(globalHistory[i].ChangedObjects))
                 {
-                    if (globalHistory[i].ChangedObjects != null)
-                    {
-                        if (globalHistory[i].ChangedObjects.Contains(s) && !globalHistory[i].IsOwner)
-                        {
-                            return true;
-                        }
-                    }
+                    return true;
                 }
             }
             return false;

@@ -675,9 +675,9 @@ namespace SEE.Controls.Actions
         /// Returns all IDs of gameObjects manipulated by this action.
         /// </summary>
         /// <returns>all IDs of gameObjects manipulated by this action</returns>
-        public override List<string> GetChangedObjects()
+        public override HashSet<string> GetChangedObjects()
         {
-            return new List<string>()
+            return new HashSet<string>()
             {
                 objectToScale.name
             };
