@@ -177,12 +177,12 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// The list of the IDs of all gameObjects changed by this action.
+        /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
         /// Because this action does not actually change any game object, 
-        /// an empty list is returned.
+        /// an empty set is always returned.
         /// </summary>
-        /// <returns>an empty list</returns>
+        /// <returns>an empty set</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string>();
