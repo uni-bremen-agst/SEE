@@ -8,8 +8,7 @@ namespace SEE.Net.Dashboard
         
         public DashboardError Error { get; }
 
-        public DashboardException(DashboardError error) 
-            : this($"An error of type '{error.type}' occurred while retrieving dashboard data: {error.localizedMessage}")
+        public DashboardException(DashboardError error) : this($"{error.type}: {error.localizedMessage}")
         {
             Error = error;
         }
