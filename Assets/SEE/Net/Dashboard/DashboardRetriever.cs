@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using SEE.Game.UI.Notification;
 using SEE.Net.Dashboard.Model;
+using UnityEngine;
 using UnityEngine.Networking;
 
 namespace SEE.Net.Dashboard
@@ -28,6 +30,18 @@ namespace SEE.Net.Dashboard
         /// The API token for the Axivion Dashboard.
         /// </summary>
         public static string Token { private get; set; }
+
+        /// <summary>
+        /// Latest supported version of the Axivion Dashboard.
+        /// Should be updated when new (supported and tested) versions come out.
+        /// </summary>
+        public static readonly DashboardVersion SupportedDashboardVersion = new DashboardVersion(7,1,5,6367);
+
+        /// <summary>
+        /// When true, receiving Dashboard models which don't match the C# models will throw an error
+        /// instead of silently assigning default values to the fields.
+        /// </summary>
+        public static bool StrictMode = true;
         
         /// <summary>
         /// Lazy wrapper around the instance of this object.
@@ -48,16 +62,24 @@ namespace SEE.Net.Dashboard
         /// Retrieves the result from calling the Axivion Dashboard at <see cref="path"/> appended to
         /// <see cref="BaseUrl"/> and returns the result.
         /// </summary>
-        /// <param name="path">Path which shall be queried, will be appended to <see cref="BaseUrl"/></param>
+        /// <param name="path">Path which shall be queried, will be appended to <see cref="BaseUrl"/>.
+        /// This path should not contain query parameters, which should be set via <paramref name="queryParameters"/>.
+        /// </param>
+        /// <param name="queryParameters">A dictionary containing the query parameters' names and values.</param>
         /// <returns>The result of the API call.</returns>
-        public async UniTask<DashboardResult> GetAtPath(string path)
+        public async UniTask<DashboardResult> GetAtPath(string path, Dictionary<string, string> queryParameters = null)
         {
-            UnityWebRequest request = UnityWebRequest.Get(BaseUrl + path);
+            string requestUrl = BaseUrl + path;
+            if (queryParameters != null)
+            {
+                requestUrl += UnityWebRequest.SerializeSimpleForm(queryParameters);
+            }
+            UnityWebRequest request = UnityWebRequest.Get(requestUrl);
             request.certificateHandler = new AxivionCertificateHandler();
             request.SetRequestHeader("Accept", "application/json");
             request.SetRequestHeader("Authorization", $"AxToken {Token}");
-            //TODO: Either this or 
-            await request.SendWebRequest().ToUniTask().Timeout(TimeSpan.FromSeconds(60f));
+            request.SendWebRequest();
+            await UniTask.WaitUntil(() => request.isDone);
             DashboardResult result = request.result switch
             {
                 UnityWebRequest.Result.Success => new DashboardResult(true, request.downloadHandler.text),
@@ -71,15 +93,97 @@ namespace SEE.Net.Dashboard
 
         /// <summary>
         /// Retrieves dashboard information from the dashboard configured for this <see cref="DashboardRetriever"/>.
+        /// IMPORTANT NOTE: This will only work if your token has full permissions, i.e., when it's not just
+        /// an IDE token. If you simply want to retrieve the dashboard version, use
         /// </summary>
         /// <returns>Dashboard information about the queried dashboard.</returns>
-        public async Task<DashboardInfo> GetDashboardInfo()
+        public async UniTask<DashboardInfo> GetDashboardInfo()
         {
-            DashboardResult result = await GetAtPath("/");
+            DashboardResult result = await GetAtPath("/../../");
             result.PossiblyThrow();
-            return result.RetrieveObject<DashboardInfo>();
+            DashboardInfo info = result.RetrieveObject<DashboardInfo>(StrictMode);
+            return info;
         }
 
+        /// <summary>
+        /// Returns the version number of the dashboard that's being queried.
+        /// </summary>
+        /// <returns>version number of the dashboard that's being queried.</returns>
+        /// <remarks>The way this works is kind of hacky: We deliberately cause an error,
+        /// because the version number is supplied in the <see cref="DashboardError"/> object.
+        /// There is no other way to retrieve the dashboard version (barring <see cref="GetDashboardInfo"/>, which
+        /// requires permissions the user usually does not have).</remarks>
+        public async UniTask<DashboardVersion> GetDashboardVersion()
+        {
+            DashboardVersion version;
+            try
+            {
+                version = new DashboardVersion((await GetDashboardInfo()).dashboardVersionNumber);
+            }
+            catch (DashboardException e)
+            {
+                if (e.Error == null)
+                {
+                    throw;
+                }
+                version = new DashboardVersion(e.Error.dashboardVersionNumber);
+            }
+
+            return version;
+        }
+
+        /// <summary>
+        /// Compares the <see cref="SupportedDashboardVersion"/> with the actual version of the accessed dashboard
+        /// and warns the user via notifications or a log message, depending on how critical the difference is.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        private async UniTaskVoid VerifyVersionNumber()
+        {
+            DashboardVersion version = await GetDashboardVersion();
+            switch (version.GetDifference(SupportedDashboardVersion))
+            {
+                case DashboardVersion.Difference.MAJOR_OLDER: 
+                case DashboardVersion.Difference.MINOR_OLDER: 
+                    // If major or minor version of the dashboard is older, we may use features that aren't existent
+                    // in it yet, so we have to notify the user with a warning.
+                    ShowNotification.Error("Dashboard Version too old", 
+                                           $"The version of the dashboard is {version}, but the DashboardRetriever "
+                                           + $"has been written for version {SupportedDashboardVersion}. Please update your dashboard.");
+                    break;
+                case DashboardVersion.Difference.PATCH_OLDER:
+                    // If patch version is older, there may be some bugfixes / security problems not accounted for.
+                    ShowNotification.Warn("Dashboard Version outdated", 
+                                          $"Your dashboard has version {version} but this API supports "
+                                          + $"{SupportedDashboardVersion}. The difference in versions is small," 
+                                          + "so this shouldn't be too critical, but please update your dashboard to avoid any issues.");
+                    break;
+                case DashboardVersion.Difference.MAJOR_NEWER: 
+                    // Major new version can introduce breaking changes
+                    ShowNotification.Error("Dashboard Version unsupported", 
+                        $"Your dashboard has a major new version ({version}) compared to the supported version "
+                        + $"({SupportedDashboardVersion}), which may have introduced breaking changes. "
+                        + "Please update SEE's retrieval code accordingly.");
+                    break;
+                case DashboardVersion.Difference.MINOR_NEWER: 
+                case DashboardVersion.Difference.PATCH_NEWER: 
+                    // Minor and patch updates shouldn't impact existing functionality, but the retrieval code
+                    // should still be updated by a developer.
+                    Debug.LogWarning($"The dashboard uses version {version} while the retrieval code has been "
+                                     + $"written for version {SupportedDashboardVersion}. Please update SEE's retrieval "
+                                     + "code accordingly.");
+                    break;
+                case DashboardVersion.Difference.EXTRA_OLDER:
+                case DashboardVersion.Difference.EXTRA_NEWER:
+                    // Extra changes are assumed to be small enough to not even warrant a warning.
+                    Debug.Log($"Dashboard version {version} differs slightly from supported version {version}.");
+                    break;
+                case DashboardVersion.Difference.SAME:
+                    // No need to do anything
+                    break;
+                default: throw new ArgumentOutOfRangeException();
+            }
+        }
 
         /// <summary>
         /// Checks the component for incorrect values and throws an <see cref="ArgumentException"/> if necessary.
@@ -96,6 +200,8 @@ namespace SEE.Net.Dashboard
             {
                 throw new ArgumentException("Base URL must be a HTTPS URL.\n");
             }
+
+            VerifyVersionNumber().Forget();
         }
 
         /// <summary>

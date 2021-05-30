@@ -50,9 +50,14 @@ namespace SEE.Game.UI.Notification
         /// <param name="title">Title of the notification.</param>
         /// <param name="description">Description of the notification.</param>
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
-        public static void Info(string title, string description, float duration = DEFAULT_DURATION)
+        /// <param name="log">Whether to log the given notification in Unity's log as well</param>
+        public static void Info(string title, string description, float duration = DEFAULT_DURATION, bool log = true)
         {
             Show(title, description, InfoIcon, InfoColor, duration);
+            if (log)
+            {
+                Debug.Log($"{title}: {description}");
+            }
         }
         
         /// <summary>
@@ -61,9 +66,14 @@ namespace SEE.Game.UI.Notification
         /// <param name="title">Title of the notification.</param>
         /// <param name="description">Description of the notification.</param>
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
-        public static void Warn(string title, string description, float duration = DEFAULT_DURATION)
+        /// <param name="log">Whether to log the given notification in Unity's log as well</param>
+        public static void Warn(string title, string description, float duration = DEFAULT_DURATION, bool log = true)
         {
             Show(title, description, WarningIcon, WarningColor, duration);
+            if (log)
+            {
+                Debug.LogWarning($"{title}: {description}");
+            }
         }
         
         /// <summary>
@@ -72,9 +82,14 @@ namespace SEE.Game.UI.Notification
         /// <param name="title">Title of the notification.</param>
         /// <param name="description">Description of the notification.</param>
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
-        public static void Error(string title, string description, float duration = DEFAULT_DURATION)
+        /// <param name="log">Whether to log the given notification in Unity's log as well</param>
+        public static void Error(string title, string description, float duration = DEFAULT_DURATION, bool log = true)
         {
             Show(title, description, ErrorIcon, ErrorColor, duration);
+            if (log)
+            {
+                Debug.LogError($"{title}: {description}");
+            }
         }
 
         /// <summary>

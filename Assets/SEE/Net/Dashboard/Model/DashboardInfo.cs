@@ -99,6 +99,21 @@ namespace SEE.Net.Dashboard.Model
                 this.name = name;
                 this.url = url;
             }
+
+            public override string ToString()
+            {
+                return $"{nameof(name)}: {name}, {nameof(url)}: {url}";
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(dashboardVersion)}: {dashboardVersion}, "
+                   + $"{nameof(dashboardVersionNumber)}: {dashboardVersionNumber}, "
+                   + $"{nameof(dashboardBuildDate)}: {dashboardBuildDate}, {nameof(username)}: {username},"
+                   + $" {nameof(csrfTokenHeader)}: {csrfTokenHeader}, {nameof(csrfToken)}: {csrfToken},"
+                   + $" {nameof(checkCredentialsUrl)}: {checkCredentialsUrl}, {nameof(projects)}: {projects},"
+                   + $" {nameof(userApiTokenUrl)}: {userApiTokenUrl}";
         }
     }
 }
