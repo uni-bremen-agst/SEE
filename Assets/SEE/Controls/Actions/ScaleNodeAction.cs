@@ -248,7 +248,7 @@ namespace SEE.Controls.Actions
                 {
                     DrawGamingGizmos();
                 }
-                if (SEEInput.Drag())
+                if (SEEInput.Scale())
                 {
                     if (draggedSphere == null && Raycasting.RaycastAnything(out RaycastHit raycastHit))
                     {
