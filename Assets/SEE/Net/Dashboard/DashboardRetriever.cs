@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
-using UnityEngine;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
+using SEE.Net.Dashboard.Model;
 using UnityEngine.Networking;
 
 namespace SEE.Net.Dashboard
@@ -11,35 +12,52 @@ namespace SEE.Net.Dashboard
     /// <summary>
     /// Can retrieve information from the Axivion Dashboard API.
     /// </summary>
-    public class DashboardRetriever : MonoBehaviour
+    public class DashboardRetriever
     {
         /// <summary>
         /// The public key for the X.509 certificate authority from the dashboard's certificate.
         /// </summary>
         public static string PublicKey { private get; set; }
+        
         /// <summary>
         /// The URL to the Axivion Dashboard, up to the project name.
         /// </summary>
         public static string BaseUrl { private get; set; }
+        
         /// <summary>
         /// The API token for the Axivion Dashboard.
         /// </summary>
         public static string Token { private get; set; }
         
+        /// <summary>
+        /// Lazy wrapper around the instance of this object.
+        /// Calls the parameterless constructor of this class upon first access.
+        /// </summary>
+        /// <seealso cref="Lazy{T}"/>
+        private static readonly Lazy<DashboardRetriever> instance = new Lazy<DashboardRetriever>(() => new DashboardRetriever());
+        
+        /// <summary>
+        /// Will automatically instantiate this class when it's accessed first, afterwards the single instance
+        /// of this class will be returned.
+        /// It's important that you only call this after having set <see cref="PublicKey"/>, <see cref="BaseUrl"/>,
+        /// and <see cref="Token"/>.
+        /// </summary>
+        public static DashboardRetriever Instance => instance.Value;
 
         /// <summary>
-        /// Coroutine which retrieves the result from calling the Axivion Dashboard at <see cref="path"/> appended to
-        /// <see cref="BaseUrl"/> and calls <see cref="action"/> with the result.
+        /// Retrieves the result from calling the Axivion Dashboard at <see cref="path"/> appended to
+        /// <see cref="BaseUrl"/> and returns the result.
         /// </summary>
         /// <param name="path">Path which shall be queried, will be appended to <see cref="BaseUrl"/></param>
-        /// <param name="action">Will be called with the result of the retrieval.</param>
-        public static IEnumerator GetAtPath(string path, Action<DashboardResult> action)
+        /// <returns>The result of the API call.</returns>
+        public async UniTask<DashboardResult> GetAtPath(string path)
         {
             UnityWebRequest request = UnityWebRequest.Get(BaseUrl + path);
             request.certificateHandler = new AxivionCertificateHandler();
             request.SetRequestHeader("Accept", "application/json");
             request.SetRequestHeader("Authorization", $"AxToken {Token}");
-            yield return request.SendWebRequest();
+            //TODO: Either this or 
+            await request.SendWebRequest().ToUniTask().Timeout(TimeSpan.FromSeconds(60f));
             DashboardResult result = request.result switch
             {
                 UnityWebRequest.Result.Success => new DashboardResult(true, request.downloadHandler.text),
@@ -48,32 +66,35 @@ namespace SEE.Net.Dashboard
                 UnityWebRequest.Result.DataProcessingError => new DashboardResult(new FormatException(request.error)),
                 _ => new DashboardResult(new SystemException(request.error))
             };
-            action.Invoke(result);
+            return result;
         }
 
         /// <summary>
-        /// Sets up this component by checking for incorrect values.
+        /// Retrieves dashboard information from the dashboard configured for this <see cref="DashboardRetriever"/>.
         /// </summary>
-        private void Start()
+        /// <returns>Dashboard information about the queried dashboard.</returns>
+        public async Task<DashboardInfo> GetDashboardInfo()
         {
-            if (FindObjectOfType<DashboardRetriever>())
-            {
-                Debug.LogError($"{nameof(DashboardRetriever)} added to scene while another is already present,"
-                               + "disabling this one.\n");
-                enabled = false;
-                return;
-            }
+            DashboardResult result = await GetAtPath("/");
+            result.PossiblyThrow();
+            return result.RetrieveObject<DashboardInfo>();
+        }
+
+
+        /// <summary>
+        /// Checks the component for incorrect values and throws an <see cref="ArgumentException"/> if necessary.
+        /// </summary>
+        private DashboardRetriever()
+        {
             if (new[]{BaseUrl, Token, PublicKey}.Any(string.IsNullOrEmpty))
             {
-                Debug.LogError("Necessary information not supplied, disabling this component.\n");
-                enabled = false;
-                return;
+                throw new ArgumentException("Necessary information not supplied. "
+                                            + "Please set base URL, token, and public key before accessing this class.");
             }
+
             if (!BaseUrl.StartsWith("https"))
             {
-                Debug.LogError("Base URL must be a HTTPS URL.\n");
-                enabled = false;
-                return;
+                throw new ArgumentException("Base URL must be a HTTPS URL.\n");
             }
         }
 
