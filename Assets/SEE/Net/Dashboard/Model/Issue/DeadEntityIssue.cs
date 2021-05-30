@@ -41,5 +41,11 @@ namespace SEE.Net.Dashboard.Model
             this.line = line;
             this.linkName = linkName;
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(entity)}: {entity}, {nameof(entityType)}: {entityType}, {nameof(path)}: {path}, "
+                   + $"{nameof(line)}: {line}, {nameof(linkName)}: {linkName}";
+        }
     }
 }

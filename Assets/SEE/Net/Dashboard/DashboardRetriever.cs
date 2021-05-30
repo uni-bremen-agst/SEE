@@ -32,12 +32,6 @@ namespace SEE.Net.Dashboard
         public static string Token { private get; set; }
 
         /// <summary>
-        /// Latest supported version of the Axivion Dashboard.
-        /// Should be updated when new (supported and tested) versions come out.
-        /// </summary>
-        public static readonly DashboardVersion SupportedDashboardVersion = new DashboardVersion(7,1,5,6367);
-
-        /// <summary>
         /// When true, receiving Dashboard models which don't match the C# models will throw an error
         /// instead of silently assigning default values to the fields.
         /// </summary>
@@ -100,7 +94,6 @@ namespace SEE.Net.Dashboard
         public async UniTask<DashboardInfo> GetDashboardInfo()
         {
             DashboardResult result = await GetAtPath("/../../");
-            result.PossiblyThrow();
             DashboardInfo info = result.RetrieveObject<DashboardInfo>(StrictMode);
             return info;
         }
@@ -109,10 +102,10 @@ namespace SEE.Net.Dashboard
         /// Returns the version number of the dashboard that's being queried.
         /// </summary>
         /// <returns>version number of the dashboard that's being queried.</returns>
-        /// <remarks>The way this works is kind of hacky: We deliberately cause an error,
-        /// because the version number is supplied in the <see cref="DashboardError"/> object.
-        /// There is no other way to retrieve the dashboard version (barring <see cref="GetDashboardInfo"/>, which
-        /// requires permissions the user usually does not have).</remarks>
+        /// <remarks>We first try to get this using <see cref="GetDashboardInfo"/>, but typical IDE tokens don't have
+        /// enough permissions to access that API endpoint. In that case, we instead deliberately cause an error by
+        /// trying to access it, because the version number is supplied in the <see cref="DashboardError"/> object.
+        /// </remarks>
         public async UniTask<DashboardVersion> GetDashboardVersion()
         {
             DashboardVersion version;
@@ -136,12 +129,10 @@ namespace SEE.Net.Dashboard
         /// Compares the <see cref="SupportedDashboardVersion"/> with the actual version of the accessed dashboard
         /// and warns the user via notifications or a log message, depending on how critical the difference is.
         /// </summary>
-        /// <returns></returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
         private async UniTaskVoid VerifyVersionNumber()
         {
             DashboardVersion version = await GetDashboardVersion();
-            switch (version.GetDifference(SupportedDashboardVersion))
+            switch (version.DifferenceToSupportedVersion)
             {
                 case DashboardVersion.Difference.MAJOR_OLDER: 
                 case DashboardVersion.Difference.MINOR_OLDER: 
@@ -149,20 +140,21 @@ namespace SEE.Net.Dashboard
                     // in it yet, so we have to notify the user with a warning.
                     ShowNotification.Error("Dashboard Version too old", 
                                            $"The version of the dashboard is {version}, but the DashboardRetriever "
-                                           + $"has been written for version {SupportedDashboardVersion}. Please update your dashboard.");
+                                           + $"has been written for version {DashboardVersion.SupportedVersion}."
+                                           + $" Please update your dashboard.");
                     break;
                 case DashboardVersion.Difference.PATCH_OLDER:
                     // If patch version is older, there may be some bugfixes / security problems not accounted for.
                     ShowNotification.Warn("Dashboard Version outdated", 
                                           $"Your dashboard has version {version} but this API supports "
-                                          + $"{SupportedDashboardVersion}. The difference in versions is small," 
+                                          + $"{DashboardVersion.SupportedVersion}. The difference in versions is small," 
                                           + "so this shouldn't be too critical, but please update your dashboard to avoid any issues.");
                     break;
                 case DashboardVersion.Difference.MAJOR_NEWER: 
                     // Major new version can introduce breaking changes
                     ShowNotification.Error("Dashboard Version unsupported", 
                         $"Your dashboard has a major new version ({version}) compared to the supported version "
-                        + $"({SupportedDashboardVersion}), which may have introduced breaking changes. "
+                        + $"({DashboardVersion.SupportedVersion}), which may have introduced breaking changes. "
                         + "Please update SEE's retrieval code accordingly.");
                     break;
                 case DashboardVersion.Difference.MINOR_NEWER: 
@@ -170,15 +162,16 @@ namespace SEE.Net.Dashboard
                     // Minor and patch updates shouldn't impact existing functionality, but the retrieval code
                     // should still be updated by a developer.
                     Debug.LogWarning($"The dashboard uses version {version} while the retrieval code has been "
-                                     + $"written for version {SupportedDashboardVersion}. Please update SEE's retrieval "
+                                     + $"written for version {DashboardVersion.SupportedVersion}. Please update SEE's retrieval "
                                      + "code accordingly.");
                     break;
                 case DashboardVersion.Difference.EXTRA_OLDER:
                 case DashboardVersion.Difference.EXTRA_NEWER:
                     // Extra changes are assumed to be small enough to not even warrant a warning.
-                    Debug.Log($"Dashboard version {version} differs slightly from supported version {version}.");
+                    Debug.Log($"Dashboard version {version} differs slightly from supported version "
+                              + $"{DashboardVersion.SupportedVersion}.");
                     break;
-                case DashboardVersion.Difference.SAME:
+                case DashboardVersion.Difference.EQUAL:
                     // No need to do anything
                     break;
                 default: throw new ArgumentOutOfRangeException();

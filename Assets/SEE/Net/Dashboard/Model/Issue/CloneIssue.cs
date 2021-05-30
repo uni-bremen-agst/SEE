@@ -79,5 +79,14 @@ namespace SEE.Net.Dashboard.Model
             this.rightLength = rightLength;
             this.rightWeight = rightWeight;
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(cloneType)}: {cloneType}, {nameof(leftPath)}: {leftPath}, {nameof(leftLine)}: {leftLine},"
+                   + $" {nameof(leftEndLine)}: {leftEndLine}, {nameof(leftLength)}: {leftLength},"
+                   + $" {nameof(leftWeight)}: {leftWeight}, {nameof(rightPath)}: {rightPath},"
+                   + $" {nameof(rightLine)}: {rightLine}, {nameof(rightEndLine)}: {rightEndLine}, "
+                   + $"{nameof(rightLength)}: {rightLength}, {nameof(rightWeight)}: {rightWeight}";
+        }
     }
 }

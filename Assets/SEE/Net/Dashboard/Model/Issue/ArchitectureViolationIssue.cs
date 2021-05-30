@@ -132,5 +132,22 @@ namespace SEE.Net.Dashboard.Model
             this.targetLine = targetLine;
             this.targetLinkName = targetLinkName;
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(architectureSource)}: {architectureSource}, "
+                   + $"{nameof(architectureSourceType)}: {architectureSourceType},"
+                   + $" {nameof(architectureSourceLinkName)}: {architectureSourceLinkName},"
+                   + $" {nameof(architectureTarget)}: {architectureTarget},"
+                   + $" {nameof(architectureTargetType)}: {architectureTargetType},"
+                   + $" {nameof(architectureTargetLinkName)}: {architectureTargetLinkName},"
+                   + $" {nameof(errorNumber)}: {errorNumber}, {nameof(violationType)}: {violationType},"
+                   + $" {nameof(dependencyType)}: {dependencyType}, {nameof(sourceEntity)}: {sourceEntity},"
+                   + $" {nameof(sourceEntityType)}: {sourceEntityType}, {nameof(sourcePath)}: {sourcePath},"
+                   + $" {nameof(sourceLine)}: {sourceLine}, {nameof(sourceLinkName)}: {sourceLinkName},"
+                   + $" {nameof(targetEntity)}: {targetEntity}, {nameof(targetEntityType)}: {targetEntityType},"
+                   + $" {nameof(targetPath)}: {targetPath}, {nameof(targetLine)}: {targetLine},"
+                   + $" {nameof(targetLinkName)}: {targetLinkName}";
+        }
     }
 }
