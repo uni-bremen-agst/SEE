@@ -390,10 +390,10 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Returns the list of IDs of all game objects changed by this action.
+        /// Returns the set of IDs of all game objects changed by this action.
         /// <see cref="ReversibleAction.GetChangedObjects"/>.
         /// </summary>
-        /// <returns>The list of the IDs of all game objects changed by this action</returns>
+        /// <returns>The set of the IDs of all game objects changed by this action</returns>
         public HashSet<string> GetChangedObjects()
         {
             // TODO
