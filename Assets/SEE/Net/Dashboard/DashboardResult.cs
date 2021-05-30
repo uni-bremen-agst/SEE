@@ -7,7 +7,7 @@ namespace SEE.Net.Dashboard
 {
     public class DashboardResult
     {
-        public bool Success { get; private set; } = true;
+        public bool Success { get; private set; }
         public readonly DashboardError Error;
         public readonly Exception Exception;
         private readonly string json;
@@ -28,18 +28,43 @@ namespace SEE.Net.Dashboard
             Exception = exception;
         }
 
+        /// <summary>
+        /// Depending on the value of <see cref="Success"/>, throws an exception containing information
+        /// about the <see cref="Error"/> or <see cref="Exception"/>.
+        /// If <see cref="Success"/> is <c>true</c>, nothing will happen.
+        /// </summary>
+        /// <exception cref="DashboardException">Will be thrown if <see cref="Success"/> is <c>false</c>
+        /// and contains additional information about the <see cref="Error"/> or <see cref="Exception"/>.</exception>
+        /// <exception cref="InvalidOperationException">Will be thrown if this object is in an invalid state
+        /// and implies a programming error, because this will only happen if <see cref="Success"/> is <c>false</c>
+        /// without <see cref="Error"/> or <see cref="Exception"/> being defined.</exception>
+        public void PossiblyThrow()
+        {
+            if (Success)
+            {
+                return;
+            }
+
+            if (Exception != null)
+            {
+                throw new DashboardException(Exception);
+            }
+
+            if (Error != null)
+            {
+                throw new DashboardException(Error);
+            }
+
+            // Success is false, so something is wrong, but for some reason both Error and Exception are null.
+            // In such a case, we assume a programming error and throw a different exception.
+            throw new InvalidOperationException("An unknown error occurred while retrieving dashboard data.");
+        }
+
         public T RetrieveObject<T>()
         {
             if (!Success)
             {
-                if (Exception == null)
-                {
-                    throw new InvalidOperationException($"Can't retrieve {typeof(T)}: {Error.message}");
-                }
-                else
-                {
-                    throw new InvalidOperationException($"Can't retrieve {typeof(T)}", Exception);
-                }
+                PossiblyThrow();
             }
 
             try
@@ -48,7 +73,7 @@ namespace SEE.Net.Dashboard
             }
             catch (ArgumentException)
             {
-                Debug.Log("Error encountered, given JSON was: " + json);
+                Debug.LogError("Error encountered, given JSON was: " + json);
                 throw;
             }
         }
