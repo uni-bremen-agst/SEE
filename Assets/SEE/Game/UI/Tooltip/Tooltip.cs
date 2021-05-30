@@ -15,13 +15,13 @@ namespace SEE.Game.UI.Tooltip
     /// Note that this class will not implement the hover detection: A tooltip must be manually shown
     /// and hidden using the <see cref="Show"/> and <see cref="Hide"/> methods.
     /// </summary>
-    public class Tooltip: PlatformDependentComponent
+    public class Tooltip : PlatformDependentComponent
     {
         /// <summary>
         /// Contains the text which shall be shown in the tooltip if <see cref="Show"/> has been called before Start.
         /// </summary>
         private string textBeforeStart;
-        
+
         /// <summary>
         /// The path to the prefab for the tooltip game object.
         /// Will be added as a child to the <see cref="Canvas"/>.
@@ -39,7 +39,7 @@ namespace SEE.Game.UI.Tooltip
         /// The time it will take to fade out.
         /// </summary>
         private const float FADE_OUT_DURATION = FADE_IN_DURATION / 2;
-        
+
         /// <summary>
         /// The tooltip manager, which can (as its name implies) control tooltips.
         /// Note that this manager controls a single tooltip whose text can be changed. If multiple tooltips
@@ -51,12 +51,12 @@ namespace SEE.Game.UI.Tooltip
         /// The text mesh pro containing the actual tooltip text.
         /// </summary>
         private TextMeshProUGUI textComp;
-        
+
         /// <summary>
         /// The canvas group in which the tooltip is contained.
         /// </summary>
         private CanvasGroup canvasGroup;
-        
+
         /// <summary>
         /// The doTween sequence used for fading the tooltip in.
         /// </summary>
@@ -74,13 +74,13 @@ namespace SEE.Game.UI.Tooltip
         /// <param name="text">The text which shall be displayed in the tooltip.</param>
         /// <param name="delay">The time after which the tooltip should start fading in.</param>
         /// <exception cref="ArgumentException">If <paramref name="delay"/> is negative.</exception>
-        public void Show(string text, float delay = FADE_IN_DURATION*2)
+        public void Show(string text, float delay = FADE_IN_DURATION * 2)
         {
             if (delay < 0f)
             {
                 throw new ArgumentException($"{nameof(delay)} must be a positive number!");
             }
-            
+
             if (HasStarted)
             {
                 fadeIn = DOTween.Sequence();
@@ -93,13 +93,25 @@ namespace SEE.Game.UI.Tooltip
                 fadeIn.AppendCallback(() => textComp.text = text);
                 fadeIn.AppendInterval(Mathf.Max(delay - FADE_OUT_DURATION, 0f));
                 // Move to top of layer hierarchy, which is at the bottom
-                fadeIn.AppendCallback(TooltipManager.gameObject.transform.SetAsLastSibling);
-                fadeIn.Append(DOTween.To(() => canvasGroup.alpha, a => canvasGroup.alpha = a, 1f, FADE_IN_DURATION));
-                fadeIn.Play();
+
+                fadeIn.AppendCallback(SetLastSibling);
+                fadeIn.Append(DOTween.To(() => canvasGroup != null ? canvasGroup.alpha : 0f, a => {
+                    if (canvasGroup != null)
+                    {
+                        canvasGroup.alpha = a;
+                    }
+                }, 1f, FADE_IN_DURATION)); fadeIn.Play();
             }
             else
             {
                 textBeforeStart = text;
+            }
+            void SetLastSibling()
+            {
+                if (TooltipManager != null && TooltipManager.gameObject != null)
+                {
+                    TooltipManager.gameObject.transform.SetAsLastSibling();
+                }
             }
         }
 
@@ -113,7 +125,12 @@ namespace SEE.Game.UI.Tooltip
             {
                 fadeIn?.Pause(); // if we're still fading in right now, we need to stop that
                 // Fade out
-                DOTween.To(() => canvasGroup.alpha, a => canvasGroup.alpha = a, 0f, FADE_OUT_DURATION);
+                DOTween.To(() => canvasGroup != null ? canvasGroup.alpha : 0f, a => {
+                    if (canvasGroup != null)
+                    {
+                        canvasGroup.alpha = a;
+                    }
+                }, 0f, FADE_OUT_DURATION);
             }
             else
             {
@@ -143,7 +160,8 @@ namespace SEE.Game.UI.Tooltip
                     if (textComp == null)
                     {
                         Debug.LogError("Couldn't find Description text component for tooltip.");
-                    } else if (textBeforeStart != null)
+                    }
+                    else if (textBeforeStart != null)
                     {
                         // Having initialized all necessary components, we can now show the Tooltip.
                         Show(textBeforeStart);
@@ -151,9 +169,10 @@ namespace SEE.Game.UI.Tooltip
                 }
             }
         }
-        
+
         private void OnDestroy()
         {
+            fadeIn.Kill();
             Destroy(tooltipGameObject);
         }
 
