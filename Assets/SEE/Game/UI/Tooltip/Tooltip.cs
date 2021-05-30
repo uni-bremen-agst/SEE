@@ -95,7 +95,8 @@ namespace SEE.Game.UI.Tooltip
                 // Move to top of layer hierarchy, which is at the bottom
 
                 fadeIn.AppendCallback(SetLastSibling);
-                fadeIn.Append(DOTween.To(() => canvasGroup != null ? canvasGroup.alpha : 0f, a => {
+                fadeIn.Append(DOTween.To(() => canvasGroup != null ? canvasGroup.alpha : 0f, a =>
+                {
                     if (canvasGroup != null)
                     {
                         canvasGroup.alpha = a;
@@ -125,7 +126,8 @@ namespace SEE.Game.UI.Tooltip
             {
                 fadeIn?.Pause(); // if we're still fading in right now, we need to stop that
                 // Fade out
-                DOTween.To(() => canvasGroup != null ? canvasGroup.alpha : 0f, a => {
+                DOTween.To(() => canvasGroup != null ? canvasGroup.alpha : 0f, a =>
+                {
                     if (canvasGroup != null)
                     {
                         canvasGroup.alpha = a;
