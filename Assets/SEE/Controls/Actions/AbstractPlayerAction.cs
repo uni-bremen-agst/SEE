@@ -1,4 +1,6 @@
 ﻿using SEE.Utils;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -10,6 +12,11 @@ namespace SEE.Controls.Actions
     /// </summary>
     public abstract class AbstractPlayerAction : ReversibleAction
     {
+        /// <summary>
+        /// The unique ID of an action.
+        /// </summary>
+        private readonly Guid id = Guid.NewGuid();
+
         /// <summary>
         /// The object that the cursor hovers over.
         /// </summary>
@@ -122,6 +129,21 @@ namespace SEE.Controls.Actions
         public ReversibleAction.Progress CurrentProgress()
         {
             return currentState;
+        }
+
+        /// <summary>
+        /// Returns the IDs of all gameObjects manipulated by the specific action.
+        /// </summary>
+        /// <returns>All IDs of manipulated gameObjects</returns>
+        public abstract HashSet<string> GetChangedObjects();
+
+        /// <summary>
+        /// A getter for the ID of this action.
+        /// </summary>
+        /// <returns>The ID of this action as a string</returns>
+        public string GetId()
+        {
+            return id.ToString();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
@@ -90,8 +91,7 @@ namespace SEE.Controls.Actions
         /// <returns>new instance of <see cref="MappingAction"/></returns>
         internal static ReversibleAction CreateReversibleAction()
         {
-            MappingAction result = new MappingAction();
-            return result;
+            return new MappingAction();
         }
 
         /// <summary>
@@ -100,8 +100,7 @@ namespace SEE.Controls.Actions
         /// <returns>new copy of this</returns>
         public ReversibleAction NewInstance()
         {
-            MappingAction result = new MappingAction(this);
-            return result;
+            return new MappingAction(this);
         }
 
         public void Awake()
@@ -147,6 +146,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public void Undo()
         {
+            // TODO
             Debug.Log("UNDO MAPPING");
         }
 
@@ -155,6 +155,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public void Redo()
         {
+            // TODO
             Debug.Log("REDO MAPPING");
         }
 
@@ -192,7 +193,6 @@ namespace SEE.Controls.Actions
         /// Called by incremental reflexion for every change in the reflexion model
         /// by way of the observer protocol as a callback. Dispatches the event to
         /// the appropriate handling function.
-        /// 
         /// </summary>
         /// <param name="changeEvent">additional information about the change in the reflexion model</param>
         public void Update(ChangeEvent changeEvent)
@@ -389,11 +389,36 @@ namespace SEE.Controls.Actions
             return ActionStateType.Map;
         }
 
+        /// <summary>
+        /// Returns the set of IDs of all game objects changed by this action.
+        /// <see cref="ReversibleAction.GetChangedObjects"/>.
+        /// </summary>
+        /// <returns>The set of the IDs of all game objects changed by this action</returns>
+        public HashSet<string> GetChangedObjects()
+        {
+            // TODO
+            return new HashSet<string>();
+        }
+
+        /// <summary>
+        /// The unique ID of an action.
+        /// </summary>
+        private readonly string id = Guid.NewGuid().ToString();
+
+        /// <summary>
+        /// The unique ID of this action.
+        /// <see cref="ReversibleAction.GetId"/>.
+        /// </summary>
+        /// <returns>unique ID</returns>
+        public string GetId()
+        {
+            return id;
+        }
+
         public ReversibleAction.Progress CurrentProgress()
         {
             // FIXME
-            ReversibleAction.Progress result = ReversibleAction.Progress.NoEffect;
-            return result;
+            return ReversibleAction.Progress.NoEffect;
         }
 
         #endregion

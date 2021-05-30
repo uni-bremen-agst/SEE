@@ -2,6 +2,7 @@
 using SEE.GO;
 using SEE.Utils;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -173,6 +174,18 @@ namespace SEE.Controls.Actions
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.Draw;
+        }
+
+        /// <summary>
+        /// The set of IDs of all gameObjects changed by this action.
+        /// <see cref="ReversibleAction.GetActionStateType"/>
+        /// Because this action does not actually change any game object, 
+        /// an empty set is always returned.
+        /// </summary>
+        /// <returns>an empty set</returns>
+        public override HashSet<string> GetChangedObjects()
+        {
+            return new HashSet<string>();
         }
     }
 }
