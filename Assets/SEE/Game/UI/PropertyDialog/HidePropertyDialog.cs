@@ -196,7 +196,7 @@ namespace SEE.Game.UI.PropertyDialog
             bHideAllEdgesOfSelected.Description = "Hides the edges for all selected nodes.";
             bHideAllEdgesOfSelected.buttonColor = Color.magenta.Darker();
             bHideAllEdgesOfSelected.Value = HideModeSelector.HideAllEdgesOfSelected;
-            bHideAllEdgesOfSelected.selectionType = HideModeSelector.SelectMultiple;
+            bHideAllEdgesOfSelected.selectionType = HideModeSelector.SelectSingle;
 
             bHighlightConnectingEdges = dialog.AddComponent<ButtonProperty>();
             bHighlightConnectingEdges.Name = "Highlight connecting edges";
