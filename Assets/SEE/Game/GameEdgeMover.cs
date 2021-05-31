@@ -67,12 +67,6 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="node">The node whose edges are to be recalculated</param>
-        ///
-
-        /// <summary>
         /// Searches for all children nodes of the passed node and calculates for their incoming and outgoing edges
         /// the corresponding new positions and finally moves those edges to the calculated positions.
         /// </summary>
@@ -95,7 +89,6 @@ namespace SEE.Game
                     }
                 }
             }
-
             HashSet<(GameObject, GameObject, string)> backupSourceTargetEdge = new HashSet<(GameObject, GameObject, string)>();
 
             foreach (Node nodeToBeRedrawn in nodeList)
@@ -137,16 +130,7 @@ namespace SEE.Game
             }
             if (allNodes)
             {
-                // Delete all old edges.
-                foreach ((GameObject, GameObject, string) element in backupSourceTargetEdge)
-                {
-                    GameEdgeAdder.Remove(GameObject.Find(element.Item3));
-                }
-                //Create all new edges
-                foreach ((GameObject, GameObject, string) element in backupSourceTargetEdge)
-                {
-                    GameEdgeAdder.Add(element.Item1, element.Item2, element.Item3);
-                }
+                redrawEdges(backupSourceTargetEdge);
             }
             else
             {
@@ -171,6 +155,28 @@ namespace SEE.Game
                 {
                     GameEdgeAdder.Add(element.Item1, element.Item2, element.Item3);
                 }
+                redrawEdges(sourceTargetEdgeWithinSameSubset);
+            }
+        }
+
+        /// <summary>
+        /// Deletes all edges in the set and then draws them at their new position.
+        /// </summary>
+        /// <param name="edges">The edges that are to be redrawn</param>
+        private static void redrawEdges(ISet<(GameObject, GameObject, string)> edges)
+        {
+            // Delete all old edges.
+            foreach ((GameObject, GameObject, string) element in edges)
+            {
+                //Removes the edge form the graph
+                GameEdgeAdder.Remove(GameObject.Find(element.Item3));
+                //Removes the edge-gameobject 
+                Object.Destroy(GameObject.Find(element.Item3));
+            }
+            //Create all new edges
+            foreach ((GameObject, GameObject, string) element in edges)
+            {
+                GameEdgeAdder.Add(element.Item1, element.Item2, element.Item3);
             }
         }
     }
