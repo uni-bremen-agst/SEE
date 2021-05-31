@@ -102,6 +102,20 @@ namespace SEE.Controls.Actions
         public CreateReversibleAction CreateReversible { get; }
 
         /// <summary>
+        /// Constructor allowing to set <see cref="CreateReversible"/>.
+        /// 
+        /// This constructor is needed for the test cases which implement
+        /// their own variants of <see cref="ReversibleAction"/> and 
+        /// which need to provide an <see cref="ActionStateType"/> of
+        /// their own.
+        /// </summary>
+        /// <param name="createReversible">value for <see cref="CreateReversible"/></param>
+        protected ActionStateType(CreateReversibleAction createReversible) 
+        {
+            CreateReversible = createReversible;
+        }
+
+        /// <summary>
         /// Constructor for ActionStateType.
         /// Because this class replaces an enum, values of this class may only be created inside of it,
         /// hence the visibility modifier is set to private.

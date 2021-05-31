@@ -1,12 +1,9 @@
 ﻿using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
+using System.Collections.Generic;
 using System;
 using UnityEngine;
-using System.Collections.Generic;
-using SEE.DataModel.DG;
-using SEE.DataModel;
-using System.Linq;
 
 namespace SEE.Controls.Actions
 {
@@ -251,7 +248,7 @@ namespace SEE.Controls.Actions
                 {
                     DrawGamingGizmos();
                 }
-                if (SEEInput.Drag())
+                if (SEEInput.Scale())
                 {
                     if (draggedSphere == null && Raycasting.RaycastAnything(out RaycastHit raycastHit))
                     {
@@ -672,6 +669,18 @@ namespace SEE.Controls.Actions
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Returns all IDs of gameObjects manipulated by this action.
+        /// </summary>
+        /// <returns>all IDs of gameObjects manipulated by this action</returns>
+        public override HashSet<string> GetChangedObjects()
+        {
+            return new HashSet<string>()
+            {
+                objectToScale.name
+            };
         }
     }
 }

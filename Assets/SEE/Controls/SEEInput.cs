@@ -151,6 +151,19 @@ namespace SEE.Controls
         }
 
         //-----------------------------------------------------
+        // Manipulating nodes
+        //-----------------------------------------------------
+
+        /// <summary>
+        /// The user wants to scale a selected node.
+        /// </summary>
+        /// <returns>true if the user requests this action</returns>
+        internal static bool Scale()
+        {
+            return Input.GetMouseButton(0);
+        }
+
+        //-----------------------------------------------------
         // Navigation in a code city
         //-----------------------------------------------------
 

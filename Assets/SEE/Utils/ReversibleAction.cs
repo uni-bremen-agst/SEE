@@ -1,4 +1,5 @@
 ﻿using SEE.Controls.Actions;
+using System.Collections.Generic;
 
 namespace SEE.Utils
 {
@@ -118,6 +119,18 @@ namespace SEE.Utils
         /// Assertion: This action is in state <see cref="Progress.Completed"/>.
         /// </summary>
         void Redo();
+
+        /// <summary>
+        /// Returns the ID of this action.
+        /// </summary>
+        /// <returns>the ID of this action</returns>
+        string GetId();
+
+        /// <summary>
+        /// Returns the list of IDs of all game objects changed by this action.
+        /// </summary>
+        /// <returns>The list of the IDs of all game objects changed by this action</returns>
+        HashSet<string> GetChangedObjects();
 
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.

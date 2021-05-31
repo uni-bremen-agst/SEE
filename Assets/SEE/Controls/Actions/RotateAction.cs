@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 ﻿using SEE.Game;
 using SEE.Game.UI3D;
 using SEE.GO;
@@ -65,6 +66,17 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Returns the set of IDs of all game objects changed by this action.
+        /// <see cref="ReversibleAction.GetChangedObjects"/>
+        /// </summary>
+        /// <returns>empty set because this action does not change anything</returns>
+        public override HashSet<string> GetChangedObjects()
+        {
+            return new HashSet<string>();
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="RotateAction"/>.
         /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
         /// <returns>always false</returns>
