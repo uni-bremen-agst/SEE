@@ -99,7 +99,8 @@ namespace SEE.Net.Dashboard
         /// If <see cref="Success"/> is <c>false</c>, an error will be thrown.
         /// </summary>
         /// <param name="strict">Whether a mismatch between the received data and the corresponding
-        /// C# object it is deserialized to should cause an exception.</param>
+        /// C# object it is deserialized to should cause an exception. Specifically,
+        /// if the received data has more fields than the C# object, not the other way around.</param>
         /// <typeparam name="T">The serializable type the data should be deserialized to.</typeparam>
         /// <returns>An object of type <typeparamref name="T"/> filled with the received data of the dashboard API.
         /// </returns>

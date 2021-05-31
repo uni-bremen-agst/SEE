@@ -1,6 +1,7 @@
 ﻿using System;
+using Newtonsoft.Json;
 
-namespace SEE.Net.Dashboard.Model
+namespace SEE.Net.Dashboard.Model.Issues
 {
     /// <summary>
     /// An issue representing a metric violation.
@@ -68,6 +69,12 @@ namespace SEE.Net.Dashboard.Model
         /// </summary>
         public readonly int value;
 
+        public MetricViolationIssue()
+        {
+            // Necessary for generics shenanigans in IssueRetriever.
+        }
+
+        [JsonConstructor]
         public MetricViolationIssue(string severity, string entity, string entityType, string path, uint line, 
                                     string linkName, string metric, string errorNumber, string description, 
                                     int max, int min, int value)

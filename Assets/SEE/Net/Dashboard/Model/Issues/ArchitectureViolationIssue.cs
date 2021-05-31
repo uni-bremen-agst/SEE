@@ -1,6 +1,7 @@
 ﻿using System;
+using Newtonsoft.Json;
 
-namespace SEE.Net.Dashboard.Model
+namespace SEE.Net.Dashboard.Model.Issues
 {
     /// <summary>
     /// An issue representing architecture violations.
@@ -103,6 +104,12 @@ namespace SEE.Net.Dashboard.Model
         /// </summary>
         public readonly string targetLinkName;
 
+        public ArchitectureViolationIssue()
+        {
+            // Necessary for generics shenanigans in IssueRetriever.
+        }
+
+        [JsonConstructor]
         protected ArchitectureViolationIssue(string architectureSource, string architectureSourceType, 
                                              string architectureSourceLinkName, string architectureTarget, 
                                              string architectureTargetType, string architectureTargetLinkName, 

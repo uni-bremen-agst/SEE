@@ -1,6 +1,7 @@
 ﻿using System;
+using Newtonsoft.Json;
 
-namespace SEE.Net.Dashboard.Model
+namespace SEE.Net.Dashboard.Model.Issues
 {
     /// <summary>
     /// An issue representing a dead entity.
@@ -32,7 +33,13 @@ namespace SEE.Net.Dashboard.Model
         /// The internal name of the corresponding entity
         /// </summary>
         public readonly string linkName;
+        
+        public DeadEntityIssue()
+        {
+            // Necessary for generics shenanigans in IssueRetriever.
+        }
 
+        [JsonConstructor]
         protected DeadEntityIssue(string entity, string entityType, string path, uint line, string linkName)
         {
             this.entity = entity;

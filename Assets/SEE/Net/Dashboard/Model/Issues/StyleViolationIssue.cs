@@ -1,6 +1,7 @@
 ﻿using System;
+using Newtonsoft.Json;
 
-namespace SEE.Net.Dashboard.Model
+namespace SEE.Net.Dashboard.Model.Issues
 {
     /// <summary>
     /// An issue representing a style violation.
@@ -43,6 +44,12 @@ namespace SEE.Net.Dashboard.Model
         /// </summary>
         public readonly uint line;
 
+        public StyleViolationIssue()
+        {
+            // Necessary for generics shenanigans in IssueRetriever.
+        }
+
+        [JsonConstructor]
         public StyleViolationIssue(string severity, string provider, string errorNumber, string message, string entity, 
                                    string path, uint line)
         {

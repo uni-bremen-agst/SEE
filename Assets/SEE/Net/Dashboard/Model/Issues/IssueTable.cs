@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
-namespace SEE.Net.Dashboard.Model
+namespace SEE.Net.Dashboard.Model.Issues
 {
     /// <summary>
     /// Result of querying the issue-list retrieval entry point mainly containing a list of issues.
@@ -13,11 +14,13 @@ namespace SEE.Net.Dashboard.Model
         /// The version of the removed issues.
         /// If the query was not an actual diff query this will be unset.
         /// </summary>
+        [JsonProperty(Required = Required.Default)]
         public readonly AnalysisVersion startVersion;
 
         /// <summary>
         /// The version of the added issues for a diff query or simply the version of a normal issue list query (no startVersion)
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly AnalysisVersion endVersion;
 
         /// <summary>
@@ -27,6 +30,7 @@ namespace SEE.Net.Dashboard.Model
         /// This only contains a subset of the complete data if paging is enabled via <c>offset</c> and <c>limit</c>.
         /// </summary>
         /// <typeparam name="T">Type of the issue. If this is unknown, simply use <see cref="Issue"/>.</typeparam>
+        [JsonProperty(Required = Required.Always)]
         public readonly IList<T> rows;
 
         /// <summary>
@@ -36,6 +40,7 @@ namespace SEE.Net.Dashboard.Model
         /// Only available when <c>computeTotalRowCount</c> was specified as <c>true</c>.
         /// Mostly useful when doing paged queries using the query parameters <c>limit</c> and <c>offset</c>.
         /// </remarks>
+        [JsonProperty(Required = Required.Default)]
         public readonly uint totalRowCount;
 
         /// <summary>
@@ -44,6 +49,7 @@ namespace SEE.Net.Dashboard.Model
         /// <remarks>
         /// Only useful in diff queries and only calculated when <c>computeTotalRowCount</c> was specified as <c>true</c>.
         /// </remarks>
+        [JsonProperty(Required = Required.Default)]
         public readonly uint totalAddedCount;
 
         /// <summary>
@@ -52,6 +58,7 @@ namespace SEE.Net.Dashboard.Model
         /// <remarks>
         /// Only useful in diff queries and only calculated when <c>computeTotalRowCount</c> was specified as <c>true</c>.
         /// </remarks>
+        [JsonProperty(Required = Required.Default)]
         public readonly uint totalRemovedCount;
 
         public IssueTable(AnalysisVersion startVersion, AnalysisVersion endVersion, IList<T> rows, 

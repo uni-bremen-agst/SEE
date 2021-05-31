@@ -1,6 +1,7 @@
 ﻿using System;
+using Newtonsoft.Json;
 
-namespace SEE.Net.Dashboard.Model
+namespace SEE.Net.Dashboard.Model.Issues
 {
     /// <summary>
     /// An issue representing a clone.
@@ -63,6 +64,12 @@ namespace SEE.Net.Dashboard.Model
         /// </summary>
         public readonly int rightWeight;
 
+        public CloneIssue()
+        {
+            // Necessary for generics shenanigans in IssueRetriever.
+        }
+
+        [JsonConstructor]
         public CloneIssue(int cloneType, string leftPath, uint leftLine, uint leftEndLine, uint leftLength, 
                           int leftWeight, string rightPath, uint rightLine, uint rightEndLine, uint rightLength,
                           int rightWeight)
