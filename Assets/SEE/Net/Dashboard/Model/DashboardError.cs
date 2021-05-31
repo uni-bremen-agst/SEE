@@ -38,7 +38,7 @@ namespace SEE.Net.Dashboard.Model
         /// understand and communicate certain types of error to the user.
         /// Always inspect the type so you know what keys you can expect.
         /// </summary>
-        [JsonProperty(Required = Required.AllowNull)]
+        [JsonProperty(Required = Required.Default)]
         public readonly DashboardErrorData data;
 
         public DashboardError(string dashboardVersionNumber, string type, string message, string localizedMessage, DashboardErrorData data)

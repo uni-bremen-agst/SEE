@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using Cysharp.Threading.Tasks;
 using SEE.Game.UI.Notification;
-using SEE.Net.Dashboard.Model;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -14,7 +16,7 @@ namespace SEE.Net.Dashboard
     /// <summary>
     /// Can retrieve information from the Axivion Dashboard API.
     /// </summary>
-    public class DashboardRetriever
+    public partial class DashboardRetriever
     {
         /// <summary>
         /// The public key for the X.509 certificate authority from the dashboard's certificate.
@@ -32,10 +34,10 @@ namespace SEE.Net.Dashboard
         public static string Token { private get; set; }
 
         /// <summary>
-        /// When true, receiving Dashboard models which don't match the C# models will throw an error
-        /// instead of silently assigning default values to the fields.
+        /// When true, receiving Dashboard models which have more fields than the C# models will throw an error
+        /// instead of silently ignoring the extra fields.
         /// </summary>
-        public static bool StrictMode = true;
+        public static bool StrictMode = false;
         
         /// <summary>
         /// Lazy wrapper around the instance of this object.
@@ -61,12 +63,12 @@ namespace SEE.Net.Dashboard
         /// </param>
         /// <param name="queryParameters">A dictionary containing the query parameters' names and values.</param>
         /// <returns>The result of the API call.</returns>
-        public async UniTask<DashboardResult> GetAtPath(string path, Dictionary<string, string> queryParameters = null)
+        private static async UniTask<DashboardResult> GetAtPath(string path, Dictionary<string, string> queryParameters = null)
         {
             string requestUrl = BaseUrl + path;
             if (queryParameters != null)
             {
-                requestUrl += UnityWebRequest.SerializeSimpleForm(queryParameters);
+                requestUrl += "?" + Encoding.UTF8.GetString(UnityWebRequest.SerializeSimpleForm(queryParameters));
             }
             UnityWebRequest request = UnityWebRequest.Get(requestUrl);
             request.certificateHandler = new AxivionCertificateHandler();
@@ -86,43 +88,41 @@ namespace SEE.Net.Dashboard
         }
 
         /// <summary>
-        /// Retrieves dashboard information from the dashboard configured for this <see cref="DashboardRetriever"/>.
-        /// IMPORTANT NOTE: This will only work if your token has full permissions, i.e., when it's not just
-        /// an IDE token. If you simply want to retrieve the dashboard version, use
+        /// Queries the dashboard at the given <paramref name="path"/> with the given <paramref name="parameterValues"/>
+        /// and the parameter names of the caller.
+        /// <b>Do not pass the <paramref name="memberName"/> parameter, it will be automatically filled!</b>
         /// </summary>
-        /// <returns>Dashboard information about the queried dashboard.</returns>
-        public async UniTask<DashboardInfo> GetDashboardInfo()
+        /// <param name="path">The path to the Axivion dashboard API entry point that shall be queried.</param>
+        /// <param name="parameterValues">The values of the parameters of the caller.
+        /// <i>Need to be in the same order as in the calling method's signature.</i></param>
+        /// <param name="memberName"><i>Do not pass this parameter!</i>
+        /// Will be automatically filled with the caller's name.</param>
+        /// <typeparam name="T">The type of object that is returned by the API.</typeparam>
+        /// <returns>The queried object returned by the API.</returns>
+        /// <exception cref="DashboardException">If there was an error accessing the API entry point.</exception>
+        private async UniTask<T> QueryDashboard<T>(string path, IReadOnlyList<string> parameterValues, 
+                                                  [CallerMemberName] string memberName = "")
         {
-            DashboardResult result = await GetAtPath("/../../");
-            DashboardInfo info = result.RetrieveObject<DashboardInfo>(StrictMode);
-            return info;
-        }
-
-        /// <summary>
-        /// Returns the version number of the dashboard that's being queried.
-        /// </summary>
-        /// <returns>version number of the dashboard that's being queried.</returns>
-        /// <remarks>We first try to get this using <see cref="GetDashboardInfo"/>, but typical IDE tokens don't have
-        /// enough permissions to access that API endpoint. In that case, we instead deliberately cause an error by
-        /// trying to access it, because the version number is supplied in the <see cref="DashboardError"/> object.
-        /// </remarks>
-        public async UniTask<DashboardVersion> GetDashboardVersion()
-        {
-            DashboardVersion version;
-            try
+            // Magically retrieve parameter names from caller
+            ParameterInfo[] callerParameters = GetType().GetMethod(memberName)?.GetParameters();
+            if (callerParameters == null)
             {
-                version = new DashboardVersion((await GetDashboardInfo()).dashboardVersionNumber);
-            }
-            catch (DashboardException e)
-            {
-                if (e.Error == null)
-                {
-                    throw;
-                }
-                version = new DashboardVersion(e.Error.dashboardVersionNumber);
+                throw new InvalidOperationException("Couldn't retrieve parameter names from caller. "
+                                                    + "Make sure this method is private, otherwise it won't work.");
             }
 
-            return version;
+            if (callerParameters.Length != parameterValues.Count)
+            {
+                throw new ArgumentException($"{parameterValues} must have the same number of items as the caller's parameters!");
+            }
+
+            // Map parameter names to parameter values
+            Dictionary<string, string> queryParameters = callerParameters.Where(x => parameterValues[x.Position] != null)
+                                                                         .ToDictionary(x => x.Name, x => parameterValues[x.Position]);
+                                                                         
+            // Finally, actually query the dashboard
+            DashboardResult result = await GetAtPath(path, queryParameters);
+            return result.RetrieveObject<T>(StrictMode);
         }
 
         /// <summary>

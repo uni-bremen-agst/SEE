@@ -1,6 +1,7 @@
 ﻿using System;
+using Newtonsoft.Json;
 
-namespace SEE.Net.Dashboard.Model
+namespace SEE.Net.Dashboard.Model.Issues
 {
     /// <summary>
     /// An issue representing cyclic dependencies.
@@ -63,6 +64,12 @@ namespace SEE.Net.Dashboard.Model
         /// </summary>
         public readonly string targetLinkName;
 
+        public CycleIssue()
+        {
+            // Necessary for generics shenanigans in IssueRetriever.
+        }
+
+        [JsonConstructor]
         protected CycleIssue(string dependencyType, string sourceEntity, string sourceEntityType, 
                              string sourcePath, uint sourceLine, string sourceLinkName, string targetEntity, 
                              string targetEntityType, string targetPath, uint targetLine, string targetLinkName)

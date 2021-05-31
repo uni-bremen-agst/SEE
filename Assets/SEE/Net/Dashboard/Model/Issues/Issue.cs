@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
-namespace SEE.Net.Dashboard.Model
+namespace SEE.Net.Dashboard.Model.Issues
 {
     /// <summary>
     /// Contains information about an issue in the source code.
@@ -10,6 +12,72 @@ namespace SEE.Net.Dashboard.Model
     public class Issue
     {
         // A note: Due to how the JSON serializer works with inheritance, fields in here can't be readonly.
+
+        /// <summary>
+        /// Represents the state of an issue.
+        /// </summary>
+        public enum IssueState
+        {
+            added, changed, removed  // note: names must be lowercase for the serialization to work
+        }
+
+        /// <summary>
+        /// The issue kind.
+        /// </summary>
+        public enum IssueKind
+        {
+            // Note: The abbreviations have to be used here instead of the full name, otherwise serialization
+            // won't work.
+            
+            /// <summary>
+            /// Special fallback value, used if issue kind could not be determined.
+            /// </summary>
+            Unknown,
+            
+            /// <summary>
+            /// Architecture violations.
+            /// </summary>
+            AV, 
+            
+            /// <summary>
+            /// Clones.
+            /// </summary>
+            CL, 
+            
+            /// <summary>
+            /// Cycles.
+            /// </summary>
+            CY, 
+            
+            /// <summary>
+            /// Dead Entities.
+            /// </summary>
+            DE, 
+            
+            /// <summary>
+            /// Metric Violations.
+            /// </summary>
+            MV, 
+            
+            /// <summary>
+            /// Style Violations.
+            /// </summary>
+            SV
+        }
+
+        /// <summary>
+        /// The kind of issue this is.
+        /// </summary>
+        public IssueKind kind => this switch 
+        { 
+            ArchitectureViolationIssue _ => IssueKind.AV,
+            CloneIssue _ => IssueKind.CL,
+            CycleIssue _ => IssueKind.CY,
+            DeadEntityIssue _ => IssueKind.DE,
+            MetricViolationIssue _ => IssueKind.MV,
+            StyleViolationIssue _ => IssueKind.SV,
+            _ => IssueKind.Unknown
+        };
         
         /// <summary>
         /// A kind-wide Id identifying the issue across analysis versions
@@ -21,7 +89,8 @@ namespace SEE.Net.Dashboard.Model
         /// i.e. contained in the base-version but not any more in the current version or “Added”,
         /// i.e. it was not contained in the base-version but is contained in the current version
         /// </summary>
-        public string state;
+        [JsonConverter(typeof(StringEnumConverter))]
+        public IssueState state;
 
         /// <summary>
         /// Whether or not the issue is suppressed or disabled via a control comment.
@@ -58,10 +127,10 @@ namespace SEE.Net.Dashboard.Model
 
         protected Issue()
         {
-            
+            // Necessary for inheritance with Newtonsoft.Json to work properly
         }
 
-        public Issue(int id, string state, bool suppressed, string justification, 
+        public Issue(int id, IssueState state, bool suppressed, string justification, 
                      IList<IssueTag> tag, IList<IssueComment> comments, IList<UserRef> owners)
         {
             this.id = id;

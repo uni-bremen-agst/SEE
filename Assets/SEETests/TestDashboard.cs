@@ -2,6 +2,7 @@
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using SEE.Net.Dashboard;
+using SEE.Net.Dashboard.Model.Issues;
 using UnityEngine.TestTools;
 
 namespace SEETests
@@ -28,6 +29,7 @@ namespace SEETests
                                            + "75139D193B4DC4F2EB46FEE09495CCF67259A3F4516873612582B84512019A1157F621B46D4"
                                            + "5BCEE471BCE855C068B701F40C4CBB78F8E11550C83D7E6897967FD0B90C4BD25B0E3884492"
                                            + "66293CF52814112B7F1A95A8EC3D6CBB5567B6B0916A995D5EB8254E31647B2F810203010001";
+            DashboardRetriever.StrictMode = false;
         }
         
         [UnityTest]
@@ -35,6 +37,13 @@ namespace SEETests
         {
             DashboardVersion version = await DashboardRetriever.Instance.GetDashboardVersion();
             Assert.AreEqual(version, DashboardVersion.SupportedVersion);
+        });
+
+        [UnityTest]
+        public IEnumerator testDashboardIssues() => UniTask.ToCoroutine(async () =>
+        {
+            IssueTable<CloneIssue> table = await DashboardRetriever.Instance.GetIssues<CloneIssue>(limit: 1);
+            Assert.IsNotNull(table);
         });
     }
 }
