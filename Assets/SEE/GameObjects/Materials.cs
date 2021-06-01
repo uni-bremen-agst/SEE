@@ -121,11 +121,11 @@ namespace SEE.GO
         {
             if (degree < 0 || degree >= NumberOfMaterials)
             {
-                throw new Exception("Color degree " + degree + " out of range [0," + (NumberOfMaterials - 1) + "]");
+                throw new Exception($"Color degree {degree} out of range [0, {(NumberOfMaterials - 1)}].");
             }
             if (renderQueueOffset < 0)
             {
-                throw new Exception("Render queue offset must not be negative");
+                throw new Exception("Render queue offset must not be negative.");
             }
             if (renderQueueOffset >= materials.Count)
             {
@@ -140,13 +140,14 @@ namespace SEE.GO
         public static Material New(string name, Color color, int renderQueueOffset = 0)
         {
             Material prefab = Resources.Load<Material>(name);
-            Assert.IsNotNull(prefab, "Material resource '" + name + "' could not be found!");
+            Assert.IsNotNull(prefab, $"Material resource '{name}' could not be found!");
             Material material = new Material(prefab)
             {
                 // FIXME this is not a good solution. we may want to add an enum or something for
                 // possible materials, such that we can ensure the correct renderQueue. that would
                 // adding new materials make easier as well.
-                renderQueue = (int) (name.Contains("Transparent") ? UnityEngine.Rendering.RenderQueue.Transparent : UnityEngine.Rendering.RenderQueue.Geometry) + renderQueueOffset,
+                renderQueue = (int) (name.Contains("Transparent") ? UnityEngine.Rendering.RenderQueue.Transparent 
+                                                                  : UnityEngine.Rendering.RenderQueue.Geometry) + renderQueueOffset,
                 color = color
             };
             return material;
