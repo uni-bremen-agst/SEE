@@ -43,15 +43,22 @@ namespace SEE.GO
             return Materials.NumberOfMaterials;
         }
 
+        /// <summary>
+        /// Sets the <paramref name="style"/> of given <paramref name="block"/>
+        /// assumed to be an inner node.
+        /// <see cref="NodeFactory.SetStyle(GameObject, int)"/>.
+        /// </summary>
+        /// <param name="block">game node whose style is to be set</param>
+        /// <param name="style">new style</param>
         public override void SetStyle(GameObject block, int style)
         {
-            Renderer renderer = block.GetComponent<Renderer>();
-            if (renderer != null)
+            if (block.TryGetComponent(out Renderer renderer))
             {
                 UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>());
                 UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>().Value);
                 int level = block.GetComponent<NodeRef>().Value.Level;
-                renderer.sharedMaterial = Materials.Get(level, Mathf.Clamp(style, 0, (int)NumberOfStyles() - 1));
+                int degree = Mathf.Clamp(style, 0, (int)NumberOfStyles() - 1);
+                renderer.sharedMaterial = Materials.Get(level, degree);
             }
         }
     }
