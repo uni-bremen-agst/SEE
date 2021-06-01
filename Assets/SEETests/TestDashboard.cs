@@ -8,6 +8,9 @@ using UnityEngine.TestTools;
 
 namespace SEETests
 {
+    /// <summary>
+    /// Class which tests the dashboard retrieval, i.e. everything in the <see cref="SEE.Net.Dashboard"/> namespace.
+    /// </summary>
     public class TestDashboard
     {
         /**
