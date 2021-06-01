@@ -12,56 +12,67 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// <summary>
         /// The type of the relation between source and target
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly string dependencyType;
 
         /// <summary>
         /// The source entity
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly string sourceEntity;
 
         /// <summary>
         /// The source entity type
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly string sourceEntityType;
 
         /// <summary>
         /// The source filename
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly string sourcePath;
 
         /// <summary>
         /// The source line number
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly uint sourceLine;
 
         /// <summary>
         /// The internal name of the corresponding entity
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly string sourceLinkName;
 
         /// <summary>
         /// The target entity
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly string targetEntity;
 
         /// <summary>
         /// The target entity type
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly string targetEntityType;
 
         /// <summary>
         /// The target filename
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly string targetPath;
 
         /// <summary>
         /// The target line number
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly uint targetLine;
 
         /// <summary>
         /// The internal name of the corresponding entity
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly string targetLinkName;
 
         public CycleIssue()

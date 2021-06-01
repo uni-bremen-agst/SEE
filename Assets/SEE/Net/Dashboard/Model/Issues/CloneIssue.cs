@@ -12,56 +12,67 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// <summary>
         /// The clone type
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly int cloneType;
             
         /// <summary>
         /// The filename of the left clone fragment
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly string leftPath;
             
         /// <summary>
         /// The start line number of the left clone fragment
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly uint leftLine;
 
         /// <summary>
         /// The end line number of the left clone fragment
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly uint leftEndLine;
 
         /// <summary>
         /// The number of lines of the left clone fragment
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly uint leftLength;
             
         /// <summary>
         /// The weight of the left clone fragment
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly int leftWeight;
 
         /// <summary>
         /// The filename of the right clone fragment
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly string rightPath;
             
         /// <summary>
         /// The start line number of the right clone fragment
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly uint rightLine;
 
         /// <summary>
         /// The end line number of the right clone fragment
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly uint rightEndLine;
 
         /// <summary>
         /// The number of lines of the right clone fragment
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly uint rightLength;
             
         /// <summary>
         /// The weight of the right clone fragment
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly int rightWeight;
 
         public CloneIssue()

@@ -62,11 +62,14 @@ namespace SEE.Net.Dashboard
         /// This path should not contain query parameters, which should be set via <paramref name="queryParameters"/>.
         /// </param>
         /// <param name="queryParameters">A dictionary containing the query parameters' names and values.</param>
+        /// <param name="apiPath">Whether the query path starts with <c>/api</c></param>
         /// <returns>The result of the API call.</returns>
-        private static async UniTask<DashboardResult> GetAtPath(string path, Dictionary<string, string> queryParameters = null)
+        private static async UniTask<DashboardResult> GetAtPath(string path, Dictionary<string, string> queryParameters = null,
+                                                                bool apiPath = true)
         {
-            string requestUrl = BaseUrl + path;
-            if (queryParameters != null)
+            string requestUrl = apiPath ? BaseUrl.Replace("/projects/", "/api/projects/") : BaseUrl;
+            requestUrl += path;
+            if (queryParameters != null && queryParameters.Count > 0)
             {
                 requestUrl += "?" + Encoding.UTF8.GetString(UnityWebRequest.SerializeSimpleForm(queryParameters));
             }
@@ -95,6 +98,7 @@ namespace SEE.Net.Dashboard
         /// <param name="path">The path to the Axivion dashboard API entry point that shall be queried.</param>
         /// <param name="parameterValues">The values of the parameters of the caller.
         /// <i>Need to be in the same order as in the calling method's signature.</i></param>
+        /// <param name="apiPath">Whether the query path starts with <c>/api</c></param>
         /// <param name="memberName"><i>Do not pass this parameter!</i>
         /// Will be automatically filled with the caller's name.</param>
         /// <typeparam name="T">The type of object that is returned by the API.</typeparam>
@@ -103,7 +107,7 @@ namespace SEE.Net.Dashboard
         /// <exception cref="ArgumentException">If the number of items in <paramref name="parameterValues"/>
         /// don't match the number of parameters from the caller.</exception>
         private async UniTask<T> QueryDashboard<T>(string path, IReadOnlyList<string> parameterValues, 
-                                                  [CallerMemberName] string memberName = "")
+                                                   bool apiPath = true, [CallerMemberName] string memberName = "")
         {
             if (path == null || parameterValues == null)
             {
@@ -127,7 +131,7 @@ namespace SEE.Net.Dashboard
                                                                          .ToDictionary(x => x.Name, x => parameterValues[x.Position]);
                                                                          
             // Finally, actually query the dashboard
-            return await QueryDashboard<T>(path, queryParameters);
+            return await QueryDashboard<T>(path, queryParameters, apiPath);
         }
 
         /// <summary>
@@ -135,11 +139,13 @@ namespace SEE.Net.Dashboard
         /// </summary>
         /// <param name="path">The path to the Axivion dashboard API entry point that shall be queried.</param>
         /// <param name="parameters">The query parameters that shall be used.</param>
+        /// <param name="apiPath">Whether the query path starts with <c>/api</c></param>
         /// <typeparam name="T">The type that is returned by the API call.</typeparam>
         /// <returns>The queried object of type <typeparamref name="T"/>.</returns>
-        private static async UniTask<T> QueryDashboard<T>(string path, Dictionary<string, string> parameters = null)
+        private static async UniTask<T> QueryDashboard<T>(string path, Dictionary<string, string> parameters = null, 
+                                                          bool apiPath = true)
         {
-            DashboardResult result = await GetAtPath(path, parameters);
+            DashboardResult result = await GetAtPath(path, parameters, apiPath);
             return result.RetrieveObject<T>(StrictMode);
         }
 

@@ -82,6 +82,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// <summary>
         /// A kind-wide Id identifying the issue across analysis versions
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public int id;
 
         /// <summary>
@@ -90,6 +91,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// i.e. it was not contained in the base-version but is contained in the current version
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
+        [JsonProperty(Required = Required.Default)]
         public IssueState state;
 
         /// <summary>
@@ -98,16 +100,19 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// <remarks>
         /// This column is only available for projects where importing of suppressed issues is configured
         /// </remarks>
+        [JsonProperty(Required = Required.Default)]
         public bool suppressed;
 
         /// <summary>
         /// The justification provided in the source-code via a control comment
         /// </summary>
+        [JsonProperty(Required = Required.AllowNull)]
         public string justification;
 
         /// <summary>
         /// Tags that are attached to the issue.
         /// </summary>
+        [JsonProperty(Required = Required.Default)]
         public IList<IssueTag> tag;
 
         /// <summary>
@@ -117,12 +122,14 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// This column is not available for CSV output.
         /// This column is not returned by default and must be explicitly requested via the “columns” parameter.
         /// </remarks>
+        [JsonProperty(Required = Required.Default)]
         public IList<IssueComment> comments;
 
         /// <summary>
         /// The dashboard users associated with the issue via VCS blaming, CI path mapping,
         /// CI user name mapping and dashboard user name mapping.
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public IList<UserRef> owners;
 
         protected Issue()
@@ -151,12 +158,14 @@ namespace SEE.Net.Dashboard.Model.Issues
             /// <summary>
             /// Use this for displaying the tag.
             /// </summary>
+            [JsonProperty(Required = Required.Always)]
             public readonly string tag;
 
             /// <summary>
             /// An RGB hex color in the form #RRGGBB directly usable by css.
             /// The colors are best suited to draw a label on bright background and to contain white letters for labeling.
             /// </summary>
+            [JsonProperty(Required = Required.Always)]
             public readonly string color;
 
             public IssueTag(string tag, string color)
@@ -175,27 +184,32 @@ namespace SEE.Net.Dashboard.Model.Issues
             /// <summary>
             /// The loginname of the user that created the comment.
             /// </summary>
+            [JsonProperty(Required = Required.Always)]
             public readonly string username;
 
             /// <summary>
             /// The recommended display name of the user that wrote the comment.
             /// </summary>
+            [JsonProperty(Required = Required.Always)]
             public readonly string userDisplayName;
 
             /// <summary>
             /// The Date when the comment was created.
             /// </summary>
+            [JsonProperty(Required = Required.Always)]
             public readonly DateTime date;
 
             /// <summary>
             /// The Date when the comment was created for UI-display.
             /// It is formatted as a human-readable string relative to query time, e.g. 2 minutes ago.
             /// </summary>
+            [JsonProperty(Required = Required.Always)]
             public readonly string displayDate;
 
             /// <summary>
             /// The comment text.
             /// </summary>
+            [JsonProperty(Required = Required.Always)]
             public readonly string text;
 
             /// <summary>
@@ -206,6 +220,7 @@ namespace SEE.Net.Dashboard.Model.Issues
             /// <remarks>
             /// This is never set when the Comment is returned as the result of an Issue-List query.
             /// </remarks>
+            [JsonProperty(Required = Required.Default)]
             public readonly string commentDeletionId;
 
             public IssueComment(string username, string userDisplayName, DateTime date, 

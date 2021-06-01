@@ -117,7 +117,7 @@ namespace SEE.Net.Dashboard
             }
             catch (Exception e) when (e is JsonSerializationException || e is JsonReaderException)
             {
-                Debug.LogError("Error encountered, given JSON was: " + json);
+                Debug.LogError($"Error encountered: {e.Message}.\nGiven JSON was: {json}");
                 throw;
             }
         }
