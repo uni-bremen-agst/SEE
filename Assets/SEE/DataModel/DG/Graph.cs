@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Object = System.Object;
 
 namespace SEE.DataModel.DG
@@ -31,6 +32,17 @@ namespace SEE.DataModel.DG
         /// </summary>
         public const string UnknownType = "";
 
+        /// <summary>
+        /// Indicates whether the node hierarchy has changed and, hence, 
+        /// the node levels and roots need to be recalculated. Rather than
+        /// re-calculating the levels and roots each time a new node is
+        /// added, we will re-calculate them only on demand, that is,
+        /// if the node levels or roots are requested. This may save time.
+        /// 
+        /// Note: This attribute should be set only by <see cref="Node"/>.
+        /// </summary>
+        public bool NodeHierarchyHasChanged = true;
+
         private int maxDepth = -1;
         /// <summary>
         /// The maximal depth of the node hierarchy. The maximal depth is the
@@ -45,9 +57,8 @@ namespace SEE.DataModel.DG
         { 
             get
             {
-                if (maxDepth < 0)
+                if (NodeHierarchyHasChanged)
                 {
-                    Debug.LogErrorFormat("Forgotten call to FinalizeGraph() for graph {0}\n", name);
                     FinalizeNodeHierarchy();
                 }
                 return maxDepth;
@@ -73,28 +84,26 @@ namespace SEE.DataModel.DG
         /// <param name="node"></param>
         public void AddNode(Node node)
         {
-            if (ReferenceEquals(node, null))
+            if (node == null)
             {
-                throw new Exception("node must not be null");
+                throw new Exception("A node added to a graph must not be null.");
             }
             if (string.IsNullOrEmpty(node.ID))
             {
-                throw new Exception("ID of a node must neither be null nor empty");
+                throw new Exception("ID of a node must neither be null nor empty.");
             }
             if (nodes.ContainsKey(node.ID))
             {
-                throw new Exception("ID '" + node.ID + "' is not unique:\n"
-                                    + node
-                                    + ".\nDuplicate already in graph: "
-                                    + nodes[node.ID]);
+                throw new Exception($"ID '{node.ID}' is not unique\n: {node}. \nDuplicate already in graph: {nodes[node.ID]}.");
             }
-            if (!ReferenceEquals(node.ItsGraph, null))
+            if (node.ItsGraph != null)
             {
-                throw new Exception("node " + node + " is already in a graph " + node.ItsGraph.Name);
+                throw new Exception($"Node {node.ID} is already in a graph {node.ItsGraph.Name}.");
             }
 
             nodes[node.ID] = node;
             node.ItsGraph = this;
+            NodeHierarchyHasChanged = true;
         }
 
         /// <summary>
@@ -106,19 +115,18 @@ namespace SEE.DataModel.DG
         /// <param name="node">node to be removed</param>
         public void RemoveNode(Node node)
         {
-            if (ReferenceEquals(node, null))
+            if (node == null)
             {
-                throw new Exception("node must not be null");
+                throw new Exception("A node to be removed from a graph must not be null.");
             }
 
             if (node.ItsGraph != this)
             {
-                if (ReferenceEquals(node.ItsGraph, null))
+                if (node.ItsGraph == null)
                 {
-                    throw new Exception("node " + node + " is not contained in any graph");
+                    throw new Exception($"Node {node} is not contained in any graph.");
                 }
-
-                throw new Exception("node " + node + " is contained in a different graph " + node.ItsGraph.Name);
+                throw new Exception($"Node {node} is contained in a different graph {node.ItsGraph.Name}.");
             }
 
             if (nodes.Remove(node.ID))
@@ -158,17 +166,13 @@ namespace SEE.DataModel.DG
                             node.Parent.AddChild(child);
                         }
                     }
-                    // Because the node hierarchy has changed, we need to re-calcuate
-                    // the levels. Note: We could do that incrementally if we wanted to
-                    // by traversing only the children of node instead of all nodes in 
-                    // the graph.
-                    FinalizeNodeHierarchy();
                 }
                 node.ItsGraph = null;
+                NodeHierarchyHasChanged = true;
             }
             else
             {
-                throw new Exception("node " + node + " is not contained in this graph " + Name);
+                throw new Exception($"Node {node} is not contained in this graph {Name}.");
             }
         }
 
@@ -185,12 +189,10 @@ namespace SEE.DataModel.DG
             {
                 throw new Exception("node must not be null");
             }
-
             if (String.IsNullOrEmpty(node.ID))
             {
                 throw new Exception("ID of a node must neither be null nor empty");
             }
-
             return nodes.ContainsKey(node.ID);
         }
 
@@ -209,12 +211,13 @@ namespace SEE.DataModel.DG
                 Node newRoot = new Node();
                 newRoot.SourceName = name;
                 newRoot.ID = name;
+                newRoot.Type = type;
                 AddNode(newRoot);
                 foreach (Node oldRoot in roots)
                 {
                     newRoot.AddChild(oldRoot);
                 }
-                FinalizeNodeHierarchy();
+                NodeHierarchyHasChanged = true;
             }
         }
 
@@ -229,12 +232,10 @@ namespace SEE.DataModel.DG
             {
                 throw new Exception("ID must neither be null nor empty");
             }
-
             if (nodes.TryGetValue(ID, out Node node))
             {
                 return node;
             }
-
             return null;
         }
 
@@ -249,12 +250,10 @@ namespace SEE.DataModel.DG
             {
                 throw new Exception("ID must neither be null nor empty");
             }
-
             if (edges.TryGetValue(ID, out Edge edge))
             {
                 return edge;
             }
-
             return null;
         }
 
@@ -271,24 +270,20 @@ namespace SEE.DataModel.DG
             {
                 throw new Exception("Edge must not be null.");
             }
-
             if (ReferenceEquals(edge.Source, null) || ReferenceEquals(edge.Target, null))
             {
                 throw new Exception("Source/target of this edge is null.");
             }
-
             if (ReferenceEquals(edge.ItsGraph, null))
             {
                 if (edge.Source.ItsGraph != this)
                 {
                     throw new Exception($"Source node {edge.Source} is not in the graph.");
                 }
-
                 if (edge.Target.ItsGraph != this)
                 {
                     throw new Exception($"Target node {edge.Target} is not in the graph.");
                 }
-
                 if (edges.ContainsKey(edge.ID))
                 {
                     throw new Exception($"There is already an edge with the ID {edge.ID}.");
@@ -315,17 +310,14 @@ namespace SEE.DataModel.DG
             {
                 throw new Exception("edge must not be null");
             }
-
             if (edge.ItsGraph != this)
             {
                 if (ReferenceEquals(edge.ItsGraph, null))
                 {
                     throw new Exception("edge " + edge + " is not contained in any graph");
                 }
-
                 throw new Exception("edge " + edge + " is contained in a different graph " + edge.ItsGraph.Name);
             }
-
             if (!edges.ContainsKey(edge.ID))
             {
                 throw new Exception("edge " + edge + " is not contained in graph " + Name);
@@ -384,6 +376,11 @@ namespace SEE.DataModel.DG
             return edges.Values.ToList();
         }
 
+        /// <summary>
+        /// Returns true if a node with the given <paramref name="ID"/> is part of the graph.
+        /// </summary>
+        /// <param name="ID">unique ID of the node searched</param>
+        /// <returns>true if a node with the given <paramref name="ID"/> is part of the graph</returns>
         public bool ContainsNode(string ID)
         {
             return nodes.ContainsKey(ID);
@@ -403,11 +400,50 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// The list of root nodes of this graph. Must be re-computed
+        /// whenever nodeHierarchyHasChanged becomes true.
+        /// </summary>
+        private readonly List<Node> roots = new List<Node>();
+
+        /// <summary>
         /// Returns the list of nodes without parent.
         /// </summary>
         /// <returns>root nodes of the hierarchy</returns>
-        public List<Node> GetRoots() // TODO(torben): this query could be cached to improve performance
+        public List<Node> GetRoots()
         {
+            if (NodeHierarchyHasChanged)
+            {
+                FinalizeNodeHierarchy();
+            }
+            return roots;
+#if false
+            // FIXME this method is called often, which is why it should be more performant.
+            // firstly, the result of this query could be cached to improve performance. this is
+            // only possible, if the graph is final and nodes do not change parents anymore.
+            // moreover, we could count the number of root nodes, create a list with appropriate
+            // capacity and then fill it. then, we could also use an array. this reduces the number
+            // of mallocs and potentially improves performance. profile the implementation below
+
+            Node[] values = nodes.Values.ToArray();
+            int capacity = 0;
+            int count = values.Length;
+            for (int i = 0; i < count; i++)
+            {
+                if (values[i].IsRoot())
+                {
+                    capacity++;
+                }
+            }
+            List<Node> result = new List<Node>(capacity);
+            for (int i = 0; i < count; i++)
+            {
+                if (values[i].IsRoot())
+                {
+                    result.Add(values[i]);
+                }
+            }
+            return result;
+//#else
             List<Node> result = new List<Node>();
             foreach (Node node in nodes.Values)
             {
@@ -417,6 +453,7 @@ namespace SEE.DataModel.DG
                 }
             }
             return result;
+#endif
         }
 
         /// <summary>
@@ -555,10 +592,12 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Sets the level of each node in the graph. The level of a root node is 0.
         /// For all other nodes, the level is the level of its parent + 1.
+        /// 
+        /// Precondition: <see cref="roots"/> is up to date.
         /// </summary>
         private void CalculateLevels()
         {
-            foreach (Node root in GetRoots())
+            foreach (Node root in roots)
             {
                 root.SetLevel(0);
             }
@@ -567,15 +606,40 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Sets the levels of all nodes and the maximal depth of the graph. 
         /// 
-        /// Note: This method must be called after the graph has been fully 
-        /// loaded and before any client is accessing MaxDepth or the Level
-        /// of any node in the graph.
+        /// Note: This method should be called only by <see cref="Node"/>.
         /// </summary>
-        public void FinalizeNodeHierarchy()
+        internal void FinalizeNodeHierarchy()
         {
-            CalculateLevels();
+            Assert.IsTrue(NodeHierarchyHasChanged);
+            GatherRoots();
+            CalculateLevels();            
+            maxDepth = CalcMaxDepth(roots, -1);
+            NodeHierarchyHasChanged = false;
+            /// Note: SetLevelMetric just propagates the newly calculated node levels
+            /// to the metric attribute. It can be called when that level is known.
+            /// It must be called after NodeHierarchyHasChanged has been set to false,
+            /// otherwise we will run into an endless loop because querying the level
+            /// attribute will trigger <see cref="FinalizeNodeHierarchy"/> again.
             SetLevelMetric();
-            maxDepth = CalcMaxDepth(GetRoots(), -1);
+        }
+
+        /// <summary>
+        /// Recalculates <see cref="roots"/>, that is, clears the set of 
+        /// <see cref="roots"/> and adds every node without a parent to it.
+        /// </summary>
+        private void GatherRoots()
+        {
+            if (NodeHierarchyHasChanged)
+            {
+                roots.Clear();
+                foreach (Node node in nodes.Values)
+                {
+                    if (node.Parent == null)
+                    {
+                        roots.Add(node);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -609,10 +673,12 @@ namespace SEE.DataModel.DG
             base.HandleCloned(clone);
             Graph target = (Graph)clone;
             target.name = name;
-            target.path = path;
+            target.path = path;            
             CopyNodesTo(target);
             CopyEdgesTo(target);
             CopyHierarchy(this, target);
+            target.NodeHierarchyHasChanged = true;
+            target.FinalizeNodeHierarchy();
         }
 
         private void CopyNodesTo(Graph target)
@@ -667,7 +733,6 @@ namespace SEE.DataModel.DG
                     throw new Exception("target graph does not have a node with ID " + fromRoot.ID);
                 }
             }
-            toGraph.FinalizeNodeHierarchy();
         }
 
         /// <summary>

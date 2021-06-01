@@ -94,7 +94,7 @@ namespace SEE.Game.Charts.VR
         {
             base.Awake();
             Transform parent = transform.parent;
-            // TODO(torben): vvv
+            // FIXME the line below was here before refactoring charts and needs to be reintroduced for VR
             //_parent = parent.GetComponent<ChartContent>().parent.transform;
             _pointerCamera = GameObject.FindGameObjectWithTag("Pointer").GetComponent<Camera>();
             _chartContent = parent.GetComponent<ChartContentVr>();

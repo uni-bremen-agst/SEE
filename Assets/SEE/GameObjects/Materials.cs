@@ -143,7 +143,9 @@ namespace SEE.GO
             Assert.IsNotNull(prefab, "Material resource '" + name + "' could not be found!");
             Material material = new Material(prefab)
             {
-                // TODO(torben): This is not a good solution!
+                // FIXME this is not a good solution. we may want to add an enum or something for
+                // possible materials, such that we can ensure the correct renderQueue. that would
+                // adding new materials make easier as well.
                 renderQueue = (int) (name.Contains("Transparent") ? UnityEngine.Rendering.RenderQueue.Transparent : UnityEngine.Rendering.RenderQueue.Geometry) + renderQueueOffset,
                 color = color
             };

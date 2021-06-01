@@ -26,6 +26,7 @@ namespace SEE.Controls
 
         private void Start()
         {
+            lastAxis = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
             Camera mainCamera = MainCamera.Camera;
             if (focusedObject != null)
             {                

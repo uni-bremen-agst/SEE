@@ -62,6 +62,9 @@ namespace SEE.Controls.Actions
             new ActionStateType(9, "Draw", "Draw a line",
                         Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                         DrawAction.CreateReversibleAction);
+        public static ActionStateType Hide { get; } =
+            new ActionStateType(10, "Hide Node", "Hides a node",
+                               Color.yellow.Darker(), "Materials/ModernUIPack/Eye", HideAction.CreateReversibleAction);
         #endregion
 
         /// <summary>
@@ -100,6 +103,20 @@ namespace SEE.Controls.Actions
         /// May be null if none needs to be created (in which case this delegate will not be called).
         /// </summary>
         public CreateReversibleAction CreateReversible { get; }
+
+        /// <summary>
+        /// Constructor allowing to set <see cref="CreateReversible"/>.
+        /// 
+        /// This constructor is needed for the test cases which implement
+        /// their own variants of <see cref="ReversibleAction"/> and 
+        /// which need to provide an <see cref="ActionStateType"/> of
+        /// their own.
+        /// </summary>
+        /// <param name="createReversible">value for <see cref="CreateReversible"/></param>
+        protected ActionStateType(CreateReversibleAction createReversible) 
+        {
+            CreateReversible = createReversible;
+        }
 
         /// <summary>
         /// Constructor for ActionStateType.

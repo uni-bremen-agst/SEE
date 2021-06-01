@@ -45,7 +45,7 @@ namespace SEE.Game.Charts.VR
         /// FIXME: Obsolete. Should be removed. Is this used in the prefab?
         /// A checkbox to toggle the <see cref="ChartManager.selectionMode"/>.
         /// </summary>
-        [SerializeField] private Toggle selectionToggle; // TODO(torben): remove?
+        [SerializeField] private Toggle selectionToggle;
 
         /// <summary>
         /// Activates the <see cref="selectionToggle"/>.
@@ -66,7 +66,7 @@ namespace SEE.Game.Charts.VR
         {
             foreach (ChartMarker marker in activeMarkers)
             {
-                Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition; // TODO(torben): could i just use marker.transform.[...]?
+                Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
                 if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                 {
                     List<uint> ids = marker.ids;

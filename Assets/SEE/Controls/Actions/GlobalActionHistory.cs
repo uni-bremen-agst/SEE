@@ -1,4 +1,5 @@
 ﻿using SEE.Utils;
+using static SEE.Utils.ActionHistory;
 
 namespace SEE.Controls.Actions
 {
@@ -6,7 +7,7 @@ namespace SEE.Controls.Actions
     /// This class manages the history of actions triggered by the player and that
     /// can be undone and re-done.
     /// </summary>
-    public static class PlayerActionHistory
+    public static class GlobalActionHistory
     {
         /// <summary>
         /// The history of actions.
@@ -27,7 +28,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public static void Undo()
         {
-            if (history.UndoCount > 0)
+            if (history.UndoCount() > 0)
             {
                 history.Undo();
             }
@@ -38,7 +39,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public static void Redo()
         {
-            if (history.RedoCount > 0)
+            if (history.RedoCount() > 0)
             {
                 history.Redo();
             }
@@ -51,7 +52,37 @@ namespace SEE.Controls.Actions
         public static void Execute(ActionStateType actionType)
         {
             ActionState.Value = actionType;
-            history.Execute(actionType.CreateReversible());
+            ReversibleAction action = actionType.CreateReversible();
+            history.Execute(action);
+        }
+
+        /// <summary>
+        /// Pushes new actions to the history of executed actions.
+        /// </summary>
+        /// <param name="action">The action and all of its specific values which are needed for the history</param>
+        public static void Push(GlobalHistoryEntry action)
+        {
+            history.Push(action);
+        }
+
+        /// <summary>
+        /// Replaces an item in the globalHistory.
+        /// </summary>
+        /// <param name="oldItem">the item that should be replaced.</param>
+        /// <param name="newItem">the new item inserted instead.</param>
+        /// <param name="isNetwork">true, if the call comes from another client through the network, else false.</param>
+        public static void Replace(GlobalHistoryEntry oldItem, GlobalHistoryEntry newItem, bool isNetwork)
+        {
+            history.Replace(oldItem, newItem, isNetwork);
+        }
+
+        /// <summary>
+        /// Removes the action with given <paramref name="id"/> from the history of executed actions.
+        /// </summary>
+        /// <param name="id">the ID of the action that should be removed</param>
+        public static void RemoveAction(string id)
+        {
+            history.RemoveAction(id);
         }
 
         /// <summary>
@@ -61,7 +92,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType"/> of the currently executed action or null</returns>
         public static ActionStateType Current()
         {
-            return history.Current?.GetActionStateType();
+            return history.CurrentAction?.GetActionStateType();
         }
 
         /// <summary>
@@ -70,7 +101,7 @@ namespace SEE.Controls.Actions
         /// <returns>true if the action history is empty</returns>
         public static bool IsEmpty()
         {
-            return history.UndoCount == 0;
+            return history.UndoCount() == 0;
         }
     }
 }
