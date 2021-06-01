@@ -15,7 +15,15 @@ namespace SEE.Net.Dashboard
 {
     /// <summary>
     /// Can retrieve information from the Axivion Dashboard API.
+    /// Before using it, make sure the <see cref="PublicKey"/>, <see cref="BaseUrl"/>
+    /// and <see cref="Token"/> fields are filled with the correct values.
+    /// This class follows the Singleton pattern, use the <see cref="Instance"/> attribute
+    /// to call its methods.
     /// </summary>
+    /// <remarks>
+    /// Retrieval methods use the <c>async</c> keyword, if you want to use the received data
+    /// it is strongly recommended to do this from an <c>async</c> context as well.
+    /// </remarks>
     public partial class DashboardRetriever
     {
         /// <summary>
