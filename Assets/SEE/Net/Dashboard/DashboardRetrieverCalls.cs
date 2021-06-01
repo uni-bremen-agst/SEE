@@ -4,24 +4,27 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.Net.Dashboard.Model;
 using SEE.Net.Dashboard.Model.Issues;
+using SEE.Net.Dashboard.Model.Metric;
 
 namespace SEE.Net.Dashboard
 {
     /// <summary>
     /// The part of the <see cref="DashboardRetriever"/> which contains the actual API calls.
     /// Basically a wrapper around the Axivion Dashboard API as described in its documentation.
+    /// In fact, most of the documentation here has been copied and modified from the dashboard itself.
     /// </summary>
     public partial class DashboardRetriever
     {
         #region Dashboard Info API
+
         /// <summary>
         /// Retrieves dashboard information from the dashboard configured for this <see cref="DashboardRetriever"/>.
         /// IMPORTANT NOTE: This will only work if your token has full permissions, i.e., when it's not just
         /// an IDE token. If you simply want to retrieve the dashboard version, use
         /// </summary>
         /// <returns>Dashboard information about the queried dashboard.</returns>
-        public async UniTask<DashboardInfo> GetDashboardInfo() => await QueryDashboard<DashboardInfo>("/../../");
-        
+        public async UniTask<DashboardInfo> GetDashboardInfo() => await QueryDashboard<DashboardInfo>("/../../", apiPath: false);
+
         /// <summary>
         /// Returns the version number of the dashboard that's being queried.
         /// </summary>
@@ -43,15 +46,17 @@ namespace SEE.Net.Dashboard
                 {
                     throw;
                 }
+
                 version = new DashboardVersion(e.Error.dashboardVersionNumber);
             }
 
             return version;
         }
+
         #endregion
 
         #region Issue Lists API
-        
+
         /// <summary>
         /// Queries the issue lists.
         /// </summary>
@@ -96,7 +101,7 @@ namespace SEE.Net.Dashboard
                                                          string user = null, string fileFilter = null,
                                                          IReadOnlyDictionary<string, string> columnFilters = null,
                                                          int limit = int.MaxValue,
-                                                         int offset = 0, bool computeTotalRowCount = false) 
+                                                         int offset = 0, bool computeTotalRowCount = false)
             where T : Issue, new()
         {
             const string ANY_PATH = "filter_any path";
@@ -120,15 +125,18 @@ namespace SEE.Net.Dashboard
                 {
                     throw new ArgumentNullException();
                 }
+
                 if (columnFilters.ContainsKey(ANY_PATH))
                 {
                     throw new ArgumentException($"When filtering for file paths, use the {nameof(fileFilter)} parameter!");
                 }
+
                 if (columnFilters.Any(x => !typeof(T).GetFields().Select(f => f.Name).Contains(x.Key)))
                 {
                     throw new ArgumentException($"The given {nameof(columnFilters)} may only contain field names from"
                                                 + $"the queried class (in this case, {typeof(T).Name})!");
                 }
+
                 // Add "filter_{column}" parameters
                 parameters = parameters.Concat(columnFilters.Select(x => new KeyValuePair<string, string>($"filter_{x.Key}", x.Value)))
                                        .ToDictionary(x => x.Key, x => x.Value);
@@ -138,14 +146,79 @@ namespace SEE.Net.Dashboard
             {
                 parameters[ANY_PATH] = fileFilter;
             }
-            return await QueryDashboard<IssueTable<T>>("/issues/", parameters);
+
+            return await QueryDashboard<IssueTable<T>>("/issues/", parameters, false);
         }
 
         #endregion
 
         #region Metrics API
 
+        /// <summary>
+        /// Use this to get the project's System Entity.
+        /// The version as well as versioned <see cref="Entity"/> properties will only be returned
+        /// if a version is specified. The versioned attributes are <c>path</c> and <c>line</c>.
+        /// </summary>
+        /// <param name="projectName">The name of the Project</param>
+        /// <param name="version">The optional version query string for the entity properties.</param>
+        /// <returns>An <see cref="EntityList"/> containing only the System Entity.</returns>
+        public async UniTask<EntityList> GetSystemEntity(string version = null) =>
+            await QueryDashboard<EntityList>("/getSystemEntity", new[] {version});
+
+        /// <summary>
+        /// Returns a list of Entities available in the Project.
+        /// Note, that this list is not necessarily complete.
+        /// By default only entities associated with Issues are stored in the database.
+        /// Storing all Metrics (and their associated Entities) has to be enabled explicitly
+        /// in your project configuration. The version as well as versioned Entity properties will only be returned,
+        /// if a version is specified. The versioned attributes are path and line.
+        /// </summary>
+        /// <param name="version">The optional version query string for the entity properties.
+        /// If not specified, versioned entity attributes will not be included in the result.
+        /// If it is specified, entities not available in that version will not be included in the result.</param>
+        /// <param name="metric">If a Metric ID is given, only Entities having associated the given Metric will be
+        /// returned.</param>
+        /// <returns>List of Entities available in the given version.</returns>
+        public async UniTask<EntityList> GetEntities(string version = null, string metric = null) =>
+            await QueryDashboard<EntityList>("/getEntities", new[] {version, metric});
+
+        /// <summary>
+        /// Returns a list of Metrics available for the database that can be used to create nice charts over time.
+        /// The Version and versioned Metric properties will only be returned if a version is specified.
+        /// The versioned properties are <c>minValue<c> and <c>maxValue</c>.
+        /// </summary>
+        /// <param name="version">The optional version query string for the metric properties.
+        /// If not specified, versioned metric attributes will not be included in the result.
+        /// If it is specified metrics not available in that version will not be included in the result.
+        /// </param>
+        /// <param name="entity">If an Entity ID is given, only Metrics associated with the given Entity will be
+        /// returned.</param>
+        /// <returns>The metrics available in the given version.</returns>
+        public async UniTask<MetricList> GetMetrics(string version = null, string entity = null) =>
+            await QueryDashboard<MetricList>("/getMetrics", new[] {version, entity});
+
+        /// <summary>
+        /// Queries a <paramref name="metric"/> for a particular <paramref name="entity"/>.
+        /// </summary>
+        /// <param name="entity">The Entity ID to fetch the values for.</param>
+        /// <param name="metric">The Metric ID to fetch the values for.</param>
+        /// <param name="start">The result Version range start specifier.</param>
+        /// <param name="end">The result Version range end (inclusive) specifier.</param>
+        /// <returns></returns>
+        public async UniTask<MetricValueRange> GetMetricValueRange(string entity, string metric, string start = null, 
+                                                                   string end = null) =>
+             await QueryDashboard<MetricValueRange>("/queryMetricValueRange", new[] {entity, metric, start, end});
         
+        /// <summary>
+        /// This allows querying metric values of a specific version with properties flattened out in a tabular format
+        /// similar to the Issue List API. In contrast to the issue list entry point,
+        /// this entry point does not support sorting or filtering.
+        /// </summary>
+        /// <param name="version">The Version of the table data.</param>
+        /// <returns>The metric value table data.</returns>
+        public async UniTask<MetricValueTable> GetMetricValueTable(string version = null) =>
+            await QueryDashboard<MetricValueTable>("/queryMetricValueTable", new[] {version});
+
 
         #endregion
     }

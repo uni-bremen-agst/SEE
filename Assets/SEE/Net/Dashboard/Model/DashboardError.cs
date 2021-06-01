@@ -14,22 +14,26 @@ namespace SEE.Net.Dashboard.Model
         /// A parseable version number indicating the server version.
         /// </summary>
         /// <remarks>This can be parsed using <see cref="DashboardVersion"/>.</remarks>
+        [JsonProperty(Required = Required.Always)]
         public readonly string dashboardVersionNumber;
         
         /// <summary>
         /// The name of the error kind.
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly string type;
         
         /// <summary>
         /// A human readable english message describing the error.
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly string message;
         
         /// <summary>
         /// Use this instead of message in order to display a message translated according to your language preferences.
         /// Will contain exactly the same contents as message in case no translation is available.
         /// </summary>
+        [JsonProperty(Required = Required.Always)]
         public readonly string localizedMessage;
         
         /// <summary>
@@ -60,24 +64,24 @@ namespace SEE.Net.Dashboard.Model
             /// References the column that has the invalid filter value.
             /// The file filter is referred to by the string "any path"
             /// </summary>
-            [JsonProperty(Required = Required.AllowNull)]
+            [JsonProperty(Required = Required.Default)]
             public readonly string column;
             
             /// <summary>
             /// Provides an ASCII-encoded URL pointing to human-readable help that might help a user understand
             /// and resolve the error. If the URL is relative, then it is meant relative to the Dashboard the error originated from.
             /// </summary>
-            [JsonProperty(Required = Required.AllowNull)]
+            [JsonProperty(Required = Required.Default)]
             public readonly string help;
             
             /// <summary>
             /// Indicates that the provided password may be used as API token with the respective API.
             /// E.g. use 'Authorization: AxToken …' header instead of HTTP basic auth.
             /// </summary>
-            [JsonProperty(Required = Required.AllowNull)]
-            public readonly bool passwordMayBeUsedAsApiToken;
+            [JsonProperty(Required = Required.Default)]
+            public readonly bool? passwordMayBeUsedAsApiToken;
 
-            public DashboardErrorData(string column, string help, bool passwordMayBeUsedAsApiToken)
+            public DashboardErrorData(string column, string help, bool? passwordMayBeUsedAsApiToken)
             {
                 this.column = column;
                 this.help = help;
