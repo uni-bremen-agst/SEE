@@ -127,9 +127,9 @@ namespace SEE.Utils
         string GetId();
 
         /// <summary>
-        /// Returns the list of IDs of all game objects changed by this action.
+        /// Returns the set of IDs of all game objects changed by this action.
         /// </summary>
-        /// <returns>The list of the IDs of all game objects changed by this action</returns>
+        /// <returns>The set of the IDs of all game objects changed by this action</returns>
         HashSet<string> GetChangedObjects();
 
         /// <summary>
