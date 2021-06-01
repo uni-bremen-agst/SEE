@@ -788,5 +788,15 @@ namespace SEE.Controls.Actions
         {
             return ActionStateType.Hide;
         }
+
+        /// <summary>
+        /// Returns the set of IDs of all game objects hidden by this action.
+        /// <see cref="ReversibleAction.GetChangedObjects"/>.
+        /// </summary>
+        /// <returns>The set of the IDs of all game objects hidden by this action</returns> 
+        public override HashSet<string> GetChangedObjects()
+        {
+            return new HashSet<string>(hiddenObjects.Select(o => o.name));
+        }
     }
 }
