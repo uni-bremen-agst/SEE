@@ -513,18 +513,18 @@ namespace SEE.Game
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
                 p.End();
-                Debug.Log("Loaded graph data successfully:"
-                          + "\nFilename: " + filename
-                          + "\nNumber of nodes: " + graph.NodeCount
-                          + "\nNumber of edges: " + graph.EdgeCount
-                          + "\nElapsed time: " + p.GetElapsedTime() + "[h:m:s:ms]\n");
-
+                Debug.Log($"Loaded graph data for city {name} from {filename} successfully:\n"
+                          + $"Number of nodes: {graph.NodeCount}\n"
+                          + $"Number of edges: {graph.EdgeCount}\n"
+                          + $"Elapsed time: {p.GetElapsedTime()} [h:m:s:ms]\n");
                 LoadDataForGraphListing(graph);
                 return graph;
             }
-
-            Debug.LogErrorFormat("GXL file {0} does not exist.\n", filename);
-            return new Graph();
+            else
+            {
+                Debug.LogError($"GXL file {filename} of city {name} does not exist.\n");
+                return new Graph();
+            }
         }
 
         /// <summary>
