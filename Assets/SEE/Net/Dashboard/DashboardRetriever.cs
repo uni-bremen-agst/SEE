@@ -100,9 +100,15 @@ namespace SEE.Net.Dashboard
         /// <typeparam name="T">The type of object that is returned by the API.</typeparam>
         /// <returns>The queried object returned by the API.</returns>
         /// <exception cref="DashboardException">If there was an error accessing the API entry point.</exception>
+        /// <exception cref="ArgumentException">If the number of items in <paramref name="parameterValues"/>
+        /// don't match the number of parameters from the caller.</exception>
         private async UniTask<T> QueryDashboard<T>(string path, IReadOnlyList<string> parameterValues, 
                                                   [CallerMemberName] string memberName = "")
         {
+            if (path == null || parameterValues == null)
+            {
+                throw new ArgumentNullException();
+            }
             // Magically retrieve parameter names from caller
             ParameterInfo[] callerParameters = GetType().GetMethod(memberName)?.GetParameters();
             if (callerParameters == null)
@@ -121,7 +127,19 @@ namespace SEE.Net.Dashboard
                                                                          .ToDictionary(x => x.Name, x => parameterValues[x.Position]);
                                                                          
             // Finally, actually query the dashboard
-            DashboardResult result = await GetAtPath(path, queryParameters);
+            return await QueryDashboard<T>(path, queryParameters);
+        }
+
+        /// <summary>
+        /// Queries the dashboard at the given <paramref name="path"/> with the given <paramref name="parameters"/>.
+        /// </summary>
+        /// <param name="path">The path to the Axivion dashboard API entry point that shall be queried.</param>
+        /// <param name="parameters">The query parameters that shall be used.</param>
+        /// <typeparam name="T">The type that is returned by the API call.</typeparam>
+        /// <returns>The queried object of type <typeparamref name="T"/>.</returns>
+        private static async UniTask<T> QueryDashboard<T>(string path, Dictionary<string, string> parameters = null)
+        {
+            DashboardResult result = await GetAtPath(path, parameters);
             return result.RetrieveObject<T>(StrictMode);
         }
 

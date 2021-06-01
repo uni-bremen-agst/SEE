@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using SEE.Net.Dashboard;
@@ -42,7 +43,11 @@ namespace SEETests
         [UnityTest]
         public IEnumerator testDashboardIssues() => UniTask.ToCoroutine(async () =>
         {
-            IssueTable<CloneIssue> table = await DashboardRetriever.Instance.GetIssues<CloneIssue>(limit: 1);
+            IssueTable<StyleViolationIssue> table = await DashboardRetriever.Instance.GetIssues<StyleViolationIssue>(fileFilter: "PlayerMenu.cs",
+                columnFilters: new Dictionary<string, string>()
+                {
+                    [nameof(StyleViolationIssue.severity)] = "error"
+                });
             Assert.IsNotNull(table);
         });
     }

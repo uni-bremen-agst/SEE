@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.Net.Dashboard.Model;
 using SEE.Net.Dashboard.Model.Issues;
@@ -18,12 +20,7 @@ namespace SEE.Net.Dashboard
         /// an IDE token. If you simply want to retrieve the dashboard version, use
         /// </summary>
         /// <returns>Dashboard information about the queried dashboard.</returns>
-        public async UniTask<DashboardInfo> GetDashboardInfo()
-        {
-            DashboardResult result = await GetAtPath("/../../");
-            DashboardInfo info = result.RetrieveObject<DashboardInfo>(StrictMode);
-            return info;
-        }
+        public async UniTask<DashboardInfo> GetDashboardInfo() => await QueryDashboard<DashboardInfo>("/../../");
         
         /// <summary>
         /// Returns the version number of the dashboard that's being queried.
@@ -58,8 +55,6 @@ namespace SEE.Net.Dashboard
         /// <summary>
         /// Queries the issue lists.
         /// </summary>
-        /// <param name="kind">The issue kind.
-        /// Will be inferred from <typeparamref name="T"/>, so specifying it isn't necessary.</param>
         /// <param name="start">The diff start version as gotten by the version’s date property.
         /// Defaults to the <c>EMPTY</c> version if omitted, i.e. no diff will be displayed</param>
         /// <param name="end">The diff end version as gotten by the version’s date property.
@@ -76,6 +71,13 @@ namespace SEE.Net.Dashboard
         ///</param>
         /// <param name="user">Only show issues of the given user referenced by the name attribute of the project user.
         /// Defaults to <c>ANYBODY</c>, i.e. the result is not filtered by owner at all.</param>
+        /// <param name="columnFilters">A dictionary where the key is the field name that's being filtered for
+        /// and the value the filter string. It's highly recommended to use <c>nameof</c> for the key,
+        /// e.g. if you want to filter suppressed issues use <c>nameof(Issue.suppressed)</c>.</param>
+        /// <param name="fileFilter">Returns issues where the file matches the given path.
+        /// Substring matching is used and wildcards (*) are supported. If you want to use whole string matching,
+        /// enclose the search query in "double quotes".In the case of issues which have more than one file
+        /// (e.g. <see cref="CloneIssue"/>), all filenames will be queried. </param>
         /// <param name="limit">Limit the number of returned issues to the given number.
         /// Returns a deterministic result. Useful for paging.</param>
         /// <param name="offset">Omit the issues before the given 0 based index. Returns a deterministic result.
@@ -84,24 +86,59 @@ namespace SEE.Net.Dashboard
         /// Be aware that calculating this might involve additional database accesses.</param>
         /// <typeparam name="T">The issue kind that shall be queried.</typeparam>
         /// <returns>The list of queried issues, as represented by the <see cref="IssueTable{T}"/>.</returns>
+        /// <exception cref="ArgumentException">If the given <paramref name="columnFilters"/> contain a field
+        /// not present on the given type <typeparamref name="T"/>.</exception>
         /// <remarks>
-        /// TODO: Note that sorting and filtering issues is not yet supported.
+        /// TODO: Note that sorting issues is not yet supported.
         /// </remarks>
-        public async UniTask<IssueTable<T>> GetIssues<T>(Issue.IssueKind kind = Issue.IssueKind.Unknown, 
-                                                         string start = null, string end = null,
+        public async UniTask<IssueTable<T>> GetIssues<T>(string start = null, string end = null,
                                                          Issue.IssueState state = Issue.IssueState.changed,
-                                                         string user = null, int limit = int.MaxValue,
+                                                         string user = null, string fileFilter = null,
+                                                         IReadOnlyDictionary<string, string> columnFilters = null,
+                                                         int limit = int.MaxValue,
                                                          int offset = 0, bool computeTotalRowCount = false) 
             where T : Issue, new()
         {
-            Issue.IssueKind actualKind = new T().kind;
-            if (kind != Issue.IssueKind.Unknown && actualKind != kind)
+            const string ANY_PATH = "filter_any path";
+            // add non-nullable parameters
+            Dictionary<string, string> parameters = new Dictionary<string, string>
             {
-                throw new ArgumentException($"Given {nameof(kind)} doesn't correspond to expected return type!");
+                ["kind"] = new T().kind.ToString(),
+                ["start"] = start,
+                ["end"] = end,
+                ["state"] = state.ToString(),
+                ["user"] = user,
+                ["limit"] = limit.ToString(),
+                ["offset"] = offset.ToString(),
+                ["computeTotalRowCount"] = computeTotalRowCount.ToString().ToLower()
+            };
+            // remove null values
+            parameters = parameters.Where(x => x.Value != null).ToDictionary(x => x.Key, x => x.Value);
+            if (columnFilters != null)
+            {
+                if (columnFilters.Any(x => x.Key == null || x.Value == null))
+                {
+                    throw new ArgumentNullException();
+                }
+                if (columnFilters.ContainsKey(ANY_PATH))
+                {
+                    throw new ArgumentException($"When filtering for file paths, use the {nameof(fileFilter)} parameter!");
+                }
+                if (columnFilters.Any(x => !typeof(T).GetFields().Select(f => f.Name).Contains(x.Key)))
+                {
+                    throw new ArgumentException($"The given {nameof(columnFilters)} may only contain field names from"
+                                                + $"the queried class (in this case, {typeof(T).Name})!");
+                }
+                // Add "filter_{column}" parameters
+                parameters = parameters.Concat(columnFilters.Select(x => new KeyValuePair<string, string>($"filter_{x.Key}", x.Value)))
+                                       .ToDictionary(x => x.Key, x => x.Value);
             }
-            string[] values = { actualKind.ToString(), start, end, state.ToString(), user, limit.ToString(), offset.ToString(), 
-                computeTotalRowCount.ToString().ToLower() };
-            return await QueryDashboard<IssueTable<T>>("/issues/", values);
+
+            if (fileFilter != null)
+            {
+                parameters[ANY_PATH] = fileFilter;
+            }
+            return await QueryDashboard<IssueTable<T>>("/issues/", parameters);
         }
 
         #endregion
