@@ -96,7 +96,9 @@ namespace SEE.Net
         {
             lock (serializedPendingPackets)
             {
-                // FIXME: Why this assert? It always fails.
+                // Some opertations can be executed only by the Unity main thread. That
+                // is why we need to make sure, the thread currently executing this code
+                // is actually the Unity main thread.
                 Assert.AreEqual(Thread.CurrentThread, Network.MainThread);
                 foreach (SerializedPendingPacket serializedPendingPacket in serializedPendingPackets)
                 {
