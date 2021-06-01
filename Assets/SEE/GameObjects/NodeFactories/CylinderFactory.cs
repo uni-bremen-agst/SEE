@@ -21,10 +21,9 @@ namespace SEE.GO
         {
             GameObject result = CreateCylinder();
             result.AddComponent<MeshCollider>();
-
             MeshRenderer renderer = result.AddComponent<MeshRenderer>();
             renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
-            renderer.sharedMaterial = Materials.Get(renderQueueOffset, style);
+            renderer.sharedMaterial = Materials.Get(renderQueueOffset: renderQueueOffset, degree: style);
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;
 
