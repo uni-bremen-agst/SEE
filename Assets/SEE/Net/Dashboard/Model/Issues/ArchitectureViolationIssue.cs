@@ -110,13 +110,13 @@ namespace SEE.Net.Dashboard.Model.Issues
         }
 
         [JsonConstructor]
-        protected ArchitectureViolationIssue(string architectureSource, string architectureSourceType, 
-                                             string architectureSourceLinkName, string architectureTarget, 
-                                             string architectureTargetType, string architectureTargetLinkName, 
-                                             string errorNumber, string violationType, string dependencyType, 
-                                             string sourceEntity, string sourceEntityType, string sourcePath, 
-                                             uint sourceLine, string sourceLinkName, string targetEntity, 
-                                             string targetEntityType, string targetPath, uint targetLine, 
+        protected ArchitectureViolationIssue(string architectureSource, string architectureSourceType,
+                                             string architectureSourceLinkName, string architectureTarget,
+                                             string architectureTargetType, string architectureTargetLinkName,
+                                             string errorNumber, string violationType, string dependencyType,
+                                             string sourceEntity, string sourceEntityType, string sourcePath,
+                                             uint sourceLine, string sourceLinkName, string targetEntity,
+                                             string targetEntityType, string targetPath, uint targetLine,
                                              string targetLinkName)
         {
             this.architectureSource = architectureSource;
