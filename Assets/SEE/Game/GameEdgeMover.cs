@@ -144,16 +144,6 @@ namespace SEE.Game
                         sourceTargetEdgeWithinSameSubset.Add(element);
                     }
                 }
-                // Delete all old edges.
-                foreach ((GameObject, GameObject, string) element in sourceTargetEdgeWithinSameSubset)
-                {
-                    Object.Destroy(GameObject.Find(element.Item3));
-                }
-                // Create all new edges.
-                foreach ((GameObject, GameObject, string) element in sourceTargetEdgeWithinSameSubset)
-                {
-                    GameEdgeAdder.Add(element.Item1, element.Item2, element.Item3);
-                }
                 redrawEdges(sourceTargetEdgeWithinSameSubset);
             }
         }
