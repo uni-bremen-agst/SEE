@@ -148,7 +148,6 @@ namespace SEE.Game
                 foreach ((GameObject, GameObject, string) element in sourceTargetEdgeWithinSameSubset)
                 {
                     Object.Destroy(GameObject.Find(element.Item3));
-                    //GameEdgeAdder.Remove(GameObject.Find(element.Item3));
                 }
                 // Create all new edges.
                 foreach ((GameObject, GameObject, string) element in sourceTargetEdgeWithinSameSubset)
@@ -168,10 +167,11 @@ namespace SEE.Game
             // Delete all old edges.
             foreach ((GameObject, GameObject, string) element in edges)
             {
+                GameObject edgeToBeRedrawn = GameObject.Find(element.Item3);
                 //Removes the edge form the graph
-                GameEdgeAdder.Remove(GameObject.Find(element.Item3));
+                GameEdgeAdder.Remove(edgeToBeRedrawn);
                 //Removes the edge-gameobject 
-                Object.Destroy(GameObject.Find(element.Item3));
+                Object.Destroy(edgeToBeRedrawn);
             }
             //Create all new edges
             foreach ((GameObject, GameObject, string) element in edges)
