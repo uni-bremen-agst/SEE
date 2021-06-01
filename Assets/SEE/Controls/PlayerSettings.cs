@@ -271,7 +271,9 @@ namespace SEE.Controls
                     Teleport.instance.CancelTeleportHint();
                 }
             }
+#if UNITY_EDITOR
             KeyBindings.PrintBindings();
+#endif
         }
 
         /// <summary>
@@ -321,7 +323,7 @@ namespace SEE.Controls
                 }
             }
 
-            #region Local Methods
+#region Local Methods
             //Scales the city by factor and pretend it to collection 
             static void SetCityScale(GameObject cityWitchContainer, Transform cityCollectionTransform, float cityScaleFactor)
             {
@@ -362,7 +364,7 @@ namespace SEE.Controls
                 return cityContainer;
             }
 
-            #endregion
+#endregion
         }
 
         /// <summary>

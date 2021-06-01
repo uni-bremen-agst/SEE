@@ -19,22 +19,22 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// If the object is not grabbed, a selection outline will be
-        /// created. Depending upon <paramref name="isOwner"/> one of two different
+        /// created. Depending upon <paramref name="isInitiator"/> one of two different
         /// colors will be used for the outline.
         /// Called when the object is selected.
         /// </summary>
-        /// <param name="isOwner">true if a local user initiated this call</param>
-        protected override void On(InteractableObject interactableObject, bool isOwner)
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        protected override void On(InteractableObject interactableObject, bool isInitiator)
         {
             if (!interactable.IsGrabbed)
             {
                 if (TryGetComponent(out Outline outline))
                 {
-                    outline.SetColor(isOwner ? LocalSelectColor : RemoteSelectColor);
+                    outline.SetColor(isInitiator ? LocalSelectColor : RemoteSelectColor);
                 }
                 else
                 {
-                    Outline.Create(gameObject, isOwner ? LocalSelectColor : RemoteSelectColor);
+                    Outline.Create(gameObject, isInitiator ? LocalSelectColor : RemoteSelectColor);
                 }
             }
         }
@@ -43,12 +43,25 @@ namespace SEE.Controls.Actions
         /// If the object is neither grabbed nor hovered over and if it has an outline,
         /// that outline will be removed.
         /// </summary>
-        /// <param name="isOwner">true if a local user initiated this call</param>
-        protected override void Off(InteractableObject interactableObject, bool isOwner)
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        protected override void Off(InteractableObject interactableObject, bool isInitiator)
         {
-            if (!interactable.IsGrabbed && !interactable.IsHovered && TryGetComponent(out Outline outline))
+            if (!interactable.IsHovered && !interactable.IsGrabbed && TryGetComponent(out Outline outline))
             {
                 DestroyImmediate(outline);
+            }
+        }
+
+        /// <summary>
+        /// If the object is no longer grabbed, but selected, the outline color is changed.
+        /// </summary>
+        /// <param name="interactableObject">The ungrabbed object.</param>
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        protected override void GrabOff(InteractableObject interactableObject, bool isInitiator)
+        {
+            if (interactable.IsSelected)
+            {
+                GetComponent<Outline>().SetColor(isInitiator ? LocalSelectColor : RemoteSelectColor);
             }
         }
     }

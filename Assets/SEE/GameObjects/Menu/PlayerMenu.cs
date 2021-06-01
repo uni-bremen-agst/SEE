@@ -49,7 +49,7 @@ namespace SEE.GO.Menu
             bool first = true;
             foreach (ActionStateType type in ActionStateType.AllTypes)
             {
-                UnityAction entryAction = () => PlayerActionHistory.Execute(type);
+                UnityAction entryAction = () => GlobalActionHistory.Execute(type);
                 UnityAction exitAction = null;
 
                 //FIXME This is a bad hack and should be replaced with something proper for non-reversible actions.
@@ -76,7 +76,7 @@ namespace SEE.GO.Menu
                     ));
                 if (first)
                 {
-                    PlayerActionHistory.Execute(type);
+                    GlobalActionHistory.Execute(type);
                     first = false;
                 }
             }
@@ -143,10 +143,10 @@ namespace SEE.GO.Menu
             }
             if (SEEInput.Undo())
             {
-                PlayerActionHistory.Undo();
-                if (!PlayerActionHistory.IsEmpty())
+                GlobalActionHistory.Undo();
+                if (!GlobalActionHistory.IsEmpty())
                 {
-                    ActionStateType currentAction = PlayerActionHistory.Current();
+                    ActionStateType currentAction = GlobalActionHistory.Current();
                     SetPlayerMenu(currentAction.Name);
                     Indicator.ChangeActionState(currentAction);
                 }
@@ -161,12 +161,12 @@ namespace SEE.GO.Menu
             }
             else if (SEEInput.Redo())
             {
-                PlayerActionHistory.Redo();
-                ActionStateType currentAction = PlayerActionHistory.Current();
+                GlobalActionHistory.Redo();
+                ActionStateType currentAction = GlobalActionHistory.Current();
                 SetPlayerMenu(currentAction.Name);
                 Indicator.ChangeActionState(currentAction);
             }
-            PlayerActionHistory.Update();
+            GlobalActionHistory.Update();
         }
 
         /// <summary>

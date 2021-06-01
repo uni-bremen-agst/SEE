@@ -106,7 +106,6 @@ namespace SEE.DataModel.DG.IO
                 outGraph.Path = basename + extension;
 
                 WriteReadGraph(basename, outGraph);
-
             }
         }
 
@@ -212,12 +211,6 @@ namespace SEE.DataModel.DG.IO
             Edge edge1 = NewEdge(graph, node1, node2, "call");
             Edge edge2 = NewEdge(graph, node2, node1, "called");
 
-            // Although the node levels are not stored in the GXL file,
-            // they will be set when the graph is loaded and they will be
-            // taken into account when graphs are compared by Equals().
-            // Hence, we need to set them here, otherwise Equals() would
-            // yield false at any rate.
-            graph.FinalizeNodeHierarchy();
             return graph;
         }
     }
