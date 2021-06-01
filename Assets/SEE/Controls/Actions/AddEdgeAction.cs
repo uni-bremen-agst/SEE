@@ -1,3 +1,4 @@
+﻿using System.Collections.Generic;
 ﻿using SEE.Game;
 using SEE.Game.UI.Notification;
 using SEE.GO;
@@ -146,6 +147,7 @@ namespace SEE.Controls.Actions
                 // We do not have an edge ID yet, so we let the graph renderer create a unique ID.
                 memento = new Memento(from, to);
                 createdEdge = CreateEdge(ref memento);
+
                 if (createdEdge != null)
                 {
                     // The edge ID was created by the graph renderer.
@@ -231,6 +233,20 @@ namespace SEE.Controls.Actions
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.NewEdge;
+        }
+
+        /// <summary>
+        /// Returns all IDs of gameObjects manipulated by this action.
+        /// </summary>
+        /// <returns>all IDs of gameObjects manipulated by this action</returns>
+        public override HashSet<string> GetChangedObjects()
+        {
+            return new HashSet<string>
+            {
+                memento.from.name,
+                memento.to.name,
+                createdEdge.name
+            };
         }
     }
 }

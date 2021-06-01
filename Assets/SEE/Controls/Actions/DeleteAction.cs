@@ -5,6 +5,7 @@ using SEE.GO;
 using SEE.Net;
 using SEE.Utils;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -318,18 +319,25 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Finds the root of the <paramref name="graph"/> and saves the gameobject and the <paramref name="graph"/> in <see cref="roots"/>
+        /// Returns all IDs of gameObjects manipulated by this action.
+        /// </summary>
+        /// <returns>all IDs of gameObjects manipulated by this action</returns>
+        public override HashSet<string> GetChangedObjects()
+        {
+            return new HashSet<string>(deletedNodes.Keys.Union(deletedEdges.Keys).Union(explicitlyDeletedNodesAndEdges).Select(x => x.name));
+        }
+
+        /// <summary>
+        /// Finds the roots of the <paramref name="graph"/> and saves 
+        /// the gameobject representing it in <see cref="roots"/> (along with the graph).
         /// </summary>
         /// <param name="graph">graph to be added</param>
         private void FindRoot(Graph graph)
         {
-            List<Node> rootNodes = graph.GetRoots();
-            GameObject rootOfCity = new GameObject();
-            foreach (Node root in rootNodes)
+            foreach (Node root in graph.GetRoots())
             {
-                rootOfCity = SceneQueries.RetrieveGameNode(root.ID);
-                roots.Add(rootOfCity, graph);
-            }  
+                roots.Add(SceneQueries.RetrieveGameNode(root.ID), graph);
+            }
         }
     }
 }
