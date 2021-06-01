@@ -12,7 +12,7 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class AddNodeAction : AbstractPlayerAction
     {
-        /// <summa
+        /// <summary>
         /// If the user clicks with the mouse hitting a game object representing a graph node, 
         /// this graph node is a parent to which a new node is created and added as a child.
         /// <see cref="ReversibleAction.Update"/>.
@@ -26,35 +26,62 @@ namespace SEE.Controls.Actions
             if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
             {
-                // the hit object is the parent in which to create the new node
+                // the hit object is the parent in which to create the new node as a child
                 GameObject parent = raycastHit.collider.gameObject;
-                if (parent.TryGetComponentOrLog(out NodeRef nodeRef) && !parent.transform.parent.TryGetComponent(out AbstractSEECity _))
+                if (parent.TryGetComponentOrLog(out NodeRef parentNodeRef))
                 {
-                    string nodeId = nodeRef.Value.ID;
-                    Transform grandParent = parent.transform.parent;
-                    Vector3 oldPos = new Vector3(parent.transform.position.x, grandParent.transform.position.y, parent.transform.position.z);
-                    Vector3 oldWorldScale = FindSize(parent.gameObject, oldPos);
-                    oldWorldScale = new Vector3(oldWorldScale.x * 5, oldWorldScale.y, oldWorldScale.z * 5);
-                    GameNodeAdder.Remove(parent);
-                    parent = GameNodeAdder.Add(grandParent.gameObject, oldPos, 2* oldWorldScale, nodeId, false);
-                    //The position at which the parent was hit will be the center point of the new node
-                    //TODO: Locate new LeafNode according to point clicked into the circle.
-                    Vector3 scale = FindSize(parent, oldPos);
-                    //TODO: Find a fitted scaling and replace filler
-                    scale = new Vector3(scale.x * 2, scale.y * 2, scale.z * 2);
-                    addedGameNode = GameNodeAdder.Add(parent, position: new Vector3(oldPos.x, parent.GetRoof() + scale.y, oldPos.z), worldSpaceScale: scale);
-                    //TODO: implement AddNodeAddAction
+                    bool parentWasFormerlyLeaf = parentNodeRef.Value.IsLeaf();
+
+                    // We need to add the child first so that the parent is 
+                    // definitely no longer a leaf because a child was added.
+                    // The drawing of the node depends upon that (there may
+                    // be different metrics chosen for visual attributes depending
+                    // upon whether a node is a leaf or inner node.
+                    // TODO: Find a fitted scaling and replace filler
+                    Vector3 childScale = 2 * FindSize(parent, parent.transform.position);
+
+                    // FIXME: The following will not work if we create multiple children
+                    // because all of them would be placed at the same position.
+                    Vector3 childPosition = parent.transform.position;
+                    childPosition.y = parent.GetRoof() + childScale.y / 2.0f + float.Epsilon;
+
+                    addedGameNode = GameNodeAdder.Add(parent, position: childPosition, worldSpaceScale: childScale);
                     if (addedGameNode != null)
                     {
-                        memento = new Memento(parent, position: oldPos, scale: scale);
-                        memento.NodeID = addedGameNode.name;
+                        UnityEngine.Assertions.Assert.AreEqual(parent, addedGameNode.transform.parent.gameObject);
+                        // If the parent was formerly a leaf, we need to turn it into an inner node.
+                        if (parentWasFormerlyLeaf)
+                        {
+                            SEECity city = parent.ContainingCity();
+                            if (city != null)
+                            {
+                                city.Renderer.ToInnerNode(ref parent);
+                                // The height of parent may have changed, hence, we need to adjust
+                                // the y co-ordinate of its child again.
+                                childPosition.y = parent.GetRoof() + childScale.y / 2.0f + float.Epsilon;
+                                addedGameNode.transform.position = childPosition;
+
+                                // FIXME: We need to propagate the migration of this former leaf node
+                                // to an inner node to all clients in the network.
+                            }
+                            else
+                            {
+                                Debug.LogError($"Parent {parent.name} of new node to be added is not contained in a code city.\n");
+                            }
+                        }
+
+                        memento = new Memento(parent, position: childPosition, scale: childScale)
+                        {
+                            NodeID = addedGameNode.name
+                        };
                         new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
+
                         result = true;
                         currentState = ReversibleAction.Progress.Completed;
                     }
                     else
                     {
-                        Debug.LogError($"New node could not be created.\n");
+                        Debug.LogError("New node could not be created.\n");
                     }
                 }
             }
@@ -145,6 +172,9 @@ namespace SEE.Controls.Actions
             base.Undo();
             if (addedGameNode != null)
             {
+                /// FIXME: If the parent of addedGameNode was formerly a leaf,
+                /// we need to turn into a leaf again. 
+                /// Implement and call <see cref="GraphRenderer.ToLeaf(ref GameObject)"/>.
                 new DeleteNetAction(addedGameNode.name).Execute();
                 GameNodeAdder.Remove(addedGameNode);
                 Destroyer.DestroyGameObject(addedGameNode);
@@ -158,6 +188,11 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
+            // FIXME: If the parent of addedGameNode was originally a leaf
+            // that was then into an inner node during Update and then 
+            // back again into a leaf by way of Undo, it must now become
+            // an inner node again.
+            /// Call <see cref="GraphRenderer.ToInnerNode(ref GameObject)"/>.
             addedGameNode = GameNodeAdder.Add(memento.Parent, position: memento.Position, worldSpaceScale: memento.Scale, nodeID: memento.NodeID);
             if (addedGameNode != null)
             {
