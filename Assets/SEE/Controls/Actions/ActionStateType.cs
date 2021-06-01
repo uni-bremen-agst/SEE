@@ -62,6 +62,9 @@ namespace SEE.Controls.Actions
             new ActionStateType(9, "Draw", "Draw a line",
                         Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                         DrawAction.CreateReversibleAction);
+        public static ActionStateType Hide { get; } =
+            new ActionStateType(10, "Hide Node", "Hides a node",
+                               Color.yellow.Darker(), "Materials/ModernUIPack/Eye", HideAction.CreateReversibleAction);
         #endregion
 
         /// <summary>
