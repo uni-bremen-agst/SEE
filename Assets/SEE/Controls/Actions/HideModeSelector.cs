@@ -1,7 +1,8 @@
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Represent the various HideModes and serves to simplify selection.
+    /// Represents the various modes for hiding nodes and edges 
+    /// and helps simplifying selection.
     /// </summary>
     public enum HideModeSelector
     {
