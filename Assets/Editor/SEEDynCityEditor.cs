@@ -21,7 +21,7 @@ namespace SEEEditor
         {
             base.Attributes();
             SEEDynCity city = target as SEEDynCity;
-            city.DYNPath = GetDataPath("DYN file", city.DYNPath, Filenames.ExtensionWithoutPeriod(Filenames.DYNExtension));
+            city.DYNPath = DataPathEditor.GetDataPath("DYN file", city.DYNPath, Filenames.ExtensionWithoutPeriod(Filenames.DYNExtension));
         }
     }
 }

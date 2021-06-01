@@ -1,6 +1,5 @@
 ﻿using SEE.DataModel.DG;
 using SEE.GO;
-using SEE.Utils;
 using System;
 using UnityEngine;
 
@@ -21,7 +20,7 @@ namespace SEE.Game
         /// <returns>new graph node</returns>
         private static Node NewGraphNode(string nodeID)
         {
-            string ID = string.IsNullOrEmpty(nodeID) ? RandomStrings.Get() : nodeID;
+            string ID = string.IsNullOrEmpty(nodeID) ? Guid.NewGuid().ToString() : nodeID;
             return new Node()
             {
                 ID = ID,
@@ -63,23 +62,23 @@ namespace SEE.Game
                 }
                 if (string.IsNullOrEmpty(node.ID))
                 {
-                    // Loop until the node.ID is unique.
-                    node.ID = RandomStrings.Get();
+                    // Loop until the node.ID is unique within the graph.
+                    node.ID = Guid.NewGuid().ToString();
                     while (graph.GetNode(node.ID) != null)
                     {
-                        node.ID = RandomStrings.Get();
+                        node.ID = Guid.NewGuid().ToString();
                     }
                 }
                 graph.AddNode(node);
                 parent.AddChild(node);
-                graph.FinalizeNodeHierarchy();
             }
         }
 
         /// <summary>
         /// Creates and returns a new game node as a child of <paramref name="parent"/> having
         /// a nodeRef referencing <paramref name="node"/> at the given <paramref name="position"/>
-        /// with the given <paramref name="worldSpaceScale"/>. 
+        /// with the given <paramref name="worldSpaceScale"/>. The new child node will be
+        /// drawn as a leaf node.
         /// 
         /// Precondition: <paramref name="parent"/> must have a valid node reference.
         /// </summary>
@@ -88,23 +87,16 @@ namespace SEE.Game
         /// <param name="position">the position in world space for the center point of the new game node</param>
         /// <param name="worldSpaceScale">the scale in world space of the new game node</param>
         /// <param name="nodeID">the unique ID of the new node; if null or empty, a random ID will be used</param>
+        /// <param name="isLeaf">if true, the node is added as a leaf</param>
         /// <returns>new child game node or null if none could be created</returns>
-        public static GameObject Add(GameObject parent, Vector3 position, Vector3 worldSpaceScale, string nodeID = null,bool isLeaf = true)
+        public static GameObject Add(GameObject parent, Vector3 position, Vector3 worldSpaceScale, string nodeID = null)
         {
             SEECity city = parent.ContainingCity();
             if (city != null)
             {
                 Node node = NewGraphNode(nodeID);
                 AddNodeToGraph(parent.GetNode(), node);
-                GameObject result;
-                if (isLeaf)
-                {
-                    result = city.Renderer.NewLeafNode(node);
-                }
-                else
-                {
-                    result = city.Renderer.NewInnerNode(node);
-                }
+                GameObject result = city.Renderer.DrawLeafNode(node);
                 result.transform.localScale = worldSpaceScale;
                 result.transform.position = position;
                 result.transform.SetParent(parent.transform);
@@ -119,10 +111,15 @@ namespace SEE.Game
         /// <summary>
         /// Inverse operation of <see cref="Add(GameObject, Vector3, Vector3, string)"/>.
         /// Removes the given <paramref name="gameNode"/> from the scene and its associated 
-        /// graph node from its graph. <paramref name="gameNode"/> is destroyed afterwards.
+        /// graph node from its graph. 
         /// 
-        /// Note: If <paramref name="gameNode"/> represents an inner node of the node
+        /// Notes: 
+        /// 
+        /// <paramref name="gameNode"/> is not actually destroyed.
+        /// 
+        /// If <paramref name="gameNode"/> represents an inner node of the node
         /// hierarchy, its ancestors will not be deleted.
+        /// 
         /// Precondition: <paramref name="gameNode"/> must have a valid NodeRef; otherwise
         /// an exception will be thrown.
         /// </summary>
@@ -132,8 +129,6 @@ namespace SEE.Game
             Node node = gameNode.GetNode();
             Graph graph = node.ItsGraph;
             graph.RemoveNode(node);
-            graph.FinalizeNodeHierarchy();
-            GameObject.Destroy(gameNode);
         }
     }
 }

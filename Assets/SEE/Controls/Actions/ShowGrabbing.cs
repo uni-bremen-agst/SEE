@@ -14,21 +14,21 @@ namespace SEE.Controls.Actions
         /// </summary>
         private readonly static Color RemoteGrabColor = Utils.ColorPalette.Viridis(0.0f);
 
-        protected override void On(InteractableObject interactableObject, bool isOwner)
+        protected override void On(InteractableObject interactableObject, bool isInitiator)
         {
             if (TryGetComponent(out Outline outline))
             {
-                outline.SetColor(isOwner ? LocalGrabColor : RemoteGrabColor);
+                outline.SetColor(isInitiator ? LocalGrabColor : RemoteGrabColor);
             }
             else
             {
-                Outline.Create(gameObject, isOwner ? LocalGrabColor : RemoteGrabColor);
+                Outline.Create(gameObject, isInitiator ? LocalGrabColor : RemoteGrabColor);
             }
         }
 
-        protected override void Off(InteractableObject interactableObject, bool isOwner)
+        protected override void Off(InteractableObject interactableObject, bool isInitiator)
         {
-            if (!interactable.IsSelected && !interactable.IsHovered && TryGetComponent(out Outline outline))
+            if (!interactable.IsHovered && !interactable.IsSelected && TryGetComponent(out Outline outline))
             {
                 DestroyImmediate(outline);
             }

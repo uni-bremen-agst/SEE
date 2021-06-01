@@ -1,12 +1,9 @@
 ﻿using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
+using System.Collections.Generic;
 using System;
 using UnityEngine;
-using System.Collections.Generic;
-using SEE.DataModel.DG;
-using SEE.DataModel;
-using System.Linq;
 
 namespace SEE.Controls.Actions
 {
@@ -251,9 +248,9 @@ namespace SEE.Controls.Actions
                 {
                     DrawGamingGizmos();
                 }
-                if (SEEInput.Drag())
+                if (SEEInput.Scale())
                 {
-                    if (draggedSphere == null && Raycasting.RayCastAnything(out RaycastHit raycastHit))
+                    if (draggedSphere == null && Raycasting.RaycastAnything(out RaycastHit raycastHit))
                     {
                         draggedSphere = SelectedScalingGizmo(raycastHit.collider.gameObject);
                     }
@@ -331,44 +328,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void AdjustEdge()
         {
-            HashSet<Edge> edgesToBeRedrawn = new HashSet<Edge>();
-
-            // Search for all incoming and outgoing edges
-            foreach (GameObject node in GameObject.FindGameObjectsWithTag(Tags.Node))
-            {
-                if (node.activeInHierarchy && node.ID().Equals(objectToScale.ID()))
-                {
-                    if (node.TryGetComponent(out NodeRef nodeRef))
-                    {
-
-                        edgesToBeRedrawn.UnionWith(nodeRef.Value.Outgoings.Union(nodeRef.Value.Incomings));
-                    }
-                }
-            }
-
-            List<(GameObject, GameObject, String)> sourceTargetEdge = new List<(GameObject, GameObject, string)>();
-
-            // Search for the corresponding GameObjects
-            foreach (Edge edge in edgesToBeRedrawn)
-            {
-                GameObject source = GameObject.Find(edge.Source.ID);
-                GameObject target = GameObject.Find(edge.Target.ID);
-
-                if (source != null && target != null)
-                {
-                    sourceTargetEdge.Add((source, target, edge.ID));
-                }
-            }
-            // Deleting the old edges
-            foreach ((GameObject, GameObject, string) element in sourceTargetEdge)
-            {
-                GameEdgeAdder.Remove(GameObject.Find(element.Item3));
-            }
-            // Create the new edges
-            foreach ((GameObject, GameObject, string) element in sourceTargetEdge)
-            {
-                GameEdgeAdder.Add(element.Item1, element.Item2, element.Item3);
-            }
+            GameEdgeMover.MoveAllConnectingEdgesOfNode(objectToScale);
         }
 
         /// <summary>
@@ -709,6 +669,18 @@ namespace SEE.Controls.Actions
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Returns all IDs of gameObjects manipulated by this action.
+        /// </summary>
+        /// <returns>all IDs of gameObjects manipulated by this action</returns>
+        public override HashSet<string> GetChangedObjects()
+        {
+            return new HashSet<string>()
+            {
+                objectToScale.name
+            };
         }
     }
 }
