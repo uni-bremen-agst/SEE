@@ -1326,10 +1326,12 @@ namespace SEE.Game
             bool isLeaf = node.IsLeaf();
             NodeFactory nodeFactory = isLeaf ? leafNodeFactories[(int)node.Domain] : innerNodeFactories[(int)node.Domain];
             uint numberOfStyles = nodeFactory.NumberOfStyles();
-            ColoringKind coloringKind = isLeaf ? settings.leafNodeAttributesPerKind[(int)node.Domain].coloringKind : settings.innerNodeAttributesPerKind[(int)node.Domain].coloringKind;
+            ColoringKind coloringKind = isLeaf ? settings.leafNodeAttributesPerKind[(int)node.Domain].coloringKind 
+                                               : settings.innerNodeAttributesPerKind[(int)node.Domain].coloringKind;
             if (coloringKind == ColoringKind.Metric)
             {
-                string styleMetric = isLeaf ? settings.leafNodeAttributesPerKind[(int)node.Domain].styleMetric : settings.innerNodeAttributesPerKind[(int)node.Domain].styleMetric;
+                string styleMetric = isLeaf ? settings.leafNodeAttributesPerKind[(int)node.Domain].styleMetric 
+                                            : settings.innerNodeAttributesPerKind[(int)node.Domain].styleMetric;
 
                 float metricMaximum;
                 if (TryGetFloat(styleMetric, out float value))
@@ -1389,7 +1391,7 @@ namespace SEE.Game
             NodeRef noderef = gameNode.GetComponent<NodeRef>();
             if (noderef == null)
             {
-                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
+                throw new Exception($"Game object {gameNode.name} does not have a graph node attached to it.");
             }
 
             Node node = noderef.Value;
@@ -1415,7 +1417,7 @@ namespace SEE.Game
             NodeRef noderef = gameNode.GetComponent<NodeRef>();
             if (noderef == null)
             {
-                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
+                throw new Exception($"Game object {gameNode.name} does not have a graph node attached to it.");
             }
             Node node = noderef.Value;
             if (node.IsLeaf())
@@ -1441,7 +1443,7 @@ namespace SEE.Game
             NodeRef noderef = gameNode.GetComponent<NodeRef>();
             if (noderef == null)
             {
-                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
+                throw new Exception($"Game object {gameNode.name} does not have a graph node attached to it.");
             }
             else
             {
@@ -1462,7 +1464,7 @@ namespace SEE.Game
             NodeRef noderef = gameNode.GetComponent<NodeRef>();
             if (noderef == null)
             {
-                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
+                throw new Exception($"Game object {gameNode.name} does not have a graph node attached to it.");
             }
 
             Node node = noderef.Value;
@@ -1492,7 +1494,7 @@ namespace SEE.Game
             NodeRef nodeRef = gameNode.GetComponent<NodeRef>();
             if (nodeRef == null)
             {
-                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
+                throw new Exception($"Game object {gameNode.name} does not have a graph node attached to it.");
             }
 
             Node node = nodeRef.Value;
@@ -1519,7 +1521,7 @@ namespace SEE.Game
             }
             else
             {
-                throw new Exception("Game object " + gameNode.name + " is not a leaf.");
+                throw new Exception($"Game object {gameNode.name} is not a leaf.");
             }
         }
 
@@ -1616,18 +1618,7 @@ namespace SEE.Game
             // render queue should be. We are assuming that the nodes are stacked on each
             // other according to the node hierarchy. Leaves are on top of all other nodes.
 
-            int style = SelectStyle(node);
-            GameObject result = innerNodeFactories[(int)node.Domain].NewBlock(style, node.Level);
-            ColoringKind coloringKind = settings.innerNodeAttributesPerKind[(int)node.Domain].coloringKind;
-            if (coloringKind == ColoringKind.Random)
-            {
-                Assert.IsTrue(coloringKind == ColoringKind.Random);
-                float r = UnityEngine.Random.Range(0.5f, 1.0f);
-                float g = UnityEngine.Random.Range(0.5f, 1.0f);
-                float b = UnityEngine.Random.Range(0.5f, 1.0f);
-                Color randomColor = new Color(r, g, b);
-                result.GetComponent<MeshRenderer>().material = Materials.New(ShaderType, randomColor, node.Level);
-            }
+            GameObject result = NewInnerNode(node);
             result.name = node.ID;
             result.tag = Tags.Node;
             result.AddComponent<NodeRef>().Value = node;
@@ -1635,6 +1626,100 @@ namespace SEE.Game
             AddLOD(result);
             InteractionDecorator.PrepareForInteraction(result);
             return result;
+        }
+
+        /// <summary>
+        /// Creates and returns a new inner node manufactored according to the 
+        /// visual settings for given <paramref name="node"/>.
+        /// 
+        /// Precondition: <paramref name="node"/> is an inner node in its graph.
+        /// </summary>
+        /// <param name="node">graph node represented by the resulting game node</param>
+        /// <returns>resulting game node representing the inner graph <paramref name="node"/></returns>
+        private GameObject NewInnerNode(Node node)
+        {
+            int style = SelectStyle(node);
+            GameObject result = innerNodeFactories[(int)node.Domain].NewBlock(style, node.Level);
+            ColoringKind coloringKind = settings.innerNodeAttributesPerKind[(int)node.Domain].coloringKind;
+            if (coloringKind == ColoringKind.Random)
+            {
+                float r = UnityEngine.Random.Range(0.5f, 1.0f);
+                float g = UnityEngine.Random.Range(0.5f, 1.0f);
+                float b = UnityEngine.Random.Range(0.5f, 1.0f);
+                Color randomColor = new Color(r, g, b);
+                result.GetComponent<MeshRenderer>().material = Materials.New(ShaderType, randomColor, node.Level);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Transform the given <paramref name="gameNode"/> into the shape
+        /// and style of an inner node. The position and depth and width of it will
+        /// be maintained, but its height will be as in other inner nodes.
+        /// The <paramref name="gameNode"/> also maintains its parent and
+        /// its children.
+        /// 
+        /// If <paramref name="gameNode"/> does not represent a graph node,
+        /// nothing happens.
+        /// </summary>
+        /// <param name="gameNode">the node to be migrated into an inner node</param>
+        public void ToInnerNode(ref GameObject gameNode)
+        {
+            if (gameNode.TryGetComponentOrLog(out NodeRef nodeRef))
+            {                
+                GameObject innerNode = DrawInnerNode(nodeRef.Value);
+                innerNode.transform.SetParent(gameNode.transform.parent);
+                innerNode.transform.position = gameNode.transform.position;
+                innerNode.transform.rotation = gameNode.transform.rotation;
+                // We are re-using the width and depth of the original gameNode
+                // but maintain the height of inner nodes.
+                innerNode.transform.localScale = new Vector3(gameNode.transform.localScale.x, innerNode.transform.localScale.y, gameNode.transform.localScale.z);
+
+                // Re-parent all children of gameNode to innerNode.
+                {
+                    // We cannot iterate on the gameNode.transform and re-parent the
+                    // the children at the same time. That is why we need to first
+                    // collect all children, and then we can re-parent them.
+                    Transform[] children = new Transform[gameNode.transform.childCount];
+                    int i = 0;
+                    foreach (Transform child in gameNode.transform)
+                    {
+                        children[i] = child;
+                        i++;
+                    }
+                    foreach (Transform child in children)
+                    {
+                        child.transform.SetParent(innerNode.transform);
+                    }
+                }
+                GameObject destructableObject = gameNode;
+                gameNode = innerNode;
+                GameObject.Destroy(destructableObject);
+            }
+        }
+
+        /// <summary>
+        /// Transform the given inner <paramref name="gameNode"/> into the shape
+        /// and style of a leaf node. The position and depth and width of it will
+        /// be maintained, but its height will be as in other leaf nodes.
+        /// 
+        /// Precondition: <paramref name="gameNode"/> must be a leaf in the
+        /// graph and does not have any children.
+        /// If <paramref name="gameNode"/> does not represent a graph node,
+        /// nothing happens.
+        /// </summary>
+        /// <param name="gameNode">the node to be migrated into a leaf node</param>
+        public void ToLeaf(ref GameObject gameNode)
+        {
+            if (gameNode.TryGetComponent(out NodeRef nodeRef))
+            {
+                if (gameNode.transform.childCount > 0)
+                {
+                    throw new Exception($"Game node {gameNode.name} to become a leaf must not have children.");
+                }
+                // FIXME: Implement this method.
+                throw new NotImplementedException();
+            }
         }
 
         /// <summary>
@@ -1775,16 +1860,14 @@ namespace SEE.Game
                     }
                     else
                     {
-                        throw new Exception("Code city " + codeCity.name + " has multiple children tagged by " + Tags.Node
-                            + ": " + result.name + " and " + child.name);
+                        throw new Exception($"Code city {codeCity.name} has multiple children tagged by {Tags.Node}: {result.name} and {child.name}.");
                     }
                 }
             }
             if (result == null)
             {
-                throw new Exception("Code city " + codeCity.name + " has no child tagged by " + Tags.Node);
+                throw new Exception($"Code city {codeCity.name} has no child tagged by {Tags.Node}");
             }
-
             return result;
         }
     }
