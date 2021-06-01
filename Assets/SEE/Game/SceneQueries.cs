@@ -160,6 +160,19 @@ namespace SEE.Game
             return null;
         }
 
+        /// <param name="cityChildTransform">The child transform, to find the root for.</param>
+        /// <returns>The root transform of given child, so the highest transform with the tag
+        /// <see cref="Tags.Node"/>.</returns>
+        public static Transform GetCityRootTransformUpwards(Transform cityChildTransform)
+        {
+            Transform result = cityChildTransform;
+            while (result.parent.CompareTag(Tags.Node))
+            {
+                result = result.parent;
+            }
+            return result;
+        }
+
         /// <summary>
         /// Returns the root game object that represents a code city as a whole
         /// along with the settings (layout information etc.). In other words,
@@ -300,84 +313,77 @@ namespace SEE.Game
         // Queries necessary in the context of the reflexion analysis.
         //------------------------------------------------------------
 
-        private const string ArchGOName = "Architecture";
-        private const string ImplGOName = "Implementation";
-
-        private static SEECity arch = null;
-        private static SEECity impl = null;
-
-        public static SEECity GetArch()
-        {
-            if (!arch)
-            {
-                SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
-                foreach (SEECity city in cities)
-                {
-                    if (city.gameObject.name.Equals(ArchGOName))
-                    {
-                        arch = city;
-                        break;
-                    }
-                }
-            }
-            return arch;
-        }
-
-        public static SEECity GetImpl()
-        {
-            if (!impl)
-            {
-                SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
-                foreach (SEECity city in cities)
-                {
-                    if (city.gameObject.name.Equals(ImplGOName))
-                    {
-                        impl = city;
-                        break;
-                    }
-                }
-            }
-            return impl;
-        }
+        /// <summary>
+        /// Cached implementation city
+        /// </summary>
+        private static SEECity cachedImplementation = null;
 
         /// <summary>
-        /// Finds the implementation city in the scene.
+        /// Cached architecture city
+        /// </summary>
+        private static SEECity cachedArchitecture = null;
+
+        /// <summary>
+        /// Cached mapping city
+        /// </summary>
+        private static SEECity cachedMapping = null;
+
+        /// <summary>
+        /// Finds the implementation city in the scene. The city may be cached.
         /// </summary>
         /// <returns>The implementation city of the scene.</returns>
         public static SEECity FindImplementation()
         {
-            SEECity result = null;
-            SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
-            foreach (SEECity city in cities)
+            if (!cachedImplementation)
             {
-                if (city.gameObject.name.Equals("Implementation"))
-                {
-#if UNITY_EDITOR
-                    Assert.IsNull(result, "There must be exactly one implementation city!");
-#endif
-                    result = city;
-#if !UNITY_EDITOR
-                    break;
-#endif
-                }
+                cachedImplementation = FindSEECity("Implementation");
             }
-            return result;
+            return cachedImplementation;
         }
 
         /// <summary>
-        /// Finds the architecture city in the scene.
+        /// Finds the architecture city in the scene. The city may be cached.
         /// </summary>
         /// <returns>The architecture city of the scene.</returns>
         public static SEECity FindArchitecture()
+        {
+            if (!cachedArchitecture)
+            {
+                cachedArchitecture = FindSEECity("Architecture");
+            }
+            return cachedArchitecture;
+        }
+
+        /// <summary>
+        /// Finds the mapping city in the scene. The city may be cached.
+        /// </summary>
+        /// <returns>The mapping city of the scene.</returns>
+        public static SEECity FindMapping()
+        {
+            if (!cachedMapping)
+            {
+                cachedMapping = FindSEECity("Mapping");
+            }
+            return cachedMapping;
+        }
+
+        /// <summary>
+        /// Finds the <see cref="SEECity"/> of <see cref="GameObject"/> with name
+        /// <paramref name="name"/>. As this method does not cache anything, this call is quite
+        /// heavy and should not be called too often.
+        /// </summary>
+        /// <param name="name">The name of the object with city component attached.</param>
+        /// <returns>The found city or <code>null</code>, if no such city exists.</returns>
+        private static SEECity FindSEECity(string name)
         {
             SEECity result = null;
             SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
             foreach (SEECity city in cities)
             {
-                if (city.gameObject.name.Equals("Architecture"))
+                if (city.gameObject.name.Equals(name))
                 {
 #if UNITY_EDITOR
-                    Assert.IsNull(result, "There must be exactly one architecture city!");
+                    Assert.IsNull(result, "There must be exactly one city named " + name + "!");
 #endif
                     result = city;
 #if !UNITY_EDITOR

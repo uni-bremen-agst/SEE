@@ -16,7 +16,6 @@
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.DataModel.DG;
-using static SEE.Game.AbstractSEECity;
 
 namespace SEE.Layout.NodeLayouts.Cose
 {

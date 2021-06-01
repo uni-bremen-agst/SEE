@@ -97,6 +97,15 @@ namespace SEE.Controls
 #endif
         }
 
+        /// <summary>
+        /// The user wants to map an implementation node onto an architecture node for the architecture analysis.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        internal static bool Mapping()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Mapping);
+        }
+
         //-----------------------------------------------------
         // Camera path recording and playing
         //-----------------------------------------------------
@@ -139,6 +148,19 @@ namespace SEE.Controls
         public static bool ToggleMetricHoveringSelection()
         {
             return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleMetricHoveringSelection);
+        }
+
+        //-----------------------------------------------------
+        // Manipulating nodes
+        //-----------------------------------------------------
+
+        /// <summary>
+        /// The user wants to scale a selected node.
+        /// </summary>
+        /// <returns>true if the user requests this action</returns>
+        internal static bool Scale()
+        {
+            return Input.GetMouseButton(0);
         }
 
         //-----------------------------------------------------
@@ -201,12 +223,30 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// The user wants to drag the city on its plane.
+        /// The user wants to drag the hovered element of the city on its plane.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool DragCity()
+        internal static bool DragHovered()
         {
-            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.Drag);
+            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.DragHovered);
+        }
+
+        /// <summary>
+        /// The user wants to start dragging the city in its entirety or parts of it.
+        /// </summary>
+        /// <returns>true if the user requests this action</returns>
+        internal static bool StartDrag()
+        {
+            return Input.GetMouseButtonDown(2);
+        }
+
+        /// <summary>
+        /// The user wants to drag the city in it's entirety or parts of it.
+        /// </summary>
+        /// <returns>true if the user requests this action</returns>
+        internal static bool Drag()
+        {
+            return Input.GetMouseButton(2);
         }
 
         //-----------------------------------------------------
@@ -449,16 +489,6 @@ namespace SEE.Controls
         public static bool Select()
         {
             return SelectionEnabled && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI();
-        }
-
-        /// <summary>
-        /// True if the user wants to drag an object (in a desktop environment, the user
-        /// holds the left mouse pressed while the mouse cursor is not over a GUI element).
-        /// </summary>
-        /// <returns>true if the wants to drag</returns>
-        public static bool Drag()
-        {
-            return Input.GetMouseButton(0) && !Raycasting.IsMouseOverGUI();
         }
     }
 }

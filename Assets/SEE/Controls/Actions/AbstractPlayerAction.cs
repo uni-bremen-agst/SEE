@@ -1,4 +1,6 @@
 ﻿using SEE.Utils;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -10,6 +12,11 @@ namespace SEE.Controls.Actions
     /// </summary>
     public abstract class AbstractPlayerAction : ReversibleAction
     {
+        /// <summary>
+        /// The unique ID of an action.
+        /// </summary>
+        private readonly Guid id = Guid.NewGuid();
+
         /// <summary>
         /// The object that the cursor hovers over.
         /// </summary>
@@ -101,28 +108,6 @@ namespace SEE.Controls.Actions
         protected void LocalAnyHoverIn(InteractableObject interactableObject)
         {
             hoveredObject = interactableObject.gameObject;
-
-            // FIXME: For an unknown reason, the mouse events in InteractableObject will be
-            // triggered twice per frame, which causes this method to be called twice.
-            // We need to further investigate this issue.
-            //Debug.LogFormat("{0}.LocalAnyHoverIn({1})\n",
-            //                this.GetType().FullName, 
-            //                interactableObject == null ? "NULL" : interactableObject.name);
-            //try
-            //{
-            //    if (interactableObject.gameObject != hoveredObject)
-            //    {
-            //        Assert.IsNull(hoveredObject);
-            //        hoveredObject = interactableObject.gameObject;
-            //    }
-            //}
-            //catch (Exception e)
-            //{
-            //    Debug.LogErrorFormat("{0}.LocalAnyHoverIn throws {1}. [hoveredObject: {2}. interactableObject: {3}.\n",
-            //                          this.GetType().FullName,
-            //                          e.Message, hoveredObject == null ? "NULL" : hoveredObject.name, interactableObject.name);
-            //    // FIXME: There are AssertionExceptions 
-            //}
         }
 
         /// <summary>
@@ -133,25 +118,6 @@ namespace SEE.Controls.Actions
         protected void LocalAnyHoverOut(InteractableObject interactableObject)
         {
             hoveredObject = null;
-
-            // FIXME: For an unknown reason, the mouse events in InteractableObject will be
-            // triggered twice per frame, which causes this method to be called twice.
-            // We need to further investigate this issue.
-            //Debug.LogFormat("{0}.LocalAnyHoverOut({1})\n",
-            //                this.GetType().FullName,
-            //                interactableObject == null ? "NULL" : interactableObject.name);
-            //try
-            //{
-            //    Assert.IsTrue(hoveredObject == interactableObject.gameObject);
-            //    hoveredObject = null;
-            //}
-            //catch (Exception e)
-            //{
-            //    Debug.LogErrorFormat("{0}.LocalAnyHoverOut throws {1}. [hoveredObject: {2}. interactableObject: {3}.\n",
-            //                         this.GetType().FullName,
-            //                         e.Message, hoveredObject == null ? "NULL" : hoveredObject.name, interactableObject.name);
-            //    // FIXME: There are AssertionExceptions 
-            //}
         }
 
         /// <summary>
@@ -163,6 +129,21 @@ namespace SEE.Controls.Actions
         public ReversibleAction.Progress CurrentProgress()
         {
             return currentState;
+        }
+
+        /// <summary>
+        /// Returns the IDs of all gameObjects manipulated by the specific action.
+        /// </summary>
+        /// <returns>All IDs of manipulated gameObjects</returns>
+        public abstract HashSet<string> GetChangedObjects();
+
+        /// <summary>
+        /// A getter for the ID of this action.
+        /// </summary>
+        /// <returns>The ID of this action as a string</returns>
+        public string GetId()
+        {
+            return id.ToString();
         }
     }
 }

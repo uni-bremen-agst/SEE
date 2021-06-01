@@ -12,6 +12,7 @@ namespace SEE.Controls.Actions
     /// display and VR controllers. Similar interactions specific to a desktop 
     /// environment with 2D display, mouse, and keyboard are implemented
     /// in DesktopNavigationAction.
+    /// FIXME This need to be abstracted similar to NavigationAction.cs and DesktopNavigationAction.cs (which is already gone) were abstracted into ZoomAction.cs and ZoomActionDesktop.cs (and also MoveAction.cs etc.). Those scripts are attached to the e.g. DesktopPlayer prefab.
     public sealed class XRNavigationAction : NavigationAction
     {
         /// <summary>
@@ -331,5 +332,4 @@ namespace SEE.Controls.Actions
             }
         }
     }
-
 }
