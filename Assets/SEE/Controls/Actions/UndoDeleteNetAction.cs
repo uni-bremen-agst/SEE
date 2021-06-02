@@ -36,16 +36,19 @@ namespace SEE.Net
         /// </summary>
         public Graph Graph;
 
+        public Vector3 OldPosition;
+
         /// <summary>
         /// Returns a new <see cref="UndoDeleteNetAction"/> instance.
         /// </summary>
         /// <param name="gameObjectID">the unique name of the gameObject of a node or edge 
         /// which had been deleted before</param>
         /// <param name="rootID">the unique name of a graph's root</param>
-        public UndoDeleteNetAction(string gameObjectID, String rootID) : base()
+        public UndoDeleteNetAction(string gameObjectID, String rootID, Vector3 oldPosition) : base()
         {
             this.GameObjectID = gameObjectID;
             this.RootID = rootID;
+            this.OldPosition = oldPosition;
         }
 
         /// <summary>
@@ -67,6 +70,7 @@ namespace SEE.Net
             if (!IsRequester())
             {                
                 GameObject rootNode = GameObject.Find(RootID);
+               
                 if (rootNode != null)
                 {
                     Graph = rootNode.GetGraph();
@@ -81,11 +85,14 @@ namespace SEE.Net
                 }
 
                 GameObject gameObject = GameObject.Find(GameObjectID);
+                Dictionary<GameObject, Vector3> oldPos = new Dictionary<GameObject, Vector3>();
+                oldPos.Add(gameObject, OldPosition);
                 if (gameObject != null)
                 {
                     if (gameObject.HasEdgeRef())
                     {
-                        PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.RemoveFromGarbage(new List<GameObject> {gameObject}));
+                        
+                        PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.RemoveFromGarbage(new List<GameObject> {gameObject}, oldPos));
                         if (gameObject.TryGetComponentOrLog(out EdgeRef edgeReference))
                         {
                             try
@@ -104,7 +111,7 @@ namespace SEE.Net
                         {
                             gameObject
                         };
-                        PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.RemoveFromGarbage(removeFromGarbage));
+                        PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.RemoveFromGarbage(removeFromGarbage,oldPos));
                         Portal.SetInfinitePortal(gameObject);
                         Graph.AddNode(gameObject.GetNode());
                         Graph.FinalizeNodeHierarchy();
