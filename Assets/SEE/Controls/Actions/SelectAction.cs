@@ -38,12 +38,14 @@ namespace SEE.Controls.Actions
 
                 if (Input.GetKey(KeyCode.LeftControl))
                 {
-                    obj?.SetSelect(!obj.IsSelected, true);
+                    if (obj != null)
+                    {
+                        obj.SetSelect(!obj.IsSelected, true);
+                    }
                 }
                 else
                 {
-                    InteractableObject.UnselectAll(true);
-                    obj?.SetSelect(true, true);
+                    InteractableObject.ReplaceSelection(obj, true);
                 }
             }
         }

@@ -3,6 +3,7 @@ using SEE.Utils;
 using SEE.Game;
 using UnityEngine;
 using SEE.Net;
+using System.Collections.Generic;
 
 namespace SEE.Controls.Actions
 {
@@ -22,7 +23,7 @@ namespace SEE.Controls.Actions
             bool result = false;
 
             // FIXME: Needs adaptation for VR where no mouse is available.
-            if (Input.GetMouseButtonDown(0) 
+            if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
             {
                 // the hit object is the parent in which to create the new node
@@ -121,18 +122,19 @@ namespace SEE.Controls.Actions
             }
             result.y = 0.01f;
             return result;
-        }       
+        }
 
         /// <summary>
         /// Undoes this AddNodeAction.
         /// </summary>
         public override void Undo()
         {
-            base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> property.
+            base.Undo();
             if (addedGameNode != null)
             {
                 new DeleteNetAction(addedGameNode.name).Execute();
                 GameNodeAdder.Remove(addedGameNode);
+                Destroyer.DestroyGameObject(addedGameNode);
                 addedGameNode = null;
             }
         }
@@ -142,7 +144,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Redo()
         {
-            base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> property.
+            base.Redo();
             addedGameNode = GameNodeAdder.Add(memento.Parent, position: memento.Position, worldSpaceScale: memento.Scale, nodeID: memento.NodeID);
             if (addedGameNode != null)
             {
@@ -175,6 +177,19 @@ namespace SEE.Controls.Actions
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.NewNode;
+        }
+
+        /// <summary>
+        /// Returns all IDs of gameObjects manipulated by this action.
+        /// </summary>
+        /// <returns>all IDs of gameObjects manipulated by this action</returns>
+        public override HashSet<string> GetChangedObjects()
+        {
+            return new HashSet<string>
+            {
+                memento.Parent.name,
+                memento.NodeID
+            };
         }
     }
 }

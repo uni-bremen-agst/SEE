@@ -1,13 +1,13 @@
 ﻿#if UNITY_EDITOR
 
-using System.Collections.Generic;
-using System.Linq;
+using SEE;
+using SEE.DataModel.DG;
 using SEE.Game;
-using SEE.Layout.EdgeLayouts;
-using SEE.Layout.NodeLayouts;
 using SEE.Utils;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEEEditor
 {
@@ -34,9 +34,19 @@ namespace SEEEditor
         private bool showLeafAttributes = true;
 
         /// <summary>
+        /// Whether the leaf node attributes for a given <see cref="Node.NodeDomain"/> should be expanded.
+        /// </summary>
+        private bool[] showLeafAttributesAtIndex = Enumerable.Repeat(false, (int)Node.NodeDomain.Count).ToArray();
+
+        /// <summary>
         /// Whether the inner node attribute foldout should be expanded.
         /// </summary>
         private bool showInnerAttributes = true;
+
+        /// <summary>
+        /// Whether the inner node attributes for a given <see cref="Node.NodeDomain"/> should be expanded.
+        /// </summary>
+        private bool[] showInnerAttributesAtIndex = Enumerable.Repeat(false, (int)Node.NodeDomain.Count).ToArray();
 
         /// <summary>
         /// Whether the "nodes and node layout" foldout should be expanded.
@@ -78,7 +88,7 @@ namespace SEEEditor
 
             EditorGUILayout.Separator();
 
-            if (city.NodeLayout == NodeLayoutKind.CompoundSpringEmbedder)
+            if (city.nodeLayoutSettings.kind == NodeLayoutKind.CompoundSpringEmbedder)
             {
                 CompoundSpringEmbedderAttributes();
                 EditorGUILayout.Separator();
@@ -96,11 +106,10 @@ namespace SEEEditor
         /// </summary>
         private void GlobalAttributes()
         {
-            showGlobalAttributes = EditorGUILayout.Foldout(showGlobalAttributes,
-                                                           "Global attributes", true, EditorStyles.foldoutHeader);
+            showGlobalAttributes = EditorGUILayout.Foldout(showGlobalAttributes, "Global attributes", true, EditorStyles.foldoutHeader);
             if (showGlobalAttributes)
             {                
-                city.CityPath = GetDataPath("Settings file", city.CityPath, Filenames.ExtensionWithoutPeriod(Filenames.ConfigExtension));
+                city.CityPath = DataPathEditor.GetDataPath("Settings file", city.CityPath, Filenames.ExtensionWithoutPeriod(Filenames.ConfigExtension));
                 GUILayout.BeginHorizontal();
                 if (GUILayout.Button("Load", GUILayout.Width(50)))
                 {
@@ -114,7 +123,7 @@ namespace SEEEditor
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("LOD Culling");
-                city.LODCulling = EditorGUILayout.Slider(city.LODCulling, 0.0f, 1.0f);
+                city.globalCityAttributes.lodCulling = EditorGUILayout.Slider(city.globalCityAttributes.lodCulling, 0.0f, 1.0f);
                 GUILayout.EndHorizontal();
             }
 
@@ -150,8 +159,8 @@ namespace SEEEditor
             }
             if (GUILayout.Button("...", GUILayout.Width(20)))
             {
-                string selectedPath = fileDialogue ?
-                      EditorUtility.OpenFilePanel("Select file", dataPath.RootPath, extension)
+                string selectedPath = fileDialogue
+                    ? EditorUtility.OpenFilePanel("Select file", dataPath.RootPath, extension)
                     : EditorUtility.OpenFolderPanel("Select directory", dataPath.RootPath, extension);
                 if (!string.IsNullOrEmpty(selectedPath))
                 {
@@ -172,53 +181,29 @@ namespace SEEEditor
         /// </summary>
         private void CompoundSpringEmbedderAttributes()
         {
-            showCompoundSpringEmbedder = EditorGUILayout.Foldout(showCompoundSpringEmbedder,
-                "Compound spring embedder layout attributes", true, EditorStyles.foldoutHeader);
+            showCompoundSpringEmbedder = EditorGUILayout.Foldout(showCompoundSpringEmbedder, "Compound spring embedder layout attributes", true, EditorStyles.foldoutHeader);
             if (showCompoundSpringEmbedder)
             {
                 GUILayout.Label("", EditorStyles.boldLabel);
-                city.CoseGraphSettings.EdgeLength =
-                    EditorGUILayout.IntField("Edge length", city.CoseGraphSettings.EdgeLength);
-                city.CoseGraphSettings.UseSmartIdealEdgeCalculation =
-                    EditorGUILayout.Toggle("Smart ideal edge length",
-                        city.CoseGraphSettings.UseSmartIdealEdgeCalculation);
-                city.CoseGraphSettings.PerLevelIdealEdgeLengthFactor =
-                    EditorGUILayout.FloatField("Level edge length factor",
-                        city.CoseGraphSettings.PerLevelIdealEdgeLengthFactor);
-                city.CoseGraphSettings.MultiLevelScaling = EditorGUILayout.Toggle("MultiLevel-Scaling",
-                    city.CoseGraphSettings.MultiLevelScaling);
-                city.CoseGraphSettings.UseSmartMultilevelScaling =
-                    EditorGUILayout.Toggle("Smart multilevel-scaling",
-                        city.CoseGraphSettings.UseSmartMultilevelScaling);
-                city.CoseGraphSettings.UseSmartRepulsionRangeCalculation =
-                    EditorGUILayout.Toggle("Smart repulsion range",
-                        city.CoseGraphSettings.UseSmartRepulsionRangeCalculation);
-                city.CoseGraphSettings.RepulsionStrength = EditorGUILayout.FloatField("Repulsion strength",
-                    city.CoseGraphSettings.RepulsionStrength);
-                city.CoseGraphSettings.GravityStrength =
-                    EditorGUILayout.FloatField("Gravity", city.CoseGraphSettings.GravityStrength);
-                city.CoseGraphSettings.CompoundGravityStrength = EditorGUILayout.FloatField("Compound gravity",
-                    city.CoseGraphSettings.CompoundGravityStrength);
-                /*city.CoseGraphSettings.useOptAlgorithm = EditorGUILayout.Toggle("Use Opt-Algorithm", city.CoseGraphSettings.useOptAlgorithm);
-                    if (city.CoseGraphSettings.useOptAlgorithm)
-                    {
-                        //city.CoseGraphSettings.useCalculationParameter = false; 
-                    }*/
-                city.CoseGraphSettings.UseCalculationParameter =
-                    EditorGUILayout.Toggle("Calc parameters automatically",
-                        city.CoseGraphSettings.UseCalculationParameter);
-                city.CoseGraphSettings.UseIterativeCalculation =
-                    EditorGUILayout.Toggle("Find parameters iteratively",
-                        city.CoseGraphSettings.UseIterativeCalculation);
-                if (city.CoseGraphSettings.UseCalculationParameter ||
-                    city.CoseGraphSettings.UseIterativeCalculation)
+                city.coseGraphSettings.EdgeLength = EditorGUILayout.IntField("Edge length", city.coseGraphSettings.EdgeLength);
+                city.coseGraphSettings.UseSmartIdealEdgeCalculation = EditorGUILayout.Toggle("Smart ideal edge length", city.coseGraphSettings.UseSmartIdealEdgeCalculation);
+                city.coseGraphSettings.PerLevelIdealEdgeLengthFactor = EditorGUILayout.FloatField("Level edge length factor", city.coseGraphSettings.PerLevelIdealEdgeLengthFactor);
+                city.coseGraphSettings.MultiLevelScaling = EditorGUILayout.Toggle("MultiLevel-Scaling", city.coseGraphSettings.MultiLevelScaling);
+                city.coseGraphSettings.UseSmartMultilevelScaling = EditorGUILayout.Toggle("Smart multilevel-scaling", city.coseGraphSettings.UseSmartMultilevelScaling);
+                city.coseGraphSettings.UseSmartRepulsionRangeCalculation = EditorGUILayout.Toggle("Smart repulsion range", city.coseGraphSettings.UseSmartRepulsionRangeCalculation);
+                city.coseGraphSettings.RepulsionStrength = EditorGUILayout.FloatField("Repulsion strength", city.coseGraphSettings.RepulsionStrength);
+                city.coseGraphSettings.GravityStrength = EditorGUILayout.FloatField("Gravity", city.coseGraphSettings.GravityStrength);
+                city.coseGraphSettings.CompoundGravityStrength = EditorGUILayout.FloatField("Compound gravity", city.coseGraphSettings.CompoundGravityStrength);
+                city.coseGraphSettings.UseCalculationParameter = EditorGUILayout.Toggle("Calc parameters automatically", city.coseGraphSettings.UseCalculationParameter);
+                city.coseGraphSettings.UseIterativeCalculation = EditorGUILayout.Toggle("Find parameters iteratively", city.coseGraphSettings.UseIterativeCalculation);
+                if (city.coseGraphSettings.UseCalculationParameter || city.coseGraphSettings.UseIterativeCalculation)
                 {
-                    city.ZScoreScale = true;
+                    city.nodeLayoutSettings.zScoreScale = true;
 
-                    city.CoseGraphSettings.MultiLevelScaling = false;
-                    city.CoseGraphSettings.UseSmartMultilevelScaling = false;
-                    city.CoseGraphSettings.UseSmartIdealEdgeCalculation = false;
-                    city.CoseGraphSettings.UseSmartRepulsionRangeCalculation = false;
+                    city.coseGraphSettings.MultiLevelScaling = false;
+                    city.coseGraphSettings.UseSmartMultilevelScaling = false;
+                    city.coseGraphSettings.UseSmartIdealEdgeCalculation = false;
+                    city.coseGraphSettings.UseSmartRepulsionRangeCalculation = false;
                 }
             }
         }
@@ -231,18 +216,21 @@ namespace SEEEditor
             showEdgeLayout = EditorGUILayout.Foldout(showEdgeLayout, "Edges and edge layout", true, EditorStyles.foldoutHeader);
             if (showEdgeLayout)
             {
-                city.EdgeLayout = (EdgeLayoutKind) EditorGUILayout.EnumPopup("Edge layout", city.EdgeLayout);
-                city.EdgeWidth = EditorGUILayout.FloatField("Edge width", city.EdgeWidth);
-                city.EdgesAboveBlocks = EditorGUILayout.Toggle("Edges above blocks", city.EdgesAboveBlocks);
+                EdgeLayoutSettings settings = city.edgeLayoutSettings;
+                Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
+
+                settings.kind = (EdgeLayoutKind)EditorGUILayout.EnumPopup("Edge layout", settings.kind);
+                settings.edgeWidth = EditorGUILayout.FloatField("Edge width", settings.edgeWidth);
+                settings.edgesAboveBlocks = EditorGUILayout.Toggle("Edges above blocks", settings.edgesAboveBlocks);
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Label("Bundling tension");
-                city.Tension = EditorGUILayout.Slider(city.Tension, 0.0f, 1.0f);
+                settings.tension = EditorGUILayout.Slider(settings.tension, 0.0f, 1.0f);
                 EditorGUILayout.EndHorizontal();
-                city.RDP = EditorGUILayout.FloatField("RDP", city.RDP);
-                city.TubularSegments = EditorGUILayout.IntField("Tubular Segments", city.TubularSegments);
-                city.Radius = EditorGUILayout.FloatField("Radius", city.Radius);
-                city.RadialSegments = EditorGUILayout.IntField("Radial Segments", city.RadialSegments);
-                city.isEdgeSelectable = EditorGUILayout.Toggle("Edges selectable", city.isEdgeSelectable);
+                settings.rdp = EditorGUILayout.FloatField("RDP", settings.rdp);
+                settings.tubularSegments = EditorGUILayout.IntField("Tubular Segments", settings.tubularSegments);
+                settings.radius = EditorGUILayout.FloatField("Radius", settings.radius);
+                settings.radialSegments = EditorGUILayout.IntField("Radial Segments", settings.radialSegments);
+                settings.isEdgeSelectable = EditorGUILayout.Toggle("Edges selectable", settings.isEdgeSelectable);
             }
         }
 
@@ -254,31 +242,14 @@ namespace SEEEditor
             showNodeLayout = EditorGUILayout.Foldout(showNodeLayout, "Nodes and node layout", true, EditorStyles.foldoutHeader);
             if (showNodeLayout)
             {
-                city.LeafObjects = (AbstractSEECity.LeafNodeKinds) EditorGUILayout.EnumPopup("Leaf nodes", city.LeafObjects);
-                city.NodeLayout = (NodeLayoutKind) EditorGUILayout.EnumPopup("Node layout", city.NodeLayout);
-                city.LayoutPath = GetDataPath("Layout file", city.LayoutPath, "gvl");
+                NodeLayoutSettings settings = city.nodeLayoutSettings;
+                Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
 
-                GUILayout.BeginHorizontal();
-                EditorGUILayout.PrefixLabel("Inner nodes");
-                Dictionary<AbstractSEECity.InnerNodeKinds, string> shapeKinds = city.NodeLayout.GetInnerNodeKinds()
-                    .ToDictionary(kind => kind, kind => kind.ToString());
-
-                if (shapeKinds.ContainsKey(city.InnerNodeObjects))
-                {
-                    city.InnerNodeObjects = shapeKinds.ElementAt(EditorGUILayout.Popup(
-                        shapeKinds.Keys.ToList().IndexOf(city.InnerNodeObjects), shapeKinds.Values.ToArray())).Key;
-                }
-                else
-                {
-                    city.InnerNodeObjects = shapeKinds.ElementAt(EditorGUILayout.Popup(
-                        shapeKinds.Keys.ToList().IndexOf(shapeKinds.First().Key), shapeKinds.Values.ToArray())).Key;
-                }
-
-                GUILayout.EndHorizontal();
-
-                city.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", city.ZScoreScale);
-                city.ShowErosions = EditorGUILayout.Toggle("Show erosions", city.ShowErosions);
-                city.MaxErosionWidth = EditorGUILayout.FloatField("Max. width of erosion icon", city.MaxErosionWidth);
+                settings.kind = (NodeLayoutKind)EditorGUILayout.EnumPopup("Node layout", settings.kind);
+                city.globalCityAttributes.layoutPath = GetDataPath("Layout file", city.globalCityAttributes.layoutPath, Filenames.ExtensionWithoutPeriod(Filenames.GVLExtension));
+                settings.zScoreScale = EditorGUILayout.Toggle("Z-score scaling", settings.zScoreScale);
+                settings.showErosions = EditorGUILayout.Toggle("Show erosions", settings.showErosions);
+                settings.maxErosionWidth = EditorGUILayout.FloatField("Max. width of erosion icon", settings.maxErosionWidth);
             }
         }
 
@@ -287,17 +258,34 @@ namespace SEEEditor
         /// </summary>
         private void InnerNodeAttributes()
         {
-            showInnerAttributes = EditorGUILayout.Foldout(showInnerAttributes, "Attributes of inner nodes", true,
-                EditorStyles.foldoutHeader);
+            showInnerAttributes = EditorGUILayout.Foldout(showInnerAttributes, "Attributes of inner nodes", true, EditorStyles.foldoutHeader);
             if (showInnerAttributes)
             {
-                city.InnerNodeHeightMetric = EditorGUILayout.TextField("Height", city.InnerNodeHeightMetric);
-                city.InnerNodeStyleMetric = EditorGUILayout.TextField("Style", city.InnerNodeStyleMetric);
-                city.InnerNodeColorRange.lower = EditorGUILayout.ColorField("Lower color", city.InnerNodeColorRange.lower);
-                city.InnerNodeColorRange.upper = EditorGUILayout.ColorField("Upper color", city.InnerNodeColorRange.upper);
-                city.InnerNodeColorRange.NumberOfColors =
-                    (uint) EditorGUILayout.IntSlider("# Colors", (int) city.InnerNodeColorRange.NumberOfColors, 1, 15);
-                LabelSettings(ref city.InnerNodeLabelSettings);
+                EditorGUI.indentLevel++;
+                for (int i = 0; i < (int)Node.NodeDomain.Count; i++)
+                {
+                    string label = "Domain: " + ((Node.NodeDomain)i).ToString();
+                    showInnerAttributesAtIndex[i] = EditorGUILayout.Foldout(showInnerAttributesAtIndex[i], label, EditorStyles.foldout);
+                    if (showInnerAttributesAtIndex[i])
+                    {
+                        InnerNodeAttributes settings = city.innerNodeAttributesPerKind[i];
+                        Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
+
+                        settings.kind = (InnerNodeKinds)EditorGUILayout.EnumPopup("Type", settings.kind);
+                        settings.heightMetric = EditorGUILayout.TextField("Height", settings.heightMetric);
+                        settings.styleMetric = EditorGUILayout.TextField("Style", settings.styleMetric);
+                        settings.coloringKind = (ColoringKind)EditorGUILayout.EnumPopup("Color By", settings.coloringKind);
+                        EditorGUI.BeginDisabledGroup(settings.coloringKind == ColoringKind.Random);
+                        {
+                            settings.colorRange.lower = EditorGUILayout.ColorField("Lower color", settings.colorRange.lower);
+                            settings.colorRange.upper = EditorGUILayout.ColorField("Upper color", settings.colorRange.upper);
+                            settings.colorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.colorRange.NumberOfColors, 1, 15);
+                        }
+                        EditorGUI.EndDisabledGroup();
+                        LabelSettings(ref settings.labelSettings);
+                    }
+                }
+                EditorGUI.indentLevel--;
             }
         }
 
@@ -306,21 +294,36 @@ namespace SEEEditor
         /// </summary>
         private void LeafNodeAttributes()
         {
-            showLeafAttributes =
-                EditorGUILayout.Foldout(showLeafAttributes, "Attributes of leaf nodes", true, EditorStyles.foldoutHeader);
+            showLeafAttributes = EditorGUILayout.Foldout(showLeafAttributes, "Attributes of leaf nodes", true, EditorStyles.foldoutHeader);
             if (showLeafAttributes)
             {
-                city.WidthMetric = EditorGUILayout.TextField("Width", city.WidthMetric);
-                city.HeightMetric = EditorGUILayout.TextField("Height", city.HeightMetric);
-                city.DepthMetric = EditorGUILayout.TextField("Depth", city.DepthMetric);
-                city.LeafStyleMetric = EditorGUILayout.TextField("Style", city.LeafStyleMetric);
-                city.LeafNodeColorRange.lower =
-                    EditorGUILayout.ColorField("Lower color", city.LeafNodeColorRange.lower);
-                city.LeafNodeColorRange.upper =
-                    EditorGUILayout.ColorField("Upper color", city.LeafNodeColorRange.upper);
-                city.LeafNodeColorRange.NumberOfColors = (uint) EditorGUILayout.IntSlider("# Colors",
-                    (int) city.LeafNodeColorRange.NumberOfColors, 1, 15);
-                LabelSettings(ref city.LeafLabelSettings);
+                EditorGUI.indentLevel++;
+                for (int i = 0; i < (int)Node.NodeDomain.Count; i++)
+                {
+                    string label = "Domain: " + ((Node.NodeDomain)i).ToString();
+                    showLeafAttributesAtIndex[i] = EditorGUILayout.Foldout(showLeafAttributesAtIndex[i], label, EditorStyles.foldout);
+                    if (showLeafAttributesAtIndex[i])
+                    {
+                        LeafNodeAttributes settings = city.leafNodeAttributesPerKind[i];
+                        Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
+
+                        settings.kind = (LeafNodeKinds)EditorGUILayout.EnumPopup("Type", settings.kind);
+                        settings.widthMetric = EditorGUILayout.TextField("Width", settings.widthMetric);
+                        settings.heightMetric = EditorGUILayout.TextField("Height", settings.heightMetric);
+                        settings.depthMetric = EditorGUILayout.TextField("Depth", settings.depthMetric);
+                        settings.styleMetric = EditorGUILayout.TextField("Style", settings.styleMetric);
+                        settings.coloringKind = (ColoringKind)EditorGUILayout.EnumPopup("Color By", settings.coloringKind);
+                        EditorGUI.BeginDisabledGroup(settings.coloringKind == ColoringKind.Random);
+                        {
+                            settings.colorRange.lower = EditorGUILayout.ColorField("Lower color", settings.colorRange.lower);
+                            settings.colorRange.upper = EditorGUILayout.ColorField("Upper color", settings.colorRange.upper);
+                            settings.colorRange.NumberOfColors = (uint) EditorGUILayout.IntSlider("# Colors", (int) settings.colorRange.NumberOfColors, 1, 15);
+                        }
+                        EditorGUI.EndDisabledGroup();
+                        LabelSettings(ref settings.labelSettings);
+                    }
+                }
+                EditorGUI.indentLevel--;
             }
         }
 
@@ -333,8 +336,7 @@ namespace SEEEditor
             labelSettings.Show = EditorGUILayout.Toggle("Show labels", labelSettings.Show);
             labelSettings.Distance = EditorGUILayout.FloatField("Label distance", labelSettings.Distance);
             labelSettings.FontSize = EditorGUILayout.FloatField("Label font size", labelSettings.FontSize);
-            labelSettings.AnimationDuration = EditorGUILayout.FloatField("Label animation duration (in seconds)",
-                                                                         labelSettings.AnimationDuration);
+            labelSettings.AnimationDuration = EditorGUILayout.FloatField("Label animation duration (in seconds)", labelSettings.AnimationDuration);
         }
     }
 }

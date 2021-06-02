@@ -17,6 +17,8 @@ namespace SEE.Controls.Actions
             {
                 interactable.HoverIn += On;
                 interactable.HoverOut += Off;
+                interactable.SelectOut += SelectOff;
+                interactable.GrabOut += GrabOff;
             }
             else
             {
@@ -33,6 +35,8 @@ namespace SEE.Controls.Actions
             {
                 interactable.HoverIn -= On;
                 interactable.HoverOut -= Off;
+                interactable.SelectOut -= SelectOff;
+                interactable.GrabOut -= GrabOff;
             }
             else
             {
@@ -44,14 +48,28 @@ namespace SEE.Controls.Actions
         /// Called when the object is hovered over.
         /// </summary>
         /// <param name="interactableObject">the object being hovered over</param>
-        /// <param name="isOwner">true if a local user initiated this call</param>
-        protected abstract void On(InteractableObject interactableObject, bool isOwner);
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        protected abstract void On(InteractableObject interactableObject, bool isInitiator);
 
         /// <summary>
         /// Called when the object is no longer being hovered over.
         /// </summary>
         /// <param name="interactableObject">the object being hovered over</param>
-        /// <param name="isOwner">true if a local user initiated this call</param>
-        protected abstract void Off(InteractableObject interactableObject, bool isOwner);
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        protected abstract void Off(InteractableObject interactableObject, bool isInitiator);
+
+        /// <summary>
+        /// Called when the object is no longer selected.
+        /// </summary>
+        /// <param name="interactableObject">the object being selected</param>
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        protected abstract void SelectOff(InteractableObject interactableObject, bool isInitiator);
+
+        /// <summary>
+        /// Called when the object is no longer grabbed.
+        /// </summary>
+        /// <param name="interactableObject">the object being grabbed</param>
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        protected abstract void GrabOff(InteractableObject interactableObject, bool isInitiator);
     }
 }

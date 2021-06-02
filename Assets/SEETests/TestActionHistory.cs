@@ -1,6 +1,8 @@
 ﻿using NUnit.Framework;
 using SEE.Controls.Actions;
 using SEE.Utils;
+using System;
+using System.Collections.Generic;
 
 namespace SEETests
 {
@@ -110,13 +112,38 @@ namespace SEETests
                 }
             }
 
+            private class TestActionStateType : ActionStateType 
+            {
+                public TestActionStateType() : base(TestAction.CreateReversibleAction)
+                { }
+            }
+
+            private static ActionStateType actionStateType = new TestActionStateType();
+
+            private static ReversibleAction CreateReversibleAction()
+            {
+                return new TestAction();
+            }
+
             /// <summary>
             /// Returns the <see cref="ActionStateType"/> of this action.
             /// </summary>
             /// <returns>the <see cref="ActionStateType"/> of this action</returns>
             public ActionStateType GetActionStateType()
             {
-                throw new System.NotImplementedException();
+                return actionStateType;
+            }
+
+            public HashSet<string> GetChangedObjects()
+            {
+                return new HashSet<string>();
+            }
+
+            private readonly string id = Guid.NewGuid().ToString();
+
+            public string GetId()
+            {                
+                return id;
             }
         }
 
@@ -132,21 +159,14 @@ namespace SEETests
             Counter.Reset();
         }
 
-        [Test]
-        public void EmptyHistory()
-        {
-            Assert.Throws<EmptyActionHistoryException>(() => hist.Undo());
-            Assert.Throws<EmptyUndoHistoryException>(() => hist.Redo());
-        }
-
         [Test]        
         public void OneAction()
         {
-            // Note: TestAction is an action that continues forever, that is,
-            // no Update call will ever return true and its progress state
-            // is initially <see cref="ReversibleAction.Progress.NoEffect"/>
-            // and after the first Update call <see cref="ReversibleAction.Progress.InProgress"/>
-            // for the rest of its life.
+            /// Note: TestAction is an action that continues forever, that is,
+            /// no Update call will ever return true and its progress state
+            /// is initially <see cref="ReversibleAction.Progress.NoEffect"/>
+            /// and after the first Update call <see cref="ReversibleAction.Progress.InProgress"/>
+            /// for the rest of its life.
             TestAction c = new TestAction();
             CheckCalls(c, value: false, awake: 0, start: 0, update: 0, stop: 0);
             hist.Execute(c);
@@ -217,7 +237,7 @@ namespace SEETests
             // c4 is undone; execution will resume with c3, because c3 is still 
             // in progress (TestAction.Update() always yields false).
             hist.Undo();
-            Assert.AreEqual(3, hist.UndoCount);
+            Assert.AreEqual(3, hist.UndoCount());
             CheckCalls(c1, value: true,  awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c2, value: true,  awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c3, value: true,  awake: 1, start: 2, update: 1, stop: 1);
@@ -440,10 +460,19 @@ namespace SEETests
             public abstract void Undo();
             public abstract bool Update();
 
-            public ActionStateType GetActionStateType()
+            public HashSet<string> GetChangedObjects()
             {
-                throw new System.NotImplementedException();
+                return new HashSet<string>();
             }
+
+            private readonly string id = Guid.NewGuid().ToString();
+
+            public string GetId()
+            {
+                return id;
+            }
+
+            public abstract ActionStateType GetActionStateType();
         }
 
         /// <summary>
@@ -471,6 +500,28 @@ namespace SEETests
                 currentProgress = ReversibleAction.Progress.Completed;
                 counter++;
                 return true;
+            }
+
+            private class IncrementActionStateType : ActionStateType
+            {
+                public IncrementActionStateType() : base(CreateReversibleAction)
+                { }
+            }
+
+            private static ActionStateType actionStateType = new IncrementActionStateType();
+
+            private static ReversibleAction CreateReversibleAction()
+            {
+                return new Increment();
+            }
+
+            /// <summary>
+            /// Returns the <see cref="ActionStateType"/> of this action.
+            /// </summary>
+            /// <returns>the <see cref="ActionStateType"/> of this action</returns>
+            public override ActionStateType GetActionStateType()
+            {
+                return actionStateType;
             }
         }
 
@@ -500,6 +551,28 @@ namespace SEETests
                 counter--;
                 return true;
             }
+
+            private class DecrementActionStateType : ActionStateType
+            {
+                public DecrementActionStateType() : base(CreateReversibleAction)
+                { }
+            }
+
+            private static ActionStateType actionStateType = new DecrementActionStateType();
+
+            private static ReversibleAction CreateReversibleAction()
+            {
+                return new Decrement();
+            }
+
+            /// <summary>
+            /// Returns the <see cref="ActionStateType"/> of this action.
+            /// </summary>
+            /// <returns>the <see cref="ActionStateType"/> of this action</returns>
+            public override ActionStateType GetActionStateType()
+            {
+                return actionStateType;
+            }
         }
 
         /// <summary>
@@ -514,35 +587,35 @@ namespace SEETests
         {            
             hist.Execute(new Increment());
             Assert.AreEqual(0, Counter.Value);
-            Assert.AreEqual(1, hist.UndoCount);
-            Assert.AreEqual(0, hist.RedoCount);            
+            Assert.AreEqual(1, hist.UndoCount());
+            Assert.AreEqual(0, hist.RedoCount());            
             hist.Update();
             Assert.AreEqual(1, Counter.Value);
-            Assert.AreEqual(2, hist.UndoCount);
-            Assert.AreEqual(0, hist.RedoCount);
+            Assert.AreEqual(2, hist.UndoCount());
+            Assert.AreEqual(0, hist.RedoCount());
             hist.Update();
             Assert.AreEqual(2, Counter.Value);
-            Assert.AreEqual(3, hist.UndoCount);
-            Assert.AreEqual(0, hist.RedoCount);
+            Assert.AreEqual(3, hist.UndoCount());
+            Assert.AreEqual(0, hist.RedoCount());
             hist.Update();
             Assert.AreEqual(3, Counter.Value);
-            Assert.AreEqual(4, hist.UndoCount);
-            Assert.AreEqual(0, hist.RedoCount);
+            Assert.AreEqual(4, hist.UndoCount());
+            Assert.AreEqual(0, hist.RedoCount());
             // Because Increment.Update yields true every time it is called,
             // the execution will always continue with a new instance of 
             // Increment. We have had three calls to Update. Including the
             // first Execute, we should have four actions on the UndoStack.
-            Assert.AreEqual(4, hist.UndoCount);
+            Assert.AreEqual(4, hist.UndoCount());
             hist.Undo();
             Assert.AreEqual(2, Counter.Value);
             // Undo will remove one completed action and then resume with
             // a new instance of Increment.
-            Assert.AreEqual(3, hist.UndoCount); 
-            Assert.AreEqual(1, hist.RedoCount);
+            Assert.AreEqual(3, hist.UndoCount()); 
+            Assert.AreEqual(1, hist.RedoCount());
             hist.Undo();
             Assert.AreEqual(1, Counter.Value);
-            Assert.AreEqual(2, hist.UndoCount);
-            Assert.AreEqual(2, hist.RedoCount);
+            Assert.AreEqual(2, hist.UndoCount());
+            Assert.AreEqual(2, hist.RedoCount());
             hist.Undo();
             Assert.AreEqual(0, Counter.Value);
             // The UndoStack has one completed Increment action and one
@@ -551,42 +624,42 @@ namespace SEETests
             // be removed. This leaves the single action with effect,
             // which then is moved from the UndoStack to the RedoStack.
             // Thus, the UndoStack will be empty at this point.
-            Assert.AreEqual(0, hist.UndoCount);
-            Assert.AreEqual(3, hist.RedoCount);
+            Assert.AreEqual(0, hist.UndoCount());
+            Assert.AreEqual(3, hist.RedoCount());
             hist.Redo();
             Assert.AreEqual(1, Counter.Value);
             // Redo moves an action from the RedoStack to the UndoStack.
             // Because that action was completed, a new instance of 
             // Increment will be put onto the UndoStack that will be used
             // to resume.
-            Assert.AreEqual(2, hist.UndoCount);
-            Assert.AreEqual(2, hist.RedoCount);
+            Assert.AreEqual(2, hist.UndoCount());
+            Assert.AreEqual(2, hist.RedoCount());
             hist.Redo();
             Assert.AreEqual(2, Counter.Value);
-            Assert.AreEqual(3, hist.UndoCount);
-            Assert.AreEqual(1, hist.RedoCount);
+            Assert.AreEqual(3, hist.UndoCount());
+            Assert.AreEqual(1, hist.RedoCount());
             hist.Execute(new Decrement());
             // The new instance of the Increment action that was put on
             // the stack due to Redo above has not received any Update call.
             // Hence, it will be popped off the UndoStack. Thus, UndoCount
             // remains the same.
             Assert.AreEqual(2, Counter.Value); // still 2 because no Update was called
-            Assert.AreEqual(3, hist.UndoCount);
-            Assert.AreEqual(0, hist.RedoCount); // RedoStack is lost
+            Assert.AreEqual(3, hist.UndoCount());
+            Assert.AreEqual(0, hist.RedoCount()); // RedoStack is lost
             hist.Update();
             // Update has completed Decrement. A new instance of Decrement will
             // be put on the Undo stack.
             Assert.AreEqual(1, Counter.Value);
-            Assert.AreEqual(4, hist.UndoCount);
-            Assert.AreEqual(0, hist.RedoCount);
+            Assert.AreEqual(4, hist.UndoCount());
+            Assert.AreEqual(0, hist.RedoCount());
             // No Update has been called for the new instance of Decrement just put
             // on the UndoStack, hence, the Decrement at the top of the UndoStack
             // has still progress state NoEffect. Thus it will be popped off the UndoStack
             // when the next Increment is added by the following line.
             hist.Execute(new Increment());
             Assert.AreEqual(1, Counter.Value);  // still 1 because no Update was called
-            Assert.AreEqual(4, hist.UndoCount);
-            Assert.AreEqual(0, hist.RedoCount);
+            Assert.AreEqual(4, hist.UndoCount());
+            Assert.AreEqual(0, hist.RedoCount());
             // Undo without prior Update for the Increment just added; that means we are actually
             // undoing Decrement. The Increment will be popped off the UndoStack. Then the 
             // Decrement will be undone and moved from the UndoStack to the RedoStack.
@@ -594,8 +667,8 @@ namespace SEETests
             // completed, a new instance of Increment will be added.
             hist.Undo();
             Assert.AreEqual(2, Counter.Value);
-            Assert.AreEqual(3, hist.UndoCount);
-            Assert.AreEqual(1, hist.RedoCount);
+            Assert.AreEqual(3, hist.UndoCount());
+            Assert.AreEqual(1, hist.RedoCount());
             hist.Undo(); // undoing an Increment
             // No Update has been called for the new instance of the Increment with
             // progress state NoEffect. Hence, it will be popped off the UndoStack.
@@ -606,8 +679,8 @@ namespace SEETests
             // a new instance of Increment is added to the UndoStack in progress state
             // NoEffect.
             Assert.AreEqual(1, Counter.Value);
-            Assert.AreEqual(2, hist.UndoCount);
-            Assert.AreEqual(2, hist.RedoCount);
+            Assert.AreEqual(2, hist.UndoCount());
+            Assert.AreEqual(2, hist.RedoCount());
             // The current situation is a follows: the UndoStack consists of an
             // Increment with no effect and one completed Increment. The RedoStack
             // has a completed Increment and a completed Decrement.
@@ -617,12 +690,12 @@ namespace SEETests
             // Because that Increment is completed, a new instance of Increment
             // with progress state NoEffect will be added to the UndoStack.
             Assert.AreEqual(2, Counter.Value);
-            Assert.AreEqual(3, hist.UndoCount);
-            Assert.AreEqual(1, hist.RedoCount);
+            Assert.AreEqual(3, hist.UndoCount());
+            Assert.AreEqual(1, hist.RedoCount());
             hist.Redo(); // re-doing a Decrement
             Assert.AreEqual(1, Counter.Value);
-            Assert.AreEqual(4, hist.UndoCount);
-            Assert.AreEqual(0, hist.RedoCount);
-        }
-    }
+            Assert.AreEqual(4, hist.UndoCount());
+            Assert.AreEqual(0, hist.RedoCount());
+        } 
+    } 
 }
