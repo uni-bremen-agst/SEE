@@ -1,5 +1,5 @@
 # Adding a new grammar
-It's recommended to use the grammar's from [this repository](https://github.com/antlr/grammars-v4).
+It is recommended to use the grammars from [this repository](https://github.com/antlr/grammars-v4).
 The repository is very extensive and should cover any required languages.
 
 For some grammars, such as the [java grammar](https://github.com/antlr/grammars-v4/tree/master/java),
