@@ -179,7 +179,7 @@ namespace SEE.Controls.Actions
                         {
                             if (rootReference.Value == nodeGraphPair.Key)
                             {
-                                new UndoDeleteNetAction(nodeGraphPair.Key.name, rootReference.Key.name, nodeGraphPair.Key.transform.position).Execute(null);
+                                new UndoDeleteNetAction(nodeGraphPair.Key.name, rootReference.Key.name, oldPositions[nodeGraphPair.Key]).Execute(null);
                             }
                         }
                     }
@@ -200,7 +200,7 @@ namespace SEE.Controls.Actions
                     {
                         if (rootReference.Value == edgeGraphPair.Key)
                         {
-                            new UndoDeleteNetAction(edgeGraphPair.Key.name, rootReference.Key.name, edgeGraphPair.Key.transform.position).Execute(null);
+                            new UndoDeleteNetAction(edgeGraphPair.Key.name, rootReference.Key.name, oldPositions[edgeGraphPair.Key]).Execute(null);
                         }
                     }
                 }
