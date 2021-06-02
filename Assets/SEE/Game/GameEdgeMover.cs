@@ -51,7 +51,7 @@ namespace SEE.Game
         /// if they are not in the same inner node,
         /// can be used for moving inner nodes to reduce computational effort
         /// </summary>
-        /// <param name="node"></param>
+        /// <param name="node">node whose edges are to be moved</param>
         public static void MoveAllConnectingEdgesOfNodeConnectingToAnotherSubset(GameObject node)
         {
             MoveEdgesOfNode(node, false);
@@ -60,17 +60,11 @@ namespace SEE.Game
         /// <summary>
         /// Moves all incoming and outgoing edges of a node and its children depending on the new position of the node.
         /// </summary>
-        /// <param name="node"></param>
+        /// <param name="node">node whose edges are to be moved</param>
         public static void MoveAllConnectingEdgesOfNode(GameObject node)
         {
             MoveEdgesOfNode(node, true);
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="node">The node whose edges are to be recalculated</param>
-        ///
 
         /// <summary>
         /// Searches for all children nodes of the passed node and calculates for their incoming and outgoing edges
@@ -95,7 +89,6 @@ namespace SEE.Game
                     }
                 }
             }
-
             HashSet<(GameObject, GameObject, string)> backupSourceTargetEdge = new HashSet<(GameObject, GameObject, string)>();
 
             foreach (Node nodeToBeRedrawn in nodeList)
@@ -137,16 +130,7 @@ namespace SEE.Game
             }
             if (allNodes)
             {
-                // Delete all old edges.
-                foreach ((GameObject, GameObject, string) element in backupSourceTargetEdge)
-                {
-                    GameEdgeAdder.Remove(GameObject.Find(element.Item3));
-                }
-                //Create all new edges
-                foreach ((GameObject, GameObject, string) element in backupSourceTargetEdge)
-                {
-                    GameEdgeAdder.Add(element.Item1, element.Item2, element.Item3);
-                }
+                RedrawEdges(backupSourceTargetEdge);
             }
             else
             {
@@ -160,16 +144,30 @@ namespace SEE.Game
                         sourceTargetEdgeWithinSameSubset.Add(element);
                     }
                 }
-                // Delete all old edges.
-                foreach ((GameObject, GameObject, string) element in sourceTargetEdgeWithinSameSubset)
-                {
-                    GameEdgeAdder.Remove(GameObject.Find(element.Item3));
-                }
-                // Create all new edges.
-                foreach ((GameObject, GameObject, string) element in sourceTargetEdgeWithinSameSubset)
-                {
-                    GameEdgeAdder.Add(element.Item1, element.Item2, element.Item3);
-                }
+                RedrawEdges(sourceTargetEdgeWithinSameSubset);
+            }
+        }
+
+        /// <summary>
+        /// Deletes all edges in the set and then draws them at their new position.
+        /// </summary>
+        /// <param name="edges">The edges that are to be redrawn</param>
+        private static void RedrawEdges(ISet<(GameObject, GameObject, string)> edges)
+        {
+            // Delete all old edges.
+            foreach ((GameObject, GameObject, string) element in edges)
+            {
+                // FIXME GameObject.Find is an expensive operation.
+                GameObject edgeToBeRedrawn = GameObject.Find(element.Item3);
+                // Removes the edge from the graph.
+                GameEdgeAdder.Remove(edgeToBeRedrawn);
+                // Removes the edge game object.
+                Object.Destroy(edgeToBeRedrawn);
+            }
+            // Create all new edges.
+            foreach ((GameObject, GameObject, string) element in edges)
+            {
+                GameEdgeAdder.Add(element.Item1, element.Item2, element.Item3);
             }
         }
     }
