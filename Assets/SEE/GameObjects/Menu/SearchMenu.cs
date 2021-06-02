@@ -1,6 +1,7 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using FuzzySharp;
 using SEE.Controls;
 using SEE.Game;
@@ -13,22 +14,68 @@ using UnityEngine;
 
 namespace SEE.GO.Menu
 {
-    //TODO: Add missing documentation for this class.
+    /// <summary>
+    /// A menu which allows its user to fuzzy search for nodes by entering their name.
+    /// </summary>
     public class SearchMenu: MonoBehaviour
     {
-        private PropertyDialog searchDialog;
-        private StringProperty searchString;
-
-        private bool stillHighlighting = true;
-
+        
+        /// <summary>
+        /// The time (in seconds) the found node will blink.
+        /// </summary>
         private const int BLINK_SECONDS = 15;
+
+        /// <summary>
+        /// The time (in seconds) between color inversions for found nodes.
+        /// </summary>
+        private const float BLINK_INTERVAL = 0.3f;
+        
+        /// <summary>
+        /// The height of the marker used to mark the found node.
+        /// </summary>
         private const float MARKER_HEIGHT = 1f;
+        
+        /// <summary>
+        /// The width of the marker used to mark the found node.
+        /// </summary>
         private const float MARKER_WIDTH = 0.01f;
 
-        private static readonly Color MARKER_COLOR = Color.red;
-
-        private readonly IDictionary<string, ICollection<GameObject>> cachedNodes = new Dictionary<string, ICollection<GameObject>>();
+        /// <summary>
+        /// The dialog in which the search query can be entered.
+        /// </summary>
+        private PropertyDialog searchDialog;
+        
+        /// <summary>
+        /// The property which contains the searched query.
+        /// </summary>
+        private StringProperty searchString;
+        
+        /// <summary>
+        /// The menu in which the search results are listed.
+        /// The user can select the desired node here.
+        /// </summary>
         private SimpleMenu resultMenu;
+
+        /// <summary>
+        /// Whether we're currently highlighting a node.
+        /// Will be set to true when a node starts blinking, and will be set to false when a new search is started,
+        /// which will cause the node to stop blinking.
+        /// </summary>
+        private bool stillHighlighting = true;
+
+        /// <summary>
+        /// The color of the marker pointing to the found node.
+        /// </summary>
+        private static readonly Color MARKER_COLOR = Color.red;
+        
+        /// <summary>
+        /// A mapping from names to a list of nodes with that name.
+        /// Is constructed in the <see cref="Start"/> method in order not to call expensive <c>Find</c> methods every
+        /// time a search is executed. Note that this implies that changes to the cities while the game is running
+        /// will not be reflected in the search.
+        /// </summary>
+        private readonly IDictionary<string, ICollection<GameObject>> cachedNodes = new Dictionary<string, ICollection<GameObject>>();
+        
         /// <summary>
         /// A list containing all entries in the <see cref="resultMenu"/>.
         /// </summary>
@@ -36,6 +83,9 @@ namespace SEE.GO.Menu
         /// interface, which is used in <see cref="ShowResultsMenu"/>.</remarks>
         private readonly List<MenuEntry> resultMenuEntries = new List<MenuEntry>();
 
+        /// <summary>
+        /// Executes the search with the values entered in the <see cref="searchDialog"/>.
+        /// </summary>
         private void ExecuteSearch()
         {
             SEEInput.KeyboardShortcutsEnabled = true;
@@ -63,6 +113,11 @@ namespace SEE.GO.Menu
 
         }
         
+        /// <summary>
+        /// This will show a menu with search results to the user in case more than one node was found.
+        /// </summary>
+        /// <param name="results">A list of found nodes represented by 3-tuples in the format
+        /// [score (from fuzzy search), name, node game object].</param>
         private void ShowResultsMenu(IEnumerable<(int, string, GameObject)> results)
         {
             if (resultMenu == null)
@@ -97,6 +152,12 @@ namespace SEE.GO.Menu
             }
         }
 
+        /// <summary>
+        /// Highlights the given <paramref name="result"/>> node with the name <paramref name="resultName"/>
+        /// by displaying a marker above it and starting the <see cref="BlinkFor"/> coroutine.
+        /// </summary>
+        /// <param name="result">The game object of the node which shall be highlighted.</param>
+        /// <param name="resultName">The name of the node which shall be highlighted.</param>
         private void HighlightNode(GameObject result, string resultName)
         {
             ShowNotification.Info($"Highlighting '{resultName}'", 
@@ -110,24 +171,30 @@ namespace SEE.GO.Menu
                 Marker marker = new Marker(graphRenderer, MARKER_WIDTH, MARKER_HEIGHT, MARKER_COLOR,
                                            default, default, AbstractAnimator.DefaultAnimationTime);
                 Material material = cityRenderer.sharedMaterials.Last();
-                StartCoroutine(BlinkFor(BLINK_SECONDS, material));
-
-                StartCoroutine(RemoveMarkerWhenDone(marker));
+                BlinkFor(material).Forget();
+                RemoveMarkerWhenDone(marker).Forget();
                 marker.MarkBorn(result);
             }
 
-            static IEnumerator RemoveMarkerWhenDone(Marker marker)
+            async UniTaskVoid RemoveMarkerWhenDone(Marker marker)
             {
-                yield return new WaitForSeconds(BLINK_SECONDS);
+                // Remove marker either when a new search is started or when time is up
+                await UniTask.WhenAny(UniTask.Delay(TimeSpan.FromSeconds(BLINK_SECONDS)), 
+                                      UniTask.WaitUntil(() => !stillHighlighting));
                 marker.Clear();
             }
         }
 
-        private IEnumerator BlinkFor(int seconds, Material material)
+        /// <summary>
+        /// Inverts the given <paramref name="material"/>'s color periodically every <see cref="BLINK_INTERVAL"/>
+        /// seconds for <see cref="BLINK_SECONDS"/> seconds.
+        /// </summary>
+        /// <param name="material">The material whose color to invert.</param>
+        private async UniTaskVoid BlinkFor(Material material)
         {
             Color originalColor = material.color;
             stillHighlighting = true;
-            for (int i = seconds*2; i > 0; i--)
+            for (float i = BLINK_SECONDS; i > 0; i -= BLINK_INTERVAL)
             {
                 if (!stillHighlighting) 
                 {
@@ -135,18 +202,27 @@ namespace SEE.GO.Menu
                     break;
                 }
                 material.color = material.color.Invert();
-                yield return new WaitForSeconds(0.5f);
+                await UniTask.Delay(TimeSpan.FromSeconds(BLINK_INTERVAL));
             }
 
             material.color = originalColor;
         }
 
+        /// <summary>
+        /// Removes the zero-width-space from the given <paramref name="input"/>, as well as whitespace at the
+        /// beginning and end.
+        /// </summary>
+        /// <param name="input">The string which shall be filtered.</param>
+        /// <returns>The filtered string.</returns>
         private static string FilterString(string input)
         {
             const string zeroWidthSpace = "\u200B";
             return input.Trim().Replace(zeroWidthSpace, string.Empty);
         }
-
+        
+        /// <summary>
+        /// Constructs the <see cref="cachedNodes"/> and the <see cref="searchDialog"/>.
+        /// </summary>
         private void Start()
         {
             // Save all nodes in the scene to quickly search them later on
@@ -182,11 +258,14 @@ namespace SEE.GO.Menu
             //TODO: Selection property (select city)
         }
             
+        /// <summary>
+        /// Checks whether the <see cref="searchDialog"/> shall be opened.
+        /// </summary>
         private void Update()
         {
             if (SEEInput.ToggleSearch())
             {
-                stillHighlighting = true;
+                stillHighlighting = false;
                 searchDialog.DialogShouldBeShown = true;
                 SEEInput.KeyboardShortcutsEnabled = false;
             }
