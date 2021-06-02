@@ -1,7 +1,7 @@
 ﻿using System;
-using Newtonsoft.Json;
 using SEE.Net.Dashboard.Model;
 using UnityEngine;
+using Valve.Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard
 {
