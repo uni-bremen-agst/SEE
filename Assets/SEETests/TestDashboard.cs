@@ -92,6 +92,14 @@ namespace SEETests
             Assert.IsNotNull(table);
             Assert.IsNotEmpty(table.rows);
         });
+        
+        [UnityTest]
+        public IEnumerator testDashboardIssueDescription() => UniTask.ToCoroutine(async () =>
+        {
+            string description = await DashboardRetriever.Instance.GetIssueDescription("SV4");
+            Assert.IsNotNull(description);
+            Assert.IsTrue(description.StartsWith("This rule"));
+        });
 
         private static IEnumerator testDashboardIssues<T>() where T : Issue, new() => UniTask.ToCoroutine(async () =>
         {
