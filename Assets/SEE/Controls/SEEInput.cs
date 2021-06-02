@@ -42,6 +42,15 @@ namespace SEE.Controls
         }
 
         /// <summary>
+        /// Opens/closes the search menu.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        internal static bool ToggleSearch()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.SearchMenu);
+        }
+
+        /// <summary>
         /// True if KeyboardShortcutsEnabled and the key for the given <paramref name="digit"/>
         /// was pressed. Used as shortcuts for the menu entries.
         /// 

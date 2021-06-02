@@ -8,6 +8,17 @@ using UnityEngine.Windows.Speech;
 
 namespace SEE.Game.UI.Menu
 {
+
+    /// <summary>
+    /// A menu containing a list of <see cref="MenuEntry"/> items.
+    /// The difference between this and the generic menu class is that the type parameter doesn't have to be
+    /// specified here.
+    /// </summary>
+    public class SimpleMenu : SimpleMenu<MenuEntry>
+    {
+        // Intentionally empty, see class documentation.
+    }
+
     /// <summary>
     /// Represents a menu of various actions the user can choose from.
     /// The Menu consists of multiple MenuEntries of the type <typeparamref name="T"/>
@@ -15,7 +26,7 @@ namespace SEE.Game.UI.Menu
     /// </summary>
     /// <typeparam name="T">the type of entries used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
     /// <seealso cref="MenuEntry"/>
-    public partial class Menu<T>: PlatformDependentComponent where T : MenuEntry
+    public partial class SimpleMenu<T>: PlatformDependentComponent where T : MenuEntry
     {        
         /// <summary>
         /// Event type which is used for the <see cref="OnMenuEntrySelected"/> event.
@@ -185,7 +196,7 @@ namespace SEE.Game.UI.Menu
         /// <param name="entry">The entry to remove from the menu</param>
         public void RemoveEntry(T entry)
         {
-            Entries.Remove(entry);
+            entries.Remove(entry);
             if (HasStarted)
             {
                 RemoveDesktopButton(entry);
