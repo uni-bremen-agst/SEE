@@ -87,6 +87,7 @@ namespace SEE.Net
                 GameObject gameObject = GameObject.Find(GameObjectID);
                 Dictionary<GameObject, Vector3> oldPos = new Dictionary<GameObject, Vector3>();
                 oldPos.Add(gameObject, OldPosition);
+                Debug.Log(OldPosition);
                 if (gameObject != null)
                 {
                     if (gameObject.HasEdgeRef())
