@@ -103,7 +103,7 @@ namespace SEE.Controls
         /// </summary>
         internal static readonly KeyCode Redo = Register(KeyCode.Y, Scope.Always, "Re-does the last action.");
 
-        internal static readonly KeyCode SearchMenu = Register(KeyCode.Minus, Scope.Always, "Opens the search menu.");
+        internal static readonly KeyCode SearchMenu = Register(KeyCode.F, Scope.Always, "Opens the search menu.");
 
         //-----------------------------------------------------
         // Camera path recording and playing

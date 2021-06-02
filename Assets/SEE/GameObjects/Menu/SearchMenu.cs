@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using FuzzySharp;
-using FuzzySharp.Extractor;
 using SEE.Controls;
 using SEE.Game;
 using SEE.Game.Evolution;
@@ -11,7 +10,6 @@ using SEE.Game.UI.Notification;
 using SEE.Game.UI.PropertyDialog;
 using SEE.Utils;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace SEE.GO.Menu
 {
@@ -131,7 +129,7 @@ namespace SEE.GO.Menu
             stillHighlighting = true;
             for (int i = seconds*2; i > 0; i--)
             {
-                if (stillHighlighting) 
+                if (!stillHighlighting) 
                 {
                     // Another search has been started
                     break;
