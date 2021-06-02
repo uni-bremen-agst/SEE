@@ -188,7 +188,7 @@ namespace SEE.Game.UI.CodeWindow
                 throw new ArgumentNullException(nameof(tokens));
             }
             
-            // Avoid multiple enumeration in case iteration over the data source is expensive
+            // Avoid multiple enumeration in case iteration over the data source is expensive.
             List<SEEToken> tokenList = tokens.ToList();
             if (!tokenList.Any())
             {
@@ -198,10 +198,10 @@ namespace SEE.Game.UI.CodeWindow
 
             TokenLanguage language = tokenList.First().Language;
             
-            // We need to insert this pseudo-token here so that the first line gets a line number
+            // We need to insert this pseudo token here so that the first line gets a line number.
             tokenList.Insert(0, new SEEToken(string.Empty, SEEToken.Type.Newline, -1, 0, language));
 
-            // Needed padding is the number of lines, because the line number will be at most this long
+            // Needed padding is the number of lines, because the line number will be at most this long.
             // FIXME: In certain edge cases this won't work, e.g. block comments can span multiple lines. Use text.
             int neededPadding = $"{tokenList.Count(x => x.TokenType.Equals(SEEToken.Type.Newline))}".Length;
             int lineNumber = 1;
@@ -216,13 +216,13 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     AppendNewline(ref lineNumber, ref Text, neededPadding);
                 }
-                else if (token.TokenType != SEEToken.Type.EOF) // skip EOF token completely
+                else if (token.TokenType != SEEToken.Type.EOF) // Skip EOF token completely.
                 {
                     bool firstRun = true;
                     string[] tokenLines = token.Text.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None);
                     foreach (string line in tokenLines)
                     {
-                        // Any entry after the first is on a separate line
+                        // Any entry after the first is on a separate line.
                         if (!firstRun)
                         {
                             AppendNewline(ref lineNumber, ref Text, neededPadding);
@@ -245,18 +245,18 @@ namespace SEE.Game.UI.CodeWindow
                 }
             }
 
-            // Lines are equal to number of newlines, including the initial newline
-            lines = Text.Count(x => x.Equals('\n')); // No more weird CRLF shenanigans are present at this point
-            Text = Text.TrimStart('\n'); // Remove leading newline
+            // Lines are equal to number of newlines, including the initial newline.
+            lines = Text.Count(x => x.Equals('\n')); // No more weird CRLF shenanigans are present at this point.
+            Text = Text.TrimStart('\n'); // Remove leading newline.
 
             // Appends a newline to the text, assuming we're at theLineNumber and need the given padding.
             static void AppendNewline(ref int theLineNumber, ref string text, int padding)
             {
-                // First, of course, the newline
+                // First, of course, the newline.
                 text += "\n";
-                // Add whitespace next to line number so it's consistent
+                // Add whitespace next to line number so it's consistent.
                 text += string.Join("", Enumerable.Repeat(" ", padding - $"{theLineNumber}".Length));
-                // Line number will be typeset in grey to distinguish it from the rest
+                // Line number will be typeset in grey to distinguish it from the rest.
                 text += $"<color=#CCCCCC>{theLineNumber}</color> ";
                 theLineNumber++;
             }
@@ -279,9 +279,9 @@ namespace SEE.Game.UI.CodeWindow
             Text = "";
             for (int i = 0; i < text.Length; i++)
             {
-                // Add whitespace next to line number so it's consistent
+                // Add whitespace next to line number so it's consistent.
                 Text += string.Join("", Enumerable.Repeat(" ", neededPadding-$"{i+1}".Length));
-                // Line number will be typeset in yellow to distinguish it from the rest
+                // Line number will be typeset in yellow to distinguish it from the rest.
                 Text += $"<color=\"yellow\">{i+1}</color> <noparse>{text[i]}</noparse>\n";
             }
             lines = text.Length;
@@ -309,7 +309,7 @@ namespace SEE.Game.UI.CodeWindow
             try
             {
                 //TODO: First line empty, <EOF>
-                //TODO: Maybe disable syntax highlighting for huge files, as it would impact performance badly
+                //TODO: Maybe disable syntax highlighting for huge files, as it would impact performance badly.
                 if (syntaxHighlighting)
                 {
                     try
