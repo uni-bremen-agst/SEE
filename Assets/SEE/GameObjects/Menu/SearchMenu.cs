@@ -15,11 +15,11 @@ using UnityEngine;
 namespace SEE.GO.Menu
 {
     /// <summary>
-    /// A menu which allows its user to fuzzy search for nodes by entering their name.
+    /// A menu which allows its user to fuzzy search for nodes by entering the
+    /// source name of a node.
     /// </summary>
     public class SearchMenu: MonoBehaviour
-    {
-        
+    {        
         /// <summary>
         /// The time (in seconds) the found node will blink.
         /// </summary>
@@ -129,22 +129,22 @@ namespace SEE.GO.Menu
                 resultMenu.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Search");
             }
 
-            // Entries will be greyed out the further they go
-            resultMenuEntries.ForEach(resultMenu.RemoveEntry); // clean up previous entries
+            // Entries will be greyed out the further they go.
+            resultMenuEntries.ForEach(resultMenu.RemoveEntry); // Clean up previous entries.
             resultMenuEntries.Clear();
             resultMenuEntries.AddRange(results.Select(x => new MenuEntry(() => MenuEntryAction(x.Item3, x.Item2), 
                                                                          x.Item2, entryColor: ScoreColor(x.Item1))));
             resultMenuEntries.ForEach(resultMenu.AddEntry);
             resultMenu.ShowMenu(true);
 
-            // Highlight node and close menu when entry was chosen
+            // Highlight node and close menu when entry was chosen.
             void MenuEntryAction(GameObject chosen, string chosenName)
             {
                 HighlightNode(chosen, chosenName);
                 resultMenu.ShowMenu(false);
             }
 
-            // Returns a color between black and gray, the higher the given score the grayer it is
+            // Returns a color between black and gray, the higher the given score the grayer it is.
             static Color ScoreColor(int score)
             {
                 Debug.Log(score);
