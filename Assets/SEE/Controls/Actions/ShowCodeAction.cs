@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using SEE.Game.UI.CodeWindow;
 using SEE.GO;
 using SEE.Net;
@@ -94,7 +95,7 @@ namespace SEE.Controls.Actions
                         codeWindow.Title += $" ({selectedFile})";
                     }
 
-                    codeWindow.EnterFromFile($"{selectedPath}{selectedFile}"); // selectedPath has trailing /
+                    codeWindow.EnterFromFile(Path.Combine(selectedPath, selectedFile));
                 }
 
                 // Pass line number to automatically scroll to it, if it exists

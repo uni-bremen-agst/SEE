@@ -19,23 +19,23 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// If the object is neither selected nor grabbed, a hovering outline will be
-        /// created. Depending upon <paramref name="isOwner"/> one of two different
+        /// created. Depending upon <paramref name="isInitiator"/> one of two different
         /// colors will be used for the outline.
         /// Called when the object is hovered over.
         /// </summary>
         /// <param name="interactableObject">the object being hovered over (not used here)</param>
-        /// <param name="isOwner">true if a local user initiated this call</param>
-        protected override void On(InteractableObject interactableObject, bool isOwner)
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        protected override void On(InteractableObject interactableObject, bool isInitiator)
         {
             if (!interactable.IsSelected && !interactable.IsGrabbed)
             {
                 if (TryGetComponent(out Outline outline))
                 {
-                    outline.SetColor(isOwner ? LocalHoverColor : RemoteHoverColor);
+                    outline.SetColor(isInitiator ? LocalHoverColor : RemoteHoverColor);
                 }
                 else
                 {
-                    Outline.Create(gameObject, isOwner ? LocalHoverColor : RemoteHoverColor);
+                    Outline.Create(gameObject, isInitiator ? LocalHoverColor : RemoteHoverColor);
                 }
             }
         }
@@ -46,15 +46,28 @@ namespace SEE.Controls.Actions
         /// Called when the object is no longer being hovered over.
         /// </summary>
         /// <param name="interactableObject">the object being hovered over (not used here)</param>
-        /// <param name="isOwner">true if a local user initiated this call</param>
-        protected override void Off(InteractableObject interactableObject, bool isOwner)
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        protected override void Off(InteractableObject interactableObject, bool isInitiator)
         {
-            if (!interactable.IsSelected && !interactable.IsGrabbed)
+            if (!interactable.IsSelected && !interactable.IsGrabbed && TryGetComponent(out Outline outline))
             {
-                if (TryGetComponent(out Outline outline))
-                {
-                    DestroyImmediate(outline);
-                }
+                DestroyImmediate(outline);
+            }
+        }
+
+        protected override void SelectOff(InteractableObject interactableObject, bool isInitiator)
+        {
+            if (interactable.IsHovered && !interactable.IsGrabbed)
+            {
+                GetComponent<Outline>().SetColor(isInitiator ? LocalHoverColor : RemoteHoverColor);
+            }
+        }
+
+        protected override void GrabOff(InteractableObject interactableObject, bool isInitiator)
+        {
+            if (interactable.IsHovered && !interactable.IsSelected)
+            {
+                GetComponent<Outline>().SetColor(isInitiator ? LocalHoverColor : RemoteHoverColor);
             }
         }
     }
