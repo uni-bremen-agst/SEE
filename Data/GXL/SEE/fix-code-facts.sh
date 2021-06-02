@@ -4,7 +4,7 @@ set -o errexit
 set -o nounset
 
 TARGET="CodeFacts.gxl"
-if [[ $# -gt 1 || $1 == "-h" || $1 == "--help" ]]; then
+if [[ $# -gt 1 || ($# == 1 && ($1 == "-h" || $1 == "--help")) ]]; then
 	printf "usage: %s [TARGET]\n\nThis script will change the paths in TARGET to your local paths to SEE. If TARGET is not specified, the CodeFacts.gxl file will be used." "$0"
 	exit 0
 elif [[ $# == 1 ]]; then
