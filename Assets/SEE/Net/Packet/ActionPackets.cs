@@ -68,7 +68,7 @@ namespace SEE.Net
             {
                 foreach (Connection c in Server.Connections)
                 {
-                    // TODO(torben): we might want to have a hashmap for IPEndPoint => connection
+                    // FIXME do we need a hashmap for IPEndPoint => connection or is this approach sufficient?
                     if (recipients.Any(recipient => c.ConnectionInfo.RemoteEndPoint.Equals(recipient)))
                     {
                         Network.SubmitPacket(c, this);

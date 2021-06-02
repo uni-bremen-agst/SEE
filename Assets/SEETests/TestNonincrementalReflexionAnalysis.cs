@@ -231,10 +231,6 @@ namespace SEE.Tools.Architecture
             n1_c1.AddChild(n1_c1_c1);
             n1_c1.AddChild(n1_c1_c2);
 
-            // Note: The levels must be calculated when the hierarchy has been
-            // established. This is not done automatically.
-            graph.FinalizeNodeHierarchy();
-
             return graph;
         }
 
