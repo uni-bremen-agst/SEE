@@ -8064,10 +8064,10 @@ MonoBehaviour:
       Data: 5
     - Name: heightMetric
       Entry: 1
-      Data: 
+      Data: 0.001
     - Name: styleMetric
       Entry: 1
-      Data: Metric.IssuesTotal
+      Data: Metric.Level
     - Name: coloringKind
       Entry: 3
       Data: 0
@@ -8079,10 +8079,10 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.7529412
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.945098042
     - Name: 
       Entry: 4
       Data: 1
@@ -8097,13 +8097,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
       Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0.921568632
-    - Name: 
-      Entry: 4
-      Data: 0.0156862754
     - Name: 
       Entry: 4
       Data: 1
@@ -8145,10 +8145,10 @@ MonoBehaviour:
       Data: 0
     - Name: heightMetric
       Entry: 1
-      Data: 
+      Data: 0.001
     - Name: styleMetric
       Entry: 1
-      Data: 
+      Data: Metric.Level
     - Name: coloringKind
       Entry: 3
       Data: 0
@@ -8166,7 +8166,7 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.7019608
     - Name: 
       Entry: 4
       Data: 1
@@ -8178,13 +8178,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.6037736
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.561782
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.412958354
     - Name: 
       Entry: 4
       Data: 1
@@ -8193,7 +8193,7 @@ MonoBehaviour:
       Data: 
     - Name: NumberOfColors
       Entry: 3
-      Data: 1
+      Data: 10
     - Name: 
       Entry: 8
       Data: 
@@ -8226,10 +8226,10 @@ MonoBehaviour:
       Data: 0
     - Name: heightMetric
       Entry: 1
-      Data: 
+      Data: 0.001
     - Name: styleMetric
       Entry: 1
-      Data: 
+      Data: Metric.Level
     - Name: coloringKind
       Entry: 3
       Data: 0
@@ -8259,13 +8259,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 4
       Data: 1
@@ -8274,7 +8274,7 @@ MonoBehaviour:
       Data: 
     - Name: NumberOfColors
       Entry: 3
-      Data: 1
+      Data: 10
     - Name: 
       Entry: 8
       Data: 
@@ -8307,10 +8307,10 @@ MonoBehaviour:
       Data: 0
     - Name: heightMetric
       Entry: 1
-      Data: 
+      Data: 0.001
     - Name: styleMetric
       Entry: 1
-      Data: 
+      Data: Metric.Level
     - Name: coloringKind
       Entry: 3
       Data: 0
@@ -8325,10 +8325,10 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.419607848
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 4
       Data: 1
@@ -8343,10 +8343,10 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 4
       Data: 1
@@ -8409,7 +8409,7 @@ MonoBehaviour:
       Data: 21|SEE.EdgeLayoutSettings, SEE
     - Name: kind
       Entry: 3
-      Data: 0
+      Data: 3
     - Name: edgeWidth
       Entry: 4
       Data: 0.01
