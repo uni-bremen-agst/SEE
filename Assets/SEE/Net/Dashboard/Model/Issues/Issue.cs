@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using Valve.Newtonsoft.Json;
+using Valve.Newtonsoft.Json.Converters;
 
 namespace SEE.Net.Dashboard.Model.Issues
 {
