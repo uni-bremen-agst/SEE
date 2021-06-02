@@ -35,14 +35,11 @@ namespace SEE.Game
             for (int i = 0; i < (int)Node.NodeDomain.Count; i++)
             {
                 ColorRange leafColorRange = this.settings.leafNodeAttributesPerKind[i].colorRange;
-                switch (this.settings.leafNodeAttributesPerKind[i].kind)
+                leafNodeFactories[i] = this.settings.leafNodeAttributesPerKind[i].kind switch
                 {
-                    case LeafNodeKinds.Blocks:
-                        leafNodeFactories[i] = new CubeFactory(ShaderType, leafColorRange);
-                        break;
-                    default:
-                        throw new Exception("Unhandled GraphSettings.LeafNodeKinds");
-                }
+                    LeafNodeKinds.Blocks => new CubeFactory(ShaderType, leafColorRange),
+                    _ => throw new Exception("Unhandled GraphSettings.LeafNodeKinds")
+                };
 
                 ColorRange innerColorRange = this.settings.innerNodeAttributesPerKind[i].colorRange;
                 switch (this.settings.innerNodeAttributesPerKind[i].kind)
@@ -83,7 +80,7 @@ namespace SEE.Game
         private const float LevelDistance = 0.001f;
 
         /// <summary>
-        /// the groundlevel of the nodes
+        /// the ground level of the nodes
         /// </summary>
         private const float GroundLevel = 0.0f;
 
@@ -686,7 +683,7 @@ namespace SEE.Game
         /// <param name="layoutNodes">the layoutnodes</param>
         /// <param name="sublayoutLayoutNodes">the sublayout nodes</param>
         /// <param name="parent">the parent gameobject</param>
-        private void AddDecorationsForSublayouts(ICollection<ILayoutNode> layoutNodes, List<SublayoutLayoutNode> sublayoutLayoutNodes, GameObject parent)
+        private void AddDecorationsForSublayouts(IEnumerable<ILayoutNode> layoutNodes, IEnumerable<SublayoutLayoutNode> sublayoutLayoutNodes, GameObject parent)
         {
             List<ILayoutNode> remainingLayoutNodes = layoutNodes.ToList();
             foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
@@ -746,32 +743,22 @@ namespace SEE.Game
         /// </summary>
         /// <param name="nodes">the nodes, which should be layouted as sublayouts</param>
         /// <returns>a list with sublayout nodes</returns>
-        private List<SublayoutNode> CreateSublayoutNodes(List<Node> nodes)
-        {
-            List<SublayoutNode> coseSublayoutNodes = new List<SublayoutNode>();
-            foreach (KeyValuePair<string, bool> dir in settings.coseGraphSettings.ListInnerNodeToggle)
-            {
-                if (dir.Value)
-                {
-                    string name = dir.Key;
-                    if (settings.coseGraphSettings.InnerNodeLayout.ContainsKey(name) && settings.coseGraphSettings.InnerNodeShape.ContainsKey(name))
-                    {
-                        IEnumerable<Node> matches = nodes.Where(i => i.ID.Equals(name));
-                        if (matches.Count() > 0)
-                        {
-                            coseSublayoutNodes.Add(new SublayoutNode(matches.First(), settings.coseGraphSettings.InnerNodeShape[name], settings.coseGraphSettings.InnerNodeLayout[name]));
-                        }
-                    }
-                }
-            }
-            return coseSublayoutNodes;
-        }
+        private List<SublayoutNode> CreateSublayoutNodes(IReadOnlyCollection<Node> nodes) =>
+            (from dir in settings.coseGraphSettings.ListInnerNodeToggle 
+             where dir.Value 
+             select dir.Key into name 
+             where settings.coseGraphSettings.InnerNodeLayout.ContainsKey(name) 
+                   && settings.coseGraphSettings.InnerNodeShape.ContainsKey(name) 
+             let matches = nodes.Where(i => i.ID.Equals(name)) 
+             where matches.Any() 
+             select new SublayoutNode(matches.First(), settings.coseGraphSettings.InnerNodeShape[name], 
+                                      settings.coseGraphSettings.InnerNodeLayout[name])).ToList();
 
         /// <summary>
         /// Calculate the child/ removed nodes for each sublayout
         /// </summary>
         /// <param name="sublayoutNodes">the sublayout nodes</param>
-        private void CalculateNodesSublayout(List<SublayoutNode> sublayoutNodes)
+        private void CalculateNodesSublayout(ICollection<SublayoutNode> sublayoutNodes)
         {
             foreach (SublayoutNode sublayoutNode in sublayoutNodes)
             {
@@ -812,7 +799,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="root"></param>
         /// <returns></returns>
-        private List<Node> WithAllChildren(Node root)
+        private static List<Node> WithAllChildren(Node root)
         {
             List<Node> allNodes = new List<Node> { root };
             foreach (Node node in root.Children())
@@ -836,7 +823,7 @@ namespace SEE.Game
         /// when a new artifical root is added</param>
         /// <returns>the new artifical root or null if <paramref name="graph"/> has
         /// already a single root</returns>
-        private Node AddRootIfNecessary(Graph graph, Dictionary<Node, GameObject> nodeMap)
+        private Node AddRootIfNecessary(Graph graph, IDictionary<Node, GameObject> nodeMap)
         {
             // Note: Because this method is called only when a hierarchical layout is to
             // be applied (and then both leaves and inner nodes were added to nodeMap), we 
@@ -916,30 +903,19 @@ namespace SEE.Game
         /// it does not actually calculate the layout.
         /// </summary>
         /// <returns>node layout selected</returns>
-        public NodeLayout GetLayout()
-        {
-            switch (settings.nodeLayoutSettings.kind)
+        public NodeLayout GetLayout() =>
+            settings.nodeLayoutSettings.kind switch
             {
-                case NodeLayoutKind.Manhattan:
-                    return new ManhattanLayout(GroundLevel, NodeFactory.Unit);
-                case NodeLayoutKind.RectanglePacking:
-                    return new RectanglePackingNodeLayout(GroundLevel, NodeFactory.Unit);
-                case NodeLayoutKind.EvoStreets:
-                    return new EvoStreetsNodeLayout(GroundLevel, NodeFactory.Unit);
-                case NodeLayoutKind.Treemap:
-                    return new TreemapLayout(GroundLevel, 1000.0f * NodeFactory.Unit, 1000.0f * NodeFactory.Unit);
-                case NodeLayoutKind.Balloon:
-                    return new BalloonNodeLayout(GroundLevel);
-                case NodeLayoutKind.CirclePacking:
-                    return new CirclePackingNodeLayout(GroundLevel);
-                case NodeLayoutKind.CompoundSpringEmbedder:
-                    return new CoseLayout(GroundLevel, settings);
-                case NodeLayoutKind.FromFile:
-                    return new LoadedNodeLayout(GroundLevel, settings.globalCityAttributes.layoutPath.Path);
-                default:
-                    throw new Exception("Unhandled node layout " + settings.nodeLayoutSettings.kind);
-            }
-        }
+                NodeLayoutKind.Manhattan => new ManhattanLayout(GroundLevel, NodeFactory.Unit),
+                NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(GroundLevel, NodeFactory.Unit),
+                NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(GroundLevel, NodeFactory.Unit),
+                NodeLayoutKind.Treemap => new TreemapLayout(GroundLevel, 1000.0f * NodeFactory.Unit, 1000.0f * NodeFactory.Unit),
+                NodeLayoutKind.Balloon => new BalloonNodeLayout(GroundLevel),
+                NodeLayoutKind.CirclePacking => new CirclePackingNodeLayout(GroundLevel),
+                NodeLayoutKind.CompoundSpringEmbedder => new CoseLayout(GroundLevel, settings),
+                NodeLayoutKind.FromFile => new LoadedNodeLayout(GroundLevel, settings.globalCityAttributes.layoutPath.Path),
+                _ => throw new Exception("Unhandled node layout " + settings.nodeLayoutSettings.kind)
+            };
 
         /// <summary>
         /// Creates and returns a new plane enclosing all given <paramref name="gameNodes"/>.
@@ -1121,7 +1097,7 @@ namespace SEE.Game
         /// <param name="nodeMap">mapping between nodes and gameobjects</param>
         /// <param name="sublayoutNodes">a collection with sublayoutNodes</param>
         /// <returns></returns>
-        private ICollection<GameNode> ToLayoutNodes(Dictionary<Node, GameObject> nodeMap, ICollection<SublayoutNode> sublayoutNodes)
+        private ICollection<GameNode> ToLayoutNodes(Dictionary<Node, GameObject> nodeMap, IEnumerable<SublayoutNode> sublayoutNodes)
         {
             List<GameNode> layoutNodes = new List<GameNode>();
             List<GameObject> remainingGameobjects = nodeMap.Values.ToList();
@@ -1149,24 +1125,16 @@ namespace SEE.Game
         /// <param name="to_layout_node">a mapping from graph nodes onto their corresponding layout node</param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
         private static ICollection<GameNode> ToLayoutNodes
-            (ICollection<GameObject> gameNodes,
-            NodeFactory[] leafNodeFactories,
-            NodeFactory[] innerNodeFactories,
-            Dictionary<Node, ILayoutNode> to_layout_node)
+            (ICollection<GameObject> gameNodes, IReadOnlyList<NodeFactory> leafNodeFactories,
+            IReadOnlyList<NodeFactory> innerNodeFactories, Dictionary<Node, ILayoutNode> to_layout_node)
         {
             IList<GameNode> result = new List<GameNode>(gameNodes.Count);
 
             foreach (GameObject gameObject in gameNodes)
             {
                 Node node = gameObject.GetComponent<NodeRef>().Value;
-                if (node.IsLeaf())
-                {
-                    result.Add(new GameNode(to_layout_node, gameObject, leafNodeFactories[(int)node.Domain]));
-                }
-                else
-                {
-                    result.Add(new GameNode(to_layout_node, gameObject, innerNodeFactories[(int)node.Domain]));
-                }
+                NodeFactory factory = (node.IsLeaf() ? leafNodeFactories : innerNodeFactories)[(int) node.Domain];
+                result.Add(new GameNode(to_layout_node, gameObject, factory));
             }
             LayoutNodes.SetLevels(result.Cast<ILayoutNode>().ToList());
             return result;
@@ -1179,7 +1147,7 @@ namespace SEE.Game
         /// <param name="innerNodeFactory">inner node factory</param>
         /// <returns>the game objects created for the text labels</returns>
         /// <returns>the game objects created for the text labels</returns>
-        private void AddLabels(ICollection<GameObject> gameNodes, NodeFactory innerNodeFactory)
+        private static void AddLabels(IEnumerable<GameObject> gameNodes, NodeFactory innerNodeFactory)
         {
             foreach (GameObject node in gameNodes)
             {
@@ -1560,16 +1528,13 @@ namespace SEE.Game
         /// of each node is one.
         /// </summary>
         /// <param name="nodeMap">The nodes to scale.</param>
-        private void AdjustScaleBetweenNodeKinds(Dictionary<Node, GameObject> nodeMap)
+        private static void AdjustScaleBetweenNodeKinds(Dictionary<Node, GameObject> nodeMap)
         {
             for (int i = 0; i < (int)Node.NodeDomain.Count; i++)
             {
                 Vector3 denominator = Vector3.negativeInfinity;
-                IEnumerable<KeyValuePair<Node, GameObject>> nodeMapMatchingDomain = nodeMap.Where(x => (int)x.Key.Domain == i);
-                foreach (KeyValuePair<Node, GameObject> pair in nodeMapMatchingDomain)
-                {
-                    denominator = Vector3.Max(denominator, pair.Value.transform.localScale);
-                }
+                IList<KeyValuePair<Node, GameObject>> nodeMapMatchingDomain = nodeMap.Where(x => (int)x.Key.Domain == i).ToList();
+                denominator = nodeMapMatchingDomain.Aggregate(denominator, (current, pair) => Vector3.Max(current, pair.Value.transform.localScale));
                 foreach (KeyValuePair<Node, GameObject> pair in nodeMapMatchingDomain)
                 {
                     pair.Value.transform.localScale = pair.Value.transform.localScale.DividePairwise(denominator);
@@ -1585,13 +1550,13 @@ namespace SEE.Game
         /// <param name="nodes">list of nodes for which to create blocks</param>
         protected void DrawInnerNodes(Dictionary<Node, GameObject> nodeMap, IList<Node> nodes)
         {
-            for (int i = 0; i < nodes.Count; i++)
+            foreach (Node node in nodes)
             {
                 // We add only inner nodes.
-                if (!nodes[i].IsLeaf())
+                if (!node.IsLeaf())
                 {
-                    GameObject innerGameObject = DrawInnerNode(nodes[i]);
-                    nodeMap[nodes[i]] = innerGameObject;
+                    GameObject innerGameObject = DrawInnerNode(node);
+                    nodeMap[node] = innerGameObject;
                 }
             }
         }
@@ -1703,7 +1668,7 @@ namespace SEE.Game
         /// <param name="layoutNodes">the layout nodes</param>
         /// <param name="leftLowerCorner">the left lower corner</param>
         /// <param name="rightUpperCorner">the right upper corner</param>
-        public void ComputeBoundingBox(ICollection<ILayoutNode> layoutNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
+        public static void ComputeBoundingBox(ICollection<ILayoutNode> layoutNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
         {
             if (layoutNodes.Count == 0)
             {
@@ -1767,7 +1732,7 @@ namespace SEE.Game
             GameObject result = null;
             foreach (Transform child in codeCity.transform)
             {
-                if (child.tag == Tags.Node)
+                if (child.CompareTag(Tags.Node))
                 {
                     if (result == null)
                     {
