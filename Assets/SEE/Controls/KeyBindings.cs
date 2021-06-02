@@ -66,10 +66,12 @@ namespace SEE.Controls
         /// </summary>
         internal static void PrintBindings()
         {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder("Key Bindings:\n");
             foreach (var binding in bindings)
             {
-                Debug.Log($"Key {binding.Key}: {binding.Value}\n");
+                sb.Append($"Key {binding.Key}: {binding.Value}\n");
             }
+            Debug.Log(sb.ToString());
         }
 
         //-----------------------------------------------------
@@ -134,24 +136,29 @@ namespace SEE.Controls
         //----------------------------------------------------
 
         /// <summary>
+        /// Architecture mapping: maps implementation entity onto architecture entity.
+        /// </summary>
+        internal static KeyCode Mapping = Register(KeyCode.V, Scope.Architecture, "Architecture mapping: maps implementation entity onto architecture entity.");
+
+        /// <summary>
         /// Architecture mapping: saves the current architecture mapping.
         /// </summary>
-        internal static KeyCode SaveArchitectureMapping = Register(KeyCode.F, Scope.Architecture, "Architecture mapping: saves the current architecture mapping.");
+        //internal static KeyCode SaveArchitectureMapping = Register(KeyCode.F, Scope.Architecture, "Architecture mapping: saves the current architecture mapping.");
 
         /// <summary>
         /// Architecture mapping: copies/removes selected implementation node to/from clipboard.
         /// </summary>
-        internal static KeyCode AddOrRemoveFromClipboard = Register(KeyCode.C, Scope.Architecture, "Architecture mapping: copies/removes selected implementation node to/from clipboard.");
+        //internal static KeyCode AddOrRemoveFromClipboard = Register(KeyCode.C, Scope.Architecture, "Architecture mapping: copies/removes selected implementation node to/from clipboard.");
 
         /// <summary>
         /// Architecture mapping: maps all nodes in clipboard onto selected architecture node.
         /// </summary>
-        internal static KeyCode PasteClipboard = Register(KeyCode.V, Scope.Architecture, "Architecture mapping: maps all nodes in clipboard onto selected architecture node.");
+        //internal static KeyCode PasteClipboard = Register(KeyCode.V, Scope.Architecture, "Architecture mapping: maps all nodes in clipboard onto selected architecture node.");
 
         /// <summary>
         /// Architecture mapping: clears clipboard.
         /// </summary>
-        internal static KeyCode ClearClipboard = Register(KeyCode.X, Scope.Architecture, "Architecture mapping: clears clipboard.");
+        //internal static KeyCode ClearClipboard = Register(KeyCode.X, Scope.Architecture, "Architecture mapping: clears clipboard.");
 
         //-----------------------------------------------------
         // Navigation in a code city
@@ -181,7 +188,7 @@ namespace SEE.Controls
         /// <summary>
         /// The user drags the city as a whole on the plane.
         /// </summary>
-        internal static KeyCode Drag = Register(KeyCode.LeftControl, Scope.Browsing, "Drag city element.");
+        internal static KeyCode DragHovered = Register(KeyCode.LeftControl, Scope.Browsing, "Drag city element.");
         /// <summary>
         /// Toggles between the locked and free camera mode.
         /// </summary>

@@ -70,8 +70,6 @@ namespace SEE.DataModel.DG.IO
                     }
                 }
             }
-            // After having the complete hierarchy, we can calculate the node levels.
-            graph.FinalizeNodeHierarchy();
         }
 
         /// <summary>

@@ -5,18 +5,18 @@ namespace Michsky.UI.ModernUIPack
 {
     public class RangeSlider : MonoBehaviour
     {
-        [Header("SETTINGS")]
+        [Header("Settings")]
         [Range(0,2)] public int decimalPlaces = 0;
         public float minValue = 0;
         public float maxValue = 1;
         public bool showLabels = true;
         public bool useWholeNumbers = true;
 
-        [Header("MIN SLIDER")]
+        [Header("Min Slider")]
         public RangeMinSlider minSlider;
         public TextMeshProUGUI minSliderLabel;
 
-        [Header("MAX SLIDER")]
+        [Header("Max Slider")]
         public RangeMaxSlider maxSlider;
         public TextMeshProUGUI maxSliderLabel;
 
@@ -44,8 +44,8 @@ namespace Michsky.UI.ModernUIPack
 
             if (useWholeNumbers == true)
             {
-                minSlider.wholeNumbers = false;
-                maxSlider.wholeNumbers = false;
+                minSlider.wholeNumbers = true;
+                maxSlider.wholeNumbers = true;
             }
 
             minSlider.minValue = minValue;

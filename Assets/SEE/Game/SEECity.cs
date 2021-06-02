@@ -124,19 +124,19 @@ namespace SEE.Game
                 }
                 else
                 {
-                    Debug.LogErrorFormat("SEECity.Awake: Could not load GXL file {0}.\n", filename);
+                    Debug.LogError($"SEECity.Awake: Could not load GXL file {filename} of city {name}.\n");
                 }
             }
             else
             {
-                Debug.LogError("SEECity.Awake: GXL file is undefined.\n");
+                Debug.LogError($"SEECity.Awake: GXL file of city {name} is undefined.\n");
             }
 
             if (loadedGraph != null)
             {
                 if (dict.ContainsKey(filename))
                 {
-                    Debug.LogWarning("Graph seems to exists twice!");
+                    Debug.Log($"SEECity.Awake: Graph contained in {filename} of city {name} seems to exist twice.\n");
                 }
                 else
                 {
@@ -403,7 +403,7 @@ namespace SEE.Game
         /// </summary>
         public void SaveLayout()
         {
-            string path = LayoutPath.Path;
+            string path = globalCityAttributes.layoutPath.Path;
             Debug.LogFormat("Saving layout data to {0}.\n", path);            
             if (Filenames.HasExtension(path, Filenames.GVLExtension))
             {

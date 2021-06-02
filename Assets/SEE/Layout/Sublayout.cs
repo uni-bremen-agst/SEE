@@ -64,11 +64,6 @@ namespace SEE.Layout
         private Vector3 rootNodeRealScale;
 
         /// <summary>
-        /// the leaf node factory
-        /// </summary>
-        private readonly NodeFactory leafNodeFactory;
-
-        /// <summary>
         ///  the sublayout node
         /// </summary>
         private readonly SublayoutLayoutNode sublayout;
@@ -104,14 +99,12 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="sublayout">the sublayout node</param>
         /// <param name="groundLevel">the groundlevel for the nodes</param>
-        /// <param name="leafNodeFactory">the leafnodefactory</param>
         /// <param name="graph">the underlying graph</param>
         /// <param name="settings">abstract see city settings</param>
-        public Sublayout(SublayoutLayoutNode sublayout, float groundLevel, NodeFactory leafNodeFactory, Graph graph, AbstractSEECity settings)
+        public Sublayout(SublayoutLayoutNode sublayout, float groundLevel, Graph graph, AbstractSEECity settings)
         {
             nodeLayout = sublayout.NodeLayout;
             this.groundLevel = groundLevel;
-            this.leafNodeFactory = leafNodeFactory;
             this.sublayout = sublayout;
             this.graph = graph;
             this.settings = settings;
@@ -323,7 +316,7 @@ namespace SEE.Layout
         /// <returns>a mapping from iLayoutNode to the calcualted nodeTransform</returns>
         private Dictionary<ILayoutNode, NodeTransform> CalculateSublayout()
         {
-            NodeLayout layout = CoseHelper.GetNodelayout(nodeLayout, groundLevel, leafNodeFactory.Unit, settings);
+            NodeLayout layout = CoseHelper.GetNodelayout(nodeLayout, groundLevel, NodeFactory.Unit, settings);
             innerNodeHeight = layout.InnerNodeHeight;
             if (layout.UsesEdgesAndSublayoutNodes())
             {

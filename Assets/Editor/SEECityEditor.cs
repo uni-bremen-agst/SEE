@@ -1,8 +1,8 @@
 ﻿#if UNITY_EDITOR
 
+using SEE;
 using SEE.DataModel.DG;
 using SEE.Game;
-using SEE.Layout.NodeLayouts;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -44,7 +44,7 @@ namespace SEEEditor
         {
             EditorGUILayout.Separator();
 
-            if (city.NodeLayout == NodeLayoutKind.CompoundSpringEmbedder)
+            if (city.nodeLayoutSettings.kind == NodeLayoutKind.CompoundSpringEmbedder)
             {
                 Graph graph = city.LoadedGraph;
 
@@ -164,13 +164,13 @@ namespace SEEEditor
             GUILayout.FlexibleSpace();
             GUILayout.BeginHorizontal();
             GUILayoutOption[] guiOptionsToggle = { GUILayout.ExpandWidth(false), GUILayout.Width(20) };
-            bool toggle = EditorGUILayout.Toggle("", seeCity.CoseGraphSettings.ListInnerNodeToggle[root.ID], guiOptionsToggle);
-            seeCity.CoseGraphSettings.ListInnerNodeToggle[root.ID] = toggle;
+            bool toggle = EditorGUILayout.Toggle("", seeCity.coseGraphSettings.ListInnerNodeToggle[root.ID], guiOptionsToggle);
+            seeCity.coseGraphSettings.ListInnerNodeToggle[root.ID] = toggle;
             //var checkedToggle = editorSettings.CoseGraphSettings.ListDirToggle.Where(predicate: kvp => kvp.Value);
 
             if (toggle)
             {
-                ShowSublayoutEnum(seeCity.CoseGraphSettings.InnerNodeLayout[root.ID], root, childrenAreLeaves, parentNodeLayouts);
+                ShowSublayoutEnum(seeCity.coseGraphSettings.InnerNodeLayout[root.ID], root, childrenAreLeaves, parentNodeLayouts);
             }
             else
             {
@@ -186,12 +186,12 @@ namespace SEEEditor
             GUILayout.FlexibleSpace();
             if (toggle)
             {
-                ShowInnerNodesEnum(seeCity.CoseGraphSettings.InnerNodeLayout[root.ID], root);
+                ShowInnerNodesEnum(seeCity.coseGraphSettings.InnerNodeLayout[root.ID], root);
             }
             else
             {
                 EditorGUI.BeginDisabledGroup(true);
-                ShowInnerNodesEnum(seeCity.CoseGraphSettings.InnerNodeLayout[root.ID], root);
+                ShowInnerNodesEnum(seeCity.coseGraphSettings.InnerNodeLayout[root.ID], root);
                 EditorGUI.EndDisabledGroup();
             }
         }
@@ -206,15 +206,15 @@ namespace SEEEditor
             GUILayoutOption[] guiOptions = { GUILayout.ExpandWidth(false), GUILayout.Width(200) };
             EditorGUIUtility.labelWidth = 80;
             EditorGUILayout.PrefixLabel("Inner nodes");
-            Dictionary<AbstractSEECity.InnerNodeKinds, string> shapeKinds = nodeLayout.GetInnerNodeKinds().ToDictionary(kind => kind, kind => kind.ToString());
+            Dictionary<InnerNodeKinds, string> shapeKinds = nodeLayout.GetInnerNodeKinds().ToDictionary(kind => kind, kind => kind.ToString());
 
-            if (shapeKinds.ContainsKey(seeCity.CoseGraphSettings.InnerNodeShape[node.ID]))
+            if (shapeKinds.ContainsKey(seeCity.coseGraphSettings.InnerNodeShape[node.ID]))
             {
-                seeCity.CoseGraphSettings.InnerNodeShape[node.ID] = shapeKinds.ElementAt(EditorGUILayout.Popup(shapeKinds.Keys.ToList().IndexOf(seeCity.CoseGraphSettings.InnerNodeShape[node.ID]), shapeKinds.Values.ToArray(), guiOptions)).Key;
+                seeCity.coseGraphSettings.InnerNodeShape[node.ID] = shapeKinds.ElementAt(EditorGUILayout.Popup(shapeKinds.Keys.ToList().IndexOf(seeCity.coseGraphSettings.InnerNodeShape[node.ID]), shapeKinds.Values.ToArray(), guiOptions)).Key;
             }
             else
             {
-                seeCity.CoseGraphSettings.InnerNodeShape[node.ID] = shapeKinds.ElementAt(EditorGUILayout.Popup(shapeKinds.Keys.ToList().IndexOf(shapeKinds.First().Key), shapeKinds.Values.ToArray(), guiOptions)).Key;
+                seeCity.coseGraphSettings.InnerNodeShape[node.ID] = shapeKinds.ElementAt(EditorGUILayout.Popup(shapeKinds.Keys.ToList().IndexOf(shapeKinds.First().Key), shapeKinds.Values.ToArray(), guiOptions)).Key;
             }
 
             EditorGUIUtility.labelWidth = 150;
@@ -250,17 +250,17 @@ namespace SEEEditor
                 subLayoutNodeLayouts = subLayoutNodeLayouts.Where(elem => possible.Contains(elem.Key)).ToDictionary(x => x.Key, x => x.Value);
             }
 
-            if (subLayoutNodeLayouts.ContainsKey(seeCity.CoseGraphSettings.InnerNodeLayout[root.ID]))
+            if (subLayoutNodeLayouts.ContainsKey(seeCity.coseGraphSettings.InnerNodeLayout[root.ID]))
             {
-                seeCity.CoseGraphSettings.InnerNodeLayout[root.ID] = subLayoutNodeLayouts.ElementAt(EditorGUILayout.Popup(subLayoutNodeLayouts.Keys.ToList().IndexOf(seeCity.CoseGraphSettings.InnerNodeLayout[root.ID]), subLayoutNodeLayouts.Values.ToArray(), guiOptions)).Key;
+                seeCity.coseGraphSettings.InnerNodeLayout[root.ID] = subLayoutNodeLayouts.ElementAt(EditorGUILayout.Popup(subLayoutNodeLayouts.Keys.ToList().IndexOf(seeCity.coseGraphSettings.InnerNodeLayout[root.ID]), subLayoutNodeLayouts.Values.ToArray(), guiOptions)).Key;
 
             }
             else
             {
-                seeCity.CoseGraphSettings.InnerNodeLayout[root.ID] = subLayoutNodeLayouts.ElementAt(EditorGUILayout.Popup(subLayoutNodeLayouts.Keys.ToList().IndexOf(subLayoutNodeLayouts.First().Key), subLayoutNodeLayouts.Values.ToArray(), guiOptions)).Key;
+                seeCity.coseGraphSettings.InnerNodeLayout[root.ID] = subLayoutNodeLayouts.ElementAt(EditorGUILayout.Popup(subLayoutNodeLayouts.Keys.ToList().IndexOf(subLayoutNodeLayouts.First().Key), subLayoutNodeLayouts.Values.ToArray(), guiOptions)).Key;
             }
 
-            parentNodeLayouts.Add(seeCity.CoseGraphSettings.InnerNodeLayout[root.ID]);
+            parentNodeLayouts.Add(seeCity.coseGraphSettings.InnerNodeLayout[root.ID]);
             EditorGUIUtility.labelWidth = 150;
         }
 
@@ -324,8 +324,8 @@ namespace SEEEditor
                                                     "Data Files", true, EditorStyles.foldoutHeader);
             if (showDataFiles)
             {
-                seeCity.GXLPath = GetDataPath("GXL file", seeCity.GXLPath, Filenames.ExtensionWithoutPeriod(Filenames.GXLExtension));
-                seeCity.CSVPath = GetDataPath("Metric file", seeCity.CSVPath, Filenames.ExtensionWithoutPeriod(Filenames.CSVExtension));
+                seeCity.GXLPath = DataPathEditor.GetDataPath("GXL file", seeCity.GXLPath, Filenames.ExtensionWithoutPeriod(Filenames.GXLExtension));
+                seeCity.CSVPath = DataPathEditor.GetDataPath("Metric file", seeCity.CSVPath, Filenames.ExtensionWithoutPeriod(Filenames.CSVExtension));
             }
         }
 

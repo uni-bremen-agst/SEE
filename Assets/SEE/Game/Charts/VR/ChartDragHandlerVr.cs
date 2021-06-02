@@ -45,7 +45,7 @@ namespace SEE.Game.Charts.VR
         protected override void Awake()
         {
             base.Awake();
-            // TODO(torben): vvv
+            // FIXME the line below was here before refactoring charts and needs to be reintroduced for VR
             //_parent = transform.parent.GetComponent<ChartContent>().parent.transform;
         }
 

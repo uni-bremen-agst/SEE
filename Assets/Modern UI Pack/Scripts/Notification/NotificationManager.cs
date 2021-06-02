@@ -8,7 +8,7 @@ namespace Michsky.UI.ModernUIPack
 {
     public class NotificationManager : MonoBehaviour
     {
-        // CONTENT
+        // Content
         public Sprite icon;
         public string title = "Notification Title";
         [TextArea] public string description = "Notification description";
