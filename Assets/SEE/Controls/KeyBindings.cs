@@ -94,6 +94,11 @@ namespace SEE.Controls
         internal static readonly KeyCode ToggleMenu = Register(KeyCode.Space, Scope.Always, "Turns on/off the player-action menu.");
 
         /// <summary>
+        /// Opens the search menu.
+        /// </summary>
+        internal static readonly KeyCode SearchMenu = Register(KeyCode.F, Scope.Always, "Opens the search menu.");
+
+        /// <summary>
         /// Undoes the last action.
         /// </summary>
         internal static readonly KeyCode Undo = Register(KeyCode.Z, Scope.Always, "Undoes the last action.");
@@ -102,8 +107,6 @@ namespace SEE.Controls
         /// Re-does the last action.
         /// </summary>
         internal static readonly KeyCode Redo = Register(KeyCode.Y, Scope.Always, "Re-does the last action.");
-
-        internal static readonly KeyCode SearchMenu = Register(KeyCode.F, Scope.Always, "Opens the search menu.");
 
         //-----------------------------------------------------
         // Camera path recording and playing
