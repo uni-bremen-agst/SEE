@@ -82,6 +82,11 @@ namespace SEE.Controls
         private static ConcurrentDictionary<GameObject, Graph> deletedEdges { get; set; } = new ConcurrentDictionary<GameObject, Graph>();
 
         /// <summary>
+        /// A vector containing the position liniearly interpolated for the edges which have to be moved to the garbage can.
+        /// </summary>
+        private static Vector3 GarbageCanPositionForEdges = new Vector3();
+
+        /// <summary>
         /// Returns the position of the garbage can if one exists in the scene.
         /// If none exists, an empty game object representing it will be used
         /// as a substitute at location <see cref="Vector3.zero"/>.
@@ -111,7 +116,7 @@ namespace SEE.Controls
         /// </summary>
         /// <param name="deletedNodesAndEdges">the deleted nodes and edges which will be moved to the garbage can.</param>
         /// <returns>the waiting time between moving deleted objects over the garbage can and then into the garbage can</returns>
-        public static IEnumerator MoveToGarbage(IList<GameObject> deletedNodesAndEdges)
+        public static IEnumerator MoveNodeOrEdgeToGarbage(IList<GameObject> deletedNodesAndEdges)
         {
             Vector3 garbageCanPosition = GarbageCanPosition();
 
@@ -120,43 +125,97 @@ namespace SEE.Controls
             // leave their portal.
             foreach (GameObject deletedNode in deletedNodesAndEdges)
             {
-                oldPositions[deletedNode] = deletedNode.transform.position;
                 Portal.SetInfinitePortal(deletedNode);
             }
             foreach (GameObject deletedNode in deletedNodesAndEdges)
             {
-                Tweens.Move(deletedNode, 
+
+                if (deletedNode.HasNodeRef())
+                {
+                    Tweens.Move(deletedNode,
                             new Vector3(garbageCanPosition.x,
                                         garbageCanPosition.y + verticalHeight,
-                                        garbageCanPosition.z), 
+                                        garbageCanPosition.z),
                             TimeForAnimation);
+                }
+
+                
+                   else if (deletedNode.TryGetComponentOrLog(out EdgeRef edgeReference))
+                    {
+                        Node target = edgeReference.Value.Target;
+                        GameObject targetObject = SceneQueries.RetrieveGameNode(target.ID);
+                        Vector3 targetPosi = targetObject.transform.position;
+                        GarbageCanPositionForEdges = new Vector3(garbageCanPosition.x, garbageCanPosition.y + verticalHeight - targetPosi.y, garbageCanPosition.z);
+
+                        if (targetPosi.x > 0)
+                        {
+                            GarbageCanPositionForEdges.x -= targetPosi.x;
+                        }
+                        else
+                        {
+                            GarbageCanPositionForEdges.x += (targetPosi.x * -1); // might be written in "math.Abs way"
+                        }
+
+                        if (targetPosi.z > 0)
+                        {
+                            GarbageCanPositionForEdges.z -= targetPosi.z;
+                        }
+                        else
+                        {
+                            GarbageCanPositionForEdges.z += (targetPosi.z * -1);
+                        }
+
+                        Tweens.Move(deletedNode,
+                                GarbageCanPositionForEdges,
+                                TimeForAnimation);
+                    }
+                
             }
             yield return new WaitForSeconds(TimeToWait);
 
             foreach (GameObject deletedNode in deletedNodesAndEdges)
             {
-                Vector3 shrinkFactor = VectorOperations.DivideVectors(deletedNode.transform.localScale, defaultGarbageVector);
-                shrinkFactors.TryAdd(deletedNode, shrinkFactor);
-                deletedNode.transform.localScale = Vector3.Scale(deletedNode.transform.localScale, shrinkFactor);
-                Tweens.Move(deletedNode, garbageCanPosition, TimeForAnimation);
+                if (deletedNode.HasNodeRef())
+                {
+                    Vector3 shrinkFactor = VectorOperations.DivideVectors(deletedNode.transform.localScale, defaultGarbageVector);
+                    shrinkFactors.TryAdd(deletedNode, shrinkFactor);
+                    deletedNode.transform.localScale = Vector3.Scale(deletedNode.transform.localScale, shrinkFactor);
+                    Tweens.Move(deletedNode, garbageCanPosition, TimeForAnimation);
+                }
+
+                else
+                {
+                    Tweens.Move(deletedNode, new Vector3(deletedNode.transform.position.x, deletedNode.transform.position.y - verticalHeight, deletedNode.transform.position.z), TimeForAnimation);
+                }
             }
             yield return new WaitForSeconds(TimeToWait);
         }
 
         /// <summary>
-        /// Removes all given <paramref name="deletedNodesOrEdges"/> from the garbage can back to their original location.
+        /// Removes all given nodes respectively edges from the garbage can back to their original location.
         /// </summary>
-        /// <param name="deletedNodesAndEdges">The nodes and edges to be removed from the garbage can</param>
-        /// <returns>the waiting time between moving deleted objexra from the garbage can and then to the city</returns>
-        public static IEnumerator RemoveFromGarbage(IList<GameObject> deletedNodesOrEdges)
+        /// <param name="deletedNodesAndEdges">The nodes to be removed from the garbage can</param>
+        /// <returns>the waiting time between moving deleted nodes from the garbage can and then to the city</returns>
+        public static IEnumerator RemoveFromGarbage(IList<GameObject> deletedNodesOrEdges, Dictionary<GameObject, Vector3> oldPositions)
         {
             Vector3 garbageCanPosition = GarbageCanPosition();
 
-            // vertical movement of deleted objects
-            foreach (GameObject deletedObject in deletedNodesOrEdges)
+            // vertical movement of nodes respectively edges.
+            foreach (GameObject deletedNode in deletedNodesOrEdges)
             {
-                Tweens.Move(deletedObject, new Vector3(garbageCanPosition.x, garbageCanPosition.y + verticalHeight, garbageCanPosition.z), TimeForAnimation);
-                PlayerSettings.GetPlayerSettings().StartCoroutine(WaitAndExpand(deletedObject));
+                if (deletedNode.HasNodeRef())
+                {
+                    Portal.SetInfinitePortal(deletedNode);
+                    Tweens.Move(deletedNode, new Vector3(garbageCanPosition.x, garbageCanPosition.y + verticalHeight, garbageCanPosition.z), TimeForAnimation);
+                }
+                else
+                {
+                    Tweens.Move(deletedNode, new Vector3(deletedNode.transform.position.x, deletedNode.transform.position.y + verticalHeight, deletedNode.transform.position.z), TimeForAnimation);
+                }
+                if (deletedNode.HasNodeRef())
+                {
+                    PlayerSettings.GetPlayerSettings().StartCoroutine(WaitAndExpand(deletedNode));
+                }
             }
 
             yield return new WaitForSeconds(TimeToWait);
@@ -164,25 +223,10 @@ namespace SEE.Controls
             // back to the original position
             foreach (GameObject nodeOrEdgeReference in deletedNodesOrEdges)
             {
-                if (nodeOrEdgeReference.HasNodeRef())
-                {
-                  Tweens.Move(nodeOrEdgeReference, oldPositions[nodeOrEdgeReference], TimeForAnimation);
-                }
-                else if (nodeOrEdgeReference.TryGetComponentOrLog(out EdgeRef edgeReference))
-                {
-                    Node target = edgeReference.Value.Target;
-                    GameObject targetObject = SceneQueries.RetrieveGameNode(target.ID);
-
-                    // Due to the fact that edges as a GameObject have the orginal position (0,0,0) unlike nodes
-                    // and it would look like they move through the city on towards the ground 
-                    // having been removed fom the garbage can, we consequently move the edges first to 
-                    // their target´s node position and afterwards to their final original position.
-                    Tweens.Move(nodeOrEdgeReference, targetObject.transform.position, TimeForAnimation / 2);
-                    yield return new WaitForSeconds(TimeForAnimation / 2);
-                    Tweens.Move(nodeOrEdgeReference, oldPositions[nodeOrEdgeReference], TimeForAnimation);
-                }
+                Portal.SetInfinitePortal(nodeOrEdgeReference);
+                Tweens.Move(nodeOrEdgeReference, oldPositions[nodeOrEdgeReference], TimeForAnimation);
             }
-           
+
             yield return new WaitForSeconds(TimeToWait);
             deletedNodesOrEdges.Clear();
             deletedEdges.Clear();
@@ -197,16 +241,16 @@ namespace SEE.Controls
         /// <returns>the waiting time between moving deleted objects from the garbage can and then to the city</returns>
         private static IEnumerator WaitAndExpand(GameObject deletedObject)
         {
-            yield return new WaitForSeconds(TimeToWait);
-            Vector3 shrinkFactor = shrinkFactors[deletedObject];
-            float exponent = 1 / StepsOfExpansionAnimation;
-            shrinkFactor = VectorOperations.ExponentOfVectorCoordinates(shrinkFactor, exponent);
+                yield return new WaitForSeconds(TimeToWait);
+                Vector3 shrinkFactor = shrinkFactors[deletedObject];
+                float exponent = 1 / StepsOfExpansionAnimation;
+                shrinkFactor = VectorOperations.ExponentOfVectorCoordinates(shrinkFactor, exponent);
 
-            for (float animationsCount = StepsOfExpansionAnimation; animationsCount > 0; animationsCount--)
-            {
-                deletedObject.transform.localScale = VectorOperations.DivideVectors(shrinkFactor, deletedObject.transform.localScale);
-                yield return new WaitForSeconds(TimeBetweenExpansionAnimation);
-            }
+                for (float animationsCount = StepsOfExpansionAnimation; animationsCount > 0; animationsCount--)
+                {
+                    deletedObject.transform.localScale = VectorOperations.DivideVectors(shrinkFactor, deletedObject.transform.localScale);
+                    yield return new WaitForSeconds(TimeBetweenExpansionAnimation);
+                }
         }
     }
 }

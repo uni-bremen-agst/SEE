@@ -58,6 +58,17 @@ namespace SEE.Controls.Actions
         private Dictionary<GameObject, Graph> roots { get; set; } = new Dictionary<GameObject, Graph>();
 
         /// <summary>
+        /// A list containing both, nodes and edges to be deleted.
+        /// </summary>
+        List<GameObject> NodesAndEdgesToDelete = new List<GameObject>();
+
+        /// <summary>
+        /// A history of the old positions of the objects deleted by this action.
+        /// </summary>
+        private static Dictionary<GameObject, Vector3> oldPositions = new Dictionary<GameObject, Vector3>();
+
+
+        /// <summary>
         /// Disables the general selection provided by <see cref="SEEInput.Select"/>.
         /// We need to avoid that the selection of graph elements to be deleted 
         /// interferes with the general <see cref="SelectAction"/>.
@@ -133,7 +144,7 @@ namespace SEE.Controls.Actions
                     // The selectedObject (a node) and its ancestors are not deleted immediately. Instead we
                     // will run an animation that moves them into a garbage bin. Only when they arrive there,
                     // we will actually delete them.
-                    PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.MoveToGarbage(deletedObject.AllAncestors()));
+                    PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.MoveNodeOrEdgeToGarbage(deletedObject.AllAncestors()));
                     Portal.SetInfinitePortal(deletedObject);
                     MarkAsDeleted(deletedObject.AllAncestors());
                 }
@@ -168,7 +179,7 @@ namespace SEE.Controls.Actions
                         {
                             if (rootReference.Value == nodeGraphPair.Key)
                             {
-                                new UndoDeleteNetAction(nodeGraphPair.Key.name, rootReference.Key.name).Execute(null);
+                                new UndoDeleteNetAction(nodeGraphPair.Key.name, rootReference.Key.name, nodeGraphPair.Key.transform.position).Execute(null);
                             }
                         }
                     }
@@ -189,13 +200,14 @@ namespace SEE.Controls.Actions
                     {
                         if (rootReference.Value == edgeGraphPair.Key)
                         {
-                            new UndoDeleteNetAction(edgeGraphPair.Key.name, rootReference.Key.name).Execute(null);
+                            new UndoDeleteNetAction(edgeGraphPair.Key.name, rootReference.Key.name, edgeGraphPair.Key.transform.position).Execute(null);
                         }
                     }
                 }
             }
-            PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.RemoveFromGarbage(new List<GameObject>(deletedNodes.Keys)));
-            PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.RemoveFromGarbage(new List<GameObject>(deletedEdges.Keys)));
+            NodesAndEdgesToDelete = new List<GameObject>(deletedNodes.Keys);
+            NodesAndEdgesToDelete.AddRange(deletedEdges.Keys);
+            PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.RemoveFromGarbage(NodesAndEdgesToDelete, oldPositions));
         }
 
         /// <summary>
@@ -255,6 +267,9 @@ namespace SEE.Controls.Actions
             {
                 DeleteNode(deletedGameNode);
             }
+            implicitlyDeletedEdges.UnionWith(gameNodesToDelete);
+            List<GameObject> unitedNodesAndEdges = new List<GameObject>(implicitlyDeletedEdges);
+            PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.MoveNodeOrEdgeToGarbage(unitedNodesAndEdges));
         }
 
         /// <summary>
@@ -273,6 +288,10 @@ namespace SEE.Controls.Actions
             {
                 Graph graph = nodeRef.Value.ItsGraph;
                 deletedNodes[gameNode] = graph;
+                if (!oldPositions.ContainsKey(gameNode))
+                {
+                    oldPositions.Add(gameNode, gameNode.transform.position);
+                }
                 if (!roots.ContainsValue(graph))
                 {
                     FindRoot(graph);
@@ -300,9 +319,13 @@ namespace SEE.Controls.Actions
                 {
                     FindRoot(graph);
                 }
+                if (!oldPositions.ContainsKey(gameEdge))
+                {
+                    oldPositions.Add(gameEdge, gameEdge.transform.position);
+                }
                 new DeleteNetAction(gameEdge.name).Execute(null);
                 deletedEdges[gameEdge] = graph;
-                PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.MoveToGarbage(new List<GameObject> {gameEdge}));
+                PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.MoveNodeOrEdgeToGarbage(new List<GameObject> {gameEdge}));
                 graph.RemoveEdge(edgeRef.Value);
             }
         }
