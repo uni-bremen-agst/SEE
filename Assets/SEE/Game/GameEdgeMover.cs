@@ -51,7 +51,7 @@ namespace SEE.Game
         /// if they are not in the same inner node,
         /// can be used for moving inner nodes to reduce computational effort
         /// </summary>
-        /// <param name="node"></param>
+        /// <param name="node">node whose edges are to be moved</param>
         public static void MoveAllConnectingEdgesOfNodeConnectingToAnotherSubset(GameObject node)
         {
             MoveEdgesOfNode(node, false);
@@ -60,7 +60,7 @@ namespace SEE.Game
         /// <summary>
         /// Moves all incoming and outgoing edges of a node and its children depending on the new position of the node.
         /// </summary>
-        /// <param name="node"></param>
+        /// <param name="node">node whose edges are to be moved</param>
         public static void MoveAllConnectingEdgesOfNode(GameObject node)
         {
             MoveEdgesOfNode(node, true);
