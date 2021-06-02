@@ -71,9 +71,10 @@ namespace SEE.Net.Dashboard
         /// </param>
         /// <param name="queryParameters">A dictionary containing the query parameters' names and values.</param>
         /// <param name="apiPath">Whether the query path starts with <c>/api</c></param>
+        /// <param name="accept">The HTTP Accept header value.</param>
         /// <returns>The result of the API call.</returns>
         private static async UniTask<DashboardResult> GetAtPath(string path, Dictionary<string, string> queryParameters = null,
-                                                                bool apiPath = true)
+                                                                bool apiPath = true, string accept = "application/json")
         {
             string requestUrl = apiPath ? BaseUrl.Replace("/projects/", "/api/projects/") : BaseUrl;
             requestUrl += path;
@@ -83,7 +84,7 @@ namespace SEE.Net.Dashboard
             }
             UnityWebRequest request = UnityWebRequest.Get(requestUrl);
             request.certificateHandler = new AxivionCertificateHandler();
-            request.SetRequestHeader("Accept", "application/json");
+            request.SetRequestHeader("Accept", accept);
             request.SetRequestHeader("Authorization", $"AxToken {Token}");
             request.SendWebRequest();
             await UniTask.WaitUntil(() => request.isDone);

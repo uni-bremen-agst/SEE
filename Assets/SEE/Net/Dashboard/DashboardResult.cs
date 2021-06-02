@@ -35,7 +35,7 @@ namespace SEE.Net.Dashboard
         /// Contains the received JSON from the dashboard.
         /// May be <c>null</c> if <see cref="Success"/> is <c>false</c>.
         /// </summary>
-        private readonly string json;
+        public readonly string JSON;
 
         /// <summary>
         /// Instantiates a new instance of this class from the given success value and JSON.
@@ -45,7 +45,7 @@ namespace SEE.Net.Dashboard
         /// <exception cref="ArgumentNullException">If the given <paramref name="json"/> is <c>null</c>.</exception>
         public DashboardResult(bool success, string json)
         {
-            this.json = json ?? throw new ArgumentNullException(nameof(json));
+            JSON = json ?? throw new ArgumentNullException(nameof(json));
             if (!success)
             {
                 Success = true; // temporarily set this to true so that the next method works
@@ -110,14 +110,14 @@ namespace SEE.Net.Dashboard
 
             try
             {
-                return JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings
+                return JsonConvert.DeserializeObject<T>(JSON, new JsonSerializerSettings
                 {
                     MissingMemberHandling = strict ? MissingMemberHandling.Error : MissingMemberHandling.Ignore
                 });
             }
             catch (Exception e) when (e is JsonSerializationException || e is JsonReaderException)
             {
-                Debug.LogError($"Error encountered: {e.Message}.\nGiven JSON was: {json}");
+                Debug.LogError($"Error encountered: {e.Message}.\nGiven JSON was: {JSON}");
                 throw;
             }
         }
@@ -128,7 +128,7 @@ namespace SEE.Net.Dashboard
         /// <returns>human-readable representation of this class.</returns>
         public override string ToString()
         {
-            return $"{nameof(Error)}: {Error}, {nameof(Exception)}: {Exception}, {nameof(json)}: {json}, {nameof(Success)}: {Success}";
+            return $"{nameof(Error)}: {Error}, {nameof(Exception)}: {Exception}, {nameof(JSON)}: {JSON}, {nameof(Success)}: {Success}";
         }
     }
 }
