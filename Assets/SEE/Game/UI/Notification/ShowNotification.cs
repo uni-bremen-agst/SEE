@@ -56,7 +56,7 @@ namespace SEE.Game.UI.Notification
             Show(title, description, InfoIcon, InfoColor, duration);
             if (log)
             {
-                Debug.Log($"{title}: {description}");
+                Debug.Log($"{title}: {description}\n");
             }
         }
         
@@ -72,7 +72,7 @@ namespace SEE.Game.UI.Notification
             Show(title, description, WarningIcon, WarningColor, duration);
             if (log)
             {
-                Debug.LogWarning($"{title}: {description}");
+                Debug.LogWarning($"{title}: {description}\n");
             }
         }
         
@@ -88,7 +88,7 @@ namespace SEE.Game.UI.Notification
             Show(title, description, ErrorIcon, ErrorColor, duration);
             if (log)
             {
-                Debug.LogError($"{title}: {description}");
+                Debug.LogError($"{title}: {description}\n");
             }
         }
 
