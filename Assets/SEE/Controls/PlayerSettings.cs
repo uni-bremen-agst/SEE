@@ -62,6 +62,11 @@ namespace SEE.Controls
         [OdinSerialize]
         public Vector3 PlayerOrigin = Vector3.one;
 
+        [Tooltip("The rotation along the y axis at which to spawn the player initially (in degree).")]
+        [OdinSerialize]
+        [Range(0, 359)]
+        public float PlayerYRotation = 0;
+
         [Tooltip("The plane the player is to focus initially in the desktop environment.")]
         [OdinSerialize]
         public GO.Plane FocusPlane;
@@ -192,6 +197,7 @@ namespace SEE.Controls
                     throw new NotImplementedException($"Unhandled case {inputType}.");
             }
             player.transform.position = PlayerOrigin;
+            player.transform.rotation = Quaternion.Euler(0, PlayerYRotation, 0);
             return player;
         }
 
