@@ -173,7 +173,7 @@ namespace SEE.Controls
                 case PlayerInputType.DesktopPlayer:
                     if (FocusPlane == null)
                     {
-                       Debug.LogError("No focus plane set for the desktop player. Set this value in the inspector.\n");
+                       Debug.Log("No focus plane set for the desktop player. You can set this value in the inspector.\n");
                     }
                     player = PlayerFactory.CreateDesktopPlayer(FocusPlane);
                     break;
