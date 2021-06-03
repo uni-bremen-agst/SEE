@@ -1,6 +1,7 @@
 ﻿using SEE.Controls;
 using SEE.GO;
 using System;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
 
@@ -35,6 +36,20 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void Start()
         {
+            if (string.IsNullOrEmpty(GrammarFilePath.Path))
+            {
+                Debug.LogError("Grammar file for speech recognition is not defined.\n");
+                enabled = false;
+                return;
+            }
+
+            if (!File.Exists(GrammarFilePath.Path))
+            {
+                Debug.LogError($"Grammar file {GrammarFilePath} for speech recognition does not exist.\n");
+                enabled = false;
+                return;
+            }
+
             try
             {
                 input = new GrammarInput(GrammarFilePath.Path);
@@ -68,10 +83,14 @@ namespace SEE.Game.Avatars
                     // Debug.Log($"Meaning: {meaning.key} => {ToString(meaning.values)}\n");
                     foreach (string value in meaning.values)
                     {
-                        // help, time, about
-                        if (value == "help")
+                        // data, help, time, about
+                        if (value == "data")
                         {
-                            brain.Help();
+                            brain.Overview();
+                        }
+                        else if (value == "interact")
+                        {
+                            brain.Interaction();
                         }
                         else if (value == "time")
                         {
