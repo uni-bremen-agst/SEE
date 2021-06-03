@@ -75,13 +75,13 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// If the user asks for help, the <see cref="helpText"/> is spoken.
+        /// If the user asks for help, the <see cref="overviewText"/> is spoken.
         /// </summary>
         private void Update()
         {
             if (SEEInput.Help())
             {
-                Help();
+                Interaction();
             }
         }
 
@@ -95,11 +95,19 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// Speaks the general help text.
+        /// Speaks the general overview text about SEE and code cities <see cref="overviewText"/>.
         /// </summary>
-        public void Help()
+        internal void Overview()
         {
-            Say(helpText);
+            Say(overviewText);
+        }
+
+        /// <summary>
+        /// Speaks the help text about available interactions <see cref="interactionText"/>.
+        /// </summary>
+        public void Interaction()
+        {
+            Say(interactionText);
         }
 
         /// <summary>
@@ -178,7 +186,7 @@ namespace SEE.Game.Avatars
         /// influence the pronounciation. See, for instance,
         /// https://cloud.google.com/text-to-speech/docs/ssml
         /// </summary>
-        private const string helpText = "Welcome to the wonderful world of SEE, "
+        private const string overviewText = "Welcome to the wonderful world of SEE, "
             + "<prosody rate=\"slow\"><say-as interpret-as=\"characters\">S E E</say-as></prosody>, "
             + "for software engineering experience. "
             + "SEE let's you visualize your software as code cities. "
@@ -189,7 +197,13 @@ namespace SEE.Game.Avatars
             + "Inner nodes of this tree can be visualized as nested circles or rectangles "
             + "depending on the layout you choose. "
             + "Dependencies can be depicted by connecting edges between blocks. "
-            + "You can hover on the objects to get additional details. "
+            + "And now <emphasis level=\"strong\">have fun</emphasis>!";
+
+        /// <summary>
+        /// General overview on the interactions in SEE.
+        /// </summary>
+        private const string interactionText =
+              "You can hover on the objects to get additional details. "
             + "You can zoom in and out of a code city using the mouse wheel. "
             + "You can drag the code city by moving the mouse while holding the "
             + "middle mouse button pressed. "
@@ -206,8 +220,7 @@ namespace SEE.Game.Avatars
             + "use the keys, <prosody rate = \"slow\"><say-as interpret-as= \"characters\">Q </say-as></prosody>, "
             + "and, <prosody rate = \"slow\"><say-as interpret-as= \"characters\"> E </say-as></prosody>, "
             + "to move up and down. "
-            + "To bring up the menu for additional actions, just hit the space bar. "
-            + "And now <emphasis level=\"strong\">have fun</emphasis>!";
+            + "To bring up the menu for additional actions, just hit the space bar.";
 
         /// <summary>
         /// A brief information about SEE and its developers.
