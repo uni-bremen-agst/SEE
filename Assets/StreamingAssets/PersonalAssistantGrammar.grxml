@@ -5,9 +5,11 @@
   <rule id="sentences">
     <ruleref uri="#intro" />
 	<one-of>
-	  <item><ruleref uri="#help" /> <tag> out.action = "help"; </tag></item>
+	  <item><ruleref uri="#data" /> <tag> out.action = "data"; </tag></item>
+	  <item><ruleref uri="#interact" /> <tag> out.action = "interact"; </tag></item>
       <item><ruleref uri="#timeQuery" /> <tag> out.action = "time"; </tag></item>
 	  <item><ruleref uri="#aboutYou" /><tag> out.action = "about"; </tag></item>
+	  <item><ruleref uri="#goodBye" /><tag> out.action = "goodBye"; </tag></item>
 	</one-of>
   </rule>
 
@@ -23,16 +25,26 @@
 	 <item> see </item>
   </rule>
   
-  <!-- help -->
-  <rule id="help">
+  <!-- data -->
+  <rule id="data">
+    <one-of>
+      <item> what do I see </item>
+      <item> what is a code city </item>
+      <item> tell me about SEE </item>
+    </one-of>
+  </rule>
+  
+  <!-- interact -->
+  <rule id="interact">
     <one-of>
       <item> I need help </item>
       <item> help me </item>
       <item> give help </item>
 	  <item> provide help </item>
+	  <item> how do I interact </item>
     </one-of>
   </rule>
-
+  
   <!-- current time -->
   <rule id="timeQuery">
     <one-of>
@@ -67,5 +79,15 @@
 	   <item>yourself</item>
 	 </one-of>
   </rule>	  
+  
+  <!-- goodBye -->
+  <rule id="goodBye">
+    <one-of>
+      <item> good bye </item>
+      <item> bye bye </item>
+      <item> take care </item>
+	  <item> see you later </item>
+    </one-of>
+  </rule>
   
 </grammar>
