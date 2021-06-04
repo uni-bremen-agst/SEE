@@ -10,7 +10,7 @@ namespace SEEEditor
     /// <summary>
     /// Editor for ArchitectureInteraction.
     /// </summary>
-    [Obsolete("Introduced only for capturing videos.")]
+    //[Obsolete("Introduced only for capturing videos.")]
     [CustomEditor(typeof(ArchitectureInteraction))]
     public class ArchitectureInteractionEditor : Editor
     {
