@@ -7,7 +7,7 @@ namespace SEE.Controls
     public class DesktopPlayerMovement : MonoBehaviour
     {
         [Tooltip("Speed of movements")]
-        public float Speed = 2.0f;
+        public float Speed = 0.5f;
         [Tooltip("Boost factor of speed, applied when shift is pressed.")]
         public float BoostFactor = 2.0f;
 
