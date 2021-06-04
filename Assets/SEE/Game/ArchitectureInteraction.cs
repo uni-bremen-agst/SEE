@@ -1,6 +1,7 @@
 ﻿using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.GO;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -101,20 +102,21 @@ namespace SEE.Game
         /// </summary>
         private void Reset()
         {
-            implementationEdgesVisible = true;
+            implementationEdgesVisible = false;
             implementationEdgesStartColor = Lighter(implementationEdgesColorDefault);
             implementationEdgesEndColor = implementationEdgesColorDefault;
             implementationEdgesWidth = implementationEdgeWidthDefault;
 
-            architectureEdgesVisible = true;
+            architectureEdgesVisible = false;
             architectureEdgesStartColor = Lighter(architectureEdgesColorDefault);
             architectureEdgesEndColor = architectureEdgesColorDefault;
             architectureEdgesWidth = architectureEdgeWidthDefault;
 
-            reflexionEdgesVisible = true;
+            reflexionEdgesVisible = false;
             reflexionEdgesWidth = reflexionEdgeWidthDefault;
 
             architectureNodesVisible = true;
+            implementationNodesVisible = false;
         }
 
         /// <summary>
@@ -127,6 +129,10 @@ namespace SEE.Game
                 Debug.LogError($"Game object {name} does not have a SEECity component.\n");
                 enabled = false;
             }
+            else
+            {
+                UpdateCity();
+            }
         }
 
         // --------------------------------------------
@@ -138,6 +144,7 @@ namespace SEE.Game
             if (Input.GetKeyDown(KeyCode.F5))
             {
                 ImplementationEdgesVisible = !ImplementationEdgesVisible;
+                Debug.Log("F5 pressed.\n");
             }
             if (Input.GetKeyDown(KeyCode.F6))
             {
@@ -149,11 +156,11 @@ namespace SEE.Game
             }
             if (Input.GetKeyDown(KeyCode.F11))
             {
-                ImplementationNodesVisible = !ImplementationNodesVisible;
+                ArchitectureNodesVisible = !ArchitectureNodesVisible;                
             }
             if (Input.GetKeyDown(KeyCode.F12))
             {
-                ArchitectureNodesVisible = !ArchitectureNodesVisible;
+                ImplementationNodesVisible = !ImplementationNodesVisible;
             }
         }
 
@@ -170,13 +177,35 @@ namespace SEE.Game
                 if (root != null)
                 {
                     Debug.LogFormat("Root of {0} is {1}\n", CodeCity.name, root.name);
-                    ColorNodes(root);
+                    SetAllNodes(root);                    
+                    SetAllEdges();
                 }
             }
             else
             {
                 Debug.LogErrorFormat("Code city is null in {0}.\n", name);
             }
+        }
+
+        /// <summary>
+        /// Sets all attributes of all nodes.
+        /// </summary>
+        /// <param name="root">root node of the code city</param>
+        private void SetAllNodes(GameObject root)
+        {
+            ColorNodes(root);
+            SetNodeVisibility(ArchitectureNodes(), architectureNodesVisible);
+            SetNodeVisibility(ImplementationNodes(), implementationNodesVisible);
+        }
+
+        /// <summary>
+        /// Sets all attributes of all edges.
+        /// </summary>
+        private void SetAllEdges()
+        {
+            SetArchitectureEdges();
+            SetImplementationEdges();
+            SetReflexionEdges();
         }
 
         /// <summary>
@@ -378,7 +407,7 @@ namespace SEE.Game
         // Implementation edge type properties
         //------------------------------------
 
-        private bool implementationEdgesVisible = true;
+        private bool implementationEdgesVisible = false;
         /// <summary>
         /// Whether implementation edges are visible.
         /// </summary>
@@ -407,7 +436,7 @@ namespace SEE.Game
                 if (implementationEdgesStartColor != value)
                 {
                     implementationEdgesStartColor = value;
-                    SetLine(ImplementationEdgeTypes, implementationEdgesStartColor, implementationEdgesEndColor, implementationEdgesWidth);
+                    SetImplementationEdges();
                 }
             }
         }
@@ -424,7 +453,7 @@ namespace SEE.Game
                 if (implementationEdgesEndColor != value)
                 {
                     implementationEdgesEndColor = value;
-                    SetLine(ImplementationEdgeTypes, implementationEdgesStartColor, implementationEdgesEndColor, implementationEdgesWidth);
+                    SetImplementationEdges();
                 }
             }
         }
@@ -441,16 +470,25 @@ namespace SEE.Game
                 if (implementationEdgesWidth != value)
                 {
                     implementationEdgesWidth = value;
-                    SetLine(ImplementationEdgeTypes, implementationEdgesStartColor, implementationEdgesEndColor, implementationEdgesWidth);
+                    SetImplementationEdges();
                 }
             }
+        }
+
+        /// <summary>
+        /// Sets all attributes of implementation edges.
+        /// </summary>
+        private void SetImplementationEdges()
+        {
+            SetLine(ImplementationEdgeTypes, implementationEdgesStartColor, implementationEdgesEndColor, implementationEdgesWidth);
+            SetEdgeVisiblity(ImplementationEdgeTypes, implementationEdgesVisible);
         }
 
         //------------------------------------
         // Reflexion edge type properties
         //------------------------------------
 
-        private bool reflexionEdgesVisible = true;
+        private bool reflexionEdgesVisible = false;
         /// <summary>
         /// Whether reflexion edges are visible.
         /// </summary>
@@ -479,7 +517,7 @@ namespace SEE.Game
                 if (reflexionEdgesWidth != value)
                 {
                     reflexionEdgesWidth = value;
-                    SetReflexionEdgeLine(reflexionEdgesWidth);
+                    SetReflexionEdges();
                 }
             }
         }
@@ -487,21 +525,21 @@ namespace SEE.Game
         /// <summary>
         /// Sets start and end color and width for the lines of all reflexion edges.
         /// Absences will be colored yellow, convergences will be colored green, and
-        /// divergences will be colored red.
+        /// divergences will be colored red. Sets the visibility of the reflexion edges.
         /// </summary>
-        /// <param name="reflexionEdgesWidth">the new width of the reflexion edges</param>
-        private void SetReflexionEdgeLine(float reflexionEdgesWidth)
+        private void SetReflexionEdges()
         {
             SetLine(new HashSet<string>() { "Absence" }, Color.yellow, Darker(Color.yellow), reflexionEdgesWidth);
             SetLine(new HashSet<string>() { "Convergence" }, Color.green, Darker(Color.green), reflexionEdgesWidth);
             SetLine(new HashSet<string>() { "Divergence" }, Color.red, Darker(Color.red), reflexionEdgesWidth);
+            SetEdgeVisiblity(ReflexionEdgeTypes, reflexionEdgesVisible);
         }
 
         //------------------------------------
         // Architecture edge type properties
         //------------------------------------
 
-        private bool architectureEdgesVisible = true;
+        private bool architectureEdgesVisible = false;
         /// <summary>
         /// Whether architecture dependencies are visible.
         /// </summary>
@@ -530,7 +568,7 @@ namespace SEE.Game
                 if (architectureEdgesStartColor != value)
                 {
                     architectureEdgesStartColor = value;
-                    SetLine(ArchitectureEdgeTypes, architectureEdgesStartColor, architectureEdgesEndColor, architectureEdgesWidth);
+                    SetArchitectureEdges();
                 }
             }
         }
@@ -547,7 +585,7 @@ namespace SEE.Game
                 if (architectureEdgesEndColor != value)
                 {
                     architectureEdgesEndColor = value;
-                    SetLine(ArchitectureEdgeTypes, architectureEdgesStartColor, architectureEdgesEndColor, architectureEdgesWidth);
+                    SetArchitectureEdges();
                 }
             }
         }
@@ -564,10 +602,20 @@ namespace SEE.Game
                 if (architectureEdgesWidth != value)
                 {
                     architectureEdgesWidth = value;
-                    SetLine(ArchitectureEdgeTypes, architectureEdgesStartColor, architectureEdgesEndColor, architectureEdgesWidth);
+                    SetArchitectureEdges();
                 }
             }
         }
+
+        /// <summary>
+        /// Sets all attributes of all architecture edges.
+        /// </summary>
+        private void SetArchitectureEdges()
+        {
+            SetLine(ArchitectureEdgeTypes, architectureEdgesStartColor, architectureEdgesEndColor, architectureEdgesWidth);
+            SetEdgeVisiblity(ArchitectureEdgeTypes, architectureEdgesVisible);
+        }
+
         /// <summary>
         /// Set the visibility of all edges in the <see cref="CodeCity"/> that have
         /// any of the given <paramref name="edgeTypes"/> to <paramref name="show"/>.
@@ -632,7 +680,7 @@ namespace SEE.Game
             }
         }
 
-        private bool implementationNodesVisible = true;
+        private bool implementationNodesVisible = false;
         /// <summary>
         /// Whether implementation nodes are visible.
         /// </summary>
