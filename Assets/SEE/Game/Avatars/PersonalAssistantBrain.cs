@@ -119,6 +119,14 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
+        /// Says good bye.
+        /// </summary>
+        public void GoodBye()
+        {
+            Say(goodByeText);
+        }
+
+        /// <summary>
         /// Tells the current time.
         /// </summary>
         public void CurrentTime()
@@ -229,5 +237,13 @@ namespace SEE.Game.Avatars
             + "Myself and all the world you see, was created by Christian, Falko, Jan, Leonard, Lino, Marcel, Moritz, "
             + "Nick, Rainer, Robin, Simon, Sören, Thore, Thorsten, Torben, and many others. "
             + "<emphasis level=\"strong\">Thanks, guys!</emphasis>";
+
+        /// <summary>
+        /// A brief information about SEE and its developers.
+        /// </summary>
+        private const string goodByeText = 
+              "It was a pleasure to meet you. "
+            + "I hope to see you in the coming winter semester again in my team. "
+            + "<emphasis level=\"strong\">Good bye!</emphasis>";        
     }
 }

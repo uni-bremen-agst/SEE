@@ -9,6 +9,7 @@
 	  <item><ruleref uri="#interact" /> <tag> out.action = "interact"; </tag></item>
       <item><ruleref uri="#timeQuery" /> <tag> out.action = "time"; </tag></item>
 	  <item><ruleref uri="#aboutYou" /><tag> out.action = "about"; </tag></item>
+	  <item><ruleref uri="#goodBye" /><tag> out.action = "goodBye"; </tag></item>
 	</one-of>
   </rule>
 
@@ -78,5 +79,15 @@
 	   <item>yourself</item>
 	 </one-of>
   </rule>	  
+  
+  <!-- goodBye -->
+  <rule id="goodBye">
+    <one-of>
+      <item> good bye </item>
+      <item> bye bye </item>
+      <item> take care </item>
+	  <item> see you later </item>
+    </one-of>
+  </rule>
   
 </grammar>

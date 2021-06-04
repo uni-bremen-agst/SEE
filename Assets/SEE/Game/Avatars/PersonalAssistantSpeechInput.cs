@@ -83,7 +83,7 @@ namespace SEE.Game.Avatars
                     // Debug.Log($"Meaning: {meaning.key} => {ToString(meaning.values)}\n");
                     foreach (string value in meaning.values)
                     {
-                        // data, help, time, about
+                        // data, help, time, about, goodBye
                         if (value == "data")
                         {
                             brain.Overview();
@@ -99,6 +99,10 @@ namespace SEE.Game.Avatars
                         else if (value == "about")
                         {
                             brain.About();
+                        }
+                        else if (value == "goodBye")
+                        {
+                            brain.GoodBye();
                         }
                     }
                 }
