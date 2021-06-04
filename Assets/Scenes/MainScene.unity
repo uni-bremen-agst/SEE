@@ -4378,7 +4378,7 @@ GameObject:
   - component: {fileID: 1190604627}
   m_Layer: 0
   m_Name: Ground
-  m_TagString: Decoration
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -4885,7 +4885,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcc1cedcf0a20b04ca3d2bb78035f3cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerInputType: 0
+  playerInputType: 3
   PlayerOrigin: {x: 0, y: 0.5, z: -1.5}
   FocusPlane: {fileID: 1758871332}
   Ground: {fileID: 1190604626}
@@ -6168,6 +6168,10 @@ PrefabInstance:
     - target: {fileID: 2280538230576076327, guid: 4791a6d14e45cb04a9e63875472d1e75, type: 3}
       propertyPath: m_Name
       value: GarbageCan
+      objectReference: {fileID: 0}
+    - target: {fileID: 2280538230576076327, guid: 4791a6d14e45cb04a9e63875472d1e75, type: 3}
+      propertyPath: m_TagString
+      value: Decoration
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4791a6d14e45cb04a9e63875472d1e75, type: 3}
