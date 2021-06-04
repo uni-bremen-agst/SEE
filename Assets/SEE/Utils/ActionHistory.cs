@@ -65,6 +65,9 @@ namespace SEE.Utils
         // See also the test cases in <seealso cref="SEETests.TestActionHistory"/> for 
         // additional information.
 
+        /// <summary>
+        /// An entry describing an executed action in the global action history.
+        /// </summary>
         public struct GlobalHistoryEntry
         {
             /// <summary>
@@ -179,7 +182,7 @@ namespace SEE.Utils
             action.Awake();
             action.Start();
             // Whenever a new action is excuted, we consider the redo history lost.
-            RedoHistory.Clear();
+            DeleteAllRedos();
         }
 
         /// Calls <see cref="ReversibleAction.Update"/> for the currently executed action of this
@@ -229,6 +232,25 @@ namespace SEE.Utils
         {
             RemoveAction(action.ActionID);
             new NetActionHistory().Delete(action.ActionID);
+        }
+
+        /// <summary>
+        /// Clears <see cref="RedoHistory"/> and removes all the local player's
+        /// undone actions in <see cref="globalHistory"/> both locally and for
+        /// all clients in the network.
+        /// </summary>
+        private void DeleteAllRedos()
+        {
+            for (int i = 0; i < globalHistory.Count; i++)
+            {
+                if (globalHistory[i].IsOwner && globalHistory[i].ActionType == HistoryType.UndoneAction)
+                {
+                    new NetActionHistory().Delete(globalHistory[i].ActionID);
+                    globalHistory.RemoveAt(i);
+                    i--;
+                }
+            }
+            RedoHistory.Clear();
         }
 
         /// <summary>
