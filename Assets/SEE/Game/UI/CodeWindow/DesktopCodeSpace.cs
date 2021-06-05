@@ -73,6 +73,7 @@ namespace SEE.Game.UI.CodeWindow
                         throw new InvalidOperationException();
                     }
                     ActiveCodeWindow = currentActiveCodeWindow;
+                    
                     // Note: This is a tail-recursion, which would be great if C# had tail call optimization, 
                     // which it doesn't. Your IDE may recommend to then use an iterative construct instead of the 
                     // recursive one to be more efficient, but this will just "improve" an O(1) space complexity to
@@ -95,36 +96,7 @@ namespace SEE.Game.UI.CodeWindow
             } 
             else if (!Panel && codeWindows.Any(x => x.codeWindow))
             {
-                // We need to initialize the panel first
-                if (!space.TryGetComponentOrLog(out PanelsCanvas))
-                {
-                    Destroy(this);
-                }
-                Panel = PanelUtils.CreatePanelFor((RectTransform) codeWindows[0].codeWindow.transform, PanelsCanvas);
-                // When the active tab *on this panel* is changed, we invoke the corresponding event
-                PanelNotificationCenter.OnActiveTabChanged += tab =>
-                {
-                    if (Panel == tab.Panel)
-                    {
-                        ActiveCodeWindow = CodeWindows.First(x => x.codeWindow.GetInstanceID() == tab.Content.gameObject.GetInstanceID());
-                        OnActiveCodeWindowChanged.Invoke();
-                    }
-                };
-                PanelNotificationCenter.OnPanelClosed += panel =>
-                {
-                    if (panel == Panel)
-                    {
-                        // Close each tab
-                        foreach (CodeWindow codeWindow in codeWindows)
-                        {
-                            Panel.RemoveTab(Panel.GetTab((RectTransform) codeWindow.codeWindow.transform));
-                            Destroy(codeWindow);
-                        }
-                        codeWindows.Clear();
-                        OnActiveCodeWindowChanged.Invoke();
-                        Destroy(Panel);
-                    }
-                };
+                InitializePanel();
             } 
             else if (!Panel)
             {
@@ -142,7 +114,7 @@ namespace SEE.Game.UI.CodeWindow
                 currentActiveCodeWindow = ActiveCodeWindow;
             }
             
-            // Now we need to detect changes in the open code windows
+            // Now we need to detect changes in the open code windows.
             // Unfortunately this adds an O(m+n) call to each frame, but considering how small m and n are likely to be,
             // this shouldn't be a problem.
             
@@ -168,26 +140,71 @@ namespace SEE.Game.UI.CodeWindow
                 // Allow closing the tab
                 if (CanClose)
                 {
-                    // FIXME: Apparently, this is called twice. It seems like the problem lies in PanelNotificationCenter.
-                    PanelNotificationCenter.OnTabClosed += panelTab =>
-                    {
-                        if (panelTab.Panel == Panel)
-                        {
-                            CloseCodeWindow(codeWindows.First(x => x.codeWindow.GetInstanceID() == panelTab.Content.gameObject.GetInstanceID()));
-                            if (panelTab.Panel.NumberOfTabs <= 1)
-                            {
-                                // All tabs were closed, so we send out an event 
-                                // (The PanelNotificationCenter won't trigger in this case)
-                                OnActiveCodeWindowChanged.Invoke();
-                            }
-                        }
-                    };
+                    // FIXME: Apparently, this is called twice. It seems like the problem is in PanelNotificationCenter.
+                    PanelNotificationCenter.OnTabClosed += CloseTab;
                 }
 
                 // Rebuild layout
                 PanelsCanvas.ForceRebuildLayoutImmediate();
                 codeWindow.RecalculateExcessLines();
             }
+
+            void CloseTab(PanelTab panelTab)
+            {
+                if (panelTab.Panel == Panel)
+                {
+                    CloseCodeWindow(codeWindows.First(x => x.codeWindow.GetInstanceID() == panelTab.Content.gameObject.GetInstanceID()));
+                    if (panelTab.Panel.NumberOfTabs <= 1)
+                    {
+                        // All tabs were closed, so we send out an event 
+                        // (The PanelNotificationCenter won't trigger in this case)
+                        OnActiveCodeWindowChanged.Invoke();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Initializes the dynamic panel on the panel canvas.
+        /// </summary>
+        private void InitializePanel()
+        {
+            if (!space.TryGetComponentOrLog(out PanelsCanvas))
+            {
+                Destroy(this);
+            }
+
+            Panel = PanelUtils.CreatePanelFor((RectTransform) codeWindows[0].codeWindow.transform, PanelsCanvas);
+            // When the active tab *on this panel* is changed, we invoke the corresponding event
+            PanelNotificationCenter.OnActiveTabChanged += ChangeActiveTab;
+            PanelNotificationCenter.OnPanelClosed += ClosePanel;
+            
+            void ChangeActiveTab(PanelTab tab)
+            {
+                if (Panel == tab.Panel)
+                {
+                    ActiveCodeWindow = CodeWindows.First(x => x.codeWindow.GetInstanceID() == tab.Content.gameObject.GetInstanceID());
+                    OnActiveCodeWindowChanged.Invoke();
+                }
+            }
+
+            void ClosePanel(Panel panel)
+            {
+                if (panel == Panel)
+                {
+                    // Close each tab
+                    foreach (CodeWindow codeWindow in codeWindows)
+                    {
+                        Panel.RemoveTab(Panel.GetTab((RectTransform) codeWindow.codeWindow.transform));
+                        Destroy(codeWindow);
+                    }
+
+                    codeWindows.Clear();
+                    OnActiveCodeWindowChanged.Invoke();
+                    Destroy(Panel);
+                }
+            }
+
         }
     }
 }
