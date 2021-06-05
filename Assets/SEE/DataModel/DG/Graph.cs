@@ -8,7 +8,7 @@ using Object = System.Object;
 namespace SEE.DataModel.DG
 {
     /// <summary>
-    /// A graph with nodes and edges representing the data to be visualized 
+    /// A graph with nodes and edges representing the data to be visualized
     /// by way of blocks and connections.
     /// </summary>
     public class Graph : Attributable
@@ -33,12 +33,12 @@ namespace SEE.DataModel.DG
         public const string UnknownType = "";
 
         /// <summary>
-        /// Indicates whether the node hierarchy has changed and, hence, 
+        /// Indicates whether the node hierarchy has changed and, hence,
         /// the node levels and roots need to be recalculated. Rather than
         /// re-calculating the levels and roots each time a new node is
         /// added, we will re-calculate them only on demand, that is,
         /// if the node levels or roots are requested. This may save time.
-        /// 
+        ///
         /// Note: This attribute should be set only by <see cref="Node"/>.
         /// </summary>
         public bool NodeHierarchyHasChanged = true;
@@ -49,12 +49,12 @@ namespace SEE.DataModel.DG
         /// maximal length of all paths from any of the roots to their leaves
         /// where the length of a path is defined by the number of nodes on this
         /// path. The empty graph has maximal depth 0.
-        /// 
-        /// Important note: This value must be computed by calling FinalizeGraph() 
+        ///
+        /// Important note: This value must be computed by calling FinalizeGraph()
         /// before accessing <see cref="MaxDepth"/>.
         /// </summary>
-        public int MaxDepth 
-        { 
+        public int MaxDepth
+        {
             get
             {
                 if (NodeHierarchyHasChanged)
@@ -74,7 +74,7 @@ namespace SEE.DataModel.DG
             this.name = name;
         }
 
-        /// Adds a node to the graph. 
+        /// Adds a node to the graph.
         /// Preconditions:
         ///   (1) node must not be null
         ///   (2) node.ID must be defined.
@@ -109,7 +109,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Removes the given node from the graph. Its incoming and outgoing edges are removed
         /// along with it.
-        /// 
+        ///
         /// Precondition: node must not be null and must be contained in this graph.
         /// </summary>
         /// <param name="node">node to be removed</param>
@@ -259,7 +259,7 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Adds a non-hierarchical edge to the graph.
-        /// Preconditions: 
+        /// Preconditions:
         /// (1) edge must not be null.
         /// (2) its source and target nodes must be in the graph already
         /// (3) the edge must not be in any other graph
@@ -288,7 +288,7 @@ namespace SEE.DataModel.DG
                 {
                     throw new Exception($"There is already an edge with the ID {edge.ID}.");
                 }
-                
+
                 edge.ItsGraph = this;
                 edges[edge.ID] = edge;
                 edge.Source.AddOutgoing(edge);
@@ -476,7 +476,7 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Dumps the hierarchy for given root by adding level many - 
+        /// Dumps the hierarchy for given root by adding level many -
         /// as indentation. Used for debugging.
         /// </summary>
         private void DumpTree(Node root, int level)
@@ -495,7 +495,7 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Destroys the GameObjects of the graph's nodes and edges including the
-        /// associated Node and Edge components as well as the GameObject of the graph 
+        /// associated Node and Edge components as well as the GameObject of the graph
         /// itself (and its Graph component). The graph is unusable afterward.
         /// </summary>
         public void Destroy()
@@ -526,7 +526,7 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Returns all edges of graph whose source and target is contained in 
+        /// Returns all edges of graph whose source and target is contained in
         /// selectedNodes.
         /// </summary>
         /// <param name="graph">graph whose edges are to be filtered</param>
@@ -565,7 +565,7 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Returns the graph in a JSON-like format including its attributes and all its nodes 
+        /// Returns the graph in a JSON-like format including its attributes and all its nodes
         /// and edges including their attributes.
         /// </summary>
         /// <returns>graph in textual form</returns>
@@ -592,7 +592,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Sets the level of each node in the graph. The level of a root node is 0.
         /// For all other nodes, the level is the level of its parent + 1.
-        /// 
+        ///
         /// Precondition: <see cref="roots"/> is up to date.
         /// </summary>
         private void CalculateLevels()
@@ -604,15 +604,15 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Sets the levels of all nodes and the maximal depth of the graph. 
-        /// 
+        /// Sets the levels of all nodes and the maximal depth of the graph.
+        ///
         /// Note: This method should be called only by <see cref="Node"/>.
         /// </summary>
         internal void FinalizeNodeHierarchy()
         {
             Assert.IsTrue(NodeHierarchyHasChanged);
             GatherRoots();
-            CalculateLevels();            
+            CalculateLevels();
             maxDepth = CalcMaxDepth(roots, -1);
             NodeHierarchyHasChanged = false;
             /// Note: SetLevelMetric just propagates the newly calculated node levels
@@ -624,7 +624,7 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Recalculates <see cref="roots"/>, that is, clears the set of 
+        /// Recalculates <see cref="roots"/>, that is, clears the set of
         /// <see cref="roots"/> and adds every node without a parent to it.
         /// </summary>
         private void GatherRoots()
@@ -661,9 +661,9 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Creates deep copies of attributes where necessary. Is called by
-        /// Clone() once the copy is created. Must be extended by every 
+        /// Clone() once the copy is created. Must be extended by every
         /// subclass that adds fields that should be cloned, too.
-        /// 
+        ///
         /// IMPORTANT NOTE: Cloning a graph means to create deep copies of
         /// its node and children, too. The hierarchy will be isomporph.
         /// </summary>
@@ -673,7 +673,7 @@ namespace SEE.DataModel.DG
             base.HandleCloned(clone);
             Graph target = (Graph)clone;
             target.name = name;
-            target.path = path;            
+            target.path = path;
             CopyNodesTo(target);
             CopyEdgesTo(target);
             CopyHierarchy(this, target);
@@ -763,7 +763,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Yields a subgraph of given graph that contains only nodes with one of the given
         /// <paramref name="nodeTypes"/>. The edges of this graph are "lifted" in the subgraph.
-        /// More precisely, let mapsTo be a mapping of nodes from this graph onto nodes in 
+        /// More precisely, let mapsTo be a mapping of nodes from this graph onto nodes in
         /// in the resulting subgraph defined as follows (for every node N in this graph):
         /// (A) if N has a type in <paramref name="nodeTypes"/>,
         ///     then N has a clone N' in the subgraph and mapsTo[N] = N'
@@ -771,10 +771,10 @@ namespace SEE.DataModel.DG
         ///     then N has no clone in subgraph and
         ///     (1) if N has a nearest ancestor A that has a type in <paramref name="nodeTypes"/>,
         ///         then mapsTo[N] = mapsTo[A]
-        ///     or     
+        ///     or
         ///     (2) none of the ancestors of N has a type in <paramref name="nodeTypes"/>,
         ///         then mapsTo[N] = null
-        /// 
+        ///
         /// Given this mapping mapsTo, edges in the resulting subgraph are present as follows.
         /// For every edge E in this graph, there is a cloned edge E' in the resulting subgraph
         /// if and only if mapsTo[E.Source] != null and mapsTo[E.Target] != null where
@@ -782,17 +782,17 @@ namespace SEE.DataModel.DG
         /// not already an edge (of any type) from mapsTo[E.Source] to mapsTo[E.Target]
         /// (i.e., not mapsTo[E.Source].HasSuccessor(mapsTo[E.Target]). Every propatated
         /// edge is marked with the toggle attribute Edge.IsLiftedToggle.
-        /// 
-        /// Notes: 
-        /// 
+        ///
+        /// Notes:
+        ///
         /// The result is a new graph, that is, the nodes and edges are copies; they are not
         /// shared. Graph elements in the resulting subgraph can be mapped onto their original
         /// corresponding graph elements in this graph by way of their ID.
-        /// 
-        /// The resulting subgraph may have fewer edges: if an edge of this graph has a 
+        ///
+        /// The resulting subgraph may have fewer edges: if an edge of this graph has a
         /// source or target, N, for which mapsTo[N] = null, it will be lost.
-        /// 
-        /// An edge, E, is not propagated to a pair of nodes that already have an edge, E', 
+        ///
+        /// An edge, E, is not propagated to a pair of nodes that already have an edge, E',
         /// independent of the types of E and E'. As a consequence, there can only be one
         /// propagated edge from one node to another node. Because the edge types are
         /// neglected, we loose information. On the other hand, we reduce the number of edges.
@@ -841,7 +841,7 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Adds all ancestors of <paramref name="parent"/> to <paramref name="subgraph"/> if their 
+        /// Adds all ancestors of <paramref name="parent"/> to <paramref name="subgraph"/> if their
         /// type is one of <paramref name="relevantTypes"/>. The mapping <paramref name="mapsTo"/>
         /// is updated accordingly.
         /// </summary>
@@ -867,7 +867,7 @@ namespace SEE.DataModel.DG
                     // The child in the subgraph must become a child of the node
                     // corresponding to the parent (i.e., mapsTo[parent]) if
                     // one exists; it may happen that parent has no corresponding
-                    // node in the subgraph if and only if either the parent is 
+                    // node in the subgraph if and only if either the parent is
                     // a root with a type to be ignored or if all its ascendants
                     // have a type to be ignored.
                     Node parentInSubgraph = mapsTo[parent];
@@ -982,7 +982,7 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Returns true if <paramref name="other"/> meets all of the following 
+        /// Returns true if <paramref name="other"/> meets all of the following
         /// conditions:
         ///  (1) is not null
         ///  (2) has exactly the same C# type
@@ -992,7 +992,7 @@ namespace SEE.DataModel.DG
         ///  (6) has the same number of nodes and the sets of nodes are equal
         ///  (7) has the same number of edges and the sets of edges are equal
         ///  (8) has the same node hierarchy
-        ///  
+        ///
         /// Note: This node and the other node may or may not be in the same graph.
         /// </summary>
         /// <param name="other">to be compared to</param>
