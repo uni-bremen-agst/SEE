@@ -21,7 +21,7 @@ namespace SEE.Net
         /// <summary>
         /// Creates a new DeleteNetAction.
         /// </summary>
-        /// <param name="gameObjectID">the unique name of the gameObject of a node or edge 
+        /// <param name="gameObjectID">the unique name of the gameObject of a node or edge
         /// that has to be deleted</param>
         public DeleteNetAction(string gameObjectID) : base()
         {

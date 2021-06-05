@@ -125,7 +125,7 @@ namespace SEE.Controls.Actions
             bool result = false;
 
             // Assigning the game objects to be connected.
-            // Checking whether the two game objects are not null and whether they are 
+            // Checking whether the two game objects are not null and whether they are
             // actually nodes.
             // FIXME: We need an interaction for VR, too.
             if (hoveredObject != null && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI() && hoveredObject.HasNodeRef())
@@ -216,8 +216,8 @@ namespace SEE.Controls.Actions
                 /// If <see cref="CreateEdge(Memento)"/> was called from Update
                 /// when the edge is created for the first time, <see cref="memento.edgeID"/>
                 /// will not be set. Then the creation process triggered by <see cref="GameEdgeAdder"/>
-                /// will create a new unique id for the edge. If <see cref="CreateEdge(Memento)"/> 
-                /// is called from <see cref="Redo"/>, <see cref="memento.edgeID"/> has 
+                /// will create a new unique id for the edge. If <see cref="CreateEdge(Memento)"/>
+                /// is called from <see cref="Redo"/>, <see cref="memento.edgeID"/> has
                 /// a valid edge id (set by the previous call to <see cref="CreateEdge(Memento)"/>.
                 GameObject result = GameEdgeAdder.Add(memento.from, memento.to, memento.edgeID);
                 UnityEngine.Assertions.Assert.IsNotNull(result);
