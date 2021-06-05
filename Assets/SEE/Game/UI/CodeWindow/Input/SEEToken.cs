@@ -7,7 +7,7 @@ using Antlr4.Runtime;
 namespace SEE.Game.UI.CodeWindow
 {
     /// <summary>
-    /// Represents a token from a source code file, including <see cref="Text"/> and a <see cref="SEE.Game.UI.CodeWindow.SEEToken.Type"/>.
+    /// Represents a token from a source code file, including <see cref="Text"/> and a <see cref="Type"/>.
     /// </summary>
     public readonly struct SEEToken
     {

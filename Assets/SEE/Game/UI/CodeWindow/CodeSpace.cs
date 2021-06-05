@@ -144,6 +144,8 @@ namespace SEE.Game.UI.CodeWindow
         /// This includes changing the active code window to nothing (i.e. closing all of them.)
         /// </summary>
         public UnityEvent OnActiveCodeWindowChanged = new UnityEvent();
+        
+        #region Value Object
 
         /// <summary>
         /// Re-creates a <see cref="CodeSpace"/> from the given <paramref name="valueObject"/> and attaches
@@ -213,5 +215,7 @@ namespace SEE.Game.UI.CodeWindow
                 CodeWindows = codeWindows.Select(x => x.ToValueObject(fulltext)).ToList();
             }
         }
+        
+        #endregion
     }
 }
