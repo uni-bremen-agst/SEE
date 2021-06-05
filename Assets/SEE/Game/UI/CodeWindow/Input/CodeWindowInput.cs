@@ -2,7 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Cysharp.Threading.Tasks;
+using SEE.Game.UI.Notification;
+using SEE.Net.Dashboard;
+using SEE.Net.Dashboard.Model.Issues;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Game.UI.CodeWindow
 {
@@ -156,8 +161,8 @@ namespace SEE.Game.UI.CodeWindow
             // Try to read the file, otherwise display the error message.
             if (!File.Exists(filename))
             {
-                Text = $"<color=\"red\"><b>Couldn't find file '<noparse>{filename}</noparse>'.</b></color>";
-                Debug.LogError($"Couldn't find file {filename}");
+                ShowNotification.Error("File not found", $"Couldn't find file '{filename}'.");
+                Destroy(this);
                 return;
             }
             try
@@ -168,6 +173,8 @@ namespace SEE.Game.UI.CodeWindow
                     try
                     {
                         EnterFromTokens(SEEToken.fromFile(filename));
+                        //TODO: Other issue types too
+                        FindIssues<StyleViolationIssue>(filename).Forget(); // initiate issue search
                         return;
                     }
                     catch (ArgumentException e)
@@ -181,11 +188,47 @@ namespace SEE.Game.UI.CodeWindow
             }
             catch (IOException exception)
             {
-                Text = $"<color=\"red\"><noparse>{exception}</noparse></color>";
-                Debug.LogError(exception);
+                ShowNotification.Error("File access error", $"Couldn't access file {filename}: {exception}");
+                Destroy(this);
             }
         }
 
-        
+        private async UniTaskVoid FindIssues<T>(string path) where T : Issue, new()
+        {
+            string queryPath = Path.GetFileName(path);
+            IssueTable<T> issueTable = await DashboardRetriever.Instance.GetIssues<T>(fileFilter: $"\"*{queryPath}\"");
+            await UniTask.SwitchToThreadPool(); // don't interrupt main UI thread
+            if (issueTable.rows.Count == 0)
+            {
+                return;
+            }
+            List<T> issues = issueTable.rows.ToList();
+
+            // When there are different paths in the issue table, this implies that there are some files 
+            // which aren't actually the one we're looking for (because we've only matched by filename so far).
+            // In this case, we'll gradually refine our results until this isn't the case anymore.
+            for (int skippedParts = path.Count(x => x == Path.PathSeparator)-2; DifferentPaths(issues); skippedParts--)
+            {
+                Assert.IsTrue(path.Contains(Path.PathSeparator));
+                // Skip the first <c>skippedParts</c> parts, so that we query progressively larger parts.
+                queryPath = string.Join(Path.PathSeparator.ToString(), path.Split(Path.PathSeparator).Skip(skippedParts));
+                issues.RemoveAll(x => !x.Paths.Any(p => p.EndsWith(queryPath)));
+            }
+            
+            await UniTask.SwitchToMainThread(); // We interfere with UI now
+
+            foreach (T issue in issues)
+            {
+                //TODO: Underline the line
+                Debug.Log(issue);
+            }
+
+            static bool DifferentPaths(ICollection<T> issues)
+            {
+                HashSet<string> subPaths = new HashSet<string>(issues.First().Paths);
+                return issues.Select(x => x.Paths).Any(x => !subPaths.SetEquals(x));
+            }
+        }
+
     }
 }

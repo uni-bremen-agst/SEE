@@ -78,6 +78,17 @@ namespace SEE.Net.Dashboard.Model.Issues
             StyleViolationIssue _ => IssueKind.SV,
             _ => IssueKind.Unknown
         };
+
+        public IEnumerable<string> Paths => this switch
+        {
+            ArchitectureViolationIssue issue => new[] {issue.sourcePath, issue.targetPath},
+            CloneIssue issue => new[] {issue.leftPath, issue.rightPath},
+            CycleIssue issue => new[] {issue.sourcePath, issue.targetPath},
+            DeadEntityIssue issue => new[] {issue.path},
+            MetricViolationIssue issue => new[] {issue.path},
+            StyleViolationIssue issue => new[] {issue.path},
+            _ => throw new ArgumentOutOfRangeException()
+        };
         
         /// <summary>
         /// A kind-wide Id identifying the issue across analysis versions
