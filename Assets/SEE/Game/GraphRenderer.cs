@@ -163,11 +163,11 @@ namespace SEE.Game
         public GameObject DrawEdge(GameObject from, GameObject to, string id)
         {
             Node fromNode = from.GetNode();
-            Node toNode = to.GetNode();
             if (fromNode == null)
             {
                 throw new Exception($"The source {from.name} of the edge is not contained in any graph.");
             }
+            Node toNode = to.GetNode();
             if (toNode == null)
             {
                 throw new Exception($"The target {to.name} of the edge is not contained in any graph.");
