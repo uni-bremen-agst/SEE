@@ -13,7 +13,7 @@ namespace SEE.GO
         /// <summary>
         /// Maps a Node onto its NodeRef (the one referring to it).
         /// </summary>
-        [NonSerialized] private static Dictionary<Node, NodeRef> nodeToNodeRefDict = new Dictionary<Node, NodeRef>();
+        [NonSerialized] private static readonly Dictionary<Node, NodeRef> nodeToNodeRefDict = new Dictionary<Node, NodeRef>();
 
         /// <summary>
         /// The graph node this node reference is referring to. It will be set either

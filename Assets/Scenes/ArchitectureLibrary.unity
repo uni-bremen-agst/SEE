@@ -17010,12 +17010,18 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: LayoutPath
+    - Name: globalCityAttributes
       Entry: 7
-      Data: 0|SEE.Game.DataPath, SEE
+      Data: 0|SEE.GlobalCityAttributes, SEE
+    - Name: lodCulling
+      Entry: 4
+      Data: 0.01
+    - Name: layoutPath
+      Entry: 7
+      Data: 1|SEE.Game.DataPath, SEE
     - Name: Root
       Entry: 3
-      Data: 1
+      Data: 2
     - Name: relativePath
       Entry: 1
       Data: 
@@ -17025,9 +17031,866 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: leafNodeAttributesPerKind
+      Entry: 7
+      Data: 2|SEE.LeafNodeAttributes[], SEE
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: 3|SEE.LeafNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: widthMetric
+      Entry: 1
+      Data: Metric.Number_of_Tokens
+    - Name: heightMetric
+      Entry: 1
+      Data: Metric.Clone_Rate
+    - Name: depthMetric
+      Entry: 1
+      Data: Metric.LOC
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 4|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 5|SEE.LeafNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: widthMetric
+      Entry: 1
+      Data: Metric.Number_of_Tokens
+    - Name: heightMetric
+      Entry: 1
+      Data: Metric.Clone_Rate
+    - Name: depthMetric
+      Entry: 1
+      Data: Metric.LOC
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 6|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 7|SEE.LeafNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: widthMetric
+      Entry: 1
+      Data: Metric.Number_of_Tokens
+    - Name: heightMetric
+      Entry: 1
+      Data: Metric.Clone_Rate
+    - Name: depthMetric
+      Entry: 1
+      Data: Metric.LOC
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 8|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 9|SEE.LeafNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: widthMetric
+      Entry: 1
+      Data: Metric.Number_of_Tokens
+    - Name: heightMetric
+      Entry: 1
+      Data: Metric.Clone_Rate
+    - Name: depthMetric
+      Entry: 1
+      Data: Metric.LOC
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 10|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: innerNodeAttributesPerKind
+      Entry: 7
+      Data: 11|SEE.InnerNodeAttributes[], SEE
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: 12|SEE.InnerNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: heightMetric
+      Entry: 1
+      Data: 
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 13|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 14|SEE.InnerNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: heightMetric
+      Entry: 1
+      Data: 
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 15|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 16|SEE.InnerNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: heightMetric
+      Entry: 1
+      Data: 
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 17|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 18|SEE.InnerNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: heightMetric
+      Entry: 1
+      Data: 
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 19|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: nodeLayoutSettings
+      Entry: 7
+      Data: 20|SEE.NodeLayoutSettings, SEE
+    - Name: kind
+      Entry: 3
+      Data: 1
+    - Name: zScoreScale
+      Entry: 5
+      Data: true
+    - Name: showErosions
+      Entry: 5
+      Data: false
+    - Name: maxErosionWidth
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: edgeLayoutSettings
+      Entry: 7
+      Data: 21|SEE.EdgeLayoutSettings, SEE
+    - Name: kind
+      Entry: 3
+      Data: 3
+    - Name: edgeWidth
+      Entry: 4
+      Data: 0.01
+    - Name: edgesAboveBlocks
+      Entry: 5
+      Data: true
+    - Name: tension
+      Entry: 4
+      Data: 0.85
+    - Name: rdp
+      Entry: 4
+      Data: 0.0001
+    - Name: tubularSegments
+      Entry: 3
+      Data: 50
+    - Name: radius
+      Entry: 4
+      Data: 0.005
+    - Name: radialSegments
+      Entry: 3
+      Data: 8
+    - Name: isEdgeSelectable
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: coseGraphSettings
+      Entry: 7
+      Data: 22|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
+    - Name: EdgeLength
+      Entry: 3
+      Data: 20
+    - Name: UseSmartIdealEdgeCalculation
+      Entry: 5
+      Data: false
+    - Name: UseSmartMultilevelScaling
+      Entry: 5
+      Data: false
+    - Name: PerLevelIdealEdgeLengthFactor
+      Entry: 4
+      Data: 0.1
+    - Name: UseSmartRepulsionRangeCalculation
+      Entry: 5
+      Data: false
+    - Name: GravityStrength
+      Entry: 4
+      Data: 0.8
+    - Name: CompoundGravityStrength
+      Entry: 4
+      Data: 1.5
+    - Name: RepulsionStrength
+      Entry: 4
+      Data: 50
+    - Name: MultiLevelScaling
+      Entry: 5
+      Data: false
+    - Name: ListInnerNodeToggle
+      Entry: 7
+      Data: 23|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 24|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeLayout
+      Entry: 7
+      Data: 25|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.NodeLayoutKind,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 24
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeShape
+      Entry: 7
+      Data: 26|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.InnerNodeKinds,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 24
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LoadedForNodeTypes
+      Entry: 7
+      Data: 27|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 24
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: UseCalculationParameter
+      Entry: 5
+      Data: true
+    - Name: UseIterativeCalculation
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: HierarchicalEdges
       Entry: 7
-      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+      Data: 28|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
     - Name: 
       Entry: 12
       Data: 4
@@ -17051,11 +17914,11 @@ MonoBehaviour:
       Data: 
     - Name: SelectedNodeTypes
       Entry: 7
-      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 29|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 30|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -17191,7 +18054,7 @@ MonoBehaviour:
       Data: 
     - Name: CityPath
       Entry: 7
-      Data: 4|SEE.Game.DataPath, SEE
+      Data: 31|SEE.Game.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 2
@@ -17204,196 +18067,10 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: LeafNodeColorRange
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.917647064
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0.7372549
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 15
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: InnerNodeColorRange
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.5882353
-    - Name: 
-      Entry: 4
-      Data: 0.5882353
-    - Name: 
-      Entry: 4
-      Data: 0.5882353
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 15
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LeafLabelSettings
-      Entry: 7
-      Data: 5|SEE.Game.LabelSettings, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationDuration
-      Entry: 4
-      Data: 0.5
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: InnerNodeLabelSettings
-      Entry: 7
-      Data: 6|SEE.Game.LabelSettings, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationDuration
-      Entry: 4
-      Data: 0.5
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: CoseGraphSettings
-      Entry: 7
-      Data: 7|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
-    - Name: EdgeLength
-      Entry: 3
-      Data: 20
-    - Name: UseSmartIdealEdgeCalculation
-      Entry: 5
-      Data: false
-    - Name: UseSmartMultilevelScaling
-      Entry: 5
-      Data: false
-    - Name: PerLevelIdealEdgeLengthFactor
-      Entry: 4
-      Data: 0.1
-    - Name: UseSmartRepulsionRangeCalculation
-      Entry: 5
-      Data: false
-    - Name: GravityStrength
-      Entry: 4
-      Data: 0.8
-    - Name: CompoundGravityStrength
-      Entry: 4
-      Data: 1.5
-    - Name: RepulsionStrength
-      Entry: 4
-      Data: 50
-    - Name: MultiLevelScaling
-      Entry: 5
-      Data: false
-    - Name: ListInnerNodeToggle
-      Entry: 6
-      Data: 
-    - Name: InnerNodeLayout
-      Entry: 6
-      Data: 
-    - Name: InnerNodeShape
-      Entry: 6
-      Data: 
-    - Name: LoadedForNodeTypes
-      Entry: 6
-      Data: 
-    - Name: UseCalculationParameter
-      Entry: 5
-      Data: false
-    - Name: UseIterativeCalculation
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-  LODCulling: 0.01
-  LayoutPath:
-    Root: 1
-    relativePath: 
-    absolutePath: 
   CityPath:
     Root: 2
     relativePath: 
     absolutePath: 
-  WidthMetric: Metric.Number_Of_Calling_Routines
-  HeightMetric: Metric.Lines.LOC
-  DepthMetric: Metric.Number_Of_Called_Routines
-  LeafStyleMetric: Metric.McCabe_Complexity
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -17409,25 +18086,8 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
-  InnerNodeHeightMetric: 0.001
-  InnerNodeStyleMetric: Metric.LOC
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
-  LeafObjects: 0
-  InnerNodeObjects: 0
-  NodeLayout: 3
-  EdgeLayout: 3
-  ZScoreScale: 0
-  EdgeWidth: 0.005
-  ShowErosions: 0
-  MaxErosionWidth: 1
-  EdgesAboveBlocks: 1
-  Tension: 0.85
-  RDP: 0.0001
-  TubularSegments: 50
-  Radius: 0.005
-  RadialSegments: 8
-  isEdgeSelectable: 0
   GXLPath:
     Root: 3
     relativePath: /SEE/CodeFacts.gxl
@@ -18695,9 +19355,15 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: LayoutPath
+    - Name: globalCityAttributes
       Entry: 7
-      Data: 0|SEE.Game.DataPath, SEE
+      Data: 0|SEE.GlobalCityAttributes, SEE
+    - Name: lodCulling
+      Entry: 4
+      Data: 0.01
+    - Name: layoutPath
+      Entry: 7
+      Data: 1|SEE.Game.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 2
@@ -18710,9 +19376,866 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: leafNodeAttributesPerKind
+      Entry: 7
+      Data: 2|SEE.LeafNodeAttributes[], SEE
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: 3|SEE.LeafNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: widthMetric
+      Entry: 1
+      Data: Metric.Number_of_Tokens
+    - Name: heightMetric
+      Entry: 1
+      Data: Metric.Clone_Rate
+    - Name: depthMetric
+      Entry: 1
+      Data: Metric.LOC
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 4|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 5|SEE.LeafNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: widthMetric
+      Entry: 1
+      Data: Metric.Number_of_Tokens
+    - Name: heightMetric
+      Entry: 1
+      Data: Metric.Clone_Rate
+    - Name: depthMetric
+      Entry: 1
+      Data: Metric.LOC
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 6|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 7|SEE.LeafNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: widthMetric
+      Entry: 1
+      Data: Metric.Number_of_Tokens
+    - Name: heightMetric
+      Entry: 1
+      Data: Metric.Clone_Rate
+    - Name: depthMetric
+      Entry: 1
+      Data: Metric.LOC
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 8|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 9|SEE.LeafNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: widthMetric
+      Entry: 1
+      Data: Metric.Number_of_Tokens
+    - Name: heightMetric
+      Entry: 1
+      Data: Metric.Clone_Rate
+    - Name: depthMetric
+      Entry: 1
+      Data: Metric.LOC
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 10|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: innerNodeAttributesPerKind
+      Entry: 7
+      Data: 11|SEE.InnerNodeAttributes[], SEE
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: 12|SEE.InnerNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: heightMetric
+      Entry: 1
+      Data: 
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 13|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 14|SEE.InnerNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: heightMetric
+      Entry: 1
+      Data: 
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 15|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 16|SEE.InnerNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: heightMetric
+      Entry: 1
+      Data: 
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 17|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 18|SEE.InnerNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: heightMetric
+      Entry: 1
+      Data: 
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 19|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: nodeLayoutSettings
+      Entry: 7
+      Data: 20|SEE.NodeLayoutSettings, SEE
+    - Name: kind
+      Entry: 3
+      Data: 1
+    - Name: zScoreScale
+      Entry: 5
+      Data: true
+    - Name: showErosions
+      Entry: 5
+      Data: false
+    - Name: maxErosionWidth
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: edgeLayoutSettings
+      Entry: 7
+      Data: 21|SEE.EdgeLayoutSettings, SEE
+    - Name: kind
+      Entry: 3
+      Data: 3
+    - Name: edgeWidth
+      Entry: 4
+      Data: 0.01
+    - Name: edgesAboveBlocks
+      Entry: 5
+      Data: true
+    - Name: tension
+      Entry: 4
+      Data: 0.85
+    - Name: rdp
+      Entry: 4
+      Data: 0.0001
+    - Name: tubularSegments
+      Entry: 3
+      Data: 50
+    - Name: radius
+      Entry: 4
+      Data: 0.005
+    - Name: radialSegments
+      Entry: 3
+      Data: 8
+    - Name: isEdgeSelectable
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: coseGraphSettings
+      Entry: 7
+      Data: 22|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
+    - Name: EdgeLength
+      Entry: 3
+      Data: 20
+    - Name: UseSmartIdealEdgeCalculation
+      Entry: 5
+      Data: false
+    - Name: UseSmartMultilevelScaling
+      Entry: 5
+      Data: false
+    - Name: PerLevelIdealEdgeLengthFactor
+      Entry: 4
+      Data: 0.1
+    - Name: UseSmartRepulsionRangeCalculation
+      Entry: 5
+      Data: false
+    - Name: GravityStrength
+      Entry: 4
+      Data: 0.8
+    - Name: CompoundGravityStrength
+      Entry: 4
+      Data: 1.5
+    - Name: RepulsionStrength
+      Entry: 4
+      Data: 50
+    - Name: MultiLevelScaling
+      Entry: 5
+      Data: false
+    - Name: ListInnerNodeToggle
+      Entry: 7
+      Data: 23|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 24|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeLayout
+      Entry: 7
+      Data: 25|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.NodeLayoutKind,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 24
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeShape
+      Entry: 7
+      Data: 26|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.InnerNodeKinds,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 24
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LoadedForNodeTypes
+      Entry: 7
+      Data: 27|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 24
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: UseCalculationParameter
+      Entry: 5
+      Data: true
+    - Name: UseIterativeCalculation
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: HierarchicalEdges
       Entry: 7
-      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+      Data: 28|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
     - Name: 
       Entry: 12
       Data: 4
@@ -18736,11 +20259,11 @@ MonoBehaviour:
       Data: 
     - Name: SelectedNodeTypes
       Entry: 7
-      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 29|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 30|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -18780,7 +20303,7 @@ MonoBehaviour:
       Data: 
     - Name: CityPath
       Entry: 7
-      Data: 4|SEE.Game.DataPath, SEE
+      Data: 31|SEE.Game.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 1
@@ -18793,196 +20316,10 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: LeafNodeColorRange
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: InnerNodeColorRange
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0.83998394
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LeafLabelSettings
-      Entry: 7
-      Data: 5|SEE.Game.LabelSettings, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationDuration
-      Entry: 4
-      Data: 0.5
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: InnerNodeLabelSettings
-      Entry: 7
-      Data: 6|SEE.Game.LabelSettings, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationDuration
-      Entry: 4
-      Data: 0.5
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: CoseGraphSettings
-      Entry: 7
-      Data: 7|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
-    - Name: EdgeLength
-      Entry: 3
-      Data: 20
-    - Name: UseSmartIdealEdgeCalculation
-      Entry: 5
-      Data: false
-    - Name: UseSmartMultilevelScaling
-      Entry: 5
-      Data: false
-    - Name: PerLevelIdealEdgeLengthFactor
-      Entry: 4
-      Data: 0.1
-    - Name: UseSmartRepulsionRangeCalculation
-      Entry: 5
-      Data: false
-    - Name: GravityStrength
-      Entry: 4
-      Data: 0.8
-    - Name: CompoundGravityStrength
-      Entry: 4
-      Data: 1.5
-    - Name: RepulsionStrength
-      Entry: 4
-      Data: 50
-    - Name: MultiLevelScaling
-      Entry: 5
-      Data: false
-    - Name: ListInnerNodeToggle
-      Entry: 6
-      Data: 
-    - Name: InnerNodeLayout
-      Entry: 6
-      Data: 
-    - Name: InnerNodeShape
-      Entry: 6
-      Data: 
-    - Name: LoadedForNodeTypes
-      Entry: 6
-      Data: 
-    - Name: UseCalculationParameter
-      Entry: 5
-      Data: false
-    - Name: UseIterativeCalculation
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-  LODCulling: 0.01
-  LayoutPath:
-    Root: 2
-    relativePath: 
-    absolutePath: 
   CityPath:
     Root: 1
     relativePath: 
     absolutePath: 
-  WidthMetric: Metric.LOC
-  HeightMetric: Metric.Number_of_Tokens
-  DepthMetric: Metric.LOC
-  LeafStyleMetric: Metric.Clone_Rate
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -18998,25 +20335,8 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
-  InnerNodeHeightMetric: 
-  InnerNodeStyleMetric: Metric.Level
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
-  LeafObjects: 0
-  InnerNodeObjects: 0
-  NodeLayout: 3
-  EdgeLayout: 0
-  ZScoreScale: 0
-  EdgeWidth: 0.3
-  ShowErosions: 0
-  MaxErosionWidth: 1
-  EdgesAboveBlocks: 1
-  Tension: 0.85
-  RDP: 0.05
-  TubularSegments: 50
-  Radius: 0.005
-  RadialSegments: 8
-  isEdgeSelectable: 1
   MaxRevisionsToLoad: 500
   GXLDirectory:
     Root: 3
@@ -32892,12 +34212,18 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: LayoutPath
+    - Name: globalCityAttributes
       Entry: 7
-      Data: 0|SEE.Game.DataPath, SEE
+      Data: 0|SEE.GlobalCityAttributes, SEE
+    - Name: lodCulling
+      Entry: 4
+      Data: 0.01
+    - Name: layoutPath
+      Entry: 7
+      Data: 1|SEE.Game.DataPath, SEE
     - Name: Root
       Entry: 3
-      Data: 1
+      Data: 2
     - Name: relativePath
       Entry: 1
       Data: 
@@ -32907,9 +34233,866 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: leafNodeAttributesPerKind
+      Entry: 7
+      Data: 2|SEE.LeafNodeAttributes[], SEE
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: 3|SEE.LeafNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: widthMetric
+      Entry: 1
+      Data: Metric.Number_of_Tokens
+    - Name: heightMetric
+      Entry: 1
+      Data: Metric.Clone_Rate
+    - Name: depthMetric
+      Entry: 1
+      Data: Metric.LOC
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 4|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 5|SEE.LeafNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: widthMetric
+      Entry: 1
+      Data: Metric.Number_of_Tokens
+    - Name: heightMetric
+      Entry: 1
+      Data: Metric.Clone_Rate
+    - Name: depthMetric
+      Entry: 1
+      Data: Metric.LOC
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 6|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 7|SEE.LeafNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: widthMetric
+      Entry: 1
+      Data: Metric.Number_of_Tokens
+    - Name: heightMetric
+      Entry: 1
+      Data: Metric.Clone_Rate
+    - Name: depthMetric
+      Entry: 1
+      Data: Metric.LOC
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 8|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 9|SEE.LeafNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: widthMetric
+      Entry: 1
+      Data: Metric.Number_of_Tokens
+    - Name: heightMetric
+      Entry: 1
+      Data: Metric.Clone_Rate
+    - Name: depthMetric
+      Entry: 1
+      Data: Metric.LOC
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 10|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: innerNodeAttributesPerKind
+      Entry: 7
+      Data: 11|SEE.InnerNodeAttributes[], SEE
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: 12|SEE.InnerNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: heightMetric
+      Entry: 1
+      Data: 
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 13|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 14|SEE.InnerNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: heightMetric
+      Entry: 1
+      Data: 
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 15|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 16|SEE.InnerNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: heightMetric
+      Entry: 1
+      Data: 
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 17|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 18|SEE.InnerNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: heightMetric
+      Entry: 1
+      Data: 
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 19|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: nodeLayoutSettings
+      Entry: 7
+      Data: 20|SEE.NodeLayoutSettings, SEE
+    - Name: kind
+      Entry: 3
+      Data: 1
+    - Name: zScoreScale
+      Entry: 5
+      Data: true
+    - Name: showErosions
+      Entry: 5
+      Data: false
+    - Name: maxErosionWidth
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: edgeLayoutSettings
+      Entry: 7
+      Data: 21|SEE.EdgeLayoutSettings, SEE
+    - Name: kind
+      Entry: 3
+      Data: 3
+    - Name: edgeWidth
+      Entry: 4
+      Data: 0.01
+    - Name: edgesAboveBlocks
+      Entry: 5
+      Data: true
+    - Name: tension
+      Entry: 4
+      Data: 0.85
+    - Name: rdp
+      Entry: 4
+      Data: 0.0001
+    - Name: tubularSegments
+      Entry: 3
+      Data: 50
+    - Name: radius
+      Entry: 4
+      Data: 0.005
+    - Name: radialSegments
+      Entry: 3
+      Data: 8
+    - Name: isEdgeSelectable
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: coseGraphSettings
+      Entry: 7
+      Data: 22|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
+    - Name: EdgeLength
+      Entry: 3
+      Data: 20
+    - Name: UseSmartIdealEdgeCalculation
+      Entry: 5
+      Data: false
+    - Name: UseSmartMultilevelScaling
+      Entry: 5
+      Data: false
+    - Name: PerLevelIdealEdgeLengthFactor
+      Entry: 4
+      Data: 0.1
+    - Name: UseSmartRepulsionRangeCalculation
+      Entry: 5
+      Data: false
+    - Name: GravityStrength
+      Entry: 4
+      Data: 0.8
+    - Name: CompoundGravityStrength
+      Entry: 4
+      Data: 1.5
+    - Name: RepulsionStrength
+      Entry: 4
+      Data: 50
+    - Name: MultiLevelScaling
+      Entry: 5
+      Data: false
+    - Name: ListInnerNodeToggle
+      Entry: 7
+      Data: 23|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 24|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeLayout
+      Entry: 7
+      Data: 25|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.NodeLayoutKind,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 24
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeShape
+      Entry: 7
+      Data: 26|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.InnerNodeKinds,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 24
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LoadedForNodeTypes
+      Entry: 7
+      Data: 27|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 24
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: UseCalculationParameter
+      Entry: 5
+      Data: true
+    - Name: UseIterativeCalculation
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: HierarchicalEdges
       Entry: 7
-      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+      Data: 28|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
     - Name: 
       Entry: 12
       Data: 4
@@ -32933,11 +35116,11 @@ MonoBehaviour:
       Data: 
     - Name: SelectedNodeTypes
       Entry: 7
-      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 29|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 30|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -33073,7 +35256,7 @@ MonoBehaviour:
       Data: 
     - Name: CityPath
       Entry: 7
-      Data: 4|SEE.Game.DataPath, SEE
+      Data: 31|SEE.Game.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 2
@@ -33086,196 +35269,10 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: LeafNodeColorRange
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.917647064
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0.7372549
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 15
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: InnerNodeColorRange
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.5882353
-    - Name: 
-      Entry: 4
-      Data: 0.5882353
-    - Name: 
-      Entry: 4
-      Data: 0.5882353
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 15
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LeafLabelSettings
-      Entry: 7
-      Data: 5|SEE.Game.LabelSettings, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationDuration
-      Entry: 4
-      Data: 0.5
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: InnerNodeLabelSettings
-      Entry: 7
-      Data: 6|SEE.Game.LabelSettings, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationDuration
-      Entry: 4
-      Data: 0.5
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: CoseGraphSettings
-      Entry: 7
-      Data: 7|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
-    - Name: EdgeLength
-      Entry: 3
-      Data: 20
-    - Name: UseSmartIdealEdgeCalculation
-      Entry: 5
-      Data: false
-    - Name: UseSmartMultilevelScaling
-      Entry: 5
-      Data: false
-    - Name: PerLevelIdealEdgeLengthFactor
-      Entry: 4
-      Data: 0.1
-    - Name: UseSmartRepulsionRangeCalculation
-      Entry: 5
-      Data: false
-    - Name: GravityStrength
-      Entry: 4
-      Data: 0.8
-    - Name: CompoundGravityStrength
-      Entry: 4
-      Data: 1.5
-    - Name: RepulsionStrength
-      Entry: 4
-      Data: 50
-    - Name: MultiLevelScaling
-      Entry: 5
-      Data: false
-    - Name: ListInnerNodeToggle
-      Entry: 6
-      Data: 
-    - Name: InnerNodeLayout
-      Entry: 6
-      Data: 
-    - Name: InnerNodeShape
-      Entry: 6
-      Data: 
-    - Name: LoadedForNodeTypes
-      Entry: 6
-      Data: 
-    - Name: UseCalculationParameter
-      Entry: 5
-      Data: false
-    - Name: UseIterativeCalculation
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-  LODCulling: 0.01
-  LayoutPath:
-    Root: 1
-    relativePath: 
-    absolutePath: 
   CityPath:
     Root: 2
     relativePath: 
     absolutePath: 
-  WidthMetric: Metric.Number_Of_Calling_Routines
-  HeightMetric: Metric.Lines.LOC
-  DepthMetric: Metric.Number_Of_Called_Routines
-  LeafStyleMetric: Metric.McCabe_Complexity
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -33291,25 +35288,8 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
-  InnerNodeHeightMetric: 0.001
-  InnerNodeStyleMetric: Metric.LOC
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
-  LeafObjects: 0
-  InnerNodeObjects: 0
-  NodeLayout: 3
-  EdgeLayout: 0
-  ZScoreScale: 0
-  EdgeWidth: 0.001
-  ShowErosions: 0
-  MaxErosionWidth: 1
-  EdgesAboveBlocks: 1
-  Tension: 0.85
-  RDP: 0.0001
-  TubularSegments: 50
-  Radius: 0.005
-  RadialSegments: 8
-  isEdgeSelectable: 0
   GXLPath:
     Root: 3
     relativePath: /SEE/CodeFacts.gxl
@@ -50217,11 +52197,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerInputType: 0
   PlayerOrigin: {x: -5.906, y: 0.376, z: -1.858}
+  PlayerYRotation: 0
   FocusPlane: {fileID: 816506529}
   Ground: {fileID: 162897622}
   HideVRControllers: 1
   ShowControllerHints: 0
-  experienceScale: 1
+  ExperienceScale: 1
   CityScalingFactor: 1
   EyeGazeHover: 1
   EyeStareDelay: 1
@@ -54538,24 +56519,887 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: LayoutPath
+    - Name: globalCityAttributes
       Entry: 7
-      Data: 0|SEE.Game.DataPath, SEE
+      Data: 0|SEE.GlobalCityAttributes, SEE
+    - Name: lodCulling
+      Entry: 4
+      Data: 0.01
+    - Name: layoutPath
+      Entry: 7
+      Data: 1|SEE.Game.DataPath, SEE
     - Name: Root
       Entry: 3
-      Data: 3
+      Data: 2
     - Name: relativePath
       Entry: 1
-      Data: /SEE/ArchitectureCheck.sld
+      Data: 
     - Name: absolutePath
       Entry: 1
       Data: 
     - Name: 
       Entry: 8
       Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: leafNodeAttributesPerKind
+      Entry: 7
+      Data: 2|SEE.LeafNodeAttributes[], SEE
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: 3|SEE.LeafNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: widthMetric
+      Entry: 1
+      Data: Metric.Number_of_Tokens
+    - Name: heightMetric
+      Entry: 1
+      Data: Metric.Clone_Rate
+    - Name: depthMetric
+      Entry: 1
+      Data: Metric.LOC
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 4|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 5|SEE.LeafNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: widthMetric
+      Entry: 1
+      Data: Metric.Number_of_Tokens
+    - Name: heightMetric
+      Entry: 1
+      Data: Metric.Clone_Rate
+    - Name: depthMetric
+      Entry: 1
+      Data: Metric.LOC
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 6|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 7|SEE.LeafNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: widthMetric
+      Entry: 1
+      Data: Metric.Number_of_Tokens
+    - Name: heightMetric
+      Entry: 1
+      Data: Metric.Clone_Rate
+    - Name: depthMetric
+      Entry: 1
+      Data: Metric.LOC
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 8|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 9|SEE.LeafNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: widthMetric
+      Entry: 1
+      Data: Metric.Number_of_Tokens
+    - Name: heightMetric
+      Entry: 1
+      Data: Metric.Clone_Rate
+    - Name: depthMetric
+      Entry: 1
+      Data: Metric.LOC
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.Complexity
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 10|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: innerNodeAttributesPerKind
+      Entry: 7
+      Data: 11|SEE.InnerNodeAttributes[], SEE
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: 12|SEE.InnerNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: heightMetric
+      Entry: 1
+      Data: 
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 13|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 14|SEE.InnerNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: heightMetric
+      Entry: 1
+      Data: 
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 15|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 16|SEE.InnerNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: heightMetric
+      Entry: 1
+      Data: 
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 17|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 18|SEE.InnerNodeAttributes, SEE
+    - Name: kind
+      Entry: 3
+      Data: 0
+    - Name: heightMetric
+      Entry: 1
+      Data: 
+    - Name: styleMetric
+      Entry: 1
+      Data: Metric.IssuesTotal
+    - Name: coloringKind
+      Entry: 3
+      Data: 0
+    - Name: colorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.921568632
+    - Name: 
+      Entry: 4
+      Data: 0.0156862754
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: labelSettings
+      Entry: 7
+      Data: 19|SEE.Game.LabelSettings, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: nodeLayoutSettings
+      Entry: 7
+      Data: 20|SEE.NodeLayoutSettings, SEE
+    - Name: kind
+      Entry: 3
+      Data: 1
+    - Name: zScoreScale
+      Entry: 5
+      Data: true
+    - Name: showErosions
+      Entry: 5
+      Data: false
+    - Name: maxErosionWidth
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: edgeLayoutSettings
+      Entry: 7
+      Data: 21|SEE.EdgeLayoutSettings, SEE
+    - Name: kind
+      Entry: 3
+      Data: 3
+    - Name: edgeWidth
+      Entry: 4
+      Data: 0.01
+    - Name: edgesAboveBlocks
+      Entry: 5
+      Data: true
+    - Name: tension
+      Entry: 4
+      Data: 0.85
+    - Name: rdp
+      Entry: 4
+      Data: 0.0001
+    - Name: tubularSegments
+      Entry: 3
+      Data: 50
+    - Name: radius
+      Entry: 4
+      Data: 0.005
+    - Name: radialSegments
+      Entry: 3
+      Data: 8
+    - Name: isEdgeSelectable
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: coseGraphSettings
+      Entry: 7
+      Data: 22|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
+    - Name: EdgeLength
+      Entry: 3
+      Data: 20
+    - Name: UseSmartIdealEdgeCalculation
+      Entry: 5
+      Data: false
+    - Name: UseSmartMultilevelScaling
+      Entry: 5
+      Data: false
+    - Name: PerLevelIdealEdgeLengthFactor
+      Entry: 4
+      Data: 0.1
+    - Name: UseSmartRepulsionRangeCalculation
+      Entry: 5
+      Data: false
+    - Name: GravityStrength
+      Entry: 4
+      Data: 0.8
+    - Name: CompoundGravityStrength
+      Entry: 4
+      Data: 1.5
+    - Name: RepulsionStrength
+      Entry: 4
+      Data: 50
+    - Name: MultiLevelScaling
+      Entry: 5
+      Data: false
+    - Name: ListInnerNodeToggle
+      Entry: 7
+      Data: 23|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 24|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeLayout
+      Entry: 7
+      Data: 25|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.NodeLayoutKind,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 24
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeShape
+      Entry: 7
+      Data: 26|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.InnerNodeKinds,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 24
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LoadedForNodeTypes
+      Entry: 7
+      Data: 27|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 24
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: UseCalculationParameter
+      Entry: 5
+      Data: true
+    - Name: UseIterativeCalculation
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: HierarchicalEdges
       Entry: 7
-      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+      Data: 28|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
     - Name: 
       Entry: 12
       Data: 4
@@ -54579,11 +57423,11 @@ MonoBehaviour:
       Data: 
     - Name: SelectedNodeTypes
       Entry: 7
-      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 29|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 30|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -54731,7 +57575,7 @@ MonoBehaviour:
       Data: 
     - Name: CityPath
       Entry: 7
-      Data: 4|SEE.Game.DataPath, SEE
+      Data: 31|SEE.Game.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 2
@@ -54744,196 +57588,10 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: LeafNodeColorRange
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: InnerNodeColorRange
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0.921568632
-    - Name: 
-      Entry: 4
-      Data: 0.0156862754
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LeafLabelSettings
-      Entry: 7
-      Data: 5|SEE.Game.LabelSettings, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationDuration
-      Entry: 4
-      Data: 0.5
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: InnerNodeLabelSettings
-      Entry: 7
-      Data: 6|SEE.Game.LabelSettings, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationDuration
-      Entry: 4
-      Data: 0.5
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: CoseGraphSettings
-      Entry: 7
-      Data: 7|SEE.Layout.NodeLayouts.Cose.CoseGraphSettings, SEE
-    - Name: EdgeLength
-      Entry: 3
-      Data: 20
-    - Name: UseSmartIdealEdgeCalculation
-      Entry: 5
-      Data: false
-    - Name: UseSmartMultilevelScaling
-      Entry: 5
-      Data: false
-    - Name: PerLevelIdealEdgeLengthFactor
-      Entry: 4
-      Data: 0.1
-    - Name: UseSmartRepulsionRangeCalculation
-      Entry: 5
-      Data: false
-    - Name: GravityStrength
-      Entry: 4
-      Data: 0.8
-    - Name: CompoundGravityStrength
-      Entry: 4
-      Data: 1.5
-    - Name: RepulsionStrength
-      Entry: 4
-      Data: 50
-    - Name: MultiLevelScaling
-      Entry: 5
-      Data: false
-    - Name: ListInnerNodeToggle
-      Entry: 6
-      Data: 
-    - Name: InnerNodeLayout
-      Entry: 6
-      Data: 
-    - Name: InnerNodeShape
-      Entry: 6
-      Data: 
-    - Name: LoadedForNodeTypes
-      Entry: 6
-      Data: 
-    - Name: UseCalculationParameter
-      Entry: 5
-      Data: false
-    - Name: UseIterativeCalculation
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-  LODCulling: 0.01
-  LayoutPath:
-    Root: 3
-    relativePath: /SEE/ArchitectureCheck.sld
-    absolutePath: 
   CityPath:
     Root: 2
     relativePath: 
     absolutePath: 
-  WidthMetric: Metric.Number_of_Descendants
-  HeightMetric: 0.0001
-  DepthMetric: Metric.Number_of_Descendants
-  LeafStyleMetric: Metric.Number_of_Clusters
   ArchitectureIssue: Metric.Architecture_Violations
   CloneIssue: Metric.Clone
   CycleIssue: Metric.Cycle
@@ -54949,25 +57607,8 @@ MonoBehaviour:
   StyleIssue_SUM: Metric.Style_SUM
   UniversalIssue_SUM: Metric.Universal_SUM
   InnerDonutMetric: Metric.IssuesTotal
-  InnerNodeHeightMetric: 0.0001
-  InnerNodeStyleMetric: Metric.Number_of_Descendants
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
-  LeafObjects: 0
-  InnerNodeObjects: 0
-  NodeLayout: 7
-  EdgeLayout: 3
-  ZScoreScale: 0
-  EdgeWidth: 0.01
-  ShowErosions: 0
-  MaxErosionWidth: 1
-  EdgesAboveBlocks: 1
-  Tension: 0.85
-  RDP: 0.001
-  TubularSegments: 50
-  Radius: 0.005
-  RadialSegments: 8
-  isEdgeSelectable: 0
   GXLPath:
     Root: 3
     relativePath: /SEE/ArchitectureCheck.gxl

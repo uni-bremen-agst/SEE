@@ -1,9 +1,10 @@
 ﻿using SEE.DataModel.DG;
-using SEE.Game.UI.PropertyDialog;
 using SEE.GO;
 using SEE.Utils;
+using System.Collections.Generic;
 using System;
 using UnityEngine;
+using SEE.Game.UI.PropertyDialog;
 
 namespace SEE.Controls.Actions
 {
@@ -188,6 +189,22 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Returns all IDs of gameObjects manipulated by this action.
+        /// </summary>
+        /// <returns>all IDs of gameObjects manipulated by this action</returns>
+        public override HashSet<string> GetChangedObjects()
+        {
+            if (memento.node == null)
+            {
+                return new HashSet<string>();
+            }
+            else
+            {
+                return new HashSet<string> { memento.node.ID };
+            }
+        }
+
+        /// <summary>
         /// Opens a dialog where the user can enter the node name and type.
         /// If the user presses the OK button, the SourceName and Type of
         /// <see cref="memento.node"/> will have the new values entered 
@@ -214,6 +231,7 @@ namespace SEE.Controls.Actions
                 progress = ProgressState.ValuesAreGiven;
                 memento.newName = memento.node.SourceName;
                 memento.newType = memento.node.Type;
+                InteractableObject.UnselectAll(true);
             }
         }
     }

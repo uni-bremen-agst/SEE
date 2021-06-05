@@ -124,19 +124,19 @@ namespace SEE.Game
                 }
                 else
                 {
-                    Debug.LogErrorFormat("SEECity.Awake: Could not load GXL file {0}.\n", filename);
+                    Debug.LogError($"SEECity.Awake: Could not load GXL file {filename} of city {name}.\n");
                 }
             }
             else
             {
-                Debug.LogError("SEECity.Awake: GXL file is undefined.\n");
+                Debug.LogError($"SEECity.Awake: GXL file of city {name} is undefined.\n");
             }
 
             if (loadedGraph != null)
             {
                 if (dict.ContainsKey(filename))
                 {
-                    Debug.LogWarning("Graph seems to exists twice!");
+                    Debug.Log($"SEECity.Awake: Graph contained in {filename} of city {name} seems to exist twice.\n");
                 }
                 else
                 {
