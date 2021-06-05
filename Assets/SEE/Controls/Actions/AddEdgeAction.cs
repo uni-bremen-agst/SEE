@@ -213,8 +213,8 @@ namespace SEE.Controls.Actions
             }
             try
             {
-                /// If <see cref="CreateEdge(Memento)"/> is be called from Update
-                /// when the edge is created the first time, <see cref="memento.edgeID"/>
+                /// If <see cref="CreateEdge(Memento)"/> was called from Update
+                /// when the edge is created for the first time, <see cref="memento.edgeID"/>
                 /// will not be set. Then the creation process triggered by <see cref="GameEdgeAdder"/>
                 /// will create a new unique id for the edge. If <see cref="CreateEdge(Memento)"/> 
                 /// is called from <see cref="Redo"/>, <see cref="memento.edgeID"/> has 
