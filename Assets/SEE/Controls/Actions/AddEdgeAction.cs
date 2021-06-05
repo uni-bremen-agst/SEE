@@ -221,8 +221,9 @@ namespace SEE.Controls.Actions
                 /// a valid edge id (set by the previous call to <see cref="CreateEdge(Memento)"/>.
                 GameObject result = GameEdgeAdder.Add(memento.from, memento.to, memento.edgeID);
                 UnityEngine.Assertions.Assert.IsNotNull(result);
-                /// Note that we need to use result.name as edge ID because edgeMemento.edgeID will
-                /// be null if <see cref="CreateEdge(Memento)"/> is be called from Update.
+                /// Note that we need to use <see cref="result.name"/ as edge ID because
+                /// <see cref="memento.edgeID"/ will be null if <see cref="CreateEdge(Memento)"/> was
+                /// called from Update.
                 new AddEdgeNetAction(memento.from.name, memento.to.name, result.name).Execute();
                 return result;
             }
