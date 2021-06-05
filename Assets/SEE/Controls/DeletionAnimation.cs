@@ -10,14 +10,14 @@ using System.Collections.Concurrent;
 namespace SEE.Controls
 {
     /// <summary>
-    /// A class providing methods needed for the animations of gameobjects having been deleted 
-    /// by the user, for instance, the movement of a game node to the garbage can, as well 
+    /// A class providing methods needed for the animations of gameobjects having been deleted
+    /// by the user, for instance, the movement of a game node to the garbage can, as well
     /// as the inverse undo mechanism.
     /// </summary>
     public static class DeletionAnimation
     {
         /// <summary>
-        /// The garbage can the deleted nodes will be moved to. It is the object named 
+        /// The garbage can the deleted nodes will be moved to. It is the object named
         /// <see cref="GarbageCanName"/>.
         /// </summary>
         private static GameObject garbageCan;
@@ -45,8 +45,8 @@ namespace SEE.Controls
 
         /// <summary>
         ///  A vector for an objects localScale which fits into the garbage can.
-        ///  TODO: Currently set to an absolute value. Should be set abstract, e.g., half of the 
-        ///  garbage can's diameter. 
+        ///  TODO: Currently set to an absolute value. Should be set abstract, e.g., half of the
+        ///  garbage can's diameter.
         /// </summary>
         private static readonly Vector3 defaultGarbageVector = new Vector3(0.1f, 0.1f, 0.1f);
 
@@ -102,9 +102,9 @@ namespace SEE.Controls
 
         /// <summary>
         /// Moves all nodes in <paramref name="deletedNodes"/> to the garbage can
-        /// using an animation. When they finally arrive there, they will be 
-        /// deleted. 
-        /// 
+        /// using an animation. When they finally arrive there, they will be
+        /// deleted.
+        ///
         /// Assumption: <paramref name="deletedNodes"/> contains all nodes in a subtree
         /// of the game-node hierarchy. All of them represent graph nodes.
         /// </summary>
@@ -115,7 +115,7 @@ namespace SEE.Controls
             Vector3 garbageCanPosition = GarbageCanPosition();
 
             // We need to reset the portal of all all deletedNodes so that we can move
-            // them to the garbage bin. Otherwise they will become invisible if they 
+            // them to the garbage bin. Otherwise they will become invisible if they
             // leave their portal.
             foreach (GameObject deletedNode in deletedNodes)
             {
@@ -124,10 +124,10 @@ namespace SEE.Controls
             }
             foreach (GameObject deletedNode in deletedNodes)
             {
-                Tweens.Move(deletedNode, 
+                Tweens.Move(deletedNode,
                             new Vector3(garbageCanPosition.x,
                                         garbageCanPosition.y + verticalHeight,
-                                        garbageCanPosition.z), 
+                                        garbageCanPosition.z),
                             TimeForAnimation);
             }
             yield return new WaitForSeconds(TimeToWait);
@@ -193,7 +193,7 @@ namespace SEE.Controls
 
         /// <summary>
         /// Unhides the given <paramref name="gameEdge"/> after some delay.
-        /// 
+        ///
         /// Intended to be used as a co-routine.
         /// </summary>
         /// <param name="gameEdge">game edge to be shown again</param>
@@ -211,7 +211,7 @@ namespace SEE.Controls
         public static void HideEdge(GameObject gameEdge)
         {
             gameEdge.SetVisibility(false, true);
-            deletedEdges.TryAdd(gameEdge, gameEdge.GetGraph()); 
+            deletedEdges.TryAdd(gameEdge, gameEdge.GetGraph());
         }
     }
 }
