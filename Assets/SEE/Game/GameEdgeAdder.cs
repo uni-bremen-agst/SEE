@@ -34,15 +34,15 @@ namespace SEE.Game
         /// provides more details why</exception>
         public static GameObject Add(GameObject source, GameObject target, string edgeID = null)
         {
-            GameObject result = null;
             Transform cityObject = SceneQueries.GetCodeCity(source.transform);
+            GameObject result;
             if (cityObject != null)
             {
                 // FIXME: This will work only for SEECity but not other subclasses of AbstractSEECity.
                 if (cityObject.TryGetComponent(out SEECity city))
                 {
                     try
-                    {
+                    {                        
                         result = city.Renderer.DrawEdge(source, target, id: edgeID);
                     }
                     catch (Exception e)
@@ -52,7 +52,7 @@ namespace SEE.Game
                 }
                 else
                 {
-                    throw new Exception($"The code city for the new edge from {source.name} to {target.name} has no .\n");
+                    throw new Exception($"The code city for the new edge from {source.name} to {target.name} cannot be determined.\n");
                 }
             }
             else
@@ -78,11 +78,18 @@ namespace SEE.Game
             if (gameEdge.TryGetEdge(out Edge edge))
             {
                 Graph graph = edge.ItsGraph;
-                graph.RemoveEdge(edge);
+                if (graph != null)
+                {
+                    graph.RemoveEdge(edge);
+                }
+                else
+                {
+                    throw new Exception($"Edge {gameEdge.name} to be removed is not contained in a graph.");
+                }
             }
             else
             {
-                throw new Exception($"Edge {gameEdge.name} has no valid edge reference.");
+                throw new Exception($"Edge {gameEdge.name} to be removed has no valid edge reference.");
             }
         }
     }
