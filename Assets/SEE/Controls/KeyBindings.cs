@@ -18,7 +18,7 @@ namespace SEE.Controls
         /// <summary>        
         /// The registered keyboard shortcuts. The value is a help message on the shortcut.
         /// </summary>
-        private static Dictionary<KeyCode, string> bindings = new Dictionary<KeyCode, string>();
+        private static readonly Dictionary<KeyCode, string> bindings = new Dictionary<KeyCode, string>();
 
         /// <summary>
         /// Categories for the keyboard shortcuts.
@@ -81,7 +81,7 @@ namespace SEE.Controls
         /// <summary>
         /// Prints help on the key bindings.
         /// </summary>
-        internal static KeyCode Help = Register(KeyCode.H, Scope.Always, "Prints help on the key bindings.");
+        internal static readonly KeyCode Help = Register(KeyCode.H, Scope.Always, "Prints help on the key bindings.");
 
         //-----------------------------------------------------------------
         // Menu
@@ -91,17 +91,22 @@ namespace SEE.Controls
         /// <summary>
         /// Turns on/off the player-action menu.
         /// </summary>
-        internal static KeyCode ToggleMenu = Register(KeyCode.Space, Scope.Always, "Turns on/off the player-action menu.");
+        internal static readonly KeyCode ToggleMenu = Register(KeyCode.Space, Scope.Always, "Turns on/off the player-action menu.");
+
+        /// <summary>
+        /// Opens the search menu.
+        /// </summary>
+        internal static readonly KeyCode SearchMenu = Register(KeyCode.F, Scope.Always, "Opens the search menu.");
 
         /// <summary>
         /// Undoes the last action.
         /// </summary>
-        internal static KeyCode Undo = Register(KeyCode.Z, Scope.Always, "Undoes the last action.");
+        internal static readonly KeyCode Undo = Register(KeyCode.Z, Scope.Always, "Undoes the last action.");
 
         /// <summary>
         /// Re-does the last action.
         /// </summary>
-        internal static KeyCode Redo = Register(KeyCode.Y, Scope.Always, "Re-does the last action.");
+        internal static readonly KeyCode Redo = Register(KeyCode.Y, Scope.Always, "Re-does the last action.");
 
         //-----------------------------------------------------
         // Camera path recording and playing
@@ -110,12 +115,12 @@ namespace SEE.Controls
         /// <summary>
         /// Saves the current position when recording paths.
         /// </summary>
-        internal static KeyCode SavePathPosition = Register(KeyCode.P, Scope.CameraPaths, "Saves the current position when recording paths.");
+        internal static readonly KeyCode SavePathPosition = Register(KeyCode.P, Scope.CameraPaths, "Saves the current position when recording paths.");
 
         /// <summary>
         /// Starts/stops the automated path replay.
         /// </summary>
-        internal static KeyCode TogglePathPlaying = Register(KeyCode.F3, Scope.CameraPaths, "Starts/stops the automated camera movement along a path.");
+        internal static readonly KeyCode TogglePathPlaying = Register(KeyCode.F3, Scope.CameraPaths, "Starts/stops the automated camera movement along a path.");
 
         //-----------------------------------------------------
         // Metric charts
@@ -129,7 +134,7 @@ namespace SEE.Controls
         /// <summary>
         /// Toggles hovering/selection for markers in metric charts.
         /// </summary>
-        internal static KeyCode ToggleMetricHoveringSelection = Register(KeyCode.N, Scope.MetricCharts, "Toggles hovering/selection for markers in metric charts.");
+        internal static readonly KeyCode ToggleMetricHoveringSelection = Register(KeyCode.N, Scope.MetricCharts, "Toggles hovering/selection for markers in metric charts.");
 
         //----------------------------------------------------
         // Architecture mapping and analysis
@@ -167,24 +172,24 @@ namespace SEE.Controls
         /// <summary>
         /// Forgets all currently selected objects.
         /// </summary>
-        internal static KeyCode Unselect = Register(KeyCode.U, Scope.Browsing, "Forgets all currently selected objects.");
+        internal static readonly KeyCode Unselect = Register(KeyCode.U, Scope.Browsing, "Forgets all currently selected objects.");
         /// <summary>
         /// Cancels an action.
         /// </summary>
-        internal static KeyCode Cancel = Register(KeyCode.Escape, Scope.Browsing, "Cancels an action.");
+        internal static readonly KeyCode Cancel = Register(KeyCode.Escape, Scope.Browsing, "Cancels an action.");
         /// <summary>
         /// To reset a NavigationAction: resets position/rotation to the original position/rotation.
         /// </summary>
-        internal static KeyCode Reset = Register(KeyCode.R, Scope.Browsing, "Cancels an action.");
+        internal static readonly KeyCode Reset = Register(KeyCode.R, Scope.Browsing, "Cancels an action.");
         /// <summary>
         /// Zooms into a city.
         /// </summary>
-        internal static KeyCode ZoomInto = Register(KeyCode.G, Scope.Browsing, "To zoom into a city.");
+        internal static readonly KeyCode ZoomInto = Register(KeyCode.G, Scope.Browsing, "To zoom into a city.");
         /// <summary>
         /// While moving the city, snaps to one of eight predefined directions.
         /// While rotating the city, rotates in 45 degree steps.
         /// </summary>
-        internal static KeyCode Snap = Register(KeyCode.LeftAlt, Scope.Browsing, "Snap move/rotate city.");
+        internal static readonly KeyCode Snap = Register(KeyCode.LeftAlt, Scope.Browsing, "Snap move/rotate city.");
         /// <summary>
         /// The user drags the city as a whole on the plane.
         /// </summary>
@@ -192,7 +197,7 @@ namespace SEE.Controls
         /// <summary>
         /// Toggles between the locked and free camera mode.
         /// </summary>
-        internal static KeyCode ToggleCameraLock = Register(KeyCode.L, Scope.Browsing, "Toggles between the locked and free camera mode.");
+        internal static readonly KeyCode ToggleCameraLock = Register(KeyCode.L, Scope.Browsing, "Toggles between the locked and free camera mode.");
 
         //-----------------------------------------------------
         // Player (camera) movements.
@@ -200,31 +205,31 @@ namespace SEE.Controls
         /// <summary>
         /// Boosts the speed of the player movement. While pressed, movement is faster.
         /// </summary>        
-        internal static KeyCode BoostCameraSpeed = Register(KeyCode.LeftShift, Scope.Browsing, "Boosts the speed of the player movement. While pressed, movement is faster.");
+        internal static readonly KeyCode BoostCameraSpeed = Register(KeyCode.LeftShift, Scope.Browsing, "Boosts the speed of the player movement. While pressed, movement is faster.");
         /// <summary>
         /// Move camera (player) forward.
         /// </summary>
-        internal static KeyCode MoveForward = Register(KeyCode.W, Scope.Movement, "Move forward.");
+        internal static readonly KeyCode MoveForward = Register(KeyCode.W, Scope.Movement, "Move forward.");
         /// <summary>
         /// Move camera (player) backward.
         /// </summary>
-        internal static KeyCode MoveBackward = Register(KeyCode.S, Scope.Movement, "Move backward.");
+        internal static readonly KeyCode MoveBackward = Register(KeyCode.S, Scope.Movement, "Move backward.");
         /// <summary>
         /// Move camera (player) to the right.
         /// </summary>
-        internal static KeyCode MoveRight = Register(KeyCode.D, Scope.Movement, "Move to the right.");
+        internal static readonly KeyCode MoveRight = Register(KeyCode.D, Scope.Movement, "Move to the right.");
         /// <summary>
         /// Move camera (player) to the left.
         /// </summary>
-        internal static KeyCode MoveLeft = Register(KeyCode.A, Scope.Movement, "Move to the left.");
+        internal static readonly KeyCode MoveLeft = Register(KeyCode.A, Scope.Movement, "Move to the left.");
         /// <summary>
         /// Move camera (player) up.
         /// </summary>
-        internal static KeyCode MoveUp = Register(KeyCode.Q, Scope.Movement, "Move up.");
+        internal static readonly KeyCode MoveUp = Register(KeyCode.Q, Scope.Movement, "Move up.");
         /// <summary>
         /// Move camera (player) down.
         /// </summary>
-        internal static KeyCode MoveDown = Register(KeyCode.E, Scope.Movement, "Move down.");
+        internal static readonly KeyCode MoveDown = Register(KeyCode.E, Scope.Movement, "Move down.");
 
         //--------------------------
         // Evolution 
@@ -233,27 +238,27 @@ namespace SEE.Controls
         /// <summary>
         /// The previous revision is to be shown.
         /// </summary>
-        internal static KeyCode PreviousRevision = Register(KeyCode.LeftArrow, Scope.Evolution, "The previous revision is to be shown.");
+        internal static readonly KeyCode PreviousRevision = Register(KeyCode.LeftArrow, Scope.Evolution, "The previous revision is to be shown.");
         /// <summary>
         /// The next revision is to be shown.
         /// </summary>
-        internal static KeyCode NextRevision = Register(KeyCode.RightArrow, Scope.Evolution, "The next revision is to be shown.");
+        internal static readonly KeyCode NextRevision = Register(KeyCode.RightArrow, Scope.Evolution, "The next revision is to be shown.");
         /// <summary>
         /// Toggles auto play of the animation.
         /// </summary>
-        internal static KeyCode ToggleAutoPlay = Register(KeyCode.Tab, Scope.Evolution, "Toggles auto play of the animation.");
+        internal static readonly KeyCode ToggleAutoPlay = Register(KeyCode.Tab, Scope.Evolution, "Toggles auto play of the animation.");
         /// <summary>
         /// Sets a new marker.
         /// </summary>
-        internal static KeyCode SetMarker = Register(KeyCode.Insert, Scope.Evolution, "Sets a new marker.");
+        internal static readonly KeyCode SetMarker = Register(KeyCode.Insert, Scope.Evolution, "Sets a new marker.");
         /// <summary>
         /// Deletes a marker.
         /// </summary>
-        internal static KeyCode DeleteMarker = Register(KeyCode.Delete, Scope.Evolution, "Deletes a marker.");
+        internal static readonly KeyCode DeleteMarker = Register(KeyCode.Delete, Scope.Evolution, "Deletes a marker.");
         /// <summary>
         /// Toggles between between the two canvases for the animation and selection of a revision.
         /// </summary>
-        internal static KeyCode ToggleEvolutionCanvases = Register(KeyCode.T, Scope.Evolution, "Toggles between between the two canvases for the animation and selection of a revision.");
+        internal static readonly KeyCode ToggleEvolutionCanvases = Register(KeyCode.T, Scope.Evolution, "Toggles between between the two canvases for the animation and selection of a revision.");
 
         //----------------------------------------------------
         // Animation speed (shared by Debugging and Evolution)
@@ -261,11 +266,11 @@ namespace SEE.Controls
         /// <summary>
         /// Double animation speed.
         /// </summary>
-        internal static KeyCode IncreaseAnimationSpeed = Register(KeyCode.UpArrow, Scope.Animation, "Doubles animation speed.");
+        internal static readonly KeyCode IncreaseAnimationSpeed = Register(KeyCode.UpArrow, Scope.Animation, "Doubles animation speed.");
         /// <summary>
         /// Halve animation speed.
         /// </summary>
-        internal static KeyCode DecreaseAnimationSpeed = Register(KeyCode.DownArrow, Scope.Animation, "Halves animation speed.");
+        internal static readonly KeyCode DecreaseAnimationSpeed = Register(KeyCode.DownArrow, Scope.Animation, "Halves animation speed.");
 
         //--------------------------
         // Debugging 
@@ -274,27 +279,27 @@ namespace SEE.Controls
         /// <summary>
         /// Toggles automatic/manual execution mode.
         /// </summary>
-        internal static KeyCode ToggleAutomaticManualMode = Register(KeyCode.I, Scope.Debugging, "Toggles automatic/manual execution mode.");
+        internal static readonly KeyCode ToggleAutomaticManualMode = Register(KeyCode.I, Scope.Debugging, "Toggles automatic/manual execution mode.");
         /// <summary>
         /// Toggles execution order (forward/backward).
         /// </summary>
-        internal static KeyCode ToggleExecutionOrder = Register(KeyCode.O, Scope.Debugging, "Toggles execution order (foward/backward).");
+        internal static readonly KeyCode ToggleExecutionOrder = Register(KeyCode.O, Scope.Debugging, "Toggles execution order (foward/backward).");
         /// <summary>
         /// Continues execution until next breakpoint is reached.
         /// </summary>
-        internal static KeyCode ExecuteToBreakpoint = Register(KeyCode.B, Scope.Debugging, "Continues execution until next breakpoint is reached.");
+        internal static readonly KeyCode ExecuteToBreakpoint = Register(KeyCode.B, Scope.Debugging, "Continues execution until next breakpoint is reached.");
         /// <summary>
         /// Executes previous statement.
         /// </summary>
-        internal static KeyCode PreviousStatement = Register(KeyCode.PageUp, Scope.Debugging, "Executes previous statement.");
+        internal static readonly KeyCode PreviousStatement = Register(KeyCode.PageUp, Scope.Debugging, "Executes previous statement.");
         /// <summary>
         /// Executes next statement.
         /// </summary>
-        internal static KeyCode NextStatement = Register(KeyCode.PageDown, Scope.Debugging, "Executes next statement.");
+        internal static readonly KeyCode NextStatement = Register(KeyCode.PageDown, Scope.Debugging, "Executes next statement.");
         /// <summary>
         /// Execution is back to very first statement.
         /// </summary>
-        internal static KeyCode FirstStatement = Register(KeyCode.Home, Scope.Debugging, "Execution is back to very first statement.");
+        internal static readonly KeyCode FirstStatement = Register(KeyCode.Home, Scope.Debugging, "Execution is back to very first statement.");
 
         //--------------------
         // Source-code viewer
@@ -303,12 +308,12 @@ namespace SEE.Controls
         /// <summary>
         /// Toggles the menu of the source-code viewer.
         /// </summary>
-        internal static KeyCode ShowCodeWindowMenu = Register(KeyCode.F1, Scope.CodeViewer, "Toggles the menu of the source-code viewer.");
+        internal static readonly KeyCode ShowCodeWindowMenu = Register(KeyCode.F1, Scope.CodeViewer, "Toggles the menu of the source-code viewer.");
 
         /// <summary>
         /// Toggles the source-code viewer.
         /// </summary>
         [Obsolete("This keybinding is needed only for the video trailer and will soon disappear again.")]
-        internal static KeyCode ShowCodeWindow = Register(KeyCode.F2, Scope.CodeViewer, "Toggles the source-code viewer.");
+        internal static readonly KeyCode ShowCodeWindow = Register(KeyCode.F2, Scope.CodeViewer, "Toggles the source-code viewer.");
     }
 }

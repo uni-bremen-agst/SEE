@@ -118,6 +118,14 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// The color property of materials and used by the shader. 
+        /// Ideally, string-based property lookups should be avoided due to being inefficient.
+        /// This can be solved by creating a field for this class such as this.
+        /// This property can then be used instead of "_Color".
+        /// </summary>
+        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
+
+        /// <summary>
         /// Sets the color for this <paramref name="gameObject"/> to given <paramref name="color"/>.
         /// 
         /// Precondition: <paramref name="gameObject"/> has a renderer whose material has attribute _Color.
@@ -128,8 +136,24 @@ namespace SEE.GO
         {
             if (gameObject.TryGetComponent(out Renderer renderer))
             {
-                Material material = renderer.sharedMaterial;
-                material.SetColor("_Color", color);
+                Material material = renderer.sharedMaterial;                
+                material.SetColor(ColorProperty, color);
+            }
+        }
+
+        /// <summary>
+        /// Sets the alpha value (transparency) of the given <paramref name="gameObject"/>
+        /// to <paramref name="alpha"/>.
+        /// </summary>
+        /// <param name="gameObject">game objects whose transparency is to be set</param>
+        /// <param name="alpha">a value in between 0 and 1 for transparence</param>
+        public static void SetTransparency(this GameObject gameObject, float alpha)
+        {
+            if (gameObject.TryGetComponent(out Renderer renderer))
+            {
+                Color oldColor = renderer.material.color;
+                Color newColor = new Color(oldColor.r, oldColor.g, oldColor.b, alpha);
+                renderer.material.SetColor(ColorProperty, newColor);
             }
         }
 

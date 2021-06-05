@@ -7,7 +7,7 @@ namespace SEE.Controls
     public class DesktopPlayerMovement : MonoBehaviour
     {
         [Tooltip("Speed of movements")]
-        public float Speed = 2.0f;
+        public float Speed = 0.5f;
         [Tooltip("Boost factor of speed, applied when shift is pressed.")]
         public float BoostFactor = 2.0f;
 
@@ -26,22 +26,24 @@ namespace SEE.Controls
 
         private void Start()
         {
-            lastAxis = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
             Camera mainCamera = MainCamera.Camera;
             if (focusedObject != null)
-            {                
+            {
+                cameraState.distance = 2.0f;
+                cameraState.yaw = 0.0f;
+                cameraState.pitch = 45.0f;
                 mainCamera.transform.position = focusedObject.CenterTop;
+                mainCamera.transform.position -= mainCamera.transform.forward * cameraState.distance;
+                mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
             }
             else
             {
+                // Use the inital camera rotation.
+                Vector3 rotation = mainCamera.transform.rotation.eulerAngles;
+                cameraState.yaw = rotation.y;
+                cameraState.pitch = rotation.x;
                 cameraState.freeMode = true;
-                Debug.Log($"Player {name} has no focus object assigned.\n");
             }
-            cameraState.distance = 2.0f;
-            cameraState.yaw = 0.0f;
-            cameraState.pitch = 45.0f;
-            mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
-            mainCamera.transform.position -= mainCamera.transform.forward * cameraState.distance;
             lastAxis = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
         }
 
@@ -50,7 +52,8 @@ namespace SEE.Controls
             Camera mainCamera = MainCamera.Camera;
             if (SEEInput.ToggleCameraLock())
             {
-                if (cameraState.freeMode)
+                cameraState.freeMode = !cameraState.freeMode;
+                if (!cameraState.freeMode)
                 {
                     Vector3 positionToFocusedObject = focusedObject.CenterTop - transform.position;
                     cameraState.distance = positionToFocusedObject.magnitude;
@@ -59,7 +62,6 @@ namespace SEE.Controls
                     cameraState.pitch = pitchYawRoll.x;
                     cameraState.yaw = pitchYawRoll.y;
                 }
-                cameraState.freeMode = !cameraState.freeMode;
             }
 
             float speed = Speed * Time.deltaTime;

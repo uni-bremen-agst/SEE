@@ -13,7 +13,7 @@ namespace SEE.Game.UI.Menu
     /// Responsible for the desktop UI for menus.
     /// </summary>
     /// <typeparam name="T">the type of entries used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
-    public partial class Menu<T>
+    public partial class SimpleMenu<T>
     {
         /// <summary>
         /// The path to the prefab for the menu game object.
@@ -175,14 +175,26 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// Destroys the button with the same text as the given <paramref name="entry"/>.
         /// If no such button exists, nothing will happen.
-        /// If more than one such button exists, an InvalidOperationException will be thrown.
+        /// If more than one such button exists, all of them will be removed.
         /// </summary>
         /// <param name="entry">The entry whose button shall be destroyed.</param>
-        /// <exception cref="System.InvalidOperationException">If more than one button with the same text as
-        /// <paramref name="entry"/> exists.</exception>
         private void RemoveDesktopButton(T entry)
         {
-            Destroy(ButtonManagers.SingleOrDefault(x => x.buttonText == entry.Title)?.gameObject);
+            IEnumerable<ButtonManagerBasicWithIcon> managers = ButtonManagers?.Where(x => x.buttonText == entry.Title);
+            if (managers != null)
+            {
+                foreach (ButtonManagerBasicWithIcon manager in managers)
+                {
+                    if (manager)
+                    {
+                        Destroy(manager.gameObject);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Couldn't remove entry, its button was already destroyed.");
+                    }
+                }
+            }
         }
 
         protected override void UpdateDesktop()
@@ -194,11 +206,17 @@ namespace SEE.Game.UI.Menu
                     // Move window to the top of the hierarchy (which, confusingly, is actually at the bottom)
                     // so that this menu is rendered over any other potentially existing menu on the UI canvas
                     MenuGameObject.transform.SetAsLastSibling();
-                    Manager?.OpenWindow();
+                    if (Manager)
+                    {
+                        Manager.OpenWindow();
+                    }
                 }
                 else
                 {
-                    Manager?.CloseWindow();
+                    if (Manager)
+                    {
+                        Manager.CloseWindow();
+                    }
                 }
 
                 CurrentMenuShown = MenuShown;
