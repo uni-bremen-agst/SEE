@@ -288,7 +288,7 @@ namespace SEE.DataModel.DG
                 {
                     throw new Exception($"There is already an edge with the ID {edge.ID}.");
                 }
-
+                
                 edge.ItsGraph = this;
                 edges[edge.ID] = edge;
                 edge.Source.AddOutgoing(edge);
@@ -308,19 +308,19 @@ namespace SEE.DataModel.DG
         {
             if (ReferenceEquals(edge, null))
             {
-                throw new Exception("edge must not be null");
+                throw new Exception("Edge must not be null");
             }
             if (edge.ItsGraph != this)
             {
                 if (ReferenceEquals(edge.ItsGraph, null))
                 {
-                    throw new Exception("edge " + edge + " is not contained in any graph");
+                    throw new Exception($"Edge {edge} is not contained in any graph");
                 }
-                throw new Exception("edge " + edge + " is contained in a different graph " + edge.ItsGraph.Name);
+                throw new Exception($"Edge {edge} is contained in a different graph {edge.ItsGraph.Name}.");
             }
             if (!edges.ContainsKey(edge.ID))
             {
-                throw new Exception("edge " + edge + " is not contained in graph " + Name);
+                throw new Exception($"Edge {edge} is not contained in graph {Name}.");
             }
 
             edge.Source.RemoveOutgoing(edge);
