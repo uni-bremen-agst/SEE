@@ -4885,8 +4885,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcc1cedcf0a20b04ca3d2bb78035f3cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerInputType: 3
+  playerInputType: 0
   PlayerOrigin: {x: 0, y: 0.5, z: -1.5}
+  PlayerYRotation: 0
   FocusPlane: {fileID: 1758871332}
   Ground: {fileID: 1190604626}
   HideVRControllers: 0
@@ -4922,7 +4923,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useInOfflineMode: 1
-  hostServer: 1
+  hostServer: 0
   remoteServerIPAddress: 192.168.178.120
   localServerPort: 55555
   remoteServerPort: 55555

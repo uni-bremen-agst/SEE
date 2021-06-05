@@ -13,12 +13,12 @@ namespace SEE.Game
     {
         /// <summary>
         /// Creates and returns a new edge from <paramref name="source"/> to <paramref name="target"/>.
-        /// A new graph edge will be added to the underlying graph as well and attached as an 
+        /// A new graph edge will be added to the underlying graph as well and attached as an
         /// <see cref="EdgeRef"/> to that edge. The line of this edge is created by the
         /// <see cref="GraphRenderer"/> for the code city this edge belongs to. If <paramref name="edgeID"/>
         /// is neither null nor empty, that ID will be used for the name of the edge and the ID of the
         /// underlying graph edge. Otherwise the renderer will create a random unique ID for it.
-        /// 
+        ///
         /// Precondition:
         /// (1) <paramref name="source"/> and <paramref name="target"/> must have a valid node reference
         ///      to nodes in the same graph and they both belong to the same code city.
@@ -34,8 +34,8 @@ namespace SEE.Game
         /// provides more details why</exception>
         public static GameObject Add(GameObject source, GameObject target, string edgeID = null)
         {
-            GameObject result = null;
             Transform cityObject = SceneQueries.GetCodeCity(source.transform);
+            GameObject result;
             if (cityObject != null)
             {
                 // FIXME: This will work only for SEECity but not other subclasses of AbstractSEECity.
@@ -52,7 +52,7 @@ namespace SEE.Game
                 }
                 else
                 {
-                    throw new Exception($"The code city for the new edge from {source.name} to {target.name} has no .\n");
+                    throw new Exception($"The code city for the new edge from {source.name} to {target.name} cannot be determined.\n");
                 }
             }
             else
@@ -64,11 +64,11 @@ namespace SEE.Game
 
         /// <summary>
         /// Inverse operation of <see cref="Add(GameObject, GameObject, string)"/>.
-        /// Removes the given <paramref name="gameEdge"/> from the scene and its associated 
+        /// Removes the given <paramref name="gameEdge"/> from the scene and its associated
         /// graph edge from its graph.
-        /// 
+        ///
         /// Note: <paramref name="gameEdge"/> is not actually destroyed.
-        /// 
+        ///
         /// Precondition: <paramref name="gameEdge"/> must have a valid EdgeRef; otherwise
         /// an exception will be thrown.
         /// </summary>
@@ -78,11 +78,18 @@ namespace SEE.Game
             if (gameEdge.TryGetEdge(out Edge edge))
             {
                 Graph graph = edge.ItsGraph;
-                graph.RemoveEdge(edge);
+                if (graph != null)
+                {
+                    graph.RemoveEdge(edge);
+                }
+                else
+                {
+                    throw new Exception($"Edge {gameEdge.name} to be removed is not contained in a graph.");
+                }
             }
             else
             {
-                throw new Exception($"Edge {gameEdge.name} has no valid edge reference.");
+                throw new Exception($"Edge {gameEdge.name} to be removed has no valid edge reference.");
             }
         }
     }
