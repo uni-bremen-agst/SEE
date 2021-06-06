@@ -16,6 +16,10 @@ namespace SEE.Controls
     /// </summary>
     public static class DeletionAnimation
     {
+        //-----------------------------------------
+        // General settings of the animation
+        //-----------------------------------------
+
         /// <summary>
         /// The garbage can the deleted nodes and edges will be moved to. It is the object named
         /// <see cref="GarbageCanName"/>.
@@ -42,7 +46,18 @@ namespace SEE.Controls
         /// The vertical height above the garbage can the removed objects move to during the undo process, respectively,
         /// the objects move to having been deleted.
         /// </summary>
-        private const float verticalHeight = 1.4f;
+        private const float VerticalHeight = 1.4f;
+
+        /// <summary>
+        /// Number of animations used for an object's expansion, removing it from the garbage can.
+        /// </summary>
+        private const float StepsOfExpansionAnimation = 10;
+
+        /// <summary>
+        /// The time (in seconds) between animations of expanding a deleted object that is being restored
+        /// from the garbage can.
+        /// </summary>
+        private const float TimeBetweenExpansionAnimation = 0.14f;
 
         /// <summary>
         ///  A vector for an objects localScale which fits into the garbage can.
@@ -57,22 +72,6 @@ namespace SEE.Controls
         /// FIXME: Why is a ConcurrentDictionary needed?
         /// </summary>
         private static ConcurrentDictionary<GameObject, Vector3> shrinkFactors { get; set; } = new ConcurrentDictionary<GameObject, Vector3>();
-
-        // <summary>
-        /// A history of the old positions of the objects deleted by this action.
-        /// </summary>
-        private static Dictionary<GameObject, Vector3> oldPositions = new Dictionary<GameObject, Vector3>();
-
-        /// <summary>
-        /// Number of animations used for an object's expansion, removing it from the garbage can.
-        /// </summary>
-        private const float StepsOfExpansionAnimation = 10;
-
-        /// <summary>
-        /// The time (in seconds) between animations of expanding a deleted object that is being restored
-        /// from the garbage can.
-        /// </summary>
-        private const float TimeBetweenExpansionAnimation = 0.14f;
 
         /// <summary>
         /// A history of all edges and the graph where they were attached to, deleted by this action.
@@ -136,7 +135,7 @@ namespace SEE.Controls
                 {
                     Tweens.Move(deletedNode,
                             new Vector3(garbageCanPosition.x,
-                                        garbageCanPosition.y + verticalHeight,
+                                        garbageCanPosition.y + VerticalHeight,
                                         garbageCanPosition.z),
                             TimeForAnimation);
                 }
@@ -147,7 +146,7 @@ namespace SEE.Controls
                         Node target = edgeReference.Value.Target;
                         GameObject targetObject = SceneQueries.RetrieveGameNode(target.ID);
                         Vector3 targetPosi = targetObject.transform.position;
-                        GarbageCanPositionForEdges = new Vector3(garbageCanPosition.x, garbageCanPosition.y + verticalHeight - targetPosi.y, garbageCanPosition.z);
+                        GarbageCanPositionForEdges = new Vector3(garbageCanPosition.x, garbageCanPosition.y + VerticalHeight - targetPosi.y, garbageCanPosition.z);
 
                         if (targetPosi.x > 0)
                         {
@@ -187,7 +186,7 @@ namespace SEE.Controls
 
                 else
                 {
-                    Tweens.Move(deletedNode, new Vector3(deletedNode.transform.position.x, deletedNode.transform.position.y - verticalHeight, deletedNode.transform.position.z), TimeForAnimation);
+                    Tweens.Move(deletedNode, new Vector3(deletedNode.transform.position.x, deletedNode.transform.position.y - VerticalHeight, deletedNode.transform.position.z), TimeForAnimation);
                 }
             }
             yield return new WaitForSeconds(TimeToWait);
@@ -208,11 +207,11 @@ namespace SEE.Controls
                 if (deletedNode.HasNodeRef())
                 {
                     Portal.SetInfinitePortal(deletedNode);
-                    Tweens.Move(deletedNode, new Vector3(garbageCanPosition.x, garbageCanPosition.y + verticalHeight, garbageCanPosition.z), TimeForAnimation);
+                    Tweens.Move(deletedNode, new Vector3(garbageCanPosition.x, garbageCanPosition.y + VerticalHeight, garbageCanPosition.z), TimeForAnimation);
                 }
                 else
                 {
-                    Tweens.Move(deletedNode, new Vector3(deletedNode.transform.position.x, deletedNode.transform.position.y + verticalHeight, deletedNode.transform.position.z), TimeForAnimation);
+                    Tweens.Move(deletedNode, new Vector3(deletedNode.transform.position.x, deletedNode.transform.position.y + VerticalHeight, deletedNode.transform.position.z), TimeForAnimation);
                 }
                 if (deletedNode.HasNodeRef())
                 {
