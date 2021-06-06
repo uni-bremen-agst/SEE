@@ -1,3 +1,4 @@
+﻿using System.Collections.Generic;
 ﻿using SEE.Game;
 using SEE.Game.UI.Notification;
 using SEE.GO;
@@ -124,7 +125,7 @@ namespace SEE.Controls.Actions
             bool result = false;
 
             // Assigning the game objects to be connected.
-            // Checking whether the two game objects are not null and whether they are 
+            // Checking whether the two game objects are not null and whether they are
             // actually nodes.
             // FIXME: We need an interaction for VR, too.
             if (hoveredObject != null && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI() && hoveredObject.HasNodeRef())
@@ -145,7 +146,8 @@ namespace SEE.Controls.Actions
             {
                 // We do not have an edge ID yet, so we let the graph renderer create a unique ID.
                 memento = new Memento(from, to);
-                createdEdge = CreateEdge(ref memento);
+                createdEdge = CreateEdge(memento);
+
                 if (createdEdge != null)
                 {
                     // The edge ID was created by the graph renderer.
@@ -184,7 +186,7 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            createdEdge = CreateEdge(ref memento);
+            createdEdge = CreateEdge(memento);
         }
 
         /// <summary>
@@ -193,7 +195,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="memento">information needed to create the edge</param>
         /// <returns>a new edge or null</returns>
-        private static GameObject CreateEdge(ref Memento memento)
+        private static GameObject CreateEdge(Memento memento)
         {
             // If we arrive here because Redo() call this method, it could happen
             // that the source or target in edgeMemento were replaced because their
@@ -211,9 +213,17 @@ namespace SEE.Controls.Actions
             }
             try
             {
+                /// If <see cref="CreateEdge(Memento)"/> was called from Update
+                /// when the edge is created for the first time, <see cref="memento.edgeID"/>
+                /// will not be set. Then the creation process triggered by <see cref="GameEdgeAdder"/>
+                /// will create a new unique id for the edge. If <see cref="CreateEdge(Memento)"/>
+                /// is called from <see cref="Redo"/>, <see cref="memento.edgeID"/> has
+                /// a valid edge id (set by the previous call to <see cref="CreateEdge(Memento)"/>.
                 GameObject result = GameEdgeAdder.Add(memento.from, memento.to, memento.edgeID);
                 UnityEngine.Assertions.Assert.IsNotNull(result);
-                // Note that we need to use result.name as edge ID because edgeMemento.edgeID could be null.
+                /// Note that we need to use <see cref="result.name"/ as edge ID because
+                /// <see cref="memento.edgeID"/ will be null if <see cref="CreateEdge(Memento)"/> was
+                /// called from Update.
                 new AddEdgeNetAction(memento.from.name, memento.to.name, result.name).Execute();
                 return result;
             }
@@ -231,6 +241,20 @@ namespace SEE.Controls.Actions
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.NewEdge;
+        }
+
+        /// <summary>
+        /// Returns all IDs of gameObjects manipulated by this action.
+        /// </summary>
+        /// <returns>all IDs of gameObjects manipulated by this action</returns>
+        public override HashSet<string> GetChangedObjects()
+        {
+            return new HashSet<string>
+            {
+                memento.from.name,
+                memento.to.name,
+                createdEdge.name
+            };
         }
     }
 }

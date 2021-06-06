@@ -49,14 +49,14 @@ namespace SEEEditor
                     }
                 }
 
-                if (city.CoseGraphSettings.LoadedForNodeTypes == null || city.CoseGraphSettings.LoadedForNodeTypes.Count == 0)
+                if (city.coseGraphSettings.LoadedForNodeTypes == null || city.coseGraphSettings.LoadedForNodeTypes.Count == 0)
                 {
                     ShowGraphListing = true;
                 }
                 else
                 {
                     bool allTypes = true;
-                    foreach (KeyValuePair<string, bool> kvp in city.CoseGraphSettings.LoadedForNodeTypes)
+                    foreach (KeyValuePair<string, bool> kvp in city.coseGraphSettings.LoadedForNodeTypes)
                     {
                         if (city.SelectedNodeTypes.ContainsKey(kvp.Key))
                         {
@@ -68,7 +68,7 @@ namespace SEEEditor
                         }
                     }
 
-                    if (allTypes && countSelected != city.CoseGraphSettings.LoadedForNodeTypes.Count)
+                    if (allTypes && countSelected != city.coseGraphSettings.LoadedForNodeTypes.Count)
                     {
                         allTypes = false;
                     }

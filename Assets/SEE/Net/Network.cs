@@ -228,8 +228,7 @@ namespace SEE.Net
             GameObject rig = GameObject.Find("Player Rig");
             if (rig)
             {
-                // TODO(torben): this has to adapted once VR-hardware is available
-                // also, this is now initialized in Server.cs
+                // FIXME this has to adapted once VR-hardware is available. Also, this is now initialized in Server.cs
 #if false
                 ControlMode mode = rig.GetComponent<ControlMode>();
 #if UNITY_EDITOR
@@ -314,7 +313,7 @@ namespace SEE.Net
                 Client.Shutdown();
             }
 
-            // TODO(torben): there must be a better way to stop the logging spam!
+            // FIXME there must be a better way to stop the logging spam!
             string currentDirectory = Directory.GetCurrentDirectory();
             DirectoryInfo directoryInfo = new DirectoryInfo(currentDirectory);
             FileInfo[] fileInfos = directoryInfo.GetFiles();

@@ -115,7 +115,6 @@ namespace SEE.Net
                         PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.RemoveFromGarbage(removeFromGarbage,oldPos));
                         Portal.SetInfinitePortal(gameObject);
                         Graph.AddNode(gameObject.GetNode());
-                        Graph.FinalizeNodeHierarchy();
                     }
                 }
                 else

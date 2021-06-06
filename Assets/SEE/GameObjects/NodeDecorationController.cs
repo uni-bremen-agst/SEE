@@ -9,9 +9,35 @@ namespace SEE.GO
 {
     /// <summary>
     /// Decorates each block with an assigned texture.
+    /// 
+    /// The component is assumed to be attached to every node
+    /// to be decorated.
     /// </summary>
+    [ExecuteInEditMode]
     public class NodeDecorationController : MonoBehaviour
     {
+        /// Although the component is assumed to be attached to every node
+        /// to be decorated, in order to prevent errors, the 
+        /// component needs to get the gameObject it is attached to 
+        /// manually (rather than using parent). The <see cref="ChildNodes"/> 
+        /// need to be set manually because:
+        /// <ul>
+        /// <li> If using normal decoration mode: you only want to decorate
+        /// the block using the upmost children (not recursively all 
+        /// transitive ancestors) and furthermore we need the gameObjects
+        /// of the children, as using this.children might error out of there
+        /// are empty objects between the node and its children.
+        /// <li> If using treemap decorators: the node only knows what
+        /// gameObject children it has, the graph renderer, however, needs a
+        /// graph object to be able to render the treemaps, which is why it
+        /// needs to be set manually.
+        /// </ul>
+
+        /// <summary>
+        /// Child nodes of this block.
+        /// </summary>
+        public IList<GameObject> ChildNodes = new List<GameObject>();
+        
         /// <summary>
         /// The height the treemap decorators should have, is set
         /// to 0.1f so they are basically flush with the surface of the
@@ -32,6 +58,7 @@ namespace SEE.GO
         /// Otherwise the block gets decorated using a roof that corresponds to the
         /// type the node has (for instance Enum > Rounded Roof).
         /// </summary>
+        [Tooltip("Whether the node should be folded.")]
         public bool FoldedBlock = false;
 
         /// <summary>
@@ -84,7 +111,7 @@ namespace SEE.GO
         /// <summary>
         /// Treemap graph.
         /// </summary>
-        private Graph treemapGraph;
+        public Graph TreemapGraph;
 
         /// <summary>
         /// Roof type dropdown menu items.
@@ -289,7 +316,7 @@ namespace SEE.GO
                 p3, p4, p0,
                 p0, p4, p1
             };
-            mesh.triangles = Enumerable.Range(0, 17).ToArray();
+            mesh.triangles = Enumerable.Range(0, mesh.vertices.Length).ToArray();
             mesh.RecalculateNormals();
             mesh.RecalculateBounds();
             mesh.Optimize();
@@ -574,19 +601,14 @@ namespace SEE.GO
                 }
                 if (!DecorateUsingTreemap)
                 {
-                    DecoratePackedBlock(childNodes, NodeObject);
+                    DecoratePackedBlock(ChildNodes, NodeObject);
                 }
                 else
                 {
-                    DecoratePackedBlockWithTreemap(SideTreemapSettings, treemapGraph, NodeObject);
+                    DecoratePackedBlockWithTreemap(SideTreemapSettings, TreemapGraph, NodeObject);
                 }
             }
         }
-
-        /// <summary>
-        /// Child nodes of this block.
-        /// </summary>
-        private readonly IList<GameObject> childNodes = new List<GameObject>();
 
         /// <summary>
         /// Tests the block decoration implementation both visually and mathematically.
@@ -611,7 +633,7 @@ namespace SEE.GO
                 o.name = i.ToString();
                 o.GetComponent<Renderer>().material.color = Color.red;
                 o.transform.SetParent(debugObject.transform);
-                childNodes.Add(o);
+                ChildNodes.Add(o);
             }
             // Find corners of parent node, parent node is moved using it's 3d center
             float parentNodeLowX = nodeLocation.x - nodeSize.x / 2;
@@ -626,7 +648,7 @@ namespace SEE.GO
             {
                 for (int j = 0; j < columns; j++)
                 {
-                    GameObject currentChild = childNodes[currentListIndex];
+                    GameObject currentChild = ChildNodes[currentListIndex];
                     // Location for current child
                     float childLocX = currentLocationX + currentChild.transform.localScale.x / 2;
                     float childLocZ = currentLocationZ + currentChild.transform.localScale.z / 2;
@@ -655,13 +677,11 @@ namespace SEE.GO
                 {
                     Node n = new Node();
                     n.ID = counter + "-DummyNode";
-                    n.SetLevel(1);
                     graph.AddNode(n);
                     counter++;
                 }
             }
-            graph.FinalizeNodeHierarchy();
-            treemapGraph = graph;
+            TreemapGraph = graph;
         }
     }
 }

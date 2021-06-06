@@ -21,7 +21,7 @@ namespace SEE.Game
         /// <returns>new graph node</returns>
         private static Node NewGraphNode(string nodeID)
         {
-            string ID = string.IsNullOrEmpty(nodeID) ? RandomStrings.Get() : nodeID;
+            string ID = string.IsNullOrEmpty(nodeID) ? Guid.NewGuid().ToString() : nodeID;
             return new Node()
             {
                 ID = ID,
@@ -32,12 +32,12 @@ namespace SEE.Game
 
         /// <summary>
         /// Adds a <paramref name="node"/> as a child of <paramref name="parent"/> to the
-        /// graph containing <paramref name="parent"/> with a random unique ID. 
-        /// 
+        /// graph containing <paramref name="parent"/> with a random unique ID.
+        ///
         /// If node has no ID yet (null or empty), a random unique ID will be used. If it has
         /// an ID, that ID will be kept. In case this ID is not unique, an exception will
         /// be thrown.
-        /// 
+        ///
         /// Precondition: <paramref name="parent"/> must not be null, neither may
         /// <paramref name="parent"/> and <paramref name="node"/> be equal; otherwise an exception
         /// will be thrown.
@@ -63,24 +63,23 @@ namespace SEE.Game
                 }
                 if (string.IsNullOrEmpty(node.ID))
                 {
-                    // Loop until the node.ID is unique.
-                    node.ID = RandomStrings.Get();
+                    // Loop until the node.ID is unique within the graph.
+                    node.ID = Guid.NewGuid().ToString();
                     while (graph.GetNode(node.ID) != null)
                     {
-                        node.ID = RandomStrings.Get();
+                        node.ID = Guid.NewGuid().ToString();
                     }
                 }
                 graph.AddNode(node);
                 parent.AddChild(node);
-                graph.FinalizeNodeHierarchy();
             }
         }
 
         /// <summary>
         /// Creates and returns a new game node as a child of <paramref name="parent"/> having
         /// a nodeRef referencing <paramref name="node"/> at the given <paramref name="position"/>
-        /// with the given <paramref name="worldSpaceScale"/>. 
-        /// 
+        /// with the given <paramref name="worldSpaceScale"/>.
+        ///
         /// Precondition: <paramref name="parent"/> must have a valid node reference.
         /// </summary>
         /// <param name="parent">parent of the new node</param>
@@ -96,7 +95,7 @@ namespace SEE.Game
             {
                 Node node = NewGraphNode(nodeID);
                 AddNodeToGraph(parent.GetNode(), node);
-                GameObject result = city.Renderer.NewLeafNode(node);
+                GameObject result = city.Renderer.DrawLeafNode(node);
                 result.transform.localScale = worldSpaceScale;
                 result.transform.position = position;
                 result.transform.SetParent(parent.transform);
@@ -110,16 +109,16 @@ namespace SEE.Game
 
         /// <summary>
         /// Inverse operation of <see cref="Add(GameObject, Vector3, Vector3, string)"/>.
-        /// Removes the given <paramref name="gameNode"/> from the scene and its associated 
-        /// graph node from its graph. 
-        /// 
-        /// Notes: 
-        /// 
+        /// Removes the given <paramref name="gameNode"/> from the scene and its associated
+        /// graph node from its graph.
+        ///
+        /// Notes:
+        ///
         /// <paramref name="gameNode"/> is not actually destroyed.
-        /// 
+        ///
         /// If <paramref name="gameNode"/> represents an inner node of the node
         /// hierarchy, its ancestors will not be deleted.
-        /// 
+        ///
         /// Precondition: <paramref name="gameNode"/> must have a valid NodeRef; otherwise
         /// an exception will be thrown.
         /// </summary>
@@ -129,7 +128,6 @@ namespace SEE.Game
             Node node = gameNode.GetNode();
             Graph graph = node.ItsGraph;
             graph.RemoveNode(node);
-            graph.FinalizeNodeHierarchy();
         }
     }
 }

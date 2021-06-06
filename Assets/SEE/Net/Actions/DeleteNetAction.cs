@@ -22,7 +22,7 @@ namespace SEE.Net
         /// <summary>
         /// Creates a new DeleteNetAction.
         /// </summary>
-        /// <param name="gameObjectID">the unique name of the gameObject of a node or edge 
+        /// <param name="gameObjectID">the unique name of the gameObject of a node or edge
         /// that has to be deleted</param>
         public DeleteNetAction(string gameObjectID) : base()
         {
@@ -59,8 +59,11 @@ namespace SEE.Net
                     {
                         PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.MoveNodeOrEdgeToGarbage(new List<GameObject> {gameObject}));
                         GameEdgeAdder.Remove(gameObject);
-                        // Note: gameObject is not actually destroyed because it will be
-                        // moved to the garbage can from where it can be restored.
+                        GameObject.Destroy(gameObject);
+                    }
+                    else
+                    {
+                        throw new System.Exception($"The game object with the ID {GameObjectID} to be deleted is neither a node nor an edge.");
                     }
                 }
                 else
