@@ -49,5 +49,16 @@ namespace SEE.Utils
                                                                             + (backgroundColor.b * 255 * 0.114));
             return (255 - bgDelta < nThreshold) ? Color.black : Color.white;
         }
+
+        /// <summary>
+        /// Inverts the given color.
+        /// This is done similarly to the MRTK's Color.Invert method.
+        /// </summary>
+        /// <param name="color">The color to invert</param>
+        /// <returns>The inverted color.</returns>
+        public static Color Invert(this Color color)
+        {
+            return new Color(1f - color.r, 1f - color.g, 1f - color.b);
+        }
     }
 }

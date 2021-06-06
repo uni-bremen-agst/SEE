@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace SEE.DataModel.DG
 {
@@ -11,6 +12,7 @@ namespace SEE.DataModel.DG
         {
             Node node = new Node();
             node.Type = "Routine";
+            node.Domain = Node.NodeDomain.Implementation;
             node.ID = linkname;
             node.SourceName = "Source_" + linkname;
             node.SetFloat("float", 1.0f);
@@ -29,6 +31,7 @@ namespace SEE.DataModel.DG
 
             Node clone = (Node)original.Clone();
             Assert.That(clone.Type == original.Type);
+            Assert.That(clone.Domain == original.Domain);
             Assert.That(clone.ID == original.ID);
             Assert.That(clone.SourceName == original.SourceName);
             Assert.That(clone.GetFloat("float") == original.GetFloat("float"));
@@ -128,10 +131,6 @@ namespace SEE.DataModel.DG
             original.AddNode(n1_c1_c2);
             n1_c1.AddChild(n1_c1_c1);
             n1_c1.AddChild(n1_c1_c2);
-
-            // Note: The levels must be calculated when the hierarchy has been
-            // established. This is not done automatically.
-            original.FinalizeNodeHierarchy();
 
             Graph clone = (Graph)original.Clone();
             Assert.That(clone.Path == original.Path);

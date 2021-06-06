@@ -3,7 +3,7 @@
     /// <summary> 
     /// Implements HoloLens UI for menus. 
     /// </summary>
-    public partial class Menu<T>
+    public partial class SimpleMenu<T>
     {
         protected override void StartHoloLens()
         {

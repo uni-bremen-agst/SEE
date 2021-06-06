@@ -10,7 +10,7 @@ namespace SEE.Game.UI.Notification
     public static class ShowNotification
     {
         /// <summary>
-        /// Default amount of time a notification is shown (in seconds), if not specified any further. 
+        /// Default amount of time a notification is shown (in seconds), if not specified any further.
         /// </summary>
         private const float DEFAULT_DURATION = 10f;
 
@@ -18,12 +18,12 @@ namespace SEE.Game.UI.Notification
         /// Background color for error messages.
         /// </summary>
         private static readonly Color ErrorColor = new Color(0x55/255f, 0x2D/255f, 0x2E/255f);
-        
+
         /// <summary>
         /// Background color for warning messages.
         /// </summary>
         private static readonly Color WarningColor = new Color(0x55/255f, 0x4E/255f, 0x2D/255f);
-        
+
         /// <summary>
         /// Background color for info messages.
         /// </summary>
@@ -50,31 +50,46 @@ namespace SEE.Game.UI.Notification
         /// <param name="title">Title of the notification.</param>
         /// <param name="description">Description of the notification.</param>
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
-        public static void Info(string title, string description, float duration = DEFAULT_DURATION)
+        /// <param name="log">Whether to log the given notification in Unity's log as well</param>
+        public static void Info(string title, string description, float duration = DEFAULT_DURATION, bool log = true)
         {
             Show(title, description, InfoIcon, InfoColor, duration);
+            if (log)
+            {
+                Debug.Log($"{title}: {description}\n");
+            }
         }
-        
+
         /// <summary>
         /// Displays a warning message to the user as a notification.
         /// </summary>
         /// <param name="title">Title of the notification.</param>
         /// <param name="description">Description of the notification.</param>
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
-        public static void Warn(string title, string description, float duration = DEFAULT_DURATION)
+        /// <param name="log">Whether to log the given notification in Unity's log as well</param>
+        public static void Warn(string title, string description, float duration = DEFAULT_DURATION, bool log = true)
         {
             Show(title, description, WarningIcon, WarningColor, duration);
+            if (log)
+            {
+                Debug.LogWarning($"{title}: {description}\n");
+            }
         }
-        
+
         /// <summary>
         /// Displays an error message to the user as a notification.
         /// </summary>
         /// <param name="title">Title of the notification.</param>
         /// <param name="description">Description of the notification.</param>
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
-        public static void Error(string title, string description, float duration = DEFAULT_DURATION)
+        /// <param name="log">Whether to log the given notification in Unity's log as well</param>
+        public static void Error(string title, string description, float duration = DEFAULT_DURATION, bool log = true)
         {
             Show(title, description, ErrorIcon, ErrorColor, duration);
+            if (log)
+            {
+                Debug.LogError($"{title}: {description}\n");
+            }
         }
 
         /// <summary>
