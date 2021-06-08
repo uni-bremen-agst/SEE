@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Valve.Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
@@ -37,7 +38,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// The line number of the entity
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly uint line;
+        public readonly int line;
 
         /// <summary>
         /// The internal name of the corresponding entity
@@ -87,7 +88,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         }
 
         [JsonConstructor]
-        public MetricViolationIssue(string severity, string entity, string entityType, string path, uint line, 
+        public MetricViolationIssue(string severity, string entity, string entityType, string path, int line, 
                                     string linkName, string metric, string errorNumber, string description, 
                                     float? max, float? min, float value)
         {
@@ -104,5 +105,12 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.min = min;
             this.value = value;
         }
+
+        public override IssueKind kind => IssueKind.MV;
+
+        public override IEnumerable<SourceCodeEntity> Entities => new[]
+        {
+            new SourceCodeEntity(path, line, null, entity)
+        };
     }
 }

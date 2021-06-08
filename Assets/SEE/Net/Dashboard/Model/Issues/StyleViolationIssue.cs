@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Valve.Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
@@ -49,7 +50,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// The line number
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly uint line;
+        public readonly int line;
 
         public StyleViolationIssue()
         {
@@ -58,7 +59,7 @@ namespace SEE.Net.Dashboard.Model.Issues
 
         [JsonConstructor]
         public StyleViolationIssue(string severity, string provider, string errorNumber, string message, string entity, 
-                                   string path, uint line)
+                                   string path, int line)
         {
             this.severity = severity;
             this.provider = provider;
@@ -68,5 +69,12 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.path = path;
             this.line = line;
         }
+
+        public override IssueKind kind => IssueKind.SV;
+
+        public override IEnumerable<SourceCodeEntity> Entities => new[]
+        {
+            new SourceCodeEntity(path, line, null, entity)
+        };
     }
 }

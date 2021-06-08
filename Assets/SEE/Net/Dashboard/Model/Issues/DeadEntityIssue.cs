@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Valve.Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
@@ -31,7 +32,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// The line number of the entity
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly uint line;
+        public readonly int line;
 
         /// <summary>
         /// The internal name of the corresponding entity
@@ -45,7 +46,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         }
 
         [JsonConstructor]
-        protected DeadEntityIssue(string entity, string entityType, string path, uint line, string linkName)
+        protected DeadEntityIssue(string entity, string entityType, string path, int line, string linkName)
         {
             this.entity = entity;
             this.entityType = entityType;
@@ -59,5 +60,12 @@ namespace SEE.Net.Dashboard.Model.Issues
             return $"{nameof(entity)}: {entity}, {nameof(entityType)}: {entityType}, {nameof(path)}: {path}, "
                    + $"{nameof(line)}: {line}, {nameof(linkName)}: {linkName}";
         }
+
+        public override IssueKind kind => IssueKind.DE;
+
+        public override IEnumerable<SourceCodeEntity> Entities => new[]
+        {
+            new SourceCodeEntity(path, line, null, entity)
+        };
     }
 }
