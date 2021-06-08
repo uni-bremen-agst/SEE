@@ -9,7 +9,7 @@ namespace SEE.Net.Dashboard.Model.Issues
     /// Contains information about an issue in the source code.
     /// </summary>
     [Serializable]
-    public class Issue
+    public abstract class Issue
     {
         // A note: Due to how the JSON serializer works with inheritance, fields in here can't be readonly.
 
@@ -65,30 +65,6 @@ namespace SEE.Net.Dashboard.Model.Issues
             SV
         }
 
-        /// <summary>
-        /// The kind of issue this is.
-        /// </summary>
-        public IssueKind kind => this switch 
-        { 
-            ArchitectureViolationIssue _ => IssueKind.AV,
-            CloneIssue _ => IssueKind.CL,
-            CycleIssue _ => IssueKind.CY,
-            DeadEntityIssue _ => IssueKind.DE,
-            MetricViolationIssue _ => IssueKind.MV,
-            StyleViolationIssue _ => IssueKind.SV,
-            _ => IssueKind.Unknown
-        };
-
-        public IEnumerable<string> Paths => this switch
-        {
-            ArchitectureViolationIssue issue => new[] {issue.sourcePath, issue.targetPath},
-            CloneIssue issue => new[] {issue.leftPath, issue.rightPath},
-            CycleIssue issue => new[] {issue.sourcePath, issue.targetPath},
-            DeadEntityIssue issue => new[] {issue.path},
-            MetricViolationIssue issue => new[] {issue.path},
-            StyleViolationIssue issue => new[] {issue.path},
-            _ => throw new ArgumentOutOfRangeException()
-        };
         
         /// <summary>
         /// A kind-wide Id identifying the issue across analysis versions
@@ -142,6 +118,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// </summary>
         [JsonProperty(Required = Required.Always)]
         public IList<UserRef> owners;
+        
 
         protected Issue()
         {
@@ -245,6 +222,60 @@ namespace SEE.Net.Dashboard.Model.Issues
                 this.commentDeletionId = commentDeletionId;
             }
         }
+        
+        
+        // In this region are properties not defined in the Dashboard spec.
+        // These will either be derived from existing fields or defined statically.
+        #region Additional Properties
+        
+        /// <summary>
+        /// The kind of issue this is.
+        /// </summary>
+        public abstract IssueKind kind { get; }
+
+        /// <summary>
+        /// The entities this issue references.
+        /// </summary>
+        public abstract IEnumerable<SourceCodeEntity> Entities { get; }
+
+        /// <summary>
+        /// An entity in the source code, consisting of a <see cref="path"/>, a <see cref="line"/>,
+        /// an optional <see cref="endLine"/> and an optional <see cref="content"/>.
+        /// The <see cref="content"/> will usually be the "entity" as described in the Axivion Dashboard documentation.
+        /// </summary>
+        public class SourceCodeEntity
+        {
+            /// <summary>
+            /// The path of the file of the entity.
+            /// </summary>
+            public readonly string path;
+            
+            /// <summary>
+            /// The line number of the entity.
+            /// If <see cref="endLine"/> is specified, this will be the beginning of the line range of this entity.
+            /// </summary>
+            public readonly int line;
+            
+            /// <summary>
+            /// The optional end line number of the entity.
+            /// </summary>
+            public readonly int? endLine;
+            
+            /// <summary>
+            /// The optional content of the entity.
+            /// </summary>
+            public readonly string content;
+
+            public SourceCodeEntity(string path, int line, int? endLine = null, string content = null)
+            {
+                this.path = path ?? throw new ArgumentNullException(nameof(path));
+                this.line = line;
+                this.endLine = endLine;
+                this.content = string.IsNullOrEmpty(content) ? null : content;
+            }
+        } 
+        
+        #endregion
 
     }
 }

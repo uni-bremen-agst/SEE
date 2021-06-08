@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Valve.Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
@@ -37,7 +38,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// The source line number
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly uint sourceLine;
+        public readonly int sourceLine;
 
         /// <summary>
         /// The internal name of the corresponding entity
@@ -67,7 +68,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// The target line number
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly uint targetLine;
+        public readonly int targetLine;
 
         /// <summary>
         /// The internal name of the corresponding entity
@@ -82,8 +83,8 @@ namespace SEE.Net.Dashboard.Model.Issues
 
         [JsonConstructor]
         protected CycleIssue(string dependencyType, string sourceEntity, string sourceEntityType, 
-                             string sourcePath, uint sourceLine, string sourceLinkName, string targetEntity, 
-                             string targetEntityType, string targetPath, uint targetLine, string targetLinkName)
+                             string sourcePath, int sourceLine, string sourceLinkName, string targetEntity, 
+                             string targetEntityType, string targetPath, int targetLine, string targetLinkName)
         {
             this.dependencyType = dependencyType;
             this.sourceEntity = sourceEntity;
@@ -107,5 +108,13 @@ namespace SEE.Net.Dashboard.Model.Issues
                    + $" {nameof(targetPath)}: {targetPath}, {nameof(targetLine)}: {targetLine},"
                    + $" {nameof(targetLinkName)}: {targetLinkName}";
         }
+
+        public override IssueKind kind => IssueKind.CY;
+
+        public override IEnumerable<SourceCodeEntity> Entities => new[]
+        {
+            new SourceCodeEntity(sourcePath, sourceLine, null, sourceEntity),
+            new SourceCodeEntity(targetPath, targetLine, null, targetEntity)
+        };
     }
 }

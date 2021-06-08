@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Valve.Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
@@ -25,19 +26,19 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// The start line number of the left clone fragment
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly uint leftLine;
+        public readonly int leftLine;
 
         /// <summary>
         /// The end line number of the left clone fragment
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly uint leftEndLine;
+        public readonly int leftEndLine;
 
         /// <summary>
         /// The number of lines of the left clone fragment
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly uint leftLength;
+        public readonly int leftLength;
             
         /// <summary>
         /// The weight of the left clone fragment
@@ -55,19 +56,19 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// The start line number of the right clone fragment
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly uint rightLine;
+        public readonly int rightLine;
 
         /// <summary>
         /// The end line number of the right clone fragment
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly uint rightEndLine;
+        public readonly int rightEndLine;
 
         /// <summary>
         /// The number of lines of the right clone fragment
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly uint rightLength;
+        public readonly int rightLength;
             
         /// <summary>
         /// The weight of the right clone fragment
@@ -81,8 +82,8 @@ namespace SEE.Net.Dashboard.Model.Issues
         }
 
         [JsonConstructor]
-        public CloneIssue(int cloneType, string leftPath, uint leftLine, uint leftEndLine, uint leftLength, 
-                          int leftWeight, string rightPath, uint rightLine, uint rightEndLine, uint rightLength,
+        public CloneIssue(int cloneType, string leftPath, int leftLine, int leftEndLine, int leftLength, 
+                          int leftWeight, string rightPath, int rightLine, int rightEndLine, int rightLength,
                           int rightWeight)
         {
             this.cloneType = cloneType;
@@ -106,5 +107,13 @@ namespace SEE.Net.Dashboard.Model.Issues
                    + $" {nameof(rightLine)}: {rightLine}, {nameof(rightEndLine)}: {rightEndLine}, "
                    + $"{nameof(rightLength)}: {rightLength}, {nameof(rightWeight)}: {rightWeight}";
         }
+
+        public override IssueKind kind => IssueKind.CL;
+
+        public override IEnumerable<SourceCodeEntity> Entities => new[]
+        {
+            new SourceCodeEntity(leftPath, leftLine, leftEndLine),
+            new SourceCodeEntity(rightPath, rightLine, rightEndLine)
+        };
     }
 }
