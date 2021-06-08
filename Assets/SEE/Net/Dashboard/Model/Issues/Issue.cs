@@ -273,6 +273,8 @@ namespace SEE.Net.Dashboard.Model.Issues
                 this.endLine = endLine;
                 this.content = string.IsNullOrEmpty(content) ? null : content;
             }
+            
+            
         } 
         
         #endregion

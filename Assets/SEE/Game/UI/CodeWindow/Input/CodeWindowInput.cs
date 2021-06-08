@@ -218,59 +218,64 @@ namespace SEE.Game.UI.CodeWindow
                 queryPath = string.Join(Path.PathSeparator.ToString(), path.Split(Path.PathSeparator).Skip(skippedParts));
                 issues.RemoveAll(x => !x.Entities.Select(e => e.path).Any(p => p.EndsWith(queryPath)));
             }
+
+            // Dictionary from each entity to its issue
+            IOrderedEnumerable<(Issue.SourceCodeEntity entity, T issue)> entities = 
+                issues.SelectMany(x => x.Entities.Select(e => (entity: e, issue: x)))
+                      .Where(x => x.entity.path.EndsWith(queryPath)).OrderBy(x => x.entity.line);
             
-            //await UniTask.SwitchToMainThread(); // We interfere with UI now
-
-            foreach (T issue in issues)
+            int shift = 0;
+            foreach ((Issue.SourceCodeEntity entity, T issue) in entities)
             {
-                // If there are multiple entities, use all those whose path matches what we have
-                foreach (Issue.SourceCodeEntity entity in issue.Entities.Where(x => x.path.EndsWith(queryPath)))
+                if (entity.content != null)
                 {
-                    if (entity.content != null)
-                    {
-                        await UnderlinePart(await GetContentIndices(entity.line, entity.content), issue);
-                    }
-                    else
-                    {
-                        // Apply underline to all lines between line and endLine, if endLine is defined
-                        IEnumerable<int> entityLines = entity.endLine == null ? new[] {entity.line} 
-                            : Enumerable.Range(entity.line, (int) entity.endLine - entity.line);
+                    (int, int, bool, bool) contentIndices = GetContentIndices(entity.line, entity.content, shift);
+                    UnderlinePart(contentIndices, issue, ref shift);
+                }
+                else
+                {
+                    // Apply underline to all lines between line and endLine, if endLine is defined
+                    IEnumerable<int> entityLines = entity.endLine == null ? new[] {entity.line} 
+                        : Enumerable.Range(entity.line, (int) entity.endLine - entity.line);
 
-                        foreach (int line in entityLines)
-                        {
-                            await UnderlinePart(GetLineIndices(line), issue);
-                        }
+                    foreach (int line in entityLines)
+                    {
+                        UnderlinePart(GetLineIndices(line, shift), issue, ref shift);
                     }
-                    // TODO: Underline the entity
                 }
             }
 
+            await UniTask.SwitchToMainThread();
+            TextMesh.text = Text;
+            TextMesh.ForceMeshUpdate();
+
             #region Local Methods
 
-            async UniTask UnderlinePart((int startIndex, int endIndex, bool noparseStart, bool noparseEnd) content, T issue)
+            void UnderlinePart((int startIndex, int endIndex, bool noparseStart, bool noparseEnd) content, 
+                                        T issue, ref int indexShift)
             {
                 const string UNDERLINE = "<u>";
                 const string UNDERLINE_CLOSE = "</u>";
                 (int startIndex, int endIndex, bool noparseStart, bool noparseEnd) = content;
-                await UniTask.SwitchToMainThread();  // We need to modify the displayed text on the main thread
                 
                 // We put the closing tag in first, otherwise our endIndex would shift.
-                TextMesh.text = TextMesh.text.Insert(endIndex, UNDERLINE_CLOSE).Insert(startIndex, UNDERLINE);
+                Text = Text.Insert(endIndex, UNDERLINE_CLOSE).Insert(startIndex, UNDERLINE);
+                indexShift += UNDERLINE_CLOSE.Length + UNDERLINE.Length;
                 if (noparseEnd)
                 {
                     // We want to "unescape" <u> and </u> in the <noparse> segments.
                     // </noparse> is shifted right by <u>.
-                    TextMesh.text = TextMesh.text.Insert(endIndex + UNDERLINE.Length + UNDERLINE_CLOSE.Length, NOPARSE)
+                    Text = Text.Insert(endIndex + UNDERLINE.Length + UNDERLINE_CLOSE.Length, NOPARSE)
                                             .Insert(endIndex + UNDERLINE.Length, NOPARSE_CLOSE);
+                    indexShift += NOPARSE_CLOSE.Length + NOPARSE.Length;
                 }
                 if (noparseStart)
                 {
-                    TextMesh.text = TextMesh.text.Insert(startIndex + UNDERLINE.Length, NOPARSE).Insert(startIndex, NOPARSE_CLOSE);
+                    Text = Text.Insert(startIndex + UNDERLINE.Length, NOPARSE).Insert(startIndex, NOPARSE_CLOSE);
+                    indexShift += NOPARSE_CLOSE.Length + NOPARSE.Length;
                 }
-                
-                await UniTask.SwitchToThreadPool(); // And we're done with that for now
 
-                //TODO: Tooltip with info from issue
+                //TODO: Tooltip with info from issue via hyperlink TMP tag
             }
 
             static bool DifferentPaths(ICollection<T> issues)
@@ -282,45 +287,40 @@ namespace SEE.Game.UI.CodeWindow
 
 
             // Returns (rich start index, rich end index, whether the beginning, end is in a <noparse>)
-            async UniTask<(int, int, bool, bool)> GetContentIndices(int line, string content)
+            (int, int, bool, bool) GetContentIndices(int line, string content, int indexShift)
             {
                 // For the motivation behind what happens here, please see method GetRichIndex.
                 // As a TL;DR: Our TMP contains rich tags, while the given line and content don't account for them.
                 
-                (string lineContent, IList<TMP_CharacterInfo> contentInfo) = await GetLineInfo(line);
+                (string lineContent, IList<TMP_CharacterInfo> contentInfo) = GetLineInfo(line);
                 // We get the start and end index within this list, not accounting for rich tags ("clean").
                 int cleanStartIndex = lineContent.IndexOf(content, StringComparison.Ordinal);
                 int cleanEndIndex = cleanStartIndex + content.Length;
-
-                bool startInNoparse = ContentInNoparse(contentInfo[cleanStartIndex].index);
-                bool endInNoparse = ContentInNoparse(contentInfo[cleanEndIndex].index);
                 // The "rich" start index can then be inferred using the index property.
-                return (contentInfo[cleanStartIndex].index, contentInfo[cleanEndIndex].index, 
-                        startInNoparse, endInNoparse);
+                int richStartIndex = contentInfo[cleanStartIndex].index + indexShift;
+                int richEndIndex = contentInfo[cleanEndIndex].index + indexShift;
+
+                bool startInNoparse = ContentInNoparse(richStartIndex);
+                bool endInNoparse = ContentInNoparse(richEndIndex);
+                return (richStartIndex, richEndIndex, startInNoparse, endInNoparse);
             }
             
-            // Returns (rich start index, rich end index, whether the start, end of the line contains <noparse>
-            (int, int, bool, bool) GetLineIndices(int line)
+            // Returns (rich start index, rich end index, whether the start, end of the line contains <noparse>)
+            (int, int, bool, bool) GetLineIndices(int line, int indexShift)
             {
-                List<string> splitText = TextMesh.text.Split('\n').ToList();
+                List<string> splitText = Text.Split('\n').ToList();
                 string lineContent = splitText[line-1];
                 // We want to count newlines as well (+ line - 1)
-                int indexShift = line == 1 ? 0 : splitText.GetRange(0, line - 1).SelectMany(c => c).Count() + line - 1;
-                int startIndex = indexShift + lineContent.IndexOf("</color>", StringComparison.Ordinal);
-                int endIndex = indexShift + lineContent.Length;
+                int lineShift = line == 1 ? 0 : splitText.GetRange(0, line - 1).SelectMany(c => c).Count() + line - 1;
+                int startIndex = lineShift + lineContent.IndexOf("</color>", StringComparison.Ordinal);
+                int endIndex = lineShift + lineContent.Length;
                 
                 return (startIndex, endIndex, ContentInNoparse(startIndex), ContentInNoparse(endIndex));
             }
 
             // Returns ("clean" line as a string, line info)
-            async UniTask<(string, IList<TMP_CharacterInfo>)> GetLineInfo(int line)
+            (string, IList<TMP_CharacterInfo>) GetLineInfo(int line)
             {
-                // In order to update the displayed text, we need to temporarily switch to the main thread
-                await UniTask.SwitchToMainThread();
-                // This call is necessary to recompute the textInfo property with its indices
-                TextMesh.ForceMeshUpdate(true, true);
-                await UniTask.SwitchToThreadPool();
-                
                 // We get a list of CharacterInfos from the target line
                 IList<TMP_CharacterInfo> contentInfo = TextMesh.textInfo.characterInfo
                                                                .SkipWhile(x => x.lineNumber+1 != line) 
@@ -337,13 +337,16 @@ namespace SEE.Game.UI.CodeWindow
                 // This gets the beginning of the line containing the richIndex until the richIndex
                 for (int i = 0; i < richIndex; i++)
                 {
-                    char current = TextMesh.text[i];
+                    char current = Text[i];
                     if (current == '\n')
                     {
                         // Reset on new line
                         untilContent = "";
+                    } 
+                    else 
+                    {
+                        untilContent += current;
                     }
-                    untilContent += current;
                 }
                 // Content is in <noparse> if the tag has been opened more times than it has been closed
                 return Regex.Matches(untilContent, Regex.Escape(NOPARSE)).Count
