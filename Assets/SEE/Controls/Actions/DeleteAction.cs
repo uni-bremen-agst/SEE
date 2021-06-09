@@ -12,7 +12,8 @@ using UnityEngine.Assertions;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Action to delete the currently selected game object (edge or node).
+    /// Action to delete the currently selected game object (edge or node)
+    /// including all its children.
     /// </summary>
     internal class DeleteAction : AbstractPlayerAction
     {
@@ -54,24 +55,23 @@ namespace SEE.Controls.Actions
         private Dictionary<GameObject, Graph> deletedEdges { get; set; } = new Dictionary<GameObject, Graph>();
 
         /// <summary>
-        /// A data structure containing the graph's root of a SEEcity and its graph. 
+        /// A mapping of game nodes representing a root node of a graph onto the graph they are contained in.
         /// </summary>
         private Dictionary<GameObject, Graph> roots { get; set; } = new Dictionary<GameObject, Graph>();
 
         /// <summary>
         /// A list containing both, nodes and edges to be deleted.
         /// </summary>
-        List<GameObject> NodesAndEdgesToDelete = new List<GameObject>();
+        private List<GameObject> NodesAndEdgesToDelete = new List<GameObject>();
 
         /// <summary>
         /// A history of the old positions of the objects deleted by this action.
         /// </summary>
         private static Dictionary<GameObject, Vector3> oldPositions = new Dictionary<GameObject, Vector3>();
 
-
         /// <summary>
         /// Disables the general selection provided by <see cref="SEEInput.Select"/>.
-        /// We need to avoid that the selection of graph elements to be deleted 
+        /// We need to avoid that the selection of graph elements to be deleted
         /// interferes with the general <see cref="SelectAction"/>.
         /// </summary>
         public override void Start()
@@ -119,8 +119,8 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Deletes given <paramref GameObject="selectedObject"/> assumed to be either an
         /// edge or node. If it represents a node, the incoming and outgoing edges and
-        /// its ancestors will be removed, too. For the possibility of an undo, the deleted objects will be saved. 
-        /// 
+        /// its ancestors will be removed, too. For the possibility of an undo, the deleted objects will be saved.
+        ///
         /// Precondition: <paramref name="deletedObject"/> != null.
         /// </summary>
         /// <param name="deletedObject">selected GameObject that along with its children should be removed</param>
@@ -136,6 +136,7 @@ namespace SEE.Controls.Actions
             {
                 if (deletedObject.GetNode().IsRoot())
                 {
+                    // FIXME: We need to throw an exception or show a user notification.
                     Debug.LogError("A root shall not be deleted.\n");
                     return false;
                 }
@@ -147,7 +148,7 @@ namespace SEE.Controls.Actions
                     // we will actually delete them.
                     PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.MoveNodeOrEdgeToGarbage(deletedObject.AllAncestors()));
                     Portal.SetInfinitePortal(deletedObject);
-                    MarkAsDeleted(deletedObject.AllAncestors());
+                    DeleteNodes(deletedObject.AllAncestors());
                 }
             }
             return true;
@@ -225,16 +226,16 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Marks the given <paramref name="gameNodesToDelete"/> as deleted, i.e.,
-        /// 1) removes the associated nodes represented by thos <paramref name="gameNodesToDelete"/> 
+        /// 1) removes the associated nodes represented by thos <paramref name="gameNodesToDelete"/>
         ///    from their graph
         /// 2) removes the incoming and outgoing edges of <paramref name="gameNodesToDelete"/>
         ///    from their graph and makes those invisible
-        /// 
+        ///
         /// Assumption: <paramref name="gameNodesToDelete"/> contains all nodes in a subtree
         /// of the game-node hierarchy. All of them represent graph nodes.
         /// </summary>
         /// <param name="gameNodesToDelete">all deleted objects of the last operation</param>
-        private void MarkAsDeleted(IList<GameObject> gameNodesToDelete)
+        private void DeleteNodes(IList<GameObject> gameNodesToDelete)
         {
             ISet<GameObject> edgesInScene = new HashSet<GameObject>(GameObject.FindGameObjectsWithTag(Tags.Edge));
             // First identify all incoming and outgoing edges for all nodes in gameNodesToDelete
@@ -276,9 +277,9 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Deletes the given <paramref name="gameNode"/>, that is, it will remove
         /// the associated Node it from its graph. The <paramref name="gameNode"/>
-        /// itself is not deleted or made invisible (because it will be needed during 
+        /// itself is not deleted or made invisible (because it will be needed during
         /// the animation).
-        /// 
+        ///
         /// Precondition: <paramref name="gameNode"/> must have an <see cref="NodeRef"/>
         /// attached to it.
         /// </summary>
@@ -289,10 +290,7 @@ namespace SEE.Controls.Actions
             {
                 Graph graph = nodeRef.Value.ItsGraph;
                 deletedNodes[gameNode] = graph;
-                if (!oldPositions.ContainsKey(gameNode))
-                {
-                    oldPositions.Add(gameNode, gameNode.transform.position);
-                }
+                oldPositions[gameNode] = gameNode.transform.position;
                 if (!roots.ContainsValue(graph))
                 {
                     FindRoot(graph);
@@ -305,26 +303,25 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Deletes the given <paramref name="gameEdge"/>, that is, it will make it
         /// invisible and remove it from its graph.
-        /// 
+        ///
         /// Precondition: <paramref name="gameEdge"/> must have an <see cref="EdgeRef"/>
         /// attached to it.
         /// </summary>
         /// <param name="gameEdge">a game object representing an edge</param>
         private void DeleteEdge(GameObject gameEdge)
         {
+            /// FIXME: This code is very similar to <see cref="DeleteNode"/>.
+            /// The methods should be replaced by one.
             if (gameEdge.TryGetComponentOrLog(out EdgeRef edgeRef))
             {
                 Graph graph = edgeRef.Value.ItsGraph;
+                deletedEdges[gameEdge] = graph;
+                oldPositions[gameEdge] = gameEdge.transform.position;
                 if (!roots.ContainsValue(graph))
                 {
                     FindRoot(graph);
                 }
-                if (!oldPositions.ContainsKey(gameEdge))
-                {
-                    oldPositions.Add(gameEdge, gameEdge.transform.position);
-                }
                 new DeleteNetAction(gameEdge.name).Execute(null);
-                deletedEdges[gameEdge] = graph;
                 PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.MoveNodeOrEdgeToGarbage(new List<GameObject> {gameEdge}));
                 graph.RemoveEdge(edgeRef.Value);
             }
@@ -349,15 +346,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Finds the roots of the <paramref name="graph"/> and saves 
-        /// the gameobject representing it in <see cref="roots"/> (along with the graph).
+        /// Adds a mapping of each game node representing a root node in <paramref name="graph"/>
+        /// onto <paramref name="graph"/> to <see cref="roots"/>.
         /// </summary>
-        /// <param name="graph">graph to be added</param>
+        /// <param name="graph">graph whose roots are to be added to <see cref="roots"/></param>
         private void FindRoot(Graph graph)
         {
             foreach (Node root in graph.GetRoots())
             {
-                roots.Add(SceneQueries.RetrieveGameNode(root.ID), graph);
+                roots[SceneQueries.RetrieveGameNode(root.ID)] = graph;
             }
         }
     }
