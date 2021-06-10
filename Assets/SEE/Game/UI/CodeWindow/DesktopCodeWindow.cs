@@ -1,5 +1,6 @@
 using System.Linq;
 using SEE.GO;
+using SEE.Net.Dashboard.Model.Issues;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
@@ -87,6 +88,34 @@ namespace SEE.Game.UI.CodeWindow
 
             // Animate scrollbar to scroll to desired line
             VisibleLine = Mathf.Clamp(Mathf.FloorToInt(PreStartLine), 1, lines);
+        }
+
+        private Tooltip.Tooltip issueTooltip;
+
+        protected override void UpdateDesktop()
+        {
+            // Passing camera as null causes the screen space rather than world space camera to be used
+            if (issueDictionary.Count != 0 && Input.GetMouseButtonDown(0))
+            {
+                // Show issue info on click
+                int link = TMP_TextUtilities.FindIntersectingLink(TextMesh, Input.mousePosition, null);
+                if (link != -1 && int.TryParse(TextMesh.textInfo.linkInfo[link].GetLinkID(), out int issueId) 
+                               && issueDictionary.TryGetValue(issueId, out Issue issue))
+                {
+                    issueTooltip ??= gameObject.AddComponent<Tooltip.Tooltip>();
+                    issueTooltip.Show(issue.ToString(), 0f);
+                }
+                else if (issueTooltip != null)
+                {
+                    issueTooltip.Hide();
+                }
+            } 
+            else if (issueDictionary.Count != 0 && Input.GetMouseButtonDown(1) && issueTooltip != null)
+            {
+                // Hide tooltip by right-clicking
+                issueTooltip.Hide();
+            }
+
         }
 
         /// <summary>
