@@ -84,11 +84,21 @@ namespace SEE.Game
             return result;
         }
 
+        private static void SetInactive(GameObject gameObject)
+        {
+            gameObject.SetActive(false);
+        }
+
+        private static void SetActive(GameObject gameObject)
+        {
+            gameObject.SetActive(true);
+        }
+
         public static void Delete(ISet<GameObject> implicitlyDeletedNodesAndEdges)
         {
             foreach (GameObject nodeOrEdge in implicitlyDeletedNodesAndEdges)
             {
-                nodeOrEdge.SetActive(false);
+                GameObjectFader.FadeOut(nodeOrEdge, SetInactive);
             }
 
         }
@@ -97,7 +107,8 @@ namespace SEE.Game
         {
             foreach (GameObject nodeOrEdge in implicitlyDeletedNodesAndEdges)
             {
-                nodeOrEdge.SetActive(true);
+                SetActive(nodeOrEdge);
+                GameObjectFader.FadeIn(nodeOrEdge, null);
             }
         }
     }
