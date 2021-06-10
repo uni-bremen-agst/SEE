@@ -98,7 +98,7 @@ namespace SEE.Game
         {
             foreach (GameObject nodeOrEdge in implicitlyDeletedNodesAndEdges)
             {
-                GameObjectFader.FadeOut(nodeOrEdge, SetInactive);
+                GameObjectFader.FadingOut(nodeOrEdge, SetInactive);
             }
 
         }
@@ -108,7 +108,7 @@ namespace SEE.Game
             foreach (GameObject nodeOrEdge in implicitlyDeletedNodesAndEdges)
             {
                 SetActive(nodeOrEdge);
-                GameObjectFader.FadeIn(nodeOrEdge, null);
+                GameObjectFader.FadingIn(nodeOrEdge, null);
             }
         }
     }
