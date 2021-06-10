@@ -18,6 +18,12 @@ namespace SEE.Game.UI.CodeWindow
     /// </summary>
     public partial class CodeWindow
     {
+
+        /// <summary>
+        /// A dictionary mapping each issue ID to their issue.
+        /// </summary>
+        private readonly Dictionary<int, Issue> issueDictionary = new Dictionary<int, Issue>();
+        
         /// <summary>
         /// Populates the code window with the content of the given non-filled lexer's token stream.
         /// </summary>
@@ -227,6 +233,8 @@ namespace SEE.Game.UI.CodeWindow
             int shift = 0;
             foreach ((Issue.SourceCodeEntity entity, T issue) in entities)
             {
+                issueDictionary.Add(issue.id, issue);
+                
                 if (entity.content != null)
                 {
                     (int, int, bool, bool) contentIndices = GetContentIndices(entity.line, entity.content, shift);
@@ -240,7 +248,7 @@ namespace SEE.Game.UI.CodeWindow
 
                     foreach (int line in entityLines)
                     {
-                        UnderlinePart(GetLineIndices(line, shift), issue, ref shift);
+                        UnderlinePart(GetLineIndices(line), issue, ref shift);
                     }
                 }
             }
@@ -256,26 +264,32 @@ namespace SEE.Game.UI.CodeWindow
             {
                 const string UNDERLINE = "<u>";
                 const string UNDERLINE_CLOSE = "</u>";
+                string LINK = $"<link=\"{issue.id}\">";
+                const string LINK_CLOSE = "</link>";
                 (int startIndex, int endIndex, bool noparseStart, bool noparseEnd) = content;
                 
                 // We put the closing tag in first, otherwise our endIndex would shift.
-                Text = Text.Insert(endIndex, UNDERLINE_CLOSE).Insert(startIndex, UNDERLINE);
-                indexShift += UNDERLINE_CLOSE.Length + UNDERLINE.Length;
+                //TODO: This whole index shift workaround can still be defeated if entities within a line
+                // don't appear in the order of the issue table's rows. This may happen for issues with more than one
+                // occurence in the same file.
+                Text = Text.Insert(endIndex, UNDERLINE_CLOSE).Insert(startIndex, UNDERLINE)
+                           .Insert(endIndex + UNDERLINE_CLOSE.Length + UNDERLINE.Length, LINK_CLOSE)
+                           .Insert(startIndex, LINK);
+                indexShift += UNDERLINE_CLOSE.Length + UNDERLINE.Length + LINK.Length + LINK_CLOSE.Length;
                 if (noparseEnd)
                 {
                     // We want to "unescape" <u> and </u> in the <noparse> segments.
                     // </noparse> is shifted right by <u>.
-                    Text = Text.Insert(endIndex + UNDERLINE.Length + UNDERLINE_CLOSE.Length, NOPARSE)
-                                            .Insert(endIndex + UNDERLINE.Length, NOPARSE_CLOSE);
+                    Text = Text.Insert(endIndex + UNDERLINE.Length + UNDERLINE_CLOSE.Length + LINK.Length + LINK_CLOSE.Length, NOPARSE)
+                               .Insert(endIndex + UNDERLINE.Length + LINK.Length, NOPARSE_CLOSE);
                     indexShift += NOPARSE_CLOSE.Length + NOPARSE.Length;
                 }
                 if (noparseStart)
                 {
-                    Text = Text.Insert(startIndex + UNDERLINE.Length, NOPARSE).Insert(startIndex, NOPARSE_CLOSE);
+                    Text = Text.Insert(startIndex + UNDERLINE.Length + LINK.Length, NOPARSE)
+                               .Insert(startIndex, NOPARSE_CLOSE);
                     indexShift += NOPARSE_CLOSE.Length + NOPARSE.Length;
                 }
-
-                //TODO: Tooltip with info from issue via hyperlink TMP tag
             }
 
             static bool DifferentPaths(ICollection<T> issues)
@@ -306,7 +320,7 @@ namespace SEE.Game.UI.CodeWindow
             }
             
             // Returns (rich start index, rich end index, whether the start, end of the line contains <noparse>)
-            (int, int, bool, bool) GetLineIndices(int line, int indexShift)
+            (int, int, bool, bool) GetLineIndices(int line)
             {
                 List<string> splitText = Text.Split('\n').ToList();
                 string lineContent = splitText[line-1];
