@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Text;
+﻿using System.Text;
 
 namespace SEE.Utils
 {
@@ -36,7 +35,7 @@ namespace SEE.Utils
                 builder.Append(line + '\n');
             }
 
-            return builder.Remove(builder.Length - 1, 1).ToString();
+            return builder.Remove(builder.Length - 1, 1).ToString().TrimEnd('\n'); // remove excess newlines
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using SEE.Utils;
 using Valve.Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
@@ -68,6 +70,12 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.entity = entity;
             this.path = path;
             this.line = line;
+        }
+
+        public override async UniTask<string> ToDisplayString()
+        {
+            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"SV{id}");
+            return $"<style=\"H2\">{message.WrapLines(WRAP_AT - WRAP_AT/4)}</style>\n{explanation.WrapLines(WRAP_AT)}";
         }
 
         public override IssueKind kind => IssueKind.SV;
