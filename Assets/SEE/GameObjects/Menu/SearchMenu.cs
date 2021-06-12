@@ -96,6 +96,15 @@ namespace SEE.GO.Menu
                        .SelectMany(x => cachedNodes[x.Value].Select(y => (x.Score, x.Value, y)))
                        .ToList();
             
+            // In cases there are duplicates in the result, we append the filename too
+            results = results.GroupBy(x => x.Item2)
+                             .SelectMany(x => x.Select((entry, i) => (entry, index: i)))
+                             .Select(x => x.index <= 0 ? x.entry : 
+                                         (x.entry.Item1, 
+                                          $"{x.entry.Item2} ({x.entry.Item3.GetNode().SourceFile ?? x.index.ToString()})", 
+                                          x.entry.Item3));
+                   
+            
             int found = results.Count();
             switch (found)
             {
@@ -145,11 +154,7 @@ namespace SEE.GO.Menu
             }
 
             // Returns a color between black and gray, the higher the given score the grayer it is.
-            static Color ScoreColor(int score)
-            {
-                Debug.Log(score);
-                return Color.Lerp(Color.gray, Color.white, score / 100f);
-            }
+            static Color ScoreColor(int score) => Color.Lerp(Color.gray, Color.white, score / 100f);
         }
 
         /// <summary>
