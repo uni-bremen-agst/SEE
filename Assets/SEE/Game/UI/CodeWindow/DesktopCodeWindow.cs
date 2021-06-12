@@ -1,4 +1,5 @@
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using SEE.GO;
 using SEE.Net.Dashboard.Model.Issues;
 using SEE.Utils;
@@ -103,7 +104,7 @@ namespace SEE.Game.UI.CodeWindow
                                && issueDictionary.TryGetValue(issueId, out Issue issue))
                 {
                     issueTooltip ??= gameObject.AddComponent<Tooltip.Tooltip>();
-                    issueTooltip.Show(issue.ToString(), 0f);
+                    issue.ToDisplayString().ContinueWith(x => issueTooltip.Show(x, 0f));
                 }
                 else if (issueTooltip != null)
                 {

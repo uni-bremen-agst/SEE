@@ -227,18 +227,21 @@ namespace SEE.Net.Dashboard
 
         /// <summary>
         /// Retrieves the issue description for the given <paramref name="issueName"/>.
+        /// This will return the empty string if the retrieved issue description contains HTML tags.
         /// Note that this implementation is very hacky and may easily break for more complex descriptions
         /// or for older/more recent versions of the Axivion Dashboard. 
         /// </summary>
         /// <param name="issueName">The ID of the issue whose rule text shall be displayed</param>
         /// <param name="version">The optional analysis version of the issue.</param>
-        /// <returns>The description/explanation of the issue's rule. May contain some HTML tags.</returns>
+        /// <returns>The description/explanation of the issue's rule, or the empty string if it would otherwise
+        /// contain HTML tags.</returns>
         public async UniTask<string> GetIssueDescription(string issueName, string version = null)
         {
             Dictionary<string, string> parameters = new Dictionary<string, string> {["version"] = version};
             DashboardResult result = await GetAtPath($"/issues/{issueName}/rule", version == null ? null : parameters, 
                                                      false, "text/html");
-            return string.Join("\n", result.JSON.Split('\n').Skip(1).TakeWhile(x => !x.StartsWith("<h5>")));
+            string explanation = string.Join("\n", result.JSON.Split('\n').Skip(1).TakeWhile(x => !x.StartsWith("<h5>")));
+            return explanation.Contains("<") ? "" : explanation;
         }
         
         #endregion

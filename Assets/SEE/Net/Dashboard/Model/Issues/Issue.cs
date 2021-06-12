@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Valve.Newtonsoft.Json;
 using Valve.Newtonsoft.Json.Converters;
 
@@ -18,7 +19,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// </summary>
         public enum IssueState
         {
-            added, changed, removed  // note: names must be lowercase for the serialization to work
+            added, changed, removed // note: names must be lowercase for the serialization to work
         }
 
         /// <summary>
@@ -28,44 +29,44 @@ namespace SEE.Net.Dashboard.Model.Issues
         {
             // Note: The abbreviations have to be used here instead of the full name, otherwise serialization
             // won't work.
-            
+
             /// <summary>
             /// Special fallback value, used if issue kind could not be determined.
             /// </summary>
             Unknown,
-            
+
             /// <summary>
             /// Architecture violations.
             /// </summary>
-            AV, 
-            
+            AV,
+
             /// <summary>
             /// Clones.
             /// </summary>
-            CL, 
-            
+            CL,
+
             /// <summary>
             /// Cycles.
             /// </summary>
-            CY, 
-            
+            CY,
+
             /// <summary>
             /// Dead Entities.
             /// </summary>
-            DE, 
-            
+            DE,
+
             /// <summary>
             /// Metric Violations.
             /// </summary>
-            MV, 
-            
+            MV,
+
             /// <summary>
             /// Style Violations.
             /// </summary>
             SV
         }
 
-        
+
         /// <summary>
         /// A kind-wide Id identifying the issue across analysis versions
         /// </summary>
@@ -118,14 +119,14 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// </summary>
         [JsonProperty(Required = Required.Always)]
         public IList<UserRef> owners;
-        
+
 
         protected Issue()
         {
             // Necessary for inheritance with Newtonsoft.Json to work properly
         }
 
-        public Issue(int id, IssueState state, bool suppressed, string justification, 
+        public Issue(int id, IssueState state, bool suppressed, string justification,
                      IList<IssueTag> tag, IList<IssueComment> comments, IList<UserRef> owners)
         {
             this.id = id;
@@ -136,6 +137,19 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.comments = comments;
             this.owners = owners;
         }
+        
+        /// <summary>
+        /// Number of lines to wrap the string in <see cref="ToDisplayString"/> at.
+        /// </summary>
+        protected const int WRAP_AT = 60;
+
+        /// <summary>
+        /// Returns a string suitable for display in a TextMeshPro which describes this issue.
+        /// TextMeshPro's rich tags are used in here, so the string shouldn't be displayed elsewhere.
+        /// </summary>
+        /// <returns>A string describing this issue which is suitable for display in a TextMeshPro</returns>
+        public virtual async UniTask<string> ToDisplayString() { return ""; }
+        //TODO: This should be an abstract method
 
         /// <summary>
         /// An issue tag as returned by the Issue-List API.

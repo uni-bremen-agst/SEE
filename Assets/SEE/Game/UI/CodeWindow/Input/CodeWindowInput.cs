@@ -205,6 +205,10 @@ namespace SEE.Game.UI.CodeWindow
         {
             const string NOPARSE = "<noparse>";
             const string NOPARSE_CLOSE = "</noparse>";
+            
+            // First notification should stay as long as issues are still loading.
+            Notification.Notification firstNotification = ShowNotification.Info("Loading issues...", 
+                                                                                "This may take a while.", -1f);
             string queryPath = Path.GetFileName(path);
             IssueTable<T> issueTable = await DashboardRetriever.Instance.GetIssues<T>(fileFilter: $"\"*{queryPath}\"");
             await UniTask.SwitchToThreadPool(); // don't interrupt main UI thread
@@ -214,14 +218,15 @@ namespace SEE.Game.UI.CodeWindow
             }
             List<T> issues = issueTable.rows.ToList();
 
+            const char PATH_SEPARATOR = '/';
             // When there are different paths in the issue table, this implies that there are some files 
             // which aren't actually the one we're looking for (because we've only matched by filename so far).
             // In this case, we'll gradually refine our results until this isn't the case anymore.
-            for (int skippedParts = path.Count(x => x == Path.PathSeparator)-2; DifferentPaths(issues); skippedParts--)
+            for (int skippedParts = path.Count(x => x == PATH_SEPARATOR)-2; DifferentPaths(issues); skippedParts--)
             {
-                Assert.IsTrue(path.Contains(Path.PathSeparator));
+                Assert.IsTrue(path.Contains(PATH_SEPARATOR));
                 // Skip the first <c>skippedParts</c> parts, so that we query progressively larger parts.
-                queryPath = string.Join(Path.PathSeparator.ToString(), path.Split(Path.PathSeparator).Skip(skippedParts));
+                queryPath = string.Join(PATH_SEPARATOR.ToString(), path.Split(PATH_SEPARATOR).Skip(skippedParts));
                 issues.RemoveAll(x => !x.Entities.Select(e => e.path).Any(p => p.EndsWith(queryPath)));
             }
 
@@ -235,20 +240,20 @@ namespace SEE.Game.UI.CodeWindow
             {
                 issueDictionary.Add(issue.id, issue);
                 
-                if (entity.content != null)
+                (int, int, bool, bool)? contentIndices = GetContentIndices(entity.line, entity.content, shift);
+                if (contentIndices.HasValue)
                 {
-                    (int, int, bool, bool) contentIndices = GetContentIndices(entity.line, entity.content, shift);
-                    UnderlinePart(contentIndices, issue, ref shift);
+                    HighlightPart(contentIndices.Value, issue, ref shift);
                 }
                 else
                 {
-                    // Apply underline to all lines between line and endLine, if endLine is defined
+                    // Apply highlight to all lines between line and endLine, if endLine is defined
                     IEnumerable<int> entityLines = entity.endLine == null ? new[] {entity.line} 
                         : Enumerable.Range(entity.line, (int) entity.endLine - entity.line);
 
                     foreach (int line in entityLines)
                     {
-                        UnderlinePart(GetLineIndices(line), issue, ref shift);
+                        HighlightPart(GetLineIndices(line), issue, ref shift);
                     }
                 }
             }
@@ -256,14 +261,18 @@ namespace SEE.Game.UI.CodeWindow
             await UniTask.SwitchToMainThread();
             TextMesh.text = Text;
             TextMesh.ForceMeshUpdate();
+            
+            //TODO: This may as well be implemented as a loading bar, showing continuous progress as we iterate.
+            firstNotification.Close();
+            ShowNotification.Info("Issues loaded", $"{issues.Count} issues have been found for {Title}.");
 
             #region Local Methods
 
-            void UnderlinePart((int startIndex, int endIndex, bool noparseStart, bool noparseEnd) content, 
+            void HighlightPart((int startIndex, int endIndex, bool noparseStart, bool noparseEnd) content, 
                                         T issue, ref int indexShift)
             {
-                const string UNDERLINE = "<u>";
-                const string UNDERLINE_CLOSE = "</u>";
+                const string MARK = "<mark=#ff000044>";
+                const string MARK_CLOSE = "</mark>";
                 string LINK = $"<link=\"{issue.id}\">";
                 const string LINK_CLOSE = "</link>";
                 (int startIndex, int endIndex, bool noparseStart, bool noparseEnd) = content;
@@ -272,21 +281,21 @@ namespace SEE.Game.UI.CodeWindow
                 //TODO: This whole index shift workaround can still be defeated if entities within a line
                 // don't appear in the order of the issue table's rows. This may happen for issues with more than one
                 // occurence in the same file.
-                Text = Text.Insert(endIndex, UNDERLINE_CLOSE).Insert(startIndex, UNDERLINE)
-                           .Insert(endIndex + UNDERLINE_CLOSE.Length + UNDERLINE.Length, LINK_CLOSE)
+                Text = Text.Insert(endIndex, MARK_CLOSE).Insert(startIndex, MARK)
+                           .Insert(endIndex + MARK_CLOSE.Length + MARK.Length, LINK_CLOSE)
                            .Insert(startIndex, LINK);
-                indexShift += UNDERLINE_CLOSE.Length + UNDERLINE.Length + LINK.Length + LINK_CLOSE.Length;
+                indexShift += MARK_CLOSE.Length + MARK.Length + LINK.Length + LINK_CLOSE.Length;
                 if (noparseEnd)
                 {
-                    // We want to "unescape" <u> and </u> in the <noparse> segments.
-                    // </noparse> is shifted right by <u>.
-                    Text = Text.Insert(endIndex + UNDERLINE.Length + UNDERLINE_CLOSE.Length + LINK.Length + LINK_CLOSE.Length, NOPARSE)
-                               .Insert(endIndex + UNDERLINE.Length + LINK.Length, NOPARSE_CLOSE);
+                    // We want to "unescape" <mark> and </mark> in the <noparse> segments.
+                    // </noparse> is shifted right by <mark>.
+                    Text = Text.Insert(endIndex + MARK.Length + MARK_CLOSE.Length + LINK.Length + LINK_CLOSE.Length, NOPARSE)
+                               .Insert(endIndex + MARK.Length + LINK.Length, NOPARSE_CLOSE);
                     indexShift += NOPARSE_CLOSE.Length + NOPARSE.Length;
                 }
                 if (noparseStart)
                 {
-                    Text = Text.Insert(startIndex + UNDERLINE.Length + LINK.Length, NOPARSE)
+                    Text = Text.Insert(startIndex + MARK.Length + LINK.Length, NOPARSE)
                                .Insert(startIndex, NOPARSE_CLOSE);
                     indexShift += NOPARSE_CLOSE.Length + NOPARSE.Length;
                 }
@@ -298,17 +307,26 @@ namespace SEE.Game.UI.CodeWindow
                 HashSet<string> subPaths = new HashSet<string>(issues.First().Entities.Select(e => e.path));
                 return issues.Select(x => x.Entities.Select(e => e.path)).Any(x => !subPaths.SetEquals(x));
             }
-
-
-            // Returns (rich start index, rich end index, whether the beginning, end is in a <noparse>)
-            (int, int, bool, bool) GetContentIndices(int line, string content, int indexShift)
+            
+            // Note that this method will return null if the given content either can't be found at the given line,
+            // or if it's found more than once (in which case it's impossible to find out what to highlight).
+            (int richStartIndex, int richEndIndex, bool startNoparse, bool endNoparse)? 
+                GetContentIndices(int line, string content, int indexShift)
             {
+                if (content == null)
+                {
+                    return null;
+                }
                 // For the motivation behind what happens here, please see method GetRichIndex.
                 // As a TL;DR: Our TMP contains rich tags, while the given line and content don't account for them.
                 
                 (string lineContent, IList<TMP_CharacterInfo> contentInfo) = GetLineInfo(line);
                 // We get the start and end index within this list, not accounting for rich tags ("clean").
                 int cleanStartIndex = lineContent.IndexOf(content, StringComparison.Ordinal);
+                if (cleanStartIndex == -1 || Regex.Matches(lineContent, Regex.Escape(content)).Count > 1)
+                {
+                    return null;
+                }
                 int cleanEndIndex = cleanStartIndex + content.Length;
                 // The "rich" start index can then be inferred using the index property.
                 int richStartIndex = contentInfo[cleanStartIndex].index + indexShift;
@@ -319,8 +337,7 @@ namespace SEE.Game.UI.CodeWindow
                 return (richStartIndex, richEndIndex, startInNoparse, endInNoparse);
             }
             
-            // Returns (rich start index, rich end index, whether the start, end of the line contains <noparse>)
-            (int, int, bool, bool) GetLineIndices(int line)
+            (int richStartIndex, int richEndIndex, bool startNoparse, bool endNoparse) GetLineIndices(int line)
             {
                 List<string> splitText = Text.Split('\n').ToList();
                 string lineContent = splitText[line-1];
@@ -332,8 +349,7 @@ namespace SEE.Game.UI.CodeWindow
                 return (startIndex, endIndex, ContentInNoparse(startIndex), ContentInNoparse(endIndex));
             }
 
-            // Returns ("clean" line as a string, line info)
-            (string, IList<TMP_CharacterInfo>) GetLineInfo(int line)
+            (string cleanLine, IList<TMP_CharacterInfo> lineInfo) GetLineInfo(int line)
             {
                 // We get a list of CharacterInfos from the target line
                 IList<TMP_CharacterInfo> contentInfo = TextMesh.textInfo.characterInfo
@@ -378,8 +394,8 @@ namespace SEE.Game.UI.CodeWindow
         /// <example>
         /// Assume we have the source line <c>&lt;color red&gt;private class&lt;/color&gt; Test {</c>.
         /// As we can see, rich tags have been inserted so that the "private class" keywords are rendered in red.
-        /// This is a problem when we later want to e.g. underline "class Test". It's no longer possible to simply
-        /// search the text for "class Test" and underline that part, because it's broken up by <c>&lt;/color&gt;</c>.
+        /// This is a problem when we later want to e.g. highlight "class Test". It's no longer possible to simply
+        /// search the text for "class Test" and highlight that part, because it's broken up by <c>&lt;/color&gt;</c>.
         /// To remedy this, you can call this method with an index in the "clean" version.
         /// In our example, this would be 9 (before "class") and 19 (after "Test"). This method will then return the
         /// corresponding indices in the text with tags present, which in our example would be 20 and 38.
