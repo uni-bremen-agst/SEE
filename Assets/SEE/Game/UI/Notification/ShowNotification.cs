@@ -51,13 +51,15 @@ namespace SEE.Game.UI.Notification
         /// <param name="description">Description of the notification.</param>
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
         /// <param name="log">Whether to log the given notification in Unity's log as well</param>
-        public static void Info(string title, string description, float duration = DEFAULT_DURATION, bool log = true)
+        /// <returns>The created notification. Will be <c>null</c> as soon it's done playing.</returns>
+        public static Notification Info(string title, string description, float duration = DEFAULT_DURATION, 
+                                        bool log = true)
         {
-            Show(title, description, InfoIcon, InfoColor, duration);
             if (log)
             {
                 Debug.Log($"{title}: {description}\n");
             }
+            return Show(title, description, InfoIcon, InfoColor, duration);
         }
         
         /// <summary>
@@ -67,13 +69,15 @@ namespace SEE.Game.UI.Notification
         /// <param name="description">Description of the notification.</param>
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
         /// <param name="log">Whether to log the given notification in Unity's log as well</param>
-        public static void Warn(string title, string description, float duration = DEFAULT_DURATION, bool log = true)
+        /// <returns>The created notification. Will be <c>null</c> as soon it's done playing.</returns>
+        public static Notification Warn(string title, string description, float duration = DEFAULT_DURATION, 
+                                        bool log = true)
         {
-            Show(title, description, WarningIcon, WarningColor, duration);
             if (log)
             {
                 Debug.LogWarning($"{title}: {description}\n");
             }
+            return Show(title, description, WarningIcon, WarningColor, duration);
         }
         
         /// <summary>
@@ -83,13 +87,15 @@ namespace SEE.Game.UI.Notification
         /// <param name="description">Description of the notification.</param>
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
         /// <param name="log">Whether to log the given notification in Unity's log as well</param>
-        public static void Error(string title, string description, float duration = DEFAULT_DURATION, bool log = true)
+        /// <returns>The created notification. Will be <c>null</c> as soon it's done playing.</returns>
+        public static Notification Error(string title, string description, float duration = DEFAULT_DURATION, 
+                                         bool log = true)
         {
-            Show(title, description, ErrorIcon, ErrorColor, duration);
             if (log)
             {
                 Debug.LogError($"{title}: {description}\n");
             }
+            return Show(title, description, ErrorIcon, ErrorColor, duration);
         }
 
         /// <summary>
@@ -100,8 +106,9 @@ namespace SEE.Game.UI.Notification
         /// <param name="icon">The icon of the notification.</param>
         /// <param name="color">The color of the notification.</param>
         /// <param name="duration">The duration of the notification.</param>
-        public static void Show(string title, string description, Sprite icon, Color color,
-                                float duration = DEFAULT_DURATION)
+        /// <returns>The created notification. Will be <c>null</c> as soon it's done playing.</returns>
+        public static Notification Show(string title, string description, Sprite icon, Color color, 
+                                        float duration = DEFAULT_DURATION)
         {
             GameObject notificationGameObject = new GameObject {name = $"Notification '{title}'"};
             Notification notification = notificationGameObject.AddComponent<Notification>();
@@ -111,6 +118,7 @@ namespace SEE.Game.UI.Notification
             notification.Icon = icon;
             notification.Color = color;
             notification.DestroyAfterPlaying = true;
+            return notification;
         }
     }
 }
