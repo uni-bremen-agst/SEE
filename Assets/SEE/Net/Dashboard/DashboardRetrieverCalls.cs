@@ -205,10 +205,10 @@ namespace SEE.Net.Dashboard
         /// <param name="start">The result Version range start specifier.</param>
         /// <param name="end">The result Version range end (inclusive) specifier.</param>
         /// <returns></returns>
-        public async UniTask<MetricValueRange> GetMetricValueRange(string entity, string metric, string start = null, 
+        public async UniTask<MetricValueRange> GetMetricValueRange(string entity, string metric, string start = null,
                                                                    string end = null) =>
-             await QueryDashboard<MetricValueRange>("/queryMetricValueRange", new[] {entity, metric, start, end});
-        
+            await QueryDashboard<MetricValueRange>("/queryMetricValueRange", new[] {entity, metric, start, end});
+
         /// <summary>
         /// This allows querying metric values of a specific version with properties flattened out in a tabular format
         /// similar to the Issue List API. In contrast to the issue list entry point,
@@ -219,10 +219,8 @@ namespace SEE.Net.Dashboard
         public async UniTask<MetricValueTable> GetMetricValueTable(string version = null) =>
             await QueryDashboard<MetricValueTable>("/queryMetricValueTable", new[] {version});
 
-
         #endregion
-        
-        
+
         #region Unofficial APIs
 
         /// <summary>
@@ -238,12 +236,65 @@ namespace SEE.Net.Dashboard
         public async UniTask<string> GetIssueDescription(string issueName, string version = null)
         {
             Dictionary<string, string> parameters = new Dictionary<string, string> {["version"] = version};
-            DashboardResult result = await GetAtPath($"/issues/{issueName}/rule", version == null ? null : parameters, 
+            DashboardResult result = await GetAtPath($"/issues/{issueName}/rule", version == null ? null : parameters,
                                                      false, "text/html");
             string explanation = string.Join("\n", result.JSON.Split('\n').Skip(1).TakeWhile(x => !x.StartsWith("<h5>")));
             return explanation.Contains("<") ? "" : explanation;
         }
-        
+
+        #endregion
+
+        #region Aggregate Calls
+
+        /// <summary>
+        /// This method returns a list of all issues which are configured to be retrieved by
+        /// the instance fields <see cref="ArchitectureViolationIssues"/>, <see cref="CloneIssues"/>,
+        /// <see cref="CycleIssues"/>, <see cref="DeadEntityIssues"/>, <see cref="MetricViolationIssues"/> and
+        /// <see cref="StyleViolationIssues"/>. For a documentation of parameters, see <see cref="GetIssues{T}"/>.
+        /// </summary>
+        /// <returns>A list of all retrieved issues.</returns>
+        public async UniTask<IList<Issue>> GetConfiguredIssues(string start = null, string end = null,
+                                                               Issue.IssueState state = Issue.IssueState.changed,
+                                                               string user = null, string fileFilter = null,
+                                                               IReadOnlyDictionary<string, string> columnFilters = null,
+                                                               int limit = int.MaxValue,
+                                                               int offset = 0, bool computeTotalRowCount = false)
+        {
+            List<Issue> issues = new List<Issue>();
+            if (ArchitectureViolationIssues)
+            {
+                issues.AddRange((await GetIssues<ArchitectureViolationIssue>(start, end, state, user, fileFilter,
+                                    columnFilters, limit, offset, computeTotalRowCount)).rows);
+            }
+            if (CloneIssues)
+            {
+                issues.AddRange((await GetIssues<CloneIssue>(start, end, state, user, fileFilter,
+                                    columnFilters, limit, offset, computeTotalRowCount)).rows);
+            }
+            if (CycleIssues)
+            {
+                issues.AddRange((await GetIssues<CycleIssue>(start, end, state, user, fileFilter,
+                                    columnFilters, limit, offset, computeTotalRowCount)).rows);
+            }
+            if (DeadEntityIssues)
+            {
+                issues.AddRange((await GetIssues<DeadEntityIssue>(start, end, state, user, fileFilter,
+                                    columnFilters, limit, offset, computeTotalRowCount)).rows);
+            }
+            if (MetricViolationIssues)
+            {
+                issues.AddRange((await GetIssues<MetricViolationIssue>(start, end, state, user, fileFilter,
+                                    columnFilters, limit, offset, computeTotalRowCount)).rows);
+            }
+            if (StyleViolationIssues)
+            {
+                issues.AddRange((await GetIssues<StyleViolationIssue>(start, end, state, user, fileFilter,
+                                    columnFilters, limit, offset, computeTotalRowCount)).rows);
+            }
+
+            return issues;
+        }
+
         #endregion
     }
 }
