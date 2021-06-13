@@ -148,7 +148,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// TextMeshPro's rich tags are used in here, so the string shouldn't be displayed elsewhere.
         /// </summary>
         /// <returns>A string describing this issue which is suitable for display in a TextMeshPro</returns>
-        public virtual async UniTask<string> ToDisplayString() { return ""; }
+        public virtual async UniTask<string> ToDisplayString() { return "<b>TODO</b>"; }
         //TODO: This should be an abstract method
 
         /// <summary>
