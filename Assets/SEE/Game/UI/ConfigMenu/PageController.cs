@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using TMPro;
-using UnityEngine;
+﻿using TMPro;
 
 namespace SEE.Game.UI.ConfigMenu
 {
+    /// <summary>
+    /// Controls the active page (mostly its headline).
+    /// </summary>
     public class PageController : DynamicUIBehaviour
     {
+        /// <summary>
+        /// The headline text of this page.
+        /// </summary>
         public string headlineText;
 
         private TextMeshProUGUI _headline;

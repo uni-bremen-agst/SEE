@@ -5,6 +5,10 @@ using UnityEngine.UI.Michsky.UI.ModernUIPack;
 
 namespace SEE.Game.UI.ConfigMenu
 {
+    /// <summary>
+    /// A button that is used in the sidebar of the config menu.
+    /// It indicates the currently active page and allows for page switches.
+    /// </summary>
     [RequireComponent(typeof(ButtonManagerBasic))]
     public class TabButton : MonoBehaviour
     {
@@ -17,8 +21,19 @@ namespace SEE.Game.UI.ConfigMenu
 
         private Button _button;
 
+        /// <summary>
+        /// The color when the button is inactive.
+        /// </summary>
         public Color inactiveColor = new Color(0.203f, 0.213f, 0.224f, 1f);
+
+        /// <summary>
+        /// The color when the button is active (selected).
+        /// </summary>
         public Color activeColor = Color.white;
+
+        /// <summary>
+        /// The color when the button gets hovered.
+        /// </summary>
         public Color hoverColor = new Color(0.45f, 0.55f, 0.72f, 1f);
 
         void Start()

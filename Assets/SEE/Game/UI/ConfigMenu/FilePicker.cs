@@ -5,22 +5,46 @@ using SEE.GO;
 using SimpleFileBrowser;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace SEE.Game.UI.ConfigMenu
 {
 
-
+    /// <summary>
+    /// Component that controls a file picker.
+    /// It comes with a label to display next to the file dialog trigger.
+    ///
+    /// Unlike the other inputs, this component does not communicate via a controlled interface.
+    /// It receives a DataPath instance and manipulates it directly because a lot of the necessary
+    /// processing happens directly on the DataPath instance. It would be redundant to implement that
+    /// same behavior as part of this component.
+    ///
+    /// To manipulate the RootKind of a DataPath, the prefab of this file picker comes with a select
+    /// box change the root kind. The root kind should also be updated if you pick something via the
+    /// file picker.
+    ///
+    /// The actual file picker dialog comes from an external library and uses a global interface to
+    /// open the dialog.
+    /// </summary>
     public class FilePicker : DynamicUIBehaviour
     {
-
         private CustomDropdown _dropdown;
         private TMP_InputField _customInput;
         private TextMeshProUGUI _labelText;
         private ButtonManagerBasic _pickerButton;
 
+        /// <summary>
+        /// The DataPath instance this file picker manipulates.
+        /// </summary>
         public DataPath dataPathInstance;
+
+        /// <summary>
+        /// The picker mode (Files, Directories etc.)
+        /// </summary>
         public FileBrowser.PickMode pickMode = FileBrowser.PickMode.Files;
+
+        /// <summary>
+        /// The label of this component.
+        /// </summary>
         public string label;
 
         void Start()
@@ -58,6 +82,7 @@ namespace SEE.Game.UI.ConfigMenu
                                            initialPath: dataPathInstance.RootPath
                 );
 
+                // Find the newly opened file browser and optimize it for VR.
                 GameObject fileBrowser = GameObject.FindWithTag("FileBrowser");
                 fileBrowser.transform.Find("EventSystem").gameObject.SetActive(false);
                 if (PlayerSettings.GetInputType() == PlayerInputType.VRPlayer)
@@ -129,6 +154,9 @@ namespace SEE.Game.UI.ConfigMenu
         }
     }
 
+    /// <summary>
+    /// Instantiates a new file picker game object via prefab and sets the wrapper script.
+    /// </summary>
     public class FilePickerBuilder : UiBuilder<FilePicker>
     {
         protected override string PrefabPath =>
