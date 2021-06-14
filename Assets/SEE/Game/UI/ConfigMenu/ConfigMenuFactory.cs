@@ -4,9 +4,16 @@ using Valve.VR;
 using PlayerSettings = SEE.Controls.PlayerSettings;
 namespace SEE.Game.UI.ConfigMenu
 {
+    /// <summary>
+    /// The script responsible for constructing a config menu and modifying its runtime behavior,
+    /// e.g. hotkey handling to show/hide the menu.
+    ///
+    /// This gets usually attached to a player (currently VR/Desktop).
+    /// </summary>
     public class ConfigMenuFactory : DynamicUIBehaviour
     {
-        private static readonly EditableInstance DefaultInstanceToEdit = EditableInstance.Implementation;
+        private static readonly EditableInstance DefaultInstanceToEdit =
+            EditableInstance.Implementation;
         private static readonly string ConfigMenuPrefabPath = "Assets/Prefabs/UI/ConfigMenu.prefab";
 
         private readonly SteamVR_Action_Boolean _openAction =
@@ -25,7 +32,9 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void BuildConfigMenu(EditableInstance instanceToEdit)
         {
-            Instantiate(_configMenuPrefab).MustGetComponent(out _configMenu);
+            GameObject configMenuGo = Instantiate(_configMenuPrefab);
+            configMenuGo.transform.SetSiblingIndex(0);
+            configMenuGo.MustGetComponent(out _configMenu);
             _configMenu.CurrentlyEditing = instanceToEdit;
             _configMenu.OnInstanceChangeRequest.AddListener(ReplaceMenu);
         }

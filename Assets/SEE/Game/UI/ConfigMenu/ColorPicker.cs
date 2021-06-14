@@ -6,6 +6,11 @@ using UnityEngine;
 
 namespace SEE.Game.UI.ConfigMenu
 {
+    /// <summary>
+    /// The wrapper script for a color picker. This component doesn't actually own the color picker
+    /// component nor renders it. This script communicates with a controller script to show/hide and
+    /// manipulate the value of a singleton color picker game object.
+    /// </summary>
     public class ColorPicker : DynamicUIBehaviour
     {
         private TextMeshProUGUI _labelText;
@@ -13,15 +18,30 @@ namespace SEE.Game.UI.ConfigMenu
 
         private readonly Queue<Color> _valueUpdates = new Queue<Color>();
 
+        /// <summary>
+        /// The controller script of the singleton color picker.
+        /// </summary>
         public ColorPickerControl colorPickerControl;
+
+        /// <summary>
+        /// The label of the component.
+        /// </summary>
         public string label;
         public Action<Color> OnValueChange;
 
+        /// <summary>
+        /// Holds the latest selected color.
+        /// This can come from user input or from programmatic changes and is useful for displaying
+        /// the selected color.
+        /// </summary>
         public Color LatestSelectedColor {
             get;
             private set;
         }
 
+        /// <summary>
+        /// The color that should be displayed by the color picker.
+        /// </summary>
         public Color Value { set => _valueUpdates.Enqueue(value); }
 
         void Update()
@@ -65,6 +85,9 @@ namespace SEE.Game.UI.ConfigMenu
         }
     }
 
+    /// <summary>
+    /// Instantiates a new color picker game object via prefab and sets the wrapper script.
+    /// </summary>
     public class ColorPickerBuilder : UiBuilder<ColorPicker>
     {
         protected override string PrefabPath => "Assets/Prefabs/UI/Input Group - Color Picker.prefab";

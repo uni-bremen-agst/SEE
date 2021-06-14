@@ -1,6 +1,8 @@
-﻿using System;
-namespace SEE.Game.UI.ConfigMenu
+﻿namespace SEE.Game.UI.ConfigMenu
 {
+    /// <summary>
+    /// Enumerates the list of SEECity instances the config menu can manipulate.
+    /// </summary>
     public class EditableInstance
     {
         private EditableInstance(string displayValue, string gameObjectName)
@@ -8,10 +10,25 @@ namespace SEE.Game.UI.ConfigMenu
             DisplayValue = displayValue;
             GameObjectName = gameObjectName;
         }
+
+        /// <summary>
+        /// The name that should be used to display this instance inside the menu.
+        /// </summary>
         public string DisplayValue { get; }
+
+        /// <summary>
+        /// The name of the GameObject the SEECity is attached to.
+        /// </summary>
         public string GameObjectName { get; }
 
+        /// <summary>
+        /// References the architecture SEECity.
+        /// </summary>
         public static EditableInstance Architecture => new EditableInstance("Arch", "Architecture");
+
+        /// <summary>
+        /// References the implementation SEECity.
+        /// </summary>
         public static EditableInstance Implementation =>
             new EditableInstance("Impl", "Implementation");
 

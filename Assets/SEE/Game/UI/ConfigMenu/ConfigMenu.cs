@@ -20,13 +20,27 @@ namespace SEE.Game.UI.ConfigMenu
         Inactive,
     }
 
+    /// <summary>
+    /// The primary wrapper script for the config menu prefab. The config menu allows for runtime
+    /// configuration of a SEECity instance. It's agnostic about what instance can be manipulated and
+    /// offers an easy way to extend the list of instances that can be accessed.
+    ///
+    /// This script instantiates almost all of its used game objects.
+    /// </summary>
     public class ConfigMenu : DynamicUIBehaviour
     {
-        private static readonly List<string> _numericAttributes =
+        /// <summary>
+        /// A list of numeric attributes digestible by the ComboSelect component.
+        /// </summary>
+        private static readonly List<string> NumericAttributes =
             Enum.GetValues(typeof(NumericAttributeNames))
                 .Cast<NumericAttributeNames>()
                 .Select(x => x.Name())
                 .ToList();
+
+        /// <summary>
+        /// The list of SEECity instances this menu can manipulate.
+        /// </summary>
         private static readonly List<EditableInstance> EditableInstances =
             new List<EditableInstance>
             {
@@ -53,8 +67,16 @@ namespace SEE.Game.UI.ConfigMenu
         private Canvas _canvas;
         private HorizontalSelector _editingInstanceSelector;
 
+        /// <summary>
+        /// The event handler that gets called when an user interaction changes the currently edited
+        /// SEECity instance.
+        /// </summary>
         public UnityEvent<EditableInstance> OnInstanceChangeRequest =
             new UnityEvent<EditableInstance>();
+
+        /// <summary>
+        /// The currently edited SEECity instance.
+        /// </summary>
         public EditableInstance CurrentlyEditing = EditableInstance.Implementation;
 
         private void Start()
@@ -144,7 +166,7 @@ namespace SEE.Game.UI.ConfigMenu
                 rectTransform.anchoredPosition3D = Vector3.zero;
                 rectTransform.localScale = Vector3.one;
 
-                // Make the color picker slightly rotated towards the user.
+                // Maker the color picker slightly rotated towards the user.
                 _colorPickerControl.gameObject.transform.Rotate(0f, 45f, 0f);
 
                 // Place the menu as a whole in front of the 'table'.
@@ -205,7 +227,7 @@ namespace SEE.Game.UI.ConfigMenu
             // Width metric
             ComboSelectBuilder.Init(controls.transform)
                 .SetLabel("Width")
-                .SetAllowedValues(_numericAttributes)
+                .SetAllowedValues(NumericAttributes)
                 .SetDefaultValue(_city.WidthMetric)
                 .SetOnChangeHandler(s => _city.WidthMetric = s)
                 .Build();
@@ -213,7 +235,7 @@ namespace SEE.Game.UI.ConfigMenu
             // Height metric
             ComboSelectBuilder.Init(controls.transform)
                 .SetLabel("Height")
-                .SetAllowedValues(_numericAttributes)
+                .SetAllowedValues(NumericAttributes)
                 .SetDefaultValue(_city.HeightMetric)
                 .SetOnChangeHandler(s => _city.HeightMetric = s)
                 .Build();
@@ -221,7 +243,7 @@ namespace SEE.Game.UI.ConfigMenu
             // Height metric
             ComboSelectBuilder.Init(controls.transform)
                 .SetLabel("Depth")
-                .SetAllowedValues(_numericAttributes)
+                .SetAllowedValues(NumericAttributes)
                 .SetDefaultValue(_city.DepthMetric)
                 .SetOnChangeHandler(s => _city.DepthMetric = s)
                 .Build();
@@ -229,7 +251,7 @@ namespace SEE.Game.UI.ConfigMenu
             // Leaf style metric
             ComboSelectBuilder.Init(controls.transform)
                 .SetLabel("Style")
-                .SetAllowedValues(_numericAttributes)
+                .SetAllowedValues(NumericAttributes)
                 .SetDefaultValue(_city.LeafStyleMetric)
                 .SetOnChangeHandler(s => _city.LeafStyleMetric = s)
                 .Build();
@@ -272,7 +294,7 @@ namespace SEE.Game.UI.ConfigMenu
             // Height metric
             ComboSelectBuilder.Init(controls.transform)
                 .SetLabel("Height")
-                .SetAllowedValues(_numericAttributes)
+                .SetAllowedValues(NumericAttributes)
                 .SetDefaultValue(_city.InnerNodeHeightMetric)
                 .SetOnChangeHandler(s => _city.InnerNodeHeightMetric = s)
                 .Build();
@@ -280,7 +302,7 @@ namespace SEE.Game.UI.ConfigMenu
             // Leaf style metric
             ComboSelectBuilder.Init(controls.transform)
                 .SetLabel("Style")
-                .SetAllowedValues(_numericAttributes)
+                .SetAllowedValues(NumericAttributes)
                 .SetDefaultValue(_city.InnerNodeStyleMetric)
                 .SetOnChangeHandler(s => _city.InnerNodeStyleMetric = s)
                 .Build();
@@ -511,6 +533,11 @@ namespace SEE.Game.UI.ConfigMenu
             }
         }
 
+        /// <summary>
+        /// Converts an enum to a list of strings.
+        /// </summary>
+        /// <typeparam name="EnumType">The enum to map.</typeparam>
+        /// <returns>a list of string representations of the enum.</returns>
         public static List<string> EnumToStr<EnumType>() where EnumType : Enum
         {
             return Enum.GetValues(typeof(EnumType))
@@ -519,6 +546,9 @@ namespace SEE.Game.UI.ConfigMenu
                 .ToList();
         }
 
+        /// <summary>
+        /// Toggles the visibility of the menu.
+        /// </summary>
         public void Toggle()
         {
             _canvas.gameObject.SetActive(!_canvas.gameObject.activeSelf);

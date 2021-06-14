@@ -12,10 +12,27 @@ namespace SEE.Game.UI.ConfigMenu
         Float
     }
 
+    /// <summary>
+    /// The wrapper component for a numerical slider. It comes with a label that is displayed
+    /// next to the input.
+    ///
+    /// This slider can be operated either with floats or integers.
+    /// </summary>
     public class Slider : DynamicUIBehaviour
     {
+        /// <summary>
+        /// The label of this component.
+        /// </summary>
         public string label;
+
+        /// <summary>
+        /// The operational range of the slider.
+        /// </summary>
         public (float Min, float Max) range = (0f, 10f);
+
+        /// <summary>
+        /// The slider mode.
+        /// </summary>
         public SliderMode sliderMode = SliderMode.Float;
 
         private SliderManager _sliderManager;
@@ -23,6 +40,9 @@ namespace SEE.Game.UI.ConfigMenu
 
         private readonly Queue<float> _valueUpdates = new Queue<float>();
 
+        /// <summary>
+        /// Requests an external value update.
+        /// </summary>
         public float Value {
             set => _valueUpdates.Enqueue(value);
         }
@@ -51,9 +71,15 @@ namespace SEE.Game.UI.ConfigMenu
             }
         }
 
+        /// <summary>
+        /// The event handler that gets invoked when the value changes.
+        /// </summary>
         public Action<float> OnValueChange { get; set; }
     }
 
+    /// <summary>
+    /// Instantiates a new slider game object via prefab and sets the wrapper script.
+    /// </summary>
     public class SliderBuilder : UiBuilder<Slider>
     {
         protected override string PrefabPath => "Assets/Prefabs/UI/Input Group - Slider.prefab";

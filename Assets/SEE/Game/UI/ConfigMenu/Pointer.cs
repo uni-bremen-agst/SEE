@@ -1,52 +1,56 @@
-using System.Collections;
-using System.Collections.Generic;
-using SEE.Game.UI.ConfigMenu;
 using UnityEngine;
 using UnityEngine.EventSystems;
-
-public class Pointer : MonoBehaviour
+namespace SEE.Game.UI.ConfigMenu
 {
-    public float DefaultLength = 5.0f;
-    public VRInputModule InputModule;
-
-    private GameObject _dot;
-    private LineRenderer _lineRenderer;
-
-    void Awake()
+    /// <summary>
+    /// A basic pointer for SteamVR.
+    ///
+    /// Based on: https://www.youtube.com/watch?v=3mRI1hu9Y3w
+    /// </summary>
+    public class Pointer : MonoBehaviour
     {
-        _lineRenderer = GetComponent<LineRenderer>();
-        _dot = transform.Find("Dot").gameObject;
-    }
+        public float DefaultLength = 5.0f;
+        public VRInputModule InputModule;
 
-    void Update()
-    {
-        UpdateLine();
-    }
+        private GameObject _dot;
+        private LineRenderer _lineRenderer;
 
-    private void UpdateLine()
-    {
-        PointerEventData data = InputModule.GetData();
-        float targetLength = data.pointerCurrentRaycast.distance == 0 ? DefaultLength
-            : data.pointerCurrentRaycast.distance;
-        RaycastHit hit = CreateRaycast(targetLength);
-        Vector3 endPosition = transform.position + transform.forward * targetLength;
-        if (hit.collider != null)
+        void Awake()
         {
-            endPosition = hit.point;
+            _lineRenderer = GetComponent<LineRenderer>();
+            _dot = transform.Find("Dot").gameObject;
         }
 
-        _dot.transform.position = endPosition;
+        void Update()
+        {
+            UpdateLine();
+        }
 
-        _lineRenderer.SetPosition(0, transform.position);
-        _lineRenderer.SetPosition(1, endPosition);
-    }
+        private void UpdateLine()
+        {
+            PointerEventData data = InputModule.GetData();
+            float targetLength = data.pointerCurrentRaycast.distance == 0 ? DefaultLength
+                : data.pointerCurrentRaycast.distance;
+            RaycastHit hit = CreateRaycast(targetLength);
+            Vector3 endPosition = transform.position + transform.forward * targetLength;
+            if (hit.collider != null)
+            {
+                endPosition = hit.point;
+            }
 
-    private RaycastHit CreateRaycast(float length)
-    {
-        RaycastHit hit;
-        Ray ray = new Ray(transform.position, transform.forward);
-        Physics.Raycast(ray, out hit, length);
+            _dot.transform.position = endPosition;
 
-        return hit;
+            _lineRenderer.SetPosition(0, transform.position);
+            _lineRenderer.SetPosition(1, endPosition);
+        }
+
+        private RaycastHit CreateRaycast(float length)
+        {
+            RaycastHit hit;
+            Ray ray = new Ray(transform.position, transform.forward);
+            Physics.Raycast(ray, out hit, length);
+
+            return hit;
+        }
     }
 }
