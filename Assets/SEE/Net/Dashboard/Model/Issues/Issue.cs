@@ -139,9 +139,9 @@ namespace SEE.Net.Dashboard.Model.Issues
         }
         
         /// <summary>
-        /// Number of lines to wrap the string in <see cref="ToDisplayString"/> at.
+        /// Number of characters to wrap the string in <see cref="ToDisplayString"/> at.
         /// </summary>
-        protected const int WRAP_AT = 60;
+        protected const int WRAP_AT = 120;
 
         /// <summary>
         /// Returns a string suitable for display in a TextMeshPro which describes this issue.

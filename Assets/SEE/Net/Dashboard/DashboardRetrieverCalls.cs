@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Cysharp.Threading.Tasks;
 using SEE.Net.Dashboard.Model;
 using SEE.Net.Dashboard.Model.Issues;
 using SEE.Net.Dashboard.Model.Metric;
+using UnityEngine;
 
 namespace SEE.Net.Dashboard
 {
@@ -235,11 +237,49 @@ namespace SEE.Net.Dashboard
         /// contain HTML tags.</returns>
         public async UniTask<string> GetIssueDescription(string issueName, string version = null)
         {
+            // These tags are allowed if they are in the explanation. Any other tags will cause this function to
+            // return an empty string.
+            string[] allowedTags = { "b", "i", "s", "u", "style" };
+            // These strings will be removed from the explanation
+            string[] removables = { "<div>", "</div>", "<p>", "</p>", "<h4>", "</h4>", "<section>", "</section>" };
+            // These strings will be converted from left to right in the explanation
+            IDictionary<string, string> convertibles = new Dictionary<string, string>
+            {
+                ["<h5>"] = "<style=\"H3\">",
+                ["</h5>"] = "</style>"
+            };
+            const string TAG_REGEX = @"<([a-z]*) [^<>]*>";
+            
             Dictionary<string, string> parameters = new Dictionary<string, string> {["version"] = version};
             DashboardResult result = await GetAtPath($"/issues/{issueName}/rule", version == null ? null : parameters,
                                                      false, "text/html");
-            string explanation = string.Join("\n", result.JSON.Split('\n').Skip(1).TakeWhile(x => !x.StartsWith("<h5>")));
-            return explanation.Contains("<") ? "" : explanation;
+
+            string explanation = string.Join("\n", result.JSON.Split('\n')
+                                                         .TakeWhile(x => !x.StartsWith("<h5>Configuration"))
+                                                         .Select(x => x.TrimStart(' ', '\t')));
+            int hIndex = explanation.IndexOf("</h4>", StringComparison.Ordinal);
+            if (hIndex != -1)
+            {
+                explanation = explanation.Substring(hIndex + "</h4>".Length).TrimStart('\n');
+            }
+            explanation = removables.Aggregate(explanation, (x, removable) => x.Replace(removable, ""));
+            explanation = convertibles.Aggregate(explanation, (x, convertible) => x.Replace(convertible.Key, convertible.Value));
+
+            // This checks if any tag is not supported by us. For this, we have to descend the regex hierarchy of
+            // Matches -> Groups -> Captures and check each Capture against our list of allowed tags.
+            // We have to skip the first element each time because that's just the match again.
+            bool validTags = Regex.Matches(explanation, TAG_REGEX, RegexOptions.Multiline).Cast<Match>().Skip(1)
+                                  .All(m => m.Groups.Cast<Group>().Skip(1)
+                                             .All(g => g.Captures.Cast<Capture>()
+                                                        .All(capture => allowedTags.Contains(capture.Value))));
+
+            if (!validTags)
+            {
+                // If we can't convey certain necessary information (e.g. links), we don't show any explanation at all.
+                Debug.LogWarning($"Invalid tag in issue description for {issueName}: {explanation}\n");
+                return "";
+            }
+            return explanation;
         }
 
         #endregion

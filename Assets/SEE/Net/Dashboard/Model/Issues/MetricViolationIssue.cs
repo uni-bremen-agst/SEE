@@ -12,6 +12,13 @@ namespace SEE.Net.Dashboard.Model.Issues
     [Serializable]
     public class MetricViolationIssue : Issue
     {
+        
+        /// <summary>
+        /// Whether the explanation shall be shown for these issues.
+        /// This is relevant because explanation for metrics are often very long, so disabling it may be of use.
+        /// </summary>
+        private const bool SHOW_EXPLANATION = false;
+        
         /// <summary>
         /// The severity of the violation
         /// </summary>
@@ -110,12 +117,12 @@ namespace SEE.Net.Dashboard.Model.Issues
         
         public override async UniTask<string> ToDisplayString()
         {
-            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"MV{id}");
+            string explanation = SHOW_EXPLANATION ? await DashboardRetriever.Instance.GetIssueDescription($"MV{id}") : "";
             string minimum = min.HasValue ? $"; Minimum: <b>{min:0.##}</b>" : "";
             string maximum = max.HasValue ? $"; Maximum: <b>{max:0.##}</b>" : "";
-            return $"<style=\"H2\">Metric: {description.WrapLines(WRAP_AT - WRAP_AT/4)}</style>"
-               + $"\nActual: <b>{value}</b>{minimum}{maximum}" 
-               + $"\n{explanation.WrapLines(WRAP_AT)}";
+            return $"<style=\"H2\">Metric: {description.WrapLines(WRAP_AT - WRAP_AT / 4)}</style>"
+                   + $"\nActual: <b>{value}</b>{minimum}{maximum}"
+                   + $"\n{explanation.WrapLines(WRAP_AT)}";
         }
 
         public override IssueKind kind => IssueKind.MV;

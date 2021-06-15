@@ -23,7 +23,7 @@ namespace SEE.Utils
                 string line = inputLine;
                 while (line.Length >= wrapAt)
                 {
-                    int lastSpace = line.Substring(0, wrapAt+1).LastIndexOf(' ');
+                    int lastSpace = line.Substring(0, wrapAt).LastIndexOf(' ');
                     if (lastSpace == -1)
                     {
                         lastSpace = wrapAt;
