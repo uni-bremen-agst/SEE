@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using SEE.DataModel;
 using SEE.Game;
+using SEE.Net.Dashboard;
 using UnityEditor;
 using UnityEngine;
 using Plane = SEE.GO.Plane;
@@ -107,7 +108,7 @@ namespace SEEEditor
             codeCity.AddComponent<MeshRenderer>();
             codeCity.AddComponent<BoxCollider>();
             // Attach portal plane to navigation action components
-            Plane plane = codeCity.AddComponent<Plane>();
+            codeCity.AddComponent<Plane>();
 
             codeCity.AddComponent(CityTypes[selectedCityType]);
         }
@@ -118,7 +119,14 @@ namespace SEEEditor
         private void SetupScene()
         {
             //TODO: Check if objects are already there and only add as necessary
-            //TODO: Make compatible with MRTK
+            //TODO: This is out of date, the MainScene looks different now!
+            
+            // Add dashboard retriever to PlayerSettings if it isn't there yet
+            PlayerSettings settings = FindObjectOfType<PlayerSettings>();
+            if (!settings.TryGetComponent(out DashboardRetriever _))
+            {
+                settings.gameObject.AddComponent<DashboardRetriever>();
+            }
 
             // Create light
             GameObject light = new GameObject {name = "Light"};
