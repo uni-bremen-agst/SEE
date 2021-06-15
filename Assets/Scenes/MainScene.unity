@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.10010709, g: 0.1693151, b: 0.30522084, a: 1}
+  m_IndirectSpecularColor: {r: 0.10009589, g: 0.1694057, b: 0.30514205, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -4866,6 +4866,7 @@ GameObject:
   - component: {fileID: 1381114940}
   - component: {fileID: 1381114939}
   - component: {fileID: 1381114941}
+  - component: {fileID: 1381114942}
   m_Layer: 0
   m_Name: Player Settings
   m_TagString: Untagged
@@ -4885,8 +4886,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcc1cedcf0a20b04ca3d2bb78035f3cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerInputType: 3
+  playerInputType: 0
   PlayerOrigin: {x: 0, y: 0.5, z: -1.5}
+  PlayerYRotation: 0
   FocusPlane: {fileID: 1758871332}
   Ground: {fileID: 1190604626}
   HideVRControllers: 0
@@ -4931,6 +4933,34 @@ MonoBehaviour:
   internalLoggingEnabled: 1
   minimalSeverity: 2
   vivoxChannelName: 
+--- !u!114 &1381114942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1381114938}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 175ce339391b42b1b31b4db72cbdb2ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PublicKey: 3082020A0282020100B20ACB6E1639D673B6AF9E9F36578F66068AFDA50327DC2AB0F804E2F83765BCB7AD74FED31EC8812FF9AA9C2461D53F7DC08449C765F0ECFA9C0787B9D1E1AE92F8D1919EDB6871E70601DB0834FF34389EDBA30BFF48F3EA8D07786E976B04F5232AC3A63D07DA5EAD5F5450026C9E2FB9294D32FC0172E9F0DFF33CDCB35180DB22E6985C15B02BBFAD02499D0E52AA916ADD5F9E7A40E22B8EC5427E02E47FD78CFEF30B5A2EDB53EA47E8B70230FB9EAE57B4B7042BD8829F67F4DCDA0230BB933741AF42992CD9164C4F5E2C126A46DC42AE5BD22682C97880F8D0A82FA36FEC89CE9318E0DE2CAA3352F92F6231B18DF29913445AA323931106B0764066DB4A2F8764CE4FAC2500F5A084AE3133C6C82D18181655FC1050629257A54B44FBACB1BE43E51C7FA80DD7CE68D2F86AF448CA2E03B3C81A1289AA355E926CF221D881BFCD82BE7B0FA99F1B04A95D23F9B030B6CDF81E90197868BC72F314E2DFBA5F9965517F8C33BF056C0050DB08D285C988EFF7F212CC9D652E70B8FE67BC632F17ECFAE57603F5592C831951442F821575139D193B4DC4F2EB46FEE09495CCF67259A3F4516873612582B84512019A1157F621B46D45BCEE471BCE855C068B701F40C4CBB78F8E11550C83D7E6897967FD0B90C4BD25B0E388449266293CF52814112B7F1A95A8EC3D6CBB5567B6B0916A995D5EB8254E31647B2F810203010001
+  BaseUrl: https://stvive.informatik.uni-bremen.de:9443/axivion/projects/SEE/
+  Token: 0.0000000000014.l-qjyU2eTKuNl7v0PsBb4qfI3sVHvtwKGGeOTKV_3eE
+  StrictMode: 0
+  ArchitectureViolationIssues: 1
+  CloneIssues: 1
+  CycleIssues: 1
+  DeadEntityIssues: 1
+  MetricViolationIssues: 1
+  StyleViolationIssues: 1
+  ArchitectureViolationIssueColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  CloneIssueColor: {r: 1, g: 0, b: 0, a: 1}
+  CycleIssueColor: {r: 0, g: 1, b: 0, a: 1}
+  DeadEntityIssueColor: {r: 0, g: 0, b: 0, a: 1}
+  MetricViolationIssueColor: {r: 1, g: 0, b: 1, a: 1}
+  StyleViolationIssueColor: {r: 0, g: 1, b: 1, a: 1}
 --- !u!4 &1502973842 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400004, guid: 01dfb375646cba84e9b92e2cedf7d149, type: 3}
@@ -7681,10 +7711,10 @@ MonoBehaviour:
       Data: 1|SEE.Game.DataPath, SEE
     - Name: Root
       Entry: 3
-      Data: 3
+      Data: 1
     - Name: relativePath
       Entry: 1
-      Data: /mini/CodeFacts.gvl
+      Data: /Data/GXL/SEE/CodeFacts.gvl
     - Name: absolutePath
       Entry: 1
       Data: 
@@ -8413,7 +8443,7 @@ MonoBehaviour:
       Data: 21|SEE.EdgeLayoutSettings, SEE
     - Name: kind
       Entry: 3
-      Data: 3
+      Data: 0
     - Name: edgeWidth
       Entry: 4
       Data: 0.01
@@ -8585,25 +8615,13 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 4
+      Data: 10
     - Name: 
       Entry: 7
       Data: 
     - Name: $k
       Entry: 1
-      Data: Method
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Field
+      Data: Member
     - Name: $v
       Entry: 5
       Data: true
@@ -8627,7 +8645,91 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Package
+      Data: Class_Template
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Interface
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Interface_Template
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Type
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Constant
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Method
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Method_Template
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Namespace
     - Name: $v
       Entry: 5
       Data: true
@@ -8677,12 +8779,12 @@ MonoBehaviour:
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
   GXLPath:
-    Root: 3
-    relativePath: /mini/CodeFacts.gxl
+    Root: 1
+    relativePath: /Data/GXL/SEE/CodeFacts.gxl
     absolutePath: C:\dev\SEE\Data\GXL\linux-clones\fs\CodeFacts.gxl
   CSVPath:
-    Root: 3
-    relativePath: /mini/CodeFacts.csv
+    Root: 1
+    relativePath: /Data/GXL/SEE/CodeFacts.csv
     absolutePath: C:\dev\SEE\Data\GXL\linux-clones\fs\CodeFacts.csv
 --- !u!114 &1972412193
 MonoBehaviour:
@@ -8697,7 +8799,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.004589379
+  HeightOffset: 0.0031492114
 --- !u!65 &1972412194
 BoxCollider:
   m_ObjectHideFlags: 0
