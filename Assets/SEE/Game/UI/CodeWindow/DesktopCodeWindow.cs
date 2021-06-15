@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.GO;
-using SEE.Net.Dashboard.Model.Issues;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
@@ -95,19 +95,22 @@ namespace SEE.Game.UI.CodeWindow
 
         protected override void UpdateDesktop()
         {
-            // Passing camera as null causes the screen space rather than world space camera to be used
+            // Show issue info on click (on hover would be too expensive)
             if (issueDictionary.Count != 0 && Input.GetMouseButtonDown(0))
             {
-                // Show issue info on click
+                // Passing camera as null causes the screen space rather than world space camera to be used
                 int link = TMP_TextUtilities.FindIntersectingLink(TextMesh, Input.mousePosition, null);
-                if (link != -1 && int.TryParse(TextMesh.textInfo.linkInfo[link].GetLinkID(), out int issueId) 
-                               && issueDictionary.TryGetValue(issueId, out Issue issue))
+                if (link != -1)
                 {
+                    IEnumerable<int> issueIds = TextMesh.textInfo.linkInfo[link].GetLinkID().ToIntArray();
                     issueTooltip ??= gameObject.AddComponent<Tooltip.Tooltip>();
-                    issue.ToDisplayString().ContinueWith(x => issueTooltip.Show(x, 0f));
+                    // Display tooltip containing all issue descriptions
+                    UniTask.WhenAll(issueIds.Select(x => issueDictionary[x].ToDisplayString()))
+                           .ContinueWith(x => issueTooltip.Show(string.Join("\n", x), 0f));
                 }
                 else if (issueTooltip != null)
                 {
+                    // Hide tooltip by clicking somewhere else
                     issueTooltip.Hide();
                 }
             } 

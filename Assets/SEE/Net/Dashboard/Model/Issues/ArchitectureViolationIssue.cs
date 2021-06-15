@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using SEE.Utils;
 using Valve.Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
@@ -158,6 +160,16 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.targetPath = targetPath;
             this.targetLine = targetLine;
             this.targetLinkName = targetLinkName;
+        }
+        
+        public override async UniTask<string> ToDisplayString()
+        {
+            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"AV{id}");
+            return "<style=\"H2\">"
+                   + $"{violationType} ({architectureSource} to {architectureTarget})".WrapLines(WRAP_AT - WRAP_AT/4)
+                   + $"</style>\nSource: {sourcePath} ({sourceEntityType}), Line {sourceLine}".WrapLines(WRAP_AT)
+                   + $"\nTarget: {targetPath} ({targetEntityType}), Line {targetLine}".WrapLines(WRAP_AT)
+                   + $"\n{explanation.WrapLines(WRAP_AT)}";
         }
 
         public override string ToString()

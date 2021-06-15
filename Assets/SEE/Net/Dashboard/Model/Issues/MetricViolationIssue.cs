@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using SEE.Utils;
 using Valve.Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
@@ -104,6 +106,16 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.max = max;
             this.min = min;
             this.value = value;
+        }
+        
+        public override async UniTask<string> ToDisplayString()
+        {
+            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"MV{id}");
+            string minimum = min.HasValue ? $"; Minimum: <b>{min:0.##}</b>" : "";
+            string maximum = max.HasValue ? $"; Maximum: <b>{max:0.##}</b>" : "";
+            return $"<style=\"H2\">Metric: {description.WrapLines(WRAP_AT - WRAP_AT/4)}</style>"
+               + $"\nActual: <b>{value}</b>{minimum}{maximum}" 
+               + $"\n{explanation.WrapLines(WRAP_AT)}";
         }
 
         public override IssueKind kind => IssueKind.MV;

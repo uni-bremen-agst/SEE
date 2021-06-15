@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using SEE.Utils;
 using Valve.Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
@@ -54,11 +56,13 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.line = line;
             this.linkName = linkName;
         }
-
-        public override string ToString()
+        
+        public override async UniTask<string> ToDisplayString()
         {
-            return $"{nameof(entity)}: {entity}, {nameof(entityType)}: {entityType}, {nameof(path)}: {path}, "
-                   + $"{nameof(line)}: {line}, {nameof(linkName)}: {linkName}";
+            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"DE{id}");
+            return "<style=\"H2\">Dead Entity</style>"
+                   + $"\nThe entity '{entity.WrapLines(WRAP_AT)}' ({entityType.WrapLines(WRAP_AT)}) is dead."
+                   + $"\n{explanation.WrapLines(WRAP_AT)}";
         }
 
         public override IssueKind kind => IssueKind.DE;
