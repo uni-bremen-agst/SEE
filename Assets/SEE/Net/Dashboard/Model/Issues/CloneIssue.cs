@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using SEE.Utils;
 using Valve.Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
@@ -97,6 +99,15 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.rightEndLine = rightEndLine;
             this.rightLength = rightLength;
             this.rightWeight = rightWeight;
+        }
+        
+        public override async UniTask<string> ToDisplayString()
+        {
+            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"CL{id}");
+            return $"<style=\"H2\">Clone of type <b>{cloneType}</b></style>"
+                   + $"\nLeft: {leftPath}, Lines {leftLine}-{leftEndLine}".WrapLines(WRAP_AT)
+                   + $"\nRight: {rightPath}, Lines {rightLine}-{rightEndLine}\n".WrapLines(WRAP_AT)
+                   + $"\n{explanation.WrapLines(WRAP_AT)}";
         }
 
         public override string ToString()

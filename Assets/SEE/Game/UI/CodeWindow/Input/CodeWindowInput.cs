@@ -181,9 +181,7 @@ namespace SEE.Game.UI.CodeWindow
                     try
                     {
                         EnterFromTokens(SEEToken.fromFile(filename));
-                        //TODO: Other issue types too
-                        MarkIssues<StyleViolationIssue>(filename).Forget(); // initiate issue search
-                        return;
+                        MarkIssues(filename).Forget(); // initiate issue search
                     }
                     catch (ArgumentException e)
                     {
@@ -191,8 +189,11 @@ namespace SEE.Game.UI.CodeWindow
                         Debug.LogError($"Encountered an exception, disabling syntax highlighting: {e}");
                     }
                 }
-
-                EnterFromText(File.ReadAllLines(filename));
+                else
+                {
+                    EnterFromText(File.ReadAllLines(filename));
+                    MarkIssues(filename).Forget(); // initiate issue search
+                }
             }
             catch (IOException exception)
             {
@@ -201,7 +202,7 @@ namespace SEE.Game.UI.CodeWindow
             }
         }
 
-        private async UniTaskVoid MarkIssues<T>(string path) where T : Issue, new()
+        private async UniTaskVoid MarkIssues(string path)
         {
             const string NOPARSE = "<noparse>";
             const string NOPARSE_CLOSE = "</noparse>";
@@ -210,77 +211,115 @@ namespace SEE.Game.UI.CodeWindow
             Notification.Notification firstNotification = ShowNotification.Info("Loading issues...", 
                                                                                 "This may take a while.", -1f);
             string queryPath = Path.GetFileName(path);
-            IssueTable<T> issueTable = await DashboardRetriever.Instance.GetIssues<T>(fileFilter: $"\"*{queryPath}\"");
+            List<Issue> allIssues;
+            try
+            {
+                allIssues = new List<Issue>(await DashboardRetriever.Instance.GetConfiguredIssues(fileFilter: $"\"*{queryPath}\""));
+            } catch (DashboardException e)
+            {
+                firstNotification.Close();
+                ShowNotification.Error("Couldn't load issues", e.Message);
+                return;
+            }
+
             await UniTask.SwitchToThreadPool(); // don't interrupt main UI thread
-            if (issueTable.rows.Count == 0)
+            if (allIssues.Count == 0)
             {
                 return;
             }
-            List<T> issues = issueTable.rows.ToList();
 
             const char PATH_SEPARATOR = '/';
             // When there are different paths in the issue table, this implies that there are some files 
             // which aren't actually the one we're looking for (because we've only matched by filename so far).
             // In this case, we'll gradually refine our results until this isn't the case anymore.
-            for (int skippedParts = path.Count(x => x == PATH_SEPARATOR)-2; DifferentPaths(issues); skippedParts--)
+            for (int skippedParts = path.Count(x => x == PATH_SEPARATOR)-2; !MatchingPaths(allIssues); skippedParts--)
             {
                 Assert.IsTrue(path.Contains(PATH_SEPARATOR));
                 // Skip the first <c>skippedParts</c> parts, so that we query progressively larger parts.
                 queryPath = string.Join(PATH_SEPARATOR.ToString(), path.Split(PATH_SEPARATOR).Skip(skippedParts));
-                issues.RemoveAll(x => !x.Entities.Select(e => e.path).Any(p => p.EndsWith(queryPath)));
+                allIssues.RemoveAll(x => !x.Entities.Select(e => e.path).Any(p => p.EndsWith(queryPath)));
             }
 
-            // Dictionary from each entity to its issue
-            IOrderedEnumerable<(Issue.SourceCodeEntity entity, T issue)> entities = 
-                issues.SelectMany(x => x.Entities.Select(e => (entity: e, issue: x)))
-                      .Where(x => x.entity.path.EndsWith(queryPath)).OrderBy(x => x.entity.line);
+            // Mapping from each line to the entities and issues contained therein
+            //FIXME: There may still be issues here if some line range (endLine) overlaps something else
+            Dictionary<int, List<(Issue.SourceCodeEntity entity, Issue issue)>> entities = 
+                allIssues.SelectMany(x => x.Entities.Select(e => (entity: e, issue: x)))
+                      .Where(x => x.entity.path.EndsWith(queryPath))
+                      .OrderBy(x => x.entity.line).GroupBy(x => x.entity.line)
+                      .ToDictionary(x => x.Key, x => x.ToList());
             
             int shift = 0;
-            foreach ((Issue.SourceCodeEntity entity, T issue) in entities)
+            foreach (KeyValuePair<int, List<(Issue.SourceCodeEntity entity, Issue issue)>> lineIssues in entities)
             {
-                issueDictionary.Add(issue.id, issue);
+                lineIssues.Value.ForEach(x => issueDictionary[x.issue.id] = x.issue);
                 
-                (int, int, bool, bool)? contentIndices = GetContentIndices(entity.line, entity.content, shift);
+                // If we have more than one issue in this line, or alternatively
+                // no occurence or more than one occurence of the content within the entity,
+                // we instead fall back to highlighting the whole line, because we have no real way of doing these
+                // kinds of highlights with TextMeshPro.
+                (int, int)? contentIndices = null;
+                if (lineIssues.Value.Count == 1)
+                {
+                    contentIndices = GetContentIndices(lineIssues.Value[0].entity.line, 
+                                                       lineIssues.Value[0].entity.content, shift);
+                }
                 if (contentIndices.HasValue)
                 {
-                    HighlightPart(contentIndices.Value, issue, ref shift);
+                    HighlightPart(contentIndices.Value, lineIssues.Value.Select(x => x.issue).ToList(), ref shift);
                 }
                 else
                 {
                     // Apply highlight to all lines between line and endLine, if endLine is defined
-                    IEnumerable<int> entityLines = entity.endLine == null ? new[] {entity.line} 
-                        : Enumerable.Range(entity.line, (int) entity.endLine - entity.line);
+
+                    int? endLine = lineIssues.Value.Where(x => x.entity.endLine.HasValue).Max(x => x.entity.endLine);
+                    IEnumerable<int> entityLines = !endLine.HasValue ? new[] {lineIssues.Key} 
+                        : Enumerable.Range(lineIssues.Key, endLine.Value - lineIssues.Key);
 
                     foreach (int line in entityLines)
                     {
-                        HighlightPart(GetLineIndices(line), issue, ref shift);
+                        HighlightPart(GetLineIndices(line), lineIssues.Value.Select(x => x.issue).ToList(), ref shift);
                     }
                 }
             }
 
             await UniTask.SwitchToMainThread();
-            TextMesh.text = Text;
-            TextMesh.ForceMeshUpdate();
-            
+            try
+            {
+                TextMesh.text = Text;
+                TextMesh.ForceMeshUpdate();
+            }
+            catch (IndexOutOfRangeException)
+            {
+                //FIXME: Split up TMP into multiple game objects.
+                ShowNotification.Error("File too big", "The file is too big to display any issues, sorry.");
+                return;
+            }
+            finally
+            {
+                firstNotification.Close();
+            }
+
             //TODO: This may as well be implemented as a loading bar, showing continuous progress as we iterate.
-            firstNotification.Close();
-            ShowNotification.Info("Issues loaded", $"{issues.Count} issues have been found for {Title}.");
+            ShowNotification.Info("Issues loaded", $"{allIssues.Count} issues have been found for {Title}.");
 
             #region Local Methods
 
-            void HighlightPart((int startIndex, int endIndex, bool noparseStart, bool noparseEnd) content, 
-                                        T issue, ref int indexShift)
+            void HighlightPart((int richStartIndex, int richEndIndex) content, IList<Issue> issues, 
+                               ref int indexShift)
             {
-                const string MARK = "<mark=#ff000044>";
+                // Limitation: We can only use the color of the first issue, because we can't reliably detect the
+                // order of the entities within a single line. Details for all issues are shown on hover.
+                string MARK = $"<mark=#{ColorUtility.ToHtmlStringRGB(DashboardRetriever.Instance.GetIssueKindColor(issues[0].kind))}33>";
                 const string MARK_CLOSE = "</mark>";
-                string LINK = $"<link=\"{issue.id}\">";
+                string LINK = $"<link=\"{issues.Select(x => x.id).ToArray().IntToString()}\">";
                 const string LINK_CLOSE = "</link>";
-                (int startIndex, int endIndex, bool noparseStart, bool noparseEnd) = content;
-                
+                (int startIndex, int endIndex) = content;
+
+                // These tell us which other tags our indices are contained in
+                bool noparseStart = ContentInTag(startIndex, NOPARSE, NOPARSE_CLOSE);
+                bool noparseEnd = ContentInTag(endIndex, NOPARSE, NOPARSE_CLOSE);
+
                 // We put the closing tag in first, otherwise our endIndex would shift.
-                //TODO: This whole index shift workaround can still be defeated if entities within a line
-                // don't appear in the order of the issue table's rows. This may happen for issues with more than one
-                // occurence in the same file.
                 Text = Text.Insert(endIndex, MARK_CLOSE).Insert(startIndex, MARK)
                            .Insert(endIndex + MARK_CLOSE.Length + MARK.Length, LINK_CLOSE)
                            .Insert(startIndex, LINK);
@@ -301,17 +340,17 @@ namespace SEE.Game.UI.CodeWindow
                 }
             }
 
-            static bool DifferentPaths(ICollection<T> issues)
+            // Returns true iff all issues are on the same path.
+            static bool MatchingPaths(ICollection<Issue> issues)
             {
-                //TODO: Does this also detect different paths within an entity enumerable, not just across issues?
-                HashSet<string> subPaths = new HashSet<string>(issues.First().Entities.Select(e => e.path));
-                return issues.Select(x => x.Entities.Select(e => e.path)).Any(x => !subPaths.SetEquals(x));
+                // Every path in the first issue could be the "right" path, so we try them all.
+                // If every issue has at least one path which matches that one, we can return true.
+                return issues.First().Entities.Select(e => e.path).Any(path => issues.All(x => x.Entities.Any(e => e.path == path)));
             }
             
             // Note that this method will return null if the given content either can't be found at the given line,
             // or if it's found more than once (in which case it's impossible to find out what to highlight).
-            (int richStartIndex, int richEndIndex, bool startNoparse, bool endNoparse)? 
-                GetContentIndices(int line, string content, int indexShift)
+            (int richStartIndex, int richEndIndex)? GetContentIndices(int line, string content, int indexShift)
             {
                 if (content == null)
                 {
@@ -332,12 +371,10 @@ namespace SEE.Game.UI.CodeWindow
                 int richStartIndex = contentInfo[cleanStartIndex].index + indexShift;
                 int richEndIndex = contentInfo[cleanEndIndex].index + indexShift;
 
-                bool startInNoparse = ContentInNoparse(richStartIndex);
-                bool endInNoparse = ContentInNoparse(richEndIndex);
-                return (richStartIndex, richEndIndex, startInNoparse, endInNoparse);
+                return (richStartIndex, richEndIndex);
             }
             
-            (int richStartIndex, int richEndIndex, bool startNoparse, bool endNoparse) GetLineIndices(int line)
+            (int richStartIndex, int richEndIndex) GetLineIndices(int line)
             {
                 List<string> splitText = Text.Split('\n').ToList();
                 string lineContent = splitText[line-1];
@@ -345,8 +382,8 @@ namespace SEE.Game.UI.CodeWindow
                 int lineShift = line == 1 ? 0 : splitText.GetRange(0, line - 1).SelectMany(c => c).Count() + line - 1;
                 int startIndex = lineShift + lineContent.IndexOf("</color>", StringComparison.Ordinal);
                 int endIndex = lineShift + lineContent.Length;
-                
-                return (startIndex, endIndex, ContentInNoparse(startIndex), ContentInNoparse(endIndex));
+
+                return (startIndex, endIndex);
             }
 
             (string cleanLine, IList<TMP_CharacterInfo> lineInfo) GetLineInfo(int line)
@@ -360,9 +397,13 @@ namespace SEE.Game.UI.CodeWindow
                 return (lineContent, contentInfo);
             }
 
-            // Returns whether or not the content at the rich index is in a <noparse> tag (by checking the line it's in)
-            bool ContentInNoparse(int richIndex)
+            // Returns whether or not the content at the rich index is in the given tag (by checking the line it's in)
+            bool ContentInTag(int richIndex, string startTag, string endTag, bool escapeRegex = true)
             {
+                //FIXME: This will not work if used in a file which contains the given tag (for example, this file).
+                // Either "true" XML parsing needs to be used, or an alternative solution must be found,
+                // e.g. removing all content in a <noparse> tag first.
+                
                 string untilContent = "";
                 // This gets the beginning of the line containing the richIndex until the richIndex
                 for (int i = 0; i < richIndex; i++)
@@ -379,8 +420,8 @@ namespace SEE.Game.UI.CodeWindow
                     }
                 }
                 // Content is in <noparse> if the tag has been opened more times than it has been closed
-                return Regex.Matches(untilContent, Regex.Escape(NOPARSE)).Count
-                       > Regex.Matches(untilContent, Regex.Escape(NOPARSE_CLOSE)).Count;
+                return Regex.Matches(untilContent, escapeRegex ? Regex.Escape(startTag) : startTag).Count
+                       > Regex.Matches(untilContent, escapeRegex ? Regex.Escape(endTag) : endTag).Count;
             }
 
             #endregion

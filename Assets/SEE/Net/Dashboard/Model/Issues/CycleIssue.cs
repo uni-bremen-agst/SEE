@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using SEE.Utils;
 using Valve.Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
@@ -97,6 +99,15 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.targetPath = targetPath;
             this.targetLine = targetLine;
             this.targetLinkName = targetLinkName;
+        }
+        
+        public override async UniTask<string> ToDisplayString()
+        {
+            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"CY{id}");
+            return "<style=\"H2\">Cyclic dependency</style>"
+                   + $"\nSource: {sourcePath} ({sourceEntityType}), Line {sourceLine}\n".WrapLines(WRAP_AT)
+                   + $"\nTarget: {targetPath} ({targetEntityType}), Line {targetLine}\n".WrapLines(WRAP_AT)
+                   + $"\n{explanation.WrapLines(WRAP_AT)}";
         }
 
         public override string ToString()
