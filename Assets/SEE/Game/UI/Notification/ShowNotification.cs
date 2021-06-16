@@ -10,7 +10,7 @@ namespace SEE.Game.UI.Notification
     public static class ShowNotification
     {
         /// <summary>
-        /// Default amount of time a notification is shown (in seconds), if not specified any further. 
+        /// Default amount of time a notification is shown (in seconds), if not specified any further.
         /// </summary>
         private const float DEFAULT_DURATION = 10f;
 
@@ -18,12 +18,12 @@ namespace SEE.Game.UI.Notification
         /// Background color for error messages.
         /// </summary>
         private static readonly Color ErrorColor = new Color(0x55/255f, 0x2D/255f, 0x2E/255f);
-        
+
         /// <summary>
         /// Background color for warning messages.
         /// </summary>
         private static readonly Color WarningColor = new Color(0x55/255f, 0x4E/255f, 0x2D/255f);
-        
+
         /// <summary>
         /// Background color for info messages.
         /// </summary>
@@ -59,7 +59,7 @@ namespace SEE.Game.UI.Notification
                 Debug.Log($"{title}: {description}\n");
             }
         }
-        
+
         /// <summary>
         /// Displays a warning message to the user as a notification.
         /// </summary>
@@ -75,7 +75,7 @@ namespace SEE.Game.UI.Notification
                 Debug.LogWarning($"{title}: {description}\n");
             }
         }
-        
+
         /// <summary>
         /// Displays an error message to the user as a notification.
         /// </summary>

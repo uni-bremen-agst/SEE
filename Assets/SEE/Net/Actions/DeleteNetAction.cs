@@ -1,6 +1,4 @@
-using SEE.Controls;
 using SEE.Game;
-using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Net
@@ -21,7 +19,7 @@ namespace SEE.Net
         /// <summary>
         /// Creates a new DeleteNetAction.
         /// </summary>
-        /// <param name="gameObjectID">the unique name of the gameObject of a node or edge 
+        /// <param name="gameObjectID">the unique name of the gameObject of a node or edge
         /// that has to be deleted</param>
         public DeleteNetAction(string gameObjectID) : base()
         {
@@ -47,20 +45,7 @@ namespace SEE.Net
                 GameObject gameObject = GameObject.Find(GameObjectID);
                 if (gameObject != null)
                 {
-                    if (gameObject.HasNodeRef())
-                    {
-                        GameNodeAdder.Remove(gameObject);
-                        // gameObject is not actually destroyed because we are moving it to the garbage can.
-                        PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.MoveNodeToGarbage(gameObject.AllAncestors()));
-                        Portal.SetInfinitePortal(gameObject);
-                    }
-                    else if (gameObject.HasEdgeRef())
-                    {
-                        DeletionAnimation.HideEdge(gameObject);
-                        GameEdgeAdder.Remove(gameObject);
-                        // Note: gameObject is not actually destroyed because it will be
-                        // moved to the garbage can from where it can be restored.
-                    }
+                    GameElementDeleter.Delete(gameObject);
                 }
                 else
                 {

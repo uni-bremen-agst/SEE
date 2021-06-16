@@ -15,6 +15,11 @@ namespace SEE.Game.Avatars
     public class PersonalAssistantBrain : MonoBehaviour
     {
         /// <summary>
+        /// If true, the welcome message will be spoken.
+        /// </summary>
+        public bool PlayWelcome = false;
+
+        /// <summary>
         /// The audio source used to say the text. Will be retrieved from the character.
         /// </summary>
         private AudioSource audioSource;
@@ -57,8 +62,11 @@ namespace SEE.Game.Avatars
             else
             {
                 isTalking = Animator.StringToHash("IsTalking");
-                // We want to start the welcome message 3 seconds after the game has started.
-                Invoke(nameof(Welcome), 3);
+                if (PlayWelcome)
+                {
+                    // We want to start the welcome message 3 seconds after the game has started.
+                    Invoke(nameof(Welcome), 3);
+                }
             }
         }
 
@@ -143,7 +151,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Speaks the given <paramref name="text"/>. The text can be annotated
         /// in Speech Synthesis Markup Language (SSML).
-        /// 
+        ///
         /// A female US English voice will be used if available.
         /// </summary>
         /// <param name="text">text to be spoken</param>
@@ -171,7 +179,7 @@ namespace SEE.Game.Avatars
 
         /// <summary>
         /// Callback to reset the state of the animator to idle. It will
-        /// be registered by <see cref="Say"/> and be called when the text 
+        /// be registered by <see cref="Say"/> and be called when the text
         /// if completely spoken.
         /// </summary>
         /// <param name="message">a message from RT-Voice (currently not used)</param>
@@ -241,9 +249,9 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// A brief information about SEE and its developers.
         /// </summary>
-        private const string goodByeText = 
+        private const string goodByeText =
               "It was a pleasure to meet you. "
             + "I hope to see you in the coming winter semester again in my team. "
-            + "<emphasis level=\"strong\">Good bye!</emphasis>";        
+            + "<emphasis level=\"strong\">Good bye!</emphasis>";
     }
 }
