@@ -1,15 +1,17 @@
 ﻿using DG.Tweening;
+using SEE.GO;
+using SEE.Utils;
 using System.Collections;
 using UnityEngine;
 
 namespace SEE.Game
 {
     /// <summary>
-    /// Provides fading in and out for game objects. There are static as well instance methods
+    /// Provides fading in and out for game objects. There are static as well as instance methods
     /// for the same purpose. If one wants to run the fading animations as a coroutine,
     /// the caller must be a MonoBehaviour. If clients of this class are MonoBehaviours
     /// they can run their <see cref="StartCoroutine"/> with the static methods as parameters.
-    /// For situations in which a client of this class is not a MonoBehaviour, why we derive
+    /// For situations in which a client of this class is not a MonoBehaviour, we derive
     /// from that MonoBehaviour here. This way we can offer convenient static methods that
     /// create an instance of this class and attach this as a component to the game object to
     /// be animated. When the animation has finished that instance self destructs.
@@ -178,6 +180,8 @@ namespace SEE.Game
                 case Fading.FadingOut:
                     StartCoroutine(FadeOut(gameObject, SelfDestruct));
                     break;
+                default:
+                    throw new System.NotImplementedException($"Unexpected case {fading} for type {nameof(Fading)}.");
             }
         }
 
@@ -192,28 +196,13 @@ namespace SEE.Game
             if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
             {
                 // Colors of lines must be handeled differently from other game objects.
-                lineRenderer.startColor = InvertedColor(lineRenderer.startColor);
-                lineRenderer.endColor = InvertedColor(lineRenderer.endColor);
+                lineRenderer.startColor = lineRenderer.startColor.Invert();
+                lineRenderer.endColor = lineRenderer.endColor.Invert();
             }
-            else if (gameObject.TryGetComponent(out Renderer renderer))
+            else if (gameObject.TryGetComponentOrLog(out Renderer renderer))
             {
-                renderer.material.DOColor(InvertedColor(renderer.material.color), inversionTime);
+                renderer.material.DOColor(renderer.material.color.Invert(), inversionTime);
             }
-            else
-            {
-                Debug.LogError($"{gameObject.name} has no renderer.\n");
-            }
-        }
-
-        /// <summary>
-        /// Returns the inversion of <paramref name="color"/>.
-        /// </summary>
-        /// <param name="color">color to be inverted</param>
-        /// <returns>inverted color</returns>
-        private static Color InvertedColor(Color color)
-        {
-            Color.RGBToHSV(color, out float H, out float S, out float V);
-            return Color.HSVToRGB((H + 0.5f) % 1f, S, V);
         }
 
         /// <summary>
@@ -249,15 +238,11 @@ namespace SEE.Game
         /// should have after <paramref name="animationDuration"/> seconds</param>
         private static void Fade(GameObject gameObject, float animationDuration, float alpha)
         {
-            if (gameObject.TryGetComponent(out Renderer renderer))
+            if (gameObject.TryGetComponentOrLog(out Renderer renderer))
             {
                 // Note: the material must use Rendering Mode "Transparent", otherwise
                 // the following call has no effect.
                 renderer.material.DOFade(alpha, animationDuration);
-            }
-            else
-            {
-                Debug.LogError($"{gameObject.name} has no renderer.\n");
             }
         }
     }

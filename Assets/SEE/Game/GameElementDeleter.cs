@@ -9,17 +9,26 @@ namespace SEE.Game
     /// <summary>
     /// Allows to delete nodes and edges.
     /// </summary>
-    class GameElementDeleter
+    internal class GameElementDeleter
     {
         /// <summary>
-        /// Deletes given <paramref GameObject="selectedObject"/> assumed to be either an
-        /// edge or node. If it represents a node, the incoming and outgoing edges and
-        /// its ancestors will be removed, too. For the possibility of an undo, the deleted objects will be saved.
+        /// Deletes given  <paramref name="deletedObject"/> assumed to be either an
+        /// edge or node. If it represents a node, its ancestors and any edges related
+        /// to those will be removed, too. If it is an edge, only that edge is deleted.
+        ///
+        /// Note: The objects are not actually destroyed. They are just marked as deleted
+        /// by way of <see cref="GameObjectFader"/>. That means to let them blink and
+        /// fade out and eventually be set inactive.
         ///
         /// Precondition: <paramref name="deletedObject"/> != null.
         /// </summary>
-        /// <param name="deletedObject">selected GameObject that along with its children should be removed</param>
-        /// <returns>true if <paramref name="deletedObject"/> was actually deleted</returns>
+        /// <param name="deletedObject">the game object that along with its ancestors and
+        /// their edges should be removed</param>
+        /// <returns>all ancestors of <paramref name="deletedObject"/> and their incoming
+        /// and outgoing edges marked as deleted along with <paramref name="deletedObject"/></returns>
+        /// <exception cref="Exception">thrown if <paramref name="deletedObject"/> is a root</exception>
+        /// <exception cref="ArgumentException">thrown if <paramref name="deletedObject"/> is
+        /// neither a node nor an edge</exception>
         public static ISet<GameObject> Delete(GameObject deletedObject)
         {
             if (deletedObject.CompareTag(Tags.Edge))
@@ -32,7 +41,6 @@ namespace SEE.Game
             {
                 if (deletedObject.GetNode().IsRoot())
                 {
-                    // FIXME: We need to throw an exception or show a user notification.
                     throw new Exception("A root shall not be deleted.\n");
                 }
                 else
@@ -49,9 +57,21 @@ namespace SEE.Game
             }
         }
 
-        private static ISet<GameObject> DeleteTree(GameObject deletedObject)
+        /// <summary>
+        /// Deletes and returns all game objects representing nodes or edges
+        /// of the node tree rooted by <paramref name="root"/>. The nodes
+        /// contained in this tree are the transitive ancestors of <paramref name="root"/>.
+        /// The edges in this tree are those whose source or target node
+        /// is contained in the tree.
+        ///
+        /// Note: The result consists of both nodes and edges.
+        /// </summary>
+        /// <param name="root">the root of the tree to be deleted</param>
+        /// <returns>all ancestors of <paramref name="root"/> and their incoming
+        /// and outgoing edges</returns>
+        private static ISet<GameObject> DeleteTree(GameObject root)
         {
-            IList<GameObject> ancestors = deletedObject.AllAncestors();
+            IList<GameObject> ancestors = root.AllAncestors();
             ISet<GameObject> result = new HashSet<GameObject>(ancestors);
 
             // FIXME: This may be an expensive operation as it iterates over all game objects in the scene.
@@ -84,25 +104,48 @@ namespace SEE.Game
             return result;
         }
 
+        /// <summary>
+        /// Sets <paramref name="gameObject"/> inactive.
+        /// </summary>
+        /// <param name="gameObject">object to be set inactive</param>
         private static void SetInactive(GameObject gameObject)
         {
             gameObject.SetActive(false);
         }
 
+        /// <summary>
+        /// Sets <paramref name="gameObject"/> active.
+        /// </summary>
+        /// <param name="gameObject">object to be set active</param>
         private static void SetActive(GameObject gameObject)
         {
             gameObject.SetActive(true);
         }
 
-        public static void Delete(ISet<GameObject> implicitlyDeletedNodesAndEdges)
+        /// <summary>
+        /// Marks all elements in <paramref name="nodesOrEdges"/> by way of
+        /// <see cref="GameObjectFader"/> as deleted. That means to let
+        /// them blink and fade out and eventually be set inactive.
+        ///
+        /// Note: The objects are not actually destroyed.
+        /// </summary>
+        /// <param name="nodesOrEdges">nodes and edge to be marked as deleted</param>
+        public static void Delete(ISet<GameObject> nodesOrEdges)
         {
-            foreach (GameObject nodeOrEdge in implicitlyDeletedNodesAndEdges)
+            foreach (GameObject nodeOrEdge in nodesOrEdges)
             {
                 GameObjectFader.FadingOut(nodeOrEdge, SetInactive);
             }
-
         }
 
+        /// <summary>
+        /// Marks all elements in <paramref name="nodesOrEdges"/> by way of
+        /// <see cref="GameObjectFader"/> as alive again. That means to let
+        /// them be set active, fade in and blink.
+        ///
+        /// Assumption: The objects were set inactive.
+        /// </summary>
+        /// <param name="nodesOrEdges">nodes and edge to be marked as alive again</param>
         public static void Revive(ISet<GameObject> implicitlyDeletedNodesAndEdges)
         {
             foreach (GameObject nodeOrEdge in implicitlyDeletedNodesAndEdges)
