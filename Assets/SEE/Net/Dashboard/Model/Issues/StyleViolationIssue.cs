@@ -77,8 +77,8 @@ namespace SEE.Net.Dashboard.Model.Issues
             string explanation = await DashboardRetriever.Instance.GetIssueDescription($"SV{id}");
             return $"<style=\"H2\">{message.WrapLines(WRAP_AT - WRAP_AT/4)}</style>\n{explanation.WrapLines(WRAP_AT)}";
         }
-
-        public override IssueKind kind => IssueKind.SV;
+        
+        public override string IssueKind => "SV";
 
         public override IEnumerable<SourceCodeEntity> Entities => new[]
         {

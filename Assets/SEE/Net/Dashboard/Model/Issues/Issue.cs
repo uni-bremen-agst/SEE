@@ -23,51 +23,6 @@ namespace SEE.Net.Dashboard.Model.Issues
         }
 
         /// <summary>
-        /// The issue kind.
-        /// </summary>
-        public enum IssueKind
-        {
-            // Note: The abbreviations have to be used here instead of the full name, otherwise serialization
-            // won't work.
-
-            /// <summary>
-            /// Special fallback value, used if issue kind could not be determined.
-            /// </summary>
-            Unknown,
-
-            /// <summary>
-            /// Architecture violations.
-            /// </summary>
-            AV,
-
-            /// <summary>
-            /// Clones.
-            /// </summary>
-            CL,
-
-            /// <summary>
-            /// Cycles.
-            /// </summary>
-            CY,
-
-            /// <summary>
-            /// Dead Entities.
-            /// </summary>
-            DE,
-
-            /// <summary>
-            /// Metric Violations.
-            /// </summary>
-            MV,
-
-            /// <summary>
-            /// Style Violations.
-            /// </summary>
-            SV
-        }
-
-
-        /// <summary>
         /// A kind-wide Id identifying the issue across analysis versions
         /// </summary>
         [JsonProperty(Required = Required.Always)]
@@ -137,7 +92,7 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.comments = comments;
             this.owners = owners;
         }
-        
+
         /// <summary>
         /// Number of characters to wrap the string in <see cref="ToDisplayString"/> at.
         /// </summary>
@@ -149,6 +104,12 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// </summary>
         /// <returns>A string describing this issue which is suitable for display in a TextMeshPro</returns>
         public abstract UniTask<string> ToDisplayString();
+
+        /// <summary>
+        /// The kind of issue this is.
+        /// Usually an abbreviation of the type of the issue, e.g. MV for Metric Violation Issues.
+        /// </summary>
+        public abstract string IssueKind { get; }
 
         /// <summary>
         /// An issue tag as returned by the Issue-List API.
@@ -240,11 +201,6 @@ namespace SEE.Net.Dashboard.Model.Issues
         // In this region are properties not defined in the Dashboard spec.
         // These will either be derived from existing fields or defined statically.
         #region Additional Properties
-        
-        /// <summary>
-        /// The kind of issue this is.
-        /// </summary>
-        public abstract IssueKind kind { get; }
 
         /// <summary>
         /// The entities this issue references.

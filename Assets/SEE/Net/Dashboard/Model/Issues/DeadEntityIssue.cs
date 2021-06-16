@@ -65,7 +65,7 @@ namespace SEE.Net.Dashboard.Model.Issues
                    + $"\n{explanation.WrapLines(WRAP_AT)}";
         }
 
-        public override IssueKind kind => IssueKind.DE;
+        public override string IssueKind => "DE";
 
         public override IEnumerable<SourceCodeEntity> Entities => new[]
         {

@@ -124,8 +124,8 @@ namespace SEE.Net.Dashboard.Model.Issues
                    + $"\nActual: <b>{value}</b>{minimum}{maximum}"
                    + $"\n{explanation.WrapLines(WRAP_AT)}";
         }
-
-        public override IssueKind kind => IssueKind.MV;
+        
+        public override string IssueKind => "MV";
 
         public override IEnumerable<SourceCodeEntity> Entities => new[]
         {

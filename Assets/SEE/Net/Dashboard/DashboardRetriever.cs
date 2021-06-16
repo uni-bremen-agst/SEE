@@ -279,22 +279,21 @@ namespace SEE.Net.Dashboard
         }
 
         /// <summary>
-        /// Returns the color for the given issue kind.
+        /// Returns the color for the given issue, based on its type.
         /// </summary>
-        /// <param name="issueKind">The issue kind whose color to return.</param>
-        /// <returns>The color for the given issue kind.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">If the given issue kind is invalid.</exception>
-        public Color GetIssueKindColor(Issue.IssueKind issueKind) =>
-            issueKind switch
+        /// <param name="issue">The issue whose color to return.</param>
+        /// <returns>The color for the given issue.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">If the type of the given issue is invalid.</exception>
+        public Color GetIssueColor(Issue issue) =>
+            issue switch
             {
-                Issue.IssueKind.AV => ArchitectureViolationIssueColor,
-                Issue.IssueKind.CL => CloneIssueColor,
-                Issue.IssueKind.CY => CycleIssueColor,
-                Issue.IssueKind.DE => DeadEntityIssueColor,
-                Issue.IssueKind.MV => MetricViolationIssueColor,
-                Issue.IssueKind.SV => StyleViolationIssueColor,
-                Issue.IssueKind.Unknown => Color.gray,
-                _ => throw new ArgumentOutOfRangeException(nameof(issueKind), issueKind, "Unknown issue kind!")
+                ArchitectureViolationIssue _ => ArchitectureViolationIssueColor,
+                CloneIssue _ => CloneIssueColor,
+                CycleIssue _ => CycleIssueColor,
+                DeadEntityIssue _ => DeadEntityIssueColor,
+                MetricViolationIssue _ => MetricViolationIssueColor,
+                StyleViolationIssue _ => StyleViolationIssueColor,
+                _ => throw new ArgumentOutOfRangeException(nameof(issue), issue, "Unknown issue kind!")
             };
 
         /// <summary>
