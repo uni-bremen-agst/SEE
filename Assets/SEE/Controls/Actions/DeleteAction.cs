@@ -63,7 +63,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Deletes all objects marked as deletec by this action (i.e., set inactive)
+        /// Deletes all objects marked as deleted by this action (i.e., set inactive)
         /// for good if action was actually completed.
         /// </summary>
         ~DeleteAction()
