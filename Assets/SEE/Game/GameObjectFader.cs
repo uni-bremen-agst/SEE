@@ -206,7 +206,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns the inverted of <paramref name="color"/>.
+        /// Returns the inversion of <paramref name="color"/>.
         /// </summary>
         /// <param name="color">color to be inverted</param>
         /// <returns>inverted color</returns>
