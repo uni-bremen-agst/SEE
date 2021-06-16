@@ -90,7 +90,7 @@ namespace SEE.Controls.Actions
         /// Contains all implicitly deleted nodes and edges as a consequence of the deletion
         /// of one particular selected game object (in <see cref="Update"/>).
         ///
-        /// If an edge is deleted. this set will contain only that deleted edge.
+        /// If an edge is deleted, this set will contain only that deleted edge.
         /// If a node is deleted, the whole node subtree rooted by the selected
         /// node including edges whose source or target is contained in the subtree
         /// are deleted and contained in this set. This set will always include the
