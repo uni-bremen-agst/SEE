@@ -242,14 +242,14 @@ namespace SEE.Game.UI.CodeWindow
 
             // Mapping from each line to the entities and issues contained therein
             //FIXME: There may still be issues here if some line range (endLine) overlaps something else
-            Dictionary<int, List<(Issue.SourceCodeEntity entity, Issue issue)>> entities = 
+            Dictionary<int, List<(SourceCodeEntity entity, Issue issue)>> entities = 
                 allIssues.SelectMany(x => x.Entities.Select(e => (entity: e, issue: x)))
                       .Where(x => x.entity.path.EndsWith(queryPath))
                       .OrderBy(x => x.entity.line).GroupBy(x => x.entity.line)
                       .ToDictionary(x => x.Key, x => x.ToList());
             
             int shift = 0;
-            foreach (KeyValuePair<int, List<(Issue.SourceCodeEntity entity, Issue issue)>> lineIssues in entities)
+            foreach (KeyValuePair<int, List<(SourceCodeEntity entity, Issue issue)>> lineIssues in entities)
             {
                 lineIssues.Value.ForEach(x => issueDictionary[x.issue.id] = x.issue);
                 
@@ -345,7 +345,8 @@ namespace SEE.Game.UI.CodeWindow
             {
                 // Every path in the first issue could be the "right" path, so we try them all.
                 // If every issue has at least one path which matches that one, we can return true.
-                return issues.First().Entities.Select(e => e.path).Any(path => issues.All(x => x.Entities.Any(e => e.path == path)));
+                return issues.First().Entities.Select(e => e.path)
+                             .Any(path => issues.All(x => x.Entities.Any(e => e.path == path)));
             }
             
             // Note that this method will return null if the given content either can't be found at the given line,
