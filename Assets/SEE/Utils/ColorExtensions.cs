@@ -17,7 +17,7 @@ namespace SEE.Utils
         {
             return Color.Lerp(color, Color.white, 0.5f); // To lighten by 50 %
         }
-        
+
         /// <summary>
         /// Returns given <paramref name="color"/> darkened by 50%.
         /// </summary>
@@ -45,7 +45,7 @@ namespace SEE.Utils
         public static Color IdealTextColor(this Color backgroundColor)
         {
             const int nThreshold = 105;
-            int bgDelta = Convert.ToInt32((backgroundColor.r * 255 * 0.299) + (backgroundColor.g * 255 * 0.587) 
+            int bgDelta = Convert.ToInt32((backgroundColor.r * 255 * 0.299) + (backgroundColor.g * 255 * 0.587)
                                                                             + (backgroundColor.b * 255 * 0.114));
             return (255 - bgDelta < nThreshold) ? Color.black : Color.white;
         }
@@ -59,6 +59,10 @@ namespace SEE.Utils
         public static Color Invert(this Color color)
         {
             return new Color(1f - color.r, 1f - color.g, 1f - color.b);
+
+            // An alternative approach to invert the color is as follows:
+            // Color.RGBToHSV(color, out float H, out float S, out float V);
+            // return Color.HSVToRGB((H + 0.5f) % 1f, S, V);
         }
     }
 }
