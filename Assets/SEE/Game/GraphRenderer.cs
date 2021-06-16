@@ -148,9 +148,9 @@ namespace SEE.Game
         /// <summary>
         /// Creates and returns a new edge between <paramref name="from"/> and <paramref name="to"/>
         /// based on the current settings. A new edge will be added to the underlying graph, too.
-        /// 
+        ///
         /// Note: A default edge layout will be used if no edge layout was chosen.
-        /// 
+        ///
         /// Precondition: <paramref name="from"/> and <paramref name="to"/> must have a valid
         /// node reference. The corresponding graph nodes must be in the same graph.
         /// </summary>
@@ -163,11 +163,11 @@ namespace SEE.Game
         public GameObject DrawEdge(GameObject from, GameObject to, string id)
         {
             Node fromNode = from.GetNode();
-            Node toNode = to.GetNode();
             if (fromNode == null)
             {
                 throw new Exception($"The source {from.name} of the edge is not contained in any graph.");
             }
+            Node toNode = to.GetNode();
             if (toNode == null)
             {
                 throw new Exception($"The target {to.name} of the edge is not contained in any graph.");
@@ -233,7 +233,7 @@ namespace SEE.Game
             InteractionDecorator.PrepareForInteraction(resultingEdge);
             // The edge becomes a child of the root node of the game-node hierarchy
             GameObject codeCity = SceneQueries.GetCodeCity(from.transform).gameObject;
-            GameObject rootNode = SceneQueries.GetCityRootNode(codeCity).gameObject;                                        
+            GameObject rootNode = SceneQueries.GetCityRootNode(codeCity).gameObject;
             resultingEdge.transform.SetParent(rootNode.transform);
             // The portal of the new edge is inherited from the codeCity.
             Portal.SetPortal(root: codeCity, gameObject: resultingEdge);
@@ -551,9 +551,9 @@ namespace SEE.Game
         /// <summary>
         /// Applies the given <paramref name="layout"/> to the given <paramref name="gameNode"/>,
         /// i.e., sets its size and position according to the <paramref name="layout"/> and
-        /// possibly rotates it. The game node can represent a leaf or inner node of the node 
+        /// possibly rotates it. The game node can represent a leaf or inner node of the node
         /// hierarchy.
-        /// 
+        ///
         /// Precondition: <paramref name="gameNode"/> must have NodeRef component referencing a
         /// graph node.
         /// </summary>
@@ -739,19 +739,19 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Creates the sublayoutnodes for a given set of nodes 
+        /// Creates the sublayoutnodes for a given set of nodes
         /// </summary>
         /// <param name="nodes">the nodes, which should be layouted as sublayouts</param>
         /// <returns>a list with sublayout nodes</returns>
         private List<SublayoutNode> CreateSublayoutNodes(IReadOnlyCollection<Node> nodes) =>
-            (from dir in settings.coseGraphSettings.ListInnerNodeToggle 
-             where dir.Value 
-             select dir.Key into name 
-             where settings.coseGraphSettings.InnerNodeLayout.ContainsKey(name) 
-                   && settings.coseGraphSettings.InnerNodeShape.ContainsKey(name) 
-             let matches = nodes.Where(i => i.ID.Equals(name)) 
-             where matches.Any() 
-             select new SublayoutNode(matches.First(), settings.coseGraphSettings.InnerNodeShape[name], 
+            (from dir in settings.coseGraphSettings.ListInnerNodeToggle
+             where dir.Value
+             select dir.Key into name
+             where settings.coseGraphSettings.InnerNodeLayout.ContainsKey(name)
+                   && settings.coseGraphSettings.InnerNodeShape.ContainsKey(name)
+             let matches = nodes.Where(i => i.ID.Equals(name))
+             where matches.Any()
+             select new SublayoutNode(matches.First(), settings.coseGraphSettings.InnerNodeShape[name],
                                       settings.coseGraphSettings.InnerNodeLayout[name])).ToList();
 
         /// <summary>
@@ -813,7 +813,7 @@ namespace SEE.Game
         /// <summary>
         /// If <paramref name="graph"/> has a single root, nothing is done. Otherwise
         /// an artifical root is created and added to both the <paramref name="graph"/>
-        /// and <paramref name="nodeMap"/> (and there mapped onto a newly created game 
+        /// and <paramref name="nodeMap"/> (and there mapped onto a newly created game
         /// object for inner nodes). All true roots of <paramref name="graph"/> will
         /// become children of this artificial root.
         /// Note: This method is the counterpart to RemoveRootIfNecessary.
@@ -826,7 +826,7 @@ namespace SEE.Game
         private Node AddRootIfNecessary(Graph graph, IDictionary<Node, GameObject> nodeMap)
         {
             // Note: Because this method is called only when a hierarchical layout is to
-            // be applied (and then both leaves and inner nodes were added to nodeMap), we 
+            // be applied (and then both leaves and inner nodes were added to nodeMap), we
             // could traverse through graph.GetRoots() or nodeMaps.Keys. It would not make
             // a difference. If -- for any reason --, we decide not to create a game object
             // for some inner nodes, we should rather iterate on nodeMaps.Keys.
@@ -861,13 +861,13 @@ namespace SEE.Game
         /// <param name="root">artifical root node to be removed (created by AddRootIfNecessary) or null;
         /// will be null afterward</param>
         /// <param name="graph">graph where <paramref name="root"/> should be removed/param>
-        /// <param name="nodeMap">mapping of nodes onto game objects from which to remove 
+        /// <param name="nodeMap">mapping of nodes onto game objects from which to remove
         /// <paramref name="root"/></param>
         private void RemoveRootIfNecessary(ref Node root, Graph graph, Dictionary<Node, GameObject> nodeMap, ICollection<GameNode> layoutNodes)
         {
-            return; 
-            // FIXME: temporarily disabled because the current implementation of the 
-            // custom shader for culling all city objects falling off the plane assumes 
+            return;
+            // FIXME: temporarily disabled because the current implementation of the
+            // custom shader for culling all city objects falling off the plane assumes
             // that there is exactly one root node of the graph.
 
             //if (root is object)
@@ -952,10 +952,10 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Determines the new <paramref name="centerPosition"/> and <paramref name="scale"/> for the given 
+        /// Determines the new <paramref name="centerPosition"/> and <paramref name="scale"/> for the given
         /// <paramref name="plane"/> so that it would enclose all given <paramref name="gameNodes"/>
         /// and the y co-ordinate and the height of <paramref name="plane"/> would remain the same.
-        /// 
+        ///
         /// Precondition: <paramref name="plane"/> is a plane game object.
         /// </summary>
         /// <param name="plane">a plane game object to be adjusted</param>
@@ -993,7 +993,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Adds decoration for the given <paramref name="gameNode"/> with the global settings 
+        /// Adds decoration for the given <paramref name="gameNode"/> with the global settings
         /// for inner node kinds and nodelayout.
         /// </summary>
         /// <param name="gameNode"></param>
@@ -1003,7 +1003,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Adds decoration for the given list of <paramref name="gameNodes"/> with the global settings 
+        /// Adds decoration for the given list of <paramref name="gameNodes"/> with the global settings
         /// for inner node kinds and nodelayout.
         /// </summary>
         /// <param name="gameNodes">a list with gamenode objects</param>
@@ -1202,11 +1202,11 @@ namespace SEE.Game
 
         /// <summary>
         /// Create and returns a new game object for representing the given <paramref name="node"/>.
-        /// The exact kind of representation depends upon the leaf-node factory. The node is 
-        /// scaled according to the WidthMetric, HeightMetric, and DepthMetric of the current settings. 
+        /// The exact kind of representation depends upon the leaf-node factory. The node is
+        /// scaled according to the WidthMetric, HeightMetric, and DepthMetric of the current settings.
         /// Its style is determined by LeafNodeStyleMetric (linerar interpolation of a color gradient).
         /// The <paramref name="node"/> is attached to that new game object via a NodeRef component.
-        /// 
+        ///
         /// Precondition: <paramref name="node"/> must be a leaf node in the node hierarchy.
         /// </summary>
         /// <param name="node">leaf node</param>
@@ -1279,10 +1279,10 @@ namespace SEE.Game
         /// Let M be the metric selected for the style metric (the style metric
         /// for leaves if <paramref name="node"/> is a leaf or for an inner node
         /// otherwise). M can be either the name of a node metric or a number.
-        /// If M is the name of a node metric, C is the normalized metric value of 
+        /// If M is the name of a node metric, C is the normalized metric value of
         /// <paramref name="node"/> for the attribute chosen for the style
         /// and metricMaximum is the maximal value of the style metric. If M is
-        /// instead a number, C is that value -- clamped into [0, S] where S is 
+        /// instead a number, C is that value -- clamped into [0, S] where S is
         /// the maximal number of styles available) and metricMaximum is S.
         /// </summary>
         /// <param name="node">node for which to determine the style index</param>
@@ -1347,7 +1347,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Returns the center of the roof of the given <paramref name="gameNode"/>.
-        /// 
+        ///
         /// Precondition: <paramref name="gameNode"/> must have been created by this graph renderer.
         /// </summary>
         /// <param name="gameNode">game node for which to determine the roof position</param>
@@ -1373,7 +1373,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Returns the scale of the given <paramref name="gameNode"/>.
-        /// 
+        ///
         /// Precondition: <paramref name="gameNode"/> must have been created by this graph renderer.
         /// </summary>
         /// <param name="gameNode"></param>
@@ -1399,7 +1399,7 @@ namespace SEE.Game
         /// <summary>
         /// Adjusts the height (y axis) of the given <paramref name="gameNode"/> according
         /// to the InnerNodeHeightMetric.
-        /// 
+        ///
         /// Precondition: <paramref name="gameNode"/> must denote an inner node created
         /// by innerNodeFactory.
         /// </summary>
@@ -1447,9 +1447,9 @@ namespace SEE.Game
 
         /// <summary>
         /// Adjusts the scale of the given leaf <paramref name="gameNode"/> according
-        /// to the metric values of the <paramref name="node"/> attached to 
-        /// <paramref name="gameNode"/>. 
-        /// The scale of a leaf is determined by the node's width, height, and depth 
+        /// to the metric values of the <paramref name="node"/> attached to
+        /// <paramref name="gameNode"/>.
+        /// The scale of a leaf is determined by the node's width, height, and depth
         /// metrics (which are determined by the settings).
         /// Precondition: A graph node is attached to <paramref name="gameNode"/>
         /// and has the width, height, and depth metrics set and is a leaf.
@@ -1492,7 +1492,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns the scale of the given <paramref name="node"/> as requested by the user's 
+        /// Returns the scale of the given <paramref name="node"/> as requested by the user's
         /// settings, i.e., what the use specified for the width, height, and depth of nodes.
         /// </summary>
         /// <param name="node"></param>
@@ -1564,11 +1564,11 @@ namespace SEE.Game
         /// <summary>
         /// Creates a new game object for an inner node using innerNodeFactory.
         /// The inner <paramref name="node"/> is attached to that new game object
-        /// via a NodeRef component. The style and height of the resulting game 
-        /// object are adjusted according to the selected InnerNodeStyleMetric 
+        /// via a NodeRef component. The style and height of the resulting game
+        /// object are adjusted according to the selected InnerNodeStyleMetric
         /// and InnerNodeHeightMetric, respectively. The other scale dimensions
         /// are not changed.
-        /// 
+        ///
         /// Precondition: <paramref name="node"/> must be an inner node of the node
         /// hierarchy.
         /// </summary>
