@@ -10,7 +10,7 @@ namespace SEE.Net.Dashboard.Model.Issues
     /// Contains information about an issue in the source code.
     /// </summary>
     [Serializable]
-    public abstract class Issue
+    public abstract partial class Issue
     {
         // A note: Due to how the JSON serializer works with inheritance, fields in here can't be readonly.
 
@@ -197,56 +197,10 @@ namespace SEE.Net.Dashboard.Model.Issues
             }
         }
         
-        
-        // In this region are properties not defined in the Dashboard spec.
-        // These will either be derived from existing fields or defined statically.
-        #region Additional Properties
-
         /// <summary>
         /// The entities this issue references.
         /// </summary>
         public abstract IEnumerable<SourceCodeEntity> Entities { get; }
-
-        /// <summary>
-        /// An entity in the source code, consisting of a <see cref="path"/>, a <see cref="line"/>,
-        /// an optional <see cref="endLine"/> and an optional <see cref="content"/>.
-        /// The <see cref="content"/> will usually be the "entity" as described in the Axivion Dashboard documentation.
-        /// </summary>
-        public class SourceCodeEntity
-        {
-            /// <summary>
-            /// The path of the file of the entity.
-            /// </summary>
-            public readonly string path;
-            
-            /// <summary>
-            /// The line number of the entity.
-            /// If <see cref="endLine"/> is specified, this will be the beginning of the line range of this entity.
-            /// </summary>
-            public readonly int line;
-            
-            /// <summary>
-            /// The optional end line number of the entity.
-            /// </summary>
-            public readonly int? endLine;
-            
-            /// <summary>
-            /// The optional content of the entity.
-            /// </summary>
-            public readonly string content;
-
-            public SourceCodeEntity(string path, int line, int? endLine = null, string content = null)
-            {
-                this.path = path ?? throw new ArgumentNullException(nameof(path));
-                this.line = line;
-                this.endLine = endLine;
-                this.content = string.IsNullOrEmpty(content) ? null : content;
-            }
-            
-            
-        } 
-        
-        #endregion
 
     }
 }
