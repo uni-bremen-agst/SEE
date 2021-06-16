@@ -119,8 +119,8 @@ namespace SEE.Net.Dashboard.Model.Issues
                    + $"{nameof(rightLength)}: {rightLength}, {nameof(rightWeight)}: {rightWeight}";
         }
 
-        public override IssueKind kind => IssueKind.CL;
-
+        public override string IssueKind => "CL";
+        
         public override IEnumerable<SourceCodeEntity> Entities => new[]
         {
             new SourceCodeEntity(leftPath, leftLine, leftEndLine),

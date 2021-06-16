@@ -110,7 +110,7 @@ namespace SEE.Net.Dashboard
             // add non-nullable parameters
             Dictionary<string, string> parameters = new Dictionary<string, string>
             {
-                ["kind"] = new T().kind.ToString(),
+                ["kind"] = new T().IssueKind,
                 ["start"] = start,
                 ["end"] = end,
                 ["state"] = state.ToString(),

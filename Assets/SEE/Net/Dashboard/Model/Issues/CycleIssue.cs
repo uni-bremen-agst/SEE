@@ -120,8 +120,8 @@ namespace SEE.Net.Dashboard.Model.Issues
                    + $" {nameof(targetLinkName)}: {targetLinkName}";
         }
 
-        public override IssueKind kind => IssueKind.CY;
-
+        public override string IssueKind => "CY";
+        
         public override IEnumerable<SourceCodeEntity> Entities => new[]
         {
             new SourceCodeEntity(sourcePath, sourceLine, null, sourceEntity),

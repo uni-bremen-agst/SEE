@@ -309,7 +309,7 @@ namespace SEE.Game.UI.CodeWindow
             {
                 // Limitation: We can only use the color of the first issue, because we can't reliably detect the
                 // order of the entities within a single line. Details for all issues are shown on hover.
-                string MARK = $"<mark=#{ColorUtility.ToHtmlStringRGB(DashboardRetriever.Instance.GetIssueKindColor(issues[0].kind))}33>";
+                string MARK = $"<mark=#{ColorUtility.ToHtmlStringRGB(DashboardRetriever.Instance.GetIssueColor(issues[0]))}33>";
                 const string MARK_CLOSE = "</mark>";
                 string LINK = $"<link=\"{issues.Select(x => x.id).ToArray().IntToString()}\">";
                 const string LINK_CLOSE = "</link>";

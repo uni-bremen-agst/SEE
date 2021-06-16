@@ -188,8 +188,8 @@ namespace SEE.Net.Dashboard.Model.Issues
                    + $" {nameof(targetPath)}: {targetPath}, {nameof(targetLine)}: {targetLine},"
                    + $" {nameof(targetLinkName)}: {targetLinkName}";
         }
-
-        public override IssueKind kind => IssueKind.AV;
+        
+        public override string IssueKind => "AV";
 
         public override IEnumerable<SourceCodeEntity> Entities => new[]
         {
