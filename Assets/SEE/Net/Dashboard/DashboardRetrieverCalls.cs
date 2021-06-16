@@ -254,6 +254,16 @@ namespace SEE.Net.Dashboard
             DashboardResult result = await GetAtPath($"/issues/{issueName}/rule", version == null ? null : parameters,
                                                      false, "text/html");
 
+            const string RULE_ID_INDICATOR = "ruleid\">Rule ";
+            string ruleId = result.JSON.Substring(result.JSON.IndexOf(RULE_ID_INDICATOR, StringComparison.Ordinal) 
+                                                  + RULE_ID_INDICATOR.Length)
+                                  .TakeWhile(c => c != '<').ToString();
+
+            if (!ruleId.StartsWith("Generic-"))
+            {
+                Debug.LogWarning("Retrieved rule is protected by copyright and can't be displayed.");
+                return "";
+            }
             string explanation = string.Join("\n", result.JSON.Split('\n')
                                                          .TakeWhile(x => !x.StartsWith("<h5>Configuration"))
                                                          .Select(x => x.TrimStart(' ', '\t')));
