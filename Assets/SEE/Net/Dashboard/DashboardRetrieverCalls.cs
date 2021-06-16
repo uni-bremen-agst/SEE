@@ -227,13 +227,13 @@ namespace SEE.Net.Dashboard
 
         /// <summary>
         /// Retrieves the issue description for the given <paramref name="issueName"/>.
-        /// This will return the empty string if the retrieved issue description contains HTML tags.
+        /// This will return an empty string if the retrieved issue description contains HTML tags.
         /// Note that this implementation is very hacky and may easily break for more complex descriptions
         /// or for older/more recent versions of the Axivion Dashboard. 
         /// </summary>
         /// <param name="issueName">The ID of the issue whose rule text shall be displayed</param>
         /// <param name="version">The optional analysis version of the issue.</param>
-        /// <returns>The description/explanation of the issue's rule, or the empty string if it would otherwise
+        /// <returns>The description/explanation of the issue's rule, or an empty string if it would otherwise
         /// contain HTML tags.</returns>
         public async UniTask<string> GetIssueDescription(string issueName, string version = null)
         {
