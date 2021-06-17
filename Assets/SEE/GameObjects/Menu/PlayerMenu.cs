@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.Game.UI.Menu;
+using SEE.Game.UI.Notification;
 using SEE.Game.UI.StateIndicator;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -27,7 +29,7 @@ namespace SEE.GO.Menu
 
         /// <summary>
         /// This creates and returns the mode menu, with which you can select the active game mode.
-        /// 
+        ///
         /// Available modes can be found in <see cref="ActionStateType"/>.
         /// </summary>
         /// <param name="attachTo">The game object the menu should be attached to. If <c>null</c>, a
@@ -36,11 +38,11 @@ namespace SEE.GO.Menu
         private static SelectionMenu CreateModeMenu(GameObject attachTo = null)
         {
             Assert.IsTrue(ActionStateType.AllTypes.Count == 11);
-            
+
             // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
             GameObject modeMenuGO = attachTo ? attachTo : new GameObject { name = "Mode Menu" };
 
-            // IMPORTANT NOTE: Because an ActionState.Type value will be used as an index into 
+            // IMPORTANT NOTE: Because an ActionState.Type value will be used as an index into
             // the following field of menu entries, the rank of an entry in this field of entry
             // must correspond to the ActionState.Type value. If this is not the case, we will
             // run into an endless recursion.
@@ -59,7 +61,7 @@ namespace SEE.GO.Menu
                 // to the code action.
                 if (Equals(type, ActionStateType.ShowCode))
                 {
-                    // Attach ShowCodeAction 
+                    // Attach ShowCodeAction
                     ShowCodeAction action = modeMenuGO.AddComponent<ShowCodeAction>();
                     entryAction = () => action.enabled = true;
                     exitAction = () => action.enabled = false;
@@ -128,45 +130,55 @@ namespace SEE.GO.Menu
         /// </summary>
         private void Update()
         {
-            // Select action state via numbers on the keyboard
-            for (int i = 0; i < ModeMenu.Entries.Count; i++)
+            try
             {
-                if (SEEInput.DigitKeyPressed(i))
+                // Select action state via numbers on the keyboard
+                for (int i = 0; i < ModeMenu.Entries.Count; i++)
                 {
-                    ModeMenu.SelectEntry(i);
-                    break;
+                    if (SEEInput.DigitKeyPressed(i))
+                    {
+                        ModeMenu.SelectEntry(i);
+                        break;
+                    }
                 }
-            }
-            if (SEEInput.ToggleMenu())
-            {
-                ModeMenu.ToggleMenu();
-            }
-            if (SEEInput.Undo())
-            {
-                GlobalActionHistory.Undo();
-                if (!GlobalActionHistory.IsEmpty())
+                if (SEEInput.ToggleMenu())
                 {
+                    ModeMenu.ToggleMenu();
+                }
+                if (SEEInput.Undo())
+                {
+                    GlobalActionHistory.Undo();
+                    if (!GlobalActionHistory.IsEmpty())
+                    {
+                        ActionStateType currentAction = GlobalActionHistory.Current();
+                        SetPlayerMenu(currentAction.Name);
+                        Indicator.ChangeActionState(currentAction);
+                    }
+                    else
+                    {
+                        // This case will be reached if there is no finished action in the undo history.
+                        // Special case: The user is executing his first action after moving while running the application,
+                        // but this action is not finished yet. Then, the user executes undo.
+                        ModeMenu.ActiveEntry = ModeMenu.Entries.Single(x => x.Title == ActionStateType.Move.Name);
+                        Indicator.ChangeActionState(ActionStateType.Move);
+                    }
+                }
+                else if (SEEInput.Redo())
+                {
+                    GlobalActionHistory.Redo();
                     ActionStateType currentAction = GlobalActionHistory.Current();
                     SetPlayerMenu(currentAction.Name);
                     Indicator.ChangeActionState(currentAction);
                 }
-                else
-                {
-                    // This case will be reached if there is no finished action in the undo history.
-                    // Special case: The user is executing his first action after moving while running the application,
-                    // but this action is not finished yet. Then, the user executes undo. 
-                    ModeMenu.ActiveEntry = ModeMenu.Entries.Single(x => x.Title == ActionStateType.Move.Name);
-                    Indicator.ChangeActionState(ActionStateType.Move);
-                }
+                GlobalActionHistory.Update();
             }
-            else if (SEEInput.Redo())
+            catch (Exception e)
             {
-                GlobalActionHistory.Redo();
-                ActionStateType currentAction = GlobalActionHistory.Current();
-                SetPlayerMenu(currentAction.Name);
-                Indicator.ChangeActionState(currentAction);
+                ShowNotification.Error("Action Error", e.Message);
+#if UNITY_EDITOR
+                Debug.LogError(e.StackTrace);
+#endif
             }
-            GlobalActionHistory.Update();
         }
 
         /// <summary>

@@ -16,7 +16,7 @@ namespace SEE.GO
         /// <summary>
         /// An extension of GameObjects to retrieve their IDs. If <paramref name="gameObject"/>
         /// has a NodeRef attached to it, the corresponding node's ID is returned.
-        /// If <paramref name="gameObject"/> has an EdgeRef attached to it, the corresponding 
+        /// If <paramref name="gameObject"/> has an EdgeRef attached to it, the corresponding
         /// edge's ID is returned. Otherwise the name of <paramref name="gameObject"/> is
         /// returned.
         /// </summary>
@@ -40,7 +40,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// If <paramref name="gameObject"/> represents a graph node or edge, the city this 
+        /// If <paramref name="gameObject"/> represents a graph node or edge, the city this
         /// object is contained in will be returned. Otherwise null is returned.
         /// </summary>
         /// <param name="gameObject">graph node or edge whose containing city is requested</param>
@@ -67,7 +67,7 @@ namespace SEE.GO
 
         /// <summary>
         /// True if <paramref name="gameNode"/> represents a leaf in the graph.
-        /// 
+        ///
         /// Precondition: <paramref name="gameNode"/> has a NodeRef component attached to it
         /// that is a valid graph node reference.
         /// </summary>
@@ -79,7 +79,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns all transitive children of <paramref name="gameObject"/> tagged by 
+        /// Returns all transitive children of <paramref name="gameObject"/> tagged by
         /// given <paramref name="tag"/> (including <paramref name="gameObject"/> itself).
         /// </summary>
         /// <param name="tag">tag the ancestors must have</param>
@@ -99,8 +99,60 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Returns the first ancestor of the given <paramref name="gameObject"/> with the given <paramref name="id"/>.
+        /// Will also return inactive game objects. If no such ancestor exists, null will be returned.
+        /// Unlike <see cref="Transform.Find(string)"/>, this method will descend into the game-object hierarchy.
+        /// </summary>
+        /// <param name="gameObject">root object</param>
+        /// <param name="id">id of the ancestor to be found</param>
+        /// <returns>found game object or null</returns>
+        public static GameObject Ancestor(this GameObject gameObject, string id)
+        {
+            foreach (Transform child in gameObject.transform)
+            {
+                if (child.name == id)
+                {
+                    return child.gameObject;
+                }
+                else
+                {
+                    GameObject ancestor = child.gameObject.Ancestor(id);
+                    if (ancestor != null)
+                    {
+                        return ancestor;
+                    }
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Returns all ancestors of <paramref name="gameObject"/> having a name contained in <paramref name="gameObjectIDs"/>.
+        /// The result will also inlcude inactive game objects, but does not contained <paramref name="gameObject"/> itself.
+        /// This method will descend into the game-object hierarchy rooted by <paramref name="gameObject"/>.
+        ///
+        /// Precondition: <paramref name="gameObjectIDs"/> is not null.
+        /// </summary>
+        /// <param name="gameObject">root of the game-object hierarchy to be searched</param>
+        /// <param name="gameObjectIDs">list of names any of the game objects to be retrieved should have</param>
+        /// <returns>found game objects</returns>
+        public static IList<GameObject> Ancestors(this GameObject gameObject, ISet<string> gameObjectIDs)
+        {
+            List<GameObject> result = new List<GameObject>();
+            foreach (Transform child in gameObject.transform)
+            {
+                if (gameObjectIDs.Contains(child.name))
+                {
+                    result.Add(child.gameObject);
+                }
+                result.AddRange(child.gameObject.Ancestors(gameObjectIDs));
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Returns the render-queue offset of given <paramref name="gameObject"/>.
-        /// 
+        ///
         /// Precondition: <paramref name="gameObject"/> must have a renderer attached
         /// to it; otherwise 0 will be returned.
         /// </summary>
@@ -112,13 +164,12 @@ namespace SEE.GO
             {
                 return renderer.sharedMaterial.renderQueue;
             }
-
             Debug.LogWarningFormat("GetRenderQueue: Game object {0} has no renderer.\n", gameObject.name);
             return 0;
         }
 
         /// <summary>
-        /// The color property of materials and used by the shader. 
+        /// The color property of materials and used by the shader.
         /// Ideally, string-based property lookups should be avoided due to being inefficient.
         /// This can be solved by creating a field for this class such as this.
         /// This property can then be used instead of "_Color".
@@ -127,7 +178,7 @@ namespace SEE.GO
 
         /// <summary>
         /// Sets the color for this <paramref name="gameObject"/> to given <paramref name="color"/>.
-        /// 
+        ///
         /// Precondition: <paramref name="gameObject"/> has a renderer whose material has attribute _Color.
         /// </summary>
         /// <param name="gameObject">objects whose color is to be set</param>
@@ -136,7 +187,7 @@ namespace SEE.GO
         {
             if (gameObject.TryGetComponent(out Renderer renderer))
             {
-                Material material = renderer.sharedMaterial;                
+                Material material = renderer.sharedMaterial;
                 material.SetColor(ColorProperty, color);
             }
         }
@@ -159,7 +210,7 @@ namespace SEE.GO
 
         /// <summary>
         /// Sets the start and end line color of <paramref name="gameObject"/>.
-        /// 
+        ///
         /// Precondition: <paramref name="gameObject"/> must have a line renderer.
         /// </summary>
         /// <param name="gameObject">object holding a line renderer whose start and end color is to be set</param>
@@ -177,15 +228,15 @@ namespace SEE.GO
         /// <summary>
         /// Sets the visibility and the collider of this <paramref name="gameObject"/> to <paramref name="show"/>.
         /// If <paramref name="show"/> is false, the object becomes invisible. If it is true
-        /// instead, it becomes visible. 
-        /// 
-        /// If <paramref name="includingChildren"/> is false, only the renderer of <paramref name="gameObject"/> 
+        /// instead, it becomes visible.
+        ///
+        /// If <paramref name="includingChildren"/> is false, only the renderer of <paramref name="gameObject"/>
         /// is turned on/off, which will not affect whether the <paramref name="gameObject"/>
         /// is active or inactive. If <paramref name="gameObject"/> has children, their
         /// renderers will not be changed.
-        /// 
+        ///
         /// If <paramref name="includingChildren"/> is true, the operation applies to all descendants, too.
-        /// 
+        ///
         /// Precondition: <paramref name="gameObject"/> must have a Renderer.
         /// </summary>
         /// <param name="gameObject">object whose visibility is to be changed</param>
@@ -211,7 +262,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Sets the scale of this <paramref name="node"/> to <paramref name="scale"/> independent from 
+        /// Sets the scale of this <paramref name="node"/> to <paramref name="scale"/> independent from
         /// the local scale from the parent.
         /// </summary>
         /// <param name="node">object whose scale should be set</param>
@@ -242,7 +293,7 @@ namespace SEE.GO
         public static Vector3 WorldSpaceScale(this GameObject gameObject)
         {
             // For some objects, such as capsules, lossyScale gives wrong results.
-            // The more reliable option to determine the size is using the 
+            // The more reliable option to determine the size is using the
             // object's renderer if it has one.
             if (gameObject.TryGetComponent(out Renderer renderer))
             {
@@ -324,7 +375,7 @@ namespace SEE.GO
 
         /// <summary>
         /// Returns the graph node represented by this <paramref name="gameObject"/>.
-        /// 
+        ///
         /// Precondition: <paramref name="gameObject"/> must have a <see cref="NodeRef"/>
         /// attached to it referring to a valid node; if not, an exception is raised.
         /// </summary>
@@ -389,7 +440,7 @@ namespace SEE.GO
 
         /// <summary>
         /// Returns the graph containing the node represented by this <paramref name="gameObject"/>.
-        /// 
+        ///
         /// Precondition: <paramref name="gameObject"/> must have a <see cref="NodeRef"/>
         /// attached to it referring to a valid node; if not, an exception is raised.
         /// </summary>
@@ -419,7 +470,7 @@ namespace SEE.GO
         /// Returns the full name of given <paramref name="gameObject"/>.
         /// The full name is the concatenation of all names of the ancestors of <paramref name="gameObject"/>
         /// separated by a period. E.g., if <paramref name="gameObject"/> has name C and its parent
-        /// has name B and the parent's parent has name A, then the result will be A.B.C.        
+        /// has name B and the parent's parent has name A, then the result will be A.B.C.
         /// </summary>
         /// <param name="gameObject">the gameObject whose full name is to be retrieved</param>
         /// <returns>full name</returns>
@@ -444,7 +495,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns all ancestors of given <paramref name="rootNode"/> tagged by <see cref="Tags.Node"/>
+        /// Returns all active ancestors of given <paramref name="rootNode"/> tagged by <see cref="Tags.Node"/>
         /// including <paramref name="rootNode"/> itself.
         /// </summary>
         /// <param name="rootNode">the root of the node hierarchy to be collected</param>
@@ -457,9 +508,9 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Adds all ancestors of <paramref name="root"/> to <paramref name="result"/>
+        /// Adds all active ancestors of <paramref name="root"/> to <paramref name="result"/>
         /// (only if tagged by <see cref="Tags.Node"/>).
-        /// 
+        ///
         /// Note: <paramref name="root"/> is assumed to be contained in <paramref name="result"/>
         /// already.
         /// </summary>
@@ -469,7 +520,7 @@ namespace SEE.GO
         {
             foreach (Transform child in root.transform)
             {
-                if (child.gameObject.CompareTag(Tags.Node))
+                if (child.gameObject.activeInHierarchy && child.gameObject.CompareTag(Tags.Node))
                 {
                     result.Add(child.gameObject);
                     AllAncestors(child.gameObject, result);
