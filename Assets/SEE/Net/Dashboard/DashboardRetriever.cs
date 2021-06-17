@@ -110,6 +110,12 @@ namespace SEE.Net.Dashboard
         public Color DeadEntityIssueColor = Color.black;
         public Color MetricViolationIssueColor = Color.magenta;
         public Color StyleViolationIssueColor = Color.cyan;
+        
+        /// <summary>
+        /// Whether to hide any possibly copyrighted texts.
+        /// </summary>
+        [Tooltip("Whether to hide any possibly copyrighted texts.")]
+        public bool HideCopyrightedTexts = false;
 
         /// <summary>
         /// Lazy wrapper around the instance of this class.
