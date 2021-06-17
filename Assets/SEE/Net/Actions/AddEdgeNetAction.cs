@@ -63,12 +63,12 @@ namespace SEE.Net
                     }
                     else
                     {
-                        Debug.LogError($"There is no game node named {ToId}.\n");
+                        Debug.LogError($"There is no game node named {ToId} for the target of new edge {EdgeID}.\n");
                     }
                 }
                 else
                 {
-                    Debug.LogError($"There is no game node named {FromId}.\n");
+                    Debug.LogError($"There is no game node named {FromId} for the source of new edge {EdgeID}.\n");
                 }
             }
         }

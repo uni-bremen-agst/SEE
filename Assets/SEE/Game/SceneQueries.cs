@@ -82,7 +82,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Returns the roots of all graphs currently represented by any of the <paramref name="gameNodes"/>.
-        /// 
+        ///
         /// Precondition: Every game object in <paramref name="gameNodes"/> must be tagged by
         /// Tags.Node and have a valid graph node reference.
         /// </summary>
@@ -125,7 +125,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Returns all graphs currently represented by any of the <paramref name="gameNodes"/>.
-        /// 
+        ///
         /// Precondition: Every game object in <paramref name="gameNodes"/> must be tagged by
         /// Tags.Node and have a valid graph node reference.
         /// </summary>
@@ -142,7 +142,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns first child of <paramref name="codeCity"/> tagged by Tags.Node. 
+        /// Returns first child of <paramref name="codeCity"/> tagged by Tags.Node.
         /// If <paramref name="codeCity"/> is a node representing a code city,
         /// the result is considered the root of the graph.
         /// </summary>
@@ -181,7 +181,7 @@ namespace SEE.Game
         /// it will be returned. If not, null will be returned.
         /// </summary>
         /// <param name="transform">transform at which to start the search</param>
-        /// <returns>top-most transform in the game-object hierarchy tagged by 
+        /// <returns>top-most transform in the game-object hierarchy tagged by
         /// Tags.CodeCity or null</returns>
         public static Transform GetCodeCity(Transform transform)
         {
@@ -249,11 +249,11 @@ namespace SEE.Game
 
         /// <summary>
         /// Retrieves the game object representing a node with the given <paramref name="nodeID"/>.
-        /// 
+        ///
         /// Note: This is an expensive operation as it traverses all objects in the scene.
         /// FIXME: We may need to cache all this information in look up tables for better
         /// performance.
-        /// 
+        ///
         /// Precondition: Such a game object actually exists.
         /// </summary>
         /// <param name="nodeID">the unique ID of the node to be retrieved</param>
@@ -273,12 +273,12 @@ namespace SEE.Game
 
         /// <summary>
         /// Retrieves the game object representing the given <paramref name="node"/>.
-        /// 
+        ///
         /// Note: This is an expensive operation as it traverses all objects in the scene.
         /// FIXME: We may need to cache all this information in look up tables for better
         /// performance.
-        /// 
-        /// Preconditions: 
+        ///
+        /// Preconditions:
         ///   (1) <paramref name="node"/> is not null.
         ///   (2) Such a game object actually exists.
         /// </summary>
@@ -292,12 +292,12 @@ namespace SEE.Game
 
         /// <summary>
         /// Retrieves the game object representing the node referenced by the given <paramref name="nodeRef"/>.
-        /// 
+        ///
         /// Note: This is an expensive operation as it traverses all objects in the scene.
         /// FIXME: We may need to cache all this information in look up tables for better
         /// performance.
-        /// 
-        /// Preconditions: 
+        ///
+        /// Preconditions:
         /// (1) <paramref name="nodeRef"/> must reference a valid node.
         /// (2) Such a game object actually exists.
         /// </summary>
@@ -307,6 +307,59 @@ namespace SEE.Game
         public static GameObject RetrieveGameNode(NodeRef nodeRef)
         {
             return RetrieveGameNode(nodeRef.Value);
+        }
+
+        /// <summary>
+        /// Returns the first game object in the current scene with the given <paramref name="id"/>.
+        /// Will also return inactive game objects. If no such object exists, null will be returned.
+        ///
+        /// Note: This method will descend only in the root nodes tagged by <see cref="Tags.CodeCity"/>.
+        /// Those roots themselves will not be considered.
+        /// </summary>
+        /// <param name="id">id of the game object to be found</param>
+        /// <returns>found game object or null</returns>
+        public static GameObject Find(string id)
+        {
+            UnityEngine.SceneManagement.Scene activeScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+
+            // GetRootGameObjects() yields also inactive game objects
+            foreach (GameObject root in activeScene.GetRootGameObjects())
+            {
+                if (root.CompareTag(Tags.CodeCity))
+                {
+                    GameObject ancestor = root.Ancestor(id);
+                    if (ancestor != null)
+                    {
+                        return ancestor;
+                    }
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Returns all game objects in the current scene having a name contained in <paramref name="gameObjectIDs"/>.
+        /// Will also return inactive game objects.
+        ///
+        /// Note: This method will descend only in the root nodes tagged by <see cref="Tags.CodeCity"/>.
+        /// Those roots themselves will not be included.
+        /// </summary>
+        /// <param name="gameObjectIDs">list of names any of the game objects to be retrieved should have</param>
+        /// <returns>found game objects</returns>
+        public static ISet<GameObject> Find(ISet<string> gameObjectIDs)
+        {
+            ISet<GameObject> result = new HashSet<GameObject>();
+            UnityEngine.SceneManagement.Scene activeScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+
+            // GetRootGameObjects() yields also inactive game objects
+            foreach (GameObject root in activeScene.GetRootGameObjects())
+            {
+                if (root.CompareTag(Tags.CodeCity))
+                {
+                    result.UnionWith(root.Ancestors(gameObjectIDs));
+                }
+            }
+            return result;
         }
 
         //------------------------------------------------------------
