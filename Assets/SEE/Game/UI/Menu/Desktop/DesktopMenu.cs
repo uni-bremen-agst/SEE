@@ -19,7 +19,7 @@ namespace SEE.Game.UI.Menu
         /// The path to the prefab for the menu game object.
         /// Will be added as a child to the <see cref="Canvas"/> if it doesn't exist yet.
         /// </summary>
-        private const string MENU_PREFAB = "Prefabs/UI/Menu";
+        protected virtual string MENU_PREFAB => "Prefabs/UI/Menu";
 
         /// <summary>
         /// The path to the prefab for the menu game object.
@@ -46,7 +46,7 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// The modal window manager which contains the actual menu.
         /// </summary>
-        private ModalWindowManager Manager;
+        protected ModalWindowManager Manager;
 
         /// <summary>
         /// UI game object containing the entries as buttons.
