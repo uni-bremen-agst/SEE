@@ -175,6 +175,9 @@ namespace SEE.GO.Menu
             catch (Exception e)
             {
                 ShowNotification.Error("Action Error", e.Message);
+#if UNITY_EDITOR
+                Debug.LogError(e.StackTrace);
+#endif
             }
         }
 
