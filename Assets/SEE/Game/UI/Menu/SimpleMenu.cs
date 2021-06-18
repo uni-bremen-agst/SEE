@@ -56,7 +56,7 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// Whether the menu shall be shown.
         /// </summary>
-        private bool MenuShown;
+        public bool MenuShown { get; set; }
 
         /// <summary>
         /// Whether the menu is currently shown or not.
