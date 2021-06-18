@@ -93,13 +93,32 @@ namespace SEE.Game
             SEECity city = parent.ContainingCity();
             if (city != null)
             {
-                Node node = NewGraphNode(nodeID);
-                AddNodeToGraph(parent.GetNode(), node);
-                GameObject result = city.Renderer.DrawLeafNode(node);
-                result.transform.localScale = worldSpaceScale;
-                result.transform.position = position;
-                result.transform.SetParent(parent.transform);
-                return result;
+                if (parent.IsLeaf())
+                {
+                    Transform parentTrans = parent.transform;
+                    String cache = parent.GetNode().ID;
+                    Node grandparentNode = parent.GetNode().Parent;
+                    Remove(parent);
+                    GameObject.Destroy(parent);
+                    Node parentNode = NewGraphNode(cache);
+                    AddNodeToGraph(grandparentNode ,parentNode);
+                    parent = city.Renderer.DrawInnerNode(parentNode);
+                    parent.transform.position = new Vector3(parentTrans.position.x, parentTrans.parent.transform.position.y, parentTrans.position.z);
+                    parent.transform.localScale = new Vector3(parentTrans.localScale.x, parentTrans.parent.transform.lossyScale.y, parentTrans.localScale.z);
+                    parent.transform.SetParent(parent.transform.parent);
+                    return Add(parent, new Vector3(position.x, parentTrans.position.y, position.z), worldSpaceScale, null);
+                }
+                else
+                {
+                    Node node = NewGraphNode(nodeID);
+                    AddNodeToGraph(parent.GetNode(), node);
+                    GameObject result = city.Renderer.DrawLeafNode(node);
+                    result.transform.localScale = worldSpaceScale;
+                    result.transform.position = position;
+                    result.transform.SetParent(parent.transform);
+                    return result;
+                }
+                
             }
             else
             {
