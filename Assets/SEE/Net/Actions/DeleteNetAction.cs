@@ -1,6 +1,4 @@
-using SEE.Controls;
 using SEE.Game;
-using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Net
@@ -47,23 +45,7 @@ namespace SEE.Net
                 GameObject gameObject = GameObject.Find(GameObjectID);
                 if (gameObject != null)
                 {
-                    if (gameObject.HasNodeRef())
-                    {
-                        GameNodeAdder.Remove(gameObject);
-                        // gameObject is not actually destroyed because we are moving it to the garbage can.
-                        PlayerSettings.GetPlayerSettings().StartCoroutine(DeletionAnimation.MoveNodeToGarbage(gameObject.AllAncestors()));
-                        Portal.SetInfinitePortal(gameObject);
-                    }
-                    else if (gameObject.HasEdgeRef())
-                    {
-                        DeletionAnimation.HideEdge(gameObject);
-                        GameEdgeAdder.Remove(gameObject);
-                        GameObject.Destroy(gameObject);
-                    }
-                    else
-                    {
-                        throw new System.Exception($"The game object with the ID {GameObjectID} to be deleted is neither a node nor an edge.");
-                    }
+                    GameElementDeleter.Delete(gameObject);
                 }
                 else
                 {
