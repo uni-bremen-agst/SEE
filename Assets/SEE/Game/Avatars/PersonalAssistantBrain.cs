@@ -184,9 +184,14 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Text to be spoken as a welcome message.
         /// </summary>
-        private const string welcomeText = "Hi there! Welcome! I am SEE. I am here to help. "
-            + "Just press key <prosody rate = \"slow\"><say-as interpret-as= \"characters\"> H </say-as></prosody> "
-            + "or say, hi SEE, and I will help.";
+        private const string welcomeText = "Hi there! I am SEE. "
+            + "Just look around and click on me, if you need help. For a general dSescription of this application, "
+            + " press key <prosody rate = \"slow\"><say-as interpret-as= \"characters\"> H </say-as></prosody> "
+            + " or say, hi SEE, and I will help.";
+
+        //"Hi there! Welcome! I am SEE. I am here to help. "
+        //+ "Just press key <prosody rate = \"slow\"><say-as interpret-as= \"characters\"> H </say-as></prosody> "
+        //+ "or say, hi SEE, and I will help.";
 
         /// <summary>
         /// General overview on SEE.

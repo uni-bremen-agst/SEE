@@ -1,8 +1,19 @@
 using SEE.Game.UI.Menu;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class HelpSystemMenu : MonoBehaviour
 {
+    /// <summary>
+    /// All menus and submenus are needed for the help-system
+    /// </summary>
+    private List<SimpleMenu> menus = new List<SimpleMenu>();
+
+    /// <summary>
+    /// The main menu from where the user can navigate to sub-menus.
+    /// </summary>
+    private SimpleMenu mainMenu;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -12,7 +23,27 @@ public class HelpSystemMenu : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetMouseButtonDown(0))
+        {
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out hit))
+                if (hit.transform == GameObject.Find("PersonalAssistant").transform)
+                {
+                    bool menuIsOpen = false;
+                    foreach (SimpleMenu menu in menus)
+                    {
+                        if (menu.MenuShown)
+                        {
+                            menuIsOpen = true;
+                        }
+                    }
+                    if (!menuIsOpen)
+                    {
+                        mainMenu.ToggleMenu();
+                    }
+                }
+        }
     }
 
     /// <summary>
@@ -26,13 +57,23 @@ public class HelpSystemMenu : MonoBehaviour
         // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
         GameObject modeMenuGO = attachTo ? attachTo : new GameObject { name = "HelpSystem" };
 
-        SimpleMenu mainMenu = CreateNewMenu(modeMenuGO, "Functions", "Where do you need help?","Materials/Notification/info");
-        SimpleMenu navigation = CreateNewMenu(modeMenuGO, "Navigation", "Choose your specific use-case","Materials/Notification/error");
+        mainMenu = CreateNewMenu(modeMenuGO, "Functions", "Where do you need help?", "Materials/Notification/info");
+        SimpleMenu navigation = CreateNewMenu(modeMenuGO, "Navigation", "Choose your specific use-case", "Materials/Notification/error");
+        SimpleMenu playerMenu = CreateNewMenu(modeMenuGO, "Player Menu", "Choose your specific use-case", "Materials/Notification/error");
         SimpleMenu architecture = CreateNewMenu(modeMenuGO, "Architecture", "Choose your specific use-case", "Materials/Notification/error");
         SimpleMenu evolution = CreateNewMenu(modeMenuGO, "Evolution", "Choose your specific use-case", "Materials/Notification/error");
         SimpleMenu debugging = CreateNewMenu(modeMenuGO, "Debugging", "Choose your specific use-case", "Materials/Notification/error");
         SimpleMenu quality = CreateNewMenu(modeMenuGO, "Quality", "Choose your specific use-case", "Materials/Notification/error");
-        
+
+        // Add all menu큦 to list
+        menus.Add(mainMenu);
+        menus.Add(playerMenu);
+        menus.Add(navigation);
+        menus.Add(architecture);
+        menus.Add(evolution);
+        menus.Add(debugging);
+        menus.Add(quality);
+
         // Entry큦 for main Menu - titel has to be unique!
         CreateNewRefEntry("Navigation", "All Use-Cases in context of simple navigation in SEE", Color.gray, "Materials/Notification/info", mainMenu, navigation, mainMenu);
         CreateNewRefEntry("Architecture", "All Use-Cases in context of Architecture-comparision", Color.gray, "Materials/Notification/info", mainMenu, architecture, mainMenu);
@@ -40,32 +81,30 @@ public class HelpSystemMenu : MonoBehaviour
         CreateNewRefEntry("Debugging", "All Use-Cases in context of Debugging", Color.gray, "Materials/Notification/info", mainMenu, debugging, mainMenu);
         CreateNewRefEntry("Quality", "All Use-Cases in context of Software-Quality", Color.gray, "Materials/Notification/info", mainMenu, quality, mainMenu);
         // Entry큦 for Navigation-Menu 
-        CreateNewRefEntry("Move in space", "How to navigate inside of the application", Color.gray, "Materials/Notification/info", navigation, architecture, navigation);
-        CreateNewRefEntry("Switch table", "How to switch tables for other use-cases", Color.gray, "Materials/Notification/info", navigation, architecture, navigation);
-        CreateNewRefEntry("Open player Menu", "How to open the Player Menu for interacting with code-cities", Color.gray, "Materials/Notification/info", navigation, architecture, navigation);
-        CreateNewRefEntry("Zoom", "How to zoom into a code-city", Color.gray, "Materials/Notification/info", navigation, architecture, navigation);
-        CreateNewRefEntry("Lock Camera", "How to lock your POV to a specific table", Color.gray, "Materials/Notification/info", navigation, architecture, navigation);
-        CreateNewRefEntry("Frontstep", "Example", Color.green, "Materials/Notification/info", navigation, architecture, navigation);
-        CreateNewRefEntry("Back", "Beschreibung2", Color.red, "Materials/Notification/info", navigation, mainMenu, navigation);
+        CreateNewRefEntry("Move in space", "How to navigate inside of the application", Color.gray, "Materials/Notification/info", navigation, mainMenu, navigation);
+        CreateNewRefEntry("Switch table", "How to switch tables for other use-cases", Color.gray, "Materials/Notification/info", navigation, mainMenu, navigation);
+        CreateNewRefEntry("Zoom", "How to zoom into a code-city", Color.gray, "Materials/Notification/info", navigation, mainMenu, navigation);
+        CreateNewRefEntry("Lock Camera", "How to lock your POV to a specific table", Color.gray, "Materials/Notification/info", navigation, mainMenu, navigation);
         // Entry큦 for Architecture-Menu
-        CreateNewRefEntry("Adding a node", "Description how to add a new node to a code-city", Color.gray, "Materials/Notification/info", architecture, mainMenu, architecture);
-        CreateNewRefEntry("Adding an edge", "Description how to add a new edge to a code-city", Color.gray, "Materials/Notification/info", architecture, mainMenu, architecture);
-        CreateNewRefEntry("Scale a node", "Description how to scale a node", Color.gray, "Materials/Notification/info", architecture, mainMenu, architecture);
-        CreateNewRefEntry("Edit a node", "Description how to edit the metrics of an existing node", Color.gray, "Materials/Notification/info", architecture, mainMenu, architecture);
-        CreateNewRefEntry("Delete node(s) or edge(s)", "Description how to delete either node(s) or edge(s)", Color.gray, "Materials/Notification/info", architecture, mainMenu, architecture);
-        CreateNewRefEntry("Hide nodes(s) or edge(s)", "Description how to hide edge(s) or node(s) of a code-city", Color.gray, "Materials/Notification/info", architecture, mainMenu, architecture);
-        CreateNewRefEntry("Draw lines", "Description how to Draw lines inside of the application", Color.gray, "Materials/Notification/info", architecture, mainMenu, architecture);
-        CreateNewRefEntry("Show code", "Description how to show the source-code of an object", Color.gray, "Materials/Notification/info", architecture, mainMenu, architecture);
-        CreateNewRefEntry("Back", "Description how to add a new node to a code-city", Color.red, "Materials/Notification/info", architecture, mainMenu, architecture);
-
+        CreateNewRefEntry("Search for a node", "Description how to search for a specific node", Color.gray, "Materials/Notification/info", architecture, mainMenu, architecture);
         // Entry큦 for Evolution-Menu
-        CreateNewRefEntry("Back", "Beschreibung2", Color.red, "Materials/Notification/info", evolution, mainMenu, evolution);
+        CreateNewRefEntry("Start Evolution", "How to start and use the evolution", Color.gray, "Materials/Notification/info", evolution, mainMenu, evolution);
+        CreateNewRefEntry("Metric Charts", "How to show and use the metric charts", Color.gray, "Materials/Notification/info", evolution, mainMenu, evolution);
+        // Entry큦 for Player-Menu
+        CreateNewRefEntry("Open player Menu", "How to open the Player Menu for interacting with code-cities", Color.gray, "Materials/Notification/info", playerMenu, mainMenu, playerMenu);
+        CreateNewRefEntry("Adding a node", "Description how to add a new node to a code-city", Color.gray, "Materials/Notification/info", playerMenu, mainMenu, playerMenu);
+        CreateNewRefEntry("Adding an edge", "Description how to add a new edge to a code-city", Color.gray, "Materials/Notification/info", playerMenu, mainMenu, playerMenu);
+        CreateNewRefEntry("Scale a node", "Description how to scale a node", Color.gray, "Materials/Notification/info", playerMenu, mainMenu, playerMenu);
+        CreateNewRefEntry("Edit a node", "Description how to edit the metrics of an existing node", Color.gray, "Materials/Notification/info", playerMenu, mainMenu, playerMenu);
+        CreateNewRefEntry("Delete node(s) or edge(s)", "Description how to delete either node(s) or edge(s)", Color.gray, "Materials/Notification/info", playerMenu, mainMenu, playerMenu);
+        CreateNewRefEntry("Hide nodes(s) or edge(s)", "Description how to hide edge(s) or node(s) of a code-city", Color.gray, "Materials/Notification/info", playerMenu, mainMenu, playerMenu);
+        CreateNewRefEntry("Draw lines", "Description how to Draw lines inside of the application", Color.gray, "Materials/Notification/info", playerMenu, mainMenu, playerMenu);
+        CreateNewRefEntry("Undo or Redo an action", "Description how to undo or redo an action", Color.gray, "Materials/Notification/info", playerMenu, mainMenu, playerMenu);
         // Entry큦 for Debugging-Menu
-        CreateNewRefEntry("Back", "Beschreibung2", Color.red, "Materials/Notification/info", debugging, mainMenu, debugging);
+        CreateNewRefEntry("Show code", "Description how to show the source-code of an object", Color.gray, "Materials/Notification/info", debugging, mainMenu, debugging);
+        CreateNewRefEntry("Choose shown code-window","Description how to switch the shown code-window of an object", Color.gray, "Materials/Notification/info", debugging, mainMenu, debugging);
+        CreateNewRefEntry("Animation speed", "Description how to in or decrease the animation speed", Color.gray, "Materials/Notification/info", debugging, mainMenu, debugging);
         // Entry큦 for Quality-Menu
-        CreateNewRefEntry("Back", "Beschreibung2", Color.red, "Materials/Notification/info", quality, mainMenu, quality);
-
-        mainMenu.ShowMenu(true);
     }
 
     /// <summary>
@@ -121,13 +160,18 @@ public class HelpSystemMenu : MonoBehaviour
     /// <param name="description">the subtitle or rather description of the menu</param>
     /// <param name="iconPath">the path to the icon for the new menu</param>
     /// <returns>the new SimpleMenu</returns>
-    public SimpleMenu CreateNewMenu(GameObject objectToAddMenu, string title, string description,string iconPath)
+    public SimpleMenu CreateNewMenu(GameObject objectToAddMenu, string title, string description, string iconPath)
     {
         SimpleMenu simpleMenu = objectToAddMenu.AddComponent<SimpleMenu>();
         simpleMenu.Icon = Resources.Load<Sprite>(iconPath);
         simpleMenu.Title = title;
         simpleMenu.Description = description;
 
+        if (mainMenu != null)
+        {
+            CreateNewRefEntry("Play all", "Example", new Color(0.3f, 0.4f, 0.6f), "Materials/Notification/info", simpleMenu, mainMenu, simpleMenu);
+            CreateNewRefEntry("Back", "Beschreibung2", Color.red, "Materials/Notification/info", simpleMenu, mainMenu, simpleMenu);
+        }
         return simpleMenu;
     }
 }
