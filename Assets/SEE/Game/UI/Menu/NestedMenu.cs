@@ -22,7 +22,7 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// The parent of the
         /// </summary>
-        public SimpleMenu parent;
+        public SimpleMenu<MenuEntry> parent;
         
         protected override void OnEntrySelected(MenuEntry entry)
         {
