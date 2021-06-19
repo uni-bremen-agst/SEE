@@ -43,6 +43,10 @@ namespace SEE.Game.UI.Menu
             }
         }
 
+        public void ResetList()
+        {
+            entries.Clear();
+        }
         /// <summary>
         /// Descends down a level in the menu hierarchy and removes the entry from the <see cref="Levels"/>.
         /// </summary>
