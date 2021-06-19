@@ -75,13 +75,13 @@ namespace SEE.Game.UI.Menu
         /// A list of menu entries for this menu.
         /// </summary>
         /// <seealso cref="MenuEntry"/>
-        protected readonly List<T> entries = new List<T>();
+        public List<T> entries = new List<T>();
         
         /// <summary>
         /// A read-only wrapper around the list of menu entries for this menu.
         /// </summary>
         /// <seealso cref="MenuEntry"/>
-        public IList<T> Entries => entries.AsReadOnly();
+        public IList<T> Entries => entries;
 
         /// <summary>
         /// Displays or hides the menu, depending on <paramref name="show"/>.
