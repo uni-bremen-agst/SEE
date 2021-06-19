@@ -18,6 +18,11 @@ namespace SEE.Game.UI.Menu
         /// Path to the NestedMenu prefab.
         /// </summary>
         protected override string MENU_PREFAB => "Prefabs/UI/NestedMenu";
+
+        /// <summary>
+        /// The parent of the
+        /// </summary>
+        public SimpleMenu parent;
         
         protected override void OnEntrySelected(MenuEntry entry)
         {
@@ -66,7 +71,13 @@ namespace SEE.Game.UI.Menu
         protected override void StartDesktop()
         {
             base.StartDesktop();
-            Manager.onConfirm.AddListener(DescendLevel); // Go one level higher when clicking "back"
+            Manager.onCancel.AddListener(GoBack); // Go one level higher when clicking "back"
+        }
+
+        private void GoBack()
+        {
+            this.ToggleMenu();
+            parent.ToggleMenu();
         }
 
         /// <summary>
