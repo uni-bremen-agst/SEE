@@ -31,46 +31,50 @@ public class HelpSystemMenu : MonoBehaviour
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out hit))
-                if (hit.transform == GameObject.Find(PersonalAssistant).transform)
+                if (hit.transform == GameObject.Find(PersonalAssistant).transform && mainMenu.MenuShown == false)
                 {
-                    mainMenu.ToggleMenu();
+                    mainMenu.ShowMenu(true);
                 }
         }
     }
 
+    private const string RefIcon = "Materials/ModernUIPack/Plus";
+
+    private const string EntryIcon = "Materials/ModernUIPack/Eye";
+
     private void CreateStartMenu()
     {
-        mainMenu = GameObject.Find(HelpSystem).AddComponent<NestedMenu>();
-        mainMenu.Title = "Test";
-        mainMenu.Description = "Testdescription";
-        mainMenu.Icon = Resources.Load<Sprite>("Materials/Notification/info");
+        // Important note: You have to define the lowest hierachy-level first. 
+        // That means, the mainMenu will be defined at the end and the lowest entry-list first.
 
-        MenuEntry entry1 = new MenuEntry(action: null,
-                                         title: "Entry1",
-                                         description: "Des Entry1",
-                                         entryColor: Color.red,
-                                         icon: Resources.Load<Sprite>("Materials/Notification/info"));
-        MenuEntry entry2 = new MenuEntry(action: null,
-                                         title: "Entry2",
-                                         description: "Des Entry2",
-                                         entryColor: Color.red,
-                                         icon: Resources.Load<Sprite>("Materials/Notification/info"));
-        MenuEntry entry3 = new MenuEntry(action: null,
-                                         title: "Entry3",
-                                         description: "Des Entry3",
-                                         entryColor: Color.red,
-                                         icon: Resources.Load<Sprite>("Materials/Notification/info"));
+        List<MenuEntry> mainMenuEntries = new List<MenuEntry>();
+        List<MenuEntry> architectureEntries = new List<MenuEntry>();
+        List<MenuEntry> playerMenuEntries = new List<MenuEntry>();
+        List<MenuEntry> evolutionEntries = new List<MenuEntry>();
+        List<MenuEntry> debuggingEntries = new List<MenuEntry>();
+        List<MenuEntry> qualityEntries = new List<MenuEntry>();
 
-        List<MenuEntry> a = new List<MenuEntry> {entry1, entry2};
+        playerMenuEntries = new List<MenuEntry>
+        {
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "Add Edge Description", Color.green, EntryIcon),
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Node", "Add Node Description", Color.green, EntryIcon),
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Line", "Add Line Description", Color.green, EntryIcon)
+        };
 
-        NestedMenuEntry entry4 = new NestedMenuEntry(innerEntries: a,
-                                                     title: "Entry4 ref",
-                                                     description: "Des Entry4 ref",
-                                                     entryColor: Color.red,
-                                                     enabled: true,
-                                                     icon: Resources.Load<Sprite>("Materials/Notification/info"));
+        architectureEntries = new List<MenuEntry>
+        {
+            HelpSystemBuilder.CreateNewRefEntry(playerMenuEntries,"Player Menu", "Add Edge Description", Color.green, RefIcon),
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Map Architecture", "Mapping description", Color.green, EntryIcon)
+        };
 
-        mainMenu.AddEntry(entry4);
-        mainMenu.AddEntry(entry3);
+        mainMenuEntries = new List<MenuEntry>
+        {
+            HelpSystemBuilder.CreateNewRefEntry(architectureEntries, "Architecture", "ArchitectureDescription", Color.green, RefIcon),
+            HelpSystemBuilder.CreateNewRefEntry(evolutionEntries, "Evolution", "EvolutionDescription", Color.red, RefIcon),
+            HelpSystemBuilder.CreateNewRefEntry(debuggingEntries, "Debugging", "DebuggingDescription", Color.blue, RefIcon),
+            HelpSystemBuilder.CreateNewRefEntry(qualityEntries, "Quality", "QualityDescription", Color.cyan,RefIcon)
+        };
+
+        mainMenu = HelpSystemBuilder.CreateMainMenu(HelpSystem, "MainMenu", "MainDescription", "Materials/Notification/info", mainMenuEntries);
     }
 }
