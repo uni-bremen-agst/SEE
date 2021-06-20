@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game.UI.Menu
@@ -7,7 +8,7 @@ namespace SEE.Game.UI.Menu
     /// <summary>
     /// A menu similar to the <see cref="SimpleMenu"/> with buttons which can open other menus.
     /// </summary>
-    public class NestedMenu: SimpleMenu<MenuEntry>
+    public class NestedMenu : SimpleMenu<MenuEntry>
     {
         /// <summary>
         /// The menu levels we have ascended through.
@@ -19,18 +20,16 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         protected override string MENU_PREFAB => "Prefabs/UI/NestedMenu";
 
-        /// <summary>
-        /// The parent of the
-        /// </summary>
-        public SimpleMenu<MenuEntry> parent;
-        
         protected override void OnEntrySelected(MenuEntry entry)
         {
             if (entry is NestedMenuEntry nestedEntry)
             {
                 // If this contains another menu level, repopulate list with new level after saving the current one
                 Levels.Push(new MenuLevel(Title, Description, Icon, entries));
-                entries.ForEach(RemoveEntry);
+                while(entries.Count != 0)
+                {
+                    RemoveEntry(entries.ElementAt(0));
+                }
                 Title = nestedEntry.Title;
                 Description = nestedEntry.Description;
                 Icon = nestedEntry.Icon;
@@ -47,17 +46,28 @@ namespace SEE.Game.UI.Menu
         {
             entries.Clear();
         }
+
         /// <summary>
         /// Descends down a level in the menu hierarchy and removes the entry from the <see cref="Levels"/>.
         /// </summary>
         private void DescendLevel()
         {
-            MenuLevel level = Levels.Pop();
-            Title = level.Title;
-            Description = level.Description;
-            Icon = level.Icon;
-            entries.ForEach(RemoveEntry);
-            entries.AddRange(level.Entries);
+            Debug.Log(Levels.Count);
+            if (Levels.Count != 0)
+            {
+                MenuLevel level = Levels.Pop();
+                Title = level.Title;
+                Description = level.Description;
+                Icon = level.Icon;
+                while (entries.Count != 0)
+                {
+                    RemoveEntry(entries.ElementAt(0));
+                }
+                foreach(MenuEntry m in level.Entries)
+                {
+                    AddEntry(m);
+                }
+            }
         }
 
         /// <summary>
@@ -75,13 +85,7 @@ namespace SEE.Game.UI.Menu
         protected override void StartDesktop()
         {
             base.StartDesktop();
-            Manager.onCancel.AddListener(GoBack); // Go one level higher when clicking "back"
-        }
-
-        private void GoBack()
-        {
-            this.ToggleMenu();
-            parent.ToggleMenu();
+            Manager.onCancel.AddListener(DescendLevel); // Go one level higher when clicking "back"
         }
 
         /// <summary>

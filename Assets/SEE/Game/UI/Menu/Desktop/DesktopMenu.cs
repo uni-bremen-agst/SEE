@@ -41,7 +41,7 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// The GameObject which has the <see cref="ModalWindowManager"/> component attached.
         /// </summary>
-        private GameObject MenuGameObject;
+        protected GameObject MenuGameObject;
 
         /// <summary>
         /// The modal window manager which contains the actual menu.
