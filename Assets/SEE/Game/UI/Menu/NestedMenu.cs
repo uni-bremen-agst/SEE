@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game.UI.Menu
@@ -20,15 +19,21 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         protected override string MENU_PREFAB => "Prefabs/UI/NestedMenu";
 
+        /// <summary>
+        /// Whether to reset the level of the menu when clicking on the close button.
+        /// Can only be changed before this component has been started.
+        /// </summary>
+        public bool ResetLevelOnClose = true;
+
         protected override void OnEntrySelected(MenuEntry entry)
         {
             if (entry is NestedMenuEntry nestedEntry)
             {
                 // If this contains another menu level, repopulate list with new level after saving the current one
                 Levels.Push(new MenuLevel(Title, Description, Icon, entries));
-                while(entries.Count != 0)
+                while (entries.Count != 0)
                 {
-                    RemoveEntry(entries.ElementAt(0));
+                    RemoveEntry(entries[0]); // Remove all entries
                 }
                 Title = nestedEntry.Title;
                 Description = nestedEntry.Description;
@@ -42,17 +47,11 @@ namespace SEE.Game.UI.Menu
             }
         }
 
-        public void ResetList()
-        {
-            entries.Clear();
-        }
-
         /// <summary>
         /// Descends down a level in the menu hierarchy and removes the entry from the <see cref="Levels"/>.
         /// </summary>
         private void DescendLevel()
         {
-            Debug.Log(Levels.Count);
             if (Levels.Count != 0)
             {
                 MenuLevel level = Levels.Pop();
@@ -61,12 +60,13 @@ namespace SEE.Game.UI.Menu
                 Icon = level.Icon;
                 while (entries.Count != 0)
                 {
-                    RemoveEntry(entries.ElementAt(0));
+                    RemoveEntry(entries[0]); // Remove all entries
                 }
-                foreach(MenuEntry m in level.Entries)
-                {
-                    AddEntry(m);
-                }
+                level.Entries.ForEach(AddEntry);
+            }
+            else
+            {
+                ShowMenu(false);
             }
         }
 
@@ -74,7 +74,7 @@ namespace SEE.Game.UI.Menu
         /// Resets to the lowest level, i.e. resets the menu to the state it was in before any
         /// <see cref="NestedMenuEntry"/> was clicked.
         /// </summary>
-        public void ResetToBase()
+        private void ResetToBase()
         {
             while (Levels.Count > 0)
             {
@@ -86,6 +86,10 @@ namespace SEE.Game.UI.Menu
         {
             base.StartDesktop();
             Manager.onCancel.AddListener(DescendLevel); // Go one level higher when clicking "back"
+            if (ResetLevelOnClose)
+            {
+                Manager.onConfirm.AddListener(ResetToBase); // When closing the menu, its level will be reset to the top
+            }
         }
 
         /// <summary>
@@ -97,7 +101,7 @@ namespace SEE.Game.UI.Menu
             public readonly string Title;
             public readonly string Description;
             public readonly Sprite Icon;
-            public readonly IList<MenuEntry> Entries;
+            public readonly List<MenuEntry> Entries;
 
             public MenuLevel(string title, string description, Sprite icon, IList<MenuEntry> entries)
             {

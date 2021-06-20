@@ -1,7 +1,7 @@
-﻿using SEE.Controls;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Controls;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Windows.Speech;
@@ -38,20 +38,62 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// The name of this menu. Displayed to the user.
         /// </summary>
-        public string Title = "Unnamed Menu";
+        private string title = "Unnamed Menu";
+
+        /// <summary>
+        /// The name of this menu. Displayed to the user.
+        /// </summary>
+        public string Title
+        {
+            get => title;
+            set
+            {
+                title = value;
+                UpdateDesktopTitle();
+            }
+        }
 
         /// <summary>
         /// Brief description of what this menu controls.
         /// Will be displayed to the user above the choices.
         /// The text may <i>not be longer than 3 lines!</i>
         /// </summary>
-        public string Description = "No description added.";
+        private string description = "No description added.";
+
+        /// <summary>
+        /// Brief description of what this menu controls.
+        /// Will be displayed to the user above the choices.
+        /// The text may <i>not be longer than 3 lines!</i>
+        /// </summary>
+        public string Description
+        {
+            get => description;
+            set
+            {
+                description = value;
+                UpdateDesktopDescription();
+            }
+        }
 
         /// <summary>
         /// Icon for this menu. Displayed along the title.
         /// Default is a generic settings (gear) icon.
         /// </summary>
-        public Sprite Icon;
+        private Sprite icon;
+
+        /// <summary>
+        /// Icon for this menu. Displayed along the title.
+        /// Default is a generic settings (gear) icon.
+        /// </summary>
+        public Sprite Icon
+        {
+            get => icon;
+            set
+            {
+                icon = value;
+                UpdateDesktopIcon();
+            }
+        }
 
         /// <summary>
         /// Whether the menu shall be shown.
@@ -81,7 +123,7 @@ namespace SEE.Game.UI.Menu
         /// A read-only wrapper around the list of menu entries for this menu.
         /// </summary>
         /// <seealso cref="MenuEntry"/>
-        public IList<T> Entries => entries;
+        public IList<T> Entries => entries.AsReadOnly();
 
         /// <summary>
         /// Displays or hides the menu, depending on <paramref name="show"/>.
@@ -225,14 +267,14 @@ namespace SEE.Game.UI.Menu
         /// <param name="entry">The entry which was selected.</param>
         protected virtual void OnEntrySelected(T entry)
         {
+            entry.DoAction?.Invoke();
             OnMenuEntrySelected.Invoke(entry);
-            entry.DoAction();
         }
 
         private void Awake()
         {
             // Load default icon (can't be done during instantiation, only in Awake() or Start())
-            Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Settings");
+            icon = Resources.Load<Sprite>("Materials/ModernUIPack/Settings");
         }
         
         protected override void StartTouchGamepad() => StartDesktop();
