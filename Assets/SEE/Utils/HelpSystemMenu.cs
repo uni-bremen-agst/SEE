@@ -1,7 +1,5 @@
-using SEE.Game.UI.Menu;
-using SEE.Utils;
-using System;
 using System.Collections.Generic;
+using SEE.Game.UI.Menu;
 using UnityEngine;
 
 public class HelpSystemMenu : MonoBehaviour
@@ -47,45 +45,32 @@ public class HelpSystemMenu : MonoBehaviour
         mainMenu.Description = "Testdescription";
         mainMenu.Icon = Resources.Load<Sprite>("Materials/Notification/info");
 
-        ToggleMenuEntry entry1 = new ToggleMenuEntry(
-            active: true,
-                    entryAction: null,
-                    exitAction: null,
-                    title: "Entry1",
-                    description: "Des Entry1",
-                    entryColor: Color.red,
-                    icon: Resources.Load<Sprite>("Materials/Notification/info"));
-        ToggleMenuEntry entry2 = new ToggleMenuEntry(
-    active: true,
-            entryAction: null,
-            exitAction: null,
-            title: "Entry2",
-            description: "Des Entry2",
-            entryColor: Color.red,
-            icon: Resources.Load<Sprite>("Materials/Notification/info"));
-        ToggleMenuEntry entry3 = new ToggleMenuEntry(
-    active: true,
-            entryAction: null,
-            exitAction: null,
-            title: "Entry3",
-            description: "Des Entry3",
-            entryColor: Color.red,
-            icon: Resources.Load<Sprite>("Materials/Notification/info"));
+        MenuEntry entry1 = new MenuEntry(action: null,
+                                         title: "Entry1",
+                                         description: "Des Entry1",
+                                         entryColor: Color.red,
+                                         icon: Resources.Load<Sprite>("Materials/Notification/info"));
+        MenuEntry entry2 = new MenuEntry(action: null,
+                                         title: "Entry2",
+                                         description: "Des Entry2",
+                                         entryColor: Color.red,
+                                         icon: Resources.Load<Sprite>("Materials/Notification/info"));
+        MenuEntry entry3 = new MenuEntry(action: null,
+                                         title: "Entry3",
+                                         description: "Des Entry3",
+                                         entryColor: Color.red,
+                                         icon: Resources.Load<Sprite>("Materials/Notification/info"));
 
-        List<ToggleMenuEntry> a = new List<ToggleMenuEntry>();
-        a.Add(entry1);
-        a.Add(entry2);
+        List<MenuEntry> a = new List<MenuEntry> {entry1, entry2};
 
-        NestedMenuEntry entry4 = new NestedMenuEntry(
-             innerEntries: a,
-                title: "Entry4 ref",
-                description: "Des Entry4 ref",
-                entryColor: Color.red,
-                enabled: true,
-                icon: Resources.Load<Sprite>("Materials/Notification/info"));
+        NestedMenuEntry entry4 = new NestedMenuEntry(innerEntries: a,
+                                                     title: "Entry4 ref",
+                                                     description: "Des Entry4 ref",
+                                                     entryColor: Color.red,
+                                                     enabled: true,
+                                                     icon: Resources.Load<Sprite>("Materials/Notification/info"));
 
         mainMenu.AddEntry(entry4);
         mainMenu.AddEntry(entry3);
-        mainMenu.ToggleMenu();
     }
 }
