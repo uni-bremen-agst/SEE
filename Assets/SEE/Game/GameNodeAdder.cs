@@ -103,7 +103,7 @@ namespace SEE.Game
                     Remove(parent);
                     GameObject.Destroy(parent);
                     Node parentNode = NewGraphNode(cache);
-                    AddNodeToGraph(grandparentNode ,parentNode);
+                    AddNodeToGraph(grandparentNode, parentNode);
                     parent = city.Renderer.DrawInnerNode(parentNode);
                     parent.transform.position = new Vector3(parentTrans.position.x, grandparentTrans.position.y, parentTrans.position.z);
                     parent.transform.localScale = new Vector3(parentTrans.localScale.x, grandparentTrans.lossyScale.y, parentTrans.localScale.z);
