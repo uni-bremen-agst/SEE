@@ -120,8 +120,6 @@ namespace SEE.Game
                 
                 result.transform.SetParent(parent.transform);
                 return result;
-                
-                
             }
             else
             {
