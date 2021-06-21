@@ -117,6 +117,7 @@ namespace SEE.Game
                 result.transform.localScale = worldSpaceScale;
                 result.transform.position = new Vector3(position.x, parent.transform.position.y + worldSpaceScale.y / 2, position.z);
                 result.transform.SetParent(parent.transform);
+                Portal.SetPortal(city.gameObject, gameObject: result);
                 return result;
             }
             else
