@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml.XPath;
 using Cysharp.Threading.Tasks;
 using HtmlAgilityPack;
 using SEE.Net.Dashboard.Model;
 using SEE.Net.Dashboard.Model.Issues;
 using SEE.Net.Dashboard.Model.Metric;
 using UnityEngine;
-using Valve.VR.InteractionSystem;
 
 namespace SEE.Net.Dashboard
 {
@@ -241,8 +237,6 @@ namespace SEE.Net.Dashboard
         /// contain HTML tags.</returns>
         public async UniTask<string> GetIssueDescription(string issueName, string version = null)
         {
-            const string TAG_REGEX = @"<([a-z]*) [^<>]*>";
-            
             Dictionary<string, string> parameters = new Dictionary<string, string> {["version"] = version};
             DashboardResult result = await GetAtPath($"/issues/{issueName}/rule", version == null ? null : parameters,
                                                      false, "text/html");
