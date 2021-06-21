@@ -79,6 +79,10 @@ namespace SEE.Game
         /// Creates and returns a new game node as a child of <paramref name="parent"/> having
         /// a nodeRef referencing <paramref name="node"/> at the given <paramref name="position"/>
         /// with the given <paramref name="worldSpaceScale"/>.
+        /// 
+        /// If the <paramref name="parent"/> <paramref name="isLeaf"/>, the parent needs to change 
+        /// from a leafNode to an innerNode. Therefore all Data will be stored and the old leafNode
+        /// will be deleted. Afterwards a new node with the same attributes will be created.
         ///
         /// Precondition: <paramref name="parent"/> must have a valid node reference.
         /// </summary>
@@ -87,38 +91,46 @@ namespace SEE.Game
         /// <param name="position">the position in world space for the center point of the new game node</param>
         /// <param name="worldSpaceScale">the scale in world space of the new game node</param>
         /// <param name="nodeID">the unique ID of the new node; if null or empty, a random ID will be used</param>
+        /// <param name="isLeaf">Status of parent</param>
         /// <returns>new child game node or null if none could be created</returns>
         public static GameObject Add(GameObject parent, Vector3 position, Vector3 worldSpaceScale, string nodeID = null, bool isLeaf = false)
         {
             SEECity city = parent.ContainingCity();
             if (city != null)
             {
+                Transform parentTrans = parent.transform;
+
                 if (isLeaf)
                 {
-                    Transform parentTrans = parent.transform;
+                    //preparing transition of leafNode to innerNode
+                    //therefore its parent (grandparent) is needed
                     Transform grandparentTrans = parentTrans.parent.transform;
-                    String cache = parent.GetNode().ID;
-                    NodeRef refCache = NodeRef.Get(parent.GetNode());
-                    Node grandparentNode = parent.GetNode().Parent;
+                    //saving data
+                    Node oldNode = parent.GetNode();
+                    String cache = oldNode.ID;
+                    Node grandparentNode = oldNode.Parent;
+                    //destroy the old LeafNode as GameObject and as Node
                     Remove(parent);
                     GameObject.Destroy(parent);
+                    //creating parent as innerNode and adding it
                     Node parentNode = NewGraphNode(cache);
                     AddNodeToGraph(grandparentNode, parentNode);
                     parent = city.Renderer.DrawInnerNode(parentNode);
-                    parent.transform.position = new Vector3(parentTrans.position.x, grandparentTrans.position.y, parentTrans.position.z);
-                    parent.transform.localScale = new Vector3(parentTrans.localScale.x, grandparentTrans.lossyScale.y, parentTrans.localScale.z);
-                    parent.transform.SetParent(grandparentTrans.parent);
+                    parentTrans.position = new Vector3(parentTrans.position.x, grandparentTrans.position.y, parentTrans.position.z);
+                    parentTrans.localScale = new Vector3(parentTrans.localScale.x, grandparentTrans.lossyScale.y, parentTrans.localScale.z);
+                    parentTrans.SetParent(grandparentTrans.parent);
+                    //synching new innerNode
                     GameNodeMover.FinalizePosition(parent, parent.transform.position);
-                    GameNodeMover.NetworkFinalizeNodePosition(parent, parent.transform.parent.name, parent.transform.position);
+                    GameNodeMover.NetworkFinalizeNodePosition(parent, grandparentTrans.name, parent.transform.position);
                 }
 
                 Node node = NewGraphNode(nodeID);
                 AddNodeToGraph(parent.GetNode(), node);
                 GameObject result = city.Renderer.DrawLeafNode(node);
                 result.transform.localScale = worldSpaceScale;
-                result.transform.position = new Vector3(position.x, parent.transform.position.y , position.z);
+                result.transform.position = new Vector3(position.x, parentTrans.position.y , position.z);
                 
-                result.transform.SetParent(parent.transform);
+                result.transform.SetParent(parentTrans);
                 return result;
             }
             else
