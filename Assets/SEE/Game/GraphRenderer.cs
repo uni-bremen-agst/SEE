@@ -430,7 +430,7 @@ namespace SEE.Game
                         sublayout.Layout();
                     }
 
-                    p = Performance.Begin("node layout " + settings.nodeLayoutSettings.kind + " (with sublayouts)");
+                    p = Performance.Begin($"Node layout {settings.nodeLayoutSettings.kind} (with sublayouts)");
                     // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
                     // (GameNode implements ILayoutNode).
                     ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
@@ -1401,15 +1401,18 @@ namespace SEE.Game
         /// to the InnerNodeHeightMetric.
         ///
         /// Precondition: <paramref name="gameNode"/> must denote an inner node created
-        /// by innerNodeFactory.
+        /// by <see cref="innerNodeFactory"/> and must have a <see cref="NodeRef"/>
+        /// attached to it.
         /// </summary>
         /// <param name="gameNode">inner node whose height is to be set</param>
+        /// <exception cref="Exception">thrown if <paramref name="gameNode"/> has no
+        /// <see cref="NodeRef"/> attached to it</exception>
         private void AdjustHeightOfInnerNode(GameObject gameNode)
         {
             NodeRef noderef = gameNode.GetComponent<NodeRef>();
             if (noderef == null)
             {
-                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
+                throw new Exception($"Game object {gameNode.name} does not have a graph node attached to it.");
             }
             else
             {
@@ -1567,7 +1570,8 @@ namespace SEE.Game
         /// via a NodeRef component. The style and height of the resulting game
         /// object are adjusted according to the selected InnerNodeStyleMetric
         /// and InnerNodeHeightMetric, respectively. The other scale dimensions
-        /// are not changed.
+        /// are not changed. In addition, level of details are added as well
+        /// as all components needed for interaction with this game object.
         ///
         /// Precondition: <paramref name="node"/> must be an inner node of the node
         /// hierarchy.
@@ -1580,7 +1584,27 @@ namespace SEE.Game
             // later it should be drawn, or in other words, the higher its offset in the
             // render queue should be. We are assuming that the nodes are stacked on each
             // other according to the node hierarchy. Leaves are on top of all other nodes.
+            GameObject result = CreateInnerGameObject(node);
+            AddLOD(result);
+            InteractionDecorator.PrepareForInteraction(result);
+            return result;
+        }
 
+        /// <summary>
+        /// Creates a new game object for an inner node using innerNodeFactory.
+        /// The inner <paramref name="node"/> is attached to that new game object
+        /// via a NodeRef component. The style and height of the resulting game
+        /// object are adjusted according to the selected InnerNodeStyleMetric
+        /// and InnerNodeHeightMetric, respectively. The other scale dimensions
+        /// are not changed.
+        ///
+        /// Precondition: <paramref name="node"/> must be an inner node of the node
+        /// hierarchy.
+        /// </summary>
+        /// <param name="node">graph node for which to create the game node</param>
+        /// <returns>new game object for the inner node</returns>
+        private GameObject CreateInnerGameObject(Node node)
+        {
             int style = SelectStyle(node);
             GameObject result = innerNodeFactories[(int)node.Domain].NewBlock(style, node.Level);
             ColoringKind coloringKind = settings.innerNodeAttributesPerKind[(int)node.Domain].coloringKind;
@@ -1597,9 +1621,50 @@ namespace SEE.Game
             result.tag = Tags.Node;
             result.AddComponent<NodeRef>().Value = node;
             AdjustHeightOfInnerNode(result);
-            AddLOD(result);
-            InteractionDecorator.PrepareForInteraction(result);
             return result;
+        }
+
+        /// <summary>
+        /// Re-draws <paramref name="gameNode"/> as an inner node.
+        /// </summary>
+        /// <param name="gameNode">node to be drawn as inner node</param>
+        public void RedrawAsInnerNode(GameObject gameNode)
+        {
+            // We create a new inner node and then "steal" its mesh.
+            Node node = gameNode.GetNode();
+            GameObject innerNode = CreateInnerGameObject(node);
+            Mesh newMesh = innerNode.GetComponent<MeshFilter>().mesh;
+            gameNode.GetComponent<MeshFilter>().mesh = newMesh;
+
+            InnerNodeFactory innerNodeFactory = innerNodeFactories[(int)node.Domain];
+
+            // The original ground position of gameNode.
+            Vector3 groundPosition = innerNodeFactory.Ground(gameNode);
+            /// We maintain the depth and width of gameNode, but adjust its height
+            /// according to the metric that determines the height of inner nodes.
+            /// The call to <see cref="CreateInnerGameObject"/> has set the height
+            /// of <see cref="innerNode"/> accordingly.
+            innerNodeFactory.SetHeight(gameNode, innerNode.transform.lossyScale.y);
+
+            // Finally, because the height has changed, we need to adjust the position.
+            innerNodeFactory.SetGroundPosition(gameNode, groundPosition);
+
+            // If newMesh is modified, call the following (just for the record, not necessary here).
+            // Required by almost every shader to calculate brightness levels correctly:
+            //   newMesh.RecalculateNormals();
+            // Required for some shaders, especially those which use bump mapping.
+            // This step depends on the normals, so it needs to be executed after
+            // you recalculated the normals:
+            //   newMesh.RecalculateTangents();
+            // Required for reliably detecting if the mesh is off-screen (so it can
+            // be culled) and for collision detection if you are using it as a
+            // MeshCollider. This method actually gets called automatically when
+            // you set the .triangles, but not when you set the .vertices:
+            //   newMesh.RecalculateBounds();
+
+            // innerNode is no longer needed; we have its mesh that is all we needed.
+            // It can be dismissed.
+            GameObject.Destroy(innerNode);
         }
 
         /// <summary>
