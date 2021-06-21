@@ -31,7 +31,7 @@ namespace SEE.Controls.Actions
                 // The position at which the parent was hit will be the center point of the new node
                 Vector3 position = raycastHit.point;
                 Vector3 scale = FindSize(parent, position);
-                addedGameNode = GameNodeAdder.Add(parent, position: position, worldSpaceScale: scale, null, parent.IsLeaf());
+                addedGameNode = GameNodeAdder.Add(parent, position: position, worldSpaceScale: scale, isLeaf: parent.IsLeaf());
                 if (addedGameNode != null)
                 {
                     memento = new Memento(parent, position: position, scale: scale);
