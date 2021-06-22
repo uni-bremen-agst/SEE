@@ -134,7 +134,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="start">start position</param>
         /// <param name="end">end position</param>
-        /// <returns>mid point in between <paramref name="start"/> and <paramref name="end"/></returns>
+        /// <returns>mid point inbetween <paramref name="start"/> and <paramref name="end"/></returns>
         private static Vector3 FindPlace(Vector3 start, Vector3 end)
         {
             return start + 0.5f * (end - start);
