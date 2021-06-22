@@ -1294,10 +1294,12 @@ namespace SEE.Game
             bool isLeaf = node.IsLeaf();
             NodeFactory nodeFactory = isLeaf ? leafNodeFactories[(int)node.Domain] : innerNodeFactories[(int)node.Domain];
             uint numberOfStyles = nodeFactory.NumberOfStyles();
-            ColoringKind coloringKind = isLeaf ? settings.leafNodeAttributesPerKind[(int)node.Domain].coloringKind : settings.innerNodeAttributesPerKind[(int)node.Domain].coloringKind;
+            ColoringKind coloringKind = isLeaf ? settings.leafNodeAttributesPerKind[(int)node.Domain].coloringKind
+                                               : settings.innerNodeAttributesPerKind[(int)node.Domain].coloringKind;
             if (coloringKind == ColoringKind.Metric)
             {
-                string styleMetric = isLeaf ? settings.leafNodeAttributesPerKind[(int)node.Domain].styleMetric : settings.innerNodeAttributesPerKind[(int)node.Domain].styleMetric;
+                string styleMetric = isLeaf ? settings.leafNodeAttributesPerKind[(int)node.Domain].styleMetric
+                                            : settings.innerNodeAttributesPerKind[(int)node.Domain].styleMetric;
 
                 float metricMaximum;
                 if (TryGetFloat(styleMetric, out float value))
@@ -1354,20 +1356,21 @@ namespace SEE.Game
         /// <returns>roof position</returns>
         internal Vector3 GetRoof(GameObject gameNode)
         {
-            NodeRef noderef = gameNode.GetComponent<NodeRef>();
-            if (noderef == null)
+            if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
-                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
-            }
-
-            Node node = noderef.Value;
-            if (node.IsLeaf())
-            {
-                return leafNodeFactories[(int)node.Domain].Roof(gameNode);
+                Node node = nodeRef.Value;
+                if (node.IsLeaf())
+                {
+                    return leafNodeFactories[(int)node.Domain].Roof(gameNode);
+                }
+                else
+                {
+                    return innerNodeFactories[(int)node.Domain].Roof(gameNode);
+                }
             }
             else
             {
-                return innerNodeFactories[(int)node.Domain].Roof(gameNode);
+                throw new Exception($"Game object {gameNode.name} does not have a graph node attached to it.");
             }
         }
 
@@ -1380,19 +1383,21 @@ namespace SEE.Game
         /// <returns>scale of <paramref name="gameNode"/></returns>
         internal Vector3 GetSize(GameObject gameNode)
         {
-            NodeRef noderef = gameNode.GetComponent<NodeRef>();
-            if (noderef == null)
+            if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
-                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
-            }
-            Node node = noderef.Value;
-            if (node.IsLeaf())
-            {
-                return leafNodeFactories[(int)node.Domain].GetSize(gameNode);
+                Node node = nodeRef.Value;
+                if (node.IsLeaf())
+                {
+                    return leafNodeFactories[(int)node.Domain].GetSize(gameNode);
+                }
+                else
+                {
+                    return innerNodeFactories[(int)node.Domain].GetSize(gameNode);
+                }
             }
             else
             {
-                return innerNodeFactories[(int)node.Domain].GetSize(gameNode);
+                throw new Exception($"Game object {gameNode.name} does not have a graph node attached to it.");
             }
         }
 
@@ -1409,16 +1414,15 @@ namespace SEE.Game
         /// <see cref="NodeRef"/> attached to it</exception>
         private void AdjustHeightOfInnerNode(GameObject gameNode)
         {
-            NodeRef noderef = gameNode.GetComponent<NodeRef>();
-            if (noderef == null)
+            if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
-                throw new Exception($"Game object {gameNode.name} does not have a graph node attached to it.");
+                Node node = nodeRef.Value;
+                float value = GetMetricValue(nodeRef.Value, settings.innerNodeAttributesPerKind[(int)node.Domain].heightMetric);
+                innerNodeFactories[(int)node.Domain].SetHeight(gameNode, value);
             }
             else
             {
-                Node node = noderef.Value;
-                float value = GetMetricValue(noderef.Value, settings.innerNodeAttributesPerKind[(int)node.Domain].heightMetric);
-                innerNodeFactories[(int)node.Domain].SetHeight(gameNode, value);
+                throw new Exception($"Game object {gameNode.name} does not have a graph node attached to it.");
             }
         }
 
@@ -1430,21 +1434,23 @@ namespace SEE.Game
         /// <param name="gameNode">a game node representing a leaf or inner graph node</param>
         public void AdjustStyle(GameObject gameNode)
         {
-            NodeRef noderef = gameNode.GetComponent<NodeRef>();
-            if (noderef == null)
+            if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
-                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
-            }
-
-            Node node = noderef.Value;
-            int style = SelectStyle(node);
-            if (node.IsLeaf())
-            {
-                leafNodeFactories[(int)node.Domain].SetStyle(gameNode, style);
+                Node node = nodeRef.Value;
+                int style = SelectStyle(node);
+                if (node.IsLeaf())
+                {
+                    leafNodeFactories[(int)node.Domain].SetStyle(gameNode, style);
+                }
+                else
+                {
+                    // TODO: for some reason, the material is selected twice. Once here and once somewhere earlier (I believe in NewBlock somewhere).
+                    innerNodeFactories[(int)node.Domain].SetStyle(gameNode, style);
+                }
             }
             else
             {
-                innerNodeFactories[(int)node.Domain].SetStyle(gameNode, style); // TODO: for some reason, the material is selected twice. once here and once somewhere earlier (i believe in NewBlock somewhere).
+                throw new Exception($"Game object {gameNode.name} does not have a graph node attached to it.");
             }
         }
 
@@ -1460,37 +1466,38 @@ namespace SEE.Game
         /// <param name="gameNode">the game object whose visual attributes are to be adjusted</param>
         public void AdjustScaleOfLeaf(GameObject gameNode)
         {
-            NodeRef nodeRef = gameNode.GetComponent<NodeRef>();
-            if (nodeRef == null)
+            if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
-                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
-            }
-
-            Node node = nodeRef.Value;
-            if (node.IsLeaf())
-            {
-                // Scaled metric values for the three dimensions.
-                Vector3 scale = GetScale(node);
-
-                // Scale according to the metrics.
-                if (settings.nodeLayoutSettings.kind == NodeLayoutKind.Treemap)
+                Node node = nodeRef.Value;
+                if (node.IsLeaf())
                 {
-                    // FIXME: This is ugly. The graph renderer should not need to care what
-                    // kind of layout was applied.
-                    // In case of treemaps, the width metric is mapped on the ground area.
-                    float widthOfSquare = Mathf.Sqrt(scale.x);
-                    leafNodeFactories[(int)node.Domain].SetWidth(gameNode, NodeFactory.Unit * widthOfSquare);
-                    leafNodeFactories[(int)node.Domain].SetDepth(gameNode, NodeFactory.Unit * widthOfSquare);
-                    leafNodeFactories[(int)node.Domain].SetHeight(gameNode, NodeFactory.Unit * scale.y);
+                    // Scaled metric values for the three dimensions.
+                    Vector3 scale = GetScale(node);
+
+                    // Scale according to the metrics.
+                    if (settings.nodeLayoutSettings.kind == NodeLayoutKind.Treemap)
+                    {
+                        // FIXME: This is ugly. The graph renderer should not need to care what
+                        // kind of layout was applied.
+                        // In case of treemaps, the width metric is mapped on the ground area.
+                        float widthOfSquare = Mathf.Sqrt(scale.x);
+                        leafNodeFactories[(int)node.Domain].SetWidth(gameNode, NodeFactory.Unit * widthOfSquare);
+                        leafNodeFactories[(int)node.Domain].SetDepth(gameNode, NodeFactory.Unit * widthOfSquare);
+                        leafNodeFactories[(int)node.Domain].SetHeight(gameNode, NodeFactory.Unit * scale.y);
+                    }
+                    else
+                    {
+                        gameNode.transform.localScale = NodeFactory.Unit * scale;
+                    }
                 }
                 else
                 {
-                    gameNode.transform.localScale = NodeFactory.Unit * scale;
+                    throw new Exception($"Game object {gameNode.name} is not a leaf.");
                 }
             }
             else
             {
-                throw new Exception("Game object " + gameNode.name + " is not a leaf.");
+                throw new Exception($"Game object {gameNode.name} does not have a graph node attached to it.");
             }
         }
 
