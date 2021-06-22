@@ -127,7 +127,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns the position in between <paramref name="start"/> and <paramref name="end"/>.
+        /// Returns the position inbetween <paramref name="start"/> and <paramref name="end"/>.
         /// More precisely, let L be the line from <paramref name="start"/> to <paramref name="end"/>.
         /// Then the point on L is returned whose distance to <paramref name="start"/> equals the
         /// distance to <paramref name="end"/>.
