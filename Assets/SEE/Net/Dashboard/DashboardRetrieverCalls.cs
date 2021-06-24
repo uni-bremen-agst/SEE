@@ -256,12 +256,13 @@ namespace SEE.Net.Dashboard
 
             HtmlNode ruleInfo = htmlDocument.DocumentNode.SelectSingleNode("//div[contains(concat(' ',normalize-space(@class),' '),' errorinfo ')]");
             // Remove configuration table and heading
-            ruleInfo.SelectNodes("//h4[position()=1]").ToList().ForEach(x => x.Remove());
-            ruleInfo.SelectNodes("//h5[text()='Configuration']").ToList().ForEach(x => x.Remove());
+            ruleInfo.SelectNodes("//h4[position()=1]")?.ToList().ForEach(x => x?.Remove());
+            ruleInfo.SelectNodes("//h5[text()='Configuration']")?.ToList().ForEach(x => x?.Remove());
             ruleInfo.SelectNodes("//table[contains(concat(' ',normalize-space(@class),' '),' rule-config ')]")
-                    .ToList().ForEach(x => x.Remove());
+                   ?.ToList().ForEach(x => x?.Remove());
 
-            return HtmlEntity.DeEntitize(ruleInfo.InnerText);
+            string ruleText = string.Join("\n", ruleInfo.InnerText.Split('\n').Select(x => x.Trim(' ', '\t')));
+            return HtmlEntity.DeEntitize(ruleText).Trim(' ', '\t', '\n', '\r');
         }
 
         #endregion

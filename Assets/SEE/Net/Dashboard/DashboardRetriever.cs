@@ -158,7 +158,9 @@ namespace SEE.Net.Dashboard
             request.certificateHandler = new AxivionCertificateHandler(PublicKey);
             request.SetRequestHeader("Accept", accept);
             request.SetRequestHeader("Authorization", $"AxToken {Token}");
-            request.SendWebRequest();
+            #pragma warning disable CS4014
+            request.SendWebRequest(); // we don't need to await this, because of the next line
+            #pragma warning restore CS4014
             await UniTask.WaitUntil(() => request.isDone);
             DashboardResult result = request.result switch
             {

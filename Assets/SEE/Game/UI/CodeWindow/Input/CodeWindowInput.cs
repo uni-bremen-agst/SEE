@@ -7,7 +7,6 @@ using Cysharp.Threading.Tasks;
 using SEE.Game.UI.Notification;
 using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Issues;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -18,51 +17,69 @@ namespace SEE.Game.UI.CodeWindow
     /// </summary>
     public partial class CodeWindow
     {
+        /// <summary>
+        /// A dictionary mapping each link ID to its issues.
+        /// </summary>
+        private readonly Dictionary<char, List<Issue>> issueDictionary = new Dictionary<char, List<Issue>>();
 
         /// <summary>
-        /// A dictionary mapping each issue ID to their issue.
+        /// Counter which represents the lowest unfilled position in the <see cref="issueDictionary"/>.
+        /// Any index above it must not be filled either.
         /// </summary>
-        private readonly Dictionary<int, Issue> issueDictionary = new Dictionary<int, Issue>();
-        
+        private char linkCounter = char.MinValue;
+
         /// <summary>
-        /// Populates the code window with the content of the given non-filled lexer's token stream.
+        /// List of tokens for this code window.
         /// </summary>
-        /// <param name="lexer">Lexer with which the source code file was read. Must not be filled.</param>
-        /// <param name="language">Token language for the given lexer. May be <c>null</c>, in which case it is
-        /// determined by the lexer name.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="lexer"/> is <c>null</c></exception>
-        /// <exception cref="ArgumentException">
-        /// If the given <paramref name="lexer"/> is not of a supported grammar.
-        /// </exception>
-        public void EnterFromTokens(IEnumerable<SEEToken> tokens)
+        private List<SEEToken> TokenList;
+
+        /// <summary>
+        /// Characters representing newlines.
+        /// Note that newlines may also consist of aggregations of this set (e.g. "\r\n").
+        /// </summary>
+        private static readonly char[] NewlineCharacters = {'\r', '\n'};
+
+        /// <summary>
+        /// Populates the code window with the content of the given token stream.
+        /// </summary>
+        /// <param name="tokens">Stream of tokens representing the source code of this code window.</param>
+        /// <param name="issues">Issues for this file. If <c>null</c>, will be automatically retrieved.
+        /// Entities spanning multiple lines (i.e. using <c>endLine</c>) are not supported.
+        /// If you wish to use such issues, split the entities up into one per line (see <see cref="MarkIssues"/>).
+        /// </param>
+        /// <exception cref="ArgumentNullException">If <paramref name="tokens"/> is <c>null</c>.</exception>
+        public void EnterFromTokens(IEnumerable<SEEToken> tokens,
+                                    IDictionary<int, List<(SourceCodeEntity entity, Issue issue)>> issues = null)
         {
             if (tokens == null)
             {
                 throw new ArgumentNullException(nameof(tokens));
             }
-            
+
             // Avoid multiple enumeration in case iteration over the data source is expensive.
-            List<SEEToken> tokenList = tokens.ToList();
-            if (!tokenList.Any())
+            TokenList = tokens.ToList();
+            TokenLanguage language = TokenList.FirstOrDefault()?.Language;
+            if (language == null)
             {
                 Text = "<i>This file is empty.</i>";
                 return;
             }
 
-            TokenLanguage language = tokenList.First().Language;
-            
-            // We need to insert this pseudo token here so that the first line gets a line number.
-            tokenList.Insert(0, new SEEToken(string.Empty, SEEToken.Type.Newline, -1, 0, language));
-
             // Unsurprisingly, each newline token corresponds to a new line.
             // However, we need to also add "hidden" newlines contained in other tokens, e.g. block comments.
-            int assumedLines = tokenList.Count(x => x.TokenType.Equals(SEEToken.Type.Newline)) 
-                               + tokenList.Where(x => !x.TokenType.Equals(SEEToken.Type.Newline)) 
+            int assumedLines = TokenList.Count(x => x.TokenType.Equals(SEEToken.Type.Newline))
+                               + TokenList.Where(x => !x.TokenType.Equals(SEEToken.Type.Newline))
                                           .Aggregate(0, (l, token) => token.Text.Count(x => x == '\n'));
             // Needed padding is the number of lines, because the line number will be at most this long.
             int neededPadding = assumedLines.ToString().Length;
-            int lineNumber = 1;
-            foreach (SEEToken token in tokenList)
+
+            Text = $"<color=#CCCCCC>{string.Join("", Enumerable.Repeat(" ", neededPadding - 1))}1</color> ";
+            int lineNumber = 2; // Line number we'll write down next
+            bool currentlyMarking = false;
+            Dictionary<SEEToken, ISet<Issue>> issueTokens = new Dictionary<SEEToken, ISet<Issue>>();
+            //TODO: Handle these issues
+
+            foreach (SEEToken token in TokenList)
             {
                 if (token.TokenType == SEEToken.Type.Unknown)
                 {
@@ -71,11 +88,11 @@ namespace SEE.Game.UI.CodeWindow
 
                 if (token.TokenType == SEEToken.Type.Newline)
                 {
-                    AppendNewline(ref lineNumber, ref Text, neededPadding);
+                    AppendNewline(ref lineNumber, ref Text, neededPadding, token);
                 }
                 else if (token.TokenType != SEEToken.Type.EOF) // Skip EOF token completely.
                 {
-                    lineNumber = HandleMultilineToken(token);
+                    lineNumber = HandleToken(token);
                 }
             }
 
@@ -84,32 +101,79 @@ namespace SEE.Game.UI.CodeWindow
             Text = Text.TrimStart('\n'); // Remove leading newline.
 
             # region Local Functions
+
             // Appends a newline to the text, assuming we're at theLineNumber and need the given padding.
-            static void AppendNewline(ref int theLineNumber, ref string text, int padding)
+            // Note that newlines MUST be added in this method, not anywhere else, else issue highlighting will break!
+            void AppendNewline(ref int theLineNumber, ref string text, int padding, SEEToken token)
             {
+                // Close an issue marking here if necessary
+                if (currentlyMarking)
+                {
+                    text += "</mark></link>";
+                    currentlyMarking = false;
+                }
+
                 // First, of course, the newline.
                 text += "\n";
                 // Add whitespace next to line number so it's consistent.
                 text += string.Join("", Enumerable.Repeat(" ", padding - $"{theLineNumber}".Length));
                 // Line number will be typeset in grey to distinguish it from the rest.
                 text += $"<color=#CCCCCC>{theLineNumber}</color> ";
+
+                if (issues?.ContainsKey(theLineNumber) ?? false)
+                {
+                    // If all issues in this line are content-based, we try to find the content within the line
+                    if (issues[theLineNumber].Exists(x => x.entity.content == null)
+                        || !HandleContentBasedIssue(theLineNumber, token))
+                    {
+                        // Otherwise, start new issue marking here if an issue in the line is line-based (has no content)
+                        // or if we couldn't do the content-based issue marking for any reason.
+                        HandleLineBasedIssue(theLineNumber, ref text);
+                    }
+                }
+
                 theLineNumber++;
             }
 
             // Handles a token which may contain newlines and adds its syntax-highlighted content to the code window.
-            int HandleMultilineToken(SEEToken token)
+            // Returns the new line number.
+            int HandleToken(SEEToken token)
             {
+                string[] newlineStrings = NewlineCharacters.Select(x => x.ToString()).Concat(new[]
+                {
+                    // Apart from the characters themselves, we also want to look for the concatenation of them
+                    NewlineCharacters.Aggregate("", (s, c) => s + c),
+                    NewlineCharacters.Aggregate("", (s, c) => c + s)
+                }).ToArray();
+                string[] tokenLines = token.Text.Split(newlineStrings, StringSplitOptions.None);
                 bool firstRun = true;
-                string[] tokenLines = token.Text.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None);
                 foreach (string line in tokenLines)
                 {
                     // Any entry after the first is on a separate line.
                     if (!firstRun)
                     {
-                        AppendNewline(ref lineNumber, ref Text, neededPadding);
+                        AppendNewline(ref lineNumber, ref Text, neededPadding, token);
                     }
 
-                    // No "else if" because we still want to display this token.
+                    // Mark any potential issue
+                    if (issueTokens.ContainsKey(token) && issueTokens[token].Count > 0)
+                    {
+                        if (currentlyMarking)
+                        {
+                            // If this line is already fully marked, we just add our issue to the corresponding link
+                            Assert.IsNotNull(issueDictionary[linkCounter], "Entry must exist when we are currently marking!");
+                            issueDictionary[linkCounter].AddRange(issueTokens[token]);
+                        }
+                        else
+                        {
+                            Color issueColor = DashboardRetriever.Instance.GetIssueColor(issueTokens[token].First());
+                            string issueColorString = ColorUtility.ToHtmlStringRGB(issueColor);
+                            IncreaseLinkCounter();
+                            issueDictionary[linkCounter] = issueTokens[token].ToList();
+                            Text += $"<link=\"{linkCounter.ToString()}\"><mark=#{issueColorString}33>";
+                        }
+                    }
+
                     if (token.TokenType == SEEToken.Type.Whitespace)
                     {
                         // We just copy the whitespace verbatim, no need to even color it.
@@ -118,7 +182,13 @@ namespace SEE.Game.UI.CodeWindow
                     }
                     else
                     {
-                        Text += $"<color=#{token.TokenType.Color}><noparse>{line.Replace("noparse", "")}</noparse></color>";
+                        Text += $"<color=#{token.TokenType.Color}><noparse>{line.Replace("/noparse", "")}</noparse></color>";
+                    }
+
+                    // Close any potential issue marking
+                    if (issueTokens.ContainsKey(token) && !currentlyMarking)
+                    {
+                        Text += "</mark></link>";
                     }
 
                     firstRun = false;
@@ -126,9 +196,87 @@ namespace SEE.Game.UI.CodeWindow
 
                 return lineNumber;
             }
+
+            // Returns true iff the content based issue could correctly be inserted
+            bool HandleContentBasedIssue(int theLineNumber, SEEToken currentToken)
+            {
+                // Note: If there are any performance issues, I suspect the following loop body to be a major
+                // contender for optimization. The easiest fix at the loss of functionality would be
+                // to simply not mark the issues by content, but instead only use line-based markings.
+                foreach ((SourceCodeEntity entity, Issue issue) in issues[theLineNumber])
+                {
+                    string entityContent = entity.content;
+                    // We now have to determine whether this token is part of an issue entity.
+                    // In order to do this, we look ahead in the token stream and construct the line we're on
+                    // to determine whether the entity will arrive in this line or not.
+                    IList<SEEToken> lineTokens =
+                        TokenList.SkipWhile(x => x != currentToken).Skip(1)
+                                 .TakeWhile(x => x.TokenType != SEEToken.Type.Newline
+                                                 && !x.Text.Intersect(NewlineCharacters).Any()).ToList();
+                    string line = lineTokens.Aggregate("", (s, t) => s + t.Text);
+                    MatchCollection matches = Regex.Matches(line, Regex.Escape(entityContent));
+                    if (matches.Count != 1)
+                    {
+                        // Switch to line-based marking instead.
+                        // We do this if we found more than one occurence too, because in that case
+                        // we have no way to determine which of the occurrences is the right one.
+                        return false;
+                    }
+                    else
+                    {
+                        // We have to check at which token the entity begins and at which it (inclusively) ends.
+                        // Note that this implies that we assume an entity will always encompass only whole
+                        // tokens, never just parts of tokens. If this doesn't hold, the whole token will be
+                        // highlighted anyway.
+                        // TODO: It is possible to implement an algorithm which can also handle that,
+                        // but that won't be done here, since it's out of scope.
+
+                        // We first create a list of character-wise parts of the tokens, then match
+                        // using the regex's index and length.
+                        IList<SEEToken> matchTokens = lineTokens.SelectMany(t => t.Text.Select(_ => t))
+                                                                .Skip(matches[0].Index)
+                                                                .Take(entityContent.Length).ToList();
+                        foreach (SEEToken matchToken in matchTokens.ToList())
+                        {
+                            if (!issueTokens.ContainsKey(matchToken))
+                            {
+                                issueTokens[matchToken] = new HashSet<Issue>();
+                            }
+
+                            issueTokens[matchToken].Add(issue);
+                        }
+
+                        Assert.IsTrue(matchTokens.Count > 0); // Regex Match necessitates at least 1 occurence!
+                    }
+                }
+
+                return true;
+            }
+
+            // Returns the last line number which is part of the issue starting in this line
+            void HandleLineBasedIssue(int theLineNumber, ref string text)
+            {
+                // Limitation: We can only use the color of the first issue, because we can't reliably detect the
+                // order of the entities within a single line. Details for all issues are shown on hover.
+                string issueColor = ColorUtility.ToHtmlStringRGB(DashboardRetriever.Instance.GetIssueColor(issues[theLineNumber][0].issue));
+                IncreaseLinkCounter();
+                issueDictionary[linkCounter] = issues[theLineNumber].Select(x => x.issue).ToList();
+                text += $"<link=\"{linkCounter.ToString()}\"><mark=#{issueColor}33>"; //Transparency value of 0x33
+                currentlyMarking = true;
+            }
+
+            // Increases the link counter to its next value
+            void IncreaseLinkCounter()
+            {
+                Assert.IsTrue(linkCounter < char.MaxValue);
+                char[] reservedCharacters = {'<', '>', '"', '\''}; // these characters would break our formatting
+                // Increase link counter until it contains an allowed character
+                while (reservedCharacters.Contains(++linkCounter));
+            }
+
             #endregion
         }
-        
+
         /// <summary>
         /// Populates the code window with the contents of the given file.
         /// This will overwrite any existing text.
@@ -147,10 +295,11 @@ namespace SEE.Game.UI.CodeWindow
             for (int i = 0; i < text.Length; i++)
             {
                 // Add whitespace next to line number so it's consistent.
-                Text += string.Join("", Enumerable.Repeat(" ", neededPadding-$"{i+1}".Length));
+                Text += string.Join("", Enumerable.Repeat(" ", neededPadding - $"{i + 1}".Length));
                 // Line number will be typeset in yellow to distinguish it from the rest.
-                Text += $"<color=\"yellow\">{i+1}</color> <noparse>{text[i].Replace("noparse", "")}</noparse>\n";
+                Text += $"<color=\"yellow\">{i + 1}</color> <noparse>{text[i].Replace("noparse", "")}</noparse>\n";
             }
+
             lines = text.Length;
         }
 
@@ -165,7 +314,7 @@ namespace SEE.Game.UI.CodeWindow
         public void EnterFromFile(string filename, bool syntaxHighlighting = true)
         {
             FilePath = filename;
-            
+
             // Try to read the file, otherwise display the error message.
             if (!File.Exists(filename))
             {
@@ -173,9 +322,10 @@ namespace SEE.Game.UI.CodeWindow
                 Destroy(this);
                 return;
             }
+
             try
             {
-                //TODO: Maybe disable syntax highlighting for huge files, as it would impact performance badly.
+                //TODO: Maybe disable syntax highlighting for huge files, as it may impact performance badly.
                 if (syntaxHighlighting)
                 {
                     try
@@ -192,7 +342,6 @@ namespace SEE.Game.UI.CodeWindow
                 else
                 {
                     EnterFromText(File.ReadAllLines(filename));
-                    MarkIssues(filename).Forget(); // initiate issue search
                 }
             }
             catch (IOException exception)
@@ -204,18 +353,16 @@ namespace SEE.Game.UI.CodeWindow
 
         private async UniTaskVoid MarkIssues(string path)
         {
-            const string NOPARSE = "<noparse>";
-            const string NOPARSE_CLOSE = "</noparse>";
-            
             // First notification should stay as long as issues are still loading.
-            Notification.Notification firstNotification = ShowNotification.Info("Loading issues...", 
+            Notification.Notification firstNotification = ShowNotification.Info("Loading issues...",
                                                                                 "This may take a while.", -1f);
             string queryPath = Path.GetFileName(path);
             List<Issue> allIssues;
             try
             {
                 allIssues = new List<Issue>(await DashboardRetriever.Instance.GetConfiguredIssues(fileFilter: $"\"*{queryPath}\""));
-            } catch (DashboardException e)
+            }
+            catch (DashboardException e)
             {
                 firstNotification.Close();
                 ShowNotification.Error("Couldn't load issues", e.Message);
@@ -232,7 +379,7 @@ namespace SEE.Game.UI.CodeWindow
             // When there are different paths in the issue table, this implies that there are some files 
             // which aren't actually the one we're looking for (because we've only matched by filename so far).
             // In this case, we'll gradually refine our results until this isn't the case anymore.
-            for (int skippedParts = path.Count(x => x == PATH_SEPARATOR)-2; !MatchingPaths(allIssues); skippedParts--)
+            for (int skippedParts = path.Count(x => x == PATH_SEPARATOR) - 2; !MatchingPaths(allIssues); skippedParts--)
             {
                 Assert.IsTrue(path.Contains(PATH_SEPARATOR));
                 // Skip the first <c>skippedParts</c> parts, so that we query progressively larger parts.
@@ -240,49 +387,18 @@ namespace SEE.Game.UI.CodeWindow
                 allIssues.RemoveAll(x => !x.Entities.Select(e => e.path).Any(p => p.EndsWith(queryPath)));
             }
 
-            // Mapping from each line to the entities and issues contained therein
-            //FIXME: There may still be issues here if some line range (endLine) overlaps something else
-            Dictionary<int, List<(SourceCodeEntity entity, Issue issue)>> entities = 
-                allIssues.SelectMany(x => x.Entities.Select(e => (entity: e, issue: x)))
-                      .Where(x => x.entity.path.EndsWith(queryPath))
-                      .OrderBy(x => x.entity.line).GroupBy(x => x.entity.line)
-                      .ToDictionary(x => x.Key, x => x.ToList());
-            
-            int shift = 0;
-            foreach (KeyValuePair<int, List<(SourceCodeEntity entity, Issue issue)>> lineIssues in entities)
-            {
-                lineIssues.Value.ForEach(x => issueDictionary[x.issue.id] = x.issue);
-                
-                // If we have more than one issue in this line, or alternatively
-                // no occurence or more than one occurence of the content within the entity,
-                // we instead fall back to highlighting the whole line, because we have no real way of doing these
-                // kinds of highlights with TextMeshPro.
-                (int, int)? contentIndices = null;
-                if (lineIssues.Value.Count == 1)
-                {
-                    contentIndices = GetContentIndices(lineIssues.Value[0].entity.line, 
-                                                       lineIssues.Value[0].entity.content, shift);
-                }
-                if (contentIndices.HasValue)
-                {
-                    HighlightPart(contentIndices.Value, lineIssues.Value.Select(x => x.issue).ToList(), ref shift);
-                }
-                else
-                {
-                    // Apply highlight to all lines between line and endLine, if endLine is defined
+            // Mapping from each line to the entities and issues contained therein.
+            // Important: When an entity spans over multiple lines, it's split up into one entity per line.
+            Dictionary<int, List<(SourceCodeEntity entity, Issue issue)>> entities =
+                allIssues.SelectMany(x => x.Entities.SelectMany(SplitUpIntoLines).Select(e => (entity: e, issue: x)))
+                         .Where(x => x.entity.path.EndsWith(queryPath))
+                         .OrderBy(x => x.entity.line).GroupBy(x => x.entity.line)
+                         .ToDictionary(x => x.Key, x => x.ToList());
 
-                    int? endLine = lineIssues.Value.Where(x => x.entity.endLine.HasValue).Max(x => x.entity.endLine);
-                    IEnumerable<int> entityLines = !endLine.HasValue ? new[] {lineIssues.Key} 
-                        : Enumerable.Range(lineIssues.Key, endLine.Value - lineIssues.Key);
-
-                    foreach (int line in entityLines)
-                    {
-                        HighlightPart(GetLineIndices(line), lineIssues.Value.Select(x => x.issue).ToList(), ref shift);
-                    }
-                }
-            }
+            EnterFromTokens(TokenList, entities);
 
             await UniTask.SwitchToMainThread();
+            firstNotification.Close();
             try
             {
                 TextMesh.text = Text;
@@ -290,55 +406,13 @@ namespace SEE.Game.UI.CodeWindow
             }
             catch (IndexOutOfRangeException)
             {
-                //FIXME: Split up TMP into multiple game objects.
-                ShowNotification.Error("File too big", "The file is too big to display any issues, sorry.");
+                //FIXME: Use multiple TMPs: Either one as an overlay, or split the main TMP up into multiple ones.
+                ShowNotification.Error("File too big", "This file is too big to be displayed correctly.");
                 return;
-            }
-            finally
-            {
-                firstNotification.Close();
             }
 
             //TODO: This may as well be implemented as a loading bar, showing continuous progress as we iterate.
             ShowNotification.Info("Issues loaded", $"{allIssues.Count} issues have been found for {Title}.");
-
-            #region Local Methods
-
-            void HighlightPart((int richStartIndex, int richEndIndex) content, IList<Issue> issues, 
-                               ref int indexShift)
-            {
-                // Limitation: We can only use the color of the first issue, because we can't reliably detect the
-                // order of the entities within a single line. Details for all issues are shown on hover.
-                string MARK = $"<mark=#{ColorUtility.ToHtmlStringRGB(DashboardRetriever.Instance.GetIssueColor(issues[0]))}33>";
-                const string MARK_CLOSE = "</mark>";
-                string LINK = $"<link=\"{issues.Select(x => x.id).ToArray().IntToString()}\">";
-                const string LINK_CLOSE = "</link>";
-                (int startIndex, int endIndex) = content;
-
-                // These tell us which other tags our indices are contained in
-                bool noparseStart = ContentInTag(startIndex, NOPARSE, NOPARSE_CLOSE);
-                bool noparseEnd = ContentInTag(endIndex, NOPARSE, NOPARSE_CLOSE);
-
-                // We put the closing tag in first, otherwise our endIndex would shift.
-                Text = Text.Insert(endIndex, MARK_CLOSE).Insert(startIndex, MARK)
-                           .Insert(endIndex + MARK_CLOSE.Length + MARK.Length, LINK_CLOSE)
-                           .Insert(startIndex, LINK);
-                indexShift += MARK_CLOSE.Length + MARK.Length + LINK.Length + LINK_CLOSE.Length;
-                if (noparseEnd)
-                {
-                    // We want to "unescape" <mark> and </mark> in the <noparse> segments.
-                    // </noparse> is shifted right by <mark>.
-                    Text = Text.Insert(endIndex + MARK.Length + MARK_CLOSE.Length + LINK.Length + LINK_CLOSE.Length, NOPARSE)
-                               .Insert(endIndex + MARK.Length + LINK.Length, NOPARSE_CLOSE);
-                    indexShift += NOPARSE_CLOSE.Length + NOPARSE.Length;
-                }
-                if (noparseStart)
-                {
-                    Text = Text.Insert(startIndex + MARK.Length + LINK.Length, NOPARSE)
-                               .Insert(startIndex, NOPARSE_CLOSE);
-                    indexShift += NOPARSE_CLOSE.Length + NOPARSE.Length;
-                }
-            }
 
             // Returns true iff all issues are on the same path.
             static bool MatchingPaths(ICollection<Issue> issues)
@@ -348,104 +422,13 @@ namespace SEE.Game.UI.CodeWindow
                 return issues.First().Entities.Select(e => e.path)
                              .Any(path => issues.All(x => x.Entities.Any(e => e.path == path)));
             }
-            
-            // Note that this method will return null if the given content either can't be found at the given line,
-            // or if it's found more than once (in which case it's impossible to find out what to highlight).
-            (int richStartIndex, int richEndIndex)? GetContentIndices(int line, string content, int indexShift)
-            {
-                if (content == null)
-                {
-                    return null;
-                }
-                // For the motivation behind what happens here, please see method GetRichIndex.
-                // As a TL;DR: Our TMP contains rich tags, while the given line and content don't account for them.
-                
-                (string lineContent, IList<TMP_CharacterInfo> contentInfo) = GetLineInfo(line);
-                // We get the start and end index within this list, not accounting for rich tags ("clean").
-                int cleanStartIndex = lineContent.IndexOf(content, StringComparison.Ordinal);
-                if (cleanStartIndex == -1 || Regex.Matches(lineContent, Regex.Escape(content)).Count > 1)
-                {
-                    return null;
-                }
-                int cleanEndIndex = cleanStartIndex + content.Length;
-                // The "rich" start index can then be inferred using the index property.
-                int richStartIndex = contentInfo[cleanStartIndex].index + indexShift;
-                int richEndIndex = contentInfo[cleanEndIndex].index + indexShift;
 
-                return (richStartIndex, richEndIndex);
-            }
-            
-            (int richStartIndex, int richEndIndex) GetLineIndices(int line)
-            {
-                List<string> splitText = Text.Split('\n').ToList();
-                string lineContent = splitText[line-1];
-                // We want to count newlines as well (+ line - 1)
-                int lineShift = line == 1 ? 0 : splitText.GetRange(0, line - 1).SelectMany(c => c).Count() + line - 1;
-                int startIndex = lineShift + lineContent.IndexOf("</color>", StringComparison.Ordinal);
-                int endIndex = lineShift + lineContent.Length;
-
-                return (startIndex, endIndex);
-            }
-
-            (string cleanLine, IList<TMP_CharacterInfo> lineInfo) GetLineInfo(int line)
-            {
-                // We get a list of CharacterInfos from the target line
-                IList<TMP_CharacterInfo> contentInfo = TextMesh.textInfo.characterInfo
-                                                               .SkipWhile(x => x.lineNumber+1 != line) 
-                                                               .TakeWhile(x => x.lineNumber+1 == line).ToList();
-                
-                string lineContent = string.Concat(contentInfo.Select(x => x.character));
-                return (lineContent, contentInfo);
-            }
-
-            // Returns whether or not the content at the rich index is in the given tag (by checking the line it's in)
-            bool ContentInTag(int richIndex, string startTag, string endTag, bool escapeRegex = true)
-            {
-                //FIXME: This will not work if used in a file which contains the given tag (for example, this file).
-                // Either "true" XML parsing needs to be used, or an alternative solution must be found,
-                // e.g. removing all content in a <noparse> tag first.
-                
-                string untilContent = "";
-                // This gets the beginning of the line containing the richIndex until the richIndex
-                for (int i = 0; i < richIndex; i++)
-                {
-                    char current = Text[i];
-                    if (current == '\n')
-                    {
-                        // Reset on new line
-                        untilContent = "";
-                    } 
-                    else 
-                    {
-                        untilContent += current;
-                    }
-                }
-                // Content is in <noparse> if the tag has been opened more times than it has been closed
-                return Regex.Matches(untilContent, escapeRegex ? Regex.Escape(startTag) : startTag).Count
-                       > Regex.Matches(untilContent, escapeRegex ? Regex.Escape(endTag) : endTag).Count;
-            }
-
-            #endregion
+            // Splits up a SourceCodeEntity into one entity per line it is set on (ranging from line to endLine).
+            // Each new entity will have a line attribute of the line it is split on and an endLine of null.
+            // If the input parameter has no endLine, an enumerable with this entity as its only value will be returned.
+            static IEnumerable<SourceCodeEntity> SplitUpIntoLines(SourceCodeEntity entity)
+                => Enumerable.Range(entity.line, entity.endLine - entity.line + 1 ?? 1)
+                             .Select(l => new SourceCodeEntity(entity.path, l, null, entity.content));
         }
-
-        /// <summary>
-        /// Get index within the "rich" text (with markup tags) from index in the "clean" text (with markup tags).
-        /// </summary>
-        /// <param name="cleanIndex">The index within the "clean" text.</param>
-        /// <returns>The index within the "rich" text.</returns>
-        /// <example>
-        /// Assume we have the source line <c>&lt;color red&gt;private class&lt;/color&gt; Test {</c>.
-        /// As we can see, rich tags have been inserted so that the "private class" keywords are rendered in red.
-        /// This is a problem when we later want to e.g. highlight "class Test". It's no longer possible to simply
-        /// search the text for "class Test" and highlight that part, because it's broken up by <c>&lt;/color&gt;</c>.
-        /// To remedy this, you can call this method with an index in the "clean" version.
-        /// In our example, this would be 9 (before "class") and 19 (after "Test"). This method will then return the
-        /// corresponding indices in the text with tags present, which in our example would be 20 and 38.
-        /// </example>
-        private int GetRichIndex(int cleanIndex)
-        {
-            return TextMesh.textInfo.characterInfo[cleanIndex].index;
-        }
-
     }
 }
