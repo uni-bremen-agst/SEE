@@ -10,7 +10,7 @@ namespace SEE.Net.Dashboard.Model.Issues
     /// Contains information about an issue in the source code.
     /// </summary>
     [Serializable]
-    public abstract partial class Issue
+    public abstract class Issue
     {
         // A note: Due to how the JSON serializer works with inheritance, fields in here can't be readonly.
 

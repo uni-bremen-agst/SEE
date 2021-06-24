@@ -10,7 +10,7 @@ namespace SEE.Net.Dashboard.Model.Issues
     /// An issue representing a dead entity.
     /// </summary>
     [Serializable]
-    public class DeadEntityIssue: Issue
+    public class DeadEntityIssue : Issue
     {
         /// <summary>
         /// The dead entity
@@ -41,7 +41,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// </summary>
         [JsonProperty(Required = Required.Always)]
         public readonly string linkName;
-        
+
         public DeadEntityIssue()
         {
             // Necessary for generics shenanigans in IssueRetriever.
@@ -56,13 +56,13 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.line = line;
             this.linkName = linkName;
         }
-        
+
         public override async UniTask<string> ToDisplayString()
         {
             string explanation = await DashboardRetriever.Instance.GetIssueDescription($"DE{id}");
             return "<style=\"H2\">Dead Entity</style>"
                    + $"\nThe entity '{entity.WrapLines(WRAP_AT)}' ({entityType.WrapLines(WRAP_AT)}) is dead."
-                   + $"\n{explanation.WrapLines(WRAP_AT)}";
+                   + $"\nMay it rest in peace.\n{explanation.WrapLines(WRAP_AT)}";
         }
 
         public override string IssueKind => "DE";

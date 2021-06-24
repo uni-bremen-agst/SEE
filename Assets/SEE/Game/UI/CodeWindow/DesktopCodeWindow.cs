@@ -1,6 +1,7 @@
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Utils;
 using TMPro;
@@ -102,10 +103,10 @@ namespace SEE.Game.UI.CodeWindow
                 int link = TMP_TextUtilities.FindIntersectingLink(TextMesh, Input.mousePosition, null);
                 if (link != -1)
                 {
-                    IEnumerable<int> issueIds = TextMesh.textInfo.linkInfo[link].GetLinkID().ToIntArray();
+                    char linkId = TextMesh.textInfo.linkInfo[link].GetLinkID()[0];
                     issueTooltip ??= gameObject.AddComponent<Tooltip.Tooltip>();
                     // Display tooltip containing all issue descriptions
-                    UniTask.WhenAll(issueIds.Select(x => issueDictionary[x].ToDisplayString()))
+                    UniTask.WhenAll(issueDictionary[linkId].Select(x => x.ToDisplayString()))
                            .ContinueWith(x => issueTooltip.Show(string.Join("\n", x), 0f));
                 }
                 else if (issueTooltip != null)
@@ -129,7 +130,16 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         public void RecalculateExcessLines()
         {
-            TextMesh.ForceMeshUpdate();
+            try
+            {
+                TextMesh.ForceMeshUpdate();
+            }
+            catch (IndexOutOfRangeException)
+            {
+                //FIXME: Use multiple TMPs: Either one as an overlay, or split the main TMP up into multiple ones.
+                ShowNotification.Error("File too big", "This file is too large to be displayed correctly.");
+            }
+
             if (lines > 0 && codeWindow.transform.Find("Content/Scrollable").gameObject.TryGetComponentOrLog(out RectTransform rect))
             {
                 excessLines = Mathf.CeilToInt(rect.rect.height / TextMesh.textInfo.lineInfo[0].lineHeight) - 2;

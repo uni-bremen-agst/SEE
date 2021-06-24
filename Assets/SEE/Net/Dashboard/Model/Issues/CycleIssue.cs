@@ -84,8 +84,8 @@ namespace SEE.Net.Dashboard.Model.Issues
         }
 
         [JsonConstructor]
-        protected CycleIssue(string dependencyType, string sourceEntity, string sourceEntityType, 
-                             string sourcePath, int sourceLine, string sourceLinkName, string targetEntity, 
+        protected CycleIssue(string dependencyType, string sourceEntity, string sourceEntityType,
+                             string sourcePath, int sourceLine, string sourceLinkName, string targetEntity,
                              string targetEntityType, string targetPath, int targetLine, string targetLinkName)
         {
             this.dependencyType = dependencyType;
@@ -100,7 +100,7 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.targetLine = targetLine;
             this.targetLinkName = targetLinkName;
         }
-        
+
         public override async UniTask<string> ToDisplayString()
         {
             string explanation = await DashboardRetriever.Instance.GetIssueDescription($"CY{id}");
@@ -110,18 +110,8 @@ namespace SEE.Net.Dashboard.Model.Issues
                    + $"\n{explanation.WrapLines(WRAP_AT)}";
         }
 
-        public override string ToString()
-        {
-            return $"{nameof(dependencyType)}: {dependencyType}, {nameof(sourceEntity)}: {sourceEntity},"
-                   + $" {nameof(sourceEntityType)}: {sourceEntityType}, {nameof(sourcePath)}: {sourcePath},"
-                   + $" {nameof(sourceLine)}: {sourceLine}, {nameof(sourceLinkName)}: {sourceLinkName},"
-                   + $" {nameof(targetEntity)}: {targetEntity}, {nameof(targetEntityType)}: {targetEntityType},"
-                   + $" {nameof(targetPath)}: {targetPath}, {nameof(targetLine)}: {targetLine},"
-                   + $" {nameof(targetLinkName)}: {targetLinkName}";
-        }
-
         public override string IssueKind => "CY";
-        
+
         public override IEnumerable<SourceCodeEntity> Entities => new[]
         {
             new SourceCodeEntity(sourcePath, sourceLine, null, sourceEntity),

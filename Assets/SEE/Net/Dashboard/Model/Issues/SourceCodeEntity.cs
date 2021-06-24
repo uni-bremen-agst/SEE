@@ -13,18 +13,19 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// The path of the file of the entity.
         /// </summary>
         public readonly string path;
-            
+
         /// <summary>
         /// The line number of the entity.
         /// If <see cref="endLine"/> is specified, this will be the beginning of the line range of this entity.
         /// </summary>
         public readonly int line;
-            
+
         /// <summary>
         /// The optional end line number of the entity.
+        /// While the documentation doesn't specify this, it is assumed to be inclusive.
         /// </summary>
         public readonly int? endLine;
-            
+
         /// <summary>
         /// The optional content of the entity.
         /// </summary>

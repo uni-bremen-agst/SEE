@@ -60,7 +60,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         }
 
         [JsonConstructor]
-        public StyleViolationIssue(string severity, string provider, string errorNumber, string message, string entity, 
+        public StyleViolationIssue(string severity, string provider, string errorNumber, string message, string entity,
                                    string path, int line)
         {
             this.severity = severity;
@@ -75,9 +75,9 @@ namespace SEE.Net.Dashboard.Model.Issues
         public override async UniTask<string> ToDisplayString()
         {
             string explanation = await DashboardRetriever.Instance.GetIssueDescription($"SV{id}");
-            return $"<style=\"H2\">{message.WrapLines(WRAP_AT - WRAP_AT/4)}</style>\n{explanation.WrapLines(WRAP_AT)}";
+            return $"<style=\"H2\">{message.WrapLines(WRAP_AT / 2)}</style>\n{explanation.WrapLines(WRAP_AT)}";
         }
-        
+
         public override string IssueKind => "SV";
 
         public override IEnumerable<SourceCodeEntity> Entities => new[]

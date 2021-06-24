@@ -161,34 +161,17 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.targetLine = targetLine;
             this.targetLinkName = targetLinkName;
         }
-        
+
         public override async UniTask<string> ToDisplayString()
         {
             string explanation = await DashboardRetriever.Instance.GetIssueDescription($"AV{id}");
             return "<style=\"H2\">"
-                   + $"{violationType} ({architectureSource} to {architectureTarget})".WrapLines(WRAP_AT - WRAP_AT/4)
+                   + $"{violationType} ({architectureSource} to {architectureTarget})".WrapLines(WRAP_AT / 2)
                    + $"</style>\nSource: {sourcePath} ({sourceEntityType}), Line {sourceLine}".WrapLines(WRAP_AT)
                    + $"\nTarget: {targetPath} ({targetEntityType}), Line {targetLine}".WrapLines(WRAP_AT)
                    + $"\n{explanation.WrapLines(WRAP_AT)}";
         }
 
-        public override string ToString()
-        {
-            return $"{nameof(architectureSource)}: {architectureSource}, "
-                   + $"{nameof(architectureSourceType)}: {architectureSourceType},"
-                   + $" {nameof(architectureSourceLinkName)}: {architectureSourceLinkName},"
-                   + $" {nameof(architectureTarget)}: {architectureTarget},"
-                   + $" {nameof(architectureTargetType)}: {architectureTargetType},"
-                   + $" {nameof(architectureTargetLinkName)}: {architectureTargetLinkName},"
-                   + $" {nameof(errorNumber)}: {errorNumber}, {nameof(violationType)}: {violationType},"
-                   + $" {nameof(dependencyType)}: {dependencyType}, {nameof(sourceEntity)}: {sourceEntity},"
-                   + $" {nameof(sourceEntityType)}: {sourceEntityType}, {nameof(sourcePath)}: {sourcePath},"
-                   + $" {nameof(sourceLine)}: {sourceLine}, {nameof(sourceLinkName)}: {sourceLinkName},"
-                   + $" {nameof(targetEntity)}: {targetEntity}, {nameof(targetEntityType)}: {targetEntityType},"
-                   + $" {nameof(targetPath)}: {targetPath}, {nameof(targetLine)}: {targetLine},"
-                   + $" {nameof(targetLinkName)}: {targetLinkName}";
-        }
-        
         public override string IssueKind => "AV";
 
         public override IEnumerable<SourceCodeEntity> Entities => new[]
