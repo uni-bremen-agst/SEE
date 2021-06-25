@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game.UI.Menu
@@ -30,15 +31,7 @@ namespace SEE.Game.UI.Menu
             if (entry is NestedMenuEntry nestedEntry)
             {
                 // If this contains another menu level, repopulate list with new level after saving the current one
-                Levels.Push(new MenuLevel(Title, Description, Icon, entries));
-                while (entries.Count != 0)
-                {
-                    RemoveEntry(entries[0]); // Remove all entries
-                }
-                Title = nestedEntry.Title;
-                Description = nestedEntry.Description;
-                Icon = nestedEntry.Icon;
-                nestedEntry.InnerEntries.ForEach(AddEntry);
+                AscendLevel(nestedEntry);
             }
             else
             {
@@ -47,6 +40,33 @@ namespace SEE.Game.UI.Menu
             }
         }
 
+        /// <summary>
+        /// Ascends up in the menu hierarchy by creating a new level from the given <paramref name="nestedEntry"/>.
+        /// </summary>
+        /// <param name="nestedEntry">The entry from which to construct the new level</param>
+        private void AscendLevel(NestedMenuEntry nestedEntry)
+        {
+            Levels.Push(new MenuLevel(Title, Description, Icon, entries));
+            while (entries.Count != 0)
+            {
+                RemoveEntry(entries[0]); // Remove all entries
+            }
+            Title = nestedEntry.Title;
+            //TODO: Instead of abusing the description for this, use a proper individual text object
+            // (Maybe displaying it above the title in a different color or something would work,
+            // as the title is technically the last element in the breadcrumb)
+            string breadcrumb = GetBreadcrumb();
+            Description = nestedEntry.Description + (breadcrumb.Length > 0 ? $"\nHierarchy: {GetBreadcrumb()}" : "");
+            Icon = nestedEntry.Icon;
+            nestedEntry.InnerEntries.ForEach(AddEntry);
+        }
+
+        /// <summary>
+        /// Returns a "breadcrumb" for the current level, displaying our current position in the menu hierarchy.
+        /// </summary>
+        /// <returns>breadcrumb for the current level</returns>
+        private string GetBreadcrumb() => string.Join(" / ", Levels.Reverse().Select(x => x.Title));
+        
         /// <summary>
         /// Descends down a level in the menu hierarchy and removes the entry from the <see cref="Levels"/>.
         /// </summary>
