@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Windows.Speech;
 
 namespace SEE.Game.UI.Menu
 {
@@ -21,6 +22,11 @@ namespace SEE.Game.UI.Menu
         protected override string MENU_PREFAB => "Prefabs/UI/NestedMenu";
 
         /// <summary>
+        /// The keyword to be used to step back in the menu verbally.
+        /// </summary>
+        private const string BackMenuCommand = "go back";
+
+        /// <summary>
         /// Whether to reset the level of the menu when clicking on the close button.
         /// Can only be changed before this component has been started.
         /// </summary>
@@ -30,13 +36,69 @@ namespace SEE.Game.UI.Menu
         {
             if (entry is NestedMenuEntry nestedEntry)
             {
+                foreach (string s in GetMenuEntryTitles())
+                {
+                    UnityEngine.Debug.LogError(s);
+                }
                 // If this contains another menu level, repopulate list with new level after saving the current one
                 AscendLevel(nestedEntry);
+                foreach (string s in GetMenuEntryTitles())
+                {
+                    UnityEngine.Debug.LogError("2:  " + s);
+                }
+
             }
             else
             {
                 // Otherwise, we do the same we'd do normally
                 base.OnEntrySelected(entry);
+            }
+        }
+
+        /// <summary>
+        /// Returns the titles of all <see cref="entries"/> plus
+        /// <see cref="CloseMenuCommand"/> appended at the end.
+        /// </summary>
+        /// <returns>titles of all <see cref="entries"/> appended by 
+        /// <see cref="CloseMenuCommand"/></returns>
+        protected override string[] GetMenuEntryTitles()
+        {
+            return entries.Select(x => x.Title).Append(CloseMenuCommand).Append(BackMenuCommand).ToArray();
+        }
+
+        /// <summary>
+        /// Callback registered in <see cref="Listen(bool)"/> to be called when
+        /// one of the menu entry titles was recognized (spoken by the user).
+        /// Triggers the corresponding action of the selected entry if the 
+        /// corresponding entry title was recognized and then closes the menu 
+        /// again. If only <see cref="CloseMenuCommand"/> was recognized, no 
+        /// action will be triggered, yet the menu will be closed, too.
+        /// </summary>
+        /// <param name="args">the phrase recognized</param>
+        protected override void OnMenuEntryTitleRecognized(PhraseRecognizedEventArgs args)
+        {
+            Debug.Log(args.text);
+            Debug.Log("overwritten");
+            int i = 0;
+            foreach (string keyword in GetMenuEntryTitles())
+            {
+                if (args.text == keyword)
+                {
+                    if (args.text == CloseMenuCommand)
+                    {
+                        ToggleMenu();
+                    }
+                    if (args.text == BackMenuCommand)
+                    {
+                        DescendLevel();
+                    }
+                    else
+                    {
+                        SelectEntry(i);
+                    }
+                    break;
+                }
+                i++;
             }
         }
 
@@ -59,6 +121,9 @@ namespace SEE.Game.UI.Menu
             Description = nestedEntry.Description + (breadcrumb.Length > 0 ? $"\nHierarchy: {GetBreadcrumb()}" : "");
             Icon = nestedEntry.Icon;
             nestedEntry.InnerEntries.ForEach(AddEntry);
+            keywordInput.Unregister(OnMenuEntryTitleRecognized);
+            keywordInput.Register(OnMenuEntryTitleRecognized);
+
         }
 
         /// <summary>
@@ -83,6 +148,10 @@ namespace SEE.Game.UI.Menu
                     RemoveEntry(entries[0]); // Remove all entries
                 }
                 level.Entries.ForEach(AddEntry);
+                foreach (string s in GetMenuEntryTitles())
+                {
+                    UnityEngine.Debug.LogError("2:    " + s);
+                }
             }
             else
             {
