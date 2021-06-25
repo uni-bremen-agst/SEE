@@ -248,7 +248,7 @@ namespace SEE.Game.Runtime
                 float t = 1.0f - (sphereToDstDistFlat / srcToDstDistFlat);
 
                 // Color
-                Color color = viridisColorPalette[(int)(t * viridisColorPalette.Length) % viridisColorPalette.Length];
+                Color color = viridisColorPalette[Mathf.Abs((int)(t * viridisColorPalette.Length) % viridisColorPalette.Length)];
                 spheres[i].GetComponentInChildren<MeshRenderer>().material.color = color;
 
                 // Altitude
