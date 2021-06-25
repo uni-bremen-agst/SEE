@@ -174,6 +174,13 @@ namespace SEE.Game.UI.CodeWindow
                 Destroy(this);
             }
 
+            codeWindows.RemoveAll(x => x == null);
+            if (codeWindows.Count == 0)
+            {
+                Destroy(this);
+                codeWindows.Clear();
+                return;
+            }
             Panel = PanelUtils.CreatePanelFor((RectTransform) codeWindows[0].codeWindow.transform, PanelsCanvas);
             // When the active tab *on this panel* is changed, we invoke the corresponding event
             PanelNotificationCenter.OnActiveTabChanged += ChangeActiveTab;
