@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using SEE.Utils;
 using Valve.Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
@@ -7,7 +10,7 @@ namespace SEE.Net.Dashboard.Model.Issues
     /// An issue representing a dead entity.
     /// </summary>
     [Serializable]
-    public class DeadEntityIssue: Issue
+    public class DeadEntityIssue : Issue
     {
         /// <summary>
         /// The dead entity
@@ -31,21 +34,21 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// The line number of the entity
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly uint line;
+        public readonly int line;
 
         /// <summary>
         /// The internal name of the corresponding entity
         /// </summary>
         [JsonProperty(Required = Required.Always)]
         public readonly string linkName;
-        
+
         public DeadEntityIssue()
         {
             // Necessary for generics shenanigans in IssueRetriever.
         }
 
         [JsonConstructor]
-        protected DeadEntityIssue(string entity, string entityType, string path, uint line, string linkName)
+        protected DeadEntityIssue(string entity, string entityType, string path, int line, string linkName)
         {
             this.entity = entity;
             this.entityType = entityType;
@@ -54,10 +57,19 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.linkName = linkName;
         }
 
-        public override string ToString()
+        public override async UniTask<string> ToDisplayString()
         {
-            return $"{nameof(entity)}: {entity}, {nameof(entityType)}: {entityType}, {nameof(path)}: {path}, "
-                   + $"{nameof(line)}: {line}, {nameof(linkName)}: {linkName}";
+            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"DE{id}");
+            return "<style=\"H2\">Dead Entity</style>"
+                   + $"\nThe entity '{entity.WrapLines(WRAP_AT)}' ({entityType.WrapLines(WRAP_AT)}) is dead."
+                   + $"\nMay it rest in peace.\n{explanation.WrapLines(WRAP_AT)}";
         }
+
+        public override string IssueKind => "DE";
+
+        public override IEnumerable<SourceCodeEntity> Entities => new[]
+        {
+            new SourceCodeEntity(path, line, null, entity)
+        };
     }
 }
