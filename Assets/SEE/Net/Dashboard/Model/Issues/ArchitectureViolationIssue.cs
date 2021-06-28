@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using SEE.Utils;
 using Valve.Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
@@ -85,7 +88,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// The line of the source code target location
         /// </summary>
         [JsonProperty(Required = Required.AllowNull)]
-        public readonly uint sourceLine;
+        public readonly int sourceLine;
 
         /// <summary>
         /// The internal name of the corresponding entity
@@ -115,7 +118,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// The line of the source code source location
         /// </summary>
         [JsonProperty(Required = Required.AllowNull)]
-        public readonly uint targetLine;
+        public readonly int targetLine;
 
         /// <summary>
         /// The internal name of the corresponding entity
@@ -134,8 +137,8 @@ namespace SEE.Net.Dashboard.Model.Issues
                                              string architectureTargetType, string architectureTargetLinkName,
                                              string errorNumber, string violationType, string dependencyType,
                                              string sourceEntity, string sourceEntityType, string sourcePath,
-                                             uint sourceLine, string sourceLinkName, string targetEntity,
-                                             string targetEntityType, string targetPath, uint targetLine,
+                                             int sourceLine, string sourceLinkName, string targetEntity,
+                                             string targetEntityType, string targetPath, int targetLine,
                                              string targetLinkName)
         {
             this.architectureSource = architectureSource;
@@ -159,21 +162,22 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.targetLinkName = targetLinkName;
         }
 
-        public override string ToString()
+        public override async UniTask<string> ToDisplayString()
         {
-            return $"{nameof(architectureSource)}: {architectureSource}, "
-                   + $"{nameof(architectureSourceType)}: {architectureSourceType},"
-                   + $" {nameof(architectureSourceLinkName)}: {architectureSourceLinkName},"
-                   + $" {nameof(architectureTarget)}: {architectureTarget},"
-                   + $" {nameof(architectureTargetType)}: {architectureTargetType},"
-                   + $" {nameof(architectureTargetLinkName)}: {architectureTargetLinkName},"
-                   + $" {nameof(errorNumber)}: {errorNumber}, {nameof(violationType)}: {violationType},"
-                   + $" {nameof(dependencyType)}: {dependencyType}, {nameof(sourceEntity)}: {sourceEntity},"
-                   + $" {nameof(sourceEntityType)}: {sourceEntityType}, {nameof(sourcePath)}: {sourcePath},"
-                   + $" {nameof(sourceLine)}: {sourceLine}, {nameof(sourceLinkName)}: {sourceLinkName},"
-                   + $" {nameof(targetEntity)}: {targetEntity}, {nameof(targetEntityType)}: {targetEntityType},"
-                   + $" {nameof(targetPath)}: {targetPath}, {nameof(targetLine)}: {targetLine},"
-                   + $" {nameof(targetLinkName)}: {targetLinkName}";
+            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"AV{id}");
+            return "<style=\"H2\">"
+                   + $"{violationType} ({architectureSource} to {architectureTarget})".WrapLines(WRAP_AT / 2)
+                   + $"</style>\nSource: {sourcePath} ({sourceEntityType}), Line {sourceLine}".WrapLines(WRAP_AT)
+                   + $"\nTarget: {targetPath} ({targetEntityType}), Line {targetLine}".WrapLines(WRAP_AT)
+                   + $"\n{explanation.WrapLines(WRAP_AT)}";
         }
+
+        public override string IssueKind => "AV";
+
+        public override IEnumerable<SourceCodeEntity> Entities => new[]
+        {
+            new SourceCodeEntity(sourcePath, sourceLine, null, sourceEntity),
+            new SourceCodeEntity(targetPath, targetLine, null, targetEntity)
+        };
     }
 }

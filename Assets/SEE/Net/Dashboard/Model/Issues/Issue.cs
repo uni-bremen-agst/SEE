@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Valve.Newtonsoft.Json;
 using Valve.Newtonsoft.Json.Converters;
 
@@ -9,7 +10,7 @@ namespace SEE.Net.Dashboard.Model.Issues
     /// Contains information about an issue in the source code.
     /// </summary>
     [Serializable]
-    public class Issue
+    public abstract class Issue
     {
         // A note: Due to how the JSON serializer works with inheritance, fields in here can't be readonly.
 
@@ -18,67 +19,9 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// </summary>
         public enum IssueState
         {
-            added, changed, removed  // note: names must be lowercase for the serialization to work
+            added, changed, removed // note: names must be lowercase for the serialization to work
         }
 
-        /// <summary>
-        /// The issue kind.
-        /// </summary>
-        public enum IssueKind
-        {
-            // Note: The abbreviations have to be used here instead of the full name, otherwise serialization
-            // won't work.
-            
-            /// <summary>
-            /// Special fallback value, used if issue kind could not be determined.
-            /// </summary>
-            Unknown,
-            
-            /// <summary>
-            /// Architecture violations.
-            /// </summary>
-            AV, 
-            
-            /// <summary>
-            /// Clones.
-            /// </summary>
-            CL, 
-            
-            /// <summary>
-            /// Cycles.
-            /// </summary>
-            CY, 
-            
-            /// <summary>
-            /// Dead Entities.
-            /// </summary>
-            DE, 
-            
-            /// <summary>
-            /// Metric Violations.
-            /// </summary>
-            MV, 
-            
-            /// <summary>
-            /// Style Violations.
-            /// </summary>
-            SV
-        }
-
-        /// <summary>
-        /// The kind of issue this is.
-        /// </summary>
-        public IssueKind kind => this switch 
-        { 
-            ArchitectureViolationIssue _ => IssueKind.AV,
-            CloneIssue _ => IssueKind.CL,
-            CycleIssue _ => IssueKind.CY,
-            DeadEntityIssue _ => IssueKind.DE,
-            MetricViolationIssue _ => IssueKind.MV,
-            StyleViolationIssue _ => IssueKind.SV,
-            _ => IssueKind.Unknown
-        };
-        
         /// <summary>
         /// A kind-wide Id identifying the issue across analysis versions
         /// </summary>
@@ -132,12 +75,13 @@ namespace SEE.Net.Dashboard.Model.Issues
         [JsonProperty(Required = Required.Always)]
         public IList<UserRef> owners;
 
+
         protected Issue()
         {
             // Necessary for inheritance with Newtonsoft.Json to work properly
         }
 
-        public Issue(int id, IssueState state, bool suppressed, string justification, 
+        public Issue(int id, IssueState state, bool suppressed, string justification,
                      IList<IssueTag> tag, IList<IssueComment> comments, IList<UserRef> owners)
         {
             this.id = id;
@@ -148,6 +92,24 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.comments = comments;
             this.owners = owners;
         }
+
+        /// <summary>
+        /// Number of characters to wrap the string in <see cref="ToDisplayString"/> at.
+        /// </summary>
+        protected const int WRAP_AT = 120;
+
+        /// <summary>
+        /// Returns a string suitable for display in a TextMeshPro which describes this issue.
+        /// TextMeshPro's rich tags are used in here, so the string shouldn't be displayed elsewhere.
+        /// </summary>
+        /// <returns>A string describing this issue which is suitable for display in a TextMeshPro</returns>
+        public abstract UniTask<string> ToDisplayString();
+
+        /// <summary>
+        /// The kind of issue this is.
+        /// Usually an abbreviation of the type of the issue, e.g. MV for Metric Violation Issues.
+        /// </summary>
+        public abstract string IssueKind { get; }
 
         /// <summary>
         /// An issue tag as returned by the Issue-List API.
@@ -215,7 +177,7 @@ namespace SEE.Net.Dashboard.Model.Issues
             /// <summary>
             /// The id for comment deletion.
             /// When the requesting user is allowed to delete the comment,
-            /// contains an id that can be used to mark the comment as deleted using another API. 
+            /// contains an id that can be used to mark the comment as deleted using another API.
             /// </summary>
             /// <remarks>
             /// This is never set when the Comment is returned as the result of an Issue-List query.
@@ -223,7 +185,7 @@ namespace SEE.Net.Dashboard.Model.Issues
             [JsonProperty(Required = Required.Default)]
             public readonly string commentDeletionId;
 
-            public IssueComment(string username, string userDisplayName, DateTime date, 
+            public IssueComment(string username, string userDisplayName, DateTime date,
                                 string displayDate, string text, string commentDeletionId)
             {
                 this.username = username;
@@ -235,5 +197,9 @@ namespace SEE.Net.Dashboard.Model.Issues
             }
         }
 
+        /// <summary>
+        /// The entities this issue references.
+        /// </summary>
+        public abstract IEnumerable<SourceCodeEntity> Entities { get; }
     }
 }

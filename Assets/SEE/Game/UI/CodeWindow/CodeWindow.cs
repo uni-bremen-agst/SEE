@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using DG.Tweening;
 using SEE.GO;
@@ -14,7 +12,7 @@ namespace SEE.Game.UI.CodeWindow
     /// Represents a movable, scrollable window containing source code.
     /// The source code may either be entered manually or read from a file.
     /// </summary>
-    public partial class CodeWindow: PlatformDependentComponent
+    public partial class CodeWindow : PlatformDependentComponent
     {
         /// <summary>
         /// The text displayed in the code window.
@@ -46,93 +44,12 @@ namespace SEE.Game.UI.CodeWindow
         /// Resolution of the code window. By default, this is set to a resolution of 900x500.
         /// </summary>
         public Vector2 Resolution = new Vector2(900, 500);
-        
+
         /// <summary>
         /// An event which gets called whenever the scrollbar is used to scroll to a different line.
         /// Will be called after the scroll is completed.
         /// </summary>
         public readonly UnityEvent ScrollEvent = new UnityEvent();
-
-        /// <summary>
-        /// The line we're scrolling towards at the moment.
-        /// Will be 0 if we're not scrolling towards anything.
-        /// </summary>
-        private int ScrollingTo;
-
-        /// <summary>
-        /// The line currently at the top of the window.
-        /// Will scroll smoothly to the line when changed and mark it visually.
-        /// While scrolling to a line, this returns the line we're currently scrolling to.
-        /// If a line outside the range of available lines is set, the highest available line number is used instead.
-        /// </summary>
-        /// <remarks>Only a fully visible line counts. If a line is partially obscured, the next line number
-        /// will be returned.</remarks>
-        public int VisibleLine
-        {
-            get => ScrollingTo > 0 ? ScrollingTo : Mathf.CeilToInt(visibleLine)+1;
-            set
-            {
-                if (value > lines || value < 1)
-                {
-                    Debug.LogError($"Specified line number {value} is outside the range of lines 1-{lines}. "
-                                   + $"Using maximum line number {lines} instead.");
-                    value = lines;
-                }
-                // If this is called before Start() has been called, scrollbar will be null, so we have to cache
-                // the desired visible line.
-                if (!HasStarted)
-                {
-                    PreStartLine = value;
-                }
-                else
-                {
-                    ScrollingTo = value;
-                    DOTween.Sequence().Append(DOTween.To(() => visibleLine, f => visibleLine = f, value-1, 1f))
-                           .AppendCallback(() => ScrollingTo = 0);
-                    
-                    // FIXME: TMP bug: Large files cause issues with highlighting text. This is just a workaround.
-                    // See https://github.com/uni-bremen-agst/SEE/issues/250#issuecomment-819653373
-                    if (Text.Length < 16382)
-                    {
-                        MarkLine(value);
-                    }
-                    ScrollEvent.Invoke();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Holds the desired visible line before <see cref="Start"/> is called, because <see cref="scrollbar"/> will
-        /// be undefined until then.
-        /// </summary>
-        private float PreStartLine = 1;
-        
-        /// <summary>
-        /// The line currently at the top of the window.
-        /// Will immediately set the line.
-        /// Note that the line here is 0-indexed, as opposed to <see cref="VisibleLine"/>, which is 1-indexed.
-        /// </summary>
-        private float visibleLine
-        {
-            get => HasStarted ? (1-scrollRect.verticalNormalizedPosition) * (lines-1-excessLines) : PreStartLine;
-            set
-            {
-                if (value > lines-1 || value < 0)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(value));
-                }
-                // If this is called before Start() has been called, scrollbar will be null, so we have to cache
-                // the desired visible line.
-                if (!HasStarted)
-                {
-                    PreStartLine = value;
-                }
-                else
-                {
-                    scrollRect.verticalNormalizedPosition = 1 - value / (lines-1-excessLines);
-                }
-            }
-        }
 
         /// <summary>
         /// GameObject containing the actual UI for the code window.
@@ -143,15 +60,6 @@ namespace SEE.Game.UI.CodeWindow
         /// Number of lines within the file.
         /// </summary>
         private int lines;
-
-        /// <summary>
-        /// Number of "excess lines" within this code window.
-        /// Excess lines are defined as lines which can't be accessed by the scrollbar, so
-        /// they're all lines which are visible when scrolling to the lowest point of the window (except for the
-        /// first line, as that one is still accessible by the scrollbar).
-        /// In our case, this can be calculated by <c>ceil(window_height/line_height)</c>.
-        /// </summary>
-        private int excessLines;
 
         /// <summary>
         /// Path to the code canvas prefab.
@@ -165,172 +73,10 @@ namespace SEE.Game.UI.CodeWindow
         /// <param name="line">The line number of the line to mark and scroll to (1-indexed)</param>
         private void MarkLine(int lineNumber)
         {
-            string[] allLines = TextMesh.text.Split('\n').Select(x => x.EndsWith("</mark>") ? x.Substring(16, x.Length-16-7) : x).ToArray();
-            string markedLine = $"<mark=#ff000044>{allLines[lineNumber-1]}</mark>\n";
-            TextMesh.text = string.Join("", allLines.Select(x => x+"\n").Take(lineNumber-1).Append(markedLine)
-                                                    .Concat(allLines.Select(x => x + "\n").Skip(lineNumber).Take(lines-lineNumber-2)));
-        }
-
-        /// <summary>
-        /// Populates the code window with the content of the given non-filled lexer's token stream.
-        /// </summary>
-        /// <param name="lexer">Lexer with which the source code file was read. Must not be filled.</param>
-        /// <param name="language">Token language for the given lexer. May be <c>null</c>, in which case it is
-        /// determined by the lexer name.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="lexer"/> is <c>null</c></exception>
-        /// <exception cref="ArgumentException">
-        /// If the given <paramref name="lexer"/> is not of a supported grammar.
-        /// </exception>
-        public void EnterFromTokens(IEnumerable<SEEToken> tokens)
-        {
-            if (tokens == null)
-            {
-                throw new ArgumentNullException(nameof(tokens));
-            }
-            
-            // Avoid multiple enumeration in case iteration over the data source is expensive.
-            List<SEEToken> tokenList = tokens.ToList();
-            if (!tokenList.Any())
-            {
-                Text = "<i>This file is empty.</i>";
-                return;
-            }
-
-            TokenLanguage language = tokenList.First().Language;
-            
-            // We need to insert this pseudo token here so that the first line gets a line number.
-            tokenList.Insert(0, new SEEToken(string.Empty, SEEToken.Type.Newline, -1, 0, language));
-
-            // Needed padding is the number of lines, because the line number will be at most this long.
-            // FIXME: In certain edge cases this won't work, e.g. block comments can span multiple lines. Use text.
-            int neededPadding = $"{tokenList.Count(x => x.TokenType.Equals(SEEToken.Type.Newline))}".Length;
-            int lineNumber = 1;
-            foreach (SEEToken token in tokenList)
-            {
-                if (token.TokenType == SEEToken.Type.Unknown)
-                {
-                    Debug.LogError($"Unknown token encountered for text '{token.Text}'.\n");
-                }
-
-                if (token.TokenType == SEEToken.Type.Newline)
-                {
-                    AppendNewline(ref lineNumber, ref Text, neededPadding);
-                }
-                else if (token.TokenType != SEEToken.Type.EOF) // Skip EOF token completely.
-                {
-                    bool firstRun = true;
-                    string[] tokenLines = token.Text.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None);
-                    foreach (string line in tokenLines)
-                    {
-                        // Any entry after the first is on a separate line.
-                        if (!firstRun)
-                        {
-                            AppendNewline(ref lineNumber, ref Text, neededPadding);
-                        }
-                        
-                        // No "else if" because we still want to display this token.
-                        if (token.TokenType == SEEToken.Type.Whitespace)
-                        {
-                            // We just copy the whitespace verbatim, no need to even color it.
-                            // Note: We have to assume that whitespace will not interfere with TMP's XML syntax.
-                            Text += line.Replace("\t", new string(' ', language.TabWidth));
-                        }
-                        else
-                        {
-                            Text += $"<color=#{token.TokenType.Color}><noparse>{line}</noparse></color>";
-                        }
-
-                        firstRun = false;
-                    }
-                }
-            }
-
-            // Lines are equal to number of newlines, including the initial newline.
-            lines = Text.Count(x => x.Equals('\n')); // No more weird CRLF shenanigans are present at this point.
-            Text = Text.TrimStart('\n'); // Remove leading newline.
-
-            // Appends a newline to the text, assuming we're at theLineNumber and need the given padding.
-            static void AppendNewline(ref int theLineNumber, ref string text, int padding)
-            {
-                // First, of course, the newline.
-                text += "\n";
-                // Add whitespace next to line number so it's consistent.
-                text += string.Join("", Enumerable.Repeat(" ", padding - $"{theLineNumber}".Length));
-                // Line number will be typeset in grey to distinguish it from the rest.
-                text += $"<color=#CCCCCC>{theLineNumber}</color> ";
-                theLineNumber++;
-            }
-        }
-        
-        /// <summary>
-        /// Populates the code window with the contents of the given file.
-        /// This will overwrite any existing text.
-        /// </summary>
-        /// <param name="text">An array of lines to use for the code window.</param>
-        /// <exception cref="ArgumentException">If <paramref name="text"/> is empty or <c>null</c></exception>
-        public void EnterFromText(string[] text)
-        {
-            if (text == null || text.Length <= 0)
-            {
-                throw new ArgumentException("Given text must not be empty or null.\n");
-            }
-
-            int neededPadding = $"{text.Length}".Length;
-            Text = "";
-            for (int i = 0; i < text.Length; i++)
-            {
-                // Add whitespace next to line number so it's consistent.
-                Text += string.Join("", Enumerable.Repeat(" ", neededPadding-$"{i+1}".Length));
-                // Line number will be typeset in yellow to distinguish it from the rest.
-                Text += $"<color=\"yellow\">{i+1}</color> <noparse>{text[i]}</noparse>\n";
-            }
-            lines = text.Length;
-        }
-
-        /// <summary>
-        /// Populates the code window with the contents of the given file.
-        /// This will overwrite any existing text.
-        /// </summary>
-        /// <param name="filename">The filename for the file to read.</param>
-        /// <param name="syntaxHighlighting">Whether syntax highlighting shall be enabled.
-        /// The language will be detected by looking at the file extension.
-        /// If the language is not supported, an ArgumentException will be thrown.</param>
-        public void EnterFromFile(string filename, bool syntaxHighlighting = true)
-        {
-            FilePath = filename;
-            
-            // Try to read the file, otherwise display the error message.
-            if (!File.Exists(filename))
-            {
-                Text = $"<color=\"red\"><b>Couldn't find file '<noparse>{filename}</noparse>'.</b></color>";
-                Debug.LogError($"Couldn't find file {filename}");
-                return;
-            }
-            try
-            {
-                //TODO: First line empty, <EOF>
-                //TODO: Maybe disable syntax highlighting for huge files, as it would impact performance badly.
-                if (syntaxHighlighting)
-                {
-                    try
-                    {
-                        EnterFromTokens(SEEToken.fromFile(filename));
-                        return;
-                    }
-                    catch (ArgumentException e)
-                    {
-                        // In case the filetype is not supported, we render the text normally.
-                        Debug.LogError($"Encountered an exception, disabling syntax highlighting: {e}");
-                    }
-                }
-
-                EnterFromText(File.ReadAllLines(filename));
-            }
-            catch (IOException exception)
-            {
-                Text = $"<color=\"red\"><noparse>{exception}</noparse></color>";
-                Debug.LogError(exception);
-            }
+            string[] allLines = TextMesh.text.Split('\n').Select(x => x.EndsWith("</mark>") ? x.Substring(16, x.Length - 16 - 7) : x).ToArray();
+            string markedLine = $"<mark=#ff000044>{allLines[lineNumber - 1]}</mark>\n";
+            TextMesh.text = string.Join("", allLines.Select(x => x + "\n").Take(lineNumber - 1).Append(markedLine)
+                                                    .Concat(allLines.Select(x => x + "\n").Skip(lineNumber).Take(lines - lineNumber - 2)));
         }
 
         /// <summary>
@@ -343,17 +89,22 @@ namespace SEE.Game.UI.CodeWindow
         {
             switch (Platform)
             {
-                case PlayerInputType.DesktopPlayer: ShowDesktop(show);
+                case PlayerInputType.DesktopPlayer:
+                    ShowDesktop(show);
                     break;
-                case PlayerInputType.TouchGamepadPlayer: ShowDesktop(show);
+                case PlayerInputType.TouchGamepadPlayer:
+                    ShowDesktop(show);
                     break;
-                case PlayerInputType.VRPlayer: PlatformUnsupported();
+                case PlayerInputType.VRPlayer:
+                    PlatformUnsupported();
                     break;
-                case PlayerInputType.HoloLensPlayer: PlatformUnsupported();
+                case PlayerInputType.HoloLensPlayer:
+                    PlatformUnsupported();
                     break;
-                case PlayerInputType.None:  // nothing needs to be done
+                case PlayerInputType.None: // nothing needs to be done
                     break;
-                default: Debug.LogError($"Platform {Platform} not handled in switch case.\n");
+                default:
+                    Debug.LogError($"Platform {Platform} not handled in switch case.\n");
                     break;
             }
         }
@@ -379,7 +130,105 @@ namespace SEE.Game.UI.CodeWindow
                 codeWindow.SetActive(true);
             }
         }
-        
+
+        #region Visible Line Calculation
+
+        /// <summary>
+        /// The line we're scrolling towards at the moment.
+        /// Will be 0 if we're not scrolling towards anything.
+        /// </summary>
+        private int ScrollingTo;
+
+        /// <summary>
+        /// Number of "excess lines" within this code window.
+        /// Excess lines are defined as lines which can't be accessed by the scrollbar, so
+        /// they're all lines which are visible when scrolling to the lowest point of the window (except for the
+        /// first line, as that one is still accessible by the scrollbar).
+        /// In our case, this can be calculated by <c>ceil(window_height/line_height)</c>.
+        /// </summary>
+        private int excessLines;
+
+        /// <summary>
+        /// Holds the desired visible line before <see cref="Start"/> is called, because <see cref="scrollbar"/> will
+        /// be undefined until then.
+        /// </summary>
+        private float PreStartLine = 1;
+
+        /// <summary>
+        /// The line currently at the top of the window.
+        /// Will scroll smoothly to the line when changed and mark it visually.
+        /// While scrolling to a line, this returns the line we're currently scrolling to.
+        /// If a line outside the range of available lines is set, the highest available line number is used instead.
+        /// </summary>
+        /// <remarks>Only a fully visible line counts. If a line is partially obscured, the next line number
+        /// will be returned.</remarks>
+        public int VisibleLine
+        {
+            get => ScrollingTo > 0 ? ScrollingTo : Mathf.CeilToInt(visibleLine) + 1;
+            set
+            {
+                if (value > lines || value < 1)
+                {
+                    Debug.LogError($"Specified line number {value} is outside the range of lines 1-{lines}. "
+                                   + $"Using maximum line number {lines} instead.");
+                    value = lines;
+                }
+
+                // If this is called before Start() has been called, scrollbar will be null, so we have to cache
+                // the desired visible line.
+                if (!HasStarted)
+                {
+                    PreStartLine = value;
+                }
+                else
+                {
+                    // Animate scroll
+                    ScrollingTo = value;
+                    DOTween.Sequence().Append(DOTween.To(() => visibleLine, f => visibleLine = f, value - 1, 1f))
+                           .AppendCallback(() => ScrollingTo = 0);
+
+                    // FIXME: TMP bug: Large files cause issues with highlighting text. This is just a workaround.
+                    // See https://github.com/uni-bremen-agst/SEE/issues/250#issuecomment-819653373
+                    if (Text.Length < 16382)
+                    {
+                        MarkLine(value);
+                    }
+
+                    ScrollEvent.Invoke();
+                }
+            }
+        }
+
+        /// <summary>
+        /// The line currently at the top of the window.
+        /// Will immediately set the line.
+        /// Note that the line here is 0-indexed, as opposed to <see cref="VisibleLine"/>, which is 1-indexed.
+        /// </summary>
+        private float visibleLine
+        {
+            get => HasStarted ? (1 - scrollRect.verticalNormalizedPosition) * (lines - 1 - excessLines) : PreStartLine;
+            set
+            {
+                if (value > lines - 1 || value < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value));
+                }
+
+                // If this is called before Start() has been called, scrollbar will be null, so we have to cache
+                // the desired visible line.
+                if (!HasStarted)
+                {
+                    PreStartLine = value;
+                }
+                else
+                {
+                    scrollRect.verticalNormalizedPosition = 1 - value / (lines - 1 - excessLines);
+                }
+            }
+        }
+
+        #endregion
+
         #region Value Object
 
         /// <summary>
@@ -404,11 +253,12 @@ namespace SEE.Game.UI.CodeWindow
                     throw new InvalidOperationException($"GameObject with name {valueObject} could not be found.\n");
                 }
             }
+
             CodeWindow window = attachTo.AddComponent<CodeWindow>();
             if (valueObject.Path != null)
             {
                 window.EnterFromFile(valueObject.Path);
-            } 
+            }
             else if (valueObject.Text != null)
             {
                 window.EnterFromText(valueObject.Text.Split('\n'));
@@ -417,6 +267,7 @@ namespace SEE.Game.UI.CodeWindow
             {
                 throw new ArgumentException("Invalid value object. Either FilePath or Text must not be null.");
             }
+
             window.Title = valueObject.Title;
             window.VisibleLine = valueObject.VisibleLine;
             return window;
@@ -430,10 +281,12 @@ namespace SEE.Game.UI.CodeWindow
         /// <returns>The newly created <see cref="CodeWindowValues"/>, matching this class</returns>
         public CodeWindowValues ToValueObject(bool fulltext)
         {
-            return fulltext ? new CodeWindowValues(Title, VisibleLine, gameObject.name, Text) 
-                : new CodeWindowValues(Title, VisibleLine, gameObject.name, path: FilePath);
+            string attachedTo = gameObject.name;
+            return fulltext
+                ? new CodeWindowValues(Title, VisibleLine, attachedTo, Text)
+                : new CodeWindowValues(Title, VisibleLine, attachedTo, path: FilePath);
         }
-        
+
         /// <summary>
         /// Represents the values of a code window needed to re-create its content.
         /// Used for serialization when sending a <see cref="CodeWindow"/> over the network.
@@ -491,6 +344,7 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     throw new ArgumentException("Either text or filename must not be null!");
                 }
+
                 Text = text;
                 Path = path;
                 AttachedTo = attachedTo;
@@ -498,7 +352,7 @@ namespace SEE.Game.UI.CodeWindow
                 VisibleLine = visibleLine;
             }
         }
-        
+
         #endregion
     }
 }
