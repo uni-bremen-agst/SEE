@@ -95,9 +95,9 @@ MonoBehaviour:
   m_fontSize: 22.5
   m_fontSizeBase: 22.5
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 16
+  m_fontSizeMax: 22.5
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -371,6 +371,7 @@ MonoBehaviour:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
+  buttonVar: {fileID: 0}
   normalImage: {fileID: 1531332202938432071}
   normalText: {fileID: 7271999502370158117}
   soundSource: {fileID: 0}
@@ -380,6 +381,7 @@ MonoBehaviour:
   useHoverSound: 1
   useClickSound: 1
   useRipple: 1
+  rippleUpdateMode: 1
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6
@@ -387,9 +389,6 @@ MonoBehaviour:
   transitionColor: {r: 0, g: 0, b: 0, a: 0}
   renderOnTop: 0
   centered: 0
-  hoverExitEvent:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &2539900339822752133
 MonoBehaviour:
   m_ObjectHideFlags: 0
