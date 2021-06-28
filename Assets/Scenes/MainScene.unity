@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.10009589, g: 0.1694057, b: 0.30514205, a: 1}
+  m_IndirectSpecularColor: {r: 0.10010709, g: 0.1693151, b: 0.30522084, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1338,16 +1338,16 @@ MonoBehaviour:
       Data: 0
     - Name: widthMetric
       Entry: 1
-      Data: Metric.Number_of_Tokens
+      Data: Metric.Lines.LOC
     - Name: heightMetric
       Entry: 1
-      Data: Metric.Clone_Rate
+      Data: Metric.Lines.LOC
     - Name: depthMetric
       Entry: 1
-      Data: Metric.LOC
+      Data: Metric.Lines.LOC
     - Name: styleMetric
       Entry: 1
-      Data: Metric.Complexity
+      Data: Metric.Extended_McCabe
     - Name: coloringKind
       Entry: 3
       Data: 0
@@ -1698,10 +1698,10 @@ MonoBehaviour:
       Data: 0
     - Name: heightMetric
       Entry: 1
-      Data: 
+      Data: 0.000001
     - Name: styleMetric
       Entry: 1
-      Data: Metric.IssuesTotal
+      Data: Metric.Level
     - Name: coloringKind
       Entry: 3
       Data: 0
@@ -2025,10 +2025,10 @@ MonoBehaviour:
       Data: 20|SEE.NodeLayoutSettings, SEE
     - Name: kind
       Entry: 3
-      Data: 1
+      Data: 3
     - Name: zScoreScale
       Entry: 5
-      Data: true
+      Data: false
     - Name: showErosions
       Entry: 5
       Data: false
@@ -2043,10 +2043,10 @@ MonoBehaviour:
       Data: 21|SEE.EdgeLayoutSettings, SEE
     - Name: kind
       Entry: 3
-      Data: 3
+      Data: 0
     - Name: edgeWidth
       Entry: 4
-      Data: 0.1
+      Data: 0.001
     - Name: edgesAboveBlocks
       Entry: 5
       Data: true
@@ -2361,7 +2361,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.0031000376
+  HeightOffset: 0.0030500293
 --- !u!65 &155696310
 BoxCollider:
   m_ObjectHideFlags: 0
