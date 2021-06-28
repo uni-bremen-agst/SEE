@@ -23,6 +23,8 @@ namespace SEE.Game.UI.CodeWindow
         /// TextMeshPro component containing the code.
         /// </summary>
         private TextMeshProUGUI TextMesh;
+        
+        private TMP_InputField TextMeshInputField;
 
         /// <summary>
         /// Path to the file whose content is displayed in this code window.
