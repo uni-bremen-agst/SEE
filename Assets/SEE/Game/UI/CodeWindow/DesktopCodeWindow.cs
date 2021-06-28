@@ -27,12 +27,12 @@ namespace SEE.Game.UI.CodeWindow
         /// <param name="show">Whether the code window should be shown.</param>
         private void ShowDesktop(bool show)
         {
-            if (codeWindow) 
+            if (codeWindow)
             {
                 codeWindow.SetActive(show);
             }
         }
-        
+
         protected override void StartDesktop()
         {
             if (Title == null || Text == null)
@@ -82,7 +82,7 @@ namespace SEE.Game.UI.CodeWindow
                     }
                 }
             }
-            
+
             RecalculateExcessLines();
 
             // Position code window in center of screen
@@ -92,6 +92,9 @@ namespace SEE.Game.UI.CodeWindow
             VisibleLine = Mathf.Clamp(Mathf.FloorToInt(PreStartLine), 1, lines);
         }
 
+        /// <summary>
+        /// Tooltip containing all issue descriptions.
+        /// </summary>
         private Tooltip.Tooltip issueTooltip;
 
         protected override void UpdateDesktop()
@@ -114,13 +117,12 @@ namespace SEE.Game.UI.CodeWindow
                     // Hide tooltip by clicking somewhere else
                     issueTooltip.Hide();
                 }
-            } 
+            }
             else if (issueDictionary.Count != 0 && Input.GetMouseButtonDown(1) && issueTooltip != null)
             {
                 // Hide tooltip by right-clicking
                 issueTooltip.Hide();
             }
-
         }
 
         /// <summary>
