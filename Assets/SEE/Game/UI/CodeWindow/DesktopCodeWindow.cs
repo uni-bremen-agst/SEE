@@ -1,4 +1,7 @@
+using System;
 using System.Linq;
+using Cysharp.Threading.Tasks;
+using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Utils;
 using TMPro;
@@ -24,12 +27,12 @@ namespace SEE.Game.UI.CodeWindow
         /// <param name="show">Whether the code window should be shown.</param>
         private void ShowDesktop(bool show)
         {
-            if (codeWindow) 
+            if (codeWindow)
             {
                 codeWindow.SetActive(show);
             }
         }
-        
+
         protected override void StartDesktop()
         {
             if (Title == null || Text == null)
@@ -79,7 +82,7 @@ namespace SEE.Game.UI.CodeWindow
                     }
                 }
             }
-            
+
             RecalculateExcessLines();
 
             // Position code window in center of screen
@@ -90,13 +93,55 @@ namespace SEE.Game.UI.CodeWindow
         }
 
         /// <summary>
+        /// Tooltip containing all issue descriptions.
+        /// </summary>
+        private Tooltip.Tooltip issueTooltip;
+
+        protected override void UpdateDesktop()
+        {
+            // Show issue info on click (on hover would be too expensive)
+            if (issueDictionary.Count != 0 && Input.GetMouseButtonDown(0))
+            {
+                // Passing camera as null causes the screen space rather than world space camera to be used
+                int link = TMP_TextUtilities.FindIntersectingLink(TextMesh, Input.mousePosition, null);
+                if (link != -1)
+                {
+                    char linkId = TextMesh.textInfo.linkInfo[link].GetLinkID()[0];
+                    issueTooltip ??= gameObject.AddComponent<Tooltip.Tooltip>();
+                    // Display tooltip containing all issue descriptions
+                    UniTask.WhenAll(issueDictionary[linkId].Select(x => x.ToDisplayString()))
+                           .ContinueWith(x => issueTooltip.Show(string.Join("\n", x), 0f));
+                }
+                else if (issueTooltip != null)
+                {
+                    // Hide tooltip by clicking somewhere else
+                    issueTooltip.Hide();
+                }
+            }
+            else if (issueDictionary.Count != 0 && Input.GetMouseButtonDown(1) && issueTooltip != null)
+            {
+                // Hide tooltip by right-clicking
+                issueTooltip.Hide();
+            }
+        }
+
+        /// <summary>
         /// Recalculates the <see cref="excessLines"/> using the current window height and line height of the text.
         /// This method should be called every time the window height or the line height changes.
         /// For more information, see the documentation of <see cref="excessLines"/>.
         /// </summary>
         public void RecalculateExcessLines()
         {
-            TextMesh.ForceMeshUpdate();
+            try
+            {
+                TextMesh.ForceMeshUpdate();
+            }
+            catch (IndexOutOfRangeException)
+            {
+                //FIXME: Use multiple TMPs: Either one as an overlay, or split the main TMP up into multiple ones.
+                ShowNotification.Error("File too big", "This file is too large to be displayed correctly.");
+            }
+
             if (lines > 0 && codeWindow.transform.Find("Content/Scrollable").gameObject.TryGetComponentOrLog(out RectTransform rect))
             {
                 excessLines = Mathf.CeilToInt(rect.rect.height / TextMesh.textInfo.lineInfo[0].lineHeight) - 2;
