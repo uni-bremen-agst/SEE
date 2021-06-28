@@ -177,7 +177,7 @@ namespace SEE.Net.Dashboard.Model.Issues
             /// <summary>
             /// The id for comment deletion.
             /// When the requesting user is allowed to delete the comment,
-            /// contains an id that can be used to mark the comment as deleted using another API. 
+            /// contains an id that can be used to mark the comment as deleted using another API.
             /// </summary>
             /// <remarks>
             /// This is never set when the Comment is returned as the result of an Issue-List query.
@@ -185,7 +185,7 @@ namespace SEE.Net.Dashboard.Model.Issues
             [JsonProperty(Required = Required.Default)]
             public readonly string commentDeletionId;
 
-            public IssueComment(string username, string userDisplayName, DateTime date, 
+            public IssueComment(string username, string userDisplayName, DateTime date,
                                 string displayDate, string text, string commentDeletionId)
             {
                 this.username = username;
@@ -196,11 +196,10 @@ namespace SEE.Net.Dashboard.Model.Issues
                 this.commentDeletionId = commentDeletionId;
             }
         }
-        
+
         /// <summary>
         /// The entities this issue references.
         /// </summary>
         public abstract IEnumerable<SourceCodeEntity> Entities { get; }
-
     }
 }
