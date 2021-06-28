@@ -112,7 +112,9 @@ namespace SEE.Controls
                     else
                     {
                         // Visible line may have changed
-                        CodeSpaces[playerName].CodeWindows.First(x => x.Title == windowValue.Title).VisibleLine = windowValue.VisibleLine;
+                        CodeWindow window = CodeSpaces[playerName].CodeWindows.First(x => x.Title == windowValue.Title);
+                        window.VisibleLine = windowValue.VisibleLine;
+                        //TODO: Text merge between windowValue.Text and window.Text
                         
                         // Window is still open, so it's not closed
                         closedWindows.RemoveAll(x => x.Title == windowValue.Title);

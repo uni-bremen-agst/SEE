@@ -51,10 +51,19 @@ namespace SEE.Game.UI.CodeWindow
 
             // Set title, text and preferred font size
             codeWindow.transform.Find("Dragger/Title").gameObject.GetComponent<TextMeshProUGUI>().text = Title;
-            if (codeWindow.transform.Find("Content/Scrollable/Code").gameObject.TryGetComponentOrLog(out TextMesh))
+            if (codeWindow.transform.Find("Content/Scrollable/Code").gameObject.TryGetComponentOrLog(out TextMesh) 
+            && codeWindow.transform.Find("Content/Scrollable/Code").gameObject.TryGetComponentOrLog(out TextMeshInputField))
             {
                 TextMesh.text = Text;
                 TextMesh.fontSize = FontSize;
+                
+                TextMeshInputField.enabled = true;
+                TextMeshInputField.interactable = true;
+                int neededPadding = 1; // TODO: Use real padding
+                //FIXME: startIndex too big
+                TextMeshInputField.text = string.Concat('\n', Text.Split('\n')
+                                                                  .Select((x, i) => GetCleanLine(i).Substring(neededPadding))
+                                                                  .ToArray());
             }
 
             // Register events to find out when window was scrolled in.

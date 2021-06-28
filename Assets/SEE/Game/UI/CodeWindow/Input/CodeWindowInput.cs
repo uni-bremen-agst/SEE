@@ -271,7 +271,7 @@ namespace SEE.Game.UI.CodeWindow
                 Assert.IsTrue(linkCounter < char.MaxValue);
                 char[] reservedCharacters = {'<', '>', '"', '\''}; // these characters would break our formatting
                 // Increase link counter until it contains an allowed character
-                while (reservedCharacters.Contains(++linkCounter));
+                while (reservedCharacters.Contains(++linkCounter)) ;
             }
 
             #endregion
@@ -430,5 +430,36 @@ namespace SEE.Game.UI.CodeWindow
                 => Enumerable.Range(entity.line, entity.endLine - entity.line + 1 ?? 1)
                              .Select(l => new SourceCodeEntity(entity.path, l, null, entity.content));
         }
+
+        /// <summary>
+        /// Get index within the "rich" text (with markup tags) from index in the "clean" text (with markup tags).
+        /// </summary>
+        /// <param name="cleanIndex">The index within the "clean" text.</param>
+        /// <returns>The index within the "rich" text.</returns>
+        /// <example>
+        /// Assume we have the source line <c>&lt;color red&gt;private class&lt;/color&gt; Test {</c>.
+        /// As we can see, rich tags have been inserted so that the "private class" keywords are rendered in red.
+        /// This is a problem when we later want to e.g. highlight "class Test". It's no longer possible to simply
+        /// search the text for "class Test" and highlight that part, because it's broken up by <c>&lt;/color&gt;</c>.
+        /// To remedy this, you can call this method with an index in the "clean" version.
+        /// In our example, this would be 9 (before "class") and 19 (after "Test"). This method will then return the
+        /// corresponding indices in the text with tags present, which in our example would be 20 and 38.
+        /// </example>
+        private int GetRichIndex(int cleanIndex)
+        {
+            return TextMesh.textInfo.characterInfo[cleanIndex].index;
+        }
+
+        /// <summary>
+        /// Returns the line at the given <paramref name="lineNumber"/> from the <see cref="TextMesh"/>
+        /// without any XML tags.
+        /// </summary>
+        /// <param name="lineNumber">The line number whose cleaned up line shall be returned</param>
+        /// <returns>The line at <paramref name="lineNumber"/> without any XML tags</returns>
+        private string GetCleanLine(int lineNumber) =>
+                //FIXME: There may be an issue here
+            new string(TextMesh.textInfo.characterInfo
+                    .SkipWhile(x => x.lineNumber + 1 != lineNumber) 
+                    .TakeWhile(x => x.lineNumber + 1 == lineNumber).Select(x => x.character).ToArray());
     }
 }
