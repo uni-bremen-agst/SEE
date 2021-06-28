@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using SEE.Utils;
 using Valve.Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
@@ -9,6 +12,12 @@ namespace SEE.Net.Dashboard.Model.Issues
     [Serializable]
     public class MetricViolationIssue : Issue
     {
+        /// <summary>
+        /// Whether the explanation shall be shown for these issues.
+        /// This is relevant because explanation for metrics are often very long, so disabling it may be of use.
+        /// </summary>
+        private const bool SHOW_EXPLANATION = false;
+
         /// <summary>
         /// The severity of the violation
         /// </summary>
@@ -37,7 +46,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// The line number of the entity
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly uint line;
+        public readonly int line;
 
         /// <summary>
         /// The internal name of the corresponding entity
@@ -87,8 +96,8 @@ namespace SEE.Net.Dashboard.Model.Issues
         }
 
         [JsonConstructor]
-        public MetricViolationIssue(string severity, string entity, string entityType, string path, uint line, 
-                                    string linkName, string metric, string errorNumber, string description, 
+        public MetricViolationIssue(string severity, string entity, string entityType, string path, int line,
+                                    string linkName, string metric, string errorNumber, string description,
                                     float? max, float? min, float value)
         {
             this.severity = severity;
@@ -104,5 +113,22 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.min = min;
             this.value = value;
         }
+
+        public override async UniTask<string> ToDisplayString()
+        {
+            string explanation = SHOW_EXPLANATION ? await DashboardRetriever.Instance.GetIssueDescription($"MV{id}") : "";
+            string minimum = min.HasValue ? $"; Minimum: <b>{min:0.##}</b>" : "";
+            string maximum = max.HasValue ? $"; Maximum: <b>{max:0.##}</b>" : "";
+            return $"<style=\"H2\">Metric: {description.WrapLines(WRAP_AT / 2)}</style>"
+                   + $"\nActual: <b>{value}</b>{minimum}{maximum}"
+                   + $"\n{explanation.WrapLines(WRAP_AT)}";
+        }
+
+        public override string IssueKind => "MV";
+
+        public override IEnumerable<SourceCodeEntity> Entities => new[]
+        {
+            new SourceCodeEntity(path, line, null, entity)
+        };
     }
 }

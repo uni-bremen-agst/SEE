@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SEE.DataModel.DG
 {
@@ -79,6 +80,11 @@ namespace SEE.DataModel.DG
         public const string SourceNameAttribute = "Source.Name";
 
         /// <summary>
+        /// The attribute name for the filename of nodes. The filename may not exist.
+        /// </summary>
+        public const string SourceFileAttribute = "Source.File";
+
+        /// <summary>
         /// The name of the node (which is not necessarily unique).
         /// </summary>
         public string SourceName
@@ -88,9 +94,17 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// The parent of this node. Is null if it has none.
+        /// The filename of the node. May not exist, in which case this will be null.
         /// </summary>
-        private Node parent;
+        public string SourceFile
+        {
+            get
+            {
+                TryGetString(SourceFileAttribute, out string file); 
+                return file;
+            }
+            set => SetString(SourceFileAttribute, value);
+        }
 
         /// <summary>
         /// The level of the node in the hierarchy. The top-most level has level 
@@ -118,10 +132,7 @@ namespace SEE.DataModel.DG
                 }
                 return level;
             }                
-            set
-            {
-                level = value;
-            }
+            set => level = value;
         }
 
         /// <summary>
@@ -147,27 +158,15 @@ namespace SEE.DataModel.DG
         /// <returns>maximal depth of the tree rooted by this node</returns>
         public int Depth()
         {
-            int maxDepth = 0;
+            int maxDepth = children.Select(child => child.Depth()).Prepend(0).Max();
 
-            foreach (Node child in children)
-            {
-                int depth = child.Depth();
-                if (depth > maxDepth)
-                {
-                    maxDepth = depth;
-                }
-            }
             return maxDepth + 1;
         }
 
         /// <summary>
         /// The ancestor of the node in the hierarchy. May be null if the node is a root.
         /// </summary>
-        public Node Parent
-        {
-            get => parent;
-            set => parent = value;
-        }
+        public Node Parent { get; set; }
 
         /// <summary>
         /// True iff node has no parent.
@@ -175,7 +174,7 @@ namespace SEE.DataModel.DG
         /// <returns>true iff node is a root node</returns>
         public bool IsRoot()
         {
-            return parent == null;
+            return Parent == null;
         }
 
         /// <summary>
@@ -499,26 +498,26 @@ namespace SEE.DataModel.DG
             else if (newParent == null)
             {
                 // Nothing do be done for newParent == null and parent == null.
-                if (parent != null)
+                if (Parent != null)
                 {
-                    parent.children.Remove(this);
-                    parent = null;
+                    Parent.children.Remove(this);
+                    Parent = null;
                     ItsGraph.NodeHierarchyHasChanged = true;
                 }
             }
             else
             {
                 // assert: newParent != null
-                if (parent == null)
+                if (Parent == null)
                 {
                     newParent.AddChild(this);                    
                 }
                 else
                 {
                     // parent != null and newParent != null
-                    parent.children.Remove(this);
-                    parent = newParent;
-                    parent.children.Add(this);
+                    Parent.children.Remove(this);
+                    Parent = newParent;
+                    Parent.children.Add(this);
                 }
                 ItsGraph.NodeHierarchyHasChanged = true;
             }
@@ -625,7 +624,7 @@ namespace SEE.DataModel.DG
         {
             base.HandleCloned(clone);
             Node target = (Node)clone;
-            target.parent = null;
+            target.Parent = null;
             target.level = 0;
             target.children = new List<Node>();
             target.outgoings = new List<Edge>();

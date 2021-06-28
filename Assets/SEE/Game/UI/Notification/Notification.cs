@@ -88,6 +88,17 @@ namespace SEE.Game.UI.Notification
         /// </summary>
         private int frames;
 
+        /// <summary>
+        /// Closes the notification immediately.
+        /// </summary>
+        public void Close()
+        {
+            if (manager != null)
+            {
+                manager.CloseNotification();
+            }
+        }
+
         private void OnDestroy()
         {
             if (manager != null)
