@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HelpSystemEntry
+public class HelpSystemEntryModel
 {
     private string title;
 
@@ -12,7 +12,7 @@ public class HelpSystemEntry
 
     private string audioText;
 
-    public HelpSystemEntry(string title, string videoPath, List<string> keyPoints, string audioText)
+    public HelpSystemEntryModel(string title, string videoPath, List<string> keyPoints, string audioText)
     {
         this.title = title;
         this.videoPath = videoPath;
