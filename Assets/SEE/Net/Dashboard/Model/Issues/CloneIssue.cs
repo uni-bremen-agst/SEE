@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using SEE.Utils;
 using Valve.Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
@@ -7,38 +10,38 @@ namespace SEE.Net.Dashboard.Model.Issues
     /// An issue representing a clone.
     /// </summary>
     [Serializable]
-    public class CloneIssue: Issue
+    public class CloneIssue : Issue
     {
         /// <summary>
         /// The clone type
         /// </summary>
         [JsonProperty(Required = Required.Always)]
         public readonly int cloneType;
-            
+
         /// <summary>
         /// The filename of the left clone fragment
         /// </summary>
         [JsonProperty(Required = Required.Always)]
         public readonly string leftPath;
-            
+
         /// <summary>
         /// The start line number of the left clone fragment
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly uint leftLine;
+        public readonly int leftLine;
 
         /// <summary>
         /// The end line number of the left clone fragment
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly uint leftEndLine;
+        public readonly int leftEndLine;
 
         /// <summary>
         /// The number of lines of the left clone fragment
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly uint leftLength;
-            
+        public readonly int leftLength;
+
         /// <summary>
         /// The weight of the left clone fragment
         /// </summary>
@@ -50,25 +53,25 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// </summary>
         [JsonProperty(Required = Required.Always)]
         public readonly string rightPath;
-            
+
         /// <summary>
         /// The start line number of the right clone fragment
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly uint rightLine;
+        public readonly int rightLine;
 
         /// <summary>
         /// The end line number of the right clone fragment
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly uint rightEndLine;
+        public readonly int rightEndLine;
 
         /// <summary>
         /// The number of lines of the right clone fragment
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly uint rightLength;
-            
+        public readonly int rightLength;
+
         /// <summary>
         /// The weight of the right clone fragment
         /// </summary>
@@ -81,8 +84,8 @@ namespace SEE.Net.Dashboard.Model.Issues
         }
 
         [JsonConstructor]
-        public CloneIssue(int cloneType, string leftPath, uint leftLine, uint leftEndLine, uint leftLength, 
-                          int leftWeight, string rightPath, uint rightLine, uint rightEndLine, uint rightLength,
+        public CloneIssue(int cloneType, string leftPath, int leftLine, int leftEndLine, int leftLength,
+                          int leftWeight, string rightPath, int rightLine, int rightEndLine, int rightLength,
                           int rightWeight)
         {
             this.cloneType = cloneType;
@@ -98,13 +101,21 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.rightWeight = rightWeight;
         }
 
-        public override string ToString()
+        public override async UniTask<string> ToDisplayString()
         {
-            return $"{nameof(cloneType)}: {cloneType}, {nameof(leftPath)}: {leftPath}, {nameof(leftLine)}: {leftLine},"
-                   + $" {nameof(leftEndLine)}: {leftEndLine}, {nameof(leftLength)}: {leftLength},"
-                   + $" {nameof(leftWeight)}: {leftWeight}, {nameof(rightPath)}: {rightPath},"
-                   + $" {nameof(rightLine)}: {rightLine}, {nameof(rightEndLine)}: {rightEndLine}, "
-                   + $"{nameof(rightLength)}: {rightLength}, {nameof(rightWeight)}: {rightWeight}";
+            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"CL{id}");
+            return $"<style=\"H2\">Clone of type {cloneType}</style>"
+                   + $"\nLeft: {leftPath}, Lines {leftLine}-{leftEndLine}".WrapLines(WRAP_AT)
+                   + $"\nRight: {rightPath}, Lines {rightLine}-{rightEndLine}\n".WrapLines(WRAP_AT)
+                   + $"\n{explanation.WrapLines(WRAP_AT)}";
         }
+
+        public override string IssueKind => "CL";
+
+        public override IEnumerable<SourceCodeEntity> Entities => new[]
+        {
+            new SourceCodeEntity(leftPath, leftLine, leftEndLine),
+            new SourceCodeEntity(rightPath, rightLine, rightEndLine)
+        };
     }
 }
