@@ -124,6 +124,7 @@ namespace SEE.Game.UI.Menu
             keywordInput.Unregister(OnMenuEntryTitleRecognized);
             keywordInput.Register(OnMenuEntryTitleRecognized);
 
+
         }
 
         /// <summary>
