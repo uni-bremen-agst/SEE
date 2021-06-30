@@ -25,7 +25,7 @@ namespace SEE.Game
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in 
         /// <see cref="Save(ConfigWriter)"/> and 
-        /// <see cref="Restore(Dictionary{string, object})"/>, 
+        /// <see cref="Restore(Dictionary{string,object})"/>, 
         /// respectively (both declared in AbstractSEECityIO). You should also
         /// extend the test cases in TestConfigIO.
 
@@ -83,10 +83,8 @@ namespace SEE.Game
         /// <param name="filename"></param>
         public void Save(string filename)
         {
-            using (ConfigWriter writer = new ConfigWriter(filename))
-            {
-                Save(writer);
-            }
+            using ConfigWriter writer = new ConfigWriter(filename);
+            Save(writer);
         }
 
         /// <summary>
@@ -95,10 +93,8 @@ namespace SEE.Game
         /// <param name="filename"></param>
         public void Load(string filename)
         {
-            using (ConfigReader stream = new ConfigReader(filename))
-            {
-                Restore(stream.Read());
-            }
+            using ConfigReader stream = new ConfigReader(filename);
+            Restore(stream.Read());
         }
 
         /// <summary>
@@ -413,8 +409,8 @@ namespace SEE.Game
         /// <returns>all attribute names of the different kinds of software erosions for inner nodes</returns>
         public IList<string> AllInnerNodeIssues()
         {
-            List<string> result = new List<string>()
-               {
+            List<string> result = new List<string>
+            {
                   ArchitectureIssue_SUM,
                   CloneIssue_SUM,
                   CycleIssue_SUM,
@@ -536,7 +532,7 @@ namespace SEE.Game
             if (nodeLayoutSettings.kind == NodeLayoutKind.CompoundSpringEmbedder)
             {
                 Dictionary<string, bool> dirs = coseGraphSettings.ListInnerNodeToggle;
-                // die neuen dirs 
+                // the new directories
                 Dictionary<string, bool> dirsLocal = new Dictionary<string, bool>();
 
                 Dictionary<string, NodeLayoutKind> dirsLayout = new Dictionary<string, NodeLayoutKind>();
@@ -552,17 +548,13 @@ namespace SEE.Game
                     }
                 }
 
-                // falls der key nicht in den alten dictonary ist
+                // if the key isn't in the old dictionaries
                 //dirsLocal = dirsLocal.Where(i => !dirs.ContainsKey(i.Key)).ToDictionary(i => i.Key, i => i.Value);
 
                 bool diff1 = dirs.Keys.Except(dirsLocal.Keys).Any();
                 bool diff2 = dirsLocal.Keys.Except(dirs.Keys).Any();
 
-                if (dirs.Count == dirsLocal.Count && !diff1 && !diff2)
-                {
-
-                }
-                else
+                if (dirs.Count != dirsLocal.Count || diff1 || diff2)
                 {
                     coseGraphSettings.InnerNodeShape = dirsShape;
                     coseGraphSettings.InnerNodeLayout = dirsLayout;

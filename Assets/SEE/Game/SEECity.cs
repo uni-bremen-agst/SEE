@@ -144,9 +144,7 @@ namespace SEE.Game
                 }
             }
 
-#if true
             RemoveTransparency();
-#endif
         }
 
         /// <summary>
@@ -162,9 +160,9 @@ namespace SEE.Game
                 if (meshRenderer)
                 {
                     Material material = meshRenderer.material;
-                    Color color = material.GetColor("_Color");
+                    Color color = material.GetColor(ColorProperty);
                     color.a = 1.0f;
-                    material.SetColor("_Color", color);
+                    material.SetColor(ColorProperty, color);
                 }
             }
             foreach (EdgeRef edgeRef in FindObjectsOfType<EdgeRef>())
@@ -173,9 +171,9 @@ namespace SEE.Game
                 if (lineRenderer)
                 {
                     Material material = lineRenderer.material;
-                    Color color = material.GetColor("_Color");
+                    Color color = material.GetColor(ColorProperty);
                     color.a = 1.0f;
-                    material.SetColor("_Color", color);
+                    material.SetColor(ColorProperty, color);
                 }
             }
         }
@@ -193,7 +191,7 @@ namespace SEE.Game
             if (loadedGraph != null)
             {
                 SetNodeEdgeRefs(loadedGraph, gameObject);
-                Debug.LogFormat("Node and edge references for {0} are resolved.\n", gameObject.name);
+                Debug.Log($"Node and edge references for {gameObject.name} are resolved.\n");
             }
             else
             {
@@ -379,6 +377,12 @@ namespace SEE.Game
         /// Neither serialized nor saved to the config file.
         /// </summary>
         private GraphRenderer graphRenderer;
+
+        /// <summary>
+        /// Color property of the shader. Lookups using this value are more efficient than lookups using the
+        /// string value "_Color".
+        /// </summary>
+        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
 
         /// <summary>
         /// Yields a graph renderer that can draw this city.

@@ -452,7 +452,7 @@ namespace SEE.Game
                     plane = DrawPlane(leftFrontCorner, rightBackCorner, parent.transform.position.y + parent.transform.lossyScale.y / 2.0f + LevelDistance);
                     AddToParent(plane, parent);
 
-                    // The layouNodes are put just above the plane w.r.t. the y axis.
+                    // The layoutNodes are put just above the plane w.r.t. the y axis.
                     NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + LevelDistance);
 
                     CreateObjectHierarchy(nodeMap, parent);
@@ -470,7 +470,7 @@ namespace SEE.Game
                 }
                 finally
                 {
-                    // If we added an artifical root node to the graph, we must remove it again
+                    // If we added an artificial root node to the graph, we must remove it again
                     // from the graph when we are done.
                     RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, gameNodes);
                 }
