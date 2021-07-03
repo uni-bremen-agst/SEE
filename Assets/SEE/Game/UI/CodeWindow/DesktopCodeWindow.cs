@@ -61,9 +61,10 @@ namespace SEE.Game.UI.CodeWindow
                 TextMeshInputField.interactable = true;
                 int neededPadding = 1; // TODO: Use real padding
                 //FIXME: startIndex too big
-                TextMeshInputField.text = string.Concat('\n', Text.Split('\n')
-                                                                  .Select((x, i) => GetCleanLine(i).Substring(neededPadding))
-                                                                  .ToArray());
+                TextMeshInputField.text = Text; //string.Concat('\n', Text.Split('\n')
+                                                //                        .Select((x, i) => GetCleanLine(i).Substring(neededPadding))
+                                                //                       .ToArray()); 
+                TextMeshInputField.caretPosition = 1;
             }
 
             // Register events to find out when window was scrolled in.
