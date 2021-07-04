@@ -159,7 +159,6 @@ namespace SEE.Game.UI.Menu
             else if (keywordInput != null)
             {
                 keywordInput.Unregister(OnMenuEntryTitleRecognized);
-                UnityEngine.Debug.Log("hoffentlich nicht");
                 keywordInput.Dispose();
             }
         }
@@ -197,7 +196,6 @@ namespace SEE.Game.UI.Menu
             {
                 if (args.text == keyword)
                 {
-                    UnityEngine.Debug.Log("AHA!" + keyword);
                     if (args.text != CloseMenuCommand)
                     {
                         SelectEntry(i);
