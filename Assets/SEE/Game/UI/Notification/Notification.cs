@@ -112,6 +112,7 @@ namespace SEE.Game.UI.Notification
         /// </summary>
         protected override void StartDesktop()
         {
+            Debug.Log("ru nning");
             GameObject notification = PrefabInstantiator.InstantiatePrefab(NOTIFICATION_PREFAB, Canvas.transform, false);
             
             // Setup anchoring
@@ -157,6 +158,7 @@ namespace SEE.Game.UI.Notification
 
         protected override void UpdateDesktop()
         {
+            Debug.Log("HI");
             // We only perform this expensive comparison once every 50 frames, if necessary
             if (DestroyAfterPlaying && ++frames % 50 == 0 && manager == null)
             {
