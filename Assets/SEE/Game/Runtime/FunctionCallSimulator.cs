@@ -1,4 +1,5 @@
 ﻿using OdinSerializer;
+using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -120,7 +121,7 @@ namespace SEE.Game.Runtime
             for (int i = 0; i < spheres.Length; i++)
             {
                 spheres[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                spheres[i].transform.position = Vector3.Lerp(sourcePosition, targetPosition, (float)i / (float)spheres.Length); 
+                spheres[i].transform.position = Vector3.Lerp(sourcePosition, targetPosition, (float)i / (float)spheres.Length);
                 spheres[i].transform.position = Vector3.Lerp(sourcePosition, targetPosition, i / (float)spheres.Length);
                 spheres[i].transform.rotation = Quaternion.identity;
                 spheres[i].transform.localScale = new Vector3(SPHERE_SCALE, SPHERE_SCALE, SPHERE_SCALE);
@@ -186,7 +187,9 @@ namespace SEE.Game.Runtime
         {
             Vector3 srcPos = src.transform.position;
             Vector3 dstPos = dst.transform.position;
+            // The source of the function call within the x/z plane.
             Vector2 srcPosFlat = new Vector2(srcPos.x, srcPos.z);
+            // The destination of the function call within the x/z plane.
             Vector2 dstPosFlat = new Vector2(dstPos.x, dstPos.z);
 
             Vector2 srcToDstFlat = dstPosFlat - srcPosFlat;
@@ -201,13 +204,13 @@ namespace SEE.Game.Runtime
                 srcToDstFlat = dstPosFlat - srcPosFlat;
                 srcToDstDistFlat = srcToDstFlat.magnitude;
             }
+            // The direction towards the spheres fly.
             Vector2 flyDirFlat = srcToDstFlat.normalized;
 
             // Translate first sphere
-            Vector2 stepFlat = flyDirFlat * SPHERE_HORIZONTAL_SPEED * Time.deltaTime * Mathf.Sqrt(srcToDstDistFlat);
+            Vector2 stepFlat = Mathf.Sqrt(srcToDstDistFlat) * SPHERE_HORIZONTAL_SPEED * Time.deltaTime * flyDirFlat;
             Vector2 fstPosFlat = new Vector2(spheres[0].transform.position.x, spheres[0].transform.position.z) + stepFlat;
 
-            float fstToDstDistFlat = Vector2.Distance(fstPosFlat, dstPosFlat);
             float fstToSrcDistFlat = Vector2.Distance(fstPosFlat, srcPosFlat);
             if (fstToSrcDistFlat > srcToDstDistFlat)
             {
@@ -220,10 +223,7 @@ namespace SEE.Game.Runtime
             bool pastDst = false;
             for (int i = 1; i < spheres.Length; i++)
             {
-                Vector3 spherePos = spheres[i].transform.position;
-                Vector2 spherePosFlat = new Vector2(spherePos.x, spherePos.z);
-
-                spherePosFlat = fstPosFlat + i * sphereOffsetFlat;
+                Vector2 spherePosFlat = fstPosFlat + i * sphereOffsetFlat;
 
                 if (!pastDst)
                 {
@@ -242,13 +242,20 @@ namespace SEE.Game.Runtime
             for (int i = 0; i < spheres.Length; i++)
             {
                 Vector3 spherePos = spheres[i].transform.position;
+                // The position of the sphere in the x/z plane.
                 Vector2 spherePosFlat = new Vector2(spherePos.x, spherePos.z);
-
                 float sphereToDstDistFlat = Vector3.Distance(spherePosFlat, dstPosFlat);
-                float t = 1.0f - (sphereToDstDistFlat / srcToDstDistFlat);
+
+                // FIXME: The assumption here is that sphereToDstDistFlat <= srcToDstDistFlat.
+                // It turns out that this may not be the case if the user zooms into a code city.
+                // To cure the symptom, we clamp the fraction into 0 and 1. However, that
+                // does not fix the root cause of the problem. How can sphereToDstDistFlat
+                // be greater than srcToDstDistFlat?
+                float t = 1.0f - Mathf.Clamp(sphereToDstDistFlat / srcToDstDistFlat, 0f, 1f);
 
                 // Color
-                Color color = viridisColorPalette[Mathf.Abs((int)(t * viridisColorPalette.Length) % viridisColorPalette.Length)];
+                //Debug.Log($"i={i} spheres.Length={spheres.Length} srcPosFlat ={srcPosFlat} dstPosFlat={dstPosFlat} spherePosFlat ={spherePosFlat} sphereToDstDistFlat={sphereToDstDistFlat} srcToDstDistFlat={srcToDstDistFlat}\n");
+                Color color = viridisColorPalette[(int)(t * viridisColorPalette.Length) % viridisColorPalette.Length];
                 spheres[i].GetComponentInChildren<MeshRenderer>().material.color = color;
 
                 // Altitude
@@ -259,7 +266,7 @@ namespace SEE.Game.Runtime
                 Vector3 dstPoint = dst.transform.position;
                 dstPoint.y = dstRoofHeight;
                 float altitude = Vector3.Lerp(srcPoint, dstPoint, t).y;
-                altitude = altitude + SPHERE_MAX_ALTITUDE * Mathf.Sin(t * Mathf.PI);
+                altitude += SPHERE_MAX_ALTITUDE * Mathf.Sin(t * Mathf.PI);
                 spheres[i].transform.position = new Vector3(spherePosFlat.x, altitude, spherePosFlat.y);
             }
         }
