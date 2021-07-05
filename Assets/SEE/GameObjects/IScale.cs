@@ -89,6 +89,22 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Returns the normalization value of given node <paramref name="metric"/> of
+        /// <paramref name="node"/> set in relation to the maximum value of the
+        /// normalized <paramref name="metric"/>. Hence, the result is in [0,1].
+        /// If the maximum normalized value of <paramref name="metric"/> is 0, 0
+        /// is returned.
+        /// </summary>
+        /// <param name="metric">name of the node metric</param>
+        /// <param name="node">node whose metric is to be queried</param>
+        /// <returns></returns>
+        internal float GetRelativeNormalizedValue(string metric, Node node)
+        {
+            float maximum = GetNormalizedMaximum(metric);
+            return maximum == 0 ? 0 : GetNormalizedValue(metric, node) / maximum;
+        }
+
+        /// <summary>
         /// Returns the maximal values of the given node metrics.
         /// </summary>
         /// <param name="graphs">the set of graphs for which to determine the node metric maxima</param>
