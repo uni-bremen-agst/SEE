@@ -25,6 +25,7 @@ TagManager:
   - Function Call
   - Runtime
   - Path
+  - Erosion
   layers:
   - Default
   - TransparentFX
