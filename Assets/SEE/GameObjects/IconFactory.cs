@@ -5,14 +5,14 @@ using UnityEngine;
 namespace SEE.GO
 {
     /// <summary>
-    /// A factory to generate sprites from sprite prefab files for all types of 
+    /// A factory to generate sprites from sprite prefab files for all types of
     /// software erosion kinds we currently support (architecture violation, clones,
     /// cycles, dead code, metrics, style, and universal).
     /// </summary>
     public class IconFactory
     {
-        /// The sprite prefabs are already generated in the Unity editor from the 
-        /// original SVG files. To do that, the SVG file must first be imported 
+        /// The sprite prefabs are already generated in the Unity editor from the
+        /// original SVG files. To do that, the SVG file must first be imported
         /// in the editor and then a sprite must be generated. The sprite can then
         /// be added to the scene as a new game object, which creates an instance
         /// in the scene hierarchy. From the scene hierarchy, the instance can be
@@ -59,7 +59,7 @@ namespace SEE.GO
         private const float ScreenRelativeTransitionHeight = 0.02f;
 
         /// <summary>
-        /// The paths to the sprite prefab files. 
+        /// The paths to the sprite prefab files.
         /// The viewBox of the original SVG files from which those prefabs were
         /// create is 0 0 1194.11 1161.28. Thus, the aspect ratio is roughly 1194:1161,
         /// or even more roughly 1:1.
@@ -100,7 +100,7 @@ namespace SEE.GO
 
         // A mapping of Erosions onto sprite prefabs. During start up we load the
         // sprite prefabs from the Assets for each kind of Erosion and store them
-        // in this field. Later when game objects are to be created from these 
+        // in this field. Later when game objects are to be created from these
         // prefabs, we look those prefabs up in this mapping.
         private readonly UnityEngine.Object[] erosionToSprite;
 
@@ -133,14 +133,14 @@ namespace SEE.GO
                 UnityEngine.Object prefab = Resources.Load<GameObject>(filename);
                 if (prefab == null)
                 {
-                    Debug.LogErrorFormat("Loading sprite prefab from file {0} failed.\n", filename);
+                    Debug.LogError($"Loading sprite prefab from file {filename} failed.\n");
                 }
                 return prefab;
 
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                Debug.LogErrorFormat("Loading Sprite prefab from file {0} failed: {1}", filename, e.ToString());
+                Debug.LogError($"Loading Sprite prefab from file {filename} failed: {e.ToString()}.\n");
             }
             return null;
         }
@@ -149,10 +149,10 @@ namespace SEE.GO
         /// Generates a sprite game object for the given kind of Erosion at the given
         /// location. The name of the game object is the kind of Erosion. The game
         /// object returned is a composite of different level-of-detail (LOD) objects
-        /// nested in an LOD group. Currently, there is only one such child object, 
+        /// nested in an LOD group. Currently, there is only one such child object,
         /// which is the sprite for the given kind of erosion. It will be culled by
         /// ScreenRelativeTransitionHeight.
-        /// 
+        ///
         /// This function may be called in editor mode.
         /// </summary>
         /// <param name="position">the location for positioning the new game object</param>
@@ -183,7 +183,9 @@ namespace SEE.GO
                 }
                 else
                 {
+                    string prefabName = prefab.name;
                     erosionSprite = UnityEngine.Object.Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
+                    erosionSprite.name = prefabName;
                 }
                 erosionSprite.transform.parent = gameObject.transform;
                 Renderer[] renderers = new Renderer[1];
