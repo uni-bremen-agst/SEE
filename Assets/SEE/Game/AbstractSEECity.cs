@@ -211,20 +211,7 @@ namespace SEE.Game
         /// <summary>
         /// True if all node types in nodeTypes are relevant.
         /// </summary>
-        private bool AllNodeTypesAreRelevant
-        {
-            get
-            {
-                foreach (bool relevant in SelectedNodeTypes.Values)
-                {
-                    if (!relevant)
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
+        private bool AllNodeTypesAreRelevant => SelectedNodeTypes.Values.All(relevant => relevant);
 
         /// <summary>
         /// If <paramref name="graph"/> is null, nothing happens. Otherwise:

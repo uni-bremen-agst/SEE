@@ -17,12 +17,12 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.Utils;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 using System.IO;
+using System.Linq;
+using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -80,7 +80,7 @@ namespace SEE.DataModel.DG.IO
                     if (File.Exists(csvFilename))
                     {
                         Debug.LogFormat("Loading CSV file {0}.\n", csvFilename);
-                        int numberOfErrors = MetricImporter.Load(graph, csvFilename, ';');
+                        int numberOfErrors = MetricImporter.LoadCsv(graph, csvFilename, ';');
                         if (numberOfErrors > 0)
                         {
                             Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", csvFilename, numberOfErrors);

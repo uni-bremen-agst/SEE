@@ -17,9 +17,7 @@ namespace SEE.GO
         /// <param name="scaler">scaling to be applied on the metrics for the erosion issues</param>
         /// <param name="maxSpriteWidth">the maximal absolute width of a sprite representing an erosion in world-space Unity units</param>
         public ErosionIssues(Dictionary<string, IconFactory.Erosion> issueMap,
-                             NodeFactory leaveNodeFactory,
-                             IScale scaler,
-                             float maxSpriteWidth)
+                             NodeFactory leaveNodeFactory, IScale scaler, float maxSpriteWidth)
         {
             this.issueMap = issueMap;
             this.leaveNodeFactory = leaveNodeFactory;
@@ -51,11 +49,12 @@ namespace SEE.GO
         /// Creates sprites for software-erosion indicators for all given game nodes as children.
         /// </summary>
         /// <param name="gameNodes">list of game nodes for which to create erosion visualizations</param>
-        public void Add(ICollection<GameObject> gameNodes)
+        public void Add(IEnumerable<GameObject> gameNodes)
         {
             foreach (GameObject block in gameNodes)
             {
-                AddErosionIssues(block);
+                NodeRef nodeRef = block.GetComponent<NodeRef>();
+                AddErosionIssues(nodeRef);
             }
         }
 
@@ -66,9 +65,9 @@ namespace SEE.GO
         /// children to <paramref name="gameNode"/>.
         /// </summary>
         /// <param name="gameNode">the game node which the sprites are to be created for</param>
-        protected void AddErosionIssues(GameObject gameNode)
+        protected void AddErosionIssues(NodeRef gameNode)
         {
-            Node node = gameNode.GetComponent<NodeRef>().Value;
+            Node node = gameNode.Value;
 
             // The list of sprites for the erosion issues.
             List<GameObject> sprites = new List<GameObject>();
@@ -76,38 +75,35 @@ namespace SEE.GO
             // Create and scale the sprites and add them to the list of sprites.
             foreach (KeyValuePair<string, IconFactory.Erosion> issue in issueMap)
             {
-                if (node.TryGetNumeric(issue.Key, out float value))
+                if (node.TryGetNumeric(issue.Key, out float value) && value > 1.0)
                 {
-                    if (value > 0.0f)
-                    {
-                        // Scale the erosion issue by normalization set in relation to the
-                        // maximum value of the normalized metric. Hence, this value is in [0,1].
-                        float metricScale = scaler.GetRelativeNormalizedValue(issue.Key, node);
+                    // Scale the erosion issue by normalization set in relation to the
+                    // maximum value of the normalized metric. Hence, this value is in [0,1].
+                    float metricScale = scaler.GetRelativeNormalizedValue(issue.Key, node);
 
-                        GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value);
-                        sprite.name = sprite.name + " " + node.SourceName;
+                    GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value);
+                    sprite.name = $"{sprite.name} {node.SourceName}";
 
-                        Vector3 spriteSize = GetSizeOfSprite(sprite);
-                        // Scale the sprite to one Unity unit.
-                        float spriteScale = 1.0f / spriteSize.x;
-                        Vector3 scale = sprite.transform.localScale;
-                        // First: scale its width to unit size 1.0 maintaining the aspect ratio.
-                        scale *= spriteScale;
-                        // assert: scale.x = 1
-                        // Now scale it by the normalized metric.
-                        scale *= metricScale;
-                        // assert: scale.x in [0,1]
-                        // UnityEngine.Assertions.Assert.IsTrue(0 <= scale.x);
-                        // UnityEngine.Assertions.Assert.IsTrue(scale.x <= 1, $"scale.x={scale.x}");
+                    Vector3 spriteSize = GetSizeOfSprite(sprite);
+                    // Scale the sprite to one Unity unit.
+                    float spriteScale = 1.0f / spriteSize.x;
+                    Vector3 scale = sprite.transform.localScale;
+                    // First: scale its width to unit size 1.0 maintaining the aspect ratio.
+                    scale *= spriteScale;
+                    // assert: scale.x = 1
+                    // Now scale it by the normalized metric.
+                    scale *= metricScale;
+                    // assert: scale.x in [0,1]
+                    // UnityEngine.Assertions.Assert.IsTrue(0 <= scale.x);
+                    // UnityEngine.Assertions.Assert.IsTrue(scale.x <= 1, $"scale.x={scale.x}");
 
-                        // No scale the sprite into the corridor [0, maxSpriteWidth]
-                        scale *= Mathf.Lerp(0, maxSpriteWidth, scale.x);
+                    // Now scale the sprite into the corridor [0, maxSpriteWidth]
+                    scale *= Mathf.Lerp(0, maxSpriteWidth, scale.x);
 
-                        sprite.transform.localScale = scale;
-                        sprite.transform.position = leaveNodeFactory.Roof(gameNode);
+                    sprite.transform.localScale = scale;
+                    sprite.transform.position = leaveNodeFactory.Roof(gameNode.gameObject);
 
-                        sprites.Add(sprite);
-                    }
+                    sprites.Add(sprite);
                 }
             }
 
@@ -116,7 +112,7 @@ namespace SEE.GO
             {
                 // The space that we put in between two subsequent erosion issue sprites.
                 Vector3 delta = Vector3.up / 100.0f;
-                Vector3 currentRoof = leaveNodeFactory.Roof(gameNode);
+                Vector3 currentRoof = leaveNodeFactory.Roof(gameNode.gameObject);
                 sprites.Sort(Comparer<GameObject>.Create((left, right) => GetSizeOfSprite(left).x.CompareTo(GetSizeOfSprite(right).x)));
                 foreach (GameObject sprite in sprites)
                 {
