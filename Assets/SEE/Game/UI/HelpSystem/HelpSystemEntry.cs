@@ -98,7 +98,6 @@ public partial class HelpSystemEntry : PlatformDependentComponent
         Manager.descriptionText = description;
         Manager.icon = Resources.Load<Sprite>(icon);
         Manager.OpenWindow();
-        Manager.CloseWindow();
 
         rectTransform.pivot = Pivot;
         rectTransform.anchorMax = AnchorMax;
@@ -110,7 +109,7 @@ public partial class HelpSystemEntry : PlatformDependentComponent
     {
         base.UpdateDesktop();
         Debug.Log("HI");
-        if (Input.GetKeyDown(KeyCode.H))
+        if (Input.GetKeyDown(KeyCode.V))
         {
             Debug.Log("HÄ?");
             Manager.CloseWindow();
