@@ -44,24 +44,7 @@ public partial class HelpSystemEntry : PlatformDependentComponent
     /// <summary>
     /// The modal window manager which contains the actual menu.
     /// </summary>
-    protected ModalWindowManager Manager;
-
-    /// <summary>
-    /// The normalized position in the canvas that the upper right corner is anchored to.
-    /// Changes will only have an effect before Start() is called.
-    /// </summary>
-    public Vector2 AnchorMin = Vector2.one;
-
-    /// <summary>
-    /// The normalized position in the canvas that the lower left corner is anchored to.
-    /// Changes will only have an effect before Start() is called.
-    /// </summary>
-    public Vector2 AnchorMax = Vector2.one;
-
-    /// <summary>
-    /// The normalized position in this Canvas that it rotates around.
-    /// </summary>
-    public Vector2 Pivot = Vector2.one;
+    public ModalWindowManager Manager;
 
     /// <summary>
     /// Brief description of what this menu controls.
@@ -97,11 +80,7 @@ public partial class HelpSystemEntry : PlatformDependentComponent
         Manager.titleText = titleManager;
         Manager.descriptionText = description;
         Manager.icon = Resources.Load<Sprite>(icon);
-        Manager.OpenWindow();
 
-        rectTransform.pivot = Pivot;
-        rectTransform.anchorMax = AnchorMax;
-        rectTransform.anchorMin = AnchorMin;
         ShowEntry();
     }
 
@@ -113,6 +92,11 @@ public partial class HelpSystemEntry : PlatformDependentComponent
         {
             Debug.Log("HÄ?");
             Manager.CloseWindow();
+        }
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            Debug.Log("AH");
+            Manager.OpenWindow();
         }
     }
 

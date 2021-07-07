@@ -36,17 +36,8 @@ namespace SEE.Game.UI.Menu
         {
             if (entry is NestedMenuEntry nestedEntry)
             {
-                foreach (string s in GetMenuEntryTitles())
-                {
-                    UnityEngine.Debug.LogError(s);
-                }
                 // If this contains another menu level, repopulate list with new level after saving the current one
                 AscendLevel(nestedEntry);
-                foreach (string s in GetMenuEntryTitles())
-                {
-                    UnityEngine.Debug.LogError("2:  " + s);
-                }
-
             }
             else
             {
@@ -123,8 +114,6 @@ namespace SEE.Game.UI.Menu
             nestedEntry.InnerEntries.ForEach(AddEntry);
             keywordInput.Unregister(OnMenuEntryTitleRecognized);
             keywordInput.Register(OnMenuEntryTitleRecognized);
-
-
         }
 
         /// <summary>
@@ -149,10 +138,6 @@ namespace SEE.Game.UI.Menu
                     RemoveEntry(entries[0]); // Remove all entries
                 }
                 level.Entries.ForEach(AddEntry);
-                foreach (string s in GetMenuEntryTitles())
-                {
-                    UnityEngine.Debug.LogError("2:    " + s);
-                }
             }
             else
             {

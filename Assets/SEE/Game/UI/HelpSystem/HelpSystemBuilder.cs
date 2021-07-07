@@ -1,4 +1,6 @@
+using SEE.Controls;
 using SEE.Game.UI.Menu;
+using SEE.GO;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -45,6 +47,12 @@ public static class HelpSystemBuilder
 
     public static void Execute(HelpSystemEntry helpSystem)
     {
-
+        Debug.Log("called");
+        GameObject go = GameObject.Find("HelpSystem");
+        Debug.Log(go);
+        go.TryGetComponentOrLog(out NestedMenu menu);
+        menu.ToggleMenu();
+        Debug.Log(helpSystem);
+        helpSystem.Manager.OpenWindow();
     }
 }
