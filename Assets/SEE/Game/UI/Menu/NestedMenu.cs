@@ -149,7 +149,7 @@ namespace SEE.Game.UI.Menu
         /// Resets to the lowest level, i.e. resets the menu to the state it was in before any
         /// <see cref="NestedMenuEntry"/> was clicked.
         /// </summary>
-        private void ResetToBase()
+        public void ResetToBase()
         {
             while (Levels.Count > 0)
             {

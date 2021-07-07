@@ -1,5 +1,7 @@
 using Michsky.UI.ModernUIPack;
 using SEE.Game.UI;
+using SEE.Game.UI.Menu;
+using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
@@ -35,6 +37,8 @@ public partial class HelpSystemEntry : PlatformDependentComponent
     /// True if the entry is running, else false.
     /// </summary>
     public bool IsPlaying { get; set; }
+    public string TitleManager { get => titleManager; set => titleManager = value; }
+    public string Description { get => description; set => description = value; }
 
     /// <summary>
     /// Path to the HelpSystemEntry prefab.
@@ -69,7 +73,6 @@ public partial class HelpSystemEntry : PlatformDependentComponent
     {
         Debug.Log("HAALLLOO");
         GameObject helpSystemEntry = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_PREFAB, Canvas.transform, false);
-        // Setup anchoring
         RectTransform rectTransform = (RectTransform)helpSystemEntry.transform;
         ModalWindowManager[] managers = Canvas.GetComponentsInChildren<ModalWindowManager>();
         foreach(ModalWindowManager m in managers)
@@ -80,8 +83,9 @@ public partial class HelpSystemEntry : PlatformDependentComponent
         Manager.titleText = titleManager;
         Manager.descriptionText = description;
         Manager.icon = Resources.Load<Sprite>(icon);
+        Manager.onConfirm.AddListener(Pause);
+        Manager.onCancel.AddListener(Close);
 
-        ShowEntry();
     }
 
     protected override void UpdateDesktop()
@@ -120,6 +124,13 @@ public partial class HelpSystemEntry : PlatformDependentComponent
     /// </summary>
     public void Stop() { }
 
+    public void Close() {
+        Manager.CloseWindow();
+        GameObject go = GameObject.Find(HelpSystemBuilder.HelpSystemGO);
+        go.TryGetComponentOrLog(out NestedMenu menu);
+        menu.ResetToBase();
+    }
+
     /// <summary>
     /// Replays the HelpSystemEntry after finishing. It starts from the beginning again.
     /// </summary>
@@ -129,7 +140,13 @@ public partial class HelpSystemEntry : PlatformDependentComponent
     /// Pauses the running HelpSystemEntry. That means after playing on the entry will be played from the same 
     /// state of progress as before pausing.
     /// </summary>
-    public void Pause() { }
+    public void Pause() {
+
+        GameObject go = GameObject.Find(HelpSystemBuilder.HelpSystemGO);
+        go.TryGetComponentOrLog(out NestedMenu menu);
+        Manager.CloseWindow();
+        menu.ToggleMenu();
+    }
 
     /// <summary>
     /// Toggles the "IsPlaying" - state. If the entry is running, it will be paused, if it is paused,
