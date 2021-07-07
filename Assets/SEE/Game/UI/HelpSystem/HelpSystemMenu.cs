@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using SEE.Controls;
 using SEE.Game.UI.Menu;
+using SEE.GO;
 using UnityEngine;
 
 public class HelpSystemMenu : MonoBehaviour
@@ -47,6 +49,8 @@ public class HelpSystemMenu : MonoBehaviour
         // Important note: You have to define the lowest hierachy-level first. 
         // That means, the mainMenu will be defined at the end and the lowest entry-list first.
 
+        PlayerSettings.LocalPlayer.TryGetComponentOrLog(out HelpSystemEntry entry);
+      
         List<MenuEntry> mainMenuEntries = new List<MenuEntry>();
         List<MenuEntry> architectureEntries = new List<MenuEntry>();
         List<MenuEntry> playerMenuEntries = new List<MenuEntry>();
@@ -56,15 +60,15 @@ public class HelpSystemMenu : MonoBehaviour
 
         playerMenuEntries = new List<MenuEntry>
         {
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "Add Edge Description", Color.green, EntryIcon),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Node", "Add Node Description", Color.green, EntryIcon),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Line", "Add Line Description", Color.green, EntryIcon)
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "Add Edge Description", Color.green, EntryIcon, entry),
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Node", "Add Node Description", Color.green, EntryIcon, entry),
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Line", "Add Line Description", Color.green, EntryIcon, entry)
         };
 
         architectureEntries = new List<MenuEntry>
         {
             HelpSystemBuilder.CreateNewRefEntry(playerMenuEntries,"Player Menu", "Add Edge Description", Color.green, RefIcon),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Map Architecture", "Mapping description", Color.green, EntryIcon)
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Map Architecture", "Mapping description", Color.green, EntryIcon, entry)
         };
 
         mainMenuEntries = new List<MenuEntry>
