@@ -1,10 +1,9 @@
 ﻿#if UNITY_EDITOR
 
-using SEE;
+using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Utils;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -264,7 +263,7 @@ namespace SEEEditor
                 EditorGUI.indentLevel++;
                 for (int i = 0; i < (int)Node.NodeDomain.Count; i++)
                 {
-                    string label = "Domain: " + ((Node.NodeDomain)i).ToString();
+                    string label = $"Domain: {(Node.NodeDomain) i}";
                     showInnerAttributesAtIndex[i] = EditorGUILayout.Foldout(showInnerAttributesAtIndex[i], label, EditorStyles.foldout);
                     if (showInnerAttributesAtIndex[i])
                     {
@@ -300,7 +299,7 @@ namespace SEEEditor
                 EditorGUI.indentLevel++;
                 for (int i = 0; i < (int)Node.NodeDomain.Count; i++)
                 {
-                    string label = "Domain: " + ((Node.NodeDomain)i).ToString();
+                    string label = $"Domain: {(Node.NodeDomain) i}";
                     showLeafAttributesAtIndex[i] = EditorGUILayout.Foldout(showLeafAttributesAtIndex[i], label, EditorStyles.foldout);
                     if (showLeafAttributesAtIndex[i])
                     {
@@ -331,7 +330,7 @@ namespace SEEEditor
         /// Allows the user to set the attributes of <paramref name="labelSettings"/>.
         /// </summary>
         /// <param name="labelSettings">settings to be retrieved from the user</param>
-        private void LabelSettings(ref LabelSettings labelSettings)
+        private static void LabelSettings(ref LabelSettings labelSettings)
         {
             labelSettings.Show = EditorGUILayout.Toggle("Show labels", labelSettings.Show);
             labelSettings.Distance = EditorGUILayout.FloatField("Label distance", labelSettings.Distance);

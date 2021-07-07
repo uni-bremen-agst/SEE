@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using SEE.Controls;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.GO;
@@ -1175,7 +1174,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes"></param>
         /// <returns>the leaf nodes in gameNodes as a list</returns>
-        private ICollection<GameObject> FindLeafNodes(ICollection<GameObject> gameNodes)
+        private static ICollection<GameObject> FindLeafNodes(IEnumerable<GameObject> gameNodes)
         {
             return gameNodes.Where(o => o.IsLeaf()).ToList();
         }

@@ -1,5 +1,5 @@
-﻿using SEE.DataModel;
-using System;
+﻿using System;
+using SEE.DataModel;
 using UnityEngine;
 
 namespace SEE.GO
@@ -39,20 +39,18 @@ namespace SEE.GO
         /// </summary>
         /// <param name="erosion">erosion type for which to yield a string</param>
         /// <returns>human readable string representation</returns>
-        public static string ToString(Erosion erosion)
-        {
-            switch (erosion)
+        public static string ToString(Erosion erosion) =>
+            erosion switch
             {
-                case Erosion.Architecture_Violation: return "Architecture_Violation";
-                case Erosion.Clone: return "Clone";
-                case Erosion.Cycle: return "Cycle";
-                case Erosion.Dead_Code: return "Dead_Code";
-                case Erosion.Metric: return "Metric";
-                case Erosion.Style: return "Style";
-                case Erosion.Universal: return "Universal";
-                default: return "UNDEFINED";
-            }
-        }
+                Erosion.Architecture_Violation => "Architecture_Violation",
+                Erosion.Clone => "Clone",
+                Erosion.Cycle => "Cycle",
+                Erosion.Dead_Code => "Dead_Code",
+                Erosion.Metric => "Metric",
+                Erosion.Style => "Style",
+                Erosion.Universal => "Universal",
+                _ => "UNDEFINED"
+            };
 
         // Relative screen space required so that a erosion sprite becomes visible.
         // If the size of the sprite is below this value, it will be culled.
@@ -67,8 +65,7 @@ namespace SEE.GO
         /// Note: Extensions must be omitted.
         /// Note: All asset names and paths in Unity use forward slashes, paths using backslashes will not work.
         /// </summary>
-        private static readonly string[] paths = new string[]
-        {
+        private static readonly string[] paths = {
             "Icons/architectureSprite",
             "Icons/cloneSprite",
             "Icons/cycleSprite",
@@ -88,15 +85,11 @@ namespace SEE.GO
         }
 
         // The single instance of this class.
-        private static readonly IconFactory instance = new IconFactory();
 
         /// <summary>
         /// The single instance of this class.
         /// </summary>
-        public static IconFactory Instance
-        {
-            get => instance;
-        }
+        public static IconFactory Instance { get; } = new IconFactory();
 
         // A mapping of Erosions onto sprite prefabs. During start up we load the
         // sprite prefabs from the Assets for each kind of Erosion and store them
@@ -140,7 +133,7 @@ namespace SEE.GO
             }
             catch (Exception e)
             {
-                Debug.LogError($"Loading Sprite prefab from file {filename} failed: {e.ToString()}.\n");
+                Debug.LogError($"Loading Sprite prefab from file {filename} failed: {e}.\n");
             }
             return null;
         }

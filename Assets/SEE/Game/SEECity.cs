@@ -259,12 +259,14 @@ namespace SEE.Game
         {
             string filename = CSVPath.Path;
             Performance p = Performance.Begin("loading metric data data from CSV file " + filename);
-            int numberOfErrors = MetricImporter.Load(LoadedGraph, filename);
+            int numberOfErrors = MetricImporter.LoadCsv(LoadedGraph, filename);
             if (numberOfErrors > 0)
             {
                 Debug.LogWarning($"CSV file {filename} has {numberOfErrors} many errors.\n");
             }
             p.End();
+            // Substitute missing values from the dashboard
+            MetricImporter.LoadDashboard(LoadedGraph).Forget();
         }
 
         /// <summary>
@@ -427,10 +429,7 @@ namespace SEE.Game
         {
             base.Reset();
             // Delete the underlying graph.
-            if (loadedGraph != null)
-            {
-                loadedGraph.Destroy();
-            }
+            loadedGraph?.Destroy();
             LoadedGraph = null;
         }
 

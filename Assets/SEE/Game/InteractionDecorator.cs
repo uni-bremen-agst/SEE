@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
+using SEE.Controls;
 using SEE.Controls.Actions;
-using SEE.Game;
 using SEE.GO;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
 
-namespace SEE.Controls
+namespace SEE.Game
 {
     /// <summary>
     /// Adds components required for interacting with a game object.
@@ -52,7 +52,7 @@ namespace SEE.Controls
         /// <returns>component in <paramref name="gameObject"/></returns>
         private static T AddComponentIfNecessary<T>(this GameObject gameObject) where T : MonoBehaviour
         {
-            if (gameObject.TryGetComponent<T>(out T component))
+            if (gameObject.TryGetComponent(out T component))
             {
                 return component;
             }
@@ -73,7 +73,7 @@ namespace SEE.Controls
         /// or edge.
         /// </summary>
         /// <param name="gameObjects">game object where the components are to be added to</param>
-        public static void PrepareForInteraction(ICollection<GameObject> gameObjects)
+        public static void PrepareForInteraction(IEnumerable<GameObject> gameObjects)
         {
             foreach (GameObject go in gameObjects)
             {

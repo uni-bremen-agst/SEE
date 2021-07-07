@@ -288,14 +288,21 @@ namespace SEE.Net.Dashboard
         /// <returns>A list of <see cref="MetricValueTableRow"/>s which matches the given parameters.</returns>
         public async UniTask<List<MetricValueTableRow>> GetSpecificMetricRows(string path, string entityName)
         {
-            // I really hope I don't accidentally cause some deadlock by the synchronization code below...
-            // If some problems do occur here after all, maybe there's a better way to do this, but
-            // using C#'s lock statement is unfortunately impossible from async methods.
             metrics ??= (await GetMetricValueTable()).rows.GroupBy(x => (x.path, x.entity))
                                                      .ToDictionary(x => x.Key, x => x.ToList());
 
-            Debug.Log($"Metrics right now: {metrics}");
             return metrics.ContainsKey((path, entityName)) ? metrics[(path, entityName)] : new List<MetricValueTableRow>();
+        }
+
+        /// <summary>
+        /// TODO: Documentation
+        /// </summary>
+        /// <returns></returns>
+        public async UniTask<IDictionary<(string path, string entity), List<MetricValueTableRow>>> GetAllMetricRows()
+        {
+            metrics ??= (await GetMetricValueTable()).rows.GroupBy(x => (x.path, x.entity))
+                                                     .ToDictionary(x => x.Key, x => x.ToList());
+            return metrics;
         }
 
         /// <summary>

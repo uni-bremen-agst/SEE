@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using Cysharp.Threading.Tasks;
+using SEE.Net.Dashboard;
+using SEE.Net.Dashboard.Model.Issues;
+using SEE.Net.Dashboard.Model.Metric;
 using UnityEngine;
 
 namespace SEE.DataModel.DG.IO
@@ -10,6 +15,87 @@ namespace SEE.DataModel.DG.IO
     /// </summary>
     public class MetricImporter : MetricsIO
     {
+        //TODO: MetricExporter should be able to use dashboard too
+
+        public static async UniTaskVoid LoadDashboard(Graph graph, bool @override = true)
+        {
+            IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics = await DashboardRetriever.Instance.GetAllMetricRows();
+            IDictionary<string, List<Issue>> issues = await LoadIssueMetrics();
+
+            HashSet<Node> encounteredIssueNodes = new HashSet<Node>();
+            int updatedMetrics = 0;
+            // Go through all nodes, checking whether any metric in the dashboard matches it.
+            foreach (Node node in graph.Nodes())
+            {
+                string nodePath = $"{node.RelativePath()}{node.Filename() ?? string.Empty}";
+                if (metrics.TryGetValue((nodePath, node.SourceName), out List<MetricValueTableRow> metricValues))
+                {
+                    foreach (MetricValueTableRow metricValue in metricValues)
+                    {
+                        // Only set if value doesn't already exist, or if we're supposed to override and the value differs
+                        if (!node.TryGetFloat(metricValue.metric, out float value) || @override && !Mathf.Approximately(metricValue.value, value))
+                        {
+                            node.SetFloat(metricValue.metric, metricValue.value);
+                            updatedMetrics++;
+                        }
+                    }
+                }
+                
+                if (issues.TryGetValue(nodePath, out List<Issue> issueList))
+                {
+                    foreach (Issue issue in issueList)
+                    {
+                        if (node.TryGetFloat(issue.AttributeName.Name(), out float value)) {
+                            if (!encounteredIssueNodes.Contains(node))
+                            {
+                                // If the value already exists and it was set from somewhere else,
+                                // we override it if the caller wishes to do so.
+                                if (@override)
+                                {
+                                    node.SetFloat(issue.AttributeName.Name(), 0);
+                                    encounteredIssueNodes.Add(node);
+                                }
+                            }
+                            else
+                            {
+                                // We found one more issue here, so we increment the value by one
+                                node.SetFloat(issue.AttributeName.Name(), value+1);
+                            }
+                        }
+                        else 
+                        {
+                            node.SetFloat(issue.AttributeName.Name(), 0);
+                            encounteredIssueNodes.Add(node);
+                        }
+                    }
+                }
+            }
+            Debug.Log($"Updated {updatedMetrics} metric values and {encounteredIssueNodes.Count} issues " 
+                      + "using the Axivion dashboard.\n");
+            
+            //TODO: Save values afterwards
+
+            
+            static async UniTask<IDictionary<string, List<Issue>>> LoadIssueMetrics()
+            {
+                IDictionary<string, List<Issue>> issues = new Dictionary<string, List<Issue>>();
+                IList<Issue> allIssues = await DashboardRetriever.Instance.GetConfiguredIssues();
+                foreach (Issue issue in allIssues)
+                {
+                    foreach (SourceCodeEntity entity in issue.Entities)
+                    {
+                        if (!issues.ContainsKey(entity.path))
+                        {
+                            issues[entity.path] = new List<Issue>();
+                        }
+                        issues[entity.path].Add(issue);
+                    }
+                }
+
+                return issues;
+            }
+        }
+        
         /// <summary>
         /// Loads node metric values from given CSV file with given separator.
         /// The file must contain a header with the column names. The first column
@@ -33,7 +119,7 @@ namespace SEE.DataModel.DG.IO
         /// <param name="filename">CSV file from which to import node metrics</param>
         /// <param name="separator">used to separate column entries</param>
         /// <returns>the number of errors</returns>
-        public static int Load(Graph graph, string filename, char separator = ';')
+        public static int LoadCsv(Graph graph, string filename, char separator = ';')
         {
             if (!File.Exists(filename))
             {
@@ -55,10 +141,10 @@ namespace SEE.DataModel.DG.IO
                     // Header row
                     string headerLine = reader.ReadLine();
                     // The names of the columns
-                    string[] columnNames = headerLine.Split(separator);
+                    string[] columnNames = headerLine?.Split(separator);
                     lineCount++;
                     // We expect the ID plus at least one metric
-                    if (columnNames.Length > 1)
+                    if (columnNames?.Length > 1)
                     {
                         // The first column must be the ID
                         if (columnNames[0] != IDColumnName)
@@ -139,5 +225,4 @@ namespace SEE.DataModel.DG.IO
             return numberOfErrors;
         }
     }
-
 }

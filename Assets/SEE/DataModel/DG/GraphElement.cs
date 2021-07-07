@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SEE.Game;
 
 namespace SEE.DataModel.DG
 {
@@ -121,6 +122,18 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// Returns the path of the source file for this graph element relative to the project root.
+        /// The project root is determined by calling <see cref="DataPath.ProjectFolder"/>.
+        /// Note that not all graph elements may have a source file.
+        /// If the graph element does not have this attribute, null is returned.
+        /// </summary>
+        /// <returns>relative path of source file or null</returns>
+        public string RelativePath()
+        {
+            return Path()?.Replace(DataPath.ProjectFolder(), string.Empty).TrimStart('/');
+        }
+
+        /// <summary>
         /// Returns the name of the source file for this graph element.
         /// Note that not all graph elements may have a source file.
         /// If the graph element does not have this attribute, null is returned.
@@ -145,6 +158,7 @@ namespace SEE.DataModel.DG
             TryGetInt("Source.Line", out int result);
             // If this attribute cannot be found, result will have the standard value 
             // for int, which is 0.
+            //TODO: Perhaps it may be more sensible to make the return type `int?` and return `null` in such a case.
             return result;
         }
 

@@ -1,6 +1,6 @@
-﻿using SEE.DataModel.DG;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using SEE.DataModel.DG;
 using UnityEngine;
 
 namespace SEE.GO
@@ -111,7 +111,7 @@ namespace SEE.GO
         /// <param name="metrics">the metrics for which the maxima are to be gathered</param>
         /// <param name="leavesOnly">if true, only the leaf nodes are considered</param>
         /// <returns>metric maxima</returns>
-        protected Dictionary<string, float> DetermineMetricMaxima(ICollection<Graph> graphs, IList<string> metrics, bool leavesOnly)
+        protected static Dictionary<string, float> DetermineMetricMaxima(ICollection<Graph> graphs, IList<string> metrics, bool leavesOnly)
         {
             Dictionary<string, float> result = new Dictionary<string, float>();
             foreach (string metric in metrics)
@@ -144,7 +144,7 @@ namespace SEE.GO
         /// <summary>
         /// Dumps metricMaxima for debugging.
         /// </summary>
-        protected void DumpMetricMaxima(Dictionary<string, float> metricMaxima)
+        protected static void DumpMetricMaxima(Dictionary<string, float> metricMaxima)
         {
             foreach (KeyValuePair<string, float> item in metricMaxima)
             {
