@@ -7,10 +7,12 @@ using UnityEngine.Events;
 
 public static class HelpSystemBuilder
 {
-    public static MenuEntry CreateNewHelpSystemEntry(string title, string description, Color entryColor, string iconPath, HelpSystemEntry entry = null)
+    public static string HelpSystemGO = "HelpSystem";
+
+    public static MenuEntry CreateNewHelpSystemEntry(string title, string description, Color entryColor, string iconPath, string titleh, string desh, HelpSystemEntry entry = null)
     {
         MenuEntry helpSystemEntry = new MenuEntry(
-            action: new UnityAction(() => { Execute(entry); }),
+            action: new UnityAction(() => { Execute(entry,titleh,desh); }),
             title: title,
             description: description,
             entryColor: entryColor,
@@ -45,14 +47,25 @@ public static class HelpSystemBuilder
         return mainMenu;
     }
 
-    public static void Execute(HelpSystemEntry helpSystem)
+    public static void Execute(HelpSystemEntry helpSystem, string titleh, string desh)
     {
-        Debug.Log("called");
-        GameObject go = GameObject.Find("HelpSystem");
-        Debug.Log(go);
+        GameObject go = GameObject.Find(HelpSystemGO);
         go.TryGetComponentOrLog(out NestedMenu menu);
+        PlayerSettings.LocalPlayer.TryGetComponentOrLog(out HelpSystemEntry entry);
+        if (titleh != null)
+        {
+            entry.Manager.titleText = titleh;
+            entry.Manager.descriptionText = desh;
+        }
+        else
+        {
+            entry.Manager.descriptionText = "placeholder";
+            entry.Manager.titleText = "placeholder";
+        }
+
         menu.ToggleMenu();
-        Debug.Log(helpSystem);
         helpSystem.Manager.OpenWindow();
+        Debug.Log(helpSystem.Description);
+        Debug.Log(entry.Description);
     }
 }
