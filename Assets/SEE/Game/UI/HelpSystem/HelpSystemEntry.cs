@@ -5,6 +5,7 @@ using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Video;
 
 public partial class HelpSystemEntry : PlatformDependentComponent
 {
@@ -83,7 +84,7 @@ public partial class HelpSystemEntry : PlatformDependentComponent
         Manager.titleText = titleManager;
         Manager.descriptionText = description;
         Manager.icon = Resources.Load<Sprite>(icon);
-        Manager.onConfirm.AddListener(Pause);
+        Manager.onConfirm.AddListener(Back);
         Manager.onCancel.AddListener(Close);
 
     }
@@ -95,13 +96,23 @@ public partial class HelpSystemEntry : PlatformDependentComponent
         if (Input.GetKeyDown(KeyCode.V))
         {
             Debug.Log("HÄ?");
-            Manager.CloseWindow();
+            GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out VideoPlayer videoPlayer);
+            videoPlayer.Pause();
         }
         if (Input.GetKeyDown(KeyCode.W))
         {
-            Debug.Log("AH");
-            Manager.OpenWindow();
+            GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out VideoPlayer videoPlayer);
+            videoPlayer.Play();
+            Debug.Log(videoPlayer.url);
         }
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            Debug.Log("AH");
+            GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out VideoPlayer videoPlayer);
+            videoPlayer.url = "Assets/SEE/Videos/ZwischenstandAddNode.mp4";
+            videoPlayer.Play();
+        }
+
     }
 
     /// <summary>
@@ -127,8 +138,14 @@ public partial class HelpSystemEntry : PlatformDependentComponent
     public void Close() {
         Manager.CloseWindow();
         GameObject go = GameObject.Find(HelpSystemBuilder.HelpSystemGO);
+        GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out VideoPlayer videoPlayer);
+        if (videoPlayer == null)
+        {
+            throw new System.Exception("No Video-Player found");
+        }
         go.TryGetComponentOrLog(out NestedMenu menu);
         menu.ResetToBase();
+        videoPlayer.Stop();
     }
 
     /// <summary>
@@ -140,12 +157,18 @@ public partial class HelpSystemEntry : PlatformDependentComponent
     /// Pauses the running HelpSystemEntry. That means after playing on the entry will be played from the same 
     /// state of progress as before pausing.
     /// </summary>
-    public void Pause() {
+    public void Back() {
 
         GameObject go = GameObject.Find(HelpSystemBuilder.HelpSystemGO);
         go.TryGetComponentOrLog(out NestedMenu menu);
         Manager.CloseWindow();
         menu.ToggleMenu();
+        GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out VideoPlayer videoPlayer);
+        if (videoPlayer == null)
+        {
+            throw new System.Exception("No Video-Player found");
+        }
+        videoPlayer.Stop();
     }
 
     /// <summary>

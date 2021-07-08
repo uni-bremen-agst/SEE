@@ -4,6 +4,7 @@ using SEE.GO;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Video;
 
 public static class HelpSystemBuilder
 {
@@ -52,6 +53,11 @@ public static class HelpSystemBuilder
         GameObject go = GameObject.Find(HelpSystemGO);
         go.TryGetComponentOrLog(out NestedMenu menu);
         PlayerSettings.LocalPlayer.TryGetComponentOrLog(out HelpSystemEntry entry);
+        GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out VideoPlayer videoPlayer);
+        if(videoPlayer == null)
+        {
+            throw new System.Exception("No Video-Player found");
+        }
         if (titleh != null)
         {
             entry.Manager.titleText = titleh;
@@ -62,10 +68,9 @@ public static class HelpSystemBuilder
             entry.Manager.descriptionText = "placeholder";
             entry.Manager.titleText = "placeholder";
         }
+        videoPlayer.Play();
 
         menu.ToggleMenu();
         helpSystem.Manager.OpenWindow();
-        Debug.Log(helpSystem.Description);
-        Debug.Log(entry.Description);
     }
 }

@@ -26,6 +26,7 @@ TagManager:
   - Runtime
   - Path
   - Erosion
+  - VideoPlayer
   layers:
   - Default
   - TransparentFX
