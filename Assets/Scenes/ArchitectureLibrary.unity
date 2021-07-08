@@ -18105,12 +18105,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 428063742}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd9537a868ba1214eba7ee3caf4c2e76, type: 3}
+  m_Script: {fileID: 11500000, guid: 7623b0249cfceff40b25a7b4ea3b89f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  portalPlane: {fileID: 428063745}
-  id: 4
-  cursor: {fileID: 0}
 --- !u!114 &428063745
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20384,12 +20381,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 461367507}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd9537a868ba1214eba7ee3caf4c2e76, type: 3}
+  m_Script: {fileID: 11500000, guid: 7623b0249cfceff40b25a7b4ea3b89f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  portalPlane: {fileID: 461367512}
-  id: 3
-  cursor: {fileID: 0}
 --- !u!65 &461367515
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -35307,12 +35301,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 816506526}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd9537a868ba1214eba7ee3caf4c2e76, type: 3}
+  m_Script: {fileID: 11500000, guid: 7623b0249cfceff40b25a7b4ea3b89f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  portalPlane: {fileID: 816506529}
-  id: 5
-  cursor: {fileID: 0}
 --- !u!114 &816506529
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57626,12 +57617,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1409350044}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd9537a868ba1214eba7ee3caf4c2e76, type: 3}
+  m_Script: {fileID: 11500000, guid: 7623b0249cfceff40b25a7b4ea3b89f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  portalPlane: {fileID: 1409350047}
-  id: 0
-  cursor: {fileID: 0}
 --- !u!114 &1409350047
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57729,7 +57717,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1409350044}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4f25e472fae0c304e994d615ed8259db, type: 3}
   m_Name: 
