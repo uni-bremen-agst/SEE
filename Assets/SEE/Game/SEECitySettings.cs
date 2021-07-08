@@ -32,16 +32,6 @@ namespace SEE
     }
 
     /// <summary>
-    /// The kind of coloring of objects.
-    /// </summary>
-    public enum ColoringKind : byte
-    {
-        Metric,
-        RandomRange,
-        Random
-    }
-
-    /// <summary>
     /// How leaf graph nodes should be depicted.
     /// </summary>
     public enum LeafNodeKinds : byte
@@ -77,8 +67,8 @@ namespace SEE
         /// <summary>
         /// The path for the layout file containing the node layout information.
         /// If the file extension is <see cref="Filenames.GVLExtension"/>, the layout is expected
-        /// to be stored in Axivion's Gravis layout (GVL) with 2D co-ordinates. 
-        /// Otherwise is our own layout format SDL is expected, which saves the complete Transform 
+        /// to be stored in Axivion's Gravis layout (GVL) with 2D co-ordinates.
+        /// Otherwise is our own layout format SDL is expected, which saves the complete Transform
         /// data of a game object.
         /// </summary>
         [OdinSerialize]
@@ -95,7 +85,6 @@ namespace SEE
         public string           heightMetric  = NumericAttributeNames.Clone_Rate.Name();
         public string           depthMetric   = NumericAttributeNames.LOC.Name();
         public string           styleMetric   = NumericAttributeNames.Complexity.Name();
-        public ColoringKind     coloringKind  = ColoringKind.Metric;
         public ColorRange       colorRange    = new ColorRange(Color.white, Color.red, 10);
         [OdinSerialize]
         public LabelSettings    labelSettings = new LabelSettings();
@@ -109,7 +98,6 @@ namespace SEE
         public InnerNodeKinds    kind          = InnerNodeKinds.Blocks;
         public string            heightMetric  = "";
         public string            styleMetric   = NumericAttributeNames.IssuesTotal.Name();
-        public ColoringKind      coloringKind  = ColoringKind.Metric;
         public ColorRange        colorRange    = new ColorRange(Color.white, Color.yellow, 10);
         [OdinSerialize]
         public LabelSettings     labelSettings = new LabelSettings();
@@ -142,7 +130,7 @@ namespace SEE
         public float             edgeWidth        = 0.01f;
 
         /// <summary>
-        /// Orientation of the edges; 
+        /// Orientation of the edges;
         /// if false, the edges are drawn below the houses;
         /// if true, the edges are drawn above the houses;
         /// </summary>
