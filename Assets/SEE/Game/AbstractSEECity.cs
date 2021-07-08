@@ -8,6 +8,7 @@ using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.GO;
 using SEE.Layout.NodeLayouts.Cose;
+using SEE.Tools;
 using SEE.Utils;
 using UnityEngine;
 
@@ -38,13 +39,13 @@ namespace SEE.Game
         /// The attributes of the leaf nodes per kind. They are indexed by <see cref="Node.NodeDomain"/>
         /// casted to an integer.
         /// </summary>
-        public LeafNodeAttributes[] leafNodeAttributesPerKind = ArrayUtils.New((int)Node.NodeDomain.Count, (int _) => new LeafNodeAttributes());
+        public LeafNodeAttributes[] leafNodeAttributesPerKind = ArrayUtils.New((int)Node.NodeDomain.Count, _ => new LeafNodeAttributes());
 
         /// <summary>
         /// The attributes of the inner nodes per kind. They are indexed by <see cref="Node.NodeDomain"/>
         /// casted to an integer.
         /// </summary>
-        public InnerNodeAttributes[] innerNodeAttributesPerKind = ArrayUtils.New((int)Node.NodeDomain.Count, (int _) => new InnerNodeAttributes());
+        public InnerNodeAttributes[] innerNodeAttributesPerKind = ArrayUtils.New((int)Node.NodeDomain.Count, _ => new InnerNodeAttributes());
 
         /// <summary>
         /// The node layout settings.
@@ -436,9 +437,8 @@ namespace SEE.Game
         /// for leaf nodes in the GXL file onto the icons to be used for visualizing them.
         /// </summary>
         /// <returns>mapping of all node attribute names for leaves onto icon ids</returns>
-        public Dictionary<string, IconFactory.Erosion> LeafIssueMap()
-        {
-            Dictionary<string, IconFactory.Erosion> result = new Dictionary<string, IconFactory.Erosion>
+        public Dictionary<string, IconFactory.Erosion> LeafIssueMap() =>
+            new Dictionary<string, IconFactory.Erosion>
             {
                 { ArchitectureIssue, IconFactory.Erosion.Architecture_Violation },
                 { CloneIssue, IconFactory.Erosion.Clone },
@@ -448,8 +448,17 @@ namespace SEE.Game
                 { StyleIssue, IconFactory.Erosion.Style },
                 { UniversalIssue, IconFactory.Erosion.Universal }
             };
-            return result;
-        }
+
+        /// <summary>
+        /// Yields a mapping of all node attribute names that define erosion issues 
+        /// for inner nodes onto the icons to be used for visualizing them.
+        /// These are usually the same attributes from <see cref="LeafIssueMap"/>, appended with
+        /// <see cref="MetricAggregator.SUM_EXTENSION"/>, i.e., they represent the aggregated issue metrics.
+        /// </summary>
+        /// <returns>mapping of all node attribute names for inner nodes onto icon ids</returns>
+        public Dictionary<string, IconFactory.Erosion> InnerIssueMap() =>
+            LeafIssueMap().Select(x => (Key: x.Key + MetricAggregator.SUM_EXTENSION, x.Value))
+                          .ToDictionary(x => x.Key, x => x.Value);
 
         /// <summary>
         /// All metrics used for visual attributes of inner nodes (InnerNodeStyleMetric

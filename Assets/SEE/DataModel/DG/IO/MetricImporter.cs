@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Issues;
 using SEE.Net.Dashboard.Model.Metric;
+using SEE.Tools;
+using Sirenix.Utilities;
 using UnityEngine;
 
 namespace SEE.DataModel.DG.IO
@@ -17,6 +20,13 @@ namespace SEE.DataModel.DG.IO
     {
         //TODO: MetricExporter should be able to use dashboard too
 
+        /// <summary>
+        /// Loads metrics and issues from the Axivion dashboard and imports them to the graph.
+        /// Issues are also aggregated along the node decomposition tree as a sum
+        /// using the <see cref="MetricAggregator"/>.
+        /// </summary>
+        /// <param name="graph">The graph whose nodes' metrics shall be set</param>
+        /// <param name="override">Whether any existing metrics present in the graph's nodes shall be updated</param>
         public static async UniTaskVoid LoadDashboard(Graph graph, bool @override = true)
         {
             IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics = await DashboardRetriever.Instance.GetAllMetricRows();
@@ -43,7 +53,18 @@ namespace SEE.DataModel.DG.IO
                 
                 if (issues.TryGetValue(nodePath, out List<Issue> issueList))
                 {
-                    foreach (Issue issue in issueList)
+                    int? line = node.SourceLine();
+                    if (!line.HasValue)
+                    {
+                        continue;
+                    }
+                    int? length = node.SourceLength();
+                    HashSet<int> lineRange = Enumerable.Range(line.Value, length ?? 1).ToHashSet();
+                    // Relevant issues are those which are entirely contained by the source region of this node
+                    IEnumerable<Issue> relevantIssues = issueList.Where(
+                        x => x.Entities.Any(e => lineRange.Contains(e.line) && 
+                                                 (!e.endLine.HasValue || lineRange.Contains(e.endLine.Value))));
+                    foreach (Issue issue in relevantIssues)
                     {
                         if (node.TryGetFloat(issue.AttributeName.Name(), out float value)) {
                             if (!encounteredIssueNodes.Contains(node))
@@ -70,6 +91,15 @@ namespace SEE.DataModel.DG.IO
                     }
                 }
             }
+            
+            // Aggregate metrics
+            NumericAttributeNames[] issueNames =
+            {
+                NumericAttributeNames.Clone, NumericAttributeNames.Complexity, NumericAttributeNames.Cycle,
+                NumericAttributeNames.Metric, NumericAttributeNames.Style, 
+                NumericAttributeNames.Architecture_Violations, NumericAttributeNames.Dead_Code
+            };
+            MetricAggregator.AggregateSum(graph, issueNames.Select(x => x.Name()));
             Debug.Log($"Updated {updatedMetrics} metric values and {encounteredIssueNodes.Count} issues " 
                       + "using the Axivion dashboard.\n");
             
