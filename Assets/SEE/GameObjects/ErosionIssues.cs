@@ -13,14 +13,14 @@ namespace SEE.GO
         /// Constructor.
         /// </summary>
         /// <param name="issueMap">the relevant metrics for the erosion issues</param>
-        /// <param name="leaveNodeFactory">factory that created the game nodes that are to be decorated</param>
+        /// <param name="innerNodeFactory">factory that created the game nodes that are to be decorated</param>
         /// <param name="scaler">scaling to be applied on the metrics for the erosion issues</param>
         /// <param name="maxSpriteWidth">the maximal absolute width of a sprite representing an erosion in world-space Unity units</param>
         public ErosionIssues(Dictionary<string, IconFactory.Erosion> issueMap,
-                             NodeFactory leaveNodeFactory, IScale scaler, float maxSpriteWidth)
+                             NodeFactory innerNodeFactory, IScale scaler, float maxSpriteWidth)
         {
             this.issueMap = issueMap;
-            this.leaveNodeFactory = leaveNodeFactory;
+            this.innerNodeFactory = innerNodeFactory;
             this.scaler = scaler;
             this.maxSpriteWidth = maxSpriteWidth;
         }
@@ -33,7 +33,7 @@ namespace SEE.GO
         /// <summary>
         /// The factory that created the game nodes that are to be decorated.
         /// </summary>
-        private readonly NodeFactory leaveNodeFactory;
+        private readonly NodeFactory innerNodeFactory;
 
         /// <summary>
         /// The scaling to be applied on the metrics for the erosion issues.
@@ -101,7 +101,7 @@ namespace SEE.GO
                     scale *= Mathf.Lerp(0, maxSpriteWidth, scale.x);
 
                     sprite.transform.localScale = scale;
-                    sprite.transform.position = leaveNodeFactory.Roof(gameNode.gameObject);
+                    sprite.transform.position = innerNodeFactory.Roof(gameNode.gameObject);
 
                     sprites.Add(sprite);
                 }
@@ -112,7 +112,7 @@ namespace SEE.GO
             {
                 // The space that we put in between two subsequent erosion issue sprites.
                 Vector3 delta = Vector3.up / 100.0f;
-                Vector3 currentRoof = leaveNodeFactory.Roof(gameNode.gameObject);
+                Vector3 currentRoof = innerNodeFactory.Roof(gameNode.gameObject);
                 sprites.Sort(Comparer<GameObject>.Create((left, right) => GetSizeOfSprite(left).x.CompareTo(GetSizeOfSprite(right).x)));
                 foreach (GameObject sprite in sprites)
                 {

@@ -150,30 +150,49 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns the line in the source file declaring this graph element.
         /// Note that not all graph elements may have a source location.
-        /// If the graph element does not have this attribute, 0 is returned.
+        /// If the graph element does not have this attribute, null is returned.
         /// </summary>
-        /// <returns>line in source file or 0</returns>
-        public int SourceLine()
+        /// <returns>line in source file or null</returns>
+        public int? SourceLine()
         {
-            TryGetInt("Source.Line", out int result);
-            // If this attribute cannot be found, result will have the standard value 
-            // for int, which is 0.
-            //TODO: Perhaps it may be more sensible to make the return type `int?` and return `null` in such a case.
-            return result;
+            if (TryGetInt("Source.Line", out int result))
+            {
+                return result;
+            }
+            // If this attribute cannot be found, result will be null
+            return null;
+        }
+
+        /// <summary>
+        /// Returns the length of this graph element, measured in number of lines.
+        /// Note that not all graph elements may have a length.
+        /// If the graph element does not have this attribute, null is returned.
+        /// </summary>
+        /// <returns>number of lines of the element in source file or null</returns>
+        public int? SourceLength()
+        {
+            if (TryGetInt("Source.Region_Start", out int result))
+            {
+                return result;
+            }
+            // If this attribute cannot be found, result will be null
+            return null;
         }
 
         /// <summary>
         /// Returns the column in the source file declaring this graph element.
         /// Note that not all graph elements may have a source location.
-        /// If the graph element does not have this attribute, 0 is returned.
+        /// If the graph element does not have this attribute, null is returned.
         /// </summary>
-        /// <returns>column in source file or 0</returns>
-        public int SourceColumn()
+        /// <returns>column in source file or null</returns>
+        public int? SourceColumn()
         {
-            TryGetInt("Source.Column", out int result);
-            // If this attribute cannot be found, result will have the standard value 
-            // for int, which is 0.
-            return result;
+            if (TryGetInt("Source.Column", out int result))
+            {
+                return result;
+            }
+            // If this attribute cannot be found, result will be null.
+            return null;
         }
 
         /// <summary>

@@ -1027,8 +1027,9 @@ namespace SEE.Game
             // Add software erosion decorators for all leaf nodes if requested.
             if (settings.nodeLayoutSettings.showErosions)
             {
-                ErosionIssues issueDecorator = new ErosionIssues(settings.LeafIssueMap(), leafNodeFactories[0], scaler, settings.nodeLayoutSettings.maxErosionWidth);
-                issueDecorator.Add(FindLeafNodes(gameNodes));
+                ErosionIssues issueDecorator = new ErosionIssues(settings.InnerIssueMap(), innerNodeFactory, 
+                                                                 scaler, settings.nodeLayoutSettings.maxErosionWidth);
+                issueDecorator.Add(FindInnerNodes(gameNodes));
             }
 
             // Add text labels for all inner nodes
