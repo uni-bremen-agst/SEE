@@ -18,8 +18,8 @@ namespace SEE.DataModel.DG
         // Neither will its incoming and outgoing edges be copied.
 
         /// <summary>
-        /// The domain of a node regarding the architecture analysis, that is, 
-        /// whether it belongs to the architecture, implementation, or 
+        /// The domain of a node regarding the architecture analysis, that is,
+        /// whether it belongs to the architecture, implementation, or
         /// mapping between the two.
         /// </summary>
         public enum NodeDomain : byte
@@ -34,7 +34,7 @@ namespace SEE.DataModel.DG
             /// </summary>
             Implementation,
             /// <summary>
-            /// Represents a concept in the architecture and was created 
+            /// Represents a concept in the architecture and was created
             /// by the software architecture. It is part of the architecture
             /// model.
             /// </summary>
@@ -62,17 +62,27 @@ namespace SEE.DataModel.DG
         /// </summary>
         public const string LinknameAttribute = "Linkage.Name";
 
+        private string id = "";
         /// <summary>
         /// The unique identifier of a node (unique within a graph).
-        /// 
+        /// Setting a new id will also set set a new <see cref="LinknameAttribute"/>.
+        ///
         /// Important note on setting this property:
         /// This will only set the id attribute, but does not alter the
         /// hashed ids of the underlying graph. If the node was already
-        /// added to a graph, you cannot change the ID anymore. 
+        /// added to a graph, you cannot change the ID anymore.
         /// Otherwise expect inconsistencies. If the node has not been added
         /// to a graph, however, setting this property is safe.
         /// </summary>
-        public override string ID { get; set; } = "";
+        public override string ID
+        {
+            get => id;
+            set
+            {
+                id = value;
+                SetString(LinknameAttribute, id);
+            }
+        }
 
         /// <summary>
         /// The attribute name for the name of nodes. They may or may not be unique.
@@ -100,14 +110,14 @@ namespace SEE.DataModel.DG
         {
             get
             {
-                TryGetString(SourceFileAttribute, out string file); 
+                TryGetString(SourceFileAttribute, out string file);
                 return file;
             }
             set => SetString(SourceFileAttribute, value);
         }
 
         /// <summary>
-        /// The level of the node in the hierarchy. The top-most level has level 
+        /// The level of the node in the hierarchy. The top-most level has level
         /// number 0. The number is the length of the path in the hierarchy from
         /// the node to its ancestor that has no parent.
         /// </summary>
@@ -131,14 +141,14 @@ namespace SEE.DataModel.DG
                     ItsGraph.FinalizeNodeHierarchy();
                 }
                 return level;
-            }                
+            }
             set => level = value;
         }
 
         /// <summary>
         /// Sets the level of the node as specified by the parameter and sets
         /// the respective level values of each of its (transitive) descendants.
-        /// 
+        ///
         /// Note: This method should be called only by <see cref="Graph"/>.
         /// </summary>
         internal void SetLevel(int level)
@@ -152,7 +162,7 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Returns the maximal depth of the tree rooted by this node, that is,
-        /// the number of nodes on the longest path from this node to any of its 
+        /// the number of nodes on the longest path from this node to any of its
         /// leaves. The minimal value returned is 1.
         /// </summary>
         /// <returns>maximal depth of the tree rooted by this node</returns>
@@ -195,7 +205,7 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Returns true if <paramref name="other"/> if other meets all of the following 
+        /// Returns true if <paramref name="other"/> if other meets all of the following
         /// conditions:
         ///  (1) is not null
         ///  (2) has exactly the same C# type
@@ -207,7 +217,7 @@ namespace SEE.DataModel.DG
         ///  (8) the set of IDs of the children are the same
         ///  (9) has the same number of outgoing edges and the set of the edges' IDs are the same
         /// (10) has the same number of incoming edges and the set of the edges' IDs are the same
-        ///  
+        ///
         /// Note: This node and the other node may or may not be in the same graph.
         /// </summary>
         /// <param name="other">to be compared to</param>
@@ -313,10 +323,10 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Adds given edge to the list of incoming edges of this node.
-        /// 
-        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients 
+        ///
+        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients
         /// should use Graph.AddEdge() instead.
-        /// 
+        ///
         /// Precondition: edge != null and edge.Target == this
         /// </summary>
         /// <param name="edge">edge to be added as one of the node's incoming edges</param>
@@ -338,10 +348,10 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Removes given edge from the list of incoming edges of this node.
-        /// 
-        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients 
+        ///
+        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients
         /// should use Graph.RemoveEdge() instead.
-        /// 
+        ///
         /// Precondition: edge != null and edge.Target == this
         /// </summary>
         /// <param name="edge">edge to be removed from the node's incoming edges</param>
@@ -379,7 +389,7 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Removes all incoming and outgoing edges from this node.
-        /// 
+        ///
         /// IMPORTANT NOTE: This method is reserved for Graph and should not
         /// be used by any other client.
         /// </summary>
@@ -391,10 +401,10 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Adds given edge to the list of outgoing edges of this node.
-        /// 
-        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients 
+        ///
+        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients
         /// should use Graph.AddEdge() instead.
-        /// 
+        ///
         /// Precondition: edge != null and edge.Source == this
         /// </summary>
         /// <param name="edge">edge to be added as one of the node's outgoing edges</param>
@@ -416,10 +426,10 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Removes given edge from the list of outgoing edges of this node.
-        /// 
-        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients 
+        ///
+        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients
         /// should use Graph.RemoveEdge() instead.
-        /// 
+        ///
         /// Precondition: edge != null and edge.Source == this
         /// </summary>
         /// <param name="edge">edge to be removed from the node's outgoing edges</param>
@@ -457,7 +467,7 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// The descendants of the node. 
+        /// The descendants of the node.
         /// Note: This is not a copy. Do not modify the result.
         /// </summary>
         /// <returns>descendants of the node</returns>
@@ -510,7 +520,7 @@ namespace SEE.DataModel.DG
                 // assert: newParent != null
                 if (Parent == null)
                 {
-                    newParent.AddChild(this);                    
+                    newParent.AddChild(this);
                 }
                 else
                 {
@@ -534,8 +544,8 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Compares the two given nodes by name. 
-        /// 
+        /// Compares the two given nodes by name.
+        ///
         /// Returns 0 if:
         ///    both are null
         ///    or name(first) = name(second)
@@ -556,12 +566,12 @@ namespace SEE.DataModel.DG
             {
                 if (ReferenceEquals(second, null))
                 {
-                    // If first is null and second is null, they're equal. 
+                    // If first is null and second is null, they're equal.
                     return 0;
                 }
                 else
                 {
-                    // If first is null and second is not null, second is greater. 
+                    // If first is null and second is not null, second is greater.
                     return -1;
                 }
             }
@@ -610,12 +620,12 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Creates deep copies of attributes where necessary. Is called by
-        /// Clone() once the copy is created. Must be extended by every 
+        /// Clone() once the copy is created. Must be extended by every
         /// subclass that adds fields that should be cloned, too.
-        /// 
+        ///
         /// IMPORTANT NOTE: Cloning a node means only to create copy of its
         /// type and attributes. The hierarchy information (parent, level,
-        /// and children) are not copied. Instead the copy will become a 
+        /// and children) are not copied. Instead the copy will become a
         /// node without parent and children at level 0. If we copied the
         /// hierarchy information, the hierarchy were no longer a forrest.
         /// </summary>
@@ -632,9 +642,9 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Returns the list of outgoing edges from this node to the given 
+        /// Returns the list of outgoing edges from this node to the given
         /// target node that have exactly the given edge type.
-        /// 
+        ///
         /// Precondition: target must not be null
         /// </summary>
         /// <param name="target">target node</param>
