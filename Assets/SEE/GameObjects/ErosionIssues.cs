@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using SEE.DataModel.DG;
+using SEE.Game;
 using UnityEngine;
 
 namespace SEE.GO
@@ -128,6 +129,7 @@ namespace SEE.GO
             foreach (GameObject sprite in sprites)
             {
                 sprite.transform.SetParent(gameNode.transform);
+                Portal.SetPortal(sprite);
             }
         }
 
