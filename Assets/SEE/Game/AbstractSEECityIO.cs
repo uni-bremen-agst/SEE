@@ -66,7 +66,7 @@ namespace SEE.Game
         private const string ZScoreScaleLabel = "ZScoreScale";
         private const string EdgeWidthLabel = "EdgeWidth";
         private const string ShowErosionsLabel = "ShowErosions";
-        private const string MaxErosionWidthLabel = "MaxErosionWidth";
+        private const string ErosionScalingFactorLabel = "ErosionScalingFactor";
         private const string EdgesAboveBlocksLabel = "EdgesAboveBlocks";
         private const string TensionLabel = "Tension";
         private const string RDPLabel = "RDP";        
@@ -138,7 +138,7 @@ namespace SEE.Game
             writer.Save(nodeLayoutSettings.zScoreScale, ZScoreScaleLabel);
             writer.Save(edgeLayoutSettings.edgeWidth, EdgeWidthLabel);
             writer.Save(nodeLayoutSettings.showErosions, ShowErosionsLabel);
-            writer.Save(nodeLayoutSettings.maxErosionWidth, MaxErosionWidthLabel);
+            writer.Save(nodeLayoutSettings.erosionScalingFactor, ErosionScalingFactorLabel);
             writer.Save(edgeLayoutSettings.edgesAboveBlocks, EdgesAboveBlocksLabel);
             writer.Save(edgeLayoutSettings.tension, TensionLabel);
             writer.Save(edgeLayoutSettings.rdp, RDPLabel);
@@ -217,7 +217,7 @@ namespace SEE.Game
             ConfigIO.Restore(attributes, ZScoreScaleLabel, ref nodeLayoutSettings.zScoreScale);
             ConfigIO.Restore(attributes, EdgeWidthLabel, ref edgeLayoutSettings.edgeWidth);
             ConfigIO.Restore(attributes, ShowErosionsLabel, ref nodeLayoutSettings.showErosions);
-            ConfigIO.Restore(attributes, MaxErosionWidthLabel, ref nodeLayoutSettings.maxErosionWidth);
+            ConfigIO.Restore(attributes, ErosionScalingFactorLabel, ref nodeLayoutSettings.erosionScalingFactor);
             ConfigIO.Restore(attributes, EdgesAboveBlocksLabel, ref edgeLayoutSettings.edgesAboveBlocks);
             ConfigIO.Restore(attributes, TensionLabel, ref edgeLayoutSettings.tension);
             ConfigIO.Restore(attributes, RDPLabel, ref edgeLayoutSettings.rdp);

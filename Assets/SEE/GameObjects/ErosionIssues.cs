@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using SEE.DataModel.DG;
-using SEE.Game;
 using UnityEngine;
 
 namespace SEE.GO
@@ -16,14 +15,14 @@ namespace SEE.GO
         /// <param name="issueMap">the relevant metrics for the erosion issues</param>
         /// <param name="innerNodeFactory">factory that created the game nodes that are to be decorated</param>
         /// <param name="scaler">scaling to be applied on the metrics for the erosion issues</param>
-        /// <param name="maxSpriteWidth">the maximal absolute width of a sprite representing an erosion in world-space Unity units</param>
+        /// <param name="erosionScalingFactor">the factor by which the erosion icons shall be scaled</param>
         public ErosionIssues(Dictionary<string, IconFactory.Erosion> issueMap,
-                             NodeFactory innerNodeFactory, IScale scaler, float maxSpriteWidth)
+                             NodeFactory innerNodeFactory, IScale scaler, float erosionScalingFactor)
         {
             this.issueMap = issueMap;
             this.innerNodeFactory = innerNodeFactory;
             this.scaler = scaler;
-            this.maxSpriteWidth = maxSpriteWidth;
+            this.erosionScalingFactor = erosionScalingFactor;
         }
 
         /// <summary>
@@ -44,7 +43,7 @@ namespace SEE.GO
         /// <summary>
         /// The maximal absolute width of a sprite representing an erosion in world-space Unity units.
         /// </summary>
-        private readonly float maxSpriteWidth;
+        private readonly float erosionScalingFactor;
 
         /// <summary>
         /// Creates sprites for software-erosion indicators for all given game nodes as children.
@@ -99,7 +98,10 @@ namespace SEE.GO
                     // UnityEngine.Assertions.Assert.IsTrue(scale.x <= 1, $"scale.x={scale.x}");
 
                     // Now scale the sprite into the corridor [0, maxSpriteWidth]
-                    scale *= Mathf.Lerp(0, maxSpriteWidth, scale.x);
+                    scale *= Mathf.Lerp(0, innerNodeFactory.GetSize(gameNode.gameObject).x, scale.x);
+
+                    // Finally, scale sprite by the configured scaling factor
+                    scale *= erosionScalingFactor;
 
                     sprite.transform.localScale = scale;
                     sprite.transform.position = innerNodeFactory.Roof(gameNode.gameObject);
@@ -129,7 +131,6 @@ namespace SEE.GO
             foreach (GameObject sprite in sprites)
             {
                 sprite.transform.SetParent(gameNode.transform);
-                Portal.SetPortal(sprite);
             }
         }
 
