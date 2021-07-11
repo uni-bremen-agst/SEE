@@ -687,20 +687,12 @@ namespace SEE.Game
             List<ILayoutNode> remainingLayoutNodes = layoutNodes.ToList();
             foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
             {
-                ICollection<GameObject> gameObjects = new List<GameObject>();
-                foreach (GameNode gameNode in layoutNode.Nodes)
-                {
-                    gameObjects.Add(gameNode.GetGameObject());
-                }
+                ICollection<GameObject> gameObjects = (from GameNode gameNode in layoutNode.Nodes select gameNode.GetGameObject()).ToList();
                 AddDecorations(gameObjects, layoutNode.InnerNodeKind, layoutNode.NodeLayout);
                 remainingLayoutNodes.RemoveAll(node => layoutNode.Nodes.Contains(node));
             }
 
-            ICollection<GameObject> remainingGameObjects = new List<GameObject>();
-            foreach (GameNode gameNode in remainingLayoutNodes)
-            {
-                remainingGameObjects.Add(gameNode.GetGameObject());
-            }
+            ICollection<GameObject> remainingGameObjects = (from GameNode gameNode in remainingLayoutNodes select gameNode.GetGameObject()).ToList();
 
             AddDecorations(remainingGameObjects);
         }
@@ -1020,27 +1012,29 @@ namespace SEE.Game
         /// <param name="innerNodeKinds">the inner node kinds for the gameobject</param>
         /// <param name="nodeLayout">the nodeLayout used for this gameobject</param>
         /// <returns>the game objects added for the decorations; may be an empty collection</returns>
-        private void AddDecorations(ICollection<GameObject> gameNodes, InnerNodeKinds innerNodeKinds, NodeLayoutKind nodeLayout)
+        private void AddDecorations(IEnumerable<GameObject> gameNodes, InnerNodeKinds innerNodeKinds, 
+                                    NodeLayoutKind nodeLayout)
         {
             InnerNodeFactory innerNodeFactory = innerNodeFactories[0];
+            ICollection<GameObject> innerNodes = FindInnerNodes(gameNodes);
 
             // Add software erosion decorators for all leaf nodes if requested.
             if (settings.nodeLayoutSettings.showErosions)
             {
                 ErosionIssues issueDecorator = new ErosionIssues(settings.InnerIssueMap(), innerNodeFactory, 
-                                                                 scaler, settings.nodeLayoutSettings.maxErosionWidth);
-                issueDecorator.Add(FindInnerNodes(gameNodes));
+                                                                 scaler, settings.nodeLayoutSettings.erosionScalingFactor);
+                issueDecorator.Add(innerNodes);
             }
 
             // Add text labels for all inner nodes
             if (nodeLayout == NodeLayoutKind.Balloon
                 || nodeLayout == NodeLayoutKind.EvoStreets)
             {
-                AddLabels(FindInnerNodes(gameNodes), innerNodeFactory);
+                AddLabels(innerNodes, innerNodeFactory);
             }
 
             // Add decorators specific to the shape of inner nodes (circle decorators for circles
-            // and donut decorators for donuts.
+            // and donut decorators for donuts).
 
             switch (innerNodeKinds)
             {
@@ -1051,14 +1045,14 @@ namespace SEE.Game
                     {
                         // We want to adjust the size and the line width of the circle line created by the CircleFactory.
                         CircleDecorator decorator = new CircleDecorator(innerNodeFactory, Color.white);
-                        decorator.Add(FindInnerNodes(gameNodes));
+                        decorator.Add(innerNodes);
                     }
                     break;
                 case InnerNodeKinds.Rectangles:
                     {
                         // We want to adjust the line width of the rectangle line created by the RectangleFactory.
                         RectangleDecorator decorator = new RectangleDecorator(innerNodeFactory, Color.white);
-                        decorator.Add(FindInnerNodes(gameNodes));
+                        decorator.Add(innerNodes);
                     }
                     break;
                 case InnerNodeKinds.Donuts:
@@ -1067,7 +1061,7 @@ namespace SEE.Game
                                                                       settings.AllInnerNodeIssues().ToArray());
                         // the circle segments and the inner circle for the donut are added as children by Add();
                         // that is why we do not add the result to decorations.
-                        decorator.Add(FindInnerNodes(gameNodes));
+                        decorator.Add(innerNodes);
                     }
                     break;
                 case InnerNodeKinds.Cylinders:
@@ -1076,7 +1070,8 @@ namespace SEE.Game
                     // TODO
                     break;
                 default:
-                    throw new Exception("Unhandled GraphSettings.InnerNodeKinds " + settings.innerNodeAttributesPerKind[0].kind);
+                    throw new InvalidOperationException("Unhandled GraphSettings.InnerNodeKinds "
+                                                        + $"{settings.innerNodeAttributesPerKind[0].kind}");
             }
         }
 
@@ -1165,7 +1160,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes"></param>
         /// <returns>the inner nodes in gameNodes as a list</returns>
-        private ICollection<GameObject> FindInnerNodes(ICollection<GameObject> gameNodes)
+        private static ICollection<GameObject> FindInnerNodes(IEnumerable<GameObject> gameNodes)
         {
             return gameNodes.Where(o => !o.IsLeaf()).ToList();
         }

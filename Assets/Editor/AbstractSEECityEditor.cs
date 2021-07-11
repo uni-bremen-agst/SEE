@@ -248,7 +248,8 @@ namespace SEEEditor
                 city.globalCityAttributes.layoutPath = GetDataPath("Layout file", city.globalCityAttributes.layoutPath, Filenames.ExtensionWithoutPeriod(Filenames.GVLExtension));
                 settings.zScoreScale = EditorGUILayout.Toggle("Z-score scaling", settings.zScoreScale);
                 settings.showErosions = EditorGUILayout.Toggle("Show erosions", settings.showErosions);
-                settings.maxErosionWidth = EditorGUILayout.FloatField("Max. width of erosion icon", settings.maxErosionWidth);
+                settings.erosionScalingFactor = EditorGUILayout.FloatField("Scaling factor of erosions", 
+                                                                           settings.erosionScalingFactor);
             }
         }
 

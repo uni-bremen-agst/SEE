@@ -132,7 +132,7 @@ namespace SEE.Game
         public bool showErosions = false; // Whether erosions should be visible above blocks.
 
         [Range(0.0f, float.MaxValue)]
-        public float maxErosionWidth = 1.0f;
+        public float erosionScalingFactor = 1.0f;
     }
 
     /// <summary>
