@@ -24,6 +24,11 @@ namespace SEE.GO
             this.scaler = scaler;
             this.erosionScalingFactor = erosionScalingFactor;
         }
+        
+        /// <summary>
+        /// Prefix used for game objects containing erosion sprites.
+        /// </summary>
+        public const string EROSION_SPRITE_PREFIX = "Erosion:";
 
         /// <summary>
         /// The settings that determine the relevant metrics for the erosion issues.
@@ -82,7 +87,9 @@ namespace SEE.GO
                     float metricScale = scaler.GetRelativeNormalizedValue(issue.Key, node);
 
                     GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value);
-                    sprite.name = $"{sprite.name} {node.SourceName}";
+                    // NOTE: The EROSION_SPRITE_PREFIX must be present here,
+                    // otherwise partial erosion display won't work!
+                    sprite.name = $"{EROSION_SPRITE_PREFIX} {sprite.name} {node.SourceName}";
 
                     Vector3 spriteSize = GetSizeOfSprite(sprite);
                     // Scale the sprite to one Unity unit.
