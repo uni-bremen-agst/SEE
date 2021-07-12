@@ -14,6 +14,10 @@ namespace SEE.GO
         /// Color of the text.
         /// </summary>
         private static readonly Color TextColorDefault = Color.black;
+        
+        /// <summary>
+        /// Name of the font used for the text.
+        /// </summary>
         private const string PortalFontName = "Fonts & Materials/LiberationSans SDF - Portal";
 
         /// <summary>
