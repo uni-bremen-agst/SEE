@@ -1,6 +1,7 @@
 ﻿using System;
 using SEE.DataModel;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.GO
 {
@@ -150,8 +151,9 @@ namespace SEE.GO
         /// </summary>
         /// <param name="position">the location for positioning the new game object</param>
         /// <param name="erosion">the kind of Erosion for which to generate the game object</param>
+        /// <param name="color">The color in which to render the sprite</param>
         /// <returns>a new game object for this type of erosion</returns>
-        public GameObject GetIcon(Vector3 position, Erosion erosion)
+        public GameObject GetIcon(Vector3 position, Erosion erosion, Color color = default)
         {
             GameObject gameObject = new GameObject
             {
@@ -178,11 +180,16 @@ namespace SEE.GO
                 {
                     string prefabName = prefab.name;
                     erosionSprite = UnityEngine.Object.Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
+                    Assert.IsNotNull(erosionSprite);
                     erosionSprite.name = prefabName;
                 }
                 erosionSprite.transform.parent = gameObject.transform;
-                Renderer[] renderers = new Renderer[1];
-                renderers[0] = erosionSprite.GetComponent<Renderer>();
+                SpriteRenderer renderer = erosionSprite.GetComponent<SpriteRenderer>();
+                if (color != default)
+                {
+                    renderer.color = color;
+                }
+                Renderer[] renderers = { renderer };
                 lods[0] = new LOD(ScreenRelativeTransitionHeight, renderers);
             }
             group.SetLODs(lods);

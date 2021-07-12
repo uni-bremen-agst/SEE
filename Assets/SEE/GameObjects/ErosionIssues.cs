@@ -86,7 +86,10 @@ namespace SEE.GO
                     // maximum value of the normalized metric. Hence, this value is in [0,1].
                     float metricScale = scaler.GetRelativeNormalizedValue(issue.Key, node);
 
-                    GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value);
+                    //TODO: Color according to metric
+                    GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value,
+                                                                     new Color(metricScale, 0, 0, 0.9f));
+                    
                     // NOTE: The EROSION_SPRITE_PREFIX must be present here,
                     // otherwise partial erosion display won't work!
                     sprite.name = $"{EROSION_SPRITE_PREFIX} {sprite.name} {node.SourceName}";

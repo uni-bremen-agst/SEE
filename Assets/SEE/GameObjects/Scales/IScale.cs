@@ -18,7 +18,8 @@ namespace SEE.GO
         /// <param name="minimalLength">the minimal value that can be returned by this scaling</param>
         /// <param name="minimalLength">the maximal value that can be returned by this scaling</param>
         /// <param name="leavesOnly">if true, only the leaf nodes are considered</param>
-        public IScale(ICollection<Graph> graphs, IList<string> metrics, float minimalLength, float maximalLength, bool leavesOnly)
+        public IScale(ICollection<Graph> graphs, IList<string> metrics, float minimalLength, float maximalLength, 
+                      bool leavesOnly)
         {
             this.metrics = metrics;
             this.minimalLength = minimalLength;
