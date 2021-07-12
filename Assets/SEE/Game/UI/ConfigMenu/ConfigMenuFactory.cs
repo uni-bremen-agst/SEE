@@ -47,10 +47,17 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void Update()
         {
-            if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer)
-                HandleDesktopUpdate();
-            else if (PlayerSettings.GetInputType() == PlayerInputType.VRPlayer)
-                HandleVRUpdate();
+            switch (PlayerSettings.GetInputType())
+            {
+                case PlayerInputType.DesktopPlayer:
+                    HandleDesktopUpdate();
+                    break;
+                case PlayerInputType.VRPlayer:
+                    HandleVRUpdate();
+                    break;
+                default:
+                    throw new System.NotImplementedException($"ConfigMenuFactory.Update not implemented for {PlayerSettings.GetInputType()}.");
+            }
         }
         private void HandleDesktopUpdate()
         {
