@@ -1,8 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using SEE.Controls;
 using SEE.Controls.Actions;
-using SEE.Game.UI;
+using SEE.Game.UI.Menu;
+using SEE.Game.UI.Notification;
+using SEE.Game.UI.StateIndicator;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Events;
 
 namespace SEE.GO.Menu
 {
@@ -20,10 +26,10 @@ namespace SEE.GO.Menu
         /// The UI object representing the indicator, which displays the current action state on the screen.
         /// </summary>
         private ActionStateIndicator Indicator;
-        
+
         /// <summary>
         /// This creates and returns the mode menu, with which you can select the active game mode.
-        /// 
+        ///
         /// Available modes can be found in <see cref="ActionStateType"/>.
         /// </summary>
         /// <param name="attachTo">The game object the menu should be attached to. If <c>null</c>, a
@@ -31,17 +37,12 @@ namespace SEE.GO.Menu
         /// <returns>the newly created mode menu component.</returns>
         private static SelectionMenu CreateModeMenu(GameObject attachTo = null)
         {
-            Assert.IsTrue(ActionStateType.AllTypes.Count == 8);
-            Assert.IsTrue(ActionStateType.Move.Value == 0);
-            Assert.IsTrue(ActionStateType.Rotate.Value == 1);
-            Assert.IsTrue(ActionStateType.Map.Value == 2);
-            Assert.IsTrue(ActionStateType.NewEdge.Value == 3);
-            Assert.IsTrue(ActionStateType.NewNode.Value == 4);
-            Assert.IsTrue(ActionStateType.EditNode.Value == 5);
-            Assert.IsTrue(ActionStateType.ScaleNode.Value == 6);
-            Assert.IsTrue(ActionStateType.Delete.Value == 7);
+            Assert.IsTrue(ActionStateType.AllTypes.Count == 11);
 
-            // IMPORTANT NOTE: Because an ActionState.Type value will be used as an index into 
+            // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
+            GameObject modeMenuGO = attachTo ? attachTo : new GameObject { name = "Mode Menu" };
+
+            // IMPORTANT NOTE: Because an ActionState.Type value will be used as an index into
             // the following field of menu entries, the rank of an entry in this field of entry
             // must correspond to the ActionState.Type value. If this is not the case, we will
             // run into an endless recursion.
@@ -50,19 +51,38 @@ namespace SEE.GO.Menu
             bool first = true;
             foreach (ActionStateType type in ActionStateType.AllTypes)
             {
+                UnityAction entryAction = () => GlobalActionHistory.Execute(type);
+                UnityAction exitAction = null;
+
+                //FIXME This is a bad hack and should be replaced with something proper for non-reversible actions.
+                // This currently just attaches the ShowCodeAction to the menu and registers entry/exitActions which
+                // will enable/disable the component. It should be replaced with something more generalizable.
+                // The current behavior also has a bug which doesn't properly leave an action when switching
+                // to the code action.
+                if (Equals(type, ActionStateType.ShowCode))
+                {
+                    // Attach ShowCodeAction
+                    ShowCodeAction action = modeMenuGO.AddComponent<ShowCodeAction>();
+                    entryAction = () => action.enabled = true;
+                    exitAction = () => action.enabled = false;
+                    action.enabled = false;
+                }
                 entries.Add(new ToggleMenuEntry(
                     active: first,
-                    entryAction: () => ActionState.Value = type,
-                    exitAction: null,
+                    entryAction: entryAction,
+                    exitAction: exitAction,
                     title: type.Name,
                     description: type.Description,
                     entryColor: type.Color,
                     icon: Resources.Load<Sprite>(type.IconPath)
                     ));
-                first = false;
+                if (first)
+                {
+                    GlobalActionHistory.Execute(type);
+                    first = false;
+                }
             }
 
-            GameObject modeMenuGO = attachTo ?? new GameObject { name = "Mode Menu" };
             SelectionMenu modeMenu = modeMenuGO.AddComponent<SelectionMenu>();
             modeMenu.Title = "Mode Selection";
             modeMenu.Description = "Please select the mode you want to activate.";
@@ -74,7 +94,7 @@ namespace SEE.GO.Menu
         }
 
         /// <summary>
-        /// This creates and returns the <see cref="ActionStateIndicator"/>, which displays the current mode.
+        /// This creates and returns the <see cref="StateIndicator.ActionStateIndicator"/>, which displays the current mode.
         /// The indicator will either be attached to the given GameObject or to a new GameObject if
         /// <paramref name="attachTo"/> is null.
         /// </summary>
@@ -83,7 +103,8 @@ namespace SEE.GO.Menu
         /// <returns>The newly created ActionStateIndicator.</returns>
         private static ActionStateIndicator CreateActionStateIndicator(GameObject attachTo = null)
         {
-            GameObject actionStateGO = attachTo ?? new GameObject {name = "Action State Indicator"};
+            // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
+            GameObject actionStateGO = attachTo ? attachTo : new GameObject { name = "Action State Indicator" };
             ActionStateIndicator indicator = actionStateGO.AddComponent<ActionStateIndicator>();
             return indicator;
         }
@@ -92,21 +113,15 @@ namespace SEE.GO.Menu
         {
             ModeMenu = CreateModeMenu(gameObject);
             Indicator = CreateActionStateIndicator(gameObject);
+            // Whenever the state is changed, the action state indicator should reflect that
+            ModeMenu.OnMenuEntrySelected.AddListener(SetIndicatorStateToEntry);
+            // Initialize action state indicator to current action state
+            SetIndicatorStateToEntry(ModeMenu.ActiveEntry);
 
-            ActionState.OnStateChanged += OnStateChanged;
-            Assert.IsTrue(ActionStateType.AllTypes.Count <= 9, 
-                          "Only up to 9 (10 if zero is included) entries can be selected via the numbers on the keyboard!");
-        }
-        
-        /// <summary>
-        /// Called whenever the action state changes.
-        /// This updates the menu to indicate the selected value, and updates the action state indicator.
-        /// </summary>
-        /// <param name="value">The new action state</param>
-        private void OnStateChanged(ActionStateType value)
-        {
-            ModeMenu.SelectEntry(value.Value);
-            Indicator.ChangeState(value);
+            void SetIndicatorStateToEntry(ToggleMenuEntry entry)
+            {
+                Indicator.ChangeActionState(ActionStateType.FromID(ModeMenu.Entries.IndexOf(entry)));
+            }
         }
 
         /// <summary>
@@ -115,20 +130,78 @@ namespace SEE.GO.Menu
         /// </summary>
         private void Update()
         {
-            // Select action state via numbers on the keyboard
-            for (int i = 0; i < ModeMenu.Entries.Count; i++)
+            try
             {
-                if (Input.GetKeyDown(KeyCode.Alpha1 + i))
+                // Select action state via numbers on the keyboard
+                for (int i = 0; i < ModeMenu.Entries.Count; i++)
                 {
-                    ModeMenu.SelectEntry(i);
+                    if (SEEInput.DigitKeyPressed(i))
+                    {
+                        ModeMenu.SelectEntry(i);
+                        break;
+                    }
+                }
+                if (SEEInput.ToggleMenu())
+                {
+                    ModeMenu.ToggleMenu();
+                }
+                if (SEEInput.Undo())
+                {
+                    GlobalActionHistory.Undo();
+                    if (!GlobalActionHistory.IsEmpty())
+                    {
+                        ActionStateType currentAction = GlobalActionHistory.Current();
+                        SetPlayerMenu(currentAction.Name);
+                        Indicator.ChangeActionState(currentAction);
+                    }
+                    else
+                    {
+                        // This case will be reached if there is no finished action in the undo history.
+                        // Special case: The user is executing his first action after moving while running the application,
+                        // but this action is not finished yet. Then, the user executes undo.
+                        ModeMenu.ActiveEntry = ModeMenu.Entries.Single(x => x.Title == ActionStateType.Move.Name);
+                        Indicator.ChangeActionState(ActionStateType.Move);
+                    }
+                }
+                else if (SEEInput.Redo())
+                {
+                    GlobalActionHistory.Redo();
+                    ActionStateType currentAction = GlobalActionHistory.Current();
+                    SetPlayerMenu(currentAction.Name);
+                    Indicator.ChangeActionState(currentAction);
+                }
+                GlobalActionHistory.Update();
+            }
+            catch (Exception e)
+            {
+                ShowNotification.Error("Action Error", e.Message);
+#if UNITY_EDITOR
+                Debug.LogError(e.StackTrace);
+#endif
+            }
+        }
+
+        /// <summary>
+        /// Sets the currently selected menu entry in PlayerMenu to the action with given <paramref name="actionName"/>.
+        /// </summary>
+        /// <param name="actionName">name of the menu entry to be </param>
+        private void SetPlayerMenu(string actionName)
+        {
+            if (PlayerSettings.LocalPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu))
+            {
+                // We cannot use PlayerActionHistory.Current here
+                playerMenu.ModeMenu.ActiveEntry
+                    = playerMenu.ModeMenu.Entries.First
+                         (x => x.Title.Equals(actionName));
+            }
+            foreach (ToggleMenuEntry toggleMenuEntry in playerMenu.ModeMenu.Entries)
+            {
+                // Hint (can be removed after review): we cannot use PlayerActionHistory.Current
+                if (toggleMenuEntry.Title.Equals(actionName))
+                {
+                    playerMenu.ModeMenu.ActiveEntry = toggleMenuEntry;
                     break;
                 }
-            }
-
-            // space bar toggles menu            
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                ModeMenu.ToggleMenu();
             }
         }
     }

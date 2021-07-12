@@ -10,6 +10,7 @@ using SEE.DataModel;
 using SEE.Game;
 using SEE.Game.Charts.VR;
 using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
@@ -18,7 +19,7 @@ namespace SEE.Controls
 {
     /// <summary>
     /// Allows a user to select the kind of environment in which the game
-    /// runs: (1) desktop with keyboard and mouse input, (2) touch devices 
+    /// runs: (1) desktop with keyboard and mouse input, (2) touch devices
     /// or gamepads using InControl, (3) virtual reality, or (4) augmented
     /// reality.
     /// </summary>
@@ -61,6 +62,11 @@ namespace SEE.Controls
         [OdinSerialize]
         public Vector3 PlayerOrigin = Vector3.one;
 
+        [Tooltip("The rotation along the y axis at which to spawn the player initially (in degree).")]
+        [OdinSerialize]
+        [Range(0, 359)]
+        public float PlayerYRotation = 0;
+
         [Tooltip("The plane the player is to focus initially in the desktop environment.")]
         [OdinSerialize]
         public GO.Plane FocusPlane;
@@ -82,9 +88,9 @@ namespace SEE.Controls
         [Tooltip("Whether hints should be shown for controllers.")]
         public bool ShowControllerHints = false;
 
-        [Header("HoloLens specific settings (relevant only for HoloLens players)")] 
+        [Header("HoloLens specific settings (relevant only for HoloLens players)")]
         [Tooltip("Which scale shall be used for HoloLens players.")]
-        public ExperienceScale experienceScale = ExperienceScale.Seated;
+        public ExperienceScale ExperienceScale = ExperienceScale.Seated;
 
         [Tooltip("The factor by which code cities should be scaled on startup."), OdinSerialize, Min(0.01f)]
         public float CityScalingFactor = 1f;
@@ -97,14 +103,10 @@ namespace SEE.Controls
         public float EyeStareDelay = 1;
 
         /// <summary>
-        /// The game object representing the active local player, that is, the player 
+        /// The game object representing the active local player, that is, the player
         /// executing on this local instance of Unity.
         /// </summary>
-        public static GameObject LocalPlayer
-        {
-            get;
-            private set;
-        }
+        public static GameObject LocalPlayer { get; private set; }
 
         /// <summary>
         /// The cached player settings within this local instance of Unity.
@@ -171,12 +173,9 @@ namespace SEE.Controls
                 case PlayerInputType.DesktopPlayer:
                     if (FocusPlane == null)
                     {
-                        throw new Exception("No focus plane set for the desktop player. Set this value in the inspector.");
+                       Debug.Log("No focus plane set for the desktop player. You can set this value in the inspector.\n");
                     }
-                    else
-                    {
-                        player = PlayerFactory.CreateDesktopPlayer(FocusPlane);
-                    }
+                    player = PlayerFactory.CreateDesktopPlayer(FocusPlane);
                     break;
                 case PlayerInputType.VRPlayer:
                     {
@@ -185,7 +184,7 @@ namespace SEE.Controls
                     }
                     break;
                 case PlayerInputType.HoloLensPlayer:
-                    {                        
+                    {
                         player = PlayerFactory.CreateHololensPlayer();
                         SetupMixedReality();
                     }
@@ -198,6 +197,7 @@ namespace SEE.Controls
                     throw new NotImplementedException($"Unhandled case {inputType}.");
             }
             player.transform.position = PlayerOrigin;
+            player.transform.rotation = Quaternion.Euler(0, PlayerYRotation, 0);
             return player;
         }
 
@@ -219,14 +219,8 @@ namespace SEE.Controls
             }
             else
             {
-                {
-                    // Create Teleporting game object
-                    UnityEngine.Object teleportingPrefab = Resources.Load<GameObject>("Prefabs/Players/Teleporting");
-                    UnityEngine.Assertions.Assert.IsNotNull(teleportingPrefab);
-                    GameObject teleporting = Instantiate(teleportingPrefab) as GameObject;
-                    UnityEngine.Assertions.Assert.IsNotNull(teleporting);
-                    teleporting.name = "Teleporting";
-                }
+                // Create Teleporting game object
+                PrefabInstantiator.InstantiatePrefab("Prefabs/Players/Teleporting").name = "Teleporting";
                 {
                     // Attach TeleportArea to floor
                     // The TeleportArea replaces the material of the game object it is attached to
@@ -283,6 +277,9 @@ namespace SEE.Controls
                     Teleport.instance.CancelTeleportHint();
                 }
             }
+#if UNITY_EDITOR
+            KeyBindings.PrintBindings();
+#endif
         }
 
         /// <summary>
@@ -290,60 +287,59 @@ namespace SEE.Controls
         /// </summary>
         private void SetupMixedReality()
         {
+            Destroy(UnityEngine.SceneManagement.SceneManager.GetActiveScene()
+                               .GetRootGameObjects().SingleOrDefault(x => x.name == "MixedRealityPlayspace"));
+
             // Add a MixedRealityToolkit to the scene
-            UnityEngine.Object mrtkPrefab = Resources.Load<GameObject>("Prefabs/MixedRealityToolkit");
-            GameObject mrtk = Instantiate(mrtkPrefab) as GameObject;
-            UnityEngine.Assertions.Assert.IsNotNull(mrtk);
-            mrtk.name = MixedRealityToolkitName;
+            PrefabInstantiator.InstantiatePrefab("Prefabs/MixedRealityToolkit").name = MixedRealityToolkitName;
 
             // Create HoloLensAppBar from prefab
-            UnityEngine.Object appBarPrefab = Resources.Load<GameObject>("Prefabs/HoloLensAppBar");
-            GameObject appBar = Instantiate(appBarPrefab) as GameObject;
-            UnityEngine.Assertions.Assert.IsNotNull(appBar);
-            appBar.name = AppBarName;
+            PrefabInstantiator.InstantiatePrefab("Prefabs/HoloLensAppBar").name = AppBarName;
 
             // Add a city collection
-            UnityEngine.Object cityCollectionPrefab = Resources.Load<GameObject>("Prefabs/CityCollection");
-            GameObject cityCollection = Instantiate(cityCollectionPrefab) as GameObject;
-            UnityEngine.Assertions.Assert.IsNotNull(cityCollection);
+            GameObject cityCollection = PrefabInstantiator.InstantiatePrefab("Prefabs/CityCollection");
             cityCollection.name = CityCollectionName;
 
-            // Hide all decoration to improve performance
+            // Hide all decoration to improve performance.
             GameObject.FindGameObjectsWithTag(Tags.Decoration).ForEach(go => go.SetActive(false));
 
             {
-                // Set selected experience scale 
-                MixedRealityToolkit.Instance.ActiveProfile.TargetExperienceScale = experienceScale;
-                
-                Debug.Log($"Current HoloLens scale: {experienceScale}\n");
-                if (experienceScale == ExperienceScale.Seated || experienceScale == ExperienceScale.OrientationOnly)
+                // Set selected experience scale.
+                MixedRealityToolkit.Instance.ActiveProfile.TargetExperienceScale = ExperienceScale;
+
+                Debug.Log($"Current HoloLens scale: {ExperienceScale}\n");
+                if (ExperienceScale == ExperienceScale.Seated || ExperienceScale == ExperienceScale.OrientationOnly)
                 {
                     // Position and scale planes and CodeCities accordingly using CityCollection grid
                     if (cityCollection.TryGetComponentOrLog(out GridObjectCollection grid))
                     {
-
                         GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
 
-                        foreach (GameObject city in cities)
+                        GameObject[] citiesWithContainer = cities.Select(AddCodeCityContainer).ToArray();
+
+                        foreach (GameObject city in citiesWithContainer)
                         {
-                            // Scale city by given factor, and reset position to origin
-                            city.transform.localScale *= CityScalingFactor;
-                            // City needs to be parented to collection to be organized by it
-                            city.transform.parent = cityCollection.transform;
-                            
+                            SetCityScale(city, cityCollection.transform, CityScalingFactor);
                             AddInteractions(city);
                             AppBarCityConfiguration(city);
                         }
 
-                        SetGridCellWidth(grid, cities);
+                        SetGridCellWidth(grid, citiesWithContainer);
                     }
                 }
             }
 
-            #region Local Methods
+#region Local Methods
+            //Scales the city by factor and pretend it to collection 
+            static void SetCityScale(GameObject cityWitchContainer, Transform cityCollectionTransform, float cityScaleFactor)
+            {
+                cityWitchContainer.transform.localScale *= cityScaleFactor;
+                // City needs to be parented to collection to be organized by it
+                cityWitchContainer.transform.parent = cityCollectionTransform;
+            }
 
             //Sets the width of the Grid containing the cities
-            void SetGridCellWidth(GridObjectCollection grid, IEnumerable<GameObject> cities)
+            static void SetGridCellWidth(GridObjectCollection grid, IEnumerable<GameObject> cities)
             {
                 // To avoid overlaps, set cell width to maximum length of code cities
                 grid.CellWidth = cities.Max(x => x.transform.localScale.MaxComponent());
@@ -351,20 +347,30 @@ namespace SEE.Controls
             }
 
             // Adds AppBar and ObjectManipulator components to City
-            void AddInteractions(GameObject city)
+            static void AddInteractions(GameObject city)
             {
                 city.AddComponent<AppBarInteractableObject>();
                 city.AddComponent<ObjectManipulator>();
             }
 
-            void AppBarCityConfiguration(GameObject city)
+            static void AppBarCityConfiguration(GameObject city)
             {
                 BoundsControl boundsControl = city.AddComponent<BoundsControl>();
                 boundsControl.BoundsControlActivation = Microsoft.MixedReality.Toolkit.UI.BoundsControlTypes
                                                                  .BoundsControlActivationType.ActivateManually;
             }
 
-            #endregion
+
+            // Creates a Container GameObject for Cities 
+            static GameObject AddCodeCityContainer(GameObject city)
+            {
+                GameObject cityContainer = new GameObject {name = city.name + "Container"};
+                cityContainer.transform.position = city.transform.position;
+                city.transform.SetParent(cityContainer.transform);
+                return cityContainer;
+            }
+
+#endregion
         }
 
         /// <summary>
@@ -390,6 +396,10 @@ namespace SEE.Controls
                         hand.SetSkeletonRangeOfMotion(EVRSkeletalMotionRange.WithController);
                     }
                 }
+            }
+            if (SEEInput.Help())
+            {
+                KeyBindings.PrintBindings();
             }
         }
     }

@@ -1,7 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UI.Michsky.UI.ModernUIPack;
 
 namespace SEE.Game.UI.ConfigMenu
 {
@@ -15,7 +14,7 @@ namespace SEE.Game.UI.ConfigMenu
         private ButtonManagerBasic _buttonManager;
         private UIGradient _uiGradient;
         private TabGroup _group;
-        
+
         public bool isDefaultActive;
         public string buttonText;
 
@@ -47,9 +46,9 @@ namespace SEE.Game.UI.ConfigMenu
             _uiGradient = GetComponent<UIGradient>();
             _buttonManager = GetComponent<ButtonManagerBasic>();
             _button = _buttonManager.GetComponent<Button>();
-            
+
             _buttonManager.normalText.text = buttonText;
-            
+
             ResetStyles();
             _group.Subscribe(this);
             _buttonManager.clickEvent.AddListener(() => _group.OnTabSelected(this));

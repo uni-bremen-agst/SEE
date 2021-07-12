@@ -13,7 +13,7 @@ namespace SEE.GO
         /// <summary>
         /// Maps a Node onto its NodeRef (the one referring to it).
         /// </summary>
-        [NonSerialized] private static Dictionary<Node, NodeRef> nodeToNodeRefDict = new Dictionary<Node, NodeRef>();
+        [NonSerialized] private static readonly Dictionary<Node, NodeRef> nodeToNodeRefDict = new Dictionary<Node, NodeRef>();
 
         /// <summary>
         /// The graph node this node reference is referring to. It will be set either
@@ -22,22 +22,21 @@ namespace SEE.GO
         /// It will not be serialized to prevent duplicating and endless serialization
         /// by both Unity and Odin.
         /// </summary>
-        [NonSerialized] private Node node;
         public Node Value
         {
-            get => node;
+            get => (Node)elem;
             set
             {
-                if (node != value)
+                if (elem != value)
                 {
-                    if (node != null)
+                    if (elem != null)
                     {
-                        nodeToNodeRefDict.Remove(node);
+                        nodeToNodeRefDict.Remove((Node)elem);
                     }
-                    node = value;
-                    if (node != null)
+                    elem = value;
+                    if (elem != null)
                     {
-                        nodeToNodeRefDict[node] = this;
+                        nodeToNodeRefDict[(Node)elem] = this;
                     }
                 }
             }
@@ -52,6 +51,36 @@ namespace SEE.GO
         {
             Assert.IsNotNull(node);
             return nodeToNodeRefDict[node];
+        }
+
+        public static bool TryGet(Node node, out NodeRef nodeRef)
+        {
+            bool result = false;
+            nodeRef = null;
+            if (nodeToNodeRefDict.TryGetValue(node, out NodeRef v))
+            {
+                result = true;
+                nodeRef = v;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the IDs of all incoming and outgoing edges for this NodeRef.
+        /// </summary>
+        /// <returns>IDs of all incoming and outgoing edges</returns>
+        public ISet<string> GetEdgeIds()
+        {
+            HashSet<string> edgeIDs = new HashSet<string>();
+            foreach (Edge edge in Value.Outgoings)
+            {
+                edgeIDs.Add(edge.ID);
+            }
+            foreach (Edge edge in Value.Incomings)
+            {
+                edgeIDs.Add(edge.ID);
+            }
+            return edgeIDs;
         }
     }
 }

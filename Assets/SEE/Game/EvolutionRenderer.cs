@@ -17,16 +17,19 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.DataModel.DG;
-using SEE.Game.Evolution;
-using SEE.Game.Charts;
-using SEE.GO;
-using SEE.Layout;
-using SEE.Layout.NodeLayouts;
-using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using SEE.DataModel.DG;
+using SEE.Game.Charts;
+using SEE.Game.Evolution;
+using SEE.GO;
+using SEE.Layout;
+using SEE.Layout.EdgeLayouts;
+using SEE.Layout.NodeLayouts;
+using SEE.Layout.Utils;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
@@ -47,11 +50,45 @@ namespace SEE.Game
     {
         /// <summary>
         /// Constructors for MonoBehaviours are meaningless. We need to initialize everything
-        /// at Start() time.
+        /// at Awake() time.
         /// </summary>
-        public void Start()
+        private void Awake()
         {
-            RegisterAllAnimators(animators);
+            if (gameObject.TryGetComponent(out SEECityEvolution cityEvolution))
+            {
+                // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
+                // So we cannot make the following assignment in the constructor. Neither
+                // can we assign this value at the declaration of graphRenderer because
+                // we need the city argument, which comes only later. Anyhow, whenever we
+                // assign a new city, we also need a new graph renderer for that city.
+                // So in fact this is the perfect place to assign graphRenderer.
+                graphRenderer = new GraphRenderer(cityEvolution, null);
+                Assert.IsNotNull(graphRenderer);
+                diff = new NumericAttributeDiff(cityEvolution.AllMetricAttributes());
+                Vector3 beamScale = new Vector3(cityEvolution.MarkerWidth, cityEvolution.MarkerHeight, cityEvolution.MarkerWidth);
+                Dictionary<Difference, Color> beamColor = new Dictionary<Difference, Color>
+                {
+                    { Difference.Added, cityEvolution.AdditionBeamColor },
+                    { Difference.Changed, cityEvolution.ChangeBeamColor },
+                    { Difference.Deleted, cityEvolution.DeletionBeamColor },
+                };
+
+                moveScaleShakeAnimator = new MoveScaleShakeAnimator(beamColor, beamScale);
+                objectManager = new ObjectManager(graphRenderer, gameObject, cityEvolution.DeletionBeamColor, beamScale);
+                marker = new Marker(graphRenderer,
+                                    markerWidth: cityEvolution.MarkerWidth,
+                                    markerHeight: cityEvolution.MarkerHeight,
+                                    additionColor: cityEvolution.AdditionBeamColor,
+                                    changeColor: cityEvolution.ChangeBeamColor,
+                                    deletionColor: cityEvolution.DeletionBeamColor,
+                                    duration: AnimationLag);
+                RegisterAllAnimators(animators);
+            }
+            else
+            {
+                Debug.LogError($"This EvolutionRenderer attached to {name} has no sibling component of type {nameof(SEECityEvolution)}.\n");
+                enabled = false;
+            }
         }
 
         /// <summary>
@@ -84,43 +121,43 @@ namespace SEE.Game
         /// <summary>
         /// The city evolution to be drawn by this renderer.
         /// </summary>
-        public SEECityEvolution CityEvolution
-        {
-            set
-            {
-                // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
-                // So we cannot make the following assignment in the constructor. Neither
-                // can we assign this value at the declaration of graphRenderer because
-                // we need the city argument, which comes only later. Anyhow, whenever we
-                // assign a new city, we also need a new graph renderer for that city.
-                // So in fact this is the perfect place to assign graphRenderer.
-                graphRenderer = new GraphRenderer(value, null);
-                Assert.IsNotNull(graphRenderer);
-                diff = new NumericAttributeDiff(value.AllMetricAttributes());
-                objectManager = new ObjectManager(graphRenderer, gameObject);
-                if (gameObject.TryGetComponent<SEECityEvolution>(out SEECityEvolution cityEvolution))
-                {
-                    marker = new Marker(graphRenderer,
-                                        markerWidth: cityEvolution.MarkerWidth,
-                                        markerHeight: cityEvolution.MarkerHeight,
-                                        additionColor: cityEvolution.AdditionBeamColor,
-                                        changeColor: cityEvolution.ChangeBeamColor,
-                                        deletionColor: cityEvolution.DeletionBeamColor,
-                                        duration: AnimationLag);
-                }
-                else
-                {
-                    Debug.LogErrorFormat("This EvolutionRenderer attached to {0} has no sibling component of type SEECityEvolution",
-                                         name);
-                    enabled = false;
-                }
-            }
-        }
+        //public SEECityEvolution CityEvolution
+        //{
+        //    set
+        //    {
+        //        if (gameObject.TryGetComponent<SEECityEvolution>(out SEECityEvolution cityEvolution))
+        //        {
+        //            // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
+        //            // So we cannot make the following assignment in the constructor. Neither
+        //            // can we assign this value at the declaration of graphRenderer because
+        //            // we need the city argument, which comes only later. Anyhow, whenever we
+        //            // assign a new city, we also need a new graph renderer for that city.
+        //            // So in fact this is the perfect place to assign graphRenderer.
+        //            graphRenderer = new GraphRenderer(value, null);
+        //            Assert.IsNotNull(graphRenderer);
+        //            diff = new NumericAttributeDiff(value.AllMetricAttributes());
+        //            Vector3 beamScale = new Vector3(cityEvolution.MarkerWidth, cityEvolution.MarkerHeight, cityEvolution.MarkerWidth);
+        //            objectManager = new ObjectManager(graphRenderer, gameObject, cityEvolution.DeletionBeamColor, beamScale);
+        //            marker = new Marker(graphRenderer,
+        //                                markerWidth: cityEvolution.MarkerWidth,
+        //                                markerHeight: cityEvolution.MarkerHeight,
+        //                                additionColor: cityEvolution.AdditionBeamColor,
+        //                                changeColor: cityEvolution.ChangeBeamColor,
+        //                                deletionColor: cityEvolution.DeletionBeamColor,
+        //                                duration: AnimationLag);
+        //        }
+        //        else
+        //        {
+        //            Debug.LogError($"This EvolutionRenderer attached to {name} has no sibling component of type {nameof(SEECityEvolution)}.\n");
+        //            enabled = false;
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// Shortest time period in which an animation can be run in seconds.
         /// </summary>
-        private readonly float MinimalWaitTimeForNextRevision = 0.1f;
+        private const float MinimalWaitTimeForNextRevision = 0.1f;
 
         /// <summary>
         /// Registers <paramref name="action"/> to be called back when the shown
@@ -143,24 +180,24 @@ namespace SEE.Game
         public readonly UnityEvent AnimationFinishedEvent = new UnityEvent();
 
         /// <summary>
+        /// Used to store whether a node has been born or changed.
+        /// </summary>
+        private enum MarkerType { Changed, Born }
+
+        /// <summary>
         /// The animator used when an inner node is removed from the scene.
         /// </summary>
         protected readonly AbstractAnimator moveAnimator = new MoveAnimator();
 
         /// <summary>
-        /// An animator used for all other occasions.
+        /// An animator used for all other occasions. Will be set in Start().
         /// </summary>
-        protected readonly AbstractAnimator moveScaleShakeAnimator = new MoveScaleShakeAnimator();
-
-        /// <summary>
-        /// Whether the animation is still ongoing.
-        /// </summary>
-        private bool _isStillAnimating = false;  // serialized by Unity
+        protected AbstractAnimator moveScaleShakeAnimator;
 
         /// <summary>
         /// Whether the edge animation is ongoing.
         /// </summary>
-        private bool moveEdges = false;
+        private bool moveEdges;
 
         /// <summary>
         /// Saves pairs of old and new edges.
@@ -170,16 +207,12 @@ namespace SEE.Game
         /// <summary>
         /// Timer for edge animation
         /// </summary>
-        private float timer = 0f;
+        private float timer;
 
         /// <summary>
         /// True if animation is still ongoing.
         /// </summary>
-        public bool IsStillAnimating
-        {
-            get => _isStillAnimating;
-            set => _isStillAnimating = value;
-        }
+        public bool IsStillAnimating { get; private set; }
 
         /// <summary>
         /// The collection of registered <see cref="AbstractAnimator"/> to be updated
@@ -228,6 +261,16 @@ namespace SEE.Game
         protected Dictionary<string, ILayoutNode> CurrentLayoutShown => _currentCity?.Layout;  // not serialized by Unity
 
         /// <summary>
+        /// Evaluates the performance of the edge animation.
+        /// </summary>
+        private int edgeAnimationPerfScore = 10;
+
+        /// <summary>
+        /// Saves how many edges were moved during the last animation.
+        /// </summary>
+        private int lastMovedEdgesCount = 0;
+
+        /// <summary>
         /// The city (graph + layout) to be shown next.
         /// </summary>
         private LaidOutGraph _nextCity;  // not serialized by Unity
@@ -250,6 +293,29 @@ namespace SEE.Game
         /// </summary>
         private readonly NodeEqualityComparer nodeEqualityComparer = new NodeEqualityComparer();
 
+        /// <summary>
+        /// Saves the names of the game objects representing nodes that were not moved during an iteration.
+        /// </summary>
+        private ISet<string> negligibleNodes = new HashSet<string>();
+
+        /// <summary>
+        /// List for saving the copied nodes. Is used for animation.
+        /// </summary>
+        private readonly IList<GameObject> animationNodes = new List<GameObject>();
+
+        /// <summary>
+        /// List for saving the deactivated nodes. Is used for animation.
+        /// </summary>
+        private readonly IList<GameObject> currentNodes = new List<GameObject>();
+
+        /// <summary>
+        /// List to add markers to the animated nodes afterwards.
+        /// </summary>
+        private readonly IList<(GameObject, MarkerType)> animationMarker = new List<(GameObject, MarkerType)>();
+
+        /// <summary>
+        /// Allows the comparison of two instances of <see cref="Edge"/> from different graphs.
+        /// </summary>
         private readonly EdgeEqualityComparer edgeEqualityComparer = new EdgeEqualityComparer();
 
         /// <summary>
@@ -306,25 +372,22 @@ namespace SEE.Game
 
             // Gather all nodes for the layout.
             ignoreInnerNodes = !nodeLayout.IsHierarchical();
-            foreach (Node node in graph.Nodes())
+            foreach (Node node in graph.Nodes().Where(node => !ignoreInnerNodes || node.IsLeaf()))
             {
-                if (!ignoreInnerNodes || node.IsLeaf())
+                // All layouts (flat and hierarchical ones) must be able to handle leaves; 
+                // hence, leaves can be added at any rate. For a hierarchical layout, we 
+                // need to add the game objects for inner nodes, too. To put it differently,
+                // inner nodes are added only if we apply a hierarchical layout.
+                objectManager.GetNode(node, out GameObject gameNode);
+                // Now after having attached the new node to the game object,
+                // we must adjust the scale of it according to the newly attached node so 
+                // that the layouter has these. We need to adjust the scale only for leaves, 
+                // however, because the layouter will select the scale for inner nodes.
+                if (node.IsLeaf())
                 {
-                    // All layouts (flat and hierarchical ones) must be able to handle leaves; 
-                    // hence, leaves can be added at any rate. For a hierarchical layout, we 
-                    // need to add the game objects for inner nodes, too. To put it differently,
-                    // inner nodes are added only if we apply a hierarchical layout.
-                    objectManager.GetNode(node, out GameObject gameNode);
-                    // Now after having attached the new node to the game object,
-                    // we must adjust the scale of it according to the newly attached node so 
-                    // that the layouter has these. We need to adjust the scale only for leaves, 
-                    // however, because the layouter will select the scale for inner nodes.
-                    if (node.IsLeaf())
-                    {
-                        graphRenderer.AdjustScaleOfLeaf(gameNode);
-                    }
-                    gameObjects.Add(gameNode);
+                    graphRenderer.AdjustScaleOfLeaf(gameNode);
                 }
+                gameObjects.Add(gameNode);
             }
 
             // Calculate and apply the node layout
@@ -333,7 +396,7 @@ namespace SEE.Game
             // these layoutNodes represent. Here, we leave the game objects untouched. The layout
             // must be later applied when we render a city. Here, we only store the layout for later use.
             nodeLayout.Apply(layoutNodes);
-            GraphRenderer.Fit(gameObject, layoutNodes);          
+            GraphRenderer.Fit(gameObject, layoutNodes);
             return ToNodeIDLayout(layoutNodes);
 
             // Note: The game objects for leaf nodes are already properly scaled by the call to 
@@ -453,6 +516,7 @@ namespace SEE.Game
         /// <param name="next">the new graph to be shown, in which to migrate the current graph; must not be null</param>
         private void RenderGraph(LaidOutGraph current, LaidOutGraph next)
         {
+            negligibleNodes.Clear();
             next.AssertNotNull("next");
             IsStillAnimating = true;
             // First remove all markings of the previous animation cycle.
@@ -474,9 +538,9 @@ namespace SEE.Game
                 // For all edges of the current graph not in the next graph; that is, all
                 // edges removed: remove those. As above, edges are compared by their
                 // IDs.
-                 current.Graph?
-                     .Edges().Except(next.Graph.Edges(), edgeEqualityComparer).ToList()
-                     .ForEach(RenderRemovedOldEdge);
+                current.Graph?
+                    .Edges().Except(next.Graph.Edges(), edgeEqualityComparer).ToList()
+                    .ForEach(RenderRemovedOldEdge);
             }
             // We need to assign _nextCity because the callback RenderPlane, RenderInnerNode, RenderLeaf, and 
             // RenderEdge will access it.
@@ -491,21 +555,13 @@ namespace SEE.Game
             {
                 next.Graph.Traverse(RenderNode, RenderNode, RenderNode);
             }
+
+            objectManager.NegligibleNodes = negligibleNodes;
             // FOR ANIMATION: next.Graph.Edges().ForEach(RenderEdge);
 
             // We have made the transition to the next graph.
             _currentCity = next;
             RenderPlane();
-            
-            Invoke("AnimateEdges", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
-        }
-
-        /// <summary>
-        /// Event function triggered when the knot animation is finished. Starts the animation of the edges.
-        /// </summary>
-        private void AnimateEdges()
-        {
-            //Starts the edge animation
             MoveEdges();
             Invoke("OnAnimationsFinished", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
         }
@@ -513,19 +569,47 @@ namespace SEE.Game
         /// <summary>
         /// Current graph revision counter
         /// </summary>
-        private int currentGraphRevisionCounter = 0;
+        private int currentGraphRevisionCounter;
 
         /// <summary>
-        /// Event function triggered when alls animations are finished. Animates the transition of the edges and renders all edges
-        /// as new and notifies everyone that the animation is finished.
+        /// Event function triggered when all animations are finished. Animates the transition of the edges 
+        /// and renders all edges as new and notifies everyone that the animation is finished.
+        /// 
+        /// Note: This method is a callback called from the animation framework (DoTween). It is 
+        /// passed to this animation framework in <see cref="RenderGraph"/>.
         /// </summary>
         private void OnAnimationsFinished()
         {
+            // Activates the nodes that were deactivated for the animation    
+            foreach (GameObject currentNode in currentNodes)
+            {
+                currentNode.SetActive(true);
+            }
+            // Adds a marker to the nodes
+            foreach ((GameObject, MarkerType) nodeMarker in animationMarker)
+            {
+                switch (nodeMarker.Item2)
+                {
+                    case MarkerType.Changed:
+                        marker.MarkChanged(nodeMarker.Item1);
+                        break;
+                    case MarkerType.Born:
+                        marker.MarkBorn(nodeMarker.Item1);
+                        break;
+                    default:
+                        throw new NotImplementedException($"Unhandled case {nodeMarker.Item2}.");
+                }
+            }
+            // Clears all lists relevant for the animation of the nodes
+            animationNodes.Clear();
+            currentNodes.Clear();
+            animationMarker.Clear();
+
             // Destroy all previous edges and draw all edges of next graph. This can only
             // be done when nodes have reached their final position, that is, at the end
             // of the animation cycle.
-            
             objectManager.RenderEdges();
+
             // Stops the edge animation
             moveEdges = false;
             IsStillAnimating = false;
@@ -568,85 +652,171 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Checks whether two edges are equal.
+        /// </summary>
+        /// <param name="left">First edge to be checked</param>
+        /// <param name="right">Second edge to be checked</param>
+        /// <returns>true if both edges are equal</returns>
+        protected virtual bool AreEqualGameEdges(GameObject left, GameObject right)
+        {
+            return left.TryGetComponent(out EdgeRef leftEdgeRef)
+                && right.TryGetComponent(out EdgeRef rightEdgeRef)
+                && leftEdgeRef.Value.ID == rightEdgeRef.Value.ID;
+        }
+
+        /// <summary>
         /// Combines the edges of the old and the new graph by their ID. Called by the MoveEdges method
         /// </summary>
         /// <param name="oldEdges">List of currently drawn edges</param>
         /// <param name="newEdges">List of new edges to be drawn</param>
         /// <returns>List of related edges</returns>
-        protected virtual IList<(GameObject, GameObject)> EdgeMatcher(IList<GameObject> oldEdges, IList<GameObject> newEdges)
+        protected virtual void EdgeMatcher(IList<GameObject> oldEdges, IList<GameObject> newEdges)
         {
-            IList<(GameObject, GameObject)> result = new List<(GameObject, GameObject)>();
-            foreach (GameObject oldEdgeGameObject in oldEdges)
+            matchedEdges = new List<(GameObject, GameObject)>();
+            foreach (GameObject newEdge in newEdges)
             {
-                foreach (GameObject newEdgeGameObject in newEdges)
-                {                    
-                    if (oldEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef oldEdgeRef) 
-                        && newEdgeGameObject.TryGetComponent<EdgeRef>(out EdgeRef newEdgeRef)
-                        && oldEdgeRef.edge.Equals(newEdgeRef.edge))
-                    {
-                        result.Add((oldEdgeGameObject, newEdgeGameObject));
-                    }
+                GameObject oldEdge = oldEdges.ToList().Find(i => AreEqualGameEdges(i, newEdge));
+                if (oldEdge != null)
+                {
+                    matchedEdges.Add((oldEdge, newEdge));
                 }
             }
-            return result;
         }
-        
+
         /// <summary>
         /// Calculates the control points of the edges of the next graph and generates their actual line points from them. 
         /// </summary>
         protected virtual void MoveEdges()
         {
-           try
-           {
-                // Calculates the edges for the next graph
+            try
+            {
+                // Calculates the edges for the next graph.
                 IList<GameObject> newEdges = objectManager.CalculateNewEdgeControlPoints().ToList();
                 IList<GameObject> oldEdges = objectManager.GetEdges().ToList();
-                
-                // Searches for pairs between old and new edges
-                matchedEdges =  EdgeMatcher(oldEdges,newEdges);              
-                // Case distinction in case the layout does not need sample points
-                if(!graphRenderer.GetSettings().EdgeLayout.Equals(SEE.Layout.EdgeLayouts.EdgeLayoutKind.Straight))
-                {
-                    foreach((GameObject oldEdge, GameObject newEdge) in matchedEdges)
-                    {
-                        oldEdge.TryGetComponent<Points>(out Points oP);
-                        newEdge.TryGetComponent<Points>(out Points nP);
 
-                        uint sampleRate = (uint)Math.Max(oP.linePoints.Count(),nP.linePoints.Count());
+                // Searches for pairs between old and new edge.
+                EdgeMatcher(oldEdges, newEdges);
+
+                // Case distinction in case the layout does not need sample points.
+                if (graphRenderer.settings.edgeLayoutSettings.kind != EdgeLayoutKind.Straight && newEdges.Count() != 0)
+                {
+                    foreach ((GameObject oldEdge, GameObject newEdge) in matchedEdges)
+                    {
+                        oldEdge.TryGetComponent(out Points oP);
+                        newEdge.TryGetComponent(out Points nP);
+
+                        // Approximates the length of the edge over the control points to save computing power.
+                        float dist = Vector3.Distance(nP.controlPoints[0], nP.controlPoints[nP.controlPoints.Count() - 1]);
+
+                        // The AdjustedSamplerate is determined by the performance of the last animation
+                        // and tries to achieve a balance between performance and aesthetics
+                        // by giving all edges a number of points according to their length,
+                        // the total number of edges, and the performance of the last animation.  
+                        double adjustedSampleRate = Math.Floor(edgeAnimationPerfScore * dist * 10 * lastMovedEdgesCount / matchedEdges.Count());
+
+                        lastMovedEdgesCount = matchedEdges.Count();
+
+                        //In order to use DynamicSampleRateReduction, all edges should have a number of points that is divisible by two.
+                        if (adjustedSampleRate % 2 != 0)
+                        {
+                            adjustedSampleRate++;
+                        }
+
+                        // No edge should have more than 75, or less than 2 points.
+                        adjustedSampleRate = Math.Min(Math.Max(adjustedSampleRate, 2), 75);
 
                         // Creates new line points from the control points 
-                        oP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(oP.controlPoints, sampleRate);
-                        nP.linePoints = SEE.Layout.Utils.LinePoints.BSplineLinePointsSampleRate(nP.controlPoints, sampleRate);
+                        oP.linePoints = LinePoints.BSplineLinePointsSampleRate(oP.controlPoints, (uint)adjustedSampleRate);
+                        nP.linePoints = LinePoints.BSplineLinePointsSampleRate(nP.controlPoints, (uint)adjustedSampleRate);
 
                         // Saves the new line points to the LineRenderer
-                        oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer);
+                        oldEdge.TryGetComponent(out LineRenderer lineRenderer);
                         lineRenderer.positionCount = oP.linePoints.Count();
                         lineRenderer.SetPositions(oP.linePoints);
                     }
                 }
-                    // Sets the timer for the animation to zero
-                    timer = 0f;
-                    // Starts the animation of the edges
-                    moveEdges = true;
+                // Sets the timer for the animation to zero
+                timer = 0f;
+                // Starts the animation of the edges
+                moveEdges = true;
+                // Resets performance Score
+                edgeAnimationPerfScore = 10;
             }
             catch (ArgumentNullException)
             {
                 moveEdges = false;
             }
         }
-        
+
+        /// <summary>
+        /// Reduces the number of points on the edge by half to improve performance in particularly complex cases.
+        /// </summary>
+        /// <returns>Whether the reduction was successful.</returns>
+        private bool DynamicSampleRateReduction()
+        {
+            try
+            {
+                // Copies every second point.
+                foreach ((GameObject oldEdge, GameObject newEdge) in matchedEdges)
+                {
+                    oldEdge.TryGetComponent<Points>(out Points oP);
+                    newEdge.TryGetComponent<Points>(out Points nP);
+
+                    if (oP.linePoints.Count() <= 2) return true;
+
+                    Vector3[] oldLinePointsHalf = oP.linePoints.Where((_, index) => index % 2 == 0).ToArray();
+                    Vector3[] newLinePointsHalf = nP.linePoints.Where((_, index) => index % 2 == 0).ToArray();
+                    nP.linePoints = newLinePointsHalf;
+
+                    // Saves the new line points to the LineRenderer
+                    if (oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer)) 
+                    {
+                        lineRenderer.positionCount = oP.linePoints.Count() / 2;
+                        lineRenderer.SetPositions(oldLinePointsHalf);
+                    }
+                }
+                return true;
+            }
+            catch (IndexOutOfRangeException)
+            {
+                return false;
+            }
+        }
+
         /// <summary>
         /// Interpolates the points of the old edges with those of the new edges over time.
         /// </summary>
-        void Update()
+        private void Update()
         {
-            if (moveEdges) 
+            if (moveEdges)
             {
                 timer += Time.deltaTime;
-                 foreach ((GameObject oldEdge, GameObject newEdge) in matchedEdges)
-                 {
-                    if (oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer)
-                        && newEdge.TryGetComponent<Points>(out Points newLinePoints))
+
+                // We try to keep the animation between 30 and 60 FPS, so we adjust the PerformanceScore at each iteration.
+                if (Time.deltaTime > 0.033f)
+                {
+                    edgeAnimationPerfScore -= 2;
+                }
+                else if (Time.deltaTime < 0.016f)
+                {
+                    edgeAnimationPerfScore += 1;
+                }
+
+                // If the performance drops too much, we halve the number of points to be drawn by half.
+                if (edgeAnimationPerfScore < -200)
+                {
+                    DynamicSampleRateReduction();
+
+                }
+                RedrawEdges();
+            }
+
+            void RedrawEdges()
+            {
+                foreach ((GameObject oldEdge, GameObject newEdge) in matchedEdges)
+                {
+                    if (oldEdge.TryGetComponent(out LineRenderer lineRenderer)
+                        && newEdge.TryGetComponent(out Points newLinePoints))
                     {
                         for (int i = 0; i < lineRenderer.positionCount; i++)
                         {
@@ -670,10 +840,28 @@ namespace SEE.Game
         /// <param name="gameNode">game node object that was just modified by the animation</param>
         public void OnRenderNodeFinishedAnimation(object gameNode)
         {
-            if (gameNode is GameObject)
+            if (gameNode is GameObject node)
             {
-                graphRenderer.AdjustStyle(gameNode as GameObject);
+                graphRenderer.AdjustStyle(node);
             }
+        }
+
+        /// <summary>
+        /// Returns true if the x and z co-ordindates of the two vectors are approximately equal.
+        /// </summary>
+        /// <param name="v1">First vector</param>
+        /// <param name="v2">Second vector</param>
+        /// <returns>true if the x and z co-ordindates of the two vectors are approximately equal</returns>
+        private bool XZAreEqual(Vector3 v1, Vector3 v2)
+        {
+            double x1, z1, x2, z2;
+
+            x1 = Math.Round(v1.x, 2);
+            z1 = Math.Round(v1.z, 2);
+            x2 = Math.Round(v2.x, 2);
+            z2 = Math.Round(v2.z, 2);
+
+            return x1 == x2 && z1 == z2;
         }
 
         /// <summary>
@@ -688,15 +876,25 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Renders the game object corresponding to the given <paramref name="graphNode"/>.
+        /// Renders the game object corresponding to the given <paramref name="graphNode"/>
+        /// by creating a copy of the GameObject that is used during the animation.
         /// </summary>
         /// <param name="graphNode">graph node to be displayed</param>
         protected virtual void RenderNode(Node graphNode)
         {
-            // the layout to be applied to graphNode
+            // The layout to be applied to graphNode
             ILayoutNode layoutNode = NextLayoutToBeShown[graphNode.ID];
-            // the game node representing the graphNode if there is any; null if there is none
+            // The game node representing the graphNode if there is any; null if there is none
             Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject currentGameNode);
+
+            // Copy of the currentGameNode. This copy will be used during the animation on behalf of currentGameNode.
+            GameObject animationNode = Instantiate(currentGameNode);
+            // The copied node is added to list animationNodes so that it can be deleted after animation.
+            animationNodes.Add(animationNode);
+            // The actual node is added to list currentNodes so that it can be reactivated after animation.
+            currentNodes.Add(currentGameNode);
+            // Hide the actual node during the animation.
+            currentGameNode.SetActive(false);
 
             Difference difference;
             if (formerGraphNode == null)
@@ -708,27 +906,42 @@ namespace SEE.Game
                 Vector3 position = layoutNode.CenterPosition;
                 position.y -= layoutNode.LocalScale.y;
                 layoutNode.CenterPosition = position;
-                graphRenderer.Apply(currentGameNode, gameObject, layoutNode);
+
                 // Revert the change to the y co-ordindate.
                 position.y += layoutNode.LocalScale.y;
                 layoutNode.CenterPosition = position;
-                marker.MarkBorn(currentGameNode);
+                animationMarker.Add((currentGameNode, MarkerType.Born));
                 difference = Difference.Added;
+
+                // Set the layout for the copied node.
+                animationNode.transform.localScale = layoutNode.LocalScale;
+                animationNode.transform.position = layoutNode.CenterPosition;
             }
             else
             {
-                // node existed before
+                // Edge was not moved
+                if (XZAreEqual(layoutNode.CenterPosition, currentGameNode.transform.position))
+                {
+                    negligibleNodes.Add(currentGameNode.ID());
+                }
+                // Node existed before.
                 if (diff.AreDifferent(formerGraphNode, graphNode))
                 {
                     difference = Difference.Changed;
-                    marker.MarkChanged(currentGameNode);
+                    animationMarker.Add((currentGameNode, MarkerType.Changed));
                 }
                 else
                 {
                     difference = Difference.None;
                 }
+                // Set the layout for the copied node.
+                animationNode.transform.localScale = new Vector3(currentGameNode.transform.localScale.x, 0.0001f, currentGameNode.transform.localScale.z);
+                animationNode.transform.position = currentGameNode.transform.position;
             }
-            moveScaleShakeAnimator.AnimateTo(currentGameNode, layoutNode, difference, OnRenderNodeFinishedAnimation);
+            // The actual node is shifted to its new position.
+            graphRenderer.Apply(currentGameNode, gameObject, layoutNode);
+            // The copied node is animated.
+            moveScaleShakeAnimator.AnimateTo(animationNode, layoutNode, difference, OnAnimationNodeAnimationFinished);
         }
 
         /// <summary>
@@ -737,11 +950,32 @@ namespace SEE.Game
         /// removed has been finished.
         /// </summary>
         /// <param name="gameObject">game object to be destroyed</param>
-        public void OnRemovedNodeFinishedAnimation(object gameObject)
+        private void OnRemovedNodeFinishedAnimation(object gameObject)
         {
-            if (gameObject != null && gameObject is GameObject)
+            DestroyGameObject(gameObject);
+        }
+
+        /// <summary>
+        /// Event function that destroys the given <paramref name="gameObject"/>.
+        /// Called as a callback and deletes the <paramref name="gameObject"/>
+        /// after the animation is finished.
+        /// </summary>
+        /// <param name="gameObject">game object to be destroyed</param>
+        private void OnAnimationNodeAnimationFinished(object gameObject)
+        {
+            DestroyGameObject(gameObject);
+        }
+
+        /// <summary>
+        /// Destroys <paramref name="gameObject"/> if it is an instance of <see cref="GameObject"/>.
+        /// </summary>
+        /// <param name="gameObject">object to be destroyed</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void DestroyGameObject(object gameObject)
+        {
+            if (gameObject is GameObject go)
             {
-                Destroy((GameObject)gameObject);
+                Destroy(go);
             }
         }
 
@@ -810,7 +1044,7 @@ namespace SEE.Game
         /// <summary>
         /// The index of the currently visualized graph.
         /// </summary>
-        private int currentGraphIndex = 0;  // not serialized by Unity
+        private int currentGraphIndex;  // not serialized by Unity
 
         /// <summary>
         /// Returns the index of the currently shown graph.
@@ -826,19 +1060,19 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// An event fired when the viewn graph has changed.
+        /// An event fired when the view graph has changed.
         /// </summary>
         private readonly UnityEvent shownGraphHasChangedEvent = new UnityEvent();
 
         /// <summary>
         /// Whether the user has selected auto-play mode.
         /// </summary>
-        private bool _isAutoplay = false;  // not serialized by Unity
+        private bool _isAutoplay;  // not serialized by Unity
 
         /// <summary>
         /// Whether the user has selected reverse auto-play mode.
         /// </summary>
-        private bool _isAutoplayReverse = false;  // not serialized by Unity
+        private bool _isAutoplayReverse;  // not serialized by Unity
 
         /// <summary>
         /// Returns true if automatic animations are active.
@@ -866,14 +1100,24 @@ namespace SEE.Game
             }
         }
 
-
         /// <summary>
-        /// Initiates the visualization of the evolving series of <paramref name="graphs"/>.
+        /// Sets the evolving series of <paramref name="graphs"/> to be visualized.
+        /// The actual visualization is triggered by <see cref="ShowGraphEvolution"/>
+        /// that can be called next.
         /// </summary>
         /// <param name="graphs">series of graphs to be visualized</param>
-        public void ShowGraphEvolution(List<Graph> graphs)
+        public void SetGraphEvolution(List<Graph> graphs)
         {
             this.graphs = graphs;
+        }
+
+        /// <summary>
+        /// Initiates the visualization of the evolving series of graphs
+        /// provided earlier by <see cref="SetGraphEvolution(List{Graph})"/>
+        /// (the latter function must have been called before).
+        /// </summary>
+        public void ShowGraphEvolution()
+        {
             CurrentGraphIndex = 0;
             _currentCity = null;
             _nextCity = null;
@@ -889,7 +1133,7 @@ namespace SEE.Game
             }
             else
             {
-                Debug.LogError("Evolution renderer could not show the inital graph.\n");
+                Debug.LogError("Evolution renderer could not show the initial graph.\n");
             }
         }
 
@@ -918,11 +1162,10 @@ namespace SEE.Game
                 Debug.LogErrorFormat("The value {0} is no valid index.\n", index);
                 return false;
             }
-            CurrentGraphIndex = index;
-
-            if (HasCurrentLaidOutGraph(out LaidOutGraph loadedGraph))
+            if (HasCurrentLaidOutGraph(out LaidOutGraph loadedGraph) && HasLaidOutGraph(index, out LaidOutGraph newGraph))
             {
-                DisplayGraphAsNew(loadedGraph);
+                CurrentGraphIndex = index;
+                TransitionToNextGraph(loadedGraph, newGraph);
                 return true;
             }
             else
@@ -989,7 +1232,6 @@ namespace SEE.Game
             if (!ShowNextIfPossible())
             {
                 Debug.Log("This is already the last graph revision.\n");
-                return;
             }
         }
 
@@ -1014,7 +1256,7 @@ namespace SEE.Game
                 currentGraphRevisionCounter++;
                 NodeChangesBuffer.GetSingleton().revisionChanged = true;
                 // Note: newlyShownGraph is the very next future of currentlyShownGraph
-                TransitionToNextGraph(currentlyShownGraph, newlyShownGraph);                
+                TransitionToNextGraph(currentlyShownGraph, newlyShownGraph);
             }
             else
             {
@@ -1070,7 +1312,6 @@ namespace SEE.Game
             if (!ShowPreviousIfPossible())
             {
                 Debug.Log("This is already the first graph revision.\n");
-                return;
             }
         }
 
@@ -1138,7 +1379,6 @@ namespace SEE.Game
                     Debug.Log("This is already the first graph revision.\n");
                 }
             }
-            
             else
             {
                 AnimationFinishedEvent.RemoveListener(OnAutoPlayReverseCanContinue);
@@ -1177,35 +1417,21 @@ namespace SEE.Game
         /// <summary>
         /// An implementation of ILayoutNode that is used for animation purposes only.
         /// The only features it supports are the position and scale of node.
-        /// That is what is currenly needed by the animators.
+        /// That is what is currently needed by the animators.
         /// </summary>
         private class AnimationNode : ILayoutNode
         {
-            private Vector3 centerPosition;
-            private Vector3 scale;
-
             public AnimationNode(Vector3 centerPosition, Vector3 scale)
             {
-                this.centerPosition = centerPosition;
-                this.scale = scale;
+                this.CenterPosition = centerPosition;
+                this.LocalScale = scale;
             }
 
-            public Vector3 LocalScale
-            {
-                get => scale;
-                set => scale = value;
-            }
+            public Vector3 LocalScale { get; set; }
 
-            public Vector3 AbsoluteScale
-            {
-                get => scale;
-            }
+            public Vector3 AbsoluteScale => LocalScale;
 
-            public Vector3 CenterPosition
-            {
-                get => centerPosition;
-                set => centerPosition = value;
-            }
+            public Vector3 CenterPosition { get; set; }
 
             public void ScaleBy(float factor)
             {

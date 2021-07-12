@@ -94,7 +94,7 @@ namespace SEE.Game.Charts.VR
         {
             base.Awake();
             Transform parent = transform.parent;
-            // TODO(torben): vvv
+            // FIXME the line below was here before refactoring charts and needs to be reintroduced for VR
             //_parent = parent.GetComponent<ChartContent>().parent.transform;
             _pointerCamera = GameObject.FindGameObjectWithTag("Pointer").GetComponent<Camera>();
             _chartContent = parent.GetComponent<ChartContentVr>();
@@ -109,9 +109,9 @@ namespace SEE.Game.Charts.VR
         protected override void GetSettingData()
         {
             base.GetSettingData();
-            _chartScrollSpeed = ChartManager.Instance.chartScrollSpeed;
-            _minimumDistance = ChartManager.Instance.distanceThreshold;
-            _maximumDistance = ChartManager.Instance.pointerLength;
+            _chartScrollSpeed = ChartManager.Instance.ChartScrollSpeed;
+            _minimumDistance = ChartManager.Instance.DistanceThreshold;
+            _maximumDistance = ChartManager.Instance.PointerLength;
             _chartAction = GameObject.Find("VRPlayer").GetComponent<ChartAction>();
         }
 

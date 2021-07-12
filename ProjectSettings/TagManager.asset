@@ -26,6 +26,8 @@ TagManager:
   - Runtime
   - VRPointer
   - FileBrowser
+  - Path
+  - Erosion
   layers:
   - Default
   - TransparentFX

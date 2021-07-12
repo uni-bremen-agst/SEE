@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using SEE.GO;
 using SEE.Utils;
@@ -8,13 +7,13 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SEE.Game.UI
+namespace SEE.Game.UI.Menu
 {
     /// <summary>
     /// Responsible for the desktop UI for menus.
     /// </summary>
     /// <typeparam name="T">the type of entries used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
-    public partial class Menu<T>
+    public partial class SimpleMenu<T>
     {
         /// <summary>
         /// The path to the prefab for the menu game object.
@@ -24,7 +23,7 @@ namespace SEE.Game.UI
 
         /// <summary>
         /// The path to the prefab for the menu game object.
-        /// Will be added for each menu entry in <see cref="Entries"/>.
+        /// Will be added for each menu entry in <see cref="entries"/>.
         /// </summary>
         private const string BUTTON_PREFAB = "Prefabs/UI/Button";
         
@@ -33,34 +32,31 @@ namespace SEE.Game.UI
         /// Will be added as a child to the <see cref="MenuGameObject"/>.
         /// </summary>
         private const string LIST_PREFAB = "Prefabs/UI/MenuEntries";
-        
-        /// <summary>
-        /// The path to the prefab for the tooltip game object.
-        /// Will be added as a child to the <see cref="Canvas"/>.
-        /// </summary>
-        private const string TOOLTIP_PREFAB = "Prefabs/UI/Tooltip";
 
         /// <summary>
         /// The GameObject which contains the actual content of the menu, i.e. its entries.
         /// </summary>
-        protected GameObject MenuContent;
+        private GameObject MenuContent;
         
         /// <summary>
         /// The GameObject which has the <see cref="ModalWindowManager"/> component attached.
         /// </summary>
-        protected GameObject MenuGameObject;
+        private GameObject MenuGameObject;
 
         /// <summary>
         /// The modal window manager which contains the actual menu.
         /// </summary>
-        protected ModalWindowManager Manager;
-        
+        private ModalWindowManager Manager;
+
         /// <summary>
-        /// The tooltip manager, which can (as its name implies) control tooltips.
-        /// Note that this manager controls a single tooltip whose text can be changed. If multiple tooltips
-        /// are needed, more GameObjects with TooltipManagers need to be created.
+        /// UI game object containing the entries as buttons.
         /// </summary>
-        protected TooltipManager TooltipManager;
+        private GameObject EntryList;
+
+        /// <summary>
+        /// The tooltip in which the description is displayed.
+        /// </summary>
+        private Tooltip.Tooltip Tooltip;
 
         /// <summary>
         /// List of all button managers for the buttons used in this menu.
@@ -85,9 +81,7 @@ namespace SEE.Game.UI
             if (Manager == null)
             {
                 // Create it from prefab if it doesn't exist yet
-                Object menuPrefab = Resources.Load<GameObject>(MENU_PREFAB);
-                MenuGameObject = Instantiate(menuPrefab, Canvas.transform, false) as GameObject;
-                UnityEngine.Assertions.Assert.IsNotNull(MenuGameObject);
+                MenuGameObject = PrefabInstantiator.InstantiatePrefab(MENU_PREFAB, Canvas.transform, false);
                 MenuGameObject.name = Title;
                 MenuGameObject.TryGetComponentOrLog(out Manager);
             }
@@ -101,17 +95,9 @@ namespace SEE.Game.UI
             Manager.descriptionText = Description;
             Manager.icon = Icon;
             Manager.onConfirm.AddListener(() => ShowMenu(false));
-            
-            // Add tooltip
-            TooltipManager = MenuGameObject.GetComponentInChildren<TooltipManager>();
-            if (TooltipManager == null)
-            {
-                // Create new tooltip GameObject
-                Object tooltipPrefab = Resources.Load<GameObject>(TOOLTIP_PREFAB);
-                GameObject tooltip = Instantiate(tooltipPrefab, Canvas.transform, false) as GameObject;
-                UnityEngine.Assertions.Assert.IsNotNull(tooltip);
-                tooltip.TryGetComponentOrLog(out TooltipManager);
-            }
+
+            // Create tooltip
+            Tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
             
             // Find content GameObject for menu entries.
             MenuContent = MenuGameObject.transform.Find("Main Content/Content Mask/Content")?.gameObject;
@@ -127,49 +113,49 @@ namespace SEE.Game.UI
         /// </summary>
         protected virtual void SetUpDesktopContent()
         {
-            GameObject List = MenuContent.transform.Find("Menu Entries/Scroll Area/List")?.gameObject;
-            if (List == null)
+            EntryList = MenuContent.transform.Find("Menu Entries/Scroll Area/List")?.gameObject;
+            if (EntryList == null)
             {
                 // Create menu entry list if it doesn't exist yet
-                Object listPrefab = Resources.Load<GameObject>(LIST_PREFAB);
-                List = Instantiate(listPrefab, MenuContent.transform, false) as GameObject;
-                if (List == null)
-                {
-                    Debug.LogError("Couldn't instantiate List object.");
-                    return;
-                }
-                List.name = "Menu Entries";
+                EntryList = PrefabInstantiator.InstantiatePrefab(LIST_PREFAB, MenuContent.transform, false);
+                EntryList.name = "Menu Entries";
                 // List should actually be the list, not the entry object
-                List = List.transform.Find("Scroll Area/List").gameObject;
+                EntryList = EntryList.transform.Find("Scroll Area/List").gameObject;
             }
 
             // Then, add all entries as buttons
-            Object buttonPrefab = Resources.Load<GameObject>(BUTTON_PREFAB);
-            foreach (T entry in Entries)
+            AddDesktopButtons(Entries);
+        }
+
+        /// <summary>
+        /// Adds the given <paramref name="buttonEntries"/> as buttons to the Desktop menu.
+        /// </summary>
+        /// <param name="buttonEntries">The entries to add to the menu.</param>
+        protected virtual void AddDesktopButtons(IEnumerable<T> buttonEntries)
+        {
+            foreach (T entry in buttonEntries)
             {
-                GameObject button = Instantiate(buttonPrefab, List.transform, false) as GameObject;
-                GameObject text = button?.transform.Find("Text").gameObject;
-                GameObject icon = button?.transform.Find("Icon").gameObject;
-                if (button == null || text == null || icon == null)
-                {
-                    Debug.LogError("Couldn't instantiate button for MenuEntry correctly.");
-                    return;
-                }
+                GameObject button = PrefabInstantiator.InstantiatePrefab(BUTTON_PREFAB, EntryList.transform, false);
+                GameObject text = button.transform.Find("Text").gameObject;
+                GameObject icon = button.transform.Find("Icon").gameObject;
+
                 button.name = entry.Title;
-                if (!button.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager) || 
+                if (!button.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager) ||
                     !button.TryGetComponentOrLog(out Image buttonImage) ||
                     !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro) ||
-                    !icon.TryGetComponentOrLog(out Image iconImage))
+                    !icon.TryGetComponentOrLog(out Image iconImage) ||
+                    !button.TryGetComponentOrLog(out PointerHelper pointerHelper))
                 {
                     return;
                 }
 
                 buttonManager.buttonText = entry.Title;
                 buttonManager.buttonIcon = entry.Icon;
-                buttonManager.hoverEvent.AddListener(() => ShowTooltip(entry.Description));
+                pointerHelper.EnterEvent.AddListener(() => Tooltip.Show(entry.Description));
+                pointerHelper.ExitEvent.AddListener(Tooltip.Hide);
                 if (entry.Enabled)
                 {
-                    buttonManager.clickEvent.AddListener(entry.DoAction);
+                    buttonManager.clickEvent.AddListener(() => OnEntrySelected(entry));
                     buttonImage.color = entry.EntryColor;
                     textMeshPro.color = entry.EntryColor.IdealTextColor();
                     iconImage.color = entry.EntryColor.IdealTextColor();
@@ -181,32 +167,33 @@ namespace SEE.Game.UI
                     textMeshPro.color = entry.DisabledColor.IdealTextColor();
                     iconImage.color = entry.DisabledColor.IdealTextColor();
                 }
+
                 ButtonManagers.Add(buttonManager);
             }
         }
 
         /// <summary>
-        /// Displays a tooltip with the given <paramref name="text"/>.
+        /// Destroys the button with the same text as the given <paramref name="entry"/>.
+        /// If no such button exists, nothing will happen.
+        /// If more than one such button exists, all of them will be removed.
         /// </summary>
-        /// <param name="text">The text to display in the tooltip.</param>
-        protected void ShowTooltip(string text)
+        /// <param name="entry">The entry whose button shall be destroyed.</param>
+        private void RemoveDesktopButton(T entry)
         {
-            TooltipManager.allowUpdating = true;
-            if (TooltipManager.tooltipObject.TryGetComponentOrLog(out CanvasGroup canvasGroup))
+            IEnumerable<ButtonManagerBasicWithIcon> managers = ButtonManagers?.Where(x => x.buttonText == entry.Title);
+            if (managers != null)
             {
-                // Change text
-                TextMeshProUGUI[] texts = TooltipManager.tooltipContent.GetComponentsInChildren<TextMeshProUGUI>();
-                TextMeshProUGUI textComp = texts.FirstOrDefault(x => x.name == "Description");
-                if (textComp == null)
+                foreach (ButtonManagerBasicWithIcon manager in managers)
                 {
-                    Debug.LogError("Couldn't find Description text component for tooltip.");
-                    return;
+                    if (manager)
+                    {
+                        Destroy(manager.gameObject);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Couldn't remove entry, its button was already destroyed.");
+                    }
                 }
-                textComp.text = text;
-                
-                // Fade in 
-                //FIXME Tooltip isn't displayed. I suspect this is because the alpha value of the canvas group can't be changed at runtime.
-                DOTween.To(() => canvasGroup.alpha, a => canvasGroup.alpha = a, 1f, 0.5f);
             }
         }
 
@@ -216,11 +203,20 @@ namespace SEE.Game.UI
             {
                 if (MenuShown)
                 {
-                    Manager?.OpenWindow();
+                    // Move window to the top of the hierarchy (which, confusingly, is actually at the bottom)
+                    // so that this menu is rendered over any other potentially existing menu on the UI canvas
+                    MenuGameObject.transform.SetAsLastSibling();
+                    if (Manager)
+                    {
+                        Manager.OpenWindow();
+                    }
                 }
                 else
                 {
-                    Manager?.CloseWindow();
+                    if (Manager)
+                    {
+                        Manager.CloseWindow();
+                    }
                 }
 
                 CurrentMenuShown = MenuShown;

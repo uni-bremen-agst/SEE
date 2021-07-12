@@ -1,115 +1,238 @@
-﻿using SEE.GO;
+﻿using SEE.DataModel.DG;
+using SEE.GO;
+using SEE.Utils;
+using System.Collections.Generic;
+using System;
 using UnityEngine;
+using SEE.Game.UI.PropertyDialog;
 
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Action to edit an existing node.
+    /// Action to edit an existing node's attributes.
     /// </summary>
     public class EditNodeAction : AbstractPlayerAction
     {
         /// <summary>
-        /// Start() will register an anonymous delegate of type 
-        /// <see cref="ActionState.OnStateChangedFn"/> on the event
-        /// <see cref="ActionState.OnStateChanged"/> to be called upon every
-        /// change of the action state, where the newly entered state will
-        /// be passed as a parameter. The anonymous delegate will compare whether
-        /// this state equals <see cref="ThisActionState"/> and if so, execute
-        /// what needs to be done for this action here. If that parameter is
-        /// different from <see cref="ThisActionState"/>, this action will
-        /// put itself to sleep. 
-        /// Thus, this action will be executed only if the new state is 
-        /// <see cref="ThisActionState"/>.
-        /// </summary>
-        private readonly ActionStateType ThisActionState = ActionStateType.EditNode;
-
-        /// <summary>
         /// The life cycle of this edit action.
         /// </summary>
-        public enum ProgressState
+        private enum ProgressState
         {
             NoNodeSelected,  // initial state when no node is selected
-            NodeSelected,    // a node is currently selected
+            WaitingForInput, // a node is currently selected, the dialog is opened, and we wait for input
+            ValuesAreGiven,  // the dialog is closed and input is given
             EditIsCanceled,  // the edit action is canceled
         }
 
         /// <summary>
-        /// The current state of the edit-node process.
+        /// The current state of the edit node process.
         /// </summary>
-        public ProgressState EditProgress { get; set; } = ProgressState.NoNodeSelected;
+        private ProgressState progress = ProgressState.NoNodeSelected;
 
-        private void Start()
+        /// <summary>
+        /// The information we need to (re-)edit a node.
+        /// </summary>
+        private struct Memento
         {
-            if (!InitializeCanvasObject())
+            /// <summary>
+            /// Node whose state is represented here.
+            /// </summary>
+            public readonly Node node;
+            /// <summary>
+            /// The original source name of the node that should be used when the state is to be restored.
+            /// </summary>
+            public readonly string originalName;
+            /// <summary>
+            /// The original type of the node that should be used when the state is to be restored.
+            /// </summary>
+            public readonly string originalType;
+            /// <summary>
+            /// The new source name of the node that should be used for Redo().
+            /// </summary>
+            public string newName;
+            /// <summary>
+            /// The new type of the node that should be used for Redo().
+            /// </summary>
+            public string newType;
+            /// <summary>
+            /// Constructor setting the information necessary to re-set an edited node to
+            /// its original state.
+            /// </summary>
+            /// <param name="node">the node that was edited</param>
+            public Memento(Node node)
             {
-                Debug.LogError($"No canvas object named {nameOfCanvasObject} could be found in the scene.\n");
-                enabled = false;
-                return;
+                this.node = node;
+                this.originalName = node.SourceName;
+                this.originalType = node.Type;
+                this.newName = string.Empty;
+                this.newType = string.Empty;
             }
-            ActionState.OnStateChanged += newState =>
-            {
-                // Is this our action state where we need to do something?
-                if (Equals(newState, ThisActionState))
-                {
-                    // The MonoBehaviour is enabled and Update() will be called by Unity.
-                    enabled = true;
-                    InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
-                    InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
-                    instantiated = true;
-                }
-                else
-                {
-                    // The MonoBehaviour is disabled and Update() no longer be called by Unity.
-                    enabled = false;
-                    canvasObject.TryGetComponentOrLog(out CanvasGenerator canvasGenerator);
-                    canvasGenerator.DestroyEditNodeCanvasAction();
-                    instantiated = false;
-                    InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
-                    InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
-                    hoveredObject = null;
-                }
-            };
-            enabled = ActionState.Is(ThisActionState);
         }
+
+        /// <summary>
+        /// The memento holding the information for Undo and Redo.
+        /// </summary>
+        private Memento memento;
 
         /// <summary>
         /// The Update method's behavior depends on the edit-progress state (sequential series).
         /// NoNodeSelected: Waits until a node is selected by selecting a game node via the mouse button.
         /// NodeSelected: Instantiates the canvasObject if a gameNode is selected.
+        /// ValuesAreGiven: Saves the new values of the node in a memento and updates the specific node.
         /// EditIsCanceled: Removes the canvas and resets all values if the process is canceled.
+        /// See <see cref="ReversibleAction.Update"/>.
         /// </summary>
-        private void Update()
+        /// <returns>true if completed</returns>
+        public override bool Update()
         {
-            switch (EditProgress)
+            bool result = false;
+            switch (progress)
             {
                 case ProgressState.NoNodeSelected:
-                    if (hoveredObject != null && Input.GetMouseButtonDown(0))
+                    // FIXME: Needs adaptation for VR where no mouse is available.
+                    if (Input.GetMouseButtonDown(0)
+                        && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
                     {
-                        EditProgress = ProgressState.NodeSelected;
+                        // the hit object is the node to be edited
+                        GameObject editedNode = raycastHit.collider.gameObject;
+                        if (editedNode.TryGetNode(out Node node))
+                        {
+                            progress = ProgressState.WaitingForInput;
+                            memento = new Memento(node);
+                            OpenDialog();
+                        }
+                        else
+                        {
+                            Debug.LogError($"Game node {editedNode.name}'s node reference is null.\n");
+                        }
                     }
                     break;
 
-                case ProgressState.NodeSelected:
-                    if (canvasObject.GetComponent<EditNodeCanvasAction>() == null)
-                    {
-                        CanvasGenerator generator = canvasObject.GetComponent<CanvasGenerator>();
-                        EditNodeCanvasAction script = generator.InstantiateEditNodeCanvas();
-                        script.nodeToEdit = hoveredObject.GetComponent<NodeRef>().Value;
-                        script.gameObjectID = hoveredObject.name;
-                    }
+                case ProgressState.WaitingForInput:
+                    // Waiting until the dialog is closed and all input is present
+                    break;
+
+                case ProgressState.ValuesAreGiven:
+                    progress = ProgressState.NoNodeSelected;
+                    result = true;
+                    currentState = ReversibleAction.Progress.Completed;
+                    NotifyClients(memento.node);
                     break;
 
                 case ProgressState.EditIsCanceled:
-                    CanvasGenerator canvasGenerator = canvasObject.GetComponent<CanvasGenerator>();
-                    canvasGenerator.DestroyEditNodeCanvasAction();
-                    hoveredObject = null;
-                    EditProgress = ProgressState.NoNodeSelected;
+                    progress = ProgressState.NoNodeSelected;
                     break;
 
                 default:
-                    throw new System.NotImplementedException("Unhandled case.");
+                    throw new NotImplementedException("Unhandled case.");
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Sends an EditNodeNetAction to all clients with the given <paramref name="node"/>'s
+        /// ID, SourceName and Type.
+        /// </summary>
+        /// <param name="node">node whose changes should be propagated</param>
+        private static void NotifyClients(Node node)
+        {
+            new EditNodeNetAction(node.ID, node.SourceName, node.Type).Execute();
+        }
+
+        /// <summary>
+        /// Undoes this EditNodeAction.
+        /// </summary>
+        public override void Undo()
+        {
+            base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> property.
+            memento.node.SourceName = memento.originalName;
+            memento.node.Type = memento.originalType;
+            NotifyClients(memento.node);
+        }
+
+        /// <summary>
+        /// Redoes this EditNodeAction.
+        /// </summary>
+        public override void Redo()
+        {
+            base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> property.
+            memento.node.SourceName = memento.newName;
+            memento.node.Type = memento.newType;
+            NotifyClients(memento.node);
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="EditNodeAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public static ReversibleAction CreateReversibleAction()
+        {
+            return new EditNodeAction();
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="EditNodeAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
+        }
+
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this action.
+        /// </summary>
+        /// <returns><see cref="ActionStateType.EditNode"/></returns>
+        public override ActionStateType GetActionStateType()
+        {
+            return ActionStateType.EditNode;
+        }
+
+        /// <summary>
+        /// Returns all IDs of gameObjects manipulated by this action.
+        /// </summary>
+        /// <returns>all IDs of gameObjects manipulated by this action</returns>
+        public override HashSet<string> GetChangedObjects()
+        {
+            if (memento.node == null)
+            {
+                return new HashSet<string>();
+            }
+            else
+            {
+                return new HashSet<string> { memento.node.ID };
+            }
+        }
+
+        /// <summary>
+        /// Opens a dialog where the user can enter the node name and type.
+        /// If the user presses the OK button, the SourceName and Type of
+        /// <see cref="memento.node"/> will have the new values entered 
+        /// and <see cref="memento.newName"/> and <see cref="memento.newType"/> 
+        /// will be set to memorize these and <see cref="progress"/> is
+        /// moved forward to <see cref="ProgressState.ValuesAreGiven"/>. 
+        /// If the user presses the Cancel button, the <see cref="memento"/> 
+        /// including <see cref="memento.node"/> will not be changed and 
+        /// <see cref="progress"/> is moved forward to 
+        /// <see cref="ProgressState.EditIsCanceled"/>.
+        /// </summary>
+        private void OpenDialog()
+        {
+            // This dialog will set the source name and type of memento.node.
+            NodePropertyDialog dialog = new NodePropertyDialog(memento.node);
+            // If the OK button is pressed, we continue with ProgressState.ValuesAreGiven.
+            dialog.OnConfirm.AddListener(() => OKButtonPressed());
+            // If the Cancel button is pressed, we continue with ProgressState.AddingIsCanceled.
+            dialog.OnCancel.AddListener(() => progress = ProgressState.EditIsCanceled);
+            dialog.Open();
+
+            void OKButtonPressed()
+            {
+                progress = ProgressState.ValuesAreGiven;
+                memento.newName = memento.node.SourceName;
+                memento.newType = memento.node.Type;
+                InteractableObject.UnselectAll(true);
             }
         }
     }
 }
-

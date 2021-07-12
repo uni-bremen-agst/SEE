@@ -186,11 +186,13 @@ namespace SEE.Tools
         /// <param name="leafConstraint">constraint for the leaf nodes to be generated</param>
         /// <param name="innerNodeConstraint">constraint for the inner nodes to be generated</param>
         /// <param name="leafAttributes">constraints for node attributes to be generated</param>
+        /// <param name="printStatistics">if true statistics about the graph will be printed to the debugging console</param>
         /// <returns>a random graph fulfilling the given constraints</returns>
         public Graph Create
             (Constraint leafConstraint,
              Constraint innerNodeConstraint,
-             ICollection<RandomAttributeDescriptor> leafAttributes)
+             ICollection<RandomAttributeDescriptor> leafAttributes,
+             bool printStatistics = false)
         {
             leafConstraint.Check();
             innerNodeConstraint.Check();
@@ -200,8 +202,10 @@ namespace SEE.Tools
             IList<Node> innerNodes = CreateTree(graph, innerNodeConstraint);
             AssignLeaves(graph, leaves, innerNodes);
             ICollection<Edge> innerEdges = CreateEdges(graph, innerNodes, innerNodeConstraint);
-            graph.FinalizeNodeHierarchy();
-            PrintStatistics(graph, leaves.Count, leafEdges.Count, innerNodes.Count, innerEdges.Count);
+            if (printStatistics)
+            {
+                PrintStatistics(graph, leaves.Count, leafEdges.Count, innerNodes.Count, innerEdges.Count);
+            }
             return graph;
         }
 

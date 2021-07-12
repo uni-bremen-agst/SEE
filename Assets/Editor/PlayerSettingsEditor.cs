@@ -2,9 +2,9 @@
 
 using System;
 using System.Linq;
-using SEE.Controls.Actions;
 using SEE.DataModel;
 using SEE.Game;
+using SEE.Net.Dashboard;
 using UnityEditor;
 using UnityEngine;
 using Plane = SEE.GO.Plane;
@@ -22,7 +22,7 @@ namespace SEEEditor
         /// <summary>
         /// An array of all types of code cities which the user should be able to create.
         /// </summary>
-        private static readonly Type[] CityTypes = 
+        private static readonly Type[] CityTypes =
         {
             // If there are SEECity types not listed in the menu, you can add them here.
             typeof(SEECity), typeof(SEECityEvolution), typeof(SEECityRandom), typeof(SEEDynCity), typeof(SEEJlgCity)
@@ -32,25 +32,28 @@ namespace SEEEditor
         /// Names of the city types. This is automatically generated from <see cref="CityTypes"/> and shouldn't
         /// need to be changed.
         /// </summary>
-        private static readonly string[] CityTypeNames = CityTypes.Select(x => x.Name).ToArray();       
+        private static readonly string[] CityTypeNames = CityTypes.Select(x => x.Name).ToArray();
 
         /// <summary>
         /// Name of the new city.
         /// </summary>
         private string cityName;
+
         /// <summary>
         /// If true, the foldout for creating a new city is shown.
         /// </summary>
         private bool showCreation = true;
+
         /// <summary>
         /// If true, the foldout for the platform settings is shown.
         /// </summary>
         private bool showPlatform = true;
+
         /// <summary>
         /// The kind of city to be created (regular code city, evolution city, dynamic city, etc.).
         /// </summary>
         private int selectedCityType;
-        
+
         public override void OnInspectorGUI()
         {
             // Platform settings which are defined in PlayerSettings class
@@ -58,9 +61,9 @@ namespace SEEEditor
             if (showPlatform)
             {
                 base.OnInspectorGUI();
-                EditorGUILayout.Space();  // additional space for improved readability
+                EditorGUILayout.Space(); // additional space for improved readability
             }
-            EditorGUILayout.Space();                
+            EditorGUILayout.Space();
             CodeCityGUI();
         }
 
@@ -105,9 +108,7 @@ namespace SEEEditor
             codeCity.AddComponent<MeshRenderer>();
             codeCity.AddComponent<BoxCollider>();
             // Attach portal plane to navigation action components
-            Plane plane = codeCity.AddComponent<Plane>();
-            codeCity.AddComponent<DesktopNavigationAction>().portalPlane = plane;
-            codeCity.AddComponent<XRNavigationAction>().portalPlane = plane;
+            codeCity.AddComponent<Plane>();
 
             codeCity.AddComponent(CityTypes[selectedCityType]);
         }
@@ -118,10 +119,17 @@ namespace SEEEditor
         private void SetupScene()
         {
             //TODO: Check if objects are already there and only add as necessary
-            //TODO: Make compatible with MRTK
+            //TODO: This is out of date, the MainScene looks different now!
+            
+            // Add dashboard retriever to PlayerSettings if it isn't there yet
+            PlayerSettings settings = FindObjectOfType<PlayerSettings>();
+            if (!settings.TryGetComponent(out DashboardRetriever _))
+            {
+                settings.gameObject.AddComponent<DashboardRetriever>();
+            }
 
             // Create light
-            GameObject light = new GameObject { name = "Light" };
+            GameObject light = new GameObject {name = "Light"};
             light.AddComponent<Light>().lightmapBakeType = LightmapBakeType.Mixed;
 
             // Create table from table prefab
@@ -136,7 +144,6 @@ namespace SEEEditor
             GameObject chartManager = Instantiate(chartManagerPrefab) as GameObject;
             UnityEngine.Assertions.Assert.IsNotNull(chartManager);
             chartManager.name = "Chart Manager";
-
         }
     }
 }

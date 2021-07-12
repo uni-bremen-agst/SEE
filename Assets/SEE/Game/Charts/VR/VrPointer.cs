@@ -78,7 +78,7 @@ namespace SEE.Game.Charts.VR
         /// </summary>
         private void GetSettingData()
         {
-            _pointerLength = ChartManager.Instance.pointerLength;
+            _pointerLength = ChartManager.Instance.PointerLength;
         }
 
         /// <summary>

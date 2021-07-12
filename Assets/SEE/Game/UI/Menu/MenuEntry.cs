@@ -3,10 +3,10 @@ using UnityEngine;
 using UnityEngine.Events;
 using Valve.VR.InteractionSystem;
 
-namespace SEE.Game.UI
+namespace SEE.Game.UI.Menu
 {
     /// <summary>
-    /// This class represents a platform-independent entry in a <see cref="Menu"/>,
+    /// This class represents a platform-independent entry in a <see cref="SimpleMenu"/>,
     /// which performs a designated action when it is chosen there.
     /// </summary>
     public class MenuEntry

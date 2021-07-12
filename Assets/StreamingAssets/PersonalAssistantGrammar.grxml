@@ -1,0 +1,93 @@
+<grammar version="1.0" xml:lang="en-US" root="sentences"
+ xmlns="http://www.w3.org/2001/06/grammar" tag-format="semantics/1.0">
+
+  <!-- grammar root rule -->
+  <rule id="sentences">
+    <ruleref uri="#intro" />
+	<one-of>
+	  <item><ruleref uri="#data" /> <tag> out.action = "data"; </tag></item>
+	  <item><ruleref uri="#interact" /> <tag> out.action = "interact"; </tag></item>
+      <item><ruleref uri="#timeQuery" /> <tag> out.action = "time"; </tag></item>
+	  <item><ruleref uri="#aboutYou" /><tag> out.action = "about"; </tag></item>
+	  <item><ruleref uri="#goodBye" /><tag> out.action = "goodBye"; </tag></item>
+	</one-of>
+  </rule>
+
+  <!-- trigger phrase for SEE -->
+  <rule id="intro">
+     <one-of>
+       <item> hey </item>
+	   <item> hi </item>
+	   <item> I </item>
+	   <item> okay </item>
+	   <item>  </item>
+	 </one-of>
+	 <item> see </item>
+  </rule>
+  
+  <!-- data -->
+  <rule id="data">
+    <one-of>
+      <item> what do I see </item>
+      <item> what is a code city </item>
+      <item> tell me about SEE </item>
+    </one-of>
+  </rule>
+  
+  <!-- interact -->
+  <rule id="interact">
+    <one-of>
+      <item> I need help </item>
+      <item> help me </item>
+      <item> give help </item>
+	  <item> provide help </item>
+	  <item> how do I interact </item>
+    </one-of>
+  </rule>
+  
+  <!-- current time -->
+  <rule id="timeQuery">
+    <one-of>
+      <item> what time is it </item>
+      <item> what is the current time </item>
+      <item> how late is it </item>
+    </one-of>
+  </rule>
+
+  <!-- more about SEE -->
+  <rule id="aboutYou">
+    <one-of>      
+	  <item> who are you</item>
+      <item> what are you</item>
+	  <item> tell me more <item repeat="0-1"><ruleref uri="#about"/> <ruleref uri="#yourself"/></item></item>
+      <item> who made <ruleref uri="#yourself"/></item>
+    </one-of>
+  </rule>
+  
+  <!-- about/on -->
+  <rule id="about">
+    <one-of>
+      <item> about </item>
+      <item> on </item>
+    </one-of>
+  </rule>
+  
+  <!-- you/yourself -->
+  <rule id="yourself">
+  	 <one-of>
+	   <item>you</item>
+	   <item>yourself</item>
+	 </one-of>
+  </rule>	  
+  
+  <!-- goodBye -->
+  <rule id="goodBye">
+    <one-of>
+      <item> good bye </item>
+      <item> bye bye </item>
+      <item> take care </item>
+	  <item> see you later </item>
+    </one-of>
+  </rule>
+  
+</grammar>

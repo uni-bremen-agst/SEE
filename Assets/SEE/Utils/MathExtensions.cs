@@ -1,4 +1,6 @@
-﻿namespace UnityEngine
+﻿using UnityEngine;
+
+namespace SEE.Utils
 {
     /// <summary>
     /// Contains extensions for math operations.
@@ -31,11 +33,7 @@
         /// </summary>
         /// <param name="a">The vector of which the angle is to be determined.</param>
         /// <returns>The angle of given vector.</returns>
-        public static float Angle180(this Vector2 a)
-        {
-            float result = Mathf.Atan2(-a.y, a.x) / Mathf.PI * 180f;
-            return result;
-        }
+        public static float Angle180(this Vector2 a) => Mathf.Atan2(-a.y, a.x) / Mathf.PI * 180f;
 
         /// <summary>
         /// Returns the angle of <paramref name="a"/> in range [0, 360) in degrees. The
@@ -91,41 +89,31 @@
         /// <summary>
         /// Divides the components of <paramref name="a"/> by the components of
         /// <paramref name="b"/> and returns the result. If one component of
-        /// <paramref name="b"/> is <code>0</code>, the corresponding component of the resulting
-        /// vector is set to <code>0</code> as well.
+        /// <paramref name="b"/> is <c>0</c>, the corresponding component of the resulting
+        /// vector is set to <c>0</c> as well.
         /// </summary>
         /// <param name="a">The numerator.</param>
         /// <param name="b">The denominator.</param>
         /// <returns>The pairwise divided vector.</returns>
-        public static Vector2 DividePairwise(this Vector2 a, Vector2 b)
-        {
-            return new Vector2(
+        public static Vector2 DividePairwise(this Vector2 a, Vector2 b) =>
+            new Vector2(
                 b.x == 0.0f ? 0.0f : a.x / b.x,
                 b.y == 0.0f ? 0.0f : a.y / b.y
             );
-        }
 
         /// <summary>
         /// Returns the largest component of given vector.
         /// </summary>
         /// <param name="a">The vector.</param>
         /// <returns>The largest component of given vector.</returns>
-        public static float MaxComponent(this Vector2 a)
-        {
-            float result = Mathf.Max(a.x, a.y);
-            return result;
-        }
+        public static float MaxComponent(this Vector2 a) => Mathf.Max(a.x, a.y);
 
         /// <summary>
         /// Returns the smallest component of given vector.
         /// </summary>
         /// <param name="a">The vector.</param>
         /// <returns>The smallest component of given vector.</returns>
-        public static float MinComponent(this Vector2 a)
-        {
-            float result = Mathf.Min(a.x, a.y);
-            return result;
-        }
+        public static float MinComponent(this Vector2 a) => Mathf.Min(a.x, a.y);
 
         /// <summary>
         /// Divides the components of <paramref name="a"/> by <paramref name="f"/> and
@@ -150,20 +138,18 @@
         /// <summary>
         /// Divides the components of <paramref name="a"/> by the components of
         /// <paramref name="b"/> and returns the result. If one component of
-        /// <paramref name="b"/> is <code>0</code>, the corresponding component of the resulting
-        /// vector is set to <code>0</code> as well.
+        /// <paramref name="b"/> is <c>0</c>, the corresponding component of the resulting
+        /// vector is set to <c>0</c> as well.
         /// </summary>
         /// <param name="a">The numerator.</param>
         /// <param name="b">The denominator.</param>
         /// <returns>The pairwise divided vector.</returns>
-        public static Vector3 DividePairwise(this Vector3 a, Vector3 b)
-        {
-            return new Vector3(
+        public static Vector3 DividePairwise(this Vector3 a, Vector3 b) =>
+            new Vector3(
                 b.x == 0.0f ? 0.0f : a.x / b.x,
                 b.y == 0.0f ? 0.0f : a.y / b.y,
                 b.z == 0.0f ? 0.0f : a.z / b.z
             );
-        }
 
         /// <summary>
         /// Floors the components of given vector to an integer vector and returns the
@@ -171,33 +157,22 @@
         /// </summary>
         /// <param name="a">The vector.</param>
         /// <returns>The floored vector.</returns>
-        public static Vector3Int FloorToInt(this Vector3 a)
-        {
-            Vector3Int result = new Vector3Int(Mathf.FloorToInt(a.x), Mathf.FloorToInt(a.y), Mathf.FloorToInt(a.z));
-            return result;
-        }
+        public static Vector3Int FloorToInt(this Vector3 a) => 
+            new Vector3Int(Mathf.FloorToInt(a.x), Mathf.FloorToInt(a.y), Mathf.FloorToInt(a.z));
 
         /// <summary>
         /// Returns the largest component of given vector.
         /// </summary>
         /// <param name="a">The vector.</param>
         /// <returns>The largest component of given vector.</returns>
-        public static float MaxComponent(this Vector3 a)
-        {
-            float result = Mathf.Max(a.x, a.y, a.z);
-            return result;
-        }
+        public static float MaxComponent(this Vector3 a) => Mathf.Max(a.x, a.y, a.z);
 
         /// <summary>
         /// Returns the smallest component of given vector.
         /// </summary>
         /// <param name="a">The vector.</param>
         /// <returns>The smallest component of given vector.</returns>
-        public static float MinComponent(this Vector3 a)
-        {
-            float result = Mathf.Min(a.x, a.y, a.z);
-            return result;
-        }
+        public static float MinComponent(this Vector3 a) => Mathf.Min(a.x, a.y, a.z);
 
         /// <summary>
         /// Performs a collision test between a circle and an axis-aligned bounding box.
@@ -227,8 +202,7 @@
             distance = float.MaxValue;
             normalizedToSurfaceDirection = Vector2.zero;
 
-            Vector2[] centers = new Vector2[]
-            {
+            Vector2[] centers = {
                 min,
                 new Vector2(max.x, min.y),
                 new Vector2(min.x, max.y),
@@ -245,14 +219,12 @@
                 }
             }
 
-            Vector2[] aabbMins = new Vector2[]
-            {
+            Vector2[] aabbMins = {
                 new Vector2(min.x - radius, min.y),
                 new Vector2(min.x, min.y - radius)
             };
 
-            Vector2[] aabbMaxs = new Vector2[]
-            {
+            Vector2[] aabbMaxs = {
                 new Vector2(max.x + radius, max.y),
                 new Vector2(max.x, max.y + radius)
             };
@@ -288,6 +260,62 @@
         /// <param name="a">The vector.</param>
         /// <returns>The copied components as a 2d-vector.</returns>
         public static Vector2 YZ(this Vector3 a) => new Vector2(a.y, a.z);
+
+        /// <summary>
+        /// Creates and returns a copy of the x, y- and z-components of given 4d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 3d-vector.</returns>
+        public static Vector3 XYZ(this Vector4 a) => new Vector3(a.x, a.y, a.z);
+
+        /// <summary>
+        /// Creates and returns a copy of the y, z- and w-components of given 4d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 3d-vector.</returns>
+        public static Vector3 YZW(this Vector4 a) => new Vector3(a.y, a.z, a.w);
+
+        /// <summary>
+        /// Creates and returns a copy of the x- and y-components of given 4d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 2d-vector.</returns>
+        public static Vector2 XY(this Vector4 a) => new Vector2(a.x, a.y);
+
+        /// <summary>
+        /// Creates and returns a copy of the x- and z-components of given 4d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 2d-vector.</returns>
+        public static Vector2 XZ(this Vector4 a) => new Vector2(a.x, a.z);
+
+        /// <summary>
+        /// Creates and returns a copy of the x- and w-components of given 4d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 2d-vector.</returns>
+        public static Vector2 XW(this Vector4 a) => new Vector2(a.x, a.w);
+
+        /// <summary>
+        /// Creates and returns a copy of the y- and z-components of given 4d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 2d-vector.</returns>
+        public static Vector2 YZ(this Vector4 a) => new Vector2(a.y, a.z);
+
+        /// <summary>
+        /// Creates and returns a copy of the y- and w-components of given 4d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 2d-vector.</returns>
+        public static Vector2 YW(this Vector4 a) => new Vector2(a.y, a.w);
+
+        /// <summary>
+        /// Creates and returns a copy of the z- and w-components of given 4d-vector.
+        /// </summary>
+        /// <param name="a">The vector.</param>
+        /// <returns>The copied components as a 2d-vector.</returns>
+        public static Vector2 ZW(this Vector4 a) => new Vector2(a.z, a.w);
 
         /// <summary>
         /// Performs a collision test between a point and a circle. The distance and a

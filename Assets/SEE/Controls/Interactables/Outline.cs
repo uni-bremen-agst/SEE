@@ -8,12 +8,12 @@
 // https://assetstore.unity.com/packages/tools/particles-effects/quick-outline-115488
 //
 
-using SEE.DataModel.DG;
-using SEE.Game;
-using SEE.GO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.DataModel.DG;
+using SEE.Game;
+using SEE.GO;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -35,7 +35,7 @@ namespace SEE.Controls
 
         public Mode OutlineMode
         {
-            get { return outlineMode; }
+            get => outlineMode;
             set
             {
                 outlineMode = value;
@@ -45,7 +45,7 @@ namespace SEE.Controls
 
         public Color OutlineColor
         {
-            get { return outlineColor; }
+            get => outlineColor;
             set
             {
                 outlineColor = value;
@@ -55,7 +55,7 @@ namespace SEE.Controls
 
         public float OutlineWidth
         {
-            get { return outlineWidth; }
+            get => outlineWidth;
             set
             {
                 outlineWidth = value;
@@ -120,7 +120,7 @@ namespace SEE.Controls
                 {
                     Node node = nodeRef.Value;
                     Graph graph = node.ItsGraph;
-                    int maxDepth = graph.MaxDepth;
+                    int maxDepth = graph != null ? graph.MaxDepth : 1;
 
                     int inverseRenderQueueOffset = node.Level;
                     if (nodeRef.Value.IsInnerNode())
@@ -183,7 +183,7 @@ namespace SEE.Controls
                 {
                     renderer.enabled = true;
 
-                    Material[] materials = new Material[2] {
+                    Material[] materials = {
                         outlineMaskMaterial,
                         outlineFillMaterial
                     };
@@ -266,7 +266,7 @@ namespace SEE.Controls
                 List<Vector3> smoothNormals = SmoothNormals(meshFilter.sharedMesh);
 
                 bakeKeys.Add(meshFilter.sharedMesh);
-                bakeValues.Add(new ListVector3() { data = smoothNormals });
+                bakeValues.Add(new ListVector3 { data = smoothNormals });
             }
         }
 
@@ -299,7 +299,7 @@ namespace SEE.Controls
             }
         }
 
-        private List<Vector3> SmoothNormals(Mesh mesh)
+        private static List<Vector3> SmoothNormals(Mesh mesh)
         {
             // Group vertices by location
             Assert.IsNotNull(mesh);
@@ -320,12 +320,7 @@ namespace SEE.Controls
                 }
 
                 // Calculate the average normal
-                Vector3 smoothNormal = Vector3.zero;
-
-                foreach (KeyValuePair<Vector3, int> pair in group)
-                {
-                    smoothNormal += mesh.normals[pair.Value];
-                }
+                Vector3 smoothNormal = group.Aggregate(Vector3.zero, (current, pair) => current + mesh.normals[pair.Value]);
 
                 smoothNormal.Normalize();
 

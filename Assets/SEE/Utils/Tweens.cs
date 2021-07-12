@@ -8,9 +8,18 @@ namespace SEE.Utils
     /// A class for animating objects (tweening).
     /// </summary>
     internal class Tweens : MonoBehaviour
-    {
+    {        
         /// <summary>
-        /// Moves a GameObject to a specific position over a given duration.
+        /// Sets the capacity of DOTween.
+        /// </summary>
+        static Tweens()
+        {
+            DOTween.SetTweensCapacity(2000, 100);
+        }
+
+        /// <summary>
+        /// Moves a GameObject to a specific position over a given duration
+        /// and makes a <paramref name="callback"/> if this is not null.
         /// </summary>
         /// <param name="gameObject">
         /// A <see cref="GameObject"/> to be the target of the animation.
@@ -21,13 +30,24 @@ namespace SEE.Utils
         /// <param name="MaxAnimationTime">
         /// A <see cref="System.Single"/> for the time in seconds the animation will take to complete.
         /// </param>
-        public static void Move(GameObject gameObject, Vector3 position, float MaxAnimationTime)
+        /// <param name="callback">
+        /// A <see cref="Action"/> The invoked callback after the animation.
+        /// </param>
+        public static void Move(GameObject gameObject, Vector3 position, float MaxAnimationTime, Action<object> callback = null)
         {
-            gameObject.transform.DOMove(position, MaxAnimationTime);
+            if (callback != null)
+            {
+                gameObject.transform.DOMove(position, MaxAnimationTime).OnComplete(()=>{callback?.Invoke(gameObject);});
+            }
+            else
+            {
+                gameObject.transform.DOMove(position, MaxAnimationTime);
+            }
         }
 
         /// <summary>
-        /// Randomly shakes a GameObject's rotation by a diminishing amount over time with.
+        /// Randomly shakes a GameObject's rotation by a diminishing amount over time with
+        /// and makes a <paramref name="callback"/> if this is not null.
         /// </summary>
         /// <param name="gameObject">
         /// A <see cref="GameObject"/> to be the target of the animation.
@@ -38,13 +58,24 @@ namespace SEE.Utils
         /// <param name="MaxAnimationTime">
         /// A <see cref="System.Single"/> for the time in seconds the animation will take to complete.
         /// </param>
-        public static void ShakeRotate(GameObject gameObject, float MaxAnimationTime, Vector3 vector)
+        /// <param name="callback">
+        /// A <see cref="Action"/> The invoked callback after the animation.
+        /// </param>
+        public static void ShakeRotate(GameObject gameObject, float MaxAnimationTime, Vector3 vector, Action<object> callback = null)
         {
-            gameObject.transform.DOShakeRotation(MaxAnimationTime, vector);
+            if (callback != null)
+            {
+                gameObject.transform.DOShakeRotation(MaxAnimationTime, vector).OnComplete(()=>{callback?.Invoke(gameObject);});
+            }
+            else
+            {
+                gameObject.transform.DOShakeRotation(MaxAnimationTime, vector);
+            }            
         }
 
         /// <summary>
-        /// Changes a GameObject's scale over time.
+        /// Changes a GameObject's scale over time and makes a <paramref name="callback"/> 
+        /// if this is not null.
         /// </summary>
         /// <param name="gameObject">
         /// A <see cref="GameObject"/> to be the target of the animation.
@@ -55,9 +86,19 @@ namespace SEE.Utils
         /// <param name="MaxAnimationTime">
         /// A <see cref="System.Single"/> for the time in seconds the animation will take to complete.
         /// </param>
-        public static void Scale(GameObject gameObject, Vector3 localScale, float MaxAnimationTime)
+        /// <param name="callback">
+        /// A <see cref="Action"/> The invoked callback after the animation.
+        /// </param>
+        public static void Scale(GameObject gameObject, Vector3 localScale, float MaxAnimationTime, Action<object> callback = null)
         {
-            gameObject.transform.DOScale(localScale, MaxAnimationTime);
+            if (callback != null)
+            {
+                gameObject.transform.DOScale(localScale, MaxAnimationTime).OnComplete(()=>{callback?.Invoke(gameObject);});
+            }
+            else
+            {
+                gameObject.transform.DOScale(localScale, MaxAnimationTime);
+            }            
         }
     }
 }

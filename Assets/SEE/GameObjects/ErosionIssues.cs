@@ -82,8 +82,7 @@ namespace SEE.GO
                     {
                         // Scale the erosion issue by normalization set in relation to the
                         // maximum value of the normalized metric. Hence, this value is in [0,1].
-                        float metricScale = scaler.GetNormalizedValue(issue.Key, node)
-                                           / scaler.GetNormalizedMaximum(issue.Key);
+                        float metricScale = scaler.GetRelativeNormalizedValue(issue.Key, node);
 
                         GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value);
                         sprite.name = sprite.name + " " + node.SourceName;
@@ -98,6 +97,9 @@ namespace SEE.GO
                         // Now scale it by the normalized metric.
                         scale *= metricScale;
                         // assert: scale.x in [0,1]
+                        // UnityEngine.Assertions.Assert.IsTrue(0 <= scale.x);
+                        // UnityEngine.Assertions.Assert.IsTrue(scale.x <= 1, $"scale.x={scale.x}");
+
                         // No scale the sprite into the corridor [0, maxSpriteWidth]
                         scale *= Mathf.Lerp(0, maxSpriteWidth, scale.x);
 
@@ -134,14 +136,14 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns the size of the sprite for given game node that was drawn for 
+        /// Returns the size of the sprite for given game node that was drawn for
         /// a software-erosion indicator above the roof of the node.
         /// </summary>
         /// <param name="gameNode"></param>
         /// <returns>size of the sprite</returns>
         protected static Vector3 GetSizeOfSprite(GameObject gameNode)
         {
-            // The game object representing an erosion is a composite of 
+            // The game object representing an erosion is a composite of
             // multiple LOD child objects to be drawn depending how close
             // the camera is. The container object 'go' itself does not
             // have a renderer. We need to obtain the renderer of the

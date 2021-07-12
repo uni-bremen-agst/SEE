@@ -44,14 +44,14 @@ namespace SEE.Controls.Actions
         /// Called when the object is grabbed.
         /// </summary>
         /// <param name="interactableObject">the object being grabbed</param>
-        /// <param name="isOwner">true if a local user initiated this call</param>
-        protected abstract void On(InteractableObject interactableObject, bool isOwner);
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        protected abstract void On(InteractableObject interactableObject, bool isInitiator);
 
         /// <summary>
         /// Called when the object is no longer grabbed.
         /// </summary>
         /// <param name="interactableObject">the object being grabbed</param>
-        /// <param name="isOwner">true if a local user initiated this call</param>
-        protected abstract void Off(InteractableObject interactableObject, bool isOwner);
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        protected abstract void Off(InteractableObject interactableObject, bool isInitiator);
     }
 }

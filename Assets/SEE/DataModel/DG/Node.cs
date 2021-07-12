@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SEE.DataModel.DG
 {
@@ -11,41 +12,87 @@ namespace SEE.DataModel.DG
         // IMPORTANT NOTES:
         //
         // If you use Clone() to create a copy of a node, be aware that the clone
-        // will have a deep copy of all attributes and the type of the node only.
+        // will have a deep copy of all attributes and the type and domain of the node only.
         // The hierarchy information (parent, children, level) is not copied at all.
         // The clone will appear as a node without parent and children at level 0.
         // Neither will its incoming and outgoing edges be copied.
+
+        /// <summary>
+        /// The domain of a node regarding the architecture analysis, that is,
+        /// whether it belongs to the architecture, implementation, or
+        /// mapping between the two.
+        /// </summary>
+        public enum NodeDomain : byte
+        {
+            /// <summary>
+            /// Does not belong to any domain.
+            /// </summary>
+            Unspecified,
+            /// <summary>
+            /// Represents a fact retrieved from the implementation,
+            /// typically created by a static analysis.
+            /// </summary>
+            Implementation,
+            /// <summary>
+            /// Represents a concept in the architecture and was created
+            /// by the software architecture. It is part of the architecture
+            /// model.
+            /// </summary>
+            Architecture,
+            /// <summary>
+            /// Is part of the mapping from the implementation domain
+            /// onto the architecture domain.
+            /// </summary>
+            Mapping,
+            /// <summary>
+            /// The number of possible <see cref="NodeDomain"/>s. As more values are added above
+            /// this element, the integer value of this element will represent the number of
+            /// elements in this enum.
+            /// </summary>
+            Count
+        }
+
+        /// <summary>
+        /// The domain of the node.
+        /// </summary>
+        public NodeDomain Domain = NodeDomain.Unspecified;
 
         /// <summary>
         /// The attribute name for unique identifiers (within a graph).
         /// </summary>
         public const string LinknameAttribute = "Linkage.Name";
 
-        /// <summary>
-        /// The unique identifier of a node (unique within a graph).
-        /// </summary>
         private string id = "";
-
         /// <summary>
         /// The unique identifier of a node (unique within a graph).
-        /// 
+        /// Setting a new id will also set set a new <see cref="LinknameAttribute"/>.
+        ///
         /// Important note on setting this property:
         /// This will only set the id attribute, but does not alter the
         /// hashed ids of the underlying graph. If the node was already
-        /// added to a graph, you cannot change the ID anymore. 
+        /// added to a graph, you cannot change the ID anymore.
         /// Otherwise expect inconsistencies. If the node has not been added
         /// to a graph, however, setting this property is safe.
         /// </summary>
         public override string ID
         {
             get => id;
-            set => id = value;
+            set
+            {
+                id = value;
+                SetString(LinknameAttribute, id);
+            }
         }
 
         /// <summary>
         /// The attribute name for the name of nodes. They may or may not be unique.
         /// </summary>
         public const string SourceNameAttribute = "Source.Name";
+
+        /// <summary>
+        /// The attribute name for the filename of nodes. The filename may not exist.
+        /// </summary>
+        public const string SourceFileAttribute = "Source.File";
 
         /// <summary>
         /// The name of the node (which is not necessarily unique).
@@ -57,12 +104,20 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// The parent of this node. Is null if it has none.
+        /// The filename of the node. May not exist, in which case this will be null.
         /// </summary>
-        private Node parent;
+        public string SourceFile
+        {
+            get
+            {
+                TryGetString(SourceFileAttribute, out string file);
+                return file;
+            }
+            set => SetString(SourceFileAttribute, value);
+        }
 
         /// <summary>
-        /// The level of the node in the hierarchy. The top-most level has level 
+        /// The level of the node in the hierarchy. The top-most level has level
         /// number 0. The number is the length of the path in the hierarchy from
         /// the node to its ancestor that has no parent.
         /// </summary>
@@ -71,15 +126,30 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The level of a node in the hierarchy. The level of a root node is 0.
         /// For all other nodes, the level is the level of its parent + 1.
+        /// The level of a node that is currently in no graph is 0.
         /// </summary>
         public int Level
         {
-            get => level;
+            get
+            {
+                if (ItsGraph == null)
+                {
+                    return 0;
+                }
+                if (ItsGraph.NodeHierarchyHasChanged)
+                {
+                    ItsGraph.FinalizeNodeHierarchy();
+                }
+                return level;
+            }
+            set => level = value;
         }
 
         /// <summary>
         /// Sets the level of the node as specified by the parameter and sets
-        /// the respective level values of each of its (transitive) descendants. 
+        /// the respective level values of each of its (transitive) descendants.
+        ///
+        /// Note: This method should be called only by <see cref="Graph"/>.
         /// </summary>
         internal void SetLevel(int level)
         {
@@ -92,33 +162,21 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Returns the maximal depth of the tree rooted by this node, that is,
-        /// the number of nodes on the longest path from this node to any of its 
+        /// the number of nodes on the longest path from this node to any of its
         /// leaves. The minimal value returned is 1.
         /// </summary>
         /// <returns>maximal depth of the tree rooted by this node</returns>
         public int Depth()
         {
-            int maxDepth = 0;
+            int maxDepth = children.Select(child => child.Depth()).Prepend(0).Max();
 
-            foreach (Node child in children)
-            {
-                int depth = child.Depth();
-                if (depth > maxDepth)
-                {
-                    maxDepth = depth;
-                }
-            }
             return maxDepth + 1;
         }
 
         /// <summary>
         /// The ancestor of the node in the hierarchy. May be null if the node is a root.
         /// </summary>
-        public Node Parent
-        {
-            get => parent;
-            set => parent = value;
-        }
+        public Node Parent { get; set; }
 
         /// <summary>
         /// True iff node has no parent.
@@ -126,7 +184,7 @@ namespace SEE.DataModel.DG
         /// <returns>true iff node is a root node</returns>
         public bool IsRoot()
         {
-            return parent == null;
+            return Parent == null;
         }
 
         /// <summary>
@@ -147,7 +205,7 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Returns true if <paramref name="other"/> if other meets all of the following 
+        /// Returns true if <paramref name="other"/> if other meets all of the following
         /// conditions:
         ///  (1) is not null
         ///  (2) has exactly the same C# type
@@ -159,12 +217,12 @@ namespace SEE.DataModel.DG
         ///  (8) the set of IDs of the children are the same
         ///  (9) has the same number of outgoing edges and the set of the edges' IDs are the same
         /// (10) has the same number of incoming edges and the set of the edges' IDs are the same
-        ///  
+        ///
         /// Note: This node and the other node may or may not be in the same graph.
         /// </summary>
         /// <param name="other">to be compared to</param>
         /// <returns>true if equal</returns>
-        public override bool Equals(System.Object other)
+        public override bool Equals(object other)
         {
             if (!base.Equals(other))
             {
@@ -173,7 +231,7 @@ namespace SEE.DataModel.DG
             else
             {
                 Node otherNode = other as Node;
-                if (level != otherNode.level)
+                if (level != otherNode?.level)
                 {
                     Report(ID + ": The levels are different");
                     return false;
@@ -265,10 +323,10 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Adds given edge to the list of incoming edges of this node.
-        /// 
-        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients 
+        ///
+        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients
         /// should use Graph.AddEdge() instead.
-        /// 
+        ///
         /// Precondition: edge != null and edge.Target == this
         /// </summary>
         /// <param name="edge">edge to be added as one of the node's incoming edges</param>
@@ -290,10 +348,10 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Removes given edge from the list of incoming edges of this node.
-        /// 
-        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients 
+        ///
+        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients
         /// should use Graph.RemoveEdge() instead.
-        /// 
+        ///
         /// Precondition: edge != null and edge.Target == this
         /// </summary>
         /// <param name="edge">edge to be removed from the node's incoming edges</param>
@@ -331,7 +389,7 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Removes all incoming and outgoing edges from this node.
-        /// 
+        ///
         /// IMPORTANT NOTE: This method is reserved for Graph and should not
         /// be used by any other client.
         /// </summary>
@@ -343,10 +401,10 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Adds given edge to the list of outgoing edges of this node.
-        /// 
-        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients 
+        ///
+        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients
         /// should use Graph.AddEdge() instead.
-        /// 
+        ///
         /// Precondition: edge != null and edge.Source == this
         /// </summary>
         /// <param name="edge">edge to be added as one of the node's outgoing edges</param>
@@ -368,10 +426,10 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Removes given edge from the list of outgoing edges of this node.
-        /// 
-        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients 
+        ///
+        /// IMPORTANT NOTE: This method is intended for Graph only. Other clients
         /// should use Graph.RemoveEdge() instead.
-        /// 
+        ///
         /// Precondition: edge != null and edge.Source == this
         /// </summary>
         /// <param name="edge">edge to be removed from the node's outgoing edges</param>
@@ -409,7 +467,7 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// The descendants of the node. 
+        /// The descendants of the node.
         /// Note: This is not a copy. Do not modify the result.
         /// </summary>
         /// <returns>descendants of the node</returns>
@@ -425,18 +483,22 @@ namespace SEE.DataModel.DG
         /// <param name="child">descendant to be added to node</param>
         public void AddChild(Node child)
         {
-            if (ReferenceEquals(child.Parent, null))
+            if (child.Parent == null)
             {
                 children.Add(child);
                 child.Parent = this;
+                ItsGraph.NodeHierarchyHasChanged = true;
             }
             else
             {
-                throw new Exception("Hierarchical edges do not form a tree. Node with multiple parents: "
-                    + child.ID);
+                throw new Exception($"Node hierarchy does not form a tree. Node with multiple parents: {child.ID}.");
             }
         }
 
+        /// <summary>
+        /// Re-assigns the node to a different <paramref name="newParent"/>.
+        /// </summary>
+        /// <param name="newParent">the new parent of this node</param>
         public void Reparent(Node newParent)
         {
             if (this == newParent)
@@ -446,28 +508,28 @@ namespace SEE.DataModel.DG
             else if (newParent == null)
             {
                 // Nothing do be done for newParent == null and parent == null.
-                if (parent != null)
+                if (Parent != null)
                 {
-                    parent.children.Remove(this);
-                    parent = null;
-                    graph.FinalizeNodeHierarchy();
+                    Parent.children.Remove(this);
+                    Parent = null;
+                    ItsGraph.NodeHierarchyHasChanged = true;
                 }
             }
             else
             {
                 // assert: newParent != null
-                if (parent == null)
+                if (Parent == null)
                 {
-                    newParent.AddChild(this);                    
+                    newParent.AddChild(this);
                 }
                 else
                 {
                     // parent != null and newParent != null
-                    parent.children.Remove(this);
-                    parent = newParent;
-                    parent.children.Add(this);
+                    Parent.children.Remove(this);
+                    Parent = newParent;
+                    Parent.children.Add(this);
                 }
-                graph.FinalizeNodeHierarchy();
+                ItsGraph.NodeHierarchyHasChanged = true;
             }
         }
 
@@ -482,8 +544,8 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Compares the two given nodes by name. 
-        /// 
+        /// Compares the two given nodes by name.
+        ///
         /// Returns 0 if:
         ///    both are null
         ///    or name(first) = name(second)
@@ -504,12 +566,12 @@ namespace SEE.DataModel.DG
             {
                 if (ReferenceEquals(second, null))
                 {
-                    // If first is null and second is null, they're equal. 
+                    // If first is null and second is null, they're equal.
                     return 0;
                 }
                 else
                 {
-                    // If first is null and second is not null, second is greater. 
+                    // If first is null and second is not null, second is greater.
                     return -1;
                 }
             }
@@ -558,12 +620,12 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Creates deep copies of attributes where necessary. Is called by
-        /// Clone() once the copy is created. Must be extended by every 
+        /// Clone() once the copy is created. Must be extended by every
         /// subclass that adds fields that should be cloned, too.
-        /// 
+        ///
         /// IMPORTANT NOTE: Cloning a node means only to create copy of its
         /// type and attributes. The hierarchy information (parent, level,
-        /// and children) are not copied. Instead the copy will become a 
+        /// and children) are not copied. Instead the copy will become a
         /// node without parent and children at level 0. If we copied the
         /// hierarchy information, the hierarchy were no longer a forrest.
         /// </summary>
@@ -572,7 +634,7 @@ namespace SEE.DataModel.DG
         {
             base.HandleCloned(clone);
             Node target = (Node)clone;
-            target.parent = null;
+            target.Parent = null;
             target.level = 0;
             target.children = new List<Node>();
             target.outgoings = new List<Edge>();
@@ -580,9 +642,9 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Returns the list of outgoing edges from this node to the given 
+        /// Returns the list of outgoing edges from this node to the given
         /// target node that have exactly the given edge type.
-        /// 
+        ///
         /// Precondition: target must not be null
         /// </summary>
         /// <param name="target">target node</param>
@@ -628,6 +690,11 @@ namespace SEE.DataModel.DG
                 }
             }
             return false;
+        }
+
+        public static implicit operator bool(Node node)
+        {
+            return node != null;
         }
     }
 }

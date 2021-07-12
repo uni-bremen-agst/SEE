@@ -35,6 +35,10 @@ namespace SEE.GO
         public const string MRTKTransparentLineMaterialName = "Materials/TransparentLineMRTKMaterial";
         public const string MRTKInvisibleMaterialName = "Materials/InvisibleMRTKMaterial";
 
+        // Special materials
+        public const string TransparentMeshParticleSystemMaterialName = "Materials/TransparentMeshParticleMaterial";
+        public const string MeshParticleSystemMaterialName = "Materials/MeshParticleMaterial";
+
         /// <summary>
         /// The type of the shaders of this material instance.
         /// </summary>
@@ -133,6 +137,21 @@ namespace SEE.GO
             return materials[renderQueueOffset][degree];
         }
 
+        public static Material New(string name, Color color, int renderQueueOffset = 0)
+        {
+            Material prefab = Resources.Load<Material>(name);
+            Assert.IsNotNull(prefab, "Material resource '" + name + "' could not be found!");
+            Material material = new Material(prefab)
+            {
+                // FIXME this is not a good solution. we may want to add an enum or something for
+                // possible materials, such that we can ensure the correct renderQueue. that would
+                // adding new materials make easier as well.
+                renderQueue = (int) (name.Contains("Transparent") ? UnityEngine.Rendering.RenderQueue.Transparent : UnityEngine.Rendering.RenderQueue.Geometry) + renderQueueOffset,
+                color = color
+            };
+            return material;
+        }
+
         /// <summary>
         /// Creates and returns a new material of given <paramref name="shaderType"/> and
         /// <paramref name="color"/>. This material will be unique and not reused by this
@@ -145,17 +164,17 @@ namespace SEE.GO
         /// <returns>new material</returns>
         public static Material New(ShaderType shaderType, Color color, int renderQueueOffset = 0)
         {
-            string materialName = null;
+            string name = null;
 
             // When the user is on a HoloLens, the special MRTK shader variants should be used
             if (PlayerSettings.GetInputType() != PlayerInputType.HoloLensPlayer)
             {
                 switch (shaderType)
                 {
-                    case ShaderType.Opaque: materialName = OpaqueMaterialName; break;
-                    case ShaderType.Transparent: materialName = TransparentMaterialName; break;
-                    case ShaderType.TransparentLine: materialName = TransparentLineMaterialName; break;
-                    case ShaderType.Invisible: materialName = InvisibleMaterialName; break;
+                    case ShaderType.Opaque:             name = OpaqueMaterialName; break;
+                    case ShaderType.Transparent:        name = TransparentMaterialName; break;
+                    case ShaderType.TransparentLine:    name = TransparentLineMaterialName; break;
+                    case ShaderType.Invisible:          name = InvisibleMaterialName; break;
                     default: Assertions.InvalidCodePath(); break;
                 }
             }
@@ -163,24 +182,20 @@ namespace SEE.GO
             {
                 switch (shaderType)
                 {
-                    case ShaderType.Opaque: materialName = MRTKOpaqueMaterialName; break;
-                    case ShaderType.Transparent: materialName = MRTKTransparentMaterialName; break;
-                    case ShaderType.TransparentLine: materialName = MRTKTransparentLineMaterialName; break;
-                    case ShaderType.Invisible: materialName = MRTKInvisibleMaterialName; break;
+                    case ShaderType.Opaque:             name = MRTKOpaqueMaterialName; break;
+                    case ShaderType.Transparent:        name = MRTKTransparentMaterialName; break;
+                    case ShaderType.TransparentLine:    name = MRTKTransparentLineMaterialName; break;
+                    case ShaderType.Invisible:          name = MRTKInvisibleMaterialName; break;
                     default: Assertions.InvalidCodePath(); break;
                 }
             }
 
-            Material materialPrefab = Resources.Load<Material>(materialName);
-            Assert.IsNotNull(materialPrefab, "Material resource '" + materialName + "' could not be found!");
+            return New(name, color, renderQueueOffset);
+        }
 
-            Material material = new Material(materialPrefab)
-            {
-                renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + renderQueueOffset,
-                color = color
-            };
-
-            return material;
+        public static Material New(string name, int renderQueueOffset = 0)
+        {
+            return New(name, Color.white, renderQueueOffset);
         }
 
         /// <summary>
