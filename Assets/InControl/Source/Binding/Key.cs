@@ -170,7 +170,7 @@
 		// Menu,
 		// Pause,
 
-		// Unity doesn't define/support these. :(
+		// Unity doesn't define/support these :(
 		// F16,
 		// F17,
 		// F18,

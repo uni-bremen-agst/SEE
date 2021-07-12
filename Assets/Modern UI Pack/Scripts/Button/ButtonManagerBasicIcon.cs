@@ -2,9 +2,13 @@
 using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace Michsky.UI.ModernUIPack
 {
+    [RequireComponent(typeof(Button))]
     public class ButtonManagerBasicIcon : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
     {
         // Content
@@ -13,7 +17,7 @@ namespace Michsky.UI.ModernUIPack
         public UnityEvent hoverEvent;
         public AudioClip hoverSound;
         public AudioClip clickSound;
-        Button buttonVar;
+        public Button buttonVar;
 
         // Resources
         public Image normalIcon;
@@ -28,6 +32,7 @@ namespace Michsky.UI.ModernUIPack
         public bool useRipple = true;
 
         // Ripple
+        public RippleUpdateMode rippleUpdateMode = RippleUpdateMode.UNSCALED_TIME;
         public Sprite rippleShape;
         [Range(0.1f, 5)] public float speed = 1f;
         [Range(0.5f, 25)] public float maxSize = 4f;
@@ -37,23 +42,21 @@ namespace Michsky.UI.ModernUIPack
         public bool centered = false;
         bool isPointerOn;
 
+        public enum RippleUpdateMode
+        {
+            NORMAL,
+            UNSCALED_TIME
+        }
+
         void Start()
-        {        
+        {
             if (buttonVar == null)
                 buttonVar = gameObject.GetComponent<Button>();
 
-            buttonVar.onClick.AddListener(delegate
-            {
-                clickEvent.Invoke();
-            });
+            buttonVar.onClick.AddListener(delegate { clickEvent.Invoke(); });
 
             if (enableButtonSounds == true && useClickSound == true)
-            {
-                buttonVar.onClick.AddListener(delegate
-                {
-                    soundSource.PlayOneShot(clickSound);
-                });
-            }
+                buttonVar.onClick.AddListener(delegate { soundSource.PlayOneShot(clickSound); });
 
             if (useCustomContent == false)
                 UpdateUI();
@@ -74,7 +77,6 @@ namespace Michsky.UI.ModernUIPack
             if (rippleParent != null)
             {
                 GameObject rippleObj = new GameObject();
-                rippleObj.AddComponent<Ripple>();
                 rippleObj.AddComponent<Image>();
                 rippleObj.GetComponent<Image>().sprite = rippleShape;
                 rippleObj.name = "Ripple";
@@ -91,17 +93,30 @@ namespace Michsky.UI.ModernUIPack
                 else
                     rippleObj.transform.position = pos;
 
-                rippleObj.GetComponent<Ripple>().speed = speed;
-                rippleObj.GetComponent<Ripple>().maxSize = maxSize;
-                rippleObj.GetComponent<Ripple>().startColor = startColor;
-                rippleObj.GetComponent<Ripple>().transitionColor = transitionColor;
+                rippleObj.AddComponent<Ripple>();
+                Ripple tempRipple = rippleObj.GetComponent<Ripple>();
+                tempRipple.speed = speed;
+                tempRipple.maxSize = maxSize;
+                tempRipple.startColor = startColor;
+                tempRipple.transitionColor = transitionColor;
+
+                if (rippleUpdateMode == RippleUpdateMode.NORMAL)
+                    tempRipple.unscaledTime = false;
+                else
+                    tempRipple.unscaledTime = true;
             }
         }
 
         public void OnPointerDown(PointerEventData eventData)
         {
             if (useRipple == true && isPointerOn == true)
+#if ENABLE_LEGACY_INPUT_MANAGER
                 CreateRipple(Input.mousePosition);
+#elif ENABLE_INPUT_SYSTEM && ENABLE_LEGACY_INPUT_MANAGER
+                CreateRipple(Input.mousePosition);
+#elif ENABLE_INPUT_SYSTEM
+                CreateRipple(Mouse.current.position.ReadValue());
+#endif
             else if (useRipple == false)
                 this.enabled = false;
         }

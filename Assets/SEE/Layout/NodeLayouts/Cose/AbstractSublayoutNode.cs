@@ -16,7 +16,6 @@
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using static SEE.Game.AbstractSEECity;
 
 namespace SEE.Layout.NodeLayouts.Cose
 {

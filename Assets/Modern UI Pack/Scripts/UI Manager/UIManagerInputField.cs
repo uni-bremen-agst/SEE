@@ -8,15 +8,19 @@ namespace Michsky.UI.ModernUIPack
     [ExecuteInEditMode]
     public class UIManagerInputField : MonoBehaviour
     {
-        [Header("SETTINGS")]
+        [Header("Settings")]
         public UIManager UIManagerAsset;
+        public bool webglMode = false;
 
-        [Header("RESOURCES")]
+        [Header("Resources")]
         public List<GameObject> images = new List<GameObject>();
         public List<GameObject> texts = new List<GameObject>();
 
         void Awake()
         {
+            if (Application.isPlaying && webglMode == true)
+                return;
+
             try
             {
                 if (UIManagerAsset == null)
@@ -31,10 +35,7 @@ namespace Michsky.UI.ModernUIPack
                 }
             }
 
-            catch
-            {
-                Debug.Log("<b>[Modern UI Pack]</b> No UI Manager found, assign it manually.", this);
-            }
+            catch { Debug.Log("<b>[Modern UI Pack]</b> No UI Manager found, assign it manually.", this); }
         }
 
         void LateUpdate()

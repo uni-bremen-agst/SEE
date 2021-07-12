@@ -1,11 +1,14 @@
 ﻿using UnityEngine;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace Michsky.UI.ModernUIPack
 {
+    [RequireComponent(typeof(Animator))]
     public class ContextMenuManager : MonoBehaviour
     {
         // Resources
-        [SerializeField]
         public Canvas mainCanvas;
         public GameObject contextButton;
         public GameObject contextContent;
@@ -68,7 +71,13 @@ namespace Michsky.UI.ModernUIPack
 
         public void SetContextMenuPosition()
         {
+#if ENABLE_LEGACY_INPUT_MANAGER
             cursorPos = Input.mousePosition;
+#elif ENABLE_INPUT_SYSTEM && ENABLE_LEGACY_INPUT_MANAGER
+            cursorPos = Input.mousePosition;
+#elif ENABLE_INPUT_SYSTEM
+            cursorPos = Mouse.current.position.ReadValue();
+#endif
             uiPos = contextRect.anchoredPosition;
             CheckForBounds();
 
@@ -84,6 +93,12 @@ namespace Michsky.UI.ModernUIPack
                 contextRect.position = cursorPos;
                 contextContent.transform.position = new Vector3(cursorPos.x + contentPos.x, cursorPos.y + contentPos.y, 0);
             }
+        }
+
+        public void OpenContextMenu()
+        {
+            contextAnimator.Play("Menu In");
+            isContextMenuOn = true;
         }
 
         public void CloseOnClick()

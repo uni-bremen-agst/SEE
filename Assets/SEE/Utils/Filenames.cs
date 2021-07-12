@@ -10,7 +10,13 @@ namespace SEE.Utils
     /// </summary>
     public class Filenames
     {
-        private const char WindowsDirectorySeparator = '\\';
+        /// <summary>
+        /// Directory separator on Windows.
+        /// </summary>
+        public const char WindowsDirectorySeparator = '\\';
+        /// <summary>
+        /// Directory separator on Unix.
+        /// </summary>
         public const char UnixDirectorySeparator = '/';
 
         /// <summary>
@@ -52,6 +58,11 @@ namespace SEE.Utils
         /// of AbstractSEECity instances are persisted.
         /// </summary>
         public const string ConfigExtension = ".cfg";
+
+        /// <summary>
+        /// File extension for Speech Recognition Grammar Specifications (SRGS).
+        /// </summary>
+        public const string GrammarExtension = ".grxml";
 
         /// <summary>
         /// Returns the last part of the given <paramref name="extension"/>

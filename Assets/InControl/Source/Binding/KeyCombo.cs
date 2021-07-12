@@ -1,4 +1,7 @@
-﻿namespace InControl
+﻿using System.Text;
+
+
+namespace InControl
 {
 	using System;
 	using System.Collections.Generic;
@@ -37,8 +40,8 @@
 				return;
 			}
 
-			includeData = includeData | (((ulong) key & 0xFF) << (includeSize * 8));
-			includeSize = includeSize + 1;
+			includeData |= ((ulong) key & 0xFF) << (includeSize * 8);
+			includeSize += 1;
 		}
 
 
@@ -86,8 +89,8 @@
 				return;
 			}
 
-			excludeData = excludeData | (((ulong) key & 0xFF) << (excludeSize * 8));
-			excludeSize = excludeSize + 1;
+			excludeData |= ((ulong) key & 0xFF) << (excludeSize * 8);
+			excludeSize += 1;
 		}
 
 
@@ -177,17 +180,19 @@
 					return false;
 				}
 
+				var provider = InputManager.KeyboardProvider;
+
 				var includePressed = true;
 				for (var i = 0; i < includeSize; i++)
 				{
-					var key = GetIncludeInt( i );
-					includePressed = includePressed && KeyInfo.KeyList[key].IsPressed;
+					var key = GetInclude( i );
+					includePressed = includePressed && provider.GetKeyIsPressed( key );
 				}
 
 				for (var i = 0; i < excludeSize; i++)
 				{
-					var key = GetExcludeInt( i );
-					if (KeyInfo.KeyList[key].IsPressed)
+					var key = GetExclude( i );
+					if (provider.GetKeyIsPressed( key ))
 					{
 						return false;
 					}
@@ -200,19 +205,28 @@
 
 		public static KeyCombo Detect( bool modifiersAsKeys )
 		{
+			const Key minModifier = Key.Shift;
+			const Key maxModifier = Key.Control;
+			const Key minFirstClassModifier = Key.LeftShift;
+			const Key maxFirstClassModifier = Key.RightControl;
+			const Key minStandardKey = Key.Escape;
+			const Key maxStandardKey = Key.QuestionMark;
+
 			var keyCombo = new KeyCombo();
+			var provider = InputManager.KeyboardProvider;
 
 			if (modifiersAsKeys)
 			{
-				for (var i = 5; i < 13; i++)
+				for (var i = minFirstClassModifier; i <= maxFirstClassModifier; i++)
 				{
-					if (KeyInfo.KeyList[i].IsPressed)
+					if (provider.GetKeyIsPressed( i ))
 					{
-						keyCombo.AddIncludeInt( i );
+						keyCombo.AddInclude( i );
 
-						if (i == 8 && KeyInfo.KeyList[10].IsPressed)
+						if (i == Key.LeftControl &&
+						    provider.GetKeyIsPressed( Key.RightAlt ))
 						{
-							keyCombo.AddIncludeInt( 10 );
+							keyCombo.AddInclude( Key.RightAlt );
 						}
 
 						return keyCombo;
@@ -221,20 +235,20 @@
 			}
 			else
 			{
-				for (var i = 1; i < 5; i++)
+				for (var i = minModifier; i <= maxModifier; i++)
 				{
-					if (KeyInfo.KeyList[i].IsPressed)
+					if (provider.GetKeyIsPressed( i ))
 					{
-						keyCombo.AddIncludeInt( i );
+						keyCombo.AddInclude( i );
 					}
 				}
 			}
 
-			for (var i = 13; i < KeyInfo.KeyList.Length; i++)
+			for (var i = minStandardKey; i <= maxStandardKey; i++)
 			{
-				if (KeyInfo.KeyList[i].IsPressed)
+				if (provider.GetKeyIsPressed( i ))
 				{
-					keyCombo.AddIncludeInt( i );
+					keyCombo.AddInclude( i );
 					return keyCombo;
 				}
 			}
@@ -244,7 +258,8 @@
 		}
 
 
-		static Dictionary<ulong, string> cachedStrings = new Dictionary<ulong, string>();
+		static readonly Dictionary<ulong, string> cachedStrings = new Dictionary<ulong, string>();
+		static readonly StringBuilder cachedStringBuilder = new StringBuilder( 256 );
 
 
 		public override string ToString()
@@ -252,17 +267,20 @@
 			string value;
 			if (!cachedStrings.TryGetValue( includeData, out value ))
 			{
-				value = "";
+				cachedStringBuilder.Clear();
 				for (var i = 0; i < includeSize; i++)
 				{
 					if (i != 0)
 					{
-						value += " ";
+						cachedStringBuilder.Append( " " );
 					}
 
-					var key = GetIncludeInt( i );
-					value += KeyInfo.KeyList[key].Name;
+					var key = GetInclude( i );
+					cachedStringBuilder.Append( InputManager.KeyboardProvider.GetNameForKey( key ) );
 				}
+
+				value = cachedStringBuilder.ToString();
+				cachedStrings[includeData] = value;
 			}
 
 			return value;
@@ -295,7 +313,7 @@
 
 		public override int GetHashCode()
 		{
-			int hash = 17;
+			var hash = 17;
 			hash = hash * 31 + includeData.GetHashCode();
 			hash = hash * 31 + excludeData.GetHashCode();
 			return hash;
@@ -304,23 +322,21 @@
 
 		internal void Load( BinaryReader reader, UInt16 dataFormatVersion )
 		{
-			if (dataFormatVersion == 1)
+			switch (dataFormatVersion)
 			{
-				includeSize = reader.ReadInt32();
-				includeData = reader.ReadUInt64();
-				return;
+				case 1:
+					includeSize = reader.ReadInt32();
+					includeData = reader.ReadUInt64();
+					return;
+				case 2:
+					includeSize = reader.ReadInt32();
+					includeData = reader.ReadUInt64();
+					excludeSize = reader.ReadInt32();
+					excludeData = reader.ReadUInt64();
+					return;
+				default:
+					throw new InControlException( "Unknown data format version: " + dataFormatVersion );
 			}
-
-			if (dataFormatVersion == 2)
-			{
-				includeSize = reader.ReadInt32();
-				includeData = reader.ReadUInt64();
-				excludeSize = reader.ReadInt32();
-				excludeData = reader.ReadUInt64();
-				return;
-			}
-
-			throw new InControlException( "Unknown data format version: " + dataFormatVersion );
 		}
 
 

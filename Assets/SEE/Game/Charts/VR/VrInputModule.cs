@@ -80,12 +80,12 @@ namespace SEE.Game.Charts.VR
             eventSystem.RaycastAll(EventData, m_RaycastResultCache);
             EventData.pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
             Ray ray = new Ray(_pointer.transform.position, _pointer.transform.forward);
-            Physics.Raycast(ray, out RaycastHit hitData, ChartManager.Instance.pointerLength);
+            Physics.Raycast(ray, out RaycastHit hitData, ChartManager.Instance.PointerLength);
             float colliderDistance = hitData.distance.Equals(0f)
-                ? ChartManager.Instance.pointerLength
+                ? ChartManager.Instance.PointerLength
                 : hitData.distance;
             float canvasDistance = EventData.pointerCurrentRaycast.distance.Equals(0f)
-                ? ChartManager.Instance.pointerLength
+                ? ChartManager.Instance.PointerLength
                 : EventData.pointerCurrentRaycast.distance;
 
             if (colliderDistance.CompareTo(canvasDistance) < 0)

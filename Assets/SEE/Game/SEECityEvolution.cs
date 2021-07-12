@@ -31,7 +31,6 @@ namespace SEE.Game
     /// A SEECityEvolution combines all necessary components for the animations
     /// of an evolving SEECity.
     /// </summary>
-    [RequireComponent(typeof(EvolutionRenderer), typeof(AnimationInteraction))]    
     public class SEECityEvolution : AbstractSEECity
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
@@ -39,7 +38,6 @@ namespace SEE.Game
         /// <see cref="SEECityEvolution.Save(ConfigWriter)"/> and 
         /// <see cref="SEECityEvolution.Restore(Dictionary{string, object})"/>, 
         /// respectively. You should also extend the test cases in TestConfigIO.
-        
 
         /// <summary>
         /// Sets the maximum number of revsions to load.
@@ -52,6 +50,16 @@ namespace SEE.Game
         /// Neither serialized nor saved in the configuration file.
         /// </summary>
         private EvolutionRenderer evolutionRenderer;  // not serialized by Unity; will be set in Start()
+
+        /// <summary>
+        /// The directory in which the GXL files of the graph series are located.
+        /// </summary>
+        [Tooltip("The directory in which the GXL files are located.")]
+        public DataPath GXLDirectory = new DataPath();
+
+        //-----------------------------------------------------
+        // Attributes to mark changes
+        //-----------------------------------------------------
 
         /// <summary>
         /// The height of posts used as markers for new and deleted elements.
@@ -84,22 +92,15 @@ namespace SEE.Game
         public Color DeletionBeamColor = Color.black;
 
         /// <summary>
-        /// The directory in which the GXL files are located.
-        /// </summary>
-        [Tooltip("The directory in which the GXL files are located.")]
-        public DataPath GXLDirectory = new DataPath();
-
-        /// <summary>
         /// Factory method to create the used EvolutionRenderer.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the current or new evolution renderder attached to this city</returns>
         protected EvolutionRenderer CreateEvolutionRenderer()
         {
             if (!gameObject.TryGetComponent<EvolutionRenderer>(out EvolutionRenderer result))
             {
                 result = gameObject.AddComponent<EvolutionRenderer>();
             }
-            result.CityEvolution = this;
             return result;
         }
 
@@ -140,7 +141,6 @@ namespace SEE.Game
             {
                 Graph graph = graphs.First<Graph>();
                 graph = RelevantGraph(graph);
-                graph.FinalizeNodeHierarchy();
                 return graph;
             }
         }
@@ -161,21 +161,21 @@ namespace SEE.Game
         /// </summary>
         private void Awake()
         {
-            DrawGraphs(LoadData());
-            // We assume this SEECityEvolution instance is a component of a game object
-            // to which an AnimationInteraction component is attached. This AniminationInteraction
-            // component must know the evolution renderer.
+            evolutionRenderer = CreateEvolutionRenderer();
+            List<Graph> graphs = LoadData();
+            DrawGraphs(graphs);
+            evolutionRenderer.SetGraphEvolution(graphs);
+
+            if (!gameObject.TryGetComponent(out AnimationInteraction animationInteraction))
             {
-                AnimationInteraction animationInteraction = gameObject.GetComponent<AnimationInteraction>();
-                if (animationInteraction == null)
-                {
-                    Debug.LogErrorFormat("The game object {0} this SEECityEvolution component is attached to must have a component AnimationInteraction attached to it, too.", gameObject.name);
-                }
-                else
-                {
-                    animationInteraction.EvolutionRenderer = evolutionRenderer;
-                }
+                animationInteraction = gameObject.AddComponent<AnimationInteraction>();
             }
+            animationInteraction.EvolutionRenderer = evolutionRenderer;            
+        }
+
+        private void Start()
+        {
+            evolutionRenderer.ShowGraphEvolution();
         }
 
         /// <summary>
@@ -198,9 +198,6 @@ namespace SEE.Game
                 graphs[i] = relevantGraph;
                 LoadDataForGraphListing(graphs[i]);
             }
-
-            evolutionRenderer = CreateEvolutionRenderer();
-            evolutionRenderer.ShowGraphEvolution(graphs);
         }
 
         //--------------------------------

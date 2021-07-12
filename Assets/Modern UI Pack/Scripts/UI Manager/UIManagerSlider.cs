@@ -7,12 +7,13 @@ namespace Michsky.UI.ModernUIPack
     [ExecuteInEditMode]
     public class UIManagerSlider : MonoBehaviour
     {
-        [Header("SETTINGS")]
+        [Header("Settings")]
         public UIManager UIManagerAsset;
         public bool hasLabel;
         public bool hasPopupLabel;
+        public bool webglMode = false;
 
-        [Header("RESOURCES")]
+        [Header("Resources")]
         public Image background;
         public Image bar;
         public Image handle;
@@ -21,6 +22,9 @@ namespace Michsky.UI.ModernUIPack
 
         void Awake()
         {
+            if (Application.isPlaying && webglMode == true)
+                return;
+
             try
             {
                 if (UIManagerAsset == null)
@@ -35,10 +39,7 @@ namespace Michsky.UI.ModernUIPack
                 }
             }
 
-            catch
-            {
-                Debug.Log("<b>[Modern UI Pack]</b> No UI Manager found, assign it manually.", this);
-            }
+            catch { Debug.Log("<b>[Modern UI Pack]</b> No UI Manager found, assign it manually.", this); }
         }
 
         void LateUpdate()
@@ -52,6 +53,9 @@ namespace Michsky.UI.ModernUIPack
 
         void UpdateSlider()
         {
+            if (Application.isPlaying && webglMode == true)
+                return;
+
             try
             {
                 if (UIManagerAsset.sliderThemeType == UIManager.SliderThemeType.BASIC)

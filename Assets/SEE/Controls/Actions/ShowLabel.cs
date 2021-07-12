@@ -68,15 +68,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Called when the object is selected. If <paramref name="isOwner"/> is false, a remote
+        /// Called when the object is selected. If <paramref name="isInitiator"/> is false, a remote
         /// player has triggered this event and, hence, nothing will be done. Otherwise
         /// the label is shown.
         /// </summary>
         /// <param name="interactableObject">the object being selected</param>
-        /// <param name="isOwner">true if a local user initiated this call</param>
-        private void SelectionOn(InteractableObject interactableObject, bool isOwner)
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        private void SelectionOn(InteractableObject interactableObject, bool isInitiator)
         {
-            if (isOwner)
+            if (isInitiator)
             {
                 isSelected = true;
                 // if the object is currently hovered over, the label is already shown
@@ -88,15 +88,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Called when the object is deselected. If <paramref name="isOwner"/> is false, a remote
+        /// Called when the object is deselected. If <paramref name="isInitiator"/> is false, a remote
         /// player has triggered this event and, hence, nothing will be done. Otherwise
         /// the label is destroyed unless the object is still hovered.
         /// </summary>
         /// <param name="interactableObject">the object being selected</param>
-        /// <param name="isOwner">true if a local user initiated this call</param>
-        private void SelectionOff(InteractableObject interactableObject, bool isOwner)
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        private void SelectionOff(InteractableObject interactableObject, bool isInitiator)
         {
-            if (isOwner)
+            if (isInitiator)
             {
                 isSelected = false;
                 if (!isHovered)
@@ -107,15 +107,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Called when the object is being hovered over. If <paramref name="isOwner"/> is false, a remote
+        /// Called when the object is being hovered over. If <paramref name="isInitiator"/> is false, a remote
         /// player has triggered this event and, hence, nothing will be done. Otherwise
         /// the label is shown.
         /// </summary>
         /// <param name="interactableObject">the object being hovered over</param>
-        /// <param name="isOwner">true if a local user initiated this call</param>
-        private void HoverOn(InteractableObject interactableObject, bool isOwner)
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        private void HoverOn(InteractableObject interactableObject, bool isInitiator)
         {
-            if (isOwner)
+            if (isInitiator)
             {
                 isHovered = true;
                 // if the object is currently selected, the label is already shown
@@ -127,15 +127,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Called when the object is no longer hovered over. If <paramref name="isOwner"/> 
+        /// Called when the object is no longer hovered over. If <paramref name="isInitiator"/> 
         /// is false, a remote player has triggered this event and, hence, nothing will be done.
         /// Otherwise the label is destroyed unless the object is still selected.
         /// </summary>
         /// <param name="interactableObject">the object being hovered over</param>
-        /// <param name="isOwner">true if a local user initiated this call</param>
-        private void HoverOff(InteractableObject interactableObject, bool isOwner)
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        private void HoverOff(InteractableObject interactableObject, bool isInitiator)
         {
-            if (isOwner)
+            if (isInitiator)
             {
                 isHovered = false;
                 if (!isSelected)
@@ -186,11 +186,13 @@ namespace SEE.Controls.Actions
         /// Returns true iff labels are enabled for this kind of node.
         /// </summary>
         /// <param name="city">the code city holding the attributes for showing labels</param>
-        /// <param name="isLeaf">whether this node is a leaf</param>
+        /// <param name="node">This node</param>
         /// <returns>true iff labels are enabled for this kind of node</returns>
-        private bool LabelsEnabled(AbstractSEECity city, bool isLeaf)
+        private static bool LabelsEnabled(AbstractSEECity city, Node node)
         {
-            return isLeaf && city.LeafLabelSettings.Show || !isLeaf && city.InnerNodeLabelSettings.Show;
+            // For leaves, we don't want to display labels if code is already shown for the node.
+            return node.IsLeaf() && city.leafNodeAttributesPerKind[(int)node.Domain].labelSettings.Show
+                || !node.IsLeaf() && city.innerNodeAttributesPerKind[(int)node.Domain].labelSettings.Show;
         }
 
         /// <summary>
@@ -207,14 +209,20 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            bool isLeaf = SceneQueries.IsLeaf(gameObject);
-            if (!LabelsEnabled(city, isLeaf))
+            if (!gameObject.TryGetComponent(out NodeRef nodeRef) || nodeRef.Value == null)
+            {
+                return;
+            }
+            Node node = nodeRef.Value;
+
+            bool isLeaf = node.IsLeaf();
+            if (!LabelsEnabled(city, node))
             {
                 return; // If labels are disabled, we don't need to do anything
             }
 
-            // If label already exists or the game object has no node reference, nothing needs to be done
-            if (nodeLabel != null && !currentlyDestroying || !gameObject.TryGetComponent(out NodeRef nodeRef))
+            // If label already exists, nothing needs to be done
+            if (nodeLabel != null && !currentlyDestroying)
             {
                 return;
             }
@@ -228,21 +236,26 @@ namespace SEE.Controls.Actions
             }
             currentlyDestroying = false;
 
-
-            Node node = nodeRef.Value;
+            string shownText;
             if (node == null)
             {
-                Debug.LogErrorFormat("Game node {0} has no valid node reference.\n", name);
-                return;
+                Debug.LogWarning($"Game node {name} has no valid node reference.\n");
+                shownText = name;
+            }
+            else
+            {
+                shownText = node.SourceName;
             }
 
             // Now we create the label
             // We define starting and ending positions for the animation
             Vector3 startLabelPosition = gameObject.transform.position;
-            nodeLabel = TextFactory.GetTextWithSize(node.SourceName, startLabelPosition,
-                                                    (isLeaf ? city.LeafLabelSettings : city.InnerNodeLabelSettings).FontSize, 
-                                                    textColor: Color.black.ColorWithAlpha(0f));
-            nodeLabel.name = $"Label {node.SourceName}";
+            nodeLabel = TextFactory.GetTextWithSize(
+                shownText,
+                startLabelPosition,
+                (isLeaf ? city.leafNodeAttributesPerKind[(int)node.Domain].labelSettings : city.innerNodeAttributesPerKind[(int)node.Domain].labelSettings).FontSize,
+                textColor: Color.black.ColorWithAlpha(0f));
+            nodeLabel.name = $"Label {shownText}";
             nodeLabel.transform.SetParent(gameObject.transform);
             
             SetOutline();
@@ -256,7 +269,7 @@ namespace SEE.Controls.Actions
             edge.transform.SetParent(nodeLabel.transform);
             Portal.SetInfinitePortal(nodeLabel);
 
-            AnimateLabel(city, isLeaf);
+            AnimateLabel(city, node);
         }
 
         /// <summary>
@@ -283,8 +296,8 @@ namespace SEE.Controls.Actions
         /// Animates the given labels by fading them in and gradually changing their position.
         /// </summary>
         /// <param name="city">The <see cref="AbstractSEECity"/> object from which to get the settings.</param>
-        /// <param name="isLeaf">Whether this node is a leaf.</param>
-        private void AnimateLabel(AbstractSEECity city, bool isLeaf)
+        /// <param name="node">The node.</param>
+        private void AnimateLabel(AbstractSEECity city, Node node)
         {
             // TODO: Maybe the class in Tweens.cs should be used instead.
             // However, I'm not sure why that class is a MonoBehaviour (shouldn't it be a static helper class?)
@@ -294,13 +307,13 @@ namespace SEE.Controls.Actions
             const float endAlpha = 1f;  // Alpha value the text and line will have at the end of the animation.
             const float lineStartAlpha = endAlpha * 0.5f;  // Alpha value the start of the line should have.
             Vector3 endLabelPosition = nodeLabel.transform.position;
-            endLabelPosition.y += (isLeaf ? city.LeafLabelSettings : city.InnerNodeLabelSettings).Distance;
+            endLabelPosition.y += (node.IsLeaf() ? city.leafNodeAttributesPerKind[(int)node.Domain].labelSettings : city.innerNodeAttributesPerKind[(int)node.Domain].labelSettings).Distance;
             // Due to the line not using world space, we need to transform its position accordingly
             Vector3 endLinePosition = edge.transform.InverseTransformPoint(endLabelPosition);
             float nodeTopPosition = nodeLabel.GetComponent<TextMeshPro>().textBounds.extents.y;
             endLinePosition.y -= nodeTopPosition * 1.3f; // add slight gap to make it slightly more aesthetic
 
-            float animationDuration = AnimationDuration(isLeaf, city);
+            float animationDuration = AnimationDuration(node, city);
             if (animationDuration <= 0)
             {
                 // If animation duration is set to 0, all otherwise animated attributes should be set immediately
@@ -399,14 +412,14 @@ namespace SEE.Controls.Actions
 
         /**
          * Returns the animation duration using values defined in AbstractSEECity.
-         * <param name="isLeaf">Must be true iff the node attached to the game object is a leaf.</param>
+         * <param name="node">The node.</param>
          * <param name="city">The city object from which to retrieve the duration.
          * If <code>null</code>, the city object will be retrieved by a call to <see cref="City"/>.</param>
          */
-        private float AnimationDuration(bool isLeaf, AbstractSEECity city = null)
+        private float AnimationDuration(Node node, AbstractSEECity city = null)
         {
-            city = city ?? City();
-            return (isLeaf ? city.LeafLabelSettings : city.InnerNodeLabelSettings).AnimationDuration;
+            city ??= City();
+            return (node.IsLeaf() ? city.leafNodeAttributesPerKind[(int)node.Domain].labelSettings : city.innerNodeAttributesPerKind[(int)node.Domain].labelSettings).AnimationDuration;
         }
 
         /// <summary>

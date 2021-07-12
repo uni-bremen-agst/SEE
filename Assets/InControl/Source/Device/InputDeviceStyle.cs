@@ -9,6 +9,7 @@ namespace InControl
 		Unknown = 0,
 		Xbox360,
 		XboxOne,
+		XboxSeriesX,
 		PlayStation2,
 		PlayStation3,
 		PlayStation4,

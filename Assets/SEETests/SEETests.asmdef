@@ -1,10 +1,12 @@
 {
     "name": "SEETests",
+    "rootNamespace": "",
     "references": [
         "GUID:cafbae0046a0f094db2fd816ce654fea",
         "GUID:27619889b8ba8c24980f49ee34dbb44a",
         "GUID:0acc523941302664db1f4e527237feb3",
-        "GUID:74fd32818bdd6ed012fb3490ef6e9793"
+        "GUID:44cd4270396f4c1413d551ef0adc55db",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23"
     ],
     "includePlatforms": [
         "Editor"

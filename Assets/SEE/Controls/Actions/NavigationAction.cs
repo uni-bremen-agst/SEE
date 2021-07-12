@@ -9,8 +9,8 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// The abstract navigation action handles generic interactions with the city.
     /// </summary>
-    [RequireComponent(typeof(Plane))]
-    public abstract class NavigationAction : CityAction
+    [RequireComponent(typeof(GO.Plane))]
+    public abstract class NavigationAction : MonoBehaviour
     {
         /// <summary>
         /// Zoom commands hold data about zooming into or out of the city.
@@ -116,7 +116,7 @@ namespace SEE.Controls.Actions
             "to the appropriate NavigationAction! If a GameObject contains both a" +
             "Desktop- and XRNavigationAction, those IDs must be identical.")]
         // TODO(torben): a better alternative would be to use the SEECity and hash the path of the graph or something...
-        // also, this will most likely be replaced by an automatic approach
+        // also, this will most likely be replaced by an automatic approach. IGNORE THIS TODO, BECAUSE THIS SCRIPT WILL BE REMOVED ANYWAY!
         [SerializeField] protected int id;
         public int ID => id;
 
@@ -250,15 +250,6 @@ namespace SEE.Controls.Actions
                 CityTransform.position += cityCenterToHitPoint;
                 CityTransform.localScale = zoomState.currentZoomFactor * zoomState.originalScale;
                 CityTransform.position -= Vector3.Scale(cityCenterToHitPointUnscaled, CityTransform.localScale);
-
-                // TODO(torben): i believe in desktop mode this made sure that zooming
-                // will always happen towards the current mouse position and not the
-                // starting position ? not sure... this might actually be an
-                // uninteresting feature
-
-                //moveState.dragStartTransformPosition += moveState.dragStartOffset;
-                //moveState.dragStartOffset = Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale);
-                //moveState.dragStartTransformPosition -= moveState.dragStartOffset;
             }
             else
             {

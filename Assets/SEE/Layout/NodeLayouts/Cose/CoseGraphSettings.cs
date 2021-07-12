@@ -15,10 +15,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.DataModel.DG;
 using SEE.Utils;
 using System.Collections.Generic;
-using static SEE.Game.AbstractSEECity;
 
 namespace SEE.Layout.NodeLayouts.Cose
 {

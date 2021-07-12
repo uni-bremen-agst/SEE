@@ -71,6 +71,7 @@ MonoBehaviour:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
+  buttonVar: {fileID: 0}
   normalText: {fileID: 114704145710624222}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 2331035904865435116}
@@ -79,6 +80,7 @@ MonoBehaviour:
   useHoverSound: 1
   useClickSound: 1
   useRipple: 1
+  rippleUpdateMode: 1
   rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
   speed: 2.4
   maxSize: 6
@@ -148,7 +150,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 100d5727b1babc14bac90fe9c56af800, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1

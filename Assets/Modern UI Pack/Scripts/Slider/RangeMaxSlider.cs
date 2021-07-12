@@ -33,7 +33,7 @@ namespace Michsky.UI.ModernUIPack
             else
                 realValue = maxValue - input + minValue;
 
-            if (wholeNumbers)
+            if (wholeNumbers == true)
                 realValue = Mathf.Round(realValue);
 
             if (realValue <= minSlider.value)
