@@ -247,7 +247,15 @@ namespace SEEEditor
                 settings.kind = (NodeLayoutKind)EditorGUILayout.EnumPopup("Node layout", settings.kind);
                 city.globalCityAttributes.layoutPath = GetDataPath("Layout file", city.globalCityAttributes.layoutPath, Filenames.ExtensionWithoutPeriod(Filenames.GVLExtension));
                 settings.zScoreScale = EditorGUILayout.Toggle("Z-score scaling", settings.zScoreScale);
-                settings.showErosions = EditorGUILayout.Toggle("Show erosions", settings.showErosions);
+                settings.showInnerErosions = EditorGUILayout.Toggle("Show inner erosions", settings.showInnerErosions);
+                settings.showLeafErosions = EditorGUILayout.Toggle("Show leaf erosions", settings.showLeafErosions);
+                settings.loadDashboardMetrics = EditorGUILayout.Toggle("Load Metrics from Dashboard", settings.loadDashboardMetrics);
+                if (settings.loadDashboardMetrics)
+                {
+                    settings.issuesAddedFromVersion = EditorGUILayout.TextField("Only issues added from version", 
+                                                                                settings.issuesAddedFromVersion);
+                    settings.overrideMetrics = EditorGUILayout.Toggle("Override existing metrics", settings.overrideMetrics);
+                }
                 settings.erosionScalingFactor = EditorGUILayout.FloatField("Scaling factor of erosions", 
                                                                            settings.erosionScalingFactor);
             }

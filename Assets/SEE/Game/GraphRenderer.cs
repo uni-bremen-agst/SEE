@@ -1018,23 +1018,30 @@ namespace SEE.Game
         /// <param name="innerNodeKinds">the inner node kinds for the gameobject</param>
         /// <param name="nodeLayout">the nodeLayout used for this gameobject</param>
         /// <returns>the game objects added for the decorations; may be an empty collection</returns>
-        private void AddDecorations(IEnumerable<GameObject> gameNodes, InnerNodeKinds innerNodeKinds, 
+        private void AddDecorations(ICollection<GameObject> gameNodes, InnerNodeKinds innerNodeKinds, 
                                     NodeLayoutKind nodeLayout)
         {
             InnerNodeFactory innerNodeFactory = innerNodeFactories[0];
+            NodeFactory leafNodeFactory = leafNodeFactories[0];
+            ICollection<GameObject> leafNodes = FindLeafNodes(gameNodes);
             ICollection<GameObject> innerNodes = FindInnerNodes(gameNodes);
 
-            // Add software erosion decorators for all leaf nodes if requested.
-            if (settings.nodeLayoutSettings.showErosions)
+            // Add software erosion decorators for all nodes if requested.
+            if (settings.nodeLayoutSettings.showInnerErosions)
             {
                 ErosionIssues issueDecorator = new ErosionIssues(settings.InnerIssueMap(), innerNodeFactory, 
                                                                  scaler, settings.nodeLayoutSettings.erosionScalingFactor);
                 issueDecorator.Add(innerNodes);
             }
+            if (settings.nodeLayoutSettings.showLeafErosions)
+            {
+                ErosionIssues issueDecorator = new ErosionIssues(settings.LeafIssueMap(), leafNodeFactory,
+                                                                 scaler, settings.nodeLayoutSettings.erosionScalingFactor);
+                issueDecorator.Add(leafNodes);
+            }
 
             // Add text labels for all inner nodes
-            if (nodeLayout == NodeLayoutKind.Balloon
-                || nodeLayout == NodeLayoutKind.EvoStreets)
+            if (nodeLayout == NodeLayoutKind.Balloon || nodeLayout == NodeLayoutKind.EvoStreets)
             {
                 AddLabels(innerNodes, innerNodeFactory);
             }

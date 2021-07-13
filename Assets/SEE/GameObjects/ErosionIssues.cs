@@ -90,7 +90,7 @@ namespace SEE.GO
                     GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value, 
                                                                      value.ToString(CultureInfo.InvariantCulture), 
                                                                      new Color(metricScale, 0, 0, 
-                                                                               Mathf.Lerp(0.5f, 1f, metricScale)));
+                                                                               Mathf.Lerp(0.75f, 1f, metricScale)));
                     
                     // NOTE: The EROSION_SPRITE_PREFIX must be present here,
                     // otherwise partial erosion display won't work!

@@ -129,10 +129,38 @@ namespace SEE.Game
         /// </summary>
         public bool zScoreScale = true;
 
-        public bool showErosions = false; // Whether erosions should be visible above blocks.
+        /// <summary>
+        /// Whether erosions should be visible above inner node blocks.
+        /// </summary>
+        public bool showInnerErosions = false;
+        
+        /// <summary>
+        /// Whether erosions should be visible above leaf node blocks.
+        /// </summary>
+        public bool showLeafErosions = false;
+        
+        /// <summary>
+        /// Whether metrics shall be retrieved from the dashboard.
+        /// This includes erosion data.
+        /// </summary>
+        public bool loadDashboardMetrics = true;
 
+        /// <summary>
+        /// If empty, all issues will be retrieved. Otherwise, only those issues which have been added from
+        /// the given version to the most recent one will be loaded.
+        /// </summary>
+        public string issuesAddedFromVersion = "";
+        
+        /// <summary>
+        /// Whether metrics retrieved from the dashboard shall override existing metrics.
+        /// </summary>
+        public bool overrideMetrics = true;
+
+        /// <summary>
+        /// Factor by which erosion icons shall be scaled.
+        /// </summary>
         [Range(0.0f, float.MaxValue)]
-        public float erosionScalingFactor = 1.0f;
+        public float erosionScalingFactor = 1.5f;
     }
 
     /// <summary>
