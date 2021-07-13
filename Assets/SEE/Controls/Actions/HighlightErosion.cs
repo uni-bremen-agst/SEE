@@ -1,8 +1,12 @@
 ﻿using System;
 using DG.Tweening;
+using SEE.DataModel.DG;
+using SEE.Game;
 using SEE.GO;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.UI;
 
 namespace SEE.Controls.Actions
 {
@@ -10,11 +14,11 @@ namespace SEE.Controls.Actions
     /// Highlights the corresponding erosion icons of the node this component is attached to.
     /// If no erosion icons are present, this component won't do anything.
     /// </summary>
-    public class HighlightErosion: InteractableObjectAction
+    public class HighlightErosion : InteractableObjectAction
     {
         // TODO: This file heavily clones code from ShowLabel.cs. It may be worthwhile to put this common behavior
         // into a shared superclass.
-        
+
         /// <summary>
         /// True if the object is currently being hovered over.
         /// </summary>
@@ -29,14 +33,14 @@ namespace SEE.Controls.Actions
         /// The node reference this component is attached to.
         /// </summary>
         private NodeRef nodeRef;
-        
+
         /// <summary>
         /// All currently active tweens, collected in a sequence.
         /// </summary>
         private Sequence sequence;
-        
+
         //TODO: Use sequence to animate tween
-        
+
         /// <summary>
         /// Registers On() and Off() for the respective hovering and selection events.
         /// </summary>
@@ -54,7 +58,7 @@ namespace SEE.Controls.Actions
                 Debug.LogError($"ShowLabel.OnEnable for {name} has NO interactable.\n");
             }
         }
-        
+
         /// <summary>
         /// Unregisters On() and Off() from the respective hovering and selection events.
         /// </summary>
@@ -72,7 +76,7 @@ namespace SEE.Controls.Actions
                 Debug.LogError($"ShowLabel.OnDisable for {name} has NO interactable.\n");
             }
         }
-        
+
         /// <summary>
         /// Called when the object is selected. If <paramref name="isInitiator"/> is false, a remote
         /// player has triggered this event and, hence, nothing will be done. Otherwise
@@ -151,27 +155,80 @@ namespace SEE.Controls.Actions
             }
         }
 
+        /// <summary>
+        /// Returns the code city holding the settings for the visualization of the node.
+        /// May be null.
+        /// </summary>
+        private AbstractSEECity City()
+        {
+            GameObject codeCityObject = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
+            if (codeCityObject == null)
+            {
+                return null;
+            }
+
+            codeCityObject.TryGetComponent(out AbstractSEECity city);
+            return city;
+        }
+
+        /**
+         * Returns the animation duration using values defined in AbstractSEECity.
+         * <param name="node">The node.</param>
+         * <param name="city">The city object from which to retrieve the duration.
+         * If <code>null</code>, the city object will be retrieved by a call to <see cref="City"/>.</param>
+         */
+        private float AnimationDuration(Node node, AbstractSEECity city = null)
+        {
+            city ??= City();
+            return (node.IsLeaf() ? city.leafNodeAttributesPerKind[(int) node.Domain].labelSettings : city.innerNodeAttributesPerKind[(int) node.Domain].labelSettings).AnimationDuration;
+        }
+
         private void On()
         {
-            Debug.Log("On erosion");
-            ForEachErosionSprite(sprite =>
+            if (sequence != null)
             {
-                sprite.transform.localScale *= 2;
-            });
+                sequence.PlayForward();
+            }
+            else
+            {
+                sequence = DOTween.Sequence();
+                sequence.SetAutoKill(false);
+                sequence.SetRecyclable(true);
+                float duration = AnimationDuration(nodeRef.Value);
+                const float SCALING_FACTOR = 1.5f;
+                ForEachErosion((sprite, textMesh, layoutGroup) =>
+                {
+                    // We have to delete the text first to animate it more nicely, so we save it here
+                    string metricText = textMesh.text;
+                    // This will enlarge the sprite, make it more opaque, and fade in the text
+                    sequence.Insert(0, DOTween.To(() => textMesh.text, text => textMesh.text = text, string.Empty, 0f))
+                            .Insert(1, DOTween.To(() => sprite.transform.localScale,
+                                                  s => sprite.transform.localScale = s,
+                                                  sprite.transform.localScale * SCALING_FACTOR, duration))
+                            .Insert(1, DOTween.ToAlpha(() => sprite.color, color => sprite.color = color,
+                                                       1f, duration))
+                            .Insert(1, DOTween.To(() => layoutGroup.padding.left,
+                                                  pad => layoutGroup.padding.left = pad, -12, duration))
+                            .Insert(1, DOTween.To(() => textMesh.text, text => textMesh.text = text,
+                                                  metricText, duration));
+
+                    textMesh.gameObject.SetActive(true);
+                });
+                sequence.PlayForward();
+            }
         }
 
         private void Off()
         {
-            Debug.Log("Off erosion");
-            //TODO: Make sure this doesn't cause floating point precision problems
-            ForEachErosionSprite(s => s.transform.localScale /= 2);
+            sequence?.PlayBackwards();
         }
 
         /// <summary>
-        /// Applies the given <paramref name="spriteAction"/> to each erosion sprite renderer of this node.
+        /// Applies the given <paramref name="spriteAction"/> to each erosion of this node.
         /// </summary>
-        /// <param name="spriteAction">The action to apply to each erosion sprite renderer.</param>
-        private void ForEachErosionSprite(Action<SpriteRenderer> spriteAction)
+        /// <param name="spriteAction">The action to apply to each erosion sprite renderer, metric text and
+        /// corresponding horizontal layout group.</param>
+        private void ForEachErosion(Action<SpriteRenderer, TextMeshPro, HorizontalLayoutGroup> spriteAction)
         {
             if (spriteAction == null)
             {
@@ -182,12 +239,13 @@ namespace SEE.Controls.Actions
             {
                 if (childTransform.name.StartsWith(ErosionIssues.EROSION_SPRITE_PREFIX))
                 {
-                    Assert.IsTrue(childTransform.childCount == 1, "Only child of sprite object should be renderer");
-                    Transform spriteChild = childTransform.GetChild(0);
-                    if (spriteChild.gameObject.TryGetComponentOrLog(out SpriteRenderer spriteRenderer))
-                    {
-                        spriteAction.Invoke(spriteRenderer);
-                    }
+                    HorizontalLayoutGroup layoutGroup = childTransform.GetComponent<HorizontalLayoutGroup>();
+                    SpriteRenderer spriteRenderer = childTransform.GetComponentInChildren<SpriteRenderer>();
+                    TextMeshPro[] textMesh = childTransform.GetComponentsInChildren<TextMeshPro>(true);
+                    Assert.IsNotNull(spriteRenderer);
+                    Assert.IsTrue(textMesh.Length > 0);
+                    Assert.IsNotNull(layoutGroup);
+                    spriteAction.Invoke(spriteRenderer, textMesh[0], layoutGroup);
                 }
             }
         }

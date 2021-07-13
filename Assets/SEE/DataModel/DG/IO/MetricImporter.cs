@@ -102,8 +102,6 @@ namespace SEE.DataModel.DG.IO
             MetricAggregator.AggregateSum(graph, issueNames.Select(x => x.Name()));
             Debug.Log($"Updated {updatedMetrics} metric values and {encounteredIssueNodes.Count} issues " 
                       + "using the Axivion dashboard.\n");
-            
-            //TODO: Save values afterwards
 
             
             static async UniTask<IDictionary<string, List<Issue>>> LoadIssueMetrics()

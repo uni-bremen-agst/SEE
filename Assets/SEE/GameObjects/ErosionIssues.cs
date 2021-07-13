@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using SEE.DataModel.DG;
 using UnityEngine;
 
@@ -84,11 +85,12 @@ namespace SEE.GO
                 {
                     // Scale the erosion issue by normalization set in relation to the
                     // maximum value of the normalized metric. Hence, this value is in [0,1].
-                    float metricScale = scaler.GetRelativeNormalizedValue(issue.Key, node);
+                    float metricScale = scaler.GetRelativeNormalizedValueInLevel(issue.Key, node);
 
-                    //TODO: Color according to metric
-                    GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value,
-                                                                     new Color(metricScale, 0, 0, 0.9f));
+                    GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value, 
+                                                                     value.ToString(CultureInfo.InvariantCulture), 
+                                                                     new Color(metricScale, 0, 0, 
+                                                                               Mathf.Lerp(0.5f, 1f, metricScale)));
                     
                     // NOTE: The EROSION_SPRITE_PREFIX must be present here,
                     // otherwise partial erosion display won't work!
@@ -102,7 +104,8 @@ namespace SEE.GO
                     scale *= spriteScale;
                     // assert: scale.x = 1
                     // Now scale it by the normalized metric.
-                    scale *= metricScale;
+                    // NOTE: Commented out because color already represents the metric.
+                    //scale *= metricScale;
                     // assert: scale.x in [0,1]
                     // UnityEngine.Assertions.Assert.IsTrue(0 <= scale.x);
                     // UnityEngine.Assertions.Assert.IsTrue(scale.x <= 1, $"scale.x={scale.x}");
@@ -126,7 +129,8 @@ namespace SEE.GO
                 // The space that we put in between two subsequent erosion issue sprites.
                 Vector3 delta = Vector3.up / 100.0f;
                 Vector3 currentRoof = innerNodeFactory.Roof(gameNode.gameObject);
-                sprites.Sort(Comparer<GameObject>.Create((left, right) => GetSizeOfSprite(left).x.CompareTo(GetSizeOfSprite(right).x)));
+                sprites.Sort(Comparer<GameObject>.Create((left, right) =>
+                                                             GetSizeOfSprite(left).x.CompareTo(GetSizeOfSprite(right).x)));
                 foreach (GameObject sprite in sprites)
                 {
                     Vector3 size = GetSizeOfSprite(sprite);

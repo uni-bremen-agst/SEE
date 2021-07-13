@@ -107,6 +107,12 @@ namespace SEE.Game
         /// The scale used to normalize the metrics determining the lengths of the blocks.
         /// </summary>
         private IScale scaler;
+        
+        /// <summary>
+        /// The scale used to normalize the erosion metrics determining the color and size of the erosion icons.
+        /// This is different from <see cref="scaler"/> insofar that 
+        /// </summary>
+        private IScale erosionScaler;
 
         /// <summary>
         /// A mapping from Node to ILayoutNode.
@@ -125,11 +131,11 @@ namespace SEE.Game
 
             if (settings.nodeLayoutSettings.zScoreScale)
             {
-                scaler = new ZScoreScale(graphs, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics, true);
+                scaler = new ZScoreScale(graphs, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics, false);
             }
             else
             {
-                scaler = new LinearScale(graphs, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics, true);
+                scaler = new LinearScale(graphs, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics, false);
             }
         }
 

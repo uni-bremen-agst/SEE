@@ -265,6 +265,7 @@ namespace SEE.Game
                 Debug.LogWarning($"CSV file {filename} has {numberOfErrors} many errors.\n");
             }
             p.End();
+            
             // Substitute missing values from the dashboard
             MetricImporter.LoadDashboard(LoadedGraph).Forget();
         }
