@@ -19,8 +19,6 @@ namespace SEE.DataModel.DG.IO
     /// </summary>
     public class MetricImporter : MetricsIO
     {
-        //TODO: MetricExporter should be able to use dashboard too
-
         /// <summary>
         /// Loads metrics and issues from the Axivion dashboard and imports them to the graph.
         /// Issues are also aggregated along the node decomposition tree as a sum
@@ -28,10 +26,10 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="graph">The graph whose nodes' metrics shall be set</param>
         /// <param name="override">Whether any existing metrics present in the graph's nodes shall be updated</param>
-        public static async UniTaskVoid LoadDashboard(Graph graph, bool @override = true)
+        public static async UniTaskVoid LoadDashboard(Graph graph, bool @override = true, string addedFrom = "")
         {
             IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics = await DashboardRetriever.Instance.GetAllMetricRows();
-            IDictionary<string, List<Issue>> issues = await LoadIssueMetrics();
+            IDictionary<string, List<Issue>> issues = await LoadIssueMetrics(addedFrom.IsNullOrWhitespace() ? null : addedFrom);
             string projectFolder = DataPath.ProjectFolder();
 
             await UniTask.SwitchToThreadPool();
@@ -110,10 +108,10 @@ namespace SEE.DataModel.DG.IO
                       + "using the Axivion dashboard.\n");
 
             
-            static async UniTask<IDictionary<string, List<Issue>>> LoadIssueMetrics()
+            static async UniTask<IDictionary<string, List<Issue>>> LoadIssueMetrics(string start)
             {
                 IDictionary<string, List<Issue>> issues = new Dictionary<string, List<Issue>>();
-                IList<Issue> allIssues = await DashboardRetriever.Instance.GetConfiguredIssues();
+                IList<Issue> allIssues = await DashboardRetriever.Instance.GetConfiguredIssues(start, state: Issue.IssueState.added);
                 foreach (Issue issue in allIssues)
                 {
                     foreach (SourceCodeEntity entity in issue.Entities)

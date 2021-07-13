@@ -267,7 +267,11 @@ namespace SEE.Game
             p.End();
             
             // Substitute missing values from the dashboard
-            MetricImporter.LoadDashboard(LoadedGraph).Forget();
+            if (nodeLayoutSettings.loadDashboardMetrics)
+            {
+                MetricImporter.LoadDashboard(LoadedGraph, nodeLayoutSettings.overrideMetrics, 
+                nodeLayoutSettings.issuesAddedFromVersion).Forget();
+            }
         }
 
         /// <summary>

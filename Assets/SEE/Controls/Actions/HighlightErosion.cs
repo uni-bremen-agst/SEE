@@ -206,8 +206,6 @@ namespace SEE.Controls.Actions
                                                                      sprite.transform.localScale * SCALING_FACTOR, duration))
                                                .Insert(0.03f, DOTween.ToAlpha(() => sprite.color, color => sprite.color = color,
                                                                           1f, duration))
-                                               .Insert(0.03f, DOTween.To(() => layoutGroup.padding.left,
-                                                                     pad => layoutGroup.padding.left = pad, -12, duration))
                                                .Insert(0.03f, DOTween.To(() => textMesh.text, t => textMesh.text = t,
                                                                      metricText, duration));
                 });
