@@ -577,7 +577,8 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Sets the levels of all nodes and the maximal depth of the graph.
         ///
-        /// Note: This method should be called only by <see cref="Node"/>.
+        /// Note: This method should be called only by <see cref="Node"/> and
+        /// <see cref="SEE.DataModel.DG.IO.GraphReader"/>.
         /// </summary>
         internal void FinalizeNodeHierarchy()
         {

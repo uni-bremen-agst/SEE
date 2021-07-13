@@ -51,7 +51,7 @@ namespace SEEEditor
         /// Whether the "nodes and node layout" foldout should be expanded.
         /// </summary>
         private bool showNodeLayout = true;
-        
+
         /// <summary>
         /// Whether the "Edges and edge layout" foldout should be expanded.
         /// </summary>
@@ -100,14 +100,14 @@ namespace SEEEditor
         }
 
         /// <summary>
-        /// Foldout for global settings (settings filename, LOD Culling) and buttons for 
+        /// Foldout for global settings (settings filename, LOD Culling) and buttons for
         /// loading and saving the settings.
         /// </summary>
         private void GlobalAttributes()
         {
             showGlobalAttributes = EditorGUILayout.Foldout(showGlobalAttributes, "Global attributes", true, EditorStyles.foldoutHeader);
             if (showGlobalAttributes)
-            {                
+            {
                 city.CityPath = DataPathEditor.GetDataPath("Settings file", city.CityPath, Filenames.ExtensionWithoutPeriod(Filenames.ConfigExtension));
                 GUILayout.BeginHorizontal();
                 if (GUILayout.Button("Load", GUILayout.Width(50)))
@@ -282,13 +282,9 @@ namespace SEEEditor
                         settings.kind = (InnerNodeKinds)EditorGUILayout.EnumPopup("Type", settings.kind);
                         settings.heightMetric = EditorGUILayout.TextField("Height", settings.heightMetric);
                         settings.styleMetric = EditorGUILayout.TextField("Style", settings.styleMetric);
-                        settings.coloringKind = (ColoringKind)EditorGUILayout.EnumPopup("Color By", settings.coloringKind);
-                        EditorGUI.BeginDisabledGroup(settings.coloringKind == ColoringKind.Random);
-                        {
-                            settings.colorRange.lower = EditorGUILayout.ColorField("Lower color", settings.colorRange.lower);
-                            settings.colorRange.upper = EditorGUILayout.ColorField("Upper color", settings.colorRange.upper);
-                            settings.colorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.colorRange.NumberOfColors, 1, 15);
-                        }
+                        settings.colorRange.lower = EditorGUILayout.ColorField("Lower color", settings.colorRange.lower);
+                        settings.colorRange.upper = EditorGUILayout.ColorField("Upper color", settings.colorRange.upper);
+                        settings.colorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.colorRange.NumberOfColors, 1, 15);
                         EditorGUI.EndDisabledGroup();
                         LabelSettings(ref settings.labelSettings);
                     }
@@ -320,13 +316,9 @@ namespace SEEEditor
                         settings.heightMetric = EditorGUILayout.TextField("Height", settings.heightMetric);
                         settings.depthMetric = EditorGUILayout.TextField("Depth", settings.depthMetric);
                         settings.styleMetric = EditorGUILayout.TextField("Style", settings.styleMetric);
-                        settings.coloringKind = (ColoringKind)EditorGUILayout.EnumPopup("Color By", settings.coloringKind);
-                        EditorGUI.BeginDisabledGroup(settings.coloringKind == ColoringKind.Random);
-                        {
-                            settings.colorRange.lower = EditorGUILayout.ColorField("Lower color", settings.colorRange.lower);
-                            settings.colorRange.upper = EditorGUILayout.ColorField("Upper color", settings.colorRange.upper);
-                            settings.colorRange.NumberOfColors = (uint) EditorGUILayout.IntSlider("# Colors", (int) settings.colorRange.NumberOfColors, 1, 15);
-                        }
+                        settings.colorRange.lower = EditorGUILayout.ColorField("Lower color", settings.colorRange.lower);
+                        settings.colorRange.upper = EditorGUILayout.ColorField("Upper color", settings.colorRange.upper);
+                        settings.colorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.colorRange.NumberOfColors, 1, 15);
                         EditorGUI.EndDisabledGroup();
                         LabelSettings(ref settings.labelSettings);
                     }
