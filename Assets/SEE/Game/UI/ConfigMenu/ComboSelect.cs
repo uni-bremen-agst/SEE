@@ -71,14 +71,16 @@ namespace SEE.Game.UI.ConfigMenu
         /// <summary>
         /// The values (options) of this input.
         /// </summary>
-        public List<string> Values {
+        public List<string> Values
+        {
             set => _valuesUpdates.Enqueue(value);
         }
 
         /// <summary>
         /// The value (currently selected option) of this input.
         /// </summary>
-        public string Value {
+        public string Value
+        {
             get => FigureOutValue();
             set => _valueUpdates.Enqueue(value);
         }
@@ -95,7 +97,7 @@ namespace SEE.Game.UI.ConfigMenu
         {
             _dropdown.dropdownEvent.AddListener(arg0 =>
             {
-                var selectedItem = _dropdown.dropdownItems[arg0].itemName;
+                string selectedItem = _dropdown.dropdownItems[arg0].itemName;
                 OnValueChange(Value);
                 FigureOutInputMode(selectedItem);
             });
@@ -116,7 +118,7 @@ namespace SEE.Game.UI.ConfigMenu
                 {
                     _dropdown.CreateNewItemFast(CustomInputText, null);
                 }
-                foreach (var s in newValues)
+                foreach (string s in newValues)
                 {
                     _dropdown.CreateNewItemFast(s, null);
                 }
@@ -155,7 +157,7 @@ namespace SEE.Game.UI.ConfigMenu
         void FigureOutInputMode(string value)
         {
             // If the new value is already part of the items in the list, we simply select its index.
-            var index = _dropdown.dropdownItems.FindIndex(item => item.itemName == value);
+            int index = _dropdown.dropdownItems.FindIndex(item => item.itemName == value);
             if (index >= 0 && value != CustomInputText)
             {
                 SetToFixedMode(index);
@@ -169,7 +171,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         string FigureOutValue()
         {
-            var item = _dropdown.dropdownItems[_dropdown.selectedItemIndex].itemName;
+            string item = _dropdown.dropdownItems[_dropdown.selectedItemIndex].itemName;
             if (item == CustomInputText)
             {
                 return _customInput.text;
