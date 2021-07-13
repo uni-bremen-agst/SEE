@@ -128,23 +128,16 @@ namespace SEE.Game
         /// <returns>root path</returns>
         private static string GetRootPath(RootKind rootKind)
         {
-            switch (rootKind)
+            return rootKind switch
             {
-                case RootKind.PersistentData:
-                    return Application.persistentDataPath;
-                case RootKind.StreamingAssets:
-                    return Application.streamingAssetsPath;
-                case RootKind.TemporaryCache:
-                    return Application.temporaryCachePath;
-                case RootKind.AssetsFolder:
-                    return Application.dataPath;
-                case RootKind.ProjectFolder:
-                    return ProjectFolder();
-                case RootKind.Absolute:
-                    return string.Empty;
-                default:
-                    throw new NotImplementedException("Unhandled case " + rootKind);
-            }
+                RootKind.PersistentData => Application.persistentDataPath,
+                RootKind.StreamingAssets => Application.streamingAssetsPath,
+                RootKind.TemporaryCache => Application.temporaryCachePath,
+                RootKind.AssetsFolder => Application.dataPath,
+                RootKind.ProjectFolder => ProjectFolder(),
+                RootKind.Absolute => string.Empty,
+                _ => throw new NotImplementedException("Unhandled case " + rootKind)
+            };
         }
 
         /// <summary>

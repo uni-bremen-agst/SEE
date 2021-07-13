@@ -126,8 +126,6 @@ namespace SEE.GO
             // Now we stack the sprites on top of the roof of the building in
             // ascending order of their widths.
             {
-                // The space that we put in between two subsequent erosion issue sprites.
-                Vector3 delta = Vector3.up / 100.0f;
                 Vector3 currentRoof = innerNodeFactory.Roof(gameNode.gameObject);
                 sprites.Sort(Comparer<GameObject>.Create((left, right) =>
                                                              GetSizeOfSprite(left).x.CompareTo(GetSizeOfSprite(right).x)));
@@ -136,7 +134,7 @@ namespace SEE.GO
                     Vector3 size = GetSizeOfSprite(sprite);
                     // Note: Consider that the position of the sprite is its center.
                     Vector3 halfHeight = (size.y / 2.0f) * Vector3.up;
-                    sprite.transform.position = currentRoof + delta + halfHeight;
+                    sprite.transform.position = currentRoof + halfHeight;
                     currentRoof = sprite.transform.position + halfHeight;
                 }
             }

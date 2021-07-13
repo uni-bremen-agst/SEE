@@ -123,14 +123,16 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Returns the path of the source file for this graph element relative to the project root.
-        /// The project root is determined by calling <see cref="DataPath.ProjectFolder"/>.
+        /// The project root is determined by calling <see cref="DataPath.ProjectFolder"/> if it is not supplied
+        /// by <paramref name="projectFolder"/>.
         /// Note that not all graph elements may have a source file.
         /// If the graph element does not have this attribute, null is returned.
         /// </summary>
+        /// <param name="projectFolder">The project's folder, containing the node's path.</param>
         /// <returns>relative path of source file or null</returns>
-        public string RelativePath()
+        public string RelativePath(string projectFolder = null)
         {
-            return Path()?.Replace(DataPath.ProjectFolder(), string.Empty).TrimStart('/');
+            return Path()?.Replace(projectFolder ?? DataPath.ProjectFolder(), string.Empty).TrimStart('/');
         }
 
         /// <summary>

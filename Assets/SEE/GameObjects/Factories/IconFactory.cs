@@ -205,7 +205,7 @@ namespace SEE.GO
                 erosionSprite.name = prefabName;
                 erosionSprite.AddComponent<RectTransform>();
             }
-            erosionSprite.transform.parent = gameObject.transform;
+            erosionSprite.transform.SetParent(gameObject.transform, false);
             erosionSprite.transform.SetAsFirstSibling();
             SpriteRenderer renderer = erosionSprite.GetComponent<SpriteRenderer>();
             if (color != default)

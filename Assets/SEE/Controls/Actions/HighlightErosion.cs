@@ -39,8 +39,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         private Sequence sequence;
 
-        //TODO: Use sequence to animate tween
-
         /// <summary>
         /// Registers On() and Off() for the respective hovering and selection events.
         /// </summary>
@@ -195,24 +193,23 @@ namespace SEE.Controls.Actions
                 sequence.SetAutoKill(false);
                 sequence.SetRecyclable(true);
                 float duration = AnimationDuration(nodeRef.Value);
-                const float SCALING_FACTOR = 1.5f;
+                const float SCALING_FACTOR = 1.3f;
                 ForEachErosion((sprite, textMesh, layoutGroup) =>
                 {
-                    // We have to delete the text first to animate it more nicely, so we save it here
+                    // We have to delete the text first to animate it more nicely, so we save it here before that
                     string metricText = textMesh.text;
                     // This will enlarge the sprite, make it more opaque, and fade in the text
-                    sequence.Insert(0, DOTween.To(() => textMesh.text, text => textMesh.text = text, string.Empty, 0f))
-                            .Insert(1, DOTween.To(() => sprite.transform.localScale,
-                                                  s => sprite.transform.localScale = s,
-                                                  sprite.transform.localScale * SCALING_FACTOR, duration))
-                            .Insert(1, DOTween.ToAlpha(() => sprite.color, color => sprite.color = color,
-                                                       1f, duration))
-                            .Insert(1, DOTween.To(() => layoutGroup.padding.left,
-                                                  pad => layoutGroup.padding.left = pad, -12, duration))
-                            .Insert(1, DOTween.To(() => textMesh.text, text => textMesh.text = text,
-                                                  metricText, duration));
-
-                    textMesh.gameObject.SetActive(true);
+                    sequence.Insert(0, DOTween.To(() => textMesh.text, t => textMesh.text = t, string.Empty, 0.01f))
+                            .InsertCallback(0.02f, () => textMesh.gameObject.SetActive(!sequence.isBackwards))
+                                               .Insert(0.03f, DOTween.To(() => sprite.transform.localScale,
+                                                                     s => sprite.transform.localScale = s,
+                                                                     sprite.transform.localScale * SCALING_FACTOR, duration))
+                                               .Insert(0.03f, DOTween.ToAlpha(() => sprite.color, color => sprite.color = color,
+                                                                          1f, duration))
+                                               .Insert(0.03f, DOTween.To(() => layoutGroup.padding.left,
+                                                                     pad => layoutGroup.padding.left = pad, -12, duration))
+                                               .Insert(0.03f, DOTween.To(() => textMesh.text, t => textMesh.text = t,
+                                                                     metricText, duration));
                 });
                 sequence.PlayForward();
             }
