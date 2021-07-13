@@ -98,7 +98,13 @@ Shader "Custom/PortalSpriteShader"
 
             fixed4 frag(const v2f IN) : SV_Target
             {
-                fixed4 c = SampleSpriteTexture(IN.texcoord) * IN.color;
+                float4 c = SampleSpriteTexture(IN.texcoord) * IN.color;
+                // Following segment taken from https://forum.unity.com/threads/sprite-tint-shader.520248/#post-3412451
+                fixed a = c.a;
+                if ( c.a >= 0.1 ){
+                    c = c + (IN.color - c) * IN.color.a * c.a;
+                    c.a = a;
+                }
                 c.rgb *= c.a;
                 return c;
             }
