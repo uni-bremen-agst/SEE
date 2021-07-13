@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using SEE.Game;
 using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Issues;
 using SEE.Net.Dashboard.Model.Metric;
@@ -31,13 +32,16 @@ namespace SEE.DataModel.DG.IO
         {
             IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics = await DashboardRetriever.Instance.GetAllMetricRows();
             IDictionary<string, List<Issue>> issues = await LoadIssueMetrics();
+            string projectFolder = DataPath.ProjectFolder();
+
+            await UniTask.SwitchToThreadPool();
 
             HashSet<Node> encounteredIssueNodes = new HashSet<Node>();
             int updatedMetrics = 0;
             // Go through all nodes, checking whether any metric in the dashboard matches it.
             foreach (Node node in graph.Nodes())
             {
-                string nodePath = $"{node.RelativePath()}{node.Filename() ?? string.Empty}";
+                string nodePath = $"{node.RelativePath(projectFolder)}{node.Filename() ?? string.Empty}";
                 if (metrics.TryGetValue((nodePath, node.SourceName), out List<MetricValueTableRow> metricValues))
                 {
                     foreach (MetricValueTableRow metricValue in metricValues)
@@ -100,6 +104,8 @@ namespace SEE.DataModel.DG.IO
                 NumericAttributeNames.Architecture_Violations, NumericAttributeNames.Dead_Code
             };
             MetricAggregator.AggregateSum(graph, issueNames.Select(x => x.Name()));
+
+            await UniTask.SwitchToMainThread();
             Debug.Log($"Updated {updatedMetrics} metric values and {encounteredIssueNodes.Count} issues " 
                       + "using the Axivion dashboard.\n");
 
