@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 using Michsky.UI.ModernUIPack;
+using SEE.Controls;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Windows.Speech;
@@ -28,8 +29,8 @@ using UnityEngine.Windows.Speech;
 namespace SEE.Game.UI.ConfigMenu
 {
     /// <summary>
-    /// This is the wrapper script for the dictaphone object that utilizes the windows speech api
-    /// to take user input via voice.
+    /// This is the wrapper script for the dictaphone object that utilizes the
+    /// MS Windows speech API to take user input via voice.
     /// </summary>
     [RequireComponent(typeof(ButtonManagerBasicIcon))]
     public class Dictaphone : DynamicUIBehaviour
@@ -43,7 +44,11 @@ namespace SEE.Game.UI.ConfigMenu
 
         private static readonly Color RecordingColor = new Color(0.94f, 0.27f, 0.27f);
 
-        private DictationRecognizer _dictationRecognizer;
+        /// <summary>
+        /// A dictation input shared by all instances of this class.
+        /// </summary>
+        private static DictationInput dictationInput;
+
         private ButtonManagerBasicIcon _button;
         private Image _buttonImage;
 
@@ -58,10 +63,6 @@ namespace SEE.Game.UI.ConfigMenu
 
         void Start()
         {
-            _dictationRecognizer = new DictationRecognizer();
-            _dictationRecognizer.DictationResult +=
-                (text, confidence) => OnDictationFinished?.Invoke(text);
-
             _button.clickEvent.AddListener(ToggleDictation);
             _initialColor = _buttonImage.color;
         }
@@ -78,18 +79,30 @@ namespace SEE.Game.UI.ConfigMenu
             }
         }
 
+        private void DictationResultCallBack(string text, ConfidenceLevel confidence)
+        {
+            Debug.Log($"Dictation result {text} with confidence {confidence}.\n");
+            OnDictationFinished?.Invoke(text);
+        }
+
         private void StartDictation()
         {
             _currentlyDictating = true;
             _buttonImage.color = RecordingColor;
-            _dictationRecognizer.Start();
+            if (dictationInput == null)
+            {
+                dictationInput = new DictationInput();
+            }
+            dictationInput.Register(DictationResultCallBack);
+            dictationInput.Start();
         }
 
         private void StopDictation()
         {
             _currentlyDictating = false;
             _buttonImage.color = _initialColor;
-            _dictationRecognizer.Stop();
+            dictationInput.Unregister(DictationResultCallBack);
+            dictationInput.Stop();
         }
     }
 }
