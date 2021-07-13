@@ -1231,15 +1231,6 @@ namespace SEE.Game
 
             int style = SelectStyle(node);
             GameObject result = leafNodeFactories[(int)node.Domain].NewBlock(style, node.ItsGraph.MaxDepth);
-            ColoringKind coloringKind = settings.leafNodeAttributesPerKind[(int)node.Domain].coloringKind;
-            if (coloringKind == ColoringKind.Random)
-            {
-                float r = UnityEngine.Random.Range(0.5f, 1.0f);
-                float g = UnityEngine.Random.Range(0.5f, 1.0f);
-                float b = UnityEngine.Random.Range(0.5f, 1.0f);
-                Color randomColor = new Color(r, g, b);
-                result.GetComponent<MeshRenderer>().material = Materials.New(ShaderType, randomColor, node.ItsGraph.MaxDepth);
-            }
             result.name = node.ID;
             result.tag = Tags.Node;
             result.AddComponent<NodeRef>().Value = node;
@@ -1297,37 +1288,27 @@ namespace SEE.Game
         /// <returns>style index</returns>
         private int SelectStyle(Node node)
         {
-            int result;
-
             bool isLeaf = node.IsLeaf();
-            NodeFactory nodeFactory = isLeaf ? leafNodeFactories[(int)node.Domain] : innerNodeFactories[(int)node.Domain];
+            NodeFactory nodeFactory = isLeaf ? leafNodeFactories[(int)node.Domain]
+                                             : innerNodeFactories[(int)node.Domain];
             uint numberOfStyles = nodeFactory.NumberOfStyles();
-            ColoringKind coloringKind = isLeaf ? settings.leafNodeAttributesPerKind[(int)node.Domain].coloringKind : settings.innerNodeAttributesPerKind[(int)node.Domain].coloringKind;
-            if (coloringKind == ColoringKind.Metric)
+            string styleMetric = isLeaf ? settings.leafNodeAttributesPerKind[(int)node.Domain].styleMetric
+                                        : settings.innerNodeAttributesPerKind[(int)node.Domain].styleMetric;
+
+            float metricMaximum;
+            if (TryGetFloat(styleMetric, out float value))
             {
-                string styleMetric = isLeaf ? settings.leafNodeAttributesPerKind[(int)node.Domain].styleMetric : settings.innerNodeAttributesPerKind[(int)node.Domain].styleMetric;
-
-                float metricMaximum;
-                if (TryGetFloat(styleMetric, out float value))
-                {
-                    // The styleMetric name is actually a number.
-                    metricMaximum = numberOfStyles;
-                    value = Mathf.Clamp(value, 0.0f, metricMaximum);
-                }
-                else
-                {
-                    metricMaximum = scaler.GetNormalizedMaximum(styleMetric);
-                    value = scaler.GetNormalizedValue(styleMetric, node);
-                }
-
-                result = Mathf.RoundToInt(Mathf.Lerp(0.0f, numberOfStyles - 1, value / metricMaximum));
+                // The styleMetric name is actually a constant number.
+                metricMaximum = numberOfStyles;
+                value = Mathf.Clamp(value, 0.0f, metricMaximum);
             }
             else
             {
-                Assert.IsTrue(coloringKind == ColoringKind.RandomRange);
-                result = UnityEngine.Random.Range(0, (int)numberOfStyles);
+                metricMaximum = scaler.GetNormalizedMaximum(styleMetric);
+                value = scaler.GetNormalizedValue(styleMetric, node);
+                Assert.IsTrue(value <= metricMaximum);
             }
-            return result;
+            return Mathf.RoundToInt(Mathf.Lerp(0.0f, numberOfStyles - 1, value / metricMaximum));
         }
 
         /// <summary>
@@ -1591,16 +1572,6 @@ namespace SEE.Game
 
             int style = SelectStyle(node);
             GameObject result = innerNodeFactories[(int)node.Domain].NewBlock(style, node.Level);
-            ColoringKind coloringKind = settings.innerNodeAttributesPerKind[(int)node.Domain].coloringKind;
-            if (coloringKind == ColoringKind.Random)
-            {
-                Assert.IsTrue(coloringKind == ColoringKind.Random);
-                float r = UnityEngine.Random.Range(0.5f, 1.0f);
-                float g = UnityEngine.Random.Range(0.5f, 1.0f);
-                float b = UnityEngine.Random.Range(0.5f, 1.0f);
-                Color randomColor = new Color(r, g, b);
-                result.GetComponent<MeshRenderer>().material = Materials.New(ShaderType, randomColor, node.Level);
-            }
             result.name = node.ID;
             result.tag = Tags.Node;
             result.AddComponent<NodeRef>().Value = node;
