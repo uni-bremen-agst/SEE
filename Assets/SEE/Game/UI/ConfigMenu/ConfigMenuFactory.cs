@@ -35,12 +35,10 @@ namespace SEE.Game.UI.ConfigMenu
     /// </summary>
     public class ConfigMenuFactory : DynamicUIBehaviour
     {
-        private static readonly EditableInstance DefaultInstanceToEdit =
-            EditableInstance.Implementation;
+        private static readonly EditableInstance DefaultInstanceToEdit = EditableInstance.Implementation;
         private static readonly string ConfigMenuPrefabPath = "Assets/Prefabs/UI/ConfigMenu.prefab";
 
-        private readonly SteamVR_Action_Boolean _openAction =
-            SteamVR_Actions._default.OpenSettingsMenu;
+        private readonly SteamVR_Action_Boolean _openAction = SteamVR_Actions._default.OpenSettingsMenu;
         private readonly SteamVR_Input_Sources _inputSource = SteamVR_Input_Sources.Any;
 
         private GameObject _configMenuPrefab;
@@ -50,14 +48,18 @@ namespace SEE.Game.UI.ConfigMenu
         private void Awake()
         {
             _configMenuPrefab = MustLoadPrefabAtPath(ConfigMenuPrefabPath);
-            BuildConfigMenu(DefaultInstanceToEdit);
+            BuildConfigMenu(DefaultInstanceToEdit, false);
         }
 
-        private void BuildConfigMenu(EditableInstance instanceToEdit)
+        private void BuildConfigMenu(EditableInstance instanceToEdit, bool turnMenuOn)
         {
             GameObject configMenuGo = Instantiate(_configMenuPrefab);
             configMenuGo.transform.SetSiblingIndex(0);
             configMenuGo.MustGetComponent(out _configMenu);
+            if (turnMenuOn)
+            {
+                _configMenu.On();
+            }
             _configMenu.CurrentlyEditing = instanceToEdit;
             _configMenu.OnInstanceChangeRequest.AddListener(ReplaceMenu);
         }
@@ -65,7 +67,7 @@ namespace SEE.Game.UI.ConfigMenu
         private void ReplaceMenu(EditableInstance newInstance)
         {
             Destroy(_configMenu.gameObject);
-            BuildConfigMenu(newInstance);
+            BuildConfigMenu(newInstance, true);
         }
 
         private void Update()
@@ -84,19 +86,28 @@ namespace SEE.Game.UI.ConfigMenu
         }
         private void HandleDesktopUpdate()
         {
+            // FIXME: We should not use Input directly. Instead SEEInput should be used.
             if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
+            {
                 _isModPressed = true;
+            }
             if (Input.GetKeyUp(KeyCode.LeftShift) || Input.GetKeyUp(KeyCode.RightShift))
+            {
                 _isModPressed = false;
+            }
 
             if (_isModPressed && Input.GetKeyUp(KeyCode.Escape))
+            {
                 _configMenu.Toggle();
+            }
         }
 
         private void HandleVRUpdate()
         {
             if (_openAction.GetStateDown(_inputSource))
+            {
                 _configMenu.Toggle();
+            }
         }
     }
 }

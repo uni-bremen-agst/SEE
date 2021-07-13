@@ -87,7 +87,7 @@ namespace SEE.Game.UI.ConfigMenu
         private HorizontalSelector _editingInstanceSelector;
 
         /// <summary>
-        /// The event handler that gets called when an user interaction changes the currently edited
+        /// The event handler that gets called when a user interaction changes the currently edited
         /// SEECity instance.
         /// </summary>
         public UnityEvent<EditableInstance> OnInstanceChangeRequest =
@@ -106,6 +106,8 @@ namespace SEE.Game.UI.ConfigMenu
             MustGetChild("Canvas/Actions", out _actions);
 
             MustGetComponentInChild("Canvas", out _canvas);
+            // initially the canvas should be inactive; it can be activated by the user on demand
+            Off();
             MustGetComponentInChild("Canvas/Picker 2.0", out _colorPickerControl);
             _colorPickerControl.gameObject.SetActive(false);
 
@@ -113,15 +115,13 @@ namespace SEE.Game.UI.ConfigMenu
             _tabButtons.MustGetComponent(out TabGroup tabGroupController);
             tabGroupController.SubscribeToUpdates(_colorPickerControl.Reset);
 
-            MustGetComponentInChild("Canvas/TabNavigation/Sidebar/CityLoadButton",
-                                    out _cityLoadButton);
+            MustGetComponentInChild("Canvas/TabNavigation/Sidebar/CityLoadButton", out _cityLoadButton);
             _cityLoadButton.clickEvent.AddListener(() =>
             {
                 _city.LoadData();
                 _actions.SetActive(true);
                 _cityLoadButton.gameObject.SetActive(false);
             });
-
 
             SetupInstanceSwitch();
             SetupEnvironment();
@@ -185,7 +185,7 @@ namespace SEE.Game.UI.ConfigMenu
                 rectTransform.anchoredPosition3D = Vector3.zero;
                 rectTransform.localScale = Vector3.one;
 
-                // Maker the color picker slightly rotated towards the user.
+                // Make the color picker slightly rotated towards the user.
                 _colorPickerControl.gameObject.transform.Rotate(0f, 45f, 0f);
 
                 // Place the menu as a whole in front of the 'table'.
@@ -227,7 +227,6 @@ namespace SEE.Game.UI.ConfigMenu
             deleteGraphButton.clickEvent.AddListener(onClick);
         }
 
-
         private void SetupPages()
         {
             SetupLeafNodesPage();
@@ -243,7 +242,8 @@ namespace SEE.Game.UI.ConfigMenu
             GameObject page = CreateAndInsertPage("Attributes of leaf nodes");
             Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
 
-            foreach (LeafNodeAttributes leafNodeAttributes in _city.leafNodeAttributesPerKind)
+            LeafNodeAttributes leafNodeAttributes = _city.leafNodeAttributesPerKind[(int)Node.NodeDomain.Unspecified];
+            //foreach (LeafNodeAttributes leafNodeAttributes in _city.leafNodeAttributesPerKind)
             {
                 // FIXME: the domain must be appended to these labels
 
@@ -581,6 +581,22 @@ namespace SEE.Game.UI.ConfigMenu
         public void Toggle()
         {
             _canvas.gameObject.SetActive(!_canvas.gameObject.activeSelf);
+        }
+
+        /// <summary>
+        /// Turns configuration menu off.
+        /// </summary>
+        public void Off()
+        {
+            _canvas.gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// Turns configuration menu on.
+        /// </summary>
+        public void On()
+        {
+            _canvas.gameObject.SetActive(true);
         }
     }
 }
