@@ -69,23 +69,34 @@ namespace SEE.GO
         public abstract float GetNormalizedValue(string metric, float value);
 
         /// <summary>
+        /// Yields the maximum of the given metric.
+        /// </summary>
+        /// <param name="metric">metric for which to return the maximum</param>
+        /// <returns>maximum</returns>
+        public float GetMaximum(string metric)
+        {
+            if (metricMaxima.TryGetValue(metric, out float value))
+            {
+                return value;
+            }
+            else
+            {
+                Debug.LogError($"Attempt to retrieve the normalized maximum of metric {metric} that is not known.\n");
+                Debug.Log("The available normalized metric maxima are as follows:\n");
+                DumpMetricMaxima(metricMaxima);
+                throw new ArgumentException($"A metric named {metric} does not exist.");
+            }
+        }
+
+        /// <summary>
         /// Yields the normalized value of the maximum of the given metric.
         /// </summary>
         /// <param name="metric">metric for which to return the normalized maximum</param>
         /// <returns>normalized maximum</returns>
+        /// <exception cref="ArgumentException">thrown if <paramref name="metric"/> is not a known metric</exception>
         public float GetNormalizedMaximum(string metric)
         {
-            if (metricMaxima.TryGetValue(metric, out float value))
-            {
-                return GetNormalizedValue(metric, value);
-            }
-            else
-            {
-                Debug.LogErrorFormat("Attempt to retrieve the normalized maximum of metric {0} that is not known.\n", metric);
-                Debug.Log("The available normalized metric maxima are as follows:\n");
-                DumpMetricMaxima(metricMaxima);
-                throw new Exception("A metric named " + metric + " does not exist.");
-            }
+            return GetNormalizedValue(metric, GetMaximum(metric));
         }
 
         /// <summary>
