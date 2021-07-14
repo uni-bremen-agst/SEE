@@ -239,7 +239,7 @@ namespace SEE.Game.UI.ConfigMenu
         private void SetupLeafNodesPage()
         {
             CreateAndInsertTabButton("Leaf nodes", TabButtonState.InitialActive);
-            GameObject page = CreateAndInsertPage("Attributes of leaf nodes");
+            GameObject page = CreateAndInsertPage("Leaf nodes");
             Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
 
             LeafNodeAttributes leafNodeAttributes = _city.leafNodeAttributesPerKind[(int)Node.NodeDomain.Unspecified];
@@ -321,10 +321,11 @@ namespace SEE.Game.UI.ConfigMenu
         private void SetupInnerNodesPage()
         {
             CreateAndInsertTabButton("Inner nodes");
-            GameObject page = CreateAndInsertPage("Attributes of inner nodes");
+            GameObject page = CreateAndInsertPage("Inner nodes");
             Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
 
-            foreach (InnerNodeAttributes innerNodeAttributes in _city.innerNodeAttributesPerKind)
+            InnerNodeAttributes innerNodeAttributes = _city.innerNodeAttributesPerKind[(int)Node.NodeDomain.Unspecified];
+            //foreach (InnerNodeAttributes innerNodeAttributes in _city.innerNodeAttributesPerKind)
             {
                 // FIXME: the domain must be appended to these labels
 
