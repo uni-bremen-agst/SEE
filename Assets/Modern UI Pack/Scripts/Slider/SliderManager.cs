@@ -106,10 +106,10 @@ namespace Michsky.UI.ModernUIPack
                 else
                 {
                     if (valueText != null)
-                        valueText.text = mainSlider.value.ToString("F2");
+                        valueText.text = mainSlider.value.ToString("F1");
 
                     if (popupValueText != null)
-                        popupValueText.text = mainSlider.value.ToString("F2");
+                        popupValueText.text = mainSlider.value.ToString("F1");
                 }
             }
         }
