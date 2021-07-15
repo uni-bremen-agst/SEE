@@ -30,7 +30,6 @@ using UnityEngine;
 
 namespace SEE.Game.UI.ConfigMenu
 {
-
     /// <summary>
     /// Component that controls a file picker.
     /// It comes with a label to display next to the file dialog trigger.
@@ -137,11 +136,12 @@ namespace SEE.Game.UI.ConfigMenu
 
             labelText.text = Label;
         }
+
         private void HandleFileBrowserSuccess(string[] paths)
         {
             if (paths.Length == 0)
             {
-                Debug.LogError("Received no paths from file browser.");
+               throw new Exception("Received no paths from file browser.");
             }
             // There should only be a single path since multiple selections are forbidden.
             DataPathInstance.Set(paths[0]);
@@ -171,8 +171,9 @@ namespace SEE.Game.UI.ConfigMenu
 
         private DataPath.RootKind ItemToRootKind(string item)
         {
-            return Enum.TryParse(item, out DataPath.RootKind rootKind) ? rootKind
-                : DataPath.RootKind.Absolute;
+            return Enum.TryParse(item, out DataPath.RootKind rootKind) ?
+                     rootKind
+                   : DataPath.RootKind.Absolute;
         }
     }
 
@@ -181,8 +182,7 @@ namespace SEE.Game.UI.ConfigMenu
     /// </summary>
     public class FilePickerBuilder : UIBuilder<FilePicker>
     {
-        protected override string PrefabPath =>
-            "Assets/Prefabs/UI/Input Group - File Picker.prefab";
+        protected override string PrefabPath => "Assets/Prefabs/UI/Input Group - File Picker.prefab";
 
         private FilePickerBuilder(Transform parent) : base(parent)
         {
