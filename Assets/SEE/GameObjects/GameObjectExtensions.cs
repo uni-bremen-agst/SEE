@@ -328,6 +328,17 @@ namespace SEE.GO
             return true;
         }
 
+        /// <summary>
+        /// Tries to get the component of the given type <typeparamref name="T"/> of this <paramref name="gameObject"/>.
+        /// If the component was found, it will be stored in <paramref name="component"/>.
+        /// If it wasn't found, <paramref name="component"/> will be <code>null</code> and
+        /// <see cref="InvalidOperationException"/> will be thrown.
+        /// </summary>
+        /// <param name="gameObject">The game object the component should be gotten from. Must not be null.</param>
+        /// <param name="component">The variable in which to save the component.</param>
+        /// <typeparam name="T">The type of the component.</typeparam>
+        /// <exception cref="InvalidOperationException">thrown if <paramref name="gameObject"/> has no
+        /// component of type <typeparamref name="T"/></exception>
         public static void MustGetComponent<T>(this GameObject gameObject, out T component)
         {
             if (!gameObject.TryGetComponent(out component))
