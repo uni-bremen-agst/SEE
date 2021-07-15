@@ -58,7 +58,7 @@ namespace SEE.Game.UI.ConfigMenu
         /// <summary>
         /// The label of the component.
         /// </summary>
-        public string label;
+        public string Label;
 
         /// <summary>
         /// The event handler that gets invoked when the value of this input changes.
@@ -68,7 +68,7 @@ namespace SEE.Game.UI.ConfigMenu
         /// <summary>
         /// The mode in which this input operates.
         /// </summary>
-        public ComboSelectMode mode = ComboSelectMode.Combo;
+        public ComboSelectMode Mode = ComboSelectMode.Combo;
 
         /// <summary>
         /// The component of type <see cref="CustomDropdown"/> in the prefab
@@ -139,7 +139,7 @@ namespace SEE.Game.UI.ConfigMenu
             });
             dropdown.isListItem = true;
             dropdown.listParent = FindCanvas(gameObject);
-            labelText.text = label;
+            labelText.text = Label;
 
             dictaphone.OnDictationFinished += text => customInput.text = text;
         }
@@ -150,7 +150,7 @@ namespace SEE.Game.UI.ConfigMenu
             {
                 List<string> newValues = valuesUpdates.Dequeue();
                 dropdown.dropdownItems.Clear();
-                if (mode == ComboSelectMode.Combo)
+                if (Mode == ComboSelectMode.Combo)
                 {
                     dropdown.CreateNewItemFast(CustomInputText, null);
                 }
@@ -234,7 +234,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         public ComboSelectBuilder SetLabel(string label)
         {
-            Instance.label = label;
+            Instance.Label = label;
             return this;
         }
 
@@ -258,7 +258,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         public ComboSelectBuilder SetComboSelectMode(ComboSelectMode comboSelectMode)
         {
-            Instance.mode = comboSelectMode;
+            Instance.Mode = comboSelectMode;
             return this;
         }
     }
