@@ -37,20 +37,20 @@ namespace SEE.Game.UI.ConfigMenu
         /// <summary>
         /// The list of all currently registered tab buttons.
         /// </summary>
-        public List<TabButton> tabButtons = new List<TabButton>();
+        public List<TabButton> TabButtons = new List<TabButton>();
 
         /// <summary>
         /// The controller of all pages.
         /// </summary>
-        public TabController tabController;
+        public TabController TabController;
 
-        private readonly List<UpdateNotifier> _updateSubscriber = new List<UpdateNotifier>();
-        private TabButton _activeButton;
+        private readonly List<UpdateNotifier> updateSubscriber = new List<UpdateNotifier>();
+        private TabButton activeButton;
 
         void Start()
         {
-            tabController = GetComponentInParent<TabController>();
-            if (!tabController)
+            TabController = GetComponentInParent<TabController>();
+            if (!TabController)
             {
                 Debug.LogError("TabGroup needs to be inside a TabController.");
             }
@@ -62,7 +62,7 @@ namespace SEE.Game.UI.ConfigMenu
         /// <param name="button">The buttons that wants to be registered.</param>
         public void Subscribe(TabButton button)
         {
-            tabButtons.Add(button);
+            TabButtons.Add(button);
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace SEE.Game.UI.ConfigMenu
         /// <param name="notifier">The component that wants to notified about updates.</param>
         public void SubscribeToUpdates(UpdateNotifier notifier)
         {
-            _updateSubscriber.Add(notifier);
+            updateSubscriber.Add(notifier);
         }
 
         /// <summary>
@@ -80,11 +80,11 @@ namespace SEE.Game.UI.ConfigMenu
         /// <param name="button"></param>
         public void OnTabSelected(TabButton button)
         {
-            _activeButton = button;
+            activeButton = button;
             button.SetActive();
             ResetButtons();
-            tabController.OnIndexUpdate(button.transform.GetSiblingIndex());
-            foreach (var updateNotifier in _updateSubscriber)
+            TabController.OnIndexUpdate(button.transform.GetSiblingIndex());
+            foreach (var updateNotifier in updateSubscriber)
             {
                 updateNotifier();
             }
@@ -95,13 +95,12 @@ namespace SEE.Game.UI.ConfigMenu
         /// </summary>
         void ResetButtons()
         {
-            foreach (var tabButton in tabButtons)
+            foreach (var tabButton in TabButtons)
             {
-                if (tabButton == _activeButton)
+                if (tabButton == activeButton)
                 {
                     continue;
                 }
-
                 tabButton.ResetStyles();
             }
         }

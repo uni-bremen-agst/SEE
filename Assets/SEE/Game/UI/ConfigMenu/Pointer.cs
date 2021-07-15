@@ -35,13 +35,13 @@ namespace SEE.Game.UI.ConfigMenu
         public float DefaultLength = 5.0f;
         public VRInputModule InputModule;
 
-        private GameObject _dot;
-        private LineRenderer _lineRenderer;
+        private GameObject dot;
+        private LineRenderer lineRenderer;
 
         void Awake()
         {
-            _lineRenderer = GetComponent<LineRenderer>();
-            _dot = transform.Find("Dot").gameObject;
+            lineRenderer = GetComponent<LineRenderer>();
+            dot = transform.Find("Dot").gameObject;
         }
 
         void Update()
@@ -61,10 +61,10 @@ namespace SEE.Game.UI.ConfigMenu
                 endPosition = hit.point;
             }
 
-            _dot.transform.position = endPosition;
+            dot.transform.position = endPosition;
 
-            _lineRenderer.SetPosition(0, transform.position);
-            _lineRenderer.SetPosition(1, endPosition);
+            lineRenderer.SetPosition(0, transform.position);
+            lineRenderer.SetPosition(1, endPosition);
         }
 
         private RaycastHit CreateRaycast(float length)

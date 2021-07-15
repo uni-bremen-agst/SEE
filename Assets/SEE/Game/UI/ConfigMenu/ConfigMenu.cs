@@ -20,13 +20,13 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.GO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -72,19 +72,19 @@ namespace SEE.Game.UI.ConfigMenu
         private const string ActionButtonPrefabPath = "Assets/Prefabs/UI/ActionButton.prefab";
         private const string PointerPrefabPath = "Assets/Prefabs/UI/Pointer.prefab";
 
-        private GameObject _pagePrefab;
-        private GameObject _actionButtonPrefab;
-        private GameObject _tabButtonPrefab;
+        private GameObject pagePrefab;
+        private GameObject actionButtonPrefab;
+        private GameObject tabButtonPrefab;
 
-        private GameObject _tabOutlet;
-        private GameObject _tabButtons;
-        private GameObject _actions;
+        private GameObject tabOutlet;
+        private GameObject tabButtons;
+        private GameObject actions;
 
-        private SEECity _city;
-        private ColorPickerControl _colorPickerControl;
-        private ButtonManager _cityLoadButton;
-        private Canvas _canvas;
-        private HorizontalSelector _editingInstanceSelector;
+        private SEECity city;
+        private ColorPickerControl colorPickerControl;
+        private ButtonManager cityLoadButton;
+        private Canvas canvas;
+        private HorizontalSelector editingInstanceSelector;
 
         /// <summary>
         /// The event handler that gets called when a user interaction changes the currently edited
@@ -101,26 +101,26 @@ namespace SEE.Game.UI.ConfigMenu
         private void Start()
         {
             SetupCity(CurrentlyEditing);
-            MustGetChild("Canvas/TabNavigation/TabOutlet", out _tabOutlet);
-            MustGetChild("Canvas/TabNavigation/Sidebar/TabButtons", out _tabButtons);
-            MustGetChild("Canvas/Actions", out _actions);
+            MustGetChild("Canvas/TabNavigation/TabOutlet", out tabOutlet);
+            MustGetChild("Canvas/TabNavigation/Sidebar/TabButtons", out tabButtons);
+            MustGetChild("Canvas/Actions", out actions);
 
-            MustGetComponentInChild("Canvas", out _canvas);
+            MustGetComponentInChild("Canvas", out canvas);
             // initially the canvas should be inactive; it can be activated by the user on demand
             Off();
-            MustGetComponentInChild("Canvas/Picker 2.0", out _colorPickerControl);
-            _colorPickerControl.gameObject.SetActive(false);
+            MustGetComponentInChild("Canvas/Picker 2.0", out colorPickerControl);
+            colorPickerControl.gameObject.SetActive(false);
 
             // Reset (hide) the color picker on page changes.
-            _tabButtons.MustGetComponent(out TabGroup tabGroupController);
-            tabGroupController.SubscribeToUpdates(_colorPickerControl.Reset);
+            tabButtons.MustGetComponent(out TabGroup tabGroupController);
+            tabGroupController.SubscribeToUpdates(colorPickerControl.Reset);
 
-            MustGetComponentInChild("Canvas/TabNavigation/Sidebar/CityLoadButton", out _cityLoadButton);
-            _cityLoadButton.clickEvent.AddListener(() =>
+            MustGetComponentInChild("Canvas/TabNavigation/Sidebar/CityLoadButton", out cityLoadButton);
+            cityLoadButton.clickEvent.AddListener(() =>
             {
-                _city.LoadData();
-                _actions.SetActive(true);
-                _cityLoadButton.gameObject.SetActive(false);
+                city.LoadData();
+                actions.SetActive(true);
+                cityLoadButton.gameObject.SetActive(false);
             });
 
             SetupInstanceSwitch();
@@ -132,8 +132,8 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void SetupCity(EditableInstance instanceToEdit)
         {
-            GameObject.Find(instanceToEdit.GameObjectName)?.MustGetComponent(out _city);
-            if (!_city)
+            GameObject.Find(instanceToEdit.GameObjectName)?.MustGetComponent(out city);
+            if (!city)
             {
                 Debug.LogError("Did not find a city instance.");
             }
@@ -142,16 +142,16 @@ namespace SEE.Game.UI.ConfigMenu
         private void SetupInstanceSwitch()
         {
             MustGetComponentInChild("Canvas/TabNavigation/Sidebar/CitySwitch",
-                                    out _editingInstanceSelector);
-            _editingInstanceSelector.itemList.Clear();
+                                    out editingInstanceSelector);
+            editingInstanceSelector.itemList.Clear();
             EditableInstances.ForEach(instance =>
-                                          _editingInstanceSelector.CreateNewItem(
+                                          editingInstanceSelector.CreateNewItem(
                                               instance.DisplayValue));
-            _editingInstanceSelector.defaultIndex = EditableInstances.IndexOf(CurrentlyEditing);
-            _editingInstanceSelector.SetupSelector();
-            _editingInstanceSelector.selectorEvent.AddListener(index =>
+            editingInstanceSelector.defaultIndex = EditableInstances.IndexOf(CurrentlyEditing);
+            editingInstanceSelector.SetupSelector();
+            editingInstanceSelector.selectorEvent.AddListener(index =>
             {
-                string displayValue = _editingInstanceSelector.itemList[index].itemTitle;
+                string displayValue = editingInstanceSelector.itemList[index].itemTitle;
                 EditableInstance newInstance =
                     EditableInstances.Find(instance => instance.DisplayValue == displayValue);
                 OnInstanceChangeRequest.Invoke(newInstance);
@@ -180,13 +180,13 @@ namespace SEE.Game.UI.ConfigMenu
 
                 // Set the canvas to world space and adjust its positition.
                 MustGetComponentInChild("Canvas", out RectTransform rectTransform);
-                _canvas.renderMode = RenderMode.WorldSpace;
-                _canvas.worldCamera = pointerCamera;
+                canvas.renderMode = RenderMode.WorldSpace;
+                canvas.worldCamera = pointerCamera;
                 rectTransform.anchoredPosition3D = Vector3.zero;
                 rectTransform.localScale = Vector3.one;
 
                 // Make the color picker slightly rotated towards the user.
-                _colorPickerControl.gameObject.transform.Rotate(0f, 45f, 0f);
+                colorPickerControl.gameObject.transform.Rotate(0f, 45f, 0f);
 
                 // Place the menu as a whole in front of the 'table'.
                 gameObject.transform.position = new Vector3(-0.36f, 1.692f, -0.634f);
@@ -195,33 +195,33 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void LoadPrefabs()
         {
-            _tabButtonPrefab = MustLoadPrefabAtPath(TabButtonPrefabPath);
-            _pagePrefab = MustLoadPrefabAtPath(PagePrefabPath);
-            _actionButtonPrefab = MustLoadPrefabAtPath(ActionButtonPrefabPath);
+            tabButtonPrefab = MustLoadPrefabAtPath(TabButtonPrefabPath);
+            pagePrefab = MustLoadPrefabAtPath(PagePrefabPath);
+            actionButtonPrefab = MustLoadPrefabAtPath(ActionButtonPrefabPath);
         }
 
         private void SetupActions()
         {
-            _actions.SetActive(false);
+            actions.SetActive(false);
             CreateActionButton("Delete Graph", () =>
             {
-                _city.Reset();
-                _cityLoadButton.gameObject.SetActive(true);
+                city.Reset();
+                cityLoadButton.gameObject.SetActive(true);
             });
-            CreateActionButton("Save Graph", _city.Save);
+            CreateActionButton("Save Graph", city.Save);
             CreateActionButton("Draw", () =>
             {
-                _city.DrawGraph();
+                city.DrawGraph();
                 Toggle();
             });
-            CreateActionButton("Re-Draw", _city.ReDrawGraph);
-            CreateActionButton("Save layout", _city.SaveLayout);
-            CreateActionButton("Add References", _city.SetNodeEdgeRefs);
+            CreateActionButton("Re-Draw", city.ReDrawGraph);
+            CreateActionButton("Save layout", city.SaveLayout);
+            CreateActionButton("Add References", city.SetNodeEdgeRefs);
         }
         private void CreateActionButton(string buttonText, UnityAction onClick)
         {
             GameObject deleteGraphButtonGo =
-                Instantiate(_actionButtonPrefab, _actions.transform, false);
+                Instantiate(actionButtonPrefab, actions.transform, false);
             deleteGraphButtonGo.MustGetComponent(out ButtonManagerBasic deleteGraphButton);
             deleteGraphButton.buttonText = buttonText;
             deleteGraphButton.clickEvent.AddListener(onClick);
@@ -242,7 +242,7 @@ namespace SEE.Game.UI.ConfigMenu
             GameObject page = CreateAndInsertPage("Leaf nodes");
             Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
 
-            LeafNodeAttributes leafNodeAttributes = _city.leafNodeAttributesPerKind[(int)Node.NodeDomain.Unspecified];
+            LeafNodeAttributes leafNodeAttributes = city.leafNodeAttributesPerKind[(int)Node.NodeDomain.Unspecified];
             //foreach (LeafNodeAttributes leafNodeAttributes in _city.leafNodeAttributesPerKind)
             {
                 // FIXME: the domain must be appended to these labels
@@ -293,7 +293,7 @@ namespace SEE.Game.UI.ConfigMenu
                     .SetLabel("Lower color")
                     .SetDefaultValue(leafNodeAttributes.colorRange.lower)
                     .SetOnChangeHandler(c => leafNodeAttributes.colorRange.lower = c)
-                    .SetColorPickerControl(_colorPickerControl)
+                    .SetColorPickerControl(colorPickerControl)
                     .Build();
 
                 // Upper color
@@ -301,7 +301,7 @@ namespace SEE.Game.UI.ConfigMenu
                     .SetLabel("Upper color")
                     .SetDefaultValue(leafNodeAttributes.colorRange.upper)
                     .SetOnChangeHandler(c => leafNodeAttributes.colorRange.upper = c)
-                    .SetColorPickerControl(_colorPickerControl)
+                    .SetColorPickerControl(colorPickerControl)
                     .Build();
 
                 // Number of colors
@@ -324,7 +324,7 @@ namespace SEE.Game.UI.ConfigMenu
             GameObject page = CreateAndInsertPage("Inner nodes");
             Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
 
-            InnerNodeAttributes innerNodeAttributes = _city.innerNodeAttributesPerKind[(int)Node.NodeDomain.Unspecified];
+            InnerNodeAttributes innerNodeAttributes = city.innerNodeAttributesPerKind[(int)Node.NodeDomain.Unspecified];
             //foreach (InnerNodeAttributes innerNodeAttributes in _city.innerNodeAttributesPerKind)
             {
                 // FIXME: the domain must be appended to these labels
@@ -359,7 +359,7 @@ namespace SEE.Game.UI.ConfigMenu
                     .SetLabel("Lower color")
                     .SetDefaultValue(innerNodeAttributes.colorRange.lower)
                     .SetOnChangeHandler(c => innerNodeAttributes.colorRange.lower = c)
-                    .SetColorPickerControl(_colorPickerControl)
+                    .SetColorPickerControl(colorPickerControl)
                     .Build();
 
                 // Upper color
@@ -367,7 +367,7 @@ namespace SEE.Game.UI.ConfigMenu
                     .SetLabel("Upper color")
                     .SetDefaultValue(innerNodeAttributes.colorRange.upper)
                     .SetOnChangeHandler(c => innerNodeAttributes.colorRange.upper = c)
-                    .SetColorPickerControl(_colorPickerControl)
+                    .SetColorPickerControl(colorPickerControl)
                     .Build();
 
                 // Number of colors
@@ -431,37 +431,37 @@ namespace SEE.Game.UI.ConfigMenu
             ComboSelectBuilder.Init(controls.transform)
                 .SetLabel("Node layout")
                 .SetAllowedValues(EnumToStr<NodeLayoutKind>())
-                .SetDefaultValue(_city.nodeLayoutSettings.kind.ToString())
-                .SetOnChangeHandler(s => Enum.TryParse(s, out _city.nodeLayoutSettings.kind))
+                .SetDefaultValue(city.nodeLayoutSettings.kind.ToString())
+                .SetOnChangeHandler(s => Enum.TryParse(s, out city.nodeLayoutSettings.kind))
                 .SetComboSelectMode(ComboSelectMode.Restricted)
                 .Build();
 
             // Layout file
             FilePickerBuilder.Init(controls.transform)
                 .SetLabel("Layout file")
-                .SetPathInstance(_city.globalCityAttributes.layoutPath)
+                .SetPathInstance(city.globalCityAttributes.layoutPath)
                 .Build();
 
             // Z-score scaling
             SwitchBuilder.Init(controls.transform)
                 .SetLabel("Z-score scaling")
-                .SetDefaultValue(_city.nodeLayoutSettings.zScoreScale)
-                .SetOnChangeHandler(b => _city.nodeLayoutSettings.zScoreScale = b)
+                .SetDefaultValue(city.nodeLayoutSettings.zScoreScale)
+                .SetOnChangeHandler(b => city.nodeLayoutSettings.zScoreScale = b)
                 .Build();
 
             // Show erosions
             SwitchBuilder.Init(controls.transform)
                 .SetLabel("Show erosions")
-                .SetDefaultValue(_city.nodeLayoutSettings.showErosions)
-                .SetOnChangeHandler(b => _city.nodeLayoutSettings.showErosions = b)
+                .SetDefaultValue(city.nodeLayoutSettings.showErosions)
+                .SetOnChangeHandler(b => city.nodeLayoutSettings.showErosions = b)
                 .Build();
 
             // Max erosion width
             SliderBuilder.Init(controls.transform)
                 .SetLabel("Max erosion width")
                 .SetMode(SliderMode.Integer)
-                .SetDefaultValue(_city.nodeLayoutSettings.maxErosionWidth)
-                .SetOnChangeHandler(f => _city.nodeLayoutSettings.maxErosionWidth = f)
+                .SetDefaultValue(city.nodeLayoutSettings.maxErosionWidth)
+                .SetOnChangeHandler(f => city.nodeLayoutSettings.maxErosionWidth = f)
                 .SetRange((1, 10))
                 .Build();
         }
@@ -476,8 +476,8 @@ namespace SEE.Game.UI.ConfigMenu
             ComboSelectBuilder.Init(controls.transform)
                 .SetLabel("Edge layout")
                 .SetAllowedValues(EnumToStr<EdgeLayoutKind>())
-                .SetDefaultValue(_city.edgeLayoutSettings.kind.ToString())
-                .SetOnChangeHandler(s => Enum.TryParse(s, out _city.edgeLayoutSettings.kind))
+                .SetDefaultValue(city.edgeLayoutSettings.kind.ToString())
+                .SetOnChangeHandler(s => Enum.TryParse(s, out city.edgeLayoutSettings.kind))
                 .SetComboSelectMode(ComboSelectMode.Restricted)
                 .Build();
 
@@ -485,24 +485,24 @@ namespace SEE.Game.UI.ConfigMenu
             SliderBuilder.Init(controls.transform)
                 .SetLabel("Edge width")
                 .SetMode(SliderMode.Float)
-                .SetDefaultValue(_city.edgeLayoutSettings.edgeWidth)
-                .SetOnChangeHandler(f => _city.edgeLayoutSettings.edgeWidth = f)
+                .SetDefaultValue(city.edgeLayoutSettings.edgeWidth)
+                .SetOnChangeHandler(f => city.edgeLayoutSettings.edgeWidth = f)
                 .SetRange((0, 0.5f))
                 .Build();
 
             // Edges above block
             SwitchBuilder.Init(controls.transform)
                 .SetLabel("Edges above block")
-                .SetDefaultValue(_city.edgeLayoutSettings.edgesAboveBlocks)
-                .SetOnChangeHandler(b => _city.edgeLayoutSettings.edgesAboveBlocks = b)
+                .SetDefaultValue(city.edgeLayoutSettings.edgesAboveBlocks)
+                .SetOnChangeHandler(b => city.edgeLayoutSettings.edgesAboveBlocks = b)
                 .Build();
 
             // Bundling tension
             SliderBuilder.Init(controls.transform)
                 .SetLabel("Bundling tension")
                 .SetMode(SliderMode.Float)
-                .SetDefaultValue(_city.edgeLayoutSettings.tension)
-                .SetOnChangeHandler(f => _city.edgeLayoutSettings.tension = f)
+                .SetDefaultValue(city.edgeLayoutSettings.tension)
+                .SetOnChangeHandler(f => city.edgeLayoutSettings.tension = f)
                 .SetRange((0, 1))
                 .Build();
 
@@ -518,7 +518,7 @@ namespace SEE.Game.UI.ConfigMenu
             // Settings file
             FilePickerBuilder.Init(controls.transform)
                 .SetLabel("Settings file")
-                .SetPathInstance(_city.CityPath)
+                .SetPathInstance(city.CityPath)
                 .Build();
 
             // LOD culling
@@ -526,40 +526,40 @@ namespace SEE.Game.UI.ConfigMenu
                 .SetLabel("LOD culling")
                 .SetMode(SliderMode.Float)
                 .SetRange((0f, 1f))
-                .SetDefaultValue(_city.globalCityAttributes.lodCulling)
-                .SetOnChangeHandler(f => _city.globalCityAttributes.lodCulling = f);
+                .SetDefaultValue(city.globalCityAttributes.lodCulling)
+                .SetOnChangeHandler(f => city.globalCityAttributes.lodCulling = f);
 
             // GXL file
             FilePickerBuilder.Init(controls.transform)
                 .SetLabel("GXL file")
-                .SetPathInstance(_city.GXLPath)
+                .SetPathInstance(city.GXLPath)
                 .Build();
 
             // Metric file
             FilePickerBuilder.Init(controls.transform)
                 .SetLabel("Metric file")
-                .SetPathInstance(_city.CSVPath)
+                .SetPathInstance(city.CSVPath)
                 .Build();
         }
 
         private GameObject CreateAndInsertPage(string headline)
         {
-            GameObject page = Instantiate(_pagePrefab, _tabOutlet.transform, false);
+            GameObject page = Instantiate(pagePrefab, tabOutlet.transform, false);
             page.MustGetComponent(out PageController pageController);
-            pageController.headlineText = headline;
+            pageController.HeadlineText = headline;
             return page;
         }
 
         private void CreateAndInsertTabButton(string label,
                                               TabButtonState initialState = TabButtonState.Inactive)
         {
-            GameObject tabButton = Instantiate(_tabButtonPrefab, _tabButtons.transform, false);
+            GameObject tabButton = Instantiate(tabButtonPrefab, tabButtons.transform, false);
             tabButton.name = $"{label}Button";
             tabButton.MustGetComponent(out TabButton button);
-            button.buttonText = label;
+            button.ButtonText = label;
             if (initialState == TabButtonState.InitialActive)
             {
-                button.isDefaultActive = true;
+                button.IsDefaultActive = true;
             }
         }
 
@@ -581,7 +581,7 @@ namespace SEE.Game.UI.ConfigMenu
         /// </summary>
         public void Toggle()
         {
-            _canvas.gameObject.SetActive(!_canvas.gameObject.activeSelf);
+            canvas.gameObject.SetActive(!canvas.gameObject.activeSelf);
         }
 
         /// <summary>
@@ -589,7 +589,7 @@ namespace SEE.Game.UI.ConfigMenu
         /// </summary>
         public void Off()
         {
-            _canvas.gameObject.SetActive(false);
+            canvas.gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -597,7 +597,7 @@ namespace SEE.Game.UI.ConfigMenu
         /// </summary>
         public void On()
         {
-            _canvas.gameObject.SetActive(true);
+            canvas.gameObject.SetActive(true);
         }
     }
 }

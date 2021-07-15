@@ -20,9 +20,9 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Michsky.UI.ModernUIPack;
 using System;
 using System.Collections.Generic;
-using Michsky.UI.ModernUIPack;
 using TMPro;
 using UnityEngine;
 
@@ -45,51 +45,52 @@ namespace SEE.Game.UI.ConfigMenu
         /// <summary>
         /// The label of this component.
         /// </summary>
-        public string label;
+        public string Label;
 
         /// <summary>
         /// The operational range of the slider.
         /// </summary>
-        public (float Min, float Max) range = (0f, 10f);
+        public (float Min, float Max) Range = (0f, 10f);
 
         /// <summary>
         /// The slider mode.
         /// </summary>
-        public SliderMode sliderMode = SliderMode.Float;
+        public SliderMode SliderMode = SliderMode.Float;
 
-        private SliderManager _sliderManager;
-        private TextMeshProUGUI _label;
+        private SliderManager sliderManager;
+        private TextMeshProUGUI label;
 
-        private readonly Queue<float> _valueUpdates = new Queue<float>();
+        private readonly Queue<float> valueUpdates = new Queue<float>();
 
         /// <summary>
         /// Requests an external value update.
         /// </summary>
-        public float Value {
-            set => _valueUpdates.Enqueue(value);
+        public float Value
+        {
+            set => valueUpdates.Enqueue(value);
         }
 
         void Start()
         {
-            MustGetComponentInChild("Label", out _label);
-            _label.text = label;
+            MustGetComponentInChild("Label", out label);
+            label.text = Label;
 
-            MustGetComponentInChild("Slider", out _sliderManager);
-            _sliderManager.mainSlider.onValueChanged.AddListener(
-                newValue => OnValueChange(sliderMode == SliderMode.Integer
+            MustGetComponentInChild("Slider", out sliderManager);
+            sliderManager.mainSlider.onValueChanged.AddListener(
+                newValue => OnValueChange(SliderMode == SliderMode.Integer
                                               ? (float)Math.Round(newValue) : newValue));
-            _sliderManager.mainSlider.minValue = range.Min;
-            _sliderManager.mainSlider.maxValue = range.Max;
-            _sliderManager.usePercent = false;
-            _sliderManager.useRoundValue = sliderMode == SliderMode.Integer;
+            sliderManager.mainSlider.minValue = Range.Min;
+            sliderManager.mainSlider.maxValue = Range.Max;
+            sliderManager.usePercent = false;
+            sliderManager.useRoundValue = SliderMode == SliderMode.Integer;
         }
 
         void Update()
         {
-            if (_valueUpdates.Count > 0)
+            if (valueUpdates.Count > 0)
             {
-                float newValue = _valueUpdates.Dequeue();
-                _sliderManager.mainSlider.value = newValue;
+                float newValue = valueUpdates.Dequeue();
+                sliderManager.mainSlider.value = newValue;
             }
         }
 
@@ -102,7 +103,7 @@ namespace SEE.Game.UI.ConfigMenu
     /// <summary>
     /// Instantiates a new slider game object via prefab and sets the wrapper script.
     /// </summary>
-    public class SliderBuilder : UiBuilder<Slider>
+    public class SliderBuilder : UIBuilder<Slider>
     {
         protected override string PrefabPath => "Assets/Prefabs/UI/Input Group - Slider.prefab";
 
@@ -117,7 +118,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         public SliderBuilder SetLabel(string label)
         {
-            Instance.label = label;
+            Instance.Label = label;
             return this;
         }
 
@@ -129,7 +130,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         public SliderBuilder SetRange((float Min, float Max) range)
         {
-            Instance.range = range;
+            Instance.Range = range;
             return this;
         }
 
@@ -140,7 +141,7 @@ namespace SEE.Game.UI.ConfigMenu
         }
         public SliderBuilder SetMode(SliderMode sliderMode)
         {
-            Instance.sliderMode = sliderMode;
+            Instance.SliderMode = sliderMode;
             return this;
         }
     }

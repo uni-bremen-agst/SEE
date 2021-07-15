@@ -49,27 +49,27 @@ namespace SEE.Game.UI.ConfigMenu
         /// </summary>
         private static DictationInput dictationInput;
 
-        private ButtonManagerBasicIcon _button;
-        private Image _buttonImage;
+        private ButtonManagerBasicIcon button;
+        private Image buttonImage;
 
-        private bool _currentlyDictating;
-        private Color _initialColor;
+        private bool currentlyDictating;
+        private Color initialColor;
 
         void Awake()
         {
-            MustGetComponent(out _button);
-            MustGetComponent(out _buttonImage);
+            MustGetComponent(out button);
+            MustGetComponent(out buttonImage);
         }
 
         void Start()
         {
-            _button.clickEvent.AddListener(ToggleDictation);
-            _initialColor = _buttonImage.color;
+            button.clickEvent.AddListener(ToggleDictation);
+            initialColor = buttonImage.color;
         }
 
         private void ToggleDictation()
         {
-            if (_currentlyDictating)
+            if (currentlyDictating)
             {
                 StopDictation();
             }
@@ -87,8 +87,8 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void StartDictation()
         {
-            _currentlyDictating = true;
-            _buttonImage.color = RecordingColor;
+            currentlyDictating = true;
+            buttonImage.color = RecordingColor;
             if (dictationInput == null)
             {
                 dictationInput = new DictationInput();
@@ -99,8 +99,8 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void StopDictation()
         {
-            _currentlyDictating = false;
-            _buttonImage.color = _initialColor;
+            currentlyDictating = false;
+            buttonImage.color = initialColor;
             dictationInput.Unregister(DictationResultCallBack);
             dictationInput.Stop();
         }

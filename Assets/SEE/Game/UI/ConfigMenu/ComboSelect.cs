@@ -53,7 +53,7 @@ namespace SEE.Game.UI.ConfigMenu
     /// </summary>
     public class ComboSelect : DynamicUIBehaviour
     {
-        private static string CustomInputText = "--Custom Input--";
+        private static readonly string CustomInputText = "--Custom Input--";
 
         /// <summary>
         /// The label of the component.
@@ -76,7 +76,7 @@ namespace SEE.Game.UI.ConfigMenu
         /// 'DropdownCombo/Dropdown'. This drop down allows a user to select one
         /// item of a predefined set of values.
         /// </summary>
-        private CustomDropdown _dropdown;
+        private CustomDropdown dropdown;
 
         /// <summary>
         /// The component of type <see cref="TMP_InputField"/> in the prefab
@@ -84,14 +84,14 @@ namespace SEE.Game.UI.ConfigMenu
         /// 'DropdownCombo/Input'. This input field allows a user to set the
         /// value directly (by typing or dictating it).
         /// </summary>
-        private TMP_InputField _customInput;
+        private TMP_InputField customInput;
 
         /// <summary>
         /// The component of type <see cref="TextMeshProUGUI"/> in the child named
         /// 'Label' in the prefab <see cref="ComboSelectBuilder.PrefabPath"/>.
         /// This represents the label of the combo box.
         /// </summary>
-        private TextMeshProUGUI _labelText;
+        private TextMeshProUGUI labelText;
 
         /// <summary>
         /// The component of type <see cref="Dictaphone"/> in the prefab
@@ -99,17 +99,17 @@ namespace SEE.Game.UI.ConfigMenu
         /// 'DropdownCombo/DictateButton'. This element represents a kind of
         /// button to turn on/off dictation of the input value.
         /// </summary>
-        private Dictaphone _dictaphone;
+        private Dictaphone dictaphone;
 
-        private readonly Queue<List<string>> _valuesUpdates = new Queue<List<string>>();
-        private readonly Queue<string> _valueUpdates = new Queue<string>();
+        private readonly Queue<List<string>> valuesUpdates = new Queue<List<string>>();
+        private readonly Queue<string> valueUpdates = new Queue<string>();
 
         /// <summary>
         /// The values (options) of this input.
         /// </summary>
         public List<string> Values
         {
-            set => _valuesUpdates.Enqueue(value);
+            set => valuesUpdates.Enqueue(value);
         }
 
         /// <summary>
@@ -118,82 +118,82 @@ namespace SEE.Game.UI.ConfigMenu
         public string Value
         {
             get => FigureOutValue();
-            set => _valueUpdates.Enqueue(value);
+            set => valueUpdates.Enqueue(value);
         }
 
         void Awake()
         {
-            MustGetComponentInChild("DropdownCombo/Dropdown", out _dropdown);
-            MustGetComponentInChild("DropdownCombo/Input", out _customInput);
-            MustGetComponentInChild("Label", out _labelText);
-            MustGetComponentInChild("DropdownCombo/DictateButton", out _dictaphone);
+            MustGetComponentInChild("DropdownCombo/Dropdown", out dropdown);
+            MustGetComponentInChild("DropdownCombo/Input", out customInput);
+            MustGetComponentInChild("Label", out labelText);
+            MustGetComponentInChild("DropdownCombo/DictateButton", out dictaphone);
         }
 
         void Start()
         {
-            _dropdown.dropdownEvent.AddListener(arg0 =>
+            dropdown.dropdownEvent.AddListener(arg0 =>
             {
-                string selectedItem = _dropdown.dropdownItems[arg0].itemName;
+                string selectedItem = dropdown.dropdownItems[arg0].itemName;
                 OnValueChange(Value);
                 FigureOutInputMode(selectedItem);
             });
-            _dropdown.isListItem = true;
-            _dropdown.listParent = FindCanvas(gameObject);
-            _labelText.text = label;
+            dropdown.isListItem = true;
+            dropdown.listParent = FindCanvas(gameObject);
+            labelText.text = label;
 
-            _dictaphone.OnDictationFinished += text => _customInput.text = text;
+            dictaphone.OnDictationFinished += text => customInput.text = text;
         }
 
         void Update()
         {
-            if (_valuesUpdates.Count > 0)
+            if (valuesUpdates.Count > 0)
             {
-                List<string> newValues = _valuesUpdates.Dequeue();
-                _dropdown.dropdownItems.Clear();
+                List<string> newValues = valuesUpdates.Dequeue();
+                dropdown.dropdownItems.Clear();
                 if (mode == ComboSelectMode.Combo)
                 {
-                    _dropdown.CreateNewItemFast(CustomInputText, null);
+                    dropdown.CreateNewItemFast(CustomInputText, null);
                 }
                 foreach (string s in newValues)
                 {
-                    _dropdown.CreateNewItemFast(s, null);
+                    dropdown.CreateNewItemFast(s, null);
                 }
 
-                _dropdown.SetupDropdown();
+                dropdown.SetupDropdown();
             }
 
-            if (_valueUpdates.Count > 0)
+            if (valueUpdates.Count > 0)
             {
-                String newValue = _valueUpdates.Dequeue();
+                String newValue = valueUpdates.Dequeue();
                 FigureOutInputMode(newValue);
             }
         }
 
         void SetToCustomMode(string customValue)
         {
-            _dropdown.selectedItemIndex =
-                _dropdown.dropdownItems.FindIndex(item => item.itemName == CustomInputText);
-            _dropdown.SetupDropdown();
-            _customInput.gameObject.SetActive(true);
-            _dictaphone.gameObject.SetActive(true);
+            dropdown.selectedItemIndex =
+                dropdown.dropdownItems.FindIndex(item => item.itemName == CustomInputText);
+            dropdown.SetupDropdown();
+            customInput.gameObject.SetActive(true);
+            dictaphone.gameObject.SetActive(true);
             if (customValue != null)
             {
-                _customInput.text = customValue;
+                customInput.text = customValue;
             }
         }
 
         void SetToFixedMode(int newIndex)
         {
-            _dropdown.selectedItemIndex = newIndex;
-            _dropdown.SetupDropdown();
-            _customInput.gameObject.SetActive(false);
-            _dictaphone.gameObject.SetActive(false);
+            dropdown.selectedItemIndex = newIndex;
+            dropdown.SetupDropdown();
+            customInput.gameObject.SetActive(false);
+            dictaphone.gameObject.SetActive(false);
         }
 
         void FigureOutInputMode(string value)
         {
             // If the new value is already part of the items in the list, we simply select its index.
-            int index = _dropdown.dropdownItems.FindIndex(item => item.itemName == value);
+            int index = dropdown.dropdownItems.FindIndex(item => item.itemName == value);
             if (index >= 0 && value != CustomInputText)
             {
                 SetToFixedMode(index);
@@ -207,10 +207,10 @@ namespace SEE.Game.UI.ConfigMenu
 
         string FigureOutValue()
         {
-            string item = _dropdown.dropdownItems[_dropdown.selectedItemIndex].itemName;
+            string item = dropdown.dropdownItems[dropdown.selectedItemIndex].itemName;
             if (item == CustomInputText)
             {
-                return _customInput.text;
+                return customInput.text;
             }
             return item;
         }
@@ -219,7 +219,7 @@ namespace SEE.Game.UI.ConfigMenu
     /// <summary>
     /// Instantiates a new combo select game object via prefab and sets the wrapper script.
     /// </summary>
-    public class ComboSelectBuilder : UiBuilder<ComboSelect>
+    public class ComboSelectBuilder : UIBuilder<ComboSelect>
     {
         protected override string PrefabPath => "Assets/Prefabs/UI/Input Group - Dropdown.prefab";
 

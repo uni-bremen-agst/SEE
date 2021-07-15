@@ -33,52 +33,52 @@ namespace SEE.Game.UI.ConfigMenu
     [RequireComponent(typeof(ButtonManagerBasic))]
     public class TabButton : MonoBehaviour
     {
-        private ButtonManagerBasic _buttonManager;
-        private UIGradient _uiGradient;
-        private TabGroup _group;
+        public bool IsDefaultActive;
+        public string ButtonText;
 
-        public bool isDefaultActive;
-        public string buttonText;
+        private ButtonManagerBasic buttonManager;
+        private UIGradient uiGradient;
+        private TabGroup group;
 
-        private Button _button;
+        private Button button;
 
         /// <summary>
         /// The color when the button is inactive.
         /// </summary>
-        public Color inactiveColor = new Color(0.203f, 0.213f, 0.224f, 1f);
+        public Color InactiveColor = new Color(0.203f, 0.213f, 0.224f, 1f);
 
         /// <summary>
         /// The color when the button is active (selected).
         /// </summary>
-        public Color activeColor = Color.white;
+        public Color ActiveColor = Color.white;
 
         /// <summary>
         /// The color when the button gets hovered.
         /// </summary>
-        public Color hoverColor = new Color(0.45f, 0.55f, 0.72f, 1f);
+        public Color HoverColor = new Color(0.45f, 0.55f, 0.72f, 1f);
 
         void Start()
         {
-            _group = GetComponentInParent<TabGroup>();
-            if (!_group)
+            group = GetComponentInParent<TabGroup>();
+            if (!group)
             {
                 Debug.LogError("TabButton is not in a TabGroup.");
             }
 
-            _uiGradient = GetComponent<UIGradient>();
-            _buttonManager = GetComponent<ButtonManagerBasic>();
-            _button = _buttonManager.GetComponent<Button>();
+            uiGradient = GetComponent<UIGradient>();
+            buttonManager = GetComponent<ButtonManagerBasic>();
+            button = buttonManager.GetComponent<Button>();
 
-            _buttonManager.normalText.text = buttonText;
+            buttonManager.normalText.text = ButtonText;
 
             ResetStyles();
-            _group.Subscribe(this);
-            _buttonManager.clickEvent.AddListener(() => _group.OnTabSelected(this));
-            var buttonColors = _button.colors;
-            buttonColors.highlightedColor = hoverColor;
-            _button.colors = buttonColors;
+            group.Subscribe(this);
+            buttonManager.clickEvent.AddListener(() => group.OnTabSelected(this));
+            ColorBlock buttonColors = button.colors;
+            buttonColors.highlightedColor = HoverColor;
+            button.colors = buttonColors;
 
-            if (isDefaultActive)
+            if (IsDefaultActive)
             {
                 SetActive();
             }
@@ -86,24 +86,24 @@ namespace SEE.Game.UI.ConfigMenu
 
         public void ResetStyles()
         {
-            _uiGradient.enabled = false;
-            _buttonManager.normalText.color = inactiveColor;
-            var buttonColors = _button.colors;
-            var normalColor = buttonColors.normalColor;
+            uiGradient.enabled = false;
+            buttonManager.normalText.color = InactiveColor;
+            ColorBlock buttonColors = button.colors;
+            Color normalColor = buttonColors.normalColor;
             normalColor.a = 0;
             buttonColors.normalColor = normalColor;
-            _button.colors = buttonColors;
+            button.colors = buttonColors;
         }
 
         public void SetActive()
         {
-            _uiGradient.enabled = true;
-            _buttonManager.normalText.color = activeColor;
-            var buttonColors = _button.colors;
-            var normalColor = buttonColors.normalColor;
+            uiGradient.enabled = true;
+            buttonManager.normalText.color = ActiveColor;
+            ColorBlock buttonColors = button.colors;
+            Color normalColor = buttonColors.normalColor;
             normalColor.a = 1;
             buttonColors.normalColor = normalColor;
-            _button.colors = buttonColors;
+            button.colors = buttonColors;
         }
     }
 }

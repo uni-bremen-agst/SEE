@@ -34,37 +34,37 @@ namespace SEE.Game.UI.ConfigMenu
         /// <summary>
         /// A list of all page GameObject that can be accessed.
         /// </summary>
-        public List<GameObject> pages = new List<GameObject>();
+        public List<GameObject> Pages = new List<GameObject>();
 
         /// <summary>
         /// The index of the initially active page.
         /// </summary>
-        public int startIndex;
+        public int StartIndex;
 
-        private int _previousPageCount;
-        private Transform _tabOutlet;
+        private int previousPageCount;
+        private Transform tabOutlet;
 
         void Start()
         {
-            _tabOutlet = gameObject.transform.Find("TabOutlet");
+            tabOutlet = gameObject.transform.Find("TabOutlet");
             RefreshPages();
         }
 
         private void RefreshPages()
         {
-            pages.Clear();
-            foreach (Transform child in _tabOutlet)
+            Pages.Clear();
+            foreach (Transform child in tabOutlet)
             {
                 child.gameObject.SetActive(false);
-                pages.Add(child.gameObject);
+                Pages.Add(child.gameObject);
             }
-            _previousPageCount = _tabOutlet.childCount;
-            pages.ElementAtOrDefault(startIndex)?.SetActive(true);
+            previousPageCount = tabOutlet.childCount;
+            Pages.ElementAtOrDefault(StartIndex)?.SetActive(true);
         }
 
         private void Update()
         {
-            if (_tabOutlet.childCount != _previousPageCount)
+            if (tabOutlet.childCount != previousPageCount)
             {
                 RefreshPages();
             }
@@ -77,15 +77,15 @@ namespace SEE.Game.UI.ConfigMenu
         /// <param name="requestedIndex">The index of the page that should be set active.</param>
         public void OnIndexUpdate(int requestedIndex)
         {
-            for (var i = 0; i < pages.Count; i++)
+            for (var i = 0; i < Pages.Count; i++)
             {
                 if (i == requestedIndex)
                 {
-                    pages[i].SetActive(true);
+                    Pages[i].SetActive(true);
                 }
                 else
                 {
-                    pages[i].SetActive(false);
+                    Pages[i].SetActive(false);
                 }
             }
         }
