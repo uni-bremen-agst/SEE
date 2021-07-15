@@ -254,8 +254,8 @@ namespace SEE.DataModel.DG
                     Report(ID + ": The children are different.");
                     return false;
                 }
-                else if (outgoings.Count != otherNode.outgoings.Count
-                         || !GetIDs(outgoings).SetEquals(GetIDs(otherNode.outgoings)))
+                else if (Outgoings.Count != otherNode.Outgoings.Count
+                         || !GetIDs(Outgoings).SetEquals(GetIDs(otherNode.Outgoings)))
                 {
                     Report(ID + ": The outgoing edges are different.");
                     return false;
@@ -279,10 +279,10 @@ namespace SEE.DataModel.DG
         /// <typeparam name="T">a GraphElement type</typeparam>
         /// <param name="graphElements">the graph elements whose IDs are to be collected</param>
         /// <returns>IDs of all given <paramref name="graphElements"/></returns>
-        private HashSet<string> GetIDs<T>(IList<T> graphElements) where T : GraphElement
+        private static HashSet<string> GetIDs<T>(IEnumerable<T> graphElements) where T : GraphElement
         {
             HashSet<string> result = new HashSet<string>();
-            foreach (GraphElement graphElement in graphElements)
+            foreach (T graphElement in graphElements)
             {
                 result.Add(graphElement.ID);
             }
@@ -316,10 +316,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The incoming edges of this node.
         /// </summary>
-        public List<Edge> Incomings
-        {
-            get => incomings;
-        }
+        public List<Edge> Incomings => incomings;
 
         /// <summary>
         /// Adds given edge to the list of incoming edges of this node.
@@ -338,7 +335,7 @@ namespace SEE.DataModel.DG
             }
             else if (edge.Target != this)
             {
-                throw new Exception("edge " + edge.ToString() + " is no incoming edge of " + ToString());
+                throw new Exception($"edge {edge} is no incoming edge of {ToString()}");
             }
             else
             {
@@ -363,13 +360,13 @@ namespace SEE.DataModel.DG
             }
             else if (edge.Target != this)
             {
-                throw new Exception("edge " + edge.ToString() + " is no incoming edge of " + ToString());
+                throw new Exception($"edge {edge} is no incoming edge of {ToString()}");
             }
             else
             {
                 if (!incomings.Remove(edge))
                 {
-                    throw new Exception("edge " + edge.ToString() + " is no incoming edge of " + ToString());
+                    throw new Exception($"edge {edge} is no incoming edge of {ToString()}");
                 }
             }
         }
@@ -377,15 +374,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The outgoing edges of this node.
         /// </summary>
-        private List<Edge> outgoings = new List<Edge>();
-
-        /// <summary>
-        /// The outgoing edges of this node.
-        /// </summary>
-        public List<Edge> Outgoings
-        {
-            get => outgoings;
-        }
+        public List<Edge> Outgoings { get; private set; } = new List<Edge>();
 
         /// <summary>
         /// Removes all incoming and outgoing edges from this node.
@@ -395,7 +384,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         public void RemoveAllEdges()
         {
-            outgoings.Clear();
+            Outgoings.Clear();
             incomings.Clear();
         }
 
@@ -416,11 +405,11 @@ namespace SEE.DataModel.DG
             }
             else if (edge.Source != this)
             {
-                throw new Exception("edge " + edge.ToString() + " is no outgoing edge of " + ToString());
+                throw new Exception($"edge {edge} is no outgoing edge of {ToString()}");
             }
             else
             {
-                outgoings.Add(edge);
+                Outgoings.Add(edge);
             }
         }
 
@@ -441,13 +430,13 @@ namespace SEE.DataModel.DG
             }
             else if (edge.Source != this)
             {
-                throw new Exception("edge " + edge.ToString() + " is no outgoing edge of " + ToString());
+                throw new Exception($"edge {edge} is no outgoing edge of {ToString()}");
             }
             else
             {
-                if (!outgoings.Remove(edge))
+                if (!Outgoings.Remove(edge))
                 {
-                    throw new Exception("edge " + edge.ToString() + " is no outgoing edge of " + ToString());
+                    throw new Exception($"edge {edge} is no outgoing edge of {ToString()}");
                 }
             }
         }
@@ -595,7 +584,7 @@ namespace SEE.DataModel.DG
                     {
                         secondName = second.ID;
                     }
-                    return firstName.CompareTo(secondName);
+                    return string.Compare(firstName, secondName, StringComparison.Ordinal);
                 }
             }
         }
@@ -637,7 +626,7 @@ namespace SEE.DataModel.DG
             target.Parent = null;
             target.level = 0;
             target.children = new List<Node>();
-            target.outgoings = new List<Edge>();
+            target.Outgoings = new List<Edge>();
             target.incomings = new List<Edge>();
         }
 
@@ -658,16 +647,7 @@ namespace SEE.DataModel.DG
             }
             else
             {
-                List<Edge> result = new List<Edge>();
-
-                foreach (Edge edge in outgoings)
-                {
-                    if (edge.Target == target && edge.Type == its_type)
-                    {
-                        result.Add(edge);
-                    }
-                }
-                return result;
+                return Outgoings.Where(edge => edge.Target == target && edge.Type == its_type).ToList();
             }
         }
 
@@ -681,15 +661,7 @@ namespace SEE.DataModel.DG
         /// <returns>true if <paramref name="other"/>is a successor</returns>
         public bool HasSuccessor(Node other, string edgeType)
         {
-            foreach (Edge outgoing in Outgoings)
-            {
-                if (outgoing.Target == other
-                    && (string.IsNullOrEmpty(edgeType) || outgoing.Type == edgeType))
-                {
-                    return true;
-                }
-            }
-            return false;
+            return Outgoings.Any(outgoing => outgoing.Target == other && (string.IsNullOrEmpty(edgeType) || outgoing.Type == edgeType));
         }
 
         public static implicit operator bool(Node node)

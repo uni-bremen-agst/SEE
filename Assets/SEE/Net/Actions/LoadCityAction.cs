@@ -1,5 +1,5 @@
-﻿using SEE.Game;
-using System;
+﻿using System;
+using SEE.Game;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -81,8 +81,12 @@ namespace SEE.Net
         public EdgeLayoutKind EdgeLayout;
         public bool ZScoreScale;
         public float EdgeWidth;
-        public bool ShowErosions;
-        public float MaxErosionWidth;
+        public bool ShowLeafErosions;
+        public bool ShowInnerErosions;
+        public bool LoadDashboardMetrics;
+        public string IssuesAddedFromVersion;
+        public bool OverrideMetrics;
+        public float ErosionScalingFactor;
         public bool EdgesAboveBlocks;
         public float Tension;
         public float RDP;
@@ -174,8 +178,12 @@ namespace SEE.Net
             EdgeLayout = city.edgeLayoutSettings.kind;
             ZScoreScale = city.nodeLayoutSettings.zScoreScale;
             EdgeWidth = city.edgeLayoutSettings.edgeWidth;
-            ShowErosions = city.nodeLayoutSettings.showErosions;
-            MaxErosionWidth = city.nodeLayoutSettings.maxErosionWidth;
+            ShowInnerErosions = city.nodeLayoutSettings.showInnerErosions;
+            ShowLeafErosions = city.nodeLayoutSettings.showLeafErosions;
+            LoadDashboardMetrics = city.nodeLayoutSettings.loadDashboardMetrics;
+            IssuesAddedFromVersion = city.nodeLayoutSettings.issuesAddedFromVersion;
+            OverrideMetrics = city.nodeLayoutSettings.overrideMetrics;
+            ErosionScalingFactor = city.nodeLayoutSettings.erosionScalingFactor;
             EdgesAboveBlocks = city.edgeLayoutSettings.edgesAboveBlocks;
             Tension = city.edgeLayoutSettings.tension;
             RDP = city.edgeLayoutSettings.rdp;
@@ -304,8 +312,12 @@ namespace SEE.Net
             city.edgeLayoutSettings.kind = EdgeLayout;
             city.nodeLayoutSettings.zScoreScale = ZScoreScale;
             city.edgeLayoutSettings.edgeWidth = EdgeWidth;
-            city.nodeLayoutSettings.showErosions = ShowErosions;
-            city.nodeLayoutSettings.maxErosionWidth = MaxErosionWidth;
+            city.nodeLayoutSettings.showInnerErosions = ShowInnerErosions;
+            city.nodeLayoutSettings.showLeafErosions = ShowLeafErosions;
+            city.nodeLayoutSettings.loadDashboardMetrics = LoadDashboardMetrics;
+            city.nodeLayoutSettings.issuesAddedFromVersion = IssuesAddedFromVersion;
+            city.nodeLayoutSettings.overrideMetrics = OverrideMetrics;
+            city.nodeLayoutSettings.erosionScalingFactor = ErosionScalingFactor;
             city.edgeLayoutSettings.edgesAboveBlocks = EdgesAboveBlocks;
             city.edgeLayoutSettings.tension = Tension;
             city.edgeLayoutSettings.rdp = RDP;

@@ -1,6 +1,10 @@
-﻿using SEE.DataModel;
-using System;
+﻿using System;
+using SEE.DataModel;
+using SEE.Utils;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Assertions;
+using UnityEngine.UI;
 
 namespace SEE.GO
 {
@@ -39,20 +43,18 @@ namespace SEE.GO
         /// </summary>
         /// <param name="erosion">erosion type for which to yield a string</param>
         /// <returns>human readable string representation</returns>
-        public static string ToString(Erosion erosion)
-        {
-            switch (erosion)
+        public static string ToString(Erosion erosion) =>
+            erosion switch
             {
-                case Erosion.Architecture_Violation: return "Architecture_Violation";
-                case Erosion.Clone: return "Clone";
-                case Erosion.Cycle: return "Cycle";
-                case Erosion.Dead_Code: return "Dead_Code";
-                case Erosion.Metric: return "Metric";
-                case Erosion.Style: return "Style";
-                case Erosion.Universal: return "Universal";
-                default: return "UNDEFINED";
-            }
-        }
+                Erosion.Architecture_Violation => "Architecture_Violation",
+                Erosion.Clone => "Clone",
+                Erosion.Cycle => "Cycle",
+                Erosion.Dead_Code => "Dead_Code",
+                Erosion.Metric => "Metric",
+                Erosion.Style => "Style",
+                Erosion.Universal => "Universal",
+                _ => "UNDEFINED"
+            };
 
         // Relative screen space required so that a erosion sprite becomes visible.
         // If the size of the sprite is below this value, it will be culled.
@@ -67,8 +69,7 @@ namespace SEE.GO
         /// Note: Extensions must be omitted.
         /// Note: All asset names and paths in Unity use forward slashes, paths using backslashes will not work.
         /// </summary>
-        private static readonly string[] paths = new string[]
-        {
+        private static readonly string[] paths = {
             "Icons/architectureSprite",
             "Icons/cloneSprite",
             "Icons/cycleSprite",
@@ -88,15 +89,11 @@ namespace SEE.GO
         }
 
         // The single instance of this class.
-        private static readonly IconFactory instance = new IconFactory();
 
         /// <summary>
         /// The single instance of this class.
         /// </summary>
-        public static IconFactory Instance
-        {
-            get => instance;
-        }
+        public static IconFactory Instance { get; } = new IconFactory();
 
         // A mapping of Erosions onto sprite prefabs. During start up we load the
         // sprite prefabs from the Assets for each kind of Erosion and store them
@@ -140,7 +137,7 @@ namespace SEE.GO
             }
             catch (Exception e)
             {
-                Debug.LogError($"Loading Sprite prefab from file {filename} failed: {e.ToString()}.\n");
+                Debug.LogError($"Loading Sprite prefab from file {filename} failed: {e}.\n");
             }
             return null;
         }
@@ -153,45 +150,71 @@ namespace SEE.GO
         /// which is the sprite for the given kind of erosion. It will be culled by
         /// ScreenRelativeTransitionHeight.
         ///
+        /// Apart from the sprite itself, a TextMeshPro with the given <paramref name="metricText"/> is placed
+        /// next to it, using a horizontal layout group.
+        ///
         /// This function may be called in editor mode.
         /// </summary>
         /// <param name="position">the location for positioning the new game object</param>
         /// <param name="erosion">the kind of Erosion for which to generate the game object</param>
+        /// <param name="metricText">Short text containing information about this erosion,
+        /// e.g. number of occurrences</param>
+        /// <param name="color">The color in which to render the sprite</param>
         /// <returns>a new game object for this type of erosion</returns>
-        public GameObject GetIcon(Vector3 position, Erosion erosion)
+        public GameObject GetIcon(Vector3 position, Erosion erosion, string metricText, Color color = default)
         {
-            GameObject gameObject = new GameObject
+            GameObject gameObject = new GameObject(ToString(erosion))
             {
-                tag = Tags.Erosion,
-                name = ToString(erosion)
+                tag = Tags.Erosion
             };
             gameObject.transform.position = position;
+            HorizontalLayoutGroup layoutGroup = gameObject.AddComponent<HorizontalLayoutGroup>();
+            layoutGroup.spacing = 7;
+            layoutGroup.childControlHeight = true;
+            layoutGroup.childControlWidth = true;
+            layoutGroup.childForceExpandHeight = true;
+            layoutGroup.childForceExpandWidth = false;
+            layoutGroup.childAlignment = TextAnchor.UpperCenter;
 
             // Programmatically create a LOD group and add LOD levels.
             LODGroup group = gameObject.AddComponent<LODGroup>();
 
             // Add LOD levels (currently only one).
             LOD[] lods = new LOD[1];
+            
+            // Add metric text label
+            GameObject text = PrefabInstantiator.InstantiatePrefab("Prefabs/Metric Value Label", gameObject.transform);
+            TextMeshPro MetricMesh = text.GetComponent<TextMeshPro>();
+            MetricMesh.text = metricText;
+            MetricMesh.enableAutoSizing = true;
+            text.SetActive(false);
+            
+            // Add the erosion sprite.
+            GameObject erosionSprite;
+            UnityEngine.Object prefab = erosionToSprite[(int)erosion];
+            if (prefab == null)
             {
-                // Add the erosion sprite.
-                GameObject erosionSprite;
-                UnityEngine.Object prefab = erosionToSprite[(int)erosion];
-                if (prefab == null)
-                {
-                    // Let sphere be the fallback icon if we do not have a prefab for this erosion kind
-                    erosionSprite = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                }
-                else
-                {
-                    string prefabName = prefab.name;
-                    erosionSprite = UnityEngine.Object.Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
-                    erosionSprite.name = prefabName;
-                }
-                erosionSprite.transform.parent = gameObject.transform;
-                Renderer[] renderers = new Renderer[1];
-                renderers[0] = erosionSprite.GetComponent<Renderer>();
-                lods[0] = new LOD(ScreenRelativeTransitionHeight, renderers);
+                // Let sphere be the fallback icon if we do not have a prefab for this erosion kind
+                erosionSprite = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             }
+            else
+            {
+                string prefabName = prefab.name;
+                erosionSprite = UnityEngine.Object.Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
+                Assert.IsNotNull(erosionSprite);
+                erosionSprite.name = prefabName;
+                erosionSprite.AddComponent<RectTransform>();
+            }
+            erosionSprite.transform.SetParent(gameObject.transform, false);
+            erosionSprite.transform.SetAsFirstSibling();
+            SpriteRenderer renderer = erosionSprite.GetComponent<SpriteRenderer>();
+            if (color != default)
+            {
+                renderer.color = color;
+            }
+            Renderer[] renderers = { renderer };
+            lods[0] = new LOD(ScreenRelativeTransitionHeight, renderers);
+                
             group.SetLODs(lods);
             group.RecalculateBounds();
             return gameObject;

@@ -1,9 +1,7 @@
-﻿using NUnit.Framework;
+﻿using System.Collections.Generic;
+using NUnit.Framework;
 using SEE.Game;
-using SEE.Layout.NodeLayouts;
 using SEE.Tools;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Utils
@@ -11,7 +9,7 @@ namespace SEE.Utils
     /// <summary>
     /// Test cases for ConfigIO.
     /// </summary>
-    class TestConfigIO
+    internal class TestConfigIO
     {        
         [Test]
         public void TestConfigParseInteger1()
@@ -515,7 +513,7 @@ namespace SEE.Utils
             Assert.AreEqual(expected.ZScoreScale, actual.ZScoreScale);
             Assert.AreEqual(expected.EdgeWidth, actual.EdgeWidth);
             Assert.AreEqual(expected.ShowErosions, actual.ShowErosions);
-            Assert.AreEqual(expected.MaxErosionWidth, actual.MaxErosionWidth);
+            Assert.AreEqual(expected.MaxErosionWidth, actual.MaxErosionWidth); //FIXME: Name changed
             Assert.AreEqual(expected.EdgesAboveBlocks, actual.EdgesAboveBlocks);
             Assert.AreEqual(expected.Tension, actual.Tension);
             Assert.AreEqual(expected.RDP, actual.RDP);
@@ -714,7 +712,7 @@ namespace SEE.Utils
             city.ZScoreScale = !city.ZScoreScale;
             city.EdgeWidth++;
             city.ShowErosions = !city.ShowErosions;
-            city.MaxErosionWidth++;
+            city.MaxErosionWidth++; //FIXME: Name changed
             city.EdgesAboveBlocks = !city.EdgesAboveBlocks;
             city.Tension = 0.0f;
             city.RDP = 10;
