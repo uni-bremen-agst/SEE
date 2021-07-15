@@ -71,7 +71,7 @@ namespace SEE.Game.UI.ConfigMenu
         }
 
         /// <summary>
-        /// Sets the page that corresponds to the requested index active and set all other
+        /// Sets the page that corresponds to the requested index active and all other
         /// pages inactive.
         /// </summary>
         /// <param name="requestedIndex">The index of the page that should be set active.</param>
