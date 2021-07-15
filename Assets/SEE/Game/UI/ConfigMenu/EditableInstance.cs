@@ -45,19 +45,25 @@ namespace SEE.Game.UI.ConfigMenu
 
         /// <summary>
         /// References the architecture SEECity.
+        ///
+        /// FIXME: We must not make any assumptions about the name of cities. We need
+        /// to support all cities in a scene, not just this one, if it exists at all.
         /// </summary>
         public static EditableInstance Architecture => new EditableInstance("Arch", "Architecture");
 
         /// <summary>
         /// References the implementation SEECity.
+        ///
+        /// FIXME: We must not make any assumptions about the name of cities. We need
+        /// to support all cities in a scene, not just this one, if it exists at all.
         /// </summary>
-        public static EditableInstance Implementation =>
-            new EditableInstance("Impl", "Implementation");
+        public static EditableInstance Implementation => new EditableInstance("Impl", "Implementation");
 
         protected bool Equals(EditableInstance other)
         {
             return GameObjectName == other.GameObjectName;
         }
+
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj))
