@@ -34,11 +34,13 @@ namespace SEE.Game.UI.ConfigMenu
         /// </summary>
         public string HeadlineText;
 
-        private TextMeshProUGUI headline;
-
         public void Start()
         {
-            MustGetComponentInChild("Heading", out headline);
+            /// FIXME: This is potentially a future problem because we the
+            /// <see cref="HeadlineText"/> will be set by methods that are also
+            /// called by a Start method. Thus, the execution of those Start
+            /// methods play a role.
+            MustGetComponentInChild("Heading", out TextMeshProUGUI headline);
             headline.text = HeadlineText;
         }
     }
