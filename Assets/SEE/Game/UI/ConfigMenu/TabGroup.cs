@@ -52,7 +52,7 @@ namespace SEE.Game.UI.ConfigMenu
             TabController = GetComponentInParent<TabController>();
             if (!TabController)
             {
-                Debug.LogError("TabGroup needs to be inside a TabController.");
+                Debug.LogError("TabGroup needs to be inside a TabController.\n");
             }
         }
 
@@ -95,7 +95,7 @@ namespace SEE.Game.UI.ConfigMenu
         /// </summary>
         void ResetButtons()
         {
-            foreach (var tabButton in TabButtons)
+            foreach (TabButton tabButton in TabButtons)
             {
                 if (tabButton == activeButton)
                 {
