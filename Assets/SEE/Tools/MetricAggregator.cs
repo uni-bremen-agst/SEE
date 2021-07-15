@@ -1,13 +1,13 @@
-﻿using SEE.DataModel.DG;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using SEE.DataModel.DG;
 
 namespace SEE.Tools
 {
     /// <summary>
     /// Allows one to aggregate or derive metrics for nodes.
     /// </summary>
-    public class MetricAggregator
+    public static class MetricAggregator
     {
         /// <summary>
         /// Sum of left and right used as a function delegate.
@@ -15,17 +15,14 @@ namespace SEE.Tools
         /// <param name="left">left operand</param>
         /// <param name="right">right operand</param>
         /// <returns>left + right</returns>
-        private static float Sum(float left, float right)
-        {
-            return left + right;
-        }
+        private static float Sum(float left, float right) => left + right;
 
         /// <summary>
         /// The metric extension if AggregateSum aggregates a metric as a sum of its
         /// children. For instance, if M is the name of metric to be aggregated, then
         /// the new metric containing the aggregation will be named M_SUM.
         /// </summary>
-        public const string SUM_Extension = "_SUM";
+        public const string SUM_EXTENSION = "_SUM";
 
         /// <summary>
         /// Aggregates the metrics along the node decomposition tree in the graph
@@ -38,9 +35,9 @@ namespace SEE.Tools
         /// </summary>
         /// <param name="graph">graph whose metric nodes are to be aggregated bottom up</param>
         /// <param name="metrics">the metrics to be aggregated</param>
-        public static void AggregateSum(Graph graph, string[] metrics)
+        public static void AggregateSum(Graph graph, IEnumerable<string> metrics)
         {
-            Aggregate(graph, metrics, Sum, "_SUM");
+            Aggregate(graph, metrics, Sum, SUM_EXTENSION);
         }
 
         /// <summary>
@@ -56,7 +53,7 @@ namespace SEE.Tools
         /// <param name="leafMetrics">the metrics to be aggregated</param>
         /// <param name="func">function to be used for the aggregation</param>
         /// <param name="extension">extension to be added to each metric name in leafMetrics for the new inner metric</param>
-        private static void Aggregate(Graph graph, string[] leafMetrics, Func<float, float, float> func, string extension)
+        private static void Aggregate(Graph graph, IEnumerable<string> leafMetrics, Func<float, float, float> func, string extension)
         {
             IList<Node> list = graph.GetRoots();
 
@@ -184,14 +181,7 @@ namespace SEE.Tools
                     {
                         // Note: Comparisons to NaN as nodeValue == float.NaN always return false, 
                         // no matter what the value of the float is. We must use float.IsNaN(nodeValue).
-                        if (float.IsNaN(nodeValue))
-                        {
-                            nodeValue = value;
-                        }
-                        else
-                        {
-                            nodeValue = func(nodeValue, value);
-                        }
+                        nodeValue = float.IsNaN(nodeValue) ? value : func(nodeValue, value);
                     }
                 }
 

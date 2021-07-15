@@ -1,6 +1,6 @@
-﻿using SEE.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.DataModel.DG.IO
@@ -217,11 +217,11 @@ namespace SEE.DataModel.DG.IO
                     }
                     else
                     {
-                        LogError("Node has no attribute " + Node.LinknameAttribute);
+                        LogError($"Node has no attribute {Node.LinknameAttribute}");
                         // let's try to use the Source.Name for the linkname instead, hoping it is unique
-                        if (String.IsNullOrEmpty(node.SourceName))
+                        if (string.IsNullOrEmpty(node.SourceName))
                         {
-                            LogError("Node has not even an attribute " + Node.SourceNameAttribute);
+                            LogError($"Node doesn't even have an attribute {Node.SourceNameAttribute}");
                         }
                         else
                         {
