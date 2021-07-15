@@ -50,6 +50,10 @@ namespace SEE.Game.UI.ConfigMenu
     {
         /// <summary>
         /// A list of numeric attributes digestible by the ComboSelect component.
+        ///
+        /// FIXME: NumericAttributes is just a list of predefined metric names. They
+        /// may or may not exist in the graph. We need to retrieve the set of metrics
+        /// from the graph.
         /// </summary>
         private static readonly List<string> NumericAttributes =
             Enum.GetValues(typeof(NumericAttributeNames))
