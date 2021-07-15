@@ -62,7 +62,7 @@ namespace SEE.Game.UI.ConfigMenu
             group = GetComponentInParent<TabGroup>();
             if (!group)
             {
-                Debug.LogError("TabButton is not in a TabGroup.");
+                throw new System.Exception("TabButton is not in a TabGroup.");
             }
 
             uiGradient = GetComponent<UIGradient>();
