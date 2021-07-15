@@ -36,7 +36,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         public void Start()
         {
-            /// FIXME: This is potentially a future problem because we the
+            /// FIXME: This is potentially a future problem because the
             /// <see cref="HeadlineText"/> will be set by methods that are also
             /// called by a Start method. Thus, the execution of those Start
             /// methods play a role.
