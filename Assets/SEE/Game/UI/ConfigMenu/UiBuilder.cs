@@ -28,10 +28,10 @@ using Object = UnityEngine.Object;
 namespace SEE.Game.UI.ConfigMenu
 {
     /// <summary>
-    /// The base builder for all ui components that are required to be instantiated by themselves
+    /// The base builder for all UI components that are required to be instantiated by themselves
     /// as opposed to be dragged to a GameObject via the editor.
     ///
-    /// By providing this fluent interface you can easily add new inputs to a page without never
+    /// By providing this fluent interface you can easily add new inputs to a page without ever
     /// needing to touch the prefab of a page.
     /// </summary>
     /// <typeparam name="T">The wrapper component that gets attached to the instantiated prefab.</typeparam>
@@ -42,7 +42,14 @@ namespace SEE.Game.UI.ConfigMenu
         /// </summary>
         protected abstract string PrefabPath { get; }
 
+        /// <summary>
+        /// The prefab from which to instantiate the UI elements.
+        /// </summary>
         private GameObject _prefab;
+
+        /// <summary>
+        /// The UI element instantiated from the prefab.
+        /// </summary>
         protected T Instance;
 
         /// <summary>
@@ -51,18 +58,21 @@ namespace SEE.Game.UI.ConfigMenu
         /// <param name="parent">The parent to which the newly created GameObject should be attached to.</param>
         protected UiBuilder(Transform parent)
         {
-            GameObject instanceHost =
-                Object.Instantiate(GetPrefab(), parent);
+            GameObject instanceHost = Object.Instantiate(GetPrefab(), parent);
             instanceHost.AddComponent<T>();
             instanceHost.MustGetComponent(out Instance);
         }
 
         /// <summary>
-        /// Builds an returns the component.
+        /// Builds and returns the component.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the UI element instantiated from the prefab</returns>
         public T Build() => Instance;
 
+        /// <summary>
+        /// Returns the prefab loaded from <see cref="PrefabPath"/>.
+        /// </summary>
+        /// <returns>prefab loaded from <see cref="PrefabPath"/></returns>
         private GameObject GetPrefab()
         {
             if (_prefab == null)
