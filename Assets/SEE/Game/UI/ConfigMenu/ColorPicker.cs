@@ -48,7 +48,8 @@ namespace SEE.Game.UI.ConfigMenu
         /// <summary>
         /// The label of the component.
         /// </summary>
-        public string label;
+        public string Label;
+
         public Action<Color> OnValueChange;
 
         /// <summary>
@@ -75,7 +76,7 @@ namespace SEE.Game.UI.ConfigMenu
         void Start()
         {
             MustGetComponentInChild("Label", out labelText);
-            labelText.text = label;
+            labelText.text = Label;
 
             MustGetComponentInChild("Trigger", out buttonManager);
             buttonManager.clickEvent.AddListener(() => colorPickerControl.RequestControl(this));
@@ -126,7 +127,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         public ColorPickerBuilder SetLabel(string label)
         {
-            Instance.label = label;
+            Instance.Label = label;
             return this;
         }
 
