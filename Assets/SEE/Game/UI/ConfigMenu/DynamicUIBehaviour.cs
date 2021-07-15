@@ -85,5 +85,28 @@ namespace SEE.Game.UI.ConfigMenu
             return AssetDatabase.LoadAssetAtPath<GameObject>(path) ??
                    throw new ArgumentException($"Prefab not found at path: {path}");
         }
+
+        /// <summary>
+        /// Returns the transform of the object holding the Canvas component
+        /// and having the given <paramref name="gameObject"/> as an descendant.
+        ///
+        /// Assumption: The root (note: root, not just parent!) of <paramref name="gameObject"/>
+        /// has an immediate child with the requested Canvas component. If that is not
+        /// the case, an exception will be thrown.
+        /// </summary>
+        /// <param name="gameObject">the object from which to start the search</param>
+        /// <returns>transform of the object holding the Canvas component</returns>
+        protected static Transform FindCanvas(GameObject gameObject)
+        {
+            Transform configMenu = gameObject.transform.root;
+            foreach (Transform child in configMenu.transform)
+            {
+                if (child.TryGetComponent(out Canvas canvas))
+                {
+                    return canvas.transform;
+                }
+            }
+            throw new Exception($"Root game object {configMenu.name} has no child with a {nameof(Canvas)} component");
+        }
     }
 }
