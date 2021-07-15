@@ -32,14 +32,14 @@ namespace SEE.Game.UI.ConfigMenu
         /// <summary>
         /// The headline text of this page.
         /// </summary>
-        public string headlineText;
+        public string HeadlineText;
 
-        private TextMeshProUGUI _headline;
+        private TextMeshProUGUI headline;
 
         public void Start()
         {
-            MustGetComponentInChild("Heading", out _headline);
-            _headline.text = headlineText;
+            MustGetComponentInChild("Heading", out headline);
+            headline.text = HeadlineText;
         }
     }
 }

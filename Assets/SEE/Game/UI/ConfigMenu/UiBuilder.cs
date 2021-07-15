@@ -35,7 +35,7 @@ namespace SEE.Game.UI.ConfigMenu
     /// needing to touch the prefab of a page.
     /// </summary>
     /// <typeparam name="T">The wrapper component that gets attached to the instantiated prefab.</typeparam>
-    public abstract class UiBuilder<T> where T : Component
+    public abstract class UIBuilder<T> where T : Component
     {
         /// <summary>
         /// Concrete builders need to specify the path where the prefab is located.
@@ -45,7 +45,7 @@ namespace SEE.Game.UI.ConfigMenu
         /// <summary>
         /// The prefab from which to instantiate the UI elements.
         /// </summary>
-        private GameObject _prefab;
+        private GameObject prefab;
 
         /// <summary>
         /// The UI element instantiated from the prefab.
@@ -56,7 +56,7 @@ namespace SEE.Game.UI.ConfigMenu
         /// Instantiates a new builder and also instantiates the associated prefab.
         /// </summary>
         /// <param name="parent">The parent to which the newly created GameObject should be attached to.</param>
-        protected UiBuilder(Transform parent)
+        protected UIBuilder(Transform parent)
         {
             GameObject instanceHost = Object.Instantiate(GetPrefab(), parent);
             instanceHost.AddComponent<T>();
@@ -75,11 +75,11 @@ namespace SEE.Game.UI.ConfigMenu
         /// <returns>prefab loaded from <see cref="PrefabPath"/></returns>
         private GameObject GetPrefab()
         {
-            if (_prefab == null)
+            if (prefab == null)
             {
-                _prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
+                prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
             }
-            return _prefab;
+            return prefab;
         }
     }
 }

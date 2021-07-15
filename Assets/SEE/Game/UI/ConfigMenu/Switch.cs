@@ -37,28 +37,29 @@ namespace SEE.Game.UI.ConfigMenu
         /// <summary>
         /// The label of this component.
         /// </summary>
-        public string label;
+        public string Label;
 
-        private TextMeshProUGUI _label;
-        private SwitchManager _switchManager;
+        private TextMeshProUGUI label;
+        private SwitchManager switchManager;
 
-        private readonly Queue<bool> _valueUpdates = new Queue<bool>();
+        private readonly Queue<bool> valueUpdates = new Queue<bool>();
 
         /// <summary>
         /// Requests an external value update.
         /// </summary>
-        public bool Value {
-            set => _valueUpdates.Enqueue(value);
+        public bool Value
+        {
+            set => valueUpdates.Enqueue(value);
         }
 
         void Start()
         {
-            MustGetComponentInChild("Label", out _label);
-            _label.text = label;
+            MustGetComponentInChild("Label", out label);
+            label.text = Label;
 
-            MustGetComponentInChild("Switch", out _switchManager);
-            _switchManager.OnEvents.AddListener(() => OnValueChange.Invoke(true));
-            _switchManager.OffEvents.AddListener(() => OnValueChange.Invoke(false));
+            MustGetComponentInChild("Switch", out switchManager);
+            switchManager.OnEvents.AddListener(() => OnValueChange.Invoke(true));
+            switchManager.OffEvents.AddListener(() => OnValueChange.Invoke(false));
             ApplyUpdate();
         }
 
@@ -69,9 +70,9 @@ namespace SEE.Game.UI.ConfigMenu
 
         void ApplyUpdate()
         {
-            if (_valueUpdates.Count > 0)
+            if (valueUpdates.Count > 0)
             {
-                _switchManager.isOn = _valueUpdates.Dequeue();
+                switchManager.isOn = valueUpdates.Dequeue();
             }
         }
 
@@ -84,7 +85,7 @@ namespace SEE.Game.UI.ConfigMenu
     /// <summary>
     /// Instantiates a switch game object via prefab and sets the wrapper script.
     /// </summary>
-    public class SwitchBuilder : UiBuilder<Switch>
+    public class SwitchBuilder : UIBuilder<Switch>
     {
         protected override string PrefabPath => "Assets/Prefabs/UI/Input Group - Switch.prefab";
 
@@ -99,7 +100,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         public SwitchBuilder SetLabel(string label)
         {
-            Instance.label = label;
+            Instance.Label = label;
             return this;
         }
 

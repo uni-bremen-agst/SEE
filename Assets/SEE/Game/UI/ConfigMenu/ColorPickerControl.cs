@@ -31,12 +31,12 @@ namespace SEE.Game.UI.ConfigMenu
     [RequireComponent(typeof(HSVPicker.ColorPicker))]
     public class ColorPickerControl : DynamicUIBehaviour
     {
-        private HSVPicker.ColorPicker _colorPickerHost;
-        private ColorPicker _registeredPicker;
+        private HSVPicker.ColorPicker colorPickerHost;
+        private ColorPicker registeredPicker;
 
         private void Awake()
         {
-            _colorPickerHost = GetComponent<HSVPicker.ColorPicker>();
+            colorPickerHost = GetComponent<HSVPicker.ColorPicker>();
         }
 
         /// <summary>
@@ -47,17 +47,17 @@ namespace SEE.Game.UI.ConfigMenu
         {
             // If the control request comes from the currently controlling wrapper script
             // we assume that the caller wants to hide color picker object.
-            if (_registeredPicker == colorPicker)
+            if (registeredPicker == colorPicker)
             {
                 Reset();
                 return;
             }
 
             gameObject.SetActive(true);
-            _registeredPicker = colorPicker;
-            _colorPickerHost.onValueChanged.RemoveAllListeners();
-            _colorPickerHost.onValueChanged.AddListener(colorPicker.OnPickerHostColorChange);
-            _colorPickerHost.AssignColor(colorPicker.LatestSelectedColor);
+            registeredPicker = colorPicker;
+            colorPickerHost.onValueChanged.RemoveAllListeners();
+            colorPickerHost.onValueChanged.AddListener(colorPicker.OnPickerHostColorChange);
+            colorPickerHost.AssignColor(colorPicker.LatestSelectedColor);
         }
 
         /// <summary>
@@ -68,9 +68,9 @@ namespace SEE.Game.UI.ConfigMenu
         /// <param name="newColor"></param>
         public void AskForColorUpdate(ColorPicker supplicant, Color newColor)
         {
-            if (_registeredPicker == supplicant)
+            if (registeredPicker == supplicant)
             {
-                _colorPickerHost.AssignColor(newColor);
+                colorPickerHost.AssignColor(newColor);
             }
         }
 
@@ -79,10 +79,10 @@ namespace SEE.Game.UI.ConfigMenu
         /// </summary>
         public void Reset()
         {
-                _colorPickerHost.onValueChanged.RemoveAllListeners();
-                _colorPickerHost.AssignColor(Color.white);
+                colorPickerHost.onValueChanged.RemoveAllListeners();
+                colorPickerHost.AssignColor(Color.white);
                 gameObject.SetActive(false);
-                _registeredPicker = null;
+                registeredPicker = null;
         }
     }
 }

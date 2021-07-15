@@ -33,48 +33,48 @@ namespace SEE.Game.UI.ConfigMenu
     /// </summary>
     public class VRInputModule : BaseInputModule
     {
-        private SteamVR_Input_Sources _inputSource = SteamVR_Input_Sources.LeftHand;
-        private SteamVR_Action_Boolean _clickAction = SteamVR_Actions._default.InteractUI;
+        private readonly SteamVR_Input_Sources inputSource = SteamVR_Input_Sources.LeftHand;
+        private readonly SteamVR_Action_Boolean clickAction = SteamVR_Actions._default.InteractUI;
 
-        private GameObject _currentObject;
-        private PointerEventData _data;
+        private GameObject currentObject;
+        private PointerEventData data;
 
         public Camera PointerCamera { get; set; }
 
         protected override void Awake()
         {
             base.Awake();
-            _data = new PointerEventData(eventSystem);
+            data = new PointerEventData(eventSystem);
         }
 
         public override void Process()
         {
-            _data.Reset();
-            _data.position =
+            data.Reset();
+            data.position =
                 new Vector3(PointerCamera.pixelWidth / 2, PointerCamera.pixelHeight / 2);
 
-            eventSystem.RaycastAll(_data, m_RaycastResultCache);
-            _data.pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
-            _currentObject = _data.pointerCurrentRaycast.gameObject;
+            eventSystem.RaycastAll(data, m_RaycastResultCache);
+            data.pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
+            currentObject = data.pointerCurrentRaycast.gameObject;
 
             m_RaycastResultCache.Clear();
 
-            HandlePointerExitAndEnter(_data, _currentObject);
-            ExecuteEvents.Execute(_data.pointerDrag, _data, ExecuteEvents.dragHandler);
+            HandlePointerExitAndEnter(data, currentObject);
+            ExecuteEvents.Execute(data.pointerDrag, data, ExecuteEvents.dragHandler);
 
-            if (_clickAction.GetStateDown(_inputSource))
+            if (clickAction.GetStateDown(inputSource))
             {
-                ProcessPress(_data);
+                ProcessPress(data);
             }
-            if (_clickAction.GetStateUp(_inputSource))
+            if (clickAction.GetStateUp(inputSource))
             {
-                ProcessRelease(_data);
+                ProcessRelease(data);
             }
         }
 
         public PointerEventData GetData()
         {
-            return _data;
+            return data;
         }
 
         private void ProcessPress(PointerEventData data)
@@ -82,9 +82,9 @@ namespace SEE.Game.UI.ConfigMenu
             data.pointerPressRaycast = data.pointerCurrentRaycast;
 
             data.pressPosition = data.position;
-            data.pointerPress = ExecuteEvents.GetEventHandler<IPointerClickHandler>(_currentObject);
-            data.pointerDrag = ExecuteEvents.GetEventHandler<IDragHandler>(_currentObject);
-            data.rawPointerPress = _currentObject;
+            data.pointerPress = ExecuteEvents.GetEventHandler<IPointerClickHandler>(currentObject);
+            data.pointerDrag = ExecuteEvents.GetEventHandler<IDragHandler>(currentObject);
+            data.rawPointerPress = currentObject;
 
             ExecuteEvents.Execute(data.pointerPress, data, ExecuteEvents.pointerDownHandler);
             ExecuteEvents.Execute(data.pointerDrag, data, ExecuteEvents.beginDragHandler);
@@ -92,13 +92,13 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void ProcessRelease(PointerEventData data)
         {
-            ExecuteEvents.Execute(_currentObject, data,
+            ExecuteEvents.Execute(currentObject, data,
                                   ExecuteEvents.pointerUpHandler);
             ExecuteEvents.Execute(data.pointerDrag, data,
                                   ExecuteEvents.endDragHandler);
 
             GameObject pointerUpHandler =
-                ExecuteEvents.GetEventHandler<IPointerClickHandler>(_currentObject);
+                ExecuteEvents.GetEventHandler<IPointerClickHandler>(currentObject);
 
             if (data.pointerPress == pointerUpHandler)
             {

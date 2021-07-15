@@ -20,9 +20,9 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Michsky.UI.ModernUIPack;
 using System;
 using System.Collections.Generic;
-using Michsky.UI.ModernUIPack;
 using TMPro;
 using UnityEngine;
 
@@ -35,10 +35,10 @@ namespace SEE.Game.UI.ConfigMenu
     /// </summary>
     public class ColorPicker : DynamicUIBehaviour
     {
-        private TextMeshProUGUI _labelText;
-        private ButtonManagerBasicWithIcon _buttonManager;
+        private TextMeshProUGUI labelText;
+        private ButtonManagerBasicWithIcon buttonManager;
 
-        private readonly Queue<Color> _valueUpdates = new Queue<Color>();
+        private readonly Queue<Color> valueUpdates = new Queue<Color>();
 
         /// <summary>
         /// The controller script of the singleton color picker.
@@ -56,7 +56,8 @@ namespace SEE.Game.UI.ConfigMenu
         /// This can come from user input or from programmatic changes and is useful for displaying
         /// the selected color.
         /// </summary>
-        public Color LatestSelectedColor {
+        public Color LatestSelectedColor
+        {
             get;
             private set;
         }
@@ -64,7 +65,7 @@ namespace SEE.Game.UI.ConfigMenu
         /// <summary>
         /// The color that should be displayed by the color picker.
         /// </summary>
-        public Color Value { set => _valueUpdates.Enqueue(value); }
+        public Color Value { set => valueUpdates.Enqueue(value); }
 
         void Update()
         {
@@ -73,20 +74,20 @@ namespace SEE.Game.UI.ConfigMenu
 
         void Start()
         {
-            MustGetComponentInChild("Label", out _labelText);
-            _labelText.text = label;
+            MustGetComponentInChild("Label", out labelText);
+            labelText.text = label;
 
-            MustGetComponentInChild("Trigger", out _buttonManager);
-            _buttonManager.clickEvent.AddListener(() => colorPickerControl.RequestControl(this));
+            MustGetComponentInChild("Trigger", out buttonManager);
+            buttonManager.clickEvent.AddListener(() => colorPickerControl.RequestControl(this));
 
             HandleQueuedUpdates();
         }
 
         private void HandleQueuedUpdates()
         {
-            if (_valueUpdates.Count > 0)
+            if (valueUpdates.Count > 0)
             {
-                Color newColor = _valueUpdates.Dequeue();
+                Color newColor = valueUpdates.Dequeue();
                 LatestSelectedColor = newColor;
                 ReflectColorUpdate();
                 colorPickerControl.AskForColorUpdate(this, newColor);
@@ -95,8 +96,8 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void ReflectColorUpdate()
         {
-            _buttonManager.normalText.text = ColorUtility.ToHtmlStringRGB(LatestSelectedColor);
-            _buttonManager.normalImage.color = LatestSelectedColor;
+            buttonManager.normalText.text = ColorUtility.ToHtmlStringRGB(LatestSelectedColor);
+            buttonManager.normalImage.color = LatestSelectedColor;
         }
 
         public void OnPickerHostColorChange(Color color)
@@ -110,7 +111,7 @@ namespace SEE.Game.UI.ConfigMenu
     /// <summary>
     /// Instantiates a new color picker game object via prefab and sets the wrapper script.
     /// </summary>
-    public class ColorPickerBuilder : UiBuilder<ColorPicker>
+    public class ColorPickerBuilder : UIBuilder<ColorPicker>
     {
         protected override string PrefabPath => "Assets/Prefabs/UI/Input Group - Color Picker.prefab";
 

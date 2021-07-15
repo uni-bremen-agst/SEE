@@ -20,11 +20,11 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
 using SEE.GO;
 using SimpleFileBrowser;
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -49,59 +49,59 @@ namespace SEE.Game.UI.ConfigMenu
     /// </summary>
     public class FilePicker : DynamicUIBehaviour
     {
-        private CustomDropdown _dropdown;
-        private TMP_InputField _customInput;
-        private TextMeshProUGUI _labelText;
-        private ButtonManagerBasic _pickerButton;
+        private CustomDropdown dropdown;
+        private TMP_InputField customInput;
+        private TextMeshProUGUI labelText;
+        private ButtonManagerBasic pickerButton;
 
         /// <summary>
         /// The DataPath instance this file picker manipulates.
         /// </summary>
-        public DataPath dataPathInstance;
+        public DataPath DataPathInstance;
 
         /// <summary>
         /// The picker mode (Files, Directories etc.)
         /// </summary>
-        public FileBrowser.PickMode pickMode = FileBrowser.PickMode.Files;
+        public FileBrowser.PickMode PickMode = FileBrowser.PickMode.Files;
 
         /// <summary>
         /// The label of this component.
         /// </summary>
-        public string label;
+        public string Label;
 
         void Start()
         {
-            MustGetComponentInChild("DropdownCombo/Dropdown", out _dropdown);
-            MustGetComponentInChild("DropdownCombo/SelectableInput/Input", out _customInput);
-            MustGetComponentInChild("DropdownCombo/SelectableInput/Button", out _pickerButton);
-            MustGetComponentInChild("Label", out _labelText);
+            MustGetComponentInChild("DropdownCombo/Dropdown", out dropdown);
+            MustGetComponentInChild("DropdownCombo/SelectableInput/Input", out customInput);
+            MustGetComponentInChild("DropdownCombo/SelectableInput/Button", out pickerButton);
+            MustGetComponentInChild("Label", out labelText);
 
-            _dropdown.dropdownItems.Clear();
+            dropdown.dropdownItems.Clear();
             foreach (string kind in ConfigMenu.EnumToStr<DataPath.RootKind>())
             {
-                _dropdown.CreateNewItemFast(kind, null);
+                dropdown.CreateNewItemFast(kind, null);
             }
-            _dropdown.selectedItemIndex =
-                _dropdown.dropdownItems.FindIndex(
-                    item => item.itemName == dataPathInstance.Root.ToString());
-            _dropdown.SetupDropdown();
-            _dropdown.dropdownEvent.AddListener(index =>
+            dropdown.selectedItemIndex =
+                dropdown.dropdownItems.FindIndex(
+                    item => item.itemName == DataPathInstance.Root.ToString());
+            dropdown.SetupDropdown();
+            dropdown.dropdownEvent.AddListener(index =>
             {
-                String selectedItem = _dropdown.dropdownItems[index].itemName;
-                dataPathInstance.Root = ItemToRootKind(selectedItem);
+                String selectedItem = dropdown.dropdownItems[index].itemName;
+                DataPathInstance.Root = ItemToRootKind(selectedItem);
                 UpdateInput();
             });
-            _dropdown.isListItem = true;
-            _dropdown.listParent = FindCanvas(gameObject);
+            dropdown.isListItem = true;
+            dropdown.listParent = FindCanvas(gameObject);
 
-            _pickerButton.clickEvent.AddListener(() =>
+            pickerButton.clickEvent.AddListener(() =>
             {
                 FileBrowser.ShowLoadDialog(HandleFileBrowserSuccess,
                                            () => { },
                                            allowMultiSelection: false,
-                                           pickMode: pickMode,
+                                           pickMode: PickMode,
                                            title: "Pick a file/folder",
-                                           initialPath: dataPathInstance.RootPath
+                                           initialPath: DataPathInstance.RootPath
                 );
 
                 // Find the newly opened file browser and optimize it for VR.
@@ -122,20 +122,20 @@ namespace SEE.Game.UI.ConfigMenu
                 }
             });
 
-            _customInput.onValueChanged.AddListener(path =>
+            customInput.onValueChanged.AddListener(path =>
             {
-                if (dataPathInstance.Root == DataPath.RootKind.Absolute)
+                if (DataPathInstance.Root == DataPath.RootKind.Absolute)
                 {
-                    dataPathInstance.AbsolutePath = path;
+                    DataPathInstance.AbsolutePath = path;
                 }
                 else
                 {
-                    dataPathInstance.RelativePath = path;
+                    DataPathInstance.RelativePath = path;
                 }
                 UpdateInput();
             });
 
-            _labelText.text = label;
+            labelText.text = Label;
         }
         private void HandleFileBrowserSuccess(string[] paths)
         {
@@ -144,28 +144,28 @@ namespace SEE.Game.UI.ConfigMenu
                 Debug.LogError("Received no paths from file browser.");
             }
             // There should only be a single path since multiple selections are forbidden.
-            dataPathInstance.Set(paths[0]);
+            DataPathInstance.Set(paths[0]);
             UpdateDropdownAndInput();
         }
 
         private void UpdateDropdownAndInput()
         {
-            _dropdown.selectedItemIndex =
-                _dropdown.dropdownItems.FindIndex(
-                    item => item.itemName == dataPathInstance.Root.ToString());
-            _dropdown.SetupDropdown();
+            dropdown.selectedItemIndex =
+                dropdown.dropdownItems.FindIndex(
+                    item => item.itemName == DataPathInstance.Root.ToString());
+            dropdown.SetupDropdown();
             UpdateInput();
         }
 
         private void UpdateInput()
         {
-            if (dataPathInstance.Root == DataPath.RootKind.Absolute)
+            if (DataPathInstance.Root == DataPath.RootKind.Absolute)
             {
-                _customInput.text = dataPathInstance.AbsolutePath;
+                customInput.text = DataPathInstance.AbsolutePath;
             }
             else
             {
-                _customInput.text = dataPathInstance.RelativePath;
+                customInput.text = DataPathInstance.RelativePath;
             }
         }
 
@@ -179,7 +179,7 @@ namespace SEE.Game.UI.ConfigMenu
     /// <summary>
     /// Instantiates a new file picker game object via prefab and sets the wrapper script.
     /// </summary>
-    public class FilePickerBuilder : UiBuilder<FilePicker>
+    public class FilePickerBuilder : UIBuilder<FilePicker>
     {
         protected override string PrefabPath =>
             "Assets/Prefabs/UI/Input Group - File Picker.prefab";
@@ -195,19 +195,19 @@ namespace SEE.Game.UI.ConfigMenu
 
         public FilePickerBuilder SetLabel(string label)
         {
-            Instance.label = label;
+            Instance.Label = label;
             return this;
         }
 
         public FilePickerBuilder SetPathInstance(DataPath dataPath)
         {
-            Instance.dataPathInstance = dataPath;
+            Instance.DataPathInstance = dataPath;
             return this;
         }
 
         public FilePickerBuilder SetPickMode(FileBrowser.PickMode pickMode)
         {
-            Instance.pickMode = pickMode;
+            Instance.PickMode = pickMode;
             return this;
         }
     }
