@@ -28,9 +28,19 @@ using UnityEngine;
 
 namespace SEE.Game.UI.ConfigMenu
 {
+    /// <summary>
+    /// Specifies what a user can do with the combo box.
+    /// </summary>
     public enum ComboSelectMode
     {
+        /// <summary>
+        /// The user can select a value of a predefined set of values or
+        /// enter a completely new value.
+        /// </summary>
         Combo,
+        /// <summary>
+        /// The user can only select a value of a predefined set of values.
+        /// </summary>
         Restricted,
     }
 
@@ -60,9 +70,35 @@ namespace SEE.Game.UI.ConfigMenu
         /// </summary>
         public ComboSelectMode mode = ComboSelectMode.Combo;
 
+        /// <summary>
+        /// The component of type <see cref="CustomDropdown"/> in the prefab
+        /// <see cref="ComboSelectBuilder.PrefabPath"/> for the child game object
+        /// 'DropdownCombo/Dropdown'. This drop down allows a user to select one
+        /// item of a predefined set of values.
+        /// </summary>
         private CustomDropdown _dropdown;
+
+        /// <summary>
+        /// The component of type <see cref="TMP_InputField"/> in the prefab
+        /// <see cref="ComboSelectBuilder.PrefabPath"/> for the child game object
+        /// 'DropdownCombo/Input'. This input field allows a user to set the
+        /// value directly (by typing or dictating it).
+        /// </summary>
         private TMP_InputField _customInput;
+
+        /// <summary>
+        /// The component of type <see cref="TextMeshProUGUI"/> in the child named
+        /// 'Label' in the prefab <see cref="ComboSelectBuilder.PrefabPath"/>.
+        /// This represents the label of the combo box.
+        /// </summary>
         private TextMeshProUGUI _labelText;
+
+        /// <summary>
+        /// The component of type <see cref="Dictaphone"/> in the prefab
+        /// <see cref="ComboSelectBuilder.PrefabPath"/> for the child game object
+        /// 'DropdownCombo/DictateButton'. This element represents a kind of
+        /// button to turn on/off dictation of the input value.
+        /// </summary>
         private Dictaphone _dictaphone;
 
         private readonly Queue<List<string>> _valuesUpdates = new Queue<List<string>>();
@@ -102,10 +138,33 @@ namespace SEE.Game.UI.ConfigMenu
                 FigureOutInputMode(selectedItem);
             });
             _dropdown.isListItem = true;
-            _dropdown.listParent = FindObjectOfType<Canvas>().transform;
+            _dropdown.listParent = FindCanvas(gameObject);
             _labelText.text = label;
 
             _dictaphone.OnDictationFinished += text => _customInput.text = text;
+        }
+
+        /// <summary>
+        /// Returns the transform of the object holding the Canvas component
+        /// and having the given <paramref name="gameObject"/> as an descendant.
+        ///
+        /// Assumption: The root (note: root, not just parent!) of <paramref name="gameObject"/>
+        /// has an immediate child with the requested Canvas component. If that is not
+        /// the case, an exception will be thrown.
+        /// </summary>
+        /// <param name="gameObject">the object from which to start the search</param>
+        /// <returns>transform of the object holding the Canvas component</returns>
+        protected static Transform FindCanvas(GameObject gameObject)
+        {
+            Transform configMenu = gameObject.transform.root;
+            foreach (Transform child in configMenu.transform)
+            {
+                if (child.TryGetComponent(out Canvas canvas))
+                {
+                    return canvas.transform;
+                }
+            }
+            throw new Exception($"Root game object {configMenu.name} has no child with a {nameof(Canvas)} component");
         }
 
         void Update()

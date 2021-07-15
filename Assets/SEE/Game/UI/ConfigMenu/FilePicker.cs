@@ -92,7 +92,7 @@ namespace SEE.Game.UI.ConfigMenu
                 UpdateInput();
             });
             _dropdown.isListItem = true;
-            _dropdown.listParent = FindObjectOfType<Canvas>().transform;
+            _dropdown.listParent = FindCanvas(gameObject);
 
             _pickerButton.clickEvent.AddListener(() =>
             {
