@@ -81,7 +81,6 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void DictationResultCallBack(string text, ConfidenceLevel confidence)
         {
-            Debug.Log($"Dictation result {text} with confidence {confidence}.\n");
             OnDictationFinished?.Invoke(text);
         }
 
