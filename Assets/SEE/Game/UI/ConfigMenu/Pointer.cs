@@ -32,10 +32,25 @@ namespace SEE.Game.UI.ConfigMenu
     /// </summary>
     public class Pointer : MonoBehaviour
     {
+        /// <summary>
+        /// The initial length of the laser pointer's beam.
+        /// </summary>
         public float DefaultLength = 5.0f;
+
+        /// <summary>
+        /// The input for the pointer.
+        /// </summary>
         public VRInputModule InputModule;
 
+        /// <summary>
+        /// The laser points consists of a line with a dot (sphere) at
+        /// the end of the line. This game object represents the dot.
+        /// </summary>
         private GameObject dot;
+        /// <summary>
+        /// The line of the laser pointer starting at the hand and ranging
+        /// to the dot.
+        /// </summary>
         private LineRenderer lineRenderer;
 
         void Awake()
@@ -45,11 +60,6 @@ namespace SEE.Game.UI.ConfigMenu
         }
 
         void Update()
-        {
-            UpdateLine();
-        }
-
-        private void UpdateLine()
         {
             PointerEventData data = InputModule.GetData();
             float targetLength = data.pointerCurrentRaycast.distance == 0 ? DefaultLength
@@ -67,12 +77,16 @@ namespace SEE.Game.UI.ConfigMenu
             lineRenderer.SetPosition(1, endPosition);
         }
 
+        /// <summary>
+        /// Returns the hit of a raycast starting of the game object
+        /// in forward direction with given <paramref name="length"/>.
+        /// </summary>
+        /// <param name="length"></param>
+        /// <returns>the hit of the raycast</returns>
         private RaycastHit CreateRaycast(float length)
         {
-            RaycastHit hit;
             Ray ray = new Ray(transform.position, transform.forward);
-            Physics.Raycast(ray, out hit, length);
-
+            Physics.Raycast(ray, out RaycastHit hit, length);
             return hit;
         }
     }
