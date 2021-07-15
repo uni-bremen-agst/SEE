@@ -94,8 +94,7 @@ namespace SEE.Game.UI.ConfigMenu
         /// The event handler that gets called when a user interaction changes the currently edited
         /// SEECity instance.
         /// </summary>
-        public UnityEvent<EditableInstance> OnInstanceChangeRequest =
-            new UnityEvent<EditableInstance>();
+        public UnityEvent<EditableInstance> OnInstanceChangeRequest = new UnityEvent<EditableInstance>();
 
         /// <summary>
         /// The currently edited SEECity instance.
@@ -108,7 +107,6 @@ namespace SEE.Game.UI.ConfigMenu
             MustGetChild("Canvas/TabNavigation/TabOutlet", out tabOutlet);
             MustGetChild("Canvas/TabNavigation/Sidebar/TabButtons", out tabButtons);
             MustGetChild("Canvas/Actions", out actions);
-
             MustGetComponentInChild("Canvas", out canvas);
             // initially the canvas should be inactive; it can be activated by the user on demand
             Off();
@@ -136,10 +134,11 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void SetupCity(EditableInstance instanceToEdit)
         {
+            // FIXME: Find should be avoided.
             GameObject.Find(instanceToEdit.GameObjectName)?.MustGetComponent(out city);
             if (!city)
             {
-                Debug.LogError("Did not find a city instance.");
+                Debug.LogError("Did not find a city instance.\n");
             }
         }
 
@@ -222,6 +221,7 @@ namespace SEE.Game.UI.ConfigMenu
             CreateActionButton("Save layout", city.SaveLayout);
             CreateActionButton("Add References", city.SetNodeEdgeRefs);
         }
+
         private void CreateActionButton(string buttonText, UnityAction onClick)
         {
             GameObject deleteGraphButtonGo =
@@ -246,11 +246,10 @@ namespace SEE.Game.UI.ConfigMenu
             GameObject page = CreateAndInsertPage("Leaf nodes");
             Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
 
+            // FIXME: We can edit only the Unspecified domain. The concept of domains will
+            // be dropped soon. So we will not invest any effort in this for the time being.
             LeafNodeAttributes leafNodeAttributes = city.leafNodeAttributesPerKind[(int)Node.NodeDomain.Unspecified];
-            //foreach (LeafNodeAttributes leafNodeAttributes in _city.leafNodeAttributesPerKind)
             {
-                // FIXME: the domain must be appended to these labels
-
                 // Shape type for leaf nodes
                 ComboSelectBuilder.Init(controls.transform)
                     .SetLabel("Shape")
@@ -328,10 +327,10 @@ namespace SEE.Game.UI.ConfigMenu
             GameObject page = CreateAndInsertPage("Inner nodes");
             Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
 
+            // FIXME: We can edit only the Unspecified domain. The concept of domains will
+            // be dropped soon. So we will not invest any effort in this for the time being.
             InnerNodeAttributes innerNodeAttributes = city.innerNodeAttributesPerKind[(int)Node.NodeDomain.Unspecified];
-            //foreach (InnerNodeAttributes innerNodeAttributes in _city.innerNodeAttributesPerKind)
             {
-                // FIXME: the domain must be appended to these labels
 
                 // Shape type for inner nodes
                 ComboSelectBuilder.Init(controls.transform)
