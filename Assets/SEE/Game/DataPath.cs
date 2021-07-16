@@ -1,7 +1,7 @@
-﻿using SEE.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game
@@ -82,33 +82,33 @@ namespace SEE.Game
         {
             if (path.Contains(Application.streamingAssetsPath))
             {
-                this.Root = RootKind.StreamingAssets;
-                this.relativePath = path.Replace(Application.streamingAssetsPath, string.Empty);
+                Root = RootKind.StreamingAssets;
+                relativePath = path.Replace(Application.streamingAssetsPath, string.Empty);
             }
             else if (path.Contains(Application.dataPath))
             {
-                this.Root = RootKind.AssetsFolder;
-                this.relativePath = path.Replace(Application.dataPath, string.Empty);
+                Root = RootKind.AssetsFolder;
+                relativePath = path.Replace(Application.dataPath, string.Empty);
             }
             else if (path.Contains(Application.persistentDataPath))
             {
-                this.Root = RootKind.PersistentData;
-                this.relativePath = path.Replace(Application.persistentDataPath, string.Empty);
+                Root = RootKind.PersistentData;
+                relativePath = path.Replace(Application.persistentDataPath, string.Empty);
             }
             else if (path.Contains(Application.temporaryCachePath))
             {
-                this.Root = RootKind.TemporaryCache;
-                this.relativePath = path.Replace(Application.temporaryCachePath, string.Empty);
+                Root = RootKind.TemporaryCache;
+                relativePath = path.Replace(Application.temporaryCachePath, string.Empty);
             }
             else if (path.Contains(ProjectFolder()))
             {
-                this.Root = RootKind.ProjectFolder;
-                this.relativePath = path.Replace(ProjectFolder(), string.Empty);
+                Root = RootKind.ProjectFolder;
+                relativePath = path.Replace(ProjectFolder(), string.Empty);
             }
             else
             {
-                this.Root = RootKind.Absolute;
-                this.absolutePath = path;
+                Root = RootKind.Absolute;
+                absolutePath = path;
             }
         }
 
@@ -128,23 +128,16 @@ namespace SEE.Game
         /// <returns>root path</returns>
         private static string GetRootPath(RootKind rootKind)
         {
-            switch (rootKind)
+            return rootKind switch
             {
-                case RootKind.PersistentData:
-                    return Application.persistentDataPath;
-                case RootKind.StreamingAssets:
-                    return Application.streamingAssetsPath;
-                case RootKind.TemporaryCache:
-                    return Application.temporaryCachePath;
-                case RootKind.AssetsFolder:
-                    return Application.dataPath;
-                case RootKind.ProjectFolder:
-                    return ProjectFolder();
-                case RootKind.Absolute:
-                    return string.Empty;
-                default:
-                    throw new NotImplementedException("Unhandled case " + rootKind.ToString());
-            }
+                RootKind.PersistentData => Application.persistentDataPath,
+                RootKind.StreamingAssets => Application.streamingAssetsPath,
+                RootKind.TemporaryCache => Application.temporaryCachePath,
+                RootKind.AssetsFolder => Application.dataPath,
+                RootKind.ProjectFolder => ProjectFolder(),
+                RootKind.Absolute => string.Empty,
+                _ => throw new NotImplementedException("Unhandled case " + rootKind)
+            };
         }
 
         /// <summary>
@@ -152,7 +145,7 @@ namespace SEE.Game
         /// "/Assets" at the end.
         /// </summary>
         /// <returns>Unity project folder</returns>
-        private static string ProjectFolder()
+        public static string ProjectFolder()
         {
             return Regex.Replace(Application.dataPath, "/Assets$", string.Empty);
         }
@@ -301,7 +294,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Restores the state of ths <see cref="DataPath"/> according to <paramref name="attributes"/>.
+        /// Restores the state of the <see cref="DataPath"/> according to <paramref name="attributes"/>.
         /// 
         /// Looks up the attributes of the data path in <paramref name="attributes"/> using
         /// the key <paramref name="label"/> and sets the internal attributes of this
@@ -316,19 +309,19 @@ namespace SEE.Game
                 Dictionary<string, object> path = dictionary as Dictionary<string, object>;
                 {
                     string value = "";
-                    if (ConfigIO.Restore<string>(path, RelativePathLabel, ref value))
+                    if (ConfigIO.Restore(path, RelativePathLabel, ref value))
                     {
                         RelativePath = value;
                     }
                 }
                 {
                     string value = "";
-                    if (ConfigIO.Restore<string>(path, AbsolutePathLabel, ref value))
+                    if (ConfigIO.Restore(path, AbsolutePathLabel, ref value))
                     {
                         AbsolutePath = value;
                     }
                 }                
-                ConfigIO.RestoreEnum<DataPath.RootKind>(path, RootLabel, ref Root);
+                ConfigIO.RestoreEnum(path, RootLabel, ref Root);
             }
         }
     }

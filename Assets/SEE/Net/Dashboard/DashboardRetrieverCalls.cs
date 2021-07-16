@@ -259,7 +259,7 @@ namespace SEE.Net.Dashboard
             ruleInfo.SelectNodes("//h4[position()=1]")?.ToList().ForEach(x => x?.Remove());
             ruleInfo.SelectNodes("//h5[text()='Configuration']")?.ToList().ForEach(x => x?.Remove());
             ruleInfo.SelectNodes("//table[contains(concat(' ',normalize-space(@class),' '),' rule-config ')]")
-                   ?.ToList().ForEach(x => x?.Remove());
+                    ?.ToList().ForEach(x => x?.Remove());
 
             string ruleText = string.Join("\n", ruleInfo.InnerText.Split('\n').Select(x => x.Trim(' ', '\t')));
             return HtmlEntity.DeEntitize(ruleText).Trim(' ', '\t', '\n', '\r');
@@ -268,6 +268,42 @@ namespace SEE.Net.Dashboard
         #endregion
 
         #region Aggregate Calls
+
+        /// <summary>
+        /// A dictionary mapping from path and entity name to the corresponding metrics.
+        /// </summary>
+        private IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics;
+
+        /// <summary>
+        /// Returns a list of <see cref="MetricValueTableRow"/>s whose <paramref name="path"/> and
+        /// <paramref name="entityName"/> match the given parameters.
+        /// If no such rows exist, an empty list will be returned.
+        ///
+        /// NOTE: The first time this method is called, an expensive network call is made, the result of which
+        /// will be cached for later accesses. This means that the first call will take a lot longer compared
+        /// to any subsequent calls.
+        /// </summary>
+        /// <param name="path">The path of the queried entity</param>
+        /// <param name="entityName">The name of the queried entity</param>
+        /// <returns>A list of <see cref="MetricValueTableRow"/>s which matches the given parameters.</returns>
+        public async UniTask<List<MetricValueTableRow>> GetSpecificMetricRows(string path, string entityName)
+        {
+            metrics ??= (await GetMetricValueTable()).rows.GroupBy(x => (x.path, x.entity))
+                                                     .ToDictionary(x => x.Key, x => x.ToList());
+
+            return metrics.ContainsKey((path, entityName)) ? metrics[(path, entityName)] : new List<MetricValueTableRow>();
+        }
+
+        /// <summary>
+        /// TODO: Documentation
+        /// </summary>
+        /// <returns></returns>
+        public async UniTask<IDictionary<(string path, string entity), List<MetricValueTableRow>>> GetAllMetricRows()
+        {
+            metrics ??= (await GetMetricValueTable()).rows.GroupBy(x => (x.path, x.entity))
+                                                     .ToDictionary(x => x.Key, x => x.ToList());
+            return metrics;
+        }
 
         /// <summary>
         /// This method returns a list of all issues which are configured to be retrieved by
@@ -287,32 +323,37 @@ namespace SEE.Net.Dashboard
             if (ArchitectureViolationIssues)
             {
                 issues.AddRange((await GetIssues<ArchitectureViolationIssue>(start, end, state, user, fileFilter,
-                                    columnFilters, limit, offset, computeTotalRowCount)).rows);
+                                                                             columnFilters, limit, offset, computeTotalRowCount)).rows);
             }
+
             if (CloneIssues)
             {
                 issues.AddRange((await GetIssues<CloneIssue>(start, end, state, user, fileFilter,
-                                    columnFilters, limit, offset, computeTotalRowCount)).rows);
+                                                             columnFilters, limit, offset, computeTotalRowCount)).rows);
             }
+
             if (CycleIssues)
             {
                 issues.AddRange((await GetIssues<CycleIssue>(start, end, state, user, fileFilter,
-                                    columnFilters, limit, offset, computeTotalRowCount)).rows);
+                                                             columnFilters, limit, offset, computeTotalRowCount)).rows);
             }
+
             if (DeadEntityIssues)
             {
                 issues.AddRange((await GetIssues<DeadEntityIssue>(start, end, state, user, fileFilter,
-                                    columnFilters, limit, offset, computeTotalRowCount)).rows);
+                                                                  columnFilters, limit, offset, computeTotalRowCount)).rows);
             }
+
             if (MetricViolationIssues)
             {
                 issues.AddRange((await GetIssues<MetricViolationIssue>(start, end, state, user, fileFilter,
-                                    columnFilters, limit, offset, computeTotalRowCount)).rows);
+                                                                       columnFilters, limit, offset, computeTotalRowCount)).rows);
             }
+
             if (StyleViolationIssues)
             {
                 issues.AddRange((await GetIssues<StyleViolationIssue>(start, end, state, user, fileFilter,
-                                    columnFilters, limit, offset, computeTotalRowCount)).rows);
+                                                                      columnFilters, limit, offset, computeTotalRowCount)).rows);
             }
 
             return issues;
