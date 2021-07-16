@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using SEE.DataModel.DG;
 using Valve.Newtonsoft.Json;
 using Valve.Newtonsoft.Json.Converters;
 
@@ -75,7 +76,6 @@ namespace SEE.Net.Dashboard.Model.Issues
         [JsonProperty(Required = Required.Always)]
         public IList<UserRef> owners;
 
-
         protected Issue()
         {
             // Necessary for inheritance with Newtonsoft.Json to work properly
@@ -92,24 +92,6 @@ namespace SEE.Net.Dashboard.Model.Issues
             this.comments = comments;
             this.owners = owners;
         }
-
-        /// <summary>
-        /// Number of characters to wrap the string in <see cref="ToDisplayString"/> at.
-        /// </summary>
-        protected const int WRAP_AT = 120;
-
-        /// <summary>
-        /// Returns a string suitable for display in a TextMeshPro which describes this issue.
-        /// TextMeshPro's rich tags are used in here, so the string shouldn't be displayed elsewhere.
-        /// </summary>
-        /// <returns>A string describing this issue which is suitable for display in a TextMeshPro</returns>
-        public abstract UniTask<string> ToDisplayString();
-
-        /// <summary>
-        /// The kind of issue this is.
-        /// Usually an abbreviation of the type of the issue, e.g. MV for Metric Violation Issues.
-        /// </summary>
-        public abstract string IssueKind { get; }
 
         /// <summary>
         /// An issue tag as returned by the Issue-List API.
@@ -198,7 +180,31 @@ namespace SEE.Net.Dashboard.Model.Issues
         }
 
         /// <summary>
+        /// Number of characters to wrap the string in <see cref="ToDisplayString"/> at.
+        /// </summary>
+        protected const int WRAP_AT = 120;
+
+        /// <summary>
+        /// Returns a string suitable for display in a TextMeshPro which describes this issue.
+        /// TextMeshPro's rich tags are used in here, so the string shouldn't be displayed elsewhere.
+        /// </summary>
+        /// <returns>A string describing this issue which is suitable for display in a TextMeshPro</returns>
+        public abstract UniTask<string> ToDisplayString();
+
+        /// <summary>
+        /// The kind of issue this is.
+        /// Usually an abbreviation of the type of the issue, e.g. MV for Metric Violation Issues.
+        /// </summary>
+        public abstract string IssueKind { get; }
+
+        /// <summary>
+        /// The numeric attribute name for this issue kind.
+        /// </summary>
+        public abstract NumericAttributeNames AttributeName { get; }
+
+        /// <summary>
         /// The entities this issue references.
+        /// May be empty if all referenced entities don't have a path.
         /// </summary>
         public abstract IEnumerable<SourceCodeEntity> Entities { get; }
     }

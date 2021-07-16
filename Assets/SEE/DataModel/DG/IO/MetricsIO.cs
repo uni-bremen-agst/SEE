@@ -6,6 +6,6 @@
     /// 
     public class MetricsIO
     {
-        public const string IDColumnName = "ID";
+        protected const string IDColumnName = "ID";
     }
 }

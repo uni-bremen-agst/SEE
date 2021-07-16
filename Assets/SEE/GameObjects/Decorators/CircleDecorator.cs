@@ -27,7 +27,7 @@ namespace SEE.GO
         /// <summary>
         /// The color for the circle line.
         /// </summary>
-        private Color color;
+        private readonly Color color;
 
         /// <summary>
         /// The material we use for the circle line. It is the same for all circle lines
@@ -43,7 +43,7 @@ namespace SEE.GO
         /// thicker the circle line.
         /// </summary>
         /// <param name="gameNodes">list of game nodes for which to create Donut chart visualizations</param>
-        public void Add(ICollection<GameObject> gameNodes)
+        public void Add(IEnumerable<GameObject> gameNodes)
         {
             foreach (GameObject gameNode in gameNodes)
             {
@@ -71,14 +71,12 @@ namespace SEE.GO
             // Note that we draw the circle line relative to the containing gameObject.
             // Hence, the radius is always 0.5 and the center of the circle is always
             // Vector3.zero.
-            float radius = 0.5f;
+            const float radius = 0.5f;
 
             // Number of line segments constituting the circle
             const int segments = 360;
-            Vector3 center = nodeFactory.GetCenterPosition(gameObject);
 
-            LineRenderer line;
-            line = gameObject.GetComponent<LineRenderer>();
+            LineRenderer line = gameObject.GetComponent<LineRenderer>();
             if (line == null)
             {
                 line = gameObject.AddComponent<LineRenderer>();

@@ -16,6 +16,7 @@
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.DataModel.DG;
+using SEE.Game;
 
 namespace SEE.Layout.NodeLayouts.Cose
 {

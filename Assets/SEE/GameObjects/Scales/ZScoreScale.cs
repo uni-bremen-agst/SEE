@@ -1,5 +1,5 @@
-﻿using SEE.DataModel.DG;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using SEE.DataModel.DG;
 using UnityEngine;
 
 namespace SEE.GO
@@ -20,25 +20,27 @@ namespace SEE.GO
         /// Constructor for z-score based scaling of node metrics. 
         /// </summary>
         /// <param name="graphs">the set of graphs whose node metrics are to be scaled</param>
-        /// <param name="minimalLength">the mininmal value a node length can have</param>
+        /// <param name="minimalLength">the minimal value a node length can have</param>
         /// <param name="maximalLength">the maximal value a node length can have</param>
         /// <param name="metrics">node metrics for scaling</param>
         /// <param name="leavesOnly">if true, only the leaf nodes are considered</param>
-        public ZScoreScale(ICollection<Graph> graphs, float minimalLength, float maximalLength, IList<string> metrics, bool leavesOnly)
-        : base(graphs, metrics, minimalLength, maximalLength, leavesOnly)
+        public ZScoreScale(ICollection<Graph> graphs, float minimalLength, float maximalLength, IList<string> metrics, 
+                           bool leavesOnly) : base(graphs, metrics, minimalLength, maximalLength, leavesOnly)
         {
-            Determine_Statistics(graphs, leavesOnly);
+            DetermineStatistics(graphs, leavesOnly);
         }
 
-        // The statistics gathered for the node metrics.
+        /// <summary>
+        /// The statistics gathered for the node metrics.
+        /// </summary>
         private Dictionary<string, Statistics> statistics;
 
         /// <summary>
-        /// Initial values 0.0 for all metrics.
+        /// Initializes values to 0.0 for all metrics.
         /// </summary>
-        /// <param name="metrics"></param>
+        /// <param name="metrics">metrics which shall be initialized to 0</param>
         /// <returns>map with value 0.0 for each metric (key)</returns>
-        protected Dictionary<string, float> Initial(IList<string> metrics)
+        protected static Dictionary<string, float> Initial(IEnumerable<string> metrics)
         {
             Dictionary<string, float> result = new Dictionary<string, float>();
             foreach (string metric in metrics)
@@ -53,7 +55,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="graphs">set of graphs whose nodes are to be considered</param>
         /// <param name="leavesOnly">if true, only the leaf nodes are considered</param>
-        private void Determine_Statistics(ICollection<Graph> graphs, bool leavesOnly)
+        private void DetermineStatistics(ICollection<Graph> graphs, bool leavesOnly)
         {
             Dictionary<string, float> sum = Initial(metrics);
             Dictionary<string, float> count = Initial(metrics);
@@ -132,7 +134,7 @@ namespace SEE.GO
             }
             public override string ToString()
             {
-                return "mean=" + mean + ", sd=" + standard_deviation;
+                return $"mean={mean}, sd={standard_deviation}";
             }
         }
 
@@ -143,7 +145,7 @@ namespace SEE.GO
         {
             foreach (string metric in metrics)
             {
-                Debug.LogFormat("statistics of metric {0}: {1}\n", metric, statistics[metric].ToString());
+                Debug.Log($"statistics of metric {metric}: {statistics[metric]}\n");
             }
         }
 
@@ -190,15 +192,27 @@ namespace SEE.GO
             }
             else
             {
-                return WithinLimits(((value - statistics[metric].mean) / sd + 1.0f));
+                return WithinLimits((value - statistics[metric].mean) / sd + 1.0f);
             }
+        }
+
+        public override float GetNormalizedValueForLevel(string metric, Node node)
+        {
+            // FIXME: Implement normalization per level
+            throw new System.NotImplementedException();
+        }
+
+        public override float GetNormalizedValueForLevel(string metric, float value, int level)
+        {
+            //FIXME: Implement normalization per level
+            throw new System.NotImplementedException();
         }
 
         /// <summary>
         /// Clamps value within range [minimalLength, maximalLength], that is,
-        /// if minimalLength <= value <= maximalLength, value is returned
-        /// if value < minimalLength, minimalLength is returned
-        /// if maximalLength < value, maximalLength is returned
+        /// if minimalLength &lt;= value &lt;= maximalLength, value is returned;
+        /// if value is less than minimalLength, minimalLength is returned;
+        /// if maximalLength is less than value, maximalLength is returned.
         /// </summary>
         /// <param name="value">value to be clamped</param>
         /// <returns>clamped value</returns>

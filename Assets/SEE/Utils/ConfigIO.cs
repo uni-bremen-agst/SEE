@@ -182,7 +182,7 @@ namespace SEE.Utils
         internal static bool Restore(Dictionary<string, object> values, string label, ref int value)
         {
             long v = value;
-            bool result = ConfigIO.Restore(values, label, ref v);
+            bool result = Restore(values, label, ref v);
             value = (int)v;
             return result;
         }

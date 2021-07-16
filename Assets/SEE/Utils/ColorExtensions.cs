@@ -13,19 +13,25 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="color">base color to be lightened</param>
         /// <returns>given <paramref name="color"/> lightened by 50%</returns>
-        public static Color Lighter(this Color color)
-        {
-            return Color.Lerp(color, Color.white, 0.5f); // To lighten by 50 %
-        }
+        public static Color Lighter(this Color color) => Color.Lerp(color, Color.white, 0.5f); // To lighten by 50 %
 
         /// <summary>
         /// Returns given <paramref name="color"/> darkened by 50%.
         /// </summary>
         /// <param name="color">base color to be darkened</param>
         /// <returns>given <paramref name="color"/> darkened by 50%</returns>
-        public static Color Darker(this Color color)
+        public static Color Darker(this Color color) => Color.Lerp(color, Color.black, 0.5f); // To darken by 50 %
+
+        /// <summary>
+        /// Returns this color with the given <paramref name="alpha"/> value.
+        /// </summary>
+        /// <param name="color">The color whose alpha value to modify</param>
+        /// <param name="alpha">The new alpha value</param>
+        /// <returns><paramref name="color"/> with the given <paramref name="alpha"/></returns>
+        public static Color WithAlpha(this Color color, float alpha)
         {
-            return Color.Lerp(color, Color.black, 0.5f); // To darken by 50 %
+            color.a = alpha;
+            return color;
         }
 
         /// <summary>

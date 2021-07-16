@@ -1,10 +1,9 @@
 ﻿#if UNITY_EDITOR
 
-using SEE;
+using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Utils;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -52,7 +51,7 @@ namespace SEEEditor
         /// Whether the "nodes and node layout" foldout should be expanded.
         /// </summary>
         private bool showNodeLayout = true;
-        
+
         /// <summary>
         /// Whether the "Edges and edge layout" foldout should be expanded.
         /// </summary>
@@ -101,14 +100,14 @@ namespace SEEEditor
         }
 
         /// <summary>
-        /// Foldout for global settings (settings filename, LOD Culling) and buttons for 
+        /// Foldout for global settings (settings filename, LOD Culling) and buttons for
         /// loading and saving the settings.
         /// </summary>
         private void GlobalAttributes()
         {
             showGlobalAttributes = EditorGUILayout.Foldout(showGlobalAttributes, "Global attributes", true, EditorStyles.foldoutHeader);
             if (showGlobalAttributes)
-            {                
+            {
                 city.CityPath = DataPathEditor.GetDataPath("Settings file", city.CityPath, Filenames.ExtensionWithoutPeriod(Filenames.ConfigExtension));
                 GUILayout.BeginHorizontal();
                 if (GUILayout.Button("Load", GUILayout.Width(50)))
@@ -248,8 +247,17 @@ namespace SEEEditor
                 settings.kind = (NodeLayoutKind)EditorGUILayout.EnumPopup("Node layout", settings.kind);
                 city.globalCityAttributes.layoutPath = GetDataPath("Layout file", city.globalCityAttributes.layoutPath, Filenames.ExtensionWithoutPeriod(Filenames.GVLExtension));
                 settings.zScoreScale = EditorGUILayout.Toggle("Z-score scaling", settings.zScoreScale);
-                settings.showErosions = EditorGUILayout.Toggle("Show erosions", settings.showErosions);
-                settings.maxErosionWidth = EditorGUILayout.FloatField("Max. width of erosion icon", settings.maxErosionWidth);
+                settings.showInnerErosions = EditorGUILayout.Toggle("Show inner erosions", settings.showInnerErosions);
+                settings.showLeafErosions = EditorGUILayout.Toggle("Show leaf erosions", settings.showLeafErosions);
+                settings.loadDashboardMetrics = EditorGUILayout.Toggle("Load Metrics from Dashboard", settings.loadDashboardMetrics);
+                if (settings.loadDashboardMetrics)
+                {
+                    settings.issuesAddedFromVersion = EditorGUILayout.TextField("Only issues added from version", 
+                                                                                settings.issuesAddedFromVersion);
+                    settings.overrideMetrics = EditorGUILayout.Toggle("Override existing metrics", settings.overrideMetrics);
+                }
+                settings.erosionScalingFactor = EditorGUILayout.FloatField("Scaling factor of erosions", 
+                                                                           settings.erosionScalingFactor);
             }
         }
 
@@ -264,7 +272,7 @@ namespace SEEEditor
                 EditorGUI.indentLevel++;
                 for (int i = 0; i < (int)Node.NodeDomain.Count; i++)
                 {
-                    string label = "Domain: " + ((Node.NodeDomain)i).ToString();
+                    string label = $"Domain: {(Node.NodeDomain) i}";
                     showInnerAttributesAtIndex[i] = EditorGUILayout.Foldout(showInnerAttributesAtIndex[i], label, EditorStyles.foldout);
                     if (showInnerAttributesAtIndex[i])
                     {
@@ -274,13 +282,9 @@ namespace SEEEditor
                         settings.kind = (InnerNodeKinds)EditorGUILayout.EnumPopup("Type", settings.kind);
                         settings.heightMetric = EditorGUILayout.TextField("Height", settings.heightMetric);
                         settings.styleMetric = EditorGUILayout.TextField("Style", settings.styleMetric);
-                        settings.coloringKind = (ColoringKind)EditorGUILayout.EnumPopup("Color By", settings.coloringKind);
-                        EditorGUI.BeginDisabledGroup(settings.coloringKind == ColoringKind.Random);
-                        {
-                            settings.colorRange.lower = EditorGUILayout.ColorField("Lower color", settings.colorRange.lower);
-                            settings.colorRange.upper = EditorGUILayout.ColorField("Upper color", settings.colorRange.upper);
-                            settings.colorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.colorRange.NumberOfColors, 1, 15);
-                        }
+                        settings.colorRange.lower = EditorGUILayout.ColorField("Lower color", settings.colorRange.lower);
+                        settings.colorRange.upper = EditorGUILayout.ColorField("Upper color", settings.colorRange.upper);
+                        settings.colorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.colorRange.NumberOfColors, 1, 15);
                         EditorGUI.EndDisabledGroup();
                         LabelSettings(ref settings.labelSettings);
                     }
@@ -300,7 +304,7 @@ namespace SEEEditor
                 EditorGUI.indentLevel++;
                 for (int i = 0; i < (int)Node.NodeDomain.Count; i++)
                 {
-                    string label = "Domain: " + ((Node.NodeDomain)i).ToString();
+                    string label = $"Domain: {(Node.NodeDomain) i}";
                     showLeafAttributesAtIndex[i] = EditorGUILayout.Foldout(showLeafAttributesAtIndex[i], label, EditorStyles.foldout);
                     if (showLeafAttributesAtIndex[i])
                     {
@@ -312,13 +316,9 @@ namespace SEEEditor
                         settings.heightMetric = EditorGUILayout.TextField("Height", settings.heightMetric);
                         settings.depthMetric = EditorGUILayout.TextField("Depth", settings.depthMetric);
                         settings.styleMetric = EditorGUILayout.TextField("Style", settings.styleMetric);
-                        settings.coloringKind = (ColoringKind)EditorGUILayout.EnumPopup("Color By", settings.coloringKind);
-                        EditorGUI.BeginDisabledGroup(settings.coloringKind == ColoringKind.Random);
-                        {
-                            settings.colorRange.lower = EditorGUILayout.ColorField("Lower color", settings.colorRange.lower);
-                            settings.colorRange.upper = EditorGUILayout.ColorField("Upper color", settings.colorRange.upper);
-                            settings.colorRange.NumberOfColors = (uint) EditorGUILayout.IntSlider("# Colors", (int) settings.colorRange.NumberOfColors, 1, 15);
-                        }
+                        settings.colorRange.lower = EditorGUILayout.ColorField("Lower color", settings.colorRange.lower);
+                        settings.colorRange.upper = EditorGUILayout.ColorField("Upper color", settings.colorRange.upper);
+                        settings.colorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.colorRange.NumberOfColors, 1, 15);
                         EditorGUI.EndDisabledGroup();
                         LabelSettings(ref settings.labelSettings);
                     }
@@ -331,7 +331,7 @@ namespace SEEEditor
         /// Allows the user to set the attributes of <paramref name="labelSettings"/>.
         /// </summary>
         /// <param name="labelSettings">settings to be retrieved from the user</param>
-        private void LabelSettings(ref LabelSettings labelSettings)
+        private static void LabelSettings(ref LabelSettings labelSettings)
         {
             labelSettings.Show = EditorGUILayout.Toggle("Show labels", labelSettings.Show);
             labelSettings.Distance = EditorGUILayout.FloatField("Label distance", labelSettings.Distance);
