@@ -65,6 +65,9 @@ namespace SEE.Controls.Actions
         public static ActionStateType Hide { get; } =
             new ActionStateType(10, "Hide Node", "Hides a node",
                                Color.yellow.Darker(), "Materials/ModernUIPack/Eye", HideAction.CreateReversibleAction);
+        public static ActionStateType Architecture { get; } = new ActionStateType(11, "Architecture",
+            "Software Architecture modelling tools", UnityEngine.Color.red.Darker(), "Materials/ModernUIPack/Cube",
+            ArchitectureAction.CreateReversibleAction);
         #endregion
 
         /// <summary>

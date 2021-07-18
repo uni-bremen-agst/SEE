@@ -38,10 +38,29 @@ namespace SEE.Utils
         /// <see cref="HitGraphElement.Node"/> or <see cref="HitGraphElement.Edge"/>,
         /// respectively, is returned. Otherwise if a GUI element is hit or if the
         /// hit game object has neither a <see cref="NodeRef"/> nor an <see cref="EdgeRef"/>
-        /// attached, <see cref="HitGraphElement.None"/> is returned.
+        /// attached, <see cref="HitGraphElement.None"/> is returned.</returns>
         public static HitGraphElement RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef elementRef)
         {
-            Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
+            return RaycastGraphElement(out raycastHit, out elementRef, Input.mousePosition);
+        }
+        
+        /// <summary>
+        /// Raycasts the scene from the camera in the direction the passed position vector is pointing.
+        /// The hit will be set, if no GUI element is hit.
+        /// </summary>
+        /// <param name="raycastHit">will always be the hit object if any was hit, no matter whether
+        /// it was a graph element or not.</param>
+        /// <param name="elementRef">is null if the result is <see cref="HitGraphElement.None"/></param>
+        /// <param name="pointerPosition">The position of the pointer used to determine the raycast origin</param>
+        /// <returns>if no GUI element is hit, but a GameObject with either an attached <see cref="NodeRef"/> or
+        /// <see cref="EdgeRef"/> is hit, then <see cref="HitGraphElement.Node"/> or <see cref="HitGraphElement.Edge"/>
+        /// respectively, is returned. Otherwise if a GUI Element is hit or if the hit game object has neither a
+        /// <see cref="NodeRef"/> nor an <see cref="EdgeRef"/> attached, <see cref="HitGraphElement.None"/> is returned
+        /// </returns>
+        public static HitGraphElement RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef elementRef,
+            Vector2 pointerPosition)
+        {
+            Ray ray = MainCamera.Camera.ScreenPointToRay(pointerPosition);
             if (!IsMouseOverGUI() && Physics.Raycast(ray, out RaycastHit hit))
             {
                 raycastHit = hit;

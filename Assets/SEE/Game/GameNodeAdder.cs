@@ -3,6 +3,7 @@ using SEE.GO;
 using SEE.Utils;
 using System;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Game
 {
@@ -18,15 +19,19 @@ namespace SEE.Game
         /// not yet in any graph.
         /// </summary>
         /// <param name="nodeID">the unique ID of the new node; if null or empty, an empty ID will be used</param>
+        /// <param name="type">The type of the new node;if null or empty, the type <see cref="Graph.UnknownType"/> is used</param>
+        /// <param name="sourceName">the source name of the new node; if null or empty, an empty string is used</param>
         /// <returns>new graph node</returns>
-        private static Node NewGraphNode(string nodeID)
+        private static Node NewGraphNode(string nodeID, string type = null, string sourceName = null )
         {
+            string SourceName = string.IsNullOrEmpty(sourceName) ? string.Empty : sourceName;
+            string Type = string.IsNullOrEmpty(type) ? Graph.UnknownType : type;
             string ID = string.IsNullOrEmpty(nodeID) ? Guid.NewGuid().ToString() : nodeID;
             return new Node()
             {
                 ID = ID,
-                SourceName = string.Empty,
-                Type = Graph.UnknownType
+                SourceName = SourceName,
+                Type = Type
             };
         }
 
@@ -83,7 +88,6 @@ namespace SEE.Game
         /// Precondition: <paramref name="parent"/> must have a valid node reference.
         /// </summary>
         /// <param name="parent">parent of the new node</param>
-        /// <param name="node">the graph node that is represented by the new node</param>
         /// <param name="position">the position in world space for the center point of the new game node</param>
         /// <param name="worldSpaceScale">the scale in world space of the new game node</param>
         /// <param name="nodeID">the unique ID of the new node; if null or empty, a random ID will be used</param>
@@ -105,6 +109,40 @@ namespace SEE.Game
             {
                 return null;
             }
+        }
+        
+        /// <summary>
+        /// Creates and returns a new game node as a child of <paramref name="parent"/> having a <see cref="NodeRef"/>
+        /// component referencing <see cref="Node"/> at the given <paramref name="position"/>
+        /// with the given <paramref name="worldScale"/>
+        /// Precondition: <paramref name="parent"/> must have a valid node reference.
+        /// </summary>
+        /// <param name="parent">Parent of the new node.</param>
+        /// <param name="position">The position in world space for the center point of the new game node</param>
+        /// <param name="worldScale">The scale in world space of the new game node</param>
+        /// <param name="nodeID">The unique id of the new node; if null or empty, a random ID will be used</param>
+        /// <param name="nodeType">The type of the new graph node. Must not be null</param>
+        /// <returns>The new child game node or null if none could be created.</returns>
+        public static GameObject AddArchitectureNode(GameObject parent, Vector3 position, Vector3 worldScale,
+            string nodeType, string nodeID = null)
+        {
+            SEECityArchitecture city = parent.ContainingArchitectureCity();
+            if (city != null)
+            {
+                Assert.IsNotNull(nodeType);
+                //Generate the default source name for this new architecture node.
+                string sourceName = "arch_" + nodeType + "_" + city.NODE_COUNTER++;
+                Node node = NewGraphNode(nodeID, nodeType, sourceName);
+                AddNodeToGraph(parent.GetNode(), node);
+                GameObject result = city.Renderer.DrawNode(node);
+                result.transform.localScale = worldScale;
+                result.transform.position = position;
+                result.transform.SetParent(parent.transform);
+                city.Renderer.RefreshNodeStyle(city.gameObject, SceneQueries.AllGameNodesInScene(true, true));
+                return result;
+            }
+            return null;
+            
         }
 
         /// <summary>

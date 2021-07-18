@@ -1,5 +1,6 @@
 ﻿using SEE.Game;
 using SEE.Game.Architecture;
+using SEE.Game.GestureRecognition;
 using SEE.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -91,7 +92,7 @@ namespace SEEEditor
             EditorGUILayout.EndHorizontal();
             if (city.LoadedGraph != null && GUILayout.Button("Add References"))
             {
-                city.AddReferences();
+                city.SetNodeEdgeRefs();
             }
             
             

@@ -107,7 +107,7 @@ namespace SEE.Game
         /// loaded nodes if GXLPath() yields a valid filename. This "deserializes"
         /// the graph to make it available at runtime.
         /// </summary>
-        protected void Awake()
+        protected virtual void Awake()
         {
             string filename = GXLPath.Path;
             if (loadedGraph != null)
@@ -151,7 +151,7 @@ namespace SEE.Game
         /// All game objects representing a graph node or edge in the current scene will be made
         /// opaque (no transparency).
         /// </summary>
-        private static void RemoveTransparency()
+        protected static void RemoveTransparency()
         {
             // Remove transparency of all nodes and edges
             foreach (NodeRef nodeRef in FindObjectsOfType<NodeRef>())

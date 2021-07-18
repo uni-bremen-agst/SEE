@@ -84,6 +84,15 @@ namespace SEE.Game.GestureRecognition
                 }
             }
 
+            var folderEntries = Directory
+                .GetFiles(Application.streamingAssetsPath + "\\Architecture\\GestureSet", "*.json")
+                .Where(s => s.EndsWith(".json")).ToList();
+            foreach (string entry in folderEntries)
+            {
+                string json = File.ReadAllText(entry);
+                GestureWrapper wrapper = JsonUtility.FromJson<GestureWrapper>(json);
+                gestures.Add(new Gesture(wrapper.Points, name: wrapper.Name));
+            }
             return gestures.ToArray();
         }
     }

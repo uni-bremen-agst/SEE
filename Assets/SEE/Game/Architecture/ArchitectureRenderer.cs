@@ -4,13 +4,14 @@ using System.IO;
 using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
-using SEE.Game.Architecture;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Edge = SEE.DataModel.DG.Edge;
+using Node = SEE.DataModel.DG.Node;
 using Plane = SEE.GO.Plane;
 
 namespace SEE.Game.Architecture
@@ -93,16 +94,11 @@ namespace SEE.Game.Architecture
         /// </summary>
         private const float MaxBlockDepth = 100f;
 
-        /// <summary>
-        /// A mapping from Node to ILayoutNode.
-        /// </summary>
-        //private readonly Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
 
-        
         /// <summary>
         /// Mapping of the string graph node types onto the <see cref="ArchitectureElementType"/>.
         /// </summary>
-        private readonly Dictionary<string, ArchitectureElementType> typeToElementType =
+        private static readonly Dictionary<string, ArchitectureElementType> typeToElementType =
             new Dictionary<string, ArchitectureElementType>()
             {
                 {"Cluster", ArchitectureElementType.Cluster},
@@ -260,13 +256,13 @@ namespace SEE.Game.Architecture
             {
                 Debug.Log("Supplied GXL graph does not contain any graph nodes.\n Adding the base root node.\n");
                 //TODO add base root node.
-                AddDrawingRootNodeIfNecessary(loadedGraph, new Dictionary<Node, GameObject>());
+                AddAndRenderArtificialRootNode(loadedGraph, new Dictionary<Node, GameObject>());
             }
 
             // Draw the graph nodes as GameObjects
             Dictionary<Node, GameObject> nodeToGO = DrawNodes(nodes);
             // Add the root node that acts as a drawing plane, if it not already exists within the graph.
-            Node artificialRoot = AddDrawingRootNodeIfNecessary(loadedGraph, nodeToGO);
+            Node artificialRoot = AddAndRenderArtificialRootNode(loadedGraph, nodeToGO);
             // Loads the layout from the supplied layout file
             NodeLayout layout = GetLayout();
 
@@ -328,7 +324,7 @@ namespace SEE.Game.Architecture
         public void PrepareNewArchitectureGraph(GameObject parent)
         {
             Dictionary<Node, GameObject> nodeToGO = new Dictionary<Node, GameObject>();
-            Node artificialRoot = AddDrawingRootNodeIfNecessary(loadedGraph, nodeToGO);
+            Node artificialRoot = AddAndRenderArtificialRootNode(loadedGraph, nodeToGO);
             Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
             
             ICollection<GameNode> gamNodes = ToLayoutNodes(nodeToGO.Values, to_layout_node);
@@ -467,7 +463,20 @@ namespace SEE.Game.Architecture
         /// <param name="graph">The graph to add the artificial root node to.</param>
         /// <param name="nodeMap">The node gameobject map.</param>
         /// <returns>The artificial root</returns>
-        private Node AddDrawingRootNodeIfNecessary(Graph graph, IDictionary<Node, GameObject> nodeMap)
+        public Node AddAndRenderArtificialRootNode(Graph graph, IDictionary<Node, GameObject> nodeMap)
+        {
+            Node artificialRoot = AddArtificialRootNode(graph);
+            nodeMap[artificialRoot] = DrawNode(artificialRoot);
+            return artificialRoot;
+        }
+
+        
+        /// <summary>
+        /// Adds an artificial root node to the graph. This node represents the drawing plane on which the nodes are drawn.
+        /// </summary>
+        /// <param name="graph"></param>
+        /// <returns></returns>
+        public Node AddArtificialRootNode(Graph graph)
         {
             if (graph.ContainsNode(graph.Name + "#ROOT"))
             {
@@ -489,9 +498,41 @@ namespace SEE.Game.Architecture
                     artificialRoot.AddChild(root);
                 }
             }
-            nodeMap[artificialRoot] = DrawNode(artificialRoot);
-            
+
             return artificialRoot;
+        }
+
+        
+        /// <summary>
+        /// Refreshes the node style for each entry in the passed list of game nodes.
+        /// Precondition: All game objects have an <see cref="NodeRef"/> component attached.
+        /// Afterwards the Portal set again to the parent extents.
+        /// </summary>
+        /// <param name="parent">The parent object for correcting the portal extents.</param>
+        /// <param name="gameNodes">The game objects.</param>
+        public void RefreshNodeStyle(GameObject parent, ICollection<GameObject> gameNodes)
+        {
+            foreach (GameObject o in gameNodes)
+            {
+                RefreshNodeStyle(o);
+            }
+            Portal.SetPortal(parent);
+        }
+        
+        /// <summary>
+        /// Refreshes the styling of a given game node.
+        /// </summary>
+        /// <param name="nodeGO">The game node</param>
+        public void RefreshNodeStyle(GameObject nodeGO)
+        {
+            if (nodeGO.TryGetNode(out Node node))
+            {
+                NodeFactory factory = GetFactoryByType(node.Type);
+                factory.SetStyle(nodeGO, SelectStyle(node));
+                return;
+            }
+            throw new Exception(
+                $"Tried to refresh the node style for {nodeGO.name} which has no NodeRef component attached.\n");
         }
     }
 }

@@ -1,0 +1,117 @@
+{
+    "name": "ArchitectureInputActions",
+    "maps": [
+        {
+            "name": "Drawing",
+            "id": "225f8ad6-74ba-4da4-9a5c-7879960653a9",
+            "actions": [
+                {
+                    "name": "DrawBegin",
+                    "type": "Button",
+                    "id": "1fb461b5-4de4-4c11-876f-bbf1e505ae9b",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "Draw",
+                    "type": "Button",
+                    "id": "083075a2-a2b0-46e6-b52e-3544985e1e10",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "DrawEnd",
+                    "type": "Button",
+                    "id": "4a4bcabd-3287-4a09-83e2-05168d2d4b34",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "Position",
+                    "type": "PassThrough",
+                    "id": "aa2a82f9-3873-4c4c-915f-112fae8a73d3",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "5fb2fa56-1759-4561-b745-96b36cd8c73e",
+                    "path": "<Pen>/tip",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DrawBegin",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a30bee44-b658-44e3-aa81-b6d92cda8153",
+                    "path": "<Pen>/press",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Draw",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "38923bcf-5209-462a-b9c7-92a1aa5b7510",
+                    "path": "<Pen>/press",
+                    "interactions": "Press(behavior=1)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DrawEnd",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f7db42d0-f682-4119-bde0-216abf02df4a",
+                    "path": "<Pen>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Position",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Moving",
+            "id": "7cd3705f-3a15-448e-8adf-1903a0b553dc",
+            "actions": [
+                {
+                    "name": "New action",
+                    "type": "Button",
+                    "id": "84c8b9c7-0427-4232-bcb0-1b0d323f6afb",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "e42dabbe-cf15-4459-bc7c-ad8b660020f6",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "New action",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

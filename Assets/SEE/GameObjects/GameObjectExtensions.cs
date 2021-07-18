@@ -66,6 +66,27 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// If <paramref name="gameObject"/> represents a graph node or edge,
+        /// the <see cref="SEECityArchitecture"/> this object is contained in will be returned.
+        /// Otherwise null is returned.
+        /// </summary>
+        /// <param name="gameObject">Graph node or edge whose containing <see cref="SEECityArchitecture"/> is requested</param>
+        /// <returns>The containing <see cref="SEECityArchitecture"/> of <paramref name="gameObject"/> or null</returns>
+        public static SEECityArchitecture ContainingArchitectureCity(this GameObject gameObject)
+        {
+            if (gameObject == null || (!gameObject.HasNodeRef() && !gameObject.HasEdgeRef()))
+            {
+                return null;
+            }
+            Transform codeCityObject = SceneQueries.GetCodeCity(gameObject.transform);
+            if (codeCityObject != null && codeCityObject.gameObject.TryGetComponent(out SEECityArchitecture city))
+            {
+                return city;
+            }
+            return null;
+        }
+
+        /// <summary>
         /// True if <paramref name="gameNode"/> represents a leaf in the graph.
         ///
         /// Precondition: <paramref name="gameNode"/> has a NodeRef component attached to it

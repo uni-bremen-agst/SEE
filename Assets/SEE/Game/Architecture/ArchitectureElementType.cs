@@ -1,4 +1,5 @@
 ﻿using System;
+using SEE.Game.GestureRecognition;
 using UnityEngine;
 
 namespace SEE.Game.Architecture
@@ -13,7 +14,7 @@ namespace SEE.Game.Architecture
         Count
     }
 
-    
+
     /// <summary>
     /// The node settings for a specific kind of <see cref="ArchitectureElementType"/>.
     /// </summary>
@@ -28,7 +29,7 @@ namespace SEE.Game.Architecture
         /// The global height for this type of architectural node.
         /// </summary>
         public float ElementHeight = 0.01f;
-        
+
         /// <summary>
         /// 
         /// </summary>

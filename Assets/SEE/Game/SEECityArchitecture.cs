@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
@@ -16,41 +18,44 @@ namespace SEE.Game
     /// <summary>
     /// Manages settings for modelling software architectures for the reflexion analysis.
     /// </summary>
-    public class SEECityArchitecture : AbstractSEECity
+    public class SEECityArchitecture : SEECity
     {
 
-        
-        /// <summary>
-        /// The loaded graph instance.
-        /// </summary>
-        public Graph LoadedGraph;
+
+        public new ArchitectureRenderer Renderer
+        {
+            get
+            {
+                if (architectureRenderer == null)
+                {
+                    architectureRenderer = new ArchitectureRenderer(this, LoadedGraph);
+                }
+
+                return architectureRenderer;
+            }
+        }
 
 
-
-        private ArchitectureRenderer _renderer;
-        
+        private new ArchitectureRenderer architectureRenderer;
         
         /// <summary>
         /// Path to the layout file of the architecture.
         /// </summary>
         [Tooltip("The path to the layout file used for this architectural graph visualization")]
         public DataPath ArchitectureLayoutPath = new DataPath();
-        
-        /// <summary>
-        /// Path to the graph gxl file of the architecture.
-        /// </summary>
-        [Tooltip("The path to the gxl graph file used for this architecture graph.")]
-        public DataPath GXLPath = new DataPath();
-
 
 
         /// <summary>
         /// Settings holders for the architecture elements.
         /// </summary>
-        public ArchitectureElementSettings[] ArchitectureElementSettings =
+        public readonly ArchitectureElementSettings[] ArchitectureElementSettings =
             ArrayUtils.New((int) ArchitectureElementType.Count, _ => new ArchitectureElementSettings());
 
-        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int NODE_COUNTER = 0;
 
         /// <summary>
         /// Re-renders the architecture graph without deleting the resetting the loaded graph.
@@ -87,7 +92,6 @@ namespace SEE.Game
         public void ResetGraph()
         {
             base.Reset();
-            //LoadedGraph?.Destroy();
             LoadedGraph = null;
         }
         
@@ -112,6 +116,36 @@ namespace SEE.Game
             }
         }
 
+        protected override void Awake()
+        {
+            string filename = GXLPath.Path;
+            if (LoadedGraph != null)
+            {
+                Debug.Log("SEECityArchitecture.Awake: graph is already loaded.\n");
+            }
+            else if (!string.IsNullOrEmpty(filename))
+            {
+                LoadedGraph = LoadGraph(filename);
+                
+                // Make sure that the artificial root node is added again.
+                ArchitectureRenderer renderer = Renderer;
+                renderer.AddArtificialRootNode(LoadedGraph);
+                if (LoadedGraph != null)
+                {
+                    SetNodeEdgeRefs(LoadedGraph, gameObject);
+                }
+                else
+                {
+                    Debug.LogError($"SEECityArchitecture.Awake: Could not laod GXL file {filename} of architecture {name}.\n");
+                }
+            }
+            else
+            {
+                Debug.LogError($"SEECityArchitecture.Awake: GXL file of architecture {name} is undefined.\n");
+            }
+            RemoveTransparency();
+        }
+
         /// <summary>
         /// Saves the layout of the current architecture graph.
         /// </summary>
@@ -132,57 +166,7 @@ namespace SEE.Game
                 SLDWriter.Save(ArchitectureLayoutPath.Path, AllNodeDescendants(gameObject));
             }
         }
-        
-        /// <summary>
-        /// Sets all EdgeRefs and NodeRefs for the loaded architecture graph to the nodes and edges.
-        /// We assume that the game objects with a NodeRef/EdgeRef required to be
-        /// defined to be immediate children of this SEECityArchitecture. Moreover, we assume a child
-        /// game object's name is the ID of the corresponding graph node/edge.
-        /// </summary>
-        public void AddReferences()
-        {
-            if (LoadedGraph != null)
-            {
-                AddNodeEdgeRefs(gameObject);
-                Debug.LogFormat("Node and edge references for {0} are resolved.\n", gameObject.name);
-            }
-            else
-            {
-                Debug.LogError("No graph loaded.\n");
-            }
-            
-        }
 
-        private void AddNodeEdgeRefs(GameObject parent)
-        {
-            foreach (Transform child in parent.transform)
-            {
-                GameObject go = child.gameObject;
-                if (go.TryGetNodeRef(out NodeRef nodeRef))
-                {
-                    nodeRef.Value = LoadedGraph.GetNode(go.name);
-                    if (nodeRef.Value == null)
-                    {
-                        Debug.LogWarningFormat("Could not resolve node reference {0}.\n", go.name);
-                    }
-                }else if (go.TryGetEdgeRef(out EdgeRef edgeRef))
-                {
-                    edgeRef.Value = LoadedGraph.GetEdge(go.name);
-                    if (edgeRef.Value == null)
-                    {
-                        Debug.LogWarningFormat("Could not resolve edge reference {0}.\n", go.name);
-                    }
-#if UNITY_EDITOR
-                    else if (go.CompareTag(Tags.Node) || go.CompareTag(Tags.Edge))
-                    {
-                        Debug.LogWarningFormat("Game object {0} has neither node nor edge reference.\n", go.name);
-                    }
-#endif
-                    AddNodeEdgeRefs(go);
-                }
-            }
-        }
-        
         /// <summary>
         /// Creates a new empty graph for architecture modelling.
         /// </summary>
@@ -190,8 +174,8 @@ namespace SEE.Game
         {
             Assert.IsNull(LoadedGraph);
             LoadedGraph = new Graph("Architecture");
-            _renderer = new ArchitectureRenderer(this, LoadedGraph);
-            _renderer.PrepareNewArchitectureGraph(gameObject);
+            ArchitectureRenderer renderer = Renderer;
+            renderer.PrepareNewArchitectureGraph(gameObject);
         }
         
         /// <summary>
@@ -200,8 +184,8 @@ namespace SEE.Game
         public void DrawGraph()
         {
             Assert.IsNotNull(LoadedGraph);
-            _renderer = new ArchitectureRenderer(this, LoadedGraph);
-            _renderer.Draw(gameObject);
+            ArchitectureRenderer renderer = Renderer;
+            renderer.Draw(gameObject);
         }
     }
 }
