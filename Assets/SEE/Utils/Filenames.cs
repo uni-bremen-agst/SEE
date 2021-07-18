@@ -31,6 +31,11 @@ namespace SEE.Utils
         public const string GVLExtension = ".gvl";
 
         /// <summary>
+        /// Both supported Layout file formats.
+        /// </summary>
+        public const string LayoutExtensions = "sld,gvl";
+
+        /// <summary>
         /// File extension of layout files in the SEE format:
         /// SEE Layout Data (SLD).
         /// These kinds of layout files contain the complete Transform

@@ -382,6 +382,11 @@ namespace SEE.Game
         private static SEECity cachedMapping = null;
 
         /// <summary>
+        /// Cached architecture city
+        /// </summary>
+        private static SEECityArchitecture cachedArchitectureCity = null;
+
+        /// <summary>
         /// Finds the implementation city in the scene. The city may be cached.
         /// </summary>
         /// <returns>The implementation city of the scene.</returns>
@@ -405,6 +410,41 @@ namespace SEE.Game
                 cachedArchitecture = FindSEECity("Architecture");
             }
             return cachedArchitecture;
+        }
+        
+        /// <summary>
+        /// Finds the <see cref="SEECityArchitecture"/> in the secne. The city may be cached.
+        /// </summary>
+        /// <returns>The architecture city of the scene.</returns>
+        public static SEECityArchitecture FindArchitectureCity()
+        {
+            if (!cachedArchitectureCity)
+            {
+                cachedArchitectureCity = FindSEECityArchitecture("Architecture");
+            }
+
+            return cachedArchitectureCity;
+        }
+
+        private static SEECityArchitecture FindSEECityArchitecture(string name)
+        {
+            SEECityArchitecture result = null;
+            SEECityArchitecture[] cities = UnityEngine.Object.FindObjectsOfType<SEECityArchitecture>();
+            foreach (SEECityArchitecture city in cities)
+            {
+                if (city.gameObject.name.Equals(name))
+                {
+#if UNITY_EDITOR
+                    Assert.IsNull(result, "There must be exactly on architecture city named " + name + "!");
+#endif
+                    result = city;
+#if UNITY_EDITOR
+                    break;
+#endif
+                }
+            }
+
+            return result;
         }
 
         /// <summary>

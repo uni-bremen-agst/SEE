@@ -179,7 +179,7 @@ namespace SEE.Game
         /// <summary>
         /// Determines to which extent the polylines of the generated splines are
         /// simplified. Range: [0.0, inf] (0.0 means no simplification). More precisely,
-        /// stores the epsilon parameter of the Ramer–Douglas–Peucker algorithm which
+        /// stores the epsilon parameter of the Ramerâ€“Douglasâ€“Peucker algorithm which
         /// is used to identify and remove points based on their distances to the line
         /// drawn between their neighbors.
         /// </summary>
