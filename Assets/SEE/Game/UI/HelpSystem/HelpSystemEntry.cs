@@ -3,33 +3,11 @@ using SEE.Game.UI;
 using SEE.Game.UI.Menu;
 using SEE.GO;
 using SEE.Utils;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Video;
 
 public partial class HelpSystemEntry : PlatformDependentComponent
 {
-    /// <summary>
-    /// The title of the specific entry.
-    /// </summary>
-    private string title;
-
-    /// <summary>
-    /// The path of the video which displays the specific use-case.
-    /// </summary>
-    private string videoPath;
-
-    /// <summary>
-    /// A collection of notes for the user for help executing the specific use case e.g. "Press Key H" or "Left mouseclick on the node" etc.
-    /// </summary>
-    private List<string> keyPoints;
-
-    /// <summary>
-    /// The text spoken by the accustic help-assistant. It should containing all key-points and a short description of the things executed in the video. 
-    /// </summary>
-    private string audioText;
-
     /// <summary>
     /// Whether the menu shall be shown.
     /// </summary>
@@ -87,11 +65,6 @@ public partial class HelpSystemEntry : PlatformDependentComponent
         Manager.onCancel.AddListener(Close);
         GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out VideoPlayer videoPlayer);
         this.videoPlayer = videoPlayer;
-        GameObject test = GameObject.Find("Code");
-        TextMeshProUGUI tmp = test.GetComponent<TextMeshProUGUI>();
-        Debug.Log(tmp.text);
-        //tmp.text = "Ein weiterer Test zum ueberschreiben von TMPUGUI";
-
     }
 
     protected override void UpdateDesktop()
@@ -187,6 +160,4 @@ public partial class HelpSystemEntry : PlatformDependentComponent
             IsPlaying = false;
         }
     }
-
-
 }

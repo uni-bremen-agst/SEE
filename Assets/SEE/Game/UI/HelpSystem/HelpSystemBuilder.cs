@@ -2,6 +2,7 @@ using SEE.Controls;
 using SEE.Game.UI.Menu;
 using SEE.GO;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Video;
@@ -23,12 +24,13 @@ public static class HelpSystemBuilder
     /// <param name="iconPath">The path of the icon of the HelpSystemMenu-Entry.</param>
     /// <param name="titleh">The title of the HelpSystemEntry which will be opened onclick.</param>
     /// <param name="desh">The description of the HelpSystemEntry which will be openend onclick.</param>
+    /// <param name="keywords">The keywords which will be displayed at the bottom of the HelpSystemEntry.</param>
     /// <param name="entry">The HelpSystemEntry where these values should be inserted.</param>
     /// <returns>A new HelpSystemMenu-Entry.</returns>
-    public static MenuEntry CreateNewHelpSystemEntry(string title, string description, Color entryColor, string iconPath, string titleh, string desh, HelpSystemEntry entry = null)
+    public static MenuEntry CreateNewHelpSystemEntry(string title, string description, Color entryColor, string iconPath, string titleh, string desh, List<string> keywords, HelpSystemEntry entry = null)
     {
         MenuEntry helpSystemEntry = new MenuEntry(
-            action: new UnityAction(() => { Execute(entry,titleh,desh); }),
+            action: new UnityAction(() => { Execute(entry,titleh,desh, keywords); }),
             title: title,
             description: description,
             entryColor: entryColor,
@@ -91,7 +93,7 @@ public static class HelpSystemBuilder
     /// <param name="helpSystem">The HelpSystemEntry which will display the given params.</param>
     /// <param name="titleh">The title of the HelpSystemEntry.</param>
     /// <param name="desh">The description of the HelpSystemEntry.</param>
-    public static void Execute(HelpSystemEntry helpSystem, string titleh, string desh)
+    public static void Execute(HelpSystemEntry helpSystem, string titleh, string desh, List<string> keywords)
     {
         GameObject go = GameObject.Find(HelpSystemGO);
         go.TryGetComponentOrLog(out NestedMenu menu);
@@ -111,6 +113,14 @@ public static class HelpSystemBuilder
             entry.Manager.descriptionText = "placeholder";
             entry.Manager.titleText = "placeholder";
         }
+        GameObject keywordDisplay = GameObject.Find("Code");
+        TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
+        string keywordsAsString = "";
+        foreach(string keyword in keywords)
+        {
+            keywordsAsString += "- " + keyword + "\n";
+        }
+        tmp.text = keywordsAsString;
         entry.Manager.UpdateUI();
         videoPlayer.Play();
         entry.IsPlaying = true;
