@@ -4,6 +4,7 @@ using SEE.Game.UI.Menu;
 using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Video;
 
@@ -37,9 +38,7 @@ public partial class HelpSystemEntry : PlatformDependentComponent
     /// <summary>
     /// True if the entry is running, else false.
     /// </summary>
-    public bool IsPlaying { get; set; }
-    public string TitleManager { get => titleManager; set => titleManager = value; }
-    public string Description { get => description; set => description = value; }
+    public bool IsPlaying { get; set; } = false;
 
     /// <summary>
     /// Path to the HelpSystemEntry prefab.
@@ -70,15 +69,15 @@ public partial class HelpSystemEntry : PlatformDependentComponent
     /// </summary>
     private string icon = "Materials/Notification/info";
 
+    private VideoPlayer videoPlayer;
+
     protected override void StartDesktop()
     {
-        Debug.Log("HAALLLOO");
         GameObject helpSystemEntry = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_PREFAB, Canvas.transform, false);
         RectTransform rectTransform = (RectTransform)helpSystemEntry.transform;
         ModalWindowManager[] managers = Canvas.GetComponentsInChildren<ModalWindowManager>();
-        foreach(ModalWindowManager m in managers)
+        foreach (ModalWindowManager m in managers)
         {
-            Debug.Log(m);
             Manager = m;
         }
         Manager.titleText = titleManager;
@@ -86,48 +85,44 @@ public partial class HelpSystemEntry : PlatformDependentComponent
         Manager.icon = Resources.Load<Sprite>(icon);
         Manager.onConfirm.AddListener(Back);
         Manager.onCancel.AddListener(Close);
+        GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out VideoPlayer videoPlayer);
+        this.videoPlayer = videoPlayer;
+        GameObject test = GameObject.Find("Code");
+        TextMeshProUGUI tmp = test.GetComponent<TextMeshProUGUI>();
+        Debug.Log(tmp.text);
+        tmp.text = "Ein weiterer Test zum ueberschreiben von TMPUGUI";
 
     }
 
     protected override void UpdateDesktop()
     {
         base.UpdateDesktop();
-        Debug.Log("HI");
         if (Input.GetKeyDown(KeyCode.V))
         {
-            Debug.Log("HÄ?");
-            GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out VideoPlayer videoPlayer);
             videoPlayer.Pause();
         }
         if (Input.GetKeyDown(KeyCode.W))
         {
-            GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out VideoPlayer videoPlayer);
             videoPlayer.Play();
-            Debug.Log(videoPlayer.url);
         }
         if (Input.GetKeyDown(KeyCode.L))
         {
-            Debug.Log("AH");
-            GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out VideoPlayer videoPlayer);
             videoPlayer.url = "Assets/SEE/Videos/ZwischenstandAddNode.mp4";
             videoPlayer.Play();
         }
-
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            TogglePlaying();
+        }
     }
 
     /// <summary>
     /// Shows the HelpSystemEntry with the inserted values. Per default - it will be started directly by showing the entry.
     /// </summary>
     public void ShowEntry()
-    { 
+    {
 
     }
-
-    /// <summary>
-    /// Starts the HelpSystemEntry. That means, that the video will be played, the keyPoints will be displayed and the text will be read by SEE.
-    /// Precondition: The entry has to be shown. If EntrySHwon == false, it doesnt start.
-    /// </summary>
-    public void StartEntry() { }
 
     /// <summary>
     /// Stops the HelpSystemEntry. That means, that the video will be resetted and SEE´s reading will be stopped.
@@ -135,10 +130,10 @@ public partial class HelpSystemEntry : PlatformDependentComponent
     /// </summary>
     public void Stop() { }
 
-    public void Close() {
+    public void Close()
+    {
         Manager.CloseWindow();
         GameObject go = GameObject.Find(HelpSystemBuilder.HelpSystemGO);
-        GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out VideoPlayer videoPlayer);
         if (videoPlayer == null)
         {
             throw new System.Exception("No Video-Player found");
@@ -146,6 +141,7 @@ public partial class HelpSystemEntry : PlatformDependentComponent
         go.TryGetComponentOrLog(out NestedMenu menu);
         menu.ResetToBase();
         videoPlayer.Stop();
+        IsPlaying = false;
     }
 
     /// <summary>
@@ -157,13 +153,13 @@ public partial class HelpSystemEntry : PlatformDependentComponent
     /// Pauses the running HelpSystemEntry. That means after playing on the entry will be played from the same 
     /// state of progress as before pausing.
     /// </summary>
-    public void Back() {
+    public void Back()
+    {
 
         GameObject go = GameObject.Find(HelpSystemBuilder.HelpSystemGO);
         go.TryGetComponentOrLog(out NestedMenu menu);
         Manager.CloseWindow();
         menu.ToggleMenu();
-        GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out VideoPlayer videoPlayer);
         if (videoPlayer == null)
         {
             throw new System.Exception("No Video-Player found");
@@ -175,7 +171,19 @@ public partial class HelpSystemEntry : PlatformDependentComponent
     /// Toggles the "IsPlaying" - state. If the entry is running, it will be paused, if it is paused,
     /// it will be played on. 
     /// </summary>
-    public void TogglePlaying() { }
+    public void TogglePlaying()
+    {
+        if (!IsPlaying)
+        {
+            videoPlayer.Play();
+            IsPlaying = true;
+        }
+        else
+        {
+            videoPlayer.Pause();
+            IsPlaying = false;
+        }
+    }
 
 
 }

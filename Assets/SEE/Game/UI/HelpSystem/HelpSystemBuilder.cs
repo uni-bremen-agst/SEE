@@ -68,8 +68,9 @@ public static class HelpSystemBuilder
             entry.Manager.descriptionText = "placeholder";
             entry.Manager.titleText = "placeholder";
         }
+        entry.Manager.UpdateUI();
         videoPlayer.Play();
-
+        entry.IsPlaying = true;
         menu.ToggleMenu();
         helpSystem.Manager.OpenWindow();
     }
