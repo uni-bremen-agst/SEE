@@ -8,6 +8,7 @@ using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.GO;
 using SEE.Layout.NodeLayouts.Cose;
+using SEE.Tools;
 using SEE.Utils;
 using UnityEngine;
 
@@ -25,7 +26,7 @@ namespace SEE.Game
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in 
         /// <see cref="Save(ConfigWriter)"/> and 
-        /// <see cref="Restore(Dictionary{string, object})"/>, 
+        /// <see cref="Restore(Dictionary{string,object})"/>, 
         /// respectively (both declared in AbstractSEECityIO). You should also
         /// extend the test cases in TestConfigIO.
 
@@ -38,13 +39,13 @@ namespace SEE.Game
         /// The attributes of the leaf nodes per kind. They are indexed by <see cref="Node.NodeDomain"/>
         /// casted to an integer.
         /// </summary>
-        public LeafNodeAttributes[] leafNodeAttributesPerKind = ArrayUtils.New((int)Node.NodeDomain.Count, (int _) => new LeafNodeAttributes());
+        public LeafNodeAttributes[] leafNodeAttributesPerKind = ArrayUtils.New((int)Node.NodeDomain.Count, _ => new LeafNodeAttributes());
 
         /// <summary>
         /// The attributes of the inner nodes per kind. They are indexed by <see cref="Node.NodeDomain"/>
         /// casted to an integer.
         /// </summary>
-        public InnerNodeAttributes[] innerNodeAttributesPerKind = ArrayUtils.New((int)Node.NodeDomain.Count, (int _) => new InnerNodeAttributes());
+        public InnerNodeAttributes[] innerNodeAttributesPerKind = ArrayUtils.New((int)Node.NodeDomain.Count, _ => new InnerNodeAttributes());
 
         /// <summary>
         /// The node layout settings.
@@ -83,10 +84,8 @@ namespace SEE.Game
         /// <param name="filename"></param>
         public void Save(string filename)
         {
-            using (ConfigWriter writer = new ConfigWriter(filename))
-            {
-                Save(writer);
-            }
+            using ConfigWriter writer = new ConfigWriter(filename);
+            Save(writer);
         }
 
         /// <summary>
@@ -95,10 +94,8 @@ namespace SEE.Game
         /// <param name="filename"></param>
         public void Load(string filename)
         {
-            using (ConfigReader stream = new ConfigReader(filename))
-            {
-                Restore(stream.Read());
-            }
+            using ConfigReader stream = new ConfigReader(filename);
+            Restore(stream.Read());
         }
 
         /// <summary>
@@ -215,20 +212,7 @@ namespace SEE.Game
         /// <summary>
         /// True if all node types in nodeTypes are relevant.
         /// </summary>
-        private bool AllNodeTypesAreRelevant
-        {
-            get
-            {
-                foreach (bool relevant in SelectedNodeTypes.Values)
-                {
-                    if (!relevant)
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
+        private bool AllNodeTypesAreRelevant => SelectedNodeTypes.Values.All(relevant => relevant);
 
         /// <summary>
         /// If <paramref name="graph"/> is null, nothing happens. Otherwise:
@@ -413,8 +397,8 @@ namespace SEE.Game
         /// <returns>all attribute names of the different kinds of software erosions for inner nodes</returns>
         public IList<string> AllInnerNodeIssues()
         {
-            List<string> result = new List<string>()
-               {
+            List<string> result = new List<string>
+            {
                   ArchitectureIssue_SUM,
                   CloneIssue_SUM,
                   CycleIssue_SUM,
@@ -453,9 +437,8 @@ namespace SEE.Game
         /// for leaf nodes in the GXL file onto the icons to be used for visualizing them.
         /// </summary>
         /// <returns>mapping of all node attribute names for leaves onto icon ids</returns>
-        public Dictionary<string, IconFactory.Erosion> LeafIssueMap()
-        {
-            Dictionary<string, IconFactory.Erosion> result = new Dictionary<string, IconFactory.Erosion>
+        public Dictionary<string, IconFactory.Erosion> LeafIssueMap() =>
+            new Dictionary<string, IconFactory.Erosion>
             {
                 { ArchitectureIssue, IconFactory.Erosion.Architecture_Violation },
                 { CloneIssue, IconFactory.Erosion.Clone },
@@ -465,8 +448,17 @@ namespace SEE.Game
                 { StyleIssue, IconFactory.Erosion.Style },
                 { UniversalIssue, IconFactory.Erosion.Universal }
             };
-            return result;
-        }
+
+        /// <summary>
+        /// Yields a mapping of all node attribute names that define erosion issues 
+        /// for inner nodes onto the icons to be used for visualizing them.
+        /// These are usually the same attributes from <see cref="LeafIssueMap"/>, appended with
+        /// <see cref="MetricAggregator.SUM_EXTENSION"/>, i.e., they represent the aggregated issue metrics.
+        /// </summary>
+        /// <returns>mapping of all node attribute names for inner nodes onto icon ids</returns>
+        public Dictionary<string, IconFactory.Erosion> InnerIssueMap() =>
+            LeafIssueMap().Select(x => (Key: x.Key + MetricAggregator.SUM_EXTENSION, x.Value))
+                          .ToDictionary(x => x.Key, x => x.Value);
 
         /// <summary>
         /// All metrics used for visual attributes of inner nodes (InnerNodeStyleMetric
@@ -536,7 +528,7 @@ namespace SEE.Game
             if (nodeLayoutSettings.kind == NodeLayoutKind.CompoundSpringEmbedder)
             {
                 Dictionary<string, bool> dirs = coseGraphSettings.ListInnerNodeToggle;
-                // die neuen dirs 
+                // the new directories
                 Dictionary<string, bool> dirsLocal = new Dictionary<string, bool>();
 
                 Dictionary<string, NodeLayoutKind> dirsLayout = new Dictionary<string, NodeLayoutKind>();
@@ -552,17 +544,13 @@ namespace SEE.Game
                     }
                 }
 
-                // falls der key nicht in den alten dictonary ist
+                // if the key isn't in the old dictionaries
                 //dirsLocal = dirsLocal.Where(i => !dirs.ContainsKey(i.Key)).ToDictionary(i => i.Key, i => i.Value);
 
                 bool diff1 = dirs.Keys.Except(dirsLocal.Keys).Any();
                 bool diff2 = dirsLocal.Keys.Except(dirs.Keys).Any();
 
-                if (dirs.Count == dirsLocal.Count && !diff1 && !diff2)
-                {
-
-                }
-                else
+                if (dirs.Count != dirsLocal.Count || diff1 || diff2)
                 {
                     coseGraphSettings.InnerNodeShape = dirsShape;
                     coseGraphSettings.InnerNodeLayout = dirsLayout;

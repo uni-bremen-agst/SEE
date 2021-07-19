@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
+using SEE.DataModel.DG;
 using SEE.Utils;
 using Valve.Newtonsoft.Json;
 
@@ -174,10 +176,15 @@ namespace SEE.Net.Dashboard.Model.Issues
 
         public override string IssueKind => "AV";
 
-        public override IEnumerable<SourceCodeEntity> Entities => new[]
-        {
-            new SourceCodeEntity(sourcePath, sourceLine, null, sourceEntity),
-            new SourceCodeEntity(targetPath, targetLine, null, targetEntity)
-        };
+        public override NumericAttributeNames AttributeName => NumericAttributeNames.Architecture_Violations;
+
+        public override IEnumerable<SourceCodeEntity> Entities =>
+            // Return source or target only if their path is not null
+            new (string path, int line, string entity)[]
+                {
+                    (sourcePath, sourceLine, sourceEntity),
+                    (targetPath, targetLine, targetEntity)
+                }.Where(x => x.path != null)
+                 .Select(x => new SourceCodeEntity(x.path, x.line, null, x.entity));
     }
 }
