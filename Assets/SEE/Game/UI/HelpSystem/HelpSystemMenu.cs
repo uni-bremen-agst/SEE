@@ -58,8 +58,6 @@ public class HelpSystemMenu : MonoBehaviour
         List<MenuEntry> debuggingEntries = new List<MenuEntry>();
         List<MenuEntry> qualityEntries = new List<MenuEntry>();
 
-        Debug.Log(entry.Description);
-
         playerMenuEntries = new List<MenuEntry>
         {
             HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "Add Edge Description", Color.green, EntryIcon, "TEST1", "TEST1", entry),

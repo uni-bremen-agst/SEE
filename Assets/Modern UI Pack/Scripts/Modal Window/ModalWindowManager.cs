@@ -64,7 +64,6 @@ namespace Michsky.UI.ModernUIPack
         {
             if (isOn == false)
             {
-                Debug.Log(sharpAnimations);
                 if (sharpAnimations == false)
                     mwAnimator.CrossFade("Fade-in", 0.1f);
                 else
