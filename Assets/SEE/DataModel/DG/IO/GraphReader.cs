@@ -1,6 +1,6 @@
-﻿using SEE.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.DataModel.DG.IO
@@ -11,15 +11,15 @@ namespace SEE.DataModel.DG.IO
     public class GraphReader : GXLParser
     {
         /// <summary>
-        /// Constructor. If <paramref name="rootName"/> is neither null nor the empty string and if 
+        /// Constructor. If <paramref name="rootName"/> is neither null nor the empty string and if
         /// the loaded graph has multiple roots, a single artificial root with that name will be added
-        /// that becomes the parent of all other original roots. The <paramref name="rootName"/> 
-        /// determines both Source.Name, Linkage.Name, and Type of that artificial root. If 
+        /// that becomes the parent of all other original roots. The <paramref name="rootName"/>
+        /// determines both Source.Name, Linkage.Name, and Type of that artificial root. If
         /// <paramref name="rootName"/> is null or the empty string or has a single root, the graph
-        /// will be loaded as stored in the GXL file. 
-        /// 
+        /// will be loaded as stored in the GXL file.
+        ///
         /// When the graph is loaded, the node levels are calculated.
-        /// 
+        ///
         /// Precondition: <paramref name="rootName"/> must be unique.
         /// </summary>
         /// <param name="filename">the name of the GXL file</param>
@@ -70,6 +70,12 @@ namespace SEE.DataModel.DG.IO
                     }
                 }
             }
+            /// The graph is loaded and its node hierarchy established. We can finalize
+            /// the node hierarchy. This finalization is necessary to calculate the
+            /// node levels. These in turn will be need to be available for setting the
+            /// metric <see cref="Graph.MetricLevel"/>, which must be available when the
+            /// metric scaler is asked to analyze the node metric values.
+            graph.FinalizeNodeHierarchy();
         }
 
         /// <summary>
@@ -211,11 +217,11 @@ namespace SEE.DataModel.DG.IO
                     }
                     else
                     {
-                        LogError("Node has no attribute " + Node.LinknameAttribute);
+                        LogError($"Node has no attribute {Node.LinknameAttribute}");
                         // let's try to use the Source.Name for the linkname instead, hoping it is unique
-                        if (String.IsNullOrEmpty(node.SourceName))
+                        if (string.IsNullOrEmpty(node.SourceName))
                         {
-                            LogError("Node has not even an attribute " + Node.SourceNameAttribute);
+                            LogError($"Node doesn't even have an attribute {Node.SourceNameAttribute}");
                         }
                         else
                         {
@@ -248,9 +254,9 @@ namespace SEE.DataModel.DG.IO
             {
                 LogError("There is still a pending graph element when new edge declaration has begun.");
             }
-            
+
             if (reader.HasAttributes)
-            {                
+            {
                 // We will first collect those attributes and then create the edge
                 // because the constructor of Edge requires an ID.
                 string fromNode = "";
@@ -303,7 +309,7 @@ namespace SEE.DataModel.DG.IO
                     throw new SyntaxError("Edge has no id.");
                 }
 
-                // Note that we do not know yet whether this edge is a hierarchical 
+                // Note that we do not know yet whether this edge is a hierarchical
                 // or non-hierarchical edge until we see the edge type.
                 Edge thisEdge = new Edge(id);
                 // set source of the edge
@@ -353,7 +359,7 @@ namespace SEE.DataModel.DG.IO
                         edge.Target.AddChild(edge.Source);
                     }
                     else
-                    {  // non-hierarchical edges are added to the graph                        
+                    {  // non-hierarchical edges are added to the graph
                         try
                         {
                             graph.AddEdge(edge);

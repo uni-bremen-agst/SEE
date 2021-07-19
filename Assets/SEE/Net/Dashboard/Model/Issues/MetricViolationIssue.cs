@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using SEE.DataModel.DG;
 using SEE.Utils;
 using Valve.Newtonsoft.Json;
 
@@ -126,9 +127,14 @@ namespace SEE.Net.Dashboard.Model.Issues
 
         public override string IssueKind => "MV";
 
-        public override IEnumerable<SourceCodeEntity> Entities => new[]
-        {
-            new SourceCodeEntity(path, line, null, entity)
-        };
+        public override NumericAttributeNames AttributeName => NumericAttributeNames.Metric;
+
+        public override IEnumerable<SourceCodeEntity> Entities =>
+            path == null
+                ? new SourceCodeEntity[] { }
+                : new[]
+                {
+                    new SourceCodeEntity(path, line, null, entity)
+                };
     }
 }
