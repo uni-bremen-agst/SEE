@@ -90,7 +90,7 @@ public partial class HelpSystemEntry : PlatformDependentComponent
         GameObject test = GameObject.Find("Code");
         TextMeshProUGUI tmp = test.GetComponent<TextMeshProUGUI>();
         Debug.Log(tmp.text);
-        tmp.text = "Ein weiterer Test zum ueberschreiben von TMPUGUI";
+        //tmp.text = "Ein weiterer Test zum ueberschreiben von TMPUGUI";
 
     }
 
@@ -130,6 +130,9 @@ public partial class HelpSystemEntry : PlatformDependentComponent
     /// </summary>
     public void Stop() { }
 
+    /// <summary>
+    /// Closes the HelpSystemEntry, stops the displayed video and resets the HelpSystemMenu too to the start.
+    /// </summary>
     public void Close()
     {
         Manager.CloseWindow();
@@ -142,6 +145,7 @@ public partial class HelpSystemEntry : PlatformDependentComponent
         menu.ResetToBase();
         videoPlayer.Stop();
         IsPlaying = false;
+        HelpSystemMenu.IsEntryOpened = false;
     }
 
     /// <summary>
@@ -155,7 +159,6 @@ public partial class HelpSystemEntry : PlatformDependentComponent
     /// </summary>
     public void Back()
     {
-
         GameObject go = GameObject.Find(HelpSystemBuilder.HelpSystemGO);
         go.TryGetComponentOrLog(out NestedMenu menu);
         Manager.CloseWindow();

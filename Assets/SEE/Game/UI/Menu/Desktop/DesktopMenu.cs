@@ -56,7 +56,7 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// The tooltip in which the description is displayed.
         /// </summary>
-        private Tooltip.Tooltip Tooltip;
+        protected Tooltip.Tooltip Tooltip;
 
         /// <summary>
         /// List of all button managers for the buttons used in this menu.

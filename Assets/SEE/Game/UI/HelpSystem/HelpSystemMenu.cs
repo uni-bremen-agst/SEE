@@ -16,9 +16,28 @@ public class HelpSystemMenu : MonoBehaviour
     /// </summary>
     public const string HelpSystem = "HelpSystem";
 
+    /// <summary>
+    /// The NestedMenu of the HelpSystem - responsible for the navigation
+    /// inside of the use-cases.
+    /// </summary>
     public NestedMenu mainMenu;
 
-    public static bool newRendering = false;
+    /// <summary>
+    /// True, if an entry is currently displayed. That means, 
+    /// that there should be no interaction possible with the collider of see 
+    /// for opening the nestedMenu while Entry is opened.
+    /// </summary>
+    public static bool IsEntryOpened { get; set; } = false;
+
+    /// <summary>
+    /// The path to the default-icon for an RefEntry in the nested menu.
+    /// </summary>
+    private const string RefIcon = "Materials/ModernUIPack/Plus";
+
+    /// <summary>
+    /// The path to the default-icon for an HelpSystemEntry in the nested menu.
+    /// </summary>
+    private const string EntryIcon = "Materials/ModernUIPack/Eye";
 
     // Start is called before the first frame update
     void Start()
@@ -33,17 +52,17 @@ public class HelpSystemMenu : MonoBehaviour
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out hit))
-                if (hit.transform == GameObject.Find(PersonalAssistant).transform && mainMenu.MenuShown == false)
+                if (hit.transform == GameObject.Find(PersonalAssistant).transform && mainMenu.MenuShown == false && !IsEntryOpened)
                 {
                     mainMenu.ShowMenu(true);
                 }
         }
     }
 
-    private const string RefIcon = "Materials/ModernUIPack/Plus";
-
-    private const string EntryIcon = "Materials/ModernUIPack/Eye";
-
+    /// <summary>
+    /// Contains all Hierachy-Layers of the Help-System-Menu from the lowest to the highest layer.
+    /// It creates all Sub-Menu's, RefEntries and HelpSystemEntrys and should be expanded by the developers.
+    /// </summary>
     private void CreateStartMenu()
     {
         // Important note: You have to define the lowest hierachy-level first. 
@@ -63,7 +82,6 @@ public class HelpSystemMenu : MonoBehaviour
             HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "Add Edge Description", Color.green, EntryIcon, "TEST1", "TEST1", entry),
             HelpSystemBuilder.CreateNewHelpSystemEntry("Add Node", "Add Node Description", Color.green, EntryIcon, "TEST2", "TEST2", entry),
             HelpSystemBuilder.CreateNewHelpSystemEntry("Add Line", "Add Line Description", Color.green, EntryIcon, null, null, entry)
-
         };
 
         architectureEntries = new List<MenuEntry>

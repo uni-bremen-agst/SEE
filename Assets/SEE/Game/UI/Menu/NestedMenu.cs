@@ -114,6 +114,7 @@ namespace SEE.Game.UI.Menu
             nestedEntry.InnerEntries.ForEach(AddEntry);
             keywordInput.Unregister(OnMenuEntryTitleRecognized);
             keywordInput.Register(OnMenuEntryTitleRecognized);
+            Tooltip.Hide();
         }
 
         /// <summary>
@@ -143,6 +144,7 @@ namespace SEE.Game.UI.Menu
             {
                 ShowMenu(false);
             }
+            Tooltip.Hide();
         }
 
         /// <summary>

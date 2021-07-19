@@ -8,8 +8,23 @@ using UnityEngine.Video;
 
 public static class HelpSystemBuilder
 {
-    public static string HelpSystemGO = "HelpSystem";
+    /// <summary>
+    /// The name of the HelpSystem GameObject.
+    /// </summary>
+    public const string HelpSystemGO = "HelpSystem";
 
+    /// <summary>
+    /// Creates a new HelpSystemEntry. That means, it should be inserted as the last element of a branch inside of the help-system-menu. 
+    /// As a difference to a normal HelpSystemMenu-Entry, onclick, there will be started an HelpSystemEntry which explains the specific use-Case.
+    /// </summary>
+    /// <param name="title">The title of the HelpSystemMenu-Entry.</param>
+    /// <param name="description">The description of the HelpSystemMenu-Entry, displayed as a tooltip.</param>
+    /// <param name="entryColor">The color of the HelpSystemMenu-Entry.</param>
+    /// <param name="iconPath">The path of the icon of the HelpSystemMenu-Entry.</param>
+    /// <param name="titleh">The title of the HelpSystemEntry which will be opened onclick.</param>
+    /// <param name="desh">The description of the HelpSystemEntry which will be openend onclick.</param>
+    /// <param name="entry">The HelpSystemEntry where these values should be inserted.</param>
+    /// <returns>A new HelpSystemMenu-Entry.</returns>
     public static MenuEntry CreateNewHelpSystemEntry(string title, string description, Color entryColor, string iconPath, string titleh, string desh, HelpSystemEntry entry = null)
     {
         MenuEntry helpSystemEntry = new MenuEntry(
@@ -22,6 +37,17 @@ public static class HelpSystemBuilder
         return helpSystemEntry;
     }
 
+    /// <summary>
+    /// Creates a new Ref-Entry for the HelpSystemMenu. That means, this entry contains a list of further entries,
+    /// which are opened as the lower hierachy-layer onclick. These entries are only responsible for the structure of the HelpSystemMenu,
+    /// they are not executing an HelpSystemEntry.
+    /// </summary>
+    /// <param name="innerEntries">The inner Entries, which are displayed onclick as the lower hierachy-layer.</param>
+    /// <param name="title">The title of the RefEntry.</param>
+    /// <param name="description">The description of the RefEntry, displayed as a tooltip.</param>
+    /// <param name="entryColor">The color of the Ref-Entry.</param>
+    /// <param name="iconPath">The path of the icon of the RefEntry.</param>
+    /// <returns>A new NestedMenuEntry.</returns>
     public static NestedMenuEntry CreateNewRefEntry(List<MenuEntry> innerEntries, string title, string description, Color entryColor, string iconPath)
     {
         NestedMenuEntry refEntry = new NestedMenuEntry(
@@ -34,9 +60,19 @@ public static class HelpSystemBuilder
         return refEntry;
     }
 
-    public static NestedMenu CreateMainMenu(string helpSystemGO, string title, string description, string icon, List<MenuEntry> mainMenuEntries)
+    /// <summary>
+    /// Creates the Main-Menu of the HelpSystemMenu. 
+    /// More specific, it creates the highest Hierachy-Layer, 
+    /// where new Layers can be attached to with the functions above.
+    /// </summary>
+    /// <param name="title">The title of the HelpSystem-MainMenu.</param>
+    /// <param name="description">The description of the HelpSystem-MainMenu.</param>
+    /// <param name="icon">The icon of the HelpSystem-MainMenu.</param>
+    /// <param name="mainMenuEntries">The MenuEntries which are displayed inside of the MainMenu for more hierachy-layers.</param>
+    /// <returns>The Main-Menu as a NestedMenu.</returns>
+    public static NestedMenu CreateMainMenu(string title, string description, string icon, List<MenuEntry> mainMenuEntries)
     {
-        NestedMenu mainMenu = GameObject.Find(helpSystemGO).AddComponent<NestedMenu>();
+        NestedMenu mainMenu = GameObject.Find(HelpSystemGO).AddComponent<NestedMenu>();
         mainMenu.Title = title;
         mainMenu.Description = description;
         mainMenu.Icon = Resources.Load<Sprite>(icon);
@@ -48,6 +84,13 @@ public static class HelpSystemBuilder
         return mainMenu;
     }
 
+    /// <summary>
+    /// Starts the execution of the HelpSystemEntry. That means, it starts the video, displays a list of keywords and sets
+    /// the title and description of the HelpSystemEntry as selected.
+    /// </summary>
+    /// <param name="helpSystem">The HelpSystemEntry which will display the given params.</param>
+    /// <param name="titleh">The title of the HelpSystemEntry.</param>
+    /// <param name="desh">The description of the HelpSystemEntry.</param>
     public static void Execute(HelpSystemEntry helpSystem, string titleh, string desh)
     {
         GameObject go = GameObject.Find(HelpSystemGO);
@@ -73,5 +116,6 @@ public static class HelpSystemBuilder
         entry.IsPlaying = true;
         menu.ToggleMenu();
         helpSystem.Manager.OpenWindow();
+        HelpSystemMenu.IsEntryOpened = true;
     }
 }
